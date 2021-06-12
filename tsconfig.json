@@ -20,7 +20,9 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "allowJs": true
+    "allowJs": true,
+    "noImplicitAny": false,
+
   },
   "exclude": [
     "test",

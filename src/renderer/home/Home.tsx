@@ -1,15 +1,14 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import logo from '../../../assets/logos/scanoss_white.png';
-import * as controller from './HomeController';
+import { dialogController } from '../dialog-controller';
 
 const Home = () => {
   const history = useHistory();
 
   const onOpenFolderPressed = () => {
-    const dir = controller.openDialog();
+    const dir = dialogController.showOpenDialog({ properties: ['openDirectory'] });
     if (dir) {
-      controller.scanDir(dir);
       history.push('/workbench');
     }
   };
