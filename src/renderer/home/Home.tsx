@@ -7,7 +7,9 @@ const Home = () => {
   const history = useHistory();
 
   const onOpenFolderPressed = () => {
-    const dir = dialogController.showOpenDialog({ properties: ['openDirectory'] });
+    const dir = dialogController.showOpenDialog({
+      properties: ['openDirectory'],
+    });
     if (dir) {
       history.push('/workbench');
     }
