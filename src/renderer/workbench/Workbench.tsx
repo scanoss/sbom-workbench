@@ -9,14 +9,13 @@ import { dialogController } from '../dialog-controller';
 import { WorkbenchContext, IWorkbenchContext } from './WorkbenchProvider';
 
 const Workbench = () => {
-  const { file, setFile, loadScan } = useContext(
-    WorkbenchContext
-  ) as IWorkbenchContext;
+  const { loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const init = async () => {
-    const result = await loadScan('/home/franco/Desktop/scanoss/datasets/scanner1.json');
+    const path = '/home/franco/Desktop/scanoss/datasets/scanner1.json'; // TODO: useContext App
+    const result = await loadScan(path);
     if (!result) {
-      dialogController.showError('Error', 'Can not read scan.')
+      dialogController.showError('Error', 'Cannot read scan.');
     }
   };
 

@@ -3,11 +3,10 @@ const { remote } = electron;
 const { dialog } = remote;
 
 class DialogController {
-
-  public showOpenDialog(options) {
+  public showOpenDialog(options): string {
     const result = dialog.showOpenDialogSync(options);
     return result ? result[0] : null;
-  };
+  }
 
   public showError(title: string, content: string) {
     dialog.showErrorBox(title, content);

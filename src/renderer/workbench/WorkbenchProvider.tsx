@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import * as controller from './WorkbenchController';
+import { workbenchController } from '../workbench-controller';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
@@ -32,7 +32,7 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
 
   const loadScan = async (path: string) => {
     try {
-      const scanResult = await controller.loadScan(path);
+      const scanResult = await workbenchController.loadScan(path);
       setScan(scanResult.scan);
       setTree(scanResult.fileTree);
       return true;

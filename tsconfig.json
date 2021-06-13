@@ -22,7 +22,6 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "noImplicitAny": false,
-
   },
   "exclude": [
     "test",
