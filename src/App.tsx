@@ -1,7 +1,7 @@
 import React from 'react';
 import { HashRouter, Route } from 'react-router-dom';
 import About from './renderer/about/About';
-import './App.global.css';
+import './App.global.scss';
 import { WorkbenchProvider } from './renderer/workbench/WorkbenchProvider';
 
 import Home from './renderer/home/Home';
