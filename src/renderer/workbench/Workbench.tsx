@@ -12,7 +12,7 @@ const Workbench = () => {
   const { loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const init = async () => {
-    const path = '/home/franco/Desktop/scanoss/datasets/scanner1.json'; // TODO: useContext App
+    const path = '/Users/Usuario/Documents/scanner1.json'; // TODO: useContext App
     const result = await loadScan(path);
     if (!result) {
       dialogController.showError('Error', 'Cannot read scan.');
