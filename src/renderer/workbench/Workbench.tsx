@@ -25,7 +25,7 @@ const Workbench = () => {
 
   return (
     <div>
-      <SplitPane split="vertical" minSize={200} defaultSize={250}>
+      <SplitPane split="vertical" minSize={200} defaultSize={350}>
         <aside className="panel explorer">
           <header>
             <span className="title">Explorer</span>
