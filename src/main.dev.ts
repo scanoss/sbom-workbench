@@ -11,10 +11,12 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './main/menu';
+
+const scanner = require('./main/scanner/scanner.js');
 
 export default class AppUpdater {
   constructor() {
@@ -130,4 +132,9 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createWindow();
+});
+
+ipcMain.on('commands', (event, arg) => {
+  console.log('Start scanning...');
+  scanner.scan('/home/ubuntu/Projects/SCANOSS/scanoss-cli-jslib');
 });
