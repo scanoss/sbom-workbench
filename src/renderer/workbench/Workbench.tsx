@@ -12,7 +12,7 @@ const Workbench = () => {
   const { loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const init = async () => {
-    const path = '/Users/Usuario/Documents/scanner1.json'; // TODO: useContext App
+    const path = '/Users/Usuario/Documents/190.json'; // TODO: useContext App
     const result = await loadScan(path);
     if (!result) {
       dialogController.showError('Error', 'Cannot read scan.');
@@ -25,7 +25,7 @@ const Workbench = () => {
 
   return (
     <div>
-      <SplitPane split="vertical" minSize={200} defaultSize={350}>
+      <SplitPane split="vertical" minSize={300} defaultSize={450}>
         <aside className="panel explorer">
           <header>
             <span className="title">Explorer</span>
@@ -33,7 +33,9 @@ const Workbench = () => {
               <Button size="small">BACK</Button>
             </Link>
           </header>
-          <FileTree />
+          <div className="file-tree-container">
+            <FileTree />
+          </div>
         </aside>
         <main className="">
           <Editor />

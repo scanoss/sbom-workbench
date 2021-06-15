@@ -1,11 +1,20 @@
 :root {
-    /* TODO: armar theme cuando llegue UI */
-    --background-color-primary: #f5f7fa;
-    --text-color-primary: #505050;
+  /* TODO: armar theme cuando llegue UI */
+  --background-color-primary: #f5f7fa;
+  --text-color-primary: #505050;
 }
 
 .explorer {
-    color: var(--text-color-primary);
-    background-color: var(--background-color-primary);
-    height: 100%;
+  color: var(--text-color-primary);
+  background-color: var(--background-color-primary);
+  height: 100%;
+  width: 100%;
+}
+
+.file-tree-container {
+  display: flex;
+  overflow: scroll;
+  overflow-x: auto;
+  width: 100%;
+  max-height: 95%;
 }
