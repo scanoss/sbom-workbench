@@ -55,6 +55,7 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
 
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
+      setLocalFileContent({ content: null, error: false });
       const content = await workbenchController.fetchLocalFile(path);
       setLocalFileContent({ content, error: false });
     } catch (error) {
@@ -64,6 +65,7 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
 
   const loadRemoteFile = async (path: string): Promise<void> => {
     try {
+      setRemoteFileContent({ content: null, error: false });
       const content = await workbenchController.fetchRemoteFile(path);
       setRemoteFileContent({ content, error: false });
     } catch (error) {

@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@material-ui/core';
+import { Card, CardContent, Chip } from '@material-ui/core';
 import React, { useContext, useState } from 'react';
 import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
 
@@ -9,11 +9,15 @@ export const Editor = () => {
 
   return (
     <>
-
-      <header>
+      <header className="match-info-header">
         <Card>
-          <CardContent>
-            Test
+          <CardContent className="content">
+            <div>
+              Match <Chip label="Pending" variant="outlined" />
+              {matchInfo?.component} - {matchInfo?.vendor}
+            </div>
+            <div>B</div>
+            <div>C</div>
           </CardContent>
         </Card>
       </header>
@@ -24,16 +28,25 @@ export const Editor = () => {
 
       <section className="editors">
         <div className="editor">
-          <pre>{remoteFileContent?.content}</pre>
+          <pre>
+            {remoteFileContent?.error ? (
+              <p>File not found</p>
+            ) : (
+              remoteFileContent?.content
+            )}
+          </pre>
         </div>
 
         <div className="editor">
-          <pre>{remoteFileContent?.content}</pre>
+          <pre>
+            {remoteFileContent?.error ? (
+              <p>File not found</p>
+            ) : (
+              remoteFileContent?.content
+            )}
+          </pre>
         </div>
       </section>
-
-
-
     </>
   );
 };

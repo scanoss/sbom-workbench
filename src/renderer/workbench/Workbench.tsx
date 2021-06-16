@@ -9,7 +9,7 @@ import { dialogController } from '../dialog-controller';
 import { WorkbenchContext, IWorkbenchContext } from './WorkbenchProvider';
 
 const Workbench = () => {
-  const { loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { loadScan, file } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const init = async () => {
     const path = '/home/franco/Desktop/scanoss/datasets/scanner1.json'; // TODO: useContext App
@@ -25,7 +25,7 @@ const Workbench = () => {
 
   return (
     <div>
-      <SplitPane split="vertical" minSize={300} defaultSize={450}>
+      <SplitPane split="vertical" minSize={300} defaultSize={300}>
         <aside className="panel explorer">
           <header>
             <span className="title">Explorer</span>
@@ -37,8 +37,8 @@ const Workbench = () => {
             <FileTree />
           </div>
         </aside>
-        <main className="">
-          <Editor />
+        <main className="match-info">
+          {file ? <Editor /> : null}
         </main>
       </SplitPane>
     </div>

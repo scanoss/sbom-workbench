@@ -40,7 +40,10 @@ class WorkbenchController {
    * @memberof WorkbenchController
    */
   public async fetchRemoteFile(hash: string): Promise<string> {
+    // TODO: move api url to API Config
     const response = await fetch(`https://osskb.org/api/file_contents/${hash}`);
+    if (!response.ok) throw new Error('File not found');
+
     return response.text();
   }
 
