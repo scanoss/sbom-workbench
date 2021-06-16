@@ -1,13 +1,15 @@
 const cliProgress = require('cli-progress');
 const scanner = require('./lib/scanner');
+const ipcMain = require('electron');
+const fs = require('fs');
 
-const results = [];
+let resultPath;
 
-// scan("./scanFolder");
-
-async function scan(scanPath) {
+async function scan(scanPath, resultsPath) {
   let results;
   let files;
+
+  resultPath = resultsPath;
 
   files = await scanner.countFiles(scanPath);
 
@@ -22,7 +24,6 @@ async function scan(scanPath) {
     );
 
   if (!files.wfpsFound.length) {
-    console.log('pass');
     results = await scanner.scanFolder(scanPath);
   }
 }
@@ -35,14 +36,19 @@ scanner.addEventListener('onServerResponse', (data) => {
   fetchingProgressBar.increment(data.counter);
 });
 
-scanner.addEventListener('onDataAvailable', () => {
-  results.push(...scanner.extractData());
+scanner.addEventListener('onScanDone', (result) => {
+  console.log("scanDone");
+
+  fs.writeFileSync(resultPath,JSON.stringify(result, null, 4), 'utf8');
+
+  //Emit an event to DB module and frontEnd
 });
 
-// Not implementde yet
+// Not implemented yet
 scanner.addEventListener('onError', (error) => {
   console.log(error);
 });
+
 
 let multiProgressBar;
 let fingerprintProgressBar;

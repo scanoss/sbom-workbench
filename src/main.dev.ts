@@ -134,7 +134,10 @@ app.on('activate', () => {
   if (mainWindow === null) createWindow();
 });
 
+
+
 ipcMain.on('commands', (event, arg) => {
   console.log('Start scanning...');
-  scanner.scan('/home/ubuntu/Projects/SCANOSS/scanoss-cli-jslib');
+  scanner.scan('/home/ubuntu/Projects/SCANOSS/Set of Files/1-ansible-2.10.9rc1 (set of files)',
+          '/home/ubuntu/Projects/SCANOSS/Set of Files/1-ansible-2.10.9rc1 (set of files)/result.json');
 });
