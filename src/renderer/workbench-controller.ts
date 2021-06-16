@@ -27,7 +27,6 @@ class WorkbenchController {
    * @memberof WorkbenchController
    */
   public async fetchLocalFile(path: string): Promise<string> {
-    path = '/home/franco/Desktop/scanoss/datasets/190.json';
     const data = await fs.readFile(path, 'utf-8');
     return data;
   }
@@ -47,17 +46,71 @@ class WorkbenchController {
     return response.text();
   }
 
-  private resultFromScan(data: string): ScanResult {
+  private async resultFromScan(data: string): Promise<ScanResult> {
     const scan = JSON.parse(data);
 
     return {
       id: '0',
-      fileTree: this.generateFileTree2(scan),
+      fileTree: await this.generateFileTree(scan),
       scan,
     };
   }
 
-  private generateFileTree(scan: Record<string, unknown>) {
+  private generateFileTree(scan: Record<string, unknown>): Promise<any> {
+    return new Promise((resolve) => {
+      const obj = {};
+      Object.keys(scan).forEach((p) =>
+        p.split('/').reduce((o, name) => (o[name] = o[name] || {}), obj)
+      );
+
+      if ('' in obj) {
+        delete Object.assign(obj, { '/': obj[''] })[''];
+      }
+
+      const convert = (o, parent) =>
+        Object.keys(o).map((key) => {
+          const p = parent
+            ? parent === '/'
+              ? `${parent}${key}`
+              : `${parent}/${key}`
+            : key;
+
+          return Object.keys(o[key]).length
+            ? {
+                label: this.getLabelMatchesCount(key, parent, 'folder'),
+                children: convert(o[key], p),
+                type: 'folder',
+                value: p,
+                showCheckbox: false,
+              }
+            : {
+                label: key,
+                type: 'file',
+                value: p,
+                showCheckbox: false,
+              };
+        });
+
+      const result = convert(obj, null);
+      // return !result[0].value && result[0].children;
+      resolve(result);
+    });
+  }
+
+  private getLabelMatchesCount(label, value, type) {
+    // TODO: ver matches
+
+    /* const matches = codetree.filter(
+      (f) => f.path.includes(value) && f.results > 0
+    );
+    if (matches.length > 0) {
+      return `${label}(${matches.length})`;
+    } */
+
+    return label;
+  }
+
+  private generateFileTree2(scan: Record<string, unknown>) {
     const result: any[] = [];
     const level = { result };
 
@@ -83,57 +136,6 @@ class WorkbenchController {
     return !result[0].value && result[0].children;
   }
 
-  private generateFileTree2(scan: Record<string, unknown>) {
-    const obj = {};
-    Object.keys(scan).forEach((p) =>
-      p.split('/').reduce((o, name) => (o[name] = o[name] || {}), obj)
-    );
-
-    if ('' in obj) {
-      delete Object.assign(obj, { '/': obj[''] })[''];
-    }
-
-    const convert = (o, parent) =>
-      Object.keys(o).map((key) => {
-        const p = parent
-          ? parent === '/'
-            ? `${parent}${key}`
-            : `${parent}/${key}`
-          : key;
-
-        return Object.keys(o[key]).length
-          ? {
-              label: this.getLabelMatchesCount(key, parent, 'folder'),
-              children: convert(o[key], p),
-              type: 'folder',
-              value: p,
-              showCheckbox: false,
-            }
-          : {
-              label: key,
-              type: 'file',
-              value: p,
-              showCheckbox: false,
-            };
-      });
-
-    const result = convert(obj, null);
-    // return !result[0].value && result[0].children;
-    return result;
-  }
-
-  private getLabelMatchesCount(label, value, type) {
-    // TODO: ver matches
-
-    /* const matches = codetree.filter(
-      (f) => f.path.includes(value) && f.results > 0
-    );
-    if (matches.length > 0) {
-      return `${label}(${matches.length})`;
-    } */
-
-    return label;
-  }
 }
 
 export const workbenchController = new WorkbenchController();

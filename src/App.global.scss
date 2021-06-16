@@ -10,7 +10,7 @@
 @import './theme/Panel.global.scss';
 
 /* components */
-@import './renderer/home/Home.css';
+@import './renderer/home/Home.scss';
 @import './renderer/workbench/Workbench.scss';
 @import './renderer/workbench/components/Editor/Editor.scss';
 
@@ -47,7 +47,7 @@ button.bnt-primary:hover {
   transform: scale(1.05);
 }
 
-button.bnt-primary:active {
+button.bnt-primary:active, button.bnt-primary:focus {
   outline: none;
 }
 

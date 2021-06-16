@@ -15,6 +15,7 @@ export interface IWorkbenchContext {
   remoteFileContent: FileContent | null;
   setFile: (file: string) => void;
   setTree: (tree: []) => void;
+  resetWorkbench: () => void;
 }
 
 export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(
@@ -73,6 +74,13 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
     }
   };
 
+  const resetWorkbench = () => {
+    console.log('reset workbench provider');
+    setFile(null);
+    setScan(null);
+    setTree(null);
+  };
+
   useEffect(() => {
     if (scan && file) {
       const [info] = scan[file];
@@ -93,6 +101,7 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
         localFileContent,
         remoteFileContent,
         setFile,
+        resetWorkbench,
       }}
     >
       {children}

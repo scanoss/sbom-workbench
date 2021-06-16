@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react';
 import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
 
 export const Editor = () => {
-  const { file, matchInfo, remoteFileContent } = useContext(
+  const { file, matchInfo, remoteFileContent, localFileContent } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
 
@@ -29,10 +29,10 @@ export const Editor = () => {
       <section className="editors">
         <div className="editor">
           <pre>
-            {remoteFileContent?.error ? (
+            {localFileContent?.error ? (
               <p>File not found</p>
             ) : (
-              remoteFileContent?.content
+              localFileContent?.content
             )}
           </pre>
         </div>

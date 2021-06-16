@@ -7,13 +7,16 @@ import { FileTree } from './components/FileTree/FileTree';
 import { dialogController } from '../dialog-controller';
 
 import { WorkbenchContext, IWorkbenchContext } from './WorkbenchProvider';
+import { AppContext } from '../context/AppProvider';
 
 const Workbench = () => {
-  const { loadScan, file } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { loadScan, file, resetWorkbench } = useContext(
+    WorkbenchContext
+  ) as IWorkbenchContext;
+  const { scanPath } = useContext(AppContext);
 
   const init = async () => {
-    const path = '/home/franco/Desktop/scanoss/datasets/scanner1.json'; // TODO: useContext App
-    const result = await loadScan(path);
+    const result = await loadScan(scanPath);
     if (!result) {
       dialogController.showError('Error', 'Cannot read scan.');
     }
@@ -21,6 +24,7 @@ const Workbench = () => {
 
   useEffect(() => {
     init();
+    return resetWorkbench;
   }, []);
 
   return (
@@ -37,9 +41,7 @@ const Workbench = () => {
             <FileTree />
           </div>
         </aside>
-        <main className="match-info">
-          {file ? <Editor /> : null}
-        </main>
+        <main className="match-info">{file ? <Editor /> : null}</main>
       </SplitPane>
     </div>
   );

@@ -10,13 +10,19 @@ main.Home {
         , #000000 0%,#06506d 100%);
 }
 
+.logo {
+  margin: 30px 0 20px;
+}
+
 button {
     font-size: 60px;
 }
 
-.Hello {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px 0;
+.progressbar {
+  margin-top: 40px;
+  width: 300px;
+  min-height: 30px;
 }
+
+
+
