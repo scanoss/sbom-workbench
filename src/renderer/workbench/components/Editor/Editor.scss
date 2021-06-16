@@ -1,0 +1,14 @@
+.editors {
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
+
+  .editor {
+
+    pre {
+      white-space: pre-line;
+     }
+
+  }
+}

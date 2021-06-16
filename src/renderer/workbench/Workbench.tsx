@@ -12,7 +12,7 @@ const Workbench = () => {
   const { loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const init = async () => {
-    const path = '/Users/Usuario/Documents/190.json'; // TODO: useContext App
+    const path = '/home/franco/Desktop/scanoss/datasets/scanner1.json'; // TODO: useContext App
     const result = await loadScan(path);
     if (!result) {
       dialogController.showError('Error', 'Cannot read scan.');
@@ -46,4 +46,3 @@ const Workbench = () => {
 };
 
 export default Workbench;
-// cancu change

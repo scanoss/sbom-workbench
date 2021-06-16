@@ -19,6 +19,31 @@ class WorkbenchController {
     return this.resultFromScan(data);
   }
 
+  /**
+   * Get file content from a local file
+   *
+   * @param {string} path
+   * @returns {string}
+   * @memberof WorkbenchController
+   */
+  public async fetchLocalFile(path: string): Promise<string> {
+    path = '/home/franco/Desktop/scanoss/datasets/190.json';
+    const data = await fs.readFile(path, 'utf-8');
+    return data;
+  }
+
+  /**
+   * Get file content from a remote file
+   *
+   * @param {string} hash
+   * @returns {string}
+   * @memberof WorkbenchController
+   */
+  public async fetchRemoteFile(hash: string): Promise<string> {
+    const response = await fetch(`https://osskb.org/api/file_contents/${hash}`);
+    return response.text();
+  }
+
   private resultFromScan(data: string): ScanResult {
     const scan = JSON.parse(data);
 
