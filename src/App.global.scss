@@ -3,7 +3,7 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 
-@import "~react-checkbox-tree/lib/react-checkbox-tree.css";
+@import '~react-checkbox-tree/lib/react-checkbox-tree.css';
 
 /* theme */
 @import './theme/SplitPane.global.scss';
@@ -13,6 +13,8 @@
 @import './renderer/home/Home.scss';
 @import './renderer/workbench/Workbench.scss';
 @import './renderer/workbench/components/Editor/Editor.scss';
+@import './renderer/workbench/components/Label/Label.scss';
+@import './renderer/workbench/components/Pill/Pill.scss';
 @import './renderer/workbench/components/FileTree/FileTree';
 
 
