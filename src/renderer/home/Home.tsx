@@ -2,8 +2,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { LinearProgress } from '@material-ui/core';
 import logo from '../../../assets/logos/scanoss_white.png';
+import * as controller from './HomeController';
 import { dialogController } from '../dialog-controller';
 import { AppContext } from '../context/AppProvider';
+import { IpcEvents } from '../../ipc-events';
+import { ipcRenderer } from 'electron';
 
 const Home = () => {
   const history = useHistory();
@@ -35,8 +38,17 @@ const Home = () => {
     const projectPath = dialogController.showOpenDialog({
       properties: ['openFile'],
     });
+    controller.scan(projectPath);
     setPath(projectPath);
-    setProgress(5);
+
+    ipcRenderer.on(IpcEvents.SCANNER_FINISH_SCAN, (event, args) => {
+      if (args.success) {
+        showScan(args.resultsPath);
+      } else {
+        showError();
+      }
+    });
+    // setProgress(5);
   };
 
   return (
@@ -56,7 +68,7 @@ const Home = () => {
       </div>
       <div className="progressbar">
         {path ? (
-          <LinearProgress variant="determinate" value={progress} />
+          <LinearProgress/>
         ) : null}
       </div>
     </main>

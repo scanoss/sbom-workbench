@@ -1,3 +1,5 @@
+import { IpcEvents } from '../../ipc-events';
+
 const cliProgress = require('cli-progress');
 const scanner = require('./lib/scanner');
 const ipcMain = require('electron');
@@ -38,10 +40,7 @@ scanner.addEventListener('onServerResponse', (data) => {
 
 /*scanner.addEventListener('onScanDone', (result) => {
   console.log("scanDone");
-
-  fs.writeFileSync(resultPath,JSON.stringify(result, null, 4), 'utf8');
-
-  //Emit an event to DB module and frontEnd
+  fs.writeFileSync(resultPath, JSON.stringify(result, null, 4), 'utf8');
 });*/
 
 // Not implemented yet
