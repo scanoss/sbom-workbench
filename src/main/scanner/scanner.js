@@ -36,13 +36,13 @@ scanner.addEventListener('onServerResponse', (data) => {
   fetchingProgressBar.increment(data.counter);
 });
 
-scanner.addEventListener('onScanDone', (result) => {
+/*scanner.addEventListener('onScanDone', (result) => {
   console.log("scanDone");
 
   fs.writeFileSync(resultPath,JSON.stringify(result, null, 4), 'utf8');
 
   //Emit an event to DB module and frontEnd
-});
+});*/
 
 // Not implemented yet
 scanner.addEventListener('onError', (error) => {

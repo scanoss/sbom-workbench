@@ -15,6 +15,8 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './main/menu';
+import { IpcEvents } from './ipc-events';
+import * as fs from 'fs';
 
 const scanner = require('./main/scanner/scanner.js');
 
@@ -134,10 +136,26 @@ app.on('activate', () => {
   if (mainWindow === null) createWindow();
 });
 
+// TODO: move to isolate module (see menu.ts)
 
+export interface IInitScan {
+  path: string;
+  scanId?: string;
+  // filter: IFilter[];
+}
 
-ipcMain.on('commands', (event, arg) => {
-  console.log('Start scanning...');
-  scanner.scan('/home/ubuntu/Projects/SCANOSS/Set of Files/1-ansible-2.10.9rc1 (set of files)',
-          '/home/ubuntu/Projects/SCANOSS/Set of Files/1-ansible-2.10.9rc1 (set of files)/result.json');
+ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
+  const { path } = arg;
+  const resultsPath = '/temp/qs.json';
+
+  console.log(`SCANNER: Start scanning path=${path}`);
+  scanner.scan(path, resultsPath);
+
+  scanner.addEventListener('onScanDone', (result: any) => {
+    fs.writeFileSync(resultsPath, JSON.stringify(result, null, 4), 'utf8');
+    event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
+      success: true,
+      resultsPath,
+    });
+  });
 });
