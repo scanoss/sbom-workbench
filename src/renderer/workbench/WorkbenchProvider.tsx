@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { workbenchController } from '../workbench-controller';
+import { AppContext } from '../context/AppProvider';
 
 export interface FileContent {
   content: string | null;
@@ -25,6 +26,8 @@ export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(
 export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   children,
 }) => {
+  const { scanBasePath } = useContext(AppContext);
+
   const [tree, setTree] = useState<[] | null>(null);
   const [scan, setScan] = useState<Record<string, unknown> | null>(null);
 
@@ -57,7 +60,8 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false });
-      const content = await workbenchController.fetchLocalFile(path);
+      console.log("file", scanBasePath + path);
+      const content = await workbenchController.fetchLocalFile(scanBasePath + path);
       setLocalFileContent({ content, error: false });
     } catch (error) {
       setLocalFileContent({ content: null, error: true });

@@ -13,7 +13,7 @@ const Workbench = () => {
   const { loadScan, file, resetWorkbench } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
-  const { scanPath } = useContext(AppContext);
+  const { scanPath, scanBasePath } = useContext(AppContext);
 
   const init = async () => {
     const result = await loadScan(scanPath);

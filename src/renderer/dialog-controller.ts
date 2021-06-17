@@ -4,7 +4,7 @@ const { dialog } = remote;
 
 class DialogController {
   public showOpenDialog(options): string {
-    const result = dialog.showOpenDialogSync(options);
+    const result = dialog.showOpenDialogSync(remote.getCurrentWindow(), options);
     return result ? result[0] : null;
   }
 

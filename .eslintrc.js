@@ -6,6 +6,9 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'react/prop-types': 'off',
     'class-methods-use-this': 'off',
+    'no-unused-vars': 'off',
+    'max-len': ['warn', { code: 120 }],
+    '@typescript-eslint/no-unused-vars': ['off'],
   },
   parserOptions: {
     ecmaVersion: 2020,
