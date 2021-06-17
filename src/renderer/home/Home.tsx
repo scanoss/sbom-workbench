@@ -36,7 +36,7 @@ const Home = () => {
 
   const onOpenFolderPressed = () => {
     const projectPath = dialogController.showOpenDialog({
-      properties: ['openFile'],
+      properties: ['openDirectory'],
     });
     controller.scan(projectPath);
     setPath(projectPath);
