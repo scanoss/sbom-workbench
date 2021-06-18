@@ -3,71 +3,64 @@
 .match-info-header {
   margin-bottom: 20px;
   height: 12%;
-  .container-info-card {
+
+  .content {
     display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    padding: 0px;
+    height: 100%;
     align-items: center;
-    min-height: 100%;
-    padding-left: 15px;
-    padding-right: 15px;
 
-    .content {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      padding: 0px;
-      height: 100%;
-      align-items: center;
+    .match-info-container {
+      display: flex;
+      flex-direction: column;
 
-      .match-info-container {
+      .first-row-match {
+        padding-bottom: 10px;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        align-items: center;
 
-        .first-row-match {
-          padding-bottom: 10px;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-
-          .match-span {
-            padding-right: 15px;
-            font-weight: 700;
-            color: black;
-            font-size: 20px;
-          }
-        }
-
-        .second-row-match {
-          // display: grid;
-          // grid-template-columns: 1fr 1fr 1fr;
-          display: flex;
-          flex-direction: row;
-
-          div {
-            display: flex;
-            flex-direction: column;
-            padding-right: 5%;
-
-            .title-component-vendor {
-              font-family: Inter;
-              font-size: 25px;
-              font-weight: 400;
-            }
-          }
+        .match-span {
+          padding-right: 15px;
+          font-weight: 700;
+          color: black;
+          font-size: 20px;
         }
       }
 
-      .usage-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        grid-column-gap: 5px;
-        grid-row-gap: 5px;
-        justify-items: stretch;
-        align-items: center;
+      .second-row-match {
+        // display: grid;
+        // grid-template-columns: 1fr 1fr 1fr;
+        display: flex;
+        flex-direction: row;
 
         div {
           display: flex;
           flex-direction: column;
+          padding-right: 5%;
+
+          .title-component-vendor {
+            font-family: Inter;
+            font-size: 25px;
+            font-weight: 400;
+          }
         }
+      }
+    }
+
+    .usage-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      grid-column-gap: 5px;
+      grid-row-gap: 5px;
+      justify-items: stretch;
+      align-items: center;
+
+      div {
+        display: flex;
+        flex-direction: column;
       }
     }
   }

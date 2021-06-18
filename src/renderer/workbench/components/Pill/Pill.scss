@@ -6,18 +6,18 @@
 
 .pending-pill {
   @include pill;
-  border: 1px solid orange;
-  color: orange;
+  border: 1px solid $pending-orange;
+  color: $pending-orange;
 }
 
 .identified-pill {
   @include pill;
-  border: 1px solid green;
-  color: green;
+  border: 1px solid $indentified-green;
+  color: $indentified-green;
 }
 
 .ignored-pill {
   @include pill;
-  border: 1px solid rgb(87, 87, 167);
-  color: rgb(87, 87, 167);
+  border: 1px solid $ignored-gray;
+  color: $ignored-gray;
 }

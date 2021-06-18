@@ -12,52 +12,58 @@ export const Editor = () => {
   return (
     <>
       <header className="match-info-header">
-        <Card className="container-info-card">
-          <CardContent className="content">
-            <div className="match-info-container">
-              <div className="first-row-match">
-                <span className="match-span">Match</span>
-                <Pill state="Pending" />
+        <CardContent className="content">
+          <div className="match-info-container">
+            <div className="first-row-match">
+              <span className="match-span">Match</span>
+              <Pill state="Pending" />
+            </div>
+            <div className="second-row-match">
+              <div>
+                <Label label="COMPONENT" />
+                <span className="title-component-vendor">
+                  {/* {matchInfo?.component} */}
+                </span>
               </div>
-              <div className="second-row-match">
-                <div>
-                  <Label label="COMPONENT" />
-                  <span className="title-component-vendor">
-                    {/* {matchInfo?.component} */}
-                  </span>
-                </div>
-                <div>
-                  <Label label="VENDOR" />
-                  <span className="title-component-vendor">
-                    {/* {matchInfo?.vendor} */}
-                  </span>
-                </div>
-                <div>
-                  <Label label="VENDOR" />
-                  {/* <span className="title-component-vendor">{matchInfo?.version}</span> */}
-                </div>
+              <div>
+                <Label label="VENDOR" />
+                <span className="title-component-vendor">
+                  {/* {matchInfo?.vendor} */}
+                </span>
+              </div>
+              <div>
+                <Label label="VERSION" />
+                <span className="title-component-vendor">
+                  {/* {matchInfo?.version} */}
+                </span>
+              </div>
+              <div>
+                <Label label="LICENSE" />
+                <span className="title-component-vendor">
+                  {/* {matchInfo?.licenses[0].name} */}
+                </span>
               </div>
             </div>
-            <div className="usage-container">
-              <div>
-                <Label label="USAGE" />
-                <span>Separated work</span>
-              </div>
-              <div>
-                <Label label="USAGE" />
-                <span>Sepa</span>
-              </div>
-              <div>
-                <Label label="USAGE" />
-                <span>Sepa</span>
-              </div>
-              <div>
-                <Label label="USAGE" />
-                <span>Sepa</span>
-              </div>
+          </div>
+          <div className="usage-container">
+            <div>
+              <Label label="USAGE" />
+              <span>Separated work</span>
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <Label label="USAGE" />
+              <span>Sepa</span>
+            </div>
+            <div>
+              <Label label="USAGE" />
+              <span>Sepa</span>
+            </div>
+            <div>
+              <Label label="USAGE" />
+              <span>Sepa</span>
+            </div>
+          </div>
+        </CardContent>
       </header>
 
       <div>
