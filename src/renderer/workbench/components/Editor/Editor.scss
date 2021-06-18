@@ -2,7 +2,9 @@
   margin-bottom: 20px;
   .content {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 3fr 1fr;
+    padding: 0 10px;
+    padding-bottom: 10px !important;
   }
 }
 
@@ -13,6 +15,7 @@
 
   .editor {
     pre {
+      font-size: 10px;
       white-space: pre-line;
      }
 

@@ -13,11 +13,29 @@ export const Editor = () => {
         <Card>
           <CardContent className="content">
             <div>
-              Match <Chip label="Pending" variant="outlined" />
-              {matchInfo?.component} - {matchInfo?.vendor}
+              {matchInfo ? (
+                <div>
+                  <h3>Match</h3>
+                  <ul>
+                    <li>
+                      Component: <strong>{matchInfo?.component}</strong>
+                    </li>
+                    <li>
+                      Vendor: <strong>{matchInfo?.vendor}</strong>
+                    </li>
+                    <li>
+                      Purl: <strong>{matchInfo?.purl?.join(' - ')}</strong>
+                    </li>
+                  </ul>
+                </div>
+              ) : (
+                <div>
+                  <h3>No match info</h3>
+                </div>
+              )}
             </div>
-            <div>B</div>
-            <div>C</div>
+            <div> </div>
+            <div> </div>
           </CardContent>
         </Card>
       </header>

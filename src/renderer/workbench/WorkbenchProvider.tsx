@@ -7,6 +7,14 @@ export interface FileContent {
   error: boolean;
 }
 
+interface Component {
+  component: string;
+  vendor: string;
+  version: string;
+  latest: string;
+  url: string;
+}
+
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
   tree: [] | null;
@@ -23,6 +31,7 @@ export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(
   null
 );
 
+
 export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   children,
 }) => {
@@ -31,12 +40,15 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   const [tree, setTree] = useState<[] | null>(null);
   const [scan, setScan] = useState<Record<string, unknown> | null>(null);
 
+  const [components, setComponents] =  useState<Component[] | null>(null);
+  const [component, setComponent] =  useState<Component | null>(null);
+
   const [file, setFile] = useState<string | null>(null);
+
+  // TODO: remove from provider?
   const [matchInfo, setMatchInfo] = useState<Record<string, unknown> | null>(
     null
   );
-
-  // TODO: remove from provider? in Editor?
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(
     null
   );
@@ -88,9 +100,14 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   useEffect(() => {
     if (scan && file) {
       const [info] = scan[file];
-      setMatchInfo(info);
       loadLocalFile(file);
-      loadRemoteFile(info.file_hash);
+      if (info.id !== 'none') {
+        loadRemoteFile(info.file_hash);
+        setMatchInfo(info);
+      } else {
+        setRemoteFileContent({ content: null, error: false });
+        setMatchInfo(null);
+      }
     }
   }, [file, scan]);
 
