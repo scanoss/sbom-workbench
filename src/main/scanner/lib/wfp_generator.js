@@ -12,25 +12,25 @@ let cfg = {}
 
 parentPort.on('message', (wfpGeneratorCfg) => {
   cfg = wfpGeneratorCfg;
-  generateWFP(); 
+  generateWFP();
 });
 
 
 function generateWFP() {
-  
+
   //Clean the directory
-  if (fs.existsSync(cfg.queuePath)){ 
+  if (fs.existsSync(cfg.queuePath)){
     fs.rmdirSync(cfg.queuePath, { recursive: true });
   }
   fs.mkdirSync(cfg.queuePath, {recursive: true});
 
   const result = recursiveWalk(cfg.scanPath);
-  
+/*
   result.then(() => {
 
     process.exit(0);
 
-  });
+  }); */
 
 }
 
@@ -49,13 +49,13 @@ function generateWFP() {
 
 
 async function recursiveWalk(scanPath) {
-  
+
   let preWfp = '';
   let wfp = '';
   let counter = 0;
 
   let index = 0;  //Count how many files have been stored in the queuePath;
-  
+
   for await (const filepath of inspectDirectory.walk(scanPath)) {
         preWfp = winnowing.wfp_for_file(filepath, filepath.replace(scanPath, ''));
         counter++;
@@ -78,18 +78,18 @@ async function recursiveWalk(scanPath) {
 
 
 function queue_scan(wfp, counter, _index) {
-  
+
   if (!fs.existsSync(cfg.queuePath)) {
     fs.mkdirSync(cfg.queuePath);
   }
   let wfpPath = `${cfg.queuePath}/${new Date().getTime()}.json`;
 
-  
+
   //The next lines do the following:
   //  - Store de WFP results on a file in the temporary directory
   //  - Send a message to main thread
   fs.writeFileSync(wfpPath, JSON.stringify({ wfp: wfp, counter: counter, status: "ok" }));
-  
+
   // let message = {};
   // message.wfpGenerator.wfpPath = wfpPath;
   // message.wfpGenerator.counter = counter;
