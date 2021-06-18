@@ -23,18 +23,18 @@ export const Editor = () => {
                 <div>
                   <Label label="COMPONENT" />
                   <span className="title-component-vendor">
-                    {matchInfo?.component}
+                    {/* {matchInfo?.component} */}
                   </span>
                 </div>
                 <div>
                   <Label label="VENDOR" />
                   <span className="title-component-vendor">
-                    {matchInfo?.vendor}
+                    {/* {matchInfo?.vendor} */}
                   </span>
                 </div>
                 <div>
                   <Label label="VENDOR" />
-                  <span className="title-component-vendor">2.3.1</span>
+                  {/* <span className="title-component-vendor">{matchInfo?.version}</span> */}
                 </div>
               </div>
             </div>
