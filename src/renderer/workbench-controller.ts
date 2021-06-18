@@ -88,6 +88,7 @@ class WorkbenchController {
                 type: 'file',
                 value: p,
                 showCheckbox: false,
+                className: this.getStatus(scan, p)
               };
         });
 
@@ -109,6 +110,11 @@ class WorkbenchController {
 
     return label;
   }
+
+  private getStatus(scan, key) {
+    return scan[key][0]?.id != 'none' ? 'match' : '';
+  }
+
 
   private generateFileTree2(scan: Record<string, unknown>) {
     const result: any[] = [];
