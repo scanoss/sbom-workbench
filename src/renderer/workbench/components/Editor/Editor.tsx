@@ -3,6 +3,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
 import Label from '../Label/Label';
 import Pill from '../Pill/Pill';
+import Title from '../Title/Title';
 
 export const Editor = () => {
   const { file, matchInfo, remoteFileContent, localFileContent } = useContext(
@@ -21,46 +22,20 @@ export const Editor = () => {
             <div className="second-row-match">
               <div>
                 <Label label="COMPONENT" />
-                <span className="title-component-vendor">
-                  {/* {matchInfo?.component} */}
-                </span>
+                {/* <Title title={matchInfo?.component} /> */}
               </div>
               <div>
                 <Label label="VENDOR" />
-                <span className="title-component-vendor">
-                  {/* {matchInfo?.vendor} */}
-                </span>
+                {/* <Title title={matchInfo?.vendor} /> */}
               </div>
               <div>
                 <Label label="VERSION" />
-                <span className="title-component-vendor">
-                  {/* {matchInfo?.version} */}
-                </span>
+                {/* <Title title={matchInfo?.version} /> */}
               </div>
               <div>
                 <Label label="LICENSE" />
-                <span className="title-component-vendor">
-                  {/* {matchInfo?.licenses[0].name} */}
-                </span>
+                {/* <Title title={matchInfo?.version} /> */}
               </div>
-            </div>
-          </div>
-          <div className="usage-container">
-            <div>
-              <Label label="USAGE" />
-              <span>Separated work</span>
-            </div>
-            <div>
-              <Label label="USAGE" />
-              <span>Sepa</span>
-            </div>
-            <div>
-              <Label label="USAGE" />
-              <span>Sepa</span>
-            </div>
-            <div>
-              <Label label="USAGE" />
-              <span>Sepa</span>
             </div>
           </div>
         </CardContent>
@@ -70,7 +45,7 @@ export const Editor = () => {
         <strong>{file}</strong>
       </div>
 
-      <section className="editors">
+      {/* <section className="editors">
         <div className="editor">
           <pre>
             {localFileContent?.error ? (
@@ -90,7 +65,7 @@ export const Editor = () => {
             )}
           </pre>
         </div>
-      </section>
+      </section> */}
     </>
   );
 };

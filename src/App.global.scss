@@ -3,10 +3,10 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 
-$pending-orange: #f87216;
-$indentified-green: #22c45f;
-$ignored-gray: #a0a1ab;
-$nomatch-black: #27262b;
+$pending-orange: #f97316;
+$indentified-green: #22c55e;
+$ignored-gray: #a1a1aa;
+$nomatch-black: #27272a;
 
 @import '~react-checkbox-tree/lib/react-checkbox-tree.css';
 
@@ -20,6 +20,7 @@ $nomatch-black: #27262b;
 @import './renderer/workbench/components/Editor/Editor.scss';
 @import './renderer/workbench/components/Label/Label.scss';
 @import './renderer/workbench/components/Pill/Pill.scss';
+@import './renderer/workbench/components/Title/Title.scss';
 @import './renderer/workbench/components/FileTree/FileTree';
 
 

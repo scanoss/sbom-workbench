@@ -6,7 +6,7 @@
 
   .content {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     padding: 0px;
     height: 100%;
     align-items: center;
@@ -25,7 +25,7 @@
           padding-right: 15px;
           font-weight: 700;
           color: black;
-          font-size: 20px;
+          font-size: 45px;
         }
       }
 
@@ -38,13 +38,7 @@
         div {
           display: flex;
           flex-direction: column;
-          padding-right: 5%;
-
-          .title-component-vendor {
-            font-family: Inter;
-            font-size: 25px;
-            font-weight: 400;
-          }
+          padding-right: 10%;
         }
       }
     }
