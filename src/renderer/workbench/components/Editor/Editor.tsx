@@ -21,25 +21,28 @@ export const Editor = () => {
             </div> */}
             <div className="second-row-match">
               <div>
-                <Label label="COMPONENT" />
+                <Label label="COMPONENT" color="gray" />
                 {/* <Title title={matchInfo?.component} /> */}
               </div>
               <div>
-                <Label label="VENDOR" />
+                <Label label="VENDOR" color="gray" />
                 {/* <Title title={matchInfo?.vendor} /> */}
               </div>
               <div>
-                <Label label="VERSION" />
+                <Label label="VERSION" color="gray" />
                 {/* <Title title={matchInfo?.version} /> */}
               </div>
               <div>
-                <Label label="LICENSE" />
-                {/* <Title title={matchInfo?.version} /> */}
+                <Label label="LICENSE" color="gray" />
+                {/* <Title title={matchInfo?.licenses[0] ? matchInfo?.licenses[0].name : 'me como una banana'} /> */}
               </div>
             </div>
           </div>
           <div className="match-card">
-            <span>x-ong/CMake.cpp</span>
+            <div>
+              <Label label="x-ong/" color="gray" />
+              <Label label="CMake.cpp" color="black" />
+            </div>
           </div>
         </CardContent>
       </header>
