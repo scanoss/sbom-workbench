@@ -15,10 +15,10 @@ export const Editor = () => {
       <header className="match-info-header">
         <CardContent className="content">
           <div className="match-info-container">
-            <div className="first-row-match">
+            {/* <div className="first-row-match">
               <span className="match-span">Match</span>
               <Pill state="Pending" />
-            </div>
+            </div> */}
             <div className="second-row-match">
               <div>
                 <Label label="COMPONENT" />
@@ -38,12 +38,15 @@ export const Editor = () => {
               </div>
             </div>
           </div>
+          <div className="match-card">
+            <span>x-ong/CMake.cpp</span>
+          </div>
         </CardContent>
       </header>
 
-      <div>
+      {/* <div>
         <strong>{file}</strong>
-      </div>
+      </div> */}
 
       {/* <section className="editors">
         <div className="editor">
