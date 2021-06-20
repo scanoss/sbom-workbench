@@ -35,13 +35,13 @@ export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(
 export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   children,
 }) => {
-  const { scanBasePath } = useContext(AppContext);
+  const { scanBasePath } = useContext<any>(AppContext);
 
   const [tree, setTree] = useState<[] | null>(null);
   const [scan, setScan] = useState<Record<string, unknown> | null>(null);
 
-  const [components, setComponents] =  useState<Component[] | null>(null);
-  const [component, setComponent] =  useState<Component | null>(null);
+  const [components, setComponents] = useState<Component[] | null>(null);
+  const [component, setComponent] = useState<Component | null>(null);
 
   const [file, setFile] = useState<string | null>(null);
 
@@ -62,6 +62,7 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
       const scanResult = await workbenchController.loadScan(path);
       setScan(scanResult.scan);
       setTree(scanResult.fileTree);
+      setComponents(scanResult.components);
       return true;
     } catch (error) {
       console.error(error);

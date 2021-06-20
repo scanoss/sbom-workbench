@@ -1,9 +1,12 @@
+import * as scanUtil from '../utils/scan-util';
+
 const fs = require('original-fs').promises;
 
 export interface ScanResult {
-  id: string;
-  fileTree: [];
+  id: string | null;
   scan: Record<string, unknown>;
+  fileTree: [];
+  components: any[];
 }
 
 class WorkbenchController {
@@ -16,7 +19,7 @@ class WorkbenchController {
    */
   public async loadScan(path: string): Promise<ScanResult> {
     const data = await fs.readFile(path, 'utf-8');
-    return this.resultFromScan(data);
+    return this.generateScanResult(data);
   }
 
   /**
@@ -46,102 +49,16 @@ class WorkbenchController {
     return response.text();
   }
 
-  private async resultFromScan(data: string): Promise<ScanResult> {
+  private async generateScanResult(data: string): Promise<ScanResult> {
     const scan = JSON.parse(data);
 
     return {
-      id: '0',
-      fileTree: await this.generateFileTree(scan),
+      id: null,
       scan,
+      fileTree: await scanUtil.generateFileTree(scan),
+      components: scanUtil.getComponents(scan),
     };
   }
-
-  private generateFileTree(scan: Record<string, unknown>): Promise<any> {
-    return new Promise((resolve) => {
-      const obj = {};
-      Object.keys(scan).forEach((p) =>
-        p.split('/').reduce((o, name) => (o[name] = o[name] || {}), obj)
-      );
-
-      if ('' in obj) {
-        delete Object.assign(obj, { '/': obj[''] })[''];
-      }
-
-      const convert = (o, parent) =>
-        Object.keys(o).map((key) => {
-          const p = parent
-            ? parent === '/'
-              ? `${parent}${key}`
-              : `${parent}/${key}`
-            : key;
-
-          return Object.keys(o[key]).length
-            ? {
-                label: this.getLabelMatchesCount(key, parent, 'folder'),
-                children: convert(o[key], p),
-                type: 'folder',
-                value: p,
-                showCheckbox: false,
-              }
-            : {
-                label: key,
-                type: 'file',
-                value: p,
-                showCheckbox: false,
-                className: this.getStatus(scan, p)
-              };
-        });
-
-      const result = convert(obj, null);
-      // return !result[0].value && result[0].children;
-      resolve(result);
-    });
-  }
-
-  private getLabelMatchesCount(label, value, type) {
-    // TODO: ver matches
-
-    /* const matches = codetree.filter(
-      (f) => f.path.includes(value) && f.results > 0
-    );
-    if (matches.length > 0) {
-      return `${label}(${matches.length})`;
-    } */
-
-    return label;
-  }
-
-  private getStatus(scan, key) {
-    return scan[key][0]?.id != 'none' ? 'match' : '';
-  }
-
-
-  private generateFileTree2(scan: Record<string, unknown>) {
-    const result: any[] = [];
-    const level = { result };
-
-    Object.keys(scan).forEach((file) => {
-      const path: string[] = [];
-      file.split('/').reduce((r, name, i, a) => {
-        path.push(name);
-        const value = path.join('/');
-        if (!r[name]) {
-          r[name] = { result: [] };
-          r.result.push({
-            label: name,
-            value,
-            className: 'test',
-            children: r[name].result,
-          });
-        }
-
-        return r[name];
-      }, level);
-    });
-
-    return !result[0].value && result[0].children;
-  }
-
 }
 
 export const workbenchController = new WorkbenchController();

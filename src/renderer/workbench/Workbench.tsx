@@ -1,6 +1,6 @@
 import { Box, Button } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Route, Switch, useRouteMatch } from 'react-router-dom';
 import SplitPane, { Pane } from 'react-split-pane';
 import { Editor } from './components/Editor/Editor';
 import { FileTree } from './components/FileTree/FileTree';
@@ -8,11 +8,15 @@ import { dialogController } from '../dialog-controller';
 
 import { WorkbenchContext, IWorkbenchContext } from './WorkbenchProvider';
 import { AppContext } from '../context/AppProvider';
+import ComponentList from './components/ComponentList/ComponentList';
 
 const Workbench = () => {
+  const { path, url } = useRouteMatch();
+
   const { loadScan, file, resetWorkbench } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
+
   const { scanPath, scanBasePath } = useContext(AppContext);
 
   const init = async () => {
@@ -41,7 +45,12 @@ const Workbench = () => {
             <FileTree />
           </div>
         </aside>
-        <main className="match-info">{file ? <Editor /> : null}</main>
+        <main className="match-info">
+          <Switch>
+            <Route exact path={path}><ComponentList /></Route>
+            <Route path={`${path}/file`}>{file ? <Editor /> : null}</Route>
+          </Switch>
+        </main>
       </SplitPane>
     </div>
   );

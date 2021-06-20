@@ -1,16 +1,22 @@
-import React, { Children, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import CheckboxTree, { OnCheckNode } from 'react-checkbox-tree';
+import { useHistory } from 'react-router-dom';
 import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
 
 export const FileTree = () => {
+  const history = useHistory();
+
   const [checked, setChecked] = useState<string[]>([]);
   const [expanded, setExpanded] = useState<string[]>([]);
 
-  const { tree, setFile } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { tree, file, setFile } = useContext(
+    WorkbenchContext
+  ) as IWorkbenchContext;
 
-  const onSelectFile = (target: OnCheckNode) => {
-    if (!target.children || target.children.length === 0) {
-      setFile(target.value);
+  const onSelectFile = ({ children, value }: OnCheckNode) => {
+    if (!children && value !== file) {
+      history.push(`/workbench/file/${value}`);
+      setFile(value);
     }
   };
 
@@ -21,7 +27,7 @@ export const FileTree = () => {
         checked={checked}
         expanded={expanded}
         onClick={(targetNode) => onSelectFile(targetNode)}
-        expandOnClick={true}
+        expandOnClick
         onCheck={(checkedItems) => setChecked(checkedItems)}
         onExpand={(expandedItems) => setExpanded(expandedItems)}
       />

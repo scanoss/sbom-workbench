@@ -7,8 +7,10 @@ module.exports = {
     'react/prop-types': 'off',
     'class-methods-use-this': 'off',
     'no-unused-vars': 'off',
-    'max-len': ['warn', { code: 120 }],
-    '@typescript-eslint/no-unused-vars': ['off'],
+    '@typescript-eslint/no-unused-vars': ['warn'],
+    '@typescript-eslint/no-explicit-any': ['off'],
+    'no-use-before-define': 'off',
+    '@typescript-eslint/no-use-before-define': ['off'],
   },
   parserOptions: {
     ecmaVersion: 2020,

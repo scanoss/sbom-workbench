@@ -10,7 +10,10 @@ import { IpcEvents } from '../../ipc-events';
 
 const Home = () => {
   const history = useHistory();
-  const { scanPath, setScanPath, setScanBasePath } = useContext(AppContext);
+
+  const { scanPath, setScanPath, setScanBasePath } = useContext<any>(
+    AppContext
+  );
 
   const [progress, setProgress] = useState<number>(0);
   const [path, setPath] = useState<string | null>(null);
@@ -25,11 +28,6 @@ const Home = () => {
     dialogController.showError('Error', 'Scanner failed');
   };
 
-  // for mock only
-  useEffect(() => {
-    if (!path) return;
-  }, [progress]);
-
   const onOpenFolderPressed = () => {
     const projectPath = dialogController.showOpenDialog({
       properties: ['openDirectory'],
@@ -38,7 +36,9 @@ const Home = () => {
     setPath(projectPath);
     controller.scan(projectPath);
 
+    // listen finish scan
     ipcRenderer.on(IpcEvents.SCANNER_FINISH_SCAN, (event, args) => {
+      console.log(IpcEvents.SCANNER_FINISH_SCAN);
       if (args.success) {
         showScan(args.resultsPath);
       } else {
