@@ -2,8 +2,8 @@ import { Card, CardContent, Chip } from '@material-ui/core';
 import React, { useContext, useState, useEffect } from 'react';
 import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
 import Label from '../Label/Label';
-import Pill from '../Pill/Pill';
-import Title from '../Title/Title';
+// import Pill from '../Pill/Pill';
+// import Title from '../Title/Title';
 
 export const Editor = () => {
   const { file, matchInfo, remoteFileContent, localFileContent } = useContext(
@@ -30,11 +30,11 @@ export const Editor = () => {
               </div>
               <div>
                 <Label label="VERSION" color="gray" />
-                {/* <Title title={matchInfo?.version} /> */}
+                    {/* <Title title={matchInfo?.version} /> */}
               </div>
               <div>
                 <Label label="LICENSE" color="gray" />
-                {/* <Title title={matchInfo?.licenses[0] ? matchInfo?.licenses[0].name : 'me como una banana'} /> */}
+                {/* <Title title={matchInfo?.licenses[0] ? matchInfo?.licenses[0].name : 'asereje'} /> */}
               </div>
             </div>
           </div>
