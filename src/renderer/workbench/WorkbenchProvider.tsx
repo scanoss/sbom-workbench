@@ -19,7 +19,7 @@ export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
   tree: [] | null;
   file: string | null;
-  matchInfo: Record<string, unknown> | null;
+  matchInfo: Record<string, any> | null;
   localFileContent: FileContent | null;
   remoteFileContent: FileContent | null;
   setFile: (file: string) => void;

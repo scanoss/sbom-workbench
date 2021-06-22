@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface LabelType {
-  label: string;
+  label: string | null;
   color: string;
 }
 
