@@ -2,13 +2,13 @@ import React from 'react';
 
 interface LabelType {
   label: string | null;
-  color: string;
+  textColor: string;
 }
 
-const Label = ({ label, color }: LabelType) => {
+const Label = ({ label, textColor }: LabelType) => {
   return (
     <>
-      <span className={`label-boxie-${color}`}>{label}</span>
+      <span className={`label-boxie-${textColor}`}>{label}</span>
     </>
   );
 };

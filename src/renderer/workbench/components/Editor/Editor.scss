@@ -1,12 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;600;700;800;900&display=swap');
 
+
+.match-title {
+  display: flex;
+  align-items: center;
+
+  .arrow-icon{
+    height: 50px;
+    width: 50px;
+    color: #71717A;
+    padding-right: 25px;
+  }
+
+  .match-span {
+    font-family: inter;
+    padding-right: 15px;
+    font-weight: 700;
+    color: black;
+    font-size: 45px;
+  }
+}
 .match-info-header {
   margin-bottom: 20px;
   height: 12%;
 
   .content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
     padding: 0px;
     height: 100%;
     align-items: center;
@@ -14,20 +35,6 @@
     .match-info-container {
       display: flex;
       flex-direction: column;
-
-      .first-row-match {
-        padding-bottom: 10px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-
-        .match-span {
-          padding-right: 15px;
-          font-weight: 700;
-          color: black;
-          font-size: 45px;
-        }
-      }
 
       .second-row-match {
         // display: grid;
@@ -38,25 +45,12 @@
         div {
           display: flex;
           flex-direction: column;
-          padding-right: 10%;
+          padding: 0 1rem;
         }
       }
     }
 
-    .match-card {
-      background-color: #ffff;
-      height: 68px;
-      border-radius: 4px;
-      box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.06),
-        0px 1px 3px rgba(0, 0, 0, 0.1);
-      display: flex;
-      align-items: center;
-      border-left: 10px solid $pending-orange;
 
-      div {
-        margin-left: 24px;
-      }
-    }
     .usage-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
