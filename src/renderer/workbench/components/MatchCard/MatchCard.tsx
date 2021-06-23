@@ -6,8 +6,9 @@ interface LabelType {
 }
 
 const MatchCard = ({ labelOfCard, status }) => {
+  //
   return (
-    <div className={`match-card-${status.toLowerCase()}`}>
+    <div className={`match-card status-${status.toLowerCase()}`  }>
       <div>
         <Label label={labelOfCard} textColor="black" />
       </div>

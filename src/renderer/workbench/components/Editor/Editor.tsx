@@ -14,57 +14,64 @@ export const Editor = () => {
   ) as IWorkbenchContext;
 
   const matchCode = remoteFileContent?.content?.toString();
-
+  console.log(matchCode);
   return (
-    <>
-      {matchInfo ? (
-        <>
-          <div className="match-title">
-            <ArrowBackIcon className="arrow-icon" />
-            <span className="match-span">Match</span>
-          </div>
-          <header className="match-info-header">
-            <CardContent className="content">
-              <div className="match-info-container">
-                <div className="second-row-match">
-                  <div>
-                    <Label label="COMPONENT" textColor="gray" />
-                    {/* <Title title={matchInfo?.component} /> */}
-                  </div>
-                  <div>
-                    <Label label="VENDOR" textColor="gray" />
-                    {/* <Title title={matchInfo?.vendor} /> */}
-                  </div>
-                  <div>
-                    <Label label="VERSION" textColor="gray" />
-                    {/* <Title title={matchInfo?.version} /> */}
-                  </div>
-                  <div>
-                    <Label label="LICENSE" textColor="gray" />
-                    {/* <Title
-                      title={
-                        matchInfo?.licenses[0]
-                          ? matchInfo?.licenses[0].name
-                          : '-'
-                      }
-                    /> */}
+    <section className="app-page">
+      <header className="app-header">
+        {matchInfo ? (
+          <>
+            <div className="match-title">
+              <ArrowBackIcon className="arrow-icon" />
+              <span className="match-span">Match</span>
+            </div>
+            <header className="match-info-header">
+              <CardContent className="content">
+                <div className="match-info-container">
+                  <div className="second-row-match">
+                    <div>
+                      <Label label="COMPONENT" textColor="gray" />
+                      <Title title={matchInfo?.component} />
+                    </div>
+                    <div>
+                      <Label label="VENDOR" textColor="gray" />
+                      <Title title={matchInfo?.vendor} />
+                    </div>
+                    <div>
+                      <Label label="VERSION" textColor="gray" />
+                      <Title title={matchInfo?.version} />
+                    </div>
+                    <div>
+                      <Label label="LICENSE" textColor="gray" />
+                      <Title
+                        title={
+                          matchInfo?.licenses[0]
+                            ? matchInfo?.licenses[0].name
+                            : '-'
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-              <MatchCard labelOfCard={file} status="pending" />
-            </CardContent>
-          </header>
-        </>
-      ) : (
-        <h1>No info</h1>
-      )}
+                <MatchCard labelOfCard={file} status="pending" />
+              </CardContent>
+            </header>
+          </>
+        ) : (
+          <h1>No info</h1>
+        )}
+      </header>
 
-      <section className="editors">
+      <main className="editors app-content">
         <div className="editor">
           {remoteFileContent?.content ? (
             <>
               <p>Source File</p>
-              <SyntaxHighlighter language="javascript" style={atomOneDark}>
+              <SyntaxHighlighter
+                className="code-viewer"
+                language="javascript"
+                style={atomOneDark}
+                showLineNumbers
+              >
                 {remoteFileContent?.error ? (
                   <p>File not found</p>
                 ) : (
@@ -79,7 +86,12 @@ export const Editor = () => {
           {remoteFileContent?.content ? (
             <>
               <p>Component File</p>
-              <SyntaxHighlighter language="javascript" style={atomOneDark}>
+              <SyntaxHighlighter
+                className="code-viewer"
+                language="javascript"
+                style={atomOneDark}
+                showLineNumbers
+              >
                 {remoteFileContent?.error ? (
                   <p>File not found</p>
                 ) : (
@@ -89,7 +101,7 @@ export const Editor = () => {
             </>
           ) : null}
         </div>
-      </section>
+      </main>
 
       {/* <section className="editors">
         <div className="editor">
@@ -112,7 +124,7 @@ export const Editor = () => {
           </pre>
         </div>
       </section> */}
-    </>
+    </section>
   );
 };
 

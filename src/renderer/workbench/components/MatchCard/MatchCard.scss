@@ -1,4 +1,4 @@
-@mixin MatchCard {
+.match-card {
   background-color: #ffff;
   height: 68px;
   width: 55%;
@@ -14,19 +14,17 @@
 }
 
 
+.status- {
+  &pending {
+    border-left: 10px solid $pending-orange;
+  }
 
-.match-card-pending {
-  @include MatchCard;
-  border-left: 10px solid $pending-orange;
+  &identified {
+    border-left: 10px solid $indentified-green;
+  }
+
+  &ignored {
+    border-left: 10px solid $ignored-gray;
+  }
 }
 
-
-.match-card-identified {
-  @include MatchCard;
-  border-left: 10px solid $indentified-green;
-}
-
-.match-card-ignored {
-  @include MatchCard;
-  border-left: 10px solid $ignored-gray;
-}

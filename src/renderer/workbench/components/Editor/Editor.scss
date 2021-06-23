@@ -13,7 +13,7 @@
   }
 
   .match-span {
-    font-family: inter;
+    font-family: Inter;
     padding-right: 15px;
     font-weight: 700;
     color: black;
@@ -22,7 +22,6 @@
 }
 .match-info-header {
   margin-bottom: 20px;
-  height: 12%;
 
   .content {
     display: flex;
@@ -68,13 +67,34 @@
   }
 }
 
+
+.app-page {
+  display: grid;
+  height: 100vh;
+  grid-template-rows: auto 1fr;
+
+
+  .app-header {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.app-content{
+  overflow: scroll;
+}
+
 .editors {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 20px;
+  grid-gap: 10px;
+  height: 100%;
+
 
 
   .editor {
+
+        margin-bottom: 50px;
 
     p {
       font-family: Inter;
@@ -85,8 +105,10 @@
       margin: 0;
     }
 
-    pre {
-      white-space: pre-line;
-    }
+    // pre {
+    //   white-space: pre-line;
+    // }
+
+
   }
 }
