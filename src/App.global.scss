@@ -6,6 +6,7 @@
 @import "~react-checkbox-tree/lib/react-checkbox-tree.css";
 
 /* theme */
+@import './theme/Layout.global.scss';
 @import './theme/SplitPane.global.scss';
 @import './theme/Panel.global.scss';
 
@@ -14,6 +15,8 @@
 @import './renderer/workbench/Workbench.scss';
 @import './renderer/workbench/components/Editor/Editor.scss';
 @import './renderer/workbench/components/FileTree/FileTree';
+@import './renderer/workbench/components/ComponentList/ComponentList';
+@import './renderer/workbench/components/ComponentCard/ComponentCard';
 
 
 body {

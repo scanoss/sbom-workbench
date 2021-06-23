@@ -8,7 +8,7 @@ import { dialogController } from '../dialog-controller';
 
 import { WorkbenchContext, IWorkbenchContext } from './WorkbenchProvider';
 import { AppContext } from '../context/AppProvider';
-import ComponentList from './components/ComponentList/ComponentList';
+import { ComponentList } from './components/ComponentList/ComponentList';
 
 const Workbench = () => {
   const { path, url } = useRouteMatch();

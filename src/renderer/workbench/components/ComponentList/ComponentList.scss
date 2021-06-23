@@ -1,0 +1,13 @@
+.component-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 200px);
+  grid-row-gap: 1.5em;
+  grid-column-gap: 1.5em;
+
+  overflow: scroll;
+  padding-bottom: 10px;
+}
+
+.app-content {
+  overflow: scroll;
+}

@@ -1,0 +1,27 @@
+.component-card {
+  width: 100%;
+  height: 230px;
+
+  .component-card-content {
+    padding-top: 0;
+    padding-bottom: 0 !important;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    p {margin: 0;}
+
+    figure {
+      margin-top: 32px;
+      text-align: center;
+    }
+
+    .component-card-files {
+      border-top: 1px solid gray;
+      padding: 10px 0;
+    }
+  }
+
+}
