@@ -1,6 +1,8 @@
 import { Card, CardContent, Chip } from '@material-ui/core';
 import React, { useContext, useState, useEffect } from 'react';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
 import Label from '../Label/Label';
 import Title from '../Title/Title';
@@ -10,6 +12,8 @@ export const Editor = () => {
   const { file, matchInfo, remoteFileContent, localFileContent } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
+
+  const matchCode = remoteFileContent?.content?.toString();
 
   return (
     <>
@@ -47,13 +51,45 @@ export const Editor = () => {
                   </div>
                 </div>
               </div>
-              {/* <MatchCard labelOfCard={file} status="identified" /> */}
+              <MatchCard labelOfCard={file} status="pending" />
             </CardContent>
           </header>
         </>
       ) : (
         <h1>No info</h1>
       )}
+
+      <section className="editors">
+        <div className="editor">
+          {remoteFileContent?.content ? (
+            <>
+              <p>Source File</p>
+              <SyntaxHighlighter language="javascript" style={atomOneDark}>
+                {remoteFileContent?.error ? (
+                  <p>File not found</p>
+                ) : (
+                  remoteFileContent?.content?.toString()
+                )}
+              </SyntaxHighlighter>
+            </>
+          ) : null}
+        </div>
+
+        <div className="editor">
+          {remoteFileContent?.content ? (
+            <>
+              <p>Component File</p>
+              <SyntaxHighlighter language="javascript" style={atomOneDark}>
+                {remoteFileContent?.error ? (
+                  <p>File not found</p>
+                ) : (
+                  remoteFileContent?.content?.toString()
+                )}
+              </SyntaxHighlighter>
+            </>
+          ) : null}
+        </div>
+      </section>
 
       {/* <section className="editors">
         <div className="editor">
