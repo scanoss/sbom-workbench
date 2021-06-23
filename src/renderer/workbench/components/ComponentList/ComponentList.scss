@@ -11,3 +11,22 @@
 .app-content {
   overflow: scroll;
 }
+
+
+.app-header {
+  margin-bottom: 1.5em;
+
+  .header-subtitle {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .header-title {
+    margin: 10px 0;
+    font-size: 48px;
+    font-weight: 700;
+
+    margin-bottom: 40px;
+  }
+}

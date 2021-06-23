@@ -18,11 +18,13 @@
 @import './renderer/workbench/components/ComponentList/ComponentList';
 @import './renderer/workbench/components/ComponentCard/ComponentCard';
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 body {
   position: relative;
-  color: black !important;
-  font-family: sans-serif;
+  color: #27272A !important;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0;
   overflow-y: hidden;
   margin: 0;
   padding: 0;

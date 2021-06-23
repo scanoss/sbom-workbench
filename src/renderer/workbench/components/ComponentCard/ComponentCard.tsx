@@ -1,4 +1,10 @@
-import { Card, CardContent } from '@material-ui/core';
+import {
+  Card,
+  CardContent,
+  Typography,
+  Tooltip,
+  ButtonBase,
+} from '@material-ui/core';
 import React from 'react';
 import { Component } from '../../WorkbenchProvider';
 import componentDefault from '../../../../../assets/imgs/component-default.svg';
@@ -10,19 +16,25 @@ interface ComponentCardProps {
 const ComponentCard = ({ component }: ComponentCardProps) => {
   return (
     <>
-      <Card className="component-card">
-        <CardContent className="component-card-content">
-          <figure>
-            <img alt="component logo" src={componentDefault} />
-          </figure>
-          <div className="component-card-info">
-            <p>{component.version}</p>
-            <p>{component.name}</p>
-          </div>
-          <div className="component-card-files">
-            <p>{component.files.length}</p>
-          </div>
-        </CardContent>
+      <Card className="component-card" elevation={1}>
+        <ButtonBase>
+          <CardContent className="component-card-content">
+            <figure>
+              <img alt="component logo" src={componentDefault} />
+            </figure>
+            <div className="component-card-info">
+              <p>{component.version}</p>
+              <Tooltip title={component.name}>
+                <Typography variant="h6" gutterBottom>
+                  {component.name}
+                </Typography>
+              </Tooltip>
+            </div>
+            <div className="component-card-files">
+              <span className="info-count">{component.files.length}</span>
+            </div>
+          </CardContent>
+        </ButtonBase>
       </Card>
     </>
   );
