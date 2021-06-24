@@ -1,0 +1,11 @@
+:root {
+  --color-primary: #3B82F6;
+
+  --color-status-pending: #F97316;
+  --color-status-ignored: #71717A;
+  --color-status-identified: #22C55E;
+}
+
+.color-primary {
+  color: var(--color-primary);
+}

@@ -6,7 +6,7 @@ export interface ScanResult {
   id: string | null;
   scan: Record<string, unknown>;
   fileTree: [];
-  components: any[];
+  components: Record<string, any>;
 }
 
 class WorkbenchController {

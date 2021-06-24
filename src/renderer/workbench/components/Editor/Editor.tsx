@@ -1,5 +1,6 @@
 import { Card, CardContent, Chip } from '@material-ui/core';
 import React, { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
 
 export const Editor = () => {
@@ -10,6 +11,10 @@ export const Editor = () => {
   return (
     <>
       <header className="match-info-header">
+        <Link to="/workbench/component">
+          <p>BACK</p>
+        </Link>
+
         <Card>
           <CardContent className="content">
             <div>
