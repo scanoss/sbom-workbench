@@ -3,10 +3,16 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 
+// Colors
+
 $pending-orange: #f97316;
 $indentified-green: #22c55e;
 $ignored-gray: #a1a1aa;
 $nomatch-black: #27272a;
+
+// Screen sizes
+
+$default-width: 1280px;
 
 @import '~react-checkbox-tree/lib/react-checkbox-tree.css';
 

@@ -4,6 +4,8 @@
 .match-title {
   display: flex;
   align-items: center;
+  margin-top: 25px;
+  margin-bottom: 40px;
 
   .arrow-icon{
     height: 50px;
@@ -30,6 +32,11 @@
     padding: 0px;
     height: 100%;
     align-items: center;
+
+    @media screen and (max-width: $default-width) {
+      flex-direction: column;
+
+    }
 
     .match-info-container {
       display: flex;
