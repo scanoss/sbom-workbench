@@ -22,7 +22,7 @@ export interface IWorkbenchContext {
   file: string | null;
   components: Record<string, Component> | null;
   component: Component | null;
-  matchInfo: Record<string, unknown> | null;
+  matchInfo: Record<string, any> | null;
   localFileContent: FileContent | null;
   remoteFileContent: FileContent | null;
   setFile: (file: string) => void;

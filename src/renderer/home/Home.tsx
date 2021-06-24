@@ -47,6 +47,15 @@ const Home = () => {
     });
   };
 
+  const onOpenFilePressed = () => {
+    const projectPath = dialogController.showOpenDialog({
+      properties: ['openFile'],
+    });
+    setScanBasePath(projectPath);
+    setPath(projectPath);
+    showScan(projectPath);
+  };
+
   return (
     <main className="Home">
       <div className="logo">
@@ -60,6 +69,15 @@ const Home = () => {
           disabled={!!path}
         >
           SCAN PROJECT
+        </button>
+
+        <button
+          className="bnt-primary"
+          type="button"
+          onClick={() => onOpenFilePressed()}
+          disabled={!!path}
+        >
+          LOAD PROJECT
         </button>
       </div>
       <div className="progressbar">{path ? <LinearProgress /> : null}</div>

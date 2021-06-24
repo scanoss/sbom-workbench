@@ -1,0 +1,20 @@
+@mixin label-boxie {
+  font-family: Inter;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.label-boxie-gray {
+  @include label-boxie;
+  color: $ignored-gray;
+}
+
+.label-boxie-black {
+  @include label-boxie;
+  color: $nomatch-black;
+}
+
+.label-boxie-orange {
+  @include label-boxie;
+  color: $pending-orange;
+}

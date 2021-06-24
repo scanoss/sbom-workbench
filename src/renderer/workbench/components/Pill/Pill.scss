@@ -1,0 +1,23 @@
+@mixin pill {
+  border-radius: 10%;
+  padding: 3px;
+  font-size: 15px;
+}
+
+.pending-pill {
+  @include pill;
+  border: 1px solid $pending-orange;
+  color: $pending-orange;
+}
+
+.identified-pill {
+  @include pill;
+  border: 1px solid $indentified-green;
+  color: $indentified-green;
+}
+
+.ignored-pill {
+  @include pill;
+  border: 1px solid $ignored-gray;
+  color: $ignored-gray;
+}

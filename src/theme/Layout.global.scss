@@ -1,6 +1,32 @@
-section.app-page {
+.app-page {
   display: grid;
   height: 100vh;
-  padding: 30px 60px;
+  padding: 30px 65px;
   grid-template-rows: auto 1fr;
+}
+
+.app-header {
+  margin-bottom: 1.5em;
+
+  .header-subtitle {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    height: 48px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+
+    &.back {
+      margin-left: -48px;
+    }
+  }
+
+  .header-title {
+    margin: 0 0 10px;
+    font-size: 46px;
+    font-weight: 700;
+
+    margin-bottom: 40px;
+  }
 }

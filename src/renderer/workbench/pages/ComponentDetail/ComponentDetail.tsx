@@ -1,10 +1,15 @@
-import { Paper, Button } from '@material-ui/core';
+import { Paper } from '@material-ui/core';
 import React, { useContext } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { WorkbenchContext, IWorkbenchContext } from '../../WorkbenchProvider';
+import IconButton from '@material-ui/core/IconButton';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import { AppContext } from '../../../context/AppProvider';
 
 export const ComponentDetail = () => {
   const history = useHistory();
+
+  const { scanBasePath } = useContext<any>(AppContext);
 
   const { component, setFile } = useContext(
     WorkbenchContext
@@ -19,9 +24,13 @@ export const ComponentDetail = () => {
     <>
       <section className="app-page">
         <header className="app-header">
-          <Button onClick={() => history.push('/workbench/')} size="small">
-            BACK
-          </Button>
+          <h4 className="header-subtitle back">
+            <IconButton onClick={() => history.goBack()} component="span">
+              <ArrowBackIcon />
+            </IconButton>
+            {scanBasePath}
+          </h4>
+
           <h1 className="header-title">
             <span className="color-primary">{component?.name}</span> matches
           </h1>
@@ -31,7 +40,7 @@ export const ComponentDetail = () => {
           <section className="file-list">
             {component
               ? component.files.map((file) => (
-                  <Paper onClick={() => onSelectFile(file)} key={file}>
+                  <Paper className="item" onClick={() => onSelectFile(file)} key={file}>
                     {file}
                   </Paper>
                 ))
