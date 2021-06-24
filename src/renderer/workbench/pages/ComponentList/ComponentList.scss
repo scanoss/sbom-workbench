@@ -1,0 +1,33 @@
+.component-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 200px);
+  grid-row-gap: 1.5em;
+  grid-column-gap: 1.5em;
+
+  overflow-y: scroll;
+  padding-bottom: 10px;
+}
+
+.app-content {
+  overflow: scroll;
+}
+
+
+.app-header {
+  margin-bottom: 1.5em;
+
+  .header-subtitle {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .header-title {
+    margin: 5px 0 10px;
+    font-size: 46px;
+    font-weight: 700;
+
+    margin-bottom: 40px;
+  }
+}

@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'url';
+
 export function generateFileTree(scan: Record<string, unknown>): Promise<any> {
   return new Promise((resolve) => {
     const obj = {};
@@ -40,8 +42,28 @@ export function generateFileTree(scan: Record<string, unknown>): Promise<any> {
   });
 }
 
-export function getComponents(scan: any[]) {
-  return [];
+export function getComponents(scan: Record<string, any>): Record<string, any> {
+  const obj = {};
+  for (const [key, value] of Object.entries(scan)) {
+    for (const result of value) {
+      if (result.id === 'none') continue;
+
+      const name = result.component;
+      if (!obj[name]) {
+        obj[name] = {
+          name,
+          vendor: result.vendor,
+          version: result.version,
+          url: result.version,
+          files: [key],
+        };
+      } else {
+        obj[name].files.push(key);
+      }
+    }
+  }
+
+  return obj;
 }
 
 function getLabelMatchesCount(label, value, type) {

@@ -7,30 +7,33 @@ export interface FileContent {
   error: boolean;
 }
 
-interface Component {
-  component: string;
+export interface Component {
+  name: string;
   vendor: string;
   version: string;
   latest: string;
   url: string;
+  files: string[];
 }
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
   tree: [] | null;
   file: string | null;
-  matchInfo: Record<string, any> | null;
+  components: Record<string, Component> | null;
+  component: Component | null;
+  matchInfo: Record<string, unknown> | null;
   localFileContent: FileContent | null;
   remoteFileContent: FileContent | null;
   setFile: (file: string) => void;
   setTree: (tree: []) => void;
+  setComponent: (component) => void;
   resetWorkbench: () => void;
 }
 
 export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(
   null
 );
-
 
 export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   children,
@@ -40,7 +43,7 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   const [tree, setTree] = useState<[] | null>(null);
   const [scan, setScan] = useState<Record<string, unknown> | null>(null);
 
-  const [components, setComponents] = useState<Component[] | null>(null);
+  const [components, setComponents] = useState<Record<string, Component> | null>(null);
   const [component, setComponent] = useState<Component | null>(null);
 
   const [file, setFile] = useState<string | null>(null);
@@ -123,6 +126,9 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
         localFileContent,
         remoteFileContent,
         setFile,
+        components,
+        component,
+        setComponent,
         resetWorkbench,
       }}
     >
