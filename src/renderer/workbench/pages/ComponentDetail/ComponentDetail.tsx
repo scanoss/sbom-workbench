@@ -19,9 +19,9 @@ export const ComponentDetail = () => {
     <>
       <section className="app-page">
         <header className="app-header">
-          <Link to="/workbench">
-            <Button size="small">BACK</Button>
-          </Link>
+          <Button onClick={() => history.push('/workbench/')} size="small">
+            BACK
+          </Button>
           <h1 className="header-title">
             <span className="color-primary">{component?.name}</span> matches
           </h1>
