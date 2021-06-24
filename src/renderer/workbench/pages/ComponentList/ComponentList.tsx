@@ -1,6 +1,7 @@
 import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import SearchIcon from '@material-ui/icons/Search';
 import { AppContext } from '../../../context/AppProvider';
 import { WorkbenchContext, IWorkbenchContext } from '../../WorkbenchProvider';
 import ComponentCard from '../../components/ComponentCard/ComponentCard';
@@ -65,7 +66,7 @@ export const ComponentList = () => {
 
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">
-              {/*  <SearchIcon /> */}
+                <SearchIcon />
             </IconButton>
             <InputBase
               className={classes.input}
