@@ -9,13 +9,52 @@
   align-items: center;
 
 
+
   @media screen and (max-width: $default-width) {
     width: 100%;
     margin-top: 20px;
   }
 
-  div {
-    margin-left: 24px;
+  .match-card-content {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+
+
+    .label-div {
+      margin-left: 24px;
+    }
+
+    .match-card-buttons {
+      visibility: hidden;
+    }
+
+    &:hover{
+
+      .match-card-buttons{
+        margin-right: 3%;
+        visibility: visible;
+        transition: 100ms ease-out;
+
+        .icon{
+          width: 30px;
+          height: 30px;
+          margin-right: 15px;
+        }
+
+        .check{
+          color: $indentified-green;
+        }
+
+        .ban {
+          color: $ignored-gray;
+        }
+
+    }
+    }
+
   }
 }
 
