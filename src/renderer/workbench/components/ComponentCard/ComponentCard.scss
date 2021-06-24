@@ -33,6 +33,7 @@
       overflow: hidden;
 
       p {
+        font-family: 'Space Mono', monospace;
         color: #A1A1AA;
         font-size: 14px;
         font-style: normal;
@@ -74,7 +75,7 @@
           width: 10px;
           height: 10px;
           border-radius: 100%;
-          background-color: red;
+          background-color: var(--color-status-pending);
         }
       }
     }

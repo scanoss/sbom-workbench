@@ -11,13 +11,14 @@ import componentDefault from '../../../../../assets/imgs/component-default.svg';
 
 interface ComponentCardProps {
   component: Component;
+  onClick: (component) => void;
 }
 
-const ComponentCard = ({ component }: ComponentCardProps) => {
+const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
   return (
     <>
       <Card className="component-card" elevation={1}>
-        <ButtonBase>
+        <ButtonBase onClick={() => onClick(component)}>
           <CardContent className="component-card-content">
             <figure>
               <img alt="component logo" src={componentDefault} />

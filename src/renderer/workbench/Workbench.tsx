@@ -8,7 +8,8 @@ import { dialogController } from '../dialog-controller';
 
 import { WorkbenchContext, IWorkbenchContext } from './WorkbenchProvider';
 import { AppContext } from '../context/AppProvider';
-import { ComponentList } from './components/ComponentList/ComponentList';
+import { ComponentList } from './pages/ComponentList/ComponentList';
+import { ComponentDetail } from './pages/ComponentDetail/ComponentDetail';
 
 const Workbench = () => {
   const { path, url } = useRouteMatch();
@@ -17,7 +18,7 @@ const Workbench = () => {
     WorkbenchContext
   ) as IWorkbenchContext;
 
-  const { scanPath, scanBasePath } = useContext(AppContext);
+  const { scanPath, scanBasePath } = useContext<any>(AppContext);
 
   const init = async () => {
     const result = await loadScan(scanPath);
@@ -47,7 +48,12 @@ const Workbench = () => {
         </aside>
         <main className="match-info">
           <Switch>
-            <Route exact path={path}><ComponentList /></Route>
+            <Route exact path={path}>
+              <ComponentList />
+            </Route>
+            <Route path={`${path}/component/`}>
+              <ComponentDetail />
+            </Route>
             <Route path={`${path}/file`}>{file ? <Editor /> : null}</Route>
           </Switch>
         </main>

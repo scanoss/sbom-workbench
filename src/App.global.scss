@@ -6,6 +6,7 @@
 @import "~react-checkbox-tree/lib/react-checkbox-tree.css";
 
 /* theme */
+@import './theme/variables.scss';
 @import './theme/Layout.global.scss';
 @import './theme/SplitPane.global.scss';
 @import './theme/Panel.global.scss';
@@ -15,10 +16,12 @@
 @import './renderer/workbench/Workbench.scss';
 @import './renderer/workbench/components/Editor/Editor.scss';
 @import './renderer/workbench/components/FileTree/FileTree';
-@import './renderer/workbench/components/ComponentList/ComponentList';
+@import './renderer/workbench/pages/ComponentList/ComponentList';
 @import './renderer/workbench/components/ComponentCard/ComponentCard';
 
+/* fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 body {
   position: relative;

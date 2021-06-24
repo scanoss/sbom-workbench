@@ -21,18 +21,19 @@ export interface IWorkbenchContext {
   tree: [] | null;
   file: string | null;
   components: Record<string, Component> | null;
+  component: Component | null;
   matchInfo: Record<string, unknown> | null;
   localFileContent: FileContent | null;
   remoteFileContent: FileContent | null;
   setFile: (file: string) => void;
   setTree: (tree: []) => void;
+  setComponent: (component) => void;
   resetWorkbench: () => void;
 }
 
 export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(
   null
 );
-
 
 export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   children,
@@ -126,6 +127,8 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
         remoteFileContent,
         setFile,
         components,
+        component,
+        setComponent,
         resetWorkbench,
       }}
     >
