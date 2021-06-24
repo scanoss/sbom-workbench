@@ -1,0 +1,23 @@
+.match-info-header {
+  margin-bottom: 20px;
+  .content {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    padding: 0 10px;
+    padding-bottom: 10px !important;
+  }
+}
+
+.editors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
+
+  .editor {
+    pre {
+      font-size: 10px;
+      white-space: pre-line;
+     }
+
+  }
+}

@@ -1,14 +1,39 @@
 import { Box, Button } from '@material-ui/core';
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
+import { Link, Route, Switch, useRouteMatch } from 'react-router-dom';
 import SplitPane, { Pane } from 'react-split-pane';
+import { Editor } from './components/Editor/Editor';
 import { FileTree } from './components/FileTree/FileTree';
-import * as controller from './WorkbenchController';
+import { dialogController } from '../dialog-controller';
+
+import { WorkbenchContext, IWorkbenchContext } from './WorkbenchProvider';
+import { AppContext } from '../context/AppProvider';
+import ComponentList from './components/ComponentList/ComponentList';
 
 const Workbench = () => {
+  const { path, url } = useRouteMatch();
+
+  const { loadScan, file, resetWorkbench } = useContext(
+    WorkbenchContext
+  ) as IWorkbenchContext;
+
+  const { scanPath, scanBasePath } = useContext(AppContext);
+
+  const init = async () => {
+    const result = await loadScan(scanPath);
+    if (!result) {
+      dialogController.showError('Error', 'Cannot read scan.');
+    }
+  };
+
+  useEffect(() => {
+    init();
+    return resetWorkbench;
+  }, []);
+
   return (
     <div>
-      <SplitPane split="vertical" minSize={200} defaultSize={250}>
+      <SplitPane split="vertical" minSize={300} defaultSize={300}>
         <aside className="panel explorer">
           <header>
             <span className="title">Explorer</span>
@@ -16,12 +41,15 @@ const Workbench = () => {
               <Button size="small">BACK</Button>
             </Link>
           </header>
-          <FileTree />
+          <div className="file-tree-container">
+            <FileTree />
+          </div>
         </aside>
-        <main className="">
-          <Box m={3}>
-            <h3>Main content</h3>
-          </Box>
+        <main className="match-info">
+          <Switch>
+            <Route exact path={path}><ComponentList /></Route>
+            <Route path={`${path}/file`}>{file ? <Editor /> : null}</Route>
+          </Switch>
         </main>
       </SplitPane>
     </div>

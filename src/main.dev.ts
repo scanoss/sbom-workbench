@@ -11,10 +11,15 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './main/menu';
+import { IpcEvents } from './ipc-events';
+import * as fs from 'fs';
+
+const scanner = require('./main/scanner/scanner.js');
+const scannerResult = require('./main/scanner/lib/scanner.js');
 
 export default class AppUpdater {
   constructor() {
@@ -69,8 +74,8 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: 1280,
+    height: 768,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       nodeIntegration: true,
@@ -130,4 +135,28 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createWindow();
+});
+
+// TODO: move to isolate module (see menu.ts)
+
+export interface IInitScan {
+  path: string;
+  scanId?: string;
+  // filter: IFilter[];
+}
+
+ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
+  const { path } = arg;
+  const resultsPath = '/tmp/qs.json';
+
+  console.log(`SCANNER: Start scanning path=${path}`);
+  scanner.scan(path, resultsPath);
+
+  scannerResult.addEventListener('onScanDone', (result: any) => {
+    fs.writeFileSync(resultsPath, JSON.stringify(result, null, 4), 'utf8');
+    event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
+      success: true,
+      resultsPath,
+    });
+  });
 });

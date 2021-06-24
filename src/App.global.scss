@@ -2,16 +2,18 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
- 
+
 @import "~react-checkbox-tree/lib/react-checkbox-tree.css";
 
 /* theme */
-@import './theme/SplitPane.global.css';
-@import './theme/Panel.global.css';
+@import './theme/SplitPane.global.scss';
+@import './theme/Panel.global.scss';
 
 /* components */
-@import './renderer/home/Home.css';
-@import './renderer/workbench/Workbench.css';
+@import './renderer/home/Home.scss';
+@import './renderer/workbench/Workbench.scss';
+@import './renderer/workbench/components/Editor/Editor.scss';
+@import './renderer/workbench/components/FileTree/FileTree';
 
 
 body {
@@ -46,7 +48,7 @@ button.bnt-primary:hover {
   transform: scale(1.05);
 }
 
-button.bnt-primary:active {
+button.bnt-primary:active, button.bnt-primary:focus {
   outline: none;
 }
 
@@ -60,10 +62,23 @@ a:hover {
   opacity: 1;
   text-decoration: none;
 }
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
 
-.Hello {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px 0;
+/* 4px scroll thumb. 10px margin from right margin */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 14px 14px transparent;
+  border: solid 3px transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  box-shadow: inset 0 0 14px 14px #d7d7db;
+  border: solid 3px transparent;
+  border-radius: 14px;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
 }

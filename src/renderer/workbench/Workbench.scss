@@ -1,0 +1,28 @@
+:root {
+  /* TODO: armar theme cuando llegue UI */
+  --background-color-primary: #e4e4e7;
+  --text-color-primary: #505050;
+}
+
+.explorer {
+  color: var(--text-color-primary);
+  height: 100%;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  .file-tree-container {
+    display: flex;
+    overflow: scroll;
+    overflow-x: auto;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.match-info {
+  height: 100%;
+  background-color: var(--background-color-primary);
+  padding: 20px 40px;
+}
