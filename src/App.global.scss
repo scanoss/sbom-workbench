@@ -27,15 +27,16 @@ $default-width: 1280px;
 @import './theme/Panel.global.scss';
 
 /* components */
-@import './renderer/home/Home.scss';
-@import './renderer/workbench/Workbench.scss';
-@import './renderer/workbench/components/Editor/Editor.scss';
-@import './renderer/workbench/components/FileTree/FileTree';
+@import './renderer/home/Home';
+@import './renderer/workbench/Workbench';
+@import 'renderer/workbench/pages/Editor/Editor';
 @import './renderer/workbench/pages/ComponentList/ComponentList';
+@import './renderer/workbench/pages/ComponentDetail/ComponentDetail';
+@import './renderer/workbench/components/FileTree/FileTree';
 @import './renderer/workbench/components/ComponentCard/ComponentCard';
-@import './renderer/workbench/components/Label/Label.scss';
-@import './renderer/workbench/components/Pill/Pill.scss';
-@import './renderer/workbench/components/Title/Title.scss';
+@import './renderer/workbench/components/Label/Label';
+@import './renderer/workbench/components/Pill/Pill';
+@import './renderer/workbench/components/Title/Title';
 @import './renderer/workbench/components/MatchCard/MatchCard';
 
 /* fonts */

@@ -40,7 +40,7 @@ export const ComponentDetail = () => {
           <section className="file-list">
             {component
               ? component.files.map((file) => (
-                  <Paper onClick={() => onSelectFile(file)} key={file}>
+                  <Paper className="item" onClick={() => onSelectFile(file)} key={file}>
                     {file}
                   </Paper>
                 ))

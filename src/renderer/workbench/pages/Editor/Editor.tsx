@@ -1,27 +1,31 @@
-import { Card, CardContent, Chip } from '@material-ui/core';
-import React, { useContext, useState, useEffect } from 'react';
+import { CardContent } from '@material-ui/core';
+import React, { useContext } from 'react';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
-import Label from '../Label/Label';
-import Title from '../Title/Title';
-import MatchCard from '../MatchCard/MatchCard';
+import Label from '../../components/Label/Label';
+import Title from '../../components/Title/Title';
+import MatchCard from '../../components/MatchCard/MatchCard';
+import IconButton from '@material-ui/core/IconButton';
+import { useHistory } from 'react-router-dom';
 
 export const Editor = () => {
+  const history = useHistory();
+
   const { file, matchInfo, remoteFileContent, localFileContent } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
 
-  const matchCode = remoteFileContent?.content?.toString();
-  console.log(matchCode);
   return (
     <section className="app-page">
       <header className="app-header">
         {matchInfo ? (
           <>
             <div className="match-title">
-              <ArrowBackIcon className="arrow-icon" />
+              <IconButton onClick={() => history.goBack()} component="span">
+                <ArrowBackIcon className="arrow-icon" />
+              </IconButton>
               <span className="match-span">Match</span>
             </div>
             <header className="match-info-header">
@@ -63,19 +67,20 @@ export const Editor = () => {
 
       <main className="editors app-content">
         <div className="editor">
-          {remoteFileContent?.content ? (
+          {localFileContent?.content ? (
             <>
               <p>Source File</p>
               <SyntaxHighlighter
                 className="code-viewer"
                 language="javascript"
+                wrapLongLines="true"
                 style={atomOneDark}
                 showLineNumbers
               >
-                {remoteFileContent?.error ? (
+                {localFileContent?.error ? (
                   <p>File not found</p>
                 ) : (
-                  remoteFileContent?.content?.toString()
+                  localFileContent?.content?.toString()
                 )}
               </SyntaxHighlighter>
             </>
@@ -89,6 +94,7 @@ export const Editor = () => {
               <SyntaxHighlighter
                 className="code-viewer"
                 language="javascript"
+                wrapLongLines="true"
                 style={atomOneDark}
                 showLineNumbers
               >

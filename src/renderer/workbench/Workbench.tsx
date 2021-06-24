@@ -2,7 +2,7 @@ import { Button } from '@material-ui/core';
 import React, { useContext, useEffect } from 'react';
 import { Link, Route, Switch, useRouteMatch } from 'react-router-dom';
 import SplitPane from 'react-split-pane';
-import { Editor } from './components/Editor/Editor';
+import { Editor } from './pages/Editor/Editor';
 import { FileTree } from './components/FileTree/FileTree';
 import { dialogController } from '../dialog-controller';
 
