@@ -80,7 +80,7 @@ function getLabelMatchesCount(label, value, type) {
 }
 
 function getStatus(scan, key) {
-  return scan[key][0]?.id !== 'none' ? 'match' : '';
+  return scan[key] && scan[key][0]?.id !== 'none' ? 'match' : '';
 }
 
 export default {
