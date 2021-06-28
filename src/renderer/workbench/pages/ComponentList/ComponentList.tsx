@@ -43,6 +43,19 @@ export const ComponentList = () => {
   const history = useHistory();
   const classes = useStyles();
 
+/*   document.getElementById("ComponentList").onscroll = () => scrollFunction();
+
+  function scrollFunction() {
+    console.log("hola");
+
+    if ( document.getElementById("ComponentList").scrollTop > 50) {
+      console.log("hola");
+      document.querySelector(".app-header").style.fontSize = "30px";
+    } else {
+      document.querySelector(".app-header").style.fontSize = "90px";
+    }
+  } */
+
   const { scanBasePath } = useContext<any>(AppContext);
 
   const { components, setComponent } = useContext(
@@ -59,7 +72,7 @@ export const ComponentList = () => {
 
   return (
     <>
-      <section className="app-page">
+      <section id="ComponentList" className="app-page">
         <header className="app-header">
           <h4 className="header-subtitle">{scanBasePath}</h4>
           <h1 className="header-title">Detected Components</h1>

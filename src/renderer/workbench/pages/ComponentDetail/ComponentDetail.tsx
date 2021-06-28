@@ -1,10 +1,12 @@
-import { Paper } from '@material-ui/core';
+import { Button, Paper } from '@material-ui/core';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
-import { WorkbenchContext, IWorkbenchContext } from '../../WorkbenchProvider';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import { WorkbenchContext, IWorkbenchContext } from '../../WorkbenchProvider';
 import { AppContext } from '../../../context/AppProvider';
+import { inventoryService } from '../../../../api/inventory-service';
+import { Inventory } from '../../../../api/types';
 
 export const ComponentDetail = () => {
   const history = useHistory();
@@ -18,6 +20,14 @@ export const ComponentDetail = () => {
   const onSelectFile = (file: string) => {
     setFile(file);
     history.push(`/workbench/file/${file}`);
+  };
+
+  const onIdentifyAllPressed = async () => {
+    const inventory: Inventory = {
+      files: component ? component.files : [],
+    };
+    const newInventory = await inventoryService.create(inventory);
+    console.log(newInventory);
   };
 
   return (
@@ -34,13 +44,27 @@ export const ComponentDetail = () => {
           <h1 className="header-title">
             <span className="color-primary">{component?.name}</span> matches
           </h1>
+
+          <section>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={onIdentifyAllPressed}
+            >
+              Identify All ({component?.files?.length})
+            </Button>
+          </section>
         </header>
 
         <main className="app-content">
           <section className="file-list">
             {component
               ? component.files.map((file) => (
-                  <Paper className="item" onClick={() => onSelectFile(file)} key={file}>
+                  <Paper
+                    className="item"
+                    onClick={() => onSelectFile(file)}
+                    key={file}
+                  >
                     {file}
                   </Paper>
                 ))
