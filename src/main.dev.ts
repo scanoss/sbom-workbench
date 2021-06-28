@@ -18,9 +18,6 @@ import MenuBuilder from './main/menu';
 import { IpcEvents } from './ipc-events';
 import * as fs from 'fs';
 
-const scanner = require('./main/scanner/scanner.js');
-const scannerResult = require('./main/scanner/lib/scanner.js');
-
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -145,18 +142,4 @@ export interface IInitScan {
   // filter: IFilter[];
 }
 
-ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
-  const { path } = arg;
-  const resultsPath = '/tmp/qs.json';
-
-  console.log(`SCANNER: Start scanning path=${path}`);
-  scanner.scan(path, resultsPath);
-
-  scannerResult.addEventListener('onScanDone', (result: any) => {
-    fs.writeFileSync(resultsPath, JSON.stringify(result, null, 4), 'utf8');
-    event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
-      success: true,
-      resultsPath,
-    });
-  });
-});
+ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {});
