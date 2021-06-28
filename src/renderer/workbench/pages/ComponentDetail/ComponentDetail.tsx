@@ -23,7 +23,17 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyAllPressed = async () => {
+    if (!component) return;
+    console.log(component);
+
     const inventory: Inventory = {
+      purl: component.purl[0],
+      url: component.url,
+      notes: 'no notes',
+      usage: 'file',
+      license_name: component.licences[0]
+        ? component.licences[0].name
+        : 'no-data',
       files: component ? component.files : [],
     };
     const newInventory = await inventoryService.create(inventory);

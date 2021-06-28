@@ -13,6 +13,8 @@ export interface Component {
   version: string;
   latest: string;
   url: string;
+  purl: string[];
+  licences: any[];
   files: string[];
 }
 

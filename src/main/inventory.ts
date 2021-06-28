@@ -8,6 +8,6 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, (event, id: number) => {
 });
 
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, (event, arg: Inventory) => {
-  console.log(arg.files);
+  console.log(arg);
   return { status: 'ok', message: 'test' };
 });
