@@ -1,17 +1,18 @@
-class ScannableItem {
-    contentSource;
-    content;
-    
-    constructor (contentSource,content) {
-        this.contentSource = contentSource;
-        this.content = content;
-    }
+export class ScannableItem {
+  contentSource;
 
-    getContent(){return this.content}
-    getContentSource(){return this.contentSource}
-}
+  content;
 
+  constructor(contentSource, content) {
+    this.contentSource = contentSource;
+    this.content = content;
+  }
 
-module.exports = {
-    ScannableItem,
+  getContent() {
+    return this.content;
+  }
+
+  getContentSource() {
+    return this.contentSource;
+  }
 }

@@ -1,13 +1,13 @@
-const EventEmitter = require("events");
-const fetch = require('node-fetch');
-const FormData = require('form-data');
-const fs = require('fs');
-const { SCANNER_EVENTS } = require('../ScannerEvents');
-const { DispatcherResponse } = require('./DispatcherResponse');
-const {default: PQueue} = require('p-queue');
+import EventEmitter             from "events";
+import fetch                    from 'node-fetch';
+import FormData                 from 'form-data';
+import fs                       from 'fs';
+import { SCANNER_EVENTS }       from '../ScannerEvents.js';
+import { DispatcherResponse }   from './DispatcherResponse.js';
+import PQueue from 'p-queue';
 
 
-class Dispatcher extends EventEmitter{
+export class Dispatcher extends EventEmitter{
 
     #CONCURRENCY_LIMIT = 3;
     #pQueue;
@@ -41,7 +41,3 @@ class Dispatcher extends EventEmitter{
     }
 }
 
-
-module.exports = {
-    Dispatcher
-}

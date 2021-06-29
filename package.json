@@ -247,7 +247,7 @@
     "isbinaryfile": "^4.0.8",
     "node-blob": "^0.0.2",
     "node-fetch": "^2.6.1",
-    "p-queue": "6.6.2",
+    "p-queue": "^7.1.0",
     "react": "^17.0.1",
     "react-checkbox-tree": "^1.7.1",
     "react-dom": "^17.0.1",

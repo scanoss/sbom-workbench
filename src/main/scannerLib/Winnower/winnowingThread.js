@@ -1,8 +1,10 @@
-const winnowing = require('./winnowingAlgorithm');
-const { parentPort } = require('worker_threads');
-
+import { parentPort } from 'worker_threads';
+import { wfp_for_content } from './winnowingAlgorithm.js';
 
 parentPort.on('message', async (scannableItem) => {
-    let fingerprint = winnowing.wfp_for_content(scannableItem.content,scannableItem.contentSource);            
-    parentPort.postMessage(fingerprint);
-  });
+  const fingerprint = wfp_for_content(
+    scannableItem.content,
+    scannableItem.contentSource
+  );
+  parentPort.postMessage(fingerprint);
+});

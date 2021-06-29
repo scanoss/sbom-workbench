@@ -1,21 +1,24 @@
-const fs = require('fs');
+import fs from 'fs';
 
-class DispatcherResponse  {
+export class DispatcherResponse {
+  #serverData;
 
-    #serverData;
-    #wfpFilePath;
+  #wfpFilePath;
 
-    constructor(serverData, wfpFilePath) {
-        this.#serverData = serverData;
-        this.#wfpFilePath = wfpFilePath;
-    }
+  constructor(serverData, wfpFilePath) {
+    this.#serverData = serverData;
+    this.#wfpFilePath = wfpFilePath;
+  }
 
-    getServerData() {return this.#serverData}
-    getWfpContent() {return fs.readFileSync(this.#wfpFilePath)}
-    getAssociatedWfp() {return this.#wfpFilePath}
-}
+  getServerData() {
+    return this.#serverData;
+  }
 
+  getWfpContent() {
+    return fs.readFileSync(this.#wfpFilePath);
+  }
 
-module.exports = {
-    DispatcherResponse,
+  getAssociatedWfp() {
+    return this.#wfpFilePath;
+  }
 }

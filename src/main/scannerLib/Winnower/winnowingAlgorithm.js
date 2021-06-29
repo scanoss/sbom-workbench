@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-/** 
+/**
 Winnowing Algorithm implementation for SCANOSS.
 
 This module implements an adaptation of the original winnowing algorithm by S. Schleimer, D. S. Wilkerson and A. Aiken
@@ -56,12 +56,10 @@ file is the MD5 hash, file length and file path being fingerprinted, followed by
 a list of WFP fingerprints with their corresponding line numbers.
 */
 
+import crypto from 'crypto';
+
 const isWin = process.platform === 'win32';
 const pathSeparator = isWin ? '\\' : '/';
-
-
-const crypto = require('crypto');
-const path = require('path');
 
 // Winnowing configuration. DO NOT CHANGE.
 const GRAM = 30;
@@ -76,18 +74,17 @@ const ASCII_a = 97;
 const ASCII_z = 122;
 const ASCII_LF = 10;
 
-
-
 function normalize(byte) {
   if (byte < ASCII_0 || byte > ASCII_z) {
     return 0;
-  } else if (byte <= ASCII_9 || byte >= ASCII_a) {
-    return byte;
-  } else if (byte >= ASCII_A && byte <= ASCII_Z) {
-    return byte + 32;
-  } else {
-    return 0;
   }
+  if (byte <= ASCII_9 || byte >= ASCII_a) {
+    return byte;
+  }
+  if (byte >= ASCII_A && byte <= ASCII_Z) {
+    return byte + 32;
+  }
+  return 0;
 }
 
 function min_hex_array(array) {
@@ -100,7 +97,6 @@ function min_hex_array(array) {
   return min;
 }
 
-
 /**
  * Returns the WFP for a file by executing the winnowing algorithm over its contents.
  * @param {string} file The name of the file
@@ -108,8 +104,8 @@ function min_hex_array(array) {
 // function wfp_for_file (file, filename) {
 //   let contents = ''
 //   let size = 0;
-//   try {  
-//       contents = fs.readFileSync(file); 
+//   try {
+//       contents = fs.readFileSync(file);
 //       size = fs.lstatSync(file).size;
 //   } catch (error) {
 //       console.log("Error reading file: ", filename)
@@ -120,7 +116,7 @@ function min_hex_array(array) {
 
 //   let file_md5 = crypto.createHash('md5').update(contents).digest('hex');
 //   let wfp = `file=${file_md5},${contents.length},${filename}\n`;
-  
+
 //   if((!isBinaryFileSync(contents, size)) && size<MAX_FILE_SIZE)  {
 //     let preWfp = calc_wfp(contents);
 //     if (preWfp.length <= MAX_SIZE_CHUNK) {
@@ -130,17 +126,16 @@ function min_hex_array(array) {
 //   return wfp;
 // }
 
-
- function wfp_for_content (contents, contentSource) {
-  let file_md5 = crypto.createHash('md5').update(contents).digest('hex');
+export function wfp_for_content(contents, contentSource) {
+  const file_md5 = crypto.createHash('md5').update(contents).digest('hex');
   let wfp = `file=${file_md5},${contents.length},${contentSource}\n`;
-  wfp+=calc_wfp(contents);
+  wfp += calc_wfp(contents);
   return wfp;
 }
 
 function calc_wfp(contents) {
   let gram = '';
-  let window = [];
+  const window = [];
   let normalized = 0;
   let line = 1;
   let min_hash = 'ffffffff';
@@ -150,8 +145,8 @@ function calc_wfp(contents) {
   let gram_crc32 = 0;
   let wfp = '';
 
-  for (var i = 0; i < contents.length; i++) {
-    let byte = contents[i];
+  for (let i = 0; i < contents.length; i++) {
+    const byte = contents[i];
     if (byte == ASCII_LF) {
       line += 1;
       normalized = 0;
@@ -173,18 +168,18 @@ function calc_wfp(contents) {
             // Hashing the hash will result in a better balanced output data set
             // as it will counter the winnowing effect which selects the "minimum"
             // hash in each window
-            let min_hash_bytes_le = parseHexString(
+            const min_hash_bytes_le = parseHexString(
               toLittleEndianCRCHex(min_hash)
             );
-            let crc_hex = crc32c_for_bytes_hex(min_hash_bytes_le);
+            const crc_hex = crc32c_for_bytes_hex(min_hash_bytes_le);
 
             if (last_line != line) {
               if (output.length > 0) {
-                wfp += output + '\n';
+                wfp += `${output}\n`;
               }
               output = `${line}=${crc_hex}`;
             } else {
-              output += ',' + crc_hex;
+              output += `,${crc_hex}`;
             }
             last_line = line;
             last_hash = min_hash;
@@ -196,14 +191,14 @@ function calc_wfp(contents) {
     }
   }
   if (output.length > 0) {
-    wfp += output + '\n';
+    wfp += `${output}\n`;
   }
 
   return wfp;
 }
 
 function parseHexString(str) {
-  var result = [];
+  const result = [];
   while (str.length >= 2) {
     result.push(parseInt(str.substring(0, 2), 16));
     str = str.substring(2, str.length);
@@ -229,14 +224,14 @@ function toLittleEndianCRCHex(hex) {
   );
 }
 
-var CRC_TABLE = [];
+let CRC_TABLE = [];
 
 function makeCRCTable() {
-  var c;
-  var crcTable = [];
-  for (var n = 0; n < 256; n++) {
+  let c;
+  const crcTable = [];
+  for (let n = 0; n < 256; n++) {
     c = n;
-    for (var k = 0; k < 8; k++) {
+    for (let k = 0; k < 8; k++) {
       c = c & 1 ? 0x82f63b78 ^ (c >>> 1) : c >>> 1;
     }
     crcTable[n] = c;
@@ -248,9 +243,9 @@ function crc32c(str) {
   if (CRC_TABLE.length == 0) {
     CRC_TABLE = makeCRCTable();
   }
-  var crc = 0 ^ -1;
+  let crc = 0 ^ -1;
 
-  for (var i = 0; i < str.length; i++) {
+  for (let i = 0; i < str.length; i++) {
     crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ str.charCodeAt(i)) & 0xff];
   }
 
@@ -261,9 +256,9 @@ function crc32c_for_bytes(bytes) {
   if (CRC_TABLE.length == 0) {
     CRC_TABLE = makeCRCTable();
   }
-  var crc = 0 ^ -1;
+  let crc = 0 ^ -1;
 
-  for (var i = 0; i < bytes.length; i++) {
+  for (let i = 0; i < bytes.length; i++) {
     crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ bytes[i]) & 0xff];
   }
 
@@ -277,9 +272,3 @@ function crc32c_for_bytes_hex(bytes) {
 function crc32c_hex(str) {
   return crc32c(str).toString(16).padStart(8, '0');
 }
-
-
-
-module.exports = {
-  wfp_for_content,
-};
