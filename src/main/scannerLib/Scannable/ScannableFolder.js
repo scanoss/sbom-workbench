@@ -1,5 +1,4 @@
 import path from 'path';
-import { readFile } from 'fs/promises';
 import fs from 'fs';
 
 import { AbstractScannable } from './AbstractScannable.js';
@@ -24,7 +23,7 @@ export class ScannableFolder extends AbstractScannable {
       // const stats = fs.lstatSync(filepath);
       if (d.isDirectory() && !d.isSymbolicLink()) yield* this.#walk(entry);
       else if (d.isFile() && !d.isSymbolicLink()) {
-        const fileContent = await readFile(entry);
+        const fileContent = await fs.promises.readFile(entry);
         yield new ScannableItem(entry, fileContent);
       }
     }

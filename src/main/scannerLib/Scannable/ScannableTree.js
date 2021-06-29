@@ -1,4 +1,4 @@
-import { readFile } from 'fs/promises';
+import fs from 'fs';
 
 import { AbstractScannable } from './AbstractScannable.js';
 import { ScannableItem } from './ScannableItem.js';
@@ -33,7 +33,7 @@ export class ScannableTree extends AbstractScannable {
 
   async *#createGenerator() {
     for (const filePath of this.#fileList) {
-      const fileContent = await readFile(filePath);
+      const fileContent = await fs.promises.readFile(filePath);
       yield new ScannableItem(filePath, fileContent);
     }
   }

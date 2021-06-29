@@ -1,5 +1,4 @@
 import { Worker } from 'worker_threads';
-import { writeFile } from 'fs/promises';
 import fs from 'fs';
 import EventEmitter from 'events';
 import { SCANNER_EVENTS } from '../ScannerEvents.js';
@@ -39,7 +38,7 @@ export class Winnower extends EventEmitter {
 
   async #createWfpFile(content, dst, name) {
     if (!fs.existsSync(dst)) fs.mkdirSync(dst);
-    await writeFile(`${dst}/${name}.wfp`, content);
+    await fs.promises.writeFile(`${dst}/${name}.wfp`, content);
     this.emit(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, `${dst}/${name}.wfp`);
   }
 
