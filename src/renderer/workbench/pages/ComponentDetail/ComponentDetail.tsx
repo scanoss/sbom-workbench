@@ -1,5 +1,5 @@
 import { Button, Paper } from '@material-ui/core';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -7,11 +7,14 @@ import { WorkbenchContext, IWorkbenchContext } from '../../WorkbenchProvider';
 import { AppContext } from '../../../context/AppProvider';
 import { inventoryService } from '../../../../api/inventory-service';
 import { Inventory } from '../../../../api/types';
+import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
 
 export const ComponentDetail = () => {
   const history = useHistory();
 
   const { scanBasePath } = useContext<any>(AppContext);
+
+  const [open, setOpen] = useState<boolean>(false);
 
   const { component, setFile } = useContext(
     WorkbenchContext
@@ -23,20 +26,15 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyAllPressed = async () => {
-    if (!component) return;
-    console.log(component);
+    setOpen(true);
+  };
 
-    const inventory: Inventory = {
-      purl: component.purl[0],
-      url: component.url,
-      notes: 'no notes',
-      usage: 'file',
-      license_name: component.licences[0]
-        ? component.licences[0].name
-        : 'no-data',
+  const handleClose = async (inventory: Inventory) => {
+    setOpen(false);
+    const newInventory = await inventoryService.create({
+      ...inventory,
       files: component ? component.files : [],
-    };
-    const newInventory = await inventoryService.create(inventory);
+    });
     console.log(newInventory);
   };
 
@@ -82,6 +80,12 @@ export const ComponentDetail = () => {
           </section>
         </main>
       </section>
+
+      <InventoryDialog
+        open={open}
+        onClose={handleClose}
+        component={component}
+      />
     </>
   );
 };

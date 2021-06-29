@@ -5,5 +5,5 @@ export interface Inventory {
   notes: string;
   url: string;
   license_name: string;
-  files: string[];
+  files?: string[];
 }
