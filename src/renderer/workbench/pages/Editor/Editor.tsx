@@ -1,14 +1,16 @@
 import { CardContent } from '@material-ui/core';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import IconButton from '@material-ui/core/IconButton';
+import { useHistory } from 'react-router-dom';
+import { isNull } from 'util';
 import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
 import Label from '../../components/Label/Label';
 import Title from '../../components/Title/Title';
 import MatchCard from '../../components/MatchCard/MatchCard';
-import IconButton from '@material-ui/core/IconButton';
-import { useHistory } from 'react-router-dom';
+import { range } from '../../../../utils/utils';
 
 export const Editor = () => {
   const history = useHistory();
@@ -16,6 +18,39 @@ export const Editor = () => {
   const { file, matchInfo, remoteFileContent, localFileContent } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
+
+  const [ossLines, setOssLines] = useState<number[] | null>([]);
+  const [lines, setLines] = useState<number[] | null>([]);
+
+  useEffect(() => {
+    console.log(matchInfo?.matched);
+    if (!matchInfo) {
+      return;
+    }
+
+    const linesOss =
+      matchInfo?.id === 'file'
+        ? setOssLines(null)
+        : setOssLines(
+            range(
+              parseInt(matchInfo?.oss_lines.split('-')[0]),
+              parseInt(matchInfo?.oss_lines.split('-')[1])
+            )
+          );
+
+    const lineasLocales =
+      matchInfo?.id === 'file'
+        ? setLines(null)
+        : setLines(
+            range(
+              parseInt(matchInfo?.lines.split('-')[0]),
+              parseInt(matchInfo?.lines.split('-')[1])
+            )
+          );
+
+          console.log(linesOss);
+          console.log(lineasLocales);
+  }, [matchInfo]);
 
   return (
     <section className="app-page">
@@ -67,7 +102,7 @@ export const Editor = () => {
 
       <main className="editors app-content">
         <div className="editor">
-          {localFileContent?.content ? (
+          {remoteFileContent?.content ? (
             <>
               <p>Source File</p>
               <SyntaxHighlighter
@@ -76,11 +111,20 @@ export const Editor = () => {
                 wrapLongLines="true"
                 style={atomOneDark}
                 showLineNumbers
+                lineProps={(lineNumber) => {
+                  const style = { display: 'block' };
+                  if(lines === null){
+                    console.log("Tengo null pq soy un file")
+                  } else if (lines.includes(lineNumber)) {
+                    style.backgroundColor = '#EBE922';
+                  }
+                  return { style };
+                }}
               >
-                {localFileContent?.error ? (
+                {remoteFileContent?.error ? (
                   <p>File not found</p>
                 ) : (
-                  localFileContent?.content?.toString()
+                  remoteFileContent?.content?.toString()
                 )}
               </SyntaxHighlighter>
             </>
@@ -97,6 +141,15 @@ export const Editor = () => {
                 wrapLongLines="true"
                 style={atomOneDark}
                 showLineNumbers
+                lineProps={(lineNumber) => {
+                  const style = { display: 'block' };
+                  if (ossLines === null) {
+                    console.log(`No tengo pq soy un file`);
+                  } else if (ossLines.includes(lineNumber)) {
+                    style.backgroundColor = '#EBE922';
+                  }
+                  return { style };
+                }}
               >
                 {remoteFileContent?.error ? (
                   <p>File not found</p>
