@@ -52,13 +52,15 @@ export function getComponents(scan: Record<string, any>): Record<string, any> {
       if (!obj[name]) {
         obj[name] = {
           name,
-          purl: result.purl | [],
+          purl: result.purl || [],
           licences: result.licenses,
           vendor: result.vendor,
           version: result.version,
           url: result.url,
           files: [key],
         };
+        console.log(obj)
+
       } else {
         obj[name].files.push(key);
       }
