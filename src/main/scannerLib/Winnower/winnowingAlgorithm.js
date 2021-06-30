@@ -56,7 +56,7 @@ file is the MD5 hash, file length and file path being fingerprinted, followed by
 a list of WFP fingerprints with their corresponding line numbers.
 */
 
-import crypto from 'crypto';
+const crypto = require('crypto');
 
 const isWin = process.platform === 'win32';
 const pathSeparator = isWin ? '\\' : '/';
@@ -126,7 +126,7 @@ function min_hex_array(array) {
 //   return wfp;
 // }
 
-export function wfp_for_content(contents, contentSource) {
+function wfp_for_content(contents, contentSource) {
   const file_md5 = crypto.createHash('md5').update(contents).digest('hex');
   let wfp = `file=${file_md5},${contents.length},${contentSource}\n`;
   wfp += calc_wfp(contents);
@@ -271,4 +271,9 @@ function crc32c_for_bytes_hex(bytes) {
 
 function crc32c_hex(str) {
   return crc32c(str).toString(16).padStart(8, '0');
+}
+
+
+module.exports = {
+  wfp_for_content,
 }

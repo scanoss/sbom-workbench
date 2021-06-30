@@ -18,6 +18,9 @@ import MenuBuilder from './main/menu';
 import { IpcEvents } from './ipc-events';
 import * as fs from 'fs';
 
+import { Scanner } from './main/scannerLib/Scanner';
+import { SCANNER_EVENTS } from './main/scannerLib/ScannerEvents';
+
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -142,4 +145,29 @@ export interface IInitScan {
   // filter: IFilter[];
 }
 
-ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {});
+ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
+  const scanner = new Scanner();
+
+  scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
+    console.log('Starting Winnowing...');
+  });
+  scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (path) =>
+    console.log(`New WFP File on: ${path}`)
+  );
+  scanner.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => {
+    console.log('Winnowing Finished...');
+  });
+
+  scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (path) => {
+    console.log(`Sending WFP file ${path} to server`);
+  });
+  scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (data) => {
+    console.log(`Received response from server ${data.getAssociatedWfp()}`);
+  });
+
+  scanner.on(SCANNER_EVENTS.SCAN_DONE, (path) => {
+    console.log(`Scan Finished... Results on: ${path}`);
+  });
+
+  scanner.scanFolder('/home/ubuntu/Projects/delete_me');
+});

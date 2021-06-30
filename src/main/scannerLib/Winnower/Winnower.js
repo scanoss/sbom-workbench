@@ -13,7 +13,7 @@ export class Winnower extends EventEmitter {
 
   #wfp;
 
-  #worker = new Worker('./scannerLib/Winnower/winnowingThread.js');
+  #worker = new Worker('./src/main/scannerLib/Winnower/winnowingThread.js');
 
   constructor() {
     super();
