@@ -148,13 +148,8 @@ export interface IInitScan {
   scanId?: string;
   // filter: IFilter[];
 }
-
-let ws: Workspace;
-
-ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
-  ws = new Workspace();
-  const scanner = new Scanner();
-
+/*
+ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
   const { path } = arg;
 
   let created: any;
