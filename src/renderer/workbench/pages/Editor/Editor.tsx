@@ -30,26 +30,24 @@ export const Editor = () => {
 
     const linesOss =
       matchInfo?.id === 'file'
-        ? setOssLines(null)
-        : setOssLines(
-            range(
-              parseInt(matchInfo?.oss_lines.split('-')[0]),
-              parseInt(matchInfo?.oss_lines.split('-')[1])
-            )
+        ? null
+        : range(
+            parseInt(matchInfo?.oss_lines.split('-')[0]),
+            parseInt(matchInfo?.oss_lines.split('-')[1])
           );
 
+    setOssLines(linesOss);
     const lineasLocales =
       matchInfo?.id === 'file'
-        ? setLines(null)
-        : setLines(
-            range(
-              parseInt(matchInfo?.lines.split('-')[0]),
-              parseInt(matchInfo?.lines.split('-')[1])
-            )
+        ? null
+        : range(
+            parseInt(matchInfo?.lines.split('-')[0]),
+            parseInt(matchInfo?.lines.split('-')[1])
           );
+    setLines(lineasLocales);
 
-          console.log(linesOss);
-          console.log(lineasLocales);
+    console.log(linesOss);
+    console.log(lineasLocales);
   }, [matchInfo]);
 
   return (
@@ -102,7 +100,7 @@ export const Editor = () => {
 
       <main className="editors app-content">
         <div className="editor">
-          {remoteFileContent?.content ? (
+          {localFileContent?.content ? (
             <>
               <p>Source File</p>
               <SyntaxHighlighter
@@ -113,18 +111,16 @@ export const Editor = () => {
                 showLineNumbers
                 lineProps={(lineNumber) => {
                   const style = { display: 'block' };
-                  if(lines === null){
-                    console.log("Tengo null pq soy un file")
-                  } else if (lines.includes(lineNumber)) {
+                  if (lines && lines.includes(lineNumber)) {
                     style.backgroundColor = '#EBE922';
                   }
                   return { style };
                 }}
               >
-                {remoteFileContent?.error ? (
+                {localFileContent?.error ? (
                   <p>File not found</p>
                 ) : (
-                  remoteFileContent?.content?.toString()
+                  localFileContent?.content?.toString()
                 )}
               </SyntaxHighlighter>
             </>
@@ -143,9 +139,7 @@ export const Editor = () => {
                 showLineNumbers
                 lineProps={(lineNumber) => {
                   const style = { display: 'block' };
-                  if (ossLines === null) {
-                    console.log(`No tengo pq soy un file`);
-                  } else if (ossLines.includes(lineNumber)) {
+                  if (ossLines && ossLines.includes(lineNumber)) {
                     style.backgroundColor = '#EBE922';
                   }
                   return { style };
