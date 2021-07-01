@@ -10,6 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import { useHistory } from 'react-router-dom';
 import { isNull } from 'util';
 import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
+import { DialogContext } from '../../DialogProvider';
 import Label from '../../components/Label/Label';
 import Title from '../../components/Title/Title';
 import MatchCard from '../../components/MatchCard/MatchCard';
@@ -21,15 +22,10 @@ import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialo
 export const Editor = () => {
   const history = useHistory();
 
-  const {
-    file,
-    matchInfo,
-    remoteFileContent,
-    localFileContent,
-    component,
-    setInventoryBool,
-    inventoryBool,
-  } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { file, matchInfo, remoteFileContent, localFileContent, component } =
+    useContext(WorkbenchContext) as IWorkbenchContext;
+
+  const { setInventoryBool, inventoryBool } = useContext(DialogContext);
 
   const [ossLines, setOssLines] = useState<number[] | null>([]);
   const [lines, setLines] = useState<number[] | null>([]);
@@ -108,7 +104,11 @@ export const Editor = () => {
                       </div>
                     </div>
                   </div>
-                  <MatchCard labelOfCard={file} status="pending" />
+                  <MatchCard
+                    labelOfCard={file}
+                    onClickCheck={() => setInventoryBool(true)}
+                    status="pending"
+                  />
                 </CardContent>
               </header>
             </>

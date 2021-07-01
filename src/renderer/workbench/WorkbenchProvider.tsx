@@ -31,10 +31,7 @@ export interface IWorkbenchContext {
   setTree: (tree: []) => void;
   setComponent: (component) => void;
   resetWorkbench: () => void;
-  inventoryBool: boolean;
-  setInventoryBool: boolean;
 }
-
 
 export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(
   null
@@ -48,12 +45,13 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   const [tree, setTree] = useState<[] | null>(null);
   const [scan, setScan] = useState<Record<string, unknown> | null>(null);
 
-  const [components, setComponents] = useState<Record<string, Component> | null>(null);
+  const [components, setComponents] = useState<Record<
+    string,
+    Component
+  > | null>(null);
   const [component, setComponent] = useState<Component | null>(null);
 
   const [file, setFile] = useState<string | null>(null);
-
-  const [inventoryBool, setInventoryBool] = useState<boolean>(false);
 
   // TODO: remove from provider?
   const [matchInfo, setMatchInfo] = useState<Record<string, unknown> | null>(
@@ -62,10 +60,8 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(
     null
   );
-  const [
-    remoteFileContent,
-    setRemoteFileContent,
-  ] = useState<FileContent | null>(null);
+  const [remoteFileContent, setRemoteFileContent] =
+    useState<FileContent | null>(null);
 
   const loadScan = async (path: string) => {
     try {
@@ -83,8 +79,10 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false });
-      console.log("file", scanBasePath + path);
-      const content = await workbenchController.fetchLocalFile(scanBasePath + path);
+      console.log('file', scanBasePath + path);
+      const content = await workbenchController.fetchLocalFile(
+        scanBasePath + path
+      );
       setLocalFileContent({ content, error: false });
     } catch (error) {
       setLocalFileContent({ content: null, error: true });
@@ -137,8 +135,6 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
         component,
         setComponent,
         resetWorkbench,
-        setInventoryBool,
-        inventoryBool,
       }}
     >
       {children}

@@ -5,13 +5,13 @@ import IconButton from '@material-ui/core/IconButton';
 import Label from '../Label/Label';
 import { WorkbenchContext } from '../../WorkbenchProvider';
 
-interface LabelType {
+interface MatchCardProps {
   labelOfCard: string | null;
-  onClickCheck: boolean;
+  onClickCheck: () => void;
+  status: string | null;
 }
 
-const MatchCard = ({ labelOfCard, status }) => {
-  const { setInventoryBool } = useContext(WorkbenchContext);
+const MatchCard = ({ labelOfCard, status, onClickCheck }: MatchCardProps) => {
   return (
     <div className={`match-card status-${status.toLowerCase()}`}>
       <div className="match-card-content">
@@ -19,10 +19,7 @@ const MatchCard = ({ labelOfCard, status }) => {
           <Label label={labelOfCard} textColor="black" />
         </div>
         <div className="match-card-buttons">
-          <CheckIcon
-            onClick={() => setInventoryBool(true)}
-            className="icon check"
-          />
+          <CheckIcon onClick={() => onClickCheck()} className="icon check" />
           <BanIcon className="icon ban" />
         </div>
       </div>
