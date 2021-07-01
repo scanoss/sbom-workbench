@@ -1,4 +1,6 @@
+/* eslint-disable no-restricted-syntax */
 import { fileURLToPath } from 'url';
+import { Inventory } from '../api/types';
 
 export function generateFileTree(scan: Record<string, unknown>): Promise<any> {
   return new Promise((resolve) => {
@@ -53,17 +55,25 @@ export function getComponents(scan: Record<string, any>): Record<string, any> {
         obj[name] = {
           name,
           purl: result.purl || [],
-          licences: result.licenses,
+          licenses: result.licenses,
           vendor: result.vendor,
           version: result.version,
           url: result.url,
           files: [key],
+          count: {
+            all: 0,
+            pending: 0,
+            ignored: 0,
+            identified: 0,
+          },
         };
-        console.log(obj)
-
       } else {
         obj[name].files.push(key);
       }
+
+      const status = result.status || 'pending';
+      obj[name].count.all += 1;
+      obj[name].count[status] += 1;
     }
   }
 
@@ -87,6 +97,16 @@ function getStatus(scan, key) {
   return scan[key] && scan[key][0]?.id !== 'none' ? 'match' : '';
 }
 
+export function updateTree(scan, inventory: Inventory) {
+  const tree = inventory.files?.reduce((acc, file) => {
+    scan[file][0].status = 'identified';
+    return { ...acc, [file]: scan[file] };
+  }, {});
+
+  return tree;
+}
+
 export default {
   generateFileTree,
+  updateTree,
 };

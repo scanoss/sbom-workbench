@@ -64,6 +64,7 @@
       .info-count {
         display: flex;
         align-items: center;
+        margin-right: 10px;
 
         font-size: 16px;
         font-weight: 400;
@@ -75,7 +76,16 @@
           width: 10px;
           height: 10px;
           border-radius: 100%;
+        }
+
+        &.pending::before {
           background-color: var(--color-status-pending);
+        }
+        &.identified::before {
+          background-color: var(--color-status-identified);
+        }
+        &.ignored::before {
+          background-color: var(--color-status-ignored);
         }
       }
     }

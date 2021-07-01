@@ -45,10 +45,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     const inventory: Inventory = {
       purl: component.purl[0],
       url: component.url,
+      version: component.version,
       notes: 'no notes',
       usage: 'file',
-      license_name: component.licences[0]
-        ? component.licences[0].name
+      license_name: component.licenses[0]
+        ? component.licenses[0].name
         : 'no-data',
     };
 
