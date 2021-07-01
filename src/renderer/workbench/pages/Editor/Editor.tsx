@@ -89,7 +89,10 @@ export const Editor = () => {
                     </div>
                   </div>
                 </div>
-                <MatchCard labelOfCard={file} status="pending" />
+                <MatchCard
+                  labelOfCard={file}
+                  status={matchInfo?.status || 'pending'}
+                />
               </CardContent>
             </header>
           </>

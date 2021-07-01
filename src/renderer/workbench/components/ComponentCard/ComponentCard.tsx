@@ -32,7 +32,21 @@ const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
               </Tooltip>
             </div>
             <div className="component-card-files">
-              <span className="info-count">{component.files.length}</span>
+              {component.count.identified !== 0 ? (
+                <span className="info-count identified">
+                  {component.count.identified}
+                </span>
+              ) : null}
+              {component.count.pending !== 0 ? (
+                <span className="info-count pending">
+                  {component.count.pending}
+                </span>
+              ) : null}
+              {component.count.ignored !== 0 ? (
+                <span className="info-count ignored">
+                  {component.count.ignored}
+                </span>
+              ) : null}
             </div>
           </CardContent>
         </ButtonBase>
