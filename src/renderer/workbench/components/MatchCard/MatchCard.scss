@@ -36,7 +36,7 @@
       .match-card-buttons{
         margin-right: 1%;
         visibility: visible;
-        transition: 100ms ease-out;
+        transition: 100ms ease-in;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -45,7 +45,12 @@
           width: 30px;
           height: 30px;
           margin-right: 15px;
-
+          padding: 10px;
+          border-radius: 50%;
+          &:hover{
+            background-color: rgba(209, 209, 209, 0.226);
+            cursor: pointer;
+          }
         }
 
         .check{

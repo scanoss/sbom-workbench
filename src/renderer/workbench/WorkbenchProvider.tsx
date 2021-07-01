@@ -31,7 +31,10 @@ export interface IWorkbenchContext {
   setTree: (tree: []) => void;
   setComponent: (component) => void;
   resetWorkbench: () => void;
+  inventoryBool: boolean;
+  setInventoryBool: boolean;
 }
+
 
 export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(
   null
@@ -49,6 +52,8 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   const [component, setComponent] = useState<Component | null>(null);
 
   const [file, setFile] = useState<string | null>(null);
+
+  const [inventoryBool, setInventoryBool] = useState<boolean>(false);
 
   // TODO: remove from provider?
   const [matchInfo, setMatchInfo] = useState<Record<string, unknown> | null>(
@@ -132,6 +137,8 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
         component,
         setComponent,
         resetWorkbench,
+        setInventoryBool,
+        inventoryBool,
       }}
     >
       {children}
