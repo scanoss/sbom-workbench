@@ -18,6 +18,8 @@ import MenuBuilder from './main/menu';
 import './main/inventory';
 import { IpcEvents } from './ipc-events';
 import * as fs from 'fs';
+import { Workspace } from './main/workspace/workspace';
+import { ItemExclude } from './api/types';
 
 const scanner = require('./main/scanner/scanner.js');
 const scannerResult = require('./main/scanner/lib/scanner.js');
@@ -145,12 +147,14 @@ export interface IInitScan {
   scanId?: string;
   // filter: IFilter[];
 }
-
+const a = new Workspace();
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
   const { path } = arg;
   const resultsPath = '/tmp/qs.json';
 
   console.log(`SCANNER: Start scanning path=${path}`);
+  a.set_scan_root(path);
+  a.prepare_scan();
   scanner.scan(path, resultsPath);
 
   scannerResult.addEventListener('onScanDone', (result: any) => {
@@ -160,4 +164,8 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
       resultsPath,
     });
   });
+});
+
+ipcMain.on(IpcEvents.ITEM_INCLUDE, (event, arg: ItemExclude) => {
+  a.exclude_file(arg.path, arg.recursive);
 });

@@ -1,20 +1,19 @@
 import { ipcMain } from 'electron';
-import { Inventory } from '../api/types';
+import { License } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { defaultWorkspace } from './workspace/workspace';
 
-ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Inventory) => {
-  let inv: any;
+ipcMain.handle(IpcEvents.LICENSE_GET, async (event, licToGet: License) => {
+  let license: any;
   try {
-    inv = await defaultWorkspace.scans_db.getInventory(invget);
+    license = await defaultWorkspace.scans_db.getLicenses(licToGet);
   } catch (e) {
     console.log('Catch an error: ', e);
   }
-  console.log(inv.id);
-  return { status: 'ok', message: inv };
+  return { status: 'ok', message: license };
 });
 
-ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
+ipcMain.handle(IpcEvents.LICENSE_CREATE, async (event, arg: License) => {
   let created: any;
   try {
     created = await defaultWorkspace.scans_db.createInventory(arg);
@@ -22,7 +21,7 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   } catch (e) {
     console.log('Catch an error: ', e);
   }
-  console.log('la info de inventario es ');
+  console.log('License was created info de inventario es ');
   console.log(arg);
   return { status: 'ok', message: created };
 });
