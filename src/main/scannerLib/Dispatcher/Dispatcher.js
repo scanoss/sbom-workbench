@@ -29,7 +29,7 @@ export class Dispatcher extends EventEmitter {
     const wfpContent = fs.readFileSync(wfpFilePath);
     const form = new FormData();
     this.emit(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, wfpFilePath);
-    form.append('filename', new Buffer.from(wfpContent), 'data.wfp');
+    form.append('filename', Buffer.from(wfpContent), 'data.wfp');
     const response = await fetch('https://osskb.org/api/scan/direct', {
       method: 'post',
       body: form,

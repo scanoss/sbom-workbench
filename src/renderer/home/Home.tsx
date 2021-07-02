@@ -11,9 +11,8 @@ import { IpcEvents } from '../../ipc-events';
 const Home = () => {
   const history = useHistory();
 
-  const { scanPath, setScanPath, setScanBasePath } = useContext<any>(
-    AppContext
-  );
+  const { scanPath, setScanPath, setScanBasePath } =
+    useContext<any>(AppContext);
 
   const [progress, setProgress] = useState<number>(0);
   const [path, setPath] = useState<string | null>(null);
@@ -40,6 +39,7 @@ const Home = () => {
     ipcRenderer.on(IpcEvents.SCANNER_FINISH_SCAN, (event, args) => {
       console.log(IpcEvents.SCANNER_FINISH_SCAN);
       if (args.success) {
+        console.log(args);
         showScan(args.resultsPath);
       } else {
         showError();

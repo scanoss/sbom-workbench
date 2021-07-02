@@ -147,28 +147,35 @@ export interface IInitScan {
 }
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
+  const { path } = arg;
+
   const scanner = new Scanner();
 
   scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
     console.log('Starting Winnowing...');
   });
-  scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (path) =>
-    console.log(`New WFP File on: ${path}`)
+  scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (dir) =>
+    console.log(`New WFP File on: ${dir}`)
   );
   scanner.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => {
     console.log('Winnowing Finished...');
   });
 
-  scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (path) => {
-    console.log(`Sending WFP file ${path} to server`);
+  scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (dir) => {
+    console.log(`Sending WFP file ${dir} to server`);
   });
   scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (data) => {
     console.log(`Received response from server ${data.getAssociatedWfp()}`);
   });
 
-  scanner.on(SCANNER_EVENTS.SCAN_DONE, (path) => {
-    console.log(`Scan Finished... Results on: ${path}`);
+  scanner.on(SCANNER_EVENTS.SCAN_DONE, (resultsPath) => {
+    console.log(`Scan Finished... Results on: ${resultsPath}`);
+    event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
+      success: true,
+      resultsPath,
+    });
   });
 
-  scanner.scanFolder('/home/ubuntu/Projects/delete_me');
+  console.log(`SCANNER: Start scanning path=${path}`);
+  scanner.scanFolder(path);
 });

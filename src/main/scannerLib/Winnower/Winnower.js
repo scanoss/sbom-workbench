@@ -58,7 +58,7 @@ function min_hex_array(array) {
 
 function wfp_for_content(contents, contentSource) {
   const file_md5 = crypto.createHash('md5').update(contents).digest('hex');
-  let wfp = 'file=' + toString(file_md5) + ',' + toString(contents.length) + ',' +toString(contentSource)+ String.fromCharCode(10);
+  let wfp = 'file=' + String(file_md5) + ',' + String(contents.length) + ',' + String(contentSource)+ String.fromCharCode(10);
   wfp += calc_wfp(contents);
   return wfp;
 }
@@ -104,11 +104,11 @@ function calc_wfp(contents) {
 
             if (last_line != line) {
               if (output.length > 0) {
-                wfp += toString(output) + String.fromCharCode(10);
+                wfp += String(output) + String.fromCharCode(10);
               }
-              output = toString(line) + '=' + toString(crc_hex);
+              output = String(line) + '=' + String(crc_hex);
             } else {
-              output += ',' + toString(crc_hex);
+              output += ',' + String(crc_hex);
             }
             last_line = line;
             last_hash = min_hash;
@@ -120,7 +120,7 @@ function calc_wfp(contents) {
     }
   }
   if (output.length > 0) {
-    wfp += toString(output) + String.fromCharCode(10);
+    wfp += String(output) + String.fromCharCode(10);
   }
 
   return wfp;
