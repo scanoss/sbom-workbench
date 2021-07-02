@@ -18,8 +18,8 @@ header.app-header {
 
 .file-list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 15px;
+  grid-template-columns: calc(50% - 7px) calc(50% - 7px);
+  grid-gap: 14px;
 
   @media screen and (max-width: $default-width) {
     grid-template-columns: 1fr;

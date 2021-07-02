@@ -62,7 +62,7 @@ export const Editor = () => {
               <span className="match-span">Match</span>
             </div>
             <header className="match-info-header">
-              <CardContent className="content">
+              <section className="content">
                 <div className="match-info-container">
                   <div className="second-row-match">
                     <div>
@@ -93,7 +93,7 @@ export const Editor = () => {
                   labelOfCard={file}
                   status={matchInfo?.status || 'pending'}
                 />
-              </CardContent>
+              </section>
             </header>
           </>
         ) : (
@@ -115,7 +115,7 @@ export const Editor = () => {
                 lineProps={(lineNumber) => {
                   const style = { display: 'block' };
                   if (lines && lines.includes(lineNumber)) {
-                    style.backgroundColor = '#EBE922';
+                    style.backgroundColor = '#ebe92252';
                   }
                   return { style };
                 }}
@@ -143,7 +143,7 @@ export const Editor = () => {
                 lineProps={(lineNumber) => {
                   const style = { display: 'block' };
                   if (ossLines && ossLines.includes(lineNumber)) {
-                    style.backgroundColor = '#EBE922';
+                    style.backgroundColor = '#ebe92247';
                   }
                   return { style };
                 }}

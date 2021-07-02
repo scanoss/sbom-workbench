@@ -16,15 +16,17 @@
   }
 
   .match-card-content {
-    display: flex;
+    display: grid;
+    grid-template-columns: 80% auto;
     align-items: center;
     flex-direction: row;
-    width: 100%;
+    width: calc(100% - 20px);
+    margin-left: 20px;
     justify-content: space-between;
 
 
     .label-div {
-      margin-left: 20px;
+      width: 100%;
     }
 
     .match-card-buttons {

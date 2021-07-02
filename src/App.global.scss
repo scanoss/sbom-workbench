@@ -111,3 +111,27 @@ a:hover {
 ::-webkit-scrollbar-button {
   display: none;
 }
+
+.app-page {
+  &::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+  }
+  &::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 14px 14px #c3c3c3;
+    border: solid 3px transparent;
+    border-radius: 6px;
+  }
+
+}
+.d-flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.mb-3 {
+  margin-bottom: 15px;
+}

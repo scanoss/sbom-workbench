@@ -8,10 +8,13 @@ import {
   Button,
   makeStyles,
   InputBase,
+  DialogContentText,
 } from '@material-ui/core';
 import React from 'react';
 import { Inventory } from '../../../../api/types';
 import { Component } from '../../WorkbenchProvider';
+import Label from '../Label/Label';
+import Title from '../Title/Title';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,11 +38,12 @@ interface InventoryDialogProps {
   open: boolean;
   component: Component;
   onClose: (inventory: Inventory) => void;
+  onCancel: () => void;
 }
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
-  const { onClose, open, component } = props;
+  const { onClose, open, component, onCancel } = props;
 
   const handleClose = () => {
     const inventory: Inventory = {
@@ -61,26 +65,20 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       <Dialog open={open} onClose={handleClose} fullWidth>
         <DialogTitle>Identify Component</DialogTitle>
         <DialogContent className={classes.content} dividers>
-          {/* <TextField
-            autoFocus
-            margin="dense"
-            variant="filled"
-            id="component"
-            label="Component"
-            type="text"
-            fullWidth
-          /> */}
-
-          <Paper component="form" className={classes.root}>
-            <InputBase
-              className={classes.input}
-              placeholder="Component"
-              fullWidth
-            />
-          </Paper>
+          <DialogContentText>
+            Are you sure you want to mark all these files as identified?
+          </DialogContentText>
+          <div className="d-flex flex-column mb-3">
+            <Label label="COMPONENT" textColor="gray" />
+            <Title title={component.name} />
+          </div>
+          <div className="d-flex flex-column">
+            <Label label="VENDOR" textColor="gray" />
+            <Title title={component.vendor} />
+          </div>
         </DialogContent>
         <DialogActions className={classes.content}>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={onCancel} color="primary">
             Cancel
           </Button>
           <Button variant="contained" color="secondary" onClick={handleClose}>

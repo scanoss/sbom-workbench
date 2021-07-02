@@ -119,6 +119,7 @@ export const ComponentDetail = () => {
       <InventoryDialog
         open={open}
         onClose={handleClose}
+        onCancel={() => setOpen(false)}
         component={component}
       />
     </>
