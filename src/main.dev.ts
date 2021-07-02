@@ -15,6 +15,7 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './main/menu';
+import './main/inventory';
 import { IpcEvents } from './ipc-events';
 import * as fs from 'fs';
 
