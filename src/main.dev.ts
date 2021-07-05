@@ -164,8 +164,8 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
   scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (dir) => {
     console.log(`Sending WFP file ${dir} to server`);
   });
-  scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (data) => {
-    console.log(`Received response from server ${data.getAssociatedWfp()}`);
+  scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (data, fileNumbers) => {
+    console.log(`Scanned ${fileNumbers} files`);
   });
 
   scanner.on(SCANNER_EVENTS.SCAN_DONE, (resultsPath) => {

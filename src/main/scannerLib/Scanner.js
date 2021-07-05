@@ -54,8 +54,14 @@ export class Scanner extends EventEmitter {
     this.#dispatcher.on(
       SCANNER_EVENTS.DISPATCHER_NEW_DATA,
       (dispatcherResponse) => {
-        Object.assign(this.#tmpResult, dispatcherResponse.getServerData());
-        this.emit(SCANNER_EVENTS.DISPATCHER_NEW_DATA, dispatcherResponse);
+        const serverResponse = dispatcherResponse.getServerData();
+        const serverResposeNumFiles = dispatcherResponse.getNumberOfFiles();
+        Object.assign(this.#tmpResult, serverResponse);
+        this.emit(
+          SCANNER_EVENTS.DISPATCHER_NEW_DATA,
+          serverResponse,
+          serverResposeNumFiles
+        );
       }
     );
 
