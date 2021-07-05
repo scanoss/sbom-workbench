@@ -19,8 +19,8 @@ import './main/inventory';
 import { IpcEvents } from './ipc-events';
 import * as fs from 'fs';
 
-const scanner = require('./main/scanner/scanner.js');
-const scannerResult = require('./main/scanner/lib/scanner.js');
+import { Scanner } from './main/scannerLib/Scanner';
+import { SCANNER_EVENTS } from './main/scannerLib/ScannerEvents';
 
 export default class AppUpdater {
   constructor() {
@@ -148,16 +148,34 @@ export interface IInitScan {
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
   const { path } = arg;
-  const resultsPath = '/tmp/qs.json';
 
-  console.log(`SCANNER: Start scanning path=${path}`);
-  scanner.scan(path, resultsPath);
+  const scanner = new Scanner();
 
-  scannerResult.addEventListener('onScanDone', (result: any) => {
-    fs.writeFileSync(resultsPath, JSON.stringify(result, null, 4), 'utf8');
+  scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
+    console.log('Starting Winnowing...');
+  });
+  scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (dir) =>
+    console.log(`New WFP File on: ${dir}`)
+  );
+  scanner.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => {
+    console.log('Winnowing Finished...');
+  });
+
+  scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (dir) => {
+    console.log(`Sending WFP file ${dir} to server`);
+  });
+  scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (data) => {
+    console.log(`Received response from server ${data.getAssociatedWfp()}`);
+  });
+
+  scanner.on(SCANNER_EVENTS.SCAN_DONE, (resultsPath) => {
+    console.log(`Scan Finished... Results on: ${resultsPath}`);
     event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
       success: true,
       resultsPath,
     });
   });
+
+  console.log(`SCANNER: Start scanning path=${path}`);
+  scanner.scanFolder(path);
 });

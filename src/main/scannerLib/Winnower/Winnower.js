@@ -1,73 +1,24 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
-/*
- * Copyright (C) 2018-2020 SCANOSS TECNOLOGIAS SL
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-/** 
-Winnowing Algorithm implementation for SCANOSS.
+import { Worker, isMainThread, parentPort } from 'worker_threads';
+import fs from 'fs';
+import EventEmitter from 'events';
+import { SCANNER_EVENTS } from '../ScannerEvents.js';
 
-This module implements an adaptation of the original winnowing algorithm by S. Schleimer, D. S. Wilkerson and A. Aiken
-as described in their seminal article which can be found here: https://theory.stanford.edu/~aiken/publications/papers/sigmod03.pdf
+const stringWorker = `
+const { parentPort } = require('worker_threads');
 
-The winnowing algorithm is configured using two parameters, the gram size and the window size. For SCANOSS the values need to be:
- - GRAM: 30
- - WINDOW: 64
+parentPort.on('message', async (scannableItem) => {
+  const fingerprint = wfp_for_content(
+    scannableItem.content,
+    scannableItem.contentSource
+  );
+  parentPort.postMessage(fingerprint);
+});
 
-The result of performing the Winnowing algorithm is a string called WFP (Winnowing FingerPrint). A WFP contains optionally
-the name of the source component and the results of the Winnowing algorithm for each file.
-
-EXAMPLE output: test-component.wfp
-component=f9fc398cec3f9dd52aa76ce5b13e5f75,test-component.zip
-file=cae3ae667a54d731ca934e2867b32aaa,948,test/test-file1.c
-4=579be9fb
-5=9d9eefda,58533be6,6bb11697
-6=80188a22,f9bb9220
-10=750988e0,b6785a0d
-12=600c7ec9
-13=595544cc
-18=e3cb3b0f
-19=e8f7133d
-file=cae3ae667a54d731ca934e2867b32aaa,1843,test/test-file2.c
-2=58fb3eed
-3=f5f7f458
-4=aba6add1
-8=53762a72,0d274008,6be2454a
-10=239c7dfa
-12=0b2188c9
-15=bd9c4b10,d5c8f9fb
-16=eb7309dd,63aebec5
-19=316e10eb
-[...]
-
-Where component is the MD5 hash and path of the component container (It could be a path to a compressed file or a URL).
-file is the MD5 hash, file length and file path being fingerprinted, followed by
-a list of WFP fingerprints with their corresponding line numbers.
-*/
-
-const isWin = process.platform === 'win32';
-const pathSeparator = isWin ? '\\' : '/';
 
 const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
-const { isBinaryFileSync } = require('isbinaryfile');
 
-// Filtering files sizes. DO NO CHANGE.
-const MAX_FILE_SIZE = 4 * 1024 * 1024;
-const MIN_FILE_SIZE = 256;
-const MAX_SIZE_CHUNK = 64 * 1000;
+const isWin = process.platform === 'win32';
+const pathSeparator = '/';
 
 // Winnowing configuration. DO NOT CHANGE.
 const GRAM = 30;
@@ -105,32 +56,10 @@ function min_hex_array(array) {
   return min;
 }
 
-/**
- * Returns the WFP for a file by executing the winnowing algorithm over its contents.
- * @param {string} file The name of the file
- */
-function wfp_for_file(file, filename) {
-  let contents = '';
-  let size = 0;
-  try {
-    contents = fs.readFileSync(file);
-    size = fs.lstatSync(file).size;
-  } catch (error) {
-    console.log('Error reading file: ', filename);
-    console.error(error);
-    throw error;
-    // return "";
-  }
-
+function wfp_for_content(contents, contentSource) {
   const file_md5 = crypto.createHash('md5').update(contents).digest('hex');
-  let wfp = `file=${file_md5},${contents.length},${filename}\n`;
-
-  if (!isBinaryFileSync(contents, size) && size < MAX_FILE_SIZE) {
-    const preWfp = calc_wfp(contents);
-    if (preWfp.length <= MAX_SIZE_CHUNK) {
-      wfp += preWfp;
-    }
-  }
+  let wfp = 'file=' + String(file_md5) + ',' + String(contents.length) + ',' + String(contentSource)+ String.fromCharCode(10);
+  wfp += calc_wfp(contents);
   return wfp;
 }
 
@@ -163,7 +92,6 @@ function calc_wfp(contents) {
         window.push(gram_crc32);
 
         if (window.length >= WINDOW) {
-          // console.log(`WINDOW: ${window}`)
           min_hash = min_hex_array(window);
           if (min_hash !== last_hash) {
             // Hashing the hash will result in a better balanced output data set
@@ -176,11 +104,11 @@ function calc_wfp(contents) {
 
             if (last_line != line) {
               if (output.length > 0) {
-                wfp += `${output}\n`;
+                wfp += String(output) + String.fromCharCode(10);
               }
-              output = `${line}=${crc_hex}`;
+              output = String(line) + '=' + String(crc_hex);
             } else {
-              output += `,${crc_hex}`;
+              output += ',' + String(crc_hex);
             }
             last_line = line;
             last_hash = min_hash;
@@ -192,7 +120,7 @@ function calc_wfp(contents) {
     }
   }
   if (output.length > 0) {
-    wfp += `${output}\n`;
+    wfp += String(output) + String.fromCharCode(10);
   }
 
   return wfp;
@@ -274,10 +202,68 @@ function crc32c_hex(str) {
   return crc32c(str).toString(16).padStart(8, '0');
 }
 
-module.exports = {
-  wfp_for_file,
+`;
 
-  MIN_FILE_SIZE,
-  MAX_FILE_SIZE,
-  MAX_SIZE_CHUNK,
-};
+export class Winnower extends EventEmitter {
+  // Configurable parameters
+  #WFP_FILE_MAX_SIZE = 64 * 1000;
+
+  #scannable;
+
+  #destFolder;
+
+  #wfp;
+
+  #worker;
+
+  constructor() {
+    super();
+    this.#wfp = '';
+    this.#worker = new Worker(stringWorker, { eval: true });
+    this.#worker.on('message', async (winnowingResult) => {
+      this.#storeResult(winnowingResult);
+      this.#nextStepMachine();
+    });
+  }
+
+  async #storeResult(winnowingResult) {
+    if (this.#wfp.length + winnowingResult.length >= this.#WFP_FILE_MAX_SIZE) {
+      await this.#createWfpFile(
+        this.#wfp,
+        this.#destFolder,
+        new Date().getTime()
+      );
+      this.#wfp = '';
+    }
+    this.#wfp += winnowingResult;
+  }
+
+  async #createWfpFile(content, dst, name) {
+    if (!fs.existsSync(dst)) fs.mkdirSync(dst);
+    await fs.promises.writeFile(`${dst}/${name}.wfp`, content);
+    this.emit(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, `${dst}/${name}.wfp`);
+  }
+
+  async #nextStepMachine() {
+    const scannableItem = await this.#scannable.getNextScannableItem();
+    if (this.#scannable.hasNextScannableItem()) {
+      this.#worker.postMessage(scannableItem);
+    } else {
+      if (this.#wfp.length != 0)
+        await this.#createWfpFile(
+          this.#wfp,
+          this.#destFolder,
+          new Date().getTime()
+        );
+      this.emit(SCANNER_EVENTS.WINNOWING_FINISHED);
+      this.#worker.terminate();
+    }
+  }
+
+  async startMachine(scannable, destPath) {
+    this.#scannable = scannable;
+    this.#destFolder = destPath;
+    this.emit(SCANNER_EVENTS.WINNOWING_STARTING);
+    return this.#nextStepMachine();
+  }
+}
