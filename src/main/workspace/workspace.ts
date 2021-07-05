@@ -1,7 +1,9 @@
 import { Debugger } from 'inspector';
 import { EventEmitter } from 'events';
+import { stripBasename } from 'history/PathUtils';
 import * as Filtering from './filtering';
 import * as Project from './directorytree';
+import * as fs from 'fs';
 // import { inventoryService } from '../../../../api/inventory-service';
 
 // import * as DB from "scanoss_db.js"
@@ -10,6 +12,7 @@ import * as Project from './directorytree';
 // import * as Components from './component_db'
 
 import { Scan } from './scan_db';
+import { Inventory } from '../../api/types';
 // const { EventEmitter } = require('events');
 // const Components = require('./scan_db');
 /**
@@ -69,6 +72,29 @@ export class Workspace extends EventEmitter {
     this.directory_tree.set_project_root(path);
   }
 
+  attachInventory(inv: Inventory) {
+    let i: number;
+    /*
+      console.log(inv.files[i]);
+      const a = getLeaf(this.directory_tree.project, inv.files[i]);
+      console.log(a);
+    } */
+    let files: string[];
+    files = inv.files;
+    for (i = 0; i < inv.files.length; i += 1) {
+      // console.log(files);
+      insertInventory(this.directory_tree.project, files[i], inv);
+    insertComponent(this.directory_tree.project, files[i],inv.purl);
+    }
+    /*  console.log(this.directory_tree.project_root);
+    console.log('----------------'); */
+    console.clear()
+    fs.writeFileSync(
+      '/home/oscar/test/output.json',
+      JSON.stringify(this.directory_tree.project).toString()
+    );
+  }
+
   set_filter_file(path: string): boolean {
     this.banned_list.load(path);
     return true;
@@ -91,7 +117,7 @@ export class Workspace extends EventEmitter {
   }
 
   async add_component(comp: any) {
-    await this.scans_db.versionNew.newInventory(i);
+    // await this.scans_db.versionNew.newInventory(i);
   }
 }
 
@@ -107,6 +133,12 @@ function setUseFile(tree: any, action: boolean, recursive: boolean) {
   }
 }
 
+function includeRoot(original: string, root: string) {
+  return `${root}/${original}`;
+}
+function excludeRoot(complete: string, root: string) {
+  return complete.replace(root, '');
+}
 // eslint-disable-next-line consistent-return
 function getLeaf(arbol: any, mypath: string): any {
   let res: string[];
@@ -116,6 +148,8 @@ function getLeaf(arbol: any, mypath: string): any {
   if (res[res.length - 1] === '') res.pop();
 
   if (arbol.name === res[0] && res.length === 1) {
+    console.log(res[0]);
+    console.log('por arriba');
     return arbol;
   }
   const i = 0;
@@ -127,11 +161,74 @@ function getLeaf(arbol: any, mypath: string): any {
         return getLeaf(arbol.files[j], newpath);
       }
       if (arbol.files[j].type === 'file' && arbol.files[j].name === res[1]) {
+        console.log('por abajo');
         return arbol.files[j];
       }
     }
   }
 }
+
+function insertInventory(tree: any, mypath: string, inv: Inventory): any {
+  let myPathFolders: string[];
+  // eslint-disable-next-line prefer-const
+  let arbol = tree;
+  console.log(tree);
+  myPathFolders = mypath.split('/');
+  if (myPathFolders[0] === '') myPathFolders.shift();
+  let i: number;
+  i = 0;
+
+
+  while (i < myPathFolders.length) {
+    let j: number;
+    if (!arbol.inventories.includes(inv.id)) arbol.inventories.push(inv.id);
+    // console.log(`busco ${myPathFolders[i]}`);
+    for (j = 0; j < arbol.files.length; j += 1) {
+      if (arbol.files[j].name === myPathFolders[i]) {
+        arbol = arbol.files[j];
+        i++;
+        break;
+      }
+    }
+  }
+
+  arbol.inventories.push(inv.id);
+ // console.log(arbol);
+}
+
+
+function insertComponent(tree: any, mypath: string, purl: string): any {
+  let myPathFolders: string[];
+  // eslint-disable-next-line prefer-const
+  let arbol = tree;
+  console.log(tree);
+  myPathFolders = mypath.split('/');
+  if (myPathFolders[0] === '') myPathFolders.shift();
+  let i: number;
+  i = 0;
+
+
+  while (i < myPathFolders.length) {
+    let j: number;
+    if (!arbol.components.includes(purl)) arbol.inventories.push(purl);
+    // console.log(`busco ${myPathFolders[i]}`);
+    for (j = 0; j < arbol.files.length; j += 1) {
+      if (arbol.files[j].name === myPathFolders[i]) {
+        arbol = arbol.files[j];
+        i++;
+        break;
+      }
+    }
+  }
+
+  arbol.inventories.push(purl);
+ // console.log(arbol);
+}
+
+
+
+
+
 
 function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {
   let i = 0;
@@ -151,6 +248,7 @@ export { defaultWorkspace };
 function onAddInventory(i: any, any: any) {
   throw new Error('Function not implemented.');
 }
+
 /*
 const a = new Workspace();
 a.set_filter_file('/home/oscar/filters.txt');

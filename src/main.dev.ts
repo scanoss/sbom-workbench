@@ -153,7 +153,7 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
   const resultsPath = '/tmp/qs.json';
 
   console.log(`SCANNER: Start scanning path=${path}`);
-  a.set_scan_root(path);
+  a.set_scan_root(`${path}`);
   a.prepare_scan();
   scanner.scan(path, resultsPath);
 

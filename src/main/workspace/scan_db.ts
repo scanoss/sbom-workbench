@@ -8,6 +8,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
 
+import { TramTwoTone } from '@material-ui/icons';
 import sqlite3 from 'sqlite3';
 import { UtilsDb } from './utils_db';
 
@@ -48,13 +49,18 @@ const SQL_INSERT_FILE_INVENTORIES =
 /** SQL COMPONENTS TABLES INSERT* */
 // SQL INSERT INTO LICENSES
 const COMPDB_LICENSES_INSERT =
-  'INSERT OR IGNORE INTO licenses (id,spdxid,name,fulltext,url) VALUES(?,?,?,?,?);';
+  'INSERT OR IGNORE INTO licenses (spdxid,name,fulltext,url) VALUES(?,?,?,?);';
 // SQL INSERT INTO  COMPONENT VERSIONS
 const COMPDB_SQL_COMP_VERSION_INSERT =
   'INSERT OR IGNORE INTO component_versions  (comp_name,version, description, url,purl,license) values (?,?,?,?,?,?);';
 // ATTACH A COMPONENT TO A LICENSE
-const SQL_LICENSE_ATTACH_TO_COMPONENT =
+const SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID =
   'INSERT or IGNORE INTO license_component_version (cvid,licid) values (?,?)';
+const SQL_ATTACH_LICENSE_BY_PURL_NAME =
+  'INSERT or IGNORE INTO license_component_version (cvid,licid) values ((SELECT id FROM component_versions where purl=? and version=?),(SELECT id FROM licenses where name=?));';
+
+const SQL_ATTACH_LICENSE_PURL_SPDXID =
+  'INSERT or IGNORE INTO license_component_version (cvid,licid) values ((SELECT id FROM component_versions where purl=? and version=?),(SELECT id FROM licenses where spdxid=?));';
 
 /** SQL SCAN SUMMARY* */
 const SQL_SCAN_COUNT_RESULT_FILTER =
@@ -83,8 +89,14 @@ const SQL_SELECT_ALL_INVENTORIES_FROM_FILE =
 // SQL_GET_COMPONENTS TABLE
 const SQL_GET_COMPONENT =
   'SELECT id,comp_name,version,description,url,purl,license from component_versions where purl like ?';
-const SQL_GET_COMPONENT_VERSION =
-  'SELECT l.name, cv.purl, cv.comp_name,cv.version,cv.url,cv.license from licenses l , component_versions cv where l.id in (SELECT lcv.licid from license_component_version lcv where lcv.cvid=? and lcv.cvid=cv.id) and cv.id=?;';
+// const SQL_GET_COMPONENT_VERSION = 'SELECT cv.id as compid,cv.purl,cv.version,cv.url,l.name as license_name,l.id,l.spdxid as license_spdxid from component_versions cv LEFT JOIN license_component_version lcv on lcv.cvid=cv.id LEFT JOIN licenses l on l.id=lcv.licid where cv.id=?;';
+
+const SQL_GET_COMPONENT_BY_ID =
+  'SELECT cv.comp_name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.id=?;';
+
+const SQL_GET_LICENSES_BY_COMPONENT_ID =
+  'SELECT l.id,l.name,l.spdxid FROM licenses l where l.id in (SELECT lcv.licid from license_component_version lcv where lcv.cvid=?);';
+
 const SQL_GET_COMPV_LICENSE_BY_COMPID =
   'SELECT li.name,li.id,li.spdxid from licenses li where li.id in (SELECT cvl.licid from license_component_version cvl where cvl.cvid=?);';
 const SQL_GET_COMPID_FROM_PURL =
@@ -319,7 +331,7 @@ export class Scan {
   }
 
   // GET INVENTORIES
-  async getInventory(inventory: any) {
+  getInventory(inventory: any) {
     const filter = this.inventoryFilter(inventory);
     return new Promise(async (resolve, reject) => {
       const db = await this.openDb();
@@ -413,7 +425,7 @@ export class Scan {
   }
 
   // INSERT LICENSES FROM A FILE
-  insertLicensesFile(path: string) {
+  importLicensesFromFile(path: string) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -421,7 +433,6 @@ export class Scan {
         for (const [key, license] of Object.entries(json)) {
           db.run(
             COMPDB_LICENSES_INSERT,
-            license.id,
             license.spdxid,
             license.name,
             license.fulltext,
@@ -439,7 +450,7 @@ export class Scan {
     });
   }
 
-  insertLicensesFromJSON(json: Record<any, any>) {
+  importLicensesFromJSON(json: Record<any, any>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -447,7 +458,6 @@ export class Scan {
           for (const [key, license] of Object.entries(json)) {
             db.run(
               COMPDB_LICENSES_INSERT,
-              license.id,
               license.spdxid,
               license.name,
               license.fulltext,
@@ -459,6 +469,32 @@ export class Scan {
         resolve(true);
       } catch (error) {
         reject(new Error('Unable to insert licenses'));
+      }
+    });
+  }
+
+  // CREATE LICENSE
+  createLicense(license: any) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        const stmt = db.prepare(COMPDB_LICENSES_INSERT);
+        stmt.run(
+          license.spdxid,
+          license.name,
+          license.fulltext,
+          license.url,
+          function (this: any, err: any) {
+            db.close();
+            if (err || this.lastID === 0)
+              reject(new Error('The license was not created or already exist'));
+            license.id = this.lastID;
+            stmt.finalize();
+            resolve(license);
+          }
+        );
+      } catch (error) {
+        reject(new Error('The license was not created'));
       }
     });
   }
@@ -581,26 +617,76 @@ export class Scan {
     });
   }
 
+  // Attach license to component version by id
+  private attachLicensebyId(data: any) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        const stmt = db.prepare(SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID);
+        stmt.run(data.compid, data.license_id, (err: any) => {
+          if (err) reject(new Error('License was not attached'));
+          db.close();
+          stmt.finalize();
+          resolve(true);
+        });
+      } catch (err) {
+        reject(new Error('License was not attached'));
+      }
+    });
+  }
+
+  // Attach license to component version by license name and purl
+  private attachLicenseByPurlLicenseName(data: any) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        const stmt = db.prepare(SQL_ATTACH_LICENSE_BY_PURL_NAME);
+        stmt.run(data.purl, data.version, data.license_name, (err: any) => {
+          if (err) reject(new Error('License was not attached'));
+          db.close();
+          stmt.finalize();
+          resolve(true);
+        });
+      } catch (err) {
+        reject(new Error('License was not attached'));
+      }
+    });
+  }
+
+  // Attach license to component version by license spdxid and purl
+  private attachLicenseByPurlSpdxid(data: any) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        const stmt = db.prepare(SQL_ATTACH_LICENSE_PURL_SPDXID);
+        stmt.run(data.purl, data.version, data.license_spdxid, (err: any) => {
+          if (err) reject(new Error('License was not attached'));
+          db.close();
+          stmt.finalize();
+          resolve(true);
+        });
+      } catch (err) {
+        reject(new Error('License was not attached'));
+      }
+    });
+  }
+
   // ATTACH LICENSE TO A COMPONENT VERSION
   licenseAttach(data: any) {
     return new Promise(async (resolve, reject) => {
       try {
-        // GET component and license id
-        const filter = await this.licenseAttachFilter(data);
+        if (data.license_id && data.compid) {
+          const success = await this.attachLicensebyId(data);
+          if (success) resolve(true);
+        }
 
-        if (filter.license_id === undefined || filter.compid === undefined)
-          reject(new Error('License not attached'));
-        const db = await this.openDb();
-        db.run(
-          SQL_LICENSE_ATTACH_TO_COMPONENT,
-          `${filter.compid}`,
-          `${filter.license_id}`,
-          (err: any) => {
-            db.close();
-            if (err) reject(new Error('License not attached'));
-            resolve('license attached');
-          }
-        );
+        if (data.purl && data.license_name) {
+          const success = await this.attachLicenseByPurlLicenseName(data);
+          if (success) resolve(true);
+        } else {
+          const success = await this.attachLicenseByPurlSpdxid(data);
+          if (success) resolve(true);
+        }
       } catch (error) {
         reject(new Error('License not attached'));
       }
@@ -609,17 +695,45 @@ export class Scan {
 
   // GET COMPONENT VERSIONS
   getComponentById(id: number) {
+    const self = this;
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
           db.all(
-            SQL_GET_COMPONENT_VERSION,
+            SQL_GET_COMPONENT_BY_ID,
             `${id}`,
+            async function (err: any, data: any) {
+              db.close();
+              if (err) reject(new Error('[]'));
+              else {
+                const licenses = await self.getAllLicensesFromComponentId(
+                  data[0].compid
+                );
+                data[0].licenses = licenses;
+                resolve(data);
+              }
+            }
+          );
+        });
+      } catch (error) {
+        reject(new Error('[]'));
+      }
+    });
+  }
+
+  // GET LICENSE BY ATTACHED TO A COMPONENT
+  private getAllLicensesFromComponentId(id: any) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.all(
+            SQL_GET_LICENSES_BY_COMPONENT_ID,
             `${id}`,
             (err: any, data: any) => {
               db.close();
-              if (err) reject(new Error('[]'));
+              if (err) resolve('[]');
               else resolve(data);
             }
           );
@@ -722,28 +836,6 @@ export class Scan {
     return filter;
   }
 
-  // GET LICENSE ID AND COMPONENT ID
-  private async licenseAttachFilter(data: any) {
-    const filter: any = {
-      license_id: null,
-      compid: null,
-    };
-    try {
-      // If we have component id and license id
-      if (data.license_id && data.compid) {
-        filter.license_id = data.license_id;
-        filter.compid = data.compid;
-      } else {
-        // Get license id and component id by purl/spdxid/license name/version
-        filter.license_id = await this.getLicenseIdFilter(data);
-        filter.compid = await this.getComponentIdFromPurl(data);
-      }
-    } catch (error) {
-      return null;
-    }
-    return filter;
-  }
-
   // GET LICENSE ID FROM SPDXID OR LICENSE NAME
   private async getLicenseIdFilter(license: any) {
     return new Promise<number>(async (resolve, reject) => {
@@ -771,8 +863,8 @@ export class Scan {
     });
   }
 
-  // GET LICENSE BY COMPONENT ID
-  private async getLicensesVersionById(cvId: number) {
+  // GET LICENSES BY COMPONENT ID
+  private getLicensesVersionById(cvId: number) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -809,7 +901,7 @@ export class Scan {
           (err: any, component: any) => {
             db.close();
             if (err) reject(new Error(undefined));
-            else resolve(component.id);
+            resolve(component.id);
           }
         );
       } catch (error) {

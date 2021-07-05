@@ -22,4 +22,5 @@ export interface License {
 export interface ItemInclude {
   path: string;
   recursive: boolean;
+  action: boolean;
 }

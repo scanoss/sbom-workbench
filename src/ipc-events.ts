@@ -1,6 +1,7 @@
 export enum IpcEvents {
   SCANNER_INIT_SCAN = 'SCANNER_INIT_SCAN',
   SCANNER_FINISH_SCAN = 'SCANNER_FINISH_SCAN',
+  SCANNER_STATUS_UPDATE = 'SCANNER_STATUS_UPDATE',
 
   INVENTORY_CREATE = 'INVENTORY_CREATE',
   INVENTORY_GET = 'INVENTORY_GET',
@@ -16,13 +17,15 @@ export enum IpcEvents {
   LICENSE_ATTACH = 'LICENSE_ATTACH',
 
   ITEM_INCLUDE = 'ITEM_INCLUDE',
-  ITEM_EXCLUDE = 'ITEM_EXCLUDE',
 
   FILTER_ADD = 'FILTER_ADD',
   FILTER_DELETE = 'FILTER_DELETE',
 }
 
-export const ipcMainEvents = [IpcEvents.SCANNER_FINISH_SCAN];
+export const ipcMainEvents = [
+  IpcEvents.SCANNER_STATUS_UPDATE,
+  IpcEvents.SCANNER_FINISH_SCAN,
+];
 
 export const ipcRendererEvents = [
   IpcEvents.SCANNER_INIT_SCAN,
@@ -41,7 +44,6 @@ export const ipcRendererEvents = [
   IpcEvents.LICENSE_ATTACH,
 
   IpcEvents.ITEM_INCLUDE,
-  IpcEvents.ITEM_EXCLUDE,
 
   IpcEvents.FILTER_ADD,
   IpcEvents.FILTER_DELETE,

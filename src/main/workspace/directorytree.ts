@@ -39,9 +39,10 @@ function dirTree(filename: string) {
   if (stats.isDirectory()) {
     info = {
       type: 'folder',
-      path: filename,
+      //path: filename,
       name: path.basename(filename),
-      inv_count: 0,
+      inventories: [],
+      components: [],
       files: undefined,
       include: true,
       action: 'scan',
@@ -54,9 +55,10 @@ function dirTree(filename: string) {
     info = {
       type: 'file',
       inv_count: 0,
-      //   path:filename,
+     // path:filename,
       name: path.basename(filename),
       inventories: [],
+      components: [],
       include: true,
       action: 'scan',
     };
