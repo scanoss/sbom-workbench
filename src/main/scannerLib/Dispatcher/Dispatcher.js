@@ -3,8 +3,8 @@ import fetch from 'node-fetch';
 import FormData from 'form-data';
 import fs from 'fs';
 import PQueue from 'p-queue';
-import { SCANNER_EVENTS } from '../ScannerEvents.js';
-import { DispatcherResponse } from './DispatcherResponse.js';
+import { SCANNER_EVENTS } from '../ScannerEvents';
+import { DispatcherResponse } from './DispatcherResponse';
 
 export class Dispatcher extends EventEmitter {
   #CONCURRENCY_LIMIT = 3;
