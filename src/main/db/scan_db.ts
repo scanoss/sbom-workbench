@@ -74,9 +74,9 @@ const SQL_SCAN_COUNT_IDENTIFIED_FILTER =
 
 /** *** SQL SCAN GET * **** */
 const SQL_SCAN_SELECT_INVENTORIES_FROM_PATH =
-  'SELECT i.id, i.compid,i.usage,i.notes,i.url,i.license_name from inventories i, file_inventories fi where i.id=fi.inventoryid and fi.path like ?;';
+  'SELECT i.id, i.compid,i.usage,i.notes,i.url,i.license_name,i.purl,i,version from inventories i, file_inventories fi where i.id=fi.inventoryid and fi.path like ?;';
 const SQL_SCAN_SELECT_INVENTORIES_FROM_PURL =
-  'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.license_name from inventories i where i.purl=? and i.version=?;';
+  'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.license_name,i.purl,i.version from inventories i where i.purl=? and i.version=?;';
 const SQL_SCAN_SELECT_FILE_RESULTS =
   'SELECT path,compid,lines,oss_lines,matched,filename,size,idtype,md5_file,md5_comp,purl from results inner join files on results.md5_file=files.md5 where path like ? and files.scanned!=0 order by path;';
 // GET ALL THE INVENTORIES ATTACHED TO A COMPONENT
@@ -357,6 +357,25 @@ export class Scan {
           inventory.purl,
           inventory.version,
           (err: object, inv: any) => {
+            db.close();
+            if (err) resolve(undefined);
+            else resolve(inv);
+          }
+        );
+      } catch (error) {
+        reject(new Error('The inventory does not exists'));
+      }
+    });
+  }
+
+  private getAllInventories() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.all(
+          'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories;',
+          (err: object, inv: any) => {
+            db.close();
             if (err) resolve(undefined);
             else resolve(inv);
           }
@@ -374,17 +393,19 @@ export class Scan {
         let inventories: any;
         if (inventory.path) {
           inventories = await this.getInventoryByFilePath(inventory.path);
-        } else {
+        } else if (inventory.purl && inventory.version) {
           inventories = await this.getInventoryByPurlVersion(inventory);
+        } else {
+          inventories = await this.getAllInventories();
         }
 
-        if (inventories !== undefined) {
-          const comp = await this.getComponent(inventory);
-          inventories[0].component = comp;
-          resolve(inventories);
-        } else {
-          reject(new Error('error'));
+        for (let i = 0; i < inventories.length; i += 1) {
+          const comp = await this.getComponent(inventories[i]);
+          inventories[i].component = comp;
+          delete inventories[i].purl;
+          delete inventories[i].version;
         }
+        resolve(inventories);
       } catch (error) {
         reject(new Error('error'));
       }
