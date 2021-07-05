@@ -1,26 +1,61 @@
-import { CardContent } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory } from 'react-router-dom';
-import { isNull } from 'util';
 import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
 import Label from '../../components/Label/Label';
 import Title from '../../components/Title/Title';
 import MatchCard from '../../components/MatchCard/MatchCard';
 import { range } from '../../../../utils/utils';
+import { workbenchController } from '../../../workbench-controller';
+import { AppContext } from '../../../context/AppProvider';
+
+export interface FileContent {
+  content: string | null;
+  error: boolean;
+}
 
 export const Editor = () => {
   const history = useHistory();
 
-  const { file, matchInfo, remoteFileContent, localFileContent } = useContext(
+  const { file, matchInfo } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
 
+  const { scanBasePath } = useContext<any>(AppContext);
+
+  const [localFileContent, setLocalFileContent] = useState<FileContent | null>(
+    null
+  );
+  const [remoteFileContent, setRemoteFileContent] =
+    useState<FileContent | null>(null);
+
   const [ossLines, setOssLines] = useState<number[] | null>([]);
   const [lines, setLines] = useState<number[] | null>([]);
+
+  const loadLocalFile = async (path: string): Promise<void> => {
+    try {
+      setLocalFileContent({ content: null, error: false });
+      const content = await workbenchController.fetchLocalFile(
+        scanBasePath + path
+      );
+      setLocalFileContent({ content, error: false });
+    } catch (error) {
+      setLocalFileContent({ content: null, error: true });
+    }
+  };
+
+  const loadRemoteFile = async (path: string): Promise<void> => {
+    try {
+      setRemoteFileContent({ content: null, error: false });
+      const content = await workbenchController.fetchRemoteFile(path);
+      setRemoteFileContent({ content, error: false });
+    } catch (error) {
+      setRemoteFileContent({ content: null, error: true });
+    }
+  };
 
   useEffect(() => {
     console.log(matchInfo?.matched);
@@ -49,6 +84,15 @@ export const Editor = () => {
     console.log(linesOss);
     console.log(lineasLocales);
   }, [matchInfo]);
+
+  useEffect(() => {
+    if (file && matchInfo) {
+      loadLocalFile(file);
+      loadRemoteFile(matchInfo.file_hash);
+    } else {
+      setRemoteFileContent({ content: null, error: false });
+    }
+  }, [file, matchInfo]);
 
   return (
     <section className="app-page">
