@@ -1,0 +1,81 @@
+.match-card {
+  background-color: #ffff;
+  height: 68px;
+  width: 55%;
+  border-radius: 4px;
+  box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.06),
+    0px 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+
+
+
+  @media screen and (max-width: $default-width) {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .match-card-content {
+    display: grid;
+    grid-template-columns: 80% auto;
+    align-items: center;
+    flex-direction: row;
+    width: calc(100% - 20px);
+    margin-left: 20px;
+    justify-content: space-between;
+
+
+    .label-div {
+      width: 100%;
+    }
+
+    .match-card-buttons {
+      visibility: hidden;
+    }
+
+    &:hover{
+
+      .match-card-buttons{
+        margin-right: 1%;
+        visibility: visible;
+        transition: 100ms ease-out;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .icon{
+          width: 30px;
+          height: 30px;
+          margin-right: 15px;
+
+        }
+
+        .check{
+          color: $indentified-green;
+        }
+
+        .ban {
+          color: $ignored-gray;
+        }
+
+    }
+    }
+
+  }
+}
+
+
+.status- {
+  &pending {
+    border-left: 10px solid $pending-orange;
+  }
+
+  &identified {
+    border-left: 10px solid $indentified-green;
+  }
+
+  &ignored {
+    border-left: 10px solid $ignored-gray;
+  }
+}
+

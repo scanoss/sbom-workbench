@@ -31,7 +31,7 @@ export interface IWorkbenchContext {
   file: string | null;
   components: Record<string, Component> | null;
   component: Component | null;
-  matchInfo: Record<string, any> | null;
+  matchInfo: Record<string, any>[] | null;
   setFile: (file: string) => void;
   setTree: (tree: []) => void;
   setComponent: (component) => void;
@@ -58,7 +58,7 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
 
   const [file, setFile] = useState<string | null>(null);
 
-  const [matchInfo, setMatchInfo] = useState<Record<string, any> | null>(
+  const [matchInfo, setMatchInfo] = useState<Record<string, any>[] | null>(
     null
   );
 
@@ -98,9 +98,9 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
 
   useEffect(() => {
     if (scan && file) {
-      const [info] = scan[file];
-      if (info.id !== 'none') {
-        setMatchInfo(info);
+      const match = scan[file];
+      if (match[0].id !== 'none') {
+        setMatchInfo(match);
       } else {
         setMatchInfo(null);
       }

@@ -11,6 +11,7 @@ import MatchCard from '../../components/MatchCard/MatchCard';
 import { range } from '../../../../utils/utils';
 import { workbenchController } from '../../../workbench-controller';
 import { AppContext } from '../../../context/AppProvider';
+import MatchInfoCard from '../../components/MatchInfoCard/MatchInfoCard';
 
 export interface FileContent {
   content: string | null;
@@ -29,6 +30,9 @@ export const Editor = () => {
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(
     null
   );
+
+  const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
+
   const [remoteFileContent, setRemoteFileContent] =
     useState<FileContent | null>(null);
 
@@ -58,26 +62,26 @@ export const Editor = () => {
   };
 
   useEffect(() => {
-    console.log(matchInfo?.matched);
-    if (!matchInfo) {
+    if (!currentMatch) {
       return;
     }
 
+    console.log(currentMatch.matched);
     const linesOss =
-      matchInfo?.id === 'file'
+      currentMatch.id === 'file'
         ? null
         : range(
-            parseInt(matchInfo?.oss_lines.split('-')[0]),
-            parseInt(matchInfo?.oss_lines.split('-')[1])
+            parseInt(currentMatch.oss_lines.split('-')[0]),
+            parseInt(currentMatch.oss_lines.split('-')[1])
           );
 
     setOssLines(linesOss);
     const lineasLocales =
-      matchInfo?.id === 'file'
+      currentMatch.id === 'file'
         ? null
         : range(
-            parseInt(matchInfo?.lines.split('-')[0]),
-            parseInt(matchInfo?.lines.split('-')[1])
+            parseInt(currentMatch.lines.split('-')[0]),
+            parseInt(currentMatch.lines.split('-')[1])
           );
     setLines(lineasLocales);
 
@@ -86,13 +90,18 @@ export const Editor = () => {
   }, [matchInfo]);
 
   useEffect(() => {
-    if (file && matchInfo) {
+    if (file && currentMatch) {
       loadLocalFile(file);
-      loadRemoteFile(matchInfo.file_hash);
+      loadRemoteFile(currentMatch.file_hash);
     } else {
       setRemoteFileContent({ content: null, error: false });
     }
-  }, [file, matchInfo]);
+  }, [file, currentMatch]);
+
+  useEffect(() => {
+    if (matchInfo)
+      setCurrentMatch(matchInfo[0]);
+  }, [matchInfo]);
 
   return (
     <section className="app-page">
@@ -111,22 +120,22 @@ export const Editor = () => {
                   <div className="second-row-match">
                     <div>
                       <Label label="COMPONENT" textColor="gray" />
-                      <Title title={matchInfo?.component} />
+                      <Title title={currentMatch?.component} />
                     </div>
                     <div>
                       <Label label="VENDOR" textColor="gray" />
-                      <Title title={matchInfo?.vendor} />
+                      <Title title={currentMatch?.vendor} />
                     </div>
                     <div>
                       <Label label="VERSION" textColor="gray" />
-                      <Title title={matchInfo?.version} />
+                      <Title title={currentMatch?.version} />
                     </div>
                     <div>
                       <Label label="LICENSE" textColor="gray" />
                       <Title
                         title={
-                          matchInfo?.licenses[0]
-                            ? matchInfo?.licenses[0].name
+                          currentMatch?.licenses[0]
+                            ? currentMatch?.licenses[0].name
                             : '-'
                         }
                       />
@@ -135,7 +144,7 @@ export const Editor = () => {
                 </div>
                 <MatchCard
                   labelOfCard={file}
-                  status={matchInfo?.status || 'pending'}
+                  status={currentMatch?.status || 'pending'}
                 />
               </section>
             </header>
