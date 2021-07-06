@@ -165,7 +165,7 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
     console.log(`Sending WFP file ${dir} to server`);
   });
   scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (data, fileNumbers) => {
-    console.log(`Scanned ${fileNumbers} files`);
+    console.log(`New ${fileNumbers} files scanned`);
   });
 
   scanner.on(SCANNER_EVENTS.SCAN_DONE, (resultsPath) => {
@@ -174,6 +174,11 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
       success: true,
       resultsPath,
     });
+  });
+
+  scanner.on('error', () => {
+    scanner.stop();
+    console.log('error recibido');
   });
 
   console.log(`SCANNER: Start scanning path=${path}`);

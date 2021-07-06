@@ -3,13 +3,15 @@ import EventEmitter from 'events';
 import os from 'os';
 import fs from 'fs';
 
-import { AbstractScannable } from './Scannable/AbstractScannable.js';
-import { ScannableTree } from './Scannable/ScannableTree.js';
-import { ScannableFolder } from './Scannable/ScannableFolder.js';
-import { Winnower } from './Winnower/Winnower.js';
-import { Dispatcher } from './Dispatcher/Dispatcher.js';
-import { DispatcherResponse } from './Dispatcher/DispatcherResponse.js';
-import { SCANNER_EVENTS } from './ScannerEvents.js';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { AbstractScannable } from './Scannable/AbstractScannable';
+import { ScannableTree } from './Scannable/ScannableTree';
+import { ScannableFolder } from './Scannable/ScannableFolder';
+import { Winnower } from './Winnower/Winnower';
+import { Dispatcher } from './Dispatcher/Dispatcher';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { DispatcherResponse } from './Dispatcher/DispatcherResponse';
+import { SCANNER_EVENTS } from './ScannerEvents';
 
 export class Scanner extends EventEmitter {
   // Private properties
@@ -32,7 +34,7 @@ export class Scanner extends EventEmitter {
     this.#dispatcher = new Dispatcher();
     this.#tmpResult = {};
 
-    /* SETTING WINNOWING THREAD EVENTS */
+    /* SETTING WINNOWING EVENTS */
     this.#winnower.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
       this.emit(SCANNER_EVENTS.WINNOWING_STARTING);
     });
@@ -44,11 +46,15 @@ export class Scanner extends EventEmitter {
     this.#winnower.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => {
       this.emit(SCANNER_EVENTS.WINNOWING_FINISHED);
     });
-    /* SETTING WINNOWING THREAD EVENTS */
+    /* SETTING WINNOWING EVENTS */
 
     /* SETTING DISPATCHER EVENTS */
     this.#dispatcher.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (wfpPath) => {
       this.emit(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, wfpPath);
+    });
+
+    this.#dispatcher.on('error', (error) => {
+      this.emit('error', error);
     });
 
     this.#dispatcher.on(
@@ -75,9 +81,12 @@ export class Scanner extends EventEmitter {
 
   async #scan() {
     await this.#scannable.prepare();
+    await this.#winnower.init();
+    await this.#dispatcher.init();
     await this.#winnower.startMachine(this.#scannable, this.#wfpDestPath);
   }
 
+  // Public Methods
   async scanFileTree(fileTreeDescriptor) {
     this.#scannable = new ScannableTree(fileTreeDescriptor);
     await this.#scan();
@@ -87,4 +96,11 @@ export class Scanner extends EventEmitter {
     this.#scannable = new ScannableFolder(dirPath);
     await this.#scan();
   }
+
+  stop() {
+    this.#winnower.stop();
+    this.#dispatcher.stop();
+    this.#tmpResult = {};
+  }
+
 }

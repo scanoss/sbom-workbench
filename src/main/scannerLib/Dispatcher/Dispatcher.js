@@ -7,38 +7,97 @@ import { SCANNER_EVENTS } from '../ScannerEvents.js';
 import { DispatcherResponse } from './DispatcherResponse.js';
 
 export class Dispatcher extends EventEmitter {
+  // API URL
+  #API_URL = 'https://osskb.org/api/scan/direct';
+
+  // Level of concurrency
   #CONCURRENCY_LIMIT = 3;
+
+  // Timeout for each transaction
+  #TIMEOUT = 90000;
+
+  // Max number of retries for each transaction
+  #RETRIES = 3;
 
   #pQueue;
 
   constructor() {
     super();
-    this.#pQueue = new PQueue({ concurrency: this.#CONCURRENCY_LIMIT });
+    this.init();
+  }
+
+  init() {
+    this.#pQueue = new PQueue({
+      concurrency: this.#CONCURRENCY_LIMIT,
+    });
+    this.#pQueue.clear();
+    if (this.#pQueue.isPaused) this.#pQueue.start();
+
     this.#pQueue.on('idle', () =>
       this.emit(SCANNER_EVENTS.DISPATCHER_FINISHED)
     );
   }
 
-  dispatchWfpFile(wfpPath) {
-    this.#pQueue.add(() => this.#dispatch(wfpPath));
+  stop() {
+    this.#pQueue.removeListener('idle');
+    this.#pQueue.clear();
+    this.#pQueue.pause();
   }
 
-  async #dispatch(wfpFilePath) {
-    let dataAsText = '';
-    let dataAsObj = {};
-    const wfpContent = fs.readFileSync(wfpFilePath);
-    const form = new FormData();
-    this.emit(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, wfpFilePath);
-    form.append('filename', Buffer.from(wfpContent), 'data.wfp');
-    const response = await fetch('https://osskb.org/api/scan/direct', {
-      method: 'post',
-      body: form,
-    });
-    if (response.ok) dataAsText = await response.text();
-    dataAsObj = JSON.parse(dataAsText);
-    this.emit(
-      SCANNER_EVENTS.DISPATCHER_NEW_DATA,
-      new DispatcherResponse(dataAsObj, wfpFilePath)
-    );
+  dispatchWfpFile(wfpPath) {
+    this.#pQueue
+      .add(() => this.#dispatch(wfpPath, this.#RETRIES))
+      .catch((error) => this.emit('error', error));
+  }
+
+  async #dispatch(wfpFilePath, retryNum) {
+    if (!retryNum) {
+      console.error(`An error ocurred fetching the file ${wfpFilePath}`);
+      return Promise.reject(
+        new Error(
+          `Failed to fetch ${wfpFilePath} after ${this.#RETRIES} retries`
+        )
+      );
+    }
+    try {
+      let dataAsText = '';
+      let dataAsObj = {};
+      const wfpContent = fs.readFileSync(wfpFilePath);
+      const form = new FormData();
+      this.emit(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, wfpFilePath);
+      form.append('filename', Buffer.from(wfpContent), 'data.wfp');
+
+      // Fetch
+      const p1 = fetch(this.#API_URL, {
+        method: 'post',
+        body: form,
+      });
+
+      // Timeout
+      const p2 = new Promise((resolve, reject) => {
+        const id = setTimeout(() => {
+          clearTimeout(id);
+          reject(new Error('TIMEOUT'));
+        }, this.#TIMEOUT);
+      });
+
+      const response = await Promise.race([p1, p2]);
+
+      if (!response.ok) throw new Error('Server communication failed');
+      dataAsText = await response.text();
+      dataAsObj = JSON.parse(dataAsText);
+      this.emit(
+        SCANNER_EVENTS.DISPATCHER_NEW_DATA,
+        new DispatcherResponse(dataAsObj, wfpFilePath)
+      );
+      return Promise.resolve();
+    } catch (error) {
+      if (error.message === 'TIMEOUT') {
+        return this.#dispatch(wfpFilePath, retryNum - 1);
+        // eslint-disable-next-line no-else-return
+      } else {
+        return Promise.reject(new Error(error));
+      }
+    }
   }
 }
