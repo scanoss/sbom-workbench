@@ -14,6 +14,7 @@ export interface Component {
   purl: string[];
   licenses: any[];
   files: string[];
+  inventories: Inventory[];
   count: {
     all: number;
     pending: number;
@@ -80,10 +81,14 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
       ...inventory,
       files: component ? component.files : [],
     });
+    //TODO: remove when backend service is ready
     const updateScan = scanUtil.updateTree(scan, inventory);
     setScan({ ...scan, ...updateScan });
     const updateComponents = scanUtil.getComponents(scan);
     setComponents(updateComponents);
+    const updateComponent = updateComponents[component?.name];
+    updateComponent.inventories = [...updateComponent.inventories, inventory];
+    setComponent({ ...component,  ...updateComponent});
     return inventory;
   };
 

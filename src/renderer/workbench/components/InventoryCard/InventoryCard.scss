@@ -1,0 +1,25 @@
+.inventory-card {
+  width: 100%;
+
+  .inventory-card-content {
+    width: 100%;
+  }
+
+  button {
+    width: 100%;
+    font-size: 60px;
+    text-align: left;
+    justify-content: left;
+  }
+
+  &.pending::before {
+    background-color: var(--color-status-pending);
+  }
+  &.identified::before {
+    background-color: var(--color-status-identified);
+  }
+  &.ignored::before {
+    background-color: var(--color-status-ignored);
+  }
+
+}

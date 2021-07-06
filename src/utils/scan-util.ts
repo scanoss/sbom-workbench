@@ -60,6 +60,7 @@ export function getComponents(scan: Record<string, any>): Record<string, any> {
           version: result.version,
           url: result.url,
           files: [key],
+          inventories: [],
           count: {
             all: 0,
             pending: 0,
