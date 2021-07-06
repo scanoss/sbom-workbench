@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import {
   Dialog,
   DialogTitle,
@@ -8,24 +9,43 @@ import {
   Button,
   makeStyles,
   InputBase,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextareaAutosize,
 } from '@material-ui/core';
+import SearchIcon from '@material-ui/icons/Search';
 import React from 'react';
 import { Inventory } from '../../../../api/types';
 import { Component } from '../../WorkbenchProvider';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
+  container: {
+    maxWidth: '',
+    width: '733px',
+
+  },
+
+  paper: {
     padding: '2px 4px',
     display: 'flex',
     alignItems: 'center',
   },
-  input: {
-    padding: theme.spacing(1),
+  dialog: {
+
   },
-  content: {
-    backgroundColor: 'var(--background-color-primary)',
+  component: {
     padding: theme.spacing(1),
+    width: '685px',
   },
+  // content: {
+  //   backgroundColor: 'var(--background-color-primary)',
+  //   padding: theme.spacing(1),
+  //   display: grid,
+  //   gridTemplateColumns: 1fr,
+  //   gridTemplateRows: 1fr 1fr 1fr 1fr 2fr,
+  //   gap: 5% 0%,
+  // },
   actions: {
     backgroundColor: 'var(--background-color-primary)',
   },
@@ -56,28 +76,80 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   return (
-    <div>
-      <Dialog open={open} onClose={handleClose} fullWidth>
-        <DialogTitle>Identify Component</DialogTitle>
-        <DialogContent className={classes.content} dividers>
-          {/* <TextField
-            autoFocus
-            margin="dense"
-            variant="filled"
-            id="component"
-            label="Component"
-            type="text"
-            fullWidth
-          /> */}
+    <div className='container-principal'>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        className={classes.container}
+      >
+        <span className="dialog-title">Identify Component</span>
+        <div className="identity-component">
+          <div className="component-version-container">
+            <div className="component-container">
+              <label>Component</label>
+              <Paper className={classes.paper}>
+                <SearchIcon />
+                <InputBase
+                  className={classes.component}
+                  placeholder="Component"
+                  fullWidth
+                />
+              </Paper>
+            </div>
+            <div className="component-container">
+              <label>Version</label>
+              <Paper component="form" className={classes.paper}>
+                <InputBase
+                  className={classes.component}
+                  placeholder="Component"
+                />
+              </Paper>
+            </div>
+          </div>
+          <div className="component-container">
+            <label>License</label>
+            <Paper component="form" className={classes.paper}>
+              <InputBase
+                className={classes.component}
+                placeholder="License"
+                fullWidth
+              />
+            </Paper>
+          </div>
+          <div className="component-container">
+            <label>URL</label>
+            <Paper component="form" className={classes.paper}>
+              <InputBase className={classes.component} placeholder="License" />
+            </Paper>
+          </div>
+          <div className="component-container">
+            <label>PURL</label>
+            <Paper component="form" className={classes.paper}>
+              <InputBase className={classes.component} placeholder="License" />
+            </Paper>
+          </div>
+          <div className="usage-notes">
+            <div>
+              <label>Usage</label>
+              <Paper component="form" className={classes.paper}>
+                <InputBase className={classes.component} placeholder="Choose" />
+              </Paper>
+            </div>
+            <div>
+              <label>Notes</label>
+              <Paper component="form" className={classes.paper}>
+                <textarea
+                  name=""
+                  id=""
+                  cols="30"
+                  rows="10"
+                  className="textarea"
+                />
+              </Paper>
+            </div>
+          </div>
+        </div>
 
-          <Paper component="form" className={classes.root}>
-            <InputBase
-              className={classes.input}
-              placeholder="Component"
-              fullWidth
-            />
-          </Paper>
-        </DialogContent>
         <DialogActions className={classes.content}>
           <Button onClick={handleClose} color="primary">
             Cancel
