@@ -20,32 +20,13 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Inventory) => {
 
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   let created: any;
-  /* try {
+  try {
     created = await defaultWorkspace.scans_db.inventories.create(arg);
     arg.id = created;
     defaultWorkspace.attachInventory(arg);
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
-  }*/
-  try {
-    /*  created = await defaultWorkspace.scans_db.inventories.get({
-      version: '2.1.8',
-      purl: 'pkg:github/scanoss/minr',
-    });*/
-    created = await defaultWorkspace.scans_db.licenses.get({
-      //   id: 1,
-      // spdxid: '0BSD',
-      name: 'BSD Zero Clause License',
-      //    fulltext: 'Test full text ',
-      //   url: 'Test url ',
-    });
-
-    arg.id = created;
-    // defaultWorkspace.attachInventory(arg);
-  } catch (e) {
-    console.log('Catch an error on inventory: ', e);
   }
-  console.log('licencias');
   console.log(created);
   return { status: 'ok', message: created };
 });
