@@ -21,22 +21,15 @@ import { Component } from '../../WorkbenchProvider';
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    maxWidth: '',
-    width: '733px',
-
   },
-
   paper: {
     padding: '2px 4px',
     display: 'flex',
     alignItems: 'center',
   },
-  dialog: {
-
-  },
+  dialog: {},
   component: {
-    padding: theme.spacing(1),
-    width: '685px',
+    padding: theme.spacing(0.5),
   },
   // content: {
   //   backgroundColor: 'var(--background-color-primary)',
@@ -76,90 +69,91 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   return (
-    <div className='container-principal'>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        className={classes.container}
-      >
-        <span className="dialog-title">Identify Component</span>
-        <div className="identity-component">
-          <div className="component-version-container">
-            <div className="component-container">
-              <label>Component</label>
-              <Paper className={classes.paper}>
-                <SearchIcon />
-                <InputBase
-                  className={classes.component}
-                  placeholder="Component"
-                  fullWidth
-                />
-              </Paper>
-            </div>
-            <div className="component-container">
-              <label>Version</label>
-              <Paper component="form" className={classes.paper}>
-                <InputBase
-                  className={classes.component}
-                  placeholder="Component"
-                />
-              </Paper>
-            </div>
-          </div>
+    <Dialog
+      maxWidth="md"
+      fullWidth
+      open={open}
+      onClose={handleClose}
+      className={classes.container}
+    >
+      <span className="dialog-title">Identify Component</span>
+      <div className="identity-component">
+        <div className="component-version-container">
           <div className="component-container">
-            <label>License</label>
-            <Paper component="form" className={classes.paper}>
+            <label>Component</label>
+            <Paper className={classes.paper}>
+              <SearchIcon />
               <InputBase
                 className={classes.component}
-                placeholder="License"
+                placeholder="Component"
                 fullWidth
               />
             </Paper>
           </div>
           <div className="component-container">
-            <label>URL</label>
+            <label>Version</label>
             <Paper component="form" className={classes.paper}>
-              <InputBase className={classes.component} placeholder="License" />
+              <InputBase
+                className={classes.component}
+                placeholder="Component"
+              />
             </Paper>
-          </div>
-          <div className="component-container">
-            <label>PURL</label>
-            <Paper component="form" className={classes.paper}>
-              <InputBase className={classes.component} placeholder="License" />
-            </Paper>
-          </div>
-          <div className="usage-notes">
-            <div>
-              <label>Usage</label>
-              <Paper component="form" className={classes.paper}>
-                <InputBase className={classes.component} placeholder="Choose" />
-              </Paper>
-            </div>
-            <div>
-              <label>Notes</label>
-              <Paper component="form" className={classes.paper}>
-                <textarea
-                  name=""
-                  id=""
-                  cols="30"
-                  rows="10"
-                  className="textarea"
-                />
-              </Paper>
-            </div>
           </div>
         </div>
+        <div className="component-container">
+          <label>License</label>
+          <Paper component="form" className={classes.paper}>
+            <InputBase
+              className={classes.component}
+              placeholder="License"
+              fullWidth
+            />
+          </Paper>
+        </div>
+        <div className="component-container">
+          <label>URL</label>
+          <Paper component="form" className={classes.paper}>
+            <InputBase className={classes.component} placeholder="License" />
+          </Paper>
+        </div>
+        <div className="component-container">
+          <label>PURL</label>
+          <Paper component="form" className={classes.paper}>
+            <InputBase className={classes.component} placeholder="License" />
+          </Paper>
+        </div>
+        <div className="usage-notes">
+          <div>
+            <label>Usage</label>
+            <Paper component="form" className={classes.paper}>
+              <SearchIcon />
+              <InputBase className={classes.component} placeholder="Choose" />
+            </Paper>
+          </div>
+          <div>
+            <label>Notes</label>
+            <Paper component="form" className={classes.paper}>
+              <textarea
+                name=""
+                id=""
+                cols="30"
+                rows="10"
+                className="textarea"
+              />
+            </Paper>
+          </div>
+        </div>
+      </div>
 
-        <DialogActions className={classes.content}>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button variant="contained" color="secondary" onClick={handleClose}>
-            Identify
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+      <DialogActions className={classes.content}>
+        <Button onClick={handleClose} color="primary">
+          Cancel
+        </Button>
+        <Button variant="contained" color="secondary" onClick={handleClose}>
+          Identify
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

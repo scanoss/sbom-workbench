@@ -1,7 +1,4 @@
-.container-principal{
-  width: 400px;
-  height: 752px;
-}
+
 
 .dialog-title{
 margin: 24px;
@@ -43,6 +40,8 @@ text-align: left;
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr;
+      grid-gap: 24px;
+      margin: 24px;
     }
 
     textarea{
