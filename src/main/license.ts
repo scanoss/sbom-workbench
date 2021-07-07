@@ -6,7 +6,7 @@ import { defaultWorkspace } from './workspace/workspace';
 ipcMain.handle(IpcEvents.LICENSE_GET, async (event, licToGet: License) => {
   let license: any;
   try {
-    license = await defaultWorkspace.scans_db.getLicenses(licToGet);
+    license = await defaultWorkspace.scans_db.licenses.get(licToGet);
   } catch (e) {
     console.log('Catch an error: ', e);
   }
@@ -16,12 +16,11 @@ ipcMain.handle(IpcEvents.LICENSE_GET, async (event, licToGet: License) => {
 ipcMain.handle(IpcEvents.LICENSE_CREATE, async (event, arg: License) => {
   let created: any;
   try {
-    created = await defaultWorkspace.scans_db.createInventory(arg);
-    // defaultWorkspace.onAddInventory(newInventory);
+    created = await defaultWorkspace.scans_db.licenses.create(arg);
   } catch (e) {
     console.log('Catch an error: ', e);
   }
-  console.log('License was created info de inventario es ');
+  console.log('License was created ');
   console.log(arg);
   return { status: 'ok', message: created };
 });

@@ -18,6 +18,10 @@ export interface Component {
 }
 export interface License {
   id: number;
+  name: string;
+  spdxid: string;
+  url: string;
+  fulltext: string;
 }
 export interface ItemInclude {
   path: string;

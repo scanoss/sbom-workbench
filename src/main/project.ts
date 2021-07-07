@@ -8,7 +8,7 @@ import { defaultWorkspace } from './workspace/workspace';
 ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Inventory) => {
   let inv: any;
   try {
-    inv = await defaultWorkspace.scans_db.inventories.get(invget);
+    inv = await defaultWorkspace.scans_db.getInventory(invget);
   } catch (e) {
     console.log('Catch an error: ', e);
   }
@@ -19,21 +19,16 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Inventory) => {
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   let created: any;
   try {
-    created = await defaultWorkspace.scans_db.inventories.create(arg);
+    created = await defaultWorkspace.scans_db.createInventory(arg);
     arg.id = created;
+    console.log('arg ' + arg);
+
     defaultWorkspace.attachInventory(arg);
     // defaultWorkspace.onAddInventory(newInventory);
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
   }
+  //console.log('la info de inventario es ');
+  // console.log(arg);
   return { status: 'ok', message: created };
 });
-
-/**
- * INVENTORY_CREATE = 'INVENTORY_CREATE',
-  INVENTORY_GET = 'INVENTORY_GET',
-  INVENTORY_DELETE = 'INVENTORY_DELETE',
-  INVENTORY_UPDATE = 'INVENTORY_UPDATE',
-  INVENTORY_ATTACH_FILE = 'INVENTORY_ATTACH_FILE',
-  INVENTORY_DETACH_FILE = 'INVENTORY_DETACH_FILE',
- */

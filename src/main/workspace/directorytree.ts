@@ -26,8 +26,8 @@ function prepareScan(jsonScan: any, bannedList: Filtering.BannedList) {
       jsonScan.action = 'filter';
     }
   } else if (jsonScan.type === 'folder') {
-    for (i = 0; i < jsonScan.files.length; i += 1)
-      prepareScan(jsonScan.files[i], bannedList);
+    for (i = 0; i < jsonScan.childs.length; i += 1)
+      prepareScan(jsonScan.childs[i], bannedList);
   }
 }
 
@@ -43,12 +43,12 @@ function dirTree(filename: string) {
       name: path.basename(filename),
       inventories: [],
       components: [],
-      files: undefined,
+      childs: undefined,
       include: true,
       action: 'scan',
     };
 
-    info.files = fs.readdirSync(filename).map(function (child: string) {
+    info.childs = fs.readdirSync(filename).map(function (child: string) {
       return dirTree(`${filename}/${child}`);
     });
   } else {
@@ -97,33 +97,33 @@ export class ProjectTree extends EventEmitter {
       name: leaf.name,
       inv_count: leaf.inv_count,
       include: leaf.include,
-      files: [],
+      childs: [],
       action: leaf.action,
     };
-    ret.files = [];
+    ret.childs = [];
     const childs = [];
-    for (j = 0; leaf.files && j < leaf.files.length; j += 1) {
-      if (leaf.files[j].type === 'folder') {
+    for (j = 0; leaf.childs && j < leaf.childs.length; j += 1) {
+      if (leaf.childs[j].type === 'folder') {
         const info = {
           type: 'folder',
-          path: leaf.files[j].name,
-          inv_count: leaf.files[j].inv_count,
-          include: leaf.files[j].include,
-          action: leaf.files[j].action,
+          path: leaf.childs[j].name,
+          inv_count: leaf.childs[j].inv_count,
+          include: leaf.childs[j].include,
+          action: leaf.childs[j].action,
         };
         childs.push(info);
-      } else if (leaf.files[j].type === 'file') {
+      } else if (leaf.childs[j].type === 'file') {
         const info = {
           type: 'file',
-          path: leaf.files[j].name,
-          inventories: leaf.files[j].inventories,
-          include: leaf.files[j].include,
-          action: leaf.files[j].action,
+          path: leaf.childs[j].name,
+          inventories: leaf.childs[j].inventories,
+          include: leaf.childs[j].include,
+          action: leaf.childs[j].action,
         };
         childs.push(info);
       }
     }
-    Object.assign(ret.files, childs);
+    Object.assign(ret.childs, childs);
     return ret;
   }
 }
