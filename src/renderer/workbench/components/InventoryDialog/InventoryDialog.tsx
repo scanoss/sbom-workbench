@@ -78,8 +78,15 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   });
 
   useEffect(() => {
-    console.log(form);
-  }, []);
+    console.table(form);
+  }, [form]);
+
+  const inputHandler = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   return (
     <Dialog
@@ -101,6 +108,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 placeholder="Component"
                 fullWidth
                 defaultValue={form?.component}
+                name="component"
+                onChange={(e) => inputHandler(e)}
               />
             </Paper>
           </div>
@@ -110,6 +119,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <InputBase
                 className={classes.component}
                 defaultValue={form?.version}
+                name="version"
+                onChange={(e) => inputHandler(e)}
               />
             </Paper>
           </div>
@@ -122,6 +133,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               placeholder="License"
               fullWidth
               defaultValue={form?.license_name}
+              name="license_name"
+              onChange={(e) => inputHandler(e)}
             />
           </Paper>
         </div>
@@ -132,6 +145,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               className={classes.component}
               placeholder="url"
               defaultValue={form?.url}
+              name="url"
+              onChange={(e) => inputHandler(e)}
             />
           </Paper>
         </div>
@@ -142,6 +157,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               className={classes.component}
               placeholder="Purl"
               defaultValue={form?.purl}
+              name="purl"
+              onChange={(e) => inputHandler(e)}
             />
           </Paper>
         </div>
@@ -154,6 +171,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 fullWidth
+                name="usage"
+                onChange={(e) => inputHandler(e)}
               >
                 <MenuItem value="File">File</MenuItem>
                 <MenuItem value="Snippet">Snippet</MenuItem>
@@ -170,6 +189,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 rows="10"
                 className="textarea"
                 defaultValue={form?.notes}
+                name="notes"
+                onChange={(e) => inputHandler(e)}
               />
             </Paper>
           </div>
