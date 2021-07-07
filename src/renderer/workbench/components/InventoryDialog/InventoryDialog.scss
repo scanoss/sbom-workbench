@@ -1,0 +1,56 @@
+
+
+.dialog-title{
+margin: 24px;
+font-family: Inter;
+font-size: 24px;
+font-style: normal;
+font-weight: 400;
+line-height: 29px;
+letter-spacing: 0em;
+text-align: left;
+
+}
+
+
+.identity-component{
+  // display: flex;
+  // justify-content: center;
+  // flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 2fr;
+    background-color: rgba(244, 244, 245, 1);
+
+    .DialogTitle{
+      background-color: rgba(244, 244, 245, 1);
+    }
+
+    .component-version-container{
+      display: grid;
+      grid-template-columns: 1.5fr 0.75fr;
+
+    }
+
+    .component-container{
+      margin: 24px;
+    }
+
+    .usage-notes{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr;
+      grid-gap: 24px;
+      margin: 24px;
+    }
+
+    textarea{
+      border: none;
+      outline:0px !important;
+    -webkit-appearance:none;
+    box-shadow: none !important;
+    resize: none;
+    width: 100%;
+    }
+
+}
