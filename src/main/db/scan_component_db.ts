@@ -12,49 +12,84 @@ import { UtilsDb } from './utils_db';
 const utilsDb = new UtilsDb();
 const query = new Querys();
 
+interface Component {
+  name: string;
+  version: string;
+  description: string;
+  url: string;
+  purl: string;
+  license_name: string;
+}
+
 export class ComponentDb extends Db {
   constructor(path: string) {
     super(path);
   }
 
-  // GET COMPONENT
-  async get(data: any) {
-    const self = this;
-    const db = await this.openDb();
-    return new Promise<any[]>((resolve, reject) => {
-      db.get(
-        query.SQL_GET_COMPONENT,
-        data.purl,
-        async function (err: any, comp: any) {
-          db.close();
-          const compid = await self.getComponentIdFromPurl(data);
-          if (compid !== undefined) {
-            const license = await self.getLicensesAttachedToComponentById(
-              compid
-            );
-            comp.licenses = license;
-          }
-          if (err) reject(new Error('[]'));
-          else resolve(comp);
+  get(data: any) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let component: any;
+        if (data.id) {
+          component = await this.getById(data.id);
+        } else if (data.purl && data.version) {
+          component = await this.getbyPurlVersion(data);
+        } else {
+          component = await this.getAll();
         }
-      );
+        resolve(component);
+      } catch (error) {
+        reject(new Error('unable to open db'));
+      }
+    });
+  }
+
+  private getAll() {
+    const self = this;
+    return new Promise<number>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.all(
+          query.SQL_GET_ALL_COMPONENTS,
+          async (err: any, component: any) => {
+            if (err) reject(new Error(undefined));
+            db.close();
+
+            for (let i = 0; i < component.length; i += 1) {
+              const licenses = await self.getAllLicensesFromComponentId(
+                component[i].compid
+              );
+              component[i].licenses = licenses;
+            }
+            resolve(component);
+          }
+        );
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
   // // GET COMPONENENT ID FROM PURL
-  private getComponentIdFromPurl(data: any) {
+  private getbyPurlVersion(data: any) {
+    const self = this;
     return new Promise<number>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.get(
-          query.SQL_GET_COMPID_FROM_PURL,
+          query.SQL_GET_COMPONENT_BY_PURL_VERSION,
           data.purl,
           data.version,
-          (err: any, component: any) => {
+          async (err: any, component: any) => {
             db.close();
-            if (err) reject(new Error(undefined));
 
-            resolve(component.id);
+            console.log(component);
+            if (err) reject(new Error(undefined));
+            const licenses = await self.getAllLicensesFromComponentId(
+              component.compid
+            );
+            component.licenses = licenses;
+            resolve(component);
           }
         );
       } catch (error) {

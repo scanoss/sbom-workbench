@@ -19,7 +19,7 @@ import { ComponentDb } from './scan_component_db';
 const query = new Querys();
 
 export class ScanDb extends Db {
-  components: any;
+  components: ComponentDb;
 
   // TO DO Change names plural
   files: FilesDb;

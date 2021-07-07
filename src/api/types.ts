@@ -30,3 +30,10 @@ export interface ItemInclude {
   recursive: boolean;
   action: boolean;
 }
+
+export interface Project {
+  work_root: string;
+  scan_root: string;
+  default_licenses: string;
+  default_components: string;
+}

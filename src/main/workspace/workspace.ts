@@ -22,7 +22,7 @@ import { Inventory } from '../../api/types';
 let defaultWorkspace: Workspace;
 
 export class Workspace extends EventEmitter {
-  root_path: string | undefined;
+  work_path: string | undefined;
 
   name!: string;
 
@@ -42,12 +42,12 @@ export class Workspace extends EventEmitter {
     });
     defaultWorkspace = this;
 
-    this.scans_db = new ScanDb('/home/oscar/test');
+    /* this.scans_db = new ScanDb('/home/oscar/test');
     this.on('createDB', async (i: any) => {
       const init = await this.scans_db.init();
       console.log(`base abierta ${init}`);
-    });
-    this.emit('createDB');
+    });*/
+    //this.emit('createDB');
   }
 
   async onAddInventory(i: any) {}
@@ -62,6 +62,10 @@ export class Workspace extends EventEmitter {
       if (results) resolve(results);
       else reject(new Error('{}'));
     });
+  }
+
+  set_work_path(path: string) {
+    this.work_path = path;
   }
 
   set_scan_root(path: string) {
@@ -203,7 +207,7 @@ function insertComponent(tree: any, mypath: string, purl: string): any {
     }
   }
 
-  arbol.inventories.push(purl);
+  arbol.components.push(purl);
   // console.log(arbol);
 }
 

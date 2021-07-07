@@ -1,9 +1,11 @@
 import { ipcMain } from 'electron';
 import { create } from 'electron-log';
 // import { Component } from 'react';
-import { Inventory, Component } from '../api/types';
+import { Inventory, Component, Project } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { defaultWorkspace } from './workspace/workspace';
+import { ScanDb } from './db/scan_db';
+import { ProjectTree } from './workspace/directorytree';
 
 ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Inventory) => {
   let inv: any;
@@ -19,26 +21,29 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Inventory) => {
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   let created: any;
   try {
-    const license = {
-      // license_id: '',
-      //  license_name: '',
-      // license_spdxid: 'CC-BY-SA-3.0',
-    };
-    created = await defaultWorkspace.scans_db.inventories.get({});
-    console.log(created);
-    // defaultWorkspace.scans_db.components.get({}); //    // defaultWorkspace.onAddInventory(newInventory);
-  } catch (e) {
-    console.log('Catch an error on retrieving licences: ', e);
-  }
-
-  /* try {
     created = await defaultWorkspace.scans_db.inventories.create(arg);
     arg.id = created;
     defaultWorkspace.attachInventory(arg);
-    // defaultWorkspace.onAddInventory(newInventory);
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
-  }*/
+  }
+  /* let p: Project = {
+    work_root: '/home/oscar/test',
+    default_licenses: '/home/oscar/test/licenses.json',
+  };
+  try {
+    defaultWorkspace.scans_db = new ScanDb(p.work_root);
+    const init = await defaultWorkspace.scans_db.init();
+    if (p.default_licenses != undefined)
+      defaultWorkspace.scans_db.licenses.importFromFile(p.default_licenses);
+    if (p.default_components != undefined)
+      defaultWorkspace.scans_db.components.importFromFile(p.default_components);
+
+    console.log(`base abierta ${init}`);
+  } catch (e) {
+    console.log('Catch an error on creating a project: ', e);
+  }
+  return { status: 'ok', message: 'ok' };*/
   return { status: 'ok', message: created };
 });
 
