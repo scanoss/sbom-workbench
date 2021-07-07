@@ -15,13 +15,12 @@ import {
   TextareaAutosize,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Inventory } from '../../../../api/types';
 import { Component } from '../../WorkbenchProvider';
 
 const useStyles = makeStyles((theme) => ({
-  container: {
-  },
+  container: {},
   paper: {
     padding: '2px 4px',
     display: 'flex',
@@ -68,6 +67,20 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     onClose(inventory);
   };
 
+  const [form, setForm] = useState({
+    component: component.name,
+    version: component.version,
+    license_name: component.licences[0] ? component.licences[0].name : '',
+    url: component.url,
+    purl: component.purl[0],
+    usage: '',
+    notes: '',
+  });
+
+  useEffect(() => {
+    console.log(form);
+  }, []);
+
   return (
     <Dialog
       maxWidth="md"
@@ -87,6 +100,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 className={classes.component}
                 placeholder="Component"
                 fullWidth
+                defaultValue={form?.component}
               />
             </Paper>
           </div>
@@ -95,7 +109,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <Paper component="form" className={classes.paper}>
               <InputBase
                 className={classes.component}
-                placeholder="Component"
+                defaultValue={form?.version}
               />
             </Paper>
           </div>
@@ -107,19 +121,28 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               className={classes.component}
               placeholder="License"
               fullWidth
+              defaultValue={form?.license_name}
             />
           </Paper>
         </div>
         <div className="component-container">
           <label>URL</label>
           <Paper component="form" className={classes.paper}>
-            <InputBase className={classes.component} placeholder="License" />
+            <InputBase
+              className={classes.component}
+              placeholder="url"
+              defaultValue={form?.url}
+            />
           </Paper>
         </div>
         <div className="component-container">
           <label>PURL</label>
           <Paper component="form" className={classes.paper}>
-            <InputBase className={classes.component} placeholder="License" />
+            <InputBase
+              className={classes.component}
+              placeholder="Purl"
+              defaultValue={form?.purl}
+            />
           </Paper>
         </div>
         <div className="usage-notes">
@@ -127,18 +150,26 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <label>Usage</label>
             <Paper component="form" className={classes.paper}>
               <SearchIcon />
-              <InputBase className={classes.component} placeholder="Choose" />
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                fullWidth
+              >
+                <MenuItem value="File">File</MenuItem>
+                <MenuItem value="Snippet">Snippet</MenuItem>
+                <MenuItem value="pre-requisite">pre-requisite</MenuItem>
+              </Select>
             </Paper>
           </div>
           <div>
             <label>Notes</label>
             <Paper component="form" className={classes.paper}>
-              <textarea
-                name=""
+              <TextareaAutosize
                 id=""
                 cols="30"
                 rows="10"
                 className="textarea"
+                defaultValue={form?.notes}
               />
             </Paper>
           </div>
