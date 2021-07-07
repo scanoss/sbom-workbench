@@ -1,0 +1,50 @@
+[
+    {
+        "description": "AUTOMATIC IMPORT",
+        "id": 1,
+        "name": "pip",
+        "purl": "pkg:github/pypa/pip",
+        "url": "https://github.com/pypa/pip/archive/19.0.zip",
+        "version": "19.0"
+    },
+    {
+        "description": "AUTOMATIC IMPORT",
+        "id": 2,
+        "name": "pip",
+        "purl": "pkg:github/pypa/pip",
+        "url": "https://github.com/pypa/pip/archive/19.0.zip",
+        "version": "18.1"
+    },
+    {
+        "description": "AUTOMATIC IMPORT",
+        "id": 3,
+        "name": "pip",
+        "purl": "pkg:github/pypa/pip",
+        "url": "https://github.com/pypa/pip/archive/19.0.2.zip",
+        "version": "19.0.2"
+    },
+    {
+        "description": "Description test",
+        "id": 4,
+        "name": "Test",
+        "purl": "pkg:github/pypa/pip",
+        "url": "url test",
+        "version": "19.0"
+    },
+    {
+        "description": "AUTOMATIC IMPORT",
+        "id": 5,
+        "name": "pip",
+        "purl": "pkg:github/pypa/pip",
+        "url": "https://github.com/pypa/pip/archive/19.0.zip",
+        "version": "18.0"
+    },
+    {
+        "description": "AUTOMATIC IMPORT",
+        "id": 6,
+        "name": "repo_helper_pycharm",
+        "purl": "pkg:github/repo-helper/repo_helper_pycharm",
+        "url": "https://github.com/repo-helper/repo_helper_pycharm/archive/v0.2.1.zip",
+        "version": "0.2.1"
+    }
+]
