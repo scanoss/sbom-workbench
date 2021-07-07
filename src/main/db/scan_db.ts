@@ -19,15 +19,15 @@ import { ComponentDb } from './scan_component_db';
 const query = new Querys();
 
 export class ScanDb extends Db {
-  component: any;
+  components: ComponentDb;
 
-  files: any;
+  files: FilesDb;
 
-  inv: any;
+  inventories: InventoryDb;
 
-  license: any;
+  licenses: LicenseDb;
 
-  results: any;
+  results: ResultsDb;
 
   lastID: any;
 
@@ -35,10 +35,10 @@ export class ScanDb extends Db {
   constructor(path: string) {
     super(path);
     this.files = new FilesDb(path);
-    this.inv = new InventoryDb(path);
+    this.inventories = new InventoryDb(path);
     this.results = new ResultsDb(path);
-    this.license = new LicenseDb(path);
-    this.component = new ComponentDb(path);
+    this.licenses = new LicenseDb(path);
+    this.components = new ComponentDb(path);
   }
 
   private getFiltered(db: any, path: string) {
