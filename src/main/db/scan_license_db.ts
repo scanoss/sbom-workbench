@@ -95,8 +95,8 @@ export class LicenseDb extends Db {
     let id: any;
     return new Promise(async (resolve, reject) => {
       try {
-        if (license.license_id) id = license.id;
-        else if (license.license_name || license.license_spdxid)
+        if (license.id) id = license.id;
+        else if (license.name || license.spdxid)
           id = await this.getLicenseIdFilter(license);
         else {
           id = '%';
@@ -154,12 +154,12 @@ export class LicenseDb extends Db {
       name: null,
       spdxid: null,
     };
-    if (license.license_name) {
-      filter.name = license.license_name;
+    if (license.name) {
+      filter.name = license.name;
       filter.spdxid = null;
-    } else if (license.license_spdxid) {
+    } else if (license.spdxid) {
       filter.name = null;
-      filter.spdxid = license.license_spdxid;
+      filter.spdxid = license.spdxid;
     }
     return filter;
   }
@@ -237,6 +237,32 @@ export class LicenseDb extends Db {
         });
       } catch (err) {
         reject(new Error('License was not attached'));
+      }
+    });
+  }
+
+  // UPDATE
+  update(license) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        const stmt = db.prepare(query.COMPDB_LICENSES_INSERT);
+        stmt.run(
+          license.spdxid,
+          license.name,
+          license.fulltext,
+          license.url,
+          function (this: any, err: any) {
+            db.close();
+            if (err || this.lastID === 0)
+              reject(new Error('The license was not created or already exist'));
+            license.id = this.lastID;
+            stmt.finalize();
+            resolve(license);
+          }
+        );
+      } catch (error) {
+        reject(new Error('The license was not created'));
       }
     });
   }

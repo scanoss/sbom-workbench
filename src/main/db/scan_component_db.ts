@@ -136,7 +136,6 @@ export class ComponentDb extends Db {
             component.description,
             component.url,
             component.purl,
-            component.license_name,
             function (this: any, err: any) {
               db.close();
               if (err) reject(new Error('error'));
@@ -223,7 +222,7 @@ export class ComponentDb extends Db {
     });
   }
 
-  // IMPORT UNIQUE RESULTS TO COMP DB FROM FILE
+  // IMPORT UNIQUE RESULTS TO COMP DB FROM FILE RESULTS
   importUniqueFromFile(resultPath: string) {
     let data: any;
     return new Promise(async (resolve, reject) => {
@@ -246,7 +245,7 @@ export class ComponentDb extends Db {
     });
   }
 
-  // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON
+  // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
   importUniqueFromJson(json: string) {
     let data: any;
     return new Promise(async (resolve, reject) => {
@@ -275,15 +274,66 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       db.serialize(function () {
         const stmt = db.prepare(query.COMPDB_SQL_COMP_VERSION_INSERT);
-        const licenseName =
-          data.licenses && data.licenses[0] ? data.licenses[0].name : 'n/a';
         stmt.run(
           data.component,
           data.version,
           'AUTOMATIC IMPORT',
           data.url,
           data.purl ? data.purl[0] : 'n/a',
-          licenseName,
+          (err: any) => {
+            if (err) reject(new Error('error'));
+          }
+        );
+        stmt.finalize();
+        resolve(true);
+      });
+    });
+  }
+
+  // IMPORT COMPONENTS FROM JSON
+  importFromJSON(component: any) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        for (let i = 0; i < component.length; i += 1) {
+          await this.componentNewImport(db, component[i]);
+        }
+        db.close();
+        resolve(true);
+      } catch (error) {
+        reject(new Error('Unable to import scan results'));
+      }
+    });
+  }
+
+  // IMPORT COMPONENT FROM FILE
+  importFromFile(path: string) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const result: Record<any, any> = await utilsDb.readFile(path);
+        const db = await this.openDb();
+        for (let i = 0; i < result.length; i += 1) {
+          await this.componentNewImport(db, result[i]);
+        }
+        db.close();
+        resolve(true);
+      } catch (error) {
+        reject(new Error('Unable to import scan results'));
+      }
+    });
+  }
+
+  // COMPONENT NEW
+  private componentNewImport(db: any, data: any) {
+    return new Promise(async (resolve, reject) => {
+      db.serialize(function () {
+        const stmt = db.prepare(query.COMPDB_SQL_COMP_VERSION_INSERT);
+        stmt.run(
+          data.name,
+          data.version,
+          data.description,
+          data.url,
+          data.purl,
           (err: any) => {
             if (err) reject(new Error('error'));
           }

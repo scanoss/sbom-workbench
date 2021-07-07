@@ -20,30 +20,33 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Inventory) => {
 
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   let created: any;
-  try {
+  /* try {
     created = await defaultWorkspace.scans_db.inventories.create(arg);
     arg.id = created;
     defaultWorkspace.attachInventory(arg);
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
-  }
-  /* let p: Project = {
-    work_root: '/home/oscar/test',
-    default_licenses: '/home/oscar/test/licenses.json',
-  };
+  }*/
   try {
-    defaultWorkspace.scans_db = new ScanDb(p.work_root);
-    const init = await defaultWorkspace.scans_db.init();
-    if (p.default_licenses != undefined)
-      defaultWorkspace.scans_db.licenses.importFromFile(p.default_licenses);
-    if (p.default_components != undefined)
-      defaultWorkspace.scans_db.components.importFromFile(p.default_components);
+    /*  created = await defaultWorkspace.scans_db.inventories.get({
+      version: '2.1.8',
+      purl: 'pkg:github/scanoss/minr',
+    });*/
+    created = await defaultWorkspace.scans_db.licenses.get({
+      //   id: 1,
+      // spdxid: '0BSD',
+      name: 'BSD Zero Clause License',
+      //    fulltext: 'Test full text ',
+      //   url: 'Test url ',
+    });
 
-    console.log(`base abierta ${init}`);
+    arg.id = created;
+    // defaultWorkspace.attachInventory(arg);
   } catch (e) {
-    console.log('Catch an error on creating a project: ', e);
+    console.log('Catch an error on inventory: ', e);
   }
-  return { status: 'ok', message: 'ok' };*/
+  console.log('licencias');
+  console.log(created);
   return { status: 'ok', message: created };
 });
 

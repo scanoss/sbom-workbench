@@ -161,7 +161,6 @@ function insertInventory(tree: any, mypath: string, inv: Inventory): any {
   let myPathFolders: string[];
   // eslint-disable-next-line prefer-const
   let arbol = tree;
-  console.log(tree);
   myPathFolders = mypath.split('/');
   if (myPathFolders[0] === '') myPathFolders.shift();
   let i: number;
@@ -181,14 +180,12 @@ function insertInventory(tree: any, mypath: string, inv: Inventory): any {
   }
 
   arbol.inventories.push(inv.id);
-  // console.log(arbol);
 }
 
 function insertComponent(tree: any, mypath: string, purl: string): any {
   let myPathFolders: string[];
   // eslint-disable-next-line prefer-const
   let arbol = tree;
-  console.log(tree);
   myPathFolders = mypath.split('/');
   if (myPathFolders[0] === '') myPathFolders.shift();
   let i: number;

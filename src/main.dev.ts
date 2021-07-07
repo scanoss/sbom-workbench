@@ -189,5 +189,5 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
 });
 
 ipcMain.on(IpcEvents.ITEM_INCLUDE, (event, arg: ItemExclude) => {
-  a.exclude_file(arg.path, arg.recursive);
+  ws.exclude_file(arg.path, arg.recursive);
 });

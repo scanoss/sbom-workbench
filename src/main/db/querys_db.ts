@@ -17,7 +17,7 @@ export class Querys {
     'CREATE TABLE IF NOT EXISTS status (files integer, scanned integer default 0, status text, project integer, user text, message text, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, type text, size text);';
 
   COMPDB_SQL_CREATE_TABLE_COMPVERS =
-    'CREATE TABLE IF NOT EXISTS component_versions (id integer primary key asc, comp_name text, version text not null, description text, url text, purl text, license text, UNIQUE(comp_name, version,description,url,purl,license));';
+    'CREATE TABLE IF NOT EXISTS component_versions (id integer primary key asc, name text, version text not null, description text, url text, purl text, UNIQUE(name, version,description,url,purl));';
 
   COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS =
     'CREATE TABLE IF NOT EXISTS license_component_version (id integer primary key asc, cvid integer not null, licid integer not null, unique(cvid,licid));';
@@ -41,6 +41,14 @@ export class Querys {
   SQL_INSERT_FILE_INVENTORIES =
     'INSERT into file_inventories (path,inventoryid) values (?,?);';
 
+  //  UPDATE INVENTORY BY ID
+  SQL_UPDATE_INVENTORY_BY_ID =
+    'UPDATE inventories SET compid=?,version=?,purl=?,usage=?, notes=?, url=?, license_name=?  where id=?;';
+
+  //  UPDATE INVENTORY BY PURL/VERSION
+  SQL_UPDATE_INVENTORY_BY_PURL_VERSION =
+    'UPDATE inventories SET compid=?,version=?,purl=?,usage=?, notes=?, url=?, license_name=?where purl=? and version=?;';
+
   /** SQL COMPONENTS TABLES INSERT* */
   // SQL INSERT INTO LICENSES
   COMPDB_LICENSES_INSERT =
@@ -48,7 +56,7 @@ export class Querys {
 
   // SQL INSERT INTO  COMPONENT VERSIONS
   COMPDB_SQL_COMP_VERSION_INSERT =
-    'INSERT OR IGNORE INTO component_versions  (comp_name,version, description, url,purl,license) values (?,?,?,?,?,?);';
+    'INSERT OR IGNORE INTO component_versions  (name,version, description, url,purl) values (?,?,?,?,?);';
 
   // ATTACH A COMPONENT TO A LICENSE
   SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID =
@@ -93,10 +101,10 @@ export class Querys {
 
   // SQL_GET_COMPONENTS TABLE
   SQL_GET_COMPONENT =
-    'SELECT id,comp_name,version,description,url,purl,license from component_versions where purl like ?';
+    'SELECT id,name,version,description,url,purl from component_versions where purl like ?';
 
   SQL_GET_COMPONENT_BY_ID =
-    'SELECT cv.comp_name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.id=?;';
+    'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.id=?;';
 
   SQL_GET_LICENSES_BY_COMPONENT_ID =
     'SELECT l.id,l.name,l.spdxid FROM licenses l where l.id in (SELECT lcv.licid from license_component_version lcv where lcv.cvid=?);';
@@ -107,6 +115,13 @@ export class Querys {
   SQL_GET_COMPID_FROM_PURL =
     'SELECT id from component_versions where purl like ? and version like ?;';
 
+  SQL_GET_COMPONENT_BY_PURL_VERSION =
+    'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.purl=? and cv.version=?;';
+
+  // GET ALL COMPONENTES
+  SQL_GET_ALL_COMPONENTS =
+    'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv;';
+
   // GET LICENSES
   COMPDB_SQL_LICENSE_ALL =
     'SELECT id, spdxid, name, url from licenses where id like ? ;';
@@ -115,6 +130,11 @@ export class Querys {
   COMPDB_SQL_GET_LICENSE_ID_FROM_SPDX_NAME =
     'SELECT id from licenses where licenses.name=? or licenses.spdxid=?;';
 
+  // GET ALL THE INVENTORIES
   SQL_GET_ALL_INVENTORIES =
     'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories;';
+
+  // GET INVENTORY BY ID
+  SQL_GET_INEVNTORY_BY_ID =
+    'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories where id=?;';
 }

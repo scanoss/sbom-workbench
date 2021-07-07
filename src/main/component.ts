@@ -16,7 +16,8 @@ ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, arg: Component) => {
 ipcMain.handle(
   IpcEvents.COMPONENT_ATTACH_LICENSE,
   async (event, comp: Component, lic: License) => {
-    await defaultWorkspace.scans_db.components.attachLicense(comp, lic);
+    let link = { license_id: lic.id, compid: comp.id };
+    await defaultWorkspace.scans_db.licenses.licenseAttach(link);
     return { status: 'ok', message: 'test' };
   }
 );
