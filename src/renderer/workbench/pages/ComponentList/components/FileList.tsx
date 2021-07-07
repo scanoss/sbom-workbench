@@ -28,7 +28,7 @@ export const FileList = ({component, scan, filter, onSelectFile}: FileListProps)
           onClick={() => onSelectFile(file.path)}
         >
           <MatchCard
-            labelOfCard={file.path}
+            label={file.path}
             status={file.status}
           />
         </article>

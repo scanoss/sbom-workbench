@@ -1,18 +1,19 @@
 .match-card {
   background-color: #ffff;
-  height: 68px;
+  height: 55px;
   width: 55%;
   border-radius: 4px;
-  box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.06),
-    0px 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.06), 0px 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
 
-
-
-  @media screen and (max-width: $default-width) {
+  @media screen and (max-width: $md) {
     width: 100%;
     margin-top: 20px;
+  }
+
+  &:hover .match-card-buttons {
+    opacity: 1 !important;
   }
 
   .match-card-content {
@@ -24,45 +25,37 @@
     margin-left: 20px;
     justify-content: space-between;
 
-
     .label-div {
       width: 100%;
     }
 
     .match-card-buttons {
-      opacity: 0;
+      display: flex;
       transition: 200ms ease;
+      opacity: 0;
+      margin-right: 12px;
 
-      .icon{
+      .icon {
         width: 30px;
         height: 30px;
-        margin-right: 15px;
         padding: 10px;
+        margin: -3px;
         border-radius: 50%;
-        &:hover{
+
+        &:hover {
           background-color: rgba(209, 209, 209, 0.226);
           cursor: pointer;
         }
       }
-      .check{
+
+      .check {
         color: $indentified-green;
       }
 
       .ban {
         color: $ignored-gray;
       }
-
-      &:hover{
-
-
-          opacity: 1;
-
-
     }
-
-
-
-  }
 
   }
 }

@@ -94,13 +94,15 @@ export const ComponentDetail = () => {
                 </Tabs>
               </Paper>
             </div>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={onIdentifyAllPressed}
-            >
-              Identify All ({component?.count.pending})
-            </Button>
+
+            { tab === 0 ?
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={onIdentifyAllPressed}
+              >
+                Identify All ({component?.count.pending})
+              </Button> : null }
           </section>
         </header>
 

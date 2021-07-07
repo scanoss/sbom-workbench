@@ -1,18 +1,14 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import {
   Dialog,
-  DialogTitle,
-  DialogContent,
   Paper,
-  TextField,
   DialogActions,
   Button,
   makeStyles,
   InputBase,
-  InputLabel,
   Select,
   MenuItem,
-  TextareaAutosize,
+  TextareaAutosize, IconButton
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import React, { useState, useEffect } from 'react';
@@ -20,24 +16,21 @@ import { Inventory } from '../../../../api/types';
 import { Component } from '../../WorkbenchProvider';
 
 const useStyles = makeStyles((theme) => ({
-  container: {},
+  dialog: {
+    width: 400,
+  },
   paper: {
     padding: '2px 4px',
     display: 'flex',
     alignItems: 'center',
   },
-  dialog: {},
+  iconButton: {
+    padding: 7,
+  },
   component: {
+    color: '#89898b',
     padding: theme.spacing(0.5),
   },
-  // content: {
-  //   backgroundColor: 'var(--background-color-primary)',
-  //   padding: theme.spacing(1),
-  //   display: grid,
-  //   gridTemplateColumns: 1fr,
-  //   gridTemplateRows: 1fr 1fr 1fr 1fr 2fr,
-  //   gap: 5% 0%,
-  // },
   actions: {
     backgroundColor: 'var(--background-color-primary)',
   },
@@ -57,23 +50,17 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const [form, setForm] = useState({
     component: component.name,
     version: component.version,
-    license_name: component.licences[0] ? component.licences[0].name : '',
+    license_name: component.licenses[0] ? component.licenses[0].name : '',
     url: component.url,
     purl: component.purl[0],
-    usage: '',
+    usage: 'file',
     notes: '',
   });
 
   const handleClose = () => {
     const inventory: Inventory = form;
-
     onClose(inventory);
-    console.log(inventory);
   };
-
-  useEffect(() => {
-    console.table(form);
-  }, [form]);
 
   const inputHandler = (e) => {
     setForm({
@@ -84,11 +71,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   return (
     <Dialog
+      id="InventoryDialog"
       maxWidth="md"
       fullWidth
       open={open}
-      onClose={handleClose}
-      className={classes.container}
+      onClose={onCancel}
     >
       <span className="dialog-title">Identify Component</span>
       <div className="identity-component">
@@ -96,13 +83,15 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <div className="component-container">
             <label>Component</label>
             <Paper className={classes.paper}>
-              <SearchIcon />
+              <IconButton className={classes.iconButton} aria-label="menu">
+                <SearchIcon />
+              </IconButton>
               <InputBase
+                name="component"
+                defaultValue={form?.component}
                 className={classes.component}
                 placeholder="Component"
                 fullWidth
-                defaultValue={form?.component}
-                name="component"
                 onChange={(e) => inputHandler(e)}
               />
             </Paper>
@@ -111,9 +100,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <label>Version</label>
             <Paper component="form" className={classes.paper}>
               <InputBase
+                name="version"
                 className={classes.component}
                 defaultValue={form?.version}
-                name="version"
+                placeholder="Version"
+                fullWidth
                 onChange={(e) => inputHandler(e)}
               />
             </Paper>
@@ -123,11 +114,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <label>License</label>
           <Paper component="form" className={classes.paper}>
             <InputBase
+              name="license_name"
+              defaultValue={form?.license_name}
               className={classes.component}
               placeholder="License"
               fullWidth
-              defaultValue={form?.license_name}
-              name="license_name"
               onChange={(e) => inputHandler(e)}
             />
           </Paper>
@@ -136,10 +127,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <label>URL</label>
           <Paper component="form" className={classes.paper}>
             <InputBase
+              name="url"
+              defaultValue={form?.url}
               className={classes.component}
               placeholder="url"
-              defaultValue={form?.url}
-              name="url"
+              fullWidth
               onChange={(e) => inputHandler(e)}
             />
           </Paper>
@@ -148,10 +140,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <label>PURL</label>
           <Paper component="form" className={classes.paper}>
             <InputBase
+              name="purl"
+              defaultValue={form?.purl}
               className={classes.component}
               placeholder="Purl"
-              defaultValue={form?.purl}
-              name="purl"
+              fullWidth
               onChange={(e) => inputHandler(e)}
             />
           </Paper>
@@ -160,17 +153,17 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <div>
             <label>Usage</label>
             <Paper component="form" className={classes.paper}>
-              <SearchIcon />
               <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                fullWidth
                 name="usage"
+                defaultValue={form?.usage}
+                className={classes.component}
+                fullWidth
+                disableUnderline
                 onChange={(e) => inputHandler(e)}
               >
-                <MenuItem value="File">File</MenuItem>
-                <MenuItem value="Snippet">Snippet</MenuItem>
-                <MenuItem value="pre-requisite">pre-requisite</MenuItem>
+                <MenuItem value="file">File</MenuItem>
+                <MenuItem value="snippet">Snippet</MenuItem>
+                <MenuItem value="pre-requisite">Pre-requisite</MenuItem>
               </Select>
             </Paper>
           </div>
@@ -178,12 +171,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <label>Notes</label>
             <Paper component="form" className={classes.paper}>
               <TextareaAutosize
-                id=""
-                cols="30"
-                rows="10"
-                className="textarea"
-                defaultValue={form?.notes}
                 name="notes"
+                defaultValue={form?.notes}
+                className={classes.component}
+                cols={30}
+                rows={8}
                 onChange={(e) => inputHandler(e)}
               />
             </Paper>
@@ -191,8 +183,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         </div>
       </div>
 
-      <DialogActions className={classes.content}>
-        <Button onClick={handleClose} color="primary">
+      <DialogActions>
+        <Button onClick={onCancel}>
           Cancel
         </Button>
         <Button variant="contained" color="secondary" onClick={handleClose}>

@@ -3,7 +3,6 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import {
   nord,
-  atomOneDark,
 } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory } from 'react-router-dom';
@@ -15,7 +14,9 @@ import MatchCard from '../../components/MatchCard/MatchCard';
 import { range } from '../../../../utils/utils';
 import { workbenchController } from '../../../workbench-controller';
 import { AppContext } from '../../../context/AppProvider';
-import MatchInfoCard from '../../components/MatchInfoCard/MatchInfoCard';
+import InventoryDialog from '../../components/InventoryDialog/InventoryDialog';
+import { Inventory } from '../../../../api/types';
+import { inventoryService } from '../../../../api/inventory-service';
 
 export interface FileContent {
   content: string | null;
@@ -25,12 +26,10 @@ export interface FileContent {
 export const Editor = () => {
   const history = useHistory();
 
-  const { file, matchInfo } = useContext(
+  const { file, matchInfo, component, createInventory } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
-
   const { setInventoryBool, inventoryBool } = useContext(DialogContext);
-
   const { scanBasePath } = useContext<any>(AppContext);
 
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(
@@ -72,7 +71,6 @@ export const Editor = () => {
       return;
     }
 
-    console.log(currentMatch.matched);
     const linesOss =
       currentMatch.id === 'file'
         ? null
@@ -82,6 +80,7 @@ export const Editor = () => {
           );
 
     setOssLines(linesOss);
+
     const lineasLocales =
       currentMatch.id === 'file'
         ? null
@@ -91,6 +90,15 @@ export const Editor = () => {
           );
     setLines(lineasLocales);
   }, [matchInfo]);
+
+  const handleClose = async (inventory: Inventory) => {
+    setInventoryBool(false);
+    const newInventory = {
+      ...inventory,
+      files: [file],
+    };
+    await createInventory(newInventory);
+  };
 
   useEffect(() => {
     if (file && currentMatch) {
@@ -103,17 +111,8 @@ export const Editor = () => {
 
   useEffect(() => {
     if (matchInfo)
-      setCurrentMatch(matchInfo[0]);
+      setCurrentMatch(matchInfo[0]); // TODO: render all matches
   }, [matchInfo]);
-
-  const handleClose = async (inventory: Inventory) => {
-    setInventoryBool(false);
-    const newInventory = await inventoryService.create({
-      ...inventory,
-      files: component ? component.files : [],
-    });
-    console.log(newInventory);
-  };
 
   return (
     <>
@@ -128,7 +127,7 @@ export const Editor = () => {
                 <span className="match-span">Match</span>
               </div>
               <header className="match-info-header">
-                <CardContent className="content">
+                <section className="content">
                   <div className="match-info-container">
                     <div className="second-row-match">
                       <div>
@@ -156,11 +155,11 @@ export const Editor = () => {
                     </div>
                   </div>
                   <MatchCard
-                    labelOfCard={file}
+                    label={file}
                     onClickCheck={() => setInventoryBool(true)}
                     status={currentMatch?.status || 'pending'}
                   />
-                </CardContent>
+                </section>
               </header>
             </>
           ) : (
@@ -176,7 +175,7 @@ export const Editor = () => {
                 <SyntaxHighlighter
                   className="code-viewer"
                   language="javascript"
-                  wrapLongLines="true"
+                  wrapLongLines
                   style={nord}
                   showLineNumbers
                   lineNumberStyle={{ color: '#ddd', fontSize: 20 }}
@@ -205,7 +204,7 @@ export const Editor = () => {
                 <SyntaxHighlighter
                   className="code-viewer"
                   language="javascript"
-                  wrapLongLines="true"
+                  wrapLongLines
                   style={nord}
                   showLineNumbers
                   lineNumberStyle={{
@@ -214,7 +213,6 @@ export const Editor = () => {
                     minWidth: 1.25,
                   }}
                   lineNumberContainerStyle={{ marginRigth: 20 }}
-                  //
                   lineProps={(lineNumber) => {
                     const style = { display: 'block' };
                     if (ossLines && ossLines.includes(lineNumber)) {
@@ -233,31 +231,11 @@ export const Editor = () => {
             ) : null}
           </div>
         </main>
-
-      {/* <section className="editors">
-        <div className="editor">
-          <pre>
-            {remoteFileContent?.error ? (
-              <p>File not found</p>
-            ) : (
-              remoteFileContent?.content
-            )}
-          </pre>
-        </div>
-
-        <div className="editor">
-          <pre>
-            {remoteFileContent?.error ? (
-              <p>File not found</p>
-            ) : (
-              remoteFileContent?.content
-            )}
-          </pre>
-        </div>
-      </section> */}
       </section>
+
       <InventoryDialog
         open={inventoryBool}
+        onCancel={() => setInventoryBool(false)}
         onClose={handleClose}
         component={component}
       />
