@@ -6,6 +6,8 @@ import {
 } from '@material-ui/core';
 import React from 'react';
 import { Inventory } from '../../../../api/types';
+import Label from '../Label/Label';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 
 interface InventoryCardProps {
   inventory: Inventory;
@@ -18,26 +20,21 @@ const InventoryCard = ({ inventory, onSelect }: InventoryCardProps) => {
       <Card className="inventory-card" elevation={1}>
         <ButtonBase onClick={() => onSelect(inventory)}>
           <CardContent className="inventory-card-content">
-            <div className='d-flex space-between'>
+            <header className='header d-flex space-between'>
               <div>
-                <Typography component="h5" variant="subtitle1">
-                  USAGE
-                </Typography>
-                <Typography component="h4" variant="h4">
-                  {inventory.usage}
-                </Typography>
+                <Label label="USAGE" textColor="gray" />
+                <Typography component="h5" variant="h5">{inventory.usage}</Typography>
               </div>
-              <Chip label="Identified Group" />
-            </div>
+              <Chip className="identified" variant="outlined" label="Identified Group" />
+            </header>
 
             <Typography paragraph>
               {inventory.notes}
             </Typography>
 
-            <Typography component="h5" variant="button">
-              Go to files
-            </Typography>
-
+            <footer>
+              <div className="link">Go to files   <ArrowForwardIcon /></div>
+            </footer>
           </CardContent>
         </ButtonBase>
       </Card>

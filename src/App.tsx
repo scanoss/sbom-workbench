@@ -8,16 +8,38 @@ import Home from './renderer/home/Home';
 import Workbench from './renderer/workbench/Workbench';
 import AppProvider from './renderer/context/AppProvider';
 
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#3B82F6',
+    },
+    secondary: {
+      main: '#22C55E',
+      contrastText: '#FFFFFF'
+    },
+  },
+  typography: {
+    button: {
+      fontWeight: 600,
+    },
+  },
+});
+
+
 export default function App() {
   return (
     <HashRouter>
-      <AppProvider>
-        <Route path="/" exact component={Home} />
-        <WorkbenchProvider>
-          <Route path="/workbench" component={Workbench} />
-        </WorkbenchProvider>
-        <Route path="/about" component={About} />
-      </AppProvider>
+      <MuiThemeProvider theme={theme}>
+        <AppProvider>
+          <Route path="/" exact component={Home} />
+          <WorkbenchProvider>
+            <Route path="/workbench" component={Workbench} />
+          </WorkbenchProvider>
+          <Route path="/about" component={About} />
+        </AppProvider>
+      </MuiThemeProvider>
     </HashRouter>
   );
 }

@@ -3,11 +3,34 @@
 
   .inventory-card-content {
     width: 100%;
+    border-left: 8px solid var(--color-status-identified);
+
+    header {
+      h5 {
+        text-transform: capitalize;
+        font-size: 36px;
+        font-style: normal;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+    }
+
+    footer {
+      .link {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        color: var(--color-status-identified);
+        font-size: 16px;
+        font-weight: 700;
+
+      }
+    }
   }
 
   button {
     width: 100%;
-    font-size: 60px;
+
     text-align: left;
     justify-content: left;
   }
@@ -21,5 +44,16 @@
   &.ignored::before {
     background-color: var(--color-status-ignored);
   }
+}
 
+// TODO: move to global
+.MuiChip-root.identified {
+  border-radius: 4px;
+  background: #DCFCE7;
+  border: 1px solid var(--color-status-identified);;
+
+  color: var(--color-status-identified);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
 }
