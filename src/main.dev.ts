@@ -147,8 +147,9 @@ export interface IInitScan {
   scanId?: string;
   // filter: IFilter[];
 }
-const a = new Workspace();
+let a;
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
+  a = new Workspace();
   const { path } = arg;
   const resultsPath = '/tmp/qs.json';
 

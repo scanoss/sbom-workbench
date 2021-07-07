@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { Component } from '../api/types';
+import { Component, License } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { defaultWorkspace } from './workspace/workspace';
 // import { Component } from '../renderer/workbench/WorkbenchProvider';
@@ -13,6 +13,13 @@ ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, arg: Component) => {
   await defaultWorkspace.scans_db.components.create(arg);
   return { status: 'ok', message: 'test' };
 });
+ipcMain.handle(
+  IpcEvents.COMPONENT_ATTACH_LICENSE,
+  async (event, comp: Component, lic: License) => {
+    await defaultWorkspace.scans_db.components.attachLicense(comp, lic);
+    return { status: 'ok', message: 'test' };
+  }
+);
 
 /*
 

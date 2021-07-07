@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Debugger } from 'inspector';
 import { EventEmitter } from 'events';
 import { stripBasename } from 'history/PathUtils';
+import * as fs from 'fs';
 import * as Filtering from './filtering';
 import * as Project from './directorytree';
-import * as fs from 'fs';
 // import { inventoryService } from '../../../../api/inventory-service';
 
 // import * as DB from "scanoss_db.js"
@@ -44,12 +43,11 @@ export class Workspace extends EventEmitter {
     defaultWorkspace = this;
 
     this.scans_db = new ScanDb('/home/oscar/test');
-
-    this.on('newInventory', async (i: any) => {
-      this.onAddInventory(i);
-      // this.scans_db.newInventory(i);
+    this.on('createDB', async (i: any) => {
+      const init = await this.scans_db.init();
+      console.log(`base abierta ${init}`);
     });
-    const init = this.scans_db.init();
+    this.emit('createDB');
   }
 
   async onAddInventory(i: any) {}
@@ -172,7 +170,7 @@ function insertInventory(tree: any, mypath: string, inv: Inventory): any {
     for (j = 0; j < arbol.childs.length; j += 1) {
       if (arbol.childs[j].name === myPathFolders[i]) {
         arbol = arbol.childs[j];
-        i++;
+        i += 1;
         break;
       }
     }

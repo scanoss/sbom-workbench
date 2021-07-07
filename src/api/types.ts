@@ -2,6 +2,7 @@ export interface Inventory {
   id?: number;
   compid: number;
   purl: string;
+  version: string;
   usage: string;
   notes: string;
   url: string;
@@ -12,6 +13,7 @@ export interface Component {
   id?: number;
   purl: string;
   name: string;
+  version: string;
   vendor?: string;
   url: string;
   description?: string;

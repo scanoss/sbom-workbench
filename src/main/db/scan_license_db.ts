@@ -96,10 +96,12 @@ export class LicenseDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         if (license.license_id) id = license.id;
-        else id = await this.getLicenseIdFilter(license);
-        if (id === undefined) {
+        else if (license.license_name || license.license_spdxid)
+          id = await this.getLicenseIdFilter(license);
+        else {
           id = '%';
         }
+
         const db = await this.openDb();
         db.serialize(function () {
           db.all(

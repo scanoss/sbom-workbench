@@ -22,13 +22,13 @@ export class ScanDb extends Db {
   components: any;
 
   // TO DO Change names plural
-  files: any;
+  files: FilesDb;
 
-  inventories: any;
+  inventories: InventoryDb;
 
-  licenses: any;
+  licenses: LicenseDb;
 
-  results: any;
+  results: ResultsDb;
 
   lastID: any;
 

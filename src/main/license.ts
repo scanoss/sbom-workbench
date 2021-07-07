@@ -3,7 +3,7 @@ import { License } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { defaultWorkspace } from './workspace/workspace';
 
-ipcMain.handle(IpcEvents.LICENSE_GET, async (event, licToGet: License) => {
+ipcMain.handle(IpcEvents.LICENSE_GET, async (_event, licToGet: License) => {
   let license: any;
   try {
     license = await defaultWorkspace.scans_db.licenses.get(licToGet);
@@ -13,7 +13,7 @@ ipcMain.handle(IpcEvents.LICENSE_GET, async (event, licToGet: License) => {
   return { status: 'ok', message: license };
 });
 
-ipcMain.handle(IpcEvents.LICENSE_CREATE, async (event, arg: License) => {
+ipcMain.handle(IpcEvents.LICENSE_CREATE, async (_event, arg: License) => {
   let created: any;
   try {
     created = await defaultWorkspace.scans_db.licenses.create(arg);
