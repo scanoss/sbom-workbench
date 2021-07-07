@@ -53,20 +53,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
   const { onClose, open, component } = props;
 
-  const handleClose = () => {
-    const inventory: Inventory = {
-      purl: component.purl[0],
-      url: component.url,
-      notes: 'no notes',
-      usage: 'file',
-      license_name: component.licences[0]
-        ? component.licences[0].name
-        : 'no-data',
-    };
-
-    onClose(inventory);
-  };
-
   const [form, setForm] = useState({
     component: component.name,
     version: component.version,
@@ -76,6 +62,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     usage: '',
     notes: '',
   });
+
+  const handleClose = () => {
+    const inventory: Inventory = form;
+
+    onClose(inventory);
+    console.log(inventory);
+  };
 
   useEffect(() => {
     console.table(form);
