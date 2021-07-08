@@ -18,7 +18,7 @@ parentPort.on('message', async (scannableItem) => {
 const crypto = require('crypto');
 
 const isWin = process.platform === 'win32';
-const pathSeparator = '/';
+const pathSeparator = isWin ? String.fromCharCode(92) : '/';
 
 // Winnowing configuration. DO NOT CHANGE.
 const GRAM = 30;
@@ -216,9 +216,18 @@ export class Winnower extends EventEmitter {
 
   #worker;
 
+  #continue;
+
+  #isRunning;
+
   constructor() {
     super();
+    this.init();
+  }
+
+  init() {
     this.#wfp = '';
+    this.#continue = true;
     this.#worker = new Worker(stringWorker, { eval: true });
     this.#worker.on('message', async (winnowingResult) => {
       this.#storeResult(winnowingResult);
@@ -245,6 +254,7 @@ export class Winnower extends EventEmitter {
   }
 
   async #nextStepMachine() {
+    if (!this.#continue) return;
     const scannableItem = await this.#scannable.getNextScannableItem();
     if (this.#scannable.hasNextScannableItem()) {
       this.#worker.postMessage(scannableItem);
@@ -255,6 +265,7 @@ export class Winnower extends EventEmitter {
           this.#destFolder,
           new Date().getTime()
         );
+      this.#isRunning = false;
       this.emit(SCANNER_EVENTS.WINNOWING_FINISHED);
       this.#worker.terminate();
     }
@@ -263,7 +274,21 @@ export class Winnower extends EventEmitter {
   async startMachine(scannable, destPath) {
     this.#scannable = scannable;
     this.#destFolder = destPath;
+    this.#isRunning = true;
     this.emit(SCANNER_EVENTS.WINNOWING_STARTING);
     return this.#nextStepMachine();
+  }
+
+  stop() {
+    this.#continue = false;
+  }
+
+  resume() {
+    this.#continue = true;
+    this.#nextStepMachine();
+  }
+
+  isRunning() {
+    return this.#isRunning;
   }
 }

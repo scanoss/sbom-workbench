@@ -168,10 +168,10 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
     const init = await ws.scans_db.init();
     if (p.default_licenses !== undefined)
       // await ws.scans_db.licenses.importFromFile(p.default_licenses);
-    /* if (p.default_components !== undefined)
+      /* if (p.default_components !== undefined)
       defaultWorkspace.scans_db.components.importFromFile(p.default_components);
     */
-    console.log(`base abierta ${init}`);
+      console.log(`base abierta ${init}`);
   } catch (e) {
     console.log('Catch an error on creating a project: ', e);
   }
@@ -180,7 +180,6 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   ws.set_scan_root(`${path}`);
   ws.prepare_scan();
   scanner.scanFolder(path);
-
 
   scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
     console.log('Starting Winnowing...');
@@ -198,8 +197,8 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
     console.log(`Sending WFP file ${dir} to server`);
   });
 
-  scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (data) => {
-    console.log(`Received response from server ${data.getAssociatedWfp()}`);
+  scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (data, fileNumbers) => {
+    console.log(`New ${fileNumbers} files scanned`);
   });
 
   scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
@@ -209,6 +208,11 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
       success: true,
       resultsPath,
     });
+  });
+
+  scanner.on('error', () => {
+    scanner.stop();
+    console.log('Scanner Error. Stoping....');
   });
 });
 

@@ -20,11 +20,10 @@ export class ScannableFolder extends AbstractScannable {
   async *#walk(dir) {
     for await (const d of await fs.promises.opendir(dir)) {
       const entry = path.join(dir, d.name);
-      // const stats = fs.lstatSync(filepath);
       if (d.isDirectory() && !d.isSymbolicLink()) yield* this.#walk(entry);
       else if (d.isFile() && !d.isSymbolicLink()) {
         const fileContent = await fs.promises.readFile(entry);
-        yield new ScannableItem(entry, fileContent);
+        yield new ScannableItem(entry.replace(this.#folderPath,''), fileContent);
       }
     }
   }
