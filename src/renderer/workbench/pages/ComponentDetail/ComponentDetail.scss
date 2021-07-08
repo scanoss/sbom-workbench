@@ -1,32 +1,26 @@
 header.app-header {
-
-  .subheader {
+  .subheader, .header {
     display: flex;
+    width: 100%;
     justify-content: space-between;
     align-items: center;
+  }
 
-    .component-info {
-      display: flex;
-      > div {
-        margin-right: 40px;
-        display: flex;
-        flex-direction: column;
-      }
-    }
+  .header {
+    align-items: flex-start;
   }
 }
 
 .file-list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 15px;
+  grid-template-columns: calc(50% - 7px) calc(50% - 7px);
+  grid-gap: 14px;
 
   @media screen and (max-width: $default-width) {
     grid-template-columns: 1fr;
     .match-card {
       margin: 0;
     }
-
   }
 
   .item {

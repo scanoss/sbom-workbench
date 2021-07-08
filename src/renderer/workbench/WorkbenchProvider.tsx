@@ -5,11 +5,6 @@ import { Inventory } from '../../api/types';
 import { inventoryService } from '../../api/inventory-service';
 import * as scanUtil from '../../utils/scan-util';
 
-export interface FileContent {
-  content: string | null;
-  error: boolean;
-}
-
 export interface Component {
   name: string;
   vendor: string;
@@ -19,6 +14,7 @@ export interface Component {
   purl: string[];
   licenses: any[];
   files: string[];
+  inventories: Inventory[];
   count: {
     all: number;
     pending: number;
@@ -36,9 +32,7 @@ export interface IWorkbenchContext {
   file: string | null;
   components: Record<string, Component> | null;
   component: Component | null;
-  matchInfo: Record<string, any> | null;
-  localFileContent: FileContent | null;
-  remoteFileContent: FileContent | null;
+  matchInfo: Record<string, any>[] | null;
   setFile: (file: string) => void;
   setTree: (tree: []) => void;
   setComponent: (component) => void;
@@ -55,7 +49,7 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   const { scanBasePath } = useContext<any>(AppContext);
 
   const [tree, setTree] = useState<[] | null>(null);
-  const [scan, setScan] = useState<Record<string, unknown> | null>(null);
+  const [scan, setScan] = useState<Record<string, any> | null>(null);
 
   const [components, setComponents] = useState<Record<
     string,
@@ -65,15 +59,9 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
 
   const [file, setFile] = useState<string | null>(null);
 
-  // TODO: remove from provider?
-  const [matchInfo, setMatchInfo] = useState<Record<string, unknown> | null>(
+  const [matchInfo, setMatchInfo] = useState<Record<string, any>[] | null>(
     null
   );
-  const [localFileContent, setLocalFileContent] = useState<FileContent | null>(
-    null
-  );
-  const [remoteFileContent, setRemoteFileContent] =
-    useState<FileContent | null>(null);
 
   const loadScan = async (path: string) => {
     try {
@@ -88,38 +76,17 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
     }
   };
 
-  const loadLocalFile = async (path: string): Promise<void> => {
-    try {
-      setLocalFileContent({ content: null, error: false });
-      console.log('file', scanBasePath + path);
-      const content = await workbenchController.fetchLocalFile(
-        scanBasePath + path
-      );
-      setLocalFileContent({ content, error: false });
-    } catch (error) {
-      setLocalFileContent({ content: null, error: true });
-    }
-  };
-
-  const loadRemoteFile = async (path: string): Promise<void> => {
-    try {
-      setRemoteFileContent({ content: null, error: false });
-      const content = await workbenchController.fetchRemoteFile(path);
-      setRemoteFileContent({ content, error: false });
-    } catch (error) {
-      setRemoteFileContent({ content: null, error: true });
-    }
-  };
-
   const createInventory = async (inventory: Inventory) => {
-    const response = await inventoryService.create({
-      ...inventory,
-      files: component ? component.files : [],
-    });
+    const response = await inventoryService.create(inventory);
+
+    // TODO: remove when backend service is ready
     const updateScan = scanUtil.updateTree(scan, inventory);
     setScan({ ...scan, ...updateScan });
     const updateComponents = scanUtil.getComponents(scan);
     setComponents(updateComponents);
+    const updateComponent = updateComponents[component?.name];
+    updateComponent.inventories = [...updateComponent.inventories, inventory];
+    setComponent({ ...component,  ...updateComponent});
     return inventory;
   };
 
@@ -134,13 +101,10 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
 
   useEffect(() => {
     if (scan && file) {
-      const [info] = scan[file];
-      loadLocalFile(file);
-      if (info.id !== 'none') {
-        loadRemoteFile(info.file_hash);
-        setMatchInfo(info);
+      const match = scan[file];
+      if (match[0].id !== 'none') {
+        setMatchInfo(match);
       } else {
-        setRemoteFileContent({ content: null, error: false });
         setMatchInfo(null);
       }
     }
@@ -156,8 +120,6 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
         setTree,
         file,
         matchInfo,
-        localFileContent,
-        remoteFileContent,
         setFile,
         components,
         component,

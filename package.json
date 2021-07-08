@@ -30,8 +30,9 @@
     ]
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "Scanoss Desktop",
+    "appId": "com.scanoss.desktop",
+    "copyright": "Copyright © 2020,2021 SCANOSS.COM",
     "files": [
       "dist/",
       "node_modules/",
@@ -67,14 +68,17 @@
     },
     "win": {
       "target": [
-        "nsis"
+        "nsis",
+        "portable"
       ]
     },
     "linux": {
       "target": [
-        "AppImage"
+        "AppImage",
+        "deb",
+        "rpm"
       ],
-      "category": "Development"
+      "category": "Utility"
     },
     "directories": {
       "app": "src",
@@ -247,6 +251,7 @@
     "isbinaryfile": "^4.0.8",
     "node-blob": "^0.0.2",
     "node-fetch": "^2.6.1",
+    "p-queue": "6.6.2",
     "react": "^17.0.1",
     "react-checkbox-tree": "^1.7.1",
     "react-dom": "^17.0.1",

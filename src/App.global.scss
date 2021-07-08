@@ -39,6 +39,9 @@ $md: 780px;
 @import './renderer/workbench/components/Pill/Pill';
 @import './renderer/workbench/components/Title/Title';
 @import './renderer/workbench/components/MatchCard/MatchCard';
+@import './renderer/workbench/components/InventoryCard/InventoryCard';
+
+@import './renderer/workbench/components/InventoryDialog/InventoryDialog';
 
 /* fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
@@ -110,4 +113,32 @@ a:hover {
 
 ::-webkit-scrollbar-button {
   display: none;
+}
+
+.app-page {
+  &::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+  }
+  &::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 14px 14px #c3c3c3;
+    border: solid 3px transparent;
+    border-radius: 6px;
+  }
+
+}
+.d-flex {
+  display: flex;
+
+  &.space-between {
+    justify-content: space-between;
+  }
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.mb-3 {
+  margin-bottom: 15px;
 }
