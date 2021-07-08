@@ -30,7 +30,7 @@
 
     @media screen and (max-width: $default-width) {
       flex-direction: column;
-
+      align-items: flex-start;
     }
 
     .match-info-container {

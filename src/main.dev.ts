@@ -18,6 +18,9 @@ import MenuBuilder from './main/menu';
 import './main/inventory';
 import { IpcEvents } from './ipc-events';
 import * as fs from 'fs';
+import { Workspace } from './main/workspace/workspace';
+import { ItemExclude, Project } from './api/types';
+import { ScanDb } from './main/db/scan_db';
 
 import { Scanner } from './main/scannerLib/Scanner';
 import { SCANNER_EVENTS } from './main/scannerLib/ScannerEvents';
@@ -76,7 +79,7 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     show: false,
     width: 1280,
-    height: 768,
+    height: 820,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       nodeIntegration: true,
@@ -146,17 +149,47 @@ export interface IInitScan {
   // filter: IFilter[];
 }
 
-ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
+let ws: Workspace;
+
+ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
+  ws = new Workspace();
+  const scanner = new Scanner();
+
   const { path } = arg;
 
-  const scanner = new Scanner();
+  let created: any;
+  let p: Project = {
+    work_root: '/tmp/', // '/home/oscar/test',
+    default_licenses: '/home/oscar/test/licenses.json',
+  };
+
+  try {
+    ws.scans_db = new ScanDb(p.work_root);
+    const init = await ws.scans_db.init();
+    if (p.default_licenses !== undefined)
+      // await ws.scans_db.licenses.importFromFile(p.default_licenses);
+    /* if (p.default_components !== undefined)
+      defaultWorkspace.scans_db.components.importFromFile(p.default_components);
+    */
+    console.log(`base abierta ${init}`);
+  } catch (e) {
+    console.log('Catch an error on creating a project: ', e);
+  }
+
+  console.log(`SCANNER: Start scanning path=${path}`);
+  ws.set_scan_root(`${path}`);
+  ws.prepare_scan();
+  scanner.scanFolder(path);
+
 
   scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
     console.log('Starting Winnowing...');
   });
+
   scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (dir) =>
     console.log(`New WFP File on: ${dir}`)
   );
+
   scanner.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => {
     console.log('Winnowing Finished...');
   });
@@ -164,12 +197,14 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
   scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (dir) => {
     console.log(`Sending WFP file ${dir} to server`);
   });
-  scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (data, fileNumbers) => {
-    console.log(`New ${fileNumbers} files scanned`);
+
+  scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (data) => {
+    console.log(`Received response from server ${data.getAssociatedWfp()}`);
   });
 
-  scanner.on(SCANNER_EVENTS.SCAN_DONE, (resultsPath) => {
+  scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
     console.log(`Scan Finished... Results on: ${resultsPath}`);
+    await ws.scans_db.components.importFromFile(resultsPath);
     event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
       success: true,
       resultsPath,
@@ -184,3 +219,7 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
   console.log(`SCANNER: Start scanning path=${path}`);
   scanner.scanFolder(path);
 });
+
+/*ipcMain.on(IpcEvents.ITEM_INCLUDE, (event, arg: ItemExclude) => {
+  ws.exclude_file(arg.path, arg.recursive);
+});*/
