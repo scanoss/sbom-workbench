@@ -4,6 +4,7 @@ import { AppContext } from '../context/AppProvider';
 import { Inventory } from '../../api/types';
 import { inventoryService } from '../../api/inventory-service';
 import * as scanUtil from '../../utils/scan-util';
+import { componentService } from '../../api/component-service';
 
 export interface Component {
   name: string;
@@ -69,6 +70,8 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
       setScan(scanResult.scan);
       setTree(scanResult.fileTree);
       setComponents(scanResult.components);
+      // let response = await componentService.get({});
+      // console.log(response)
       return true;
     } catch (error) {
       console.error(error);

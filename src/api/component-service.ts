@@ -4,8 +4,8 @@ import { Component, License } from './types';
 const { ipcRenderer } = require('electron');
 
 class ComponentService {
-  public async get(id: number): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET, id);
+  public async get(args: Partial<Component>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET, args);
     return response;
   }
 

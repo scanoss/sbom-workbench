@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Inventory } from '../../../../../api/types';
+import { inventoryService } from '../../../../../api/inventory-service';
+import { componentService } from '../../../../../api/component-service';
 import InventoryCard from '../../../components/InventoryCard/InventoryCard';
 
 const style = {

@@ -6,12 +6,12 @@ import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
 export const FileTree = () => {
   const history = useHistory();
 
-  const [checked, setChecked] = useState<string[]>([]);
-  const [expanded, setExpanded] = useState<string[]>([]);
-
   const { tree, file, setFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
+
+  const [checked, setChecked] = useState<string[]>([]);
+  const [expanded, setExpanded] = useState<string[]>(['/']);
 
   const onSelectFile = ({ children, value }: OnCheckNode) => {
     if (!children) {

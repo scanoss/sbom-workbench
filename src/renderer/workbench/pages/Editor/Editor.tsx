@@ -49,7 +49,7 @@ export const Editor = () => {
     try {
       setLocalFileContent({ content: null, error: false });
       const content = await workbenchController.fetchLocalFile(
-       scanBasePath + path
+        scanBasePath + path
       );
       setLocalFileContent({ content, error: false });
     } catch (error) {
@@ -102,7 +102,6 @@ export const Editor = () => {
     await createInventory(newInventory);
   };
 
-
   useEffect(() => {
     setLocalFileContent({ content: null, error: false });
     setRemoteFileContent({ content: null, error: false });
@@ -123,7 +122,7 @@ export const Editor = () => {
     if (matchInfo) {
       setCurrentMatch(matchInfo[0]);
     } else {
-      setCurrentMatch(null)
+      setCurrentMatch(null);
     }
   }, [matchInfo]);
 
@@ -246,14 +245,14 @@ export const Editor = () => {
         </main>
       </section>
 
-      {currentMatch ?
+      {currentMatch ? (
         <InventoryDialog
           open={inventoryBool}
           onCancel={() => setInventoryBool(false)}
           onClose={handleClose}
-          component={({...currentMatch, name: currentMatch.component})}
+          component={{ ...currentMatch, name: currentMatch.component }}
         />
-        : null }
+      ) : null}
     </>
   );
 };
