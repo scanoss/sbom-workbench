@@ -19,7 +19,7 @@ import './main/inventory';
 import { IpcEvents } from './ipc-events';
 import * as fs from 'fs';
 import { Workspace } from './main/workspace/workspace';
-import { ItemExclude } from './api/types';
+import { ItemExclude, Project } from './api/types';
 import { ScanDb } from './main/db/scan_db';
 
 import { Scanner } from './main/scannerLib/Scanner';
@@ -148,20 +148,26 @@ export interface IInitScan {
   scanId?: string;
   // filter: IFilter[];
 }
+
 let ws: Workspace;
+
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   ws = new Workspace();
+  const scanner = new Scanner();
+
+  const { path } = arg;
 
   let created: any;
   let p: Project = {
     work_root: '/tmp/', // '/home/oscar/test',
     default_licenses: '/home/oscar/test/licenses.json',
   };
+
   try {
     ws.scans_db = new ScanDb(p.work_root);
     const init = await ws.scans_db.init();
     if (p.default_licenses !== undefined)
-      await ws.scans_db.licenses.importFromFile(p.default_licenses);
+      // await ws.scans_db.licenses.importFromFile(p.default_licenses);
     /* if (p.default_components !== undefined)
       defaultWorkspace.scans_db.components.importFromFile(p.default_components);
     */
@@ -170,39 +176,20 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
     console.log('Catch an error on creating a project: ', e);
   }
 
-  const { path } = arg;
-  const resultsPath = '/tmp/qs.json';
-
   console.log(`SCANNER: Start scanning path=${path}`);
   ws.set_scan_root(`${path}`);
   ws.prepare_scan();
-  scanner.scan(path, resultsPath);
+  scanner.scanFolder(path);
 
-  scannerResult.addEventListener('onScanDone', async (result: any) => {
-    fs.writeFileSync(resultsPath, JSON.stringify(result, null, 4), 'utf8');
-    await ws.scans_db.components.importUniqueFromJson(resultsPath);
-    event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
-      success: true,
-      resultsPath,
-    });
-  });
-});
-
-ipcMain.on(IpcEvents.ITEM_INCLUDE, (event, arg: ItemExclude) => {
-  ws.exclude_file(arg.path, arg.recursive);
-});
-
-/*ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
-  const { path } = arg;
-
-  const scanner = new Scanner();
 
   scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
     console.log('Starting Winnowing...');
   });
+
   scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (dir) =>
     console.log(`New WFP File on: ${dir}`)
   );
+
   scanner.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => {
     console.log('Winnowing Finished...');
   });
@@ -210,19 +197,21 @@ ipcMain.on(IpcEvents.ITEM_INCLUDE, (event, arg: ItemExclude) => {
   scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (dir) => {
     console.log(`Sending WFP file ${dir} to server`);
   });
+
   scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (data) => {
     console.log(`Received response from server ${data.getAssociatedWfp()}`);
   });
 
-  scanner.on(SCANNER_EVENTS.SCAN_DONE, (resultsPath) => {
+  scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
     console.log(`Scan Finished... Results on: ${resultsPath}`);
+    await ws.scans_db.components.importFromFile(resultsPath);
     event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
       success: true,
       resultsPath,
     });
   });
+});
 
-  console.log(`SCANNER: Start scanning path=${path}`);
-  scanner.scanFolder(path);
+/*ipcMain.on(IpcEvents.ITEM_INCLUDE, (event, arg: ItemExclude) => {
+  ws.exclude_file(arg.path, arg.recursive);
 });*/
-
