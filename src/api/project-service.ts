@@ -4,8 +4,8 @@ import { Project } from './types';
 const { ipcRenderer } = require('electron');
 
 class ProjectService {
-  public async get(id: number): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_GET, id);
+  public async get(args: Partial<Project>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_GET, args);
     return response;
   }
 
