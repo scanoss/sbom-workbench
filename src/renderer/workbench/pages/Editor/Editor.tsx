@@ -49,7 +49,7 @@ export const Editor = () => {
     try {
       setLocalFileContent({ content: null, error: false });
       const content = await workbenchController.fetchLocalFile(
-        path
+       scanBasePath + path
       );
       setLocalFileContent({ content, error: false });
     } catch (error) {
