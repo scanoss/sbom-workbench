@@ -3,10 +3,13 @@ import fetch from 'node-fetch';
 import FormData from 'form-data';
 import fs from 'fs';
 import PQueue from 'p-queue';
-import { SCANNER_EVENTS } from '../ScannerEvents.js';
-import { DispatcherResponse } from './DispatcherResponse.js';
+import { SCANNER_EVENTS } from '../ScannerEvents';
+import { DispatcherResponse } from './DispatcherResponse';
 
 export class Dispatcher extends EventEmitter {
+  // Client Timestamp
+  #CLIENT_TIMESTAMP = 'scanner.c/1.0.0';
+
   // API URL
   #API_URL = 'https://osskb.org/api/scan/direct';
 
@@ -64,8 +67,10 @@ export class Dispatcher extends EventEmitter {
       let dataAsObj = {};
       const wfpContent = fs.readFileSync(wfpFilePath);
       const form = new FormData();
-      this.emit(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, wfpFilePath);
       form.append('filename', Buffer.from(wfpContent), 'data.wfp');
+      // form.append('User-Agent:', new Blob([this.#CLIENT_TIMESTAMP]));
+
+      this.emit(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, wfpFilePath);
 
       // Fetch
       const p1 = fetch(this.#API_URL, {
