@@ -272,8 +272,3 @@ function crc32c_for_bytes_hex(bytes) {
 function crc32c_hex(str) {
   return crc32c(str).toString(16).padStart(8, '0');
 }
-
-
-module.exports = {
-  wfp_for_content,
-}
