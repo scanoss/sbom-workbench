@@ -8,7 +8,8 @@ import {
   InputBase,
   Select,
   MenuItem,
-  TextareaAutosize, IconButton
+  TextareaAutosize,
+  IconButton,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import React, { useState, useEffect } from 'react';
@@ -184,9 +185,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       </div>
 
       <DialogActions>
-        <Button onClick={onCancel}>
-          Cancel
-        </Button>
+        <Button onClick={onCancel}>Cancel</Button>
         <Button variant="contained" color="secondary" onClick={handleClose}>
           Identify
         </Button>

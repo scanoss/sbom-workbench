@@ -1,15 +1,13 @@
 import React from 'react';
 import { HashRouter, Route } from 'react-router-dom';
-import About from './renderer/about/About';
 import './App.global.scss';
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { WorkbenchProvider } from './renderer/workbench/WorkbenchProvider';
 import { DialogProvider } from './renderer/workbench/DialogProvider';
-
+import About from './renderer/about/About';
 import Home from './renderer/home/Home';
 import Workbench from './renderer/workbench/Workbench';
 import AppProvider from './renderer/context/AppProvider';
-
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 
 const theme = createMuiTheme({
   palette: {
@@ -28,7 +26,6 @@ const theme = createMuiTheme({
     },
   },
 });
-
 
 export default function App() {
   return (

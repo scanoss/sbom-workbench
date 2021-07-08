@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 export interface DialogContextProps {
-  setInventoryBool: boolean;
   inventoryBool: boolean;
+  setInventoryBool: (boolean) => void;
 }
 
 export const DialogContext = React.createContext<DialogContextProps | null>(

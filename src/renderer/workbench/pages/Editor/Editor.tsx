@@ -1,9 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import {
-  nord,
-} from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory } from 'react-router-dom';
 import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
@@ -14,9 +12,8 @@ import MatchCard from '../../components/MatchCard/MatchCard';
 import { range } from '../../../../utils/utils';
 import { workbenchController } from '../../../workbench-controller';
 import { AppContext } from '../../../context/AppProvider';
-import InventoryDialog from '../../components/InventoryDialog/InventoryDialog';
+import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../../../api/types';
-import { inventoryService } from '../../../../api/inventory-service';
 
 export interface FileContent {
   content: string | null;
@@ -29,14 +26,16 @@ export const Editor = () => {
   const { file, matchInfo, component, createInventory } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
-  const { setInventoryBool, inventoryBool } = useContext(DialogContext);
+  const { setInventoryBool, inventoryBool } = useContext<any>(DialogContext);
   const { scanBasePath } = useContext<any>(AppContext);
 
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(
     null
   );
 
-  const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
+  const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(
+    null
+  );
 
   const [remoteFileContent, setRemoteFileContent] =
     useState<FileContent | null>(null);
@@ -93,6 +92,7 @@ export const Editor = () => {
 
   const handleClose = async (inventory: Inventory) => {
     setInventoryBool(false);
+    console.log(file);
     const newInventory = {
       ...inventory,
       files: [file],
@@ -110,8 +110,7 @@ export const Editor = () => {
   }, [file, currentMatch]);
 
   useEffect(() => {
-    if (matchInfo)
-      setCurrentMatch(matchInfo[0]); // TODO: render all matches
+    if (matchInfo) setCurrentMatch(matchInfo[0]); // TODO: render all matches
   }, [matchInfo]);
 
   return (

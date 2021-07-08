@@ -1,4 +1,4 @@
-import { Button, Paper, Popover, Tab, Tabs } from '@material-ui/core';
+import { Button, Paper, Tab, Tabs } from '@material-ui/core';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
@@ -6,13 +6,10 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { WorkbenchContext, IWorkbenchContext } from '../../WorkbenchProvider';
 import { AppContext } from '../../../context/AppProvider';
 import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
-import MatchCard from '../../components/MatchCard/MatchCard';
-import Label from '../../components/Label/Label';
-import Title from '../../components/Title/Title';
 import { Inventory } from '../../../../api/types';
-import FileList from '../ComponentList/components/FileList';
-import InventoryList from '../ComponentList/components/InventoryList';
-import ComponentInfo from '../../components/ComponentInfo/ComponentInfo';
+import { FileList } from '../ComponentList/components/FileList';
+import { InventoryList } from '../ComponentList/components/InventoryList';
+import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
 
 export const ComponentDetail = () => {
   const history = useHistory();
@@ -20,7 +17,7 @@ export const ComponentDetail = () => {
   const { scanBasePath } = useContext<any>(AppContext);
 
   const [open, setOpen] = useState<boolean>(false);
-  const [tab, setTab] = useState<number>(0)
+  const [tab, setTab] = useState<number>(0);
 
   const { component, setFile, scan, createInventory } = useContext(
     WorkbenchContext
@@ -46,15 +43,29 @@ export const ComponentDetail = () => {
   };
 
   const renderTab = () => {
-    switch(tab) {
+    switch (tab) {
       case 0:
-        return <FileList component={component} scan={scan} filter="pending" onSelectFile={onSelectFile}/>;
+        return (
+          <FileList
+            component={component}
+            scan={scan}
+            filter="pending"
+            onSelectFile={onSelectFile}
+          />
+        );
       case 1:
         return <InventoryList inventories={component?.inventories} />;
       case 2:
-        return <FileList component={component} scan={scan} filter="ignored" onSelectFile={onSelectFile}/>;
+        return (
+          <FileList
+            component={component}
+            scan={scan}
+            filter="ignored"
+            onSelectFile={onSelectFile}
+          />
+        );
       default:
-        return "no data";
+        return 'no data';
     }
   };
 
@@ -71,16 +82,14 @@ export const ComponentDetail = () => {
                 {scanBasePath}
               </h4>
 
-              <h1 className="header-title">
-                Matches
-              </h1>
+              <h1 className="header-title">Matches</h1>
             </div>
 
             <ComponentInfo component={component} />
           </div>
 
           <section className="subheader">
-            <div className='tabs'>
+            <div className="tabs">
               <Paper square>
                 <Tabs
                   value={tab}
@@ -88,27 +97,26 @@ export const ComponentDetail = () => {
                   textColor="primary"
                   onChange={(event, value) => setTab(value)}
                 >
-                  <Tab label={`Pendings (${component?.count.pending})`}/>
-                  <Tab label={`Identified (${component?.count.identified})`}/>
-                  <Tab label={`Ignored (${component?.count.ignored})`}/>
+                  <Tab label={`Pendings (${component?.count.pending})`} />
+                  <Tab label={`Identified (${component?.count.identified})`} />
+                  <Tab label={`Ignored (${component?.count.ignored})`} />
                 </Tabs>
               </Paper>
             </div>
 
-            { tab === 0 ?
+            {tab === 0 ? (
               <Button
                 variant="contained"
                 color="secondary"
                 onClick={onIdentifyAllPressed}
               >
                 Identify All ({component?.count.pending})
-              </Button> : null }
+              </Button>
+            ) : null}
           </section>
         </header>
 
-        <main className="app-content">
-          {renderTab()}
-        </main>
+        <main className="app-content">{renderTab()}</main>
       </section>
 
       <InventoryDialog

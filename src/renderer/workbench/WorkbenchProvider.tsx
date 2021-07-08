@@ -77,11 +77,9 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
   };
 
   const createInventory = async (inventory: Inventory) => {
-    const response = await inventoryService.create({
-      ...inventory,
-      files: component ? component.files : [],
-    });
-    //TODO: remove when backend service is ready
+    const response = await inventoryService.create(inventory);
+
+    // TODO: remove when backend service is ready
     const updateScan = scanUtil.updateTree(scan, inventory);
     setScan({ ...scan, ...updateScan });
     const updateComponents = scanUtil.getComponents(scan);
