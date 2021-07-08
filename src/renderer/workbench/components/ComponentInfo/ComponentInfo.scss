@@ -1,6 +1,19 @@
 .component-info{
   .container-component-info{
     position: static;
+
+    .main-info{
+      display: flex;
+      align-items: center;
+
+
+      .logo{
+        height: 48px;
+        width: 48px;
+        margin: 15px;
+      }
+    }
+
   }
 
   .component-details-card{

@@ -4,7 +4,7 @@ import Popover from '@material-ui/core/Popover';
 import { Component } from '../../WorkbenchProvider';
 import Label from '../Label/Label';
 import Title from '../Title/Title';
-import componentDefault from '';
+import componentDefault from '../../../../../assets/imgs/component-default.svg';
 
 export const ComponentInfo = ({ component }: { component: Component }) => {
   const [over, setOver] = useState<boolean>(false);
@@ -29,8 +29,13 @@ export const ComponentInfo = ({ component }: { component: Component }) => {
         onMouseLeave={() => setOver(false)}
         className="container-component-info"
       >
-        <Label label={component?.version} textColor="gray" />
-        <Title title={component?.name} />
+        <div className="main-info">
+          <img alt="component logo" className="logo" src={componentDefault} />
+          <div>
+            <Label label={component?.version} textColor="gray" />
+            <Title title={component?.name} />
+          </div>
+        </div>
 
         {over ? (
           <div className="component-details-card">
