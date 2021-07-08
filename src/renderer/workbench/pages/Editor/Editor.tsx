@@ -49,7 +49,7 @@ export const Editor = () => {
     try {
       setLocalFileContent({ content: null, error: false });
       const content = await workbenchController.fetchLocalFile(
-        scanBasePath + path
+        path
       );
       setLocalFileContent({ content, error: false });
     } catch (error) {
@@ -182,7 +182,7 @@ export const Editor = () => {
 
         <main className="editors app-content">
           <div className="editor">
-            {localFileContent?.content ? (
+            {currentMatch && localFileContent?.content ? (
               <>
                 <p>Source File</p>
                 <SyntaxHighlighter
@@ -203,7 +203,7 @@ export const Editor = () => {
                   {localFileContent?.error ? (
                     <p>File not found</p>
                   ) : (
-                    localFileContent?.content?.toString()
+                    localFileContent?.content
                   )}
                 </SyntaxHighlighter>
               </>
@@ -211,7 +211,7 @@ export const Editor = () => {
           </div>
 
           <div className="editor">
-            {remoteFileContent?.content ? (
+            {currentMatch && remoteFileContent?.content ? (
               <>
                 <p>Component File</p>
                 <SyntaxHighlighter
@@ -237,7 +237,7 @@ export const Editor = () => {
                   {remoteFileContent?.error ? (
                     <p>File not found</p>
                   ) : (
-                    remoteFileContent?.content?.toString()
+                    remoteFileContent?.content?.slice(0, 20000)
                   )}
                 </SyntaxHighlighter>
               </>
