@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Popover from '@material-ui/core/Popover';
 import { Component } from '../../WorkbenchProvider';
 import Label from '../Label/Label';
 import Title from '../Title/Title';
@@ -9,19 +7,6 @@ import componentDefault from '../../../../../assets/imgs/component-default.svg';
 export const ComponentInfo = ({ component }: { component: Component }) => {
   const [over, setOver] = useState<boolean>(false);
 
-  const useStyles = makeStyles((theme) => ({
-    popover: {
-      pointerEvents: 'none',
-    },
-    paper: {
-      padding: theme.spacing(1),
-    },
-  }));
-  const classes = useStyles();
-
-  useEffect(() => {
-    console.log(over);
-  }, [over]);
   return (
     <div className="component-info">
       <div
@@ -49,7 +34,12 @@ export const ComponentInfo = ({ component }: { component: Component }) => {
             </div>
             <div className="tiny-container-detail">
               <p className="title-detail">URL</p>
-              <a href={component?.url} className="desc-detail url">
+              <a
+                href={component?.url}
+                target="_blank"
+                className="desc-detail url"
+                rel="noreferrer"
+              >
                 {component?.url}
               </a>
             </div>
