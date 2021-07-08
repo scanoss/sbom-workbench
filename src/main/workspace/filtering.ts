@@ -162,12 +162,12 @@ export class BannedList {
   }
 }
 // export class BannedList
-module.exports = {
-  DateFilter,
-  BannedList,
-  NameFilter,
-  SizeFilter,
-};
+// module.exports = {
+//   DateFilter,
+//   BannedList,
+//   NameFilter,
+//   SizeFilter,
+// };
 /* var n=new NameFilter("contains","readme")
 // console.log(n.evaluate("readme.txt"))
 var e=new ExtensionFilter("=","txto")
