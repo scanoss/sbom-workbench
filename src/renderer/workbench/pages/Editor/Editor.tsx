@@ -23,7 +23,9 @@ export interface FileContent {
 export const Editor = () => {
   const history = useHistory();
 
-  const { file, matchInfo, component, createInventory } = useContext(
+  console.log('render');
+
+  const { file, matchInfo, createInventory } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
   const { setInventoryBool, inventoryBool } = useContext<any>(DialogContext);
@@ -88,7 +90,7 @@ export const Editor = () => {
             parseInt(currentMatch.lines.split('-')[1])
           );
     setLines(lineasLocales);
-  }, [matchInfo]);
+  }, [currentMatch]);
 
   const handleClose = async (inventory: Inventory) => {
     setInventoryBool(false);
@@ -100,17 +102,29 @@ export const Editor = () => {
     await createInventory(newInventory);
   };
 
-  useEffect(() => {
-    if (file && currentMatch) {
-      loadLocalFile(file);
-      loadRemoteFile(currentMatch.file_hash);
-    } else {
-      setRemoteFileContent({ content: null, error: false });
-    }
-  }, [file, currentMatch]);
 
   useEffect(() => {
-    if (matchInfo) setCurrentMatch(matchInfo[0]); // TODO: render all matches
+    setLocalFileContent({ content: null, error: false });
+    setRemoteFileContent({ content: null, error: false });
+
+    if (file) {
+      loadLocalFile(file);
+    }
+  }, [file]);
+
+  useEffect(() => {
+    if (currentMatch) {
+      loadRemoteFile(currentMatch.file_hash);
+    }
+  }, [currentMatch]);
+
+  // TODO: render all matches
+  useEffect(() => {
+    if (matchInfo) {
+      setCurrentMatch(matchInfo[0]);
+    } else {
+      setCurrentMatch(null)
+    }
   }, [matchInfo]);
 
   return (
@@ -232,12 +246,14 @@ export const Editor = () => {
         </main>
       </section>
 
-      <InventoryDialog
-        open={inventoryBool}
-        onCancel={() => setInventoryBool(false)}
-        onClose={handleClose}
-        component={component}
-      />
+      {currentMatch ?
+        <InventoryDialog
+          open={inventoryBool}
+          onCancel={() => setInventoryBool(false)}
+          onClose={handleClose}
+          component={({...currentMatch, name: currentMatch.component})}
+        />
+        : null }
     </>
   );
 };

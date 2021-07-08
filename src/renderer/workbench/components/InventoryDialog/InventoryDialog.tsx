@@ -47,7 +47,6 @@ interface InventoryDialogProps {
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
   const { onClose, open, component, onCancel } = props;
-
   const [form, setForm] = useState({
     component: component.name,
     version: component.version,
