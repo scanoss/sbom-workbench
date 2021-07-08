@@ -10,8 +10,8 @@ const query = new Querys();
 const utilsDb = new UtilsDb();
 
 export class FilesDb extends Db {
-  constructor(path: string) {
-    super(path);
+  constructor() {
+    super();
   }
 
   private insertFile(stmt: any, data: any, filePath: string) {

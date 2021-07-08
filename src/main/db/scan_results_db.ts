@@ -13,8 +13,8 @@ const utilsDb = new UtilsDb();
 const query = new Querys();
 
 export class ResultsDb extends Db {
-  constructor(path: string) {
-    super(path);
+  constructor() {
+    super();
   }
 
   // INSERT RESULTS

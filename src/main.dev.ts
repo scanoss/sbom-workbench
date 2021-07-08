@@ -148,8 +148,12 @@ export interface IInitScan {
   scanId?: string;
   // filter: IFilter[];
 }
-/*
-ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
+
+let ws: Workspace;
+ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
+  ws = new Workspace();
+  const scanner = new Scanner();
+
   const { path } = arg;
 
   let created: any;
@@ -159,7 +163,8 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
   };
 
   try {
-    ws.scans_db = new ScanDb(p.work_root);
+    //  ws.scans_db = new ScanDb(p.work_root);
+    ws.scans_db = new ScanDb();
     const init = await ws.scans_db.init();
     if (p.default_licenses !== undefined)
       // await ws.scans_db.licenses.importFromFile(p.default_licenses);
@@ -211,6 +216,6 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, (event, arg: IInitScan) => {
   });
 });
 
-/*ipcMain.on(IpcEvents.ITEM_INCLUDE, (event, arg: ItemExclude) => {
+/* ipcMain.on(IpcEvents.ITEM_INCLUDE, (event, arg: ItemExclude) => {
   ws.exclude_file(arg.path, arg.recursive);
-});*/
+}); */

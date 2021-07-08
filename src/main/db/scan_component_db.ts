@@ -22,8 +22,8 @@ interface Component {
 }
 
 export class ComponentDb extends Db {
-  constructor(path: string) {
-    super(path);
+  constructor() {
+    super();
   }
 
   get(data: any) {

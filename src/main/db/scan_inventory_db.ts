@@ -8,24 +8,25 @@
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { ComponentDb } from './scan_component_db';
+import { Inventory } from '../../api/types';
 
 const query = new Querys();
 
 export class InventoryDb extends Db {
   component: any;
 
-  constructor(path: string) {
-    super(path);
-    this.component = new ComponentDb(path);
+  constructor() {
+    super();
+    this.component = new ComponentDb();
   }
 
-  private getByFilePath(path: string) {
+  private getByFilePath(inventory: Inventory) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.run(
           query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH,
-          path,
+          inventory.files[0],
           (err: object, data: any) => {
             db.close();
             if (err) resolve(undefined);
@@ -38,7 +39,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private getByPurlVersion(inventory: any) {
+  private getByPurlVersion(inventory: Inventory) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -74,20 +75,20 @@ export class InventoryDb extends Db {
   }
 
   // CREATE NEW FILE INVENTORY
-  async newFileInventory(newInventory: any, invId: number) {
+  async newFileInventory(inventory: Inventory, invId: number) {
     const db = await this.openDb();
-    for (const path of newInventory.files) {
+    for (const path of inventory.files) {
       db.run(query.SQL_INSERT_FILE_INVENTORIES, path, invId);
     }
   }
 
   // GET INVENTORIES
-  get(inventory: any) {
+  get(inventory: Inventory) {
     return new Promise(async (resolve, reject) => {
       try {
         let inventories: any;
-        if (inventory.path) {
-          inventories = await this.getByFilePath(inventory.path);
+        if (inventory.files) {
+          inventories = await this.getByFilePath(inventory);
         } else if (inventory.purl && inventory.version) {
           inventories = await this.getByPurlVersion(inventory);
         } else if (inventory.id) {
@@ -114,7 +115,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private getById(inventory) {
+  private getById(inventory: Inventory) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -134,7 +135,7 @@ export class InventoryDb extends Db {
   }
 
   // NEW INVENTORY
-  async create(inventory: any) {
+  async create(inventory: Inventory) {
     const self = this;
     const db = await this.openDb();
     return new Promise<number>(async (resolve, reject) => {
@@ -160,7 +161,7 @@ export class InventoryDb extends Db {
   }
 
   // UPDATE INVENTORY
-  update(inventory: any) {
+  update(inventory: Inventory) {
     return new Promise(async (resolve, reject) => {
       try {
         let success: any;
@@ -177,7 +178,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private updateByPurl(inventory) {
+  private updateByPurl(inventory: Inventory) {
     return new Promise(async (resolve) => {
       try {
         const db = await this.openDb();
@@ -203,7 +204,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private updateById(inventory: any) {
+  private updateById(inventory: Inventory) {
     return new Promise(async (resolve) => {
       try {
         const db = await this.openDb();
@@ -253,14 +254,14 @@ export class InventoryDb extends Db {
   }
 
   // GET ALL THE INVENTORIES ATTACHED TO A FILE
-  getAllAttachedToAFile(inventory: any) {
+  getAllAttachedToAFile(inventory: Inventory) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
           db.all(
             query.SQL_SELECT_ALL_INVENTORIES_FROM_FILE,
-            `${inventory.file}`,
+            `${inventory.files[0]}`,
             (err: any, data: any) => {
               db.close();
               if (err) reject(new Error('[]'));
