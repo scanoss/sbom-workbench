@@ -218,6 +218,8 @@ export class Winnower extends EventEmitter {
 
   #continue;
 
+  #isRunning;
+
   constructor() {
     super();
     this.init();
@@ -263,6 +265,7 @@ export class Winnower extends EventEmitter {
           this.#destFolder,
           new Date().getTime()
         );
+      this.#isRunning = false;
       this.emit(SCANNER_EVENTS.WINNOWING_FINISHED);
       this.#worker.terminate();
     }
@@ -271,6 +274,7 @@ export class Winnower extends EventEmitter {
   async startMachine(scannable, destPath) {
     this.#scannable = scannable;
     this.#destFolder = destPath;
+    this.#isRunning = true;
     this.emit(SCANNER_EVENTS.WINNOWING_STARTING);
     return this.#nextStepMachine();
   }
@@ -282,5 +286,9 @@ export class Winnower extends EventEmitter {
   resume() {
     this.#continue = true;
     this.#nextStepMachine();
+  }
+
+  isRunning() {
+    return this.#isRunning;
   }
 }

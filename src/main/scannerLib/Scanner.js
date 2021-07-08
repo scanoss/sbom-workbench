@@ -72,9 +72,11 @@ export class Scanner extends EventEmitter {
     );
 
     this.#dispatcher.on(SCANNER_EVENTS.DISPATCHER_FINISHED, () => {
-      const str = JSON.stringify(this.#tmpResult, null, 4);
-      fs.writeFileSync(this.#resultFilePath, str);
-      this.emit(SCANNER_EVENTS.SCAN_DONE, this.#resultFilePath);
+      if (!this.#winnower.isRunning()) {
+        const str = JSON.stringify(this.#tmpResult, null, 4);
+        fs.writeFileSync(this.#resultFilePath, str);
+        this.emit(SCANNER_EVENTS.SCAN_DONE, this.#resultFilePath);
+      }
     });
     /* SETTING DISPATCHER EVENTS */
   }
