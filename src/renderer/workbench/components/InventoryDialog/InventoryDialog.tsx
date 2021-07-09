@@ -73,6 +73,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     <Dialog
       id="InventoryDialog"
       maxWidth="md"
+      scroll="body"
       fullWidth
       open={open}
       onClose={onCancel}

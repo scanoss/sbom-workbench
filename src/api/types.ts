@@ -7,7 +7,7 @@ export interface Inventory {
   notes: string;
   url: string;
   license_name: string;
-  files: [];
+  files: string[];
 }
 export interface Component {
   id?: number;

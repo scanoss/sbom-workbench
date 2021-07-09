@@ -7,21 +7,18 @@ import { FileTree } from './components/FileTree/FileTree';
 import { dialogController } from '../dialog-controller';
 
 import { WorkbenchContext, IWorkbenchContext } from './WorkbenchProvider';
-import { AppContext } from '../context/AppProvider';
+import { AppContext, IAppContext } from '../context/AppProvider';
 import { ComponentList } from './pages/ComponentList/ComponentList';
 import { ComponentDetail } from './pages/ComponentDetail/ComponentDetail';
 
 const Workbench = () => {
   const { path, url } = useRouteMatch();
 
-  const { loadScan, file, resetWorkbench } = useContext(
-    WorkbenchContext
-  ) as IWorkbenchContext;
-
-  const { scanPath, scanBasePath } = useContext<any>(AppContext);
+  const { loadScan, file, reset } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { scanPath, scanBasePath } = useContext(AppContext) as IAppContext;
 
   const init = async () => {
-    const result = await loadScan(scanPath);
+    const result = scanPath ? await loadScan(scanPath) : false;
     if (!result) {
       dialogController.showError('Error', 'Cannot read scan.');
     }
@@ -29,7 +26,7 @@ const Workbench = () => {
 
   useEffect(() => {
     init();
-    return resetWorkbench;
+    return reset;
   }, []);
 
   return (

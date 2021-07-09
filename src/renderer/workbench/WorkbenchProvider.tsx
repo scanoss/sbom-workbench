@@ -31,38 +31,28 @@ export interface IWorkbenchContext {
   scan: Record<string, any> | null;
   tree: [] | null;
   file: string | null;
-  components: Record<string, Component> | null;
+  components: Component[] | null;
   component: Component | null;
   matchInfo: Record<string, any>[] | null;
+
   setFile: (file: string) => void;
   setTree: (tree: []) => void;
   setComponent: (component) => void;
-  resetWorkbench: () => void;
+
+  reset: () => void;
 }
 
-export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(
-  null
-);
+export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(null);
 
-export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
-  children,
-}) => {
+export const WorkbenchProvider: React.FC = ({ children }) => {
   const { scanBasePath } = useContext<any>(AppContext);
 
   const [tree, setTree] = useState<[] | null>(null);
   const [scan, setScan] = useState<Record<string, any> | null>(null);
-
-  const [components, setComponents] = useState<Record<
-    string,
-    Component
-  > | null>(null);
+  const [components, setComponents] = useState<Component[] | null>(null);
   const [component, setComponent] = useState<Component | null>(null);
-
   const [file, setFile] = useState<string | null>(null);
-
-  const [matchInfo, setMatchInfo] = useState<Record<string, any>[] | null>(
-    null
-  );
+  const [matchInfo, setMatchInfo] = useState<Record<string, any>[] | null>(null);
 
   const loadScan = async (path: string) => {
     try {
@@ -70,8 +60,7 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
       setScan(scanResult.scan);
       setTree(scanResult.fileTree);
       setComponents(scanResult.components);
-      // let response = await componentService.get({});
-      // console.log(response)
+      // const { status, message } = await componentService.get({});
       return true;
     } catch (error) {
       console.error(error);
@@ -87,13 +76,16 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
     setScan({ ...scan, ...updateScan });
     const updateComponents = scanUtil.getComponents(scan);
     setComponents(updateComponents);
-    const updateComponent = updateComponents[component?.name];
-    updateComponent.inventories = [...updateComponent.inventories, inventory];
-    setComponent({ ...component,  ...updateComponent});
+    if (component) {
+      const updateComponent = updateComponents.find((c) => c.name === component.name);
+      updateComponent.inventories = [...updateComponent.inventories, inventory];
+      setComponent({ ...component, ...updateComponent });
+    }
+
     return inventory;
   };
 
-  const resetWorkbench = () => {
+  const reset = () => {
     console.log('reset workbench provider');
     setFile(null);
     setScan(null);
@@ -127,7 +119,7 @@ export const WorkbenchProvider: React.FC<IWorkbenchContext> = ({
         components,
         component,
         setComponent,
-        resetWorkbench,
+        reset,
       }}
     >
       {children}

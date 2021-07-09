@@ -4,24 +4,22 @@ import { useHistory } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { WorkbenchContext, IWorkbenchContext } from '../../WorkbenchProvider';
-import { AppContext } from '../../../context/AppProvider';
+import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../../../api/types';
 import { FileList } from '../ComponentList/components/FileList';
 import { InventoryList } from '../ComponentList/components/InventoryList';
 import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
+import { DialogContext } from '../../DialogProvider';
 
 export const ComponentDetail = () => {
   const history = useHistory();
 
-  const { scanBasePath } = useContext<any>(AppContext);
+  const { scanBasePath } = useContext(AppContext) as IAppContext;
+  const { component, setFile, scan, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { inventoryBool, setInventoryBool } = useContext<any>(DialogContext);
 
-  const [open, setOpen] = useState<boolean>(false);
   const [tab, setTab] = useState<number>(0);
-
-  const { component, setFile, scan, createInventory } = useContext(
-    WorkbenchContext
-  ) as IWorkbenchContext;
 
   const onSelectFile = (file: string) => {
     history.push(`/workbench/file/${file}`);
@@ -29,11 +27,11 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyAllPressed = async () => {
-    setOpen(true);
+    setInventoryBool(true);
   };
 
   const handleClose = async (inventory: Inventory) => {
-    setOpen(false);
+    setInventoryBool(false);
     const newInventory = {
       ...inventory,
       files: component ? component.files : [],
@@ -45,25 +43,11 @@ export const ComponentDetail = () => {
   const renderTab = () => {
     switch (tab) {
       case 0:
-        return (
-          <FileList
-            component={component}
-            scan={scan}
-            filter="pending"
-            onSelectFile={onSelectFile}
-          />
-        );
+        return <FileList component={component} scan={scan} filter="pending" onSelectFile={onSelectFile} />;
       case 1:
         return <InventoryList inventories={component?.inventories} />;
       case 2:
-        return (
-          <FileList
-            component={component}
-            scan={scan}
-            filter="ignored"
-            onSelectFile={onSelectFile}
-          />
-        );
+        return <FileList component={component} scan={scan} filter="ignored" onSelectFile={onSelectFile} />;
       default:
         return 'no data';
     }
@@ -105,11 +89,7 @@ export const ComponentDetail = () => {
             </div>
 
             {tab === 0 ? (
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={onIdentifyAllPressed}
-              >
+              <Button variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
                 Identify All ({component?.count.pending})
               </Button>
             ) : null}
@@ -120,9 +100,9 @@ export const ComponentDetail = () => {
       </section>
 
       <InventoryDialog
-        open={open}
+        open={inventoryBool}
         onClose={handleClose}
-        onCancel={() => setOpen(false)}
+        onCancel={() => setInventoryBool(false)}
         component={component}
       />
     </>

@@ -7,11 +7,13 @@
     letter-spacing: 0em;
     text-align: left;
     border-bottom: 1px solid #D4D4D8;
+    display: block;
   }
 
 
   .identity-component {
     background-color: rgba(244, 244, 245, 1);
+    overflow: hidden;
 
     .component-version-container {
       display: grid;
