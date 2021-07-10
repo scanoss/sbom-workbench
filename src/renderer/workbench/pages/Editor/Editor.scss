@@ -70,22 +70,6 @@
 }
 
 
-.app-page {
-  display: grid;
-  height: 100vh;
-  grid-template-rows: auto 1fr;
-
-
-  .app-header {
-    display: flex;
-    flex-direction: column;
-  }
-}
-
-.app-content{
-  overflow: scroll;
-}
-
 .editors {
   display: grid;
   grid-template-columns: 1fr 1fr;
