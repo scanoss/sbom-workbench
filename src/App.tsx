@@ -16,7 +16,7 @@ const theme = createMuiTheme({
     },
     secondary: {
       main: '#22C55E',
-      contrastText: '#FFFFFF'
+      contrastText: '#FFFFFF',
     },
   },
   typography: {
@@ -26,6 +26,8 @@ const theme = createMuiTheme({
     },
   },
 });
+
+theme.shadows[1] = '0px 1px 3px 0px #0000001A; 1px 0px 2px 0px #0000000F';
 
 export default function App() {
   return (

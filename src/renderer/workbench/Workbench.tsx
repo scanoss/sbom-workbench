@@ -1,7 +1,9 @@
-import { Button } from '@material-ui/core';
+import { Box, Button, IconButton } from '@material-ui/core';
 import React, { useContext, useEffect } from 'react';
 import { Link, Route, Switch, useRouteMatch } from 'react-router-dom';
 import SplitPane from 'react-split-pane';
+import HomeIcon from '@material-ui/icons/Home';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { Editor } from './pages/Editor/Editor';
 import { FileTree } from './components/FileTree/FileTree';
 import { dialogController } from '../dialog-controller';
@@ -33,12 +35,23 @@ const Workbench = () => {
     <div>
       <SplitPane split="vertical" minSize={300} defaultSize={300}>
         <aside className="panel explorer">
-          <header>
-            <span className="title">Explorer</span>
-            <Link to="/">
-              <Button size="small">BACK</Button>
-            </Link>
-          </header>
+          <Box boxShadow={1}>
+            <header>
+              <div className="d-flex align-center">
+                <Link to="/">
+                  <IconButton aria-label="back" size="small">
+                    <ArrowBackIcon fontSize="small" />
+                  </IconButton>
+                </Link>
+                <span className="title">Explorer</span>
+              </div>
+              <Link to="/workbench">
+                <IconButton>
+                  <HomeIcon />
+                </IconButton>
+              </Link>
+            </header>
+          </Box>
           <div className="file-tree-container">
             <FileTree />
           </div>
