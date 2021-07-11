@@ -14,7 +14,7 @@ import {
 import SearchIcon from '@material-ui/icons/Search';
 import React, { useState, useEffect } from 'react';
 import { Inventory } from '../../../../api/types';
-import { Component } from '../../WorkbenchProvider';
+import { Component } from '../../types';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {

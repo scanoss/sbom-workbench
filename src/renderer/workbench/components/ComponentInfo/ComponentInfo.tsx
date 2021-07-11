@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Component } from '../../WorkbenchProvider';
+import { Component } from '../../store';
 import Label from '../Label/Label';
 import Title from '../Title/Title';
 import componentDefault from '../../../../../assets/imgs/component-default.svg';

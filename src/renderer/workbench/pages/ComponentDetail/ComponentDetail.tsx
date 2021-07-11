@@ -3,27 +3,30 @@ import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { WorkbenchContext, IWorkbenchContext } from '../../WorkbenchProvider';
+import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../../../api/types';
 import { FileList } from '../ComponentList/components/FileList';
 import { InventoryList } from '../ComponentList/components/InventoryList';
 import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
-import { DialogContext } from '../../DialogProvider';
+import { DialogContext } from '../../../context/DialogProvider';
+import { setFile } from '../../actions';
 
 export const ComponentDetail = () => {
   const history = useHistory();
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { component, setFile, scan, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { inventoryBool, setInventoryBool } = useContext<any>(DialogContext);
+
+  const  { component, scan } = state;
 
   const [tab, setTab] = useState<number>(0);
 
   const onSelectFile = (file: string) => {
     history.push(`/workbench/file/${file}`);
-    setFile(file);
+    dispatch(setFile(file));
   };
 
   const onIdentifyAllPressed = async () => {

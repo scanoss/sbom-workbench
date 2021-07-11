@@ -4,8 +4,8 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory } from 'react-router-dom';
-import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
-import { DialogContext } from '../../DialogProvider';
+import { IWorkbenchContext, WorkbenchContext } from '../../store';
+import { DialogContext } from '../../../context/DialogProvider';
 import Label from '../../components/Label/Label';
 import Title from '../../components/Title/Title';
 import MatchCard from '../../components/MatchCard/MatchCard';
@@ -25,9 +25,11 @@ export const Editor = () => {
 
   console.log('render');
 
-  const { file, matchInfo, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { setInventoryBool, inventoryBool } = useContext<any>(DialogContext);
+
+  const { file, matchInfo } = state;
 
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);

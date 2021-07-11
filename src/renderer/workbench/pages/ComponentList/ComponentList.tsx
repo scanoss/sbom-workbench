@@ -3,8 +3,9 @@ import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
-import { WorkbenchContext, IWorkbenchContext } from '../../WorkbenchProvider';
+import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import ComponentCard from '../../components/ComponentCard/ComponentCard';
+import { setComponent } from '../../actions';
 
 const filter = (items, query) => {
   if (!items) {
@@ -44,13 +45,15 @@ export const ComponentList = () => {
   const classes = useStyles();
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { components, setComponent } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+
+  const { components } = state;
 
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filter(components, searchQuery);
 
   const onSelectComponent = (component) => {
-    setComponent(component);
+    dispatch(setComponent(component));
     history.push(`/workbench/component`);
   };
 
