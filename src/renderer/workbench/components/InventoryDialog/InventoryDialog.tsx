@@ -10,9 +10,11 @@ import {
   MenuItem,
   TextareaAutosize,
   IconButton,
+  TextField,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import React, { useState, useEffect } from 'react';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Inventory } from '../../../../api/types';
 import { Component } from '../../WorkbenchProvider';
 
@@ -69,15 +71,14 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     });
   };
 
+  useEffect(() => {
+    console.log(form);
+  }, [form]);
+
+  const options = ['sugus', 'bananita dolca', 'media hora'];
+
   return (
-    <Dialog
-      id="InventoryDialog"
-      maxWidth="md"
-      scroll="body"
-      fullWidth
-      open={open}
-      onClose={onCancel}
-    >
+    <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
       <span className="dialog-title">Identify Component</span>
       <div className="identity-component">
         <div className="component-version-container">
@@ -87,26 +88,48 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <IconButton className={classes.iconButton} aria-label="menu">
                 <SearchIcon />
               </IconButton>
-              <InputBase
-                name="component"
-                defaultValue={form?.component}
-                className={classes.component}
-                placeholder="Component"
+              {/* <InputBase
+                  name="component"
+                  defaultValue={form?.component}
+                  className={classes.component}
+                  placeholder="Component"
+                  fullWidth
+                  onChange={(e) => inputHandler(e)}
+                /> */}
+              <Autocomplete
+                id="grouped-demo"
+                options={options}
+                // groupBy={(option) => option.firstLetter}
+                // getOptionLabel={(option) => option.title}
+                style={{ outline: 'none' }}
                 fullWidth
-                onChange={(e) => inputHandler(e)}
+                renderInput={(params) => <TextField {...params} />}
               />
             </Paper>
           </div>
           <div className="component-container">
             <label>Version</label>
             <Paper component="form" className={classes.paper}>
-              <InputBase
+              {/* <InputBase
                 name="version"
                 className={classes.component}
                 defaultValue={form?.version}
                 placeholder="Version"
                 fullWidth
                 onChange={(e) => inputHandler(e)}
+              /> */}
+              <Autocomplete
+                options={options}
+                // groupBy={(option) => option.firstLetter}
+                // getOptionLabel={(option) => option.title}
+                style={{ outline: 'none' }}
+                fullWidth
+                name="version"
+                className={classes.component}
+                defaultValue={form?.version}
+                placeholder="Version"
+                onChange={(e) => inputHandler(e)}
+                renderInput={(params) => <TextField {...params} />}
               />
             </Paper>
           </div>
@@ -114,12 +137,26 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         <div className="component-container">
           <label>License</label>
           <Paper component="form" className={classes.paper}>
-            <InputBase
+            {/* <InputBase
               name="license_name"
               defaultValue={form?.license_name}
               className={classes.component}
               placeholder="License"
               fullWidth
+              onChange={(e) => inputHandler(e)}
+            /> */}
+            <Autocomplete
+              id="grouped-demo"
+              options={options}
+              // groupBy={(option) => option.firstLetter}
+              // getOptionLabel={(option) => option.title}
+              style={{ outline: 'none' }}
+              fullWidth
+              renderInput={(params) => <TextField {...params} />}
+              name="license_name"
+              defaultValue={form?.license_name}
+              className={classes.component}
+              placeholder="License"
               onChange={(e) => inputHandler(e)}
             />
           </Paper>
