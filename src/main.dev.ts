@@ -17,7 +17,7 @@ import log from 'electron-log';
 import MenuBuilder from './main/menu';
 import './main/inventory';
 import './main/component';
-import './main/inventory';
+import './main/project';
 import { IpcEvents } from './ipc-events';
 import { Workspace } from './main/workspace/workspace';
 import { ItemExclude, Project } from './api/types';
@@ -204,17 +204,9 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
 
   scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
     console.log(`Scan Finished... Results on: ${resultsPath}`);
-    console.log(resultsPath);
     await ws.scans_db.components.importUniqueFromFile(resultsPath);
     await ws.scans_db.results.insert(resultsPath);
     await ws.scans_db.files.insert(resultsPath);
-
-    const data = {
-      purl: 'pkg:github/scanoss/scanner.c',
-      version: '1.1.6',
-    };
-    const test = await ws.scans_db.files.get(data);
-    if (test) console.log(test);
     event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
       success: true,
       resultsPath,

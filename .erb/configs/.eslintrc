@@ -3,6 +3,6 @@
     "no-console": "off",
     "global-require": "off",
     "import/no-dynamic-require": "off",
-    "max-len": ["warn", { "code": 120 }]
+    "max-len": "off"
   }
 }

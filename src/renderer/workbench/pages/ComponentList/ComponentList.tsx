@@ -2,9 +2,10 @@ import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
-import { AppContext } from '../../../context/AppProvider';
-import { WorkbenchContext, IWorkbenchContext } from '../../WorkbenchProvider';
+import { AppContext, IAppContext } from '../../../context/AppProvider';
+import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import ComponentCard from '../../components/ComponentCard/ComponentCard';
+import { setComponent } from '../../actions';
 
 const filter = (items, query) => {
   if (!items) {
@@ -12,11 +13,11 @@ const filter = (items, query) => {
   }
 
   if (!query) {
-    return Object.keys(items);
+    return items;
   }
 
-  const result = Object.keys(items).filter((item) => {
-    const name = item.toLowerCase();
+  const result = items.filter((item) => {
+    const name = item.name.toLowerCase();
     return name.includes(query.toLowerCase());
   });
 
@@ -43,30 +44,16 @@ export const ComponentList = () => {
   const history = useHistory();
   const classes = useStyles();
 
-/*   document.getElementById("ComponentList").onscroll = () => scrollFunction();
+  const { scanBasePath } = useContext(AppContext) as IAppContext;
+  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
-  function scrollFunction() {
-    console.log("hola");
-
-    if ( document.getElementById("ComponentList").scrollTop > 50) {
-      console.log("hola");
-      document.querySelector(".app-header").style.fontSize = "30px";
-    } else {
-      document.querySelector(".app-header").style.fontSize = "90px";
-    }
-  } */
-
-  const { scanBasePath } = useContext<any>(AppContext);
-
-  const { components, setComponent } = useContext(
-    WorkbenchContext
-  ) as IWorkbenchContext;
+  const { components } = state;
 
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filter(components, searchQuery);
 
   const onSelectComponent = (component) => {
-    setComponent(component);
+    dispatch(setComponent(component));
     history.push(`/workbench/component`);
   };
 
@@ -79,7 +66,7 @@ export const ComponentList = () => {
 
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">
-                <SearchIcon />
+              <SearchIcon />
             </IconButton>
             <InputBase
               className={classes.input}
@@ -93,14 +80,8 @@ export const ComponentList = () => {
         <main className="app-content">
           {components && filterItems && filterItems.length > 0 ? (
             <section className="component-list">
-              {filterItems.map((key) => (
-                <>
-                  <ComponentCard
-                    key={key}
-                    component={components[key]}
-                    onClick={onSelectComponent}
-                  />
-                </>
+              {filterItems.map((component) => (
+                <ComponentCard key={component.name} component={component} onClick={onSelectComponent} />
               ))}
             </section>
           ) : (

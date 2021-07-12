@@ -4,14 +4,14 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory } from 'react-router-dom';
-import { IWorkbenchContext, WorkbenchContext } from '../../WorkbenchProvider';
-import { DialogContext } from '../../DialogProvider';
+import { IWorkbenchContext, WorkbenchContext } from '../../store';
+import { DialogContext } from '../../../context/DialogProvider';
 import Label from '../../components/Label/Label';
 import Title from '../../components/Title/Title';
 import MatchCard from '../../components/MatchCard/MatchCard';
 import { range } from '../../../../utils/utils';
 import { workbenchController } from '../../../workbench-controller';
-import { AppContext } from '../../../context/AppProvider';
+import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../../../api/types';
 
@@ -25,32 +25,22 @@ export const Editor = () => {
 
   console.log('render');
 
-  const { file, matchInfo, createInventory } = useContext(
-    WorkbenchContext
-  ) as IWorkbenchContext;
+  const { state, dispatch, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { setInventoryBool, inventoryBool } = useContext<any>(DialogContext);
-  const { scanBasePath } = useContext<any>(AppContext);
 
-  const [localFileContent, setLocalFileContent] = useState<FileContent | null>(
-    null
-  );
+  const { file, matchInfo } = state;
 
-  const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(
-    null
-  );
-
-  const [remoteFileContent, setRemoteFileContent] =
-    useState<FileContent | null>(null);
-
+  const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
+  const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
+  const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
   const [ossLines, setOssLines] = useState<number[] | null>([]);
   const [lines, setLines] = useState<number[] | null>([]);
 
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false });
-      const content = await workbenchController.fetchLocalFile(
-        scanBasePath + path
-      );
+      const content = await workbenchController.fetchLocalFile(scanBasePath + path);
       setLocalFileContent({ content, error: false });
     } catch (error) {
       setLocalFileContent({ content: null, error: true });
@@ -67,6 +57,15 @@ export const Editor = () => {
     }
   };
 
+  const handleClose = async (inventory: Inventory) => {
+    setInventoryBool(false);
+    const newInventory = {
+      ...inventory,
+      files: [file],
+    };
+    await createInventory(newInventory);
+  };
+
   useEffect(() => {
     if (!currentMatch) {
       return;
@@ -75,32 +74,17 @@ export const Editor = () => {
     const linesOss =
       currentMatch.id === 'file'
         ? null
-        : range(
-            parseInt(currentMatch.oss_lines.split('-')[0]),
-            parseInt(currentMatch.oss_lines.split('-')[1])
-          );
+        : range(parseInt(currentMatch.oss_lines.split('-')[0], 10), parseInt(currentMatch.oss_lines.split('-')[1], 10));
 
     setOssLines(linesOss);
 
     const lineasLocales =
       currentMatch.id === 'file'
         ? null
-        : range(
-            parseInt(currentMatch.lines.split('-')[0]),
-            parseInt(currentMatch.lines.split('-')[1])
-          );
+        : range(parseInt(currentMatch.lines.split('-')[0], 10), parseInt(currentMatch.lines.split('-')[1], 10));
+
     setLines(lineasLocales);
   }, [currentMatch]);
-
-  const handleClose = async (inventory: Inventory) => {
-    setInventoryBool(false);
-    console.log(file);
-    const newInventory = {
-      ...inventory,
-      files: [file],
-    };
-    await createInventory(newInventory);
-  };
 
   useEffect(() => {
     setLocalFileContent({ content: null, error: false });
@@ -156,13 +140,7 @@ export const Editor = () => {
                       </div>
                       <div>
                         <Label label="LICENSE" textColor="gray" />
-                        <Title
-                          title={
-                            currentMatch?.licenses[0]
-                              ? currentMatch?.licenses[0].name
-                              : '-'
-                          }
-                        />
+                        <Title title={currentMatch?.licenses[0] ? currentMatch?.licenses[0].name : '-'} />
                       </div>
                     </div>
                   </div>
@@ -186,11 +164,9 @@ export const Editor = () => {
                 <p>Source File</p>
                 <SyntaxHighlighter
                   className="code-viewer"
-                  language="javascript"
                   wrapLongLines
                   style={nord}
                   showLineNumbers
-                  lineNumberStyle={{ color: '#ddd', fontSize: 20 }}
                   lineProps={(lineNumber) => {
                     const style = { display: 'block' };
                     if (lines && lines.includes(lineNumber)) {
@@ -199,11 +175,7 @@ export const Editor = () => {
                     return { style };
                   }}
                 >
-                  {localFileContent?.error ? (
-                    <p>File not found</p>
-                  ) : (
-                    localFileContent?.content
-                  )}
+                  {localFileContent?.error ? <p>File not found</p> : localFileContent?.content}
                 </SyntaxHighlighter>
               </>
             ) : null}
@@ -215,15 +187,9 @@ export const Editor = () => {
                 <p>Component File</p>
                 <SyntaxHighlighter
                   className="code-viewer"
-                  language="javascript"
                   wrapLongLines
                   style={nord}
                   showLineNumbers
-                  lineNumberStyle={{
-                    color: '#ddd',
-                    fontSize: 15,
-                    minWidth: 1.25,
-                  }}
                   lineNumberContainerStyle={{ marginRigth: 20 }}
                   lineProps={(lineNumber) => {
                     const style = { display: 'block' };
@@ -233,11 +199,7 @@ export const Editor = () => {
                     return { style };
                   }}
                 >
-                  {remoteFileContent?.error ? (
-                    <p>File not found</p>
-                  ) : (
-                    remoteFileContent?.content?.slice(0, 20000)
-                  )}
+                  {remoteFileContent?.error ? <p>File not found</p> : remoteFileContent?.content?.slice(0, 20000)}
                 </SyntaxHighlighter>
               </>
             ) : null}

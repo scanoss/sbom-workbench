@@ -22,6 +22,7 @@
 
   .component-details-card{
     width: fit-content;
+    max-width: 600px;
     background-color: #ffff;
     display: flex;
     flex-direction: column;
@@ -36,28 +37,22 @@
 
 
   .tiny-container-detail{
-    margin: 24px;
-    width: 100%;
+    margin: 16px;
 
-    p{
+    p {
       margin: 0px;
     }
+
     .title-detail{
       color: #3B82F6;
-      font-family: Inter;
       font-weight: bold;
       font-size: 14px;
-      letter-spacing: 0.02em;
       text-transform: uppercase;
     }
-    .desc-detail{
-      font-family: Inter;
-      font-size: 25px;
-      font-weight: 400;
-      line-height: 25px;
-      letter-spacing: 0em;
-      text-align: left;
 
+    .desc-detail{
+      font-size: 20px;
+      font-weight: 400;
     }
 
     .url{

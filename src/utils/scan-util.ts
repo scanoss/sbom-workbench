@@ -5,9 +5,7 @@ import { Inventory } from '../api/types';
 export function generateFileTree(scan: Record<string, unknown>): Promise<any> {
   return new Promise((resolve) => {
     const obj = {};
-    Object.keys(scan).forEach((p) =>
-      p.split('/').reduce((o, name) => (o[name] = o[name] || {}), obj)
-    );
+    Object.keys(scan).forEach((p) => p.split('/').reduce((o, name) => (o[name] = o[name] || {}), obj));
 
     if ('' in obj) {
       delete Object.assign(obj, { '/': obj[''] })[''];
@@ -15,11 +13,7 @@ export function generateFileTree(scan: Record<string, unknown>): Promise<any> {
 
     const convert = (o, parent) =>
       Object.keys(o).map((key) => {
-        const p = parent
-          ? parent === '/'
-            ? `${parent}${key}`
-            : `${parent}/${key}`
-          : key;
+        const p = parent ? (parent === '/' ? `${parent}${key}` : `${parent}/${key}`) : key;
 
         return Object.keys(o[key]).length
           ? {
@@ -44,7 +38,7 @@ export function generateFileTree(scan: Record<string, unknown>): Promise<any> {
   });
 }
 
-export function getComponents(scan: Record<string, any>): Record<string, any> {
+export function getComponents(scan: Record<string, any> | null = null): any[] {
   const obj = {};
   for (const [key, value] of Object.entries(scan)) {
     for (const result of value) {
@@ -78,7 +72,7 @@ export function getComponents(scan: Record<string, any>): Record<string, any> {
     }
   }
 
-  return obj;
+  return Object.keys(obj).map((key) => obj[key]);
 }
 
 function getLabelMatchesCount(label, value, type) {

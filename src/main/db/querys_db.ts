@@ -142,4 +142,7 @@ export class Querys {
   // GET ALL THE INVENTORIES
   SQL_GET_ALL_INVENTORIES =
     'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories;';
+
+  SQL_SELECT_FILES_FROM_PURL_VERSION =
+    'SELECT fi.path,fi.identified,fi.ignored,r.version,r.purl FROM files fi INNER JOIN  results r where fi.md5=r.md5_file and r.purl=? and r.version=?;';
 }

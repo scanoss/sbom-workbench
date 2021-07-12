@@ -21,13 +21,25 @@ export class ComponentDb extends Db {
   get(data: any) {
     return new Promise(async (resolve, reject) => {
       try {
+        const component = await this.getById(data.id);
+        if (component !== undefined) resolve(component);
+        else resolve([]);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  getAll(data: any) {
+    return new Promise(async (resolve, reject) => {
+      try {
         let component: any;
-        if (data.id) {
-          component = await this.getById(data.id);
-        } else if (data.purl && data.version) {
+        if (data.purl && data.version) {
+          console.log('version purl');
           component = await this.getbyPurlVersion(data);
         } else {
-          component = await this.getAll();
+          console.log('all');
+          component = await this.getAllComponents();
         }
         resolve(component);
       } catch (error) {
@@ -36,7 +48,7 @@ export class ComponentDb extends Db {
     });
   }
 
-  private getAll() {
+  private getAllComponents() {
     const self = this;
     return new Promise<number>(async (resolve, reject) => {
       try {
@@ -152,7 +164,7 @@ export class ComponentDb extends Db {
             `${id}`,
             async function (err: any, data: any) {
               db.close();
-              if (err) reject(new Error('[]'));
+              if (err) resolve(undefined);
               else {
                 const licenses = await self.getAllLicensesFromComponentId(
                   data[0].compid

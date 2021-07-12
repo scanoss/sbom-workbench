@@ -21,8 +21,8 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
     created = await defaultWorkspace.scans_db.inventories.create(arg);
     arg.id = created;
 
-    const inv = await defaultWorkspace.scans_db.inventories.get({});
-    // if (inv) console.log(inv);
+    const inv = await defaultWorkspace.scans_db.inventories.getAll({});
+    if (inv) console.log(inv);
 
     const data = {
       version: '1.3.3',

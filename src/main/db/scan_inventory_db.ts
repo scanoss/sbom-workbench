@@ -25,7 +25,7 @@ export class InventoryDb extends Db {
       try {
         const db = await this.openDb();
         if (inventory.files !== undefined) {
-          db.run(
+          db.each(
             query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH,
             inventory.files[0],
             (err: object, data: any) => {
@@ -63,7 +63,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private getAll() {
+  private getAllInventories() {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -87,8 +87,28 @@ export class InventoryDb extends Db {
     db.close();
   }
 
-  // GET INVENTORIES
+  // GET INVENTORY BY ID
   get(inventory: Partial<Inventory>) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (inventory.id) {
+          const inventories: any = await this.getById(inventory);
+          const comp = await this.component.get(inventories);
+          inventories.component = comp;
+          // Remove purl and version from inventory
+          delete inventories.purl;
+          delete inventories.version;
+          resolve(inventories);
+        }
+        resolve([]);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  // GET ALL INVENTORIES BY PURL, VERSION OR FILES
+  getAll(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
         let inventories: any;
@@ -99,15 +119,13 @@ export class InventoryDb extends Db {
           inventory.version !== undefined
         ) {
           inventories = await this.getByPurlVersion(inventory);
-        } else if (inventory.id) {
-          inventories = await this.getById(inventory);
         } else {
-          inventories = await this.getAll();
+          inventories = await this.getAllInventories();
         }
 
         if (inventory !== undefined) {
           for (let i = 0; i < inventories.length; i += 1) {
-            const comp = await this.component.get(inventories[i]);
+            const comp = await this.component.getAll(inventories[i]);
             inventories[i].component = comp;
             // Remove purl and version from inventory
             delete inventories[i].purl;
