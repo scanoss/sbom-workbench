@@ -11,8 +11,7 @@ import { IpcEvents } from '../../ipc-events';
 const Home = () => {
   const history = useHistory();
 
-  const { scanPath, setScanPath, setScanBasePath } =
-    useContext<any>(AppContext);
+  const { scanPath, setScanPath, setScanBasePath } = useContext<any>(AppContext);
 
   const [progress, setProgress] = useState<number>(0);
   const [path, setPath] = useState<string | null>(null);
@@ -37,14 +36,25 @@ const Home = () => {
 
     // listen finish scan
     ipcRenderer.on(IpcEvents.SCANNER_FINISH_SCAN, (event, args) => {
-      console.log(IpcEvents.SCANNER_FINISH_SCAN);
       if (args.success) {
-        console.log(args);
         showScan(args.resultsPath);
       } else {
         showError();
       }
     });
+  };
+
+  const onOpenProjectPressed = async () => {
+    const projectPath = dialogController.showOpenDialog({
+      properties: ['openDirectory'],
+    });
+
+    if (!projectPath) return;
+
+    await controller.open(projectPath);
+    // setScanBasePath(projectPath);
+    // setPath(projectPath);
+    // showScan(args.resultsPath);
   };
 
   const onOpenFilePressed = () => {
@@ -62,22 +72,16 @@ const Home = () => {
         <img width="300px" alt="icon" src={logo} />
       </div>
       <div>
-        <button
-          className="bnt-primary"
-          type="button"
-          onClick={() => onOpenFolderPressed()}
-          disabled={!!path}
-        >
+        <button className="bnt-primary" type="button" onClick={() => onOpenFolderPressed()} disabled={!!path}>
           SCAN PROJECT
         </button>
 
-        <button
-          className="bnt-primary"
-          type="button"
-          onClick={() => onOpenFilePressed()}
-          disabled={!!path}
-        >
+        <button className="bnt-primary" type="button" onClick={() => onOpenProjectPressed()} disabled={!!path}>
           LOAD PROJECT
+        </button>
+
+        <button className="bnt-primary" type="button" onClick={() => onOpenFilePressed()} disabled={!!path}>
+          LOAD JSON FILE
         </button>
       </div>
       <div className="progressbar">{path ? <LinearProgress /> : null}</div>

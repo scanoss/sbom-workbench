@@ -3,7 +3,6 @@ import * as scanUtil from '../utils/scan-util';
 const fs = require('original-fs').promises;
 
 export interface ScanResult {
-  id: string | null;
   scan: Record<string, unknown>;
   fileTree: [];
   components: any[];
@@ -20,6 +19,9 @@ class WorkbenchController {
   public async loadScan(path: string): Promise<ScanResult> {
     const data = await fs.readFile(path, 'utf-8');
     return this.generateScanResult(data);
+
+    // const { status, data } = await projectService.load();
+    // data.tree;
   }
 
   /**
@@ -53,7 +55,6 @@ class WorkbenchController {
     const scan = JSON.parse(data);
 
     return {
-      id: null,
       scan,
       fileTree: await scanUtil.generateFileTree(scan),
       components: scanUtil.getComponents(scan),

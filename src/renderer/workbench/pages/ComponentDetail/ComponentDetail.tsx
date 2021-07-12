@@ -12,6 +12,8 @@ import { InventoryList } from '../ComponentList/components/InventoryList';
 import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
 import { DialogContext } from '../../../context/DialogProvider';
 import { setFile } from '../../actions';
+import { inventoryService } from '../../../../api/inventory-service';
+import { useEffect } from 'react';
 
 export const ComponentDetail = () => {
   const history = useHistory();
@@ -20,9 +22,26 @@ export const ComponentDetail = () => {
   const { state, dispatch, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { inventoryBool, setInventoryBool } = useContext<any>(DialogContext);
 
-  const  { component, scan } = state;
+  const { component, scan } = state;
 
+  const [files, setFiles] = useState<any[]>([]);
+  const [inventories, setInventories] = useState<Inventory[]>([]);
   const [tab, setTab] = useState<number>(0);
+
+  const getFiles = () => {
+    // const response = fileService.get({ compid: component.id });
+    const { files } = component;
+    setFiles(files);
+  };
+
+  const getInventories = async () => {
+    //const response = await inventoryService.get({ purl: component.purl[0], version: component.version });
+    const response = await inventoryService.get({});
+
+    console.log(response);
+    const inv = [];
+    setInventories(inv);
+  };
 
   const onSelectFile = (file: string) => {
     history.push(`/workbench/file/${file}`);
@@ -40,17 +59,24 @@ export const ComponentDetail = () => {
       files: component ? component.files : [],
     };
     await createInventory(newInventory);
+
+    setInventories((previous) => [...previous, newInventory]);
     setTab(1);
   };
+
+  useEffect(() => {
+    getFiles();
+    getInventories();
+  }, []);
 
   const renderTab = () => {
     switch (tab) {
       case 0:
-        return <FileList component={component} scan={scan} filter="pending" onSelectFile={onSelectFile} />;
+        return <FileList files={files} scan={scan} filter="pending" onSelectFile={onSelectFile} />;
       case 1:
-        return <InventoryList inventories={component?.inventories} />;
+        return <InventoryList inventories={inventories} />;
       case 2:
-        return <FileList component={component} scan={scan} filter="ignored" onSelectFile={onSelectFile} />;
+        return <FileList files={files} scan={scan} filter="ignored" onSelectFile={onSelectFile} />;
       default:
         return 'no data';
     }

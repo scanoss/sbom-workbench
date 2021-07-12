@@ -28,7 +28,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       const { scan, fileTree, components } = await workbenchController.loadScan(path);
       dispatch(loadScanSuccess(scan, fileTree, components));
 
-      // const { status, message } = await componentService.get({});
+      // const { status, data } = await componentService.get({});
       return true;
     } catch (error) {
       console.error(error);
@@ -37,7 +37,9 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   const createInventory = async (inventory: Inventory) => {
-    const response = await inventoryService.create(inventory);
+    const { status, message } = await inventoryService.create(inventory);
+    console.log(message);
+
 
     // TODO: remove when backend service is ready
     const updateScan = scanUtil.updateTree(scan, inventory);
