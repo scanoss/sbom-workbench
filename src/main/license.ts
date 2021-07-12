@@ -10,7 +10,7 @@ ipcMain.handle(IpcEvents.LICENSE_GET, async (_event, licToGet: License) => {
   } catch (e) {
     console.log('Catch an error: ', e);
   }
-  return { status: 'ok', message: license };
+  return { status: 'ok', data: license };
 });
 
 ipcMain.handle(IpcEvents.LICENSE_CREATE, async (_event, arg: License) => {
@@ -22,5 +22,5 @@ ipcMain.handle(IpcEvents.LICENSE_CREATE, async (_event, arg: License) => {
   }
   console.log('License was created ');
   console.log(arg);
-  return { status: 'ok', message: created };
+  return { status: 'ok', data: created };
 });
