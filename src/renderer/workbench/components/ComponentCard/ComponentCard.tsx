@@ -1,13 +1,7 @@
-import {
-  Card,
-  CardContent,
-  Typography,
-  Tooltip,
-  ButtonBase,
-} from '@material-ui/core';
+import { Card, CardContent, Typography, Tooltip, ButtonBase } from '@material-ui/core';
 import React from 'react';
-import { Component } from '../../WorkbenchProvider';
 import componentDefault from '../../../../../assets/imgs/component-default.svg';
+import { Component } from '../../types';
 
 interface ComponentCardProps {
   component: Component;
@@ -33,19 +27,13 @@ const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
             </div>
             <div className="component-card-files">
               {component.count.identified !== 0 ? (
-                <span className="info-count identified">
-                  {component.count.identified}
-                </span>
+                <span className="info-count identified">{component.count.identified}</span>
               ) : null}
               {component.count.pending !== 0 ? (
-                <span className="info-count pending">
-                  {component.count.pending}
-                </span>
+                <span className="info-count pending">{component.count.pending}</span>
               ) : null}
               {component.count.ignored !== 0 ? (
-                <span className="info-count ignored">
-                  {component.count.ignored}
-                </span>
+                <span className="info-count ignored">{component.count.ignored}</span>
               ) : null}
             </div>
           </CardContent>

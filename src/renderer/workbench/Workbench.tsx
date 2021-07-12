@@ -8,16 +8,19 @@ import { Editor } from './pages/Editor/Editor';
 import { FileTree } from './components/FileTree/FileTree';
 import { dialogController } from '../dialog-controller';
 
-import { WorkbenchContext, IWorkbenchContext } from './WorkbenchProvider';
+import { WorkbenchContext, IWorkbenchContext } from './store';
 import { AppContext, IAppContext } from '../context/AppProvider';
 import { ComponentList } from './pages/ComponentList/ComponentList';
 import { ComponentDetail } from './pages/ComponentDetail/ComponentDetail';
+import { reset } from './actions';
 
 const Workbench = () => {
   const { path, url } = useRouteMatch();
 
-  const { loadScan, file, reset } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanPath, scanBasePath } = useContext(AppContext) as IAppContext;
+
+  const { file } = state;
 
   const init = async () => {
     const result = scanPath ? await loadScan(scanPath) : false;
@@ -28,7 +31,7 @@ const Workbench = () => {
 
   useEffect(() => {
     init();
-    return reset;
+    return () => dispatch(reset());
   }, []);
 
   return (

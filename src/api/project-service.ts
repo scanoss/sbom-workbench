@@ -16,6 +16,14 @@ class ProjectService {
     );
     return response;
   }
+
+  public async load(path: string): Promise<any> {
+    const response = await ipcRenderer.invoke(
+      IpcEvents.PROJECT_LOAD_SCAN,
+      path
+    );
+    return response;
+  }
 }
 
 export const projectService = new ProjectService();
