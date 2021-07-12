@@ -30,17 +30,16 @@ export const ComponentDetail = () => {
 
   const getFiles = () => {
     // const response = fileService.get({ compid: component.id });
+    // console.log('FILES BY COMP', response);
+
     const { files } = component;
     setFiles(files);
   };
 
   const getInventories = async () => {
-    //const response = await inventoryService.get({ purl: component.purl[0], version: component.version });
-    const response = await inventoryService.get({});
-
-    console.log(response);
-    const inv = [];
-    setInventories(inv);
+    const response = await inventoryService.get({ purl: component.purl[0], version: component.version });
+    console.log('INVENTORIES BY COMP', response);
+    setInventories(response.message || []);
   };
 
   const onSelectFile = (file: string) => {
