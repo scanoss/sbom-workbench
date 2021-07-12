@@ -2,7 +2,7 @@ export class Querys {
   /** SQL CREATE SCAN TABLES * */
 
   SQL_CREATE_TABLE_FILES =
-    'CREATE TABLE IF NOT EXISTS files (md5 text primary key, path text unique not null, pid integer, scanned integer default 0, identified integer default 0,reviewed integer default 0, open_source integer default 0);';
+    'CREATE TABLE IF NOT EXISTS files (md5 text primary key, path text unique not null, pid integer, scanned integer default 0, identified integer default 0,reviewed integer default 0,ignored integer default 0,open_source integer default 0);';
 
   SQL_CREATE_TABLE_RESULTS =
     'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text, fileid integer, vendor text, component text, version text, latest_version text, cpe text, license text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text);';
@@ -49,6 +49,11 @@ export class Querys {
   SQL_UPDATE_INVENTORY_BY_PURL_VERSION =
     'UPDATE inventories SET compid=?,version=?,purl=?,usage=?, notes=?, url=?, license_name=?where purl=? and version=?;';
 
+  SQL_COMPDB_COMP_VERSION_UPDATE =
+    'UPDATE component_versions  SET name=?,version=?, description=?, url=?,purl=? where id=?;';
+
+  SQL_FILES_UPDATE_IDENTIFIED = 'UPDATE files SET identified=1 where path=?';
+
   /** SQL COMPONENTS TABLES INSERT* */
   // SQL INSERT INTO LICENSES
   COMPDB_LICENSES_INSERT =
@@ -87,6 +92,10 @@ export class Querys {
 
   SQL_SCAN_SELECT_INVENTORIES_FROM_PURL =
     'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.license_name,i.purl,i.version from inventories i where i.purl=? and i.version=?;';
+
+  // GET INVENTORY BY ID
+  SQL_GET_INVENTORY_BY_ID =
+    'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories where id=?;';
 
   SQL_SCAN_SELECT_FILE_RESULTS =
     'SELECT path,compid,lines,oss_lines,matched,filename,size,idtype,md5_file,md5_comp,purl from results inner join files on results.md5_file=files.md5 where path like ? and files.scanned!=0 order by path;';
@@ -133,8 +142,4 @@ export class Querys {
   // GET ALL THE INVENTORIES
   SQL_GET_ALL_INVENTORIES =
     'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories;';
-
-  // GET INVENTORY BY ID
-  SQL_GET_INEVNTORY_BY_ID =
-    'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories where id=?;';
 }

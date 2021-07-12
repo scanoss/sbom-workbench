@@ -8,18 +8,10 @@
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
+import { Component } from '../../api/types';
 
 const utilsDb = new UtilsDb();
 const query = new Querys();
-
-interface Component {
-  name: string;
-  version: string;
-  description: string;
-  url: string;
-  purl: string;
-  license_name: string;
-}
 
 export class ComponentDb extends Db {
   constructor() {
@@ -82,8 +74,6 @@ export class ComponentDb extends Db {
           data.version,
           async (err: any, component: any) => {
             db.close();
-
-            console.log(component);
             if (err) reject(new Error(undefined));
             const licenses = await self.getAllLicensesFromComponentId(
               component.compid
@@ -310,10 +300,10 @@ export class ComponentDb extends Db {
   importFromFile(path: string) {
     return new Promise(async (resolve, reject) => {
       try {
-        const result: Record<any, any> = await utilsDb.readFile(path);
+        const results: Record<any, any> = await utilsDb.readFile(path);
         const db = await this.openDb();
-        for (let i = 0; i < result.length; i += 1) {
-          await this.componentNewImport(db, result[i]);
+        for (let i = 0; i < results.length; i += 1) {
+          await this.componentNewImport(db, results[i]);
         }
         db.close();
         resolve(true);
@@ -341,6 +331,34 @@ export class ComponentDb extends Db {
         stmt.finalize();
         resolve(true);
       });
+    });
+  }
+
+  update(component: Component) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          const stmt = db.prepare(query.SQL_COMPDB_COMP_VERSION_UPDATE);
+          stmt.run(
+            component.name,
+            component.version,
+            component.description,
+            component.url,
+            component.purl,
+            component.description,
+            component.id,
+            (err: any) => {
+              if (err) resolve(false);
+            }
+          );
+          db.close();
+          stmt.finalize();
+          resolve(true);
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 }

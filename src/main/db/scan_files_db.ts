@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 /* eslint-disable @typescript-eslint/no-useless-constructor */
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/ban-types */
@@ -5,6 +6,7 @@
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
+import { Dvr } from '@material-ui/icons';
 
 const query = new Querys();
 const utilsDb = new UtilsDb();
@@ -37,6 +39,27 @@ export class FilesDb extends Db {
         resolve(true);
       } catch (error) {
         reject(error);
+      }
+    });
+  }
+
+  get(data: any) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.all(
+          'SELECT fi.path,fi.identified,fi.ignored,r.version,r.purl from files fi INNER JOIN  results r where fi.md5=r.md5_file and r.purl=? and r.version=?;',
+          data.purl,
+          data.version,
+          function (err: any, file: any) {
+            console.log(file);
+            db.close();
+            if (!err) resolve(file);
+            else resolve(undefined);
+          }
+        );
+      } catch (error) {
+        reject(new Error('error'));
       }
     });
   }

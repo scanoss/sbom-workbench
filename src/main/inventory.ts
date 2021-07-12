@@ -18,9 +18,20 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Inventory) => {
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   let created: any;
   try {
-    console.log(defaultWorkspace);
     created = await defaultWorkspace.scans_db.inventories.create(arg);
     arg.id = created;
+
+    const inv = await defaultWorkspace.scans_db.inventories.get({});
+    // if (inv) console.log(inv);
+
+    const data = {
+      version: '1.3.3',
+      purl: 'pkg:github/scanoss/scanner.c',
+    };
+
+    const files = await defaultWorkspace.scans_db.files.get(data);
+    if (files) console.log(files);
+
     // defaultWorkspace.attachInventory(arg);
     return { status: 'ok', message: created };
   } catch (e) {

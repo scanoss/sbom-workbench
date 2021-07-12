@@ -172,7 +172,7 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
       /* if (p.default_components !== undefined)
       defaultWorkspace.scans_db.components.importFromFile(p.default_components);
     */
-      console.log(`base abierta ${init}`);
+      console.log(`Open db ${init}`);
   } catch (e) {
     console.log('Catch an error on creating a project: ', e);
   }
@@ -204,7 +204,17 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
 
   scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
     console.log(`Scan Finished... Results on: ${resultsPath}`);
-    await ws.scans_db.components.importFromFile(resultsPath);
+    console.log(resultsPath);
+    await ws.scans_db.components.importUniqueFromFile(resultsPath);
+    await ws.scans_db.results.insert(resultsPath);
+    await ws.scans_db.files.insert(resultsPath);
+
+    const data = {
+      purl: 'pkg:github/scanoss/scanner.c',
+      version: '1.1.6',
+    };
+    const test = await ws.scans_db.files.get(data);
+    if (test) console.log(test);
     event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
       success: true,
       resultsPath,

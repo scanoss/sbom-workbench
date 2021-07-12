@@ -6,6 +6,7 @@
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
+import { License } from '../../api/types';
 
 const query = new Querys();
 const utilsDb = new UtilsDb();
@@ -16,7 +17,7 @@ export class LicenseDb extends Db {
   }
 
   // CREATE LICENSE
-  create(license: any) {
+  create(license: License) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -91,7 +92,7 @@ export class LicenseDb extends Db {
   }
 
   // GET LICENSES
-  get(license: any) {
+  get(license: License) {
     let id: any;
     return new Promise(async (resolve, reject) => {
       try {
@@ -121,7 +122,7 @@ export class LicenseDb extends Db {
   }
 
   // GET LICENSE ID FROM SPDXID OR LICENSE NAME
-  private async getLicenseIdFilter(license: any) {
+  private async getLicenseIdFilter(license: License) {
     return new Promise<number>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -242,7 +243,7 @@ export class LicenseDb extends Db {
   }
 
   // UPDATE
-  update(license) {
+  update(license: License) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();

@@ -20,41 +20,45 @@ export class InventoryDb extends Db {
     this.component = new ComponentDb();
   }
 
-  private getByFilePath(inventory: Inventory) {
-    return new Promise(async (resolve, reject) => {
+  private getByFilePath(inventory: Partial<Inventory>) {
+    return new Promise(async (resolve) => {
       try {
         const db = await this.openDb();
-        db.run(
-          query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH,
-          inventory.files[0],
-          (err: object, data: any) => {
-            db.close();
-            if (err) resolve(undefined);
-            else resolve(data);
-          }
-        );
+        if (inventory.files !== undefined) {
+          db.run(
+            query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH,
+            inventory.files[0],
+            (err: object, data: any) => {
+              db.close();
+              if (err) resolve(undefined);
+              else resolve(data);
+            }
+          );
+        }
       } catch (error) {
-        reject(new Error('The inventory does not exists'));
+        resolve(undefined);
       }
     });
   }
 
-  private getByPurlVersion(inventory: Inventory) {
-    return new Promise(async (resolve, reject) => {
+  private getByPurlVersion(inventory: Partial<Inventory>) {
+    return new Promise(async (resolve) => {
       try {
         const db = await this.openDb();
-        db.all(
-          query.SQL_SCAN_SELECT_INVENTORIES_FROM_PURL,
-          inventory.purl,
-          inventory.version,
-          (err: object, inv: any) => {
-            db.close();
-            if (err) resolve(undefined);
-            else resolve(inv);
-          }
-        );
+        if (inventory.purl !== undefined) {
+          db.all(
+            query.SQL_SCAN_SELECT_INVENTORIES_FROM_PURL,
+            inventory.purl,
+            inventory.version,
+            (err: object, inv: any) => {
+              db.close();
+              if (err) resolve(undefined);
+              else resolve(inv);
+            }
+          );
+        }
       } catch (error) {
-        reject(new Error('The inventory does not exists'));
+        resolve(undefined);
       }
     });
   }
@@ -80,16 +84,20 @@ export class InventoryDb extends Db {
     for (const path of inventory.files) {
       db.run(query.SQL_INSERT_FILE_INVENTORIES, path, invId);
     }
+    db.close();
   }
 
   // GET INVENTORIES
-  get(inventory: Inventory) {
+  get(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
         let inventories: any;
         if (inventory.files) {
           inventories = await this.getByFilePath(inventory);
-        } else if (inventory.purl && inventory.version) {
+        } else if (
+          inventory.purl !== undefined &&
+          inventory.version !== undefined
+        ) {
           inventories = await this.getByPurlVersion(inventory);
         } else if (inventory.id) {
           inventories = await this.getById(inventory);
@@ -115,12 +123,12 @@ export class InventoryDb extends Db {
     });
   }
 
-  private getById(inventory: Inventory) {
+  private getById(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.all(
-          query.SQL_GET_INEVNTORY_BY_ID,
+          query.SQL_GET_INVENTORY_BY_ID,
           `${inventory.id}`,
           (err: object, inv: any) => {
             db.close();
@@ -150,6 +158,7 @@ export class InventoryDb extends Db {
         inventory.license_name ? inventory.license_name : 'n/a',
         async function (this: any, err: any) {
           await self.newFileInventory(inventory, this.lastID);
+          await self.updateIdentified(inventory);
           if (err) {
             reject(new Error(err));
           } else {
@@ -157,6 +166,21 @@ export class InventoryDb extends Db {
           }
         }
       );
+    });
+  }
+
+  // UPDATE IDENTIFIED FILES
+  private updateIdentified(inventory: Inventory) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        for (const path of inventory.files) {
+          db.run(query.SQL_FILES_UPDATE_IDENTIFIED, path);
+        }
+        resolve(true);
+      } catch (error) {
+        reject(new Error('Unable to open db'));
+      }
     });
   }
 
@@ -204,7 +228,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private updateById(inventory: Inventory) {
+  private updateById(inventory: Partial<Inventory>) {
     return new Promise(async (resolve) => {
       try {
         const db = await this.openDb();
