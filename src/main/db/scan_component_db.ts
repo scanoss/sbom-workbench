@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable func-names */
@@ -10,19 +11,28 @@ import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { Component } from '../../api/types';
 
+interface Summary {
+  identified: number;
+  ignored: number;
+  pending: number;
+}
+
 const utilsDb = new UtilsDb();
 const query = new Querys();
 
 export class ComponentDb extends Db {
-  constructor() {
-    super();
+  constructor(path: string) {
+    super(path);
   }
 
-  get(data: any) {
+  get(component: Partial<Component> ) {
     return new Promise(async (resolve, reject) => {
       try {
-        const component = await this.getById(data.id);
-        if (component !== undefined) resolve(component);
+        let comp:any;
+        if(component.id){
+          comp= await this.getById(component.id);   
+          resolve(comp);  
+        }             
         else resolve([]);
       } catch (error) {
         reject(error);
@@ -30,18 +40,17 @@ export class ComponentDb extends Db {
     });
   }
 
-  getAll(data: any) {
+  getAll(data: any) {  
     return new Promise(async (resolve, reject) => {
       try {
         let component: any;
         if (data.purl && data.version) {
-          console.log('version purl');
           component = await this.getbyPurlVersion(data);
         } else {
-          console.log('all');
           component = await this.getAllComponents();
         }
-        resolve(component);
+        if(component!==undefined)resolve(component);
+        else resolve({});
       } catch (error) {
         reject(new Error('unable to open db'));
       }
@@ -50,50 +59,40 @@ export class ComponentDb extends Db {
 
   private getAllComponents() {
     const self = this;
-    return new Promise<number>(async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(
-          query.SQL_GET_ALL_COMPONENTS,
-          async (err: any, component: any) => {
-            if (err) reject(new Error(undefined));
-            db.close();
-
-            for (let i = 0; i < component.length; i += 1) {
-              const licenses = await self.getAllLicensesFromComponentId(
-                component[i].compid
-              );
-              component[i].licenses = licenses;
-            }
-            resolve(component);
+        db.all(query.SQL_GET_ALL_COMPONENTS, async (err: any, component: any) => {
+          if (err) resolve(undefined);
+          db.close();
+          for (let i = 0; i < component.length; i += 1) {
+           
+            const licenses = await self.getAllLicensesFromComponentId(component[i].compid);
+            component[i].licenses = licenses;
           }
-        );
+          resolve(component);
+        });
       } catch (error) {
         reject(error);
       }
     });
   }
 
-  // // GET COMPONENENT ID FROM PURL
+
+  
+ // GET COMPONENENT ID FROM PURL
   private getbyPurlVersion(data: any) {
     const self = this;
-    return new Promise<number>(async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.get(
-          query.SQL_GET_COMPONENT_BY_PURL_VERSION,
-          data.purl,
-          data.version,
-          async (err: any, component: any) => {
-            db.close();
-            if (err) reject(new Error(undefined));
-            const licenses = await self.getAllLicensesFromComponentId(
-              component.compid
-            );
-            component.licenses = licenses;
-            resolve(component);
-          }
-        );
+        db.get(query.SQL_GET_COMPONENT_BY_PURL_VERSION, data.purl, data.version, async (err: any, component: any) => {
+          db.close();
+          if (err) resolve(undefined);
+          const licenses = await self.getAllLicensesFromComponentId(component.compid);
+          component.licenses = licenses;
+          resolve(component);
+        });
       } catch (error) {
         reject(error);
       }
@@ -106,18 +105,14 @@ export class ComponentDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(
-            query.SQL_GET_COMPV_LICENSE_BY_COMPID,
-            `${cvId}`,
-            (err: any, data: any) => {
-              db.close();
-              if (err) {
-                resolve('[]');
-              } else {
-                resolve(data);
-              }
+          db.all(query.SQL_GET_COMPV_LICENSE_BY_COMPID, `${cvId}`, (err: any, data: any) => {
+            db.close();
+            if (err) {
+              resolve('[]');
+            } else {
+              resolve(data);
             }
-          );
+          });
         });
       } catch (error) {
         reject(new Error('[]'));
@@ -155,25 +150,19 @@ export class ComponentDb extends Db {
   // GET COMPONENT VERSIONS
   getById(id: number) {
     const self = this;
-    return new Promise(async (resolve, reject) => {
+    return new Promise (async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(
-            query.SQL_GET_COMPONENT_BY_ID,
-            `${id}`,
-            async function (err: any, data: any) {
-              db.close();
-              if (err) resolve(undefined);
-              else {
-                const licenses = await self.getAllLicensesFromComponentId(
-                  data[0].compid
-                );
-                data[0].licenses = licenses;
-                resolve(data);
-              }
+          db.get(query.SQL_GET_COMPONENT_BY_ID, `${id}`, async function (err: any, data: any) {
+            db.close();
+            if (err) resolve(undefined);
+            else {
+              const licenses = await self.getAllLicensesFromComponentId(data.compid);
+              data.licenses = licenses;
+              resolve(data);
             }
-          );
+          });
         });
       } catch (error) {
         reject(new Error('[]'));
@@ -187,15 +176,11 @@ export class ComponentDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(
-            query.SQL_GET_LICENSES_BY_COMPONENT_ID,
-            `${id}`,
-            (err: any, data: any) => {
-              db.close();
-              if (err) resolve('[]');
-              else resolve(data);
-            }
-          );
+          db.all(query.SQL_GET_LICENSES_BY_COMPONENT_ID, `${id}`, (err: any, data: any) => {
+            db.close();
+            if (err) resolve('[]');
+            else resolve(data);
+          });
         });
       } catch (error) {
         reject(new Error('[]'));
@@ -248,13 +233,12 @@ export class ComponentDb extends Db {
   }
 
   // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
-  importUniqueFromJson(json: string) {
+  importUniqueFromJSON(json: string) {
     let data: any;
     return new Promise(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        const result: Record<any, any> = await utilsDb.readFile(json);
-        for (const [key, value] of Object.entries(result)) {
+        const db = await this.openDb();        
+        for (const [key, value] of Object.entries(json)) {
           for (let i = 0; i < value.length; i += 1) {
             data = value[i];
 
@@ -330,16 +314,9 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       db.serialize(function () {
         const stmt = db.prepare(query.COMPDB_SQL_COMP_VERSION_INSERT);
-        stmt.run(
-          data.name,
-          data.version,
-          data.description,
-          data.url,
-          data.purl,
-          (err: any) => {
-            if (err) reject(new Error('error'));
-          }
-        );
+        stmt.run(data.name, data.version, data.description, data.url, data.purl, (err: any) => {
+          if (err) reject(new Error('error'));
+        });
         stmt.finalize();
         resolve(true);
       });

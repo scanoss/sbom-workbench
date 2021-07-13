@@ -26,8 +26,7 @@ ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (_event, arg: Project) => {
   try {
     defaultWorkspace.scans_db = new ScanDb(p.work_root);
     const init = await defaultWorkspace.scans_db.init();
-    if (p.default_licenses !== undefined)
-      defaultWorkspace.scans_db.licenses.importFromFile(p.default_licenses);
+    if (p.default_licenses !== undefined) defaultWorkspace.scans_db.licenses.importFromFile(p.default_licenses);
     /* if (p.default_components !== undefined)
       defaultWorkspace.scans_db.components.importFromFile(p.default_components);
     */

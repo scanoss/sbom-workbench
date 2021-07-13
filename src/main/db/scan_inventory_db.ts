@@ -15,9 +15,9 @@ const query = new Querys();
 export class InventoryDb extends Db {
   component: any;
 
-  constructor() {
-    super();
-    this.component = new ComponentDb();
+  constructor(path: string) {
+    super(path);
+    this.component = new ComponentDb(path);
   }
 
   private getByFilePath(inventory: Partial<Inventory>) {
@@ -25,15 +25,11 @@ export class InventoryDb extends Db {
       try {
         const db = await this.openDb();
         if (inventory.files !== undefined) {
-          db.each(
-            query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH,
-            inventory.files[0],
-            (err: object, data: any) => {
-              db.close();
-              if (err) resolve(undefined);
-              else resolve(data);
-            }
-          );
+          db.each(query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH, inventory.files[0], (err: object, data: any) => {
+            db.close();
+            if (err) resolve(undefined);
+            else resolve(data);
+          });
         }
       } catch (error) {
         resolve(undefined);
@@ -93,7 +89,7 @@ export class InventoryDb extends Db {
       try {
         if (inventory.id) {
           const inventories: any = await this.getById(inventory);
-          const comp = await this.component.get(inventories);
+          const comp = await this.component.getAll(inventories);
           inventories.component = comp;
           // Remove purl and version from inventory
           delete inventories.purl;
@@ -114,10 +110,7 @@ export class InventoryDb extends Db {
         let inventories: any;
         if (inventory.files) {
           inventories = await this.getByFilePath(inventory);
-        } else if (
-          inventory.purl !== undefined &&
-          inventory.version !== undefined
-        ) {
+        } else if (inventory.purl !== undefined && inventory.version !== undefined) {
           inventories = await this.getByPurlVersion(inventory);
         } else {
           inventories = await this.getAllInventories();
@@ -145,15 +138,11 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(
-          query.SQL_GET_INVENTORY_BY_ID,
-          `${inventory.id}`,
-          (err: object, inv: any) => {
-            db.close();
-            if (err) resolve(undefined);
-            else resolve(inv);
-          }
-        );
+        db.get(query.SQL_GET_INVENTORY_BY_ID, inventory.id, (err: object, inv: any) => {
+          db.close();
+          if (err) resolve(undefined);
+          else resolve(inv);
+        });
       } catch (error) {
         reject(new Error('The inventory does not exists'));
       }
@@ -301,15 +290,11 @@ export class InventoryDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(
-            query.SQL_SELECT_ALL_INVENTORIES_FROM_FILE,
-            `${inventory.files[0]}`,
-            (err: any, data: any) => {
-              db.close();
-              if (err) reject(new Error('[]'));
-              else resolve(data);
-            }
-          );
+          db.all(query.SQL_SELECT_ALL_INVENTORIES_FROM_FILE, `${inventory.files[0]}`, (err: any, data: any) => {
+            db.close();
+            if (err) reject(new Error('[]'));
+            else resolve(data);
+          });
         });
       } catch (error) {
         reject(new Error('[]'));

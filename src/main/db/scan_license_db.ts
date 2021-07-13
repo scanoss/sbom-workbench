@@ -12,8 +12,8 @@ const query = new Querys();
 const utilsDb = new UtilsDb();
 
 export class LicenseDb extends Db {
-  constructor() {
-    super();
+  constructor(path: string) {
+    super(path);
   }
 
   // CREATE LICENSE

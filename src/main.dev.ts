@@ -164,8 +164,7 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   };
 
   try {
-    //  ws.scans_db = new ScanDb(p.work_root);
-    ws.scans_db = new ScanDb();
+      ws.scans_db = new ScanDb(p.work_root);  
     const init = await ws.scans_db.init();
     if (p.default_licenses !== undefined)
       // await ws.scans_db.licenses.importFromFile(p.default_licenses);
@@ -198,15 +197,17 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
     console.log(`Sending WFP file ${dir} to server`);
   });
 
-  scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (data, fileNumbers) => {
-    console.log(`New ${fileNumbers} files scanned`);
+  scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
+    console.log(`New ${fileNumbers} files scanned`);  
+    await ws.scans_db.components.importUniqueFromJSON(data);
+    await ws.scans_db.results.insertFromJSON(data);
+    await ws.scans_db.files.insertFromJSON(data);
+
+
   });
 
   scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
-    console.log(`Scan Finished... Results on: ${resultsPath}`);
-    await ws.scans_db.components.importUniqueFromFile(resultsPath);
-    await ws.scans_db.results.insert(resultsPath);
-    await ws.scans_db.files.insert(resultsPath);
+    console.log(`Scan Finished... Results on: ${resultsPath}`);   
     event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
       success: true,
       resultsPath,

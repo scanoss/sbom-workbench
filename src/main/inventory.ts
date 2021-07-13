@@ -21,16 +21,41 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
     created = await defaultWorkspace.scans_db.inventories.create(arg);
     arg.id = created;
 
+    const invById = await defaultWorkspace.scans_db.inventories.get({ id: 1 });
+     if (invById) console.log(invById);
+
+    const compById = await defaultWorkspace.scans_db.components.get({ id: 1 });
+    console.log(compById);
+
     const inv = await defaultWorkspace.scans_db.inventories.getAll({});
-    if (inv) console.log(inv);
+    //  if (inv) console.log(inv);
+
+    // update ignored files
+    const ignore = await defaultWorkspace.scans_db.files.ignored([
+      '/.git/hooks/post-update.sample',
+      '/external/src/crc32c.c',
+      '/src/scanner.o',
+    ]);
+
+    const summary = await defaultWorkspace.scans_db.results.summary({
+      purl: 'pkg:github/scanoss/scanner.c',
+      version: '1.1.6',
+    });
+    console.log(summary);
+
+    const a = await defaultWorkspace.scans_db.components.getAll({});
+  // console.log(a);
 
     const data = {
       version: '1.3.3',
       purl: 'pkg:github/scanoss/scanner.c',
     };
 
+    
     const files = await defaultWorkspace.scans_db.files.get(data);
-    if (files) console.log(files);
+    // if (files) console.log(files);
+
+    
 
     // defaultWorkspace.attachInventory(arg);
     return { status: 'ok', message: created };
