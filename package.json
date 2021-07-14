@@ -1,6 +1,6 @@
 {
   "name": "scanoss-desktop",
-  "productName": "Scannos Desktop",
+  "productName": "Scannos",
   "description": "Desktop version to use SCANOSS OSS in your projects",
   "scripts": {
     "build": "concurrently \"yarn build:main\" \"yarn build:renderer\"",
@@ -108,15 +108,8 @@
     "url": "https://github.com/scanoss/scanoss-dt/issues"
   },
   "keywords": [
-    "electron",
-    "boilerplate",
-    "react",
-    "typescript",
-    "ts",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
+    "scanoss",
+    "opensource"
   ],
   "homepage": "https://github.com/scanoss/scanoss-dt#readme",
   "jest": {
