@@ -99,9 +99,12 @@ export class Querys {
   SQL_SELECT_ALL_INVENTORIES_ATTACHED_TO_COMPONENT =
     'SELECT i.id,i.usage,i.purl,i.notes,i.url,i.license_name from inventories i, component_versions cv where i.purl=cv.purl and i.version=cv.version and cv.purl=? and cv.version=?;';
 
-  // GET ALL THE INVENTORIES ATTACHED TO A FILE
+  // GET ALL THE INVENTORIES ATTACHED TO A FILE BY PATH
   SQL_SELECT_ALL_INVENTORIES_FROM_FILE =
     'SELECT i.id,i.usage,i.notes,i.purl,i.version,i.license_name,i.url FROM inventories i, file_inventories fi where i.id=fi.inventoryid and fi.path=?;';
+
+  SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID =
+    'SELECT fi.path as file FROM file_inventories fi INNER JOIN inventories i WHERE fi.inventoryid=i.id and i.id=?;';
 
   // SQL_GET_COMPONENTS TABLE
   SQL_GET_COMPONENT = 'SELECT id,name,version,description,url,purl from component_versions where purl like ?';

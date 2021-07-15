@@ -22,10 +22,10 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
     arg.id = created;
 
     const invById = await defaultWorkspace.scans_db.inventories.get({ id: 1 });
-     if (invById) console.log(invById);
+    //  if (invById) console.log(invById);
 
     const compById = await defaultWorkspace.scans_db.components.get({ id: 1 });
-    console.log(compById);
+    // console.log(compById);
 
     const inv = await defaultWorkspace.scans_db.inventories.getAll({});
     //  if (inv) console.log(inv);
@@ -41,21 +41,22 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
       purl: 'pkg:github/scanoss/scanner.c',
       version: '1.1.6',
     });
-    console.log(summary);
+    // console.log(summary);
 
     const a = await defaultWorkspace.scans_db.components.getAll({});
-  // console.log(a);
+    console.log(a);
+    console.log(JSON.stringify(a));
 
     const data = {
       version: '1.3.3',
       purl: 'pkg:github/scanoss/scanner.c',
     };
 
-    
+    const invPath = await defaultWorkspace.scans_db.inventories.getAttachedToFileBYId({ id: 3 });
+    console.log(invPath);
+
     const files = await defaultWorkspace.scans_db.files.get(data);
     // if (files) console.log(files);
-
-    
 
     // defaultWorkspace.attachInventory(arg);
     return { status: 'ok', message: created };

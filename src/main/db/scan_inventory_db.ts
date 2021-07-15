@@ -301,4 +301,26 @@ export class InventoryDb extends Db {
       }
     });
   }
+
+  // GET FILES ATTACHED TO AN INVENTORY BY INVENTORY ID
+  getAttachedToFileBYId(inventory: Partial<Inventory>) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.all(
+            query.SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID,
+            `${inventory.id}`,
+            (err: any, data: any) => {
+              db.close();
+              if (err) resolve([]);
+              else resolve(data);
+            }
+          );
+        });
+      } catch (error) {
+        reject(new Error('[]'));
+      }
+    });
+  }
 }

@@ -68,6 +68,7 @@ export class FilesDb extends Db {
     });
   }
 
+  // GET ALL FILES FOR A COMPONENT
   get(data: any) {
     return new Promise(async (resolve, reject) => {
       try {
