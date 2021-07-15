@@ -14,7 +14,7 @@ export class Dispatcher extends EventEmitter {
   #API_URL = 'https://osskb.org/api/scan/direct';
 
   // Level of concurrency
-  #CONCURRENCY_LIMIT = 10;
+  #CONCURRENCY_LIMIT = 3;
 
   // Timeout for each transaction
   #TIMEOUT = 90000;
