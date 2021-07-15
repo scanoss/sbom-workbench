@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Component } from '../../store';
+import React, { useState } from 'react';
 import Label from '../Label/Label';
 import Title from '../Title/Title';
 import componentDefault from '../../../../../assets/imgs/component-default.svg';
+import { Component } from '../../../../api/types';
 
 export const ComponentInfo = ({ component }: { component: Component }) => {
   const [over, setOver] = useState<boolean>(false);
@@ -46,25 +46,6 @@ export const ComponentInfo = ({ component }: { component: Component }) => {
           </div>
         ) : null}
       </div>
-
-      {/* <div>
-        <Label label="VENDOR" textColor="gray" />
-        <Title title={component?.vendor} />
-      </div>
-      <div>
-        <Label label="VERSION" textColor="gray" />
-        <Title title={component?.version} />
-      </div>
-      <div>
-        <Label label="LICENSE" textColor="gray" />
-        <Title
-          title={
-            component?.licenses && component.licenses[0]
-              ? component?.licenses[0].name
-              : '-'
-          }
-        />
-      </div> */}
     </div>
   );
 };

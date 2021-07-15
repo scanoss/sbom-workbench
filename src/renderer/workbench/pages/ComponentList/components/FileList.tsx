@@ -6,17 +6,12 @@ const MAX_FILES = 500;
 
 export interface FileListProps {
   files: any[];
-  scan: any;
   filter?: 'pending' | 'identified' | 'ignored';
   onSelectFile: (path: string) => void;
 }
 
-export const FileList = ({ files, scan, filter, onSelectFile }: FileListProps) => {
+export const FileList = ({ files, filter, onSelectFile }: FileListProps) => {
   const filteredFiles = files
-    .map((file) => ({
-      path: file,
-      status: scan[file][0]?.status ? scan[file][0].status : 'pending',
-    }))
     .filter((file) => !filter || file.status === filter);
 
   return (
@@ -24,8 +19,8 @@ export const FileList = ({ files, scan, filter, onSelectFile }: FileListProps) =
       <section className="file-list">
         {filteredFiles.length > 0
           ? filteredFiles.slice(0, MAX_FILES).map((file) => (
-              <article className="item" key={file.path} onClick={() => onSelectFile(file.path)}>
-                <MatchCard label={file.path} status={file.status} />
+              <article className="item" key={file.id} onClick={() => onSelectFile(file.file)}>
+                <MatchCard label={file.file} status={file.status} />
               </article>
             ))
           : null}

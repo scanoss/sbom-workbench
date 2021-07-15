@@ -1,4 +1,4 @@
-import { Component } from "./types";
+import { Component } from '../../api/types';
 
 export const LOAD_SCAN_SUCCESS = 'APP/WORKBENCH/LOAD_SCAN_SUCCESS';
 export const SET_COMPONENT = 'APP/WORKBENCH/SET_COMPONENT';

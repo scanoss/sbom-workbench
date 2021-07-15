@@ -1,5 +1,5 @@
 import { LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_FILE } from './actions';
-import { Component } from './types';
+import { Component } from '../../api/types';
 
 export interface State {
   scan: Record<string, any> | null;

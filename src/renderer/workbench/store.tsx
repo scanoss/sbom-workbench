@@ -36,9 +36,9 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     }
   };
 
-  const createInventory = async (inventory: Inventory) => {
-    const { status, message } = await inventoryService.create(inventory);
-    console.log(message);
+  const createInventory = async (inventory: Inventory): Inventory => {
+    const { status, data } = await inventoryService.create(inventory);
+    console.log(data);
 
 
     // TODO: remove when backend service is ready
@@ -52,7 +52,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       setComponent({ ...component, ...updateComponent });
     }
  */
-    return inventory;
+    return data;
   };
 
   return (

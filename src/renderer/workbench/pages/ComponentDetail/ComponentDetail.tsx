@@ -13,7 +13,9 @@ import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
 import { DialogContext } from '../../../context/DialogProvider';
 import { setFile } from '../../actions';
 import { inventoryService } from '../../../../api/inventory-service';
+import { componentService } from '../../../../api/component-service';
 import { useEffect } from 'react';
+import { mapFiles } from '../../../../utils/scan-util';
 
 export const ComponentDetail = () => {
   const history = useHistory();
@@ -22,22 +24,23 @@ export const ComponentDetail = () => {
   const { state, dispatch, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { inventoryBool, setInventoryBool } = useContext<any>(DialogContext);
 
-  const { component, scan } = state;
+  const { component } = state;
 
   const [files, setFiles] = useState<any[]>([]);
   const [inventories, setInventories] = useState<Inventory[]>([]);
   const [tab, setTab] = useState<number>(0);
 
   const getFiles = () => {
-    // const response = fileService.get({ compid: component.id });
-    // console.log('FILES BY COMP', response);
+/*    const response = componentService.getFiles({ compid: component.id });
+    console.log('FILES BY COMP', response);
+    setFiles(response.message || []);*/
 
-    const { files } = component;
-    setFiles(files);
+    setFiles(mapFiles([]));
   };
 
   const getInventories = async () => {
-    const response = await inventoryService.get({ purl: component.purl[0], version: component.version });
+    const response = await inventoryService
+      .get({ purl: component.purl, version: component.version });
     console.log('INVENTORIES BY COMP', response);
     setInventories(response.message || []);
   };
@@ -53,13 +56,14 @@ export const ComponentDetail = () => {
 
   const handleClose = async (inventory: Inventory) => {
     setInventoryBool(false);
-    const newInventory = {
+    let newInventory = {
       ...inventory,
-      files: component ? component.files : [],
+      files: files  || [],
     };
-    await createInventory(newInventory);
+    newInventory = await createInventory(newInventory);
 
     setInventories((previous) => [...previous, newInventory]);
+    getFiles();
     setTab(1);
   };
 
@@ -71,11 +75,11 @@ export const ComponentDetail = () => {
   const renderTab = () => {
     switch (tab) {
       case 0:
-        return <FileList files={files} scan={scan} filter="pending" onSelectFile={onSelectFile} />;
+        return <FileList files={files} filter="pending" onSelectFile={onSelectFile} />;
       case 1:
         return <InventoryList inventories={inventories} />;
       case 2:
-        return <FileList files={files} scan={scan} filter="ignored" onSelectFile={onSelectFile} />;
+        return <FileList files={files} filter="ignored" onSelectFile={onSelectFile} />;
       default:
         return 'no data';
     }
@@ -109,16 +113,16 @@ export const ComponentDetail = () => {
                   textColor="primary"
                   onChange={(event, value) => setTab(value)}
                 >
-                  <Tab label={`Pendings (${component?.count.pending})`} />
-                  <Tab label={`Identified (${component?.count.identified})`} />
-                  <Tab label={`Ignored (${component?.count.ignored})`} />
+                  <Tab label={`Pendings (${component?.summary.pending})`} />
+                  <Tab label={`Identified (${component?.summary.identified})`} />
+                  <Tab label={`Ignored (${component?.summary.ignored})`} />
                 </Tabs>
               </Paper>
             </div>
 
             {tab === 0 ? (
               <Button variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
-                Identify All ({component?.count.pending})
+                Identify All ({component?.summary.pending})
               </Button>
             ) : null}
           </section>

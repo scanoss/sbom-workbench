@@ -21,9 +21,6 @@ class WorkbenchController {
   public async loadScan(path: string): Promise<ScanResult> {
     const { data } = await projectService.load(path);
 
-    const response = await componentService.getAll({});
-    console.log('COMPONENTS', response);
-
     return this.generateScanResult(data);
   }
 
@@ -56,10 +53,12 @@ class WorkbenchController {
 
   private async generateScanResult(data): Promise<ScanResult> {
     const scan = data.results;
+    const response = await componentService.getAll({});
+    console.log('COMPONENTS', response.data);
     return {
       scan,
       fileTree: [data.logical_tree],
-      components: scanUtil.getComponents(scan),
+      components: response.data,
     };
   }
 }

@@ -82,7 +82,7 @@ export const ComponentList = () => {
           {components && filterItems && filterItems.length > 0 ? (
             <section className="component-list">
               {filterItems.map((component) => (
-                <ComponentCard key={component.name} component={component} onClick={onSelectComponent} />
+                <ComponentCard key={component.compid} component={component} onClick={onSelectComponent} />
               ))}
             </section>
           ) : (

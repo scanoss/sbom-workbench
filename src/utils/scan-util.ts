@@ -1,6 +1,18 @@
 /* eslint-disable no-restricted-syntax */
-import { fileURLToPath } from 'url';
 import { Inventory } from '../api/types';
+
+export function mapFiles(files: any[]): any[] {
+  const getStatus = (file) =>
+    file.ignored === 1
+      ? 'ignored'
+      : file.identified === 1 ? 'identified' : 'pending';
+
+  return files
+    .map((file) => ({
+      ...file,
+      status: getStatus(file),
+    }))
+}
 
 export function generateFileTree(scan: Record<string, unknown>): Promise<any> {
   return new Promise((resolve) => {
@@ -104,4 +116,5 @@ export function updateTree(scan, inventory: Inventory) {
 export default {
   generateFileTree,
   updateTree,
+  mapFiles,
 };
