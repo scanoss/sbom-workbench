@@ -4,7 +4,7 @@ import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (event, arg: Component) => {
-  const data = await defaultProject.scans_db.components.getAll(arg);
+  const data = await defaultProject.scans_db.components.getAll(arg);  
   return { status: 'ok', message: 'Components retrieved successfully', data };
 });
 

@@ -43,8 +43,8 @@ export class ResultsDb extends Db {
     }
   }
 
-   // INSERT RESULTS FROM FILE
-   async insertFromJSON(json: string) {
+  // INSERT RESULTS FROM FILE
+  async insertFromJSON(json: string) {
     try {
       const db = await this.openDb();
       let data: any;
@@ -66,7 +66,8 @@ export class ResultsDb extends Db {
     return new Promise(async (resolve) => {
       const stmt = db.prepare(query.SQL_INSERT_RESULTS);
       db.serialize(function () {
-        const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : 'n/a';
+        const licenseName =
+          data.licenses && data.licenses[0] ? data.licenses[0].name : 'n/a';
         stmt.run(
           data.file_hash,
           data.vendor,
@@ -112,13 +113,17 @@ export class ResultsDb extends Db {
   private async getResult(path: string) {
     const db = await this.openDb();
     return new Promise<any>(async (resolve, reject) => {
-      db.all(query.SQL_SCAN_SELECT_FILE_RESULTS, `%${path}`, (err: any, data: any) => {
-        if (data === !null) {
-          resolve(data);
-        } else {
-          reject(err);
+      db.all(
+        query.SQL_SCAN_SELECT_FILE_RESULTS,
+        `%${path}`,
+        (err: any, data: any) => {
+          if (data === !null) {
+            resolve(data);
+          } else {
+            reject(err);
+          }
         }
-      });
+      );
     });
   }
 
@@ -145,17 +150,24 @@ export class ResultsDb extends Db {
           pending: 0,
         };
         const db = await this.openDb();
-        db.all(query.SQL_COMP_SUMMARY, data.purl, data.version, async (err: any, comp: any) => {
-          db.close();
-          if (!err) {
-            for (let i = 0; i < comp.length; i += 1) {
-              if (comp[i].identified === 1) summary.identified = +1;
-              if (comp[i].ignored === 1) summary.ignored = +1;
-              if (comp[i].ignored === 0 && comp[i].identified === 0) summary.pending = +1;
+        db.all(
+          query.SQL_COMP_SUMMARY,
+          data.purl,
+          data.version,
+          async (err: any, comp: any) => {
+            db.close();
+            if (!err) {
+              for (let i = 0; i < comp.length; i += 1) {
+                if (comp[i].identified === 1) summary.identified += 1;
+                if (comp[i].ignored === 1) summary.ignored += 1;
+                if (comp[i].ignored === 0 && comp[i].identified === 0)
+                  summary.pending += 1;
+              }
             }
+
+            resolve(summary);
           }
-          resolve(summary);
-        });
+        );
       } catch (error) {
         reject(error);
       }

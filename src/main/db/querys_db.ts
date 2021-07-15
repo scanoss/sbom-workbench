@@ -142,5 +142,5 @@ export class Querys {
   SQL_UPDATE_IGNORED_FILES = 'UPDATE files set ignored=1 where path=?;';
 
   SQL_COMP_SUMMARY =
-    'SELECT f.identified as identified ,f.ignored as ignored FROM files f inner join results r where r.md5_file=f.md5 and r.purl=? and r.version=?;';
+    'SELECT f.identified AS identified ,f.ignored as ignored FROM files f INNER JOIN results r WHERE r.md5_file=f.md5 AND r.purl=? AND r.version=?;';
 }

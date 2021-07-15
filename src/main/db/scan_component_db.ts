@@ -10,6 +10,7 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { Component } from '../../api/types';
+import {ResultsDb} from  './scan_results_db';
 
 interface Summary {
   identified: number;
@@ -21,8 +22,12 @@ const utilsDb = new UtilsDb();
 const query = new Querys();
 
 export class ComponentDb extends Db {
+
+  results:ResultsDb;
+
   constructor(path: string) {
     super(path);
+    this.results=new ResultsDb(path);
   }
 
   get(component: Partial<Component> ) {
@@ -68,6 +73,8 @@ export class ComponentDb extends Db {
           for (let i = 0; i < component.length; i += 1) {
            
             const licenses = await self.getAllLicensesFromComponentId(component[i].compid);
+            const summary = await this.results.summary(component[i]);
+            component[i].summary=summary;
             component[i].licenses = licenses;
           }
           resolve(component);
@@ -90,6 +97,8 @@ export class ComponentDb extends Db {
           db.close();
           if (err) resolve(undefined);
           const licenses = await self.getAllLicensesFromComponentId(component.compid);
+          const summary = await this.results.summary(component);
+          component.summary=summary;
           component.licenses = licenses;
           resolve(component);
         });
