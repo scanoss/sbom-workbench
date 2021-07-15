@@ -88,6 +88,10 @@ export class Scanner extends EventEmitter {
     await this.#winnower.startMachine(this.#scannable, this.#wfpDestPath);
   }
 
+  setResultsPath(path) {
+    this.#resultFilePath = `${path}/results.json`;
+  }
+
   // Public Methods
   async scanFileTree(fileTreeDescriptor) {
     this.#scannable = new ScannableTree(fileTreeDescriptor);
@@ -104,5 +108,4 @@ export class Scanner extends EventEmitter {
     this.#dispatcher.stop();
     this.#tmpResult = {};
   }
-
 }

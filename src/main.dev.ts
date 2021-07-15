@@ -25,6 +25,9 @@ import { ScanDb } from './main/db/scan_db';
 
 import { Scanner } from './main/scannerLib/Scanner';
 import { SCANNER_EVENTS } from './main/scannerLib/ScannerEvents';
+import { fstat } from 'fs';
+const basepath = require('path');
+const fs = require('fs');
 
 export default class AppUpdater {
   constructor() {
@@ -151,34 +154,19 @@ export interface IInitScan {
 }
 
 let ws: Workspace;
+
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   ws = new Workspace();
   const scanner = new Scanner();
 
   const { path } = arg;
-
   let created: any;
-  let p: Project = {
-    work_root: '/tmp/', // '/home/oscar/test',
-    default_licenses: '/home/oscar/test/licenses.json',
-  };
 
-  try {
-      ws.scans_db = new ScanDb(p.work_root);  
-    const init = await ws.scans_db.init();
-    if (p.default_licenses !== undefined)
-      // await ws.scans_db.licenses.importFromFile(p.default_licenses);
-      /* if (p.default_components !== undefined)
-      defaultWorkspace.scans_db.components.importFromFile(p.default_components);
-    */
-      console.log(`Open db ${init}`);
-  } catch (e) {
-    console.log('Catch an error on creating a project: ', e);
-  }
-
+  ws.newProject(path);
+  ws.projectsList.prepare_scan();
+  scanner.setResultsPath(ws.projectsList.work_root);
   console.log(`SCANNER: Start scanning path=${path}`);
-  ws.set_scan_root(`${path}`);
-  ws.prepare_scan();
+  scanner.setResultsPath(ws.projectsList.work_root);
   scanner.scanFolder(path);
 
   scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
@@ -199,17 +187,24 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
 
   scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
     console.log(`New ${fileNumbers} files scanned`);
-    await ws.scans_db.components.importUniqueFromJSON(data);
-    await ws.scans_db.results.insertFromJSON(data);
-    await ws.scans_db.files.insertFromJSON(data);
+    await ws.projectsList.scans_db.components.importUniqueFromJSON(data);
+    await ws.projectsList.scans_db.results.insertFromJSON(data);
+    await ws.projectsList.scans_db.files.insertFromJSON(data);
   });
 
   scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
     console.log(`Scan Finished... Results on: ${resultsPath}`);
+
+    /**
+     * just because JSON is not accesible directly
+     */
+    let a = fs.readFileSync(`${resultsPath}`, 'utf8');
+    ws.projectsList.results = JSON.parse(a);
     event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
       success: true,
-      resultsPath,
+      resultsPath: ws.projectsList.work_root,
     });
+    ws.projectsList.saveScanProject();
   });
 
   scanner.on('error', () => {
@@ -217,7 +212,3 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
     console.log('Scanner Error. Stoping....');
   });
 });
-
-/* ipcMain.on(IpcEvents.ITEM_INCLUDE, (event, arg: ItemExclude) => {
-  ws.exclude_file(arg.path, arg.recursive);
-}); */
