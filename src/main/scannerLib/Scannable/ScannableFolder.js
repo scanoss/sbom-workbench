@@ -1,8 +1,11 @@
 import path from 'path';
 import fs from 'fs';
 
+import { isBinaryFileSync } from 'isbinaryfile';
 import { AbstractScannable } from './AbstractScannable.js';
 import { ScannableItem } from './ScannableItem.js';
+
+// const isBinaryFile = require("isbinaryfile").isBinaryFile;
 
 const FILTERED_EXT = [
   '.1',
@@ -145,8 +148,13 @@ export class ScannableFolder extends AbstractScannable {
     // eslint-disable-next-line no-restricted-syntax
     for await (const d of await fs.promises.opendir(dir)) {
       const entry = path.join(dir, d.name);
-      if (d.isDirectory() && !d.isSymbolicLink() && !this.#is_filtered_dir(entry)) yield* this.#walk(entry);
-      else if (d.isFile() && !d.isSymbolicLink() && !FILTERED_EXT.includes(path.extname(entry))) {
+      if (d.isDirectory() && !d.isSymbolicLink() && !this.#isFilteredDir(entry)) yield* this.#walk(entry);
+      else if (
+        d.isFile() &&
+        !d.isSymbolicLink() &&
+        !FILTERED_EXT.includes(path.extname(entry)) &&
+        !this.#isBinary(entry)
+      ) {
         const fileContent = await fs.promises.readFile(entry);
         yield new ScannableItem(entry.replace(this.#folderPath, ''), fileContent);
       }
@@ -165,20 +173,21 @@ export class ScannableFolder extends AbstractScannable {
 
   prepare() {
     this.#generator = this.#walk(this.#folderPath);
-
-    // Prepare the FILTERED_DIRS with the specific OS path separator
-    const pathSeparator = path.sep;
-    for (let i = 0; i < FILTERED_DIRS.length; i += 1) {
-      FILTERED_DIRS[i] = pathSeparator + FILTERED_DIRS[i];
-    }
   }
 
-  #is_filtered_dir(dir) {
+  #isFilteredDir(dir) {
     for (let i = 0; i < FILTERED_DIRS.length; i += 1) {
       if (dir.includes(FILTERED_DIRS[i])) {
         return true;
       }
     }
     return false;
+  }
+
+  #isBinary(filePath) {
+    const bytes = fs.readFileSync(filePath);
+    const statsObj = fs.lstatSync(filePath);
+    const binary = isBinaryFileSync(bytes, statsObj.size);
+    return binary;
   }
 }
