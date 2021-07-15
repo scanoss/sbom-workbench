@@ -30,17 +30,15 @@ export const ComponentDetail = () => {
   const [inventories, setInventories] = useState<Inventory[]>([]);
   const [tab, setTab] = useState<number>(0);
 
-  const getFiles = () => {
-/*    const response = componentService.getFiles({ compid: component.id });
+  const getFiles = async () => {
+    const response = await componentService.getFiles( { purl: component.purl, version: component.version });
     console.log('FILES BY COMP', response);
-    setFiles(response.message || []);*/
-
-    setFiles(mapFiles([]));
+    setFiles(mapFiles(response.data));
   };
 
   const getInventories = async () => {
     const response = await inventoryService
-      .get({ purl: component.purl, version: component.version });
+      .getAll({ purl: component.purl, version: component.version });
     console.log('INVENTORIES BY COMP', response);
     setInventories(response.message || []);
   };
