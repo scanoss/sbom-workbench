@@ -104,7 +104,7 @@ export class Querys {
     'SELECT i.id,i.usage,i.notes,i.purl,i.version,i.license_name,i.url FROM inventories i, file_inventories fi where i.id=fi.inventoryid and fi.path=?;';
 
   SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID =
-  'SELECT DISTINCT i.id,f.path as file,f.identified as identified,f.ignored as ignored,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN files f ON f.path=fi.path INNER JOIN results r on r.md5_file=f.md5 WHERE i.id=?';
+  'SELECT DISTINCT i.id,f.path as path,f.identified as identified,f.ignored as ignored,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN files f ON f.path=fi.path INNER JOIN results r on r.md5_file=f.md5 WHERE i.id=?';
 
   // SQL_GET_COMPONENTS TABLE
   SQL_GET_COMPONENT = 'SELECT id,name,version,description,url,purl from component_versions where purl like ?';
