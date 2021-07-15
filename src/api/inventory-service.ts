@@ -4,10 +4,15 @@ import { Inventory } from './types';
 const { ipcRenderer } = require('electron');
 
 class InventoryService {
-  public async get(args: Partial<Inventory>): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_GET, args);
+  public async getAll(args: Partial<Inventory>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_GET_ALL, args);
     return response;
   }
+
+    public async get(args: Partial<Inventory>): Promise<any> {
+      const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_GET, args);
+      return response;
+    }
 
   public async create(inventory: Inventory): Promise<any> {
     const response = await ipcRenderer.invoke(
@@ -16,6 +21,10 @@ class InventoryService {
     );
     return response;
   }
+
+
 }
+
+
 
 export const inventoryService = new InventoryService();

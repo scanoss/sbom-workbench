@@ -8,6 +8,8 @@ import { Dvr } from '@material-ui/icons';
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
+import { Component } from '../../api/types';
+
 
 const query = new Querys();
 const utilsDb = new UtilsDb();
@@ -69,7 +71,7 @@ export class FilesDb extends Db {
   }
 
   // GET ALL FILES FOR A COMPONENT
-  get(data: any) {
+  getFilesComponent(data: Partial<Component>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();

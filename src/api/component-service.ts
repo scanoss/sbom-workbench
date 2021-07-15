@@ -53,6 +53,14 @@ class ComponentService {
     );
     return response;
   }
+
+  public async getFiles(component: Partial<Component>): Promise<any> {
+    const response = await ipcRenderer.invoke(
+      IpcEvents.COMPONENT_GET_FILES,
+      component
+    );
+    return response;
+  }
 }
 
 export const componentService = new ComponentService();

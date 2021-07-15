@@ -90,7 +90,9 @@ export class InventoryDb extends Db {
         if (inventory.id) {
           const inventories: any = await this.getById(inventory);
           const comp = await this.component.getAll(inventories);
+          const files = await this.getAttachedToFileBYId(inventories);
           inventories.component = comp;
+          inventories.files=files;
           // Remove purl and version from inventory
           delete inventories.purl;
           delete inventories.version;
