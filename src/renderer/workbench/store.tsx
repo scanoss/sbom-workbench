@@ -6,7 +6,7 @@ import { inventoryService } from '../../api/inventory-service';
 import * as scanUtil from '../../utils/scan-util';
 import { componentService } from '../../api/component-service';
 import reducer, { initialState, State } from './reducers';
-import { loadScanSuccess } from './actions';
+import { loadScanSuccess, setComponent } from './actions';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
@@ -19,14 +19,15 @@ export interface IWorkbenchContext {
 export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(null);
 
 export const WorkbenchProvider: React.FC = ({ children }) => {
-  const { scanBasePath } = React.useContext<any>(AppContext);
+  const { setScanBasePath } = React.useContext<any>(AppContext);
   const [state, dispatch] = React.useReducer(reducer, initialState);
-  const { scan, file } = state;
+  const { scan, tree, file, component } = state;
 
   const loadScan = async (path: string) => {
     try {
-      const { scan, fileTree, components } = await workbenchController.loadScan(path);
+      const { scan, fileTree, components, scanRoot } = await workbenchController.loadScan(path);
       dispatch(loadScanSuccess(scan, fileTree, components));
+      setScanBasePath(scanRoot);
 
       // const { status, data } = await componentService.get({});
       return true;
@@ -36,22 +37,18 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     }
   };
 
-  const createInventory = async (inventory: Inventory): Inventory => {
+  const createInventory = async (inventory: Inventory): Promise<Inventory> => {
     const { status, data } = await inventoryService.create(inventory);
-    console.log(data);
-
-
-    // TODO: remove when backend service is ready
-    const updateScan = scanUtil.updateTree(scan, inventory);
-   /*  setScan({ ...scan, ...updateScan });
-    const updateComponents = scanUtil.getComponents(scan);
-    setComponents(updateComponents);
+    const components = await workbenchController.getComponents();
     if (component) {
-      const updateComponent = updateComponents.find((c) => c.name === component.name);
-      updateComponent.inventories = [...updateComponent.inventories, inventory];
-      setComponent({ ...component, ...updateComponent });
+      const updateComponent = components.find((com) =>
+        component.purl == com.purl && component.version == com.version
+      );
+      dispatch(setComponent(updateComponent));
     }
- */
+
+    dispatch(loadScanSuccess(scan, tree, components)); //TODO: Create action
+
     return data;
   };
 

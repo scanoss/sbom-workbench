@@ -28,7 +28,7 @@ export const ComponentDetail = () => {
 
   const [files, setFiles] = useState<any[]>([]);
   const [inventories, setInventories] = useState<Inventory[]>([]);
-  const [tab, setTab] = useState<number>(0);
+  const [tab, setTab] = useState<number>(component?.summary.pending !== 0 ? 0 : 1);
 
   const getFiles = async () => {
     const response = await componentService.getFiles( { purl: component.purl, version: component.version });
@@ -54,11 +54,14 @@ export const ComponentDetail = () => {
 
   const handleClose = async (inventory: Inventory) => {
     setInventoryBool(false);
-    let newInventory = {
+    const aFiles = files
+      .filter( file => file.status === 'pending')
+      .map( file => file.path);
+
+    const  newInventory = await createInventory({
       ...inventory,
-      files: files  || [],
-    };
-    newInventory = await createInventory(newInventory);
+      files: aFiles
+    });
 
     setInventories((previous) => [...previous, newInventory]);
     getFiles();
@@ -119,7 +122,9 @@ export const ComponentDetail = () => {
             </div>
 
             {tab === 0 ? (
-              <Button variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
+              <Button
+                disabled={component?.summary.pending === 0}
+                variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
                 Identify All ({component?.summary.pending})
               </Button>
             ) : null}

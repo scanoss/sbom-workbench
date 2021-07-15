@@ -18,7 +18,7 @@ const Workbench = () => {
   const { path, url } = useRouteMatch();
 
   const { state, dispatch, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const { scanPath, scanBasePath } = useContext(AppContext) as IAppContext;
+  const { scanPath } = useContext(AppContext) as IAppContext;
 
   const { file } = state;
 

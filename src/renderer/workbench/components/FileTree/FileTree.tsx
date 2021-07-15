@@ -29,6 +29,7 @@ export const FileTree = () => {
         expanded={expanded}
         onClick={(targetNode) => onSelectFile(targetNode)}
         expandOnClick
+        onlyLeafCheckboxes
         onCheck={(checkedItems) => setChecked(checkedItems)}
         onExpand={(expandedItems) => setExpanded(expandedItems)}
       />

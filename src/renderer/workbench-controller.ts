@@ -1,11 +1,12 @@
-import * as scanUtil from '../utils/scan-util';
 import { projectService } from '../api/project-service';
 import { componentService } from '../api/component-service';
+import { Component } from '../api/types';
 
 const fs = require('original-fs').promises;
 
 export interface ScanResult {
   scan: Record<string, unknown>;
+  scanRoot: string;
   fileTree: any[];
   components: any[];
 }
@@ -20,6 +21,7 @@ class WorkbenchController {
    */
   public async loadScan(path: string): Promise<ScanResult> {
     const { data } = await projectService.load(path);
+    console.log(data);
 
     return this.generateScanResult(data);
   }
@@ -51,14 +53,20 @@ class WorkbenchController {
     return response.text();
   }
 
-  private async generateScanResult(data): Promise<ScanResult> {
-    const scan = data.results;
+  public async getComponents(): Promise<Component[]> {
     const response = await componentService.getAll({});
     console.log('COMPONENTS', response.data);
+    return response.data;
+  }
+
+  private async generateScanResult(data): Promise<ScanResult> {
+    const scan = data.results;
+    const components = await this.getComponents();
     return {
       scan,
+      scanRoot: data.scan_root,
       fileTree: [data.logical_tree],
-      components: response.data,
+      components,
     };
   }
 }
