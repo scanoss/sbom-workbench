@@ -9,6 +9,11 @@ class ComponentService {
     return response;
   }
 
+  public async getAll(args: Partial<Component>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_ALL, args);
+    return response;
+  }
+
   public async create(component: Component): Promise<any> {
     const response = await ipcRenderer.invoke(
       IpcEvents.COMPONENT_CREATE,

@@ -1,11 +1,12 @@
 import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import ComponentCard from '../../components/ComponentCard/ComponentCard';
 import { setComponent } from '../../actions';
+import { componentService } from '../../../../api/component-service';
 
 const filter = (items, query) => {
   if (!items) {

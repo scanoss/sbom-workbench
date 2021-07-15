@@ -78,7 +78,6 @@ export class ProjectTree extends EventEmitter {
     this.scan_root = a.scan_root;
     this.scans_db = new ScanDb(rootOfProject);
     this.scans_db.init();
-    console.log(a);
   }
 
   saveScanProject() {

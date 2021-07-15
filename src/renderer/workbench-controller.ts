@@ -1,5 +1,6 @@
 import * as scanUtil from '../utils/scan-util';
 import { projectService } from '../api/project-service';
+import { componentService } from '../api/component-service';
 
 const fs = require('original-fs').promises;
 
@@ -19,6 +20,10 @@ class WorkbenchController {
    */
   public async loadScan(path: string): Promise<ScanResult> {
     const { data } = await projectService.load(path);
+
+    const response = await componentService.getAll({});
+    console.log('COMPONENTS', response);
+
     return this.generateScanResult(data);
   }
 

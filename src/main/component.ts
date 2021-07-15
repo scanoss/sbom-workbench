@@ -3,10 +3,9 @@ import { Component, License } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
 
-ipcMain.handle(IpcEvents.COMPONENT_GET, async (event, arg: Component) => {
-  const a = await defaultProject.scans_db.components.getAll(arg);
-  console.log('pidieron componentes');
-  return { status: 'ok', message: a };
+ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (event, arg: Component) => {
+  const data = await defaultProject.scans_db.components.getAll(arg);
+  return { status: 'ok', message: 'Components retrieved successfully', data };
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, arg: Component) => {
