@@ -51,10 +51,9 @@ const Home = () => {
 
     if (!projectPath) return;
 
-    await controller.open(projectPath);
-    // setScanBasePath(projectPath);
-    // setPath(projectPath);
-    // showScan(args.resultsPath);
+    //await controller.open(projectPath);
+    setScanBasePath(projectPath);
+    showScan(projectPath);
   };
 
   const onOpenFilePressed = () => {

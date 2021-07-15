@@ -201,7 +201,7 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
     ws.projectsList.results = JSON.parse(a);
     event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
       success: true,
-      resultsPath,
+      resultsPath: ws.projectsList.work_root,
     });
     ws.projectsList.saveScanProject();
   });
