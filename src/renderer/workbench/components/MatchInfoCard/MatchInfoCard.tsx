@@ -6,9 +6,10 @@ import componentDefault from '../../../../../assets/imgs/component-default.svg';
 
 interface MatchInfoCardProps {
   match: Record<string, any>;
+  changeLines: () => void;
 }
 
-const MatchInfoCard = ({ match }: MatchInfoCardProps) => {
+const MatchInfoCard = ({ match, changeLines }: MatchInfoCardProps) => {
   useEffect(() => {
     console.table(match);
   }, []);
@@ -18,14 +19,22 @@ const MatchInfoCard = ({ match }: MatchInfoCardProps) => {
   };
 
   return (
-    <div className={`match-info-card status-${match.status || 'pending'}`}>
+    <div onClick={changeLines} className={`match-info-card status-${match.status || 'pending'}`}>
       <div className="match-info-card-content">
         <div className="label-info-div">
           <img alt="component logo" className="logo-match-info-card" src={componentDefault} />
           <span className="component-span">{match.component}</span>
           <span className="version-span">{match.version}</span>
           <div className="usage-div">
-            <span className="usage-label">USAGE</span>
+            {match.status === 'pending' ? (
+              <>
+                <span className="usage-label">USAGE</span>
+              </>
+            ) : (
+              <>
+                <span className="usage-label">DETECTED</span>
+              </>
+            )}
             <span className="usage-id">Snippet</span>
           </div>
         </div>

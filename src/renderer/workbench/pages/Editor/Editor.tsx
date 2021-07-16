@@ -4,6 +4,7 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory } from 'react-router-dom';
+import { match } from 'assert';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 import { DialogContext } from '../../../context/DialogProvider';
 import Label from '../../components/Label/Label';
@@ -106,7 +107,7 @@ export const Editor = () => {
   // TODO: render all matches
   useEffect(() => {
     if (matchInfo) {
-      setCurrentMatch(matchInfo[0]);
+      setCurrentMatch(matchInfo[1]);
     } else {
       setCurrentMatch(null);
     }
@@ -128,7 +129,14 @@ export const Editor = () => {
                 <section className="content">
                   <div className="match-info-default-container">
                     {matchInfo.map((match, index) => (
-                      <MatchInfoCard match={match} onClickCheck={() => setInventoryBool(true)} key={index} />
+                      <MatchInfoCard
+                        changeLines={() => {
+                          setCurrentMatch(matchInfo[index]);
+                        }}
+                        match={match}
+                        onClickCheck={() => setInventoryBool(true)}
+                        key={index}
+                      />
                     ))}
                   </div>
                   <div className="match-info-identified-container">
