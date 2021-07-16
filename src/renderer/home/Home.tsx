@@ -11,7 +11,7 @@ import { IpcEvents } from '../../ipc-events';
 const Home = () => {
   const history = useHistory();
 
-  const { scanPath, setScanPath, setScanBasePath } = useContext<any>(AppContext);
+  const { scanPath, setScanPath } = useContext<any>(AppContext);
 
   const [progress, setProgress] = useState<number>(0);
   const [path, setPath] = useState<string | null>(null);
@@ -30,7 +30,6 @@ const Home = () => {
     const projectPath = dialogController.showOpenDialog({
       properties: ['openDirectory'],
     });
-    setScanBasePath(projectPath);
     setPath(projectPath);
     controller.scan(projectPath);
 
@@ -48,20 +47,15 @@ const Home = () => {
     const projectPath = dialogController.showOpenDialog({
       properties: ['openDirectory'],
     });
-
     if (!projectPath) return;
 
-    await controller.open(projectPath);
-    // setScanBasePath(projectPath);
-    // setPath(projectPath);
-    // showScan(args.resultsPath);
+    showScan(projectPath);
   };
 
   const onOpenFilePressed = () => {
     const projectPath = dialogController.showOpenDialog({
       properties: ['openFile'],
     });
-    setScanBasePath(projectPath);
     setPath(projectPath);
     showScan(projectPath);
   };
@@ -78,10 +72,6 @@ const Home = () => {
 
         <button className="bnt-primary" type="button" onClick={() => onOpenProjectPressed()} disabled={!!path}>
           LOAD PROJECT
-        </button>
-
-        <button className="bnt-primary" type="button" onClick={() => onOpenFilePressed()} disabled={!!path}>
-          LOAD JSON FILE
         </button>
       </div>
       <div className="progressbar">{path ? <LinearProgress /> : null}</div>

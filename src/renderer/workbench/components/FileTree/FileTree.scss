@@ -1,5 +1,21 @@
 .file-tree-container {
-  .match {
+  color: #3F3F46;
+  font-weight: 400;
+
+  .rct-node {
+    margin: 5px 0;
+  }
+
+  .rct-node-icon {
+    color: #3F3F46;
+  }
+
+  .match-info-result {
     font-weight: 600;
+    color: #27272A;
+
+    .rct-node-icon {
+      color: #27272A;
+    }
   }
 }

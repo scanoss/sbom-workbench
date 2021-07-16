@@ -12,7 +12,7 @@ export const FileTree = () => {
   const { tree, file } = state;
 
   const [checked, setChecked] = useState<string[]>([]);
-  const [expanded, setExpanded] = useState<string[]>(['/']);
+  const [expanded, setExpanded] = useState<string[]>([tree ? tree[0].value : '']);
 
   const onSelectFile = ({ children, value }: OnCheckNode) => {
     if (!children) {

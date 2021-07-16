@@ -1,11 +1,16 @@
-import * as scanUtil from '../utils/scan-util';
+import { projectService } from '../api/project-service';
+import { componentService } from '../api/component-service';
+import { Component } from '../api/types';
+import { sortComponents, transform } from '../utils/scan-util';
+import { IpcEvents } from '../ipc-events';
+import { ipcRenderer } from 'electron';
 
 const fs = require('original-fs').promises;
 
 export interface ScanResult {
   scan: Record<string, unknown>;
-  fileTree: [];
-  components: any[];
+  scanRoot: string;
+  fileTree: any[];
 }
 
 class WorkbenchController {
@@ -17,11 +22,10 @@ class WorkbenchController {
    * @memberof WorkbenchController
    */
   public async loadScan(path: string): Promise<ScanResult> {
-    const data = await fs.readFile(path, 'utf-8');
-    return this.generateScanResult(data);
+    const { data } = await projectService.load(path);
+    console.log(data);
 
-    // const { status, data } = await projectService.load();
-    // data.tree;
+    return this.generateScanResult(data);
   }
 
   /**
@@ -32,8 +36,8 @@ class WorkbenchController {
    * @memberof WorkbenchController
    */
   public async fetchLocalFile(path: string): Promise<string> {
-    const data = await fs.readFile(path, 'utf-8');
-    return data;
+    const { data } = await ipcRenderer.invoke(IpcEvents.FILE_GET_CONTENT, path);
+    return data.content;
   }
 
   /**
@@ -51,13 +55,28 @@ class WorkbenchController {
     return response.text();
   }
 
-  private async generateScanResult(data: string): Promise<ScanResult> {
-    const scan = JSON.parse(data);
+  public async getComponents(): Promise<Component[]> {
+    const { data } = await componentService.getAll({});
+    // console.log('COMPONENTS', data);
+    sortComponents(data)
+    return data;
+  }
 
+  public async getComponent(id: number): Promise<Component> {
+    const response = await componentService.get({compid: id});
+    console.log('COMPONENT', response.data);
+    return response.data;
+  }
+
+  private async generateScanResult(data): Promise<ScanResult> {
+    const scan = data.results;
+    const tree = [data.logical_tree];
+    transform(tree, scan);
+    console.log(tree);
     return {
       scan,
-      fileTree: await scanUtil.generateFileTree(scan),
-      components: scanUtil.getComponents(scan),
+      scanRoot: data.scan_root,
+      fileTree: tree,
     };
   }
 }

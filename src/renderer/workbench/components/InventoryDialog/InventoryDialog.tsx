@@ -12,9 +12,8 @@ import {
   IconButton,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
-import React, { useState, useEffect } from 'react';
-import { Inventory } from '../../../../api/types';
-import { Component } from '../../types';
+import React, { useState } from 'react';
+import { Component, Inventory } from '../../../../api/types';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -52,7 +51,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     version: component.version,
     license_name: component.licenses[0] ? component.licenses[0].name : '',
     url: component.url,
-    purl: component.purl[0],
+    purl: component.purl,
     usage: 'file',
     notes: '',
   });

@@ -1,5 +1,5 @@
-import { LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_FILE } from './actions';
-import { Component } from './types';
+import { LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_COMPONENTS, SET_FILE } from './actions';
+import { Component } from '../../api/types';
 
 export interface State {
   scan: Record<string, any> | null;
@@ -30,8 +30,16 @@ export default function reducer(state: State = initialState, action): State {
         components,
       };
     }
+    case SET_COMPONENTS: {
+      const { components } = action;
+      return {
+        ...state,
+        components,
+      };
+    }
     case SET_COMPONENT: {
       const { component } = action;
+      console.log(component);
       return {
         ...state,
         component,
@@ -42,11 +50,8 @@ export default function reducer(state: State = initialState, action): State {
       const { file } = action;
 
       let matchInfo = null;
-      console.log(scan);
-
-      if (scan && file && scan[file][0].id !== 'none') {
+      if (scan && file && scan[file] && scan[file][0].id !== 'none') {
         matchInfo = scan[file];
-        console.log(matchInfo);
       }
 
       return {

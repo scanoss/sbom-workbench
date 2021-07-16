@@ -9,6 +9,11 @@ class ComponentService {
     return response;
   }
 
+  public async getAll(args: Partial<Component>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_ALL, args);
+    return response;
+  }
+
   public async create(component: Component): Promise<any> {
     const response = await ipcRenderer.invoke(
       IpcEvents.COMPONENT_CREATE,
@@ -17,7 +22,7 @@ class ComponentService {
     return response;
   }
 
-  public async delete(component: Component): Promise<any> {
+  public async delete(component: Partial<Component>): Promise<any> {
     const response = await ipcRenderer.invoke(
       IpcEvents.COMPONENT_DELETE,
       component
@@ -26,8 +31,8 @@ class ComponentService {
   }
 
   public async attachLicense(
-    component: Component,
-    license: License
+    component: Partial<Component>,
+    license: Partial<License>
   ): Promise<any> {
     const response = await ipcRenderer.invoke(
       IpcEvents.COMPONENT_ATTACH_LICENSE,
@@ -45,6 +50,14 @@ class ComponentService {
       IpcEvents.COMPONENT_DETACH_LICENSE,
       component,
       license
+    );
+    return response;
+  }
+
+  public async getFiles(component: Partial<Component>): Promise<any> {
+    const response = await ipcRenderer.invoke(
+      IpcEvents.COMPONENT_GET_FILES,
+      component
     );
     return response;
   }

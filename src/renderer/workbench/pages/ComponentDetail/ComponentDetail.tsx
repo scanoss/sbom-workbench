@@ -13,55 +13,83 @@ import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
 import { DialogContext } from '../../../context/DialogProvider';
 import { setFile } from '../../actions';
 import { inventoryService } from '../../../../api/inventory-service';
+import { componentService } from '../../../../api/component-service';
 import { useEffect } from 'react';
+import { mapFiles } from '../../../../utils/scan-util';
+import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
 
 export const ComponentDetail = () => {
   const history = useHistory();
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { state, dispatch, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, createInventory, ignoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { inventoryBool, setInventoryBool } = useContext<any>(DialogContext);
 
-  const { component, scan } = state;
+  const { component } = state;
 
   const [files, setFiles] = useState<any[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [inventories, setInventories] = useState<Inventory[]>([]);
-  const [tab, setTab] = useState<number>(0);
+  const [tab, setTab] = useState<number>(component?.summary.pending !== 0 ? 0 : 1);
 
-  const getFiles = () => {
-    // const response = fileService.get({ compid: component.id });
-    // console.log('FILES BY COMP', response);
-
-    const { files } = component;
-    setFiles(files);
+  const getFiles = async () => {
+    const response = await componentService.getFiles( { purl: component.purl, version: component.version });
+    console.log('FILES BY COMP', response);
+    setFiles(mapFiles(response.data));
   };
 
   const getInventories = async () => {
-    const response = await inventoryService.get({ purl: component.purl[0], version: component.version });
+    const response = await inventoryService
+      .getAll({ purl: component.purl, version: component.version });
     console.log('INVENTORIES BY COMP', response);
     setInventories(response.message || []);
   };
 
-  const onSelectFile = (file: string) => {
-    history.push(`/workbench/file/${file}`);
-    dispatch(setFile(file));
+  const onAction = (file: string, action: MATCH_CARD_ACTIONS) => {
+    switch (action) {
+      case MATCH_CARD_ACTIONS.ACTION_ENTER:
+        history.push(`/workbench/file/${file}`);
+        dispatch(setFile(file));
+        break;
+      case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
+        onIdentifyPressed(file);
+        break;
+      case MATCH_CARD_ACTIONS.ACTION_IGNORE:
+        onIgnorePressed(file);
+        break;
+    }
+  };
+
+  const onIdentifyPressed = async (file: string) => {
+    setInventoryBool(true);
+    setSelectedFiles([file]);
   };
 
   const onIdentifyAllPressed = async () => {
     setInventoryBool(true);
+    const selFiles = files
+      .filter( file => file.status === 'pending')
+      .map( file => file.path);
+    setSelectedFiles(selFiles);
+  };
+
+  const onIgnorePressed = async (file: string) => {
+    await ignoreFile(file);
+    getFiles();
   };
 
   const handleClose = async (inventory: Inventory) => {
     setInventoryBool(false);
-    const newInventory = {
+    const  newInventory = await createInventory({
       ...inventory,
-      files: component ? component.files : [],
-    };
-    await createInventory(newInventory);
+      files: selectedFiles
+    });
 
     setInventories((previous) => [...previous, newInventory]);
+    getFiles();
     setTab(1);
   };
+
 
   useEffect(() => {
     getFiles();
@@ -71,11 +99,11 @@ export const ComponentDetail = () => {
   const renderTab = () => {
     switch (tab) {
       case 0:
-        return <FileList files={files} scan={scan} filter="pending" onSelectFile={onSelectFile} />;
+        return <FileList files={files} filter="pending" onAction={onAction} />;
       case 1:
         return <InventoryList inventories={inventories} />;
       case 2:
-        return <FileList files={files} scan={scan} filter="ignored" onSelectFile={onSelectFile} />;
+        return <FileList files={files} filter="ignored" onAction={onAction} />;
       default:
         return 'no data';
     }
@@ -109,16 +137,18 @@ export const ComponentDetail = () => {
                   textColor="primary"
                   onChange={(event, value) => setTab(value)}
                 >
-                  <Tab label={`Pendings (${component?.count.pending})`} />
-                  <Tab label={`Identified (${component?.count.identified})`} />
-                  <Tab label={`Ignored (${component?.count.ignored})`} />
+                  <Tab label={`Pendings (${component?.summary.pending})`} />
+                  <Tab label={`Identified (${component?.summary.identified})`} />
+                  <Tab label={`Ignored (${component?.summary.ignored})`} />
                 </Tabs>
               </Paper>
             </div>
 
             {tab === 0 ? (
-              <Button variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
-                Identify All ({component?.count.pending})
+              <Button
+                disabled={component?.summary.pending === 0}
+                variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
+                Identify All ({component?.summary.pending})
               </Button>
             ) : null}
           </section>

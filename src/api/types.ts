@@ -10,16 +10,22 @@ export interface Inventory {
   files: string[];
 }
 export interface Component {
-  id?: number;
+  compid?: number;
   purl: string;
   name: string;
   version: string;
-  vendor?: string;
+  vendor: string;
   url: string;
-  description?: string;
+  description: string;
+  summary?: {
+    pending: number,
+    ignored: number,
+    identified: number,
+  }
+  licenses: any[];
 }
 export interface License {
-  id: number;
+  id?: number;
   name: string;
   spdxid: string;
   url: string;

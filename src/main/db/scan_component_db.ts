@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable func-names */
@@ -8,90 +9,106 @@
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
+import { Component } from '../../api/types';
+import {ResultsDb} from  './scan_results_db';
+import {LicenseDb} from  './scan_license_db';
+import { License } from '../../api/types';
+
+interface Summary {
+  identified: number;
+  ignored: number;
+  pending: number;
+}
 
 const utilsDb = new UtilsDb();
 const query = new Querys();
 
-interface Component {
-  name: string;
-  version: string;
-  description: string;
-  url: string;
-  purl: string;
-  license_name: string;
-}
-
 export class ComponentDb extends Db {
+
+  results:ResultsDb;
+
+  license:LicenseDb;
+
   constructor(path: string) {
     super(path);
+    this.results=new ResultsDb(path);
+    this.license=new LicenseDb(path);
   }
 
-  get(data: any) {
+  get(component: Partial<Component> ) {
     return new Promise(async (resolve, reject) => {
       try {
-        let component: any;
-        if (data.id) {
-          component = await this.getById(data.id);
-        } else if (data.purl && data.version) {
-          component = await this.getbyPurlVersion(data);
-        } else {
-          component = await this.getAll();
-        }
-        resolve(component);
-      } catch (error) {
-        reject(new Error('unable to open db'));
-      }
-    });
-  }
-
-  private getAll() {
-    const self = this;
-    return new Promise<number>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.all(
-          query.SQL_GET_ALL_COMPONENTS,
-          async (err: any, component: any) => {
-            if (err) reject(new Error(undefined));
-            db.close();
-
-            for (let i = 0; i < component.length; i += 1) {
-              const licenses = await self.getAllLicensesFromComponentId(
-                component[i].compid
-              );
-              component[i].licenses = licenses;
-            }
-            resolve(component);
-          }
-        );
+        let comp:any;
+        if(component.compid){
+          comp= await this.getById(component.compid); 
+          const summary = await this.results.summary(comp);
+          comp.summary=summary;  
+          resolve(comp);  
+        }             
+        else resolve([]);
       } catch (error) {
         reject(error);
       }
     });
   }
 
-  // // GET COMPONENENT ID FROM PURL
-  private getbyPurlVersion(data: any) {
+  getAll(data: any) {  
+    return new Promise(async (resolve, reject) => {
+      try {
+        let component: any;
+        if (data.purl && data.version) {
+          component = await this.getbyPurlVersion(data);
+        } else {
+          component = await this.getAllComponents();
+        }
+        if(component!==undefined)resolve(component);
+        else resolve({});
+      } catch (error) {
+        reject(new Error('unable to open db'));
+      }
+    });
+  }
+
+  private getAllComponents() {
     const self = this;
-    return new Promise<number>(async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.get(
-          query.SQL_GET_COMPONENT_BY_PURL_VERSION,
-          data.purl,
-          data.version,
-          async (err: any, component: any) => {
-            db.close();
-
-            console.log(component);
-            if (err) reject(new Error(undefined));
-            const licenses = await self.getAllLicensesFromComponentId(
-              component.compid
-            );
-            component.licenses = licenses;
-            resolve(component);
+        db.all(query.SQL_GET_ALL_COMPONENTS, async (err: any, component: any) => {
+          if (err) resolve(undefined);
+          db.close();
+          for (let i = 0; i < component.length; i += 1) {
+           
+            const licenses = await self.getAllLicensesFromComponentId(component[i].compid);
+            const summary = await this.results.summary(component[i]);
+            component[i].summary=summary;
+            component[i].licenses = licenses;
           }
-        );
+          resolve(component);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+
+  
+ // GET COMPONENENT ID FROM PURL
+  private getbyPurlVersion(data: any) {
+    const self = this;
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.get(query.SQL_GET_COMPONENT_BY_PURL_VERSION, data.purl, data.version, async (err: any, component: any) => {
+          db.close();
+          if (err) resolve(undefined);
+          const licenses = await self.getAllLicensesFromComponentId(component.compid);
+          const summary = await this.results.summary(component);
+          component.summary=summary;
+          component.licenses = licenses;
+          resolve(component);
+        });
       } catch (error) {
         reject(error);
       }
@@ -104,18 +121,14 @@ export class ComponentDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(
-            query.SQL_GET_COMPV_LICENSE_BY_COMPID,
-            `${cvId}`,
-            (err: any, data: any) => {
-              db.close();
-              if (err) {
-                resolve('[]');
-              } else {
-                resolve(data);
-              }
+          db.all(query.SQL_GET_COMPV_LICENSE_BY_COMPID, `${cvId}`, (err: any, data: any) => {
+            db.close();
+            if (err) {
+              resolve('[]');
+            } else {
+              resolve(data);
             }
-          );
+          });
         });
       } catch (error) {
         reject(new Error('[]'));
@@ -153,25 +166,19 @@ export class ComponentDb extends Db {
   // GET COMPONENT VERSIONS
   getById(id: number) {
     const self = this;
-    return new Promise(async (resolve, reject) => {
+    return new Promise (async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(
-            query.SQL_GET_COMPONENT_BY_ID,
-            `${id}`,
-            async function (err: any, data: any) {
-              db.close();
-              if (err) reject(new Error('[]'));
-              else {
-                const licenses = await self.getAllLicensesFromComponentId(
-                  data[0].compid
-                );
-                data[0].licenses = licenses;
-                resolve(data);
-              }
+          db.get(query.SQL_GET_COMPONENT_BY_ID, `${id}`, async function (err: any, data: any) {
+            db.close();
+            if (err) resolve(undefined);
+            else {
+              const licenses = await self.getAllLicensesFromComponentId(data.compid);
+              data.licenses = licenses;
+              resolve(data);
             }
-          );
+          });
         });
       } catch (error) {
         reject(new Error('[]'));
@@ -185,15 +192,11 @@ export class ComponentDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(
-            query.SQL_GET_LICENSES_BY_COMPONENT_ID,
-            `${id}`,
-            (err: any, data: any) => {
-              db.close();
-              if (err) resolve('[]');
-              else resolve(data);
-            }
-          );
+          db.all(query.SQL_GET_LICENSES_BY_COMPONENT_ID, `${id}`, (err: any, data: any) => {
+            db.close();
+            if (err) resolve('[]');
+            else resolve(data);
+          });
         });
       } catch (error) {
         reject(new Error('[]'));
@@ -222,42 +225,43 @@ export class ComponentDb extends Db {
     });
   }
 
-  // IMPORT UNIQUE RESULTS TO COMP DB FROM FILE RESULTS
-  importUniqueFromFile(resultPath: string) {
-    let data: any;
-    return new Promise(async (resolve, reject) => {
-      try {
-        const result: Record<any, any> = await utilsDb.readFile(resultPath);
-        const db = await this.openDb();
-        for (const [key, value] of Object.entries(result)) {
-          for (let i = 0; i < value.length; i += 1) {
-            data = value[i];
-            if (data.id !== 'none') {
-              await this.componentNewImportFromResults(db, data);
-            }
-          }
-        }
-        db.close();
-      } catch (error) {
-        reject(new Error('Unable to import scan results'));
-      }
-      resolve(true);
-    });
-  }
 
   // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
-  importUniqueFromJson(json: string) {
+  importUniqueFromJSON(json: string) {
     let data: any;
+    let attachLicComp={
+      license_id:0,
+      compid:0,
+    };
+    let license:License;
+    license={
+      id:0,
+      name:'',
+      spdxid:'',
+      fulltext:'AUTOMATIC IMPORT',
+      url:'AUTOMATIC IMPORT',
+    };
     return new Promise(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        const result: Record<any, any> = await utilsDb.readFile(json);
-        for (const [key, value] of Object.entries(result)) {
-          for (let i = 0; i < value.length; i += 1) {
+        const db = await this.openDb();        
+        for (const [key, value] of Object.entries(json)) {
+          for (let i = 0; i < value.length; i += 1) {     
             data = value[i];
-
-            if (data.id !== 'none') {
-              await this.componentNewImportFromResults(db, data);
+            if (data.id !== 'none') {                   
+               data.licenses && data.licenses[0]?license.spdxid=data.licenses[0].name:'NULL';                
+               if (license.spdxid!==''){    
+                 // Get license id by result spdxid
+                  attachLicComp.license_id= await this.license.getLicenseIdFilter(license);              
+                  if(attachLicComp.license_id==0){
+                  license=await this.license.create(license);  
+                  license.id?attachLicComp.license_id=license.id:0;             
+                 }                     
+                 }else{
+                 attachLicComp.license_id= await this.license.getLicenseIdFilter(license);                     
+              }  
+              attachLicComp.compid =await this.componentNewImportFromResults(db, data);
+             await this.license.licenseAttach(attachLicComp);
+             
             }
           }
         }
@@ -271,7 +275,7 @@ export class ComponentDb extends Db {
 
   // COMPONENT NEW
   private componentNewImportFromResults(db: any, data: any) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<number>(async (resolve, reject) => {
       db.serialize(function () {
         const stmt = db.prepare(query.COMPDB_SQL_COMP_VERSION_INSERT);
         stmt.run(
@@ -280,12 +284,12 @@ export class ComponentDb extends Db {
           'AUTOMATIC IMPORT',
           data.url,
           data.purl ? data.purl[0] : 'n/a',
-          (err: any) => {
-            if (err) reject(new Error('error'));
+          function (this:any,err: any)  {   
+            stmt.finalize();       
+            if (err) reject(new Error('error'));   
+            else resolve(this.lastID);      
           }
-        );
-        stmt.finalize();
-        resolve(true);
+        ); 
       });
     });
   }
@@ -310,10 +314,10 @@ export class ComponentDb extends Db {
   importFromFile(path: string) {
     return new Promise(async (resolve, reject) => {
       try {
-        const result: Record<any, any> = await utilsDb.readFile(path);
+        const results: Record<any, any> = await utilsDb.readFile(path);
         const db = await this.openDb();
-        for (let i = 0; i < result.length; i += 1) {
-          await this.componentNewImport(db, result[i]);
+        for (let i = 0; i < results.length; i += 1) {
+          await this.componentNewImport(db, results[i]);
         }
         db.close();
         resolve(true);
@@ -328,19 +332,40 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       db.serialize(function () {
         const stmt = db.prepare(query.COMPDB_SQL_COMP_VERSION_INSERT);
-        stmt.run(
-          data.name,
-          data.version,
-          data.description,
-          data.url,
-          data.purl,
-          (err: any) => {
-            if (err) reject(new Error('error'));
-          }
-        );
+        stmt.run(data.name, data.version, data.description, data.url, data.purl, (err: any) => {
+          if (err) reject(new Error('error'));
+        });
         stmt.finalize();
         resolve(true);
       });
+    });
+  }
+
+  update(component: Component) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          const stmt = db.prepare(query.SQL_COMPDB_COMP_VERSION_UPDATE);
+          stmt.run(
+            component.name,
+            component.version,
+            component.description,
+            component.url,
+            component.purl,
+            component.description,
+            component.compid,
+            (err: any) => {
+              if (err) resolve(false);
+            }
+          );
+          db.close();
+          stmt.finalize();
+          resolve(true);
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 }

@@ -1,5 +1,6 @@
 /* eslint-disable no-async-promise-executor */
 
+import { CompareArrowsOutlined } from '@material-ui/icons';
 import fs from 'fs';
 
 class UtilsDb {

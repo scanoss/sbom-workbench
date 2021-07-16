@@ -16,10 +16,15 @@ export interface InventoryListProps {
 }
 
 export const InventoryList = ({inventories}: InventoryListProps) => {
+  const onInventorySelected = async (inventory: Inventory) => {
+    const response = await inventoryService.get({ id: inventory.id})
+    console.log('INVENTORY ID', response)
+  }
+
   return (
     <section style={style.list}>
       {inventories.map((inventory) => (
-        <InventoryCard key={inventory.id} inventory={inventory} onSelect={() => null}/>
+        <InventoryCard key={inventory.id} inventory={inventory} onSelect={() => onInventorySelected(inventory)}/>
       ))}
   </section>
   );

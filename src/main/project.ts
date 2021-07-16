@@ -3,37 +3,41 @@ import { create } from 'electron-log';
 // import { Component } from 'react';
 import { Inventory, Component, Project } from '../api/types';
 import { IpcEvents } from '../ipc-events';
-import { ScanDb } from './db/scan_db';
-import { defaultWorkspace } from './workspace/workspace';
 
-/* ipcMain.handle(IpcEvents.INVENTORY_GET, async (_event, invget: Inventory) => {
-  let inv: any;
-  try {
-    inv = await defaultWorkspace.scans_db.inventories.get(invget);
-  } catch (e) {
-    console.log('Catch an error: ', e);
-  }
-  console.log(inv.id);
-  return { status: 'ok', message: inv };
-}); */
+import { Workspace } from './workspace/workspace';
+
+const os = require('os');
+const fs = require('fs');
+
+let ws: Workspace;
+ipcMain.handle(IpcEvents.PROJECT_LOAD_SCAN, async (_event, arg: any) => {
+  let created: any;
+  console.log(arg);
+  ws = new Workspace();
+  ws.newProject(arg);
+  ws.projectsList.loadScanProject(arg);
+  // console.log(ws.projectsList.logical_tree);
+  return {
+    status: 'ok',
+    message: 'Project loaded',
+    data: ws.projectsList,
+  };
+});
+
+function getUserHome() {
+  // Return the value using process.env
+  return process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
+}
 
 ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (_event, arg: Project) => {
-  let created: any;
-  let p: Project = {
-    work_root: '/home/oscar/test',
-    default_licenses: '/home/oscar/test/licenses.json',
+  const { path } = arg;
+  console.log(arg);
+  ws = new Workspace();
+  ws.newProject(path);
+  console.log(ws.projectsList);
+  return {
+    status: 'ok',
+    message: 'Project loaded',
+    data: ws, // ws.directory_tree.project,
   };
-  try {
-    defaultWorkspace.scans_db = new ScanDb(p.work_root);
-    const init = await defaultWorkspace.scans_db.init();
-    if (p.default_licenses !== undefined)
-      defaultWorkspace.scans_db.licenses.importFromFile(p.default_licenses);
-    /* if (p.default_components !== undefined)
-      defaultWorkspace.scans_db.components.importFromFile(p.default_components);
-    */
-    console.log(`base abierta ${init}`);
-  } catch (e) {
-    console.log('Catch an error on creating a project: ', e);
-  }
-  return { status: 'ok', message: 'ok' };
 });

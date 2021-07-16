@@ -6,11 +6,13 @@ import { inventoryService } from '../../api/inventory-service';
 import * as scanUtil from '../../utils/scan-util';
 import { componentService } from '../../api/component-service';
 import reducer, { initialState, State } from './reducers';
-import { loadScanSuccess } from './actions';
+import { loadScanSuccess, setComponent, setComponents } from './actions';
+import { resultService } from '../../api/results-service';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
   createInventory: (inventory: Inventory) => Promise<Inventory>;
+  ignoreFile: (path: string) => Promise<boolean>;
 
   state: State;
   dispatch: any;
@@ -19,16 +21,16 @@ export interface IWorkbenchContext {
 export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(null);
 
 export const WorkbenchProvider: React.FC = ({ children }) => {
-  const { scanBasePath } = React.useContext<any>(AppContext);
+  const { setScanBasePath } = React.useContext<any>(AppContext);
   const [state, dispatch] = React.useReducer(reducer, initialState);
-  const { scan, file } = state;
+  const { scan, tree, file, component } = state;
 
   const loadScan = async (path: string) => {
     try {
-      const { scan, fileTree, components } = await workbenchController.loadScan(path);
-      dispatch(loadScanSuccess(scan, fileTree, components));
-
-      // const { status, data } = await componentService.get({});
+      const { scan, fileTree, scanRoot } = await workbenchController.loadScan(path);
+      dispatch(loadScanSuccess(scan, fileTree, []));
+      setScanBasePath(scanRoot);
+      update();
       return true;
     } catch (error) {
       console.error(error);
@@ -36,23 +38,27 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     }
   };
 
-  const createInventory = async (inventory: Inventory) => {
-    const { status, message } = await inventoryService.create(inventory);
-    console.log(message);
+  const createInventory = async (inventory: Inventory): Promise<Inventory> => {
+    const { status, data } = await inventoryService.create(inventory);
+    update();
+    return data;
+  };
 
+  const ignoreFile = async (file: string): Promise<boolean> => {
+    const { status, data } = await resultService.ignored([file]);
+    update();
+    return true;
+  }
 
-    // TODO: remove when backend service is ready
-    const updateScan = scanUtil.updateTree(scan, inventory);
-   /*  setScan({ ...scan, ...updateScan });
-    const updateComponents = scanUtil.getComponents(scan);
-    setComponents(updateComponents);
+  const update = async () => {
     if (component) {
-      const updateComponent = updateComponents.find((c) => c.name === component.name);
-      updateComponent.inventories = [...updateComponent.inventories, inventory];
-      setComponent({ ...component, ...updateComponent });
+      const comp = await workbenchController.getComponent(component.compid);
+      if (comp)
+        dispatch(setComponent(comp));
     }
- */
-    return inventory;
+
+    const components = await workbenchController.getComponents();
+    dispatch(setComponents(components));
   };
 
   return (
@@ -63,6 +69,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
         loadScan,
         createInventory,
+        ignoreFile,
       }}
     >
       {children}

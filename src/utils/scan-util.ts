@@ -1,6 +1,35 @@
 /* eslint-disable no-restricted-syntax */
-import { fileURLToPath } from 'url';
-import { Inventory } from '../api/types';
+import { Component, Inventory } from '../api/types';
+
+export function mapFiles(files: any[]): any[] {
+  const getStatus = (file) =>
+    file.ignored === 1
+      ? 'ignored'
+      : file.identified === 1 ? 'identified' : 'pending';
+
+  return files
+    .map((file) => ({
+      ...file,
+      status: getStatus(file),
+    }))
+}
+
+export function sortComponents(components: Component[]) {
+  components.sort((a, b) =>
+    (b.summary?.pending + b.summary?.ignored + b.summary?.identified ) -
+    (a.summary?.pending + a.summary?.ignored + a.summary?.identified )
+  );
+}
+
+export function transform(tree, scan) {
+  for (const treeElement of tree) {
+    if (treeElement.children) {
+      transform(treeElement.children, scan)
+    } else {
+      treeElement.className = getStatus(scan, treeElement .value);
+    }
+  }
+}
 
 export function generateFileTree(scan: Record<string, unknown>): Promise<any> {
   return new Promise((resolve) => {
@@ -89,7 +118,7 @@ function getLabelMatchesCount(label, value, type) {
 }
 
 function getStatus(scan, key) {
-  return scan[key] && scan[key][0]?.id !== 'none' ? 'match' : '';
+  return scan[key] && scan[key][0]?.id !== 'none' ? 'match-info-result' : '';
 }
 
 export function updateTree(scan, inventory: Inventory) {
@@ -104,4 +133,5 @@ export function updateTree(scan, inventory: Inventory) {
 export default {
   generateFileTree,
   updateTree,
+  mapFiles,
 };

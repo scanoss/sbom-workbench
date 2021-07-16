@@ -21,7 +21,6 @@ const query = new Querys();
 export class ScanDb extends Db {
   components: ComponentDb;
 
-  // TO DO Change names plural
   files: FilesDb;
 
   inventories: InventoryDb;
@@ -33,7 +32,7 @@ export class ScanDb extends Db {
   lastID: any;
 
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
-  constructor(path: string) {
+  constructor(path:string) {
     super(path);
     this.files = new FilesDb(path);
     this.inventories = new InventoryDb(path);

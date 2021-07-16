@@ -12,18 +12,43 @@ import { UtilsDb } from './utils_db';
 const utilsDb = new UtilsDb();
 const query = new Querys();
 
+interface Summary {
+  identified: number;
+  ignored: number;
+  pending: number;
+}
+
 export class ResultsDb extends Db {
   constructor(path: string) {
     super(path);
   }
 
-  // INSERT RESULTS
-  async insert(resultPath: string) {
+  // INSERT RESULTS FROM FILE
+  async insertFromFile(resultPath: string) {
     try {
       const result: Record<any, any> = await utilsDb.readFile(resultPath);
       const db = await this.openDb();
       let data: any;
       for (const [key, value] of Object.entries(result)) {
+        for (let i = 0; i < value.length; i += 1) {
+          data = value[i];
+          if (data.id !== 'none') {
+            await this.insertResult(db, data);
+          }
+        }
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // INSERT RESULTS FROM FILE
+  async insertFromJSON(json: string) {
+    try {
+      const db = await this.openDb();
+      let data: any;
+      for (const [key, value] of Object.entries(json)) {
         for (let i = 0; i < value.length; i += 1) {
           data = value[i];
           if (data.id !== 'none') {
@@ -113,6 +138,39 @@ export class ResultsDb extends Db {
         else reject(new Error('{}'));
       }
       resolve(results);
+    });
+  }
+
+  summary(data: any) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const summary: Summary = {
+          ignored: 0,
+          identified: 0,
+          pending: 0,
+        };
+        const db = await this.openDb();
+        db.all(
+          query.SQL_COMP_SUMMARY,
+          data.purl,
+          data.version,
+          async (err: any, comp: any) => {
+            db.close();
+            if (!err) {
+              for (let i = 0; i < comp.length; i += 1) {
+                if (comp[i].identified === 1) summary.identified += 1;
+                if (comp[i].ignored === 1) summary.ignored += 1;
+                if (comp[i].ignored === 0 && comp[i].identified === 0)
+                  summary.pending += 1;
+              }
+            }
+
+            resolve(summary);
+          }
+        );
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 }
