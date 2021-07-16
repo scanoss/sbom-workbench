@@ -129,7 +129,7 @@ export const Editor = () => {
 
   return (
     <>
-      <section className="app-page">
+      <section id="editor" className="app-page">
         <header className="app-header">
           {matchInfo ? (
             <>
@@ -147,7 +147,7 @@ export const Editor = () => {
                         changeLines={() => {
                           setCurrentMatch(matchInfo[index]);
                         }}
-                        style={currentMatch === match ? { borderBottom: '#3B82F6 2px solid', borderTop: '#3B82F6 2px solid', borderRight: '#3B82F6 2px solid' } : null}
+                        style={currentMatch === match ? { borderBottom: '#60A5FA 2px solid', borderTop: '#60A5FA 2px solid', borderRight: '#60A5FA 2px solid' } : null}
                         match={match}
                         onClickCheck={() => setInventoryBool(true)}
                         key={index}
@@ -161,22 +161,29 @@ export const Editor = () => {
                     ))} */}
                   </div>
                 </section>
+                <div className="info-files">
+                  <LabelCard
+                    label="Source File"
+                    subLabel={file}
+                    status={null}
+                  />
+                  <LabelCard
+                    label="Component File"
+                    subLabel={currentMatch?.file}
+                    status={null}
+                  />
+                </div>
               </header>
             </>
           ) : (
-            <h1>No info</h1>
+            <h1>No match found</h1>
           )}
         </header>
 
         <main className="editors app-content">
           <div className="editor">
-            {currentMatch && remoteFileContent?.content ? (
+            {currentMatch && localFileContent?.content ? (
               <>
-                <LabelCard
-                  label="Source File"
-                  subLabel={file}
-                  status={null}
-                />
                 <SyntaxHighlighter
                   className="code-viewer"
                   wrapLongLines
@@ -190,7 +197,7 @@ export const Editor = () => {
                     return { style };
                   }}
                 >
-                  {remoteFileContent?.error ? <p>File not found</p> : remoteFileContent?.content}
+                  {localFileContent?.error ? <p>File not found</p> : localFileContent?.content}
                 </SyntaxHighlighter>
               </>
             ) : null}
@@ -199,12 +206,6 @@ export const Editor = () => {
           <div className="editor">
             {currentMatch && remoteFileContent?.content ? (
               <>
-                <LabelCard
-                  label="Component File"
-                  subLabel={file}
-                  onClickCheck={() => setInventoryBool(true)}
-                  status={null}
-                />
                 <SyntaxHighlighter
                   className="code-viewer"
                   wrapLongLines

@@ -1,3 +1,9 @@
+#editor {
+  .app-header {
+    padding-bottom: 0;
+  }
+}
+
 .match-title {
   display: flex;
   align-items: center;
@@ -62,29 +68,29 @@
   }
 }
 
+.info-files, .editors {
+  display: grid;
+  grid-template-columns: calc(50% - 10px) 50%;
+  grid-gap: 10px;
+}
+
+.info-files {
+  margin-top: 20px;
+}
 
 .editors {
-  display: grid;
-  grid-template-columns: 50% 50%;
-  grid-gap: 10px;
-
   .editor {
+    margin-bottom: 50px;
 
-        margin-bottom: 50px;
-
+    pre {
+      margin: 0;
+    }
     p {
-      font-family: Inter;
       font-style: normal;
       font-weight: bold;
       font-size: 20px;
       padding: 0;
       margin: 0;
     }
-
-    // pre {
-    //   white-space: pre-line;
-    // }
-
-
   }
 }

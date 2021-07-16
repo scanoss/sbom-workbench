@@ -6,10 +6,9 @@ interface LabelCardProps {
   label: string | null;
   status: string | null;
   subLabel: string | null;
-  onClickCheck: () => void;
 }
 
-const LabelCard = ({ label, status, onClickCheck, subLabel }: LabelCardProps) => {
+const LabelCard = ({ label, status, subLabel }: LabelCardProps) => {
   return (
     <div className={`label-card status-${status?.toLowerCase()}`}>
       <div className="label-card-content">

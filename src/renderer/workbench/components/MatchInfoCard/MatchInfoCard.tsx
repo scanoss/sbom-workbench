@@ -17,13 +17,6 @@ interface MatchInfoCardProps {
 }
 
 const MatchInfoCard = ({ match, changeLines, style, onAction }: MatchInfoCardProps) => {
-  useEffect(() => {
-    console.table(match);
-  }, []);
-
-  const onClickCheck = () => {
-    console.log('onClickCheck');
-  };
 
   const handleClickCard = () => {
     changeLines();
@@ -49,9 +42,10 @@ const MatchInfoCard = ({ match, changeLines, style, onAction }: MatchInfoCardPro
             <span className="usage-id">Snippet</span>
           </div>
         </div>
-        <div className="match-info-card-buttons">
+       {/* <div className="match-info-card-buttons">
           {match.status === 'pending' ? (
             <>
+              <CheckIcon onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY)} className="icon check" />
               <BanIcon onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE)} className="icon ban" />
             </>
           ) : (
@@ -60,7 +54,7 @@ const MatchInfoCard = ({ match, changeLines, style, onAction }: MatchInfoCardPro
               <BanIcon onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE)} className="icon ban" />
             </>
           )}
-        </div>
+        </div>*/}
       </div>
     </div>
   );
