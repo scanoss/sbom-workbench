@@ -11,6 +11,7 @@ import { loadScanSuccess, setComponent } from './actions';
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
   createInventory: (inventory: Inventory) => Promise<Inventory>;
+  ignoreFile: (path: string) => Promise<boolean>;
 
   state: State;
   dispatch: any;
@@ -39,6 +40,16 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const createInventory = async (inventory: Inventory): Promise<Inventory> => {
     const { status, data } = await inventoryService.create(inventory);
+    update();
+    return data;
+  };
+
+  const ignoreFile = async (file: string): Promise<boolean> => {
+    update();
+    return true;
+  }
+
+  const update = async () => {
     const components = await workbenchController.getComponents();
     if (component) {
       const updateComponent = components.find((com) =>
@@ -48,8 +59,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     }
 
     dispatch(loadScanSuccess(scan, tree, components)); //TODO: Create action
-
-    return data;
   };
 
   return (
@@ -60,6 +69,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
         loadScan,
         createInventory,
+        ignoreFile,
       }}
     >
       {children}
