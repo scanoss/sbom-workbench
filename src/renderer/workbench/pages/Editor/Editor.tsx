@@ -4,6 +4,7 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory } from 'react-router-dom';
+import { match } from 'assert';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 import { DialogContext } from '../../../context/DialogProvider';
 import Label from '../../components/Label/Label';
@@ -14,6 +15,8 @@ import { workbenchController } from '../../../workbench-controller';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../../../api/types';
+import LabelCard from '../../components/LabelCard/LabelCard';
+import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../components/MatchInfoCard/MatchInfoCard';
 
 export interface FileContent {
   content: string | null;
@@ -110,9 +113,23 @@ export const Editor = () => {
     }
   }, [matchInfo]);
 
+  const onAction = (action: MATCH_INFO_CARD_ACTIONS) => {
+    switch (action) {
+      case MATCH_INFO_CARD_ACTIONS.ACTION_ENTER:
+        break;
+      case MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY:
+        setInventoryBool(true);
+        break;
+      case MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE:
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <>
-      <section className="app-page">
+      <section id="editor" className="app-page">
         <header className="app-header">
           {matchInfo ? (
             <>
@@ -124,36 +141,42 @@ export const Editor = () => {
               </div>
               <header className="match-info-header">
                 <section className="content">
-                  <div className="match-info-container">
-                    <div className="second-row-match">
-                      <div>
-                        <Label label="COMPONENT" textColor="gray" />
-                        <Title title={currentMatch?.component} />
-                      </div>
-                      <div>
-                        <Label label="VENDOR" textColor="gray" />
-                        <Title title={currentMatch?.vendor} />
-                      </div>
-                      <div>
-                        <Label label="VERSION" textColor="gray" />
-                        <Title title={currentMatch?.version} />
-                      </div>
-                      <div>
-                        <Label label="LICENSE" textColor="gray" />
-                        <Title title={currentMatch?.licenses[0] ? currentMatch?.licenses[0].name : '-'} />
-                      </div>
-                    </div>
+                  <div className="match-info-default-container">
+                    {matchInfo.map((match, index) => (
+                      <MatchInfoCard
+                        changeLines={() => {
+                          setCurrentMatch(matchInfo[index]);
+                        }}
+                        style={currentMatch === match ? { borderBottom: '#60A5FA 2px solid', borderTop: '#60A5FA 2px solid', borderRight: '#60A5FA 2px solid' } : null}
+                        match={match}
+                        onClickCheck={() => setInventoryBool(true)}
+                        key={index}
+                        onAction={onAction}
+                      />
+                    ))}
                   </div>
-                  <MatchCard
-                    label={file}
-                    onClickCheck={() => setInventoryBool(true)}
-                    status={currentMatch?.status || 'pending'}
-                  />
+                  <div className="match-info-identified-container">
+                    {/* {matchInfo.map((match, index) => (
+                      <MatchInfoCard match={match} onClickCheck={() => setInventoryBool(true)} key={index} />
+                    ))} */}
+                  </div>
                 </section>
+                <div className="info-files">
+                  <LabelCard
+                    label="Source File"
+                    subLabel={file}
+                    status={null}
+                  />
+                  <LabelCard
+                    label="Component File"
+                    subLabel={currentMatch?.file}
+                    status={null}
+                  />
+                </div>
               </header>
             </>
           ) : (
-            <h1>No info</h1>
+            <h1>No match found</h1>
           )}
         </header>
 
@@ -161,7 +184,6 @@ export const Editor = () => {
           <div className="editor">
             {currentMatch && localFileContent?.content ? (
               <>
-                <p>Source File</p>
                 <SyntaxHighlighter
                   className="code-viewer"
                   wrapLongLines
@@ -184,7 +206,6 @@ export const Editor = () => {
           <div className="editor">
             {currentMatch && remoteFileContent?.content ? (
               <>
-                <p>Component File</p>
                 <SyntaxHighlighter
                   className="code-viewer"
                   wrapLongLines
