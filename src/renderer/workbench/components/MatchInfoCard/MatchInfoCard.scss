@@ -9,7 +9,7 @@
   align-items: center;
   margin-bottom: 12px;
   cursor: pointer;
-
+  box-sizing: border-box;
 
 
   @media screen and (max-width: $default-width) {
@@ -25,6 +25,8 @@
     width: calc(100% - 20px);
     margin-left: 20px;
     justify-content: space-between;
+
+
 
 
     .label-info-div {
@@ -122,4 +124,5 @@
     border-left: 10px solid $ignored-gray;
   }
 }
+
 

@@ -1,15 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import CheckIcon from '@material-ui/icons/Check';
 import BanIcon from '@material-ui/icons/NotInterested';
-import Label from '../Label/Label';
 import componentDefault from '../../../../../assets/imgs/component-default.svg';
+
+export enum MATCH_INFO_CARD_ACTIONS {
+  ACTION_ENTER,
+  ACTION_IDENTIFY,
+  ACTION_IGNORE,
+}
 
 interface MatchInfoCardProps {
   match: Record<string, any>;
   changeLines: () => void;
+  onAction: (action: number) => void;
+  style: any;
 }
 
-const MatchInfoCard = ({ match, changeLines }: MatchInfoCardProps) => {
+const MatchInfoCard = ({ match, changeLines, style, onAction }: MatchInfoCardProps) => {
   useEffect(() => {
     console.table(match);
   }, []);
@@ -18,8 +25,12 @@ const MatchInfoCard = ({ match, changeLines }: MatchInfoCardProps) => {
     console.log('onClickCheck');
   };
 
+  const handleClickCard = () => {
+    changeLines();
+  };
+
   return (
-    <div onClick={changeLines} className={`match-info-card status-${match.status || 'pending'}`}>
+    <div onClick={handleClickCard} style={style} className={`match-info-card status-${match.status || 'pending'}`}>
       <div className="match-info-card-content">
         <div className="label-info-div">
           <img alt="component logo" className="logo-match-info-card" src={componentDefault} />
@@ -41,12 +52,12 @@ const MatchInfoCard = ({ match, changeLines }: MatchInfoCardProps) => {
         <div className="match-info-card-buttons">
           {match.status === 'pending' ? (
             <>
-              <BanIcon className="icon ban" />
+              <BanIcon onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE)} className="icon ban" />
             </>
           ) : (
             <>
-              <CheckIcon onClick={onClickCheck} className="icon check" />
-              <BanIcon className="icon ban" />
+              <CheckIcon onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY)} className="icon check" />
+              <BanIcon onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE)} className="icon ban" />
             </>
           )}
         </div>

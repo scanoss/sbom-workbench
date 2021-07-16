@@ -16,7 +16,7 @@ import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../../../api/types';
 import LabelCard from '../../components/LabelCard/LabelCard';
-import MatchInfoCard from '../../components/MatchInfoCard/MatchInfoCard';
+import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../components/MatchInfoCard/MatchInfoCard';
 
 export interface FileContent {
   content: string | null;
@@ -107,11 +107,25 @@ export const Editor = () => {
   // TODO: render all matches
   useEffect(() => {
     if (matchInfo) {
-      setCurrentMatch(matchInfo[1]);
+      setCurrentMatch(matchInfo[0]);
     } else {
       setCurrentMatch(null);
     }
   }, [matchInfo]);
+
+  const onAction = (action: MATCH_INFO_CARD_ACTIONS) => {
+    switch (action) {
+      case MATCH_INFO_CARD_ACTIONS.ACTION_ENTER:
+        break;
+      case MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY:
+        setInventoryBool(true);
+        break;
+      case MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE:
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <>
@@ -133,9 +147,11 @@ export const Editor = () => {
                         changeLines={() => {
                           setCurrentMatch(matchInfo[index]);
                         }}
+                        style={currentMatch === match ? { borderBottom: '#3B82F6 2px solid', borderTop: '#3B82F6 2px solid', borderRight: '#3B82F6 2px solid' } : null}
                         match={match}
                         onClickCheck={() => setInventoryBool(true)}
                         key={index}
+                        onAction={onAction}
                       />
                     ))}
                   </div>
@@ -159,7 +175,6 @@ export const Editor = () => {
                 <LabelCard
                   label="Source File"
                   subLabel={file}
-                  onClickCheck={() => setInventoryBool(true)}
                   status={null}
                 />
                 <SyntaxHighlighter
