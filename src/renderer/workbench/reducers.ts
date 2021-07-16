@@ -32,6 +32,7 @@ export default function reducer(state: State = initialState, action): State {
     }
     case SET_COMPONENT: {
       const { component } = action;
+      console.log(component);
       return {
         ...state,
         component,
@@ -42,7 +43,7 @@ export default function reducer(state: State = initialState, action): State {
       const { file } = action;
 
       let matchInfo = null;
-      if (scan && file && scan[file][0].id !== 'none') {
+      if (scan && file && scan[file] && scan[file][0].id !== 'none') {
         matchInfo = scan[file];
       }
 
