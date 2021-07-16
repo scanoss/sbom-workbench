@@ -7,6 +7,8 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { License } from '../../api/types';
+import { ContactSupportOutlined } from '@material-ui/icons';
+
 
 const query = new Querys();
 const utilsDb = new UtilsDb();
@@ -18,7 +20,7 @@ export class LicenseDb extends Db {
 
   // CREATE LICENSE
   create(license: License) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<License>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         const stmt = db.prepare(query.COMPDB_LICENSES_INSERT);
@@ -32,6 +34,7 @@ export class LicenseDb extends Db {
             if (err || this.lastID === 0)
               reject(new Error('The license was not created or already exist'));
             license.id = this.lastID;
+            console.log(this.lastID);
             stmt.finalize();
             resolve(license);
           }
@@ -68,7 +71,7 @@ export class LicenseDb extends Db {
     });
   }
 
-  importFromJSON(json: Record<any, any>) {
+  importFromJSON(json: Record<any, any>) {   
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -82,8 +85,8 @@ export class LicenseDb extends Db {
               license.url
             );
           }
-          db.close();
-        });
+          db.close();          
+        });        
         resolve(true);
       } catch (error) {
         reject(new Error('Unable to insert licenses'));
@@ -121,9 +124,10 @@ export class LicenseDb extends Db {
     });
   }
 
+
   // GET LICENSE ID FROM SPDXID OR LICENSE NAME
-  private async getLicenseIdFilter(license: License) {
-    return new Promise<number>(async (resolve, reject) => {
+  public async getLicenseIdFilter(license: License) {
+    return new Promise <number>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         const filter = this.licenseNameSpdxidFilter(license);
@@ -131,14 +135,14 @@ export class LicenseDb extends Db {
           resolve(0);
         }
         db.serialize(function () {
-          db.all(
+          db.get(
             query.COMPDB_SQL_GET_LICENSE_ID_FROM_SPDX_NAME,
             `${filter.name}`,
             `${filter.spdxid}`,
-            (err: any, lic: any) => {
-              db.close();
-              if (err) reject(new Error(undefined));
-              else resolve(lic[0].id);
+            (err: any, lic: any) => {             
+              db.close();                 
+               if (err || lic==undefined) resolve(0);
+               else resolve(lic.id);
             }
           );
         });
@@ -150,7 +154,7 @@ export class LicenseDb extends Db {
 
   /** *LICENSE FILTER** */
   // Filter to perform the query with license name or spdixid
-  private licenseNameSpdxidFilter(license: any) {
+  private licenseNameSpdxidFilter(license: any) { 
     const filter = {
       name: null,
       spdxid: null,

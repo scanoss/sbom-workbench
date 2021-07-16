@@ -11,6 +11,7 @@ import { Inventory, Project } from '../../api/types';
 
 import * as Filtering from './filtering';
 import { ScanDb } from '../db/scan_db';
+import { licenses } from '../db/licenses';
 
 const fs = require('fs');
 const path = require('path');
@@ -69,7 +70,7 @@ export class ProjectTree extends EventEmitter {
     this.emit('treeBuilt', this.logical_tree);
   }
 
-  loadScanProject(rootOfProject: string) {
+  async loadScanProject(rootOfProject: string) {
     const file = fs.readFileSync(`${rootOfProject}/tree.json`, 'utf8');
     const a = JSON.parse(file);
     this.logical_tree = a.logical_tree;
@@ -77,7 +78,7 @@ export class ProjectTree extends EventEmitter {
     this.results = a.results;
     this.scan_root = a.scan_root;
     this.scans_db = new ScanDb(rootOfProject);
-    this.scans_db.init();
+    await this.scans_db.init();
   }
 
   saveScanProject() {
@@ -106,13 +107,25 @@ export class ProjectTree extends EventEmitter {
     this.set_work_root(p.work_root);
     this.set_scan_root(p.scan_root);
     this.scans_db = new ScanDb(p.work_root);
-    this.scans_db.init();
   }
 
-  prepare_scan() {
+  async prepare_scan() {
+    let success;
+    const created = await this.scans_db.init();
+    if (created) {
+      console.log("Inserting licenses...");
+       success = await this.scans_db.licenses.importFromJSON(licenses);
+    }
     // const i = 0;
     this.build_tree();
     // apply filters.
+    if (success){
+      console.log("lienses inserted successfully...");
+      return true;
+    } 
+    else{
+    return false;
+    }
   }
 
   getLogicalTree() {

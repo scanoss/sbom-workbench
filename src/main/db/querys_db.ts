@@ -131,7 +131,7 @@ export class Querys {
   COMPDB_SQL_LICENSE_ALL = 'SELECT id, spdxid, name, url from licenses where id like ? ;';
 
   // GET LICENSE ID BY NAME OR SPDXID
-  COMPDB_SQL_GET_LICENSE_ID_FROM_SPDX_NAME = 'SELECT id from licenses where licenses.name=? or licenses.spdxid=?;';
+  COMPDB_SQL_GET_LICENSE_ID_FROM_SPDX_NAME = 'SELECT id FROM licenses WHERE licenses.name=? or licenses.spdxid=?;';
 
   // GET ALL THE INVENTORIES
   SQL_GET_ALL_INVENTORIES = 'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories;';
