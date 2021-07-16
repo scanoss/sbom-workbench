@@ -73,10 +73,6 @@ const Home = () => {
         <button className="bnt-primary" type="button" onClick={() => onOpenProjectPressed()} disabled={!!path}>
           LOAD PROJECT
         </button>
-
-        <button className="bnt-primary" type="button" onClick={() => onOpenFilePressed()} disabled={!!path}>
-          LOAD JSON FILE
-        </button>
       </div>
       <div className="progressbar">{path ? <LinearProgress /> : null}</div>
     </main>

@@ -2,6 +2,8 @@ import { projectService } from '../api/project-service';
 import { componentService } from '../api/component-service';
 import { Component } from '../api/types';
 import { sortComponents, transform } from '../utils/scan-util';
+import { IpcEvents } from '../ipc-events';
+import { ipcRenderer } from 'electron';
 
 const fs = require('original-fs').promises;
 
@@ -34,8 +36,8 @@ class WorkbenchController {
    * @memberof WorkbenchController
    */
   public async fetchLocalFile(path: string): Promise<string> {
-    const data = await fs.readFile(path, 'utf-8');
-    return data;
+    const { data } = await ipcRenderer.invoke(IpcEvents.FILE_GET_CONTENT, path);
+    return data.content;
   }
 
   /**
