@@ -15,7 +15,10 @@ export function mapFiles(files: any[]): any[] {
 }
 
 export function sortComponents(components: Component[]) {
-  components.sort((a, b) => b.summary?.pending - a.summary?.pending);
+  components.sort((a, b) =>
+    (b.summary?.pending + b.summary?.ignored + b.summary?.identified ) -
+    (a.summary?.pending + a.summary?.ignored + a.summary?.identified )
+  );
 }
 
 export function transform(tree, scan) {
