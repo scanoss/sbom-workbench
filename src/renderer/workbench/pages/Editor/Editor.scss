@@ -33,9 +33,10 @@
       align-items: flex-start;
     }
 
-    .match-info-container {
+    .match-info-default-container {
       display: flex;
       flex-direction: column;
+      width: 50%;
 
       .second-row-match {
         // display: grid;
@@ -51,21 +52,13 @@
       }
     }
 
-
-    .usage-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      grid-column-gap: 5px;
-      grid-row-gap: 5px;
-      justify-items: stretch;
-      align-items: center;
-
-      div {
-        display: flex;
-        flex-direction: column;
-      }
+    .match-info-identified-container {
+      display: flex;
+      flex-direction: column;
+      width: 50%;
     }
+
+
   }
 }
 

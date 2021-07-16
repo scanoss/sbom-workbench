@@ -42,8 +42,11 @@ export default function reducer(state: State = initialState, action): State {
       const { file } = action;
 
       let matchInfo = null;
+      console.log(scan);
+
       if (scan && file && scan[file][0].id !== 'none') {
         matchInfo = scan[file];
+        console.log(matchInfo);
       }
 
       return {

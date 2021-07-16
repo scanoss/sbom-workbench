@@ -1,4 +1,4 @@
-.labelie-card {
+.label-card {
   background-color: #ffff;
   height: 76px;
   width: 100%;
@@ -12,7 +12,8 @@
     margin-top: 20px;
   }
 
-  .labelie-card-content {
+
+  .label-card-content {
     display: grid;
     grid-template-columns: 80% auto;
     align-items: center;
@@ -21,10 +22,10 @@
     margin-left: 12px;
     justify-content: space-between;
 
-    .labelie-div {
+    .label-div {
       width: 100%;
 
-      .labelie-title {
+      .label-title {
         font-family: Inter;
         font-weight: 700;
         color: black;
@@ -39,7 +40,7 @@
       .directory-div {
         display: flex;
         margin-top: 8px;
-        .labelie-icon{
+        .label-icon{
           width: 20px;
           height: 20px;
           color: rgba(161, 161, 170, 1);

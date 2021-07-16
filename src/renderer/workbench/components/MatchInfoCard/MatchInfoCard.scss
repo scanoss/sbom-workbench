@@ -1,12 +1,13 @@
-.match-card {
+.match-info-card {
   background-color: #ffff;
   height: 68px;
-  width: 55%;
+  width: 90%;
   border-radius: 4px;
   box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.06),
     0px 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
+  margin-bottom: 12px;
 
 
 
@@ -15,7 +16,7 @@
     margin-top: 20px;
   }
 
-  .match-card-content {
+  .match-info-card-content {
     display: grid;
     grid-template-columns: 80% auto;
     align-items: center;
@@ -25,17 +26,59 @@
     justify-content: space-between;
 
 
-    .label-div {
+    .label-info-div {
       width: 100%;
+      display: flex;
+      align-items: center;
+
+      .logo-match-info-card{
+        width: 35px;
+        height: 35px;
+        margin-right: 12px;
+      }
+
+      .component-span{
+
+        font-style: normal;
+        font-weight: bold;
+        font-size: 20px;
+        color: #3B82F6;
+        margin-right: 12px;
+      }
+      .version-span{
+        font-family: Space Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        color: #52525B;
+        margin-right: 48px;
+      }
+      .usage-div{
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+
+        .usage-label{
+          font-style: normal;
+          font-weight: bold;
+          font-size: 14px;
+          line-height: 17px;
+        }
+        .usage-id{
+          font-style: normal;
+          font-weight: bold;
+          font-size: 20px;
+        }
+      }
     }
 
-    .match-card-buttons {
+    .match-info-card-buttons {
       visibility: hidden;
     }
 
     &:hover{
 
-      .match-card-buttons{
+      .match-info-card-buttons{
         margin-right: 1%;
         visibility: visible;
         transition: 100ms ease-out;

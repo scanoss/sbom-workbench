@@ -4,19 +4,18 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory } from 'react-router-dom';
-
+import { IWorkbenchContext, WorkbenchContext } from '../../store';
 import { DialogContext } from '../../../context/DialogProvider';
 import Label from '../../components/Label/Label';
 import Title from '../../components/Title/Title';
 import MatchCard from '../../components/MatchCard/MatchCard';
-
 import { range } from '../../../../utils/utils';
 import { workbenchController } from '../../../workbench-controller';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../../../api/types';
 import LabelCard from '../../components/LabelCard/LabelCard';
-import { WorkbenchContext, IWorkbenchContext } from '../../store';
+import MatchInfoCard from '../../components/MatchInfoCard/MatchInfoCard';
 
 export interface FileContent {
   content: string | null;
@@ -28,9 +27,11 @@ export const Editor = () => {
 
   console.log('render');
 
-  const { file, matchInfo, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { setInventoryBool, inventoryBool } = useContext<any>(DialogContext);
+
+  const { file, matchInfo } = state;
 
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
@@ -125,31 +126,16 @@ export const Editor = () => {
               </div>
               <header className="match-info-header">
                 <section className="content">
-                  <div className="match-info-container">
-                    <div className="second-row-match">
-                      <div>
-                        <Label label="COMPONENT" textColor="gray" />
-                        <Title title={currentMatch?.component} />
-                      </div>
-                      <div>
-                        <Label label="VENDOR" textColor="gray" />
-                        <Title title={currentMatch?.vendor} />
-                      </div>
-                      <div>
-                        <Label label="VERSION" textColor="gray" />
-                        <Title title={currentMatch?.version} />
-                      </div>
-                      <div>
-                        <Label label="LICENSE" textColor="gray" />
-                        <Title title={currentMatch?.licenses[0] ? currentMatch?.licenses[0].name : '-'} />
-                      </div>
-                    </div>
+                  <div className="match-info-default-container">
+                    {matchInfo.map((match, index) => (
+                      <MatchInfoCard match={match} onClickCheck={() => setInventoryBool(true)} key={index} />
+                    ))}
                   </div>
-                  <MatchCard
-                    label={file}
-                    onClickCheck={() => setInventoryBool(true)}
-                    status={currentMatch?.status || 'pending'}
-                  />
+                  <div className="match-info-identified-container">
+                    {/* {matchInfo.map((match, index) => (
+                      <MatchInfoCard match={match} onClickCheck={() => setInventoryBool(true)} key={index} />
+                    ))} */}
+                  </div>
                 </section>
               </header>
             </>
@@ -217,6 +203,7 @@ export const Editor = () => {
           </div>
         </main>
       </section>
+
       {currentMatch ? (
         <InventoryDialog
           open={inventoryBool}
