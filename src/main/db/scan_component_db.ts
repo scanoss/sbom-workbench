@@ -35,7 +35,9 @@ export class ComponentDb extends Db {
       try {
         let comp:any;
         if(component.compid){
-          comp= await this.getById(component.compid);   
+          comp= await this.getById(component.compid); 
+          const summary = await this.results.summary(comp);
+          comp.summary=summary;  
           resolve(comp);  
         }             
         else resolve([]);
