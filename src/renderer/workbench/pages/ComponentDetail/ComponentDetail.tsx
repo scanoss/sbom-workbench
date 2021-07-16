@@ -74,7 +74,7 @@ export const ComponentDetail = () => {
   };
 
   const onIgnorePressed = async (file: string) => {
-    ignoreFile(file);
+    await ignoreFile(file);
     getFiles();
   };
 

@@ -1,4 +1,4 @@
-import { LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_FILE } from './actions';
+import { LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_COMPONENTS, SET_FILE } from './actions';
 import { Component } from '../../api/types';
 
 export interface State {
@@ -27,6 +27,13 @@ export default function reducer(state: State = initialState, action): State {
         ...state,
         scan,
         tree,
+        components,
+      };
+    }
+    case SET_COMPONENTS: {
+      const { components } = action;
+      return {
+        ...state,
         components,
       };
     }

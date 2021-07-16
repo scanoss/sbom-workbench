@@ -6,7 +6,8 @@ import { inventoryService } from '../../api/inventory-service';
 import * as scanUtil from '../../utils/scan-util';
 import { componentService } from '../../api/component-service';
 import reducer, { initialState, State } from './reducers';
-import { loadScanSuccess, setComponent } from './actions';
+import { loadScanSuccess, setComponent, setComponents } from './actions';
+import { resultService } from '../../api/results-service';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
@@ -44,6 +45,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   const ignoreFile = async (file: string): Promise<boolean> => {
+    const { status, data } = await resultService.ignored([file]);
     update();
     return true;
   }
@@ -56,7 +58,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     }
 
     const components = await workbenchController.getComponents();
-    dispatch(loadScanSuccess(scan, tree, components)); //TODO: Create action
+    dispatch(setComponents(components));
   };
 
   return (

@@ -23,8 +23,17 @@ const MatchCard = ({ label, status, onAction }: MatchCardProps) => {
           <Label label={label} textColor="black" />
         </div>
         <div className="match-card-buttons">
-          <CheckIcon onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IDENTIFY)} className="icon check" />
-          <BanIcon onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IGNORE)} className="icon ban" />
+          {(status === 'pending') && (
+            <>
+              <CheckIcon onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IDENTIFY)} className="icon check" />
+              <BanIcon onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IGNORE)} className="icon ban" />
+            </>
+          )}
+          {(status === 'ignored') && (
+            <>
+              <BanIcon onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IGNORE)} className="icon ban" />
+            </>
+          )}
         </div>
       </div>
     </div>
