@@ -4,16 +4,19 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory } from 'react-router-dom';
-import { IWorkbenchContext, WorkbenchContext } from '../../store';
+
 import { DialogContext } from '../../../context/DialogProvider';
 import Label from '../../components/Label/Label';
 import Title from '../../components/Title/Title';
 import MatchCard from '../../components/MatchCard/MatchCard';
+
 import { range } from '../../../../utils/utils';
 import { workbenchController } from '../../../workbench-controller';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../../../api/types';
+import LabelCard from '../../components/LabelCard/LabelCard';
+import { WorkbenchContext, IWorkbenchContext } from '../../store';
 
 export interface FileContent {
   content: string | null;
@@ -25,11 +28,9 @@ export const Editor = () => {
 
   console.log('render');
 
-  const { state, dispatch, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { file, matchInfo, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { setInventoryBool, inventoryBool } = useContext<any>(DialogContext);
-
-  const { file, matchInfo } = state;
 
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
@@ -159,9 +160,14 @@ export const Editor = () => {
 
         <main className="editors app-content">
           <div className="editor">
-            {currentMatch && localFileContent?.content ? (
+            {currentMatch && remoteFileContent?.content ? (
               <>
-                <p>Source File</p>
+                <LabelCard
+                  label="Source File"
+                  subLabel={file}
+                  onClickCheck={() => setInventoryBool(true)}
+                  status={null}
+                />
                 <SyntaxHighlighter
                   className="code-viewer"
                   wrapLongLines
@@ -175,7 +181,7 @@ export const Editor = () => {
                     return { style };
                   }}
                 >
-                  {localFileContent?.error ? <p>File not found</p> : localFileContent?.content}
+                  {remoteFileContent?.error ? <p>File not found</p> : remoteFileContent?.content}
                 </SyntaxHighlighter>
               </>
             ) : null}
@@ -184,7 +190,12 @@ export const Editor = () => {
           <div className="editor">
             {currentMatch && remoteFileContent?.content ? (
               <>
-                <p>Component File</p>
+                <LabelCard
+                  label="Component File"
+                  subLabel={file}
+                  onClickCheck={() => setInventoryBool(true)}
+                  status={null}
+                />
                 <SyntaxHighlighter
                   className="code-viewer"
                   wrapLongLines
@@ -206,7 +217,6 @@ export const Editor = () => {
           </div>
         </main>
       </section>
-
       {currentMatch ? (
         <InventoryDialog
           open={inventoryBool}
