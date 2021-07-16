@@ -18,6 +18,7 @@ import MenuBuilder from './main/menu';
 import './main/inventory';
 import './main/component';
 import './main/project';
+import './main/results';
 import { IpcEvents } from './ipc-events';
 import { Workspace } from './main/workspace/workspace';
 import { ItemExclude, Project } from './api/types';

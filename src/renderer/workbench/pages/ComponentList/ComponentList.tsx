@@ -7,6 +7,9 @@ import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import ComponentCard from '../../components/ComponentCard/ComponentCard';
 import { setComponent } from '../../actions';
 import { componentService } from '../../../../api/component-service';
+import { Alert } from '@material-ui/lab';
+
+const LIMIT = 100;
 
 const filter = (items, query) => {
   if (!items) {
@@ -54,8 +57,8 @@ export const ComponentList = () => {
   const filterItems = filter(components, searchQuery);
 
   const onSelectComponent = (component) => {
-    dispatch(setComponent(component));
     history.push(`/workbench/component`);
+    dispatch(setComponent(component));
   };
 
   return (
@@ -81,7 +84,7 @@ export const ComponentList = () => {
         <main className="app-content">
           {components && filterItems && filterItems.length > 0 ? (
             <section className="component-list">
-              {filterItems.map((component) => (
+              {filterItems.slice(0, LIMIT).map((component) => (
                 <ComponentCard key={component.compid} component={component} onClick={onSelectComponent} />
               ))}
             </section>
@@ -90,8 +93,17 @@ export const ComponentList = () => {
               Not results found with <strong>{searchQuery}</strong>
             </p>
           )}
+
+          {filterItems?.length > LIMIT && (
+            <Alert className="my-5" severity="info">
+              <strong>Showing {LIMIT} of {filterItems.length} components</strong>
+            </Alert>
+          )}
+
         </main>
       </section>
+
+
     </>
   );
 };

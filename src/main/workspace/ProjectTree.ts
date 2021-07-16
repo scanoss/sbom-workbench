@@ -301,6 +301,12 @@ function prepareScan(jsonScan: any, bannedList: Filtering.BannedList) {
   }
 }
 
+function dirFirstFileAfter(a, b) {
+  if (!a.isDirectory() && b.isDirectory()) return 1;
+  if (a.isDirectory() && !b.isDirectory()) return -1;
+  return 0;
+}
+
 function dirTree(root: string, filename: string) {
   // console.log(filename)
   const stats = fs.lstatSync(filename);
@@ -317,11 +323,16 @@ function dirTree(root: string, filename: string) {
       children: undefined,
       include: true,
       action: 'scan',
+      showCheckbox: false,
     };
 
-    info.children = fs.readdirSync(filename).map(function (child: string) {
-      return dirTree(root, `${filename}/${child}`);
-    });
+    info.children = fs
+      .readdirSync(filename, { withFileTypes: true }) // Returns a list of files and folders
+      .sort(dirFirstFileAfter)
+      .map((dirent) => dirent.name)                   // Converts Dirent objects to paths
+      .map((child: string) => {                       // Apply the recursion function in the whole array
+        return dirTree(root, `${filename}/${child}`);
+      });
   } else {
     info = {
       type: 'file',
@@ -333,6 +344,7 @@ function dirTree(root: string, filename: string) {
       components: [],
       include: true,
       action: 'scan',
+      showCheckbox: false,
     };
   }
   return info;

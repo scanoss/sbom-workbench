@@ -1,16 +1,16 @@
 import { Alert } from '@material-ui/lab';
 import React from 'react';
-import MatchCard from '../../../components/MatchCard/MatchCard';
+import MatchCard, { MATCH_CARD_ACTIONS } from '../../../components/MatchCard/MatchCard';
 
-const MAX_FILES = 500;
+const MAX_FILES = 250;
 
 export interface FileListProps {
   files: any[];
   filter?: 'pending' | 'identified' | 'ignored';
-  onSelectFile: (path: string) => void;
+  onAction: (path: string, action: MATCH_CARD_ACTIONS) => void;
 }
 
-export const FileList = ({ files, filter, onSelectFile }: FileListProps) => {
+export const FileList = ({ files, filter, onAction }: FileListProps) => {
   const filteredFiles = files
     .filter((file) => !filter || file.status === filter);
 
@@ -18,10 +18,14 @@ export const FileList = ({ files, filter, onSelectFile }: FileListProps) => {
     <>
       <section className="file-list">
         {filteredFiles.length > 0
-          ? filteredFiles.slice(0, MAX_FILES).map((file) => (
-              <article className="item" key={file.id} onClick={() => onSelectFile(file.path)}>
-                <MatchCard label={file.path} status={file.status} />
-              </article>
+          ? filteredFiles.slice(0, MAX_FILES).map((file, index) => (
+            <article className="item" key={index}>
+              <MatchCard
+                onAction={(action) => onAction(file.path, action)}
+                label={file.path}
+                status={file.status}
+              />
+            </article>
             ))
           : null}
       </section>

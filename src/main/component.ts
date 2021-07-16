@@ -4,7 +4,12 @@ import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (event, arg: Component) => {
-  const data = await defaultProject.scans_db.components.getAll(arg);    
+  const data = await defaultProject.scans_db.components.getAll(arg);   
+  return { status: 'ok', message: 'Components retrieved successfully', data };
+});
+
+ipcMain.handle(IpcEvents.COMPONENT_GET, async (event, arg: Component) => {
+  const data = await defaultProject.scans_db.components.get(arg);    
   return { status: 'ok', message: 'Components retrieved successfully', data };
 });
 
@@ -14,7 +19,7 @@ ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, arg: Component) => {
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE,async (event, comp: Component, lic: License) => {
-    let link = { license_id: lic.id, compid: comp.id };
+    let link = { license_id: lic.id, compid: comp.compid };
     await defaultProject.scans_db.licenses.licenseAttach(link);
     return { status: 'ok', message: 'test' };
   }
