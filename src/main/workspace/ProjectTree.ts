@@ -81,17 +81,12 @@ export class ProjectTree extends EventEmitter {
   }
 
   saveScanProject() {
-    const file = fs.writeFileSync(
-      `${this.work_root}/tree.json`,
-      JSON.stringify(this).toString()
-    );
+    const file = fs.writeFileSync(`${this.work_root}/tree.json`, JSON.stringify(this).toString());
   }
 
   createScanProject(scanPath: string) {
     const p: Project = {
-      work_root: `${getUserHome()}/scanoss-workspace/${path.basename(
-        scanPath
-      )}`,
+      work_root: `${getUserHome()}/scanoss-workspace/${path.basename(scanPath)}`,
       scan_root: scanPath,
       default_components: '',
       default_licenses: '',
@@ -199,17 +194,11 @@ function getLeaf(arbol: any, mypath: string): any {
   let j = 0;
   if (arbol.type === 'folder') {
     for (j = 0; j < arbol.children.length; j += 1) {
-      if (
-        arbol.children[j].type === 'folder' &&
-        arbol.children[j].label === res[1]
-      ) {
+      if (arbol.children[j].type === 'folder' && arbol.children[j].label === res[1]) {
         const newpath = mypath.replace(`${res[0]}/`, '');
         return getLeaf(arbol.children[j], newpath);
       }
-      if (
-        arbol.children[j].type === 'file' &&
-        arbol.children[j].label === res[1]
-      ) {
+      if (arbol.children[j].type === 'file' && arbol.children[j].label === res[1]) {
         return arbol.children[j];
       }
     }
@@ -265,13 +254,10 @@ function insertComponent(tree: any, mypath: string, inv: Inventory): any {
   while (i < myPathFolders.length) {
     let j: number;
     //  if (!arbol.components.includes(component)) arbol.components.push(component);
-    if (
-      !arbol.components.some(
-        (e) => e.purl === component.purl && e.version === component.version
-      )
-    )
+    if (!arbol.components.some((e) => e.purl === component.purl && e.version === component.version)) {
       arbol.components.push(component);
-
+      arbol.className = 'match';
+    }
     // console.log(`busco ${myPathFolders[i]}`);
     for (j = 0; j < arbol.children.length; j += 1) {
       if (arbol.children[j].label === myPathFolders[i]) {
@@ -283,6 +269,7 @@ function insertComponent(tree: any, mypath: string, inv: Inventory): any {
   }
 
   arbol.components.push(component);
+  arbol.className = 'match';
   // console.log(arbol);
 }
 
@@ -295,8 +282,7 @@ function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {
       jsonScan.action = 'filter';
     }
   } else if (jsonScan.type === 'folder') {
-    for (i = 0; i < jsonScan.children.length; i += 1)
-      recurseJSON(jsonScan.children[i], banned_list);
+    for (i = 0; i < jsonScan.children.length; i += 1) recurseJSON(jsonScan.children[i], banned_list);
   }
 }
 function prepareScan(jsonScan: any, bannedList: Filtering.BannedList) {
@@ -311,8 +297,7 @@ function prepareScan(jsonScan: any, bannedList: Filtering.BannedList) {
       jsonScan.action = 'filter';
     }
   } else if (jsonScan.type === 'folder') {
-    for (i = 0; i < jsonScan.children.length; i += 1)
-      prepareScan(jsonScan.children[i], bannedList);
+    for (i = 0; i < jsonScan.children.length; i += 1) prepareScan(jsonScan.children[i], bannedList);
   }
 }
 
@@ -324,6 +309,7 @@ function dirTree(root: string, filename: string) {
   if (stats.isDirectory()) {
     info = {
       type: 'folder',
+      className: 'no-match',
       value: filename.replace(root, ''),
       label: path.basename(filename),
       inventories: [],
@@ -339,6 +325,7 @@ function dirTree(root: string, filename: string) {
   } else {
     info = {
       type: 'file',
+      className: 'no-match',
       inv_count: 0,
       value: filename.replace(root, ''),
       label: path.basename(filename),

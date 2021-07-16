@@ -26,6 +26,7 @@ import { ScanDb } from './main/db/scan_db';
 import { Scanner } from './main/scannerLib/Scanner';
 import { SCANNER_EVENTS } from './main/scannerLib/ScannerEvents';
 import { fstat } from 'fs';
+import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
 const basepath = require('path');
 const fs = require('fs');
 

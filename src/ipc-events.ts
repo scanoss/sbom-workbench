@@ -34,6 +34,7 @@ export enum IpcEvents {
   LICENSE_GET = 'LICENSE_GET',
   LICENSE_DELETE = 'LICENSE_DELETE',
   LICENSE_UPDATE = 'LICENSE_UPDATE',
+  FILE_GET_CONTENT = 'FILE_GET_CONTENT',
 }
 
 export const ipcMainEvents = [
@@ -66,10 +67,12 @@ export const ipcRendererEvents = [
   IpcEvents.COMPONENT_GET_ALL,
   IpcEvents.COMPONENT_DETACH_LICENSE,
   IpcEvents.COMPONENT_ATTACH_LICENSE,
-  IpcEvents.COMPONENT_GET_FILES, 
+  IpcEvents.COMPONENT_GET_FILES,
 
   IpcEvents.LICENSE_CREATE,
   IpcEvents.LICENSE_GET,
   IpcEvents.LICENSE_UPDATE,
   IpcEvents.LICENSE_DELETE,
+
+  IpcEvents.FILE_GET_CONTENT,
 ];
