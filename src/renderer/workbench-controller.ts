@@ -1,6 +1,7 @@
 import { projectService } from '../api/project-service';
 import { componentService } from '../api/component-service';
 import { Component } from '../api/types';
+import { sortComponents } from '../utils/scan-util';
 
 const fs = require('original-fs').promises;
 
@@ -53,9 +54,10 @@ class WorkbenchController {
   }
 
   public async getComponents(): Promise<Component[]> {
-    const response = await componentService.getAll({});
-    console.log('COMPONENTS', response.data);
-    return response.data;
+    const { data } = await componentService.getAll({});
+    // console.log('COMPONENTS', data);
+    sortComponents(data)
+    return data;
   }
 
   public async getComponent(id: number): Promise<Component> {

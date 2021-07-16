@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import { Inventory } from '../api/types';
+import { Component, Inventory } from '../api/types';
 
 export function mapFiles(files: any[]): any[] {
   const getStatus = (file) =>
@@ -12,6 +12,10 @@ export function mapFiles(files: any[]): any[] {
       ...file,
       status: getStatus(file),
     }))
+}
+
+export function sortComponents(components: Component[]) {
+  components.sort((a, b) => b.summary?.pending - a.summary?.pending);
 }
 
 export function generateFileTree(scan: Record<string, unknown>): Promise<any> {

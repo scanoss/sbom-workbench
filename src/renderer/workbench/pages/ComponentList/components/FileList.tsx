@@ -18,8 +18,8 @@ export const FileList = ({ files, filter, onAction }: FileListProps) => {
     <>
       <section className="file-list">
         {filteredFiles.length > 0
-          ? filteredFiles.slice(0, MAX_FILES).map((file) => (
-            <article className="item" key={file.id}>
+          ? filteredFiles.slice(0, MAX_FILES).map((file, index) => (
+            <article className="item" key={index}>
               <MatchCard
                 onAction={(action) => onAction(file.path, action)}
                 label={file.path}
