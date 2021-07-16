@@ -1,7 +1,7 @@
 import { projectService } from '../api/project-service';
 import { componentService } from '../api/component-service';
 import { Component } from '../api/types';
-import { sortComponents } from '../utils/scan-util';
+import { sortComponents, transform } from '../utils/scan-util';
 
 const fs = require('original-fs').promises;
 
@@ -68,10 +68,13 @@ class WorkbenchController {
 
   private async generateScanResult(data): Promise<ScanResult> {
     const scan = data.results;
+    const tree = [data.logical_tree];
+    transform(tree, scan);
+    console.log(tree);
     return {
       scan,
       scanRoot: data.scan_root,
-      fileTree: [data.logical_tree],
+      fileTree: tree,
     };
   }
 }

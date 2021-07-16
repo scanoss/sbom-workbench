@@ -18,6 +18,16 @@ export function sortComponents(components: Component[]) {
   components.sort((a, b) => b.summary?.pending - a.summary?.pending);
 }
 
+export function transform(tree, scan) {
+  for (const treeElement of tree) {
+    if (treeElement.children) {
+      transform(treeElement.children, scan)
+    } else {
+      treeElement.className = getStatus(scan, treeElement .value);
+    }
+  }
+}
+
 export function generateFileTree(scan: Record<string, unknown>): Promise<any> {
   return new Promise((resolve) => {
     const obj = {};
@@ -105,7 +115,7 @@ function getLabelMatchesCount(label, value, type) {
 }
 
 function getStatus(scan, key) {
-  return scan[key] && scan[key][0]?.id !== 'none' ? 'match' : '';
+  return scan[key] && scan[key][0]?.id !== 'none' ? 'match-info-result' : '';
 }
 
 export function updateTree(scan, inventory: Inventory) {
