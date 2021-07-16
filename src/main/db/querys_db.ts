@@ -139,7 +139,7 @@ export class Querys {
   SQL_SELECT_FILES_FROM_PURL_VERSION =
     'SELECT fi.path,fi.identified,fi.ignored,r.version,r.purl FROM files fi INNER JOIN  results r where fi.md5=r.md5_file and r.purl=? and r.version=?;';
 
-  SQL_UPDATE_IGNORED_FILES = 'UPDATE files set ignored=1 where path=?;';
+  SQL_UPDATE_IGNORED_FILES = 'UPDATE files SET ignored=1,identified=0  WHERE path=?;';
 
   SQL_COMP_SUMMARY =
     'SELECT f.identified AS identified ,f.ignored as ignored FROM files f INNER JOIN results r WHERE r.md5_file=f.md5 AND r.purl=? AND r.version=?;';
