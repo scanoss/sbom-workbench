@@ -26,11 +26,10 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const loadScan = async (path: string) => {
     try {
-      const { scan, fileTree, components, scanRoot } = await workbenchController.loadScan(path);
-      dispatch(loadScanSuccess(scan, fileTree, components));
+      const { scan, fileTree, scanRoot } = await workbenchController.loadScan(path);
+      dispatch(loadScanSuccess(scan, fileTree, []));
       setScanBasePath(scanRoot);
-
-      // const { status, data } = await componentService.get({});
+      update();
       return true;
     } catch (error) {
       console.error(error);
@@ -50,14 +49,13 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   }
 
   const update = async () => {
-    const components = await workbenchController.getComponents();
     if (component) {
-      const updateComponent = components.find((com) =>
-        component.purl == com.purl && component.version == com.version
-      );
-      dispatch(setComponent(updateComponent));
+      const comp = await workbenchController.getComponent(component.compid);
+      if (comp)
+        dispatch(setComponent(comp));
     }
 
+    const components = await workbenchController.getComponents();
     dispatch(loadScanSuccess(scan, tree, components)); //TODO: Create action
   };
 

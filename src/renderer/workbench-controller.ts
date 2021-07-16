@@ -8,7 +8,6 @@ export interface ScanResult {
   scan: Record<string, unknown>;
   scanRoot: string;
   fileTree: any[];
-  components: any[];
 }
 
 class WorkbenchController {
@@ -59,14 +58,18 @@ class WorkbenchController {
     return response.data;
   }
 
+  public async getComponent(id: number): Promise<Component> {
+    const response = await componentService.get({compid: id});
+    console.log('COMPONENT', response.data);
+    return response.data;
+  }
+
   private async generateScanResult(data): Promise<ScanResult> {
     const scan = data.results;
-    const components = await this.getComponents();
     return {
       scan,
       scanRoot: data.scan_root,
       fileTree: [data.logical_tree],
-      components,
     };
   }
 }
