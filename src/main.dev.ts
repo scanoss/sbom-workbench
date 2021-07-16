@@ -24,6 +24,7 @@ import { IpcEvents } from './ipc-events';
 import { Workspace } from './main/workspace/workspace';
 import { ItemExclude, Project } from './api/types';
 import { ScanDb } from './main/db/scan_db';
+import { licenses } from './main/db/licenses';
 
 import { Scanner } from './main/scannerLib/Scanner';
 import { SCANNER_EVENTS } from './main/scannerLib/ScannerEvents';
@@ -161,12 +162,11 @@ let ws: Workspace;
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   ws = new Workspace();
   const scanner = new Scanner();
-
   const { path } = arg;
   let created: any;
 
   ws.newProject(path);
-  ws.projectsList.prepare_scan();
+  await ws.projectsList.prepare_scan();
   scanner.setResultsPath(ws.projectsList.work_root);
   console.log(`SCANNER: Start scanning path=${path}`);
   scanner.setResultsPath(ws.projectsList.work_root);

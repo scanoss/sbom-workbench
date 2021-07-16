@@ -11,6 +11,8 @@ import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { Component } from '../../api/types';
 import {ResultsDb} from  './scan_results_db';
+import {LicenseDb} from  './scan_license_db';
+import { License } from '../../api/types';
 
 interface Summary {
   identified: number;
@@ -25,9 +27,12 @@ export class ComponentDb extends Db {
 
   results:ResultsDb;
 
+  license:LicenseDb;
+
   constructor(path: string) {
     super(path);
     this.results=new ResultsDb(path);
+    this.license=new LicenseDb(path);
   }
 
   get(component: Partial<Component> ) {
@@ -220,41 +225,43 @@ export class ComponentDb extends Db {
     });
   }
 
-  // IMPORT UNIQUE RESULTS TO COMP DB FROM FILE RESULTS
-  importUniqueFromFile(resultPath: string) {
-    let data: any;
-    return new Promise(async (resolve, reject) => {
-      try {
-        const result: Record<any, any> = await utilsDb.readFile(resultPath);
-        const db = await this.openDb();
-        for (const [key, value] of Object.entries(result)) {
-          for (let i = 0; i < value.length; i += 1) {
-            data = value[i];
-            if (data.id !== 'none') {
-              await this.componentNewImportFromResults(db, data);
-            }
-          }
-        }
-        db.close();
-      } catch (error) {
-        reject(new Error('Unable to import scan results'));
-      }
-      resolve(true);
-    });
-  }
 
   // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
   importUniqueFromJSON(json: string) {
     let data: any;
+    let attachLicComp={
+      license_id:0,
+      compid:0,
+    };
+    let license:License;
+    license={
+      id:0,
+      name:'',
+      spdxid:'',
+      fulltext:'AUTOMATIC IMPORT',
+      url:'AUTOMATIC IMPORT',
+    };
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();        
         for (const [key, value] of Object.entries(json)) {
-          for (let i = 0; i < value.length; i += 1) {
+          for (let i = 0; i < value.length; i += 1) {     
             data = value[i];
-
-            if (data.id !== 'none') {
-              await this.componentNewImportFromResults(db, data);
+            if (data.id !== 'none') {                   
+               data.licenses && data.licenses[0]?license.spdxid=data.licenses[0].name:'NULL';                
+               if (license.spdxid!==''){    
+                 // Get license id by result spdxid
+                  attachLicComp.license_id= await this.license.getLicenseIdFilter(license);              
+                  if(attachLicComp.license_id==0){
+                  license=await this.license.create(license);  
+                  license.id?attachLicComp.license_id=license.id:0;             
+                 }                     
+                 }else{
+                 attachLicComp.license_id= await this.license.getLicenseIdFilter(license);                     
+              }  
+              attachLicComp.compid =await this.componentNewImportFromResults(db, data);
+             await this.license.licenseAttach(attachLicComp);
+             
             }
           }
         }
@@ -268,7 +275,7 @@ export class ComponentDb extends Db {
 
   // COMPONENT NEW
   private componentNewImportFromResults(db: any, data: any) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<number>(async (resolve, reject) => {
       db.serialize(function () {
         const stmt = db.prepare(query.COMPDB_SQL_COMP_VERSION_INSERT);
         stmt.run(
@@ -277,12 +284,12 @@ export class ComponentDb extends Db {
           'AUTOMATIC IMPORT',
           data.url,
           data.purl ? data.purl[0] : 'n/a',
-          (err: any) => {
-            if (err) reject(new Error('error'));
+          function (this:any,err: any)  {   
+            stmt.finalize();       
+            if (err) reject(new Error('error'));   
+            else resolve(this.lastID);      
           }
-        );
-        stmt.finalize();
-        resolve(true);
+        ); 
       });
     });
   }

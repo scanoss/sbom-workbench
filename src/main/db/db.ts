@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable func-names */
 import sqlite3 from 'sqlite3';
-
 import fs from 'fs';
 
 
@@ -13,9 +12,9 @@ const query = new Querys();
 export class Db {
   dbPath: string;
 
-
   constructor(path:string) { 
     this.dbPath = `${path}/scan_db`;
+   
   }
 
   // CALL THIS FUCTION TO INIT THE DB
@@ -29,24 +28,11 @@ export class Db {
     return false;
   }
 
-  // private scanCreateFolderDb() {
-  //   return new Promise((resolve) => {
-  //     fs.access(`${this.folderDb}/database`, (err) => {
-  //       if (err) {
-  //         fs.mkdir(`${this.folderDb}/database`, (error) => {
-  //           if (!error) resolve(true);
-  //         });
-  //       } else {
-  //         resolve(true);
-  //       }
-  //     });
-  //   });
-  // }
 
   // CREATE A NEW SCAN DB
   private scanCreateDb() {
     return new Promise((resolve, reject) => {
-      const db = new sqlite3.Database(this.dbPath, (err: any) => {
+      const db = new sqlite3.Database(this.dbPath,(err: any) => {
         if (err) {
           reject(new Error('Unable to create DB'));
         } else {
@@ -56,8 +42,8 @@ export class Db {
           db.run(query.SQL_CREATE_TABLE_INVENTORY);
           db.run(query.SQL_CREATE_TABLE_STATUS);
           db.run(query.COMPDB_SQL_CREATE_TABLE_COMPVERS);
-          db.run(query.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS);
           db.run(query.COMPDB_LICENSES_TABLE);
+          db.run(query.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS);       
           db.close();
         }
         resolve(true);
