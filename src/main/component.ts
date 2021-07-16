@@ -14,7 +14,7 @@ ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, arg: Component) => {
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE,async (event, comp: Component, lic: License) => {
-    let link = { license_id: lic.id, compid: comp.id };
+    let link = { license_id: lic.id, compid: comp.compid };
     await defaultProject.scans_db.licenses.licenseAttach(link);
     return { status: 'ok', message: 'test' };
   }

@@ -34,8 +34,8 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         let comp:any;
-        if(component.id){
-          comp= await this.getById(component.id);   
+        if(component.compid){
+          comp= await this.getById(component.compid);   
           resolve(comp);  
         }             
         else resolve([]);
@@ -345,7 +345,7 @@ export class ComponentDb extends Db {
             component.url,
             component.purl,
             component.description,
-            component.id,
+            component.compid,
             (err: any) => {
               if (err) resolve(false);
             }
