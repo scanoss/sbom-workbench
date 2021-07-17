@@ -22,6 +22,8 @@ const Workbench = () => {
 
   const { file } = state;
 
+  const MemoEditor = React.memo(Editor); //TODO: move inside editor page
+
   const init = async () => {
     const result = scanPath ? await loadScan(scanPath) : false;
     if (!result) {
@@ -67,7 +69,7 @@ const Workbench = () => {
             <Route path={`${path}/component/`}>
               <ComponentDetail />
             </Route>
-            <Route path={`${path}/file`}>{file ? <Editor /> : null}</Route>
+            <Route path={`${path}/file`}>{file ? <MemoEditor /> : null}</Route>
           </Switch>
         </main>
       </SplitPane>
