@@ -36,6 +36,8 @@ export class Db {
         if (err) {
           reject(new Error('Unable to create DB'));
         } else {
+         
+          db.run("begin transaction");
           db.run(query.SQL_CREATE_TABLE_FILES);
           db.run(query.SQL_CREATE_TABLE_RESULTS);
           db.run(query.SQL_CREATE_TABLE_FILE_INVENTORIES);
@@ -44,6 +46,7 @@ export class Db {
           db.run(query.COMPDB_SQL_CREATE_TABLE_COMPVERS);
           db.run(query.COMPDB_LICENSES_TABLE);
           db.run(query.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS);       
+          db.run("commit");
           db.close();
         }
         resolve(true);

@@ -190,14 +190,14 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
 
   scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
     console.log(`New ${fileNumbers} files scanned`);
-    await ws.projectsList.scans_db.components.importUniqueFromJSON(data);
-    await ws.projectsList.scans_db.results.insertFromJSON(data);
     await ws.projectsList.scans_db.files.insertFromJSON(data);
   });
 
   scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
     console.log(`Scan Finished... Results on: ${resultsPath}`);
-
+    await ws.projectsList.scans_db.components.importUniqueFromFile(resultsPath);
+    await ws.projectsList.scans_db.results.insertFromFile(resultsPath);
+   // await ws.projectsList.scans_db.files.insertFromFile(resultsPath);
     /**
      * just because JSON is not accesible directly
      */

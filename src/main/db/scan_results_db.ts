@@ -8,6 +8,7 @@
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
+import { resolve } from 'path';
 
 const utilsDb = new UtilsDb();
 const query = new Querys();
@@ -25,22 +26,29 @@ export class ResultsDb extends Db {
 
   // INSERT RESULTS FROM FILE
   async insertFromFile(resultPath: string) {
-    try {
-      const result: Record<any, any> = await utilsDb.readFile(resultPath);
-      const db = await this.openDb();
-      let data: any;
-      for (const [key, value] of Object.entries(result)) {
-        for (let i = 0; i < value.length; i += 1) {
-          data = value[i];
-          if (data.id !== 'none') {
-            await this.insertResult(db, data);
+    return new Promise(async (resolve) => {
+      try {
+        const self = this;
+        const result: Record<any, any> = await utilsDb.readFile(resultPath);
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          let data: any;
+          for (const [key, value] of Object.entries(result)) {
+            for (let i = 0; i < value.length; i += 1) {
+              data = value[i];
+              if (data.id !== 'none')
+              self.insertResult(db, data);              
+            }
           }
-        }
+          db.run('commit');
+          db.close;
+          resolve(true);
+        });
+      } catch {
+        resolve(false);
       }
-      return true;
-    } catch {
-      return false;
-    }
+    });
   }
 
   // INSERT RESULTS FROM FILE
@@ -52,7 +60,7 @@ export class ResultsDb extends Db {
         for (let i = 0; i < value.length; i += 1) {
           data = value[i];
           if (data.id !== 'none') {
-            await this.insertResult(db, data);
+           this.insertResult(db, data);
           }
         }
       }
@@ -62,13 +70,10 @@ export class ResultsDb extends Db {
     }
   }
 
-  private insertResult(db: any, data: any) {
-    return new Promise(async (resolve) => {
-      const stmt = db.prepare(query.SQL_INSERT_RESULTS);
-      db.serialize(function () {
+  private insertResult(db: any, data: any) {  
         const licenseName =
           data.licenses && data.licenses[0] ? data.licenses[0].name : 'n/a';
-        stmt.run(
+        db.run(query.SQL_INSERT_RESULTS,
           data.file_hash,
           data.vendor,
           data.component,
@@ -84,11 +89,7 @@ export class ResultsDb extends Db {
           data.url_hash,
           data.purl ? data.purl[0] : ' '
         );
-      });
-      stmt.finalize();
-      resolve(true);
-    });
-  }
+   }
 
   // CONVERT ARRAY TO RESULTS FORMAT
   convertToResultsFormat(input: any) {
