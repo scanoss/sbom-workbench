@@ -271,12 +271,12 @@ export class ComponentDb extends Db {
               data.licenses && data.licenses[0]
                 ? (license.spdxid = data.licenses[0].name)
                 : 'NULL';
-              if (license.spdxid !== '') {
+              if (license.spdxid !== 'NULL') {
                 // Get license id by result spdxid
                 attachLicComp.license_id =
                   await this.license.getLicenseIdFilter(license);
                 if (attachLicComp.license_id == 0) {
-                  license = await this.license.bulkCreate(db,license);
+                  license = await this.license.bulkCreate(db, license);
                   license.id ? (attachLicComp.license_id = license.id) : 0;
                 }
               } else {
@@ -324,12 +324,12 @@ export class ComponentDb extends Db {
               data.licenses && data.licenses[0]
                 ? (license.spdxid = data.licenses[0].name)
                 : 'NULL';
-              if (license.spdxid !== '') {
+              if (license.spdxid !== 'NULL') {
                 // Get license id by result spdxid
                 attachLicComp.license_id =
                   await this.license.getLicenseIdFilter(license);
                 if (attachLicComp.license_id == 0) {
-                  license = await this.license.create(license);
+                  license = await this.license.bulkCreate(db, license);
                   license.id ? (attachLicComp.license_id = license.id) : 0;
                 }
               } else {
@@ -345,10 +345,10 @@ export class ComponentDb extends Db {
           }
         }
         db.close();
+        resolve(true);
       } catch (error) {
         reject(new Error('Unable to import results'));
       }
-      resolve(true);
     });
   }
 

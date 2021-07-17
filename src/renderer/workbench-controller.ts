@@ -57,7 +57,7 @@ class WorkbenchController {
 
   public async getComponents(): Promise<Component[]> {
     const { data } = await componentService.getAll({});
-    // console.log('COMPONENTS', data);
+     console.log('COMPONENTS', data);
     sortComponents(data)
     return data;
   }
