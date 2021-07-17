@@ -4,12 +4,8 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory } from 'react-router-dom';
-import { match } from 'assert';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 import { DialogContext } from '../../../context/DialogProvider';
-import Label from '../../components/Label/Label';
-import Title from '../../components/Title/Title';
-import MatchCard from '../../components/MatchCard/MatchCard';
 import { range } from '../../../../utils/utils';
 import { workbenchController } from '../../../workbench-controller';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
@@ -188,6 +184,7 @@ export const Editor = () => {
                   className="code-viewer"
                   wrapLongLines
                   style={nord}
+                  language="javascript"
                   showLineNumbers
                   lineProps={(lineNumber) => {
                     const style = { display: 'block' };
@@ -210,6 +207,7 @@ export const Editor = () => {
                   className="code-viewer"
                   wrapLongLines
                   style={nord}
+                  language="javascript"
                   showLineNumbers
                   lineNumberContainerStyle={{ marginRigth: 20 }}
                   lineProps={(lineNumber) => {

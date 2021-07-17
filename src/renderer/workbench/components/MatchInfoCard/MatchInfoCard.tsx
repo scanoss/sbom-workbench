@@ -39,7 +39,7 @@ const MatchInfoCard = ({ match, changeLines, style, onAction }: MatchInfoCardPro
                 <span className="usage-label">DETECTED</span>
               </>
             )}
-            <span className="usage-id">Snippet</span>
+            <span className="usage-id">{match.id}</span>
           </div>
         </div>
        {/* <div className="match-info-card-buttons">
