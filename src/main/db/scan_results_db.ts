@@ -8,6 +8,7 @@
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
+import { resolve } from 'path';
 
 const utilsDb = new UtilsDb();
 const query = new Querys();
@@ -24,70 +25,76 @@ export class ResultsDb extends Db {
   }
 
   // INSERT RESULTS FROM FILE
-  async insertFromFile(resultPath: string) {
-    try {
-      const result: Record<any, any> = await utilsDb.readFile(resultPath);
-      const db = await this.openDb();
-      let data: any;
-      for (const [key, value] of Object.entries(result)) {
-        for (let i = 0; i < value.length; i += 1) {
-          data = value[i];
-          if (data.id !== 'none') {
-            await this.insertResult(db, data);
+    insertFromFile(resultPath: string) {
+    return new Promise(async (resolve) => {
+      try {
+        const self = this;
+        const result: Record<any, any> = await utilsDb.readFile(resultPath);
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          let data: any;
+          for (const [key, value] of Object.entries(result)) {
+            for (let i = 0; i < value.length; i += 1) {
+              data = value[i];
+              if (data.id !== 'none') self.insertResult(db, data);
+            }
           }
-        }
+          db.run('commit');
+          db.close;
+          resolve(true);
+        });
+      } catch {
+        resolve(false);
       }
-      return true;
-    } catch {
-      return false;
-    }
+    });
   }
 
   // INSERT RESULTS FROM FILE
-  async insertFromJSON(json: string) {
-    try {
-      const db = await this.openDb();
-      let data: any;
-      for (const [key, value] of Object.entries(json)) {
-        for (let i = 0; i < value.length; i += 1) {
-          data = value[i];
-          if (data.id !== 'none') {
-            await this.insertResult(db, data);
+  insertFromJSON(json: string) {
+    return new Promise(async (resolve) => {
+      try {
+        const self = this;
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          let data: any;
+          for (const [key, value] of Object.entries(json)) {
+            for (let i = 0; i < value.length; i += 1) {
+              data = value[i];
+              if (data.id !== 'none') self.insertResult(db, data);
+            }
           }
-        }
+          db.run('commit');
+          db.close;
+          resolve(true);
+        });
+      } catch {
+        resolve(false);
       }
-      return true;
-    } catch {
-      return false;
-    }
+    });
   }
 
   private insertResult(db: any, data: any) {
-    return new Promise(async (resolve) => {
-      const stmt = db.prepare(query.SQL_INSERT_RESULTS);
-      db.serialize(function () {
-        const licenseName =
-          data.licenses && data.licenses[0] ? data.licenses[0].name : 'n/a';
-        stmt.run(
-          data.file_hash,
-          data.vendor,
-          data.component,
-          data.version,
-          data.latest,
-          licenseName,
-          data.url,
-          data.lines,
-          data.oss_lines,
-          data.matched,
-          data.file,
-          data.id,
-          data.url_hash,
-          data.purl ? data.purl[0] : ' '
-        );
-      });
-      stmt.finalize();
-      resolve(true);
-    });
+    const licenseName =
+      data.licenses && data.licenses[0] ? data.licenses[0].name : 'n/a';
+    db.run(
+      query.SQL_INSERT_RESULTS,
+      data.file_hash,
+      data.vendor,
+      data.component,
+      data.version,
+      data.latest,
+      licenseName,
+      data.url,
+      data.lines,
+      data.oss_lines,
+      data.matched,
+      data.file,
+      data.id,
+      data.url_hash,
+      data.purl ? data.purl[0] : ' '
+    );
   }
 
   // CONVERT ARRAY TO RESULTS FORMAT
@@ -141,6 +148,48 @@ export class ResultsDb extends Db {
     });
   }
 
+  private identifiedSummary(db: any, data: any) {
+    return new Promise<number>(async (resolve) => {
+      db.get(
+        query.SQL_COMP_SUMMARY_IDENTIFIED,
+        data.purl,
+        data.version,
+        async (err: any, comp: any) => {
+          if (err) resolve(0);
+          if (comp !== undefined) resolve(comp.identified);
+        }
+      );
+    });
+  }
+
+  private ignoredSummary(db: any, data: any) {
+    return new Promise<number>(async (resolve) => {
+      db.get(
+        query.SQL_COMP_SUMMARY_IGNORED,
+        data.purl,
+        data.version,
+        async (err: any, comp: any) => {
+          if (err) resolve(0);
+          if (comp !== undefined) resolve(comp.ignored);
+        }
+      );
+    });
+  }
+
+  private pendingSummary(db: any, data: any) {
+    return new Promise<number>(async (resolve) => {
+      db.get(
+        query.SQL_COMP_SUMMARY_PENDING,
+        data.purl,
+        data.version,
+        async (err: any, comp: any) => {
+          if (err) resolve(0);
+          if (comp !== undefined) resolve(comp.pending);
+        }
+      );
+    });
+  }
+
   summary(data: any) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -150,24 +199,11 @@ export class ResultsDb extends Db {
           pending: 0,
         };
         const db = await this.openDb();
-        db.all(
-          query.SQL_COMP_SUMMARY,
-          data.purl,
-          data.version,
-          async (err: any, comp: any) => {
-            db.close();
-            if (!err) {
-              for (let i = 0; i < comp.length; i += 1) {
-                if (comp[i].identified === 1) summary.identified += 1;
-                if (comp[i].ignored === 1) summary.ignored += 1;
-                if (comp[i].ignored === 0 && comp[i].identified === 0)
-                  summary.pending += 1;
-              }
-            }
-
-            resolve(summary);
-          }
-        );
+        summary.identified = await this.identifiedSummary(db, data);
+        summary.ignored = await this.ignoredSummary(db, data);
+        summary.pending = await this.pendingSummary(db, data);
+        db.close();
+        resolve(summary);
       } catch (error) {
         reject(error);
       }

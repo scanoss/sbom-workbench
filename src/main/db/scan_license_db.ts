@@ -19,6 +19,29 @@ export class LicenseDb extends Db {
   }
 
   // CREATE LICENSE
+  bulkCreate(db:any,license: License) {
+    return new Promise<License>((resolve, reject) => {
+      try {        
+        db.run(query.COMPDB_LICENSES_INSERT,
+          license.spdxid,
+          license.name,
+          license.fulltext,
+          license.url,
+          function (this: any, err: any) {      
+            if (err || this.lastID === 0)
+              reject(new Error('The license was not created or already exist'));
+            license.id = this.lastID;
+            resolve(license);
+          }
+        );
+      } catch (error) {
+        reject(new Error('The license was not created'));
+      }
+    });
+  }
+
+
+  // CREATE LICENSE
   create(license: License) {
     return new Promise<License>(async (resolve, reject) => {
       try {
@@ -33,8 +56,7 @@ export class LicenseDb extends Db {
             db.close();
             if (err || this.lastID === 0)
               reject(new Error('The license was not created or already exist'));
-            license.id = this.lastID;
-            console.log(this.lastID);
+            license.id = this.lastID;           
             stmt.finalize();
             resolve(license);
           }
@@ -76,6 +98,7 @@ export class LicenseDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(function () {
+          db.run("begin transaction");
           for (const [key, license] of Object.entries(json)) {
             db.run(
               query.COMPDB_LICENSES_INSERT,
@@ -85,6 +108,7 @@ export class LicenseDb extends Db {
               license.url
             );
           }
+          db.run("commit");
           db.close();          
         });        
         resolve(true);

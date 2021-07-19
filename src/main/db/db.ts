@@ -35,7 +35,7 @@ export class Db {
       const db = new sqlite3.Database(this.dbPath,(err: any) => {
         if (err) {
           reject(new Error('Unable to create DB'));
-        } else {
+        } else {       
           db.run(query.SQL_CREATE_TABLE_FILES);
           db.run(query.SQL_CREATE_TABLE_RESULTS);
           db.run(query.SQL_CREATE_TABLE_FILE_INVENTORIES);
@@ -43,7 +43,7 @@ export class Db {
           db.run(query.SQL_CREATE_TABLE_STATUS);
           db.run(query.COMPDB_SQL_CREATE_TABLE_COMPVERS);
           db.run(query.COMPDB_LICENSES_TABLE);
-          db.run(query.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS);       
+          db.run(query.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS);          
           db.close();
         }
         resolve(true);

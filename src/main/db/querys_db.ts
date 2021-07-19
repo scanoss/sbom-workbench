@@ -125,7 +125,7 @@ export class Querys {
 
   // GET ALL COMPONENTES
   SQL_GET_ALL_COMPONENTS =
-    ' SELECT DISTINCT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv;';
+    ' SELECT DISTINCT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv GROUP BY cv.version;';
 
   // GET LICENSES
   COMPDB_SQL_LICENSE_ALL = 'SELECT id, spdxid, name, url from licenses where id like ? ;';
@@ -141,6 +141,10 @@ export class Querys {
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE files SET ignored=1,identified=0  WHERE path=?;';
 
-  SQL_COMP_SUMMARY =
-    'SELECT f.identified AS identified ,f.ignored as ignored FROM files f INNER JOIN results r WHERE r.md5_file=f.md5 AND r.purl=? AND r.version=?;';
+  SQL_COMP_SUMMARY_PENDING =
+  "SELECT count(*) as pending FROM files f INNER JOIN results r  WHERE r.md5_file=f.md5 AND r.purl= ? AND r.version=? AND f.ignored=0 AND f.identified=0;";
+
+  SQL_COMP_SUMMARY_IDENTIFIED = 'SELECT count(f.identified ) as identified FROM files f INNER JOIN results r  WHERE r.md5_file=f.md5 AND r.purl= ? AND r.version=? AND f.identified=1;'
+
+  SQL_COMP_SUMMARY_IGNORED = 'SELECT count(f.ignored) as ignored FROM files f INNER JOIN results r  WHERE r.md5_file=f.md5 AND r.purl= ? AND r.version=? AND f.ignored=1;'
 }
