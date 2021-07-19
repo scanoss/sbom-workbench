@@ -40,9 +40,7 @@
     }
 
     .match-info-default-container {
-      display: flex;
-      flex-direction: column;
-      width: 50%;
+      width: 100%;
 
       .second-row-match {
         // display: grid;
@@ -58,16 +56,10 @@
       }
     }
 
-    .match-info-identified-container {
-      display: flex;
-      flex-direction: column;
-      width: 50%;
-    }
-
-
   }
 }
 
+.match-info-default-container,
 .info-files, .editors {
   display: grid;
   grid-template-columns: calc(50% - 10px) 50%;

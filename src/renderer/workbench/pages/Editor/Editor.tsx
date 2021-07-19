@@ -13,6 +13,8 @@ import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialo
 import { Inventory } from '../../../../api/types';
 import LabelCard from '../../components/LabelCard/LabelCard';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../components/MatchInfoCard/MatchInfoCard';
+import { componentService } from '../../../../api/component-service';
+import { mapFile, mapFiles } from '../../../../utils/scan-util';
 
 export interface FileContent {
   content: string | null;
@@ -24,7 +26,7 @@ export const Editor = () => {
 
   console.log('render');
 
-  const { state, dispatch, createInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, createInventory, ignoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { setInventoryBool, inventoryBool } = useContext<any>(DialogContext);
 
@@ -33,6 +35,7 @@ export const Editor = () => {
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
+  const [fileStatus, setFileStatus] = useState<any | null>(null);
   const [ossLines, setOssLines] = useState<number[] | null>([]);
   const [lines, setLines] = useState<number[] | null>([]);
 
@@ -65,6 +68,13 @@ export const Editor = () => {
     await createInventory(newInventory);
   };
 
+  const getFile = async () => {
+    console.log('get fi');
+    const { data } = await componentService.getFiles( { purl: currentMatch?.purl[0], version: currentMatch?.version });
+    const currentFile = data.find(f => f.path == file);
+    setFileStatus(mapFile(currentFile));
+  };
+
   useEffect(() => {
     if (!currentMatch) {
       return;
@@ -85,6 +95,15 @@ export const Editor = () => {
     setLines(lineasLocales);
   }, [currentMatch]);
 
+  const onIdentifyPressed = async () => {
+    setInventoryBool(true);
+  };
+
+  const onIgnorePressed = async () => {
+    await ignoreFile(file);
+    // getFile();
+  };
+
   useEffect(() => {
     setLocalFileContent({ content: null, error: false });
     setRemoteFileContent({ content: null, error: false });
@@ -96,11 +115,11 @@ export const Editor = () => {
 
   useEffect(() => {
     if (currentMatch) {
+      getFile(); // TODO: on init cuando este el servicio
       loadRemoteFile(currentMatch.file_hash);
     }
   }, [currentMatch]);
 
-  // TODO: render all matches
   useEffect(() => {
     if (matchInfo) {
       setCurrentMatch(matchInfo[0]);
@@ -114,9 +133,10 @@ export const Editor = () => {
       case MATCH_INFO_CARD_ACTIONS.ACTION_ENTER:
         break;
       case MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY:
-        setInventoryBool(true);
+        onIdentifyPressed();
         break;
       case MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE:
+        onIgnorePressed();
         break;
       default:
         break;
@@ -140,21 +160,14 @@ export const Editor = () => {
                   <div className="match-info-default-container">
                     {matchInfo.map((match, index) => (
                       <MatchInfoCard
-                        changeLines={() => {
-                          setCurrentMatch(matchInfo[index]);
-                        }}
-                        style={currentMatch === match ? { borderBottom: '#60A5FA 2px solid', borderTop: '#60A5FA 2px solid', borderRight: '#60A5FA 2px solid' } : null}
-                        match={match}
-                        onClickCheck={() => setInventoryBool(true)}
                         key={index}
+                        selected={currentMatch === match}
+                        match={match}
+                        status={fileStatus?.status}
+                        onSelect={() => setCurrentMatch(matchInfo[index])}
                         onAction={onAction}
                       />
                     ))}
-                  </div>
-                  <div className="match-info-identified-container">
-                    {/* {matchInfo.map((match, index) => (
-                      <MatchInfoCard match={match} onClickCheck={() => setInventoryBool(true)} key={index} />
-                    ))} */}
                   </div>
                 </section>
                 <div className="info-files">
@@ -231,7 +244,10 @@ export const Editor = () => {
           open={inventoryBool}
           onCancel={() => setInventoryBool(false)}
           onClose={handleClose}
-          component={{ ...currentMatch, name: currentMatch.component }}
+          component={{
+            ...currentMatch,
+            name: currentMatch.component
+          }}
         />
       ) : null}
     </>
