@@ -9,13 +9,18 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { Component } from '../../api/types';
+import { ComponentDb } from './scan_component_db';
 
 const query = new Querys();
 const utilsDb = new UtilsDb();
 
 export class FilesDb extends Db {
+
+  component:ComponentDb;
+
   constructor(path: string) {
     super(path);
+    this.component= new ComponentDb(path);
   }
 
   private insertFile(db: any, data: any, filePath: string) {
@@ -77,6 +82,7 @@ export class FilesDb extends Db {
 
   // GET ALL FILES FOR A COMPONENT
   getFilesComponent(data: Partial<Component>) {
+    const self=this;
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -84,9 +90,16 @@ export class FilesDb extends Db {
           query.SQL_SELECT_FILES_FROM_PURL_VERSION,
           data.purl,
           data.version,
-          function (err: any, file: any) {
+          async function (err: any, file: any) {
             db.close();
-            if (!err) resolve(file);
+            if (!err)
+            {
+              const comp = await self.component.getAll({purl:data.purl,version:data.version});
+              for(let i=0; i<file.length; i +=1){
+                file[i].component=comp;
+              }         
+              resolve(file);
+            } 
             else resolve([]);
           }
         );

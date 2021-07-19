@@ -76,7 +76,7 @@ export class ComponentDb extends Db {
           query.SQL_GET_ALL_COMPONENTS,
           async (err: any, component: any) => {
             if (err) resolve(undefined);
-            db.close();
+            db.close();            
             for (let i = 0; i < component.length; i += 1) {
               const licenses = await self.getAllLicensesFromComponentId(
                 component[i].compid
@@ -267,7 +267,7 @@ export class ComponentDb extends Db {
         for (const [key, value] of Object.entries(json)) {
           for (let i = 0; i < value.length; i += 1) {
             data = value[i];
-            if (data.id !== 'none') {
+            if (data.id !== 'none') {        
               data.licenses && data.licenses[0]
                 ? (license.spdxid = data.licenses[0].name)
                 : 'NULL';

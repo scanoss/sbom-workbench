@@ -21,8 +21,6 @@ class InventoryService {
     );
     return response;
   }
-
-
 }
 
 
