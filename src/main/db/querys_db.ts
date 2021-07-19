@@ -124,8 +124,8 @@ export class Querys {
     'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.purl=? and cv.version=?;';
 
   // GET ALL COMPONENTES
-  SQL_GET_ALL_COMPONENTS =
-    ' SELECT DISTINCT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv GROUP BY cv.version;';
+   SQL_GET_ALL_COMPONENTS =
+     ' SELECT DISTINCT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv GROUP BY cv.version;';
 
   // GET LICENSES
   COMPDB_SQL_LICENSE_ALL = 'SELECT id, spdxid, name, url from licenses where id like ? ;';
@@ -137,7 +137,7 @@ export class Querys {
   SQL_GET_ALL_INVENTORIES = 'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories;';
 
   SQL_SELECT_FILES_FROM_PURL_VERSION =
-    'SELECT fi.path,fi.identified,fi.ignored,r.version,r.purl FROM files fi INNER JOIN  results r where fi.md5=r.md5_file and r.purl=? and r.version=?;';
+    'SELECT fi.path,fi.identified,fi.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines FROM files fi INNER JOIN  results r where fi.md5=r.md5_file and r.purl=? and r.version=?;';
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE files SET ignored=1,identified=0  WHERE path=?;';
 

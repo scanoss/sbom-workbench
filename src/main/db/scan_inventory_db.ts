@@ -90,7 +90,7 @@ export class InventoryDb extends Db {
         if (inventory.id) {
           const inventories: any = await this.getById(inventory);
           const comp = await this.component.getAll(inventories);
-          const files = await this.getAttachedToFileBYId(inventories);
+          const files = await this.getInventoryFiles(inventories);
           inventories.component = comp;
           inventories.files=files;
           // Remove purl and version from inventory
@@ -305,7 +305,7 @@ export class InventoryDb extends Db {
   }
 
   // GET FILES ATTACHED TO AN INVENTORY BY INVENTORY ID
-  getAttachedToFileBYId(inventory: Partial<Inventory>) {
+  getInventoryFiles(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();

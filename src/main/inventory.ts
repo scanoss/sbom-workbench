@@ -8,7 +8,7 @@ ipcMain.handle(
   async (event, invget: Partial<Inventory>) => {
     let inv: any;
     try {
-      inv = await defaultProject.scans_db.inventories.getAll(invget);
+      inv = await defaultProject.scans_db.inventories.getAll(invget); 
       return { status: 'ok', message: inv, data: inv };
     } catch (e) {
       console.log('Catch an error: ', e);
@@ -44,6 +44,8 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
     return { status: 'fail' };
   }
 });
+
+  
 
 /**
  * INVENTORY_CREATE = 'INVENTORY_CREATE',
