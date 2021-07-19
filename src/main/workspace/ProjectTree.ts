@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { EventEmitter } from 'events';
 import * as os from 'os';
+import { connect } from 'http2';
 import { Inventory, Project } from '../../api/types';
 // import * as fs from 'fs';
 // import * as Filtering from './filtering';
@@ -12,6 +13,8 @@ import { Inventory, Project } from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanDb } from '../db/scan_db';
 import { licenses } from '../db/licenses';
+import { Scanner } from '../scannerLib/Scanner';
+import { SCANNER_EVENTS } from '../scannerLib/ScannerEvents';
 
 const fs = require('fs');
 const path = require('path');
@@ -37,7 +40,9 @@ export class ProjectTree extends EventEmitter {
 
   results: any;
 
-  scans_db: ScanDb;
+  scans_db!: ScanDb;
+
+  scanner!: Scanner;
 
   constructor(name: string) {
     super();
@@ -102,25 +107,61 @@ export class ProjectTree extends EventEmitter {
     this.set_work_root(p.work_root);
     this.set_scan_root(p.scan_root);
     this.scans_db = new ScanDb(p.work_root);
+
+    this.scanner = new Scanner();
+    this.scanner.setResultsPath(this.work_root);
+    this.setScannerListeners();
   }
+
+  setScannerListeners() {
+    this.scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => console.log('Starting Winnowing...'));
+    this.scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (dir) => console.log(`New WFP File on: ${dir}`));
+    this.scanner.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => console.log('Winnowing Finished...'));
+    this.scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (dir) => console.log(`Sending WFP file ${dir} to server`));
+
+    this.scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
+      console.log(`New ${fileNumbers} files scanned`);
+      await this.scans_db.components.importUniqueFromJSON(data);
+      await this.scans_db.results.insertFromJSON(data);
+      await this.scans_db.files.insertFromJSON(data);
+    });
+
+    this.scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
+      console.log(`Scan Finished... Results on: ${resultsPath}`);
+      const a = fs.readFileSync(`${resultsPath}`, 'utf8');
+      this.results = JSON.parse(a);
+      this.saveScanProject();
+    });
+
+    this.scanner.on('error', () => {
+      scanner.stop();
+      console.log('Scanner Error. Stoping....');
+    });
+  }
+
+  startScan() {
+    console.log(`SCANNER: Start scanning path=${path}`);
+    this.scanner.scanFolder(this.scan_root);
+  }
+
+  stopScan() {}
 
   async prepare_scan() {
     let success;
     const created = await this.scans_db.init();
     if (created) {
-      console.log("Inserting licenses...");
-       success = await this.scans_db.licenses.importFromJSON(licenses);
+      console.log('Inserting licenses...');
+      success = await this.scans_db.licenses.importFromJSON(licenses);
     }
     // const i = 0;
     this.build_tree();
     // apply filters.
-    if (success){
-      console.log("lienses inserted successfully...");
+    if (success) {
+      console.log('lienses inserted successfully...');
       return true;
-    } 
-    else{
-    return false;
     }
+
+    return false;
   }
 
   getLogicalTree() {
@@ -342,8 +383,9 @@ function dirTree(root: string, filename: string) {
     info.children = fs
       .readdirSync(filename, { withFileTypes: true }) // Returns a list of files and folders
       .sort(dirFirstFileAfter)
-      .map((dirent) => dirent.name)                   // Converts Dirent objects to paths
-      .map((child: string) => {                       // Apply the recursion function in the whole array
+      .map((dirent) => dirent.name) // Converts Dirent objects to paths
+      .map((child: string) => {
+        // Apply the recursion function in the whole array
         return dirTree(root, `${filename}/${child}`);
       });
   } else {

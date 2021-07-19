@@ -31,6 +31,13 @@ export class Workspace extends EventEmitter {
     this.projectsList = new TreeStructure.ProjectTree('Unnamed');
     this.projectsList.createScanProject(scanPath);
   }
+
+  runProject(){
+    this.projectsList.startScan();
+  }
+
+
+
 }
 
 /*

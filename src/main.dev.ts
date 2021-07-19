@@ -141,7 +141,15 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.whenReady().then(createWindow).catch(console.log);
+
+
+app
+  .whenReady()
+  .then(async () => {
+    return Promise.all([createWindow(), mainLogic()]);
+  })
+  .catch(console.log);
+
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
@@ -159,59 +167,65 @@ export interface IInitScan {
 
 let ws: Workspace;
 
-ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
+async function mainLogic() {
   ws = new Workspace();
-  const scanner = new Scanner();
+
+}
+
+ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
+
   const { path } = arg;
-  let created: any;
 
   ws.newProject(path);
   await ws.projectsList.prepare_scan();
-  scanner.setResultsPath(ws.projectsList.work_root);
-  console.log(`SCANNER: Start scanning path=${path}`);
-  scanner.setResultsPath(ws.projectsList.work_root);
-  scanner.scanFolder(path);
+  ws.runProject();
 
-  scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
-    console.log('Starting Winnowing...');
-  });
 
-  scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (dir) =>
-    console.log(`New WFP File on: ${dir}`)
-  );
+  // scanner.setResultsPath(ws.projectsList.work_root);
+  // console.log(`SCANNER: Start scanning path=${path}`);
+  // scanner.setResultsPath(ws.projectsList.work_root);
+  // scanner.scanFolder(path);
 
-  scanner.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => {
-    console.log('Winnowing Finished...');
-  });
+  // scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
+  //   console.log('Starting Winnowing...');
+  // });
 
-  scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (dir) => {
-    console.log(`Sending WFP file ${dir} to server`);
-  });
+  // scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (dir) =>
+  //   console.log(`New WFP File on: ${dir}`)
+  // );
 
-  scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
-    console.log(`New ${fileNumbers} files scanned`);
-    await ws.projectsList.scans_db.components.importUniqueFromJSON(data);
-    await ws.projectsList.scans_db.results.insertFromJSON(data);
-    await ws.projectsList.scans_db.files.insertFromJSON(data);
-  });
+  // scanner.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => {
+  //   console.log('Winnowing Finished...');
+  // });
 
-  scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
-    console.log(`Scan Finished... Results on: ${resultsPath}`);
+  // scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (dir) => {
+  //   console.log(`Sending WFP file ${dir} to server`);
+  // });
 
-    /**
-     * just because JSON is not accesible directly
-     */
-    let a = fs.readFileSync(`${resultsPath}`, 'utf8');
-    ws.projectsList.results = JSON.parse(a);
-    event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
-      success: true,
-      resultsPath: ws.projectsList.work_root,
-    });
-    ws.projectsList.saveScanProject();
-  });
+  // scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
+  //   console.log(`New ${fileNumbers} files scanned`);
+  //   await ws.projectsList.scans_db.components.importUniqueFromJSON(data);
+  //   await ws.projectsList.scans_db.results.insertFromJSON(data);
+  //   await ws.projectsList.scans_db.files.insertFromJSON(data);
+  // });
 
-  scanner.on('error', () => {
-    scanner.stop();
-    console.log('Scanner Error. Stoping....');
-  });
+  // scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
+  //   console.log(`Scan Finished... Results on: ${resultsPath}`);
+
+  //   /**
+  //    * just because JSON is not accesible directly
+  //    */
+  //   let a = fs.readFileSync(`${resultsPath}`, 'utf8');
+  //   ws.projectsList.results = JSON.parse(a);
+  //   event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
+  //     success: true,
+  //     resultsPath: ws.projectsList.work_root,
+  //   });
+  //   ws.projectsList.saveScanProject();
+  // });
+
+  // scanner.on('error', () => {
+  //   scanner.stop();
+  //   console.log('Scanner Error. Stoping....');
+  // });
 });
