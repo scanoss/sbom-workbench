@@ -23,18 +23,19 @@ export class InventoryDb extends Db {
   private getByFilePath(inventory: Partial<Inventory>) {
     return new Promise(async (resolve) => {
       try {
-        const db = await this.openDb();
-        if (inventory.files !== undefined) {
+        if(inventory.files){
+        const db = await this.openDb();     
           db.each(query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH, inventory.files[0], (err: object, data: any) => {
             db.close();
-            if (err) resolve(undefined);
+            if (err)resolve([]);
             else resolve(data);
-          });
-        }
+          });    
+      }    
       } catch (error) {
         resolve(undefined);
       }
     });
+  
   }
 
   private getByPurlVersion(inventory: Partial<Inventory>) {
@@ -87,8 +88,16 @@ export class InventoryDb extends Db {
   get(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
-        if (inventory.id) {
-          const inventories: any = await this.getById(inventory);
+        let inventories: any ;
+        if (inventory.id){
+          inventories= await this.getById(inventory);
+        }
+        else if (inventory.files){ 
+          inventories = await this.getByFilePath(inventory);
+        }
+        else{
+          resolve([]);
+        }
           const comp = await this.component.getAll(inventories);
           const files = await this.getInventoryFiles(inventories);
           inventories.component = comp;
@@ -96,9 +105,7 @@ export class InventoryDb extends Db {
           // Remove purl and version from inventory
           delete inventories.purl;
           delete inventories.version;
-          resolve(inventories);
-        }
-        resolve([]);
+          resolve(inventories);                
       } catch (error) {
         reject(error);
       }
@@ -106,18 +113,15 @@ export class InventoryDb extends Db {
   }
 
   // GET ALL INVENTORIES BY PURL, VERSION OR FILES
-  getAll(inventory: Partial<Inventory>) {
+  getAll(inventory: Partial<Inventory>) {  
     return new Promise(async (resolve, reject) => {
       try {
-        let inventories: any;
-        if (inventory.files) {
-          inventories = await this.getByFilePath(inventory);
-        } else if (inventory.purl !== undefined && inventory.version !== undefined) {
+        let inventories: any;       
+         if (inventory.purl !== undefined && inventory.version !== undefined) {
           inventories = await this.getByPurlVersion(inventory);
         } else {
           inventories = await this.getAllInventories();
-        }
-
+        }  
         if (inventory !== undefined) {
           for (let i = 0; i < inventories.length; i += 1) {
             const comp = await this.component.getAll(inventories[i]);
@@ -128,7 +132,7 @@ export class InventoryDb extends Db {
           }
           resolve(inventories);
         } else {
-          resolve('[]');
+          resolve([]);
         }
       } catch (error) {
         reject(new Error('error'));

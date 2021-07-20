@@ -34,7 +34,7 @@ export class Querys {
   + this.COMPDB_SQL_CREATE_TABLE_COMPVERS 
   + this.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS 
   + this.  COMPDB_LICENSES_TABLE;
-  
+
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS
   SQL_INSERT_RESULTS =
@@ -93,11 +93,10 @@ export class Querys {
     'SELECT COUNT (*) identified from (select md5 from files where files.identified>0 and files.path like ? );';
 
   /** *** SQL SCAN GET * **** */
-  SQL_SCAN_SELECT_INVENTORIES_FROM_PATH =
-    'SELECT i.id, i.compid,i.usage,i.notes,i.url,i.license_name,i.purl,i,version from inventories i, file_inventories fi where i.id=fi.inventoryid and fi.path like ?;';
+  SQL_SCAN_SELECT_INVENTORIES_FROM_PATH ='SELECT i.id,i.usage,i.compid,i.notes,i.url,i.license_name,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid WHERE fi.path=?;';
 
   SQL_SCAN_SELECT_INVENTORIES_FROM_PURL =
-    'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.license_name,i.purl,i.version from inventories i where i.purl=? and i.version=?;';
+    'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.license_name,i.purl,i.version FROM inventories i WHERE i.purl=? AND i.version=?;';
 
   // GET INVENTORY BY ID
   SQL_GET_INVENTORY_BY_ID = 'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories where id=?;';

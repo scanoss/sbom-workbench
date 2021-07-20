@@ -57,7 +57,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
         dispatch(setComponent(comp));
     }
 
-    const components = await workbenchController.getComponents();
+      const components = await workbenchController.getComponents();
     dispatch(setComponents(components));
   };
 
