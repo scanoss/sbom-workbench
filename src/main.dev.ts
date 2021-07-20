@@ -194,19 +194,19 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   });
 
   scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
+    
     console.log(`Scan Finished... Results on: ${resultsPath}`);
     const succesRes = await ws.projectsList.scans_db.results.insertFromFile(
       resultsPath
-    );
-    const successComp =
-      await ws.projectsList.scans_db.components.importUniqueFromFile(
-        resultsPath
-      );
+    );    
     const successFiles = await ws.projectsList.scans_db.files.insertFromFile(
       resultsPath
     );
-
-    /**
+    let successComp;
+    if(succesRes){
+    successComp = await ws.projectsList.scans_db.components.importUniqueFromFile();
+    }
+     /**
      * just because JSON is not accesible directly
      */
     let a = fs.readFileSync(`${resultsPath}`, 'utf8');

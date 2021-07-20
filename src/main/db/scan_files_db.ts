@@ -44,9 +44,10 @@ export class FilesDb extends Db {
               self.insertFile(db, data, filePath);
             }
           }
-          db.run('commit');
-          db.close();
-          resolve(true);
+          db.run('commit',()=>{
+            db.close();
+            resolve(true);
+          });         
         });
       } catch (error) {
         reject(error);

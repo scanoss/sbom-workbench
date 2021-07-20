@@ -35,18 +35,12 @@ export class Db {
       const db = new sqlite3.Database(this.dbPath,(err: any) => {
         if (err) {
           reject(new Error('Unable to create DB'));
-        } else {       
-          db.run(query.SQL_CREATE_TABLE_FILES);
-          db.run(query.SQL_CREATE_TABLE_RESULTS);
-          db.run(query.SQL_CREATE_TABLE_FILE_INVENTORIES);
-          db.run(query.SQL_CREATE_TABLE_INVENTORY);
-          db.run(query.SQL_CREATE_TABLE_STATUS);
-          db.run(query.COMPDB_SQL_CREATE_TABLE_COMPVERS);
-          db.run(query.COMPDB_LICENSES_TABLE);
-          db.run(query.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS);          
-          db.close();
-        }
-        resolve(true);
+        } else {   
+          db.exec(query.SQL_DB_TABLES,()=>{
+            db.close();
+            resolve(true);
+          } ); 
+        }    
       });
     });
   }

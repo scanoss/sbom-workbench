@@ -1,6 +1,8 @@
 export class Querys {
   /** SQL CREATE SCAN TABLES * */
 
+
+
   SQL_CREATE_TABLE_FILES =
     'CREATE TABLE IF NOT EXISTS files (md5 text primary key, path text unique not null, pid integer, scanned integer default 0, identified integer default 0,reviewed integer default 0,ignored integer default 0,open_source integer default 0);';
 
@@ -24,6 +26,14 @@ export class Querys {
 
   COMPDB_LICENSES_TABLE =
     "CREATE TABLE IF NOT EXISTS licenses (id integer primary key asc, spdxid text default '', name text not null, fulltext text default '', url text default '', unique(spdxid,name));";
+
+  SQL_DB_TABLES = this.SQL_CREATE_TABLE_FILES 
+  + this.SQL_CREATE_TABLE_RESULTS 
+  + this.SQL_CREATE_TABLE_FILE_INVENTORIES 
+  + this. SQL_CREATE_TABLE_INVENTORY 
+  + this.COMPDB_SQL_CREATE_TABLE_COMPVERS 
+  + this.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS 
+  + this.  COMPDB_LICENSES_TABLE;
 
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS
@@ -83,11 +93,10 @@ export class Querys {
     'SELECT COUNT (*) identified from (select md5 from files where files.identified>0 and files.path like ? );';
 
   /** *** SQL SCAN GET * **** */
-  SQL_SCAN_SELECT_INVENTORIES_FROM_PATH =
-    'SELECT i.id, i.compid,i.usage,i.notes,i.url,i.license_name,i.purl,i,version from inventories i, file_inventories fi where i.id=fi.inventoryid and fi.path like ?;';
+  SQL_SCAN_SELECT_INVENTORIES_FROM_PATH ='SELECT i.id,i.usage,i.compid,i.notes,i.url,i.license_name,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid WHERE fi.path=?;';
 
   SQL_SCAN_SELECT_INVENTORIES_FROM_PURL =
-    'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.license_name,i.purl,i.version from inventories i where i.purl=? and i.version=?;';
+    'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.license_name,i.purl,i.version FROM inventories i WHERE i.purl=? AND i.version=?;';
 
   // GET INVENTORY BY ID
   SQL_GET_INVENTORY_BY_ID = 'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories where id=?;';
