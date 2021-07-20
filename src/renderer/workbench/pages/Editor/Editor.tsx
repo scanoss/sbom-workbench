@@ -15,6 +15,10 @@ import LabelCard from '../../components/LabelCard/LabelCard';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../components/MatchInfoCard/MatchInfoCard';
 import { componentService } from '../../../../api/component-service';
 import { mapFile, mapFiles } from '../../../../utils/scan-util';
+import CodeEditor from '../../components/CodeEditor/CodeEditor';
+import { inventoryService } from '../../../../api/inventory-service';
+
+const MemoCodeEditor = React.memo(CodeEditor); //TODO: move inside editor page
 
 export interface FileContent {
   content: string | null;
@@ -24,9 +28,7 @@ export interface FileContent {
 export const Editor = () => {
   const history = useHistory();
 
-  console.log('render');
-
-  const { state, dispatch, createInventory, ignoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { setInventoryBool, inventoryBool } = useContext<any>(DialogContext);
 
@@ -36,8 +38,14 @@ export const Editor = () => {
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
   const [fileStatus, setFileStatus] = useState<any | null>(null);
+  const [inventories, setInventories] = useState<Inventory[]>([]);
   const [ossLines, setOssLines] = useState<number[] | null>([]);
   const [lines, setLines] = useState<number[] | null>([]);
+
+  const init = () => {
+    // getInventories();
+    // getFile();
+  };
 
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
@@ -59,20 +67,25 @@ export const Editor = () => {
     }
   };
 
-  const handleClose = async (inventory: Inventory) => {
+  const getInventories = async () => {
+    const { data } = await await inventoryService.get({files: [file]});
+    setInventories(data);
+  };
+
+  const getFile = async () => {
+    const { data } = await componentService.getFiles( { purl: currentMatch?.purl[0], version: currentMatch?.version });
+    const currentFile = data.find(f => f.path == file);
+    setFileStatus(mapFile(currentFile));
+  };
+
+  const handleAccept = async (inventory: Inventory) => {
     setInventoryBool(false);
     const newInventory = {
       ...inventory,
       files: [file],
     };
     await createInventory(newInventory);
-  };
-
-  const getFile = async () => {
-    console.log('get fi');
-    const { data } = await componentService.getFiles( { purl: currentMatch?.purl[0], version: currentMatch?.version });
-    const currentFile = data.find(f => f.path == file);
-    setFileStatus(mapFile(currentFile));
+    getFile();
   };
 
   useEffect(() => {
@@ -100,8 +113,17 @@ export const Editor = () => {
   };
 
   const onIgnorePressed = async () => {
-    await ignoreFile(file);
-    // getFile();
+    await ignoreFile([file]);
+    getFile();
+  };
+
+  const onRestorePressed = async () => {
+    await restoreFile([file]);
+    getFile();
+  };
+
+  const onDetailPressed = async () => {
+    await ignoreFile([file]);
   };
 
   useEffect(() => {
@@ -128,15 +150,24 @@ export const Editor = () => {
     }
   }, [matchInfo]);
 
+  useEffect(() => {
+    init();
+  }, []);
+
+
   const onAction = (action: MATCH_INFO_CARD_ACTIONS) => {
     switch (action) {
-      case MATCH_INFO_CARD_ACTIONS.ACTION_ENTER:
-        break;
       case MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY:
         onIdentifyPressed();
         break;
       case MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE:
         onIgnorePressed();
+        break;
+      case MATCH_INFO_CARD_ACTIONS.ACTION_RESTORE:
+        onRestorePressed();
+        break;
+      case MATCH_INFO_CARD_ACTIONS.ACTION_DETAIL:
+        onDetailPressed();
         break;
       default:
         break;
@@ -158,16 +189,21 @@ export const Editor = () => {
               <header className="match-info-header">
                 <section className="content">
                   <div className="match-info-default-container">
-                    {matchInfo.map((match, index) => (
-                      <MatchInfoCard
-                        key={index}
-                        selected={currentMatch === match}
-                        match={match}
-                        status={fileStatus?.status}
-                        onSelect={() => setCurrentMatch(matchInfo[index])}
-                        onAction={onAction}
-                      />
-                    ))}
+                    { (inventories.length > 0) ? (
+                        <p>Invent</p>
+                      ) : (
+                        matchInfo.map((match, index) => (
+                            <MatchInfoCard
+                              key={index}
+                              selected={currentMatch === match}
+                              match={match}
+                              status={fileStatus?.status}
+                              onSelect={() => setCurrentMatch(matchInfo[index])}
+                              onAction={onAction}
+                            />
+                          )
+                        ))
+                    }
                   </div>
                 </section>
                 <div className="info-files">
@@ -192,48 +228,18 @@ export const Editor = () => {
         <main className="editors app-content">
           <div className="editor">
             {currentMatch && localFileContent?.content ? (
-              <>
-                <SyntaxHighlighter
-                  className="code-viewer"
-                  wrapLongLines
-                  style={nord}
-                  language="javascript"
-                  showLineNumbers
-                  lineProps={(lineNumber) => {
-                    const style = { display: 'block' };
-                    if (lines && lines.includes(lineNumber)) {
-                      style.backgroundColor = '#ebe92252';
-                    }
-                    return { style };
-                  }}
-                >
-                  {localFileContent?.error ? <p>File not found</p> : localFileContent?.content}
-                </SyntaxHighlighter>
-              </>
+              <MemoCodeEditor
+                content={localFileContent.content}
+                highlight={lines}
+                />
             ) : null}
           </div>
-
           <div className="editor">
             {currentMatch && remoteFileContent?.content ? (
-              <>
-                <SyntaxHighlighter
-                  className="code-viewer"
-                  wrapLongLines
-                  style={nord}
-                  language="javascript"
-                  showLineNumbers
-                  lineNumberContainerStyle={{ marginRigth: 20 }}
-                  lineProps={(lineNumber) => {
-                    const style = { display: 'block' };
-                    if (ossLines && ossLines.includes(lineNumber)) {
-                      style.backgroundColor = '#ebe92252';
-                    }
-                    return { style };
-                  }}
-                >
-                  {remoteFileContent?.error ? <p>File not found</p> : remoteFileContent?.content?.slice(0, 20000)}
-                </SyntaxHighlighter>
-              </>
+              <MemoCodeEditor
+                content={remoteFileContent.content}
+                highlight={ossLines}
+                />
             ) : null}
           </div>
         </main>
@@ -243,10 +249,11 @@ export const Editor = () => {
         <InventoryDialog
           open={inventoryBool}
           onCancel={() => setInventoryBool(false)}
-          onClose={handleClose}
+          onClose={handleAccept}
           component={{
             ...currentMatch,
-            name: currentMatch.component
+            name: currentMatch.component,
+            license: currentMatch.licenses[0]
           }}
         />
       ) : null}

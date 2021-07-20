@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
 
 interface InventoryDialogProps {
   open: boolean;
-  component: Component;
+  component: Partia<Component>;
   onClose: (inventory: Inventory) => void;
   onCancel: () => void;
 }
