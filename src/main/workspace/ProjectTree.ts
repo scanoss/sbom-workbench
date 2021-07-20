@@ -2,6 +2,7 @@
 import { EventEmitter } from 'events';
 import * as os from 'os';
 import { connect } from 'http2';
+import * as fs from 'fs';
 import { Inventory, Project } from '../../api/types';
 // import * as fs from 'fs';
 // import * as Filtering from './filtering';
@@ -17,7 +18,7 @@ import { Scanner } from '../scannerLib/Scanner';
 import { SCANNER_EVENTS } from '../scannerLib/ScannerEvents';
 import { IpcEvents } from '../../ipc-events';
 
-const fs = require('fs');
+// const fs = require('fs');
 const path = require('path');
 
 // const { EventEmitter } = require('events');
@@ -105,20 +106,30 @@ export class ProjectTree extends EventEmitter {
       default_components: '',
       default_licenses: '',
     };
+    this.set_work_root(p.work_root);
+    this.set_scan_root(p.scan_root);
     if (!fs.existsSync(`${getUserHome()}/scanoss-workspace`)) {
       fs.mkdirSync(`${getUserHome()}/scanoss-workspace/`);
     }
     if (!fs.existsSync(p.work_root)) {
       fs.mkdirSync(p.work_root);
+    } else {
+      //  this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, { reason: 'projectExists', severity: 'warning' });
+     // this.cleanProject();
     }
 
-    this.set_work_root(p.work_root);
-    this.set_scan_root(p.scan_root);
     this.scans_db = new ScanDb(p.work_root);
 
     this.scanner = new Scanner();
     this.scanner.setResultsPath(this.work_root);
     this.setScannerListeners();
+  }
+
+  cleanProject() {
+    console.log(`${this.work_root}/tree.json`);
+    if (fs.existsSync(`${this.work_root}/results.json`)) fs.unlinkSync(`${this.work_root}/results.json`);
+    if (fs.existsSync(`${this.work_root}/scan_db`)) fs.unlinkSync(`${this.work_root}/scan_db`);
+    if (fs.existsSync(`${this.work_root}/tree.json`)) fs.unlinkSync(`${this.work_root}/tree.json`);
   }
 
   // Return fileList
@@ -130,15 +141,15 @@ export class ProjectTree extends EventEmitter {
 
     this.scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
       this.processedFiles += fileNumbers;
-      //console.log(`New ${fileNumbers} files scanned`);
+      // console.log(`New ${fileNumbers} files scanned`);
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
         processed: this.filesSummary.include,
         completed: (100 * this.processedFiles) / this.filesSummary.include,
       });
-      // await this.scans_db.components.importUniqueFromJSON(data);
-      // await this.scans_db.results.insertFromJSON(data);
-      // await this.scans_db.files.insertFromJSON(data);
+       await this.scans_db.components.importUniqueFromJSON(data);
+       await this.scans_db.results.insertFromJSON(data);
+       await this.scans_db.files.insertFromJSON(data);
     });
 
     this.scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resPath) => {
@@ -173,18 +184,19 @@ export class ProjectTree extends EventEmitter {
 
   async prepare_scan() {
     let success;
+    this.cleanProject();
     const created = await this.scans_db.init();
     if (created) {
       console.log('Inserting licenses...');
       success = await this.scans_db.licenses.importFromJSON(licenses);
     }
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'prepare',
       processed: 30,
     });
     // const i = 0;
     this.build_tree();
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'prepare',
       processed: 60,
     });
@@ -196,15 +208,15 @@ export class ProjectTree extends EventEmitter {
     console.log(
       `Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`
     );
+   this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: 'prepare',
+      processed: 100,
+    });
 
     if (success) {
       console.log('lienses inserted successfully...');
       return true;
     }
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'prepare',
-      processed: 100,
-    });
     return false;
   }
 

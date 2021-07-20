@@ -14,7 +14,7 @@ ipcMain.handle(IpcEvents.PROJECT_LOAD_SCAN, async (_event, arg: any) => {
   let created: any;
   console.log(arg);
   ws = new Workspace();
-  ws.newProject(arg);
+  ws.newProject(arg, _event.sender);
   ws.projectsList.loadScanProject(arg);
 
   const response = {
