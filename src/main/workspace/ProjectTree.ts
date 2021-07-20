@@ -145,9 +145,16 @@ export class ProjectTree extends EventEmitter {
     });
 
     this.scanner.on('error', (error) => {
+
+      // this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
+
       this.scanner.pause();
       console.log(error.message);
-      this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
+
+      if (error.message === SCANNER_EVENTS.ERROR_SCANNER_ABORTED) {
+        this.msgToUI.send(IpcEvents.SCANNER_ABORTED, error); //Emit only once
+      }
+
     });
   }
 

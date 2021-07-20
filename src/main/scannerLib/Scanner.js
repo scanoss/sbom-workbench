@@ -13,6 +13,10 @@ import { Dispatcher } from './Dispatcher/Dispatcher';
 import { DispatcherResponse } from './Dispatcher/DispatcherResponse';
 import { SCANNER_EVENTS } from './ScannerEvents';
 
+// TO DO:
+// - Split ScannerEvents into ExternalEvents and InternalEvents
+// -
+
 export class Scanner extends EventEmitter {
   // Private properties
   #scannable;
@@ -27,14 +31,16 @@ export class Scanner extends EventEmitter {
 
   #tmpResult;
 
+  #aborted;
+
   constructor() {
     super();
+    this.initialize();
+  }
 
+  initialize() {
     this.#winnower = new Winnower();
-    this.#dispatcher = new Dispatcher();
-    this.#tmpResult = {};
-
-    /* SETTING WINNOWING EVENTS */
+    /* ******************* SETTING WINNOWING EVENTS ******************* */
     this.#winnower.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
       this.emit(SCANNER_EVENTS.WINNOWING_STARTING);
     });
@@ -46,30 +52,24 @@ export class Scanner extends EventEmitter {
     this.#winnower.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => {
       this.emit(SCANNER_EVENTS.WINNOWING_FINISHED);
     });
-    /* SETTING WINNOWING EVENTS */
 
-    /* SETTING DISPATCHER EVENTS */
+    this.#winnower.on('error', (error) => {
+      this.#errorHandler(error, 'WINNOWER');
+    });
+    /* ******************* SETTING WINNOWING EVENTS ******************* */
+
+    this.#dispatcher = new Dispatcher();
+    /* ******************* SETTING DISPATCHER EVENTS ******************** */
     this.#dispatcher.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (wfpPath) => {
       this.emit(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, wfpPath);
     });
 
-    this.#dispatcher.on('error', (error) => {
-      this.emit('error', error);
+    this.#dispatcher.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (dispatcherResponse) => {
+      const serverResponse = dispatcherResponse.getServerData();
+      const serverResposeNumFiles = dispatcherResponse.getNumberOfFiles();
+      Object.assign(this.#tmpResult, serverResponse);
+      this.emit(SCANNER_EVENTS.DISPATCHER_NEW_DATA, serverResponse, serverResposeNumFiles);
     });
-
-    this.#dispatcher.on(
-      SCANNER_EVENTS.DISPATCHER_NEW_DATA,
-      (dispatcherResponse) => {
-        const serverResponse = dispatcherResponse.getServerData();
-        const serverResposeNumFiles = dispatcherResponse.getNumberOfFiles();
-        Object.assign(this.#tmpResult, serverResponse);
-        this.emit(
-          SCANNER_EVENTS.DISPATCHER_NEW_DATA,
-          serverResponse,
-          serverResposeNumFiles
-        );
-      }
-    );
 
     this.#dispatcher.on(SCANNER_EVENTS.DISPATCHER_FINISHED, () => {
       if (!this.#winnower.isRunning()) {
@@ -78,7 +78,31 @@ export class Scanner extends EventEmitter {
         this.emit(SCANNER_EVENTS.SCAN_DONE, this.#resultFilePath);
       }
     });
-    /* SETTING DISPATCHER EVENTS */
+
+    this.#dispatcher.on('error', (error) => {
+      this.#errorHandler(error, 'DISPATCHER');
+    });
+    /* ******************* SETTING DISPATCHER EVENTS ******************** */
+
+    this.#tmpResult = {};
+    this.#aborted = false;
+  }
+
+  #errorHandler(error, origin) {
+    if (origin === 'DISPATCHER') {
+      this.emit('error', new Error(SCANNER_EVENTS.ERROR_SCANNER_ABORTED));
+      if (error.message === '') {
+        this.#aborted = true;
+        this.emit('error', new Error(SCANNER_EVENTS.ERROR_SCANNER_ABORTED));
+      }
+      return;
+    }
+
+    if (origin === 'WINNOWER') {
+      return;
+    }
+
+    this.emit('error', error);
   }
 
   async #scan() {
@@ -112,4 +136,8 @@ export class Scanner extends EventEmitter {
   resume() {}
 
   restart() {}
+
+  isAbort() {
+    return this.#aborted;
+  }
 }

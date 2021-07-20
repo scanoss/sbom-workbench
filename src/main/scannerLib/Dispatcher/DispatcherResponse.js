@@ -1,5 +1,4 @@
 import fs from 'fs';
-import { stringify } from 'querystring';
 
 export class DispatcherResponse {
   // Contains the server response
@@ -38,7 +37,7 @@ export class DispatcherResponse {
     const serverResponseNumFiles = Object.keys(this.#serverData).length;
 
     if (wfpNumFiles !== serverResponseNumFiles) {
-      console.log('Error in server response');
+      console.log('Files on .wfp does not match on server response');
     }
 
     return serverResponseNumFiles;

@@ -13,8 +13,8 @@ ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, (event, args) => {
   console.log(`Incoming update: ${JSON.stringify(args)}`);
 });
 
-ipcRenderer.on(IpcEvents.SCANNER_ERROR_STATUS, (event, args) => {
-  console.log(`Scanner error: ${args}`);
+ipcRenderer.on(IpcEvents.SCANNER_ABORTED, (event, args) => {
+  console.log(`Scanner aborted: ${args}`);
 });
 
 const Home = () => {
