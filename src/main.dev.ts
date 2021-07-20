@@ -143,13 +143,14 @@ app.on('window-all-closed', () => {
 
 
 
-app
-  .whenReady()
-  .then(async () => {
-    return Promise.all([createWindow(), mainLogic()]);
-  })
-  .catch(console.log);
+// app
+//   .whenReady()
+//   .then(async () => {
+//     return Promise.all([createWindow(), mainLogic()]);
+//   })
+//   .catch(console.log);
 
+app.whenReady().then(createWindow).then(mainLogic).catch(console.log);
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
@@ -167,8 +168,9 @@ export interface IInitScan {
 
 let ws: Workspace;
 
+
 async function mainLogic() {
-  ws = new Workspace();
+  ws =  new Workspace();
 
 }
 
@@ -176,9 +178,16 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
 
   const { path } = arg;
 
+  // messageTo_UI.send(IpcEvents.SCANNER_FINISH_SCAN, {
+  //       success: true,
+  //       resultsPath: ws.projectsList.work_root,
+  //     });
   ws.newProject(path);
   await ws.projectsList.prepare_scan();
-  ws.runProject();
+
+  ws.projectsList.setMailbox(event.sender);
+
+  ws.projectsList.startScan();
 
 
   // scanner.setResultsPath(ws.projectsList.work_root);

@@ -16,11 +16,18 @@ ipcMain.handle(IpcEvents.PROJECT_LOAD_SCAN, async (_event, arg: any) => {
   ws = new Workspace();
   ws.newProject(arg);
   ws.projectsList.loadScanProject(arg);
-  // console.log(ws.projectsList.logical_tree);
+
+  const response = {
+    logical_tree: ws.projectsList.logical_tree,
+    work_root: ws.projectsList.work_root,
+    results: ws.projectsList.results,
+    scan_root: ws.projectsList.scan_root,
+  };
+
   return {
     status: 'ok',
     message: 'Project loaded',
-    data: ws.projectsList,
+    data: response,
   };
 });
 

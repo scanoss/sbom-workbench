@@ -32,9 +32,6 @@ export class Workspace extends EventEmitter {
     this.projectsList.createScanProject(scanPath);
   }
 
-  runProject(){
-    this.projectsList.startScan();
-  }
 
 
 

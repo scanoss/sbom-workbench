@@ -15,6 +15,7 @@ import { ScanDb } from '../db/scan_db';
 import { licenses } from '../db/licenses';
 import { Scanner } from '../scannerLib/Scanner';
 import { SCANNER_EVENTS } from '../scannerLib/ScannerEvents';
+import { IpcEvents } from '../../ipc-events';
 
 const fs = require('fs');
 const path = require('path');
@@ -43,6 +44,8 @@ export class ProjectTree extends EventEmitter {
   scans_db!: ScanDb;
 
   scanner!: Scanner;
+
+  msgToUI!: Electron.WebContents;
 
   constructor(name: string) {
     super();
@@ -84,6 +87,7 @@ export class ProjectTree extends EventEmitter {
     this.scan_root = a.scan_root;
     this.scans_db = new ScanDb(rootOfProject);
     await this.scans_db.init();
+    this.scanner = new Scanner();
   }
 
   saveScanProject() {
@@ -113,6 +117,7 @@ export class ProjectTree extends EventEmitter {
     this.setScannerListeners();
   }
 
+  //Return fileList
   setScannerListeners() {
     this.scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => console.log('Starting Winnowing...'));
     this.scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (dir) => console.log(`New WFP File on: ${dir}`));
@@ -121,27 +126,39 @@ export class ProjectTree extends EventEmitter {
 
     this.scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
       console.log(`New ${fileNumbers} files scanned`);
+      this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, { processed: 15, received: 30 });
       await this.scans_db.components.importUniqueFromJSON(data);
       await this.scans_db.results.insertFromJSON(data);
       await this.scans_db.files.insertFromJSON(data);
     });
 
-    this.scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
-      console.log(`Scan Finished... Results on: ${resultsPath}`);
-      const a = fs.readFileSync(`${resultsPath}`, 'utf8');
+    this.scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resPath) => {
+      console.log(`Scan Finished... Results on: ${resPath}`);
+      const a = fs.readFileSync(`${resPath}`, 'utf8');
       this.results = JSON.parse(a);
       this.saveScanProject();
+
+      this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
+            success: true,
+            resultsPath: this.work_root,
+          });
     });
 
-    this.scanner.on('error', () => {
-      scanner.stop();
-      console.log('Scanner Error. Stoping....');
+    this.scanner.on('error', (error) => {
+      //scanner.stop();
+      console.log(error.message);
+      this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
   }
 
   startScan() {
-    console.log(`SCANNER: Start scanning path=${path}`);
+    console.log(`SCANNER: Start scanning path=${this.scan_root}`);
     this.scanner.scanFolder(this.scan_root);
+  }
+
+
+  setMailbox(mailbox: Electron.WebContents) {
+    this.msgToUI = mailbox;
   }
 
   stopScan() {}

@@ -8,6 +8,15 @@ import { dialogController } from '../dialog-controller';
 import { AppContext } from '../context/AppProvider';
 import { IpcEvents } from '../../ipc-events';
 
+
+ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, (event, args) => {
+  console.log(`Incoming update: ${JSON.stringify(args)}`);
+});
+
+ipcRenderer.on(IpcEvents.SCANNER_ERROR_STATUS, (event, args) => {
+  console.log(`Scanner error: ${args}`);
+});
+
 const Home = () => {
   const history = useHistory();
 

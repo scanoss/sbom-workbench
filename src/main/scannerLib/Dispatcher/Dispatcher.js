@@ -17,7 +17,7 @@ export class Dispatcher extends EventEmitter {
   #CONCURRENCY_LIMIT = 6;
 
   // Timeout for each transaction
-  #TIMEOUT = 90000;
+  #TIMEOUT = 45000;
 
   // Max number of retries for each transaction
   #RETRIES = 3;
@@ -36,9 +36,14 @@ export class Dispatcher extends EventEmitter {
     this.#pQueue.clear();
     if (this.#pQueue.isPaused) this.#pQueue.start();
 
-    this.#pQueue.on('idle', () =>
+    this.#pQueue.on('idle', () => {
       this.emit(SCANNER_EVENTS.DISPATCHER_FINISHED)
-    );
+    });
+
+    // Only works for 7.x.x versions
+    // this.#pQueue.on('error', (error) => {
+    //   this.emit('error', error);
+    // });
   }
 
   stop() {
@@ -50,12 +55,14 @@ export class Dispatcher extends EventEmitter {
   dispatchWfpFile(wfpPath) {
     this.#pQueue
       .add(() => this.#dispatch(wfpPath, this.#RETRIES))
-      .catch((error) => this.emit('error', error));
+      .catch((error) => {
+        this.emit('error', error);
+      });
   }
 
   async #dispatch(wfpFilePath, retryNum) {
     if (!retryNum) {
-      console.error(`An error ocurred fetching the file ${wfpFilePath}`);
+      //console.error(`An error ocurred fetching the file ${wfpFilePath}`);
       return Promise.reject(
         new Error(
           `Failed to fetch ${wfpFilePath} after ${this.#RETRIES} retries`
@@ -91,17 +98,14 @@ export class Dispatcher extends EventEmitter {
       if (!response.ok) throw new Error('Server communication failed');
       dataAsText = await response.text();
       dataAsObj = JSON.parse(dataAsText);
-      this.emit(
-        SCANNER_EVENTS.DISPATCHER_NEW_DATA,
-        new DispatcherResponse(dataAsObj, wfpFilePath)
-      );
+      this.emit(SCANNER_EVENTS.DISPATCHER_NEW_DATA, new DispatcherResponse(dataAsObj, wfpFilePath));
       return Promise.resolve();
     } catch (error) {
       if (error.message === 'TIMEOUT') {
         return this.#dispatch(wfpFilePath, retryNum - 1);
         // eslint-disable-next-line no-else-return
       } else {
-        return Promise.reject(new Error(error));
+        throw new Error(error);
       }
     }
   }
