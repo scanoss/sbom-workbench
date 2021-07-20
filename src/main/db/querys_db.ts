@@ -1,6 +1,8 @@
 export class Querys {
   /** SQL CREATE SCAN TABLES * */
 
+
+
   SQL_CREATE_TABLE_FILES =
     'CREATE TABLE IF NOT EXISTS files (md5 text primary key, path text unique not null, pid integer, scanned integer default 0, identified integer default 0,reviewed integer default 0,ignored integer default 0,open_source integer default 0);';
 
@@ -25,6 +27,14 @@ export class Querys {
   COMPDB_LICENSES_TABLE =
     "CREATE TABLE IF NOT EXISTS licenses (id integer primary key asc, spdxid text default '', name text not null, fulltext text default '', url text default '', unique(spdxid,name));";
 
+  SQL_DB_TABLES = this.SQL_CREATE_TABLE_FILES 
+  + this.SQL_CREATE_TABLE_RESULTS 
+  + this.SQL_CREATE_TABLE_FILE_INVENTORIES 
+  + this. SQL_CREATE_TABLE_INVENTORY 
+  + this.COMPDB_SQL_CREATE_TABLE_COMPVERS 
+  + this.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS 
+  + this.  COMPDB_LICENSES_TABLE;
+  
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS
   SQL_INSERT_RESULTS =

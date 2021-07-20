@@ -216,6 +216,17 @@ export class LicenseDb extends Db {
     });
   }
 
+  bulkAttachLicensebyId(db:any,data: any){
+    return new Promise(async (resolve, reject) => {
+    db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID,data.compid, data.license_id, (err: any) => {
+      if (err) reject(new Error('License was not attached'));  
+      resolve(true);
+    });
+   });
+  }
+  
+
+
   // Attach license to component version by id
   private attachLicensebyId(data: any) {
     return new Promise(async (resolve, reject) => {

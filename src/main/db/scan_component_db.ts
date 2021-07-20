@@ -13,6 +13,7 @@ import { Component } from '../../api/types';
 import { ResultsDb } from './scan_results_db';
 import { LicenseDb } from './scan_license_db';
 import { License } from '../../api/types';
+import { resolve } from 'path';
 
 interface Summary {
   identified: number;
@@ -76,7 +77,7 @@ export class ComponentDb extends Db {
           query.SQL_GET_ALL_COMPONENTS,
           async (err: any, component: any) => {
             if (err) resolve(undefined);
-            db.close();            
+            db.close();
             for (let i = 0; i < component.length; i += 1) {
               const licenses = await self.getAllLicensesFromComponentId(
                 component[i].compid
@@ -246,62 +247,8 @@ export class ComponentDb extends Db {
     });
   }
   // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
-  importUniqueFromFile(path: string) {
-    let data: any;
-    let attachLicComp = {
-      license_id: 0,
-      compid: 0,
-    };
-    let license: License;
-    license = {
-      id: 0,
-      name: '',
-      spdxid: '',
-      fulltext: 'AUTOMATIC IMPORT',
-      url: 'AUTOMATIC IMPORT',
-    };
-    return new Promise(async (resolve, reject) => {
-      try {
-        const json: Record<any, any> = await utilsDb.readFile(path);
-        const db = await this.openDb();
-        for (const [key, value] of Object.entries(json)) {
-          for (let i = 0; i < value.length; i += 1) {
-            data = value[i];
-            if (data.id !== 'none') {        
-              data.licenses && data.licenses[0]
-                ? (license.spdxid = data.licenses[0].name)
-                : 'NULL';
-              if (license.spdxid !== 'NULL') {
-                // Get license id by result spdxid
-                attachLicComp.license_id =
-                  await this.license.getLicenseIdFilter(license);
-                if (attachLicComp.license_id == 0) {
-                  license = await this.license.bulkCreate(db, license);
-                  license.id ? (attachLicComp.license_id = license.id) : 0;
-                }
-              } else {
-                attachLicComp.license_id =
-                  await this.license.getLicenseIdFilter(license);
-              }
-              attachLicComp.compid = await this.componentNewImportFromResults(
-                db,
-                data
-              );
-              await this.license.licenseAttach(attachLicComp);
-            }
-          }
-        }
-        db.close();
-        resolve(true);
-      } catch (error) {
-        reject(new Error('Unable to import results'));
-      }
-    });
-  }
-
-  // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
-  importUniqueFromJSON(json: string) {
-    let data: any;
+  importUniqueFromFile() {
+    const self = this;
     let attachLicComp = {
       license_id: 0,
       compid: 0,
@@ -317,37 +264,38 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        for (const [key, value] of Object.entries(json)) {
-          for (let i = 0; i < value.length; i += 1) {
-            data = value[i];
-            if (data.id !== 'none') {
-              data.licenses && data.licenses[0]
-                ? (license.spdxid = data.licenses[0].name)
-                : 'NULL';
-              if (license.spdxid !== 'NULL') {
-                // Get license id by result spdxid
-                attachLicComp.license_id =
-                  await this.license.getLicenseIdFilter(license);
-                if (attachLicComp.license_id == 0) {
-                  license = await this.license.bulkCreate(db, license);
-                  license.id ? (attachLicComp.license_id = license.id) : 0;
-                }
-              } else {
-                attachLicComp.license_id =
-                  await this.license.getLicenseIdFilter(license);
-              }
-              attachLicComp.compid = await this.componentNewImportFromResults(
-                db,
-                data
+        const results = await this.results.getUnique();
+        db.serialize(async function () {
+          db.run('begin transaction');
+          for (const result of results) {
+            if (result.license !== 'NULL') {
+              license.spdxid = result.license;
+              attachLicComp.license_id = await self.license.getLicenseIdFilter(
+                license
               );
-              await this.license.licenseAttach(attachLicComp);
+              if (attachLicComp.license_id == 0) {
+                license = await self.license.bulkCreate(db, license);
+                if (license.id) attachLicComp.license_id = license.id;
+              }
+            } else {
+              attachLicComp.license_id = await self.license.getLicenseIdFilter(
+                license
+              );
             }
+            attachLicComp.compid = await self.componentNewImportFromResults(
+              db,
+              result
+            );
+            await self.license.bulkAttachLicensebyId(db, attachLicComp);
           }
-        }
-        db.close();
-        resolve(true);
+          db.run('commit', () => {
+            db.close();
+            resolve(true);
+          });
+        });
       } catch (error) {
-        reject(new Error('Unable to import results'));
+        console.log(error);
+        resolve(false);
       }
     });
   }
@@ -361,10 +309,9 @@ export class ComponentDb extends Db {
         data.version,
         'AUTOMATIC IMPORT',
         data.url,
-        data.purl ? data.purl[0] : 'n/a',
+        data.purl,
         function (this: any, err: any) {
-          if (err) reject(new Error('error'));
-          else resolve(this.lastID);
+          resolve(this.lastID);
         }
       );
     });
