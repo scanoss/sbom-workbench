@@ -279,7 +279,7 @@ export class Winnower extends EventEmitter {
     return this.#nextStepMachine();
   }
 
-  stop() {
+  pause() {
     this.#continue = false;
   }
 
@@ -287,6 +287,8 @@ export class Winnower extends EventEmitter {
     this.#continue = true;
     this.#nextStepMachine();
   }
+
+  restart() {}
 
   isRunning() {
     return this.#isRunning;

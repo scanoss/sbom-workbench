@@ -103,9 +103,13 @@ export class Scanner extends EventEmitter {
     await this.#scan();
   }
 
-  stop() {
-    this.#winnower.stop();
-    this.#dispatcher.stop();
+  pause() {
+    this.#winnower.pause();
+    this.#dispatcher.pause();
     this.#tmpResult = {};
   }
+
+  resume() {}
+
+  restart() {}
 }

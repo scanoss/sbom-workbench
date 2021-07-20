@@ -127,9 +127,9 @@ export class ProjectTree extends EventEmitter {
     this.scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
       console.log(`New ${fileNumbers} files scanned`);
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, { processed: 15, received: 30 });
-      await this.scans_db.components.importUniqueFromJSON(data);
-      await this.scans_db.results.insertFromJSON(data);
-      await this.scans_db.files.insertFromJSON(data);
+      // await this.scans_db.components.importUniqueFromJSON(data);
+      // await this.scans_db.results.insertFromJSON(data);
+      // await this.scans_db.files.insertFromJSON(data);
     });
 
     this.scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resPath) => {
@@ -145,7 +145,7 @@ export class ProjectTree extends EventEmitter {
     });
 
     this.scanner.on('error', (error) => {
-      //scanner.stop();
+      this.scanner.pause();
       console.log(error.message);
       this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
