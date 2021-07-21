@@ -14,33 +14,43 @@ import { DialogContext } from '../../../context/DialogProvider';
 import { setFile } from '../../actions';
 import { inventoryService } from '../../../../api/inventory-service';
 import { componentService } from '../../../../api/component-service';
-
-import { mapFiles } from '../../../../utils/scan-util';
 import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
 import Label from '../../components/Label/Label';
+import { mapFiles } from '../../../../utils/scan-util';
 
 export const InventoryDetail = () => {
   const history = useHistory();
   const { id } = useParams();
-  console.log(`AA AA AAJJJ ${id}`);
+  const { dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const [inventory, setInventory] = useState<Inventory>();
+  const [files, setFiles] = useState<string[]>([]);
   const getInventory = async () => {
     const response = await inventoryService.get({ id });
     setInventory(response.data);
+    console.log(response?.data);
+    setFiles(mapFiles(response?.data?.files));
   };
 
   const onAction = (file: string, action: MATCH_CARD_ACTIONS) => {
-    console.log('77777777');
+    switch (action) {
+      case MATCH_CARD_ACTIONS.ACTION_ENTER:
+        history.push(`/workbench/file/${file}`);
+        dispatch(setFile(file));
+        break;
+      case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
+        onIdentifyPressed(file);
+        break;
+      case MATCH_CARD_ACTIONS.ACTION_IGNORE:
+        onIgnorePressed(file);
+        break;
+    }
   };
-
+  console.log(files);
   useEffect(() => {
     getInventory();
   }, []);
 
-  const files = inventory?.files;
-  console.log(files);
-  console.log(inventory);
   return (
     <>
       <section className="app-page">
@@ -71,9 +81,8 @@ export const InventoryDetail = () => {
             </div>
           </div>
         </header>
-
         <main className="app-content">
-          <FileList files={[files]} filter="pending" onAction={onAction} />
+          <FileList files={files} onAction={onAction} />
         </main>
       </section>
     </>

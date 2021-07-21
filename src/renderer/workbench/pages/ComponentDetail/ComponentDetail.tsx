@@ -36,6 +36,7 @@ export const ComponentDetail = () => {
     const response = await componentService.getFiles({ purl: component.purl, version: component.version });
     console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));
+
   };
 
   const getInventories = async () => {
@@ -104,6 +105,8 @@ export const ComponentDetail = () => {
         return 'no data';
     }
   };
+
+  console.log(typeof files);
 
   return (
     <>
