@@ -158,4 +158,6 @@ export class Querys {
   SQL_COMP_SUMMARY_IDENTIFIED = 'SELECT count(f.identified ) as identified FROM files f INNER JOIN results r  WHERE r.md5_file=f.md5 AND r.purl= ? AND r.version=? AND f.identified=1;'
 
   SQL_COMP_SUMMARY_IGNORED = 'SELECT count(f.ignored) as ignored FROM files f INNER JOIN results r  WHERE r.md5_file=f.md5 AND r.purl= ? AND r.version=? AND f.ignored=1;'
+
+  SQL_GET_FILE_BY_PATH = 'SELECT path,identified,ignored FROM files WHERE path=?;';
 }

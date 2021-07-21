@@ -43,3 +43,11 @@ export interface Project {
   default_licenses: string;
   default_components: string;
 }
+
+export interface Files {
+  md5?: string;
+  ignored: string;
+  pending: string;
+  identified: string;
+  path: string;
+}
