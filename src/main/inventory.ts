@@ -22,8 +22,8 @@ ipcMain.handle(
   async (event, invget: Partial<Inventory>) => {
     let inv: any;
     try {
-      inv = await defaultProject.scans_db.inventories.get(invget);
-      return { status: 'ok', message: inv, data: inv };
+      inv = await defaultProject.scans_db.inventories.get(invget); 
+      return { status: 'ok', message: 'Inventory retrieve successfully', data: inv };
     } catch (e) {
       console.log('Catch an error: ', e);
       return { status: 'fail' };
