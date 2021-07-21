@@ -103,7 +103,7 @@ export const Editor = () => {
   };
 
   const onDetailPressed = async (result) => {
-    console.log(result);
+    history.push(`/workbench/inventory/${result.id}`);
   };
 
   useEffect(() => {
