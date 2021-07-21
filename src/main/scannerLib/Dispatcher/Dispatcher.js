@@ -18,10 +18,10 @@ export class Dispatcher extends EventEmitter {
   #API_URL = 'https://osskb.org/api/scan/direct';
 
   // Level of concurrency
-  #CONCURRENCY_LIMIT = 6;
+  #CONCURRENCY_LIMIT = 10;
 
   // Timeout for each transaction
-  #TIMEOUT = 15000;
+  #TIMEOUT = 40000;
 
   // Max number of retries for each transaction
   #RETRIES = 3;
@@ -38,9 +38,6 @@ export class Dispatcher extends EventEmitter {
   }
 
   init() {
-
-    this.#networkErrorCounter = 0;
-
     this.#pQueue = new PQueue({
       concurrency: this.#CONCURRENCY_LIMIT,
       timeout: this.#TIMEOUT,
@@ -48,7 +45,7 @@ export class Dispatcher extends EventEmitter {
     });
 
     this.#pQueue.clear();
-    if (this.#pQueue.isPaused) this.#pQueue.start();
+    if (this.isPaused()) this.#pQueue.start();
 
     this.#pQueue.on('idle', () => {
       this.emit(ScannerEvents.DISPATCHER_FINISHED)
@@ -96,7 +93,13 @@ export class Dispatcher extends EventEmitter {
       error.message === DispatcherEvents.ERROR_NETWORK_CONNECTIVITY ||
       error.name === DispatcherEvents.ERROR_TRANSACTION_TIMEOUT
     ) {
-      if (this.isPaused()) this.pause();
+      if (!this.isPaused()) {
+        this.pause();
+        console.log(`Error detected ${error}. Stopping Scanner`);
+      }
+
+      console.log(`Promises left ${this.#pQueue.pending}`);
+
 
       // Wait until all promises are resolved or rejected. Could be timeout or Network error
       if (this.#pQueue.pending <= 0) {
