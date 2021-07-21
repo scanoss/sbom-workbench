@@ -149,15 +149,19 @@ export class ProjectTree extends EventEmitter {
         processed: this.filesSummary.include,
         completed: (100 * this.processedFiles) / this.filesSummary.include,
       });
-      await this.scans_db.components.importUniqueFromJSON(data);
-      await this.scans_db.results.insertFromJSON(data);
-      await this.scans_db.files.insertFromJSON(data);
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
       console.log(`Scan Finished... Results on: ${resPath}`);
+
+      const succesRes = await this.scans_db.results.insertFromFile(resPath);
+      await this.scans_db.files.insertFromFile(resPath);
+
+      if (succesRes) await this.scans_db.components.importUniqueFromFile();
+
       const a = fs.readFileSync(`${resPath}`, 'utf8');
       this.results = JSON.parse(a);
+
       this.saveScanProject();
 
       this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
