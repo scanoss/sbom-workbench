@@ -1,5 +1,5 @@
 import { Button, Paper, Tab, Tabs } from '@material-ui/core';
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -14,7 +14,7 @@ import { DialogContext } from '../../../context/DialogProvider';
 import { setFile } from '../../actions';
 import { inventoryService } from '../../../../api/inventory-service';
 import { componentService } from '../../../../api/component-service';
-
+import { useEffect } from 'react';
 import { mapFiles } from '../../../../utils/scan-util';
 import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
 
@@ -33,14 +33,14 @@ export const ComponentDetail = () => {
   const [tab, setTab] = useState<number>(component?.summary.pending !== 0 ? 0 : 1);
 
   const getFiles = async () => {
-    const response = await componentService.getFiles({ purl: component.purl, version: component.version });
+    const response = await componentService.getFiles( { purl: component.purl, version: component.version });
     console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));
-
   };
 
   const getInventories = async () => {
-    const response = await inventoryService.getAll({ purl: component.purl, version: component.version });
+    const response = await inventoryService
+      .getAll({ purl: component.purl, version: component.version });
     console.log('INVENTORIES BY COMP', response);
     setInventories(response.message || []);
   };
@@ -67,26 +67,29 @@ export const ComponentDetail = () => {
 
   const onIdentifyAllPressed = async () => {
     setInventoryBool(true);
-    const selFiles = files.filter((file) => file.status === 'pending').map((file) => file.path);
+    const selFiles = files
+      .filter( file => file.status === 'pending')
+      .map( file => file.path);
     setSelectedFiles(selFiles);
   };
 
   const onIgnorePressed = async (file: string) => {
-    await ignoreFile(file);
+    await ignoreFile([file]);
     getFiles();
   };
 
   const handleClose = async (inventory: Inventory) => {
     setInventoryBool(false);
-    const newInventory = await createInventory({
+    const  newInventory = await createInventory({
       ...inventory,
-      files: selectedFiles,
+      files: selectedFiles
     });
 
     setInventories((previous) => [...previous, newInventory]);
     getFiles();
     setTab(1);
   };
+
 
   useEffect(() => {
     getFiles();
@@ -105,8 +108,6 @@ export const ComponentDetail = () => {
         return 'no data';
     }
   };
-
-  console.log(typeof files);
 
   return (
     <>
@@ -146,10 +147,7 @@ export const ComponentDetail = () => {
             {tab === 0 ? (
               <Button
                 disabled={component?.summary.pending === 0}
-                variant="contained"
-                color="secondary"
-                onClick={onIdentifyAllPressed}
-              >
+                variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
                 Identify All ({component?.summary.pending})
               </Button>
             ) : null}

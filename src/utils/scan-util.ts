@@ -2,16 +2,20 @@
 import { Component, Inventory } from '../api/types';
 
 export function mapFiles(files: any[]): any[] {
+  return files
+    .map((file) => mapFile(file));
+}
+
+export function mapFile(file: any): any[] {
   const getStatus = (file) =>
     file.ignored === 1
       ? 'ignored'
       : file.identified === 1 ? 'identified' : 'pending';
 
-  return files
-    .map((file) => ({
+  return {
       ...file,
       status: getStatus(file),
-    }))
+  }
 }
 
 export function sortComponents(components: Component[]) {

@@ -12,7 +12,8 @@ import { resultService } from '../../api/results-service';
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
   createInventory: (inventory: Inventory) => Promise<Inventory>;
-  ignoreFile: (path: string) => Promise<boolean>;
+  ignoreFile: (path: string[]) => Promise<boolean>;
+  restoreFile: (path: string[]) => Promise<boolean>;
 
   state: State;
   dispatch: any;
@@ -27,6 +28,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const loadScan = async (path: string) => {
     try {
+      console.log('load scan');
       const { scan, fileTree, scanRoot } = await workbenchController.loadScan(path);
       dispatch(loadScanSuccess(scan, fileTree, []));
       setScanBasePath(scanRoot);
@@ -44,8 +46,14 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     return data;
   };
 
-  const ignoreFile = async (file: string): Promise<boolean> => {
-    const { status, data } = await resultService.ignored([file]);
+  const ignoreFile = async (file: string[]): Promise<boolean> => {
+    const { status, data } = await resultService.ignored(file);
+    update();
+    return true;
+  }
+
+  const restoreFile = async (file: string[]): Promise<boolean> => {
+    const { status, data } = await resultService.unignored(file);
     update();
     return true;
   }
@@ -57,7 +65,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
         dispatch(setComponent(comp));
     }
 
-    const components = await workbenchController.getComponents();
+      const components = await workbenchController.getComponents();
     dispatch(setComponents(components));
   };
 
@@ -70,6 +78,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
         loadScan,
         createInventory,
         ignoreFile,
+        restoreFile
       }}
     >
       {children}

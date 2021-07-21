@@ -1,5 +1,5 @@
-import { Card, CardContent, Typography, Tooltip, ButtonBase } from '@material-ui/core';
 import React from 'react';
+import { Card, CardContent, Typography, Tooltip, ButtonBase } from '@material-ui/core';
 import componentDefault from '../../../../../assets/imgs/component-default.svg';
 import { Component } from '../../../../api/types';
 
