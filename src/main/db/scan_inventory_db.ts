@@ -25,7 +25,7 @@ export class InventoryDb extends Db {
       try {
         if(inventory.files){
         const db = await this.openDb();     
-          db.each(query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH, inventory.files[0], (err: object, data: any) => {
+          db.all(query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH, inventory.files[0], (err: object, data: any) => {
             db.close();
             if (err)resolve([]);
             else resolve(data);
@@ -90,14 +90,7 @@ export class InventoryDb extends Db {
       try {
         let inventories: any ;
         if (inventory.id){
-          inventories= await this.getById(inventory);
-        }
-        else if (inventory.files){ 
-          inventories = await this.getByFilePath(inventory);
-        }
-        else{
-          resolve([]);
-        }
+          inventories= await this.getById(inventory);   
           const comp = await this.component.getAll(inventories);
           const files = await this.getInventoryFiles(inventories);
           inventories.component = comp;
@@ -105,7 +98,11 @@ export class InventoryDb extends Db {
           // Remove purl and version from inventory
           delete inventories.purl;
           delete inventories.version;
-          resolve(inventories);                
+          resolve(inventories);
+        }
+          else{
+            resolve([]);
+          }                
       } catch (error) {
         reject(error);
       }
@@ -119,7 +116,9 @@ export class InventoryDb extends Db {
         let inventories: any;       
          if (inventory.purl !== undefined && inventory.version !== undefined) {
           inventories = await this.getByPurlVersion(inventory);
-        } else {
+        } else if(inventory.files) {
+          inventories = await this.getByFilePath(inventory);
+        }else{
           inventories = await this.getAllInventories();
         }  
         if (inventory !== undefined) {
