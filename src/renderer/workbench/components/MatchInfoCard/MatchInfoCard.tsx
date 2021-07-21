@@ -44,7 +44,7 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
             ) : (
                 <span className="usage-label">USAGE</span>
             )}
-            <span className="usage-id">{match.usage}</span>
+            <span className="usage-value">{match.usage}</span>
           </div>
         </div>
         <div className="match-info-card-buttons">

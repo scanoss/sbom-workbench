@@ -17,6 +17,7 @@ import { componentService } from '../../../../api/component-service';
 import { mapFile, mapFiles } from '../../../../utils/scan-util';
 import CodeEditor from '../../components/CodeEditor/CodeEditor';
 import { inventoryService } from '../../../../api/inventory-service';
+import { fileService } from '../../../../api/file-service';
 
 const MemoCodeEditor = React.memo(CodeEditor); //TODO: move inside editor page
 
@@ -61,7 +62,6 @@ export const Editor = () => {
     try {
       setRemoteFileContent({ content: null, error: false });
       const content = await workbenchController.fetchRemoteFile(path);
-      console.log("CONTENT", content);
       setRemoteFileContent({ content, error: false });
     } catch (error) {
       setRemoteFileContent({ content: null, error: true });
@@ -74,9 +74,9 @@ export const Editor = () => {
   };
 
   const getFile = async () => {
-    const { data } = await componentService.getFiles( { purl: currentMatch?.purl[0], version: currentMatch?.version });
-    const currentFile = data.find(f => f.path == file);
-    setFileStatus(mapFile(currentFile));
+    const { data } = await fileService.get(file);
+    console.log("FILE", file);
+    setFileStatus(mapFile(data));
   };
 
   const handleAccept = async (inventory: Inventory) => {

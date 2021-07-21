@@ -35,31 +35,18 @@
     align-items: center;
 
     @media screen and (max-width: $default-width) {
-      flex-direction: column;
-      align-items: flex-start;
-    }
 
-    .match-info-default-container {
-      width: 100%;
-
-      .second-row-match {
-        // display: grid;
-        // grid-template-columns: 1fr 1fr 1fr;
-        display: flex;
-        flex-direction: row;
-
-        div {
-          display: flex;
-          flex-direction: column;
-          padding: 0 1rem;
-        }
-      }
     }
 
   }
 }
 
-.match-info-default-container,
+.match-info-default-container {
+  display: flex;
+  width: calc(50% - 10px);
+  min-width: 500px;
+}
+
 .info-files, .editors {
   display: grid;
   grid-template-columns: calc(50% - 10px) 50%;
