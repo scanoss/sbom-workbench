@@ -12,10 +12,13 @@ import { inventoryService } from '../../../../api/inventory-service';
 import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
 import Label from '../../components/Label/Label';
 import { mapFiles } from '../../../../utils/scan-util';
+import { AppContext, IAppContext } from '../../../context/AppProvider';
 
 export const InventoryDetail = () => {
   const history = useHistory();
   const { id } = useParams();
+
+  const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const [inventory, setInventory] = useState<Inventory>();
@@ -49,7 +52,9 @@ export const InventoryDetail = () => {
                 <IconButton onClick={() => history.goBack()} component="span">
                   <ArrowBackIcon />
                 </IconButton>
+                {scanBasePath}
               </h4>
+              <h1 className="header-title">Groups</h1>
             </div>
             <ComponentInfo component={inventory?.component} />
           </div>
