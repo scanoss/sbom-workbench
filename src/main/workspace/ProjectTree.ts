@@ -366,6 +366,8 @@ function insertInventory(tree: any, mypath: string, inv: Inventory): any {
   let myPathFolders: string[];
   // eslint-disable-next-line prefer-const
   let arbol = tree;
+  mypath = mypath.replace('//', '/');
+  mypath = mypath.replace(root, '');
   myPathFolders = mypath.split('/');
   if (myPathFolders[0] === '') myPathFolders.shift();
   let i: number;
