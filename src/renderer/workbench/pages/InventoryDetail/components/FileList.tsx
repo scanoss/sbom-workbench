@@ -11,7 +11,7 @@ export interface FileListProps {
 }
 
 export const FileList = ({ files, filter, onAction }: FileListProps) => {
-  const filteredFiles = files.filter((file) => !filter || file.status === filter);
+  const filteredFiles = files.filter((file) => !filter || filter === file.status);
 
   return (
     <>

@@ -26,7 +26,7 @@ export const ComponentInfo = ({ component }: { component: Component }) => {
           <div className="component-details-card">
             <div className="tiny-container-detail">
               <p className="title-detail">License</p>
-              <p className="desc-detail">{component?.name}</p>
+              <p className="desc-detail">{component?.licenses[0].name}</p>
             </div>
             <div className="tiny-container-detail">
               <p className="title-detail">PURL</p>

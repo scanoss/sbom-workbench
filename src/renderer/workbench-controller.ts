@@ -72,7 +72,6 @@ class WorkbenchController {
     const scan = data.results;
     const tree = [data.logical_tree];
     transform(tree, scan);
-    console.log(tree);
     return {
       scan,
       scanRoot: data.scan_root,

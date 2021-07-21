@@ -1,4 +1,5 @@
 import { IpcEvents } from '../ipc-events';
+import { File } from './types';
 
 const { ipcRenderer } = require('electron');
 
@@ -8,7 +9,7 @@ class FileService {
     return response;
   }
 
-  public async get(args: string): Promise<any> {
+  public async get(args: Partial<File>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.FILE_GET, args);
     return response;
   }
