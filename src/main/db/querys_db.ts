@@ -148,7 +148,9 @@ export class Querys {
   SQL_SELECT_FILES_FROM_PURL_VERSION =
     'SELECT fi.path,fi.identified,fi.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines FROM files fi INNER JOIN  results r where fi.md5=r.md5_file and r.purl=? and r.version=?;';
 
-  SQL_UPDATE_IGNORED_FILES = 'UPDATE files SET ignored=1,identified=0  WHERE path=?;';
+  SQL_UPDATE_IGNORED_FILES = 'UPDATE files SET ignored=1,identified=0 WHERE path=?;';
+
+  SQL_UPDATE_UNIGNORED_FILES = 'UPDATE files SET ignored=0,identified=0  WHERE path=?;';
 
   SQL_COMP_SUMMARY_PENDING =
   "SELECT count(*) as pending FROM files f INNER JOIN results r  WHERE r.md5_file=f.md5 AND r.purl= ? AND r.version=? AND f.ignored=0 AND f.identified=0;";

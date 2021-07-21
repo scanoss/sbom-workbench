@@ -38,6 +38,7 @@ export enum IpcEvents {
 
   FILE_GET_CONTENT = 'FILE_GET_CONTENT',
   IGNORED_FILES = 'IGNORED_FILES',
+  UNIGNORED_FILES = 'UNIGNORE_FILES',
 
 }
 
@@ -83,5 +84,6 @@ export const ipcRendererEvents = [
   IpcEvents.FILE_GET_CONTENT,
 
   IpcEvents.IGNORED_FILES,
+  IpcEvents.UNIGNORED_FILES,
 
 ];
