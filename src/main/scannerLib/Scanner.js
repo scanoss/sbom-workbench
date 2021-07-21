@@ -7,6 +7,7 @@ import fs from 'fs';
 import { AbstractScannable } from './Scannable/AbstractScannable';
 import { ScannableTree } from './Scannable/ScannableTree';
 import { ScannableFolder } from './Scannable/ScannableFolder';
+import { ScannableJson } from './Scannable/ScanneableJson';
 import { Winnower } from './Winnower/Winnower';
 import { Dispatcher } from './Dispatcher/Dispatcher';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -57,19 +58,12 @@ export class Scanner extends EventEmitter {
       this.emit('error', error);
     });
 
-    this.#dispatcher.on(
-      SCANNER_EVENTS.DISPATCHER_NEW_DATA,
-      (dispatcherResponse) => {
-        const serverResponse = dispatcherResponse.getServerData();
-        const serverResposeNumFiles = dispatcherResponse.getNumberOfFiles();
-        Object.assign(this.#tmpResult, serverResponse);
-        this.emit(
-          SCANNER_EVENTS.DISPATCHER_NEW_DATA,
-          serverResponse,
-          serverResposeNumFiles
-        );
-      }
-    );
+    this.#dispatcher.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (dispatcherResponse) => {
+      const serverResponse = dispatcherResponse.getServerData();
+      const serverResposeNumFiles = dispatcherResponse.getNumberOfFiles();
+      Object.assign(this.#tmpResult, serverResponse);
+      this.emit(SCANNER_EVENTS.DISPATCHER_NEW_DATA, serverResponse, serverResposeNumFiles);
+    });
 
     this.#dispatcher.on(SCANNER_EVENTS.DISPATCHER_FINISHED, () => {
       if (!this.#winnower.isRunning()) {
@@ -95,6 +89,11 @@ export class Scanner extends EventEmitter {
   // Public Methods
   async scanFileTree(fileTreeDescriptor) {
     this.#scannable = new ScannableTree(fileTreeDescriptor);
+    await this.#scan();
+  }
+
+  async scanJsonList(jsonList) {
+    this.#scannable = new ScannableJson(jsonList);
     await this.#scan();
   }
 

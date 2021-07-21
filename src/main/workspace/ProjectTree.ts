@@ -52,6 +52,8 @@ export class ProjectTree extends EventEmitter {
 
   processedFiles = 0;
 
+  filesToScan: [];
+
   constructor(name: string) {
     super();
     this.work_root = '';
@@ -115,7 +117,7 @@ export class ProjectTree extends EventEmitter {
       fs.mkdirSync(p.work_root);
     } else {
       //  this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, { reason: 'projectExists', severity: 'warning' });
-     // this.cleanProject();
+      // this.cleanProject();
     }
 
     this.scans_db = new ScanDb(p.work_root);
@@ -147,9 +149,9 @@ export class ProjectTree extends EventEmitter {
         processed: this.filesSummary.include,
         completed: (100 * this.processedFiles) / this.filesSummary.include,
       });
-       await this.scans_db.components.importUniqueFromJSON(data);
-       await this.scans_db.results.insertFromJSON(data);
-       await this.scans_db.files.insertFromJSON(data);
+      await this.scans_db.components.importUniqueFromJSON(data);
+      await this.scans_db.results.insertFromJSON(data);
+      await this.scans_db.files.insertFromJSON(data);
     });
 
     this.scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resPath) => {
@@ -173,7 +175,9 @@ export class ProjectTree extends EventEmitter {
 
   startScan() {
     console.log(`SCANNER: Start scanning path=${this.scan_root}`);
-    this.scanner.scanFolder(this.scan_root);
+
+    this.scanner.scanJsonList(this.filesToScan);
+   // this.scanner.scanFolder(this.scan_root);
   }
 
   setMailbox(mailbox: Electron.WebContents) {
@@ -190,25 +194,29 @@ export class ProjectTree extends EventEmitter {
       console.log('Inserting licenses...');
       success = await this.scans_db.licenses.importFromJSON(licenses);
     }
-     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'prepare',
       processed: 30,
     });
     // const i = 0;
     this.build_tree();
-     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'prepare',
       processed: 60,
     });
     // apply filters.
+    this.banned_list.loadDefault();
     prepareScan(this.scan_root, this.logical_tree, this.banned_list);
 
-    const summary = { total: 0, include: 0, filter: 0 };
-    this.filesSummary = summarizeTree(this.logical_tree, summary);
+    const summary = { total: 0, include: 0, filter: 0, files: [] };
+    this.filesSummary = summarizeTree(this.scan_root,this.logical_tree, summary);
     console.log(
       `Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`
     );
-   this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+    this.filesToScan = summary.files;
+    console.log(this.filesToScan);
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'prepare',
       processed: 100,
     });
@@ -291,18 +299,21 @@ export class ProjectTree extends EventEmitter {
 
 /* AUXILIARY FUNCTIONS */
 
-function summarizeTree(tree: any, summary: any) {
+function summarizeTree(root: any,tree: any, summary: any) {
   let j = 0;
   if (tree.type === 'file') {
     summary.total += 1;
     if (tree.action === 'filter') summary.filter += 1;
-    else if (tree.include === true) summary.include += 1;
+    else if (tree.include === true) {
+      summary.include += 1;
+      summary.files.push(`${root}/${tree.value}`);
+    }
 
     return summary;
   }
   if (tree.type === 'folder') {
     for (j = 0; j < tree.children.length; j += 1) {
-      summary = summarizeTree(tree.children[j], summary);
+      summary = summarizeTree(root, tree.children[j], summary);
     }
     return summary;
   }
@@ -400,7 +411,7 @@ function insertComponent(tree: any, mypath: string, inv: Inventory): any {
   arbol.className = 'match';
   // console.log(arbol);
 }
-
+/*
 function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {
   let i = 0;
   if (jsonScan.type === 'file') {
@@ -412,7 +423,7 @@ function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {
   } else if (jsonScan.type === 'folder') {
     for (i = 0; i < jsonScan.children.length; i += 1) recurseJSON(jsonScan.children[i], banned_list);
   }
-}
+} */
 
 function prepareScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
   let i = 0;
