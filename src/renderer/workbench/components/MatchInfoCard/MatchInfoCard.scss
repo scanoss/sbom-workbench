@@ -1,73 +1,86 @@
 .match-info-card {
   background-color: #ffff;
-  height: 68px;
-  width: 90%;
+  width: 100%;
+  min-height: 68px;
   border-radius: 4px;
-  box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.06),
-    0px 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.06), 0px 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   cursor: pointer;
   box-sizing: border-box;
-
+  overflow: hidden;
 
   @media screen and (max-width: $default-width) {
     width: 100%;
     margin-top: 20px;
   }
 
+  &:hover .match-info-card-buttons {
+    opacity: 1 !important;
+  }
+
   .match-info-card-content {
-    display: grid;
-    grid-template-columns: 80% auto;
+    display: flex;
     align-items: center;
-    flex-direction: row;
-    width: calc(100% - 20px);
-    margin-left: 20px;
+    position: relative;
+    width: calc(100% - 30px);
+    height: 100%;
+    padding-left: 20px;
     justify-content: space-between;
+    border-left: 10px solid transparent;
 
+    &.status- {
+      &pending {
+        border-left: 10px solid $pending-orange;
+      }
 
+      &identified {
+        border-left: 10px solid $indentified-green;
+      }
 
+      &ignored {
+        border-left: 10px solid $ignored-gray;
+      }
+    }
 
     .label-info-div {
-      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
 
-      .logo-match-info-card{
+      .logo-match-info-card {
         width: 35px;
         height: 35px;
         margin-right: 12px;
       }
 
-      .component-span{
-
-        font-style: normal;
+      .component-span {
         font-weight: bold;
         font-size: 20px;
         color: #3B82F6;
         margin-right: 12px;
       }
-      .version-span{
+
+      .version-span {
         font-family: Space Mono;
-        font-style: normal;
-        font-weight: normal;
         font-size: 14px;
         color: #52525B;
         margin-right: 48px;
       }
-      .usage-div{
+
+      .usage-div {
         display: flex;
-        justify-content: center;
         flex-direction: column;
 
-        .usage-label{
+        .usage-label {
           font-style: normal;
           font-weight: bold;
           font-size: 14px;
           line-height: 17px;
         }
-        .usage-id {
+
+        .usage-value {
           text-transform: capitalize;
           font-style: normal;
           font-weight: bold;
@@ -77,53 +90,27 @@
     }
 
     .match-info-card-buttons {
-      visibility: hidden;
-    }
+      display: flex;
+      position: absolute;
+      background: white;
+      padding: 0 10px;
+      right: 0px;
+      opacity: 0;
+      transition: opacity 200ms ease;
 
-    &:hover{
+      .check{
+        color: $indentified-green;
+      }
 
-      .match-info-card-buttons{
-        margin-right: 1%;
-        visibility: visible;
-        transition: 100ms ease-out;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+      .ban {
+        color: $ignored-gray;
+      }
 
-        .icon{
-          width: 30px;
-          height: 30px;
-          margin-right: 15px;
-
-        }
-
-        .check{
-          color: $indentified-green;
-        }
-
-        .ban {
-          color: $ignored-gray;
-        }
-
-    }
     }
 
   }
 }
 
 
-.status- {
-  &pending {
-    border-left: 10px solid $pending-orange;
-  }
-
-  &identified {
-    border-left: 10px solid $indentified-green;
-  }
-
-  &ignored {
-    border-left: 10px solid $ignored-gray;
-  }
-}
 
 

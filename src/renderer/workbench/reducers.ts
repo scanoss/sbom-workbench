@@ -39,7 +39,6 @@ export default function reducer(state: State = initialState, action): State {
     }
     case SET_COMPONENT: {
       const { component } = action;
-      console.log(component);
       return {
         ...state,
         component,

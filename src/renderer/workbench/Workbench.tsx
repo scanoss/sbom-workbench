@@ -22,18 +22,22 @@ const Workbench = () => {
 
   const { file } = state;
 
-  const MemoEditor = React.memo(Editor); //TODO: move inside editor page
+  //const MemoEditor = React.memo(Editor); //TODO: move inside editor page
 
-  const init = async () => {
+  const onInit = async () => {
     const result = scanPath ? await loadScan(scanPath) : false;
     if (!result) {
       dialogController.showError('Error', 'Cannot read scan.');
     }
   };
 
+  const onDestroy = () => {
+    dispatch(reset());
+  }
+
   useEffect(() => {
-    init();
-    return () => dispatch(reset());
+    onInit();
+    return onDestroy();
   }, []);
 
   return (
@@ -69,7 +73,7 @@ const Workbench = () => {
             <Route path={`${path}/component/`}>
               <ComponentDetail />
             </Route>
-            <Route path={`${path}/file`}>{file ? <MemoEditor /> : null}</Route>
+            <Route path={`${path}/file`}>{file ? <Editor /> : null}</Route>
           </Switch>
         </main>
       </SplitPane>

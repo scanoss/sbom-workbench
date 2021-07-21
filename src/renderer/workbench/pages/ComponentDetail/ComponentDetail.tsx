@@ -36,7 +36,7 @@ export const ComponentDetail = () => {
     const response = await componentService.getFiles( { purl: component.purl, version: component.version });
     console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));
-  };  
+  };
 
   const getInventories = async () => {
     const response = await inventoryService
@@ -74,7 +74,7 @@ export const ComponentDetail = () => {
   };
 
   const onIgnorePressed = async (file: string) => {
-    await ignoreFile(file);
+    await ignoreFile([file]);
     getFiles();
   };
 
