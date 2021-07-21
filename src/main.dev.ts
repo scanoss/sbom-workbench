@@ -175,67 +175,14 @@ async function mainLogic() {
 }
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
-
   const { path } = arg;
 
-  // messageTo_UI.send(IpcEvents.SCANNER_FINISH_SCAN, {
-  //       success: true,
-  //       resultsPath: ws.projectsList.work_root,
-  //     });
   ws.newProject(path,event.sender);
   ws.projectsList.setMailbox(event.sender);
 
   await ws.projectsList.prepare_scan();
 
-
   ws.projectsList.startScan();
-
-
-  // scanner.setResultsPath(ws.projectsList.work_root);
-  // console.log(`SCANNER: Start scanning path=${path}`);
-  // scanner.setResultsPath(ws.projectsList.work_root);
-  // scanner.scanFolder(path);
-
-  // scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
-  //   console.log('Starting Winnowing...');
-  // });
-
-  // scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (dir) =>
-  //   console.log(`New WFP File on: ${dir}`)
-  // );
-
-  // scanner.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => {
-  //   console.log('Winnowing Finished...');
-  // });
-
-  // scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (dir) => {
-  //   console.log(`Sending WFP file ${dir} to server`);
-  // });
-
-  // scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
-  //   console.log(`New ${fileNumbers} files scanned`);
-  //   await ws.projectsList.scans_db.components.importUniqueFromJSON(data);
-  //   await ws.projectsList.scans_db.results.insertFromJSON(data);
-  //   await ws.projectsList.scans_db.files.insertFromJSON(data);
-  // });
-
-  // scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
-  //   console.log(`Scan Finished... Results on: ${resultsPath}`);
-
-  //   /**
-  //    * just because JSON is not accesible directly
-  //    */
-  //   let a = fs.readFileSync(`${resultsPath}`, 'utf8');
-  //   ws.projectsList.results = JSON.parse(a);
-  //   event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
-  //     success: true,
-  //     resultsPath: ws.projectsList.work_root,
-  //   });
-  //   ws.projectsList.saveScanProject();
-  // });
-
-  // scanner.on('error', () => {
-  //   scanner.stop();
-  //   console.log('Scanner Error. Stoping....');
-  // });
 });
+
+

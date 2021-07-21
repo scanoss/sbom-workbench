@@ -25,7 +25,7 @@ export class ResultsDb extends Db {
   }
 
   // INSERT RESULTS FROM FILE
-    insertFromFile(resultPath: string) {
+  insertFromFile(resultPath: string) {
     return new Promise(async (resolve) => {
       try {
         const self = this;
@@ -40,11 +40,13 @@ export class ResultsDb extends Db {
               if (data.id !== 'none') self.insertResult(db, data);
             }
           }
-          db.run('commit');
-          db.close;
+         db.run('commit',()=>{
+          db.close();
           resolve(true);
         });
-      } catch {
+            
+        });
+      } catch (error) {
         resolve(false);
       }
     });
@@ -77,7 +79,7 @@ export class ResultsDb extends Db {
 
   private insertResult(db: any, data: any) {
     const licenseName =
-      data.licenses && data.licenses[0] ? data.licenses[0].name : 'n/a';
+      data.licenses && data.licenses[0] ? data.licenses[0].name : 'NULL';
     db.run(
       query.SQL_INSERT_RESULTS,
       data.file_hash,
@@ -114,6 +116,24 @@ export class ResultsDb extends Db {
       }
       resolve(formattedData);
     });
+  }
+
+  async getUnique() {
+    try {
+      const db = await this.openDb();
+      return new Promise<any>(async (resolve, reject) => {
+        db.all(
+          'SELECT DISTINCT purl,version,license,component,url FROM results;',
+          (err: any, data: any) => {
+            db.close();
+            if (!err) resolve(data);
+            else resolve([]);
+          }
+        );
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   // GET RESULT
