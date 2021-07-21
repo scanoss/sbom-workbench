@@ -12,7 +12,7 @@ import {
   IconButton,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Component, Inventory } from '../../../../api/types';
 
 const useStyles = makeStyles((theme) => ({
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
 
 interface InventoryDialogProps {
   open: boolean;
-  component: Partia<Component>;
+  component: Partial<Component>;
   onClose: (inventory: Inventory) => void;
   onCancel: () => void;
 }
@@ -46,15 +46,22 @@ interface InventoryDialogProps {
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
   const { onClose, open, component, onCancel } = props;
-  const [form, setForm] = useState({
-    component: component.name,
-    version: component.version,
-    license_name: component.licenses[0] ? component.licenses[0].name : '',
-    url: component.url,
-    purl: component.purl,
-    usage: 'file',
-    notes: '',
-  });
+
+  const [form, setForm] = useState();
+
+  const setDefaults = () => {
+    setForm(
+      {
+        component: component.name,
+        version: component.version,
+        license_name: component.licenses[0] ? component.licenses[0].name : '',
+        url: component.url,
+        purl: component.purl,
+        usage: 'file',
+        notes: '',
+      }
+    );
+  }
 
   const handleClose = () => {
     const inventory: Inventory = form;
@@ -67,6 +74,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       [e.target.name]: e.target.value,
     });
   };
+
+  useEffect( setDefaults, [component]);
 
   return (
     <Dialog

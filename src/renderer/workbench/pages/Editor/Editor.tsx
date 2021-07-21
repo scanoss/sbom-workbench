@@ -74,8 +74,7 @@ export const Editor = () => {
   };
 
   const getFile = async () => {
-    const { data } = await fileService.get(file);
-    console.log("FILE", file);
+    const { data } = await fileService.get({path: file});
     setFileStatus(mapFile(data));
   };
 
@@ -126,6 +125,7 @@ export const Editor = () => {
   }, [matchInfo]);
 
   useEffect(() => {
+    console.log(currentMatch);
     if (currentMatch) {
       getFile(); // TODO: on init cuando este el servicio
       loadRemoteFile(currentMatch.file_hash);
