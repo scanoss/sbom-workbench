@@ -61,6 +61,7 @@ export const Editor = () => {
     try {
       setRemoteFileContent({ content: null, error: false });
       const content = await workbenchController.fetchRemoteFile(path);
+      console.log("CONTENT", content);
       setRemoteFileContent({ content, error: false });
     } catch (error) {
       setRemoteFileContent({ content: null, error: true });
@@ -69,7 +70,6 @@ export const Editor = () => {
 
   const getInventories = async () => {
     const { data } = await inventoryService.getAll({files: [file]});
-    console.log("INVE", data);
     setInventories(data);
   };
 
@@ -88,26 +88,6 @@ export const Editor = () => {
     setInventories((previous) => [...previous, inv]);
     getFile();
   };
-
-  useEffect(() => {
-    if (!currentMatch) {
-      return;
-    }
-
-    const linesOss =
-      currentMatch.id === 'file'
-        ? null
-        : range(parseInt(currentMatch.oss_lines.split('-')[0], 10), parseInt(currentMatch.oss_lines.split('-')[1], 10));
-
-    setOssLines(linesOss);
-
-    const lineasLocales =
-      currentMatch.id === 'file'
-        ? null
-        : range(parseInt(currentMatch.lines.split('-')[0], 10), parseInt(currentMatch.lines.split('-')[1], 10));
-
-    setLines(lineasLocales);
-  }, [currentMatch]);
 
   const onIdentifyPressed = async () => {
     setInventoryBool(true);
@@ -137,13 +117,6 @@ export const Editor = () => {
   }, [file]);
 
   useEffect(() => {
-    if (currentMatch) {
-      getFile(); // TODO: on init cuando este el servicio
-      loadRemoteFile(currentMatch.file_hash);
-    }
-  }, [currentMatch]);
-
-  useEffect(() => {
     init();
     if (matchInfo) {
       setCurrentMatch(matchInfo[0]);
@@ -151,6 +124,34 @@ export const Editor = () => {
       setCurrentMatch(null);
     }
   }, [matchInfo]);
+
+  useEffect(() => {
+    if (currentMatch) {
+      getFile(); // TODO: on init cuando este el servicio
+      loadRemoteFile(currentMatch.file_hash);
+    }
+  }, [currentMatch]);
+
+  useEffect(() => {
+    if (!currentMatch) {
+      return;
+    }
+
+    const linesOss =
+      currentMatch.id === 'file'
+        ? null
+        : range(parseInt(currentMatch.oss_lines.split('-')[0], 10), parseInt(currentMatch.oss_lines.split('-')[1], 10));
+
+    setOssLines(linesOss);
+
+    const lineasLocales =
+      currentMatch.id === 'file'
+        ? null
+        : range(parseInt(currentMatch.lines.split('-')[0], 10), parseInt(currentMatch.lines.split('-')[1], 10));
+
+    setLines(lineasLocales);
+  }, [currentMatch]);
+
 
   const onAction = (action: MATCH_INFO_CARD_ACTIONS, result) => {
     switch (action) {

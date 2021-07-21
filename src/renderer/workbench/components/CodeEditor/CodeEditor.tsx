@@ -24,7 +24,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
           return { style };
         }}
       >
-        {content}
+        {content.slice(0, 30000)}
       </SyntaxHighlighter>
     </>
   );

@@ -31,9 +31,9 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
 
   return (
     <div onClick={onSelect}
-         style={selected ? { borderBottom: '#60A5FA 2px solid', borderTop: '#60A5FA 2px solid', borderRight: '#60A5FA 2px solid' } : {} }
-         className={`match-info-card status-${status}`}>
-      <div className="match-info-card-content">
+         style={selected ? { border: '#60A5FA 2px solid' } : {} }
+         className="match-info-card">
+      <div className={`match-info-card-content status-${status}`}>
         <div className="label-info-div">
           <img alt="component logo" className="logo-match-info-card" src={componentDefault} />
           <span className="component-span">{match.component}</span>

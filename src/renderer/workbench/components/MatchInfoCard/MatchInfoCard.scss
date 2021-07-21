@@ -8,7 +8,7 @@
   margin-bottom: 16px;
   cursor: pointer;
   box-sizing: border-box;
-  border-left: 10px solid white;
+  overflow: hidden;
 
   @media screen and (max-width: $default-width) {
     width: 100%;
@@ -23,9 +23,28 @@
     display: grid;
     grid-template-columns: 80% auto;
     align-items: center;
+    height: 100%;
     width: calc(100% - 30px);
-    margin-left: 20px;
+    padding-left: 20px;
     justify-content: space-between;
+
+    border-left: 10px solid transparent;
+
+    &.status- {
+      &pending {
+        border-left: 10px solid $pending-orange;
+      }
+
+      &identified {
+        border-left: 10px solid $indentified-green;
+      }
+
+      &ignored {
+        border-left: 10px solid $ignored-gray;
+      }
+    }
+
+
 
     .label-info-div {
       width: 100%;
@@ -97,17 +116,5 @@
 }
 
 
-.status- {
-  &pending {
-    border-left: 10px solid $pending-orange;
-  }
 
-  &identified {
-    border-left: 10px solid $indentified-green;
-  }
-
-  &ignored {
-    border-left: 10px solid $ignored-gray;
-  }
-}
 
