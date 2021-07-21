@@ -16,7 +16,11 @@ export enum MATCH_INFO_CARD_ACTIONS {
 }
 
 interface MatchInfoCardProps {
-  match: Record<string, any>;
+  match: {
+    component: string;
+    version: string;
+    usage: string;
+  };
   selected: boolean;
   status: string;
   onSelect: () => void;
@@ -40,7 +44,7 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
             ) : (
                 <span className="usage-label">USAGE</span>
             )}
-            <span className="usage-id">{match.id}</span>
+            <span className="usage-id">{match.usage}</span>
           </div>
         </div>
         <div className="match-info-card-buttons">
@@ -69,11 +73,11 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
             )}
             {(status === 'identified') && (
               <>
-              <Tooltip title="Ignore">
+              {/*<Tooltip title="Ignore">
                 <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE)}>
                     <BanIcon />
                   </IconButton>
-              </Tooltip>
+              </Tooltip>*/}
               <Tooltip title="Details">
                 <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_DETAIL)}>
                   <DescriptionOutlined />

@@ -43,7 +43,7 @@ export const Editor = () => {
   const [lines, setLines] = useState<number[] | null>([]);
 
   const init = () => {
-    // getInventories();
+    getInventories();
     // getFile();
   };
 
@@ -68,7 +68,8 @@ export const Editor = () => {
   };
 
   const getInventories = async () => {
-    const { data } = await await inventoryService.get({files: [file]});
+    const { data } = await inventoryService.getAll({files: [file]});
+    console.log("INVE", data);
     setInventories(data);
   };
 
@@ -80,11 +81,11 @@ export const Editor = () => {
 
   const handleAccept = async (inventory: Inventory) => {
     setInventoryBool(false);
-    const newInventory = {
+    const inv = await createInventory({
       ...inventory,
       files: [file],
-    };
-    await createInventory(newInventory);
+    });
+    setInventories((previous) => [...previous, inv]);
     getFile();
   };
 
@@ -122,8 +123,8 @@ export const Editor = () => {
     getFile();
   };
 
-  const onDetailPressed = async () => {
-    await ignoreFile([file]);
+  const onDetailPressed = async (result) => {
+    console.log(result);
   };
 
   useEffect(() => {
@@ -143,6 +144,7 @@ export const Editor = () => {
   }, [currentMatch]);
 
   useEffect(() => {
+    init();
     if (matchInfo) {
       setCurrentMatch(matchInfo[0]);
     } else {
@@ -150,12 +152,7 @@ export const Editor = () => {
     }
   }, [matchInfo]);
 
-  useEffect(() => {
-    init();
-  }, []);
-
-
-  const onAction = (action: MATCH_INFO_CARD_ACTIONS) => {
+  const onAction = (action: MATCH_INFO_CARD_ACTIONS, result) => {
     switch (action) {
       case MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY:
         onIdentifyPressed();
@@ -167,7 +164,7 @@ export const Editor = () => {
         onRestorePressed();
         break;
       case MATCH_INFO_CARD_ACTIONS.ACTION_DETAIL:
-        onDetailPressed();
+        onDetailPressed(result);
         break;
       default:
         break;
@@ -189,14 +186,33 @@ export const Editor = () => {
               <header className="match-info-header">
                 <section className="content">
                   <div className="match-info-default-container">
-                    { (inventories.length > 0) ? (
-                        <p>Invent</p>
+                    { (inventories.length > 0) ?
+                      inventories.map((inventory, index) => (
+                          <MatchInfoCard
+                            key={index}
+                            selected={currentMatch === inventory}
+                            match={
+                              { component: inventory.component.name,
+                                version: inventory.component.version,
+                                usage: inventory.usage,
+                              }
+                            }
+                            status="identified"
+                            onSelect={() => setCurrentMatch(matchInfo[index])}
+                            onAction={(action) => onAction(action, inventory)}
+                          />
+                        )
                       ) : (
                         matchInfo.map((match, index) => (
                             <MatchInfoCard
                               key={index}
                               selected={currentMatch === match}
-                              match={match}
+                              match={
+                                { component: match.component,
+                                  version: match.version,
+                                  usage: match.id,
+                                }
+                              }
                               status={fileStatus?.status}
                               onSelect={() => setCurrentMatch(matchInfo[index])}
                               onAction={onAction}
