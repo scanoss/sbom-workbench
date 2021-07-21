@@ -98,9 +98,6 @@ export class Dispatcher extends EventEmitter {
         console.log(`Error detected ${error}. Stopping Scanner`);
       }
 
-      console.log(`Promises left ${this.#pQueue.pending}`);
-
-
       // Wait until all promises are resolved or rejected. Could be timeout or Network error
       if (this.#pQueue.pending <= 0) {
         this.emit('error', new Error(DispatcherEvents.ERROR_NETWORK_CONNECTIVITY));

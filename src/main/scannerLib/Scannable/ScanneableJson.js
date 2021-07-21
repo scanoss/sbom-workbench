@@ -13,6 +13,8 @@ export class ScannableJson extends AbstractScannable {
 
   #genHasNext;
 
+  #scanRoot;
+
   constructor(list) {
     super();
     this.#jsonlist = list;
@@ -22,7 +24,7 @@ export class ScannableJson extends AbstractScannable {
   async *#createGenerator() {
     for (const filePath of this.#jsonlist) {
       const fileContent = await fs.promises.readFile(filePath);
-      yield new ScannableItem(filePath, fileContent);
+      yield new ScannableItem(filePath.replace(this.#scanRoot, ''), fileContent);
     }
   }
 
@@ -34,6 +36,10 @@ export class ScannableJson extends AbstractScannable {
 
   hasNextScannableItem() {
     return this.#genHasNext;
+  }
+
+  setScanRoot(scanRoot) {
+    this.#scanRoot = scanRoot;
   }
 
   async prepare() {

@@ -37,6 +37,7 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
     created = await defaultProject.scans_db.inventories.create(arg);
     arg.id = created;
 
+
     defaultProject.attachInventory(arg);
     defaultProject.saveScanProject();
 

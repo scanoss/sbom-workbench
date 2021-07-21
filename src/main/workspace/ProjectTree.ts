@@ -182,7 +182,7 @@ export class ProjectTree extends EventEmitter {
   startScan() {
     console.log(`SCANNER: Start scanning path=${this.scan_root}`);
 
-    this.scanner.scanJsonList(this.filesToScan);
+    this.scanner.scanJsonList(this.filesToScan, this.scan_root);
    // this.scanner.scanFolder(this.scan_root);
   }
 
@@ -243,8 +243,8 @@ export class ProjectTree extends EventEmitter {
     let files: string[];
     files = inv.files;
     for (i = 0; i < inv.files.length; i += 1) {
-      insertInventory(this.logical_tree, files[i], inv);
-      insertComponent(this.logical_tree, files[i], inv);
+      insertInventory(this.scan_root, this.logical_tree, files[i], inv);
+      // insertComponent(this.logical_tree, files[i], inv);
     }
   }
 
@@ -362,7 +362,7 @@ function setUseFile(tree: any, action: boolean, recursive: boolean) {
   }
 }
 
-function insertInventory(tree: any, mypath: string, inv: Inventory): any {
+function insertInventory(root: string, tree: any, mypath: string, inv: Inventory): any {
   let myPathFolders: string[];
   // eslint-disable-next-line prefer-const
   let arbol = tree;
@@ -475,6 +475,7 @@ function dirTree(root: string, filename: string) {
     info.children = fs
       .readdirSync(filename, { withFileTypes: true }) // Returns a list of files and folders
       .sort(dirFirstFileAfter)
+      .filter((dirent) => !dirent.isSymbolicLink())
       .map((dirent) => dirent.name) // Converts Dirent objects to paths
       .map((child: string) => {
         // Apply the recursion function in the whole array

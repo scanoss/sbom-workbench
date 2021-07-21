@@ -122,8 +122,9 @@ export class Scanner extends EventEmitter {
     await this.#scan();
   }
 
-  async scanJsonList(jsonList) {
+  async scanJsonList(jsonList, scanRoot) {
     this.#scannable = new ScannableJson(jsonList);
+    this.#scannable.setScanRoot(scanRoot);
     await this.#scan();
   }
 
