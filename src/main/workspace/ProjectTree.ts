@@ -2,6 +2,7 @@
 import { EventEmitter } from 'events';
 import * as os from 'os';
 import { connect } from 'http2';
+import * as fs from 'fs';
 import { Inventory, Project } from '../../api/types';
 // import * as fs from 'fs';
 // import * as Filtering from './filtering';
@@ -17,7 +18,7 @@ import { Scanner } from '../scannerLib/Scanner';
 import { ScannerEvents } from '../scannerLib/ScannerEvents';
 import { IpcEvents } from '../../ipc-events';
 
-const fs = require('fs');
+// const fs = require('fs');
 const path = require('path');
 
 // const { EventEmitter } = require('events');
@@ -46,6 +47,12 @@ export class ProjectTree extends EventEmitter {
   scanner!: Scanner;
 
   msgToUI!: Electron.WebContents;
+
+  filesSummary: any;
+
+  processedFiles = 0;
+
+  filesToScan: [];
 
   constructor(name: string) {
     super();
@@ -101,15 +108,18 @@ export class ProjectTree extends EventEmitter {
       default_components: '',
       default_licenses: '',
     };
+    this.set_work_root(p.work_root);
+    this.set_scan_root(p.scan_root);
     if (!fs.existsSync(`${getUserHome()}/scanoss-workspace`)) {
       fs.mkdirSync(`${getUserHome()}/scanoss-workspace/`);
     }
     if (!fs.existsSync(p.work_root)) {
       fs.mkdirSync(p.work_root);
+    } else {
+      //  this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, { reason: 'projectExists', severity: 'warning' });
+      // this.cleanProject();
     }
 
-    this.set_work_root(p.work_root);
-    this.set_scan_root(p.scan_root);
     this.scans_db = new ScanDb(p.work_root);
 
     this.scanner = new Scanner();
@@ -117,7 +127,14 @@ export class ProjectTree extends EventEmitter {
     this.setScannerListeners();
   }
 
-  //Return fileList
+  cleanProject() {
+    console.log(`${this.work_root}/tree.json`);
+    if (fs.existsSync(`${this.work_root}/results.json`)) fs.unlinkSync(`${this.work_root}/results.json`);
+    if (fs.existsSync(`${this.work_root}/scan_db`)) fs.unlinkSync(`${this.work_root}/scan_db`);
+    if (fs.existsSync(`${this.work_root}/tree.json`)) fs.unlinkSync(`${this.work_root}/tree.json`);
+  }
+
+  // Return fileList
   setScannerListeners() {
     this.scanner.on(ScannerEvents.WINNOWING_STARTING, () => console.log('Starting Winnowing...'));
     this.scanner.on(ScannerEvents.WINNOWING_NEW_WFP_FILE, (dir) => console.log(`New WFP File on: ${dir}`));
@@ -125,11 +142,16 @@ export class ProjectTree extends EventEmitter {
     this.scanner.on(ScannerEvents.DISPATCHER_WFP_SENDED, (dir) => console.log(`Sending WFP file ${dir} to server`));
 
     this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
-      console.log(`New ${fileNumbers} files scanned`);
-      this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, { processed: 15, received: 30 });
-      // await this.scans_db.components.importUniqueFromJSON(data);
-      // await this.scans_db.results.insertFromJSON(data);
-      // await this.scans_db.files.insertFromJSON(data);
+      this.processedFiles += fileNumbers;
+      // console.log(`New ${fileNumbers} files scanned`);
+      this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+        stage: 'scanning',
+        processed: this.filesSummary.include,
+        completed: (100 * this.processedFiles) / this.filesSummary.include,
+      });
+      await this.scans_db.components.importUniqueFromJSON(data);
+      await this.scans_db.results.insertFromJSON(data);
+      await this.scans_db.files.insertFromJSON(data);
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
@@ -139,9 +161,9 @@ export class ProjectTree extends EventEmitter {
       this.saveScanProject();
 
       this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
-            success: true,
-            resultsPath: this.work_root,
-          });
+        success: true,
+        resultsPath: this.work_root,
+      });
     });
 
     this.scanner.on('error', (error) => {
@@ -155,9 +177,10 @@ export class ProjectTree extends EventEmitter {
 
   startScan() {
     console.log(`SCANNER: Start scanning path=${this.scan_root}`);
-    this.scanner.scanFolder(this.scan_root);
-  }
 
+    this.scanner.scanJsonList(this.filesToScan);
+   // this.scanner.scanFolder(this.scan_root);
+  }
 
   setMailbox(mailbox: Electron.WebContents) {
     this.msgToUI = mailbox;
@@ -167,19 +190,43 @@ export class ProjectTree extends EventEmitter {
 
   async prepare_scan() {
     let success;
+    this.cleanProject();
     const created = await this.scans_db.init();
     if (created) {
       console.log('Inserting licenses...');
       success = await this.scans_db.licenses.importFromJSON(licenses);
     }
+
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: 'prepare',
+      processed: 30,
+    });
     // const i = 0;
     this.build_tree();
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: 'prepare',
+      processed: 60,
+    });
     // apply filters.
+    this.banned_list.loadDefault();
+    prepareScan(this.scan_root, this.logical_tree, this.banned_list);
+
+    const summary = { total: 0, include: 0, filter: 0, files: [] };
+    this.filesSummary = summarizeTree(this.scan_root,this.logical_tree, summary);
+    console.log(
+      `Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`
+    );
+    this.filesToScan = summary.files;
+    console.log(this.filesToScan);
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: 'prepare',
+      processed: 100,
+    });
+
     if (success) {
       console.log('lienses inserted successfully...');
       return true;
     }
-
     return false;
   }
 
@@ -253,6 +300,27 @@ export class ProjectTree extends EventEmitter {
 }
 
 /* AUXILIARY FUNCTIONS */
+
+function summarizeTree(root: any,tree: any, summary: any) {
+  let j = 0;
+  if (tree.type === 'file') {
+    summary.total += 1;
+    if (tree.action === 'filter') summary.filter += 1;
+    else if (tree.include === true) {
+      summary.include += 1;
+      summary.files.push(`${root}/${tree.value}`);
+    }
+
+    return summary;
+  }
+  if (tree.type === 'folder') {
+    for (j = 0; j < tree.children.length; j += 1) {
+      summary = summarizeTree(root, tree.children[j], summary);
+    }
+    return summary;
+  }
+}
+
 function getLeaf(arbol: any, mypath: string): any {
   let res: string[];
   // eslint-disable-next-line prefer-const
@@ -345,7 +413,7 @@ function insertComponent(tree: any, mypath: string, inv: Inventory): any {
   arbol.className = 'match';
   // console.log(arbol);
 }
-
+/*
 function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {
   let i = 0;
   if (jsonScan.type === 'file') {
@@ -357,20 +425,19 @@ function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {
   } else if (jsonScan.type === 'folder') {
     for (i = 0; i < jsonScan.children.length; i += 1) recurseJSON(jsonScan.children[i], banned_list);
   }
-}
-function prepareScan(jsonScan: any, bannedList: Filtering.BannedList) {
+} */
+
+function prepareScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
   let i = 0;
-  // console.log
+
   if (jsonScan.type === 'file') {
-    if (bannedList.evaluate(jsonScan.path)) {
+    if (bannedList.evaluate(scanRoot + jsonScan.value)) {
       jsonScan.action = 'scan';
-      //  console.log("scan->"+jsonScan.path)
     } else {
-      // console.log("filter->"+jsonScan.name)
       jsonScan.action = 'filter';
     }
   } else if (jsonScan.type === 'folder') {
-    for (i = 0; i < jsonScan.children.length; i += 1) prepareScan(jsonScan.children[i], bannedList);
+    for (i = 0; i < jsonScan.children.length; i += 1) prepareScan(scanRoot, jsonScan.children[i], bannedList);
   }
 }
 

@@ -7,6 +7,7 @@ import fs from 'fs';
 import { AbstractScannable } from './Scannable/AbstractScannable';
 import { ScannableTree } from './Scannable/ScannableTree';
 import { ScannableFolder } from './Scannable/ScannableFolder';
+import { ScannableJson } from './Scannable/ScanneableJson';
 import { Winnower } from './Winnower/Winnower';
 import { Dispatcher } from './Dispatcher/Dispatcher';
 import { DispatcherEvents } from './Dispatcher/DispatcherEvents';
@@ -118,6 +119,11 @@ export class Scanner extends EventEmitter {
   // Public Methods
   async scanFileTree(fileTreeDescriptor) {
     this.#scannable = new ScannableTree(fileTreeDescriptor);
+    await this.#scan();
+  }
+
+  async scanJsonList(jsonList) {
+    this.#scannable = new ScannableJson(jsonList);
     await this.#scan();
   }
 
