@@ -237,13 +237,22 @@ export class Winnower extends EventEmitter {
 
   async #storeResult(winnowingResult) {
     if (this.#wfp.length + winnowingResult.length >= this.#WFP_FILE_MAX_SIZE) {
-      await this.#createWfpFile(
-        this.#wfp,
-        this.#destFolder,
-        new Date().getTime()
-      );
+      // When the fingerprint of one file is bigger than 64Kb, truncate to the last 64Kb line.
+      if (winnowingResult.length > this.#WFP_FILE_MAX_SIZE) {
+        let truncateStringOnIndex = this.#WFP_FILE_MAX_SIZE;
+        let keepRemovingCharacters = true;
+        while (keepRemovingCharacters) {
+          if (winnowingResult[truncateStringOnIndex] === '\n') keepRemovingCharacters = false;
+          truncateStringOnIndex -= 1;
+        }
+        truncateStringOnIndex += 1;
+        winnowingResult = winnowingResult.substring(0, truncateStringOnIndex);
+      }
+
+      await this.#createWfpFile(this.#wfp, this.#destFolder, new Date().getTime());
       this.#wfp = '';
     }
+
     this.#wfp += winnowingResult;
   }
 
@@ -259,12 +268,7 @@ export class Winnower extends EventEmitter {
     if (this.#scannable.hasNextScannableItem()) {
       this.#worker.postMessage(scannableItem);
     } else {
-      if (this.#wfp.length != 0)
-        await this.#createWfpFile(
-          this.#wfp,
-          this.#destFolder,
-          new Date().getTime()
-        );
+      if (this.#wfp.length != 0) await this.#createWfpFile(this.#wfp, this.#destFolder, new Date().getTime());
       this.#isRunning = false;
       this.emit(ScannerEvents.WINNOWING_FINISHED);
       this.#worker.terminate();
