@@ -3,8 +3,12 @@ import fetch from 'node-fetch';
 import FormData from 'form-data';
 import fs from 'fs';
 import PQueue from 'p-queue';
-import { SCANNER_EVENTS } from '../ScannerEvents';
+import { ScannerEvents } from '../ScannerEvents';
 import { DispatcherResponse } from './DispatcherResponse';
+import { DispatcherEvents } from './DispatcherEvents';
+
+// TO DO:
+// - Add #CLIENT_TIMESTAMP to the fetch header
 
 export class Dispatcher extends EventEmitter {
   // Client Timestamp
@@ -25,11 +29,8 @@ export class Dispatcher extends EventEmitter {
   // Promises queue
   #pQueue;
 
-  // Number of promises running at given time.
-  #numPromisesRunning;
-
   // Error counter (Resets every time a transaction is complete)
-  #errorCounter;
+  #networkErrorCounter;
 
   constructor() {
     super();
@@ -38,25 +39,30 @@ export class Dispatcher extends EventEmitter {
 
   init() {
 
-    this.#numPromisesRunning = 0;
+    this.#networkErrorCounter = 0;
 
     this.#pQueue = new PQueue({
       concurrency: this.#CONCURRENCY_LIMIT,
       timeout: this.#TIMEOUT,
       throwOnTimeout: true,
     });
+
     this.#pQueue.clear();
     if (this.#pQueue.isPaused) this.#pQueue.start();
 
     this.#pQueue.on('idle', () => {
-      this.emit(SCANNER_EVENTS.DISPATCHER_FINISHED)
+      this.emit(ScannerEvents.DISPATCHER_FINISHED)
     });
 
-    // Only works for 7.x.x versions
+    // Only works for pQueue@7.x.x versions
     // this.#pQueue.on('error', (error) => {
     //   console.log("ERROR CATCHED....");
     //   this.#errorHandler(error);
     // });
+  }
+
+  setApiUrl(url) {
+    this.#API_URL = url;
   }
 
   stop() {
@@ -65,8 +71,11 @@ export class Dispatcher extends EventEmitter {
     this.#pQueue.pause();
   }
 
+  isPaused() {
+    return this.#pQueue.isPaused;
+  }
+
   pause() {
-    this.#pQueue.clear();
     this.#pQueue.pause();
   }
 
@@ -76,36 +85,35 @@ export class Dispatcher extends EventEmitter {
 
   dispatchWfpFile(wfpPath) {
     this.#pQueue
-      .add(() => this.#dispatch(wfpPath, this.#RETRIES))
+      .add(() => this.#dispatch(wfpPath))
       .catch((error) => {
         this.#errorHandler(error);
       });
   }
 
   #errorHandler(error) {
-    console.log(`pQueue Pending: ${this.#pQueue.pending}`);
-    console.log(`Manual counter: ${this.#numPromisesRunning}`);
-    this.#errorCounter += 1;
+    if (
+      error.message === DispatcherEvents.ERROR_NETWORK_CONNECTIVITY ||
+      error.name === DispatcherEvents.ERROR_TRANSACTION_TIMEOUT
+    ) {
+      if (this.isPaused()) this.pause();
 
-    this.emit('error', error);
+      // Wait until all promises are resolved or rejected. Could be timeout or Network error
+      if (this.#pQueue.pending <= 0) {
+        this.emit('error', new Error(DispatcherEvents.ERROR_NETWORK_CONNECTIVITY));
+      }
+    }
   }
 
-  async #dispatch(wfpFilePath, retryNum) {
-    this.#numPromisesRunning += 1;
-    if (!retryNum) {
-      // this.emit('error', new Error(`Failed to fetch ${wfpFilePath} after ${this.#RETRIES} retries`));
-      this.#numPromisesRunning -= 1;
-      throw new Error(`Failed to fetch after ${this.#RETRIES} retries`);
-    }
+  async #dispatch(wfpFilePath) {
     try {
       let dataAsText = '';
       let dataAsObj = {};
       const wfpContent = fs.readFileSync(wfpFilePath);
       const form = new FormData();
       form.append('filename', Buffer.from(wfpContent), 'data.wfp');
-      // form.append('User-Agent:', new Blob([this.#CLIENT_TIMESTAMP]));
 
-      this.emit(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, wfpFilePath);
+      this.emit(ScannerEvents.DISPATCHER_WFP_SENDED, wfpFilePath);
 
       // Fetch
       const p1 = fetch(this.#API_URL, {
@@ -113,34 +121,20 @@ export class Dispatcher extends EventEmitter {
         body: form,
       });
 
-      //  Timeout
-      const p2 = new Promise((resolve, reject) => {
-        const id = setTimeout(() => {
-          clearTimeout(id);
-          reject(new Error('TIMEOUT'));
-        }, this.#TIMEOUT);
-      });
-      const response = await Promise.race([p1, p2]);
-
-
-      if (!response.ok){
-        this.#numPromisesRunning -= 1;
+      const response = await p1;
+      if (!response.ok) {
         throw new Error('Server communication failed');
       }
+
       dataAsText = await response.text();
       dataAsObj = JSON.parse(dataAsText);
-      this.emit(SCANNER_EVENTS.DISPATCHER_NEW_DATA, new DispatcherResponse(dataAsObj, wfpFilePath));
-      this.#numPromisesRunning -= 1;
-      return Promise.resolve();
+      this.emit(ScannerEvents.DISPATCHER_NEW_DATA, new DispatcherResponse(dataAsObj, wfpFilePath));
+      return await Promise.resolve();
     } catch (error) {
-      if (error.message === 'TIMEOUT') {
-        console.log("Retrying....")
-        return this.#dispatch(wfpFilePath, retryNum - 1);
+      if (error.code === 'EAI_AGAIN') {
+        throw new Error(DispatcherEvents.ERROR_NETWORK_CONNECTIVITY);
       }
-      if (error.code === 'EAI_AGAIN') console.log('No Internet connection...');
-      this.#numPromisesRunning -= 1;
       throw new Error(error);
-
     }
   }
 }

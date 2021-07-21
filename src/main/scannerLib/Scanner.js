@@ -9,9 +9,10 @@ import { ScannableTree } from './Scannable/ScannableTree';
 import { ScannableFolder } from './Scannable/ScannableFolder';
 import { Winnower } from './Winnower/Winnower';
 import { Dispatcher } from './Dispatcher/Dispatcher';
+import { DispatcherEvents } from './Dispatcher/DispatcherEvents';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { DispatcherResponse } from './Dispatcher/DispatcherResponse';
-import { SCANNER_EVENTS } from './ScannerEvents';
+import { ScannerEvents } from './ScannerEvents';
 
 // TO DO:
 // - Split ScannerEvents into ExternalEvents and InternalEvents
@@ -41,16 +42,16 @@ export class Scanner extends EventEmitter {
   initialize() {
     this.#winnower = new Winnower();
     /* ******************* SETTING WINNOWING EVENTS ******************* */
-    this.#winnower.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
-      this.emit(SCANNER_EVENTS.WINNOWING_STARTING);
+    this.#winnower.on(ScannerEvents.WINNOWING_STARTING, () => {
+      this.emit(ScannerEvents.WINNOWING_STARTING);
     });
 
-    this.#winnower.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (wfpPath) => {
-      this.emit(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, wfpPath);
+    this.#winnower.on(ScannerEvents.WINNOWING_NEW_WFP_FILE, (wfpPath) => {
+      this.emit(ScannerEvents.WINNOWING_NEW_WFP_FILE, wfpPath);
       this.#dispatcher.dispatchWfpFile(wfpPath);
     });
-    this.#winnower.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => {
-      this.emit(SCANNER_EVENTS.WINNOWING_FINISHED);
+    this.#winnower.on(ScannerEvents.WINNOWING_FINISHED, () => {
+      this.emit(ScannerEvents.WINNOWING_FINISHED);
     });
 
     this.#winnower.on('error', (error) => {
@@ -60,22 +61,22 @@ export class Scanner extends EventEmitter {
 
     this.#dispatcher = new Dispatcher();
     /* ******************* SETTING DISPATCHER EVENTS ******************** */
-    this.#dispatcher.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (wfpPath) => {
-      this.emit(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, wfpPath);
+    this.#dispatcher.on(ScannerEvents.DISPATCHER_WFP_SENDED, (wfpPath) => {
+      this.emit(ScannerEvents.DISPATCHER_WFP_SENDED, wfpPath);
     });
 
-    this.#dispatcher.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, (dispatcherResponse) => {
+    this.#dispatcher.on(ScannerEvents.DISPATCHER_NEW_DATA, (dispatcherResponse) => {
       const serverResponse = dispatcherResponse.getServerData();
       const serverResposeNumFiles = dispatcherResponse.getNumberOfFiles();
       Object.assign(this.#tmpResult, serverResponse);
-      this.emit(SCANNER_EVENTS.DISPATCHER_NEW_DATA, serverResponse, serverResposeNumFiles);
+      this.emit(ScannerEvents.DISPATCHER_NEW_DATA, serverResponse, serverResposeNumFiles);
     });
 
-    this.#dispatcher.on(SCANNER_EVENTS.DISPATCHER_FINISHED, () => {
+    this.#dispatcher.on(ScannerEvents.DISPATCHER_FINISHED, () => {
       if (!this.#winnower.isRunning()) {
         const str = JSON.stringify(this.#tmpResult, null, 4);
         fs.writeFileSync(this.#resultFilePath, str);
-        this.emit(SCANNER_EVENTS.SCAN_DONE, this.#resultFilePath);
+        this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath);
       }
     });
 
@@ -90,19 +91,17 @@ export class Scanner extends EventEmitter {
 
   #errorHandler(error, origin) {
     if (origin === 'DISPATCHER') {
-      this.emit('error', new Error(SCANNER_EVENTS.ERROR_SCANNER_ABORTED));
-      if (error.message === '') {
+      if (error.message === DispatcherEvents.ERROR_NETWORK_CONNECTIVITY) {
         this.#aborted = true;
-        this.emit('error', new Error(SCANNER_EVENTS.ERROR_SCANNER_ABORTED));
+        this.#winnower.pause(); //Only pause winnowing. Dispatcher is already paused
+        this.emit('error', new Error(ScannerEvents.ERROR_SCANNER_ABORTED));
       }
       return;
     }
 
     if (origin === 'WINNOWER') {
-      return;
+      console.log(error);
     }
-
-    this.emit('error', error);
   }
 
   async #scan() {

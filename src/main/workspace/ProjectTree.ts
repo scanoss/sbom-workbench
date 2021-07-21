@@ -14,7 +14,7 @@ import * as Filtering from './filtering';
 import { ScanDb } from '../db/scan_db';
 import { licenses } from '../db/licenses';
 import { Scanner } from '../scannerLib/Scanner';
-import { SCANNER_EVENTS } from '../scannerLib/ScannerEvents';
+import { ScannerEvents } from '../scannerLib/ScannerEvents';
 import { IpcEvents } from '../../ipc-events';
 
 const fs = require('fs');
@@ -119,12 +119,12 @@ export class ProjectTree extends EventEmitter {
 
   //Return fileList
   setScannerListeners() {
-    this.scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => console.log('Starting Winnowing...'));
-    this.scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (dir) => console.log(`New WFP File on: ${dir}`));
-    this.scanner.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => console.log('Winnowing Finished...'));
-    this.scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (dir) => console.log(`Sending WFP file ${dir} to server`));
+    this.scanner.on(ScannerEvents.WINNOWING_STARTING, () => console.log('Starting Winnowing...'));
+    this.scanner.on(ScannerEvents.WINNOWING_NEW_WFP_FILE, (dir) => console.log(`New WFP File on: ${dir}`));
+    this.scanner.on(ScannerEvents.WINNOWING_FINISHED, () => console.log('Winnowing Finished...'));
+    this.scanner.on(ScannerEvents.DISPATCHER_WFP_SENDED, (dir) => console.log(`Sending WFP file ${dir} to server`));
 
-    this.scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
+    this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
       console.log(`New ${fileNumbers} files scanned`);
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, { processed: 15, received: 30 });
       // await this.scans_db.components.importUniqueFromJSON(data);
@@ -132,7 +132,7 @@ export class ProjectTree extends EventEmitter {
       // await this.scans_db.files.insertFromJSON(data);
     });
 
-    this.scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resPath) => {
+    this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
       console.log(`Scan Finished... Results on: ${resPath}`);
       const a = fs.readFileSync(`${resPath}`, 'utf8');
       this.results = JSON.parse(a);
@@ -145,16 +145,11 @@ export class ProjectTree extends EventEmitter {
     });
 
     this.scanner.on('error', (error) => {
-
-      // this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
-
-      this.scanner.pause();
       console.log(error.message);
 
-      if (error.message === SCANNER_EVENTS.ERROR_SCANNER_ABORTED) {
+      if (error.message === ScannerEvents.ERROR_SCANNER_ABORTED) {
         this.msgToUI.send(IpcEvents.SCANNER_ABORTED, error); //Emit only once
       }
-
     });
   }
 

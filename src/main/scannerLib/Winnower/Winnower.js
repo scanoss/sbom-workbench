@@ -1,7 +1,7 @@
 import { Worker, isMainThread, parentPort } from 'worker_threads';
 import fs from 'fs';
 import EventEmitter from 'events';
-import { SCANNER_EVENTS } from '../ScannerEvents.js';
+import { ScannerEvents } from '../ScannerEvents.js';
 
 const stringWorker = `
 const { parentPort } = require('worker_threads');
@@ -250,7 +250,7 @@ export class Winnower extends EventEmitter {
   async #createWfpFile(content, dst, name) {
     if (!fs.existsSync(dst)) fs.mkdirSync(dst);
     await fs.promises.writeFile(`${dst}/${name}.wfp`, content);
-    this.emit(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, `${dst}/${name}.wfp`);
+    this.emit(ScannerEvents.WINNOWING_NEW_WFP_FILE, `${dst}/${name}.wfp`);
   }
 
   async #nextStepMachine() {
@@ -266,7 +266,7 @@ export class Winnower extends EventEmitter {
           new Date().getTime()
         );
       this.#isRunning = false;
-      this.emit(SCANNER_EVENTS.WINNOWING_FINISHED);
+      this.emit(ScannerEvents.WINNOWING_FINISHED);
       this.#worker.terminate();
     }
   }
@@ -275,7 +275,7 @@ export class Winnower extends EventEmitter {
     this.#scannable = scannable;
     this.#destFolder = destPath;
     this.#isRunning = true;
-    this.emit(SCANNER_EVENTS.WINNOWING_STARTING);
+    this.emit(ScannerEvents.WINNOWING_STARTING);
     return this.#nextStepMachine();
   }
 
