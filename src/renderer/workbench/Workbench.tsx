@@ -12,6 +12,7 @@ import { WorkbenchContext, IWorkbenchContext } from './store';
 import { AppContext, IAppContext } from '../context/AppProvider';
 import { ComponentList } from './pages/ComponentList/ComponentList';
 import { ComponentDetail } from './pages/ComponentDetail/ComponentDetail';
+import { InventoryDetail } from './pages/InventoryDetail/InventoryDetail';
 import { reset } from './actions';
 
 const Workbench = () => {
@@ -68,6 +69,9 @@ const Workbench = () => {
             </Route>
             <Route path={`${path}/component/`}>
               <ComponentDetail />
+            </Route>
+            <Route path={`${path}/inventory/:id`}>
+              <InventoryDetail />
             </Route>
             <Route path={`${path}/file`}>{file ? <MemoEditor /> : null}</Route>
           </Switch>

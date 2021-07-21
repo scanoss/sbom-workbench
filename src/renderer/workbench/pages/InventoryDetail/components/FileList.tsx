@@ -11,7 +11,7 @@ export interface FileListProps {
 }
 
 export const FileList = ({ files, filter, onAction }: FileListProps) => {
-  const filteredFiles = files.filter((file) => !filter || file.status === filter);
+  const filteredFiles = files.filter((file) => !filter);
 
   return (
     <>
@@ -19,7 +19,7 @@ export const FileList = ({ files, filter, onAction }: FileListProps) => {
         {filteredFiles.length > 0
           ? filteredFiles.slice(0, MAX_FILES).map((file, index) => (
               <article className="item" key={index}>
-                <MatchCard onAction={(action) => onAction(file.path, action)} label={file.path} status={file.status} />
+                <MatchCard onAction={(action) => onAction(file.path, action)} label={file.path}  />
               </article>
             ))
           : null}
