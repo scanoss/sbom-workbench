@@ -8,7 +8,7 @@ ipcMain.handle(
   async (event, invget: Partial<Inventory>) => {
     let inv: any;
     try {
-      inv = await defaultProject.scans_db.inventories.getAll(invget); 
+      inv = await defaultProject.scans_db.inventories.getAll(invget);
       return { status: 'ok', message: inv, data: inv };
     } catch (e) {
       console.log('Catch an error: ', e);
@@ -22,7 +22,7 @@ ipcMain.handle(
   async (event, invget: Partial<Inventory>) => {
     let inv: any;
     try {
-      inv = await defaultProject.scans_db.inventories.get(invget); 
+      inv = await defaultProject.scans_db.inventories.get(invget);
       return { status: 'ok', message: 'Inventory retrieve successfully', data: inv };
     } catch (e) {
       console.log('Catch an error: ', e);
@@ -36,8 +36,11 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   try {
     created = await defaultProject.scans_db.inventories.create(arg);
     arg.id = created;
-    defaultProject.attachInventory(arg);
+
+    // defaultProject.attachInventory(arg);
     defaultProject.saveScanProject();
+
+
     return { status: 'ok', message: 'Inventory created', data: arg };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
@@ -45,7 +48,7 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   }
 });
 
-  
+
 
 /**
  * INVENTORY_CREATE = 'INVENTORY_CREATE',

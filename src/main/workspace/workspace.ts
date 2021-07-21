@@ -28,13 +28,10 @@ export class Workspace extends EventEmitter {
   }
 
   newProject(scanPath: string,mailbox: any) {
-  this.projectsList = new TreeStructure.ProjectTree('Unnamed');
-  this.projectsList.setMailbox(mailbox);
-  this.projectsList.createScanProject(scanPath);
+    this.projectsList = new TreeStructure.ProjectTree('Unnamed');
+    this.projectsList.setMailbox(mailbox);
+    this.projectsList.createScanProject(scanPath);
   }
-
-
-
 
 }
 

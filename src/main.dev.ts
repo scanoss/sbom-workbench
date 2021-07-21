@@ -178,11 +178,15 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   const { path } = arg;
 
   ws.newProject(path,event.sender);
-  ws.projectsList.setMailbox(event.sender);
+
+  // ws.projectsList.setMailbox(event.sender);
 
   await ws.projectsList.prepare_scan();
 
   ws.projectsList.startScan();
+
+
+
 });
 
 
