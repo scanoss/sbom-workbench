@@ -1,19 +1,14 @@
-import { Button, Chip, Paper, Tab, Tabs } from '@material-ui/core';
+import {  Chip } from '@material-ui/core';
 import React, { useContext, useState, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
-import { AppContext, IAppContext } from '../../../context/AppProvider';
-import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../../../api/types';
 import { FileList } from './components/FileList';
-import { InventoryList } from '../ComponentList/components/InventoryList';
 import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
-import { DialogContext } from '../../../context/DialogProvider';
 import { setFile } from '../../actions';
 import { inventoryService } from '../../../../api/inventory-service';
-import { componentService } from '../../../../api/component-service';
 import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
 import Label from '../../components/Label/Label';
 import { mapFiles } from '../../../../utils/scan-util';
@@ -28,8 +23,7 @@ export const InventoryDetail = () => {
   const getInventory = async () => {
     const response = await inventoryService.get({ id });
     setInventory(response.data);
-    console.log(response?.data);
-    setFiles(mapFiles(response?.data?.files));
+    setFiles(mapFiles(response.data?.files));
   };
 
   const onAction = (file: string, action: MATCH_CARD_ACTIONS) => {
@@ -38,15 +32,9 @@ export const InventoryDetail = () => {
         history.push(`/workbench/file/${file}`);
         dispatch(setFile(file));
         break;
-      case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
-        onIdentifyPressed(file);
-        break;
-      case MATCH_CARD_ACTIONS.ACTION_IGNORE:
-        onIgnorePressed(file);
-        break;
     }
   };
-  console.log(files);
+
   useEffect(() => {
     getInventory();
   }, []);
