@@ -113,18 +113,40 @@ export class FilesDb extends Db {
   ignored(path: string[]) {
     return new Promise(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        db.serialize(function () {
-          const stmt = db.prepare(query.SQL_UPDATE_IGNORED_FILES);
+        const db = await this.openDb();       
+          db.serialize(function () {
+          db.run('begin transaction');
           for (let i = 0; i < path.length; i += 1) {
-            stmt.run(path[i]);
+            db.run(query.SQL_UPDATE_IGNORED_FILES,path[i]);
           }
-          stmt.finalize();
-          db.close();
-          resolve(true);
+          db.run('commit',()=>{
+            db.close();
+            resolve(true);
+          });
         });
       } catch (error) {
-        reject(new Error('error'));
+        reject(new Error('Ignore files were not successfully retrieved'));
+      }
+    });
+  }
+
+
+  unignored(path: string[]) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');     
+          for (let i = 0; i < path.length; i += 1) {
+            db.run(query.SQL_UPDATE_UNIGNORED_FILES,path[i]);
+          }
+          db.run('commit',()=>{
+            db.close();
+            resolve(true);
+          });         
+        });
+      } catch (error) {
+        reject(new Error('Unignore files were not successfully retrieved'));
       }
     });
   }
