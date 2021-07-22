@@ -175,6 +175,10 @@ export class ProjectTree extends EventEmitter {
 
       if (error.message === ScannerEvents.ERROR_SCANNER_ABORTED) {
         this.msgToUI.send(IpcEvents.SCANNER_ABORTED, error); //Emit only once
+        this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
+          success: false,
+          resultsPath: this.work_root,
+        });
       }
     });
   }

@@ -55,6 +55,7 @@ const Home = () => {
         showScan(args.resultsPath);
       } else {
         showError();
+        setPath(null);
       }
     });
   };
