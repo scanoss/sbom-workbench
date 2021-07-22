@@ -97,7 +97,7 @@ export class ProjectTree extends EventEmitter {
       default_components: '',
       default_licenses: '',
     };
-    this.set_project_name(`${path.basename(scanPath)}`)
+    this.set_project_name(`${path.basename(scanPath)}`);
     if (!fs.existsSync(`${getUserHome()}/scanoss-workspace`)) {
       fs.mkdirSync(`${getUserHome()}/scanoss-workspace/`);
     }
@@ -114,19 +114,18 @@ export class ProjectTree extends EventEmitter {
     let success;
     const created = await this.scans_db.init();
     if (created) {
-      console.log("Inserting licenses...");
-       success = await this.scans_db.licenses.importFromJSON(licenses);
+      console.log('Inserting licenses...');
+      success = await this.scans_db.licenses.importFromJSON(licenses);
     }
     // const i = 0;
     this.build_tree();
     // apply filters.
-    if (success){
-      console.log("lienses inserted successfully...");
+    if (success) {
+      console.log('lienses inserted successfully...');
       return true;
-    } 
-    else{
-    return false;
     }
+
+    return false;
   }
 
   getLogicalTree() {
@@ -139,7 +138,16 @@ export class ProjectTree extends EventEmitter {
     files = inv.files;
     for (i = 0; i < inv.files.length; i += 1) {
       insertInventory(this.logical_tree, files[i], inv);
-      insertComponent(this.logical_tree, files[i], inv);
+    }
+  }
+
+  attachComponent(comp: any) {
+    for (const [key, value] of Object.entries(comp)) {
+      for (let i = 0; i < value.length; i += 1) {
+        // console.log(key+''+value[i].purl);
+        if(value[i].purl!==undefined)
+        insertComponent(this.logical_tree, key, value[i]);
+      }
     }
   }
 
@@ -260,8 +268,7 @@ function insertInventory(tree: any, mypath: string, inv: Inventory): any {
 
   arbol.inventories.push(inv.id);
 }
-// 4= arr.some(e => e.name === obj.name);
-function insertComponent(tree: any, mypath: string, inv: Inventory): any {
+function insertComponent(tree: any, mypath: string, comp: Component): any {
   let myPathFolders: string[];
   // eslint-disable-next-line prefer-const
   let arbol = tree;
@@ -269,13 +276,15 @@ function insertComponent(tree: any, mypath: string, inv: Inventory): any {
   if (myPathFolders[0] === '') myPathFolders.shift();
   let i: number;
   i = 0;
-  const component = { purl: inv.purl, version: inv.version };
+
+  const component = { purl: comp.purl, version: comp.version };
+  console.log(component);
   while (i < myPathFolders.length) {
     let j: number;
     //  if (!arbol.components.includes(component)) arbol.components.push(component);
     if (!arbol.components.some((e) => e.purl === component.purl && e.version === component.version)) {
       arbol.components.push(component);
-      arbol.className = 'match';
+      arbol.className = 'match-info';
     }
     // console.log(`busco ${myPathFolders[i]}`);
     for (j = 0; j < arbol.children.length; j += 1) {
@@ -288,8 +297,8 @@ function insertComponent(tree: any, mypath: string, inv: Inventory): any {
   }
 
   arbol.components.push(component);
-  arbol.className = 'match';
-  // console.log(arbol);
+  arbol.className = 'match-info';
+   console.log("agrego "+JSON.stringify(component).toString());
 }
 
 function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {
@@ -348,8 +357,9 @@ function dirTree(root: string, filename: string) {
     info.children = fs
       .readdirSync(filename, { withFileTypes: true }) // Returns a list of files and folders
       .sort(dirFirstFileAfter)
-      .map((dirent) => dirent.name)                   // Converts Dirent objects to paths
-      .map((child: string) => {                       // Apply the recursion function in the whole array
+      .map((dirent) => dirent.name) // Converts Dirent objects to paths
+      .map((child: string) => {
+        // Apply the recursion function in the whole array
         return dirTree(root, `${filename}/${child}`);
       });
   } else {

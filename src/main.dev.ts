@@ -192,6 +192,8 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
     console.log(`New ${fileNumbers} files scanned`);
     await ws.projectsList.scans_db.files.insertFromJSON(data);
+
+    ws.projectsList.attachComponent(data);
   });
 
   scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
