@@ -116,11 +116,18 @@ export const ComponentDetail = () => {
     getFiles();
   };
 
+  const onRestoreAllPressed = async () => {
+    const selFiles = files
+      .filter( file => file.status === 'ignored')
+      .map( file => file.path);
+    await restoreFile(selFiles);
+    getFiles();
+  };
+
   const onRestorePressed = async (file)  => {
     await restoreFile([file.path]);
     getFiles();
   };
-
 
   const handleClose = async (inventory: Inventory) => {
     const  newInventory = await createInventory({
@@ -194,13 +201,12 @@ export const ComponentDetail = () => {
               </Paper>
             </div>
 
-            {tab === 0 ? (
+            {tab === 0 && (
               <>
                 <ButtonGroup
                   disabled={component?.summary.pending === 0}
                   ref={anchorRef} variant="contained" color="secondary" aria-label="split button">
                   <Button
-
                     variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
                     Identify All ({component?.summary.pending})
                   </Button>
@@ -212,30 +218,28 @@ export const ComponentDetail = () => {
                     <ArrowDropDownIcon />
                   </Button>
                 </ButtonGroup>
-                <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
-                  {({ TransitionProps, placement }) => (
-                    <Grow
-                      {...TransitionProps}
-                      style={{
-                        transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
-                      }}
-                    >
-                      <Paper>
-                        <ClickAwayListener onClickAway={handleCloseButtonGroup}>
-                          <MenuList id="split-button-menu">
-                              <MenuItem
-                                key="test"
-                                onClick={(event) => { setOpen(false); onIgnoreAllPressed() }}>
-                                Ignore All ({component?.summary.pending})
-                              </MenuItem>
-                          </MenuList>
-                        </ClickAwayListener>
-                      </Paper>
-                    </Grow>
-                  )}
+                <Popper open={open} anchorEl={anchorRef.current} transition disablePortal>
+                  <Paper>
+                    <ClickAwayListener onClickAway={handleCloseButtonGroup}>
+                      <MenuList id="split-button-menu">
+                          <MenuItem
+                            key="test"
+                            onClick={ () => { setOpen(false); onIgnoreAllPressed() }}>
+                            Ignore All ({component?.summary.pending})
+                          </MenuItem>
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
                 </Popper>
               </>
-            ) : null}
+            )}
+            {tab === 2 && (
+              <Button
+                disabled={component?.summary.ignored === 0}
+                variant="contained" color="secondary" onClick={onRestoreAllPressed}>
+                Restore All ({component?.summary.ignored})
+              </Button>
+            )}
           </section>
         </header>
 
