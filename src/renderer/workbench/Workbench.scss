@@ -37,3 +37,9 @@
   height: 100%;
   background-color: var(--background-color-primary);
 }
+
+.btn-export {
+  position: absolute !important;
+  bottom: 16px ;
+  right: 16px;
+}

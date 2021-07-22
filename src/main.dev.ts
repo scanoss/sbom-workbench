@@ -20,6 +20,7 @@ import './main/component';
 import './main/project';
 import './main/results';
 import './main/file';
+import './main/formats';
 import { IpcEvents } from './ipc-events';
 import { Workspace } from './main/workspace/workspace';
 import { ItemExclude, Project } from './api/types';
@@ -194,11 +195,11 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   });
 
   scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
-    
+
     console.log(`Scan Finished... Results on: ${resultsPath}`);
     const succesRes = await ws.projectsList.scans_db.results.insertFromFile(
       resultsPath
-    );    
+    );
     const successFiles = await ws.projectsList.scans_db.files.insertFromFile(
       resultsPath
     );
