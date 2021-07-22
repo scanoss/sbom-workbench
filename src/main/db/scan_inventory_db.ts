@@ -75,10 +75,12 @@ export class InventoryDb extends Db {
   }
 
   // CREATE NEW FILE INVENTORY
-  async newFileInventory(inventory: Inventory, invId: number) {
+  async newFileInventory(inventory: Partial<Inventory>, invId: number) {
     const db = await this.openDb();
-    for (const path of inventory.files) {
-      db.run(query.SQL_INSERT_FILE_INVENTORIES, path, invId);
+    if (inventory.files) {
+      for (const path of inventory.files) {
+        db.run(query.SQL_INSERT_FILE_INVENTORIES, path, invId);
+      }
     }
     db.close();
   }
@@ -153,10 +155,10 @@ export class InventoryDb extends Db {
   }
 
   // NEW INVENTORY
-  async create(inventory: Inventory) {
+  async create(inventory:any) {  
     const self = this;
     const db = await this.openDb();
-    return new Promise<number>(async (resolve, reject) => {
+    return new Promise<Inventory>(async (resolve, reject) => {
       db.run(
         query.SQL_SCAN_INVENTORY_INSERT,
         inventory.compid ? inventory.compid : 0,
@@ -169,10 +171,16 @@ export class InventoryDb extends Db {
         async function (this: any, err: any) {
           await self.newFileInventory(inventory, this.lastID);
           await self.updateIdentified(inventory);
+          const comp = await self.component.getAll(inventory);
+          delete inventory.licenses;
+          delete inventory.summary;
+          delete inventory.version;
+          inventory.component = comp;
+          inventory.id = this.lastID;
           if (err) {
             reject(new Error(err));
           } else {
-            resolve(this.lastID);
+            resolve(inventory);
           }
         }
       );
@@ -180,10 +188,11 @@ export class InventoryDb extends Db {
   }
 
   // UPDATE IDENTIFIED FILES
-  private updateIdentified(inventory: Inventory) {
+  private updateIdentified(inventory:Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
+        if(inventory.files)
         for (const path of inventory.files) {
           db.run(query.SQL_FILES_UPDATE_IDENTIFIED, path);
         }
@@ -326,6 +335,4 @@ export class InventoryDb extends Db {
       }
     });
   }
-
- 
 }

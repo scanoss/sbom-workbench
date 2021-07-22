@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable func-names */
@@ -8,7 +9,6 @@
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
-import { resolve } from 'path';
 
 const utilsDb = new UtilsDb();
 const query = new Querys();
@@ -40,11 +40,10 @@ export class ResultsDb extends Db {
               if (data.id !== 'none') self.insertResult(db, data);
             }
           }
-         db.run('commit',()=>{
-          db.close();
-          resolve(true);
-        });
-            
+          db.run('commit', () => {
+            db.close();
+            resolve(true);
+          });
         });
       } catch (error) {
         resolve(false);
@@ -68,7 +67,7 @@ export class ResultsDb extends Db {
             }
           }
           db.run('commit');
-          db.close;
+          db.close();
           resolve(true);
         });
       } catch {
@@ -78,8 +77,7 @@ export class ResultsDb extends Db {
   }
 
   private insertResult(db: any, data: any) {
-    const licenseName =
-      data.licenses && data.licenses[0] ? data.licenses[0].name : 'NULL';
+    const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : 'NULL';
     db.run(
       query.SQL_INSERT_RESULTS,
       data.file_hash,
@@ -121,15 +119,12 @@ export class ResultsDb extends Db {
   async getUnique() {
     try {
       const db = await this.openDb();
-      return new Promise<any>(async (resolve, reject) => {
-        db.all(
-          'SELECT DISTINCT purl,version,license,component,url FROM results;',
-          (err: any, data: any) => {
-            db.close();
-            if (!err) resolve(data);
-            else resolve([]);
-          }
-        );
+      return await new Promise<any>(async (resolve, reject) => {
+        db.all('SELECT DISTINCT purl,version,license,component,url FROM results;', (err: any, data: any) => {
+          db.close();
+          if (!err) resolve(data);
+          else resolve([]);
+        });
       });
     } catch (error) {
       console.log(error);
@@ -140,17 +135,13 @@ export class ResultsDb extends Db {
   private async getResult(path: string) {
     const db = await this.openDb();
     return new Promise<any>(async (resolve, reject) => {
-      db.all(
-        query.SQL_SCAN_SELECT_FILE_RESULTS,
-        `%${path}`,
-        (err: any, data: any) => {
-          if (data === !null) {
-            resolve(data);
-          } else {
-            reject(err);
-          }
+      db.all(query.SQL_SCAN_SELECT_FILE_RESULTS, `%${path}`, (err: any, data: any) => {
+        if (data === !null) {
+          resolve(data);
+        } else {
+          reject(err);
         }
-      );
+      });
     });
   }
 
@@ -170,43 +161,28 @@ export class ResultsDb extends Db {
 
   private identifiedSummary(db: any, data: any) {
     return new Promise<number>(async (resolve) => {
-      db.get(
-        query.SQL_COMP_SUMMARY_IDENTIFIED,
-        data.purl,
-        data.version,
-        async (err: any, comp: any) => {
-          if (err) resolve(0);
-          if (comp !== undefined) resolve(comp.identified);
-        }
-      );
+      db.get(query.SQL_COMP_SUMMARY_IDENTIFIED, data.purl, data.version, async (err: any, comp: any) => {
+        if (err) resolve(0);
+        if (comp !== undefined) resolve(comp.identified);
+      });
     });
   }
 
   private ignoredSummary(db: any, data: any) {
     return new Promise<number>(async (resolve) => {
-      db.get(
-        query.SQL_COMP_SUMMARY_IGNORED,
-        data.purl,
-        data.version,
-        async (err: any, comp: any) => {
-          if (err) resolve(0);
-          if (comp !== undefined) resolve(comp.ignored);
-        }
-      );
+      db.get(query.SQL_COMP_SUMMARY_IGNORED, data.purl, data.version, async (err: any, comp: any) => {
+        if (err) resolve(0);
+        if (comp !== undefined) resolve(comp.ignored);
+      });
     });
   }
 
   private pendingSummary(db: any, data: any) {
     return new Promise<number>(async (resolve) => {
-      db.get(
-        query.SQL_COMP_SUMMARY_PENDING,
-        data.purl,
-        data.version,
-        async (err: any, comp: any) => {
-          if (err) resolve(0);
-          if (comp !== undefined) resolve(comp.pending);
-        }
-      );
+      db.get(query.SQL_COMP_SUMMARY_PENDING, data.purl, data.version, async (err: any, comp: any) => {
+        if (err) resolve(0);
+        if (comp !== undefined) resolve(comp.pending);
+      });
     });
   }
 

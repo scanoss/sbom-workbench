@@ -26,13 +26,13 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Partial<Inventory>
 });
 
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
-  let created: any;
+  let inv: any;
   try {
-    created = await defaultProject.scans_db.inventories.create(arg);
-    arg.id = created;
+    inv = await defaultProject.scans_db.inventories.create(arg);    
+    arg.id = inv.id;
     defaultProject.attachInventory(arg);
     defaultProject.saveScanProject();
-    return { status: 'ok', message: 'Inventory created', data: arg };
+    return { status: 'ok', message: 'Inventory created', data: inv };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
     return { status: 'fail' };
