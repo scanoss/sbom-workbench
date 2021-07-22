@@ -1,3 +1,5 @@
+/* eslint-disable import/no-cycle */
+/* eslint-disable consistent-return */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable func-names */
@@ -5,10 +7,14 @@
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
+
+
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
-import { resolve } from 'path';
+import { ComponentDb } from './scan_component_db';
+
+
 
 const utilsDb = new UtilsDb();
 const query = new Querys();
@@ -20,8 +26,11 @@ interface Summary {
 }
 
 export class ResultsDb extends Db {
+  component: ComponentDb;
+
   constructor(path: string) {
     super(path);
+    this.component = new ComponentDb(path);
   }
 
   // INSERT RESULTS FROM FILE
@@ -40,11 +49,10 @@ export class ResultsDb extends Db {
               if (data.id !== 'none') self.insertResult(db, data);
             }
           }
-         db.run('commit',()=>{
-          db.close();
-          resolve(true);
-        });
-            
+          db.run('commit', () => {
+            db.close();
+            resolve(true);
+          });
         });
       } catch (error) {
         resolve(false);
@@ -67,9 +75,10 @@ export class ResultsDb extends Db {
               if (data.id !== 'none') self.insertResult(db, data);
             }
           }
-          db.run('commit');
-          db.close;
-          resolve(true);
+          db.run('commit',()=>{
+            db.close();
+            resolve(true);
+          });      
         });
       } catch {
         resolve(false);
@@ -118,115 +127,39 @@ export class ResultsDb extends Db {
     });
   }
 
-  async getUnique() {
-    try {
-      const db = await this.openDb();
-      return new Promise<any>(async (resolve, reject) => {
-        db.all(
-          'SELECT DISTINCT purl,version,license,component,url FROM results;',
-          (err: any, data: any) => {
-            db.close();
-            if (!err) resolve(data);
-            else resolve([]);
-          }
-        );
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   // GET RESULT
   private async getResult(path: string) {
     const db = await this.openDb();
-    return new Promise<any>(async (resolve, reject) => {
+    return new Promise<any>(async (resolve) => {
       db.all(
         query.SQL_SCAN_SELECT_FILE_RESULTS,
-        `%${path}`,
+        path,
         (err: any, data: any) => {
-          if (data === !null) {
-            resolve(data);
-          } else {
-            reject(err);
-          }
+          db.close();
+          if (err) resolve([]);
+          else resolve(data);
         }
       );
     });
   }
 
   // GET RESULTS
-  async get(paths: any) {
-    const results: any[] = [];
-    return new Promise<any[]>(async (resolve, reject) => {
-      // const db:any = await this.db;
-      for (const path of paths.files) {
-        const result: any = await this.getResult(path.path);
-        if (results) results.push(result);
-        else reject(new Error('{}'));
-      }
-      resolve(results);
-    });
-  }
-
-  private identifiedSummary(db: any, data: any) {
-    return new Promise<number>(async (resolve) => {
-      db.get(
-        query.SQL_COMP_SUMMARY_IDENTIFIED,
-        data.purl,
-        data.version,
-        async (err: any, comp: any) => {
-          if (err) resolve(0);
-          if (comp !== undefined) resolve(comp.identified);
-        }
-      );
-    });
-  }
-
-  private ignoredSummary(db: any, data: any) {
-    return new Promise<number>(async (resolve) => {
-      db.get(
-        query.SQL_COMP_SUMMARY_IGNORED,
-        data.purl,
-        data.version,
-        async (err: any, comp: any) => {
-          if (err) resolve(0);
-          if (comp !== undefined) resolve(comp.ignored);
-        }
-      );
-    });
-  }
-
-  private pendingSummary(db: any, data: any) {
-    return new Promise<number>(async (resolve) => {
-      db.get(
-        query.SQL_COMP_SUMMARY_PENDING,
-        data.purl,
-        data.version,
-        async (err: any, comp: any) => {
-          if (err) resolve(0);
-          if (comp !== undefined) resolve(comp.pending);
-        }
-      );
-    });
-  }
-
-  summary(data: any) {
+  get(path: string) {
+    let results: any;
     return new Promise(async (resolve, reject) => {
       try {
-        const summary: Summary = {
-          ignored: 0,
-          identified: 0,
-          pending: 0,
-        };
-        const db = await this.openDb();
-        summary.identified = await this.identifiedSummary(db, data);
-        summary.ignored = await this.ignoredSummary(db, data);
-        summary.pending = await this.pendingSummary(db, data);
-        db.close();
-        resolve(summary);
+        results = await this.getResult(path);
+        for (let i = 0; i < results.length; i += 1) {
+          const comp= await this.component.getAll(results[i]);
+           results.component = comp;
+        }
+        resolve(results);
       } catch (error) {
-        reject(error);
+        reject(new Error('Unable to retrieve results'));
       }
     });
   }
+
+ 
 }

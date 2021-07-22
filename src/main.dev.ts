@@ -20,6 +20,7 @@ import './main/component';
 import './main/project';
 import './main/results';
 import './main/file';
+import './main/formats';
 import { IpcEvents } from './ipc-events';
 import { Workspace } from './main/workspace/workspace';
 import { ItemExclude, Project } from './api/types';

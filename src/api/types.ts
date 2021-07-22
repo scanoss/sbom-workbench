@@ -1,6 +1,7 @@
 export interface Inventory {
   id?: number;
   compid: number;
+  component: Component;
   purl: string;
   version: string;
   usage: string;
@@ -18,10 +19,10 @@ export interface Component {
   url: string;
   description: string;
   summary?: {
-    pending: number,
-    ignored: number,
-    identified: number,
-  }
+    pending: number;
+    ignored: number;
+    identified: number;
+  };
   licenses: any[];
 }
 export interface License {
@@ -43,3 +44,12 @@ export interface Project {
   default_licenses: string;
   default_components: string;
 }
+
+export interface Files {
+  md5?: string;
+  ignored: string;
+  pending: string;
+  identified: string;
+  path: string;
+}
+

@@ -1,5 +1,15 @@
-import { Box, Button, IconButton } from '@material-ui/core';
-import React, { useContext, useEffect } from 'react';
+import {
+  Box,
+  Button,
+  Dialog, DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Fab,
+  IconButton,
+  Tooltip
+} from '@material-ui/core';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, Route, Switch, useRouteMatch } from 'react-router-dom';
 import SplitPane from 'react-split-pane';
 import HomeIcon from '@material-ui/icons/Home';
@@ -12,7 +22,31 @@ import { WorkbenchContext, IWorkbenchContext } from './store';
 import { AppContext, IAppContext } from '../context/AppProvider';
 import { ComponentList } from './pages/ComponentList/ComponentList';
 import { ComponentDetail } from './pages/ComponentDetail/ComponentDetail';
+import { InventoryDetail } from './pages/InventoryDetail/InventoryDetail';
+import SaveAltOutlinedIcon from '@material-ui/icons/SaveAltOutlined';
 import { reset } from './actions';
+import { ExportFormat } from '../../api/export-service';
+
+const Alert = ({open, handleClose}) => {
+  return (
+    <Dialog
+      open={open}
+      onClose={handleClose}
+    >
+      <DialogTitle id="alert-dialog-title">SPXD Export</DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description">
+          The operation has been completed successfully. You can find results inside ScanOSS workspace folder
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} color="primary" autoFocus>
+          OK
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
 
 const Workbench = () => {
   const { path, url } = useRouteMatch();
@@ -22,18 +56,27 @@ const Workbench = () => {
 
   const { file } = state;
 
-  const MemoEditor = React.memo(Editor); //TODO: move inside editor page
+  const [open, setOpen] = useState<boolean>(false);
 
-  const init = async () => {
+  const onInit = async () => {
     const result = scanPath ? await loadScan(scanPath) : false;
     if (!result) {
       dialogController.showError('Error', 'Cannot read scan.');
     }
   };
 
+  const onDownloadClicked = async () => {
+    await ExportFormat.spdx();
+    setOpen(true);
+  }
+
+  const onDestroy = () => {
+    dispatch(reset());
+  }
+
   useEffect(() => {
-    init();
-    return () => dispatch(reset());
+    onInit();
+    return onDestroy();
   }, []);
 
   return (
@@ -69,10 +112,21 @@ const Workbench = () => {
             <Route path={`${path}/component/`}>
               <ComponentDetail />
             </Route>
-            <Route path={`${path}/file`}>{file ? <MemoEditor /> : null}</Route>
+            <Route path={`${path}/inventory/:id`}>
+              <InventoryDetail />
+            </Route>
+            <Route path={`${path}/file`}>{file ? <Editor /> : null}</Route>
           </Switch>
         </main>
       </SplitPane>
+
+      <Tooltip title="Export SPDX">
+        <Fab className="btn-export" onClick={onDownloadClicked}>
+          <SaveAltOutlinedIcon />
+        </Fab>
+      </Tooltip>
+
+      <Alert open={open} handleClose={() => setOpen(false)}/>
     </div>
   );
 };

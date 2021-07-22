@@ -1,16 +1,37 @@
 import React, { useState } from 'react';
+import { InventoryForm } from '../workbench/components/InventoryDialog/InventoryDialog';
 
-export interface DialogContextProps {
-  inventoryBool: boolean;
-  setInventoryBool: (boolean) => void;
+export interface InventoryForm {
+  id?: string;
+  component: string;
+  version: string;
+  license: string;
+  url: string;
+  purl: string;
+  usage: string;
+  notes: string;
 }
 
-export const DialogContext = React.createContext<DialogContextProps | null>(null);
+export interface IDialogContext {
+  inventoryOpen: boolean;
+  setInventoryOpen: (boolean) => void;
+  inventory: Partial<InventoryForm>;
 
-export const DialogProvider: React.FC<DialogContextProps> = ({ children }) => {
-  const [inventoryBool, setInventoryBool] = useState<boolean>(false);
+  openInventory: (inventory: Partial<InventoryForm>) => void;
+}
 
-  return <DialogContext.Provider value={{ setInventoryBool, inventoryBool }}>{children}</DialogContext.Provider>;
+export const DialogContext = React.createContext<IDialogContext | null>(null);
+
+export const DialogProvider: React.FC = ({ children }) => {
+  const [inventoryOpen, setInventoryOpen] = useState<boolean>(false);
+  const [inventory, setInventory] = useState<Partial<InventoryForm>>({});
+
+  const openInventory = (inventory: Partial<InventoryForm>) => {
+    setInventory(inventory);
+    setInventoryOpen(true);
+  }
+
+  return <DialogContext.Provider value={{ setInventoryOpen, inventoryOpen, openInventory, inventory }}>{children}</DialogContext.Provider>;
 };
 
 export default DialogProvider;

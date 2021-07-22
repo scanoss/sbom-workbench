@@ -12,8 +12,9 @@ import {
   IconButton,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
-import React, { useState } from 'react';
-import { Component, Inventory } from '../../../../api/types';
+import React, { useContext, useEffect, useState } from 'react';
+import { Inventory } from '../../../../api/types';
+import { DialogContext, IDialogContext, IDialogContextProps, InventoryForm } from '../../../context/DialogProvider';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -37,27 +38,31 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface InventoryDialogProps {
-  open: boolean;
-  component: Component;
   onClose: (inventory: Inventory) => void;
-  onCancel: () => void;
+  onCancel?: () => void;
 }
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
-  const { onClose, open, component, onCancel } = props;
-  const [form, setForm] = useState({
-    component: component.name,
-    version: component.version,
-    license_name: component.licenses[0] ? component.licenses[0].name : '',
-    url: component.url,
-    purl: component.purl,
-    usage: 'file',
-    notes: '',
-  });
+  const { setInventoryOpen, inventoryOpen, inventory } = useContext(DialogContext) as IDialogContext;
+
+  const { onClose, onCancel } = props;
+  const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
+
+  const setDefaults = () => {
+    setForm(
+      inventory
+    );
+  }
+
+  const handleCancel = () => {
+    setInventoryOpen(false);
+    onCancel && onCancel();
+  };
 
   const handleClose = () => {
     const inventory: Inventory = form;
+    setInventoryOpen(false);
     onClose(inventory);
   };
 
@@ -68,14 +73,16 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     });
   };
 
+  useEffect( setDefaults, [inventory]);
+
   return (
     <Dialog
       id="InventoryDialog"
       maxWidth="md"
       scroll="body"
       fullWidth
-      open={open}
-      onClose={onCancel}
+      open={inventoryOpen}
+      onClose={handleCancel}
     >
       <span className="dialog-title">Identify Component</span>
       <div className="identity-component">
@@ -92,6 +99,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 className={classes.component}
                 placeholder="Component"
                 fullWidth
+                readOnly
                 onChange={(e) => inputHandler(e)}
               />
             </Paper>
@@ -105,6 +113,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 defaultValue={form?.version}
                 placeholder="Version"
                 fullWidth
+                readOnly
                 onChange={(e) => inputHandler(e)}
               />
             </Paper>
@@ -114,11 +123,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <label>License</label>
           <Paper component="form" className={classes.paper}>
             <InputBase
-              name="license_name"
-              defaultValue={form?.license_name}
+              name="license"
+              defaultValue={form?.license}
               className={classes.component}
               placeholder="License"
               fullWidth
+              readOnly
               onChange={(e) => inputHandler(e)}
             />
           </Paper>
@@ -132,6 +142,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               className={classes.component}
               placeholder="url"
               fullWidth
+              readOnly
               onChange={(e) => inputHandler(e)}
             />
           </Paper>
@@ -145,6 +156,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               className={classes.component}
               placeholder="Purl"
               fullWidth
+              readOnly
               onChange={(e) => inputHandler(e)}
             />
           </Paper>
@@ -176,6 +188,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 className={classes.component}
                 cols={30}
                 rows={8}
+                maxLength={500}
                 onChange={(e) => inputHandler(e)}
               />
             </Paper>
@@ -184,7 +197,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       </div>
 
       <DialogActions>
-        <Button onClick={onCancel}>Cancel</Button>
+        <Button onClick={handleCancel}>Cancel</Button>
         <Button variant="contained" color="secondary" onClick={handleClose}>
           Identify
         </Button>

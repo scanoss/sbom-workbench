@@ -1,11 +1,22 @@
-import { Button, Paper, Tab, Tabs } from '@material-ui/core';
+import {
+  Button,
+  ButtonGroup,
+  ClickAwayListener,
+  Grow,
+  MenuItem,
+  MenuList,
+  Paper,
+  Popper,
+  Tab,
+  Tabs
+} from '@material-ui/core';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
-import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { Inventory } from '../../../../api/types';
 import { FileList } from '../ComponentList/components/FileList';
 import { InventoryList } from '../ComponentList/components/InventoryList';
@@ -17,26 +28,30 @@ import { componentService } from '../../../../api/component-service';
 import { useEffect } from 'react';
 import { mapFiles } from '../../../../utils/scan-util';
 import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
+import InventoryDialog from '../../components/InventoryDialog/InventoryDialog';
 
 export const ComponentDetail = () => {
   const history = useHistory();
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { state, dispatch, createInventory, ignoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const { inventoryBool, setInventoryBool } = useContext<any>(DialogContext);
+  const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const dialogCtrl = useContext<any>(DialogContext);
 
   const { component } = state;
 
   const [files, setFiles] = useState<any[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [inventories, setInventories] = useState<Inventory[]>([]);
+
+  const [open, setOpen] = React.useState(false);
+  const anchorRef = React.useRef<HTMLDivElement>(null);
   const [tab, setTab] = useState<number>(component?.summary.pending !== 0 ? 0 : 1);
 
   const getFiles = async () => {
     const response = await componentService.getFiles( { purl: component.purl, version: component.version });
     console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));
-  };  
+  };
 
   const getInventories = async () => {
     const response = await inventoryService
@@ -48,8 +63,8 @@ export const ComponentDetail = () => {
   const onAction = (file: string, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push(`/workbench/file/${file}`);
-        dispatch(setFile(file));
+        history.push(`/workbench/file/${file.path}`);
+        dispatch(setFile(file.path));
         break;
       case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
         onIdentifyPressed(file);
@@ -57,29 +72,64 @@ export const ComponentDetail = () => {
       case MATCH_CARD_ACTIONS.ACTION_IGNORE:
         onIgnorePressed(file);
         break;
+      case MATCH_CARD_ACTIONS.ACTION_RESTORE:
+        onRestorePressed(file);
+        break;
     }
   };
 
-  const onIdentifyPressed = async (file: string) => {
-    setInventoryBool(true);
-    setSelectedFiles([file]);
+  const onIdentifyPressed = async (file) => {
+    const inv = {
+      ...component,
+      component: component?.name,
+      license: component?.licenses[0]?.name,
+      usage: file.type,
+    };
+    dialogCtrl.openInventory(inv);
+    setSelectedFiles([file.path]);
   };
 
   const onIdentifyAllPressed = async () => {
-    setInventoryBool(true);
+    const inv = {
+      ...component,
+      component: component?.name,
+      license: component?.licenses[0]?.name,
+      usage: 'file',
+    };
+    dialogCtrl.openInventory(inv);
     const selFiles = files
       .filter( file => file.status === 'pending')
       .map( file => file.path);
     setSelectedFiles(selFiles);
   };
 
-  const onIgnorePressed = async (file: string) => {
-    await ignoreFile(file);
+  const onIgnorePressed = async (file) => {
+    await ignoreFile([file.path]);
+    getFiles();
+  };
+
+  const onIgnoreAllPressed = async () => {
+    const selFiles = files
+      .filter( file => file.status === 'pending')
+      .map( file => file.path);
+    await ignoreFile(selFiles);
+    getFiles();
+  };
+
+  const onRestoreAllPressed = async () => {
+    const selFiles = files
+      .filter( file => file.status === 'ignored')
+      .map( file => file.path);
+    await restoreFile(selFiles);
+    getFiles();
+  };
+
+  const onRestorePressed = async (file)  => {
+    await restoreFile([file.path]);
     getFiles();
   };
 
   const handleClose = async (inventory: Inventory) => {
-    setInventoryBool(false);
     const  newInventory = await createInventory({
       ...inventory,
       files: selectedFiles
@@ -90,6 +140,13 @@ export const ComponentDetail = () => {
     setTab(1);
   };
 
+  const handleCloseButtonGroup = (event: React.MouseEvent<Document, MouseEvent>) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   useEffect(() => {
     getFiles();
@@ -144,13 +201,45 @@ export const ComponentDetail = () => {
               </Paper>
             </div>
 
-            {tab === 0 ? (
+            {tab === 0 && (
+              <>
+                <ButtonGroup
+                  disabled={component?.summary.pending === 0}
+                  ref={anchorRef} variant="contained" color="secondary" aria-label="split button">
+                  <Button
+                    variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
+                    Identify All ({component?.summary.pending})
+                  </Button>
+                  <Button
+                    color="secondary"
+                    size="small"
+                    onClick={() => setOpen((prevOpen) => !prevOpen)}
+                  >
+                    <ArrowDropDownIcon />
+                  </Button>
+                </ButtonGroup>
+                <Popper open={open} anchorEl={anchorRef.current} transition disablePortal>
+                  <Paper>
+                    <ClickAwayListener onClickAway={handleCloseButtonGroup}>
+                      <MenuList id="split-button-menu">
+                          <MenuItem
+                            key="test"
+                            onClick={ () => { setOpen(false); onIgnoreAllPressed() }}>
+                            Ignore All ({component?.summary.pending})
+                          </MenuItem>
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Popper>
+              </>
+            )}
+            {tab === 2 && (
               <Button
-                disabled={component?.summary.pending === 0}
-                variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
-                Identify All ({component?.summary.pending})
+                disabled={component?.summary.ignored === 0}
+                variant="contained" color="secondary" onClick={onRestoreAllPressed}>
+                Restore All ({component?.summary.ignored})
               </Button>
-            ) : null}
+            )}
           </section>
         </header>
 
@@ -158,10 +247,7 @@ export const ComponentDetail = () => {
       </section>
 
       <InventoryDialog
-        open={inventoryBool}
         onClose={handleClose}
-        onCancel={() => setInventoryBool(false)}
-        component={component}
       />
     </>
   );

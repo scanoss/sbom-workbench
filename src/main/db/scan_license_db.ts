@@ -7,7 +7,7 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { License } from '../../api/types';
-import { ContactSupportOutlined } from '@material-ui/icons';
+
 
 
 const query = new Querys();
@@ -165,7 +165,7 @@ export class LicenseDb extends Db {
             `${filter.spdxid}`,
             (err: any, lic: any) => {             
               db.close();                 
-               if (err || lic==undefined) resolve(0);
+               if (err || lic===undefined) resolve(0);
                else resolve(lic.id);
             }
           );
