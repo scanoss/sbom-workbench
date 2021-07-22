@@ -155,10 +155,10 @@ export class InventoryDb extends Db {
   }
 
   // NEW INVENTORY
-  async create(inventory:any) {  
+  async create(inventory: Partial<Inventory>) {
     const self = this;
     const db = await this.openDb();
-    return new Promise<Inventory>(async (resolve, reject) => {
+    return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       db.run(
         query.SQL_SCAN_INVENTORY_INSERT,
         inventory.compid ? inventory.compid : 0,
@@ -172,9 +172,6 @@ export class InventoryDb extends Db {
           await self.newFileInventory(inventory, this.lastID);
           await self.updateIdentified(inventory);
           const comp = await self.component.getAll(inventory);
-          delete inventory.licenses;
-          delete inventory.summary;
-          delete inventory.version;
           inventory.component = comp;
           inventory.id = this.lastID;
           if (err) {

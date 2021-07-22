@@ -120,7 +120,7 @@ const Workbench = () => {
         </main>
       </SplitPane>
 
-      <Tooltip title="Export SPDX" color="white">
+      <Tooltip title="Export SPDX">
         <Fab className="btn-export" onClick={onDownloadClicked}>
           <SaveAltOutlinedIcon />
         </Fab>

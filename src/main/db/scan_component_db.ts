@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable import/no-cycle */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-this-alias */
@@ -10,7 +12,6 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { Component , License } from '../../api/types';
-import { ResultsDb } from './scan_results_db';
 import { LicenseDb } from './scan_license_db';
 
 
@@ -25,13 +26,11 @@ const utilsDb = new UtilsDb();
 const query = new Querys();
 
 export class ComponentDb extends Db {
-  results: ResultsDb;
 
   license: LicenseDb;
 
   constructor(path: string) {
     super(path);
-    this.results = new ResultsDb(path);
     this.license = new LicenseDb(path);
   }
 
@@ -41,7 +40,7 @@ export class ComponentDb extends Db {
         let comp: any;
         if (component.compid) {
           comp = await this.getById(component.compid);
-          const summary = await this.results.summary(comp);
+          const summary = await this.summary(comp);
           comp.summary = summary;
           resolve(comp);
         } else resolve([]);
@@ -82,7 +81,7 @@ export class ComponentDb extends Db {
               const licenses = await self.getAllLicensesFromComponentId(
                 component[i].compid
               );
-              const summary = await this.results.summary(component[i]);
+              const summary = await this.summary(component[i]);
               component[i].summary = summary;
               component[i].licenses = licenses;
             }
@@ -111,7 +110,7 @@ export class ComponentDb extends Db {
             const licenses = await self.getAllLicensesFromComponentId(
               component.compid
             );
-            const summary = await this.results.summary(component);
+            const summary = await this.summary(component);
             component.summary = summary;
             component.licenses = licenses;
             resolve(component);
@@ -265,7 +264,7 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        const results = await this.results.getUnique();
+        const results = await this.getUnique();
         db.serialize(async function () {
           db.run('begin transaction');
           for (const result of results) {
@@ -399,4 +398,87 @@ export class ComponentDb extends Db {
       }
     });
   }
+
+ private async getUnique() {
+    try {
+      const db = await this.openDb();
+      return await new Promise<any>(async (resolve, reject) => {
+        db.all(
+          'SELECT DISTINCT purl,version,license,component,url FROM results;',
+          (err: any, data: any) => {
+            db.close();
+            if (!err) resolve(data);
+            else resolve([]);
+          }
+        );     
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  private identifiedSummary(db: any, data: any) {
+    return new Promise<number>(async (resolve) => {
+      db.get(
+        query.SQL_COMP_SUMMARY_IDENTIFIED,
+        data.purl,
+        data.version,
+        async (err: any, comp: any) => {
+          if (err) resolve(0);
+          if (comp !== undefined) resolve(comp.identified);
+        }
+      );
+    });
+  }
+
+  private ignoredSummary(db: any, data: any) {
+    return new Promise<number>(async (resolve) => {
+      db.get(
+        query.SQL_COMP_SUMMARY_IGNORED,
+        data.purl,
+        data.version,
+        async (err: any, comp: any) => {
+          if (err) resolve(0);
+          if (comp !== undefined) resolve(comp.ignored);
+        }
+      );
+    });
+  }
+
+  private pendingSummary(db: any, data: any) {
+    return new Promise<number>(async (resolve) => {
+      db.get(
+        query.SQL_COMP_SUMMARY_PENDING,
+        data.purl,
+        data.version,
+        async (err: any, comp: any) => {
+          if (err) resolve(0);
+          if (comp !== undefined) resolve(comp.pending);
+        }
+      );
+    });
+  }
+
+  summary(data: any) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const summary: Summary = {
+          ignored: 0,
+          identified: 0,
+          pending: 0,
+        };
+        const db = await this.openDb();
+        summary.identified = await this.identifiedSummary(db, data);
+        summary.ignored = await this.ignoredSummary(db, data);
+        summary.pending = await this.pendingSummary(db, data);
+        db.close();
+        resolve(summary);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+
+ 
 }

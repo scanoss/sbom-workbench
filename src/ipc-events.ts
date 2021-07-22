@@ -41,6 +41,8 @@ export enum IpcEvents {
   UNIGNORED_FILES = 'UNIGNORE_FILES',
   FILE_GET = 'FILE_GET',
 
+  RESULTS_GET = 'RESULTS_GET',
+
 
   EXPORT_SPDX = 'EXPORT_SPDX',
 
@@ -89,6 +91,8 @@ export const ipcRendererEvents = [
   IpcEvents.FILE_GET,
   IpcEvents.IGNORED_FILES,
   IpcEvents.UNIGNORED_FILES,
+
+  IpcEvents.RESULTS_GET,
 
   IpcEvents.EXPORT_SPDX,
 

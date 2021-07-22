@@ -102,7 +102,7 @@ export class Querys {
   SQL_GET_INVENTORY_BY_ID = 'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories where id=?;';
 
   SQL_SCAN_SELECT_FILE_RESULTS =
-    'SELECT path,compid,url,lines,oss_lines,matched,filename,size,idtype as type,md5_file,md5_comp,purl from results inner join files on results.md5_file=files.md5 where path=? order by path;';
+    'SELECT path,url,lines,oss_lines,matched,filename as file,idtype as type,md5_file,md5_comp as url_hash,purl,version,latest_version as latest from results inner join files on results.md5_file=files.md5 where path=? order by path;';
 
   // GET ALL THE INVENTORIES ATTACHED TO A COMPONENT
   SQL_SELECT_ALL_INVENTORIES_ATTACHED_TO_COMPONENT =
