@@ -19,10 +19,10 @@ export interface Component {
   url: string;
   description: string;
   summary?: {
-    pending: number,
-    ignored: number,
-    identified: number,
-  }
+    pending: number;
+    ignored: number;
+    identified: number;
+  };
   licenses: any[];
 }
 export interface License {
@@ -52,3 +52,4 @@ export interface Files {
   identified: string;
   path: string;
 }
+

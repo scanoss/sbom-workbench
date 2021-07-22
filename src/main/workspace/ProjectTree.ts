@@ -53,6 +53,10 @@ export class ProjectTree extends EventEmitter {
     this.scan_root = root;
   }
 
+  set_project_name(name: string) {
+    this.project_name = name;
+  }
+
   set_work_root(root: string) {
     this.work_root = root;
   }
@@ -77,6 +81,7 @@ export class ProjectTree extends EventEmitter {
     this.work_root = a.work_root;
     this.results = a.results;
     this.scan_root = a.scan_root;
+    this.project_name = a.project_name;
     this.scans_db = new ScanDb(rootOfProject);
     await this.scans_db.init();
   }
@@ -92,6 +97,7 @@ export class ProjectTree extends EventEmitter {
       default_components: '',
       default_licenses: '',
     };
+    this.set_project_name(`${path.basename(scanPath)}`)
     if (!fs.existsSync(`${getUserHome()}/scanoss-workspace`)) {
       fs.mkdirSync(`${getUserHome()}/scanoss-workspace/`);
     }

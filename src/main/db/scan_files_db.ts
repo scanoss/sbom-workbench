@@ -1,17 +1,17 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable prettier/prettier */
 /* eslint-disable func-names */
 /* eslint-disable @typescript-eslint/no-useless-constructor */
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
-import { Dvr } from '@material-ui/icons';
+
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
-import { Component } from '../../api/types';
-import { Files } from '../../api/types';
+import { Component , Files } from '../../api/types';
 import { ComponentDb } from './scan_component_db';
-import { resultService } from '../../api/results-service';
+
 
 const query = new Querys();
 const utilsDb = new UtilsDb();
@@ -69,7 +69,7 @@ export class FilesDb extends Db {
       resolve(result);
 
     }catch(error){
-      reject('Unable to retrieve file');
+      reject(new Error('Unable to retrieve file'));
     }
     });
   }
@@ -177,15 +177,15 @@ export class FilesDb extends Db {
         db.serialize(function () {
           db.get(query.SQL_GET_FILE_BY_PATH,
             file.path,
-            (err: any, file: any) => {
-              if (file.identified === 0 && file.ignored === 0) {
-                file.pending = 1;
+            (err: any, data: any) => {
+              if (data.identified === 0 && data.ignored === 0) {
+                data.pending = 1;
               } else {
-                file.pending = 0;
+                data.pending = 0;
               }
               db.close();             
               if (err) resolve(undefined);
-              else resolve(file);
+              else resolve(data);
             }
           );
         });

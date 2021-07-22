@@ -9,11 +9,11 @@
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
-import { Component } from '../../api/types';
+import { Component , License } from '../../api/types';
 import { ResultsDb } from './scan_results_db';
 import { LicenseDb } from './scan_license_db';
-import { License } from '../../api/types';
-import { resolve } from 'path';
+
+
 
 interface Summary {
   identified: number;
@@ -246,10 +246,11 @@ export class ComponentDb extends Db {
       }
     });
   }
+
   // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
   importUniqueFromFile() {
     const self = this;
-    let attachLicComp = {
+    const attachLicComp = {
       license_id: 0,
       compid: 0,
     };
@@ -273,7 +274,7 @@ export class ComponentDb extends Db {
               attachLicComp.license_id = await self.license.getLicenseIdFilter(
                 license
               );
-              if (attachLicComp.license_id == 0) {
+              if (attachLicComp.license_id === 0) {
                 license = await self.license.bulkCreate(db, license);
                 if (license.id) attachLicComp.license_id = license.id;
               }

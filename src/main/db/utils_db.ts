@@ -14,5 +14,11 @@ class UtilsDb {
       });
     });
   }
+
+  getTimeStamp() {
+    const time = new Date();
+    const timeStamp = time.toISOString();
+    return timeStamp;
+  }
 }
 export { UtilsDb };

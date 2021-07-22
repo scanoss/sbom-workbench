@@ -33,7 +33,7 @@ ipcMain.handle(IpcEvents.FILE_GET, async (_event, arg: Partial<File>) => {
     data = await defaultProject.scans_db.files.get(arg);
     console.log(data);
     if (data) return { status: 'ok', message: 'Get file', data };
-    else return { status: 'ok', message: 'Get file', data };
+    return { status: 'ok', message: 'Get file', data };
   } catch (error) {
     return { status: 'error', message: 'Get file were not successfully retrieve', data };
   }
