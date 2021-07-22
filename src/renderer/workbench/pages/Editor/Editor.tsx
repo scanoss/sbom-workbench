@@ -89,7 +89,10 @@ export const Editor = () => {
 
   const onIdentifyPressed = async () => {
     const inv = {
-      ...currentMatch,
+      component: currentMatch.component,
+      version: currentMatch.version,
+      url: currentMatch.url,
+      purl: currentMatch.purl[0],
       license: currentMatch?.licenses[0]?.name,
       usage: currentMatch?.id
     };
