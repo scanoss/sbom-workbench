@@ -7,7 +7,7 @@ const MAX_FILES = 250;
 export interface FileListProps {
   files: any[];
   filter?: 'pending' | 'identified' | 'ignored';
-  onAction: (path: string, action: MATCH_CARD_ACTIONS) => void;
+  onAction: (path: any, action: MATCH_CARD_ACTIONS) => void;
 }
 
 export const FileList = ({ files, filter, onAction }: FileListProps) => {
@@ -19,7 +19,7 @@ export const FileList = ({ files, filter, onAction }: FileListProps) => {
         {filteredFiles.length > 0
           ? filteredFiles.slice(0, MAX_FILES).map((file, index) => (
               <article className="item" key={index}>
-                <MatchCard onAction={(action) => onAction(file.path, action)} label={file.path} status={file.status} />
+                <MatchCard onAction={(action) => onAction(file, action)} label={file.path} status={file.status} />
               </article>
             ))
           : null}
