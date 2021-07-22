@@ -6,7 +6,7 @@ const spdx = {
     creators: ['Tool: SCANOSS Inventory Engine', 'Organization: http://scanoss.com'],
     comment: 'This SPDX report has been automatically generated',
     licenseListVersion: '1.19',
-    created: '2021-07-21T10:36:35-0400',
+    created: '',
   },
   spdxVersion: 'SPDX-2.0',
   dataLicense: 'CC0-1.0',

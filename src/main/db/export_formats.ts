@@ -13,6 +13,8 @@ import { spdx } from '../../api/spdx-versions';
 import { ComponentDb } from './scan_component_db';
 import { Querys } from './querys_db';
 
+import { UtilsDb } from './utils_db';
+
 
 const fs = require('fs');
 
@@ -20,19 +22,22 @@ const query = new Querys();
 
 export class Formats extends Db {
 
-
+    utils:UtilsDb;
 
     component:ComponentDb;
 
   constructor(path: string) {
     super(path);
     this.component=new ComponentDb(path);
+    this.utils=new UtilsDb();
   }
 
   spdx(path: string) {
     const document = spdx;
     return new Promise<boolean>(async (resolve, reject) => {
-      try {
+      try {       
+        const timeStamp=this.utils.getTimeStamp();
+        document.creationInfo.created=timeStamp;
         const db = await this.openDb();
         db.all(query.SQL_GET_SPDX_COMP_DATA, async (err: any, data: any) => {
           db.close();
