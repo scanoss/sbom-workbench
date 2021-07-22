@@ -146,20 +146,20 @@ export class Querys {
   SQL_GET_ALL_INVENTORIES = 'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories;';
 
   SQL_SELECT_FILES_FROM_PURL_VERSION =
-    'SELECT fi.path,fi.identified,fi.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines FROM files fi INNER JOIN  results r where fi.md5=r.md5_file and r.purl=? and r.version=?;';
+    'SELECT fi.path,fi.identified,fi.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines FROM files fi INNER JOIN  results r where fi.md5=r.md5_file and r.purl=? and r.version=? GROUP BY fi.path;';
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE files SET ignored=1,identified=0 WHERE path=?;';
 
   SQL_UPDATE_UNIGNORED_FILES = 'UPDATE files SET ignored=0,identified=0  WHERE path=?;';
-
+  
   SQL_COMP_SUMMARY_PENDING =
-    'SELECT count(*) as pending FROM files f INNER JOIN results r  WHERE r.md5_file=f.md5 AND r.purl= ? AND r.version=? AND f.ignored=0 AND f.identified=0;';
+    'SELECT count(*) as pending FROM (SELECT count(*) FROM files f INNER JOIN results r WHERE r.md5_file=f.md5 AND r.purl=? AND r.version=? AND f.ignored=0 AND f.identified=0 GROUP BY f.path);';
 
   SQL_COMP_SUMMARY_IDENTIFIED =
-    'SELECT count(f.identified ) as identified FROM files f INNER JOIN results r  WHERE r.md5_file=f.md5 AND r.purl= ? AND r.version=? AND f.identified=1;';
+    'SELECT count(*) as identified FROM (SELECT count(*) FROM files f INNER JOIN results r  WHERE r.md5_file=f.md5 AND r.purl= ? AND r.version=? AND f.identified=1 GROUP BY f.path);';
 
   SQL_COMP_SUMMARY_IGNORED =
-    'SELECT count(f.ignored) as ignored FROM files f INNER JOIN results r  WHERE r.md5_file=f.md5 AND r.purl= ? AND r.version=? AND f.ignored=1;';
+    'SELECT count(*) as ignored FROM (SELECT count(*) FROM files f INNER JOIN results r  WHERE r.md5_file=f.md5 AND r.purl= ? AND r.version=? AND f.ignored=1 GROUP BY f.path);';
 
   SQL_GET_FILE_BY_PATH = 'SELECT path,identified,ignored FROM files WHERE path=?;';
 
