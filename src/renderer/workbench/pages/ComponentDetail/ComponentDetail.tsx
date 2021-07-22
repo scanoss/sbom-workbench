@@ -23,7 +23,7 @@ export const ComponentDetail = () => {
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { state, dispatch, createInventory, ignoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const { inventoryBool, setInventoryBool } = useContext<any>(DialogContext);
+  const dialogCtrl = useContext<any>(DialogContext);
 
   const { component } = state;
 
@@ -48,8 +48,8 @@ export const ComponentDetail = () => {
   const onAction = (file: string, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push(`/workbench/file/${file}`);
-        dispatch(setFile(file));
+        history.push(`/workbench/file/${file.path}`);
+        dispatch(setFile(file.path));
         break;
       case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
         onIdentifyPressed(file);
@@ -60,26 +60,37 @@ export const ComponentDetail = () => {
     }
   };
 
-  const onIdentifyPressed = async (file: string) => {
-    setInventoryBool(true);
-    setSelectedFiles([file]);
+  const onIdentifyPressed = async (file) => {
+    const inv = {
+      ...component,
+      component: component?.name,
+      license: component?.licenses[0]?.name,
+      usage: file.type,
+    };
+    dialogCtrl.openInventory(inv);
+    setSelectedFiles([file.path]);
   };
 
   const onIdentifyAllPressed = async () => {
-    setInventoryBool(true);
+    const inv = {
+      ...component,
+      component: component?.name,
+      license: component?.licenses[0]?.name,
+      usage: 'file',
+    };
+    dialogCtrl.openInventory(inv);
     const selFiles = files
       .filter( file => file.status === 'pending')
       .map( file => file.path);
     setSelectedFiles(selFiles);
   };
 
-  const onIgnorePressed = async (file: string) => {
-    await ignoreFile([file]);
+  const onIgnorePressed = async (file) => {
+    await ignoreFile([file.path]);
     getFiles();
   };
 
   const handleClose = async (inventory: Inventory) => {
-    setInventoryBool(false);
     const  newInventory = await createInventory({
       ...inventory,
       files: selectedFiles
@@ -158,10 +169,7 @@ export const ComponentDetail = () => {
       </section>
 
       <InventoryDialog
-        open={inventoryBool}
         onClose={handleClose}
-        onCancel={() => setInventoryBool(false)}
-        component={component}
       />
     </>
   );

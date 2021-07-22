@@ -31,7 +31,7 @@ export const Editor = () => {
 
   const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { setInventoryBool, inventoryBool } = useContext<any>(DialogContext);
+  const { openInventory } = useContext<any>(DialogContext);
 
   const { file, matchInfo } = state;
 
@@ -79,7 +79,6 @@ export const Editor = () => {
   };
 
   const handleAccept = async (inventory: Inventory) => {
-    setInventoryBool(false);
     const inv = await createInventory({
       ...inventory,
       files: [file],
@@ -89,7 +88,12 @@ export const Editor = () => {
   };
 
   const onIdentifyPressed = async () => {
-    setInventoryBool(true);
+    const inv = {
+      ...currentMatch,
+      license: currentMatch?.licenses[0]?.name,
+      usage: currentMatch?.id
+    };
+    openInventory(inv)
   };
 
   const onIgnorePressed = async () => {
@@ -262,18 +266,9 @@ export const Editor = () => {
         </main>
       </section>
 
-      {currentMatch ? (
-        <InventoryDialog
-          open={inventoryBool}
-          onCancel={() => setInventoryBool(false)}
-          onClose={handleAccept}
-          component={{
-            ...currentMatch,
-            name: currentMatch.component,
-            license: currentMatch.licenses[0]
-          }}
-        />
-      ) : null}
+      <InventoryDialog
+        onClose={handleAccept}
+      />
     </>
   );
 };

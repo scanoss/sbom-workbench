@@ -1,11 +1,12 @@
 .identified-info-card {
   width: 75%;
+  max-width: 600px;
+  min-width: 400px;
   min-height: 130px;
   border-radius: 4px;
   padding: 16px;
   background-color: #ffff;
-  box-shadow:  0px 1px 3px 0px rgba(0, 0, 0, 0.1);
-  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+  box-shadow:  0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
 
   .first-part-card {
     width: 100%;

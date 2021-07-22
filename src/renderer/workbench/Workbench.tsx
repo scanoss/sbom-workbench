@@ -23,8 +23,6 @@ const Workbench = () => {
 
   const { file } = state;
 
-  //const MemoEditor = React.memo(Editor); //TODO: move inside editor page
-
   const onInit = async () => {
     const result = scanPath ? await loadScan(scanPath) : false;
     if (!result) {

@@ -54,7 +54,6 @@ export const InventoryDetail = () => {
                 </IconButton>
                 {scanBasePath}
               </h4>
-              <h1 className="header-title">Groups</h1>
             </div>
             <ComponentInfo component={inventory?.component} />
           </div>
