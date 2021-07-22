@@ -316,7 +316,7 @@ function summarizeTree(root: any,tree: any, summary: any) {
     if (tree.action === 'filter') summary.filter += 1;
     else if (tree.include === true) {
       summary.include += 1;
-      summary.files.push(`${root}/${tree.value}`);
+      summary.files.push(`${root}${tree.value}`);
     }
 
     return summary;
