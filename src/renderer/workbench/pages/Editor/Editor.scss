@@ -58,6 +58,11 @@
 }
 
 .editors {
+
+  &-full {
+    grid-template-columns: 100%;
+  }
+
   .editor {
     margin-bottom: 50px;
 
