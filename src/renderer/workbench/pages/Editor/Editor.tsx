@@ -19,7 +19,7 @@ import CodeEditor from '../../components/CodeEditor/CodeEditor';
 import { inventoryService } from '../../../../api/inventory-service';
 import { fileService } from '../../../../api/file-service';
 
-const MemoCodeEditor = React.memo(CodeEditor); //TODO: move inside editor page
+const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
 
 export interface FileContent {
   content: string | null;
@@ -29,7 +29,9 @@ export interface FileContent {
 export const Editor = () => {
   const history = useHistory();
 
-  const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(
+    WorkbenchContext
+  ) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { openInventory } = useContext<any>(DialogContext);
 
@@ -69,12 +71,12 @@ export const Editor = () => {
   };
 
   const getInventories = async () => {
-    const { data } = await inventoryService.getAll({files: [file]});
+    const { data } = await inventoryService.getAll({ files: [file] });
     setInventories(data);
   };
 
   const getFile = async () => {
-    const { data } = await fileService.get({path: file});
+    const { data } = await fileService.get({ path: file });
     setFileStatus(mapFile(data));
   };
 
@@ -94,9 +96,9 @@ export const Editor = () => {
       url: currentMatch.url,
       purl: currentMatch.purl[0],
       license: currentMatch?.licenses[0]?.name,
-      usage: currentMatch?.id
+      usage: currentMatch?.id,
     };
-    openInventory(inv)
+    openInventory(inv);
   };
 
   const onIgnorePressed = async () => {
@@ -159,7 +161,6 @@ export const Editor = () => {
     setLines(lineasLocales);
   }, [currentMatch]);
 
-
   const onAction = (action: MATCH_INFO_CARD_ACTIONS, result) => {
     switch (action) {
       case MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY:
@@ -194,53 +195,36 @@ export const Editor = () => {
               <header className="match-info-header">
                 <section className="content">
                   <div className="match-info-default-container">
-                    { (inventories.length > 0) ?
-                      inventories.map((inventory, index) => (
+                    {inventories.length > 0
+                      ? inventories.map((inventory, index) => (
                           <MatchInfoCard
                             key={index}
                             selected={currentMatch === inventory}
-                            match={
-                              { component: inventory.component.name,
-                                version: inventory.component.version,
-                                usage: inventory.usage,
-                              }
-                            }
+                            match={{
+                              component: inventory.component.name,
+                              version: inventory.component.version,
+                              usage: inventory.usage,
+                            }}
                             status="identified"
                             onSelect={() => setCurrentMatch(matchInfo[index])}
                             onAction={(action) => onAction(action, inventory)}
                           />
-                        )
-                      ) : (
-                        matchInfo.map((match, index) => (
-                            <MatchInfoCard
-                              key={index}
-                              selected={currentMatch === match}
-                              match={
-                                { component: match.component,
-                                  version: match.version,
-                                  usage: match.id,
-                                }
-                              }
-                              status={fileStatus?.status}
-                              onSelect={() => setCurrentMatch(matchInfo[index])}
-                              onAction={onAction}
-                            />
-                          )
                         ))
-                    }
+                      : matchInfo.map((match, index) => (
+                          <MatchInfoCard
+                            key={index}
+                            selected={currentMatch === match}
+                            match={{ component: match.component, version: match.version, usage: match.id }}
+                            status={fileStatus?.status}
+                            onSelect={() => setCurrentMatch(matchInfo[index])}
+                            onAction={onAction}
+                          />
+                        ))}
                   </div>
                 </section>
                 <div className="info-files">
-                  <LabelCard
-                    label="Source File"
-                    subLabel={file}
-                    status={null}
-                  />
-                  <LabelCard
-                    label="Component File"
-                    subLabel={currentMatch?.file}
-                    status={null}
-                  />
+                  <LabelCard label="Source File" subLabel={file} status={null} />
+                  <LabelCard label="Component File" subLabel={currentMatch?.file} status={null} />
                 </div>
               </header>
             </>
@@ -252,26 +236,18 @@ export const Editor = () => {
         <main className="editors app-content">
           <div className="editor">
             {currentMatch && localFileContent?.content ? (
-              <MemoCodeEditor
-                content={localFileContent.content}
-                highlight={lines}
-                />
+              <MemoCodeEditor content={localFileContent.content} highlight={lines} />
             ) : null}
           </div>
           <div className="editor">
             {currentMatch && remoteFileContent?.content ? (
-              <MemoCodeEditor
-                content={remoteFileContent.content}
-                highlight={ossLines}
-                />
+              <MemoCodeEditor content={remoteFileContent.content} highlight={ossLines} />
             ) : null}
           </div>
         </main>
       </section>
 
-      <InventoryDialog
-        onClose={handleAccept}
-      />
+      <InventoryDialog onClose={handleAccept} />
     </>
   );
 };
