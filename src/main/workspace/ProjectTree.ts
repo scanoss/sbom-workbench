@@ -155,6 +155,8 @@ export class ProjectTree extends EventEmitter {
         processed: this.filesSummary.include,
         completed: (100 * this.processedFiles) / this.filesSummary.include,
       });
+
+      this.attachComponent(data);
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
