@@ -282,7 +282,7 @@ function insertComponent(tree: any, mypath: string, comp: Component): any {
     let j: number;
      if (!arbol.components.some((e) => e.purl === component.purl && e.version === component.version)) {
       arbol.components.push(component);
-      arbol.className = 'match-info';
+      arbol.className = 'match-info-result';
     }
     for (j = 0; j < arbol.children.length; j += 1) {
       if (arbol.children[j].label === myPathFolders[i]) {
@@ -294,7 +294,7 @@ function insertComponent(tree: any, mypath: string, comp: Component): any {
   }
 
   arbol.components.push(component);
-  arbol.className = 'match-info';
+  arbol.className = 'match-info-result';
 
 }
 
