@@ -186,7 +186,7 @@ export class BannedList {
     this.addFilter(new ContentFilter('=', 'BINARY'));
     this.addFilter(new ExtensionFilter('=', '.txt'));
     this.addFilter(new NameFilter('contains', '.git'));
-
+    this.addFilter(new NameFilter('contains', 'node_modules'));
   }
 }
 // export class BannedList
