@@ -36,16 +36,9 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
   return (
     <>
       <article className="match-info-card-container">
-        <div
-          onClick={onSelect}
-          style={selected ? { border: '#60A5FA 2px solid' } : {}}
-          className="match-info-card"
-        >
+        <div onClick={onSelect} style={selected ? { border: '#60A5FA 2px solid' } : {}} className="match-info-card">
           <div className={`match-info-card-content status-${status}`}>
-            <div
-              onMouseEnter={() => setOver(true)}
-              onMouseLeave={() => setOver(false)}
-              className="label-info-div">
+            <div onMouseEnter={() => setOver(true)} onMouseLeave={() => setOver(false)} className="label-info-div">
               <img alt="component logo" className="logo-match-info-card" src={componentDefault} />
               <span className="component-span">{match.component}</span>
               <span className="version-span">{match.version}</span>
@@ -58,26 +51,25 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
                 <span className="usage-value">{match.usage}</span>
 
                 {over ? (
-                  <div className='popover-container'>
-                    <div className="component-details-card2">
-                      <div className="tiny-container-detail2">
-                        <p className="title-detail2">License</p>
-                        <p className="desc-detail2">{match?.license?.name}</p>
+                  <div className="popover-container">
+                    <div className="component-details-matchinfo">
+                      <div className="tiny-container-detail-matchinfo">
+                        <p className="title-detail-matchinfo">License</p>
+                        <p className="desc-detail-matchinfo">{match?.license?.name}</p>
                       </div>
-                      <div className="tiny-container-detail2">
-                        <p className="title-detail2">PURL</p>
-                        <p className="desc-detail2">{match?.purl}</p>
+                      <div className="tiny-container-detail-matchinfo">
+                        <p className="title-detail-matchinfo">PURL</p>
+                        <p className="desc-detail-matchinfo">{match?.purl}</p>
                       </div>
-                      <div className="tiny-container-detail2">
-                        <p className="title-detail2">URL</p>
-                        <a href={match?.url} target="_blank" className="desc-detail2 url2" rel="noreferrer">
+                      <div className="tiny-container-detail-matchinfo">
+                        <p className="desc-detail-matchinfo">URL</p>
+                        <a href={match?.url} target="_blank" className="desc-detail-matchinfo url-matchinfo" rel="noreferrer">
                           {match?.url}
                         </a>
                       </div>
                     </div>
                   </div>
                 ) : null}
-
               </div>
             </div>
             <div className="match-info-card-buttons">
@@ -121,7 +113,6 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
             </div>
           </div>
         </div>
-
       </article>
     </>
   );
