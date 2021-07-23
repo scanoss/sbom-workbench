@@ -208,6 +208,15 @@ export const Editor = () => {
                               version: inventory.component.version,
                               usage: inventory.usage,
                             }}
+                            match={
+                              { component: inventory.component.name,
+                                version: inventory.component.version,
+                                usage: inventory.usage,
+                                license: inventory.license,
+                                url: inventory.url,
+                                purl: inventory.purl,
+                              }
+                            }
                             status="identified"
                             onSelect={() => setCurrentMatch(matchInfo[index])}
                             onAction={(action) => onAction(action, inventory)}
@@ -223,6 +232,28 @@ export const Editor = () => {
                             onAction={onAction}
                           />
                         ))}
+                        )
+                      ) : (
+                        matchInfo.map((match, index) => (
+                            <MatchInfoCard
+                              key={index}
+                              selected={currentMatch === match}
+                              match={
+                                { component: match.component,
+                                  version: match.version,
+                                  usage: match.id,
+                                  license: match.licenses[0],
+                                  url: match.url,
+                                  purl: match.purl[0],
+                                }
+                              }
+                              status={fileStatus?.status}
+                              onSelect={() => setCurrentMatch(matchInfo[index])}
+                              onAction={onAction}
+                            />
+                          )
+                        ))
+                    }
                   </div>
                 </section>
                 <div className="info-files">
