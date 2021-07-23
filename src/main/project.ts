@@ -14,13 +14,20 @@ ipcMain.handle(IpcEvents.PROJECT_LOAD_SCAN, async (_event, arg: any) => {
   let created: any;
   console.log(arg);
   ws = new Workspace();
-  ws.newProject(arg);
+  ws.newProject(arg, _event.sender);
   ws.projectsList.loadScanProject(arg);
-  // console.log(ws.projectsList.logical_tree);
+
+  const response = {
+    logical_tree: ws.projectsList.logical_tree,
+    work_root: ws.projectsList.work_root,
+    results: ws.projectsList.results,
+    scan_root: ws.projectsList.scan_root,
+  };
+
   return {
     status: 'ok',
     message: 'Project loaded',
-    data: ws.projectsList,
+    data: response,
   };
 });
 
@@ -33,7 +40,7 @@ ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (_event, arg: Project) => {
   const { path } = arg;
   console.log(arg);
   ws = new Workspace();
-  ws.newProject(path);
+  ws.newProject(path, _event.sender);
   console.log(ws.projectsList);
   return {
     status: 'ok',

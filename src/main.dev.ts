@@ -142,7 +142,16 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.whenReady().then(createWindow).catch(console.log);
+
+
+// app
+//   .whenReady()
+//   .then(async () => {
+//     return Promise.all([createWindow(), mainLogic()]);
+//   })
+//   .catch(console.log);
+
+app.whenReady().then(createWindow).then(mainLogic).catch(console.log);
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
@@ -160,71 +169,15 @@ export interface IInitScan {
 
 let ws: Workspace;
 
+
+async function mainLogic() {
+  ws =  new Workspace();
+
+}
+
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
-  ws = new Workspace();
-  const scanner = new Scanner();
   const { path } = arg;
-  let created: any;
-
-  ws.newProject(path);
+  ws.newProject(path,event.sender);
   await ws.projectsList.prepare_scan();
-  scanner.setResultsPath(ws.projectsList.work_root);
-  console.log(`SCANNER: Start scanning path=${path}`);
-  scanner.setResultsPath(ws.projectsList.work_root);
-  scanner.scanFolder(path);
-
-  scanner.on(SCANNER_EVENTS.WINNOWING_STARTING, () => {
-    console.log('Starting Winnowing...');
-  });
-
-  scanner.on(SCANNER_EVENTS.WINNOWING_NEW_WFP_FILE, (dir) =>
-    console.log(`New WFP File on: ${dir}`)
-  );
-
-  scanner.on(SCANNER_EVENTS.WINNOWING_FINISHED, () => {
-    console.log('Winnowing Finished...');
-  });
-
-  scanner.on(SCANNER_EVENTS.DISPATCHER_WFP_SENDED, (dir) => {
-    console.log(`Sending WFP file ${dir} to server`);
-  });
-
-  scanner.on(SCANNER_EVENTS.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
-    console.log(`New ${fileNumbers} files scanned`);
-    await ws.projectsList.scans_db.files.insertFromJSON(data);
-
-    ws.projectsList.attachComponent(data);
-  });
-
-  scanner.on(SCANNER_EVENTS.SCAN_DONE, async (resultsPath) => {
-
-    console.log(`Scan Finished... Results on: ${resultsPath}`);
-    const succesRes = await ws.projectsList.scans_db.results.insertFromFile(
-      resultsPath
-    );
-    const successFiles = await ws.projectsList.scans_db.files.insertFromFile(
-      resultsPath
-    );
-    let successComp;
-    if(succesRes){
-    successComp = await ws.projectsList.scans_db.components.importUniqueFromFile();
-    }
-     /**
-     * just because JSON is not accesible directly
-     */
-    let a = fs.readFileSync(`${resultsPath}`, 'utf8');
-    ws.projectsList.results = JSON.parse(a);
-    if (successFiles && successComp && succesRes) {
-      event.sender.send(IpcEvents.SCANNER_FINISH_SCAN, {
-        success: true,
-        resultsPath: ws.projectsList.work_root,
-      });
-    }
-    ws.projectsList.saveScanProject();
-  });
-
-  scanner.on('error', () => {
-    scanner.stop();
-    console.log('Scanner Error. Stoping....');
-  });
+  ws.projectsList.startScan();
 });
