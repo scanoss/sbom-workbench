@@ -203,6 +203,9 @@ export const Editor = () => {
                               { component: inventory.component.name,
                                 version: inventory.component.version,
                                 usage: inventory.usage,
+                                license: inventory.license,
+                                url: inventory.url,
+                                purl: inventory.purl,
                               }
                             }
                             status="identified"
@@ -219,6 +222,9 @@ export const Editor = () => {
                                 { component: match.component,
                                   version: match.version,
                                   usage: match.id,
+                                  license: match.licenses[0],
+                                  url: match.url,
+                                  purl: match.purl[0],
                                 }
                               }
                               status={fileStatus?.status}
