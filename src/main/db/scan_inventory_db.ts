@@ -121,8 +121,8 @@ export class InventoryDb extends Db {
         } else {
           inventories = await this.getAllInventories();
         }
-        if (inventory !== undefined) {
-          for (let i = 0; i < inventories.length; i += 1) {
+        if (inventory !== undefined) {       
+          for (let i = 0; i < inventories.length; i += 1) {          
             const comp = await this.component.getAll(inventories[i]);
             inventories[i].component = comp;
             // Remove purl and version from inventory

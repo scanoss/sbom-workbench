@@ -19,7 +19,7 @@ import CodeEditor from '../../components/CodeEditor/CodeEditor';
 import { inventoryService } from '../../../../api/inventory-service';
 import { fileService } from '../../../../api/file-service';
 
-const MemoCodeEditor = React.memo(CodeEditor); //TODO: move inside editor page
+const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
 
 export interface FileContent {
   content: string | null;
@@ -29,7 +29,9 @@ export interface FileContent {
 export const Editor = () => {
   const history = useHistory();
 
-  const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(
+    WorkbenchContext
+  ) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { openInventory } = useContext<any>(DialogContext);
 
@@ -42,6 +44,7 @@ export const Editor = () => {
   const [inventories, setInventories] = useState<Inventory[]>([]);
   const [ossLines, setOssLines] = useState<number[] | null>([]);
   const [lines, setLines] = useState<number[] | null>([]);
+  const [fullFile, setFullFile] = useState<boolean | null>(null);
 
   const init = () => {
     getInventories();
@@ -69,12 +72,12 @@ export const Editor = () => {
   };
 
   const getInventories = async () => {
-    const { data } = await inventoryService.getAll({files: [file]});
+    const { data } = await inventoryService.getAll({ files: [file] });
     setInventories(data);
   };
 
   const getFile = async () => {
-    const { data } = await fileService.get({path: file});
+    const { data } = await fileService.get({ path: file });
     setFileStatus(mapFile(data));
   };
 
@@ -94,9 +97,9 @@ export const Editor = () => {
       url: currentMatch.url,
       purl: currentMatch.purl[0],
       license: currentMatch?.licenses[0]?.name,
-      usage: currentMatch?.id
+      usage: currentMatch?.id,
     };
-    openInventory(inv)
+    openInventory(inv);
   };
 
   const onIgnorePressed = async () => {
@@ -132,10 +135,12 @@ export const Editor = () => {
   }, [matchInfo]);
 
   useEffect(() => {
-    console.log(currentMatch);
     if (currentMatch) {
-      getFile(); // TODO: on init cuando este el servicio
-      loadRemoteFile(currentMatch.file_hash);
+      getFile();
+      const full = currentMatch?.lines === 'all';
+      setFullFile(full);
+      if (!full)
+        loadRemoteFile(currentMatch.file_hash);
     }
   }, [currentMatch]);
 
@@ -158,7 +163,6 @@ export const Editor = () => {
 
     setLines(lineasLocales);
   }, [currentMatch]);
-
 
   const onAction = (action: MATCH_INFO_CARD_ACTIONS, result) => {
     switch (action) {
@@ -194,23 +198,27 @@ export const Editor = () => {
               <header className="match-info-header">
                 <section className="content">
                   <div className="match-info-default-container">
-                    { (inventories.length > 0) ?
-                      inventories.map((inventory, index) => (
+                    {inventories.length > 0
+                      ? inventories.map((inventory, index) => (
                           <MatchInfoCard
                             key={index}
                             selected={currentMatch === inventory}
+
                             match={
                               { component: inventory.component.name,
                                 version: inventory.component.version,
                                 usage: inventory.usage,
+                                license: inventory.license_name,
+                                url: inventory.component.url,
+                                purl: inventory.component.purl,
                               }
                             }
                             status="identified"
                             onSelect={() => setCurrentMatch(matchInfo[index])}
                             onAction={(action) => onAction(action, inventory)}
                           />
-                        )
-                      ) : (
+                        ))
+                      : (
                         matchInfo.map((match, index) => (
                             <MatchInfoCard
                               key={index}
@@ -219,6 +227,9 @@ export const Editor = () => {
                                 { component: match.component,
                                   version: match.version,
                                   usage: match.id,
+                                  license: match.licenses[0]?.name,
+                                  url: match.url,
+                                  purl: match.purl[0],
                                 }
                               }
                               status={fileStatus?.status}
@@ -231,16 +242,8 @@ export const Editor = () => {
                   </div>
                 </section>
                 <div className="info-files">
-                  <LabelCard
-                    label="Source File"
-                    subLabel={file}
-                    status={null}
-                  />
-                  <LabelCard
-                    label="Component File"
-                    subLabel={currentMatch?.file}
-                    status={null}
-                  />
+                  <LabelCard label="Source File" subLabel={file} status={null} />
+                  <LabelCard label="Component File" subLabel={currentMatch?.file} status={null} />
                 </div>
               </header>
             </>
@@ -249,29 +252,31 @@ export const Editor = () => {
           )}
         </header>
 
-        <main className="editors app-content">
-          <div className="editor">
-            {currentMatch && localFileContent?.content ? (
-              <MemoCodeEditor
-                content={localFileContent.content}
-                highlight={lines}
-                />
-            ) : null}
-          </div>
-          <div className="editor">
-            {currentMatch && remoteFileContent?.content ? (
-              <MemoCodeEditor
-                content={remoteFileContent.content}
-                highlight={ossLines}
-                />
-            ) : null}
-          </div>
-        </main>
+        {fullFile ? (
+          <main className="editors-full app-content">
+            <div className="editor">
+              {currentMatch && localFileContent?.content ? (
+                <MemoCodeEditor content={localFileContent.content} highlight={lines} />
+              ) : null}
+            </div>
+          </main>
+        ) : (
+          <main className="editors app-content">
+            <div className="editor">
+              {currentMatch && localFileContent?.content ? (
+                <MemoCodeEditor content={localFileContent.content} highlight={lines} />
+              ) : null}
+            </div>
+            <div className="editor">
+              {currentMatch && remoteFileContent?.content ? (
+                <MemoCodeEditor content={remoteFileContent.content} highlight={ossLines} />
+              ) : null}
+            </div>
+          </main>
+        )}
       </section>
 
-      <InventoryDialog
-        onClose={handleAccept}
-      />
+      <InventoryDialog onClose={handleAccept} />
     </>
   );
 };

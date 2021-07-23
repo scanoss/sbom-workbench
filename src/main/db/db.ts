@@ -1,3 +1,4 @@
+/* eslint-disable no-async-promise-executor */
 /* eslint-disable prettier/prettier */
 /* eslint-disable func-names */
 import sqlite3 from 'sqlite3';
@@ -32,8 +33,9 @@ export class Db {
         if (err) {
           reject(new Error('Unable to create DB'));
         } else {
-          db.exec(query.SQL_DB_TABLES, () => {
+          db.exec(query.SQL_DB_TABLES,async () => {    
             db.close();
+            await this.createViews();
             resolve(true);
           });
         }
@@ -55,6 +57,40 @@ export class Db {
           resolve(db);
         }
       );
+    });
+  }
+
+  private createViews() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run("begin transaction");
+          db.run(
+            'CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url) AS SELECT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;'
+          );
+          db.run(
+            'CREATE VIEW IF NOT EXISTS license_view (cvid,name,spdxid,url,license_id) AS SELECT lcv.cvid,lic.name,lic.spdxid,lic.url,lic.id FROM license_component_version AS lcv LEFT JOIN licenses AS lic ON lcv.licid=lic.id;'
+          );
+
+          db.run(`
+            CREATE VIEW IF NOT EXISTS summary AS SELECT component_versions.id AS compid,SUM(files.ignored ) AS ignored , SUM(files.identified) AS identified , 
+            SUM(identified=0 AND ignored=0) AS pending
+            FROM results INNER JOIN files ON results.md5_file = files.md5 
+            INNER JOIN component_versions ON component_versions.purl=results.purl
+            AND component_versions.version=results.version
+            GROUP BY results.purl, results.version 
+            ORDER BY compid ASC;         
+          `)
+          db.run('commit',(err)=>{
+            db.close();
+            if(err)resolve(false)
+            else resolve(true);
+          });         
+        });
+      } catch (error) {
+        console.log(error);
+      }
     });
   }
 }
