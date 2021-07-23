@@ -55,7 +55,7 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
                     <div className="component-details-matchinfo">
                       <div className="tiny-container-detail-matchinfo">
                         <p className="title-detail-matchinfo">License</p>
-                        <p className="desc-detail-matchinfo">{match?.license?.name}</p>
+                        <p className="desc-detail-matchinfo">{match?.license}</p>
                       </div>
                       <div className="tiny-container-detail-matchinfo">
                         <p className="title-detail-matchinfo">PURL</p>

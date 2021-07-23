@@ -73,7 +73,6 @@ export const Editor = () => {
 
   const getInventories = async () => {
     const { data } = await inventoryService.getAll({ files: [file] });
-    console.log(data);
     setInventories(data);
   };
 
@@ -228,7 +227,7 @@ export const Editor = () => {
                                 { component: match.component,
                                   version: match.version,
                                   usage: match.id,
-                                  license: match.licenses[0],
+                                  license: match.licenses[0]?.name,
                                   url: match.url,
                                   purl: match.purl[0],
                                 }
