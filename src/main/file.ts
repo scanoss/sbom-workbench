@@ -6,6 +6,7 @@ import { defaultProject } from './workspace/ProjectTree';
 
 ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
   const fileContent = { content: '' };
+  // filePath = filePath.replace(defaultProject.getScanRoot(),'');
   try {
     const isBin = isBinaryFileSync(filePath);
 

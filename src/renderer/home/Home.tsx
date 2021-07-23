@@ -8,6 +8,7 @@ import { dialogController } from '../dialog-controller';
 import { AppContext } from '../context/AppProvider';
 import { IpcEvents } from '../../ipc-events';
 
+
 const Home = () => {
   const history = useHistory();
 
@@ -15,6 +16,21 @@ const Home = () => {
 
   const [progress, setProgress] = useState<number>(0);
   const [path, setPath] = useState<string | null>(null);
+  const [stage, setStage] = useState<string>('');
+
+  const init = () => {
+    ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
+  };
+
+  const cleanup = () => {
+    ipcRenderer.removeListener(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
+  };
+
+  const handlerScannerStatus = (_event, args) => {
+    console.log(args);
+    setProgress(args.completed);
+    setStage(args.stage);
+  };
 
   const showScan = (resultPath) => {
     setScanPath(resultPath);
@@ -39,6 +55,7 @@ const Home = () => {
         showScan(args.resultsPath);
       } else {
         showError();
+        setPath(null);
       }
     });
   };
@@ -60,6 +77,15 @@ const Home = () => {
     showScan(projectPath);
   };
 
+  const scannerStatusHandler = (scannerStatus: any) => {
+    setProgress(scannerStatus.processed);
+  };
+
+  useEffect(() => {
+    init();
+    return cleanup;
+  });
+
   return (
     <main className="Home">
       <div className="logo">
@@ -74,7 +100,9 @@ const Home = () => {
           LOAD PROJECT
         </button>
       </div>
-      <div className="progressbar">{path ? <LinearProgress /> : null}</div>
+      <div className="progressbar">{path ? <LinearProgress variant= {stage==='prepare' ? 'indeterminate' : 'determinate'} value={progress} /> : null}</div>
+      <div className="stage-label">  {stage} </div>
+
     </main>
   );
 };

@@ -2,6 +2,7 @@
 /* eslint-disable no-var */
 // eslint-disable-next-line max-classes-per-file
 import * as fs from 'fs';
+import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
 
 class AbstractFilter {
   // path: string | undefined;
@@ -38,6 +39,23 @@ class NameFilter extends AbstractFilter {
   }
 }
 
+class ContentFilter extends AbstractFilter {
+  constructor(condition: string, value: string) {
+    super(condition, value);
+    this.ftype = 'CONTENT';
+  }
+
+  evaluate(path: string): boolean {
+    const binary = isBinaryFileSync(path)
+
+    if (this.condition === '=' && this.value === 'BINARY' && binary) return false;
+    if (this.condition === '!=' && this.value === 'TEXT' && binary) return false;
+    if (this.condition === '=' && this.value === 'TEXT' && !binary) return false;
+    if (this.condition === '!=' && this.value === 'BINARY' && !binary) return false;
+    return true;
+  }
+}
+
 class ExtensionFilter extends AbstractFilter {
   constructor(condition: string, value: string) {
     super(condition, value);
@@ -45,6 +63,8 @@ class ExtensionFilter extends AbstractFilter {
   }
 
   evaluate(path: string): boolean {
+
+
     return !path.endsWith(this.value);
   }
 }
@@ -128,7 +148,7 @@ export class BannedList {
   }
 
   addFilter(filter: AbstractFilter): void {
-    this.filters.push[this.filters.length] = filter;
+    this.filters.push(filter);
   }
 
   evaluate(path: string): boolean {
@@ -150,15 +170,21 @@ export class BannedList {
     const a = JSON.parse(file);
     let i: number;
     for (i = 0; i < a.length; i += 1) {
-      if (a[i].ftype === 'NAME')
-        this.addFilter(new NameFilter(a[i].condition, a[i].value));
-      if (a[i].ftype === 'DATE')
-        this.addFilter(new DateFilter(a[i].condition, a[i].value));
-      if (a[i].ftype === 'SIZE')
-        this.addFilter(new SizeFilter(a[i].condition, a[i].value));
-      if (a[i].ftype === 'EXTENSION')
-        this.addFilter(new ExtensionFilter(a[i].condition, a[i].value));
+      if (a[i].ftype === 'NAME') this.addFilter(new NameFilter(a[i].condition, a[i].value));
+      if (a[i].ftype === 'DATE') this.addFilter(new DateFilter(a[i].condition, a[i].value));
+      if (a[i].ftype === 'SIZE') this.addFilter(new SizeFilter(a[i].condition, a[i].value));
+      if (a[i].ftype === 'EXTENSION') this.addFilter(new ExtensionFilter(a[i].condition, a[i].value));
+      if (a[i].ftype === 'CONTENT') this.addFilter(new ContentFilter(a[i].condition, a[i].value));
     }
+  }
+
+  loadDefault() {
+    console.log('Applying defaults filters');
+    this.addFilter(new SizeFilter('<', 100));
+    this.addFilter(new ContentFilter('=', 'BINARY'));
+    this.addFilter(new ExtensionFilter('=', '.txt'));
+    this.addFilter(new NameFilter('contains', '.git'));
+
   }
 }
 // export class BannedList

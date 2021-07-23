@@ -1,0 +1,6 @@
+export const DispatcherEvents = {
+  DONE: 'DONE',
+
+  ERROR_NETWORK_CONNECTIVITY: 'NETWORK_CONNECTIVITY',
+  ERROR_TRANSACTION_TIMEOUT: 'TimeoutError',
+};
