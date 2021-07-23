@@ -332,11 +332,15 @@ function summarizeTree(root: any,tree: any, summary: any) {
   let j = 0;
   if (tree.type === 'file') {
     summary.total += 1;
-    if (tree.action === 'filter') summary.filter += 1;
+    if (tree.action === 'filter') {
+       summary.filter += 1;
+       tree.className = 'filter-item'
+    }
     else if (tree.include === true) {
       summary.include += 1;
       summary.files.push(`${root}${tree.value}`);
-    }
+    } else {
+      tree.className='exclude-item'}
 
     return summary;
   }
