@@ -73,6 +73,7 @@ export const Editor = () => {
 
   const getInventories = async () => {
     const { data } = await inventoryService.getAll({ files: [file] });
+    console.log(data);
     setInventories(data);
   };
 
@@ -203,18 +204,14 @@ export const Editor = () => {
                           <MatchInfoCard
                             key={index}
                             selected={currentMatch === inventory}
-                            match={{
-                              component: inventory.component.name,
-                              version: inventory.component.version,
-                              usage: inventory.usage,
-                            }}
+
                             match={
                               { component: inventory.component.name,
                                 version: inventory.component.version,
                                 usage: inventory.usage,
-                                license: inventory.license,
-                                url: inventory.url,
-                                purl: inventory.purl,
+                                license: inventory.license_name,
+                                url: inventory.component.url,
+                                purl: inventory.component.purl,
                               }
                             }
                             status="identified"
@@ -222,18 +219,7 @@ export const Editor = () => {
                             onAction={(action) => onAction(action, inventory)}
                           />
                         ))
-                      : matchInfo.map((match, index) => (
-                          <MatchInfoCard
-                            key={index}
-                            selected={currentMatch === match}
-                            match={{ component: match.component, version: match.version, usage: match.id }}
-                            status={fileStatus?.status}
-                            onSelect={() => setCurrentMatch(matchInfo[index])}
-                            onAction={onAction}
-                          />
-                        ))}
-                        )
-                      ) : (
+                      : (
                         matchInfo.map((match, index) => (
                             <MatchInfoCard
                               key={index}
