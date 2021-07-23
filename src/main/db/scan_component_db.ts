@@ -11,10 +11,8 @@
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
-import { Component , License } from '../../api/types';
+import { Component, License } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
-
-
 
 interface Summary {
   identified: number;
@@ -26,7 +24,6 @@ const utilsDb = new UtilsDb();
 const query = new Querys();
 
 export class ComponentDb extends Db {
-
   license: LicenseDb;
 
   constructor(path: string) {
@@ -63,6 +60,52 @@ export class ComponentDb extends Db {
         else resolve({});
       } catch (error) {
         reject(new Error('unable to open db'));
+      }
+    });
+  }
+
+  private createViews() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run("begin transaction");
+          db.run(
+            'CREATE VIEW IF NOT EXISTS components (id,name,purl,version,url)        AS SELECT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;'
+          );
+          db.run(
+            'CREATE VIEW IF NOT EXISTS license_view (cvid,name,spdxid,url,license_id) AS SELECT lcv.cvid,lic.name,lic.spdxid,lic.url,lic.id FROM         license_component_version AS lcv LEFT JOIN licenses AS lic ON lcv.licid=lic.id;'
+          );
+          db.run('commit',(err)=>{
+            db.close();
+            if(err)resolve(false)
+            else resolve(true);
+          });         
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  }
+
+  allComp() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await this.createViews();
+        const db = await this.openDb();
+        db.serialize(function () {       
+
+          db.all(
+            'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid;',
+            (err, data) => {
+              db.close();
+              if (err) resolve([]);
+              else resolve(data);
+            }
+          );
+        });
+      } catch (error) {
+        console.log(error);
       }
     });
   }
@@ -399,7 +442,7 @@ export class ComponentDb extends Db {
     });
   }
 
- private async getUnique() {
+  private async getUnique() {
     try {
       const db = await this.openDb();
       return await new Promise<any>(async (resolve, reject) => {
@@ -410,7 +453,7 @@ export class ComponentDb extends Db {
             if (!err) resolve(data);
             else resolve([]);
           }
-        );     
+        );
       });
     } catch (error) {
       console.log(error);
@@ -478,7 +521,4 @@ export class ComponentDb extends Db {
       }
     });
   }
-
-
- 
 }

@@ -38,13 +38,17 @@ export class FilesDb extends Db {
           db.run('begin transaction');
           let data: any;
           let filePath: string;
+          let files='';
           for (const [key, value] of Object.entries(result)) {
-            for (let i = 0; i < value.length; i += 1) {
+            for (let i = 0; i < value.length; i += 1) {              
               filePath = key;
               data = value[i];
-              self.insertFile(db, data, filePath);
+              const fileHash = data.file_hash?data.file_hash:null;
+              files += `INSERT or IGNORE INTO files (md5, pid, scanned, path) values ('${fileHash}',${0},'n/a','${filePath}');`;
+             // self.insertFile(db, data, filePath);
             }
-          }
+          }      
+          db.exec(files);
           db.run('commit', () => {
             db.close();
             resolve(true);
