@@ -71,7 +71,7 @@ class WorkbenchController {
   private async generateScanResult(data): Promise<ScanResult> {
     const scan = data.results;
     const tree = [data.logical_tree];
-    transform(tree, scan);
+   // transform(tree, scan);
     return {
       scan,
       scanRoot: data.scan_root,

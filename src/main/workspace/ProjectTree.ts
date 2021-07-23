@@ -256,7 +256,6 @@ function insertInventory(tree: any, mypath: string, inv: Inventory): any {
   while (i < myPathFolders.length) {
     let j: number;
     if (!arbol.inventories.includes(inv.id)) arbol.inventories.push(inv.id);
-    // console.log(`busco ${myPathFolders[i]}`);
     for (j = 0; j < arbol.children.length; j += 1) {
       if (arbol.children[j].label === myPathFolders[i]) {
         arbol = arbol.children[j];
@@ -278,15 +277,13 @@ function insertComponent(tree: any, mypath: string, comp: Component): any {
   i = 0;
 
   const component = { purl: comp.purl, version: comp.version };
-  console.log(component);
+
   while (i < myPathFolders.length) {
     let j: number;
-    //  if (!arbol.components.includes(component)) arbol.components.push(component);
-    if (!arbol.components.some((e) => e.purl === component.purl && e.version === component.version)) {
+     if (!arbol.components.some((e) => e.purl === component.purl && e.version === component.version)) {
       arbol.components.push(component);
       arbol.className = 'match-info';
     }
-    // console.log(`busco ${myPathFolders[i]}`);
     for (j = 0; j < arbol.children.length; j += 1) {
       if (arbol.children[j].label === myPathFolders[i]) {
         arbol = arbol.children[j];
@@ -298,7 +295,7 @@ function insertComponent(tree: any, mypath: string, comp: Component): any {
 
   arbol.components.push(component);
   arbol.className = 'match-info';
-   console.log("agrego "+JSON.stringify(component).toString());
+
 }
 
 function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {

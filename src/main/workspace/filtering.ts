@@ -56,24 +56,26 @@ class SizeFilter extends AbstractFilter {
   }
 
   evaluate(path: string): boolean {
-    const file = fs.readFileSync(path, 'binary');
+     const stat = fs.statSync(path);
+
+
 
     if (this.condition === '>') {
-      if (file.length > parseInt(this.value, 10)) {
+      if (stat.size > parseInt(this.value, 10)) {
         //   console.log("NO aceptado por que NO es mayor");
         return false;
       }
       return true;
     }
     if (this.condition === '<') {
-      if (file.length < parseInt(this.value, 10)) {
+      if (stat.size < parseInt(this.value, 10)) {
         //  console.log("NO aceptado por que NO es menor");
         return false;
       }
       return true;
     }
     if (this.condition === '=') {
-      if (file.length === parseInt(this.value, 10)) {
+      if (stat.size === parseInt(this.value, 10)) {
         //   console.log("NO aceptado por que  IGUAL");
         return false;
       }

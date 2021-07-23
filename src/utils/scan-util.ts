@@ -30,7 +30,7 @@ export function transform(tree, scan) {
     if (treeElement.children) {
       transform(treeElement.children, scan)
     } else {
-      treeElement.className = getStatus(scan, treeElement.value);
+      treeElement.className = getStatus(scan, treeElement .value);
     }
   }
 }
