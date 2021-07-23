@@ -44,6 +44,7 @@ export const Editor = () => {
   const [inventories, setInventories] = useState<Inventory[]>([]);
   const [ossLines, setOssLines] = useState<number[] | null>([]);
   const [lines, setLines] = useState<number[] | null>([]);
+  const [fullFile, setFullFile] = useState<boolean | null>(null);
 
   const init = () => {
     getInventories();
@@ -142,6 +143,12 @@ export const Editor = () => {
   }, [currentMatch]);
 
   useEffect(() => {
+    if (currentMatch?.lines === 'all') {
+      setFullFile(true);
+    }
+  }, [currentMatch]);
+
+  useEffect(() => {
     if (!currentMatch) {
       return;
     }
@@ -233,18 +240,28 @@ export const Editor = () => {
           )}
         </header>
 
-        <main className="editors app-content">
-          <div className="editor">
-            {currentMatch && localFileContent?.content ? (
-              <MemoCodeEditor content={localFileContent.content} highlight={lines} />
-            ) : null}
-          </div>
-          <div className="editor">
-            {currentMatch && remoteFileContent?.content ? (
-              <MemoCodeEditor content={remoteFileContent.content} highlight={ossLines} />
-            ) : null}
-          </div>
-        </main>
+        {fullFile ? (
+          <main className="editors-full app-content">
+            <div className="editor">
+              {currentMatch && localFileContent?.content ? (
+                <MemoCodeEditor content={localFileContent.content} highlight={lines} />
+              ) : null}
+            </div>
+          </main>
+        ) : (
+          <main className="editors app-content">
+            <div className="editor">
+              {currentMatch && localFileContent?.content ? (
+                <MemoCodeEditor content={localFileContent.content} highlight={lines} />
+              ) : null}
+            </div>
+            <div className="editor">
+              {currentMatch && remoteFileContent?.content ? (
+                <MemoCodeEditor content={remoteFileContent.content} highlight={ossLines} />
+              ) : null}
+            </div>
+          </main>
+        )}
       </section>
 
       <InventoryDialog onClose={handleAccept} />
