@@ -135,16 +135,12 @@ export const Editor = () => {
   }, [matchInfo]);
 
   useEffect(() => {
-    console.log(currentMatch);
     if (currentMatch) {
-      getFile(); // TODO: on init cuando este el servicio
-      loadRemoteFile(currentMatch.file_hash);
-    }
-  }, [currentMatch]);
-
-  useEffect(() => {
-    if (currentMatch?.lines === 'all') {
-      setFullFile(true);
+      getFile();
+      const full = currentMatch?.lines === 'all';
+      setFullFile(full);
+      if (!full)
+        loadRemoteFile(currentMatch.file_hash);
     }
   }, [currentMatch]);
 
