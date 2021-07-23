@@ -19,6 +19,26 @@
     }
   }
 
+
+  .filter-item {
+    font-weight: 600;
+    color: #968d8d8a;
+    text-decoration:line-through;
+    .rct-node-icon {
+      color: #27272A;
+    }
+  }
+
+  .exclude-item {
+    font-weight: 600;
+    color: #968d8d8a;
+    text-decoration:line-through;
+
+    .rct-node-icon {
+      color: #27272A;
+    }
+  }
+
   .no-match {
     font-weight: 400;
   }
