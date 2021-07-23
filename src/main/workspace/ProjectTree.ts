@@ -115,7 +115,7 @@ export class ProjectTree extends EventEmitter {
     };
     this.set_work_root(p.work_root);
     this.set_scan_root(p.scan_root);
-    this.set_project_name(`${path.basename(scanPath)}`)
+    this.set_project_name(`${path.basename(scanPath)}`);
     if (!fs.existsSync(`${getUserHome()}/scanoss-workspace`)) {
       fs.mkdirSync(`${getUserHome()}/scanoss-workspace/`);
     }
@@ -155,6 +155,8 @@ export class ProjectTree extends EventEmitter {
         processed: this.filesSummary.include,
         completed: (100 * this.processedFiles) / this.filesSummary.include,
       });
+
+      this.attachComponent(data);
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
@@ -255,6 +257,17 @@ export class ProjectTree extends EventEmitter {
     for (i = 0; i < inv.files.length; i += 1) {
       insertInventory(this.scan_root, this.logical_tree, files[i], inv);
       // insertComponent(this.logical_tree, files[i], inv);
+      insertInventory(this.logical_tree, files[i], inv);
+    }
+  }
+
+  attachComponent(comp: any) {
+    for (const [key, value] of Object.entries(comp)) {
+      for (let i = 0; i < value.length; i += 1) {
+        // console.log(key+''+value[i].purl);
+        if(value[i].purl!==undefined)
+        insertComponent(this.logical_tree, key, value[i]);
+      }
     }
   }
 
@@ -386,7 +399,6 @@ function insertInventory(root: string, tree: any, mypath: string, inv: Inventory
   while (i < myPathFolders.length) {
     let j: number;
     if (!arbol.inventories.includes(inv.id)) arbol.inventories.push(inv.id);
-    // console.log(`busco ${myPathFolders[i]}`);
     for (j = 0; j < arbol.children.length; j += 1) {
       if (arbol.children[j].label === myPathFolders[i]) {
         arbol = arbol.children[j];
@@ -398,8 +410,7 @@ function insertInventory(root: string, tree: any, mypath: string, inv: Inventory
 
   arbol.inventories.push(inv.id);
 }
-// 4= arr.some(e => e.name === obj.name);
-function insertComponent(tree: any, mypath: string, inv: Inventory): any {
+function insertComponent(tree: any, mypath: string, comp: Component): any {
   let myPathFolders: string[];
   // eslint-disable-next-line prefer-const
   let arbol = tree;
@@ -407,15 +418,15 @@ function insertComponent(tree: any, mypath: string, inv: Inventory): any {
   if (myPathFolders[0] === '') myPathFolders.shift();
   let i: number;
   i = 0;
-  const component = { purl: inv.purl, version: inv.version };
+
+  const component = { purl: comp.purl, version: comp.version };
+
   while (i < myPathFolders.length) {
     let j: number;
-    //  if (!arbol.components.includes(component)) arbol.components.push(component);
-    if (!arbol.components.some((e) => e.purl === component.purl && e.version === component.version)) {
+     if (!arbol.components.some((e) => e.purl === component.purl && e.version === component.version)) {
       arbol.components.push(component);
-      arbol.className = 'match';
+      arbol.className = 'match-info-result';
     }
-    // console.log(`busco ${myPathFolders[i]}`);
     for (j = 0; j < arbol.children.length; j += 1) {
       if (arbol.children[j].label === myPathFolders[i]) {
         arbol = arbol.children[j];
@@ -426,8 +437,8 @@ function insertComponent(tree: any, mypath: string, inv: Inventory): any {
   }
 
   arbol.components.push(component);
-  arbol.className = 'match';
-  // console.log(arbol);
+  arbol.className = 'match-info-result';
+
 }
 /*
 function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {
