@@ -1,20 +1,16 @@
 import React, { useContext, useEffect, useState } from 'react';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory } from 'react-router-dom';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
-import { DialogContext } from '../../../context/DialogProvider';
+import { DialogContext, IDialogContext } from '../../../context/DialogProvider';
 import { range } from '../../../../utils/utils';
 import { workbenchController } from '../../../workbench-controller';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
-import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../../../api/types';
 import LabelCard from '../../components/LabelCard/LabelCard';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../components/MatchInfoCard/MatchInfoCard';
-import { componentService } from '../../../../api/component-service';
-import { mapFile, mapFiles } from '../../../../utils/scan-util';
+import { mapFile } from '../../../../utils/scan-util';
 import CodeEditor from '../../components/CodeEditor/CodeEditor';
 import { inventoryService } from '../../../../api/inventory-service';
 import { fileService } from '../../../../api/file-service';
@@ -29,11 +25,9 @@ export interface FileContent {
 export const Editor = () => {
   const history = useHistory();
 
-  const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(
-    WorkbenchContext
-  ) as IWorkbenchContext;
+  const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { openInventory } = useContext<any>(DialogContext);
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const { file, matchInfo } = state;
 
@@ -81,7 +75,7 @@ export const Editor = () => {
     setFileStatus(mapFile(data));
   };
 
-  const handleAccept = async (inventory: Inventory) => {
+  const create = async (inventory: Inventory) => {
     const inv = await createInventory({
       ...inventory,
       files: [file],
@@ -99,7 +93,10 @@ export const Editor = () => {
       license: currentMatch?.licenses[0]?.name,
       usage: currentMatch?.id,
     };
-    openInventory(inv);
+    const inventory = await dialogCtrl.openInventory(inv);
+    if (inventory) {
+      create(inventory);
+    }
   };
 
   const onIgnorePressed = async () => {
@@ -275,8 +272,6 @@ export const Editor = () => {
           </main>
         )}
       </section>
-
-      <InventoryDialog onClose={handleAccept} />
     </>
   );
 };
