@@ -2,7 +2,6 @@ import {
   Button,
   ButtonGroup,
   ClickAwayListener,
-  Grow,
   MenuItem,
   MenuList,
   Paper,
@@ -21,26 +20,24 @@ import { Inventory } from '../../../../api/types';
 import { FileList } from '../ComponentList/components/FileList';
 import { InventoryList } from '../ComponentList/components/InventoryList';
 import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
-import { DialogContext } from '../../../context/DialogProvider';
+import { DialogContext, IDialogContext } from '../../../context/DialogProvider';
 import { setFile } from '../../actions';
 import { inventoryService } from '../../../../api/inventory-service';
 import { componentService } from '../../../../api/component-service';
 import { useEffect } from 'react';
 import { mapFiles } from '../../../../utils/scan-util';
 import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
-import InventoryDialog from '../../components/InventoryDialog/InventoryDialog';
 
 export const ComponentDetail = () => {
   const history = useHistory();
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const dialogCtrl = useContext<any>(DialogContext);
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const { component } = state;
 
   const [files, setFiles] = useState<any[]>([]);
-  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [inventories, setInventories] = useState<Inventory[]>([]);
 
   const [open, setOpen] = React.useState(false);
@@ -85,8 +82,14 @@ export const ComponentDetail = () => {
       license: component?.licenses[0]?.name,
       usage: file.type,
     };
-    dialogCtrl.openInventory(inv);
-    setSelectedFiles([file.path]);
+    const inventory = await dialogCtrl.openInventory(inv);
+
+    if (inventory) {
+      create({
+        ...inventory,
+        files: [file.path]
+      });
+    }
   };
 
   const onIdentifyAllPressed = async () => {
@@ -96,11 +99,17 @@ export const ComponentDetail = () => {
       license: component?.licenses[0]?.name,
       usage: 'file',
     };
-    dialogCtrl.openInventory(inv);
+    const inventory = await dialogCtrl.openInventory(inv);
     const selFiles = files
       .filter( file => file.status === 'pending')
       .map( file => file.path);
-    setSelectedFiles(selFiles);
+
+    if (inventory) {
+      create({
+        ...inventory,
+        files: selFiles
+      });
+    }
   };
 
   const onIgnorePressed = async (file) => {
@@ -129,12 +138,8 @@ export const ComponentDetail = () => {
     getFiles();
   };
 
-  const handleClose = async (inventory: Inventory) => {
-    const  newInventory = await createInventory({
-      ...inventory,
-      files: selectedFiles
-    });
-
+  const create = async (inventory: Inventory) => {
+    const newInventory = await createInventory(inventory);
     setInventories((previous) => [...previous, newInventory]);
     getFiles();
     setTab(1);
@@ -245,10 +250,6 @@ export const ComponentDetail = () => {
 
         <main className="app-content">{renderTab()}</main>
       </section>
-
-      <InventoryDialog
-        onClose={handleClose}
-      />
     </>
   );
 };
