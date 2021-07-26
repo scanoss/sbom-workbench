@@ -240,7 +240,7 @@ export class ProjectTree extends EventEmitter {
     });
 
     if (success) {
-      console.log('lienses inserted successfully...');
+      console.log('licenses inserted successfully...');
       return true;
     }
     return false;

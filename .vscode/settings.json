@@ -26,5 +26,6 @@
     "*.{css,sass,scss}.d.ts": true
   },
 
-  "editor.formatOnSave": false
+  "editor.formatOnSave": false,
+  "compile-hero.disable-compile-files-on-did-save-code": false
 }

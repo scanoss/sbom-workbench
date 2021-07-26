@@ -28,6 +28,8 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Partial<Inventory>
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   let inv: any;
   try {
+    await defaultProject.scans_db.inventories.attachFileInventory( { files:['/external/inc/log.h','/external/src/winnowing.c'],
+    id:3});
     inv = await defaultProject.scans_db.inventories.create(arg);
     arg.id = inv.id;
     // defaultProject.attachInventory(arg);
