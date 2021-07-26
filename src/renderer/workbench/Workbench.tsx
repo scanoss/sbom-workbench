@@ -115,7 +115,7 @@ const Workbench = () => {
             <Route path={`${path}/inventory/:id`}>
               <InventoryDetail />
             </Route>
-            <Route path={`${path}/file`}>{file ? <Editor /> : null}</Route>
+            <Route path={`${path}/file`}><Editor /></Route>
           </Switch>
         </main>
       </SplitPane>

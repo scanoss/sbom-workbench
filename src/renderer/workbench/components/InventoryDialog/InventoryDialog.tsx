@@ -50,10 +50,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
 
   const setDefaults = () => {
-    setForm(
-      inventory
-    );
-  }
+    setForm(inventory);
+  };
 
   const handleCancel = () => {
     onCancel && onCancel();
@@ -70,17 +68,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     });
   };
 
-  useEffect( setDefaults, [inventory]);
+  useEffect(setDefaults, [inventory]);
 
   return (
-    <Dialog
-      id="InventoryDialog"
-      maxWidth="md"
-      scroll="body"
-      fullWidth
-      open={open}
-      onClose={handleCancel}
-    >
+    <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={handleCancel}>
       <span className="dialog-title">Identify Component</span>
       <div className="identity-component">
         <div className="component-version-container">

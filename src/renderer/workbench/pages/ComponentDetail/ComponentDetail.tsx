@@ -42,10 +42,10 @@ export const ComponentDetail = () => {
 
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
-  const [tab, setTab] = useState<number>(component?.summary.pending !== 0 ? 0 : 1);
+  const [tab, setTab] = useState<number>(component?.summary?.pending !== 0 ? 0 : 1);
 
   const getFiles = async () => {
-    const response = await componentService.getFiles( { purl: component.purl, version: component.version });
+    const response = await componentService.getFiles({ purl: component.purl, version: component.version });
     console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));
   };
@@ -60,8 +60,7 @@ export const ComponentDetail = () => {
   const onAction = (file: string, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push(`/workbench/file/${file.path}`);
-        dispatch(setFile(file.path));
+        history.push(`/workbench/file?path=${file.path}`);
         break;
       case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
         onIdentifyPressed(file);
@@ -71,6 +70,8 @@ export const ComponentDetail = () => {
         break;
       case MATCH_CARD_ACTIONS.ACTION_RESTORE:
         onRestorePressed(file);
+        break;
+      default:
         break;
     }
   };

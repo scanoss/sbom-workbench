@@ -20,36 +20,36 @@ export interface IDialogContext {
 export const DialogContext = React.createContext<IDialogContext | null>(null);
 
 export const DialogProvider: React.FC = ({ children }) => {
-
   const [inventoryDialog, setInventoryDialog] = useState<{
     open: boolean;
-    inventory?: Partial<InventoryForm>;
-    onClose?: (Inventory) => void,
-  }>({open: false});
+    inventory: Partial<InventoryForm>;
+    onClose?: (Inventory) => void;
+  }>({ open: false, inventory: {} });
 
   const openInventory = (inventory: Partial<InventoryForm>): Promise<Inventory | null> => {
-    return new Promise<Inventory>( (resolve) => {
+    return new Promise<Inventory>((resolve) => {
       setInventoryDialog({
         inventory,
         open: true,
-        onClose: (inventory) => {
-          setInventoryDialog((dialog) => ({ ...dialog, open: false }))
-          resolve(inventory)
+        onClose: (inv) => {
+          setInventoryDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(inv);
         },
       });
     });
-  }
+  };
 
-  return <DialogContext.Provider
-    value={{ openInventory }}>
-    {children}
-    <InventoryDialog
-      open={inventoryDialog?.open}
-      inventory={inventoryDialog?.inventory}
-      onCancel={() => inventoryDialog?.onClose(null)}
-      onClose={(inventory) => inventoryDialog?.onClose(inventory)}
-    />
-  </DialogContext.Provider>;
+  return (
+    <DialogContext.Provider value={{ openInventory }}>
+      {children}
+      <InventoryDialog
+        open={inventoryDialog.open}
+        inventory={inventoryDialog.inventory}
+        onCancel={() => inventoryDialog.onClose && inventoryDialog.onClose(null)}
+        onClose={(inventory) => inventoryDialog.onClose && inventoryDialog.onClose(inventory)}
+      />
+    </DialogContext.Provider>
+  );
 };
 
 export default DialogProvider;
