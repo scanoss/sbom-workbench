@@ -63,7 +63,12 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
                       </div>
                       <div className="tiny-container-detail-matchinfo">
                         <p className="desc-detail-matchinfo">URL</p>
-                        <a href={match?.url} target="_blank" className="desc-detail-matchinfo url-matchinfo" rel="noreferrer">
+                        <a
+                          href={match?.url}
+                          target="_blank"
+                          className="desc-detail-matchinfo url-matchinfo"
+                          rel="noreferrer"
+                        >
                           {match?.url}
                         </a>
                       </div>

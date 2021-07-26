@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import IconButton from '@material-ui/core/IconButton';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 import { DialogContext, IDialogContext } from '../../../context/DialogProvider';
 import { range } from '../../../../utils/utils';
@@ -14,8 +14,13 @@ import { mapFile } from '../../../../utils/scan-util';
 import CodeEditor from '../../components/CodeEditor/CodeEditor';
 import { inventoryService } from '../../../../api/inventory-service';
 import { fileService } from '../../../../api/file-service';
+import { setFile } from '../../actions';
 
 const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
+
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
 export interface FileContent {
   content: string | null;
@@ -24,8 +29,11 @@ export interface FileContent {
 
 export const Editor = () => {
   const history = useHistory();
+  const query = useQuery();
 
-  const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(
+    WorkbenchContext
+  ) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -86,10 +94,10 @@ export const Editor = () => {
 
   const onIdentifyPressed = async () => {
     const inv = {
-      component: currentMatch.component,
-      version: currentMatch.version,
-      url: currentMatch.url,
-      purl: currentMatch.purl[0],
+      component: currentMatch?.component,
+      version: currentMatch?.version,
+      url: currentMatch?.url,
+      purl: currentMatch?.purl[0],
       license: currentMatch?.licenses[0]?.name,
       usage: currentMatch?.id,
     };
@@ -114,6 +122,16 @@ export const Editor = () => {
   };
 
   useEffect(() => {
+    dispatch(setFile(query.get('path')));
+    const unlisten = history.listen((data) => {
+      const path = new URLSearchParams(data.search).get('path');
+      console.log(path);
+      dispatch(setFile(path));
+    });
+    return unlisten;
+  }, []);
+
+  useEffect(() => {
     setLocalFileContent({ content: null, error: false });
     setRemoteFileContent({ content: null, error: false });
 
@@ -136,8 +154,7 @@ export const Editor = () => {
       getFile();
       const full = currentMatch?.lines === 'all';
       setFullFile(full);
-      if (!full)
-        loadRemoteFile(currentMatch.file_hash);
+      if (!full) loadRemoteFile(currentMatch.file_hash);
     }
   }, [currentMatch]);
 
@@ -161,7 +178,7 @@ export const Editor = () => {
     setLines(lineasLocales);
   }, [currentMatch]);
 
-  const onAction = (action: MATCH_INFO_CARD_ACTIONS, result) => {
+  const onAction = (action: MATCH_INFO_CARD_ACTIONS, result: any = null) => {
     switch (action) {
       case MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY:
         onIdentifyPressed();
@@ -196,46 +213,40 @@ export const Editor = () => {
                 <section className="content">
                   <div className="match-info-default-container">
                     {inventories.length > 0
-                      ? inventories.map((inventory, index) => (
+                      ? inventories.map((inventory) => (
                           <MatchInfoCard
-                            key={index}
+                            key={inventory.id}
                             selected={currentMatch === inventory}
-
-                            match={
-                              { component: inventory.component.name,
-                                version: inventory.component.version,
-                                usage: inventory.usage,
-                                license: inventory.license_name,
-                                url: inventory.component.url,
-                                purl: inventory.component.purl,
-                              }
-                            }
+                            match={{
+                              component: inventory.component.name,
+                              version: inventory.component.version,
+                              usage: inventory.usage,
+                              license: inventory.license_name,
+                              url: inventory.component.url,
+                              purl: inventory.component.purl,
+                            }}
                             status="identified"
-                            onSelect={() => setCurrentMatch(matchInfo[index])}
+                            onSelect={() => null}
                             onAction={(action) => onAction(action, inventory)}
                           />
                         ))
-                      : (
-                        matchInfo.map((match, index) => (
-                            <MatchInfoCard
-                              key={index}
-                              selected={currentMatch === match}
-                              match={
-                                { component: match.component,
-                                  version: match.version,
-                                  usage: match.id,
-                                  license: match.licenses[0]?.name,
-                                  url: match.url,
-                                  purl: match.purl[0],
-                                }
-                              }
-                              status={fileStatus?.status}
-                              onSelect={() => setCurrentMatch(matchInfo[index])}
-                              onAction={onAction}
-                            />
-                          )
-                        ))
-                    }
+                      : matchInfo.map((match, index) => (
+                          <MatchInfoCard
+                            key={index}
+                            selected={currentMatch === match}
+                            match={{
+                              component: match.component,
+                              version: match.version,
+                              usage: match.id,
+                              license: match.licenses[0]?.name,
+                              url: match.url,
+                              purl: match.purl[0],
+                            }}
+                            status={fileStatus?.status}
+                            onSelect={() => setCurrentMatch(matchInfo[index])}
+                            onAction={onAction}
+                          />
+                        ))}
                   </div>
                 </section>
                 <div className="info-files">
