@@ -1,0 +1,31 @@
+#InventorySelectorDialog {
+
+  .list-groups {
+    margin-top: 16px;
+  }
+
+  .usage-card {
+    margin-bottom: 12px;
+    cursor: pointer;
+    box-sizing: border-box;
+    border: transparent 2px solid;
+    overflow: hidden;
+
+    &.selected {
+      border: #60A5FA 2px solid;
+    }
+
+    .usage-card-content {
+      padding: 10px;
+      font-size: 24px;
+      font-weight: 400;
+      text-transform: capitalize;
+
+      border-left: 10px solid $indentified-green;
+    }
+
+
+
+  }
+
+}

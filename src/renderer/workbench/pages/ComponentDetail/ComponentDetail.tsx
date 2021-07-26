@@ -100,7 +100,17 @@ export const ComponentDetail = () => {
       license: component?.licenses[0]?.name,
       usage: 'file',
     };
-    const inventory = await dialogCtrl.openInventory(inv);
+
+    const response = await dialogCtrl.openInventorySelector(inventories);
+    if (response.action === 'cancel') {
+      return;
+    }
+
+    let inventory: Inventory | null;
+    if (response.action === 'new') {
+      inventory = await dialogCtrl.openInventory(inv);
+    }
+
     const selFiles = files
       .filter( file => file.status === 'pending')
       .map( file => file.path);

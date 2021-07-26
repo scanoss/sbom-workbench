@@ -28,6 +28,7 @@ $md: 780px;
 /* theme */
 @import './theme/SplitPane.global.scss';
 @import './theme/Panel.global.scss';
+@import './theme/Dialog.global.scss';
 
 /* components */
 @import './renderer/home/Home';
@@ -46,7 +47,9 @@ $md: 780px;
 @import './renderer/workbench/components/MatchInfoCard/MatchInfoCard';
 @import './renderer/workbench/components/InventoryCard/InventoryCard';
 @import './renderer/workbench/components/InventoryDialog/InventoryDialog';
+@import './renderer/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 @import './renderer/workbench/components/ComponentInfo/ComponentInfo.scss';
+
 /* fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
