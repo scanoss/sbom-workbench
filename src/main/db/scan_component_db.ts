@@ -1,3 +1,4 @@
+/* eslint-disable no-else-return */
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-cycle */
 /* eslint-disable prettier/prettier */
@@ -11,10 +12,8 @@
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
-import { Component , License } from '../../api/types';
+import { Component, License } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
-
-
 
 interface Summary {
   identified: number;
@@ -26,7 +25,6 @@ const utilsDb = new UtilsDb();
 const query = new Querys();
 
 export class ComponentDb extends Db {
-
   license: LicenseDb;
 
   constructor(path: string) {
@@ -399,7 +397,7 @@ export class ComponentDb extends Db {
     });
   }
 
- private async getUnique() {
+  private async getUnique() {
     try {
       const db = await this.openDb();
       return await new Promise<any>(async (resolve, reject) => {
@@ -410,7 +408,7 @@ export class ComponentDb extends Db {
             if (!err) resolve(data);
             else resolve([]);
           }
-        );     
+        );
       });
     } catch (error) {
       console.log(error);
@@ -479,6 +477,53 @@ export class ComponentDb extends Db {
     });
   }
 
+  async getCompVersions() {
+    try {
+      const data = await this.getAll({});
+      if (data) {
+        const comp = this.mergeComp(data);
+        return await Promise.resolve(comp);
+      } else {
+        return await Promise.resolve([]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
- 
+  private mergeComp(data: any) {
+    const components: any = [];
+    for (let i = 0; i < data.length; i += 1) {
+      const comp: any = {};
+      const version: any = {};
+      let mergeCounter = 0;
+      comp.name = data[i].name;
+      comp.purl = data[i].purl;
+      comp.url = data[i].url;
+      comp.versions = [];
+      version.licenses = data[i].licenses.slice();
+      version.version = data[i].version;
+      comp.versions.push(version);
+      components.push(comp);
+      mergeCounter = 0;
+      for (let j = i + 1; j < data.length; j += 1) {
+        if (data[i].name !== data[j].name) {
+          break;
+        }
+        if (data[i].name === data[j].name) {
+          this.mergeCompVersion(components[components.length - 1], data[j]);
+          mergeCounter += 1;
+        }
+      }
+      i += mergeCounter;
+    }
+    return components;
+  }
+
+  private mergeCompVersion(components: any, data: any) {
+    const version: any = {};
+    version.licenses = data.licenses.slice();
+    version.version = data.version;
+    components.versions.push(version);
+  }
 }

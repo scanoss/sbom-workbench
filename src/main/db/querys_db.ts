@@ -135,7 +135,7 @@ export class Querys {
 
   // GET ALL COMPONENTES
   SQL_GET_ALL_COMPONENTS =
-    ' SELECT DISTINCT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv GROUP BY cv.version;';
+    ' SELECT DISTINCT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv GROUP BY cv.version ORDER BY cv.name;';
 
   // GET LICENSES
   COMPDB_SQL_LICENSE_ALL = 'SELECT id, spdxid, name, url from licenses where id like ? ;';
