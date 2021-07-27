@@ -15,14 +15,19 @@ class InventoryService {
   }
 
   public async create(inventory: Inventory): Promise<any> {
-    const response = await ipcRenderer.invoke(
-      IpcEvents.INVENTORY_CREATE,
-      inventory
-    );
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_CREATE, inventory);
+    return response;
+  }
+
+  public async attach(inventory: Inventory): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_ATTACH_FILE, inventory);
+    return response;
+  }
+
+  public async detach(inventory: Inventory): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_DETACH_FILE, inventory);
     return response;
   }
 }
-
-
 
 export const inventoryService = new InventoryService();

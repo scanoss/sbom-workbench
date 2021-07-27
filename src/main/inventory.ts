@@ -28,13 +28,29 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Partial<Inventory>
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   let inv: any;
   try {
-    await defaultProject.scans_db.inventories.attachFileInventory( { files:['/external/inc/log.h','/external/src/winnowing.c'],
-    id:3});
     inv = await defaultProject.scans_db.inventories.create(arg);
     arg.id = inv.id;
-    // defaultProject.attachInventory(arg);
-    // defaultProject.saveScanProject();
     return { status: 'ok', message: 'Inventory created', data: inv };
+  } catch (e) {
+    console.log('Catch an error on inventory: ', e);
+    return { status: 'fail' };
+  }
+});
+
+ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (event, arg: Partial<Inventory>) => {
+  try {
+    const success = await defaultProject.scans_db.inventories.attachFileInventory(arg);
+    return { status: 'ok', message: 'File attached to inventory successfully', success };
+  } catch (e) {
+    console.log('Catch an error on inventory: ', e);
+    return { status: 'fail' };
+  }
+});
+
+ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, arg: Partial<Inventory>) => {
+  try {
+    const success = await defaultProject.scans_db.inventories.detachFileInventory(arg);
+    return { status: 'ok', message: 'File detached to inventory successfully', success };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
     return { status: 'fail' };

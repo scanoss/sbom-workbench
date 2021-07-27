@@ -76,15 +76,13 @@ export class InventoryDb extends Db {
   }
 
   // CREATE NEW FILE INVENTORY
-  async attachFileInventory(inventory: Partial<Inventory>) {
-    console.log(inventory.files);
+  async attachFileInventory(inventory: Partial<Inventory>) { 
     try {
       const db = await this.openDb();
-
       db.serialize(function () {
         db.run('begin transaction');
         if (inventory.files)
-          for (const path of inventory.files) {            
+          for (const path of inventory.files) {
             db.run(query.SQL_INSERT_FILE_INVENTORIES, path, inventory.id);
           }
         db.run('commit', () => {
@@ -97,8 +95,7 @@ export class InventoryDb extends Db {
     return Promise.resolve(true);
   }
 
-  // REMOVE FILE INVENTORY
-  // CREATE NEW FILE INVENTORY
+  // DETACH FILE INVENTORY
   async detachFileInventory(inventory: Partial<Inventory>) {
     try {
       const db = await this.openDb();
@@ -106,7 +103,7 @@ export class InventoryDb extends Db {
         db.run('begin transaction');
         if (inventory.files) {
           for (const path of inventory.files) {
-            db.run(query.SQL_DELETE_FILE_INVENTORIES, path);
+            db.run(query.SQL_DELETE_FILE_INVENTORIES, path, inventory.id);
           }
         }
         db.run('commit', () => {
@@ -207,7 +204,7 @@ export class InventoryDb extends Db {
           await self.attachFileInventory(inventory);
           await self.updateIdentified(inventory);
           const comp = await self.component.getAll(inventory);
-          inventory.component = comp;        
+          inventory.component = comp;
           if (err) {
             reject(new Error(err));
           } else {
@@ -219,7 +216,7 @@ export class InventoryDb extends Db {
   }
 
   // UPDATE IDENTIFIED FILES
-  private updateIdentified(inventory: Partial<Inventory>) {
+   updateIdentified(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
