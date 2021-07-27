@@ -57,7 +57,7 @@ export class Querys {
   SQL_COMPDB_COMP_VERSION_UPDATE =
     'UPDATE component_versions  SET name=?,version=?, description=?, url=?,purl=? where id=?;';
 
-  SQL_FILES_UPDATE_IDENTIFIED = 'UPDATE results SET identified=1 where results.file_path=?';
+  SQL_FILES_UPDATE_IDENTIFIED = 'UPDATE results SET identified=1 where results.file_path=? AND results.version=? AND results.purl=?';
 
   /** SQL COMPONENTS TABLES INSERT* */
   // SQL INSERT INTO LICENSES

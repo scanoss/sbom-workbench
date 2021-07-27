@@ -189,9 +189,9 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        if(inventory.files)
-        for (const path of inventory.files) {
-          db.run(query.SQL_FILES_UPDATE_IDENTIFIED, path);
+        if (inventory.files)
+          for (let i = 0; i<inventory.files.length; i += 1) {
+            db.run(query.SQL_FILES_UPDATE_IDENTIFIED, inventory.files[i], inventory.version, inventory.purl);
         }
         resolve(true);
       } catch (error) {
