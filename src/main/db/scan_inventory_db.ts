@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable func-names */
 /* eslint-disable no-await-in-loop */
@@ -75,14 +76,44 @@ export class InventoryDb extends Db {
   }
 
   // CREATE NEW FILE INVENTORY
-  async newFileInventory(inventory: Partial<Inventory>, invId: number) {
-    const db = await this.openDb();
-    if (inventory.files) {
-      for (const path of inventory.files) {
-        db.run(query.SQL_INSERT_FILE_INVENTORIES, path, invId);
-      }
+  async attachFileInventory(inventory: Partial<Inventory>) { 
+    try {
+      const db = await this.openDb();
+      db.serialize(function () {
+        db.run('begin transaction');
+        if (inventory.files)
+          for (const path of inventory.files) {
+            db.run(query.SQL_INSERT_FILE_INVENTORIES, path, inventory.id);
+          }
+        db.run('commit', () => {
+          db.close();
+        });
+      });
+    } catch (error) {
+      return Promise.reject(new Error('Unable to attach inventory'));
     }
-    db.close();
+    return Promise.resolve(true);
+  }
+
+  // DETACH FILE INVENTORY
+  async detachFileInventory(inventory: Partial<Inventory>) {
+    try {
+      const db = await this.openDb();
+      db.serialize(function () {
+        db.run('begin transaction');
+        if (inventory.files) {
+          for (const path of inventory.files) {
+            db.run(query.SQL_DELETE_FILE_INVENTORIES, path, inventory.id);
+          }
+        }
+        db.run('commit', () => {
+          db.close();
+        });
+      });
+    } catch (error) {
+      return Promise.reject(new Error('Unable to detach inventory'));
+    }
+    return Promise.resolve(true);
   }
 
   // GET INVENTORY BY ID
@@ -169,11 +200,11 @@ export class InventoryDb extends Db {
         inventory.url ? inventory.url : 'n/a',
         inventory.license_name ? inventory.license_name : 'n/a',
         async function (this: any, err: any) {
-          await self.newFileInventory(inventory, this.lastID);
+          inventory.id = this.lastID;
+          await self.attachFileInventory(inventory);
           await self.updateIdentified(inventory);
           const comp = await self.component.getAll(inventory);
           inventory.component = comp;
-          inventory.id = this.lastID;
           if (err) {
             reject(new Error(err));
           } else {
@@ -185,14 +216,14 @@ export class InventoryDb extends Db {
   }
 
   // UPDATE IDENTIFIED FILES
-  private updateIdentified(inventory:Partial<Inventory>) {
+   updateIdentified(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        if(inventory.files)
-        for (const path of inventory.files) {
-          db.run(query.SQL_FILES_UPDATE_IDENTIFIED, path);
-        }
+        if (inventory.files)
+          for (const path of inventory.files) {
+            db.run(query.SQL_FILES_UPDATE_IDENTIFIED, path);
+          }
         resolve(true);
       } catch (error) {
         reject(new Error('Unable to open db'));

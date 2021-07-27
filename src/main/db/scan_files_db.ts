@@ -45,32 +45,6 @@ export class FilesDb extends Db {
     });
   }
 
-  insertFromJSON(json: string) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const self = this;
-        const db: any = await this.openDb();
-        db.serialize(function () {
-          db.run('begin transaction');
-          let data: any;
-          let filePath: string;
-          for (const [key, value] of Object.entries(json)) {
-            for (let i = 0; i < value.length; i += 1) {
-              filePath = key;
-              data = value[i];
-              self.insertFile(db, data, filePath);
-            }
-          }
-          db.run('commit');
-          db.close();
-          resolve(true);
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
   // GET ALL FILES FOR A COMPONENT
   getFilesComponent(data: Partial<Component>) {
     const self = this;
