@@ -11,6 +11,21 @@
     border: transparent 2px solid;
     overflow: hidden;
 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding-right: 10px;
+
+    .icon {
+      opacity: 0;
+      transition: opacity 200ms ease;
+    }
+
+    &:hover .icon, &.selected .icon {
+      opacity: .8;
+    }
+
     &.selected {
       border: #60A5FA 2px solid;
     }

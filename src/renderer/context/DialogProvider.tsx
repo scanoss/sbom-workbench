@@ -1,22 +1,12 @@
 import React, { useState } from 'react';
-import InventoryDialog from '../workbench/components/InventoryDialog/InventoryDialog';
+import { InventoryDialog } from '../workbench/components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../api/types';
-import InventorySelectorDialog from '../workbench/components/InventorySelectorDialog/InventorySelectorDialog';
-
-export interface InventoryForm {
-  id?: string;
-  component: string;
-  version: string;
-  license: string;
-  url: string;
-  purl: string;
-  usage: string;
-  notes: string;
-}
+import { InventorySelectorDialog } from '../workbench/components/InventorySelectorDialog/InventorySelectorDialog';
+import { InventoryForm, InventorySelectorResponse } from './types';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
-  openInventorySelector: (inventories: Inventory[]) => Promise<{ action: string; inventory?: Inventory | null }>;
+  openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -44,13 +34,11 @@ export const DialogProvider: React.FC = ({ children }) => {
   const [inventorySelectorDialog, setInventorySelectorDialog] = useState<{
     open: boolean;
     inventories: Inventory[];
-    onClose?: (response: { action: string; inventory?: Inventory | null }) => void;
+    onClose?: (response: InventorySelectorResponse) => void;
   }>({ open: false, inventories: [] });
 
-  const openInventorySelector = (
-    inventories: Inventory[]
-  ): Promise<{ action: string; inventory?: Inventory | null }> => {
-    return new Promise<{ action: string; inventory?: Inventory | null }>((resolve) => {
+  const openInventorySelector = (inventories: Inventory[]): Promise<InventorySelectorResponse> => {
+    return new Promise<InventorySelectorResponse>((resolve) => {
       setInventorySelectorDialog({
         inventories,
         open: true,

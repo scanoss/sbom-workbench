@@ -12,6 +12,13 @@ module.exports = {
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': ['off'],
     'prettier/prettier': ['warn', { printWidth: 120 }],
+    /* '@typescript-eslint/naming-convention': [
+      'warn',
+      {
+        selector: 'variable',
+        format: ['camelCase'],
+      },
+    ], */
   },
   parserOptions: {
     ecmaVersion: 2020,

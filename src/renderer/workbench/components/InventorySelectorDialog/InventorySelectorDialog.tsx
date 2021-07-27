@@ -1,10 +1,12 @@
-import { Dialog, DialogActions, Button, makeStyles, DialogContentText, Card, DialogContent } from '@material-ui/core';
+import { Dialog, DialogActions, Button, makeStyles, DialogContentText, Card, DialogContent, Tooltip } from '@material-ui/core';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import InfoIcon from '@material-ui/icons/Info';
 import { Inventory } from '../../../../api/types';
 import Label from '../Label/Label';
+import { DIALOG_ACTIONS, InventorySelectorResponse } from '../../../context/types';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -21,15 +23,15 @@ const useStyles = makeStyles((theme) => ({
     top: theme.spacing(1),
     color: theme.palette.grey[500],
   },
-  actions: {
-    backgroundColor: 'var(--background-color-primary)',
+  md: {
+    maxWidth: 300,
   },
 }));
 
 interface InventorySelectorDialogProps {
   open: boolean;
   inventories: Inventory[];
-  onClose: (response: { action: string; inventory?: Inventory | null }) => void;
+  onClose: (response: InventorySelectorResponse) => void;
 }
 
 export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => {
@@ -39,15 +41,15 @@ export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => 
   const [selected, setSelected] = useState<Inventory | null>(null);
 
   const handleCancel = () => {
-    onClose({ action: 'cancel' });
+    onClose({ action: DIALOG_ACTIONS.CANCEL });
   };
 
   const handleAccept = () => {
-    onClose({ action: 'ok', inventory: selected });
+    onClose({ action: DIALOG_ACTIONS.OK, inventory: selected });
   };
 
   const handleNew = () => {
-    onClose({ action: 'new' });
+    onClose({ action: DIALOG_ACTIONS.NEW });
   };
 
   return (
@@ -70,7 +72,7 @@ export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => 
         <DialogContentText>
           You already have groups for the component you want to identify. Do you want to add this file to the group?
         </DialogContentText>
-        <Label label="GROUPS USAGE" />
+        <Label label="GROUPS USAGE" textColor="gray" />
         <section className="list-groups">
           {inventories.map((inventory) => (
             <Card
@@ -81,6 +83,9 @@ export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => 
               elevation={1}
             >
               <div className="usage-card-content">{inventory.usage}</div>
+              <Tooltip title={inventory.notes} classes={{ tooltip: classes.md }} arrow>
+                <InfoIcon className="icon" />
+              </Tooltip>
             </Card>
           ))}
         </section>
