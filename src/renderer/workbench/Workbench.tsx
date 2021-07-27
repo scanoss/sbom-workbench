@@ -36,7 +36,7 @@ const Alert = ({open, handleClose}) => {
       <DialogTitle id="alert-dialog-title">SPXD Export</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          The operation has been completed successfully. You can find results inside ScanOSS workspace folder
+          The operation has been completed successfully. You can find results inside SCANOSS Workspace folder
         </DialogContentText>
       </DialogContent>
       <DialogActions>
