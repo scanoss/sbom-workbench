@@ -57,11 +57,13 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, arg: Partial<Inven
   }
 });
 
-/**
- * INVENTORY_CREATE = 'INVENTORY_CREATE',
-  INVENTORY_GET = 'INVENTORY_GET',
-  INVENTORY_DELETE = 'INVENTORY_DELETE',
-  INVENTORY_UPDATE = 'INVENTORY_UPDATE',
-  INVENTORY_ATTACH_FILE = 'INVENTORY_ATTACH_FILE',
-  INVENTORY_DETACH_FILE = 'INVENTORY_DETACH_FILE',
- */
+ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, arg: Partial<Inventory>) => {
+  try {
+    const success = await defaultProject.scans_db.inventories.delete(arg);
+    if (success) return { status: 'ok', message: 'Inventory deleted successfully', success };
+    return { status: 'error', message: 'Inventory was not deleted successfully', success };
+  } catch (e) {
+    console.log('Catch an error on inventory: ', e);
+    return { status: 'fail' };
+  }
+});

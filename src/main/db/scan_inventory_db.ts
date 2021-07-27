@@ -26,11 +26,15 @@ export class InventoryDb extends Db {
       try {
         if (inventory.files) {
           const db = await this.openDb();
-          db.all(query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH, inventory.files[0], (err: object, data: any) => {
-            db.close();
-            if (err) resolve([]);
-            else resolve(data);
-          });
+          db.all(
+            query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH,
+            inventory.files[0],
+            (err: object, data: any) => {
+              db.close();
+              if (err) resolve([]);
+              else resolve(data);
+            }
+          );
         }
       } catch (error) {
         resolve(undefined);
@@ -176,11 +180,15 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.get(query.SQL_GET_INVENTORY_BY_ID, inventory.id, (err: object, inv: any) => {
-          db.close();
-          if (err) resolve(undefined);
-          else resolve(inv);
-        });
+        db.get(
+          query.SQL_GET_INVENTORY_BY_ID,
+          inventory.id,
+          (err: object, inv: any) => {
+            db.close();
+            if (err) resolve(undefined);
+            else resolve(inv);
+          }
+        );
       } catch (error) {
         reject(new Error('The inventory does not exists'));
       }
@@ -217,7 +225,7 @@ export class InventoryDb extends Db {
   }
 
   // UPDATE IDENTIFIED FILES
-   updateIdentified(inventory: Partial<Inventory>) {
+  updateIdentified(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -331,11 +339,15 @@ export class InventoryDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(query.SQL_SELECT_ALL_INVENTORIES_FROM_FILE, `${inventory.files[0]}`, (err: any, data: any) => {
-            db.close();
-            if (err) reject(new Error('[]'));
-            else resolve(data);
-          });
+          db.all(
+            query.SQL_SELECT_ALL_INVENTORIES_FROM_FILE,
+            `${inventory.files[0]}`,
+            (err: any, data: any) => {
+              db.close();
+              if (err) reject(new Error('[]'));
+              else resolve(data);
+            }
+          );
         });
       } catch (error) {
         reject(new Error('[]'));
@@ -375,8 +387,12 @@ export class InventoryDb extends Db {
           db.run('begin transaction');
           if (inventory.files) {
             for (let i = 0; i < inventory.files.length; i += 1) {
-              db.run( 'UPDATE results SET ignored=0,identified=0 WHERE results.file_path = ? AND results.version = ? AND results.purl = ?;',
-                inventory.files[i], inventory.version, inventory.purl);
+              db.run(
+                'UPDATE results SET ignored=0,identified=0 WHERE results.file_path = ? AND results.version = ? AND results.purl = ?;',
+                inventory.files[i],
+                inventory.version,
+                inventory.purl
+              );
             }
           }
           db.run('commit', () => {
@@ -388,5 +404,22 @@ export class InventoryDb extends Db {
         reject(new Error('detach files were not successfully'));
       }
     });
+  }
+
+  async delete(inventory: Partial<Inventory>) {
+    try {
+      const db = await this.openDb();
+      db.serialize(function () {
+        db.run('begin transaction');
+        db.run('DELETE FROM inventories WHERE id=?', inventory.id);
+        db.run('commit', (err) => {
+          db.close();
+          if (err) return Promise.resolve(false);
+        });
+      });
+      return Promise.resolve(true);
+    } catch (error) {
+      return Promise.reject(new Error('detach files were not successfully'));
+    }
   }
 }
