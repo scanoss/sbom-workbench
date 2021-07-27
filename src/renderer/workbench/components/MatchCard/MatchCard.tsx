@@ -11,6 +11,7 @@ export enum MATCH_CARD_ACTIONS {
   ACTION_IDENTIFY,
   ACTION_IGNORE,
   ACTION_RESTORE,
+  ACTION_DETACH,
 };
 
 interface MatchCardProps {
@@ -45,6 +46,15 @@ const MatchCard = ({ label, status, onAction }: MatchCardProps) => {
             <>
               <Tooltip title="Restore">
                 <IconButton onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_RESTORE)}>
+                  <RestoreOutlined className="icon"/>
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
+          {(status === 'identified') && (
+            <>
+              <Tooltip title="Remove identified">
+                <IconButton onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_DETACH)}>
                   <RestoreOutlined className="icon"/>
                 </IconButton>
               </Tooltip>

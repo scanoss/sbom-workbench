@@ -149,7 +149,8 @@ export const ComponentDetail = () => {
       });
       setInventories((previous) => [...previous, newInventory]);
     } else if (action === DIALOG_ACTIONS.OK) {
-      attachFile(inventory.id, selFiles);
+      console.log(selFiles);
+      attachFile(inventory.id, inventory.purl, inventory.version, selFiles);
     }
 
     getFiles();

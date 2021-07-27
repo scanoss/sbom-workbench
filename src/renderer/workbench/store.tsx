@@ -14,8 +14,8 @@ export interface IWorkbenchContext {
   createInventory: (inventory: Inventory) => Promise<Inventory>;
   ignoreFile: (path: string[]) => Promise<boolean>;
   restoreFile: (path: string[]) => Promise<boolean>;
-  attachFile: (inventoryId: number, files: string[]) => Promise<boolean>;
-  detachFile: (inventoryId: number, files: string[]) => Promise<boolean>;
+  attachFile: (inventoryId: number, purl: string, version: string, files: string[]) => Promise<boolean>;
+  detachFile: (inventoryId: number, purl: string, version: string, files: string[]) => Promise<boolean>;
 
   state: State;
   dispatch: any;
@@ -60,17 +60,27 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     return true;
   }
 
-  const attachFile = async (inventoryId: number, files: string[]): Promise<boolean> => {
-    // const { status, data } = await inventoryService.attach({id: inventoryId, files});
+  const attachFile = async (inventoryId: number, purl: string, version: string, files: string[]): Promise<boolean> => {
+    const { status, data } = await inventoryService.attach({
+      id: inventoryId,
+      purl,
+      version,
+      files
+    });
     update();
     return true;
   }
 
-  const detachFile = async (inventoryId: number, files: string[]): Promise<boolean> => {
-    // const { status, data } = await inventoryService.detach({id: inventoryId, files});
+  const detachFile = async (inventoryId: number, purl: string, version: string, files: string[]): Promise<boolean> => {
+    const { status, data } = await inventoryService.detach({
+      id: inventoryId,
+      purl,
+      version,
+      files
+    });
     update();
     return true;
-  }
+  };
 
   const update = async () => {
     if (component) {
