@@ -24,37 +24,8 @@ export class FilesDb extends Db {
     this.component = new ComponentDb(path);
   }
 
-  private insertFile(db: any, data: any, filePath: string) {
-    db.run(query.SQL_INSERT_FILES, data.file_hash, 0, 'n/a', filePath);
-  }
 
-  insertFromFile(resultPath: string) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const self = this;
-        const result: object = await utilsDb.readFile(resultPath);
-        const db: any = await this.openDb();
-        db.serialize(function () {
-          db.run('begin transaction');
-          let data: any;
-          let filePath: string;
-          for (const [key, value] of Object.entries(result)) {
-            for (let i = 0; i < value.length; i += 1) {
-              filePath = key;
-              data = value[i];
-              self.insertFile(db, data, filePath);
-            }
-          }
-          db.run('commit', () => {
-            db.close();
-            resolve(true);
-          });
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
+
 
   get(file: Partial<Files>) {
     return new Promise(async (resolve, reject) => {

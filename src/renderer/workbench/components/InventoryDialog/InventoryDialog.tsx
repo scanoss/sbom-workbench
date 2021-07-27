@@ -12,9 +12,9 @@ import {
   IconButton,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Inventory } from '../../../../api/types';
-import { DialogContext, IDialogContext, IDialogContextProps, InventoryForm } from '../../../context/DialogProvider';
+import { InventoryForm } from '../../../context/DialogProvider';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -38,32 +38,27 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface InventoryDialogProps {
+  open: boolean;
+  inventory: Partial<InventoryForm>;
   onClose: (inventory: Inventory) => void;
   onCancel?: () => void;
 }
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
-  const { setInventoryOpen, inventoryOpen, inventory } = useContext(DialogContext) as IDialogContext;
-
-  const { onClose, onCancel } = props;
+  const { open, inventory, onClose, onCancel } = props;
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
 
   const setDefaults = () => {
-    setForm(
-      inventory
-    );
-  }
+    setForm(inventory);
+  };
 
   const handleCancel = () => {
-    setInventoryOpen(false);
     onCancel && onCancel();
   };
 
   const handleClose = () => {
-    const inventory: Inventory = form;
-    setInventoryOpen(false);
-    onClose(inventory);
+    onClose(form);
   };
 
   const inputHandler = (e) => {
@@ -73,17 +68,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     });
   };
 
-  useEffect( setDefaults, [inventory]);
+  useEffect(setDefaults, [inventory]);
 
   return (
-    <Dialog
-      id="InventoryDialog"
-      maxWidth="md"
-      scroll="body"
-      fullWidth
-      open={inventoryOpen}
-      onClose={handleCancel}
-    >
+    <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={handleCancel}>
       <span className="dialog-title">Identify Component</span>
       <div className="identity-component">
         <div className="component-version-container">

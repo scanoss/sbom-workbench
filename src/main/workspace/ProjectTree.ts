@@ -163,8 +163,6 @@ export class ProjectTree extends EventEmitter {
       console.log(`Scan Finished... Results on: ${resPath}`);
 
       const succesRes = await this.scans_db.results.insertFromFile(resPath);
-      await this.scans_db.files.insertFromFile(resPath);
-
       if (succesRes) await this.scans_db.components.importUniqueFromFile();
 
       const a = fs.readFileSync(`${resPath}`, 'utf8');

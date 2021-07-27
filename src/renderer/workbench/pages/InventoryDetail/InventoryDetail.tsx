@@ -32,8 +32,7 @@ export const InventoryDetail = () => {
   const onAction = (file: string, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push(`/workbench/file/${file}`);
-        dispatch(setFile(file));
+        history.push(`/workbench/file?path=${file}`);
         break;
     }
   };

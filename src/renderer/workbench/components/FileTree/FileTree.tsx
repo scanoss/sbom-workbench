@@ -16,8 +16,7 @@ export const FileTree = () => {
 
   const onSelectFile = ({ children, value }: OnCheckNode) => {
     if (!children) {
-      history.push(`/workbench/file`);
-      dispatch(setFile(value));
+      history.push(`/workbench/file?path=${value}`);
     }
   };
 
