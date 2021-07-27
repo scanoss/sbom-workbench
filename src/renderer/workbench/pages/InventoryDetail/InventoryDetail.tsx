@@ -19,12 +19,13 @@ export const InventoryDetail = () => {
   const { id } = useParams();
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { dispatch, detachFile } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const [inventory, setInventory] = useState<Inventory>();
   const [files, setFiles] = useState<string[]>([]);
   const getInventory = async () => {
     const response = await inventoryService.get({ id });
+    console.log(response.data)  ;
     setInventory(response.data);
     setFiles(mapFiles(response.data?.files));
   };
@@ -33,6 +34,10 @@ export const InventoryDetail = () => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
         history.push(`/workbench/file?path=${file}`);
+        break;
+      case MATCH_CARD_ACTIONS.ACTION_DETACH:
+        detachFile(inventory?.id, inventory?.component.purl, inventory?.component.version, [file]);
+        getInventory();
         break;
     }
   };

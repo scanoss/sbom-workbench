@@ -1,0 +1,46 @@
+#InventorySelectorDialog {
+
+  .list-groups {
+    margin-top: 16px;
+  }
+
+  .usage-card {
+    margin-bottom: 12px;
+    cursor: pointer;
+    box-sizing: border-box;
+    border: transparent 2px solid;
+    overflow: hidden;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding-right: 10px;
+
+    .icon {
+      opacity: 0;
+      transition: opacity 200ms ease;
+    }
+
+    &:hover .icon, &.selected .icon {
+      opacity: .8;
+    }
+
+    &.selected {
+      border: #60A5FA 2px solid;
+    }
+
+    .usage-card-content {
+      padding: 10px;
+      font-size: 24px;
+      font-weight: 400;
+      text-transform: capitalize;
+
+      border-left: 10px solid $indentified-green;
+    }
+
+
+
+  }
+
+}

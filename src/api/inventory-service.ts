@@ -19,12 +19,12 @@ class InventoryService {
     return response;
   }
 
-  public async attach(inventory: Inventory): Promise<any> {
+  public async attach(inventory: Partial<Inventory>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_ATTACH_FILE, inventory);
     return response;
   }
 
-  public async detach(inventory: Inventory): Promise<any> {
+  public async detach(inventory: Partial<Inventory>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_DETACH_FILE, inventory);
     return response;
   }

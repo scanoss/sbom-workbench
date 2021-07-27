@@ -76,9 +76,10 @@ export class InventoryDb extends Db {
   }
 
   // CREATE NEW FILE INVENTORY
-  async attachFileInventory(inventory: Partial<Inventory>) { 
+  async attachFileInventory(inventory: Partial<Inventory>) {
     try {
       const db = await this.openDb();
+      await this.updateIdentified(inventory);
       db.serialize(function () {
         db.run('begin transaction');
         if (inventory.files)
@@ -98,6 +99,7 @@ export class InventoryDb extends Db {
   // DETACH FILE INVENTORY
   async detachFileInventory(inventory: Partial<Inventory>) {
     try {
+      await this.pending(inventory);
       const db = await this.openDb();
       db.serialize(function () {
         db.run('begin transaction');
@@ -202,7 +204,6 @@ export class InventoryDb extends Db {
         async function (this: any, err: any) {
           inventory.id = this.lastID;
           await self.attachFileInventory(inventory);
-          await self.updateIdentified(inventory);
           const comp = await self.component.getAll(inventory);
           inventory.component = comp;
           if (err) {
@@ -360,6 +361,31 @@ export class InventoryDb extends Db {
         });
       } catch (error) {
         reject(new Error('[]'));
+      }
+    });
+  }
+
+  // TODO: workaround until change in DB
+  pending(inventory: Partial<Inventory>) {
+    console.log(inventory);
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          if (inventory.files) {
+            for (let i = 0; i < inventory.files.length; i += 1) {
+              db.run( 'UPDATE results SET ignored=0,identified=0 WHERE results.file_path = ? AND results.version = ? AND results.purl = ?;',
+                inventory.files[i], inventory.version, inventory.purl);
+            }
+          }
+          db.run('commit', () => {
+            db.close();
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        reject(new Error('detach files were not successfully'));
       }
     });
   }

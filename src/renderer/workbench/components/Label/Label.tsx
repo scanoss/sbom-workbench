@@ -2,7 +2,7 @@ import React from 'react';
 
 interface LabelType {
   label: string | null;
-  textColor: string;
+  textColor: string | null;
 }
 
 const Label = ({ label, textColor }: LabelType) => {

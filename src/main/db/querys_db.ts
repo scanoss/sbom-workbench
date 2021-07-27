@@ -24,7 +24,7 @@ export class Querys {
   COMPDB_LICENSES_TABLE =
     "CREATE TABLE IF NOT EXISTS licenses (id integer primary key asc, spdxid text default '', name text not null, fulltext text default '', url text default '', unique(spdxid,name));";
 
-  SQL_DB_TABLES =   
+  SQL_DB_TABLES =
     this.SQL_CREATE_TABLE_RESULTS +
     this.SQL_CREATE_TABLE_FILE_INVENTORIES +
     this.SQL_CREATE_TABLE_INVENTORY +
@@ -114,7 +114,7 @@ export class Querys {
     'SELECT i.id,i.usage,i.notes,i.purl,i.version,i.license_name,i.url FROM inventories i, file_inventories fi where i.id=fi.inventoryid and fi.path=?;';
 
   SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID =
-    'SELECT DISTINCT i.id,r.path as path,r.identified as identified,r.ignored as ignored,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN results r ON r.file_path=fi.path WHERE i.id=?';
+    'SELECT DISTINCT i.id,r.file_path as path,r.identified as identified,r.ignored as ignored,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN results r ON r.file_path=fi.path WHERE i.id=?';
 
   // SQL_GET_COMPONENTS TABLE
   SQL_GET_COMPONENT = 'SELECT id,name,version,description,url,purl from component_versions where purl like ?';
@@ -152,7 +152,7 @@ export class Querys {
   SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE results.file_path=?;';
 
   SQL_UPDATE_UNIGNORED_FILES = 'UPDATE results SET ignored=0,identified=0  WHERE results.file_path=?;';
-  
+
   SQL_COMP_SUMMARY_PENDING =
     'SELECT count(*) as pending FROM (SELECT count(*) FROM results r WHERE r.purl=? AND r.version=? AND r.ignored=0 AND r.identified=0 GROUP BY r.file_path);';
 
