@@ -74,9 +74,9 @@ export class Db {
           );
 
           db.run(`
-            CREATE VIEW IF NOT EXISTS summary AS SELECT component_versions.id AS compid,SUM(files.ignored ) AS ignored , SUM(files.identified) AS identified , 
+            CREATE VIEW IF NOT EXISTS summary AS SELECT component_versions.id AS compid,component_versions.purl,component_versions.version,SUM(results.ignored ) AS ignored , SUM(results.identified) AS identified , 
             SUM(identified=0 AND ignored=0) AS pending
-            FROM results INNER JOIN files ON results.md5_file = files.md5 
+            FROM results 
             INNER JOIN component_versions ON component_versions.purl=results.purl
             AND component_versions.version=results.version
             GROUP BY results.purl, results.version 

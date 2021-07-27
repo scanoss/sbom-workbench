@@ -1,25 +1,26 @@
 import React, { useContext, useEffect, useState } from 'react';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import IconButton from '@material-ui/core/IconButton';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
-import { DialogContext } from '../../../context/DialogProvider';
+import { DialogContext, IDialogContext } from '../../../context/DialogProvider';
 import { range } from '../../../../utils/utils';
 import { workbenchController } from '../../../workbench-controller';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
-import { InventoryDialog } from '../../components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../../../api/types';
 import LabelCard from '../../components/LabelCard/LabelCard';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../components/MatchInfoCard/MatchInfoCard';
-import { componentService } from '../../../../api/component-service';
-import { mapFile, mapFiles } from '../../../../utils/scan-util';
+import { mapFile } from '../../../../utils/scan-util';
 import CodeEditor from '../../components/CodeEditor/CodeEditor';
 import { inventoryService } from '../../../../api/inventory-service';
 import { fileService } from '../../../../api/file-service';
+import { setFile } from '../../actions';
 
 const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
+
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
 export interface FileContent {
   content: string | null;
@@ -28,12 +29,13 @@ export interface FileContent {
 
 export const Editor = () => {
   const history = useHistory();
+  const query = useQuery();
 
   const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { openInventory } = useContext<any>(DialogContext);
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const { file, matchInfo } = state;
 
@@ -81,7 +83,7 @@ export const Editor = () => {
     setFileStatus(mapFile(data));
   };
 
-  const handleAccept = async (inventory: Inventory) => {
+  const create = async (inventory: Inventory) => {
     const inv = await createInventory({
       ...inventory,
       files: [file],
@@ -92,14 +94,17 @@ export const Editor = () => {
 
   const onIdentifyPressed = async () => {
     const inv = {
-      component: currentMatch.component,
-      version: currentMatch.version,
-      url: currentMatch.url,
-      purl: currentMatch.purl[0],
+      component: currentMatch?.component,
+      version: currentMatch?.version,
+      url: currentMatch?.url,
+      purl: currentMatch?.purl[0],
       license: currentMatch?.licenses[0]?.name,
       usage: currentMatch?.id,
     };
-    openInventory(inv);
+    const inventory = await dialogCtrl.openInventory(inv);
+    if (inventory) {
+      create(inventory);
+    }
   };
 
   const onIgnorePressed = async () => {
@@ -115,6 +120,16 @@ export const Editor = () => {
   const onDetailPressed = async (result) => {
     history.push(`/workbench/inventory/${result.id}`);
   };
+
+  useEffect(() => {
+    dispatch(setFile(query.get('path')));
+    const unlisten = history.listen((data) => {
+      const path = new URLSearchParams(data.search).get('path');
+      console.log(path);
+      dispatch(setFile(path));
+    });
+    return unlisten;
+  }, []);
 
   useEffect(() => {
     setLocalFileContent({ content: null, error: false });
@@ -139,8 +154,7 @@ export const Editor = () => {
       getFile();
       const full = currentMatch?.lines === 'all';
       setFullFile(full);
-      if (!full)
-        loadRemoteFile(currentMatch.file_hash);
+      if (!full) loadRemoteFile(currentMatch.file_hash);
     }
   }, [currentMatch]);
 
@@ -164,7 +178,7 @@ export const Editor = () => {
     setLines(lineasLocales);
   }, [currentMatch]);
 
-  const onAction = (action: MATCH_INFO_CARD_ACTIONS, result) => {
+  const onAction = (action: MATCH_INFO_CARD_ACTIONS, result: any = null) => {
     switch (action) {
       case MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY:
         onIdentifyPressed();
@@ -199,46 +213,40 @@ export const Editor = () => {
                 <section className="content">
                   <div className="match-info-default-container">
                     {inventories.length > 0
-                      ? inventories.map((inventory, index) => (
+                      ? inventories.map((inventory) => (
                           <MatchInfoCard
-                            key={index}
+                            key={inventory.id}
                             selected={currentMatch === inventory}
-
-                            match={
-                              { component: inventory.component.name,
-                                version: inventory.component.version,
-                                usage: inventory.usage,
-                                license: inventory.license_name,
-                                url: inventory.component.url,
-                                purl: inventory.component.purl,
-                              }
-                            }
+                            match={{
+                              component: inventory.component.name,
+                              version: inventory.component.version,
+                              usage: inventory.usage,
+                              license: inventory.license_name,
+                              url: inventory.component.url,
+                              purl: inventory.component.purl,
+                            }}
                             status="identified"
-                            onSelect={() => setCurrentMatch(matchInfo[index])}
+                            onSelect={() => null}
                             onAction={(action) => onAction(action, inventory)}
                           />
                         ))
-                      : (
-                        matchInfo.map((match, index) => (
-                            <MatchInfoCard
-                              key={index}
-                              selected={currentMatch === match}
-                              match={
-                                { component: match.component,
-                                  version: match.version,
-                                  usage: match.id,
-                                  license: match.licenses[0]?.name,
-                                  url: match.url,
-                                  purl: match.purl[0],
-                                }
-                              }
-                              status={fileStatus?.status}
-                              onSelect={() => setCurrentMatch(matchInfo[index])}
-                              onAction={onAction}
-                            />
-                          )
-                        ))
-                    }
+                      : matchInfo.map((match, index) => (
+                          <MatchInfoCard
+                            key={index}
+                            selected={currentMatch === match}
+                            match={{
+                              component: match.component,
+                              version: match.version,
+                              usage: match.id,
+                              license: match.licenses[0]?.name,
+                              url: match.url,
+                              purl: match.purl[0],
+                            }}
+                            status={fileStatus?.status}
+                            onSelect={() => setCurrentMatch(matchInfo[index])}
+                            onAction={onAction}
+                          />
+                        ))}
                   </div>
                 </section>
                 <div className="info-files">
@@ -275,8 +283,6 @@ export const Editor = () => {
           </main>
         )}
       </section>
-
-      <InventoryDialog onClose={handleAccept} />
     </>
   );
 };

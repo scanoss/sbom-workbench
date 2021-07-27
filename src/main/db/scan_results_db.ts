@@ -45,8 +45,9 @@ export class ResultsDb extends Db {
           let data: any;
           for (const [key, value] of Object.entries(result)) {
             for (let i = 0; i < value.length; i += 1) {
+              const  filePath = key;
               data = value[i];
-              if (data.id !== 'none') self.insertResult(db, data);
+              self.insertResult(db, data, filePath);
             }
           }
           db.run('commit', () => {
@@ -71,14 +72,15 @@ export class ResultsDb extends Db {
           let data: any;
           for (const [key, value] of Object.entries(json)) {
             for (let i = 0; i < value.length; i += 1) {
+              const  filePath = key;
               data = value[i];
-              if (data.id !== 'none') self.insertResult(db, data);
+              if (data.id !== 'none') self.insertResult(db, data, filePath);
             }
           }
           db.run('commit',()=>{
             db.close();
             resolve(true);
-          });      
+          });
         });
       } catch {
         resolve(false);
@@ -86,9 +88,9 @@ export class ResultsDb extends Db {
     });
   }
 
-  private insertResult(db: any, data: any) {
+  private insertResult(db: any, data: any,filePath:string) {
     const licenseName =
-      data.licenses && data.licenses[0] ? data.licenses[0].name : 'NULL';
+   data.licenses && data.licenses[0] ? data.licenses[0].name : 'NULL';
     db.run(
       query.SQL_INSERT_RESULTS,
       data.file_hash,
@@ -104,7 +106,10 @@ export class ResultsDb extends Db {
       data.file,
       data.id,
       data.url_hash,
-      data.purl ? data.purl[0] : ' '
+      data.purl ? data.purl[0] : ' ',
+      filePath,
+      0,
+      0
     );
   }
 
@@ -132,10 +137,7 @@ export class ResultsDb extends Db {
   private async getResult(path: string) {
     const db = await this.openDb();
     return new Promise<any>(async (resolve) => {
-      db.all(
-        query.SQL_SCAN_SELECT_FILE_RESULTS,
-        path,
-        (err: any, data: any) => {
+      db.all(query.SQL_SCAN_SELECT_FILE_RESULTS, path, (err: any, data: any) => {
           db.close();
           if (err) resolve([]);
           else resolve(data);

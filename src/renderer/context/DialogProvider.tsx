@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { InventoryForm } from '../workbench/components/InventoryDialog/InventoryDialog';
+import InventoryDialog from '../workbench/components/InventoryDialog/InventoryDialog';
+import { Inventory } from '../../api/types';
 
 export interface InventoryForm {
   id?: string;
@@ -13,25 +14,42 @@ export interface InventoryForm {
 }
 
 export interface IDialogContext {
-  inventoryOpen: boolean;
-  setInventoryOpen: (boolean) => void;
-  inventory: Partial<InventoryForm>;
-
-  openInventory: (inventory: Partial<InventoryForm>) => void;
+  openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
 
 export const DialogProvider: React.FC = ({ children }) => {
-  const [inventoryOpen, setInventoryOpen] = useState<boolean>(false);
-  const [inventory, setInventory] = useState<Partial<InventoryForm>>({});
+  const [inventoryDialog, setInventoryDialog] = useState<{
+    open: boolean;
+    inventory: Partial<InventoryForm>;
+    onClose?: (Inventory) => void;
+  }>({ open: false, inventory: {} });
 
-  const openInventory = (inventory: Partial<InventoryForm>) => {
-    setInventory(inventory);
-    setInventoryOpen(true);
-  }
+  const openInventory = (inventory: Partial<InventoryForm>): Promise<Inventory | null> => {
+    return new Promise<Inventory>((resolve) => {
+      setInventoryDialog({
+        inventory,
+        open: true,
+        onClose: (inv) => {
+          setInventoryDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(inv);
+        },
+      });
+    });
+  };
 
-  return <DialogContext.Provider value={{ setInventoryOpen, inventoryOpen, openInventory, inventory }}>{children}</DialogContext.Provider>;
+  return (
+    <DialogContext.Provider value={{ openInventory }}>
+      {children}
+      <InventoryDialog
+        open={inventoryDialog.open}
+        inventory={inventoryDialog.inventory}
+        onCancel={() => inventoryDialog.onClose && inventoryDialog.onClose(null)}
+        onClose={(inventory) => inventoryDialog.onClose && inventoryDialog.onClose(inventory)}
+      />
+    </DialogContext.Provider>
+  );
 };
 
 export default DialogProvider;

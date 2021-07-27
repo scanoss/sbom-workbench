@@ -9,24 +9,11 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
 
-
-
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { Component, License } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
-
-const fs = require('fs');
-
-const { PerformanceObserver, performance } = require('perf_hooks');
-
-
-interface Summary {
-  identified: number;
-  ignored: number;
-  pending: number;
-}
 
 const utilsDb = new UtilsDb();
 const query = new Querys();
@@ -45,7 +32,7 @@ export class ComponentDb extends Db {
         let comp: any;
         if (component.compid) {
           comp = await this.getById(component.compid);
-          const summary = await this.summary(comp);
+          const summary = await this.summaryByPurlVersion(comp);
           comp.summary = summary;
           resolve(comp);
         } else resolve([]);
@@ -56,19 +43,16 @@ export class ComponentDb extends Db {
   }
 
   getAll(data: any) {
-      
     return new Promise(async (resolve, reject) => {
       try {
         let component: any;
         if (data.purl && data.version) {
-          console.log('components by purl and version');
           component = await this.getbyPurlVersion(data);
-        } else {      
-            component = await this.allComp();
+        } else {
+          component = await this.allComp();
         }
         if (component !== undefined) resolve(component);
-        else  resolve({});
-        
+        else resolve({});
       } catch (error) {
         reject(new Error('unable to open db'));
       }
@@ -96,22 +80,18 @@ export class ComponentDb extends Db {
 
         transformation.licenses.push(preLicense);
       }
-
       results.push(transformation);
-
       let countMerged = 0;
       for (let j = i + 1; j < data.length; j += 1) {
         if (data[i].compid < data[j].compid) break;
 
         if (data[i].compid === data[j].compid) {
-          this.mergeComponents(results[results.length-1], data[j]);
+          this.mergeComponents(results[results.length - 1], data[j]);
           countMerged += 1;
         }
       }
-
       i += countMerged;
     }
-    // console.log(JSON.stringify(results));
     return results;
   }
 
@@ -132,29 +112,24 @@ export class ComponentDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(
-            'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid;',
-            async (err, data: any) => {
-              db.close();
-              if (err) resolve([]);
-              else {                
-                const comp = self.processComponent(data);             
-                const summary:any= await  self.allSummaries() ;              
-                 for (let i =0;i<comp.length; i+=1){               
-                   comp[i].summary = summary[i];
-                 }
-                
-               resolve(comp);
+          db.all(query.SQL_GET_ALL_COMPONENTS, async (err: any, data: any) => {
+            db.close();
+            if (err) resolve([]);
+            else {
+              const comp = self.processComponent(data);
+              const summary: any = await self.allSummaries();
+              for (let i = 0; i < comp.length; i += 1) {
+                comp[i].summary = summary[i];
               }
+              resolve(comp);
             }
-          );
+          });
         });
       } catch (error) {
         console.log(error);
       }
     });
   }
- 
 
   // GET COMPONENENT ID FROM PURL
   private getbyPurlVersion(data: any) {
@@ -169,42 +144,19 @@ export class ComponentDb extends Db {
           async (err: any, component: any) => {
             db.close();
             if (err) resolve(undefined);
+            // Attach license to a component
+            self.processComponent(component);
             const licenses = await self.getAllLicensesFromComponentId(
               component.compid
             );
-            const summary = await this.summary(component);
-            component.summary = summary;
             component.licenses = licenses;
+            const summary = await this.summaryByPurlVersion(component);
+            component.summary = summary;       
             resolve(component);
           }
         );
       } catch (error) {
         reject(error);
-      }
-    });
-  }
-
-  // GET LICENSES BY COMPONENT ID
-  private getLicensesAttachedToComponentById(cvId: number) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(function () {
-          db.all(
-            query.SQL_GET_COMPV_LICENSE_BY_COMPID,
-            `${cvId}`,
-            (err: any, data: any) => {
-              db.close();
-              if (err) {
-                resolve('[]');
-              } else {
-                resolve(data);
-              }
-            }
-          );
-        });
-      } catch (error) {
-        reject(new Error('[]'));
       }
     });
   }
@@ -274,27 +226,6 @@ export class ComponentDb extends Db {
           db.all(
             query.SQL_GET_LICENSES_BY_COMPONENT_ID,
             `${id}`,
-            (err: any, data: any) => {
-              db.close();
-              if (err) resolve('[]');
-              else resolve(data);
-            }
-          );
-        });
-      } catch (error) {
-        reject(new Error('[]'));
-      }
-    });
-  }
-
-  getByNAme() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(function () {
-          db.all(
-            'SELECT id,comp_name,url,purl,version FROM component_versions where comp_name like ?',
-            '%p',
             (err: any, data: any) => {
               db.close();
               if (err) resolve('[]');
@@ -465,8 +396,7 @@ export class ComponentDb extends Db {
     try {
       const db = await this.openDb();
       return await new Promise<any>(async (resolve, reject) => {
-        db.all(
-          'SELECT DISTINCT purl,version,license,component,url FROM results;',
+        db.all(query.SQL_GET_UNIQUE_COMPONENT,
           (err: any, data: any) => {
             db.close();
             if (!err) resolve(data);
@@ -479,56 +409,14 @@ export class ComponentDb extends Db {
     }
   }
 
-  private identifiedSummary(db: any, data: any) {
-    return new Promise<number>(async (resolve) => {
-      db.get(
-        query.SQL_COMP_SUMMARY_IDENTIFIED,
-        data.purl,
-        data.version,
-        async (err: any, comp: any) => {
-          if (err) resolve(0);
-          if (comp !== undefined) resolve(comp.identified);
-        }
-      );
-    });
-  }
-
-  private ignoredSummary(db: any, data: any) {
-    return new Promise<number>(async (resolve) => {
-      db.get(
-        query.SQL_COMP_SUMMARY_IGNORED,
-        data.purl,
-        data.version,
-        async (err: any, comp: any) => {
-          if (err) resolve(0);
-          if (comp !== undefined) resolve(comp.ignored);
-        }
-      );
-    });
-  }
-
-  private pendingSummary(db: any, data: any) {
-    return new Promise<number>(async (resolve) => {
-      db.get(
-        query.SQL_COMP_SUMMARY_PENDING,
-        data.purl,
-        data.version,
-        async (err: any, comp: any) => {
-          if (err) resolve(0);
-          if (comp !== undefined) resolve(comp.pending);
-        }
-      );
-    });
-  }
-
-  allSummaries(){
+  allSummaries() {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all('SELECT compid,ignored,pending,identified FROM summary;',(err:any,summary:any)=>{
+        db.all(query.SQL_GET_ALL_SUMMARIES, (err: any, summary: any) => {
           db.close();
-          if(!err)        
-          resolve(summary)
+          if (err)resolve({});
+          else resolve(summary);
         });
       } catch (error) {
         reject(error);
@@ -536,20 +424,20 @@ export class ComponentDb extends Db {
     });
   }
 
-  summary(data: any) {
+  private summaryByPurlVersion(data: any) {
     return new Promise(async (resolve, reject) => {
       try {
-        const summary: Summary = {
-          ignored: 0,
-          identified: 0,
-          pending: 0,
-        };
         const db = await this.openDb();
-        summary.identified = await this.identifiedSummary(db, data);
-        summary.ignored = await this.ignoredSummary(db, data);
-        summary.pending = await this.pendingSummary(db, data);
-        db.close();
-        resolve(summary);
+        db.get(
+          query.SQL_GET_SUMMARY_BY_PURL_VERSION,
+          data.purl,
+          data.version,
+          (err: any, summary: any) => {
+            db.close();
+            if (err) resolve({});
+            else resolve(summary);
+          }
+        );
       } catch (error) {
         reject(error);
       }
