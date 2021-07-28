@@ -397,16 +397,21 @@ function insertInventory(root: string, tree: any, mypath: string, inv: Inventory
   if (myPathFolders[0] === '') myPathFolders.shift();
   let i: number;
   i = 0;
-
+  let childCount=0;
   while (i < myPathFolders.length) {
     let j: number;
     if (!arbol.inventories.includes(inv.id)) arbol.inventories.push(inv.id);
+    childCount=arbol.children.length;
     for (j = 0; j < arbol.children.length; j += 1) {
       if (arbol.children[j].label === myPathFolders[i]) {
         arbol = arbol.children[j];
         i += 1;
         break;
       }
+    }
+    if (j >= childCount) {
+      console.log("Can not insert component "+component.purl+ ' on '+mypath);
+      return;
     }
   }
 
@@ -420,7 +425,7 @@ function insertComponent(tree: any, mypath: string, comp: Component): any {
   if (myPathFolders[0] === '') myPathFolders.shift();
   let i: number;
   i = 0;
-
+  let childCount;
   const component = { purl: comp.purl, version: comp.version };
 
   while (i < myPathFolders.length) {
@@ -429,12 +434,17 @@ function insertComponent(tree: any, mypath: string, comp: Component): any {
       arbol.components.push(component);
       arbol.className = 'match-info-result';
     }
-    for (j = 0; j < arbol.children.length; j += 1) {
+      childCount=arbol.children.length;
+    for (j = 0; j < childCount; j += 1) {
       if (arbol.children[j].label === myPathFolders[i]) {
         arbol = arbol.children[j];
         i += 1;
         break;
       }
+    }
+    if (j >= childCount) {
+      console.log("Can not insert component "+component.purl+ ' on '+mypath);
+      return;
     }
   }
 
