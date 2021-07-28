@@ -82,6 +82,7 @@ export class InventoryDb extends Db {
   // CREATE NEW FILE INVENTORY
   async attachFileInventory(inventory: Partial<Inventory>) {
     try {
+      console.log(inventory);
       const db = await this.openDb();
       await this.updateIdentified(inventory);
       db.serialize(function () {

@@ -7,7 +7,7 @@ export class Querys {
     'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,file_path text ,fileid integer, vendor text, component text, version text, latest_version text, cpe text, license text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,identified integer,ignored integer);';
 
   SQL_CREATE_TABLE_FILE_INVENTORIES =
-    'CREATE TABLE IF NOT EXISTS file_inventories (id integer primary key asc, path text, inventoryid integer not null);';
+    'CREATE TABLE IF NOT EXISTS file_inventories (id integer primary key asc, path text, inventoryid integer not null, FOREIGN KEY (inventoryid) REFERENCES inventories(id) ON DELETE CASCADE);';
 
   SQL_CREATE_TABLE_INVENTORY =
     'CREATE TABLE IF NOT EXISTS inventories (id integer primary key,version text not null ,compid integer not null,purl text, usage text, notes text, url text, license_name text);';
