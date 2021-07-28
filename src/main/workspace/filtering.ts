@@ -181,7 +181,7 @@ export class BannedList {
   }
 
   loadDefault() {
-    console.log('Applying defaults filters');
+    console.log('Applying default filters');
     this.addFilter(new SizeFilter('<', 100));
     this.addFilter(new ContentFilter('=', 'BINARY'));
     this.addFilter(new ExtensionFilter('=', '.txt'));
