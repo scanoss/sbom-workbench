@@ -1,3 +1,4 @@
+/* eslint-disable no-else-return */
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-cycle */
 /* eslint-disable prettier/prettier */
@@ -8,25 +9,17 @@
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
+import {   performance } from 'perf_hooks'
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
-import { Component , License } from '../../api/types';
+import { Component, License } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
-
-
-
-interface Summary {
-  identified: number;
-  ignored: number;
-  pending: number;
-}
 
 const utilsDb = new UtilsDb();
 const query = new Querys();
 
 export class ComponentDb extends Db {
-
   license: LicenseDb;
 
   constructor(path: string) {
@@ -40,7 +33,7 @@ export class ComponentDb extends Db {
         let comp: any;
         if (component.compid) {
           comp = await this.getById(component.compid);
-          const summary = await this.summary(comp);
+          const summary = await this.summaryByPurlVersion(comp);
           comp.summary = summary;
           resolve(comp);
         } else resolve([]);
@@ -57,7 +50,7 @@ export class ComponentDb extends Db {
         if (data.purl && data.version) {
           component = await this.getbyPurlVersion(data);
         } else {
-          component = await this.getAllComponents();
+          component = await this.allComp();
         }
         if (component !== undefined) resolve(component);
         else resolve({});
@@ -67,29 +60,74 @@ export class ComponentDb extends Db {
     });
   }
 
-  private getAllComponents() {
+  private processComponent(data: any) {
+    const results: any = [];
+
+    for (let i = 0; i < data.length; i += 1) {
+      const transformation: any = {};
+      const preLicense: any = {};
+
+      transformation.compid = data[i].compid;
+      transformation.licenses = [];
+      transformation.name = data[i].comp_name;
+      transformation.purl = data[i].purl;
+      transformation.url = data[i].comp_url;
+      transformation.version = data[i].version;
+
+      if (data[i].license_id) {
+        preLicense.id = data[i].license_id;
+        preLicense.name = data[i].license_name;
+        preLicense.spdxid = data[i].license_spdxid;
+
+        transformation.licenses.push(preLicense);
+      }
+      results.push(transformation);
+      let countMerged = 0;
+      for (let j = i + 1; j < data.length; j += 1) {
+        if (data[i].compid < data[j].compid) break;
+
+        if (data[i].compid === data[j].compid) {
+          this.mergeComponents(results[results.length - 1], data[j]);
+          countMerged += 1;
+        }
+      }
+      i += countMerged;
+    }
+    return results;
+  }
+
+  // merge component b into a
+  private mergeComponents(a: any, b: any) {
+    const preLicense: any = {};
+
+    preLicense.id = b.license_id;
+    preLicense.name = b.license_name;
+    preLicense.spdxid = b.license_spdxid;
+
+    a.licenses.push(preLicense);
+  }
+
+  allComp() {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(
-          query.SQL_GET_ALL_COMPONENTS,
-          async (err: any, component: any) => {
-            if (err) resolve(undefined);
+        db.serialize(function () {
+          db.all(query.SQL_GET_ALL_COMPONENTS, async (err: any, data: any) => {
             db.close();
-            for (let i = 0; i < component.length; i += 1) {
-              const licenses = await self.getAllLicensesFromComponentId(
-                component[i].compid
-              );
-              const summary = await this.summary(component[i]);
-              component[i].summary = summary;
-              component[i].licenses = licenses;
+            if (err) resolve([]);
+            else {         
+              const comp = self.processComponent(data);
+              const summary: any = await self.allSummaries();
+              for (let i = 0; i < comp.length; i += 1) {
+                comp[i].summary = summary[i];
+              }
+              resolve(comp);
             }
-            resolve(component);
-          }
-        );
+          });
+        });
       } catch (error) {
-        reject(error);
+        console.log(error);
       }
     });
   }
@@ -107,42 +145,19 @@ export class ComponentDb extends Db {
           async (err: any, component: any) => {
             db.close();
             if (err) resolve(undefined);
+            // Attach license to a component
+            self.processComponent(component);
             const licenses = await self.getAllLicensesFromComponentId(
               component.compid
             );
-            const summary = await this.summary(component);
-            component.summary = summary;
             component.licenses = licenses;
+            const summary = await this.summaryByPurlVersion(component);
+            component.summary = summary;       
             resolve(component);
           }
         );
       } catch (error) {
         reject(error);
-      }
-    });
-  }
-
-  // GET LICENSES BY COMPONENT ID
-  private getLicensesAttachedToComponentById(cvId: number) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(function () {
-          db.all(
-            query.SQL_GET_COMPV_LICENSE_BY_COMPID,
-            `${cvId}`,
-            (err: any, data: any) => {
-              db.close();
-              if (err) {
-                resolve('[]');
-              } else {
-                resolve(data);
-              }
-            }
-          );
-        });
-      } catch (error) {
-        reject(new Error('[]'));
       }
     });
   }
@@ -212,27 +227,6 @@ export class ComponentDb extends Db {
           db.all(
             query.SQL_GET_LICENSES_BY_COMPONENT_ID,
             `${id}`,
-            (err: any, data: any) => {
-              db.close();
-              if (err) resolve('[]');
-              else resolve(data);
-            }
-          );
-        });
-      } catch (error) {
-        reject(new Error('[]'));
-      }
-    });
-  }
-
-  getByNAme() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(function () {
-          db.all(
-            'SELECT id,comp_name,url,purl,version FROM component_versions where comp_name like ?',
-            '%p',
             (err: any, data: any) => {
               db.close();
               if (err) resolve('[]');
@@ -399,86 +393,111 @@ export class ComponentDb extends Db {
     });
   }
 
- private async getUnique() {
+  private async getUnique() {
     try {
       const db = await this.openDb();
       return await new Promise<any>(async (resolve, reject) => {
-        db.all(
-          'SELECT DISTINCT purl,version,license,component,url FROM results;',
+        db.all(query.SQL_GET_UNIQUE_COMPONENT,
           (err: any, data: any) => {
             db.close();
             if (!err) resolve(data);
             else resolve([]);
           }
-        );     
+        );
       });
     } catch (error) {
       console.log(error);
     }
   }
 
-  private identifiedSummary(db: any, data: any) {
-    return new Promise<number>(async (resolve) => {
-      db.get(
-        query.SQL_COMP_SUMMARY_IDENTIFIED,
-        data.purl,
-        data.version,
-        async (err: any, comp: any) => {
-          if (err) resolve(0);
-          if (comp !== undefined) resolve(comp.identified);
-        }
-      );
-    });
-  }
-
-  private ignoredSummary(db: any, data: any) {
-    return new Promise<number>(async (resolve) => {
-      db.get(
-        query.SQL_COMP_SUMMARY_IGNORED,
-        data.purl,
-        data.version,
-        async (err: any, comp: any) => {
-          if (err) resolve(0);
-          if (comp !== undefined) resolve(comp.ignored);
-        }
-      );
-    });
-  }
-
-  private pendingSummary(db: any, data: any) {
-    return new Promise<number>(async (resolve) => {
-      db.get(
-        query.SQL_COMP_SUMMARY_PENDING,
-        data.purl,
-        data.version,
-        async (err: any, comp: any) => {
-          if (err) resolve(0);
-          if (comp !== undefined) resolve(comp.pending);
-        }
-      );
-    });
-  }
-
-  summary(data: any) {
+  allSummaries() {
     return new Promise(async (resolve, reject) => {
       try {
-        const summary: Summary = {
-          ignored: 0,
-          identified: 0,
-          pending: 0,
-        };
         const db = await this.openDb();
-        summary.identified = await this.identifiedSummary(db, data);
-        summary.ignored = await this.ignoredSummary(db, data);
-        summary.pending = await this.pendingSummary(db, data);
-        db.close();
-        resolve(summary);
+        db.all(query.SQL_GET_ALL_SUMMARIES, (err: any, summary: any) => {
+          db.close();
+          if (err)resolve({});
+          else resolve(summary);
+        });
       } catch (error) {
         reject(error);
       }
     });
   }
 
+  private summaryByPurlVersion(data: any) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.get(
+          query.SQL_GET_SUMMARY_BY_PURL_VERSION,
+          data.purl,
+          data.version,
+          (err: any, summary: any) => {
+            db.close();
+            if (err) resolve({});
+            else resolve(summary);
+          }
+        );
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 
- 
+  async getCompVersions() {
+    try {    
+      const data = await this.getAll({});
+      if (data) {        
+        this.groupComponentsByName(data);
+        const comp = this.mergeComp(data);       
+        return await Promise.resolve(comp);
+      } else {
+        return await Promise.resolve([]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+// Group components by name
+  private groupComponentsByName(data:any){
+    data.sort((a, b) => a.name.localeCompare(b.name));  
+  }
+
+  private mergeComp(data: any) {
+    const components: any = [];
+    for (let i = 0; i < data.length; i += 1) {
+      const comp: any = {};
+      const version: any = {};
+      let mergeCounter = 0;
+      comp.name = data[i].name;
+      comp.purl = data[i].purl;
+      comp.url = data[i].url;
+      comp.versions = [];
+      version.licenses = data[i].licenses.slice();
+      version.version = data[i].version;
+      comp.versions.push(version);
+      components.push(comp);
+      mergeCounter = 0;
+      for (let j = i + 1; j < data.length; j += 1) {
+        if (data[i].name !== data[j].name) {
+          break;
+        }
+        if (data[i].name === data[j].name) {
+          this.mergeCompVersion(components[components.length - 1], data[j]);
+          mergeCounter += 1;
+        }
+      }
+      i += mergeCounter;
+    }
+    return components;
+  }
+
+  private mergeCompVersion(components: any, data: any) {
+    const version: any = {};
+    version.licenses = data.licenses.slice();
+    version.version = data.version;
+    components.versions.push(version);
+  }
 }
