@@ -1,6 +1,6 @@
 {
   "name": "scanoss-desktop",
-  "productName": "Scannos",
+  "productName": "SCANOSS",
   "description": "Desktop version to use SCANOSS OSS in your projects",
   "scripts": {
     "build": "concurrently \"yarn build:main\" \"yarn build:renderer\"",

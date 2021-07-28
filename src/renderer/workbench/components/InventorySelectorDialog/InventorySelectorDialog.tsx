@@ -1,6 +1,6 @@
 import { Dialog, DialogActions, Button, makeStyles, DialogContentText, Card, DialogContent, Tooltip } from '@material-ui/core';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import InfoIcon from '@material-ui/icons/Info';
@@ -40,17 +40,18 @@ export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => 
 
   const [selected, setSelected] = useState<Inventory | null>(null);
 
-  const handleCancel = () => {
-    onClose({ action: DIALOG_ACTIONS.CANCEL });
+  const handleCancel = () => onClose({ action: DIALOG_ACTIONS.CANCEL });
+  const handleAccept = () => onClose({ action: DIALOG_ACTIONS.OK, inventory: selected });
+  const handleNew = () => onClose({ action: DIALOG_ACTIONS.NEW });
+
+  const setDefault = () => {
+    if (open && selected && !inventories.find((inventory) => inventory.id === selected.id)) {
+      console.log(inventory, selected);
+      setSelected(null);
+    }
   };
 
-  const handleAccept = () => {
-    onClose({ action: DIALOG_ACTIONS.OK, inventory: selected });
-  };
-
-  const handleNew = () => {
-    onClose({ action: DIALOG_ACTIONS.NEW });
-  };
+  useEffect(setDefault, [open]);
 
   return (
     <Dialog
@@ -76,7 +77,7 @@ export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => 
         <section className="list-groups">
           {inventories.map((inventory) => (
             <Card
-              className={`usage-card ${inventory === selected && 'selected'}`}
+              className={`usage-card ${inventory.id === selected?.id && 'selected'}`}
               onClick={() => setSelected(inventory)}
               onDoubleClick={() => handleAccept()}
               key={inventory.id}
