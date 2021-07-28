@@ -112,7 +112,7 @@ export const Editor = () => {
     }
 
     if (action === DIALOG_ACTIONS.OK) {
-      attachFile(inventory.id, inventory.component.purl, inventory.component.version, selFiles);
+      await attachFile(inventory.id, inventory.component.purl, inventory.component.version, selFiles);
       setInventories((previous) => [...previous, inventory]); // TODO: full update
     }
 
