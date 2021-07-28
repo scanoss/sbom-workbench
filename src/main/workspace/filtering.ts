@@ -182,7 +182,7 @@ export class BannedList {
 
   loadDefault() {
     console.log('Applying default filters');
-    this.addFilter(new SizeFilter('<', 100));
+    this.addFilter(new SizeFilter('<', "100"));
     this.addFilter(new ContentFilter('=', 'BINARY'));
     this.addFilter(new ExtensionFilter('=', '.txt'));
     this.addFilter(new NameFilter('contains', '.git'));

@@ -52,6 +52,8 @@ export class ProjectTree extends EventEmitter {
 
   processedFiles = 0;
 
+  filesIndexed = 0;
+
   filesToScan: [];
 
   constructor(name: string) {
@@ -223,7 +225,7 @@ export class ProjectTree extends EventEmitter {
     });
     // apply filters.
     this.banned_list.loadDefault();
-    prepareScan(this.scan_root, this.logical_tree, this.banned_list);
+    this.indexScan(this.scan_root, this.logical_tree, this.banned_list);
 
     const summary = { total: 0, include: 0, filter: 0, files: [] };
     this.filesSummary = summarizeTree(this.scan_root, this.logical_tree, summary);
@@ -320,6 +322,25 @@ export class ProjectTree extends EventEmitter {
   include_file(pathToInclude: string, recursive: boolean) {
     const a = getLeaf(this.logical_tree, pathToInclude);
     setUseFile(a, true, recursive);
+  }
+
+  indexScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
+    let i = 0;
+
+    if (jsonScan.type === 'file') {
+      this.filesIndexed += 1;
+      this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+        stage: `Indexing files (${this.filesIndexed})`,
+        processed: this.filesIndexed,
+      });
+      if (bannedList.evaluate(scanRoot + jsonScan.value)) {
+        jsonScan.action = 'scan';
+      } else {
+        jsonScan.action = 'filter';
+      }
+    } else if (jsonScan.type === 'folder') {
+      for (i = 0; i < jsonScan.children.length; i += 1) this.indexScan(scanRoot, jsonScan.children[i], bannedList);
+    }
   }
 }
 
@@ -463,8 +484,8 @@ function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {
     for (i = 0; i < jsonScan.children.length; i += 1) recurseJSON(jsonScan.children[i], banned_list);
   }
 } */
-
-function prepareScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
+/*
+function indexScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
   let i = 0;
 
   if (jsonScan.type === 'file') {
@@ -474,10 +495,10 @@ function prepareScan(scanRoot: string, jsonScan: any, bannedList: Filtering.Bann
       jsonScan.action = 'filter';
     }
   } else if (jsonScan.type === 'folder') {
-    for (i = 0; i < jsonScan.children.length; i += 1) prepareScan(scanRoot, jsonScan.children[i], bannedList);
+    for (i = 0; i < jsonScan.children.length; i += 1) indexScan(scanRoot, jsonScan.children[i], bannedList);
   }
 }
-
+*/
 function dirFirstFileAfter(a, b) {
   if (!a.isDirectory() && b.isDirectory()) return 1;
   if (a.isDirectory() && !b.isDirectory()) return -1;
