@@ -247,14 +247,15 @@ export class Winnower extends EventEmitter {
       truncateStringOnIndex += 1;
       // eslint-disable-next-line no-param-reassign
       winnowingResult = winnowingResult.substring(0, truncateStringOnIndex);
+      // eslint-disable-next-line no-param-reassign
+      winnowingResult = winnowingResult.concat('\n');
     }
 
     if (this.#wfp.length + winnowingResult.length >= this.#WFP_FILE_MAX_SIZE) {
       await this.#createWfpFile(this.#wfp, this.#destFolder, new Date().getTime());
       this.#wfp = '';
-    } else {
-      this.#wfp += winnowingResult;
     }
+    this.#wfp += winnowingResult;
   }
 
   async #createWfpFile(content, dst, name) {
