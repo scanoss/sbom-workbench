@@ -60,7 +60,7 @@ export class Querys {
   SQL_COMPDB_COMP_VERSION_UPDATE =
     'UPDATE component_versions  SET name=?,version=?, description=?, url=?,purl=? where id=?;';
 
-  SQL_FILES_UPDATE_IDENTIFIED = 'UPDATE results SET identified=1 where results.file_path=?';
+  SQL_FILES_UPDATE_IDENTIFIED = 'UPDATE results SET identified=1 where results.file_path=? AND results.version=? AND results.purl=?';
 
   /** SQL COMPONENTS TABLES INSERT* */
   // SQL INSERT INTO LICENSES
@@ -135,7 +135,7 @@ export class Querys {
 
   // GET ALL COMPONENTES
   SQL_GET_ALL_COMPONENTS =
-    ' SELECT DISTINCT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv GROUP BY cv.version ORDER BY cv.name;';
+  'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid;';
 
   // GET LICENSES
   COMPDB_SQL_LICENSE_ALL = 'SELECT id, spdxid, name, url from licenses where id like ? ;';
@@ -152,18 +152,16 @@ export class Querys {
   SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE results.file_path=?;';
 
   SQL_UPDATE_UNIGNORED_FILES = 'UPDATE results SET ignored=0,identified=0  WHERE results.file_path=?;';
-
-  SQL_COMP_SUMMARY_PENDING =
-    'SELECT count(*) as pending FROM (SELECT count(*) FROM results r WHERE r.purl=? AND r.version=? AND r.ignored=0 AND r.identified=0 GROUP BY r.file_path);';
-
-  SQL_COMP_SUMMARY_IDENTIFIED =
-    'SELECT count(*) as identified FROM (SELECT count(*) FROM results r WHERE r.purl= ? AND r.version=? AND r.identified=1 GROUP BY r.file_path);';
-
-  SQL_COMP_SUMMARY_IGNORED =
-    'SELECT count(*) as ignored FROM (SELECT count(*) FROM results r  WHERE r.purl= ? AND r.version=? AND r.ignored=1 GROUP BY r.file_path);';
-
+ 
   SQL_GET_FILE_BY_PATH = 'SELECT file_path AS path,identified,ignored FROM results WHERE results.file_path=?;';
 
   SQL_GET_SPDX_COMP_DATA =
     'SELECT cv.purl,cv.version,cv.url,cv.name,r.vendor FROM component_versions cv INNER JOIN inventories i ON cv.purl=i.purl AND cv.version=i.version INNER JOIN results r  ON r.version=i.version AND r.purl=i.purl GROUP BY i.version;';
+
+  SQL_GET_ALL_SUMMARIES = 'SELECT compid,ignored,pending,identified FROM summary;';
+
+  SQL_GET_SUMMARY_BY_PURL_VERSION = 'SELECT identified,pending,ignored FROM summary WHERE purl=? AND version=?;';
+
+  SQL_GET_UNIQUE_COMPONENT = 'SELECT DISTINCT purl,version,license,component,url FROM results;';
+
 }

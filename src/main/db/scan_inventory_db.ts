@@ -154,8 +154,8 @@ export class InventoryDb extends Db {
         } else {
           inventories = await this.getAllInventories();
         }
-        if (inventory !== undefined) {
-          for (let i = 0; i < inventories.length; i += 1) {
+        if (inventory !== undefined) {       
+          for (let i = 0; i < inventories.length; i += 1) {          
             const comp = await this.component.getAll(inventories[i]);
             inventories[i].component = comp;
             // Remove purl and version from inventory
@@ -222,9 +222,9 @@ export class InventoryDb extends Db {
       try {
         const db = await this.openDb();
         if (inventory.files)
-          for (const path of inventory.files) {
-            db.run(query.SQL_FILES_UPDATE_IDENTIFIED, path);
-          }
+          for (let i = 0; i<inventory.files.length; i += 1) {
+            db.run(query.SQL_FILES_UPDATE_IDENTIFIED, inventory.files[i], inventory.version, inventory.purl);
+        }
         resolve(true);
       } catch (error) {
         reject(new Error('Unable to open db'));
