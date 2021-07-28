@@ -30,8 +30,6 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   try {
     inv = await defaultProject.scans_db.inventories.create(arg);
     arg.id = inv.id;
-    // defaultProject.attachInventory(arg);
-    // defaultProject.saveScanProject();
     return { status: 'ok', message: 'Inventory created', data: inv };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
@@ -39,11 +37,23 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   }
 });
 
-/**
- * INVENTORY_CREATE = 'INVENTORY_CREATE',
-  INVENTORY_GET = 'INVENTORY_GET',
-  INVENTORY_DELETE = 'INVENTORY_DELETE',
-  INVENTORY_UPDATE = 'INVENTORY_UPDATE',
-  INVENTORY_ATTACH_FILE = 'INVENTORY_ATTACH_FILE',
-  INVENTORY_DETACH_FILE = 'INVENTORY_DETACH_FILE',
- */
+ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (event, arg: Partial<Inventory>) => {
+  try {
+    const success = await defaultProject.scans_db.inventories.attachFileInventory(arg);
+    return { status: 'ok', message: 'File attached to inventory successfully', success };
+  } catch (e) {
+    console.log('Catch an error on inventory: ', e);
+    return { status: 'fail' };
+  }
+});
+
+ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, arg: Partial<Inventory>) => {
+  try {
+    const success = await defaultProject.scans_db.inventories.detachFileInventory(arg);
+    return { status: 'ok', message: 'File detached to inventory successfully', success };
+  } catch (e) {
+    console.log('Catch an error on inventory: ', e);
+    return { status: 'fail' };
+  }
+});
+

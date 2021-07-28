@@ -14,6 +14,8 @@ export interface IWorkbenchContext {
   createInventory: (inventory: Inventory) => Promise<Inventory>;
   ignoreFile: (path: string[]) => Promise<boolean>;
   restoreFile: (path: string[]) => Promise<boolean>;
+  attachFile: (inventoryId: number, purl: string, version: string, files: string[]) => Promise<boolean>;
+  detachFile: (inventoryId: number, purl: string, version: string, files: string[]) => Promise<boolean>;
 
   state: State;
   dispatch: any;
@@ -46,26 +48,47 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     return data;
   };
 
-  const ignoreFile = async (file: string[]): Promise<boolean> => {
-    const { status, data } = await resultService.ignored(file);
+  const ignoreFile = async (files: string[]): Promise<boolean> => {
+    const { status, data } = await resultService.ignored(files);
     update();
     return true;
   }
 
-  const restoreFile = async (file: string[]): Promise<boolean> => {
-    const { status, data } = await resultService.unignored(file);
+  const restoreFile = async (files: string[]): Promise<boolean> => {
+    const { status, data } = await resultService.unignored(files);
     update();
     return true;
   }
+
+  const attachFile = async (inventoryId: number, purl: string, version: string, files: string[]): Promise<boolean> => {
+    const { status, data } = await inventoryService.attach({
+      id: inventoryId,
+      purl,
+      version,
+      files
+    });
+    update();
+    return true;
+  }
+
+  const detachFile = async (inventoryId: number, purl: string, version: string, files: string[]): Promise<boolean> => {
+    const { status, data } = await inventoryService.detach({
+      id: inventoryId,
+      purl,
+      version,
+      files
+    });
+    update();
+    return true;
+  };
 
   const update = async () => {
     if (component) {
       const comp = await workbenchController.getComponent(component.compid);
-      if (comp)
-        dispatch(setComponent(comp));
+      if (comp) dispatch(setComponent(comp));
     }
 
-      const components = await workbenchController.getComponents();
+    const components = await workbenchController.getComponents();
     dispatch(setComponents(components));
   };
 
@@ -78,7 +101,9 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
         loadScan,
         createInventory,
         ignoreFile,
-        restoreFile
+        restoreFile,
+        attachFile,
+        detachFile,
       }}
     >
       {children}
