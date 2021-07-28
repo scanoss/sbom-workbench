@@ -46,7 +46,6 @@ export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => 
 
   const setDefault = () => {
     if (open && selected && !inventories.find((inventory) => inventory.id === selected.id)) {
-      console.log(inventory, selected);
       setSelected(null);
     }
   };
