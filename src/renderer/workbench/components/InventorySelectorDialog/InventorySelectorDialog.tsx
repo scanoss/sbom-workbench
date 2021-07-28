@@ -45,7 +45,8 @@ export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => 
   const handleNew = () => onClose({ action: DIALOG_ACTIONS.NEW });
 
   const setDefault = () => {
-    if (open && selected && !inventories.find( inventory => inventory.id == selected.id)) {
+    if (open && selected && !inventories.find((inventory) => inventory.id === selected.id)) {
+      console.log(inventory, selected);
       setSelected(null);
     }
   };
@@ -76,7 +77,7 @@ export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => 
         <section className="list-groups">
           {inventories.map((inventory) => (
             <Card
-              className={`usage-card ${inventory.id === selected.id && 'selected'}`}
+              className={`usage-card ${inventory.id === selected?.id && 'selected'}`}
               onClick={() => setSelected(inventory)}
               onDoubleClick={() => handleAccept()}
               key={inventory.id}
