@@ -92,23 +92,21 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     dispatch(setComponents(components));
   };
 
-  return (
-    <WorkbenchContext.Provider
-      value={{
-        state,
-        dispatch,
+  const value = React.useMemo(() => ({
+      state,
+      dispatch,
 
-        loadScan,
-        createInventory,
-        ignoreFile,
-        restoreFile,
-        attachFile,
-        detachFile,
-      }}
-    >
-      {children}
-    </WorkbenchContext.Provider>
+      loadScan,
+      createInventory,
+      ignoreFile,
+      restoreFile,
+      attachFile,
+      detachFile,
+    }),
+    [state, dispatch, loadScan, createInventory, ignoreFile, restoreFile, attachFile, detachFile]
   );
+
+  return <WorkbenchContext.Provider value={value}>{children}</WorkbenchContext.Provider>;
 };
 
 export default WorkbenchProvider;

@@ -23,9 +23,9 @@ export const InventoryDetail = () => {
 
   const [inventory, setInventory] = useState<Inventory>();
   const [files, setFiles] = useState<string[]>([]);
+
   const getInventory = async () => {
     const response = await inventoryService.get({ id });
-    console.log(response.data)  ;
     setInventory(response.data);
     setFiles(mapFiles(response.data?.files));
   };

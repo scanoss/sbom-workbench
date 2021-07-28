@@ -1,8 +1,6 @@
 export class Querys {
   /** SQL CREATE SCAN TABLES * */
 
-
-
   SQL_CREATE_TABLE_RESULTS =
     'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,file_path text ,fileid integer, vendor text, component text, version text, latest_version text, cpe text, license text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,identified integer,ignored integer);';
 
@@ -37,8 +35,6 @@ export class Querys {
   SQL_INSERT_RESULTS =
     'INSERT or IGNORE INTO results (md5_file,vendor,component,version,latest_version,license,url,lines,oss_lines,matched,filename,idtype,md5_comp,purl,file_path,identified,ignored) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
-
-
   // SQL NEW INVENTORY
   SQL_SCAN_INVENTORY_INSERT =
     'INSERT INTO inventories (compid,version ,purl ,usage, notes, url, license_name) values (?,?,?,?,?,?,?);';
@@ -60,7 +56,8 @@ export class Querys {
   SQL_COMPDB_COMP_VERSION_UPDATE =
     'UPDATE component_versions  SET name=?,version=?, description=?, url=?,purl=? where id=?;';
 
-  SQL_FILES_UPDATE_IDENTIFIED = 'UPDATE results SET identified=1 where results.file_path=? AND results.version=? AND results.purl=?';
+  SQL_FILES_UPDATE_IDENTIFIED =
+    'UPDATE results SET identified=1 where results.file_path=? AND results.version=? AND results.purl=?';
 
   /** SQL COMPONENTS TABLES INSERT* */
   // SQL INSERT INTO LICENSES
@@ -78,20 +75,7 @@ export class Querys {
 
   SQL_ATTACH_LICENSE_PURL_SPDXID =
     'INSERT or IGNORE INTO license_component_version (cvid,licid) values ((SELECT id FROM component_versions where purl=? and version=?),(SELECT id FROM licenses where spdxid=?));';
-
-  /** SQL SCAN SUMMARY* */
-  SQL_SCAN_COUNT_RESULT_FILTER =
-    "SELECT COUNT(*) as filtered from (select results.id from results inner join files on results.md5_file=files.md5 where url is not null and results.url != '' and files.path like ?);";
-
-  SQL_SCAN_COUNT_REVIEWED_FILTER =
-    'SELECT COUNT (*)  as reviewed from (select md5 from files where files.reviewed>0 and files.path like ?);';
-
-  SQL_SCAN_COUNT_OPENSOURCE_FILTER =
-    'SELECT COUNT (*) openSource from (select md5 from files where files.open_source>0 and files.path like ? );';
-
-  SQL_SCAN_COUNT_IDENTIFIED_FILTER =
-    'SELECT COUNT (*) identified from (select md5 from files where files.identified>0 and files.path like ? );';
-
+ 
   /** *** SQL SCAN GET * **** */
   SQL_SCAN_SELECT_INVENTORIES_FROM_PATH =
     'SELECT i.id,i.usage,i.compid,i.notes,i.url,i.license_name,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid WHERE fi.path=?;';
@@ -135,7 +119,7 @@ export class Querys {
 
   // GET ALL COMPONENTES
   SQL_GET_ALL_COMPONENTS =
-  'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid;';
+    'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid;';
 
   // GET LICENSES
   COMPDB_SQL_LICENSE_ALL = 'SELECT id, spdxid, name, url from licenses where id like ? ;';
@@ -152,7 +136,7 @@ export class Querys {
   SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE results.file_path=?;';
 
   SQL_UPDATE_UNIGNORED_FILES = 'UPDATE results SET ignored=0,identified=0  WHERE results.file_path=?;';
- 
+
   SQL_GET_FILE_BY_PATH = 'SELECT file_path AS path,identified,ignored FROM results WHERE results.file_path=?;';
 
   SQL_GET_SPDX_COMP_DATA =
@@ -164,4 +148,11 @@ export class Querys {
 
   SQL_GET_UNIQUE_COMPONENT = 'SELECT DISTINCT purl,version,license,component,url FROM results;';
 
+  SQL_DELETE_INVENTORY_BY_ID = 'DELETE FROM inventories WHERE id=?;';
+
+  SQL_SET_RESULTS_TO_PENDING_BY_PATH_PURL_VERSION =
+    'UPDATE results SET ignored=0,identified=0 WHERE results.file_path = ? AND results.version = ? AND results.purl = ?;';
+
+  SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION =
+    'UPDATE results SET identified=0 WHERE file_path IN (SELECT path FROM file_inventories where inventoryid=?) AND purl=? AND version=?';
 }

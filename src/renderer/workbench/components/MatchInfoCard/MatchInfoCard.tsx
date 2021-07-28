@@ -4,7 +4,7 @@ import BanIcon from '@material-ui/icons/NotInterested';
 import RestoreOutlined from '@material-ui/icons/RestoreOutlined';
 import DescriptionOutlined from '@material-ui/icons/DescriptionOutlined';
 import IconButton from '@material-ui/core/IconButton';
-import { Tooltip, Typography } from '@material-ui/core';
+import { Tooltip } from '@material-ui/core';
 import componentDefault from '../../../../../assets/imgs/component-default.svg';
 
 export enum MATCH_INFO_CARD_ACTIONS {
@@ -13,6 +13,7 @@ export enum MATCH_INFO_CARD_ACTIONS {
   ACTION_IGNORE,
   ACTION_DETAIL,
   ACTION_RESTORE,
+  ACTION_DETACH,
 }
 
 interface MatchInfoCardProps {
@@ -103,11 +104,11 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
               )}
               {status === 'identified' && (
                 <>
-                  {/* <Tooltip title="Ignore">
-                  <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE)}>
-                      <BanIcon />
+                  <Tooltip title="Remove identified">
+                    <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_DETACH)}>
+                      <RestoreOutlined className="icon"/>
                     </IconButton>
-                </Tooltip> */}
+                  </Tooltip>
                   <Tooltip title="Details">
                     <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_DETAIL)}>
                       <DescriptionOutlined />

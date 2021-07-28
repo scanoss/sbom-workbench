@@ -26,15 +26,11 @@ export class InventoryDb extends Db {
       try {
         if (inventory.files) {
           const db = await this.openDb();
-          db.all(
-            query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH,
-            inventory.files[0],
-            (err: object, data: any) => {
-              db.close();
-              if (err) resolve([]);
-              else resolve(data);
-            }
-          );
+          db.all(query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH, inventory.files[0], (err: object, data: any) => {
+            db.close();
+            if (err) resolve([]);
+            else resolve(data);
+          });
         }
       } catch (error) {
         resolve(undefined);
@@ -82,7 +78,6 @@ export class InventoryDb extends Db {
   // CREATE NEW FILE INVENTORY
   async attachFileInventory(inventory: Partial<Inventory>) {
     try {
-      console.log(inventory);
       const db = await this.openDb();
       await this.updateIdentified(inventory);
       db.serialize(function () {
@@ -159,8 +154,8 @@ export class InventoryDb extends Db {
         } else {
           inventories = await this.getAllInventories();
         }
-        if (inventory !== undefined) {       
-          for (let i = 0; i < inventories.length; i += 1) {          
+        if (inventory !== undefined) {
+          for (let i = 0; i < inventories.length; i += 1) {
             const comp = await this.component.getAll(inventories[i]);
             inventories[i].component = comp;
             // Remove purl and version from inventory
@@ -181,15 +176,11 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.get(
-          query.SQL_GET_INVENTORY_BY_ID,
-          inventory.id,
-          (err: object, inv: any) => {
-            db.close();
-            if (err) resolve(undefined);
-            else resolve(inv);
-          }
-        );
+        db.get(query.SQL_GET_INVENTORY_BY_ID, inventory.id, (err: object, inv: any) => {
+          db.close();
+          if (err) resolve(undefined);
+          else resolve(inv);
+        });
       } catch (error) {
         reject(new Error('The inventory does not exists'));
       }
@@ -231,9 +222,9 @@ export class InventoryDb extends Db {
       try {
         const db = await this.openDb();
         if (inventory.files)
-          for (let i = 0; i<inventory.files.length; i += 1) {
+          for (let i = 0; i < inventory.files.length; i += 1) {
             db.run(query.SQL_FILES_UPDATE_IDENTIFIED, inventory.files[i], inventory.version, inventory.purl);
-        }
+          }
         resolve(true);
       } catch (error) {
         reject(new Error('Unable to open db'));
@@ -340,15 +331,11 @@ export class InventoryDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(
-            query.SQL_SELECT_ALL_INVENTORIES_FROM_FILE,
-            `${inventory.files[0]}`,
-            (err: any, data: any) => {
-              db.close();
-              if (err) reject(new Error('[]'));
-              else resolve(data);
-            }
-          );
+          db.all(query.SQL_SELECT_ALL_INVENTORIES_FROM_FILE, `${inventory.files[0]}`, (err: any, data: any) => {
+            db.close();
+            if (err) reject(new Error('[]'));
+            else resolve(data);
+          });
         });
       } catch (error) {
         reject(new Error('[]'));
@@ -380,7 +367,6 @@ export class InventoryDb extends Db {
 
   // TODO: workaround until change in DB
   pending(inventory: Partial<Inventory>) {
-    console.log(inventory);
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -389,7 +375,7 @@ export class InventoryDb extends Db {
           if (inventory.files) {
             for (let i = 0; i < inventory.files.length; i += 1) {
               db.run(
-                'UPDATE results SET ignored=0,identified=0 WHERE results.file_path = ? AND results.version = ? AND results.purl = ?;',
+                query.SQL_SET_RESULTS_TO_PENDING_BY_PATH_PURL_VERSION,
                 inventory.files[i],
                 inventory.version,
                 inventory.purl
@@ -409,10 +395,18 @@ export class InventoryDb extends Db {
 
   async delete(inventory: Partial<Inventory>) {
     try {
+      // GET ALL DATA FROM INVENTORY ID
+      const inv: any = await this.get(inventory);
       const db = await this.openDb();
       db.serialize(function () {
         db.run('begin transaction');
-        db.run('DELETE FROM inventories WHERE id=?', inventory.id);
+        db.run(
+          query.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION,
+          inv.id,
+          inv.component.purl,
+          inv.component.version
+        );
+        db.run(query.SQL_DELETE_INVENTORY_BY_ID, inv.id);
         db.run('commit', (err) => {
           db.close();
           if (err) return Promise.resolve(false);
