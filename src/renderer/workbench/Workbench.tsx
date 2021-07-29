@@ -27,7 +27,8 @@ import SaveAltOutlinedIcon from '@material-ui/icons/SaveAltOutlined';
 import { reset } from './actions';
 import { ExportFormat } from '../../api/export-service';
 
-const Alert = ({open, handleClose}) => {
+
+const Alert = ({ open, handleClose, path }) => {
   return (
     <Dialog
       open={open}
@@ -36,7 +37,7 @@ const Alert = ({open, handleClose}) => {
       <DialogTitle id="alert-dialog-title">SPXD Export</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          The operation has been completed successfully. You can find results inside ScanOSS workspace folder
+          The operation has been completed successfully. You can find results in {path}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
@@ -57,6 +58,7 @@ const Workbench = () => {
   const { file } = state;
 
   const [open, setOpen] = useState<boolean>(false);
+  const [savePath, setSavePath] = useState<string>();
 
   const onInit = async () => {
     const result = scanPath ? await loadScan(scanPath) : false;
@@ -66,8 +68,12 @@ const Workbench = () => {
   };
 
   const onDownloadClicked = async () => {
-    await ExportFormat.spdx();
+    const spdxPath = dialogController.showOpenDialog({
+      properties: ['openDirectory'],
+    });
+    await ExportFormat.spdx(spdxPath);
     setOpen(true);
+    setSavePath(spdxPath);
   }
 
   const onDestroy = () => {
@@ -121,12 +127,12 @@ const Workbench = () => {
       </SplitPane>
 
       <Tooltip title="Export SPDX">
-        <Fab className="btn-export" onClick={onDownloadClicked}>
+        <Fab className="btn-export"  onClick={onDownloadClicked}>
           <SaveAltOutlinedIcon />
         </Fab>
       </Tooltip>
 
-      <Alert open={open} handleClose={() => setOpen(false)}/>
+      <Alert open={open} handleClose={() => setOpen(false)} path={savePath} />
     </div>
   );
 };

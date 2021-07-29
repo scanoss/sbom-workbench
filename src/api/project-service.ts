@@ -24,6 +24,11 @@ class ProjectService {
     );
     return response;
   }
+
+  public async workspacePath(): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.UTILS_DEFAULT_PROJECT_PATH);
+    return response;
+  }
 }
 
 export const projectService = new ProjectService();

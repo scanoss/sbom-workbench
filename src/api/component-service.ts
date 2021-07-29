@@ -15,50 +15,32 @@ class ComponentService {
   }
 
   public async create(component: Component): Promise<any> {
-    const response = await ipcRenderer.invoke(
-      IpcEvents.COMPONENT_CREATE,
-      component
-    );
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_CREATE, component);
     return response;
   }
 
   public async delete(component: Partial<Component>): Promise<any> {
-    const response = await ipcRenderer.invoke(
-      IpcEvents.COMPONENT_DELETE,
-      component
-    );
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_DELETE, component);
     return response;
   }
 
-  public async attachLicense(
-    component: Partial<Component>,
-    license: Partial<License>
-  ): Promise<any> {
-    const response = await ipcRenderer.invoke(
-      IpcEvents.COMPONENT_ATTACH_LICENSE,
-      component,
-      license
-    );
+  public async attachLicense(component: Partial<Component>, license: Partial<License>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_ATTACH_LICENSE, component, license);
     return response;
   }
 
-  public async detachLicense(
-    component: Component,
-    license: License
-  ): Promise<any> {
-    const response = await ipcRenderer.invoke(
-      IpcEvents.COMPONENT_DETACH_LICENSE,
-      component,
-      license
-    );
+  public async detachLicense(component: Component, license: License): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_DETACH_LICENSE, component, license);
     return response;
   }
 
   public async getFiles(component: Partial<Component>): Promise<any> {
-    const response = await ipcRenderer.invoke(
-      IpcEvents.COMPONENT_GET_FILES,
-      component
-    );
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_FILES, component);
+    return response;
+  }
+
+  public async getCompVersions(): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_VERSIONS);
     return response;
   }
 }

@@ -37,7 +37,7 @@ export class DispatcherResponse {
     const serverResponseNumFiles = Object.keys(this.#serverData).length;
 
     if (wfpNumFiles !== serverResponseNumFiles) {
-      console.log('Files on .wfp does not match on server response');
+      console.log(`Files on .wfp does not match on server response ${this.#wfpFilePath}`);
     }
 
     return serverResponseNumFiles;

@@ -19,7 +19,7 @@ ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, arg: Component) => {
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE,async (event, comp: Component, lic: License) => {
-    let link = { license_id: lic.id, compid: comp.compid };
+    const link = { license_id: lic.id, compid: comp.compid };
     await defaultProject.scans_db.licenses.licenseAttach(link);
     return { status: 'ok', message: 'test' };
   }
@@ -28,8 +28,12 @@ ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE,async (event, comp: Component,
 ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (event, arg: Component)=> {
   const data = await defaultProject.scans_db.files.getFilesComponent(arg);
   return { status: 'ok', message: 'test',data };
-}
-);
+});
+
+ipcMain.handle(IpcEvents.COMPONENT_VERSIONS, async (event)=> {
+  const comp = await defaultProject.scans_db.components.getCompVersions();
+  return { status: 'ok', message: 'Component versions retrieve successfully', comp };
+});
 
 /*
 

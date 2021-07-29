@@ -15,14 +15,24 @@ class InventoryService {
   }
 
   public async create(inventory: Inventory): Promise<any> {
-    const response = await ipcRenderer.invoke(
-      IpcEvents.INVENTORY_CREATE,
-      inventory
-    );
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_CREATE, inventory);
+    return response;
+  }
+
+  public async attach(inventory: Partial<Inventory>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_ATTACH_FILE, inventory);
+    return response;
+  }
+
+  public async detach(inventory: Partial<Inventory>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_DETACH_FILE, inventory);
+    return response;
+  }
+
+  public async delete(inventory: Partial<Inventory>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_DELETE, inventory);
     return response;
   }
 }
-
-
 
 export const inventoryService = new InventoryService();
