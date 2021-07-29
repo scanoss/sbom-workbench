@@ -13,18 +13,10 @@ import {
   TextField,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
-import React, { useState, useEffect } from 'react';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import React, { useEffect, useState } from 'react';
+import { Autocomplete } from '@material-ui/lab';
 import { Inventory } from '../../../../api/types';
-import { Component } from '../../WorkbenchProvider';
-
-// pasar autocompletename en los tres autocomplete
-// como default value siempre usar el estado form
-// usar servicio de agus
-
-
-
-
+import { InventoryForm } from '../../../context/types';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -49,23 +41,23 @@ const useStyles = makeStyles((theme) => ({
 
 interface InventoryDialogProps {
   open: boolean;
-  component: Component;
+  inventory: Partial<InventoryForm>;
   onClose: (inventory: Inventory) => void;
-  onCancel: () => void;
+  onCancel?: () => void;
 }
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
-  const { onClose, open, component, onCancel, inventory } = props;
-  const [form, setForm] = useState({
-    component: component?.name,
-    version: component?.version,
-    license_name: component?.licenses[0] ? component?.licenses[0].name : '',
-    url: component?.url,
-    purl: component?.purl[0],
-    usage: 'file',
-    notes: '',
-  });
+  const { open, inventory, onClose, onCancel } = props;
+  const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
+
+  const setDefaults = () => {
+    setForm(inventory);
+  };
+
+  const handleCancel = () => {
+    onCancel && onCancel();
+  };
 
   const handleClose = () => {
     const inventory: Inventory = form;
@@ -79,6 +71,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     });
   };
 
+  useEffect(setDefaults, [inventory]);
+
   const autocompleteHandler = (name, value) => {
     console.log(value);
     setForm({
@@ -90,12 +84,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   useEffect(() => {
     console.log(form);
   }, [form]);
-
-  const setDefaults = () => {
-    setForm(inventory);
-  };
-
-  useEffect(setDefaults, [inventory]);
 
   const [data, setData] = useState([
     {
@@ -157,21 +145,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     },
   ]);
 
-  const [selectedNameComponent, setNamecomponent] = useState<string>('');
-  const [selectedVersion, setVersionComponent] = useState<string>('');
   const [versionscomponent, setVersions] = useState<any>([]);
   const [arrayNames, setArrayNames] = useState<any>([]);
   const [licensescomponent, setLicenses] = useState<any>([]);
-
-  // const changeNameComponent = async (e, value) => {
-  //   await setNamecomponent(value);
-  //   console.log(value);
-  // };
-
-  // const changeVersion = async (e, value) => {
-  //   await setVersionComponent(value);
-  //   console.log(value);
-  // };
 
   useEffect(() => {
     setArrayNames(data.map((item) => item.name));
@@ -183,8 +159,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     //
     setForm({...form, url: componentObject?.url });
   }, [form.component]);
-
-
 
   useEffect(() => {
     setLicenses(
