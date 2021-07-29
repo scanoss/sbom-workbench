@@ -15,6 +15,7 @@ export enum IpcEvents {
   SCANNER_ERROR_STATUS = 'SCANNER_ERROR_STATUS',
   SCANNER_ABORTED = 'SCANNER_ABORTED',
 
+  UTILS_DEFAULT_PROJECT_PATH = 'UTILS_DEFAULT_PROJECT_PATH',
 
   INVENTORY_CREATE = 'INVENTORY_CREATE',
   INVENTORY_GET = 'INVENTORY_GET',
@@ -48,6 +49,8 @@ export enum IpcEvents {
   RESULTS_GET = 'RESULTS_GET',
 
   EXPORT_SPDX = 'EXPORT_SPDX',
+
+
 }
 
 export const ipcMainEvents = [
@@ -101,4 +104,5 @@ export const ipcRendererEvents = [
 
   IpcEvents.EXPORT_SPDX,
 
+  IpcEvents.UTILS_DEFAULT_PROJECT_PATH,
 ];

@@ -8,6 +8,7 @@ import { dialogController } from '../dialog-controller';
 import { AppContext } from '../context/AppProvider';
 import { IpcEvents } from '../../ipc-events';
 
+import { fs } from 'fs';
 
 const Home = () => {
   const history = useHistory();
@@ -61,7 +62,9 @@ const Home = () => {
   };
 
   const onOpenProjectPressed = async () => {
+    const defPath = await controller.defaultWorkspacePath();  
     const projectPath = dialogController.showOpenDialog({
+      defaultPath: defPath.data,
       properties: ['openDirectory'],
     });
     if (!projectPath) return;

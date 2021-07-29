@@ -4,7 +4,9 @@ import { create } from 'electron-log';
 import { Inventory, Component, Project } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 
+
 import { Workspace } from './workspace/workspace';
+import { defaultProject } from './workspace/ProjectTree';
 
 const os = require('os');
 const fs = require('fs');
@@ -46,5 +48,18 @@ ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (_event, arg: Project) => {
     status: 'ok',
     message: 'Project loaded',
     data: ws, // ws.directory_tree.project,
-  };
+  };  
+});
+
+ipcMain.handle(IpcEvents.UTILS_DEFAULT_PROJECT_PATH, async (event) => {
+  try {  
+    let path = `${os.homedir()}/scanoss-workspace`;   
+    if (!fs.existsSync(path)){
+      path=os.homedir();
+    }
+      return { status: 'ok', message: 'SPDX export successfully', data: path };
+  } catch (e) {
+    console.log('Catch an error: ', e);
+    return { status: 'fail' };
+  }
 });

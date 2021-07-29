@@ -11,3 +11,8 @@ export const open = async (path: string) => {
    const response = await projectService.load(path);
    console.log(response);
 };
+
+export const defaultWorkspacePath = async () => {
+  const response = await projectService.workspacePath();
+  return response;
+};
