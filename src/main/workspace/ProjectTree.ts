@@ -2,7 +2,7 @@
 import { EventEmitter } from 'events';
 import * as os from 'os';
 import { connect } from 'http2';
-import * as fs from 'fs';
+import fs from 'fs';
 import { Inventory, Project } from '../../api/types';
 // import * as fs from 'fs';
 // import * as Filtering from './filtering';
@@ -151,14 +151,14 @@ export class ProjectTree extends EventEmitter {
 
     this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
       this.processedFiles += fileNumbers;
-      // console.log(`New ${fileNumbers} files scanned`);
+      console.log(`New ${fileNumbers} files scanned`);
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
         processed: this.filesSummary.include,
         completed: (100 * this.processedFiles) / this.filesSummary.include,
       });
 
-      this.attachComponent(data);
+     this.attachComponent(data);
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
