@@ -54,7 +54,7 @@ export class Formats extends Db {
               pkg.description = 'Detected by SCANOSS Inventorying Engine.';
               pkg.licenseConcluded = data[i].component.licenses[0].spdxid;
               document.Packages.push(pkg);
-            }
+            }           
             fs.writeFile(`${path}.spdx`, JSON.stringify(document), () => {
               resolve(true);
             });

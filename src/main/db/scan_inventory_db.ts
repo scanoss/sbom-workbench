@@ -217,13 +217,13 @@ export class InventoryDb extends Db {
   }
 
   // UPDATE IDENTIFIED FILES
-   updateIdentified(inventory: Partial<Inventory>) {
+  updateIdentified(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         if (inventory.files)
-          for (const path of inventory.files) {
-            db.run(query.SQL_FILES_UPDATE_IDENTIFIED, path);
+          for (let i = 0; i < inventory.files.length; i += 1) {
+            db.run(query.SQL_FILES_UPDATE_IDENTIFIED, inventory.files[i], inventory.version, inventory.purl);
           }
         resolve(true);
       } catch (error) {
@@ -367,7 +367,6 @@ export class InventoryDb extends Db {
 
   // TODO: workaround until change in DB
   pending(inventory: Partial<Inventory>) {
-    console.log(inventory);
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -375,8 +374,12 @@ export class InventoryDb extends Db {
           db.run('begin transaction');
           if (inventory.files) {
             for (let i = 0; i < inventory.files.length; i += 1) {
-              db.run( 'UPDATE results SET ignored=0,identified=0 WHERE results.file_path = ? AND results.version = ? AND results.purl = ?;',
-                inventory.files[i], inventory.version, inventory.purl);
+              db.run(
+                query.SQL_SET_RESULTS_TO_PENDING_BY_PATH_PURL_VERSION,
+                inventory.files[i],
+                inventory.version,
+                inventory.purl
+              );
             }
           }
           db.run('commit', () => {
@@ -388,5 +391,30 @@ export class InventoryDb extends Db {
         reject(new Error('detach files were not successfully'));
       }
     });
+  }
+
+  async delete(inventory: Partial<Inventory>) {
+    try {
+      // GET ALL DATA FROM INVENTORY ID
+      const inv: any = await this.get(inventory);
+      const db = await this.openDb();
+      db.serialize(function () {
+        db.run('begin transaction');
+        db.run(
+          query.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION,
+          inv.id,
+          inv.component.purl,
+          inv.component.version
+        );
+        db.run(query.SQL_DELETE_INVENTORY_BY_ID, inv.id);
+        db.run('commit', (err) => {
+          db.close();
+          if (err) return Promise.resolve(false);
+        });
+      });
+      return Promise.resolve(true);
+    } catch (error) {
+      return Promise.reject(new Error('detach files were not successfully'));
+    }
   }
 }

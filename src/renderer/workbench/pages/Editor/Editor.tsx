@@ -10,11 +10,12 @@ import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { Inventory } from '../../../../api/types';
 import LabelCard from '../../components/LabelCard/LabelCard';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../components/MatchInfoCard/MatchInfoCard';
-import { mapFile } from '../../../../utils/scan-util';
+import { mapFile, mapFiles } from '../../../../utils/scan-util';
 import CodeEditor from '../../components/CodeEditor/CodeEditor';
 import { inventoryService } from '../../../../api/inventory-service';
 import { fileService } from '../../../../api/file-service';
 import { setFile } from '../../actions';
+import { DIALOG_ACTIONS } from '../../../context/types';
 
 const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
 
@@ -31,7 +32,7 @@ export const Editor = () => {
   const history = useHistory();
   const query = useQuery();
 
-  const { state, dispatch, createInventory, ignoreFile, restoreFile } = useContext(
+  const { state, dispatch, createInventory, ignoreFile, restoreFile, attachFile, detachFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
@@ -83,12 +84,38 @@ export const Editor = () => {
     setFileStatus(mapFile(data));
   };
 
-  const create = async (inventory: Inventory) => {
-    const inv = await createInventory({
-      ...inventory,
-      files: [file],
-    });
-    setInventories((previous) => [...previous, inv]);
+  const create = async (defaultInventory, selFiles) => {
+    const response = await inventoryService.getAll( {purl: defaultInventory.purl, version: defaultInventory.version} );
+    const inventories = response.message || [];
+
+    const showSelector = inventories.length > 0;
+    let action = DIALOG_ACTIONS.NEW;
+    let inventory;
+
+    if (showSelector) {
+      const response = await dialogCtrl.openInventorySelector(inventories);
+      action = response.action;
+      inventory = response.inventory;
+    }
+
+    if (action === DIALOG_ACTIONS.CANCEL) return;
+
+    if (action === DIALOG_ACTIONS.NEW) {
+      inventory = await dialogCtrl.openInventory(defaultInventory);
+      if (!inventory) return;
+
+      const newInventory = await createInventory({
+        ...inventory,
+        files: selFiles,
+      });
+      setInventories((previous) => [...previous, newInventory]);
+    }
+
+    if (action === DIALOG_ACTIONS.OK) {
+      await attachFile(inventory.id, inventory.component.purl, inventory.component.version, selFiles);
+      setInventories((previous) => [...previous, inventory]); // TODO: full update
+    }
+
     getFile();
   };
 
@@ -101,10 +128,8 @@ export const Editor = () => {
       license: currentMatch?.licenses[0]?.name,
       usage: currentMatch?.id,
     };
-    const inventory = await dialogCtrl.openInventory(inv);
-    if (inventory) {
-      create(inventory);
-    }
+
+    create(inv, [file]);
   };
 
   const onIgnorePressed = async () => {
@@ -117,6 +142,12 @@ export const Editor = () => {
     getFile();
   };
 
+  const onDetachPressed = async (inventory) => {
+    await detachFile(inventory.id, inventory.component.purl, inventory.component.version, [file]);
+    getInventories();
+    getFile();
+  };
+
   const onDetailPressed = async (result) => {
     history.push(`/workbench/inventory/${result.id}`);
   };
@@ -125,7 +156,6 @@ export const Editor = () => {
     dispatch(setFile(query.get('path')));
     const unlisten = history.listen((data) => {
       const path = new URLSearchParams(data.search).get('path');
-      console.log(path);
       dispatch(setFile(path));
     });
     return unlisten;
@@ -191,6 +221,9 @@ export const Editor = () => {
         break;
       case MATCH_INFO_CARD_ACTIONS.ACTION_DETAIL:
         onDetailPressed(result);
+        break;
+      case MATCH_INFO_CARD_ACTIONS.ACTION_DETACH:
+        onDetachPressed(result);
         break;
       default:
         break;

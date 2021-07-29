@@ -52,6 +52,8 @@ export class ProjectTree extends EventEmitter {
 
   processedFiles = 0;
 
+  filesIndexed = 0;
+
   filesToScan: [];
 
   constructor(name: string) {
@@ -180,7 +182,7 @@ export class ProjectTree extends EventEmitter {
       console.log(error.message);
 
       if (error.message === ScannerEvents.ERROR_SCANNER_ABORTED) {
-        this.msgToUI.send(IpcEvents.SCANNER_ABORTED, error); //Emit only once
+        this.msgToUI.send(IpcEvents.SCANNER_ABORTED, error); // Emit only once
         this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
           success: false,
           resultsPath: this.work_root,
@@ -193,7 +195,7 @@ export class ProjectTree extends EventEmitter {
     console.log(`SCANNER: Start scanning path=${this.scan_root}`);
 
     this.scanner.scanJsonList(this.filesToScan, this.scan_root);
-   // this.scanner.scanFolder(this.scan_root);
+    // this.scanner.scanFolder(this.scan_root);
   }
 
   setMailbox(mailbox: Electron.WebContents) {
@@ -223,10 +225,10 @@ export class ProjectTree extends EventEmitter {
     });
     // apply filters.
     this.banned_list.loadDefault();
-    prepareScan(this.scan_root, this.logical_tree, this.banned_list);
+    this.indexScan(this.scan_root, this.logical_tree, this.banned_list);
 
     const summary = { total: 0, include: 0, filter: 0, files: [] };
-    this.filesSummary = summarizeTree(this.scan_root,this.logical_tree, summary);
+    this.filesSummary = summarizeTree(this.scan_root, this.logical_tree, summary);
     console.log(
       `Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`
     );
@@ -263,8 +265,7 @@ export class ProjectTree extends EventEmitter {
     for (const [key, value] of Object.entries(comp)) {
       for (let i = 0; i < value.length; i += 1) {
         // console.log(key+''+value[i].purl);
-        if(value[i].purl!==undefined)
-        insertComponent(this.logical_tree, key, value[i]);
+        if (value[i].purl !== undefined) insertComponent(this.logical_tree, key, value[i]);
       }
     }
   }
@@ -322,23 +323,42 @@ export class ProjectTree extends EventEmitter {
     const a = getLeaf(this.logical_tree, pathToInclude);
     setUseFile(a, true, recursive);
   }
+
+  indexScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
+    let i = 0;
+
+    if (jsonScan.type === 'file') {
+      this.filesIndexed += 1;
+      this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+        stage: `Indexing files (${this.filesIndexed})`,
+        processed: this.filesIndexed,
+      });
+      if (bannedList.evaluate(scanRoot + jsonScan.value)) {
+        jsonScan.action = 'scan';
+      } else {
+        jsonScan.action = 'filter';
+      }
+    } else if (jsonScan.type === 'folder') {
+      for (i = 0; i < jsonScan.children.length; i += 1) this.indexScan(scanRoot, jsonScan.children[i], bannedList);
+    }
+  }
 }
 
 /* AUXILIARY FUNCTIONS */
 
-function summarizeTree(root: any,tree: any, summary: any) {
+function summarizeTree(root: any, tree: any, summary: any) {
   let j = 0;
   if (tree.type === 'file') {
     summary.total += 1;
     if (tree.action === 'filter') {
-       summary.filter += 1;
-       tree.className = 'filter-item'
-    }
-    else if (tree.include === true) {
+      summary.filter += 1;
+      tree.className = 'filter-item';
+    } else if (tree.include === true) {
       summary.include += 1;
       summary.files.push(`${root}${tree.value}`);
     } else {
-      tree.className='exclude-item'}
+      tree.className = 'exclude-item';
+    }
 
     return summary;
   }
@@ -397,16 +417,21 @@ function insertInventory(root: string, tree: any, mypath: string, inv: Inventory
   if (myPathFolders[0] === '') myPathFolders.shift();
   let i: number;
   i = 0;
-
+  let childCount = 0;
   while (i < myPathFolders.length) {
     let j: number;
     if (!arbol.inventories.includes(inv.id)) arbol.inventories.push(inv.id);
+    childCount = arbol.children.length;
     for (j = 0; j < arbol.children.length; j += 1) {
       if (arbol.children[j].label === myPathFolders[i]) {
         arbol = arbol.children[j];
         i += 1;
         break;
       }
+    }
+    if (j >= childCount) {
+      console.log(`Can not insert inventory on ${mypath}`);
+      return;
     }
   }
 
@@ -420,27 +445,31 @@ function insertComponent(tree: any, mypath: string, comp: Component): any {
   if (myPathFolders[0] === '') myPathFolders.shift();
   let i: number;
   i = 0;
-
+  let childCount;
   const component = { purl: comp.purl, version: comp.version };
 
   while (i < myPathFolders.length) {
     let j: number;
-     if (!arbol.components.some((e) => e.purl === component.purl && e.version === component.version)) {
+    if (!arbol.components.some((e) => e.purl === component.purl && e.version === component.version)) {
       arbol.components.push(component);
       arbol.className = 'match-info-result';
     }
-    for (j = 0; j < arbol.children.length; j += 1) {
+    childCount = arbol.children.length;
+    for (j = 0; j < childCount; j += 1) {
       if (arbol.children[j].label === myPathFolders[i]) {
         arbol = arbol.children[j];
         i += 1;
         break;
       }
     }
+    if (j >= childCount) {
+      console.log(`Can not insert component ${component.purl} on ${mypath}`);
+      return;
+    }
   }
 
   arbol.components.push(component);
   arbol.className = 'match-info-result';
-
 }
 /*
 function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {
@@ -455,8 +484,8 @@ function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {
     for (i = 0; i < jsonScan.children.length; i += 1) recurseJSON(jsonScan.children[i], banned_list);
   }
 } */
-
-function prepareScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
+/*
+function indexScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
   let i = 0;
 
   if (jsonScan.type === 'file') {
@@ -466,10 +495,10 @@ function prepareScan(scanRoot: string, jsonScan: any, bannedList: Filtering.Bann
       jsonScan.action = 'filter';
     }
   } else if (jsonScan.type === 'folder') {
-    for (i = 0; i < jsonScan.children.length; i += 1) prepareScan(scanRoot, jsonScan.children[i], bannedList);
+    for (i = 0; i < jsonScan.children.length; i += 1) indexScan(scanRoot, jsonScan.children[i], bannedList);
   }
 }
-
+*/
 function dirFirstFileAfter(a, b) {
   if (!a.isDirectory() && b.isDirectory()) return 1;
   if (a.isDirectory() && !b.isDirectory()) return -1;

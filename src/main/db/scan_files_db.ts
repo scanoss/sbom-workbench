@@ -5,12 +5,13 @@
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
-
+import {  performance } from 'perf_hooks';
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { Component , Files } from '../../api/types';
 import { ComponentDb } from './scan_component_db';
+
 
 
 const query = new Querys();
@@ -23,9 +24,6 @@ export class FilesDb extends Db {
     super(path);
     this.component = new ComponentDb(path);
   }
-
-
-
 
   get(file: Partial<Files>) {
     return new Promise(async (resolve, reject) => {
@@ -44,9 +42,10 @@ export class FilesDb extends Db {
     }
     });
   }
+  
 
   // GET ALL FILES FOR A COMPONENT
-  getFilesComponent(data: Partial<Component>) {
+  getFilesComponent(data: Partial<Component>) { 
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
@@ -65,7 +64,8 @@ export class FilesDb extends Db {
               for (let i = 0; i < file.length; i += 1) {
                 file[i].component = comp;
               }
-              resolve(file);
+               resolve(file);
+
             } else resolve([]);
           }
         );
