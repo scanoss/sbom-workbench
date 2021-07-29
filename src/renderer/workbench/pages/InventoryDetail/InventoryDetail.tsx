@@ -1,25 +1,28 @@
-import {  Chip } from '@material-ui/core';
-import React, { useContext, useState, useEffect } from 'react';
+import { Button, Chip } from '@material-ui/core';
+import React, { useContext, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { WorkbenchContext, IWorkbenchContext } from '../../store';
+import { IWorkbenchContext, WorkbenchContext } from '../../store';
 import { Inventory } from '../../../../api/types';
 import { FileList } from './components/FileList';
 import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
-import { setFile } from '../../actions';
 import { inventoryService } from '../../../../api/inventory-service';
 import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
 import Label from '../../components/Label/Label';
 import { mapFiles } from '../../../../utils/scan-util';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
+import { DialogContext, IDialogContext } from '../../../context/DialogProvider';
+import { DIALOG_ACTIONS } from '../../../context/types';
+import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 
 export const InventoryDetail = () => {
   const history = useHistory();
   const { id } = useParams();
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { dispatch, detachFile } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { detachFile } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const [inventory, setInventory] = useState<Inventory>();
   const [files, setFiles] = useState<string[]>([]);
@@ -29,6 +32,14 @@ export const InventoryDetail = () => {
     setInventory(response.data);
     setFiles(mapFiles(response.data?.files));
   };
+
+  const onRemoveClicked = async () => {
+    const { action } = await dialogCtrl.openConfirmDialog();
+    if (action == DIALOG_ACTIONS.OK) {
+      const { status } = await inventoryService.delete({ id: inventory?.id });
+      history.goBack();
+    }
+  }
 
   const onAction = (file: string, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
@@ -62,6 +73,9 @@ export const InventoryDetail = () => {
             <ComponentInfo component={inventory?.component} />
           </div>
           <div className="identified-info-card">
+            <IconButton className="btn-delete" onClick={onRemoveClicked} >
+              <DeleteOutlineOutlinedIcon />
+            </IconButton>
             <div className="first-part-card">
               <Chip className="identified" variant="outlined" label="Identified Group" />
             </div>
@@ -75,6 +89,7 @@ export const InventoryDetail = () => {
                 <span>{inventory?.notes}</span>
               </div>
             </div>
+
           </div>
         </header>
         <main className="app-content">
