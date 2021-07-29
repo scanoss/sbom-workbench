@@ -41,6 +41,7 @@
       "main.prod.js.map",
       "package.json"
     ],
+    "afterPack": "./appimage-fix.js",
     "afterSign": ".erb/scripts/Notarize.js",
     "mac": {
       "target": [
