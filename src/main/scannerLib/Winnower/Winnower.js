@@ -230,8 +230,8 @@ export class Winnower extends EventEmitter {
     this.#continue = true;
     this.#worker = new Worker(stringWorker, { eval: true });
     this.#worker.on('message', async (winnowingResult) => {
-      this.#storeResult(winnowingResult);
-      this.#nextStepMachine();
+      await this.#storeResult(winnowingResult);
+      await this.#nextStepMachine();
     });
   }
 
@@ -248,7 +248,7 @@ export class Winnower extends EventEmitter {
       // eslint-disable-next-line no-param-reassign
       winnowingResult = winnowingResult.substring(0, truncateStringOnIndex);
       // eslint-disable-next-line no-param-reassign
-      winnowingResult = winnowingResult.concat('\n');
+      winnowingResult += '\n';
     }
 
     if (this.#wfp.length + winnowingResult.length >= this.#WFP_FILE_MAX_SIZE) {
