@@ -102,21 +102,22 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       versions: [
         {
           version: '5.5.5',
-          licenses: [{ name: 'MIT' }, { name: 'MIT 2' }, { name: 'Apache' }],
+          licenses: [{ name: 'MITReact' }, { name: 'MIT 2React' }, { name: 'ApacheReact' }],
         },
         {
           version: '5.5.5',
-          licenses: [{ name: 'MIT' }, { name: 'MIT 2' }, { name: 'Apache' }],
+          licenses: [{ name: 'MITReact' }, { name: 'MIT 2React' }, { name: 'ApacheReact' }],
         },
         {
           version: '5.5.5',
-          licenses: [{ name: 'MIT' }, { name: 'MIT 2' }, { name: 'Apache' }],
+          licenses: [{ name: 'MITReact' }, { name: 'MIT 2React' }, { name: 'ApacheReact' }],
         },
       ],
     },
   ]);
 
   const [namecomponent, setNamecomponent] = useState<string>('');
+  const [selectedVersion, setVersionComponent] = useState<string>('');
   const [versionscomponent, setVersions] = useState<any>([]);
   const [licensescomponent, setLicenses] = useState<any>([]);
 
@@ -125,18 +126,24 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     console.log(value);
   };
 
+  const changeVersion = async (e, value) => {
+    await setVersionComponent(value);
+    console.log(value);
+  };
+
   useEffect(() => {
     setVersions(data?.find((item) => item?.name === namecomponent)?.versions.map((item) => item?.version));
   }, [namecomponent]);
 
-    // useEffect(() => {
-    //   setLicenses(
-    //     data
-    //       ?.find((item) => item?.name === namecomponent)
-    //       ?.versions.map((item) => item?.licenses)
-    //       .map((item) => item?.name)
-    //   );
-    // }, [versionscomponent]);
+  useEffect(() => {
+    setLicenses(
+      data
+        ?.find((item) => item?.name === namecomponent)
+        ?.versions.find((item) => item?.version === selectedVersion)
+        ?.licenses.map((item) => item?.name)
+    );
+    console.log(licensescomponent);
+  }, [selectedVersion]);
 
   const options = ['sugus', 'bananita dolca', 'media hora', 'react', 'scanner'];
 
@@ -183,7 +190,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 onChange={(e) => inputHandler(e)}
               /> */}
               <Autocomplete
-                options={versionscomponent}
+                options={versionscomponent || options}
                 // groupBy={(option) => option.firstLetter}
                 // getOptionLabel={(option) => option.title}
                 style={{ outline: 'none' }}
@@ -192,7 +199,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 className={classes.component}
                 defaultValue={form?.version}
                 placeholder="Version"
-                onChange={(e) => inputHandler(e)}
+                onChange={changeVersion}
                 renderInput={(params) => <TextField {...params} />}
                 onClick={(e) => setVersions(e.target.value)}
               />
@@ -212,7 +219,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             /> */}
             <Autocomplete
               id="grouped-demo"
-              options={licensescomponent}
+              options={licensescomponent || options}
               // groupBy={(option) => option.firstLetter}
               // getOptionLabel={(option) => option.title}
               style={{ outline: 'none' }}
