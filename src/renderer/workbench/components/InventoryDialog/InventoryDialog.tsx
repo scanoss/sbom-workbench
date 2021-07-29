@@ -18,6 +18,14 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Inventory } from '../../../../api/types';
 import { Component } from '../../WorkbenchProvider';
 
+// pasar autocompletename en los tres autocomplete
+// como default value siempre usar el estado form
+// usar servicio de agus
+
+
+
+
+
 const useStyles = makeStyles((theme) => ({
   dialog: {
     width: 400,
@@ -48,7 +56,7 @@ interface InventoryDialogProps {
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
-  const { onClose, open, component, onCancel } = props;
+  const { onClose, open, component, onCancel, inventory } = props;
   const [form, setForm] = useState({
     component: component?.name,
     version: component?.version,
@@ -71,9 +79,23 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     });
   };
 
+  const autocompleteHandler = (name, value) => {
+    console.log(value);
+    setForm({
+      ...form,
+      [name]: value,
+    });
+  };
+
   useEffect(() => {
     console.log(form);
   }, [form]);
+
+  const setDefaults = () => {
+    setForm(inventory);
+  };
+
+  useEffect(setDefaults, [inventory]);
 
   const [data, setData] = useState([
     {
@@ -141,36 +163,40 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const [arrayNames, setArrayNames] = useState<any>([]);
   const [licensescomponent, setLicenses] = useState<any>([]);
 
-  const changeNameComponent = async (e, value) => {
-    await setNamecomponent(value);
-    console.log(value);
-  };
+  // const changeNameComponent = async (e, value) => {
+  //   await setNamecomponent(value);
+  //   console.log(value);
+  // };
 
-  const changeVersion = async (e, value) => {
-    await setVersionComponent(value);
-    console.log(value);
-  };
-
+  // const changeVersion = async (e, value) => {
+  //   await setVersionComponent(value);
+  //   console.log(value);
+  // };
 
   useEffect(() => {
     setArrayNames(data.map((item) => item.name));
   }, []);
 
   useEffect(() => {
-    setVersions(data?.find((item) => item?.name === selectedNameComponent)?.versions.map((item) => item?.version));
-  }, [selectedNameComponent]);
+    const componentObject = data?.find((item) => item?.name === form?.component);
+    setVersions(componentObject?.versions.map((item) => item?.version));
+    //
+    setForm({...form, url: componentObject?.url });
+  }, [form.component]);
+
+
 
   useEffect(() => {
     setLicenses(
       data
-        ?.find((item) => item?.name === selectedNameComponent)
-        ?.versions.find((item) => item?.version === selectedVersion)
+        ?.find((item) => item?.name === form?.component)
+        ?.versions.find((item) => item?.version === form.version)
         ?.licenses.map((item) => item?.name)
     );
     console.log(licensescomponent);
-  }, [selectedVersion]);
+  }, [form.version]);
 
-  const options = [' ', ' ', ' ', ' ', ' ', ' '];
+  const options = [' ', ' ', ' '];
 
   return (
     <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
@@ -199,7 +225,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 style={{ outline: 'none' }}
                 fullWidth
                 renderInput={(params) => <TextField {...params} />}
-                onChange={changeNameComponent}
+                onChange={(e, value) => autocompleteHandler("component", value)}
+                defaultValue={form?.component}
               />
             </Paper>
           </div>
@@ -224,7 +251,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 className={classes.component}
                 defaultValue={form?.version}
                 placeholder="Version"
-                onChange={changeVersion}
+                onChange={(e, value) => autocompleteHandler("version", value)}
                 renderInput={(params) => <TextField {...params} />}
                 onClick={(e) => setVersions(e.target.value)}
               />
@@ -254,6 +281,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               defaultValue={form?.license_name}
               className={classes.component}
               placeholder="License"
+              onChange={(e, value) => autocompleteHandler("license_name", value)}
               onClick={(e) => setLicenses(e.target.value)}
             />
           </Paper>
