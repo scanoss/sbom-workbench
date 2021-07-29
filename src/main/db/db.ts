@@ -54,6 +54,7 @@ export class Db {
           }
           db.run('PRAGMA journal_mode = WAL;');
           db.run('PRAGMA synchronous = OFF');
+          db.run('PRAGMA foreign_keys = ON;');
           resolve(db);
         }
       );

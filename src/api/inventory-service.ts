@@ -28,6 +28,11 @@ class InventoryService {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_DETACH_FILE, inventory);
     return response;
   }
+
+  public async delete(inventory: Partial<Inventory>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_DELETE, inventory);
+    return response;
+  }
 }
 
 export const inventoryService = new InventoryService();
