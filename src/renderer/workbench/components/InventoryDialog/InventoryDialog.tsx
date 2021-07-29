@@ -10,11 +10,13 @@ import {
   MenuItem,
   TextareaAutosize,
   IconButton,
+  TextField,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Inventory } from '../../../../api/types';
-import { InventoryForm } from '../../../context/DialogProvider';
+import { Component } from '../../WorkbenchProvider';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -39,26 +41,27 @@ const useStyles = makeStyles((theme) => ({
 
 interface InventoryDialogProps {
   open: boolean;
-  inventory: Partial<InventoryForm>;
+  component: Component;
   onClose: (inventory: Inventory) => void;
-  onCancel?: () => void;
+  onCancel: () => void;
 }
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
-  const { open, inventory, onClose, onCancel } = props;
-  const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
-
-  const setDefaults = () => {
-    setForm(inventory);
-  };
-
-  const handleCancel = () => {
-    onCancel && onCancel();
-  };
+  const { onClose, open, component, onCancel } = props;
+  const [form, setForm] = useState({
+    component: component?.name,
+    version: component?.version,
+    license_name: component?.licenses[0] ? component?.licenses[0].name : '',
+    url: component?.url,
+    purl: component?.purl[0],
+    usage: 'file',
+    notes: '',
+  });
 
   const handleClose = () => {
-    onClose(form);
+    const inventory: Inventory = form;
+    onClose(inventory);
   };
 
   const inputHandler = (e) => {
@@ -68,10 +71,77 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     });
   };
 
-  useEffect(setDefaults, [inventory]);
+  useEffect(() => {
+    console.log(form);
+  }, [form]);
+
+  const [data, setData] = useState([
+    {
+      name: 'scanner',
+      purl: 'asdas',
+      url: 'bla bla',
+      versions: [
+        {
+          version: '2.0.3',
+          licenses: [{ name: 'MIT' }, { name: 'MIT 2' }, { name: 'Apache' }],
+        },
+        {
+          version: '2.0.2',
+          licenses: [{ name: 'MIT' }, { name: 'MIT 2' }, { name: 'Apache' }],
+        },
+        {
+          version: '2.0.1',
+          licenses: [{ name: 'MIT' }, { name: 'MIT 2' }, { name: 'Apache' }],
+        },
+      ],
+    },
+    {
+      name: 'react',
+      purl: 'asdas',
+      url: 'bla bla',
+      versions: [
+        {
+          version: '5.5.5',
+          licenses: [{ name: 'MIT' }, { name: 'MIT 2' }, { name: 'Apache' }],
+        },
+        {
+          version: '5.5.5',
+          licenses: [{ name: 'MIT' }, { name: 'MIT 2' }, { name: 'Apache' }],
+        },
+        {
+          version: '5.5.5',
+          licenses: [{ name: 'MIT' }, { name: 'MIT 2' }, { name: 'Apache' }],
+        },
+      ],
+    },
+  ]);
+
+  const [namecomponent, setNamecomponent] = useState<string>('');
+  const [versionscomponent, setVersions] = useState<any>([]);
+  const [licensescomponent, setLicenses] = useState<any>([]);
+
+  const changeNameComponent = async (e, value) => {
+    await setNamecomponent(value);
+    console.log(value);
+  };
+
+  useEffect(() => {
+    setVersions(data?.find((item) => item?.name === namecomponent)?.versions.map((item) => item?.version));
+  }, [namecomponent]);
+
+    // useEffect(() => {
+    //   setLicenses(
+    //     data
+    //       ?.find((item) => item?.name === namecomponent)
+    //       ?.versions.map((item) => item?.licenses)
+    //       .map((item) => item?.name)
+    //   );
+    // }, [versionscomponent]);
+
+  const options = ['sugus', 'bananita dolca', 'media hora', 'react', 'scanner'];
 
   return (
-    <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={handleCancel}>
+    <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
       <span className="dialog-title">Identify Component</span>
       <div className="identity-component">
         <div className="component-version-container">
@@ -81,28 +151,50 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <IconButton className={classes.iconButton} aria-label="menu">
                 <SearchIcon />
               </IconButton>
-              <InputBase
-                name="component"
-                defaultValue={form?.component}
-                className={classes.component}
-                placeholder="Component"
+              {/* <InputBase
+                  name="component"
+                  defaultValue={form?.component}
+                  className={classes.component}
+                  placeholder="Component"
+                  fullWidth
+                  onChange={(e) => inputHandler(e)}
+                /> */}
+              <Autocomplete
+                id="grouped-demo"
+                options={options}
+                // groupBy={(option) => option.firstLetter}
+                // getOptionLabel={(option) => option.title}
+                style={{ outline: 'none' }}
                 fullWidth
-                readOnly
-                onChange={(e) => inputHandler(e)}
+                renderInput={(params) => <TextField {...params} />}
+                onChange={changeNameComponent}
               />
             </Paper>
           </div>
           <div className="component-container">
             <label>Version</label>
             <Paper component="form" className={classes.paper}>
-              <InputBase
+              {/* <InputBase
                 name="version"
                 className={classes.component}
                 defaultValue={form?.version}
                 placeholder="Version"
                 fullWidth
-                readOnly
                 onChange={(e) => inputHandler(e)}
+              /> */}
+              <Autocomplete
+                options={versionscomponent}
+                // groupBy={(option) => option.firstLetter}
+                // getOptionLabel={(option) => option.title}
+                style={{ outline: 'none' }}
+                fullWidth
+                name="version"
+                className={classes.component}
+                defaultValue={form?.version}
+                placeholder="Version"
+                onChange={(e) => inputHandler(e)}
+                renderInput={(params) => <TextField {...params} />}
+                onClick={(e) => setVersions(e.target.value)}
               />
             </Paper>
           </div>
@@ -110,14 +202,27 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         <div className="component-container">
           <label>License</label>
           <Paper component="form" className={classes.paper}>
-            <InputBase
-              name="license"
-              defaultValue={form?.license}
+            {/* <InputBase
+              name="license_name"
+              defaultValue={form?.license_name}
               className={classes.component}
               placeholder="License"
               fullWidth
-              readOnly
               onChange={(e) => inputHandler(e)}
+            /> */}
+            <Autocomplete
+              id="grouped-demo"
+              options={licensescomponent}
+              // groupBy={(option) => option.firstLetter}
+              // getOptionLabel={(option) => option.title}
+              style={{ outline: 'none' }}
+              fullWidth
+              renderInput={(params) => <TextField {...params} />}
+              name="license_name"
+              defaultValue={form?.license_name}
+              className={classes.component}
+              placeholder="License"
+              onClick={(e) => setLicenses(e.target.value)}
             />
           </Paper>
         </div>
@@ -130,7 +235,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               className={classes.component}
               placeholder="url"
               fullWidth
-              readOnly
               onChange={(e) => inputHandler(e)}
             />
           </Paper>
@@ -144,7 +248,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               className={classes.component}
               placeholder="Purl"
               fullWidth
-              readOnly
               onChange={(e) => inputHandler(e)}
             />
           </Paper>
@@ -176,7 +279,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 className={classes.component}
                 cols={30}
                 rows={8}
-                maxLength={500}
                 onChange={(e) => inputHandler(e)}
               />
             </Paper>
@@ -185,7 +287,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       </div>
 
       <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
+        <Button onClick={onCancel}>Cancel</Button>
         <Button variant="contained" color="secondary" onClick={handleClose}>
           Identify
         </Button>
