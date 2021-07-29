@@ -114,11 +114,31 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         },
       ],
     },
+    {
+      name: 'VUE',
+      purl: 'asdas',
+      url: 'bla bla',
+      versions: [
+        {
+          version: '7.7.7',
+          licenses: [{ name: 'MIT VUE' }, { name: 'MIT VUE' }, { name: 'ApacheVUE' }, { name: 'carlosVUE' }, { name: 'satoshinakaVUE' }, { name: 'ApacheVUE' }],
+        },
+        {
+          version: '7.7.7',
+          licenses: [{ name: 'MIT VUE' }, { name: 'MIT VUE' }, { name: 'ApacheVUE' }, { name: 'carlosVUE' }, { name: 'satoshinakaVUE' }, { name: 'ApacheVUE' }],
+        },
+        {
+          version: '7.7.7',
+          licenses: [{ name: 'MIT VUE' }, { name: 'MIT VUE' }, { name: 'ApacheVUE' }, { name: 'carlosVUE' }, { name: 'satoshinakaVUE' }, { name: 'ApacheVUE' }],
+        },
+      ],
+    },
   ]);
 
-  const [namecomponent, setNamecomponent] = useState<string>('');
+  const [selectedNameComponent, setNamecomponent] = useState<string>('');
   const [selectedVersion, setVersionComponent] = useState<string>('');
   const [versionscomponent, setVersions] = useState<any>([]);
+  const [arrayNames, setArrayNames] = useState<any>([]);
   const [licensescomponent, setLicenses] = useState<any>([]);
 
   const changeNameComponent = async (e, value) => {
@@ -131,21 +151,26 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     console.log(value);
   };
 
+
   useEffect(() => {
-    setVersions(data?.find((item) => item?.name === namecomponent)?.versions.map((item) => item?.version));
-  }, [namecomponent]);
+    setArrayNames(data.map((item) => item.name));
+  }, []);
+
+  useEffect(() => {
+    setVersions(data?.find((item) => item?.name === selectedNameComponent)?.versions.map((item) => item?.version));
+  }, [selectedNameComponent]);
 
   useEffect(() => {
     setLicenses(
       data
-        ?.find((item) => item?.name === namecomponent)
+        ?.find((item) => item?.name === selectedNameComponent)
         ?.versions.find((item) => item?.version === selectedVersion)
         ?.licenses.map((item) => item?.name)
     );
     console.log(licensescomponent);
   }, [selectedVersion]);
 
-  const options = ['sugus', 'bananita dolca', 'media hora', 'react', 'scanner'];
+  const options = [' ', ' ', ' ', ' ', ' ', ' '];
 
   return (
     <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
@@ -168,7 +193,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 /> */}
               <Autocomplete
                 id="grouped-demo"
-                options={options}
+                options={arrayNames}
                 // groupBy={(option) => option.firstLetter}
                 // getOptionLabel={(option) => option.title}
                 style={{ outline: 'none' }}
