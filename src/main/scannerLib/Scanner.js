@@ -35,12 +35,16 @@ export class Scanner extends EventEmitter {
 
   #aborted;
 
+  #scannedFiles;
+
   constructor() {
     super();
     this.initialize();
   }
 
   initialize() {
+    this.#scannedFiles = 0;
+
     this.#winnower = new Winnower();
     /* ******************* SETTING WINNOWING EVENTS ******************* */
     this.#winnower.on(ScannerEvents.WINNOWING_STARTING, () => {
@@ -69,6 +73,7 @@ export class Scanner extends EventEmitter {
     this.#dispatcher.on(ScannerEvents.DISPATCHER_NEW_DATA, (dispatcherResponse) => {
       const serverResponse = dispatcherResponse.getServerData();
       const serverResposeNumFiles = dispatcherResponse.getNumberOfFiles();
+      this.#scannedFiles += serverResposeNumFiles;
       Object.assign(this.#tmpResult, serverResponse);
       this.emit(ScannerEvents.DISPATCHER_NEW_DATA, serverResponse, serverResposeNumFiles);
     });
@@ -78,6 +83,7 @@ export class Scanner extends EventEmitter {
         const str = JSON.stringify(this.#tmpResult, null, 4);
         fs.writeFileSync(this.#resultFilePath, str);
         this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath);
+        console.log(`Scanned ${this.#scannedFiles} files`);
       }
     });
 
