@@ -330,7 +330,7 @@ export class ProjectTree extends EventEmitter {
     if (jsonScan.type === 'file') {
       this.filesIndexed += 1;
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-        stage: `Indexing files (${this.filesIndexed})`,
+        stage: `Indexing  (${this.filesIndexed} files)`,
         processed: this.filesIndexed,
       });
       if (bannedList.evaluate(scanRoot + jsonScan.value)) {
