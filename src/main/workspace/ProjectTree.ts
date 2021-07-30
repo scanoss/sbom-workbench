@@ -214,13 +214,13 @@ export class ProjectTree extends EventEmitter {
     }
 
     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'prepare',
+      stage: 'PREPARING',
       processed: 30,
     });
     // const i = 0;
     this.build_tree();
     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'prepare',
+      stage: 'PREPARING',
       processed: 60,
     });
     // apply filters.
@@ -235,7 +235,7 @@ export class ProjectTree extends EventEmitter {
     this.filesToScan = summary.files;
     console.log(this.filesToScan);
     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'prepare',
+      stage: 'PREPARING',
       processed: 100,
     });
 
@@ -255,9 +255,7 @@ export class ProjectTree extends EventEmitter {
     let files: string[];
     files = inv.files;
     for (i = 0; i < inv.files.length; i += 1) {
-      insertInventory(this.scan_root, this.logical_tree, files[i], inv);
-      // insertComponent(this.logical_tree, files[i], inv);
-      insertInventory(this.logical_tree, files[i], inv);
+         insertInventory(this.logical_tree, files[i], inv);
     }
   }
 
