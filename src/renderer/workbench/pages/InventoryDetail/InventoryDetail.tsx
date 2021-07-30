@@ -21,7 +21,7 @@ export const InventoryDetail = () => {
   const { id } = useParams();
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { detachFile } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { detachFile, deleteInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const [inventory, setInventory] = useState<Inventory>();
@@ -29,7 +29,8 @@ export const InventoryDetail = () => {
 
   const getInventory = async () => {
     const response = await inventoryService.get({ id });
-    if (response.status === 'failed') {
+    console.log(response);
+    if (response.status === 'fail') {
       history.goBack();
       return;
     }
@@ -40,7 +41,7 @@ export const InventoryDetail = () => {
   const onRemoveClicked = async () => {
     const { action } = await dialogCtrl.openConfirmDialog();
     if (action == DIALOG_ACTIONS.OK) {
-      const { status } = await inventoryService.delete({ id: inventory?.id });
+      await deleteInventory(inventory?.id);
       history.goBack();
     }
   }

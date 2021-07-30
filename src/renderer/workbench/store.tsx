@@ -16,6 +16,7 @@ export interface IWorkbenchContext {
   restoreFile: (path: string[]) => Promise<boolean>;
   attachFile: (inventoryId: number, purl: string, version: string, files: string[]) => Promise<boolean>;
   detachFile: (inventoryId: number, purl: string, version: string, files: string[]) => Promise<boolean>;
+  deleteInventory: (inventoryId: number) => Promise<boolean>;
 
   state: State;
   dispatch: any;
@@ -82,6 +83,12 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     return true;
   };
 
+  const deleteInventory = async (id: number): Promise<boolean> => {
+    const { status } = await inventoryService.delete({ id });
+    update();
+    return status != 'fail';
+  };
+
   const update = async () => {
     if (component) {
       const comp = await workbenchController.getComponent(component.compid);
@@ -102,6 +109,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       restoreFile,
       attachFile,
       detachFile,
+      deleteInventory,
     }),
     [state, dispatch, loadScan, createInventory, ignoreFile, restoreFile, attachFile, detachFile]
   );
