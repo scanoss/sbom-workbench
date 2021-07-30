@@ -114,6 +114,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     setForm({ ...form, url: componentObject?.url, purl: componentObject?.purl });
   }, [form?.component]);
 
+  useEffect(() => {
+    if (versionscomponent)
+    setForm({ ...form, version: versionscomponent[0], license: licensescomponent?.[0] });
+  }, [versionscomponent])
+
   // License use Effect
   useEffect(() => {
     setLicenses(
