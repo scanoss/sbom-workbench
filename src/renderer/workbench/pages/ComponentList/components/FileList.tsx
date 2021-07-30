@@ -2,7 +2,7 @@ import { Alert } from '@material-ui/lab';
 import React from 'react';
 import MatchCard, { MATCH_CARD_ACTIONS } from '../../../components/MatchCard/MatchCard';
 
-const MAX_FILES = 250;
+const MAX_FILES = 150;
 
 export interface FileListProps {
   files: any[];
