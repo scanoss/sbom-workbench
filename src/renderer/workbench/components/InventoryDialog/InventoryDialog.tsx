@@ -111,7 +111,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   useEffect(() => {
     const componentObject = data?.find((item) => item?.name === form?.component);
     setVersions(componentObject?.versions.map((item) => item?.version));
-    setForm({ ...form, url: componentObject?.url });
+    setForm({ ...form, url: componentObject?.url, purl: componentObject?.purl });
   }, [form?.component]);
 
   // License use Effect
@@ -158,7 +158,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 renderInput={(params) => (
                   <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
                 )}
-                defaultValue={form?.component}
+                value={form?.component}
               />
             </Paper>
           </div>
@@ -181,7 +181,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 fullWidth
                 name="version"
                 className={classes.component}
-                defaultValue={form?.version}
+                value={form?.version[0]}
                 placeholder="Version"
                 onChange={(e, value) => autocompleteHandler('version', value)}
                 renderInput={(params) => (
@@ -214,7 +214,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
               )}
               name="license_name"
-              defaultValue={form?.license}
+              value={form?.license[0]}
               className={classes.component}
               placeholder="License"
               onChange={(e, value) => autocompleteHandler('license_name', value)}
@@ -227,7 +227,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <Paper component="form" className={classes.paper}>
             <InputBase
               name="url"
-              defaultValue={form?.url}
+              value={form?.url}
               className={classes.component}
               placeholder="url"
               fullWidth
@@ -240,7 +240,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <Paper component="form" className={classes.paper}>
             <InputBase
               name="purl"
-              defaultValue={form?.purl}
+              value={form?.purl}
               className={classes.component}
               placeholder="Purl"
               fullWidth
@@ -254,7 +254,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <Paper component="form" className={classes.paper}>
               <Select
                 name="usage"
-                defaultValue={form?.usage}
+                value={form?.usage}
                 className={classes.component}
                 fullWidth
                 disableUnderline
@@ -271,7 +271,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <Paper component="form" className={classes.paper}>
               <TextareaAutosize
                 name="notes"
-                defaultValue={form?.notes}
+                value={form?.notes}
                 className={classes.component}
                 cols={30}
                 rows={8}
