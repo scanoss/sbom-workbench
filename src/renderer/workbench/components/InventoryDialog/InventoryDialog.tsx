@@ -131,15 +131,36 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       versions: [
         {
           version: '7.7.7',
-          licenses: [{ name: 'MIT VUE' }, { name: 'MIT VUE' }, { name: 'ApacheVUE' }, { name: 'carlosVUE' }, { name: 'satoshinakaVUE' }, { name: 'ApacheVUE' }],
+          licenses: [
+            { name: 'MIT VUE' },
+            { name: 'MIT VUE' },
+            { name: 'ApacheVUE' },
+            { name: 'carlosVUE' },
+            { name: 'satoshinakaVUE' },
+            { name: 'ApacheVUE' },
+          ],
         },
         {
           version: '7.7.7',
-          licenses: [{ name: 'MIT VUE' }, { name: 'MIT VUE' }, { name: 'ApacheVUE' }, { name: 'carlosVUE' }, { name: 'satoshinakaVUE' }, { name: 'ApacheVUE' }],
+          licenses: [
+            { name: 'MIT VUE' },
+            { name: 'MIT VUE' },
+            { name: 'ApacheVUE' },
+            { name: 'carlosVUE' },
+            { name: 'satoshinakaVUE' },
+            { name: 'ApacheVUE' },
+          ],
         },
         {
           version: '7.7.7',
-          licenses: [{ name: 'MIT VUE' }, { name: 'MIT VUE' }, { name: 'ApacheVUE' }, { name: 'carlosVUE' }, { name: 'satoshinakaVUE' }, { name: 'ApacheVUE' }],
+          licenses: [
+            { name: 'MIT VUE' },
+            { name: 'MIT VUE' },
+            { name: 'ApacheVUE' },
+            { name: 'carlosVUE' },
+            { name: 'satoshinakaVUE' },
+            { name: 'ApacheVUE' },
+          ],
         },
       ],
     },
@@ -161,7 +182,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     const componentObject = data?.find((item) => item?.name === form?.component);
     setVersions(componentObject?.versions.map((item) => item?.version));
     //
-    setForm({...form, url: componentObject?.url });
+    setForm({ ...form, url: componentObject?.url });
   }, []);
 
   useEffect(() => {
@@ -203,7 +224,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 style={{ outline: 'none' }}
                 fullWidth
                 renderInput={(params) => <TextField {...params} />}
-                onChange={(e, value) => autocompleteHandler("component", value)}
+                onChange={(e, value) => autocompleteHandler('component', value)}
+                renderInput={(params) => <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />}
                 defaultValue={form?.component}
               />
             </Paper>
@@ -229,8 +251,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 className={classes.component}
                 defaultValue={form?.version}
                 placeholder="Version"
-                onChange={(e, value) => autocompleteHandler("version", value)}
-                renderInput={(params) => <TextField {...params} />}
+                onChange={(e, value) => autocompleteHandler('version', value)}
+                renderInput={(params) => <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />}
                 onClick={(e) => setVersions(e.target.value)}
               />
             </Paper>
@@ -254,12 +276,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               // getOptionLabel={(option) => option.title}
               style={{ outline: 'none' }}
               fullWidth
-              renderInput={(params) => <TextField {...params} />}
+              renderInput={(params) => <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />}
               name="license_name"
               defaultValue={form?.license}
               className={classes.component}
               placeholder="License"
-              onChange={(e, value) => autocompleteHandler("license_name", value)}
+              onChange={(e, value) => autocompleteHandler('license_name', value)}
               onClick={(e) => setLicenses(e.target.value)}
             />
           </Paper>
