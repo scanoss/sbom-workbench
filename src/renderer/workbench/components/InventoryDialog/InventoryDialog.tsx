@@ -119,7 +119,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     setLicenses(
       data
         ?.find((item) => item?.name === form?.component)
-        ?.versions.find((item) => item?.version === form.version)
+        ?.versions?.find((item) => item?.version === form?.version)
         ?.licenses.map((item) => item?.name)
     );
     console.log(licensescomponent);
@@ -153,7 +153,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 // getOptionLabel={(option) => option.title}
                 style={{ outline: 'none' }}
                 fullWidth
-                renderInput={(params) => <TextField {...params} />}
                 onChange={(e, value) => autocompleteHandler('component', value)}
                 renderInput={(params) => (
                   <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
@@ -181,7 +180,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 fullWidth
                 name="version"
                 className={classes.component}
-                value={form?.version[0]}
+                value={form?.version}
                 placeholder="Version"
                 onChange={(e, value) => autocompleteHandler('version', value)}
                 renderInput={(params) => (
@@ -214,7 +213,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
               )}
               name="license_name"
-              value={form?.license[0]}
+              value={form?.license}
               className={classes.component}
               placeholder="License"
               onChange={(e, value) => autocompleteHandler('license_name', value)}
