@@ -97,9 +97,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   useEffect(() => {
-    getData();
-    console.log(data);
-  }, [form]);
+    if (open === true) {
+      getData();
+    } else {
+      console.log('Todavia no esta en true');
+    }
+  }, [form])
 
   useEffect(() => {
     setArrayNames(data.map((item) => item.name));
