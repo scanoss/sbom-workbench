@@ -17,6 +17,7 @@ import React, { useEffect, useState } from 'react';
 import { Autocomplete } from '@material-ui/lab';
 import { Inventory } from '../../../../api/types';
 import { InventoryForm } from '../../../context/types';
+import { componentService } from '../../../../api/component-service';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -50,6 +51,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
   const { open, inventory, onClose, onCancel } = props;
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
+  const [data, setData] = useState([]);
+  const [versionscomponent, setVersions] = useState<any>([form?.version]);
+  const [arrayNames, setArrayNames] = useState<any>([form?.component]);
+  const [licensescomponent, setLicenses] = useState<any>([form?.license]);
 
   const setDefaults = () => {
     setForm(inventory);
@@ -85,106 +90,28 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     console.log(form);
   }, [form]);
 
-  const [data, setData] = useState([
-    {
-      name: 'scanner',
-      purl: 'asdas',
-      url: 'bla bla',
-      versions: [
-        {
-          version: '2.0.3',
-          licenses: [{ name: 'MIT' }, { name: 'MIT 2' }, { name: 'Apache' }],
-        },
-        {
-          version: '2.0.2',
-          licenses: [{ name: 'MIT' }, { name: 'MIT 2' }, { name: 'Apache' }],
-        },
-        {
-          version: '2.0.1',
-          licenses: [{ name: 'MIT' }, { name: 'MIT 2' }, { name: 'Apache' }],
-        },
-      ],
-    },
-    {
-      name: 'react',
-      purl: 'asdas',
-      url: 'bla bla',
-      versions: [
-        {
-          version: '5.5.5',
-          licenses: [{ name: 'MITReact' }, { name: 'MIT 2React' }, { name: 'ApacheReact' }],
-        },
-        {
-          version: '5.5.5',
-          licenses: [{ name: 'MITReact' }, { name: 'MIT 2React' }, { name: 'ApacheReact' }],
-        },
-        {
-          version: '5.5.5',
-          licenses: [{ name: 'MITReact' }, { name: 'MIT 2React' }, { name: 'ApacheReact' }],
-        },
-      ],
-    },
-    {
-      name: 'VUE',
-      purl: 'asdas',
-      url: 'bla bla',
-      versions: [
-        {
-          version: '7.7.7',
-          licenses: [
-            { name: 'MIT VUE' },
-            { name: 'MIT VUE' },
-            { name: 'ApacheVUE' },
-            { name: 'carlosVUE' },
-            { name: 'satoshinakaVUE' },
-            { name: 'ApacheVUE' },
-          ],
-        },
-        {
-          version: '7.7.7',
-          licenses: [
-            { name: 'MIT VUE' },
-            { name: 'MIT VUE' },
-            { name: 'ApacheVUE' },
-            { name: 'carlosVUE' },
-            { name: 'satoshinakaVUE' },
-            { name: 'ApacheVUE' },
-          ],
-        },
-        {
-          version: '7.7.7',
-          licenses: [
-            { name: 'MIT VUE' },
-            { name: 'MIT VUE' },
-            { name: 'ApacheVUE' },
-            { name: 'carlosVUE' },
-            { name: 'satoshinakaVUE' },
-            { name: 'ApacheVUE' },
-          ],
-        },
-      ],
-    },
-  ]);
+  const getData = async () => {
+    const response = await componentService.getCompVersions();
+    console.log('LA RESPUESTA DEL SERVICIO DE AGUS ES', response?.comp);
+    setData(response?.comp);
+  };
 
-  // useEffect(() => {
-  //   setData();
-  // }, []);
-
-  const [versionscomponent, setVersions] = useState<any>([form?.version]);
-  const [arrayNames, setArrayNames] = useState<any>([form?.component]);
-  const [licensescomponent, setLicenses] = useState<any>([form?.license]);
+  useEffect(() => {
+    getData();
+    console.log(data);
+  }, []);
 
   useEffect(() => {
     setArrayNames(data.map((item) => item.name));
-  }, []);
+  }, [data]);
 
   useEffect(() => {
     const componentObject = data?.find((item) => item?.name === form?.component);
     setVersions(componentObject?.versions.map((item) => item?.version));
-    //
     setForm({ ...form, url: componentObject?.url });
-  }, []);
+  }, [form?.component]);
 
+  // License use Effect
   useEffect(() => {
     setLicenses(
       data
@@ -193,7 +120,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         ?.licenses.map((item) => item?.name)
     );
     console.log(licensescomponent);
-  }, []);
+  }, [form?.version]);
 
   const options = [' ', ' ', ' '];
 
@@ -225,7 +152,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 fullWidth
                 renderInput={(params) => <TextField {...params} />}
                 onChange={(e, value) => autocompleteHandler('component', value)}
-                renderInput={(params) => <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />}
+                renderInput={(params) => (
+                  <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
+                )}
                 defaultValue={form?.component}
               />
             </Paper>
@@ -252,7 +181,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 defaultValue={form?.version}
                 placeholder="Version"
                 onChange={(e, value) => autocompleteHandler('version', value)}
-                renderInput={(params) => <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />}
+                renderInput={(params) => (
+                  <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
+                )}
                 onClick={(e) => setVersions(e.target.value)}
               />
             </Paper>
@@ -276,7 +207,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               // getOptionLabel={(option) => option.title}
               style={{ outline: 'none' }}
               fullWidth
-              renderInput={(params) => <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />}
+              renderInput={(params) => (
+                <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
+              )}
               name="license_name"
               defaultValue={form?.license}
               className={classes.component}
