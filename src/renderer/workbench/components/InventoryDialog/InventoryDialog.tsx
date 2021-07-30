@@ -99,7 +99,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   useEffect(() => {
     getData();
     console.log(data);
-  }, []);
+  }, [form]);
 
   useEffect(() => {
     setArrayNames(data.map((item) => item.name));
