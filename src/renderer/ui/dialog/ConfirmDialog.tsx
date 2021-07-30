@@ -17,7 +17,10 @@ const useStyles = makeStyles((theme) => ({
   },
   okButton: {
     backgroundColor: theme.palette.error.main,
-    color: 'white'
+    color: 'white',
+    '&:hover': {
+      backgroundColor: theme.palette.error.dark,
+    },
   },
   content: {
     backgroundColor: 'white !important',

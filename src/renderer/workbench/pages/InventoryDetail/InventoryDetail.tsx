@@ -29,6 +29,10 @@ export const InventoryDetail = () => {
 
   const getInventory = async () => {
     const response = await inventoryService.get({ id });
+    if (response.status === 'failed') {
+      history.goBack();
+      return;
+    }
     setInventory(response.data);
     setFiles(mapFiles(response.data?.files));
   };
