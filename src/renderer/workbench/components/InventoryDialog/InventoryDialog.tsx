@@ -145,9 +145,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     },
   ]);
 
-  const [versionscomponent, setVersions] = useState<any>([]);
-  const [arrayNames, setArrayNames] = useState<any>([]);
-  const [licensescomponent, setLicenses] = useState<any>([]);
+  // useEffect(() => {
+  //   setData();
+  // }, []);
+
+  const [versionscomponent, setVersions] = useState<any>([form?.version]);
+  const [arrayNames, setArrayNames] = useState<any>([form?.component]);
+  const [licensescomponent, setLicenses] = useState<any>([form?.license]);
 
   useEffect(() => {
     setArrayNames(data.map((item) => item.name));
@@ -158,7 +162,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     setVersions(componentObject?.versions.map((item) => item?.version));
     //
     setForm({...form, url: componentObject?.url });
-  }, [form.component]);
+  }, []);
 
   useEffect(() => {
     setLicenses(
@@ -168,7 +172,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         ?.licenses.map((item) => item?.name)
     );
     console.log(licensescomponent);
-  }, [form.version]);
+  }, []);
 
   const options = [' ', ' ', ' '];
 
@@ -252,7 +256,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               fullWidth
               renderInput={(params) => <TextField {...params} />}
               name="license_name"
-              defaultValue={form?.license_name}
+              defaultValue={form?.license}
               className={classes.component}
               placeholder="License"
               onChange={(e, value) => autocompleteHandler("license_name", value)}
