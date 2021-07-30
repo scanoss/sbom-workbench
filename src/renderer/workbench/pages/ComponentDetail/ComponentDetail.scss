@@ -17,7 +17,7 @@ header.app-header {
   grid-gap: 14px;
 
   @media screen and (max-width: $default-width) {
-    grid-template-columns: 1fr;
+    grid-template-columns: 100%;
     .match-card {
       margin: 0;
     }

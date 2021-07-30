@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { InventoryDialog } from '../workbench/components/InventoryDialog/InventoryDialog';
 import { Inventory } from '../../api/types';
 import { InventorySelectorDialog } from '../workbench/components/InventorySelectorDialog/InventorySelectorDialog';
-import { InventoryForm, InventorySelectorResponse } from './types';
+import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse } from './types';
+import ConfirmDialog from '../ui/dialog/ConfirmDialog';
+import { DialogActions } from '@material-ui/core';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
+  openConfirmDialog: () => Promise<DialogResponse>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -50,8 +53,25 @@ export const DialogProvider: React.FC = ({ children }) => {
     });
   };
 
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    onClose?: (response: DialogResponse) => void;
+  }>({ open: false });
+
+  const openConfirmDialog = (): Promise<DialogResponse> => {
+    return new Promise<DialogResponse>((resolve) => {
+      setConfirmDialog({
+        open: true,
+        onClose: (response) => {
+          setConfirmDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(response);
+        },
+      });
+    });
+  };
+
   return (
-    <DialogContext.Provider value={{ openInventory, openInventorySelector }}>
+    <DialogContext.Provider value={{ openInventory, openInventorySelector, openConfirmDialog }}>
       {children}
       <InventoryDialog
         open={inventoryDialog.open}
@@ -65,6 +85,12 @@ export const DialogProvider: React.FC = ({ children }) => {
         inventories={inventorySelectorDialog.inventories}
         onClose={(response) => inventorySelectorDialog.onClose && inventorySelectorDialog.onClose(response)}
       />
+
+      <ConfirmDialog
+        open={confirmDialog.open}
+        onClose={(response) => confirmDialog.onClose && confirmDialog.onClose(response)}
+      />
+
     </DialogContext.Provider>
   );
 };

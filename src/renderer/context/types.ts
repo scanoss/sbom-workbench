@@ -6,6 +6,10 @@ export enum DIALOG_ACTIONS {
   NEW = 'new',
 }
 
+export interface DialogResponse {
+  action: DIALOG_ACTIONS;
+  data?: any | null;
+}
 export interface InventorySelectorResponse {
   action: DIALOG_ACTIONS;
   inventory?: Inventory | null;
