@@ -102,10 +102,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     } else {
       console.log('Todavia no esta en true');
     }
-  }, [form])
+  }, [form]);
 
   useEffect(() => {
+    console.log('SE ACTIVA');
     setArrayNames(data.map((item) => item.name));
+
   }, [data]);
 
   useEffect(() => {
@@ -114,21 +116,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     setForm({ ...form, url: componentObject?.url, purl: componentObject?.purl });
   }, [form?.component]);
 
-  useEffect(() => {
-    if (versionscomponent)
-    setForm({ ...form, version: versionscomponent[0], license: licensescomponent?.[0] });
-  }, [versionscomponent])
-
   // License use Effect
+
+
   useEffect(() => {
-    setLicenses(
-      data
-        ?.find((item) => item?.name === form?.component)
-        ?.versions?.find((item) => item?.version === form?.version)
-        ?.licenses.map((item) => item?.name)
-    );
-    console.log(licensescomponent);
-  }, [form?.version]);
+    if (versionscomponent) setForm({ ...form, version: versionscomponent[0], license: licensescomponent });
+  }, [versionscomponent]);
 
   const options = [' ', ' ', ' '];
 
