@@ -9,12 +9,14 @@ import {
   Select,
   MenuItem,
   TextareaAutosize,
-  IconButton,
+  TextField,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import React, { useEffect, useState } from 'react';
+import { Autocomplete } from '@material-ui/lab';
 import { Inventory } from '../../../../api/types';
 import { InventoryForm } from '../../../context/types';
+import { componentService } from '../../../../api/component-service';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -28,9 +30,12 @@ const useStyles = makeStyles((theme) => ({
   iconButton: {
     padding: 7,
   },
-  component: {
-    color: '#89898b',
+  input: {
+    color: '#6c6c6e',
     padding: theme.spacing(0.5),
+  },
+  autocomplete: {
+    color: '#6c6c6e',
   },
   actions: {
     backgroundColor: 'var(--background-color-primary)',
@@ -49,16 +54,24 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const { open, inventory, onClose, onCancel } = props;
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
 
-  const setDefaults = () => {
-    setForm(inventory);
-  };
+  const [data, setData] = useState<any[]>([]);
+  const [components, setComponents] = useState<any[]>();
+  const [versions, setVersions] = useState<any[]>();
+  const [licenses, setLicenses] = useState<any[]>();
 
-  const handleCancel = () => {
-    onCancel && onCancel();
+  const setDefaults = () => setForm(inventory);
+
+  const fetchData = async () => {
+    if (open) {
+      const { comp } = await componentService.getCompVersions();
+      setData(comp);
+      setComponents(comp.map((item) => item.name));
+    }
   };
 
   const handleClose = () => {
-    onClose(form);
+    const inventory: Inventory = form;
+    onClose(inventory);
   };
 
   const inputHandler = (e) => {
@@ -68,41 +81,80 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     });
   };
 
+  const autocompleteHandler = (name, value) => {
+    setForm({
+      ...form,
+      [name]: value,
+    });
+  };
+
+  const isValid = () => {
+    const { version, component, url, purl, license } = form;
+    return license && version && component && url && purl;
+  };
+
   useEffect(setDefaults, [inventory]);
+  useEffect(() => fetchData(), [open]);
+
+  useEffect(() => {
+    const component = data.find((item) => item.name === form.component);
+    if (component) {
+      setVersions(component?.versions.map((item) => item?.version));
+      setForm({ ...form, url: component?.url, purl: component?.purl });
+    }
+  }, [form.component] );
+
+  useEffect(() => {
+    const lic = data.find((item) => item?.name === form?.component)
+      ?.versions.find((item) => item?.version === form.version)
+      ?.licenses.map((item) => item?.name)
+    setLicenses(lic);
+  }, [form.version]);
+
+  useEffect(() => {
+    if (versions && versions[0]) setForm({ ...form, version: versions[0] });
+  }, [versions]);
+
+  useEffect(() => {
+    if (licenses && licenses[0]) setForm({ ...form, license: licenses[0] });
+  }, [licenses]);
 
   return (
-    <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={handleCancel}>
+    <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
       <span className="dialog-title">Identify Component</span>
       <div className="identity-component">
         <div className="component-version-container">
           <div className="component-container">
             <label>Component</label>
             <Paper className={classes.paper}>
-              <IconButton className={classes.iconButton} aria-label="menu">
-                <SearchIcon />
-              </IconButton>
-              <InputBase
-                name="component"
-                defaultValue={form?.component}
-                className={classes.component}
-                placeholder="Component"
+              <SearchIcon className={classes.iconButton}  />
+              <Autocomplete
                 fullWidth
-                readOnly
-                onChange={(e) => inputHandler(e)}
+                className={classes.input}
+                options={components || []}
+                value={form?.component}
+                disableClearable
+                onChange={(e, value) => autocompleteHandler('component', value)}
+                renderInput={(params) => (
+                  <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }} />
+                )}
               />
             </Paper>
           </div>
           <div className="component-container">
             <label>Version</label>
             <Paper component="form" className={classes.paper}>
-              <InputBase
-                name="version"
-                className={classes.component}
-                defaultValue={form?.version}
-                placeholder="Version"
+              <SearchIcon className={classes.iconButton}  />
+              <Autocomplete
                 fullWidth
-                readOnly
-                onChange={(e) => inputHandler(e)}
+                className={classes.input}
+                options={versions || []}
+                value={form?.version}
+                disableClearable
+                onChange={(e, value) => autocompleteHandler('version', value)}
+                renderInput={(params) => (
+                  <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }} />
+                )}
               />
             </Paper>
           </div>
@@ -110,14 +162,17 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         <div className="component-container">
           <label>License</label>
           <Paper component="form" className={classes.paper}>
-            <InputBase
-              name="license"
-              defaultValue={form?.license}
-              className={classes.component}
-              placeholder="License"
+            <SearchIcon className={classes.iconButton}  />
+            <Autocomplete
               fullWidth
-              readOnly
-              onChange={(e) => inputHandler(e)}
+              className={classes.input}
+              options={licenses  || []}
+              value={form.license}
+              disableClearable
+              renderInput={(params) => (
+                <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }} />
+              )}
+              onChange={(e, value) => autocompleteHandler('license_name', value)}
             />
           </Paper>
         </div>
@@ -126,12 +181,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <Paper component="form" className={classes.paper}>
             <InputBase
               name="url"
-              defaultValue={form?.url}
-              className={classes.component}
-              placeholder="url"
               fullWidth
               readOnly
+              className={classes.input}
+              value={form?.url}
               onChange={(e) => inputHandler(e)}
+              required
             />
           </Paper>
         </div>
@@ -140,12 +195,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <Paper component="form" className={classes.paper}>
             <InputBase
               name="purl"
-              defaultValue={form?.purl}
-              className={classes.component}
-              placeholder="Purl"
               fullWidth
               readOnly
+              value={form?.purl}
+              className={classes.input}
               onChange={(e) => inputHandler(e)}
+              required
             />
           </Paper>
         </div>
@@ -155,9 +210,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <Paper component="form" className={classes.paper}>
               <Select
                 name="usage"
-                defaultValue={form?.usage}
-                className={classes.component}
                 fullWidth
+                value={form?.usage}
+                className={classes.input}
                 disableUnderline
                 onChange={(e) => inputHandler(e)}
               >
@@ -172,11 +227,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <Paper component="form" className={classes.paper}>
               <TextareaAutosize
                 name="notes"
-                defaultValue={form?.notes}
-                className={classes.component}
+                value={form?.notes}
+                className={classes.input}
                 cols={30}
                 rows={8}
-                maxLength={500}
                 onChange={(e) => inputHandler(e)}
               />
             </Paper>
@@ -185,8 +239,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       </div>
 
       <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button variant="contained" color="secondary" onClick={handleClose}>
+        <Button onClick={onCancel}>Cancel</Button>
+        <Button variant="contained" color="secondary" onClick={handleClose} disabled={!isValid()}>
           Identify
         </Button>
       </DialogActions>
