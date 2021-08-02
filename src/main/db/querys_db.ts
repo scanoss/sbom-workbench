@@ -117,6 +117,9 @@ export class Querys {
   SQL_GET_COMPONENT_BY_PURL_VERSION =
     'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.purl=? and cv.version=?;';
 
+  SQL_GET_COMPONENT_BY_PURL =
+  'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.purl=?';
+
   // GET ALL COMPONENTES
   SQL_GET_ALL_COMPONENTS =
     'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid;';
@@ -132,6 +135,9 @@ export class Querys {
 
   SQL_SELECT_FILES_FROM_PURL_VERSION =
     'SELECT r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines FROM results r WHERE r.purl=? AND r.version=? GROUP BY r.file_path;';
+
+    SQL_SELECT_FILES_FROM_PURL =
+    'SELECT r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines FROM results r WHERE r.purl=? GROUP BY r.file_path;';  
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE results.file_path=?;';
 

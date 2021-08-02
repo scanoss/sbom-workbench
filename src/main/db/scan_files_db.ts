@@ -45,34 +45,65 @@ export class FilesDb extends Db {
   
 
   // GET ALL FILES FOR A COMPONENT
-  getFilesComponent(data: Partial<Component>) { 
-    const self = this;
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.all(
-          query.SQL_SELECT_FILES_FROM_PURL_VERSION,
-          data.purl,
-          data.version,
-          async function (err: any, file: any) {
-            db.close();
-            if (!err) {
-              const comp = await self.component.getAll({
-                purl: data.purl,
-                version: data.version,
-              });
-              for (let i = 0; i < file.length; i += 1) {
-                file[i].component = comp;
-              }
-               resolve(file);
+  async getFilesComponent(data: Partial<Component>) { 
+    let result;
+    try{
+    if(data.purl && data.version)
+     result = await this.getByPurlVersion(data);
+    else
+    result = await this.getByPurl(data);    
+    }catch(error){
+      console.log(error);
+    }
+    return Promise.resolve(result);
+  }
 
-            } else resolve([]);
+  private async getByPurl(data :Partial<Component>){
+    const self = this;
+    try{
+      const db = await this.openDb();
+      db.all(query.SQL_SELECT_FILES_FROM_PURL,data.purl,async function (err: any, file: any) {
+      db.close();
+        if (!err) {
+          const comp = await self.component.getAll({
+            purl: data.purl,
+            version: data.version,
+          });
+          for (let i = 0; i < file.length; i += 1) {
+            file[i].component = comp;
           }
-        );
-      } catch (error) {
-        reject(new Error('error'));
-      }
-    });
+           return Promise.resolve(file);
+        }   
+        return Promise.resolve([]);     
+      });  
+    }    
+    catch(error){
+      console.log(error);
+    }
+  }
+
+ private async getByPurlVersion(data :Partial<Component>){
+    const self = this;
+    try{
+      const db = await this.openDb();
+      db.all(query.SQL_SELECT_FILES_FROM_PURL_VERSION,data.purl,data.version,async function (err: any, file: any) {
+      db.close();
+        if (!err) {
+          const comp = await self.component.getAll({
+            purl: data.purl,
+            version: data.version,
+          });
+          for (let i = 0; i < file.length; i += 1) {
+            file[i].component = comp;
+          }
+           return Promise.resolve(file);
+        }   
+        return Promise.resolve([]);     
+      });  
+    }    
+    catch(error){
+      console.log(error);
+    }
   }
 
   ignored(path: string[]) {
