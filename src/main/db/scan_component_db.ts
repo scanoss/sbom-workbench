@@ -448,9 +448,9 @@ export class ComponentDb extends Db {
   async getCompVersions() {
     try {    
       const data = await this.getAll({});
-      if (data) {        
+      if (data) {  
         this.groupComponentsByName(data);
-        const comp = this.mergeComp(data);       
+        const comp = this.mergeComp(data);   
         return await Promise.resolve(comp);
       } else {
         return await Promise.resolve([]);
@@ -470,6 +470,7 @@ export class ComponentDb extends Db {
     for (let i = 0; i < data.length; i += 1) {
       const comp: any = {};
       const version: any = {};
+      comp.summary=data[i].summary;
       let mergeCounter = 0;
       comp.name = data[i].name;
       comp.purl = data[i].purl;
@@ -498,6 +499,10 @@ export class ComponentDb extends Db {
     const version: any = {};
     version.licenses = data.licenses.slice();
     version.version = data.version;
+    // Total summary of each component
+    components.summary.identified+=data.summary.identified;
+    components.summary.ignored+=data.summary.ignored;
+    components.summary.pending+=data.summary.pending;
     components.versions.push(version);
   }
 }
