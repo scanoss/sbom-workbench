@@ -55,6 +55,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const [versionscomponent, setVersions] = useState<any>([form?.version]);
   const [arrayNames, setArrayNames] = useState<any>([form?.component]);
   const [licensescomponent, setLicenses] = useState<any>([form?.license]);
+  const [formcomplete, setFormComplete] = useState<boolean>(true);
 
   const setDefaults = () => {
     setForm(inventory);
@@ -127,8 +128,44 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   }, [form?.version]);
 
   useEffect(() => {
-    if (versionscomponent) setForm({ ...form, version: versionscomponent[0]});
+    if (versionscomponent) setForm({ ...form, version: versionscomponent[0] });
   }, [versionscomponent]);
+
+  // function that checks if the form is complete
+  const checkFormComplete = () => {
+    console.log('chequeando...');
+    const { name, version, component, url, purl, license, notes } = form;
+    if (
+      name === undefined ||
+      version === undefined ||
+      component === undefined ||
+      url === undefined ||
+      purl === undefined ||
+      license === undefined ||
+      notes === undefined ||
+      name === '' ||
+      version === '' ||
+      component === '' ||
+      url === '' ||
+      purl === '' ||
+      license === '' ||
+      notes === '' ||
+      name === null ||
+      version === null ||
+      component === null ||
+      url === null ||
+      purl === null ||
+      license === null ||
+      notes === null
+    ) {
+      setFormComplete(true);
+    } else {
+      setFormComplete(false);
+    }
+    console.log('CHEQUEADO');
+    console.log(form);
+  };
+  useEffect(checkFormComplete, [form]);
 
   const options = [' ', ' ', ' '];
 
@@ -236,6 +273,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               placeholder="url"
               fullWidth
               onChange={(e) => inputHandler(e)}
+              required
             />
           </Paper>
         </div>
@@ -249,6 +287,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               placeholder="Purl"
               fullWidth
               onChange={(e) => inputHandler(e)}
+              required
             />
           </Paper>
         </div>
@@ -280,6 +319,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 cols={30}
                 rows={8}
                 onChange={(e) => inputHandler(e)}
+                required
               />
             </Paper>
           </div>
@@ -288,7 +328,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
       <DialogActions>
         <Button onClick={onCancel}>Cancel</Button>
-        <Button variant="contained" color="secondary" onClick={handleClose}>
+        <Button variant="contained" color="secondary" onClick={handleClose} disabled={formcomplete}>
           Identify
         </Button>
       </DialogActions>
