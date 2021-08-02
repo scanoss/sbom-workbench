@@ -34,8 +34,7 @@ const LicensesChart = ({ data }) => {
   }, [data]);
 
   return (
-    <canvas
-      ref={chartRef} />
+    <canvas ref={chartRef} />
   );
 };
 

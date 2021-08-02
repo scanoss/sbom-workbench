@@ -5,6 +5,7 @@ import { AppContext, IAppContext } from '../context/AppProvider';
 import { useHistory } from 'react-router-dom';
 import { Chart, registerables } from 'chart.js'
 import LicensesChart from './components/LicensesChart';
+import { Card } from '@material-ui/core';
 Chart.register(...registerables);
 
 const LICENSES_DATA = [
@@ -47,11 +48,12 @@ const Report = () => {
 
         <main className="app-content">
           <section className='report-layout'>
-            <div className="report-item">
-              <LicensesChart
-                data={licenses}
-              />
-            </div>
+            <Card className="report-item">
+              <LicensesChart data={licenses} />
+            </Card>
+            <Card className="report-item">
+              Match licenses
+            </Card>
           </section>
 
         </main>
