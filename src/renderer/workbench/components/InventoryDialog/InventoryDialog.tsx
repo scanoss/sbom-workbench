@@ -117,12 +117,18 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   // License use Effect
   useEffect(() => {
-    if (versionscomponent) setForm({ ...form, version: versionscomponent[0] });
-  }, [versionscomponent]);
+    setLicenses(
+      data
+        ?.find((item) => item?.name === form?.component)
+        ?.versions.find((item) => item?.version === form.version)
+        ?.licenses.map((item) => item?.name)
+    );
+    console.log(licensescomponent);
+  }, [form?.version]);
 
   useEffect(() => {
-    if (licensescomponent) setForm({ ...form, license: licensescomponent[0] });
-  }, [versionscomponent])
+    if (versionscomponent) setForm({ ...form, version: versionscomponent[0]});
+  }, [versionscomponent]);
 
   const options = [' ', ' ', ' '];
 
