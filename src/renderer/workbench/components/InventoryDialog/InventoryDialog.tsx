@@ -30,9 +30,12 @@ const useStyles = makeStyles((theme) => ({
   iconButton: {
     padding: 7,
   },
-  component: {
+  input: {
     color: '#6c6c6e',
     padding: theme.spacing(0.5),
+  },
+  autocomplete: {
+    color: '#6c6c6e',
   },
   actions: {
     backgroundColor: 'var(--background-color-primary)',
@@ -125,13 +128,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <SearchIcon className={classes.iconButton}  />
               <Autocomplete
                 fullWidth
-                className={classes.component}
+                className={classes.input}
                 options={components || []}
                 value={form?.component}
                 disableClearable
                 onChange={(e, value) => autocompleteHandler('component', value)}
                 renderInput={(params) => (
-                  <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
+                  <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }} />
                 )}
               />
             </Paper>
@@ -142,13 +145,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <SearchIcon className={classes.iconButton}  />
               <Autocomplete
                 fullWidth
-                className={classes.component}
+                className={classes.input}
                 options={versions || []}
                 value={form?.version}
                 disableClearable
                 onChange={(e, value) => autocompleteHandler('version', value)}
                 renderInput={(params) => (
-                  <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
+                  <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }} />
                 )}
               />
             </Paper>
@@ -160,12 +163,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <SearchIcon className={classes.iconButton}  />
             <Autocomplete
               fullWidth
-              className={classes.component}
+              className={classes.input}
               options={licenses  || []}
               value={form.license}
               disableClearable
               renderInput={(params) => (
-                <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
+                <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }} />
               )}
               onChange={(e, value) => autocompleteHandler('license_name', value)}
             />
@@ -178,7 +181,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               name="url"
               fullWidth
               readOnly
-              className={classes.component}
+              className={classes.input}
               value={form?.url}
               onChange={(e) => inputHandler(e)}
               required
@@ -193,7 +196,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               fullWidth
               readOnly
               value={form?.purl}
-              className={classes.component}
+              className={classes.input}
               onChange={(e) => inputHandler(e)}
               required
             />
@@ -207,7 +210,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 name="usage"
                 fullWidth
                 value={form?.usage}
-                className={classes.component}
+                className={classes.input}
                 disableUnderline
                 onChange={(e) => inputHandler(e)}
               >
@@ -223,7 +226,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <TextareaAutosize
                 name="notes"
                 value={form?.notes}
-                className={classes.component}
+                className={classes.input}
                 cols={30}
                 rows={8}
                 onChange={(e) => inputHandler(e)}
