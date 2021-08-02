@@ -178,14 +178,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <IconButton className={classes.iconButton} aria-label="menu">
                 <SearchIcon />
               </IconButton>
-              {/* <InputBase
-                  name="component"
-                  defaultValue={form?.component}
-                  className={classes.component}
-                  placeholder="Component"
-                  fullWidth
-                  onChange={(e) => inputHandler(e)}
-                /> */}
               <Autocomplete
                 id="grouped-demo"
                 options={arrayNames}
@@ -204,14 +196,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <div className="component-container">
             <label>Version</label>
             <Paper component="form" className={classes.paper}>
-              {/* <InputBase
-                name="version"
-                className={classes.component}
-                defaultValue={form?.version}
-                placeholder="Version"
-                fullWidth
-                onChange={(e) => inputHandler(e)}
-              /> */}
               <Autocomplete
                 options={versionscomponent || options}
                 // groupBy={(option) => option.firstLetter}
@@ -234,14 +218,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         <div className="component-container">
           <label>License</label>
           <Paper component="form" className={classes.paper}>
-            {/* <InputBase
-              name="license_name"
-              defaultValue={form?.license_name}
-              className={classes.component}
-              placeholder="License"
-              fullWidth
-              onChange={(e) => inputHandler(e)}
-            /> */}
             <Autocomplete
               id="grouped-demo"
               options={licensescomponent || options}
