@@ -253,7 +253,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
               )}
               name="license_name"
-              value={form?.license}
+              value={licensescomponent?.[0] || form?.license}
               className={classes.component}
               placeholder="License"
               onChange={(e, value) => autocompleteHandler('license_name', value)}
