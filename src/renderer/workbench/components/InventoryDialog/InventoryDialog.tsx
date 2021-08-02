@@ -134,23 +134,20 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   // function that checks if the form is complete
   const checkFormComplete = () => {
     console.log('chequeando...');
-    const { name, version, component, url, purl, license, notes } = form;
+    const { version, component, url, purl, license, notes } = form;
     if (
-      name === undefined ||
       version === undefined ||
       component === undefined ||
       url === undefined ||
       purl === undefined ||
       license === undefined ||
       notes === undefined ||
-      name === '' ||
-      version === '' ||
-      component === '' ||
-      url === '' ||
-      purl === '' ||
-      license === '' ||
-      notes === '' ||
-      name === null ||
+      version.trim() === '' ||
+      component.trim() === '' ||
+      url.trim() === '' ||
+      purl.trim() === '' ||
+      license.trim() === '' ||
+      notes.trim() === '' ||
       version === null ||
       component === null ||
       url === null ||
