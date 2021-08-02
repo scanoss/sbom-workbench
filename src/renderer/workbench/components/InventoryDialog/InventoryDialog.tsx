@@ -197,7 +197,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 fullWidth
                 onChange={(e, value) => autocompleteHandler('component', value)}
                 renderInput={(params) => (
-                  <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
+                  <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
                 )}
                 value={form?.component}
               />
@@ -226,7 +226,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 placeholder="Version"
                 onChange={(e, value) => autocompleteHandler('version', value)}
                 renderInput={(params) => (
-                  <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
+                  <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
                 )}
                 onClick={(e) => setVersions(e.target.value)}
               />
@@ -252,7 +252,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               style={{ outline: 'none' }}
               fullWidth
               renderInput={(params) => (
-                <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
+                <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
               )}
               name="license_name"
               value={form?.license}
