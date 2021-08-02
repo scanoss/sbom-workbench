@@ -114,7 +114,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     const componentObject = data?.find((item) => item?.name === form?.component);
     setVersions(componentObject?.versions.map((item) => item?.version));
     setForm({ ...form, url: componentObject?.url, purl: componentObject?.purl });
-  }, [form?.component]);
+    console.log('done');
+  }, [form?.component, form?.notes, form?.version]);
 
   // License use Effect
   useEffect(() => {
