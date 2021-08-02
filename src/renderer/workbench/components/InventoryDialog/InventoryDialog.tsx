@@ -105,15 +105,18 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }
   }, [form]);
 
-  useEffect(() => {
-    console.log('SE ACTIVA');
-    setArrayNames(data.map((item) => item.name));
-  }, [data]);
-
-  useEffect(() => {
+  const setterForm = () => {
     const componentObject = data?.find((item) => item?.name === form?.component);
+    setArrayNames(data.map((item) => item.name));
     setVersions(componentObject?.versions.map((item) => item?.version));
     setForm({ ...form, url: componentObject?.url, purl: componentObject?.purl });
+    setLicenses(
+      componentObject?.versions.find((item) => item?.version === form.version)?.licenses.map((item) => item?.name)
+    );
+  };
+
+  useEffect(() => {
+    setterForm();
     console.log('done');
   }, [form?.component, form?.notes]);
 
@@ -229,7 +232,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
               )}
               name="license_name"
-              value={ licensescomponent?.[0] || form?.license }
+              value={licensescomponent?.[0] || form?.license}
               className={classes.component}
               placeholder="License"
               onChange={(e, value) => autocompleteHandler('license_name', value)}
