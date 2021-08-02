@@ -55,9 +55,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
 
   const [data, setData] = useState<any[]>([]);
-  const [components, setComponents] = useState<any[]>([]);
-  const [versions, setVersions] = useState<any[]>([]);
-  const [licenses, setLicenses] = useState<any[]>([]);
+  const [components, setComponents] = useState<any[]>();
+  const [versions, setVersions] = useState<any[]>();
+  const [licenses, setLicenses] = useState<any[]>();
 
   const setDefaults = () => setForm(inventory);
 
@@ -90,16 +90,18 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const isValid = () => {
     const { version, component, url, purl, license } = form;
-    return (license && version && component && url && purl);
+    return license && version && component && url && purl;
   };
 
   useEffect(setDefaults, [inventory]);
-  useEffect(fetchData, [open]);
+  useEffect(() => fetchData(), [open]);
 
   useEffect(() => {
     const component = data.find((item) => item.name === form.component);
-    setVersions(component?.versions.map((item) => item?.version));
-    setForm({ ...form, url: component?.url, purl: component?.purl });
+    if (component) {
+      setVersions(component?.versions.map((item) => item?.version));
+      setForm({ ...form, url: component?.url, purl: component?.purl });
+    }
   }, [form.component] );
 
   useEffect(() => {
@@ -110,11 +112,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   }, [form.version]);
 
   useEffect(() => {
-    if (versions) setForm({ ...form, version: versions[0] });
+    if (versions && versions[0]) setForm({ ...form, version: versions[0] });
   }, [versions]);
 
   useEffect(() => {
-    if (licenses) setForm({ ...form, license: licenses[0] });
+    if (licenses && licenses[0]) setForm({ ...form, license: licenses[0] });
   }, [licenses]);
 
   return (

@@ -80,9 +80,11 @@ export const ComponentDetail = () => {
 
   const onIdentifyPressed = async (file) => {
     const inv = {
-      ...component,
       component: component?.name,
+      version: component?.version,
       license: component?.licenses[0]?.name,
+      url: component?.url,
+      purl: component?.purl,
       usage: file.type,
     };
 
@@ -95,9 +97,11 @@ export const ComponentDetail = () => {
       .map((file) => file.path);
 
     const inv = {
-      ...component,
       component: component?.name,
+      version: component?.version,
       license: component?.licenses[0]?.name,
+      url: component?.url,
+      purl: component?.purl,
       usage: 'file',
     };
 
@@ -140,9 +144,12 @@ export const ComponentDetail = () => {
     if (action === DIALOG_ACTIONS.CANCEL) return;
 
     if (action === DIALOG_ACTIONS.NEW) {
+      console.log(defaultInventory);
+
       inventory = await dialogCtrl.openInventory(defaultInventory);
       if (!inventory) return;
 
+      console.log(inventory);
       const newInventory = await createInventory({
         ...inventory,
         files: selFiles,
