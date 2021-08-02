@@ -9,7 +9,6 @@ import {
   Select,
   MenuItem,
   TextareaAutosize,
-  IconButton,
   TextField,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
@@ -32,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     padding: 7,
   },
   component: {
-    color: '#89898b',
+    color: '#6c6c6e',
     padding: theme.spacing(0.5),
   },
   actions: {
@@ -51,18 +50,20 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
   const { open, inventory, onClose, onCancel } = props;
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
-  const [data, setData] = useState([]);
-  const [versionscomponent, setVersions] = useState<any>([form?.version]);
-  const [arrayNames, setArrayNames] = useState<any>([form?.component]);
-  const [licensescomponent, setLicenses] = useState<any>([form?.license]);
-  const [formcomplete, setFormComplete] = useState<boolean>(true);
 
-  const setDefaults = () => {
-    setForm(inventory);
-  };
+  const [data, setData] = useState<any[]>([]);
+  const [components, setComponents] = useState<any[]>([]);
+  const [versions, setVersions] = useState<any[]>([]);
+  const [licenses, setLicenses] = useState<any[]>([]);
 
-  const handleCancel = () => {
-    onCancel && onCancel();
+  const setDefaults = () => setForm(inventory);
+
+  const fetchData = async () => {
+    if (open) {
+      const { comp } = await componentService.getCompVersions();
+      setData(comp);
+      setComponents(comp.map((item) => item.name));
+    }
   };
 
   const handleClose = () => {
@@ -77,98 +78,41 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     });
   };
 
-  useEffect(setDefaults, [inventory]);
-
   const autocompleteHandler = (name, value) => {
-    console.log(value);
     setForm({
       ...form,
       [name]: value,
     });
   };
 
-  useEffect(() => {
-    console.log(form);
-  }, [form]);
-
-  const getData = async () => {
-    const response = await componentService.getCompVersions();
-    console.log('LA RESPUESTA DEL SERVICIO DE AGUS ES', response?.comp);
-    setData(response?.comp);
+  const isValid = () => {
+    const { version, component, url, purl, license } = form;
+    return (license && version && component && url && purl);
   };
 
-  useEffect(() => {
-    if (open === true) {
-      getData();
-    } else {
-      console.log('Todavia no esta en true');
-    }
-  }, [form]);
-
-  const setterForm = () => {
-    const componentObject = data?.find((item) => item?.name === form?.component);
-    setArrayNames(data.map((item) => item.name));
-    setVersions(componentObject?.versions.map((item) => item?.version));
-    setForm({ ...form, url: componentObject?.url, purl: componentObject?.purl });
-    setLicenses(
-      componentObject?.versions.find((item) => item?.version === form.version)?.licenses.map((item) => item?.name)
-    );
-  };
+  useEffect(setDefaults, [inventory]);
+  useEffect(fetchData, [open]);
 
   useEffect(() => {
-    setterForm();
-    console.log('done');
-  }, [form?.component, form?.notes]);
-
-  // License use Effect
-  useEffect(() => {
-    setLicenses(
-      data
-        ?.find((item) => item?.name === form?.component)
-        ?.versions.find((item) => item?.version === form.version)
-        ?.licenses.map((item) => item?.name)
-    );
-    console.log(licensescomponent);
-  }, [form?.version]);
+    const component = data.find((item) => item.name === form.component);
+    setVersions(component?.versions.map((item) => item?.version));
+    setForm({ ...form, url: component?.url, purl: component?.purl });
+  }, [form.component] );
 
   useEffect(() => {
-    if (versionscomponent) setForm({ ...form, version: versionscomponent[0] });
-  }, [versionscomponent]);
+    const lic = data.find((item) => item?.name === form?.component)
+      ?.versions.find((item) => item?.version === form.version)
+      ?.licenses.map((item) => item?.name)
+    setLicenses(lic);
+  }, [form.version]);
 
-  // function that checks if the form is complete
-  const checkFormComplete = () => {
-    console.log('chequeando...');
-    const { version, component, url, purl, license, notes } = form;
-    if (
-      version === undefined ||
-      component === undefined ||
-      url === undefined ||
-      purl === undefined ||
-      license === undefined ||
-      notes === undefined ||
-      version.trim() === '' ||
-      component.trim() === '' ||
-      url.trim() === '' ||
-      purl.trim() === '' ||
-      license.trim() === '' ||
-      notes.trim() === '' ||
-      version === null ||
-      component === null ||
-      url === null ||
-      purl === null ||
-      license === null ||
-      notes === null
-    ) {
-      setFormComplete(true);
-    } else {
-      setFormComplete(false);
-    }
-    console.log('CHEQUEADO');
-    console.log(form);
-  };
-  useEffect(checkFormComplete, [form]);
+  useEffect(() => {
+    if (versions) setForm({ ...form, version: versions[0] });
+  }, [versions]);
 
-  const options = [' ', ' ', ' '];
+  useEffect(() => {
+    if (licenses) setForm({ ...form, license: licenses[0] });
+  }, [licenses]);
 
   return (
     <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
@@ -178,42 +122,34 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <div className="component-container">
             <label>Component</label>
             <Paper className={classes.paper}>
-              <IconButton className={classes.iconButton} aria-label="menu">
-                <SearchIcon />
-              </IconButton>
+              <SearchIcon className={classes.iconButton}  />
               <Autocomplete
-                id="grouped-demo"
-                options={arrayNames}
-                // groupBy={(option) => option.firstLetter}
-                // getOptionLabel={(option) => option.title}
-                style={{ outline: 'none' }}
                 fullWidth
+                className={classes.component}
+                options={components || []}
+                value={form?.component}
+                disableClearable
                 onChange={(e, value) => autocompleteHandler('component', value)}
                 renderInput={(params) => (
-                  <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
+                  <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
                 )}
-                value={form?.component}
               />
             </Paper>
           </div>
           <div className="component-container">
             <label>Version</label>
             <Paper component="form" className={classes.paper}>
+              <SearchIcon className={classes.iconButton}  />
               <Autocomplete
-                options={versionscomponent || options}
-                // groupBy={(option) => option.firstLetter}
-                // getOptionLabel={(option) => option.title}
-                style={{ outline: 'none' }}
                 fullWidth
-                name="version"
                 className={classes.component}
+                options={versions || []}
                 value={form?.version}
-                placeholder="Version"
+                disableClearable
                 onChange={(e, value) => autocompleteHandler('version', value)}
                 renderInput={(params) => (
                   <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
                 )}
-                onClick={(e) => setVersions(e.target.value)}
               />
             </Paper>
           </div>
@@ -221,22 +157,17 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         <div className="component-container">
           <label>License</label>
           <Paper component="form" className={classes.paper}>
+            <SearchIcon className={classes.iconButton}  />
             <Autocomplete
-              id="grouped-demo"
-              options={licensescomponent || options}
-              // groupBy={(option) => option.firstLetter}
-              // getOptionLabel={(option) => option.title}
-              style={{ outline: 'none' }}
               fullWidth
+              className={classes.component}
+              options={licenses  || []}
+              value={form.license}
+              disableClearable
               renderInput={(params) => (
                 <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
               )}
-              name="license_name"
-              value={licensescomponent?.[0] || form?.license}
-              className={classes.component}
-              placeholder="License"
               onChange={(e, value) => autocompleteHandler('license_name', value)}
-              onClick={(e) => setLicenses(e.target.value)}
             />
           </Paper>
         </div>
@@ -245,10 +176,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <Paper component="form" className={classes.paper}>
             <InputBase
               name="url"
-              value={form?.url}
-              className={classes.component}
-              placeholder="url"
               fullWidth
+              readOnly
+              className={classes.component}
+              value={form?.url}
               onChange={(e) => inputHandler(e)}
               required
             />
@@ -259,10 +190,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <Paper component="form" className={classes.paper}>
             <InputBase
               name="purl"
+              fullWidth
+              readOnly
               value={form?.purl}
               className={classes.component}
-              placeholder="Purl"
-              fullWidth
               onChange={(e) => inputHandler(e)}
               required
             />
@@ -274,9 +205,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <Paper component="form" className={classes.paper}>
               <Select
                 name="usage"
+                fullWidth
                 value={form?.usage}
                 className={classes.component}
-                fullWidth
                 disableUnderline
                 onChange={(e) => inputHandler(e)}
               >
@@ -296,7 +227,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 cols={30}
                 rows={8}
                 onChange={(e) => inputHandler(e)}
-                required
               />
             </Paper>
           </div>
@@ -305,7 +235,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
       <DialogActions>
         <Button onClick={onCancel}>Cancel</Button>
-        <Button variant="contained" color="secondary" onClick={handleClose} disabled={formcomplete}>
+        <Button variant="contained" color="secondary" onClick={handleClose} disabled={!isValid()}>
           Identify
         </Button>
       </DialogActions>
