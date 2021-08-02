@@ -107,7 +107,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   useEffect(() => {
     console.log('SE ACTIVA');
     setArrayNames(data.map((item) => item.name));
-
   }, [data]);
 
   useEffect(() => {
@@ -117,11 +116,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   }, [form?.component]);
 
   // License use Effect
-
+  useEffect(() => {
+    if (versionscomponent) setForm({ ...form, version: versionscomponent[0] });
+  }, [versionscomponent]);
 
   useEffect(() => {
-    if (versionscomponent) setForm({ ...form, version: versionscomponent[0], license: licensescomponent });
-  }, [versionscomponent]);
+    if (licensescomponent) setForm({ ...form, license: licensescomponent[0] });
+  }, [versionscomponent])
 
   const options = [' ', ' ', ' '];
 
