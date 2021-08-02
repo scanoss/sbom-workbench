@@ -48,12 +48,12 @@ ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (_event, arg: Project) => {
     status: 'ok',
     message: 'Project loaded',
     data: ws, // ws.directory_tree.project,
-  };  
+  };
 });
 
 ipcMain.handle(IpcEvents.UTILS_DEFAULT_PROJECT_PATH, async (event) => {
-  try {  
-    let path = `${os.homedir()}/scanoss-workspace`;   
+  try {
+    let path = `${os.homedir()}/scanoss-workspace`;
     if (!fs.existsSync(path)){
       path=os.homedir();
     }

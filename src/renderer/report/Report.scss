@@ -1,0 +1,13 @@
+#Report {
+  background-color: var(--background-color-primary);
+
+  .report-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 15px;
+
+    .report-item {
+      padding: 16px;
+    }
+  }
+}

@@ -45,14 +45,17 @@ export class Formats extends Db {
           else {
             for (let i = 0; i < data.length; i += 1) {
               const pkg: any = {};
-              const comp = await this.component.getAll(data[i]);
+              const comp:any= await this.component.getAll(data[i]);
               data[i].component = comp;
               pkg.name = data[i].component.name;
               pkg.supplier = data[i].vendor;
               pkg.versionInfo = data[i].version;
               pkg.downloadLocation = data[i].purl;
-              pkg.description = 'Detected by SCANOSS Inventorying Engine.';
+              pkg.description = 'Detected by SCANOSS Inventorying Engine.';           
+              if(comp.licenses.spdx!==undefined)
               pkg.licenseConcluded = data[i].component.licenses[0].spdxid;
+              else
+              pkg.licenseConcluded='n/a';  
               document.Packages.push(pkg);
             }           
             fs.writeFile(`${path}.spdx`, JSON.stringify(document), () => {

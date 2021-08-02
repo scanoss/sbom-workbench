@@ -10,7 +10,7 @@ import {
   Tooltip
 } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
-import { Link, Route, Switch, useRouteMatch } from 'react-router-dom';
+import { Link, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import SplitPane from 'react-split-pane';
 import HomeIcon from '@material-ui/icons/Home';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -50,6 +50,7 @@ const Alert = ({ open, handleClose, path }) => {
 }
 
 const Workbench = () => {
+  const history = useHistory();
   const { path, url } = useRouteMatch();
 
   const { state, dispatch, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
@@ -68,6 +69,9 @@ const Workbench = () => {
   };
 
   const onDownloadClicked = async () => {
+    history.push('/report');
+    return;
+
     const spdxPath = dialogController.showOpenDialog({
       properties: ['openDirectory'],
     });
