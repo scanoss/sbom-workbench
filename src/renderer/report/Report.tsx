@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { Chart, registerables } from 'chart.js';
 import { Card } from '@material-ui/core';
 import LicensesChart from './components/LicensesChart';
+import IdentificationProgress from './components/IdentificationProgress';
 import { AppContext, IAppContext } from '../context/AppProvider';
 
 Chart.register(...registerables);
@@ -15,6 +16,10 @@ const LICENSES_DATA = [
   { label: 'GNU (General Public License)', value: 5 },
   { label: 'Mozilla Public License', value: 3 },
   { label: 'Eclipse Public License', value: 2 },
+];
+
+const BAR_DATA = [
+  { label: '90%', value: 15 },
 ];
 
 const PROGRESS_DATA = { identified: 4312, pending: 15749 };
@@ -50,10 +55,14 @@ const Report = () => {
         <main className="app-content">
           <section className="report-layout">
             <Card className="report-item identification-progress">
-              <div className="a">a</div>
+              <div className="a">
+                <IdentificationProgress data={BAR_DATA} />
+              </div>
             </Card>
             <Card className="report-item licenses">
-              <div className="b">b</div>
+              <div className="b">
+                <LicensesChart data={LICENSES_DATA} />
+              </div>
             </Card>
             <Card className="report-item matches-for-license">
               <div className="c">c</div>

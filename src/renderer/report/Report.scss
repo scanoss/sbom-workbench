@@ -24,5 +24,64 @@
     .report-item {
       padding: 16px;
     }
+
+    .a {
+      width: 100%;
+      height: 150px;
+    }
+
+
+
+
+    .LicensesChart {
+      width: 330px;
+      height: fit-content;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+
+      .report-titles-container {
+
+        margin-bottom: 48px;
+
+          .report-titles {
+            color: #27272A;
+            font-size: 30px;
+            font-style: normal;
+            font-weight: 700;
+
+
+          }
+
+      }
+    }
+
+
+
+    .IdentificationProgress {
+      width: 100%;
+      height: fit-content;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+
+      .report-titles-container {
+
+        margin-bottom: 48px;
+
+          .report-titles {
+            color: #27272A;
+            font-size: 30px;
+            font-style: normal;
+            font-weight: 700;
+          }
+
+      }
+
+    }
+
+
+
+
   }
 }
