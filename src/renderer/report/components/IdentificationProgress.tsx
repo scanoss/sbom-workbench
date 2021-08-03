@@ -3,6 +3,7 @@ import { Chart } from 'chart.js';
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
+  const totalFiles = data.pending + data.identified;
 
   useEffect(() => {
     const percentage = Math.round((data.identified / data.pending) * 100);
@@ -81,6 +82,9 @@ const LicensesChart = ({ data }) => {
       </div>
       <div className="identification-canvas-container">
         <canvas ref={chartRef} />
+      </div>
+      <div className="total-files-container">
+        <span className="total-files-label">Total Files: {totalFiles}</span>
       </div>
     </div>
   )

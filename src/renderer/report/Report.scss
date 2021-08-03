@@ -80,6 +80,21 @@
 
     }
 
+    .total-files-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .total-files-label {
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 19px;
+        text-align: center;
+      }
+
+    }
+
+
 
 
 
