@@ -10,7 +10,7 @@ const LicensesChart = ({ data }) => {
     const chart = new Chart(chartRef.current, {
       type: 'bar',
       data: {
-        labels: [percentage + '%'],
+        labels: [`${percentage}%`],
         datasets: [
           {
             label: '',
@@ -46,7 +46,7 @@ const LicensesChart = ({ data }) => {
                 size: 64,
                 weight: 'bold',
                 family: 'Inter',
-            }
+              },
             },
           },
           x: {
@@ -62,12 +62,23 @@ const LicensesChart = ({ data }) => {
           },
         },
         plugins: {
+          tooltip: {
+            callbacks: {
+              label() {
+                return (``);
+              },
+              title() {
+                return (`Files\n${data?.pending}`);
+              }
+            },
+            displayColors: false,
+          },
           legend: {
             display: false,
             labels: {
               boxWidth: 0,
-            }
-          }
+            },
+          },
         },
       },
     });
@@ -87,7 +98,7 @@ const LicensesChart = ({ data }) => {
         <span className="total-files-label">Total Files: {totalFiles}</span>
       </div>
     </div>
-  )
+  );
 };
 
 export default LicensesChart;
