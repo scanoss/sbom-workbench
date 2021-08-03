@@ -18,9 +18,7 @@ const LICENSES_DATA = [
   { label: 'Eclipse Public License', value: 2 },
 ];
 
-const BAR_DATA = [
-  { label: '90%', value: 15 },
-];
+const BAR_DATA = [{ label: '90%', value: 15 }];
 
 const PROGRESS_DATA = { identified: 4312, pending: 15749 };
 
@@ -55,9 +53,7 @@ const Report = () => {
         <main className="app-content">
           <section className="report-layout">
             <Card className="report-item identification-progress">
-              <div className="a">
-                <IdentificationProgress data={BAR_DATA} />
-              </div>
+              {progress && <IdentificationProgress data={progress} />}
             </Card>
             <Card className="report-item licenses">
               <div className="b">

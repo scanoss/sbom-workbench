@@ -5,31 +5,51 @@ const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
 
   useEffect(() => {
+    const percentage = Math.round((data.identified / data.pending) * 100);
     const chart = new Chart(chartRef.current, {
       type: 'bar',
       data: {
-        labels: data.map((d) => d.label),
+        labels: [percentage + '%'],
         datasets: [
           {
             label: '',
-            data: data.map((d) => d.value),
+            data: [percentage],
             borderWidth: 0,
-            backgroundColor: ['#22C55E', '#F97316'],
+            backgroundColor: ['#22C55E'],
+            barThickness: 50,
+          },
+          {
+            label: 'Identified',
+            data: [100],
+            borderWidth: 0,
+            backgroundColor: ['#F97316'],
             barThickness: 50,
           },
         ],
       },
       options: {
+        maintainAspectRatio: false,
         indexAxis: 'y',
         scales: {
           y: {
+            stacked: true,
             beginAtZero: true,
             grid: {
               display: false,
               drawBorder: false,
             },
+            ticks: {
+              color: '#22C55E',
+              padding: 12,
+              font: {
+                size: 64,
+                weight: 'bold',
+                family: 'Inter',
+            }
+            },
           },
           x: {
+            stacked: true,
             beginAtZero: true,
             grid: {
               display: false,
@@ -59,11 +79,9 @@ const LicensesChart = ({ data }) => {
       <div className="report-titles-container">
         <span className="report-titles">Identification Progress</span>
       </div>
-      <div>
+      <div className="identification-canvas-container">
         <canvas ref={chartRef} />
-        <div className="licenses-scroll" />
       </div>
-      <canvas ref={chartRef} />
     </div>
   )
 };

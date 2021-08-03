@@ -59,10 +59,9 @@
 
 
     .IdentificationProgress {
-      width: 100%;
-      height: fit-content;
-      padding: 24px;
+      padding: 10px;
       display: flex;
+      justify-content: center;
       flex-direction: column;
 
       .report-titles-container {
@@ -77,6 +76,7 @@
           }
 
       }
+
 
     }
 
