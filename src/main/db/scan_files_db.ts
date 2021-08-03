@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable @typescript-eslint/return-await */
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable prettier/prettier */
 /* eslint-disable func-names */
@@ -46,19 +48,23 @@ export class FilesDb extends Db {
 
   // GET ALL FILES FOR A COMPONENT
   async getFilesComponent(data: Partial<Component>) { 
-    let result;
-    try{
-    if(data.purl && data.version)
-     result = await this.getByPurlVersion(data);
-    else
-    result = await this.getByPurl(data);    
-    }catch(error){
-      console.log(error);
-    }
-    return Promise.resolve(result);
+    return new Promise(async (resolve, reject) => {
+      let result;
+      try{
+        if(data.purl && data.version)
+          result = await this.getByPurlVersion(data);
+        else
+          result = await this.getByPurl(data);
+          console.log(result);
+          resolve(result);
+      }catch(error){
+        console.log(error);
+      }
+    });
   }
 
   private async getByPurl(data :Partial<Component>){
+    return new Promise(async (resolve, reject) => {
     const self = this;
     try{
       const db = await this.openDb();
@@ -71,18 +77,20 @@ export class FilesDb extends Db {
           });
           for (let i = 0; i < file.length; i += 1) {
             file[i].component = comp;
-          }
-           return Promise.resolve(file);
-        }   
-        return Promise.resolve([]);     
+          }  
+          resolve(file);       
+        }else
+          resolve([]);         
       });  
     }    
     catch(error){
       console.log(error);
     }
+  });
   }
 
  private async getByPurlVersion(data :Partial<Component>){
+  return new Promise(async (resolve, reject) => {
     const self = this;
     try{
       const db = await this.openDb();
@@ -96,15 +104,16 @@ export class FilesDb extends Db {
           for (let i = 0; i < file.length; i += 1) {
             file[i].component = comp;
           }
-           return Promise.resolve(file);
-        }   
-        return Promise.resolve([]);     
+         resolve(file);
+        }else
+          resolve([]);        
       });  
     }    
     catch(error){
       console.log(error);
     }
-  }
+  });
+}
 
   ignored(path: string[]) {
     return new Promise(async (resolve, reject) => {
