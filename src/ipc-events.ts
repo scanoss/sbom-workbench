@@ -50,6 +50,8 @@ export enum IpcEvents {
 
   EXPORT_SPDX = 'EXPORT_SPDX',
 
+  REPORT_LICENSES = 'REPORT_LICENSES',
+
 
 }
 
@@ -103,6 +105,7 @@ export const ipcRendererEvents = [
   IpcEvents.RESULTS_GET,
 
   IpcEvents.EXPORT_SPDX,
+  IpcEvents.REPORT_LICENSES,
 
   IpcEvents.UTILS_DEFAULT_PROJECT_PATH,
 ];

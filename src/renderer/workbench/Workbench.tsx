@@ -1,19 +1,21 @@
 import {
   Box,
   Button,
-  Dialog, DialogActions,
+  Dialog,
+  DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   Fab,
   IconButton,
-  Tooltip
+  Tooltip,
 } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import SplitPane from 'react-split-pane';
 import HomeIcon from '@material-ui/icons/Home';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import SaveAltOutlinedIcon from '@material-ui/icons/SaveAltOutlined';
 import { Editor } from './pages/Editor/Editor';
 import { FileTree } from './components/FileTree/FileTree';
 import { dialogController } from '../dialog-controller';
@@ -23,17 +25,14 @@ import { AppContext, IAppContext } from '../context/AppProvider';
 import { ComponentList } from './pages/ComponentList/ComponentList';
 import { ComponentDetail } from './pages/ComponentDetail/ComponentDetail';
 import { InventoryDetail } from './pages/InventoryDetail/InventoryDetail';
-import SaveAltOutlinedIcon from '@material-ui/icons/SaveAltOutlined';
 import { reset } from './actions';
 import { ExportFormat } from '../../api/export-service';
+import { report } from '../../api/report-service';
 
 
 const Alert = ({ open, handleClose, path }) => {
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-    >
+    <Dialog open={open} onClose={handleClose}>
       <DialogTitle id="alert-dialog-title">SPXD Export</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
@@ -47,7 +46,7 @@ const Alert = ({ open, handleClose, path }) => {
       </DialogActions>
     </Dialog>
   );
-}
+};
 
 const Workbench = () => {
   const history = useHistory();
@@ -68,7 +67,7 @@ const Workbench = () => {
     }
   };
 
-  const onDownloadClicked = async () => {
+  const onDownloadClickedExport = async () => {
     history.push('/report');
     return;
 
@@ -78,11 +77,17 @@ const Workbench = () => {
     await ExportFormat.spdx(spdxPath);
     setOpen(true);
     setSavePath(spdxPath);
-  }
+  };
+
+  const onDownloadClicked = async () => {
+
+
+    history.push('/report');
+  };
 
   const onDestroy = () => {
     dispatch(reset());
-  }
+  };
 
   useEffect(() => {
     onInit();
@@ -125,13 +130,15 @@ const Workbench = () => {
             <Route path={`${path}/inventory/:id`}>
               <InventoryDetail />
             </Route>
-            <Route path={`${path}/file`}><Editor /></Route>
+            <Route path={`${path}/file`}>
+              <Editor />
+            </Route>
           </Switch>
         </main>
       </SplitPane>
 
       <Tooltip title="Export SPDX">
-        <Fab className="btn-export"  onClick={onDownloadClicked}>
+        <Fab className="btn-export" onClick={onDownloadClicked}>
           <SaveAltOutlinedIcon />
         </Fab>
       </Tooltip>
