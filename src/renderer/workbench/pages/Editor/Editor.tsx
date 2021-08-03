@@ -53,6 +53,7 @@ export const Editor = () => {
   const init = () => {
     setMatchInfo(null);
     setInventories(null);
+    setFullFile(false);
     setLocalFileContent({ content: null, error: false });
     setRemoteFileContent({ content: null, error: false });
 
@@ -86,7 +87,6 @@ export const Editor = () => {
 
   const getInventories = async () => {
     const { data } = await inventoryService.getAll({ files: [file] });
-    console.log(data);
     setInventories(data);
   };
 
@@ -183,8 +183,6 @@ export const Editor = () => {
   }, [file]);
 
   useEffect(() => {
-    // init();
-
     if (matchInfo) {
       setCurrentMatch(matchInfo[0]);
     } else {
@@ -252,7 +250,7 @@ export const Editor = () => {
                   <IconButton onClick={() => history.goBack()} component="span">
                     <ArrowBackIcon />
                   </IconButton>
-                  Matches
+                  { inventories?.length === 0 && matchInfo?.length === 0 ? 'No match found' : 'Matches' }
                 </h2>
               </div>
               <header className="match-info-header">
@@ -311,7 +309,7 @@ export const Editor = () => {
         {fullFile ? (
           <main className="editors-full app-content">
             <div className="editor">
-              {currentMatch && localFileContent?.content ? (
+              {matchInfo && localFileContent?.content ? (
                 <MemoCodeEditor content={localFileContent.content} highlight={lines} />
               ) : null}
             </div>
@@ -319,7 +317,7 @@ export const Editor = () => {
         ) : (
           <main className="editors app-content">
             <div className="editor">
-              {currentMatch && localFileContent?.content ? (
+              {matchInfo && localFileContent?.content ? (
                 <MemoCodeEditor content={localFileContent.content} highlight={lines} />
               ) : null}
             </div>
