@@ -49,11 +49,24 @@ const Report = () => {
 
         <main className="app-content">
           <section className="report-layout">
-            <Card className="report-item identification-progress" />
-            <Card className="report-item licenses">a{/* <LicensesChart data={licenses} /> */}</Card>
-            <Card className="report-item matches-for-license">{/* <LicensesChart data={licenses} /> */}</Card>
-            <Card className="report-item matches">{/* <LicensesChart data={licenses} /> */}</Card>
-            <Card className="report-item">Match licenses</Card>
+            <Card className="report-item identification-progress">
+              <div className="a">a</div>
+            </Card>
+            <Card className="report-item licenses">
+              <div className="b">b</div>
+            </Card>
+            <Card className="report-item matches-for-license">
+              <div className="c">c</div>
+            </Card>
+            <Card className="report-item matches">
+              <div className="d">d</div>
+            </Card>
+            <Card className="report-item vulnerabilites">
+              <div className="e">e</div>
+            </Card>
+            <Card className="report-item licenses-obligation">
+              <div className="e">f</div>
+            </Card>
           </section>
         </main>
       </section>
