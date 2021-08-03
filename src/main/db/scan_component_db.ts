@@ -47,11 +47,12 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         let component: any;
-        if (data.purl && data.version) {
-          component = await this.getbyPurlVersion(data);
-        } else {
-          component = await this.allComp();
-        }
+        if (data.purl && data.version) 
+          component = await this.getbyPurlVersion(data);        
+        if(data.purl)
+          component = await this.getByPurl(data);
+        else 
+          component = await this.allComp();        
         if (component !== undefined) resolve(component);
         else resolve({});
       } catch (error) {
@@ -128,6 +129,34 @@ export class ComponentDb extends Db {
         });
       } catch (error) {
         console.log(error);
+      }
+    });
+  }
+
+
+  // GET COMPONENENT ID FROM PURL
+  private getByPurl(data: any) {
+    const self = this;
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.get(
+          query.SQL_GET_COMPONENT_BY_PURL,
+          data.purl,
+          async (err: any, component: any) => {
+            db.close();
+            if (err) resolve(undefined);
+            // Attach license to a component
+            self.processComponent(component);
+            const licenses = await self.getAllLicensesFromComponentId(
+              component.compid
+            );
+            component.licenses = licenses;             
+            resolve(component);
+          }
+        );
+      } catch (error) {
+        reject(error);
       }
     });
   }
