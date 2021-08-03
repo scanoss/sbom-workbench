@@ -54,8 +54,7 @@ export class FilesDb extends Db {
         if(data.purl && data.version)
           result = await this.getByPurlVersion(data);
         else
-          result = await this.getByPurl(data);
-          console.log(result);
+          result = await this.getByPurl(data);   
           resolve(result);
       }catch(error){
         console.log(error);
