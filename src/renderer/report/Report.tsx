@@ -29,9 +29,8 @@ const Report = () => {
 
   const init = async () => {
     const a = await report.getLicensesUsage();
-    console.log (a);
     setProgress(PROGRESS_DATA);
-    setLicenses(a.data);
+    setLicenses(a.data.licenses);
   };
 
   useEffect(init, []);

@@ -21,7 +21,7 @@ interface inventoryProgress {
   scannedFiles: number;
   excludedFiles: number;
   detectedComponents: number;
-  acceptedComponents:number;
+  acceptedComponents: number;
 
 
 }
@@ -30,7 +30,10 @@ interface inventoryProgress {
 ipcMain.handle(IpcEvents.REPORT_LICENSES, async (event, arg: string) => {
   let success: boolean;
   let licenses: licenseEntry[];
+  let crypto: cryptoEntry[];
+  let inventory: inventoryProgress;
 licenses=[];
+
   try {
     console.log('pase por aca');
     const a = defaultProject.results;
@@ -61,7 +64,7 @@ licenses=[];
     return {
       status: 'ok',
       message: 'SPDX export successfully',
-      data: licenses,
+      data: {licenses: licenses, crypto: crypto, progress:inventory}
     };
   } catch (e) {
     console.log('Catch an error: ', e);
