@@ -16,6 +16,7 @@ import { inventoryService } from '../../../../api/inventory-service';
 import { fileService } from '../../../../api/file-service';
 import { setFile } from '../../actions';
 import { DIALOG_ACTIONS } from '../../../context/types';
+import { resultService } from '../../../../api/results-service';
 
 const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
 
@@ -51,6 +52,7 @@ export const Editor = () => {
 
   const init = () => {
     getInventories();
+    getResults();
     // getFile();
   };
 
@@ -84,6 +86,13 @@ export const Editor = () => {
     setFileStatus(mapFile(data));
   };
 
+  const getResults = async () => {
+    const { data } = await resultService.get(file);
+    console.log(data);
+    console.log(matchInfo);
+    // setFileStatus(data);
+  };
+
   const create = async (defaultInventory, selFiles) => {
     const response = await inventoryService.getAll( {purl: defaultInventory.purl, version: defaultInventory.version} );
     const inventories = response.message || [];
@@ -112,7 +121,7 @@ export const Editor = () => {
     }
 
     if (action === DIALOG_ACTIONS.OK) {
-      await attachFile(inventory.id, inventory.component.purl, inventory.component.version, selFiles);
+      await attachFile(inventory.id, selFiles);
       setInventories((previous) => [...previous, inventory]); // TODO: full update
     }
 

@@ -154,7 +154,7 @@ export class ResultsDb extends Db {
         results = await this.getResult(path);
         for (let i = 0; i < results.length; i += 1) {
           const comp= await this.component.getAll(results[i]);
-           results.component = comp;
+          results[i].component = comp;
         }
         resolve(results);
       } catch (error) {
@@ -163,5 +163,5 @@ export class ResultsDb extends Db {
     });
   }
 
- 
+
 }

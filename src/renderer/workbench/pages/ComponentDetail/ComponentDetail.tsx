@@ -88,13 +88,13 @@ export const ComponentDetail = () => {
       usage: file.type,
     };
 
-    create(inv, [file.path]);
+    create(inv, [file.id]);
   };
 
   const onIdentifyAllPressed = async () => {
     const selFiles = files
       .filter((file) => file.status === 'pending')
-      .map((file) => file.path);
+      .map((file) => file.id);
 
     const inv = {
       component: component?.name,
@@ -109,24 +109,24 @@ export const ComponentDetail = () => {
   };
 
   const onIgnorePressed = async (file) => {
-    await ignoreFile([file.path]);
+    await ignoreFile([file.id]);
     getFiles();
   };
 
   const onIgnoreAllPressed = async () => {
-    const selFiles = files.filter((file) => file.status === 'pending').map((file) => file.path);
+    const selFiles = files.filter((file) => file.status === 'pending').map((file) => file.id);
     await ignoreFile(selFiles);
     getFiles();
   };
 
   const onRestoreAllPressed = async () => {
-    const selFiles = files.filter((file) => file.status === 'ignored').map((file) => file.path);
+    const selFiles = files.filter((file) => file.status === 'ignored').map((file) => file.id);
     await restoreFile(selFiles);
     getFiles();
   };
 
   const onRestorePressed = async (file) => {
-    await restoreFile([file.path]);
+    await restoreFile([file.id]);
     getFiles();
   };
 
@@ -144,19 +144,16 @@ export const ComponentDetail = () => {
     if (action === DIALOG_ACTIONS.CANCEL) return;
 
     if (action === DIALOG_ACTIONS.NEW) {
-      console.log(defaultInventory);
-
       inventory = await dialogCtrl.openInventory(defaultInventory);
       if (!inventory) return;
 
-      console.log(inventory);
       const newInventory = await createInventory({
         ...inventory,
         files: selFiles,
       });
       setInventories((previous) => [...previous, newInventory]);
     } else if (action === DIALOG_ACTIONS.OK) {
-      await attachFile(inventory.id, inventory.component.purl, inventory.component.version, selFiles);
+      await attachFile(inventory.id, selFiles);
     }
 
     getFiles();
