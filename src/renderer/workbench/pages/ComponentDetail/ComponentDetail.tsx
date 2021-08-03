@@ -214,7 +214,7 @@ export const ComponentDetail = () => {
                   textColor="primary"
                   onChange={(event, value) => setTab(value)}
                 >
-                  <Tab label={`Pendings (${component?.summary.pending})`} />
+                  <Tab label={`Pending (${component?.summary.pending})`} />
                   <Tab label={`Identified (${component?.summary.identified})`} />
                   <Tab label={`Ignored (${component?.summary.ignored})`} />
                 </Tabs>
