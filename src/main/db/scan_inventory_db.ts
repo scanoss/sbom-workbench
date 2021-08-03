@@ -98,24 +98,26 @@ export class InventoryDb extends Db {
 
   // DETACH FILE INVENTORY
   async detachFileInventory(inventory: Partial<Inventory>) {
-    try {
-      await this.pending(inventory);
-      const db = await this.openDb();
-      db.serialize(function () {
-        db.run('begin transaction');
-        if (inventory.files) {
-          for (const id of inventory.files) {
-            db.run(query.SQL_DELETE_FILE_INVENTORIES, id, inventory.id);
-          }
-        }
-        db.run('commit', () => {
-          db.close();
+    return new Promise(async (resolve, reject) => {
+      try {
+        await this.pending(inventory);
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          if (inventory.files) {
+            for (const id of inventory.files) {
+              db.run(query.SQL_DELETE_FILE_INVENTORIES, id, inventory.id);
+            }
+            db.run('commit', () => {
+              db.close();
+              resolve(true);
+            });
+          } else resolve(false);
         });
-      });
-    } catch (error) {
-      return Promise.reject(new Error('Unable to detach inventory'));
-    }
-    return Promise.resolve(true);
+      } catch (error) {
+        reject(new Error('Unable to detach inventory'));
+      }
+    });
   }
 
   // GET INVENTORY BY ID

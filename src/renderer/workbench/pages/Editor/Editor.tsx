@@ -10,13 +10,13 @@ import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { Inventory } from '../../../../api/types';
 import LabelCard from '../../components/LabelCard/LabelCard';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../components/MatchInfoCard/MatchInfoCard';
-import { mapFile, mapFiles } from '../../../../utils/scan-util';
+import { mapFiles } from '../../../../utils/scan-util';
 import CodeEditor from '../../components/CodeEditor/CodeEditor';
 import { inventoryService } from '../../../../api/inventory-service';
-import { fileService } from '../../../../api/file-service';
 import { setFile } from '../../actions';
 import { DIALOG_ACTIONS } from '../../../context/types';
 import { resultService } from '../../../../api/results-service';
+import { Skeleton } from '@material-ui/lab';
 
 const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
 
@@ -39,21 +39,29 @@ export const Editor = () => {
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { file, matchInfo } = state;
+  const { file } = state;
 
+  const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
+  const [inventories, setInventories] = useState<Inventory[] | null>(null);
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
-  const [fileStatus, setFileStatus] = useState<any | null>(null);
-  const [inventories, setInventories] = useState<Inventory[]>([]);
   const [ossLines, setOssLines] = useState<number[] | null>([]);
   const [lines, setLines] = useState<number[] | null>([]);
   const [fullFile, setFullFile] = useState<boolean | null>(null);
 
   const init = () => {
+    setMatchInfo(null);
+    setInventories(null);
+    setLocalFileContent({ content: null, error: false });
+    setRemoteFileContent({ content: null, error: false });
+
     getInventories();
     getResults();
-    // getFile();
+
+    if (file) {
+      loadLocalFile(file);
+    }
   };
 
   const loadLocalFile = async (path: string): Promise<void> => {
@@ -78,19 +86,13 @@ export const Editor = () => {
 
   const getInventories = async () => {
     const { data } = await inventoryService.getAll({ files: [file] });
+    console.log(data);
     setInventories(data);
-  };
-
-  const getFile = async () => {
-    const { data } = await fileService.get({ path: file });
-    setFileStatus(mapFile(data));
   };
 
   const getResults = async () => {
     const { data } = await resultService.get(file);
-    console.log(data);
-    console.log(matchInfo);
-    // setFileStatus(data);
+    setMatchInfo(mapFiles(data));
   };
 
   const create = async (defaultInventory, selFiles) => {
@@ -125,39 +127,45 @@ export const Editor = () => {
       setInventories((previous) => [...previous, inventory]); // TODO: full update
     }
 
-    getFile();
+    getResults();
   };
 
-  const onIdentifyPressed = async () => {
+  const onIdentifyPressed = async (result) => {
     const inv = {
-      component: currentMatch?.component,
-      version: currentMatch?.version,
-      url: currentMatch?.url,
-      purl: currentMatch?.purl[0],
-      license: currentMatch?.licenses[0]?.name,
-      usage: currentMatch?.id,
+      component: result.component.name,
+      version: result.component.version,
+      url: result.component.url,
+      purl: result.component.purl,
+      license: result.component.licenses[0]?.name,
+      usage: result.type,
     };
 
-    create(inv, [file]);
+    create(inv, [result.id]);
   };
 
-  const onIgnorePressed = async () => {
-    await ignoreFile([file]);
-    getFile();
+  const onIgnorePressed = async (result) => {
+    await ignoreFile([result.id]);
+    getResults();
   };
 
-  const onRestorePressed = async () => {
-    await restoreFile([file]);
-    getFile();
+  const onRestorePressed = async (result) => {
+    await restoreFile([result.id]);
+    getResults();
   };
 
   const onDetachPressed = async (inventory) => {
-    await detachFile(inventory.id, inventory.component.purl, inventory.component.version, [file]);
-    getInventories();
-    getFile();
+    const { data } = await inventoryService.get({ id: inventory.id });
+    const fileResult = data?.files.find((item) => item.path === file);
+    console.log(fileResult);
+    if (fileResult) {
+      await detachFile(inventory.id, [fileResult.id]);
+      getInventories();
+      getResults();
+    }
   };
 
   const onDetailPressed = async (result) => {
+    console.log(result);
     history.push(`/workbench/inventory/${result.id}`);
   };
 
@@ -171,16 +179,12 @@ export const Editor = () => {
   }, []);
 
   useEffect(() => {
-    setLocalFileContent({ content: null, error: false });
-    setRemoteFileContent({ content: null, error: false });
-
-    if (file) {
-      loadLocalFile(file);
-    }
+    init();
   }, [file]);
 
   useEffect(() => {
-    init();
+    // init();
+
     if (matchInfo) {
       setCurrentMatch(matchInfo[0]);
     } else {
@@ -190,7 +194,6 @@ export const Editor = () => {
 
   useEffect(() => {
     if (currentMatch) {
-      getFile();
       const full = currentMatch?.lines === 'all';
       setFullFile(full);
       if (!full) loadRemoteFile(currentMatch.file_hash);
@@ -220,13 +223,13 @@ export const Editor = () => {
   const onAction = (action: MATCH_INFO_CARD_ACTIONS, result: any = null) => {
     switch (action) {
       case MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY:
-        onIdentifyPressed();
+        onIdentifyPressed(result);
         break;
       case MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE:
-        onIgnorePressed();
+        onIgnorePressed(result);
         break;
       case MATCH_INFO_CARD_ACTIONS.ACTION_RESTORE:
-        onRestorePressed();
+        onRestorePressed(result);
         break;
       case MATCH_INFO_CARD_ACTIONS.ACTION_DETAIL:
         onDetailPressed(result);
@@ -243,19 +246,22 @@ export const Editor = () => {
     <>
       <section id="editor" className="app-page">
         <header className="app-header">
-          {matchInfo ? (
             <>
               <div className="match-title">
-                <IconButton onClick={() => history.goBack()} component="span">
-                  <ArrowBackIcon className="arrow-icon" />
-                </IconButton>
-                <span className="match-span">Match</span>
+                <h2 className="header-subtitle back">
+                  <IconButton onClick={() => history.goBack()} component="span">
+                    <ArrowBackIcon />
+                  </IconButton>
+                  Matches
+                </h2>
               </div>
               <header className="match-info-header">
-                <section className="content">
-                  <div className="match-info-default-container">
-                    {inventories.length > 0
-                      ? inventories.map((inventory) => (
+
+                { matchInfo && inventories ?
+                  <section className="content">
+                    <div className="match-info-default-container">
+                      {inventories.length > 0
+                        ? inventories.map((inventory) => (
                           <MatchInfoCard
                             key={inventory.id}
                             selected={currentMatch === inventory}
@@ -272,34 +278,34 @@ export const Editor = () => {
                             onAction={(action) => onAction(action, inventory)}
                           />
                         ))
-                      : matchInfo.map((match, index) => (
+                        : matchInfo.map((match, index) => (
                           <MatchInfoCard
                             key={index}
                             selected={currentMatch === match}
                             match={{
-                              component: match.component,
-                              version: match.version,
-                              usage: match.id,
-                              license: match.licenses[0]?.name,
-                              url: match.url,
-                              purl: match.purl[0],
+                              component: match.component.name,
+                              version: match.component.version,
+                              usage: match.type,
+                              license: match.component.licenses[0]?.name,
+                              url: match.component.url,
+                              purl: match.component.purl,
                             }}
-                            status={fileStatus?.status}
+                            status={match.status}
                             onSelect={() => setCurrentMatch(matchInfo[index])}
-                            onAction={onAction}
+                            onAction={(action) => onAction(action, match)}
                           />
                         ))}
-                  </div>
-                </section>
+                    </div>
+                  </section>
+                  : <Skeleton variant="rect" width="50%" height={60} style={{marginBottom: 34}} />
+                }
+
                 <div className="info-files">
                   <LabelCard label="Source File" subLabel={file} status={null} />
-                  <LabelCard label="Component File" subLabel={currentMatch?.file} status={null} />
+                  { matchInfo && currentMatch && <LabelCard label='Component File' subLabel={currentMatch.file} status={null} /> }
                 </div>
               </header>
             </>
-          ) : (
-            <h1>No match found</h1>
-          )}
         </header>
 
         {fullFile ? (

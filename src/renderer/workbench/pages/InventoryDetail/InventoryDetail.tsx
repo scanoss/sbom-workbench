@@ -46,13 +46,13 @@ export const InventoryDetail = () => {
     }
   }
 
-  const onAction = (fileId: number, action: MATCH_CARD_ACTIONS) => {
+  const onAction = (file: number, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push(`/workbench/file?path=${file}`);
+        history.push(`/workbench/file?path=${file.path}`);
         break;
       case MATCH_CARD_ACTIONS.ACTION_DETACH:
-        detachFile(inventory?.id, [fileId]);
+        detachFile(inventory?.id, [file.id]);
         getInventory();
         break;
     }
