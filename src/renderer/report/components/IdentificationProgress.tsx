@@ -6,7 +6,7 @@ const LicensesChart = ({ data }) => {
   const totalFiles = data.pending + data.identified;
 
   useEffect(() => {
-    const percentage = Math.round((data.identified / data.pending) * 100);
+    const percentage = Math.round((data.identified + data.pending) / totalFiles);
     const chart = new Chart(chartRef.current, {
       type: 'bar',
       data: {

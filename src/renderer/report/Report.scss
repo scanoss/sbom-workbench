@@ -30,31 +30,81 @@
       height: 150px;
     }
 
-
-
-
-    .LicensesChart {
-      width: 330px;
-      height: fit-content;
-      padding: 24px;
+    .b {
       display: flex;
       flex-direction: column;
-
       .report-titles-container {
+        .report-titles {
+          color: #27272A;
+          font-size: 30px;
+          font-style: normal;
+          font-weight: 700;
+        }
+      }
+      .report-second {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
-        margin-bottom: 48px;
+        .LicensesChart {
+          width: 330px;
+          height: fit-content;
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+        }
 
-          .report-titles {
-            color: #27272A;
-            font-size: 30px;
-            font-style: normal;
-            font-weight: 700;
+        .license-list {
+          overflow-y: scroll;
+          max-height: 320px;
 
 
+          .license-list-item {
+            display: flex;
+            align-items: center;
+            background-color: #FFFF;
+            width: 288px;
+            margin-right: 40px;
+            margin-bottom: 18px;
+            padding: 12px;
+            border-radius: 4px;
+
+            &:hover {
+              transition: ease-in 0.2s;
+              background-color: rgba(228, 228, 231, 1);
+              cursor: pointer;
+              ::-webkit-scrollbar-thumb:hover {
+                background: #555;
+              }
+            }
+
+
+            .license-list-item-color {
+              background-color: #E22C2C;
+              width: 24px;
+              height: 24px;
+              margin-right: 12px;
+              border-radius: 4px;
+            }
+
+            .license-list-item-name {
+              font-size: 20px;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 25px;
+              letter-spacing: 0em;
+              text-align: left;
+            }
           }
+        }
+
 
       }
     }
+
+
+
+
 
 
 
@@ -93,6 +143,7 @@
       }
 
     }
+
 
 
 

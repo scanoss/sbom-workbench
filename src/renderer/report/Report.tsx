@@ -7,6 +7,7 @@ import { Card } from '@material-ui/core';
 import LicensesChart from './components/LicensesChart';
 import IdentificationProgress from './components/IdentificationProgress';
 import { AppContext, IAppContext } from '../context/AppProvider';
+import LicensesTable from './components/LicensesTable';
 
 Chart.register(...registerables);
 
@@ -16,11 +17,15 @@ const LICENSES_DATA = [
   { label: 'GNU (General Public License)', value: 5 },
   { label: 'Mozilla Public License', value: 3 },
   { label: 'Eclipse Public License', value: 2 },
+  { label: 'Apache 2.0', value: 7 },
+  { label: 'GNU (General Public License)', value: 5 },
+  { label: 'Mozilla Public License', value: 3 },
+  { label: 'Eclipse Public License', value: 2 },
 ];
 
 const BAR_DATA = [{ label: '90%', value: 15 }];
 
-const PROGRESS_DATA = { identified: 4312, pending: 15749 };
+const PROGRESS_DATA = { identified: 10, pending: 15 };
 
 const Report = () => {
   const history = useHistory();
@@ -57,7 +62,13 @@ const Report = () => {
             </Card>
             <Card className="report-item licenses">
               <div className="b">
-                <LicensesChart data={LICENSES_DATA} />
+                <div className="report-titles-container">
+                  <span className="report-titles">Licenses</span>
+                </div>
+                <div className="report-second">
+                  <LicensesChart data={LICENSES_DATA} />
+                  <LicensesTable data={LICENSES_DATA} />
+                </div>
               </div>
             </Card>
             <Card className="report-item matches-for-license">
