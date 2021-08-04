@@ -2,7 +2,7 @@ export class Querys {
   /** SQL CREATE SCAN TABLES * */
 
   SQL_CREATE_TABLE_RESULTS =
-    'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,file_path text ,fileid integer, vendor text, component text, version text, latest_version text, cpe text, license text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,identified integer,ignored integer);';
+    'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,file_path text ,fileid integer, vendor text, component text, version text, latest_version text, cpe text, license text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,identified integer,ignored integer,file_url text);';
 
   SQL_CREATE_TABLE_FILE_INVENTORIES =
     'CREATE TABLE IF NOT EXISTS file_inventories (id integer primary key asc, resultid integer not null, inventoryid integer not null, FOREIGN KEY (inventoryid) REFERENCES inventories(id) ON DELETE CASCADE);';
@@ -33,7 +33,7 @@ export class Querys {
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS
   SQL_INSERT_RESULTS =
-    'INSERT or IGNORE INTO results (md5_file,vendor,component,version,latest_version,license,url,lines,oss_lines,matched,filename,idtype,md5_comp,purl,file_path,identified,ignored) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+    'INSERT or IGNORE INTO results (md5_file,vendor,component,version,latest_version,license,url,lines,oss_lines,matched,filename,idtype,md5_comp,purl,file_path,identified,ignored,file_url) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
   // SQL NEW INVENTORY
   SQL_SCAN_INVENTORY_INSERT =
@@ -87,7 +87,7 @@ export class Querys {
   SQL_GET_INVENTORY_BY_ID = 'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories where id=?;';
 
   SQL_SCAN_SELECT_FILE_RESULTS =
-    'SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored FROM results WHERE file_path=? order by file_path;';
+    "SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype!='none' order by file_path;";
 
   // GET ALL THE INVENTORIES ATTACHED TO A COMPONENT
   SQL_SELECT_ALL_INVENTORIES_ATTACHED_TO_COMPONENT =
@@ -134,10 +134,10 @@ export class Querys {
   SQL_GET_ALL_INVENTORIES = 'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories;';
 
   SQL_SELECT_FILES_FROM_PURL_VERSION =
-    'SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines FROM results r WHERE r.purl=? AND r.version=? GROUP BY r.file_path;';
+    'SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url FROM results r WHERE r.purl=? AND r.version=? GROUP BY r.file_path;';
 
     SQL_SELECT_FILES_FROM_PURL =
-    'SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines FROM results r WHERE r.purl=? GROUP BY r.file_path;';
+    'SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url FROM results r WHERE r.purl=? GROUP BY r.file_path;';
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE results.id=?;';
 

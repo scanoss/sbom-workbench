@@ -8,13 +8,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
 
-
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { ComponentDb } from './scan_component_db';
-
-
 
 const utilsDb = new UtilsDb();
 const query = new Querys();
@@ -45,8 +42,8 @@ export class ResultsDb extends Db {
           let data: any;
           for (const [key, value] of Object.entries(result)) {
             for (let i = 0; i < value.length; i += 1) {
-              const  filePath = key;
-              data = value[i];
+              const filePath = key;
+              data = value[i];       
               self.insertResult(db, data, filePath);
             }
           }
@@ -61,36 +58,8 @@ export class ResultsDb extends Db {
     });
   }
 
-  // INSERT RESULTS FROM FILE
-  insertFromJSON(json: string) {
-    return new Promise(async (resolve) => {
-      try {
-        const self = this;
-        const db = await this.openDb();
-        db.serialize(function () {
-          db.run('begin transaction');
-          let data: any;
-          for (const [key, value] of Object.entries(json)) {
-            for (let i = 0; i < value.length; i += 1) {
-              const  filePath = key;
-              data = value[i];
-              if (data.id !== 'none') self.insertResult(db, data, filePath);
-            }
-          }
-          db.run('commit',()=>{
-            db.close();
-            resolve(true);
-          });
-        });
-      } catch {
-        resolve(false);
-      }
-    });
-  }
-
-  private insertResult(db: any, data: any,filePath:string) {
-    const licenseName =
-   data.licenses && data.licenses[0] ? data.licenses[0].name : 'NULL';
+  private insertResult(db: any, data: any, filePath: string) {
+    const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : 'NULL';
     db.run(
       query.SQL_INSERT_RESULTS,
       data.file_hash,
@@ -109,7 +78,8 @@ export class ResultsDb extends Db {
       data.purl ? data.purl[0] : ' ',
       filePath,
       0,
-      0
+      0,
+      data.file_url
     );
   }
 
@@ -132,17 +102,15 @@ export class ResultsDb extends Db {
     });
   }
 
-
   // GET RESULT
   private async getResult(path: string) {
     const db = await this.openDb();
     return new Promise<any>(async (resolve) => {
       db.all(query.SQL_SCAN_SELECT_FILE_RESULTS, path, (err: any, data: any) => {
-          db.close();
-          if (err) resolve([]);
-          else resolve(data);
-        }
-      );
+        db.close();
+        if (err) resolve([]);
+        else resolve(data);
+      });
     });
   }
 
@@ -151,10 +119,10 @@ export class ResultsDb extends Db {
     let results: any;
     return new Promise(async (resolve, reject) => {
       try {
-        results = await this.getResult(path);
-        for (let i = 0; i < results.length; i += 1) {
-          const comp= await this.component.getAll(results[i]);
-          results[i].component = comp;
+        results = await this.getResult(path);  
+        for (let i = 0; i < results.length; i += 1) {     
+          const comp = await this.component.getAll(results[i]);
+          results[i].component = comp;           
         }
         resolve(results);
       } catch (error) {
@@ -162,6 +130,4 @@ export class ResultsDb extends Db {
       }
     });
   }
-
-
 }
