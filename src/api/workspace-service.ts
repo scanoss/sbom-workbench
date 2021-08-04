@@ -4,7 +4,7 @@ import { Project } from './types';
 const { ipcRenderer } = require('electron');
 
 class WorkspaceService {
-  public async projectList(): Promise<any> {
+  public async getAllProjects(): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_PROJECT_LIST);
     return response;
   }

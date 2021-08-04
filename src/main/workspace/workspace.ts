@@ -36,7 +36,7 @@ class Workspace extends EventEmitter {
     return 0;
   }
 
-  listProjects() {
+  async listProjects() {
     const projects: Array<any> = [];
     const projectPaths = fs
       .readdirSync(this.ws_path, { withFileTypes: true })
@@ -62,7 +62,6 @@ class Workspace extends EventEmitter {
 
       }
     }
-
 
     return projects;
   }

@@ -62,7 +62,7 @@ const Home = () => {
   };
 
   const onOpenProjectPressed = async () => {
-    const defPath = await controller.defaultWorkspacePath();  
+    const defPath = await controller.defaultWorkspacePath();
     const projectPath = dialogController.showOpenDialog({
       defaultPath: defPath.data,
       properties: ['openDirectory'],
@@ -102,6 +102,12 @@ const Home = () => {
         <button className="bnt-primary" type="button" onClick={() => onOpenProjectPressed()} disabled={!!path}>
           LOAD PROJECT
         </button>
+
+        <button className="bnt-primary" type="button" onClick={() => history.push("/workspace")} disabled={!!path}>
+          OPEN WORKSPACE
+        </button>
+
+
       </div>
       <div className="progressbar">{path ? <LinearProgress variant= {stage==='prepare' ? 'indeterminate' : 'determinate'} value={progress} /> : null}</div>
       <div className="stage-label">  {stage} </div>

@@ -21,6 +21,8 @@ import './main/project';
 import './main/results';
 import './main/file';
 import './main/formats';
+import './main/workspace';
+
 import { IpcEvents } from './ipc-events';
 import { workspace } from './main/workspace/workspace';
 import { ItemExclude, Project } from './api/types';

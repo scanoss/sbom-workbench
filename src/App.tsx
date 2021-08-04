@@ -9,6 +9,8 @@ import Home from './renderer/home/Home';
 import Workbench from './renderer/workbench/Workbench';
 import AppProvider from './renderer/context/AppProvider';
 import Report from './renderer/report/Report';
+import Workspace from './renderer/workspace/Workspace';
+import NewProject from './renderer/workspace/pages/NewProject/NewProject';
 
 const theme = createMuiTheme({
   palette: {
@@ -35,7 +37,8 @@ export default function App() {
     <HashRouter>
       <MuiThemeProvider theme={theme}>
         <AppProvider>
-          <Route path="/" exact component={Home} />
+          <Route path="/" exact component={Workspace} />
+          <Route path="/workspace/new" exact component={NewProject} />
           <WorkbenchProvider>
             <DialogProvider>
               <Route path="/workbench" component={Workbench} />

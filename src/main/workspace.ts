@@ -4,6 +4,6 @@ import { workspace } from '../main/workspace/workspace'
 
 ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
 
-  const projectList = workspace.listProjects();
+  const projectList = await workspace.listProjects();
   return { status: 'ok', message: 'project list', data: projectList };
 });
