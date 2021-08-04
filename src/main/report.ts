@@ -24,7 +24,7 @@ interface inventoryProgress {
   acceptedComponents: number;
 }
 
-ipcMain.handle(IpcEvents.REPORT_LICENSES, async (event, arg: string) => {
+ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
   let success: boolean;
   let licenses: licenseEntry[];
   let crypto: cryptoEntry[];

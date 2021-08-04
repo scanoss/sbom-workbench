@@ -23,7 +23,7 @@ const Report = () => {
 
 
   const init = async () => {
-    const a = await report.getLicensesUsage();
+    const a = await report.getSummary();
 //    setProgress(PROGRESS_DATA);
     setLicenses(a.data.licenses);
     setCrypto(a.data.crypto);
