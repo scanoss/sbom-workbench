@@ -17,7 +17,7 @@ ipcMain.handle(IpcEvents.UNIGNORED_FILES, async (event, arg: string[]) => {
 
 ipcMain.handle(IpcEvents.RESULTS_GET, async (event, arg: string) => {
   const result = await defaultProject.scans_db.results.get(arg);
-  if (result) return { status: 'ok', message: 'Results succesfully retrieved', result };
-  return { status: 'error', message: 'Files were not successfully retrieved', result };
+  if (result) return { status: 'ok', message: 'Results succesfully retrieved', data: result };
+  return { status: 'error', message: 'Files were not successfully retrieved' };
 });
 

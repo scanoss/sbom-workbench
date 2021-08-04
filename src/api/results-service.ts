@@ -3,20 +3,20 @@ import { IpcEvents } from '../ipc-events';
 const { ipcRenderer } = require('electron');
 
 class ResultService {
-  public async ignored(args: string[]): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.IGNORED_FILES, args);
+  public async ignored(files: number[]): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.IGNORED_FILES, files);
     return response;
   }
 
-  public async unignored(args: string[]): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.UNIGNORED_FILES, args);
+  public async unignored(files: number[]): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.UNIGNORED_FILES, files);
     return response;
   }
 
-  public async get(args: string): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.RESULTS_GET, args);
+  public async get(path: string): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.RESULTS_GET, path);
     return response;
-  } 
+  }
 }
 
 

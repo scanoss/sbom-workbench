@@ -92,7 +92,7 @@ export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => 
       </DialogContent>
       <DialogActions>
         <Button onClick={handleNew}>Identify new</Button>
-        <Button disabled={!selected} variant="contained" color="secondary" onClick={handleAccept}>
+        <Button disabled={!selected} variant="contained" color="secondary" autoFocus onClick={handleAccept}>
           Add files(s)
         </Button>
       </DialogActions>

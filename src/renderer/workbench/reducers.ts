@@ -48,15 +48,15 @@ export default function reducer(state: State = initialState, action): State {
       const { scan } = state;
       const { file } = action;
 
-      let matchInfo = null;
+/*      let matchInfo = null;
       if (scan && file && scan[file] && scan[file][0].id !== 'none') {
         matchInfo = scan[file];
-      }
+      }*/
 
       return {
         ...state,
         file,
-        matchInfo,
+        // matchInfo,
       };
     }
     case RESET:
