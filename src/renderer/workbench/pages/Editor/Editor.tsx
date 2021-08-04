@@ -194,7 +194,7 @@ export const Editor = () => {
     if (currentMatch) {
       const full = currentMatch?.lines === 'all';
       setFullFile(full);
-      if (!full) loadRemoteFile(currentMatch.file_hash);
+      if (!full) loadRemoteFile(currentMatch.md5_file);
     }
   }, [currentMatch]);
 
