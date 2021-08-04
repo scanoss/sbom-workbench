@@ -106,6 +106,19 @@ export class ProjectTree extends EventEmitter {
 
   saveScanProject() {
     const file = fs.writeFileSync(`${this.work_root}/tree.json`, JSON.stringify(this).toString());
+
+    // Save metadata
+    let self = this;
+    let metadata = {
+      id: 'NULL',
+      name: self.scan_root.split('/').pop(),  // Get the folder name
+      work_root: self.work_root,
+      scan_root: self.scan_root,
+      files: self.filesSummary.include,
+      date: new Date().toISOString(),
+    };
+
+    fs.writeFileSync(`${this.work_root}/metadata.json`, JSON.stringify(metadata).toString());
   }
 
   createScanProject(scanPath: string) {

@@ -50,6 +50,8 @@ export enum IpcEvents {
 
   EXPORT_SPDX = 'EXPORT_SPDX',
 
+  WORKSPACE_PROJECT_LIST = 'WORKSPACE_PROJECT_LIST',
+
 
 }
 
@@ -105,4 +107,6 @@ export const ipcRendererEvents = [
   IpcEvents.EXPORT_SPDX,
 
   IpcEvents.UTILS_DEFAULT_PROJECT_PATH,
+
+  IpcEvents.WORKSPACE_PROJECT_LIST,
 ];
