@@ -63,7 +63,7 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
                         <p className="desc-detail-matchinfo">{match?.purl}</p>
                       </div>
                       <div className="tiny-container-detail-matchinfo">
-                        <p className="desc-detail-matchinfo">URL</p>
+                        <p className="title-detail-matchinfo">URL</p>
                         <a
                           href={match?.url}
                           target="_blank"

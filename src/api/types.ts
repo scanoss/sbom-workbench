@@ -8,8 +8,9 @@ export interface Inventory {
   notes: string;
   url: string;
   license_name: string;
-  files: string[];
+  files: any[];
 }
+
 export interface Component {
   compid?: number;
   purl: string;

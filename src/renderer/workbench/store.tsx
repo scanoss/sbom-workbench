@@ -3,8 +3,6 @@ import { workbenchController } from '../workbench-controller';
 import { AppContext } from '../context/AppProvider';
 import { Inventory } from '../../api/types';
 import { inventoryService } from '../../api/inventory-service';
-import * as scanUtil from '../../utils/scan-util';
-import { componentService } from '../../api/component-service';
 import reducer, { initialState, State } from './reducers';
 import { loadScanSuccess, setComponent, setComponents } from './actions';
 import { resultService } from '../../api/results-service';
@@ -12,10 +10,10 @@ import { resultService } from '../../api/results-service';
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
   createInventory: (inventory: Inventory) => Promise<Inventory>;
-  ignoreFile: (path: string[]) => Promise<boolean>;
-  restoreFile: (path: string[]) => Promise<boolean>;
-  attachFile: (inventoryId: number, purl: string, version: string, files: string[]) => Promise<boolean>;
-  detachFile: (inventoryId: number, purl: string, version: string, files: string[]) => Promise<boolean>;
+  ignoreFile: (files: number[]) => Promise<boolean>;
+  restoreFile: (files: number[]) => Promise<boolean>;
+  attachFile: (inventoryId: number, files: number[]) => Promise<boolean>;
+  detachFile: (inventoryId: number, files: number[]) => Promise<boolean>;
   deleteInventory: (inventoryId: number) => Promise<boolean>;
 
   state: State;
@@ -49,34 +47,30 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     return data;
   };
 
-  const ignoreFile = async (files: string[]): Promise<boolean> => {
+  const ignoreFile = async (files: number[]): Promise<boolean> => {
     const { status, data } = await resultService.ignored(files);
     update();
     return true;
   }
 
-  const restoreFile = async (files: string[]): Promise<boolean> => {
+  const restoreFile = async (files: number[]): Promise<boolean> => {
     const { status, data } = await resultService.unignored(files);
     update();
     return true;
   }
 
-  const attachFile = async (inventoryId: number, purl: string, version: string, files: string[]): Promise<boolean> => {
+  const attachFile = async (inventoryId: number, files: number[]): Promise<boolean> => {
     const { status, data } = await inventoryService.attach({
       id: inventoryId,
-      purl,
-      version,
       files
     });
     update();
     return true;
   }
 
-  const detachFile = async (inventoryId: number, purl: string, version: string, files: string[]): Promise<boolean> => {
+  const detachFile = async (inventoryId: number, files: number[]): Promise<boolean> => {
     const { status, data } = await inventoryService.detach({
       id: inventoryId,
-      purl,
-      version,
       files
     });
     update();

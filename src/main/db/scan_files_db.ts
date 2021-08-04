@@ -31,11 +31,11 @@ export class FilesDb extends Db {
     return new Promise(async (resolve, reject) => {
       try{
         let result:any;
-      if (file.path) 
-         result = await this.getByPath(file);      
+      if (file.path)
+         result = await this.getByPath(file);
       else
         resolve([]);
-      
+
       if(result!==undefined)
       resolve(result);
 
@@ -44,10 +44,10 @@ export class FilesDb extends Db {
     }
     });
   }
-  
+
 
   // GET ALL FILES FOR A COMPONENT
-  async getFilesComponent(data: Partial<Component>) { 
+  async getFilesComponent(data: Partial<Component>) {
     return new Promise(async (resolve, reject) => {
       let result;
       try{
@@ -55,7 +55,6 @@ export class FilesDb extends Db {
           result = await this.getByPurlVersion(data);
         else
           result = await this.getByPurl(data);
-          console.log(result);
           resolve(result);
       }catch(error){
         console.log(error);
@@ -77,12 +76,12 @@ export class FilesDb extends Db {
           });
           for (let i = 0; i < file.length; i += 1) {
             file[i].component = comp;
-          }  
-          resolve(file);       
+          }
+          resolve(file);
         }else
-          resolve([]);         
-      });  
-    }    
+          resolve([]);
+      });
+    }
     catch(error){
       console.log(error);
     }
@@ -106,23 +105,23 @@ export class FilesDb extends Db {
           }
          resolve(file);
         }else
-          resolve([]);        
-      });  
-    }    
+          resolve([]);
+      });
+    }
     catch(error){
       console.log(error);
     }
   });
 }
 
-  ignored(path: string[]) {
+  ignored(files: number[]) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
-          for (let i = 0; i < path.length; i += 1) {
-            db.run(query.SQL_UPDATE_IGNORED_FILES, path[i]);
+          for (let i = 0; i < files.length; i += 1) {
+            db.run(query.SQL_UPDATE_IGNORED_FILES, files[i]);
           }
           db.run('commit', () => {
             db.close();
@@ -135,14 +134,14 @@ export class FilesDb extends Db {
     });
   }
 
-  unignored(path: string[]) {
+  unignored(files: number[]) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
-          for (let i = 0; i < path.length; i += 1) {
-            db.run(query.SQL_UPDATE_UNIGNORED_FILES, path[i]);
+          for (let i = 0; i < files.length; i += 1) {
+            db.run(query.SQL_UPDATE_UNIGNORED_FILES, files[i]);
           }
           db.run('commit', () => {
             db.close();
@@ -168,7 +167,7 @@ export class FilesDb extends Db {
               } else {
                 data.pending = 0;
               }
-              db.close();             
+              db.close();
               if (err) resolve(undefined);
               else resolve(data);
             }
