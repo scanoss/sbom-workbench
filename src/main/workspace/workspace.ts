@@ -38,32 +38,36 @@ class Workspace extends EventEmitter {
 
   async listProjects() {
     const projects: Array<any> = [];
-    const projectPaths = fs
-      .readdirSync(this.ws_path, { withFileTypes: true })
-      .sort(this.dirFirstFileAfter)
-      .filter((dirent) => {
-        return !dirent.isSymbolicLink() && !dirent.isFile();
-      })
-      .map((dirent) => `${this.ws_path}/${dirent.name}`);
+    try {
+      const projectPaths = fs
+        .readdirSync(this.ws_path, { withFileTypes: true })
+        .sort(this.dirFirstFileAfter)
+        .filter((dirent) => {
+          return !dirent.isSymbolicLink() && !dirent.isFile();
+        })
+        .map((dirent) => `${this.ws_path}/${dirent.name}`);
 
-    // eslint-disable-next-line no-restricted-syntax
-    for (const projectPath of projectPaths) {
-      const metadataPath = `${projectPath}/metadata.json`;
+      // eslint-disable-next-line no-restricted-syntax
+      for (const projectPath of projectPaths) {
+        const metadataPath = `${projectPath}/metadata.json`;
 
-      if (fs.existsSync(metadataPath)) {
-        const metadataAsText = fs.readFileSync(metadataPath, 'utf8');
-        const metadata = JSON.parse(metadataAsText);
-        projects.push(metadata);
-      } else {
-        console.log(`Metadata on project ${projectPath} does not exist. `);
-        // TO DO: Create metadata in a project that does not exist.
-        //readProject
-        //savemetadata
-
+        if (fs.existsSync(metadataPath)) {
+          const metadataAsText = fs.readFileSync(metadataPath, 'utf8');
+          const metadata = JSON.parse(metadataAsText);
+          projects.push(metadata);
+        } else {
+          console.log(`Metadata on project ${projectPath} does not exist. `);
+          // TO DO: Create metadata in a project that does not exist.
+          //readProject
+          //savemetadata
+        }
       }
-    }
 
-    return projects;
+      return projects;
+    } catch (e) {
+      console.log(e);
+      return [];
+    }
   }
 
 }

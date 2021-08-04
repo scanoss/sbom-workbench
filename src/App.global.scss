@@ -50,6 +50,9 @@ $md: 780px;
 @import './renderer/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 @import './renderer/workbench/components/ComponentInfo/ComponentInfo.scss';
 @import './renderer/report/Report.scss';
+@import './renderer/workspace/Workspace';
+@import './renderer/workspace/pages/NewProject/NewProject';
+
 
 /* fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
@@ -166,4 +169,8 @@ a:hover {
 .my-5 {
   margin-top: 25px;
   margin-bottom: 25px;
+}
+
+.text-center {
+  text-align: center;
 }
