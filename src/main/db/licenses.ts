@@ -3143,7 +3143,7 @@ const licenses = [
     {
         "fulltext": "NULL",
         "id": 449,
-        "name": "NULL",
+        "name": "n/a",
         "spdxid": "NULL",
         "url": "NULL"
     }
