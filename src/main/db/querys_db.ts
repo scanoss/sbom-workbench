@@ -75,7 +75,7 @@ export class Querys {
 
   SQL_ATTACH_LICENSE_PURL_SPDXID =
     'INSERT or IGNORE INTO license_component_version (cvid,licid) values ((SELECT id FROM component_versions where purl=? and version=?),(SELECT id FROM licenses where spdxid=?));';
- 
+
   /** *** SQL SCAN GET * **** */
   SQL_SCAN_SELECT_INVENTORIES_FROM_PATH =
     'SELECT i.id,i.usage,i.compid,i.notes,i.url,i.license_name,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid WHERE fi.path=?;';
@@ -155,4 +155,7 @@ export class Querys {
 
   SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION =
     'UPDATE results SET identified=0 WHERE file_path IN (SELECT path FROM file_inventories where inventoryid=?) AND purl=? AND version=?';
-}
+
+  SQL_GET_RESULTS_SUMMARY =
+  "SELECT (select count(*) from results r where r.identified = 1) as 'identified', (select count(*)  from results r where r.ignored = 1 ) as 'ignored', (select count(*) from results r where (r.identified = 0 AND r.ignored = 0)) as 'pending'";
+  }

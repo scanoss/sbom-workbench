@@ -5,32 +5,30 @@ import { useHistory } from 'react-router-dom';
 import { Chart, registerables } from 'chart.js';
 import { Card } from '@material-ui/core';
 import LicensesChart from './components/LicensesChart';
+import CryptoChart from './components/CryptoChart';
+import ProgressChart from './components/ProgressChart';
 import { AppContext, IAppContext } from '../context/AppProvider';
 import { report } from '../../api/report-service';
 
 Chart.register(...registerables);
 
-const LICENSES_DATA = [
-  { label: 'MIT', value: 15 },
-  { label: 'Apache 2.0', value: 7 },
-  { label: 'GNU (General Public License)', value: 5 },
-  { label: 'Mozilla Public License', value: 3 },
-  { label: 'Eclipse Public License', value: 2 },
-];
-
-const PROGRESS_DATA = { identified: 4312, pending: 15749 };
 
 const Report = () => {
   const history = useHistory();
   const { scanBasePath } = useContext(AppContext) as IAppContext;
 
-  const [progress, setProgress] = useState<any>(null);
+  const [summary, setSummary] = useState<any>(null);
   const [licenses, setLicenses] = useState<any[]>([]);
+  const [crypto, setCrypto] = useState<any[]>([]);
+
 
   const init = async () => {
     const a = await report.getLicensesUsage();
-    setProgress(PROGRESS_DATA);
+//    setProgress(PROGRESS_DATA);
     setLicenses(a.data.licenses);
+    setCrypto(a.data.crypto);
+    setSummary(a.data.summary)
+ //console.log((a.data))
   };
 
   useEffect(init, []);
@@ -54,7 +52,12 @@ const Report = () => {
             <Card className="report-item">
               <LicensesChart data={licenses} />
             </Card>
-            <Card className="report-item">Match licenses</Card>
+            <Card className="report-item">
+              <CryptoChart data={crypto} />
+            </Card>
+            <Card className="report-item">
+              <ProgressChart progress={summary} />
+            </Card>
           </section>
         </main>
       </section>
@@ -63,4 +66,4 @@ const Report = () => {
 };
 
 export default Report;
-export { LICENSES_DATA };
+
