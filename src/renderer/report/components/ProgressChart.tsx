@@ -16,7 +16,7 @@ dataInv[0] = { label: 'Pending', value: progress.pendingFiles };
 dataInv[1] = { label: 'Identified', value: progress.identifiedFiles };
   dataInv[2] = { label: 'Ignored', value: progress.ignoredFiles };
   }
-  console.log(progress);
+
   useEffect(() => {
     const chart = new Chart(chartRef.current, {
       type: 'pie',

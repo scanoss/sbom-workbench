@@ -24,11 +24,10 @@ const Report = () => {
 
   const init = async () => {
     const a = await report.getSummary();
-//    setProgress(PROGRESS_DATA);
     setLicenses(a.data.licenses);
     setCrypto(a.data.crypto);
-    setSummary(a.data.summary)
- //console.log((a.data))
+    setSummary(a.data.summary);
+    console.log(a);
   };
 
   useEffect(init, []);
