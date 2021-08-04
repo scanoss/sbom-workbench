@@ -12,10 +12,10 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 import { makeStyles } from '@material-ui/core/styles';
+import SearchIcon from '@material-ui/icons/Search';
 import { AppContext } from '../context/AppProvider';
 import { workspaceService } from '../../api/workspace-service';
 import { dialogController } from '../dialog-controller';
-import SearchIcon from '@material-ui/icons/Search';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -29,8 +29,8 @@ const useStyles = makeStyles((theme) => ({
     cursor: 'pointer',
   },
   input: {
-    width: 400
-  }
+    width: 400,
+  },
 }));
 
 const filter = (items, query) => {
@@ -78,7 +78,7 @@ const Workspace = () => {
       properties: ['openDirectory'],
     });
 
-    if(projectPath) {
+    if (projectPath) {
       setScanPath(projectPath);
       history.push('/workspace/new');
     }
@@ -98,7 +98,7 @@ const Workspace = () => {
           <h1 className="header-title">Projects</h1>
           <section className="subheader">
             <div>
-              { projects?.length > 0 &&
+              {projects && projects.length > 0 && (
                 <Paper component="form">
                   <IconButton>
                     <SearchIcon />
@@ -110,19 +110,15 @@ const Workspace = () => {
                     inputProps={{ 'aria-label': 'search', maxLength: 20 }}
                   />
                 </Paper>
-              }
+              )}
             </div>
-            <Button
-              startIcon={<AddIcon />}
-              variant="contained"
-              color="primary"
-              onClick={onNewProject}>
+            <Button startIcon={<AddIcon />} variant="contained" color="primary" onClick={onNewProject}>
               New project
             </Button>
           </section>
         </header>
         <main className="app-content">
-          {projects && projects.length > 0 ?
+          {projects && projects.length > 0 ? (
             <TableContainer component={Paper}>
               <Table className={classes.table} aria-label="projects table">
                 <TableHead className={classes.head}>
@@ -133,7 +129,7 @@ const Workspace = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filterProjects.length !== 0 ?
+                  {filterProjects.length !== 0 ? (
                     filterProjects.map((row) => (
                       <TableRow hover key={row.name} className={classes.row} onClick={() => onShowScan(row.work_root)}>
                         <TableCell component="th" scope="row">
@@ -142,7 +138,8 @@ const Workspace = () => {
                         <TableCell>{format(row.date)}</TableCell>
                         <TableCell>{row.files}</TableCell>
                       </TableRow>
-                    )) :
+                    ))
+                  ) : (
                     <TableRow>
                       <TableCell colSpan={3}>
                         <p className="text-center">
@@ -150,19 +147,26 @@ const Workspace = () => {
                         </p>
                       </TableCell>
                     </TableRow>
-                  }
+                  )}
                 </TableBody>
               </Table>
-            </TableContainer> :
-            !projects
-              ? <p>Loading projects...</p>
-              : <div className='empty-container'>
-                  <div className='empty-list'>
-                    <h3>Not projects yet</h3>
-                    <p>You can start scanning by <Link href="#" onClick={onNewProject}>creating a new project</Link>.</p>
-                  </div>
-                </div>
-          }
+            </TableContainer>
+          ) : !projects ? (
+            <p>Loading projects...</p>
+          ) : (
+            <div className="empty-container">
+              <div className="empty-list">
+                <h3>Not projects yet</h3>
+                <p>
+                  You can start scanning by
+                  <Link href="#" onClick={onNewProject}>
+                    creating a new project
+                  </Link>
+                  .
+                </p>
+              </div>
+            </div>
+          )}
         </main>
       </section>
     </>

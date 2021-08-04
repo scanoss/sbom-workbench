@@ -12,6 +12,8 @@ module.exports = {
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': ['off'],
     'prettier/prettier': ['warn', { printWidth: 120 }],
+    'no-nested-ternary': ['off'],
+    'jsx-a11y/anchor-is-valid': ['off'],
     /* '@typescript-eslint/naming-convention': [
       'warn',
       {

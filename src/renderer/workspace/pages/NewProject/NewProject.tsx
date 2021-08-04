@@ -3,15 +3,14 @@ import { useHistory } from 'react-router-dom';
 
 import { IconButton, LinearProgress } from '@material-ui/core';
 
-
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { AppContext } from '../../../context/AppProvider';
 
 import * as controller from '../../../home/HomeController';
 
 import { IpcEvents } from '../../../../ipc-events';
-const { ipcRenderer } = require('electron');
 
+const { ipcRenderer } = require('electron');
 
 const NewProject = () => {
   const history = useHistory();
@@ -66,14 +65,14 @@ const NewProject = () => {
       <section id="NewProject" className="app-page">
         <header className="app-header">
           <div>
-              <h4 className="header-subtitle back">
-                <IconButton onClick={() => history.goBack()} component="span">
-                  <ArrowBackIcon />
-                </IconButton>
-                SCANNING
-              </h4>
-            <h1>{ projectName }</h1>
-            </div>
+            <h4 className="header-subtitle back">
+              <IconButton onClick={() => history.goBack()} component="span">
+                <ArrowBackIcon />
+              </IconButton>
+              SCANNING
+            </h4>
+            <h1>{projectName}</h1>
+          </div>
         </header>
         <main className="app-content">
           <div className="progressbar">

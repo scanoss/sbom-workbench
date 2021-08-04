@@ -4,8 +4,6 @@ import './App.global.scss';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { WorkbenchProvider } from './renderer/workbench/store';
 import { DialogProvider } from './renderer/context/DialogProvider';
-import About from './renderer/about/About';
-import Home from './renderer/home/Home';
 import Workbench from './renderer/workbench/Workbench';
 import AppProvider from './renderer/context/AppProvider';
 import Report from './renderer/report/Report';
@@ -45,7 +43,6 @@ export default function App() {
               <Route path="/report" component={Report} />
             </DialogProvider>
           </WorkbenchProvider>
-          <Route path="/about" component={About} />
         </AppProvider>
       </MuiThemeProvider>
     </HashRouter>
