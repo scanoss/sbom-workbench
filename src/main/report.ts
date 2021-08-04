@@ -9,6 +9,8 @@ interface licenseEntry {
   value: number;
   incompatibles: string[];
   has_incompatibles: [];
+  copyleft: boolean;
+  patent_hints: boolean;
 }
 interface cryptoEntry {
   label: string;
@@ -30,6 +32,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
   let licenses: licenseEntry[];
   let crypto: cryptoEntry[];
   let inventory: inventoryProgress;
+  const vulnerabilities = { critical: 0, high: 0, medium: 0, moderate: 0 };
   licenses = [];
   crypto = [{ label: 'None', files: [], value: 0 }];
   let tempSummary: any;
@@ -60,9 +63,25 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
         if (result.id != 'none') {
           if (result.licenses != undefined && result.licenses[0] != undefined) {
             if (!licenses.some((l) => l.label === result.licenses[0].name)) {
-              const newLicense = { label: '', components: [], value: 1, incompatibles: [], has_incompatibles: [] };
+              const newLicense = {
+                label: '',
+                components: [],
+                value: 1,
+                incompatibles: [],
+                has_incompatibles: [],
+                patent_hints: false,
+                copyleft: false,
+              };
               newLicense.label = result.licenses[0].name;
-              newLicense.components.push({name: result.component, vendor: result.vendor, version: result.version, purl: result.purl[0]});
+              newLicense.patent_hints = (result.licenses[0].patent_hints === 'yes');
+              newLicense.copyleft = (result.licenses[0].copyleft === 'yes');
+
+              newLicense.components.push({
+                name: result.component,
+                vendor: result.vendor,
+                version: result.version,
+                purl: result.purl[0],
+              });
 
               if (result.licenses[0].incompatible_with)
                 newLicense.incompatibles = result.licenses[0].incompatible_with.split(', ');
@@ -71,7 +90,12 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
               const index = licenses.findIndex((l) => l.label === result.licenses[0].name);
               if (index >= 0) {
                 if (!licenses[index].components.some((c) => c.name && c.name === result.component))
-                  licenses[index].components.push({name: result.component, vendor: result.vendor, version: result.version, purl: result.purl[0]} );
+                  licenses[index].components.push({
+                    name: result.component,
+                    vendor: result.vendor,
+                    version: result.version,
+                    purl: result.purl[0],
+                  });
                 licenses[index].value = licenses[index].components.length;
               }
             }
@@ -86,9 +110,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
             } else {
               const index = crypto.findIndex((l) => l.label === result.cryptography[0].algorithm);
               if (index >= 0) {
-               // if (!crypto[index].files.some((c) => c.name) === result.component)
-                  crypto[index].files.push(result.file);
-
+                crypto[index].files.push(result.file);
                 crypto[index].value = crypto[index].files.length;
               }
             }
@@ -99,16 +121,27 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
             crypto[index].value = crypto[index].files.length;
             //  }
           }
+          /* Vulnerabilities */
+          if (result.vulnerabilities !== undefined) {
+            let i = 0;
+            for (i = 0; i < result.vulnerabilities.length; i++) {
+              const v = result.vulnerabilities[i];
+              if (v.severity === 'CRITICAL') vulnerabilities.critical += 1;
+              else if (v.severity === 'HIGH') vulnerabilities.high += 1;
+              else if (v.severity === 'MODERATE') vulnerabilities.moderate += 1;
+              else if (v.severity === 'MEDIUM') vulnerabilities.medium += 1;
+            }
+          }
         }
       }
     }
     if (licenses) checkForIncompatibilities(licenses);
-  // un-comment next line to output report data
-  // console.log(JSON.stringify({ licenses, crypto, summary }));
+    // un-comment next line to output report data
+    // console.log(JSON.stringify({ licenses, crypto, summary }));
     return {
       status: 'ok',
       message: 'SPDX export successfully',
-      data: { licenses, crypto, summary },
+      data: { licenses, crypto, summary, vulnerabilities },
     };
   } catch (e) {
     console.log('Catch an error: ', e);
@@ -163,5 +196,4 @@ function checkForIncompatibilities(licenses: licenseEntry[]) {
           license.has_incompatibles.push(license.incompatibles[i]);
       }
   }
-
 }
