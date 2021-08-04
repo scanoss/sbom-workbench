@@ -32,7 +32,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
   licenses = [];
   crypto = [{ label: 'None', components: [], value: 0 }];
   let tempSummary: any;
-  console.log("POR ACA????")
+  console.log('POR ACA????');
   tempSummary = await defaultProject.scans_db.inventories.getCurrentSummary();
   console.log(JSON.stringify(tempSummary));
   const projectSummary = defaultProject.filesSummary;
@@ -54,7 +54,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
   summary.identifiedFiles = tempSummary[0].identified;
   summary.ignoredFiles = tempSummary[0].ignored;
 
-//  console.log(JSON.stringify(summary));
+  //  console.log(JSON.stringify(summary));
 
   try {
     const a = defaultProject.results;
@@ -100,12 +100,48 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
         }
       }
     }
-//console.log("SALIENDO")
-  //  console.log(JSON.stringify({ licenses: licenses, crypto: crypto, summary: summary }).toString());
+    // console.log("SALIENDO")
+    //  console.log(JSON.stringify({ licenses: licenses, crypto: crypto, summary: summary }).toString());
     return {
       status: 'ok',
       message: 'SPDX export successfully',
-      data: { licenses: licenses, crypto: crypto, summary: summary },
+      data: { licenses, crypto, summary },
+    };
+  } catch (e) {
+    console.log('Catch an error: ', e);
+    return { status: 'fail' };
+  }
+});
+
+ipcMain.handle(IpcEvents.REPORT_INVENTORY_PROGRESS, async (event, arg: string) => {
+  let success: boolean;
+
+  let inventory: inventoryProgress;
+  try {
+    const tempSummary = await defaultProject.scans_db.inventories.getCurrentSummary();
+    const projectSummary = defaultProject.filesSummary;
+    // total, filter, include
+    const summary = {
+      totalFiles: 0,
+      includedFiles: 0,
+      filteredFiles: 0,
+      scannedFiles: 0,
+      pendingFiles: 0,
+      identifiedFiles: 0,
+      ignoredFiles: 0,
+    };
+    summary.totalFiles = projectSummary.total;
+    summary.includedFiles = projectSummary.include;
+    summary.filteredFiles = projectSummary.filter;
+    summary.scannedFiles = tempSummary[0].identified + tempSummary[0].ignored + tempSummary[0].pending;
+    summary.pendingFiles = tempSummary[0].pending;
+    summary.identifiedFiles = tempSummary[0].identified;
+    summary.ignoredFiles = tempSummary[0].ignored;
+
+    return {
+      status: 'ok',
+      message: 'SPDX export successfully',
+      data: summary,
     };
   } catch (e) {
     console.log('Catch an error: ', e);
