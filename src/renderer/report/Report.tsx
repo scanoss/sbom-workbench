@@ -8,6 +8,7 @@ import LicensesChart from './components/LicensesChart';
 import IdentificationProgress from './components/IdentificationProgress';
 import { AppContext, IAppContext } from '../context/AppProvider';
 import LicensesTable from './components/LicensesTable';
+import MatchesForLicense from './components/MatchesForLicense';
 
 Chart.register(...registerables);
 
@@ -72,7 +73,7 @@ const Report = () => {
               </div>
             </Card>
             <Card className="report-item matches-for-license">
-              <div className="c">c</div>
+              <MatchesForLicense />
             </Card>
             <Card className="report-item matches">
               <div className="d">d</div>
