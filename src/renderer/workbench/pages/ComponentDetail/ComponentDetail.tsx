@@ -79,7 +79,7 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyPressed = async (file) => {
-    const inv = {
+    const inv: Inventory = {
       component: component?.name,
       version: component?.version,
       license: component?.licenses[0]?.name,
@@ -96,10 +96,10 @@ export const ComponentDetail = () => {
       .filter((file) => file.status === 'pending')
       .map((file) => file.id);
 
-    const inv = {
+    const inv: Inventory = {
       component: component?.name,
       version: component?.versions[0].version,
-      license: component?.versions[0].licenses[0]?.name,
+      license_name: component?.versions[0].licenses[0]?.name,
       url: component?.url,
       purl: component?.purl,
       usage: 'file',
