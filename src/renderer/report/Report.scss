@@ -15,6 +15,15 @@
     .matches-for-license {
       grid-row: 2/5;
       grid-column: 2/3;
+      .report-titles-container {
+        margin-bottom: 20px;
+        .report-titles {
+          color: #27272A;
+          font-size: 30px;
+          font-style: normal;
+          font-weight: 700;
+        }
+      }
     }
 
     .licenses-obligation {

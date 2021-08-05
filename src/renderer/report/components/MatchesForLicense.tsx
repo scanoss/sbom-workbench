@@ -20,29 +20,32 @@ export default function MatchesForLicense({ data }) {
   console.log(data);
 
   return (
-    <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell className="" align="left">
-              Component
-            </TableCell>
-            <TableCell>Vendor</TableCell>
-            <TableCell align="right">Version</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data?.components.map((row) => (
-            <TableRow key={row.name}>
-              <TableCell component="th" scope="row" align="left">
-                {row?.name}
+    <>
+
+      <TableContainer component={Paper}>
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell className="" align="left">
+                Component
               </TableCell>
-              <TableCell>{row?.vendor}</TableCell>
-              <TableCell align="right">{row?.version}</TableCell>
+              <TableCell>Vendor</TableCell>
+              <TableCell align="right">Version</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {data?.components.map((row) => (
+              <TableRow key={row.name}>
+                <TableCell component="th" scope="row" align="left">
+                  {row?.name}
+                </TableCell>
+                <TableCell>{row?.vendor}</TableCell>
+                <TableCell align="right">{row?.version}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   );
 }
