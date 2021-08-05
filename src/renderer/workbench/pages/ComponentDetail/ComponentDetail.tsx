@@ -43,6 +43,8 @@ export const ComponentDetail = () => {
   const { component } = state;
 
   const [files, setFiles] = useState<any[]>([]);
+  const [filterFiles, setFilterFiles] = useState<{ pending: any[], identified: any[], ignored: any[] }>();
+
   const [inventories, setInventories] = useState<Inventory[]>([]);
   const [versions, setVersions] = useState<any[]>(null);
   const [version, setVersion] = useState<string>(null);
@@ -60,7 +62,8 @@ export const ComponentDetail = () => {
   };
 
   const getInventories = async () => {
-    const response = await inventoryService.getAll({ purl: component.purl, version });
+    const query =  version ? { purl: component.purl, version } : { purl: component.purl };
+    const response = await inventoryService.getAll(query);
     console.log('INVENTORIES BY COMP', response);
     setInventories(response.message || []);
   };
@@ -85,7 +88,6 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyPressed = async (file) => {
-    console.log(file);
     const inv: Partial<Inventory> = {
       component: component.name,
       url: component.url,
@@ -183,10 +185,27 @@ export const ComponentDetail = () => {
   };
 
   useEffect(() => {
+    if (!files) return;
+
+    console.log('filter!');
+
+    setFilterFiles({
+      pending: files.filter((file) => file.status === 'pending'),
+      identified: files.filter((file) => file.status === 'identified'),
+      ignored: files.filter((file) => file.status === 'ignored'),
+    });
+  }, [files]);
+
+  useEffect(() => {
     setVersions(component ? component.versions : null);
   }, [component]);
 
   useEffect(() => {
+    setFilterFiles({
+      pending: [],
+      identified: [],
+      ignored: [],
+    });
     getFiles();
     getInventories();
   }, [version]);
@@ -194,11 +213,11 @@ export const ComponentDetail = () => {
   const renderTab = () => {
     switch (tab) {
       case 0:
-        return <FileList files={files} filter="pending" onAction={onAction} />;
+        return <FileList files={filterFiles.pending} onAction={onAction} />;
       case 1:
         return <InventoryList inventories={inventories} />;
       case 2:
-        return <FileList files={files} filter="ignored" onAction={onAction} />;
+        return <FileList files={filterFiles.ignored} onAction={onAction} />;
       default:
         return 'no data';
     }
@@ -218,15 +237,17 @@ export const ComponentDetail = () => {
               </h4>
               <div className="filter-container">
                 <h1 className="header-title">Matches</h1>
-                <Button
-                  className="filter"
-                  aria-controls="menu"
-                  aria-haspopup="true"
-                  endIcon={<ArrowDropDownIcon />}
-                  onClick={(event) => setAnchorEl(event.currentTarget)}
-                >
-                  { version ? version : 'version' }
-                </Button>
+                { (component?.versions?.length > 1) &&
+                  <Button
+                    className="filter"
+                    aria-controls="menu"
+                    aria-haspopup="true"
+                    endIcon={<ArrowDropDownIcon />}
+                    onClick={(event) => setAnchorEl(event.currentTarget)}
+                  >
+                    { version ? version : 'version' }
+                  </Button>
+                }
               </div>
               <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleCloseVersionGroup}>
                 <MenuItem key="all" onClick={() => handleVersionSelected(null)}>
@@ -252,9 +273,9 @@ export const ComponentDetail = () => {
                   textColor="primary"
                   onChange={(event, value) => setTab(value)}
                 >
-                  <Tab label={`Pending (${version ? `${files.length}/` : ''}${component?.summary.pending})`} />
-                  <Tab label={`Identified (${version ? `${files.length}/` : ''}${component?.summary.identified})`} />
-                  <Tab label={`Ignored (${version ? `${files.length}/` : ''}${component?.summary.ignored})`} />
+                  <Tab label={`Pending (${version ? `${filterFiles.pending.length}/` : ''}${component?.summary.pending})`} />
+                  <Tab label={`Identified (${version ? `${filterFiles.identified.length}/` : ''}${component?.summary.identified})`} />
+                  <Tab label={`Ignored (${version ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`} />
                 </Tabs>
               </Paper>
             </div>
@@ -307,7 +328,7 @@ export const ComponentDetail = () => {
           </section>
         </header>
 
-        <main className="app-content">{renderTab()}</main>
+        <main className="app-content">{filterFiles && renderTab()}</main>
       </section>
     </>
   );

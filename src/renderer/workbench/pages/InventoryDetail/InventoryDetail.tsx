@@ -30,6 +30,7 @@ export const InventoryDetail = () => {
   const getInventory = async () => {
     const response = await inventoryService.get({ id });
     console.log(response);
+
     if (response.status === 'fail') {
       history.goBack();
       return;
@@ -75,7 +76,7 @@ export const InventoryDetail = () => {
                 {scanBasePath}
               </h4>
             </div>
-            <ComponentInfo component={inventory?.component} />
+            {/* {inventory && <ComponentInfo component={inventory.component} />} */}
           </div>
           <div className="identified-info-card">
             <IconButton className="btn-delete" onClick={onRemoveClicked} >
