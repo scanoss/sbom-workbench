@@ -1,7 +1,9 @@
+/* eslint-disable prettier/prettier */
 import {
   Button,
   ButtonGroup,
   ClickAwayListener,
+  Menu,
   MenuItem,
   MenuList,
   Paper,
@@ -9,7 +11,7 @@ import {
   Tab,
   Tabs,
 } from '@material-ui/core';
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -42,19 +44,23 @@ export const ComponentDetail = () => {
 
   const [files, setFiles] = useState<any[]>([]);
   const [inventories, setInventories] = useState<Inventory[]>([]);
+  const [versions, setVersions] = useState<any[]>(null);
+  const [version, setVersion] = useState<string>(null);
+
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef<HTMLDivElement>(null);
   const [tab, setTab] = useState<number>(component?.summary?.pending !== 0 ? 0 : 1);
 
   const getFiles = async () => {
-    const response = await componentService.getFiles({ purl: component.purl, version: component.version });
+    const response = await componentService.getFiles({ purl: component.purl, version });
     console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));
   };
 
   const getInventories = async () => {
-    const response = await inventoryService.getAll({ purl: component.purl, version: component.version });
+    const response = await inventoryService.getAll({ purl: component.purl, version });
     console.log('INVENTORIES BY COMP', response);
     setInventories(response.message || []);
   };
@@ -79,12 +85,13 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyPressed = async (file) => {
-    const inv: Inventory = {
-      component: component?.name,
-      version: component?.version,
-      license: component?.licenses[0]?.name,
-      url: component?.url,
-      purl: component?.purl,
+    console.log(file);
+    const inv: Partial<Inventory> = {
+      component: file.component.name,
+      url: file.component.url,
+      purl: file.component.purl,
+      version: file.component.version,
+      license_name: file.component.licenses[0]?.name,
       usage: file.type,
     };
 
@@ -92,11 +99,9 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyAllPressed = async () => {
-    const selFiles = files
-      .filter((file) => file.status === 'pending')
-      .map((file) => file.id);
+    const selFiles = files.filter((file) => file.status === 'pending').map((file) => file.id);
 
-    const inv: Inventory = {
+    const inv: Partial<Inventory> = {
       component: component?.name,
       version: component?.versions[0].version,
       license_name: component?.versions[0].licenses[0]?.name,
@@ -160,6 +165,15 @@ export const ComponentDetail = () => {
     setTab(1);
   };
 
+  const handleCloseVersionGroup = () => {
+    setAnchorEl(null);
+  };
+
+  const handleVersionSelected = (version: string) => {
+    setVersion(version);
+    setAnchorEl(null);
+  };
+
   const handleCloseButtonGroup = (event: React.MouseEvent<Document, MouseEvent>) => {
     if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
       return;
@@ -169,9 +183,13 @@ export const ComponentDetail = () => {
   };
 
   useEffect(() => {
+    setVersions(component ? component.versions : null);
+  }, [component]);
+
+  useEffect(() => {
     getFiles();
     getInventories();
-  }, []);
+  }, [version]);
 
   const renderTab = () => {
     switch (tab) {
@@ -188,7 +206,7 @@ export const ComponentDetail = () => {
 
   return (
     <>
-      <section className="app-page">
+      <section id="ComponentDetail" className="app-page">
         <header className="app-header">
           <div className="header">
             <div>
@@ -198,8 +216,28 @@ export const ComponentDetail = () => {
                 </IconButton>
                 {scanBasePath}
               </h4>
-
-              <h1 className="header-title">Matches</h1>
+              <div className="filter-container">
+                <h1 className="header-title">Matches</h1>
+                <Button
+                  className="filter"
+                  aria-controls="menu"
+                  aria-haspopup="true"
+                  endIcon={<ArrowDropDownIcon />}
+                  onClick={(event) => setAnchorEl(event.currentTarget)}
+                >
+                  { version ? version : 'version' }
+                </Button>
+              </div>
+              <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleCloseVersionGroup}>
+                <MenuItem key="all" onClick={() => handleVersionSelected(null)}>
+                  All versions
+                </MenuItem>
+                {versions?.map(({ version }) => (
+                  <MenuItem key={version} onClick={() => handleVersionSelected(version)}>
+                    {version}
+                  </MenuItem>
+                ))}
+              </Menu>
             </div>
 
             <ComponentInfo component={component} />
@@ -214,9 +252,9 @@ export const ComponentDetail = () => {
                   textColor="primary"
                   onChange={(event, value) => setTab(value)}
                 >
-                  <Tab label={`Pending (${component?.summary.pending})`} />
-                  <Tab label={`Identified (${component?.summary.identified})`} />
-                  <Tab label={`Ignored (${component?.summary.ignored})`} />
+                  <Tab label={`Pending (${version ? `${files.length}/` : ''}${component?.summary.pending})`} />
+                  <Tab label={`Identified (${version ? `${files.length}/` : ''}${component?.summary.identified})`} />
+                  <Tab label={`Ignored (${version ? `${files.length}/` : ''}${component?.summary.ignored})`} />
                 </Tabs>
               </Paper>
             </div>

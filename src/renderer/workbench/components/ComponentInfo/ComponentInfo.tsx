@@ -2,11 +2,16 @@ import React, { useState } from 'react';
 import Label from '../Label/Label';
 import Title from '../Title/Title';
 import componentDefault from '../../../../../assets/imgs/component-default.svg';
-import { ComponentGroup } from '../../../../api/types';
+import { Component, ComponentGroup } from '../../../../api/types';
 
-export const ComponentInfo = ({ component }: { component: ComponentGroup }) => {
+export const ComponentInfo = ({ component }: { component: any }) => {
   const [over, setOver] = useState<boolean>(false);
-  const multiple: boolean = component.versions.length > 1;
+  const group = !!component.versions;
+
+  //const version = multiple ? component.versions[0].version;
+  const version = group ? component.versions[0].length : component.version;
+  const license = group ? component.versions[0].licenses[0].name : component.license[0];
+
 
   return (
     <div className="component-info">
@@ -19,7 +24,7 @@ export const ComponentInfo = ({ component }: { component: ComponentGroup }) => {
           <img alt="component logo" className="logo" src={componentDefault} />
           <div>
             <Label
-              label={multiple ? `${component.versions.length} versions` : component.versions[0].version}
+              label={version}
               textColor="gray"
             />
             <Title title={component?.name} />
@@ -31,6 +36,7 @@ export const ComponentInfo = ({ component }: { component: ComponentGroup }) => {
             <div className="tiny-container-detail">
               <p className="title-detail">License</p>
               {/* <p className="desc-detail">{component?.licenses[0]?.name}</p> */}
+              <p className="desc-detail">{license}</p>
             </div>
             <div className="tiny-container-detail">
               <p className="title-detail">PURL</p>

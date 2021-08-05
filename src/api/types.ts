@@ -1,7 +1,7 @@
 export interface Inventory {
   id?: number;
   compid: number;
-  component: Component;
+  component: Component | string;
   purl: string;
   version: string;
   usage: string;

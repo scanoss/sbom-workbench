@@ -131,12 +131,12 @@ export const Editor = () => {
   };
 
   const onIdentifyPressed = async (result) => {
-    const inv = {
+    const inv: Partial<Inventory> = {
       component: result.component.name,
       version: result.component.version,
       url: result.component.url,
       purl: result.component.purl,
-      license: result.component.licenses[0]?.name,
+      license_name: result.component.licenses[0]?.name,
       usage: result.type,
     };
 
