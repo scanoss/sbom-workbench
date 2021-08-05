@@ -20,7 +20,6 @@ const Report = () => {
   const [progress, setProgress] = useState<any>(null);
   const [licenses, setLicenses] = useState<any[]>([]);
   const [crypto, setCrypto] = useState<any[]>([]);
-  const [licenseSelected, setLicenseSelected] = useState<string>(null);
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
 
   const init = async () => {
@@ -73,7 +72,7 @@ const Report = () => {
               <div className="report-titles-container">
                 <span className="report-titles">Matches for license</span>
               </div>
-              <MatchesForLicense data={matchedLicenseSelected} />
+              <MatchesForLicense data={matchedLicenseSelected || licenses?.[0]} />
             </Card>
             <Card className="report-item matches">
               <div className="d">d</div>
