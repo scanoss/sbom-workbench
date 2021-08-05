@@ -30,8 +30,8 @@ const Report = () => {
   };
 
   const onLicenseSelected = (license: string) => {
-    console.log(licenses);
-    console.log(license);
+    // console.log(licenses);
+    // console.log(license);
     const matchedLicense = licenses.find((item) => item?.label === license);
     setMatchedLicenseSelected(matchedLicense);
   };
@@ -64,7 +64,7 @@ const Report = () => {
                 </div>
                 <div className="report-second">
                   <LicensesChart data={licenses} />
-                  <LicensesTable selectLicense={(license) => onLicenseSelected(license)} data={licenses} />
+                  <LicensesTable matchedLicenseSelected={matchedLicenseSelected} selectLicense={(license) => onLicenseSelected(license)} data={licenses} />
                 </div>
               </div>
             </Card>

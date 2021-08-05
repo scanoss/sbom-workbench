@@ -5,7 +5,7 @@ const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
 
   useEffect(() => {
-    const percentage = Math.round((data?.identifiedFiles + data?.pendingFiles) / data.totalFiles);
+    const percentage = Math.round((data?.identifiedFiles + data?.pendingFiles) / data.totalFiles * 100) ;
     const chart = new Chart(chartRef.current, {
       type: 'bar',
       data: {
