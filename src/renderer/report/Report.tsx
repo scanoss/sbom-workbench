@@ -32,12 +32,22 @@ const Report = () => {
   const history = useHistory();
   const { scanBasePath } = useContext(AppContext) as IAppContext;
 
-  const [progress, setProgress] = useState<any>(null);
+  const [summary, setSummary] = useState<any>(null);
   const [licenses, setLicenses] = useState<any[]>([]);
+  const [crypto, setCrypto] = useState<any[]>([]);
 
   const init = () => {
     setProgress(PROGRESS_DATA);
     setLicenses(LICENSES_DATA);
+  };
+
+
+  const init = async () => {
+    const a = await report.getSummary();
+    setLicenses(a.data.licenses);
+    setCrypto(a.data.crypto);
+    setSummary(a.data.summary);
+    console.log(a);
   };
 
   useEffect(init, []);
@@ -92,3 +102,4 @@ const Report = () => {
 };
 
 export default Report;
+

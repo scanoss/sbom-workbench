@@ -50,6 +50,11 @@ export enum IpcEvents {
 
   EXPORT_SPDX = 'EXPORT_SPDX',
 
+  REPORT_INVENTORY_PROGRESS = 'REPORT_INVENTORY_PROGRESS',
+
+  REPORT_SUMMARY = 'REPORT_SUMMARY',
+
+
 
 }
 
@@ -103,6 +108,8 @@ export const ipcRendererEvents = [
   IpcEvents.RESULTS_GET,
 
   IpcEvents.EXPORT_SPDX,
+  IpcEvents.REPORT_INVENTORY_PROGRESS,
+  IpcEvents.REPORT_SUMMARY,
 
   IpcEvents.UTILS_DEFAULT_PROJECT_PATH,
 ];
