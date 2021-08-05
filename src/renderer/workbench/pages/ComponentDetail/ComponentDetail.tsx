@@ -80,24 +80,28 @@ export const ComponentDetail = () => {
 
   const onIdentifyPressed = async (file) => {
     const inv = {
-      ...component,
       component: component?.name,
+      version: component?.version,
       license: component?.licenses[0]?.name,
+      url: component?.url,
+      purl: component?.purl,
       usage: file.type,
     };
 
-    create(inv, [file.path]);
+    create(inv, [file.id]);
   };
 
   const onIdentifyAllPressed = async () => {
     const selFiles = files
       .filter((file) => file.status === 'pending')
-      .map((file) => file.path);
+      .map((file) => file.id);
 
     const inv = {
-      ...component,
       component: component?.name,
+      version: component?.version,
       license: component?.licenses[0]?.name,
+      url: component?.url,
+      purl: component?.purl,
       usage: 'file',
     };
 
@@ -105,24 +109,24 @@ export const ComponentDetail = () => {
   };
 
   const onIgnorePressed = async (file) => {
-    await ignoreFile([file.path]);
+    await ignoreFile([file.id]);
     getFiles();
   };
 
   const onIgnoreAllPressed = async () => {
-    const selFiles = files.filter((file) => file.status === 'pending').map((file) => file.path);
+    const selFiles = files.filter((file) => file.status === 'pending').map((file) => file.id);
     await ignoreFile(selFiles);
     getFiles();
   };
 
   const onRestoreAllPressed = async () => {
-    const selFiles = files.filter((file) => file.status === 'ignored').map((file) => file.path);
+    const selFiles = files.filter((file) => file.status === 'ignored').map((file) => file.id);
     await restoreFile(selFiles);
     getFiles();
   };
 
   const onRestorePressed = async (file) => {
-    await restoreFile([file.path]);
+    await restoreFile([file.id]);
     getFiles();
   };
 
@@ -149,7 +153,7 @@ export const ComponentDetail = () => {
       });
       setInventories((previous) => [...previous, newInventory]);
     } else if (action === DIALOG_ACTIONS.OK) {
-      await attachFile(inventory.id, inventory.component.purl, inventory.component.version, selFiles);
+      await attachFile(inventory.id, selFiles);
     }
 
     getFiles();
@@ -210,7 +214,7 @@ export const ComponentDetail = () => {
                   textColor="primary"
                   onChange={(event, value) => setTab(value)}
                 >
-                  <Tab label={`Pendings (${component?.summary.pending})`} />
+                  <Tab label={`Pending (${component?.summary.pending})`} />
                   <Tab label={`Identified (${component?.summary.identified})`} />
                   <Tab label={`Ignored (${component?.summary.ignored})`} />
                 </Tabs>

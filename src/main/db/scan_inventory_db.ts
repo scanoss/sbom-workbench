@@ -21,7 +21,7 @@ export class InventoryDb extends Db {
     this.component = new ComponentDb(path);
   }
 
-  private getByFilePath(inventory: Partial<Inventory>) {
+  private getByResultId(inventory: Partial<Inventory>) {
     return new Promise(async (resolve) => {
       try {
         if (inventory.files) {
@@ -44,7 +44,7 @@ export class InventoryDb extends Db {
         const db = await this.openDb();
         if (inventory.purl !== undefined) {
           db.all(
-            query.SQL_SCAN_SELECT_INVENTORIES_FROM_PURL,
+            query.SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION,
             inventory.purl,
             inventory.version,
             (err: object, inv: any) => {
@@ -83,8 +83,8 @@ export class InventoryDb extends Db {
       db.serialize(function () {
         db.run('begin transaction');
         if (inventory.files)
-          for (const path of inventory.files) {
-            db.run(query.SQL_INSERT_FILE_INVENTORIES, path, inventory.id);
+          for (const id of inventory.files) {
+            db.run(query.SQL_INSERT_FILE_INVENTORIES, id, inventory.id);
           }
         db.run('commit', () => {
           db.close();
@@ -98,24 +98,26 @@ export class InventoryDb extends Db {
 
   // DETACH FILE INVENTORY
   async detachFileInventory(inventory: Partial<Inventory>) {
-    try {
-      await this.pending(inventory);
-      const db = await this.openDb();
-      db.serialize(function () {
-        db.run('begin transaction');
-        if (inventory.files) {
-          for (const path of inventory.files) {
-            db.run(query.SQL_DELETE_FILE_INVENTORIES, path, inventory.id);
-          }
-        }
-        db.run('commit', () => {
-          db.close();
+    return new Promise(async (resolve, reject) => {
+      try {
+        await this.pending(inventory);
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          if (inventory.files) {
+            for (const id of inventory.files) {
+              db.run(query.SQL_DELETE_FILE_INVENTORIES, id, inventory.id);
+            }
+            db.run('commit', () => {
+              db.close();
+              resolve(true);
+            });
+          } else resolve(false);
         });
-      });
-    } catch (error) {
-      return Promise.reject(new Error('Unable to detach inventory'));
-    }
-    return Promise.resolve(true);
+      } catch (error) {
+        reject(new Error('Unable to detach inventory'));
+      }
+    });
   }
 
   // GET INVENTORY BY ID
@@ -147,13 +149,11 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         let inventories: any;
-        if (inventory.purl !== undefined && inventory.version !== undefined) {
+        if (inventory.purl !== undefined && inventory.version !== undefined)
           inventories = await this.getByPurlVersion(inventory);
-        } else if (inventory.files) {
-          inventories = await this.getByFilePath(inventory);
-        } else {
-          inventories = await this.getAllInventories();
-        }
+        else if (inventory.files) inventories = await this.getByResultId(inventory);
+        else if (inventory.purl !== undefined) inventories = await this.getByPurl(inventory);
+        else inventories = await this.getAllInventories();    
         if (inventory !== undefined) {
           for (let i = 0; i < inventories.length; i += 1) {
             const comp = await this.component.getAll(inventories[i]);
@@ -163,9 +163,7 @@ export class InventoryDb extends Db {
             delete inventories[i].version;
           }
           resolve(inventories);
-        } else {
-          resolve([]);
-        }
+        } else resolve([]);
       } catch (error) {
         reject(new Error('error'));
       }
@@ -178,6 +176,21 @@ export class InventoryDb extends Db {
         const db = await this.openDb();
         db.get(query.SQL_GET_INVENTORY_BY_ID, inventory.id, (err: object, inv: any) => {
           db.close();
+          if (err) resolve(undefined);
+          else resolve(inv);
+        });
+      } catch (error) {
+        reject(new Error('The inventory does not exists'));
+      }
+    });
+  }
+
+  private getByPurl(inventory: Partial<Inventory>) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.all(query.SQL_GET_INVENTORY_BY_PURL, inventory.purl, (err: object, inv: any) => {
+          db.close();       
           if (err) resolve(undefined);
           else resolve(inv);
         });
@@ -223,7 +236,7 @@ export class InventoryDb extends Db {
         const db = await this.openDb();
         if (inventory.files)
           for (let i = 0; i < inventory.files.length; i += 1) {
-            db.run(query.SQL_FILES_UPDATE_IDENTIFIED, inventory.files[i], inventory.version, inventory.purl);
+            db.run(query.SQL_FILES_UPDATE_IDENTIFIED, inventory.files[i]);
           }
         resolve(true);
       } catch (error) {
@@ -374,12 +387,7 @@ export class InventoryDb extends Db {
           db.run('begin transaction');
           if (inventory.files) {
             for (let i = 0; i < inventory.files.length; i += 1) {
-              db.run(
-                query.SQL_SET_RESULTS_TO_PENDING_BY_PATH_PURL_VERSION,
-                inventory.files[i],
-                inventory.version,
-                inventory.purl
-              );
+              db.run(query.SQL_SET_RESULTS_TO_PENDING_BY_PATH_PURL_VERSION, inventory.files[i]);
             }
           }
           db.run('commit', () => {
@@ -401,10 +409,9 @@ export class InventoryDb extends Db {
       db.serialize(function () {
         db.run('begin transaction');
         db.run(
+          // REVIEW
           query.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION,
-          inv.id,
-          inv.component.purl,
-          inv.component.version
+          inv.id
         );
         db.run(query.SQL_DELETE_INVENTORY_BY_ID, inv.id);
         db.run('commit', (err) => {

@@ -21,10 +21,11 @@ import './main/project';
 import './main/results';
 import './main/file';
 import './main/formats';
+import './main/workspace';
 import './main/report';
 
 import { IpcEvents } from './ipc-events';
-import { Workspace } from './main/workspace/workspace';
+import { workspace } from './main/workspace/workspace';
 import { ItemExclude, Project } from './api/types';
 import { ScanDb } from './main/db/scan_db';
 import { licenses } from './main/db/licenses';
@@ -170,16 +171,13 @@ export interface IInitScan {
 }
 
 let ws: Workspace;
-
-
 async function mainLogic() {
-  ws =  new Workspace();
-
+  // ws =  new Workspace();
 }
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   const { path } = arg;
-  ws.newProject(path,event.sender);
-  await ws.projectsList.prepare_scan();
-  ws.projectsList.startScan();
+  workspace.newProject(path,event.sender);
+  await workspace.projectsList.prepare_scan();
+  workspace.projectsList.startScan();
 });

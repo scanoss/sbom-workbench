@@ -7,7 +7,6 @@ import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import ComponentCard from '../../components/ComponentCard/ComponentCard';
 import { setComponent } from '../../actions';
-import { componentService } from '../../../../api/component-service';
 
 const LIMIT = 100;
 

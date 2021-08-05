@@ -8,8 +8,9 @@ export interface Inventory {
   notes: string;
   url: string;
   license_name: string;
-  files: string[];
+  files: any[];
 }
+
 export interface Component {
   compid?: number;
   purl: string;
@@ -53,3 +54,15 @@ export interface Files {
   path: string;
 }
 
+export interface ComponentGroup {
+  purl: string;
+  name: string;
+  vendor: string;
+  url: string;
+  versions: any[];
+  summary?: {
+    pending: number;
+    ignored: number;
+    identified: number;
+  };
+}
