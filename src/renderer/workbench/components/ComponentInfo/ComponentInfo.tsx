@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import Label from '../Label/Label';
 import Title from '../Title/Title';
 import componentDefault from '../../../../../assets/imgs/component-default.svg';
-import { Component } from '../../../../api/types';
+import { ComponentGroup } from '../../../../api/types';
 
-export const ComponentInfo = ({ component }: { component: Component }) => {
+export const ComponentInfo = ({ component }: { component: ComponentGroup }) => {
   const [over, setOver] = useState<boolean>(false);
+  const multiple: boolean = component.versions.length > 1;
 
   return (
     <div className="component-info">
@@ -17,7 +18,10 @@ export const ComponentInfo = ({ component }: { component: Component }) => {
         <div className="main-info">
           <img alt="component logo" className="logo" src={componentDefault} />
           <div>
-            <Label label={component?.version} textColor="gray" />
+            <Label
+              label={multiple ? `${component.versions.length} versions` : component.versions[0].version}
+              textColor="gray"
+            />
             <Title title={component?.name} />
           </div>
         </div>
@@ -26,7 +30,7 @@ export const ComponentInfo = ({ component }: { component: Component }) => {
           <div className="component-details-card">
             <div className="tiny-container-detail">
               <p className="title-detail">License</p>
-              <p className="desc-detail">{component?.licenses[0]?.name}</p>
+              {/* <p className="desc-detail">{component?.licenses[0]?.name}</p> */}
             </div>
             <div className="tiny-container-detail">
               <p className="title-detail">PURL</p>

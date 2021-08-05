@@ -26,6 +26,7 @@ export interface Component {
   };
   licenses: any[];
 }
+
 export interface License {
   id?: number;
   name: string;
@@ -54,3 +55,15 @@ export interface Files {
   path: string;
 }
 
+export interface ComponentGroup {
+  purl: string;
+  name: string;
+  vendor: string;
+  url: string;
+  versions: any[];
+  summary?: {
+    pending: number;
+    ignored: number;
+    identified: number;
+  };
+}

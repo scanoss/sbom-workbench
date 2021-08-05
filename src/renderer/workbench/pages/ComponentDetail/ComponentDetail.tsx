@@ -98,8 +98,8 @@ export const ComponentDetail = () => {
 
     const inv = {
       component: component?.name,
-      version: component?.version,
-      license: component?.licenses[0]?.name,
+      version: component?.versions[0].version,
+      license: component?.versions[0].licenses[0]?.name,
       url: component?.url,
       purl: component?.purl,
       usage: 'file',
