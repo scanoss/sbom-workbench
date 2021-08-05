@@ -54,7 +54,6 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-
         .LicensesChart {
           width: 330px;
           height: fit-content;
@@ -67,6 +66,7 @@
           overflow-y: scroll;
           max-height: 320px;
           margin-right: 40px;
+          overflow-x: hidden;
 
           .license-list-item {
             display: flex;
@@ -154,7 +154,15 @@
     }
 
 
+    .table-cell {
+      display: flex;
+      align-items: center;
+      color: #3B82F6;
+      & svg{
+        margin-right: 5px;
+      }
 
+    }
 
 
 
