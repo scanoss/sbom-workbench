@@ -10,7 +10,6 @@ import { AppContext, IAppContext } from '../context/AppProvider';
 import LicensesTable from './components/LicensesTable';
 import MatchesForLicense from './components/MatchesForLicense';
 import { report } from '../../api/report-service';
-import MatchesForLicenseTable from './components/MatchesForLicense';
 
 Chart.register(...registerables);
 
@@ -21,20 +20,21 @@ const Report = () => {
   const [progress, setProgress] = useState<any>(null);
   const [licenses, setLicenses] = useState<any[]>([]);
   const [crypto, setCrypto] = useState<any[]>([]);
-  const [licenseSelected, setLicenseSelected] = useState<string>();
+  const [licenseSelected, setLicenseSelected] = useState<string>(null);
+  const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
 
   const init = async () => {
     const a = await report.getSummary();
-    console.log(a);
     setProgress(a.data.summary);
     setLicenses(a.data.licenses);
     console.log(a);
   };
 
   const onLicenseSelected = (license: string) => {
+    console.log(licenses);
     console.log(license);
-    const matchedLicense = licenses.find(({item}) => item?.label === licenseSelected);
-    setLicenseSelected(matchedLicense);
+    const matchedLicense = licenses.find((item) => item?.label === license);
+    setMatchedLicenseSelected(matchedLicense);
   };
 
   useEffect(init, []);
@@ -73,7 +73,7 @@ const Report = () => {
               <div className="report-titles-container">
                 <span className="report-titles">Matches for license</span>
               </div>
-              <MatchesForLicense data={licenseSelected} />
+              <MatchesForLicense data={matchedLicenseSelected} />
             </Card>
             <Card className="report-item matches">
               <div className="d">d</div>
