@@ -14,6 +14,8 @@ module.exports = {
     'prettier/prettier': ['warn', { printWidth: 120 }],
     'no-nested-ternary': ['off'],
     'jsx-a11y/anchor-is-valid': ['off'],
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': ['warn'],
     /* '@typescript-eslint/naming-convention': [
       'warn',
       {

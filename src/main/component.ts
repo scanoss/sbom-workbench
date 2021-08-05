@@ -30,11 +30,11 @@ ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (event, component: Component
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET_ALL, async (event) => {
-  const comp = await defaultProject.scans_db.components.getAllComponentGroup();
-  return { status: 'ok', message: 'Components group retrieve successfully', comp };
+  const data = await defaultProject.scans_db.components.getAllComponentGroup();
+  return { status: 'ok', message: 'Components group retrieve successfully', data };
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET, async (_event, component: Partial<ComponentGroup>) => {
-  const comp = await defaultProject.scans_db.components.getComponentGroup(component);
-  return { status: 'ok', message: 'component group retrieve successfully', comp };
+  const data = await defaultProject.scans_db.components.getComponentGroup(component);
+  return { status: 'ok', message: 'Component group retrieve successfully', data };
 });

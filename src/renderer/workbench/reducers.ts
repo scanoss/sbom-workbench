@@ -1,12 +1,12 @@
 import { LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_COMPONENTS, SET_FILE } from './actions';
-import { Component } from '../../api/types';
+import { Component, ComponentGroup } from '../../api/types';
 
 export interface State {
   scan: Record<string, any> | null;
   tree: [] | null;
   file: string | null;
-  components: Component[] | null;
-  component: Component | null;
+  components: ComponentGroup[] | null;
+  component: ComponentGroup | null;
   matchInfo: Record<string, any>[] | null;
 }
 
@@ -45,18 +45,11 @@ export default function reducer(state: State = initialState, action): State {
       };
     }
     case SET_FILE: {
-      const { scan } = state;
       const { file } = action;
-
-/*      let matchInfo = null;
-      if (scan && file && scan[file] && scan[file][0].id !== 'none') {
-        matchInfo = scan[file];
-      }*/
 
       return {
         ...state,
         file,
-        // matchInfo,
       };
     }
     case RESET:

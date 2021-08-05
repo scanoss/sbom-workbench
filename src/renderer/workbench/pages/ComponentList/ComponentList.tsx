@@ -84,7 +84,7 @@ export const ComponentList = () => {
           {components && filterItems && filterItems.length > 0 ? (
             <section className="component-list">
               {filterItems.slice(0, LIMIT).map((component) => (
-                <ComponentCard key={component.compid} component={component} onClick={onSelectComponent} />
+                <ComponentCard key={component.purl} component={component} onClick={onSelectComponent} />
               ))}
             </section>
           ) : (

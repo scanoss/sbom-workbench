@@ -1,5 +1,4 @@
 import { Dialog, DialogActions, Button, makeStyles, DialogContentText, Card, DialogContent, Tooltip } from '@material-ui/core';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import React, { useEffect, useState } from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
@@ -39,12 +38,13 @@ const useStyles = makeStyles((theme) => ({
 
 interface ConfirmDialogProps {
   open: boolean;
+  message: string;
   onClose: (response: DialogResponse) => void;
 }
 
 export const ConfirmDialog = (props: ConfirmDialogProps) => {
   const classes = useStyles();
-  const { open, onClose } = props;
+  const { open, message, onClose } = props;
 
   const handleCancel = () => onClose({ action: DIALOG_ACTIONS.CANCEL });
   const handleAccept = () => onClose({ action: DIALOG_ACTIONS.OK });
@@ -64,7 +64,7 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
           <CloseIcon />
         </IconButton>
         <DialogContentText className={classes.text}>
-          Are you sure you want to delete this <b>group</b>?
+          {message}
         </DialogContentText>
       </DialogContent>
       <DialogActions className={classes.actions}>

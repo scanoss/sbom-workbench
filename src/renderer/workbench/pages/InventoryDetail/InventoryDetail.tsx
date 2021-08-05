@@ -29,7 +29,7 @@ export const InventoryDetail = () => {
 
   const getInventory = async () => {
     const response = await inventoryService.get({ id });
-    console.log(response);
+
     if (response.status === 'fail') {
       history.goBack();
       return;
@@ -39,7 +39,7 @@ export const InventoryDetail = () => {
   };
 
   const onRemoveClicked = async () => {
-    const { action } = await dialogCtrl.openConfirmDialog();
+    const { action } = await dialogCtrl.openConfirmDialog('Are you sure you want to delete this group?');
     if (action == DIALOG_ACTIONS.OK) {
       await deleteInventory(inventory?.id);
       history.goBack();
@@ -75,7 +75,7 @@ export const InventoryDetail = () => {
                 {scanBasePath}
               </h4>
             </div>
-            <ComponentInfo component={inventory?.component} />
+            {/* {inventory && <ComponentInfo component={inventory.component} />} */}
           </div>
           <div className="identified-info-card">
             <IconButton className="btn-delete" onClick={onRemoveClicked} >
