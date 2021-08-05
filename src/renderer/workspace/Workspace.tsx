@@ -10,6 +10,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 import { makeStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
@@ -31,7 +32,12 @@ const useStyles = makeStyles((theme) => ({
   input: {
     width: 400,
   },
+  margin: {
+    margin: theme.spacing(1),
+  },
 }));
+
+
 
 const filter = (items, query) => {
   if (!items) return null;
@@ -84,6 +90,23 @@ const Workspace = () => {
     }
   };
 
+  const onTrashHandler = async (path, e) => {
+    e.stopPropagation();
+    console.log(path);
+    const { status, data } = await workspaceService.deleteProject(path);
+
+    const projectPath = data;
+
+    if(status === 'ok') {
+      console.log('project deleted sucesfully');
+      init();
+    }
+    else
+      console.log('ERROR: project not deleted');
+
+  };
+
+
   useEffect(() => {
     init();
     return cleanup;
@@ -126,6 +149,7 @@ const Workspace = () => {
                     <TableCell>NAME</TableCell>
                     <TableCell>DATE</TableCell>
                     <TableCell>TOTAL FILES</TableCell>
+                    <TableCell />
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -137,6 +161,11 @@ const Workspace = () => {
                         </TableCell>
                         <TableCell>{format(row.date)}</TableCell>
                         <TableCell>{row.files}</TableCell>
+                        <TableCell>
+                          <IconButton aria-label="delete" className={classes.margin} onClick={ (event) => onTrashHandler(row.work_root,event)}>
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
