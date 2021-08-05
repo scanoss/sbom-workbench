@@ -1,5 +1,5 @@
 import { IpcEvents } from '../ipc-events';
-import { Component, License } from './types';
+import { Component, License,ComponentGroup } from './types';
 
 const { ipcRenderer } = require('electron');
 
@@ -39,18 +39,17 @@ class ComponentService {
     return response;
   }
 
-  public async getCompVersions(): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_VERSIONS);
+  public async getAllComponentGroup(): Promise<ComponentGroup[]> {
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GROUP_GET_ALL);
+    return response;
+  }
+
+  public async getComponentGroup(): Promise<ComponentGroup> {
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GROUP_GET);
     return response;
   }
 }
 
 export const componentService = new ComponentService();
 
-/*
-COMPONENT_CREATE = 'COMPONENT_CREATE',
-  COMPONENT_DELETE = 'COMPONENT_DELETE',
-  COMPONENT_GET = 'COMPONENT_GET',
-  COMPONENT_UPDATE = 'COMPONENT_UPDATE',
-  COMPONENT_ATTACH_LICENSE = 'COMPONENT_ATTACH_LICENSE',
-  COMPONENT_DETACH_LICENSE = 'COMPONENT_DETACH_LICENSE', */
+

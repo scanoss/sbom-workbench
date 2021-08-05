@@ -80,11 +80,14 @@ export class Querys {
   SQL_SCAN_SELECT_INVENTORIES_FROM_PATH =
     'SELECT i.id,i.usage,i.compid,i.notes,i.url,i.license_name,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid INNER JOIN results r ON r.id=fi.resultid WHERE r.file_path=?;'
 
-  SQL_SCAN_SELECT_INVENTORIES_FROM_PURL =
+  SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION=
     'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.license_name,i.purl,i.version FROM inventories i WHERE i.purl=? AND i.version=?;';
 
   // GET INVENTORY BY ID
-  SQL_GET_INVENTORY_BY_ID = 'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories where id=?;';
+  SQL_GET_INVENTORY_BY_PURL = 'SELECT id,compid,usage,notes,url,license_name,purl,version FROM inventories WHERE purl=?;';
+
+  // GET INVENTORY BY ID
+  SQL_GET_INVENTORY_BY_ID = 'SELECT id,compid,usage,notes,url,license_name,purl,version FROM inventories WHERE id=?;';
 
   SQL_SCAN_SELECT_FILE_RESULTS =
     "SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype!='none' order by file_path;";
@@ -118,7 +121,7 @@ export class Querys {
     'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.purl=? and cv.version=?;';
 
   SQL_GET_COMPONENT_BY_PURL =
-  'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.purl=?';
+    ' SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE comp.purl=?;';
 
   // GET ALL COMPONENTES
   SQL_GET_ALL_COMPONENTS =

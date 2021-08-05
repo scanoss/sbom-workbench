@@ -44,7 +44,7 @@ export class InventoryDb extends Db {
         const db = await this.openDb();
         if (inventory.purl !== undefined) {
           db.all(
-            query.SQL_SCAN_SELECT_INVENTORIES_FROM_PURL,
+            query.SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION,
             inventory.purl,
             inventory.version,
             (err: object, inv: any) => {
@@ -149,13 +149,11 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         let inventories: any;
-        if (inventory.purl !== undefined && inventory.version !== undefined) {
+        if (inventory.purl !== undefined && inventory.version !== undefined)
           inventories = await this.getByPurlVersion(inventory);
-        } else if (inventory.files) {
-          inventories = await this.getByResultId(inventory);
-        } else {
-          inventories = await this.getAllInventories();
-        }
+        else if (inventory.files) inventories = await this.getByResultId(inventory);
+        else if (inventory.purl !== undefined) inventories = await this.getByPurl(inventory);
+        else inventories = await this.getAllInventories();    
         if (inventory !== undefined) {
           for (let i = 0; i < inventories.length; i += 1) {
             const comp = await this.component.getAll(inventories[i]);
@@ -165,9 +163,7 @@ export class InventoryDb extends Db {
             delete inventories[i].version;
           }
           resolve(inventories);
-        } else {
-          resolve([]);
-        }
+        } else resolve([]);
       } catch (error) {
         reject(new Error('error'));
       }
@@ -180,6 +176,21 @@ export class InventoryDb extends Db {
         const db = await this.openDb();
         db.get(query.SQL_GET_INVENTORY_BY_ID, inventory.id, (err: object, inv: any) => {
           db.close();
+          if (err) resolve(undefined);
+          else resolve(inv);
+        });
+      } catch (error) {
+        reject(new Error('The inventory does not exists'));
+      }
+    });
+  }
+
+  private getByPurl(inventory: Partial<Inventory>) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.all(query.SQL_GET_INVENTORY_BY_PURL, inventory.purl, (err: object, inv: any) => {
+          db.close();       
           if (err) resolve(undefined);
           else resolve(inv);
         });
