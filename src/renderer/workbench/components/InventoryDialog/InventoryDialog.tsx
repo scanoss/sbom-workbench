@@ -63,7 +63,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const fetchData = async () => {
     if (open) {
-      const { comp } = await componentService.getCompVersions();
+      const { comp } = await componentService.getAllComponentGroup();
       setData(comp);
       setComponents(comp.map((item) => item.name));
     }
