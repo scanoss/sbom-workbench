@@ -64,7 +64,7 @@ const Report = () => {
                 </div>
                 <div className="report-second">
                   <LicensesChart data={licenses} />
-                  <LicensesTable matchedLicenseSelected={matchedLicenseSelected} selectLicense={(license) => onLicenseSelected(license)} data={licenses} />
+                  <LicensesTable matchedLicenseSelected={matchedLicenseSelected || licenses?.[0]} selectLicense={(license) => onLicenseSelected(license)} data={licenses} />
                 </div>
               </div>
             </Card>
