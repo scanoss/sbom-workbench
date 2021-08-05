@@ -29,9 +29,9 @@ const LicensesTable = ({ data, selectLicense }) => {
     if (index < colors.length) {
       return colors[index];
     }
-    return colors[colors.length - 1];
+    // repeat the array and return the same colors
+    return getColor(index % colors.length);
   };
-
 
   return (
     <div className="license-list">
