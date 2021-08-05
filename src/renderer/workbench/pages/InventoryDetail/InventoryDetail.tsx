@@ -29,7 +29,6 @@ export const InventoryDetail = () => {
 
   const getInventory = async () => {
     const response = await inventoryService.get({ id });
-    console.log(response);
 
     if (response.status === 'fail') {
       history.goBack();
@@ -40,7 +39,7 @@ export const InventoryDetail = () => {
   };
 
   const onRemoveClicked = async () => {
-    const { action } = await dialogCtrl.openConfirmDialog();
+    const { action } = await dialogCtrl.openConfirmDialog('Are you sure you want to delete this group?');
     if (action == DIALOG_ACTIONS.OK) {
       await deleteInventory(inventory?.id);
       history.goBack();

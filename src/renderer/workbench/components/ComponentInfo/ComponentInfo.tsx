@@ -13,7 +13,7 @@ export const ComponentInfo = ({ component }: { component: any }) => {
       ? component.versions[0].version
       : `${component.versions.length} versions`
     : component.version;
-  const license = group ? component.versions[0].licenses[0].name : component.licenses[0];
+  const license = group ? component.versions[0].licenses[0]?.name : component.licenses[0];
 
   return (
     <div className="component-info">
