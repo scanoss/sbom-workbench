@@ -149,11 +149,13 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         let inventories: any;
-        if (inventory.purl !== undefined && inventory.version !== undefined)
+        if (inventory.purl && inventory.version) {
           inventories = await this.getByPurlVersion(inventory);
-        else if (inventory.files) inventories = await this.getByResultId(inventory);
-        else if (inventory.purl !== undefined) inventories = await this.getByPurl(inventory);
-        else inventories = await this.getAllInventories();    
+        } else if (inventory.files) {
+          inventories = await this.getByResultId(inventory);
+        } else if (inventory.purl) {
+          inventories = await this.getByPurl(inventory);
+        } else inventories = await this.getAllInventories();
         if (inventory !== undefined) {
           for (let i = 0; i < inventories.length; i += 1) {
             const comp = await this.component.getAll(inventories[i]);
@@ -190,7 +192,7 @@ export class InventoryDb extends Db {
       try {
         const db = await this.openDb();
         db.all(query.SQL_GET_INVENTORY_BY_PURL, inventory.purl, (err: object, inv: any) => {
-          db.close();       
+          db.close();
           if (err) resolve(undefined);
           else resolve(inv);
         });

@@ -4,12 +4,11 @@ import { Inventory } from '../../api/types';
 import { InventorySelectorDialog } from '../workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse } from './types';
 import ConfirmDialog from '../ui/dialog/ConfirmDialog';
-import { DialogActions } from '@material-ui/core';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
-  openConfirmDialog: () => Promise<DialogResponse>;
+  openConfirmDialog: (message?: string) => Promise<DialogResponse>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -55,13 +54,15 @@ export const DialogProvider: React.FC = ({ children }) => {
 
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
+    message?: string;
     onClose?: (response: DialogResponse) => void;
   }>({ open: false });
 
-  const openConfirmDialog = (): Promise<DialogResponse> => {
+  const openConfirmDialog = (message: string = 'Are you sure?'): Promise<DialogResponse> => {
     return new Promise<DialogResponse>((resolve) => {
       setConfirmDialog({
         open: true,
+        message,
         onClose: (response) => {
           setConfirmDialog((dialog) => ({ ...dialog, open: false }));
           resolve(response);
@@ -88,6 +89,7 @@ export const DialogProvider: React.FC = ({ children }) => {
 
       <ConfirmDialog
         open={confirmDialog.open}
+        message={confirmDialog.message}
         onClose={(response) => confirmDialog.onClose && confirmDialog.onClose(response)}
       />
 

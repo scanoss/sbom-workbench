@@ -5,6 +5,16 @@
     margin-top: 20px;
   }
 
+  .MuiTableRow-root {
+    .btn-delete {
+      visibility: hidden;
+    }
+
+    &:hover .btn-delete {
+      visibility: visible;
+    }
+  }
+
   .empty-container {
     display: flex;
     height: 100%;

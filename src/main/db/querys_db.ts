@@ -140,7 +140,7 @@ export class Querys {
     'SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url FROM results r WHERE r.purl=? AND r.version=? GROUP BY r.file_path;';
 
     SQL_SELECT_FILES_FROM_PURL =
-    'SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url FROM results r WHERE r.purl=? GROUP BY r.file_path;';
+    'SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license FROM results r WHERE r.purl=? GROUP BY r.file_path;';
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE results.id=?;';
 
@@ -154,6 +154,8 @@ export class Querys {
   SQL_GET_ALL_SUMMARIES = 'SELECT compid,ignored,pending,identified FROM summary;';
 
   SQL_GET_SUMMARY_BY_PURL_VERSION = 'SELECT identified,pending,ignored FROM summary WHERE purl=? AND version=?;';
+
+  SQL_GET_SUMMARY_BY_PURL = 'SELECT identified,pending,ignored FROM summary WHERE purl=?;';
 
   SQL_GET_UNIQUE_COMPONENT = 'SELECT DISTINCT purl,version,license,component,url FROM results;';
 

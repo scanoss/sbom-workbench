@@ -11,6 +11,23 @@ header.app-header {
   }
 }
 
+#ComponentDetail {
+  .filter-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+
+    .header-title {
+      margin-bottom: 0;
+    }
+
+    .filter {
+      margin-top: 15px;
+      margin-left: 5px;
+    }
+  }
+}
+
 .file-list {
   display: grid;
   grid-template-columns: calc(50% - 7px) calc(50% - 7px);
