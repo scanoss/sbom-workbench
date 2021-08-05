@@ -166,4 +166,7 @@ export class Querys {
 
   SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION =
     'UPDATE results SET identified=0 WHERE id IN (SELECT resultid FROM file_inventories where inventoryid=?)';
+  SQL_GET_RESULTS_SUMMARY =
+  "SELECT (select count(*) from results r where r.identified = 1) as 'identified', (select count(*)  from results r where r.ignored = 1 ) as 'ignored', (select count(*) from results r where (r.identified = 0 AND r.ignored = 0)) as 'pending'";
 }
+

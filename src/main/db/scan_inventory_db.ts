@@ -426,4 +426,21 @@ export class InventoryDb extends Db {
       return Promise.reject(new Error('detach files were not successfully'));
     }
   }
+
+  getCurrentSummary() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.all(query.SQL_GET_RESULTS_SUMMARY, (err: any, data: any) => {
+            db.close();
+            if (err) reject(new Error('{}'));
+            else resolve(data);
+          });
+        });
+      } catch (error) {
+        reject(new Error('{}'));
+      }
+    });
+  }
 }

@@ -22,6 +22,7 @@ import './main/results';
 import './main/file';
 import './main/formats';
 import './main/workspace';
+import './main/report';
 
 import { IpcEvents } from './ipc-events';
 import { workspace } from './main/workspace/workspace';

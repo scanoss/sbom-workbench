@@ -99,6 +99,7 @@ export class ProjectTree extends EventEmitter {
     this.results = a.results;
     this.scan_root = a.scan_root;
     this.project_name = a.project_name;
+    this.filesSummary = a.filesSummary;
     this.scans_db = new ScanDb(rootOfProject);
     await this.scans_db.init();
     this.scanner = new Scanner();
