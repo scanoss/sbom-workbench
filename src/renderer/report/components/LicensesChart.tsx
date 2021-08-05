@@ -28,23 +28,23 @@ const LicensesChart = ({ data }) => {
   //   </div>
   // );
 
-  const image = new Image();
-  image.src = 'https://www.chartjs.org/img/chartjs-logo.svg';
+  // const image = new Image();
+  // image.src = 'https://www.chartjs.org/img/chartjs-logo.svg';
 
-  const plugin = {
-    id: 'custom_canvas_background_image',
-    beforeDraw: (chart) => {
-      if (image.complete) {
-        const { ctx } = chart;
-        const { top, left, width, height } = chart.chartArea;
-        const x = left + width / 2 - image.width / 2;
-        const y = top + height / 2 - image.height / 2;
-        ctx.drawImage(image, x, y);
-      } else {
-        image.onload = () => chart.draw();
-      }
-    },
-  };
+  // const plugin = {
+  //   id: 'custom_canvas_background_image',
+  //   beforeDraw: (chart) => {
+  //     if (image.complete) {
+  //       const { ctx } = chart;
+  //       const { top, left, width, height } = chart.chartArea;
+  //       const x = left + width / 2 - image.width / 2;
+  //       const y = top + height / 2 - image.height / 2;
+  //       ctx.drawImage(image, x, y);
+  //     } else {
+  //       image.onload = () => chart.draw();
+  //     }
+  //   },
+  // };
 
   useEffect(() => {
     const chart = new Chart(chartRef.current, {
@@ -72,7 +72,7 @@ const LicensesChart = ({ data }) => {
           legend: { display: false },
         },
       },
-      plugins: [plugin],
+      // plugins: [plugin],
     });
 
     return () => chart.destroy();
