@@ -79,12 +79,6 @@ const Workbench = () => {
     setSavePath(spdxPath);
   };
 
-  const onDownloadClicked = async () => {
-
-
-    history.push('/report');
-  };
-
   const onDestroy = () => {
     dispatch(reset());
   };
@@ -138,7 +132,7 @@ const Workbench = () => {
       </SplitPane>
 
       <Tooltip title="Export SPDX">
-        <Fab className="btn-export" onClick={onDownloadClicked}>
+        <Fab className="btn-export" onClick={onDownloadClickedExport}>
           <SaveAltOutlinedIcon />
         </Fab>
       </Tooltip>
