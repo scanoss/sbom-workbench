@@ -10,24 +10,9 @@ import { AppContext, IAppContext } from '../context/AppProvider';
 import LicensesTable from './components/LicensesTable';
 import MatchesForLicense from './components/MatchesForLicense';
 import { report } from '../../api/report-service';
+import MatchesForLicenseTable from './components/MatchesForLicense';
 
 Chart.register(...registerables);
-
-const LICENSES_DATA = [
-  { label: 'MIT', value: 15 },
-  { label: 'Apache 2.0', value: 7 },
-  { label: 'GNU (General Public License)', value: 5 },
-  { label: 'Mozilla Public License', value: 3 },
-  { label: 'Eclipse Public License', value: 2 },
-  { label: 'Apache 2.0', value: 7 },
-  { label: 'GNU (General Public License)', value: 5 },
-  { label: 'Mozilla Public License', value: 3 },
-  { label: 'Eclipse Public License', value: 2 },
-];
-
-const BAR_DATA = [{ label: '90%', value: 15 }];
-
-const PROGRESS_DATA = { identified: 10, pending: 15 };
 
 const Report = () => {
   const history = useHistory();
@@ -47,17 +32,14 @@ const Report = () => {
     // setCrypto(a.data.crypto);
     // setSummary(a.data.summary);
     // console.log(a);
+    console.log(a);
   };
-
-  useEffect(() => {
-    console.log(licenseSelected);
-  }, [licenseSelected])
 
   const onLicenseSelected = (license: string) => {
-    licenses.find();
+    console.log(license);
+    const matchedLicense = licenses.find(({item}) => item?.label === licenseSelected);
+    setLicenseSelected(matchedLicense);
   };
-
-  console.log();
 
   useEffect(init, []);
 
@@ -87,12 +69,12 @@ const Report = () => {
                 </div>
                 <div className="report-second">
                   <LicensesChart data={licenses} />
-                  <LicensesTable selectLicense={(license) => setLicenseSelected(license)} data={licenses} />
+                  <LicensesTable selectLicense={(license) => onLicenseSelected(license)} data={licenses} />
                 </div>
               </div>
             </Card>
             <Card className="report-item matches-for-license">
-              <MatchesForLicense />
+              <MatchesForLicense data={licenseSelected} />
             </Card>
             <Card className="report-item matches">
               <div className="d">d</div>

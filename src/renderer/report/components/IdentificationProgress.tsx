@@ -3,10 +3,9 @@ import { Chart } from 'chart.js';
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
-  const totalFiles = data.pending + data.identified;
 
   useEffect(() => {
-    const percentage = Math.round((data.identified + data.pending) / totalFiles);
+    const percentage = Math.round((data?.identifiedFiles + data?.pendingFiles) / data.totalFiles);
     const chart = new Chart(chartRef.current, {
       type: 'bar',
       data: {
@@ -68,7 +67,7 @@ const LicensesChart = ({ data }) => {
                 return (``);
               },
               title() {
-                return (`Files\n${data?.pending}`);
+                return (`Files\n${data?.pendingFiles}`);
               }
             },
             displayColors: false,
@@ -95,7 +94,7 @@ const LicensesChart = ({ data }) => {
         <canvas ref={chartRef} />
       </div>
       <div className="total-files-container">
-        <span className="total-files-label">Total Files: {totalFiles}</span>
+        <span className="total-files-label">Total Files: {data.totalFiles}</span>
       </div>
     </div>
   );
