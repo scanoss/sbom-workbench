@@ -121,7 +121,7 @@ export class Querys {
     'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.purl=? and cv.version=?;';
 
   SQL_GET_COMPONENT_BY_PURL =
-  'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.purl=?';
+    ' SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE comp.purl=?;';
 
   // GET ALL COMPONENTES
   SQL_GET_ALL_COMPONENTS =
