@@ -1,0 +1,27 @@
+#NewProject {
+  display: grid;
+
+  header.app-header {
+    h1 {
+      margin: 0;
+    }
+  }
+
+  .app-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .progressbar {
+      width: 300px;
+      min-height: 30px;
+    }
+
+    .stage-label {
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 60px;
+    }
+  }
+}

@@ -287,12 +287,10 @@ export class ComponentDb extends Db {
               if (attachLicComp.license_id === 0) {                    
                 license = await self.license.bulkCreate(db, license);
                 attachLicComp.license_id = license.id;
-              }
-            } else {
-              license.spdxid='NULL';
-              attachLicComp.license_id = await self.license.getLicenseIdFilter(license);               
-            }              
-              attachLicComp.compid = await self.componentNewImportFromResults(db,result);             
+              }      
+            }         
+              attachLicComp.compid = await self.componentNewImportFromResults(db,result); 
+              if(result.license !== 'NULL')
               await self.license.bulkAttachLicensebyId(db, attachLicComp);
           }
           db.run('commit', () => {
@@ -317,7 +315,7 @@ export class ComponentDb extends Db {
         'AUTOMATIC IMPORT',
         data.url,
         data.purl,
-        function (err: any) {       
+        function (this :any, err: any) {       
           resolve(this.lastID);
         }
       );

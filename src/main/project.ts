@@ -5,7 +5,7 @@ import { Inventory, Component, Project } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 
 
-import { Workspace } from './workspace/workspace';
+import { workspace } from './workspace/workspace';
 import { defaultProject } from './workspace/ProjectTree';
 
 const os = require('os');
@@ -15,7 +15,7 @@ let ws: Workspace;
 ipcMain.handle(IpcEvents.PROJECT_LOAD_SCAN, async (_event, arg: any) => {
   let created: any;
   console.log(arg);
-  ws = new Workspace();
+  ws = workspace;
   ws.newProject(arg, _event.sender);
   ws.projectsList.loadScanProject(arg);
 
