@@ -186,7 +186,7 @@ const Workspace = () => {
                 <h3>Not projects yet</h3>
                 <p>
                   You can start scanning by &nbsp;
-                  <Link href="#" onClick={onNewProject}>
+                  <Link onClick={onNewProject}>
                     creating a new project
                   </Link>
                   .
