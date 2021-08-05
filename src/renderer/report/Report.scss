@@ -121,6 +121,8 @@
 
 
 
+
+
     .IdentificationProgress {
       padding: 10px;
       display: flex;
@@ -166,6 +168,51 @@
         margin-right: 5px;
       }
 
+    }
+
+    .matches {
+      .report-titles-container {
+
+        margin-bottom: 48px;
+
+          .report-titles {
+            color: #27272A;
+            font-size: 30px;
+            font-style: normal;
+            font-weight: 700;
+          }
+
+      }
+    }
+
+    .vulnerabilites {
+      .report-titles-container {
+
+        margin-bottom: 48px;
+
+          .report-titles {
+            color: #27272A;
+            font-size: 30px;
+            font-style: normal;
+            font-weight: 700;
+          }
+
+      }
+    }
+
+    .licenses-obligation {
+      .report-titles-container {
+
+        margin-bottom: 48px;
+
+          .report-titles {
+            color: #27272A;
+            font-size: 30px;
+            font-style: normal;
+            font-weight: 700;
+          }
+
+      }
     }
 
 

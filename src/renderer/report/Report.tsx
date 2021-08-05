@@ -75,13 +75,25 @@ const Report = () => {
               <MatchesForLicense data={matchedLicenseSelected || licenses?.[0]} />
             </Card>
             <Card className="report-item matches">
-              <div className="d">d</div>
+              <div className="d">
+              <div className="report-titles-container">
+                <span className="report-titles">Matches</span>
+              </div>
+              </div>
             </Card>
             <Card className="report-item vulnerabilites">
-              <div className="e">e</div>
+              <div className="e">
+              <div className="report-titles-container">
+                <span className="report-titles">Vulnerabilites</span>
+              </div>
+              </div>
             </Card>
             <Card className="report-item licenses-obligation">
-              <div className="e">f</div>
+              <div className="e">
+              <div className="report-titles-container">
+                <span className="report-titles">License obligations</span>
+              </div>
+              </div>
             </Card>
           </section>
         </main>
