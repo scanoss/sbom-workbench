@@ -39,13 +39,13 @@ class ComponentService {
     return response;
   }
 
-  public async getAllComponentGroup(): Promise<ComponentGroup[]> {
+  public async getAllComponentGroup(): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GROUP_GET_ALL);
     return response;
   }
 
-  public async getComponentGroup(): Promise<ComponentGroup> {
-    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GROUP_GET);
+  public async getComponentGroup(component: Partial<ComponentGroup>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GROUP_GET, component);
     return response;
   }
 }

@@ -85,8 +85,8 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const update = async () => {
     if (component) {
-      // const comp = await workbenchController.getComponent(component.compid);
-      // if (comp) dispatch(setComponent(comp));
+      const comp = await workbenchController.getComponent(component.purl);
+      if (comp) dispatch(setComponent(comp));
     }
 
     const components = await workbenchController.getComponents();

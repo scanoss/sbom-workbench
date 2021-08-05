@@ -140,7 +140,7 @@ export class Querys {
     'SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url FROM results r WHERE r.purl=? AND r.version=? GROUP BY r.file_path;';
 
     SQL_SELECT_FILES_FROM_PURL =
-    'SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url FROM results r WHERE r.purl=? GROUP BY r.file_path;';
+    'SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license FROM results r WHERE r.purl=? GROUP BY r.file_path;';
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE results.id=?;';
 

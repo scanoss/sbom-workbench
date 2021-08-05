@@ -56,16 +56,16 @@ class WorkbenchController {
   }
 
   public async getComponents(): Promise<Component[]> {
-    const { comp } = await componentService.getCompVersions();
-    console.log('COMPONENTS', comp);
+    const { data } = await componentService.getAllComponentGroup();
+    console.log('COMPONENTS', data);
     // sortComponents(data);
-    return comp;
+    return data;
   }
 
-  public async getComponent(id: number): Promise<Component> {
-    const response = await componentService.get({compid: id});
-    console.log('COMPONENT', response.data);
-    return response.data;
+  public async getComponent(purl: string): Promise<Component> {
+    const { data } = await componentService.getComponentGroup({ purl });
+    console.log('COMPONENT', data);
+    return data;
   }
 
   private async generateScanResult(data): Promise<ScanResult> {
