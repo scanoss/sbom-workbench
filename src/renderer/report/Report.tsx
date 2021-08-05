@@ -3,13 +3,16 @@ import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router-dom';
 import { Chart, registerables } from 'chart.js';
-import { Card } from '@material-ui/core';
+import { Button, Card } from '@material-ui/core';
 import LicensesChart from './components/LicensesChart';
 import IdentificationProgress from './components/IdentificationProgress';
 import { AppContext, IAppContext } from '../context/AppProvider';
 import LicensesTable from './components/LicensesTable';
 import MatchesForLicense from './components/MatchesForLicense';
 import { report } from '../../api/report-service';
+import GetAppIcon from '@material-ui/icons/GetApp';
+import { dialogController } from '../dialog-controller';
+import { ExportFormat } from '../../api/export-service';
 
 Chart.register(...registerables);
 
@@ -26,14 +29,18 @@ const Report = () => {
     const a = await report.getSummary();
     setProgress(a.data.summary);
     setLicenses(a.data.licenses);
-    console.log(a);
   };
 
   const onLicenseSelected = (license: string) => {
-    // console.log(licenses);
-    // console.log(license);
     const matchedLicense = licenses.find((item) => item?.label === license);
     setMatchedLicenseSelected(matchedLicense);
+  };
+
+  const onDownloadClickedExport = async () => {
+    const spdxPath = dialogController.showOpenDialog({ properties: ['openDirectory'] });
+    if (spdxPath) {
+      await ExportFormat.spdx(spdxPath);
+    }
   };
 
   useEffect(init, []);
@@ -42,14 +49,15 @@ const Report = () => {
     <>
       <section id="Report" className="app-page">
         <header className="app-header">
-          <div>
             <h2 className="header-subtitle back">
               <IconButton onClick={() => history.push('/workbench')} component="span">
                 <ArrowBackIcon />
               </IconButton>
-              Reports
+              Back to workbench
             </h2>
-          </div>
+            <Button startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onDownloadClickedExport}>
+              Download
+            </Button>
         </header>
 
         <main className="app-content">

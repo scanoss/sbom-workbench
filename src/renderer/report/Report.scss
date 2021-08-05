@@ -1,6 +1,12 @@
 #Report {
   background-color: var(--background-color-primary);
 
+  .app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .report-layout {
     display: grid;
     grid-template-rows: repeat(4, max-content);
@@ -19,7 +25,7 @@
         margin-bottom: 20px;
         .report-titles {
           color: #27272A;
-          font-size: 30px;
+          font-size: 26px;
           font-style: normal;
           font-weight: 700;
         }
@@ -45,7 +51,7 @@
       .report-titles-container {
         .report-titles {
           color: #27272A;
-          font-size: 30px;
+          font-size: 26px;
           font-style: normal;
           font-weight: 700;
         }
@@ -54,8 +60,9 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+
         .LicensesChart {
-          width: 330px;
+          width: 300px;
           height: fit-content;
           padding: 24px;
           display: flex;
@@ -131,11 +138,11 @@
 
       .report-titles-container {
 
-        margin-bottom: 48px;
+        margin-bottom: 20px;
 
           .report-titles {
             color: #27272A;
-            font-size: 30px;
+            font-size: 26px;
             font-style: normal;
             font-weight: 700;
           }
@@ -177,7 +184,7 @@
 
           .report-titles {
             color: #27272A;
-            font-size: 30px;
+            font-size: 26px;
             font-style: normal;
             font-weight: 700;
           }
@@ -192,7 +199,7 @@
 
           .report-titles {
             color: #27272A;
-            font-size: 30px;
+            font-size: 26px;
             font-style: normal;
             font-weight: 700;
           }
@@ -207,7 +214,7 @@
 
           .report-titles {
             color: #27272A;
-            font-size: 30px;
+            font-size: 26px;
             font-style: normal;
             font-weight: 700;
           }

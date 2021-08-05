@@ -15,7 +15,8 @@ import { Link, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom
 import SplitPane from 'react-split-pane';
 import HomeIcon from '@material-ui/icons/Home';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import SaveAltOutlinedIcon from '@material-ui/icons/SaveAltOutlined';
+import BarChartIcon from '@material-ui/icons/BarChart';
+import InsertChartIcon from '@material-ui/icons/InsertChart';
 import { Editor } from './pages/Editor/Editor';
 import { FileTree } from './components/FileTree/FileTree';
 import { dialogController } from '../dialog-controller';
@@ -69,14 +70,6 @@ const Workbench = () => {
 
   const onDownloadClickedExport = async () => {
     history.push('/report');
-    return;
-
-    const spdxPath = dialogController.showOpenDialog({
-      properties: ['openDirectory'],
-    });
-    await ExportFormat.spdx(spdxPath);
-    setOpen(true);
-    setSavePath(spdxPath);
   };
 
   const onDestroy = () => {
@@ -100,7 +93,7 @@ const Workbench = () => {
                     <ArrowBackIcon fontSize="small" />
                   </IconButton>
                 </Link>
-                <span className="title">Explorer</span>
+                <span className="title">Projects</span>
               </div>
               <Link to="/workbench">
                 <IconButton>
@@ -131,9 +124,9 @@ const Workbench = () => {
         </main>
       </SplitPane>
 
-      <Tooltip title="Export SPDX">
+      <Tooltip title="Reports">
         <Fab className="btn-export" onClick={onDownloadClickedExport}>
-          <SaveAltOutlinedIcon />
+          <BarChartIcon />
         </Fab>
       </Tooltip>
 
