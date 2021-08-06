@@ -3,9 +3,12 @@ import { Chart } from 'chart.js';
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
-
+console.log(data)
   useEffect(() => {
-    const percentage = Math.round((data?.identifiedFiles + data?.pendingFiles) / data.totalFiles * 100) ;
+    const percentage = Math.floor((data?.identifiedFiles + data?.ignoredFiles)*100 / data.detectedFiles) ;
+    const pending = 100 - percentage;
+    console.log (percentage);
+
     const chart = new Chart(chartRef.current, {
       type: 'bar',
       data: {
@@ -20,7 +23,7 @@ const LicensesChart = ({ data }) => {
           },
           {
             label: 'Identified',
-            data: [100],
+            data: [pending],
             borderWidth: 0,
             backgroundColor: ['#F97316'],
             barThickness: 50,
@@ -67,7 +70,7 @@ const LicensesChart = ({ data }) => {
                 return (``);
               },
               title() {
-                return (`Files\n${data?.pendingFiles}`);
+                return (`Pending files\n${data?.pendingFiles}`);
               }
             },
             displayColors: false,

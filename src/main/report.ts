@@ -47,6 +47,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
     pendingFiles: 0,
     identifiedFiles: 0,
     ignoredFiles: 0,
+    detectedFiles: 0,
   };
   summary.totalFiles = projectSummary.total;
   summary.includedFiles = projectSummary.include;
@@ -55,7 +56,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
   summary.pendingFiles = tempSummary[0].pending;
   summary.identifiedFiles = tempSummary[0].identified;
   summary.ignoredFiles = tempSummary[0].ignored;
-
+  summary.detectedFiles = tempSummary[0].detected;
   try {
     const a = defaultProject.results;
     for (const [key, results] of Object.entries(a)) {
