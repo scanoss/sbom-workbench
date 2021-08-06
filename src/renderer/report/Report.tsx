@@ -4,13 +4,13 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router-dom';
 import { Chart, registerables } from 'chart.js';
 import { Button, Card } from '@material-ui/core';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import LicensesChart from './components/LicensesChart';
 import IdentificationProgress from './components/IdentificationProgress';
 import { AppContext, IAppContext } from '../context/AppProvider';
 import LicensesTable from './components/LicensesTable';
 import MatchesForLicense from './components/MatchesForLicense';
 import { report } from '../../api/report-service';
-import GetAppIcon from '@material-ui/icons/GetApp';
 import { dialogController } from '../dialog-controller';
 import { ExportFormat } from '../../api/export-service';
 
@@ -49,15 +49,15 @@ const Report = () => {
     <>
       <section id="Report" className="app-page">
         <header className="app-header">
-            <h2 className="header-subtitle back">
-              <IconButton onClick={() => history.push('/workbench')} component="span">
-                <ArrowBackIcon />
-              </IconButton>
-              Back to workbench
-            </h2>
-            <Button startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onDownloadClickedExport}>
-              Download
-            </Button>
+          <h2 className="header-subtitle back">
+            <IconButton onClick={() => history.push('/workbench')} component="span">
+              <ArrowBackIcon />
+            </IconButton>
+            Back to workbench
+          </h2>
+          <Button startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onDownloadClickedExport}>
+            Download
+          </Button>
         </header>
 
         <main className="app-content">
@@ -66,14 +66,16 @@ const Report = () => {
               {progress && <IdentificationProgress data={progress} />}
             </Card>
             <Card className="report-item licenses">
-              <div className="b">
-                <div className="report-titles-container">
-                  <span className="report-titles">Licenses</span>
-                </div>
-                <div className="report-second">
-                  <LicensesChart data={licenses} />
-                  <LicensesTable matchedLicenseSelected={matchedLicenseSelected || licenses?.[0]} selectLicense={(license) => onLicenseSelected(license)} data={licenses} />
-                </div>
+              <div className="report-titles-container">
+                <span className="report-titles">Licenses</span>
+              </div>
+              <div className="report-second">
+                <LicensesChart data={licenses} />
+                <LicensesTable
+                  matchedLicenseSelected={matchedLicenseSelected || licenses?.[0]}
+                  selectLicense={(license) => onLicenseSelected(license)}
+                  data={licenses}
+                />
               </div>
             </Card>
             <Card className="report-item matches-for-license">
@@ -83,24 +85,18 @@ const Report = () => {
               <MatchesForLicense data={matchedLicenseSelected || licenses?.[0]} />
             </Card>
             <Card className="report-item matches">
-              <div className="d">
               <div className="report-titles-container">
                 <span className="report-titles">Matches</span>
               </div>
-              </div>
             </Card>
             <Card className="report-item vulnerabilites">
-              <div className="e">
               <div className="report-titles-container">
                 <span className="report-titles">Vulnerabilites</span>
               </div>
-              </div>
             </Card>
             <Card className="report-item licenses-obligation">
-              <div className="e">
               <div className="report-titles-container">
                 <span className="report-titles">License obligations</span>
-              </div>
               </div>
             </Card>
           </section>
