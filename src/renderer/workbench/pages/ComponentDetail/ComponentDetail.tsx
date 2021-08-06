@@ -88,23 +88,14 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyPressed = async (file) => {
-    const inv: Partial<Inventory> = {
-      component: component.name,
-      url: component.url,
-      purl: component.purl,
-      version: file.version,
-      license_name: file.license,
-      usage: file.type,
-    };
-
-/*    const inv: Partial<Inventory> = {
+   const inv: Partial<Inventory> = {
       component: file.component.name,
       url: file.component.url,
       purl: file.component.purl,
       version: file.component.version,
       license_name: file.component.licenses[0]?.name,
       usage: file.type,
-    };*/
+    };
 
     create(inv, [file.id]);
   };

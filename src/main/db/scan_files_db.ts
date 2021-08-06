@@ -50,16 +50,13 @@ export class FilesDb extends Db {
 
   // GET ALL FILES FOR A COMPONENT
   async getFilesComponent(data: Partial<Component>) {
-    const t0 = performance.now();
     return new Promise(async (resolve, reject) => {
       let result;
       try{
         if(data.purl && data.version)
           result = await this.getByPurlVersion(data);
         else
-          result = await this.getByPurl(data);
-          const t1 = performance.now();
-          console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
+          result = await this.getByPurl(data);      
           resolve(result);
       }catch(error){
         console.log(error);

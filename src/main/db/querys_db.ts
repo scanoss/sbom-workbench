@@ -149,7 +149,7 @@ export class Querys {
   SQL_GET_FILE_BY_PATH = 'SELECT file_path AS path,identified,ignored FROM results WHERE results.file_path=?;';
 
   SQL_GET_SPDX_COMP_DATA =
-    'SELECT cv.purl,cv.version,cv.url,cv.name,r.vendor FROM component_versions cv INNER JOIN inventories i ON cv.purl=i.purl AND cv.version=i.version INNER JOIN results r  ON r.version=i.version AND r.purl=i.purl GROUP BY i.version;';
+    'SELECT cv.purl,cv.version,cv.url,cv.name,r.vendor,i.license_name FROM component_versions cv INNER JOIN inventories i ON cv.purl=i.purl AND cv.version=i.version INNER JOIN results r  ON r.version=i.version AND r.purl=i.purl GROUP BY i.version;';
 
   SQL_GET_ALL_SUMMARIES = 'SELECT compid,ignored,pending,identified FROM summary;';
 
