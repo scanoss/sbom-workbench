@@ -168,6 +168,6 @@ export class Querys {
     'UPDATE results SET identified=0 WHERE id IN (SELECT resultid FROM file_inventories where inventoryid=?)';
 
     SQL_GET_RESULTS_SUMMARY =
-    'SELECT (select count(*) from results r where r.identified = 1) as "identified", (select count(*)  from results r where r.ignored = 1 ) as "ignored", (select count(*) from results r where (r.identified = 0 AND r.ignored = 0)) as "pending", (select count(*) FROM results WHERE md5_file !="") as "detected" ';
+    'SELECT (select count(*) from results r where r.identified = 1) as "identified", (select count(*)  from results r where r.ignored = 1 ) as "ignored", (select count(*) from results r where (r.identified = 0 AND r.ignored = 0 and md5_file !="" )) as "pending", (select count(*) FROM results WHERE md5_file !="") as "detected" ';
 }
 
