@@ -68,7 +68,6 @@ export class ComponentDb extends Db {
     for (let i = 0; i < data.length; i += 1) {
       const transformation: any = {};
       const preLicense: any = {};
-
       transformation.compid = data[i].compid;
       transformation.licenses = [];
       transformation.name = data[i].comp_name;
@@ -80,7 +79,6 @@ export class ComponentDb extends Db {
         preLicense.id = data[i].license_id;
         preLicense.name = data[i].license_name;
         preLicense.spdxid = data[i].license_spdxid;
-
         transformation.licenses.push(preLicense);
       }
       results.push(transformation);

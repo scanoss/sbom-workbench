@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable consistent-return */
 /* eslint-disable @typescript-eslint/return-await */
 /* eslint-disable @typescript-eslint/no-this-alias */
@@ -13,6 +14,7 @@ import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { Component , Files } from '../../api/types';
 import { ComponentDb } from './scan_component_db';
+
 
 
 
@@ -54,7 +56,7 @@ export class FilesDb extends Db {
         if(data.purl && data.version)
           result = await this.getByPurlVersion(data);
         else
-          result = await this.getByPurl(data);
+          result = await this.getByPurl(data);      
           resolve(result);
       }catch(error){
         console.log(error);
@@ -70,13 +72,13 @@ export class FilesDb extends Db {
       db.all(query.SQL_SELECT_FILES_FROM_PURL,data.purl,async function (err: any, file: any) {
       db.close();
         if (!err) {
-          const comp = await self.component.getAll({
+          const components:any = await self.component.getAll({
             purl: data.purl,
             version: data.version,
-          });
-          for (let i = 0; i < file.length; i += 1) {
-            file[i].component = comp;
-          }
+          });              
+          for (let i = 0; i < file.length; i += 1) {               
+            file[i].component = components.find((component)=>file[i].version===component.version);
+          }     
           resolve(file);
         }else
           resolve([]);

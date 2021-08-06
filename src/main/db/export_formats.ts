@@ -52,8 +52,8 @@ export class Formats extends Db {
               pkg.versionInfo = data[i].version;
               pkg.downloadLocation = data[i].purl;
               pkg.description = 'Detected by SCANOSS Inventorying Engine.';           
-              if(comp.licenses.spdx!==undefined)
-              pkg.licenseConcluded = data[i].component.licenses[0].spdxid;
+              if(data[i].license_name!==undefined)
+              pkg.licenseConcluded = data[i].license_name;
               else
               pkg.licenseConcluded='n/a';  
               document.Packages.push(pkg);
