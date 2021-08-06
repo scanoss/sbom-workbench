@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js';
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
-console.log(data)
+  const [percentage, setPercentage] = useState<number>(0);
+
   useEffect(() => {
     const percentage = Math.floor((data?.identifiedFiles + data?.ignoredFiles)*100 / data.detectedFiles) ;
     const pending = 100 - percentage;
-    console.log (percentage);
+    setPercentage(percentage);
 
     const chart = new Chart(chartRef.current, {
       type: 'bar',
@@ -19,14 +20,14 @@ console.log(data)
             data: [percentage],
             borderWidth: 0,
             backgroundColor: ['#22C55E'],
-            barThickness: 50,
+            barThickness: 42,
           },
           {
             label: 'Identified',
             data: [pending],
             borderWidth: 0,
             backgroundColor: ['#F97316'],
-            barThickness: 50,
+            barThickness: 42,
           },
         ],
       },
@@ -41,15 +42,7 @@ console.log(data)
               display: false,
               drawBorder: false,
             },
-            ticks: {
-              color: '#22C55E',
-              padding: 12,
-              font: {
-                size: 64,
-                weight: 'bold',
-                family: 'Inter',
-              },
-            },
+            display: false,
           },
           x: {
             stacked: true,
@@ -94,7 +87,10 @@ console.log(data)
         <span className="report-titles">Identification Progress</span>
       </div>
       <div className="identification-canvas-container">
-        <canvas ref={chartRef} />
+        <span className="label">{percentage}%</span>
+        <div className="progress-bar">
+          <canvas ref={chartRef} />
+        </div>
       </div>
       <div className="total-files-container">
         <span className="total-files-label">Total Files: {data.totalFiles}</span>

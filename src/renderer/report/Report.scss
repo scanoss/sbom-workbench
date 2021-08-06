@@ -1,5 +1,11 @@
 #Report {
   background-color: var(--background-color-primary);
+  min-width: 800px;
+
+  @media screen and (min-width: 1024px) {
+    padding-left: 180px;
+    padding-right: 180px;
+  }
 
   .app-header {
     display: flex;
@@ -21,6 +27,7 @@
     .matches-for-license {
       grid-row: 2/5;
       grid-column: 2/3;
+
       .report-titles-container {
         margin-bottom: 20px;
         .report-titles {
@@ -57,31 +64,28 @@
         }
       }
       .report-second {
-        display: flex;
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-gap: 10px;
         justify-content: space-between;
         align-items: center;
 
         .LicensesChart {
-          width: 300px;
-          height: fit-content;
-          padding: 24px;
-          display: flex;
-          flex-direction: column;
+          padding: 24px 10px;
+          max-width: 300px;
         }
 
         .license-list {
           overflow-y: scroll;
           max-height: 320px;
-          margin-right: 40px;
           overflow-x: hidden;
+          max-width: 300px;
 
           .license-list-item {
             display: flex;
             align-items: center;
             background-color: #FFFF;
-            width: 288px;
-
-            margin-bottom: 18px;
+            margin-bottom: 4px;
             padding: 12px;
             border-radius: 4px;
 
@@ -108,7 +112,7 @@
             }
 
             .license-list-item-name {
-              font-size: 20px;
+              font-size: 16px;
               font-style: normal;
               font-weight: 400;
               line-height: 25px;
@@ -131,15 +135,31 @@
 
 
     .IdentificationProgress {
-      padding: 10px;
       display: flex;
       justify-content: center;
       flex-direction: column;
 
+      .identification-canvas-container {
+        margin-top: 30px;
+        height: 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .label {
+          color: #22C55E;
+          padding: 12;
+          font-size: 50px;
+          font-weight: 700;
+        }
+
+        .progress-bar {
+          padding: 0 20px;
+          width: 100%;
+        }
+      }
+
       .report-titles-container {
-
-        margin-bottom: 20px;
-
           .report-titles {
             color: #27272A;
             font-size: 26px;
@@ -158,9 +178,8 @@
       align-items: center;
 
       .total-files-label {
-        font-size: 20px;
-        font-weight: 700;
-        line-height: 19px;
+        font-size: 16px;
+        font-weight: 600;
         text-align: center;
       }
 
