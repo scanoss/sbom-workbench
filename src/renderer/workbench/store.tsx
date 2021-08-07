@@ -107,7 +107,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       detachFile,
       deleteInventory,
     }),
-    [state, dispatch, loadScan, createInventory, ignoreFile, restoreFile, attachFile, detachFile]
+    [state, dispatch, loadScan, createInventory, ignoreFile, restoreFile, attachFile, detachFile, deleteInventory]
   );
 
   return <WorkbenchContext.Provider value={value}>{children}</WorkbenchContext.Provider>;

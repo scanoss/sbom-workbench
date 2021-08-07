@@ -104,7 +104,6 @@ const Workspace = () => {
     }
   };
 
-
   useEffect(() => {
     init();
     return cleanup;
@@ -147,7 +146,7 @@ const Workspace = () => {
                     <TableCell width="50%">NAME</TableCell>
                     <TableCell>DATE</TableCell>
                     <TableCell>TOTAL FILES</TableCell>
-                    <TableCell width={30}/>
+                    <TableCell width={30} />
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -159,8 +158,12 @@ const Workspace = () => {
                         </TableCell>
                         <TableCell>{format(row.date)}</TableCell>
                         <TableCell>{row.files}</TableCell>
-                        <TableCell className={classes.action} >
-                          <IconButton aria-label="delete" className="btn-delete" onClick={ (event) => onTrashHandler(row.work_root,event)}>
+                        <TableCell className={classes.action}>
+                          <IconButton
+                            aria-label="delete"
+                            className="btn-delete"
+                            onClick={(event) => onTrashHandler(row.work_root, event)}
+                          >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
                         </TableCell>
@@ -183,13 +186,10 @@ const Workspace = () => {
           ) : (
             <div className="empty-container">
               <div className="empty-list">
-                <h3>Not projects yet</h3>
+                <h3>No projects found</h3>
                 <p>
-                  You can start scanning by &nbsp;
-                  <Link onClick={onNewProject}>
-                    creating a new project
-                  </Link>
-                  .
+                  You can start scanning by&nbsp;
+                  <Link onClick={onNewProject}>creating a new project</Link>.
                 </p>
               </div>
             </div>

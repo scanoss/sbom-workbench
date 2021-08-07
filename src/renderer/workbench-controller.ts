@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron';
 import { projectService } from '../api/project-service';
 import { componentService } from '../api/component-service';
-import { Component } from '../api/types';
+import { ComponentGroup } from '../api/types';
 import { sortComponents, transform } from '../utils/scan-util';
 import { IpcEvents } from '../ipc-events';
 
@@ -54,14 +54,14 @@ class WorkbenchController {
     return response.text();
   }
 
-  public async getComponents(): Promise<Component[]> {
+  public async getComponents(): Promise<ComponentGroup[]> {
     const { data } = await componentService.getAllComponentGroup();
     console.log('COMPONENTS', data);
     sortComponents(data);
     return data;
   }
 
-  public async getComponent(purl: string): Promise<Component> {
+  public async getComponent(purl: string): Promise<ComponentGroup> {
     const { data } = await componentService.getComponentGroup({ purl });
     console.log('COMPONENT', data);
     return data;

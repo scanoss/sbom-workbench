@@ -3,10 +3,10 @@ import { ComponentGroup } from '../../api/types';
 
 export interface State {
   loaded: boolean;
-  tree: any[] | null;
+  tree: any[];
   file: string | null;
-  components: ComponentGroup[] | null;
-  component: ComponentGroup | null;
+  components: ComponentGroup[];
+  component: ComponentGroup;
 }
 
 export const initialState: State = {
@@ -50,7 +50,6 @@ export default function reducer(state: State = initialState, action): State {
     }
     case SET_FILE: {
       const { file } = action;
-
       return {
         ...state,
         file,
