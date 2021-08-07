@@ -1,33 +1,37 @@
-import { LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_COMPONENTS, SET_FILE } from './actions';
-import { Component, ComponentGroup } from '../../api/types';
+import { LOAD_SCAN_FAIL, LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_COMPONENTS, SET_FILE } from './actions';
+import { ComponentGroup } from '../../api/types';
 
 export interface State {
-  scan: Record<string, any> | null;
-  tree: [] | null;
+  loaded: boolean;
+  tree: any[] | null;
   file: string | null;
   components: ComponentGroup[] | null;
   component: ComponentGroup | null;
-  matchInfo: Record<string, any>[] | null;
 }
 
 export const initialState: State = {
-  scan: null,
+  loaded: false,
   tree: null,
   file: null,
   components: null,
   component: null,
-  matchInfo: null,
 };
 
 export default function reducer(state: State = initialState, action): State {
   switch (action.type) {
     case LOAD_SCAN_SUCCESS: {
-      const { scan, tree, components } = action;
+      const { tree, components } = action;
       return {
         ...state,
-        scan,
+        loaded: true,
         tree,
         components,
+      };
+    }
+    case LOAD_SCAN_FAIL: {
+      return {
+        ...state,
+        loaded: false,
       };
     }
     case SET_COMPONENTS: {

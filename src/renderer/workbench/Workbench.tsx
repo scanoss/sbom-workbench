@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -16,7 +17,6 @@ import SplitPane from 'react-split-pane';
 import HomeIcon from '@material-ui/icons/Home';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import BarChartIcon from '@material-ui/icons/BarChart';
-import InsertChartIcon from '@material-ui/icons/InsertChart';
 import { Editor } from './pages/Editor/Editor';
 import { FileTree } from './components/FileTree/FileTree';
 import { dialogController } from '../dialog-controller';
@@ -27,9 +27,6 @@ import { ComponentList } from './pages/ComponentList/ComponentList';
 import { ComponentDetail } from './pages/ComponentDetail/ComponentDetail';
 import { InventoryDetail } from './pages/InventoryDetail/InventoryDetail';
 import { reset } from './actions';
-import { ExportFormat } from '../../api/export-service';
-import { report } from '../../api/report-service';
-
 
 const Alert = ({ open, handleClose, path }) => {
   return (
@@ -56,7 +53,7 @@ const Workbench = () => {
   const { state, dispatch, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanPath } = useContext(AppContext) as IAppContext;
 
-  const { file } = state;
+  const { loaded } = state;
 
   const [open, setOpen] = useState<boolean>(false);
   const [savePath, setSavePath] = useState<string>();
@@ -72,13 +69,16 @@ const Workbench = () => {
     history.push('/report');
   };
 
-  const onDestroy = () => {
+  const onBackClicked = () => {
     dispatch(reset());
+    history.push('/');
   };
+
+  const onDestroy = () => {};
 
   useEffect(() => {
     onInit();
-    return onDestroy();
+    return onDestroy;
   }, []);
 
   return (
@@ -88,11 +88,9 @@ const Workbench = () => {
           <Box boxShadow={1}>
             <header>
               <div className="d-flex align-center">
-                <Link to="/">
-                  <IconButton aria-label="back" size="small">
-                    <ArrowBackIcon fontSize="small" />
-                  </IconButton>
-                </Link>
+                <IconButton onClick={onBackClicked} aria-label="back" size="small">
+                  <ArrowBackIcon fontSize="small" />
+                </IconButton>
                 <span className="title">Projects</span>
               </div>
               <Link to="/workbench">
@@ -107,20 +105,26 @@ const Workbench = () => {
           </div>
         </aside>
         <main className="match-info">
-          <Switch>
-            <Route exact path={path}>
-              <ComponentList />
-            </Route>
-            <Route path={`${path}/component/`}>
-              <ComponentDetail />
-            </Route>
-            <Route path={`${path}/inventory/:id`}>
-              <InventoryDetail />
-            </Route>
-            <Route path={`${path}/file`}>
-              <Editor />
-            </Route>
-          </Switch>
+          {loaded ? (
+            <Switch>
+              <Route exact path={path}>
+                <ComponentList />
+              </Route>
+              <Route path={`${path}/component/`}>
+                <ComponentDetail />
+              </Route>
+              <Route path={`${path}/inventory/:id`}>
+                <InventoryDetail />
+              </Route>
+              <Route path={`${path}/file`}>
+                <Editor />
+              </Route>
+            </Switch>
+          ) : (
+            <div className="loader">
+              <CircularProgress size={24}/>
+            </div>
+          )}
         </main>
       </SplitPane>
 
