@@ -105,7 +105,7 @@ export const ComponentDetail = () => {
 
     const inv: Partial<Inventory> = {
       component: component?.name,
-      version: component?.versions[0].version,
+      version: version || component?.versions[0]?.version,
       license_name: component?.versions[0].licenses[0]?.name,
       url: component?.url,
       purl: component?.purl,
