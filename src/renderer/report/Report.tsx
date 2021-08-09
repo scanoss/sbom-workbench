@@ -5,13 +5,13 @@ import { useHistory } from 'react-router-dom';
 import { Chart, registerables } from 'chart.js';
 import { Button, Card, Fab, Tooltip } from '@material-ui/core';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import LicensesChart from './components/LicensesChart';
 import IdentificationProgress from './components/IdentificationProgress';
 import { AppContext, IAppContext } from '../context/AppProvider';
 import LicensesTable from './components/LicensesTable';
 import MatchesForLicense from './components/MatchesForLicense';
 import { report } from '../../api/report-service';
-import GetAppIcon from '@material-ui/icons/GetApp';
 import { dialogController } from '../dialog-controller';
 import { ExportFormat } from '../../api/export-service';
 
@@ -97,7 +97,6 @@ const Report = () => {
             <Card className="report-item licenses-obligation">
               <div className="report-title">License obligations</div>
             </Card>
-
           </section>
         </main>
       </section>
