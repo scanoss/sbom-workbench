@@ -1,33 +1,37 @@
-import { LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_COMPONENTS, SET_FILE } from './actions';
-import { Component } from '../../api/types';
+import { LOAD_SCAN_FAIL, LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_COMPONENTS, SET_FILE } from './actions';
+import { ComponentGroup } from '../../api/types';
 
 export interface State {
-  scan: Record<string, any> | null;
-  tree: [] | null;
+  loaded: boolean;
+  tree: any[];
   file: string | null;
-  components: Component[] | null;
-  component: Component | null;
-  matchInfo: Record<string, any>[] | null;
+  components: ComponentGroup[];
+  component: ComponentGroup;
 }
 
 export const initialState: State = {
-  scan: null,
+  loaded: false,
   tree: null,
   file: null,
   components: null,
   component: null,
-  matchInfo: null,
 };
 
 export default function reducer(state: State = initialState, action): State {
   switch (action.type) {
     case LOAD_SCAN_SUCCESS: {
-      const { scan, tree, components } = action;
+      const { tree, components } = action;
       return {
         ...state,
-        scan,
+        loaded: true,
         tree,
         components,
+      };
+    }
+    case LOAD_SCAN_FAIL: {
+      return {
+        ...state,
+        loaded: false,
       };
     }
     case SET_COMPONENTS: {
@@ -45,18 +49,10 @@ export default function reducer(state: State = initialState, action): State {
       };
     }
     case SET_FILE: {
-      const { scan } = state;
       const { file } = action;
-
-/*      let matchInfo = null;
-      if (scan && file && scan[file] && scan[file][0].id !== 'none') {
-        matchInfo = scan[file];
-      }*/
-
       return {
         ...state,
         file,
-        // matchInfo,
       };
     }
     case RESET:

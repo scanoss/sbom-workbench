@@ -13,7 +13,7 @@ import NewProject from './renderer/workspace/pages/NewProject/NewProject';
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#3B82F6',
+      main: '#6366F1',
     },
     secondary: {
       main: '#22C55E',
@@ -35,14 +35,14 @@ export default function App() {
     <HashRouter>
       <MuiThemeProvider theme={theme}>
         <AppProvider>
-          <Route path="/" exact component={Workspace} />
-          <Route path="/workspace/new" exact component={NewProject} />
-          <WorkbenchProvider>
-            <DialogProvider>
-              <Route path="/workbench" component={Workbench} />
-              <Route path="/report" component={Report} />
-            </DialogProvider>
-          </WorkbenchProvider>
+          <DialogProvider>
+            <Route path="/" exact component={Workspace} />
+            <Route path="/workspace/new" exact component={NewProject} />
+            <WorkbenchProvider>
+                <Route path="/workbench" component={Workbench} />
+                <Route path="/report" component={Report} />
+            </WorkbenchProvider>
+          </DialogProvider>
         </AppProvider>
       </MuiThemeProvider>
     </HashRouter>

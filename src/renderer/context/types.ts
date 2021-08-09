@@ -19,7 +19,7 @@ export interface InventoryForm {
   id?: string;
   component: string;
   version: string;
-  license: string;
+  license_name: string;
   url: string;
   purl: string;
   usage: string;

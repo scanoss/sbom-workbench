@@ -1,24 +1,26 @@
 import React from 'react';
 import { Card, CardContent, Typography, Tooltip, ButtonBase } from '@material-ui/core';
 import componentDefault from '../../../../../assets/imgs/component-default.svg';
-import { Component } from '../../../../api/types';
+import { ComponentGroup } from '../../../../api/types';
 
 interface ComponentCardProps {
-  component: Component;
+  component: ComponentGroup;
   onClick: (component) => void;
 }
 
 const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
+  const multiple: boolean = component.versions.length > 1;
+
   return (
     <>
-      <Card className="component-card" elevation={1}>
+      <Card className={`component-card ${multiple && 'multiple'}`} elevation={1}>
         <ButtonBase onClick={() => onClick(component)}>
           <CardContent className="component-card-content">
             <figure>
               <img alt="component logo" src={componentDefault} />
             </figure>
             <div className="component-card-info">
-              <p>{component.version}</p>
+              <p>{multiple ? `${component.versions.length} versions` : component.versions[0].version}</p>
               <Tooltip title={component.name}>
                 <Typography variant="h6" gutterBottom>
                   {component.name}

@@ -2,7 +2,7 @@ import { Alert } from '@material-ui/lab';
 import React from 'react';
 import MatchCard, { MATCH_CARD_ACTIONS } from '../../../components/MatchCard/MatchCard';
 
-const MAX_FILES = 150;
+const MAX_FILES = 250;
 
 export interface FileListProps {
   files: any[];
@@ -17,8 +17,8 @@ export const FileList = ({ files, filter, onAction }: FileListProps) => {
     <>
       <section className="file-list">
         {filteredFiles.length > 0
-          ? filteredFiles.slice(0, MAX_FILES).map((file, index) => (
-              <article className="item" key={index}>
+          ? filteredFiles.slice(0, MAX_FILES).map((file) => (
+              <article className="item" key={file.id}>
                 <MatchCard onAction={(action) => onAction(file, action)} label={file.path} status={file.status} />
               </article>
             ))

@@ -2,6 +2,8 @@
   .container-component-info {
     position: static;
 
+
+
     .main-info {
       display: flex;
       align-items: center;
@@ -10,6 +12,11 @@
         height: 48px;
         width: 48px;
         margin: 15px;
+      }
+
+      .label-boxie-gray {
+        font-family: 'Space Mono', monospace;
+        font-weight: 400;
       }
     }
 

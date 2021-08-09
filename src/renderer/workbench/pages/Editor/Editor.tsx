@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory, useLocation } from 'react-router-dom';
+import { Skeleton } from '@material-ui/lab';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 import { DialogContext, IDialogContext } from '../../../context/DialogProvider';
 import { range } from '../../../../utils/utils';
@@ -16,7 +17,6 @@ import { inventoryService } from '../../../../api/inventory-service';
 import { setFile } from '../../actions';
 import { DIALOG_ACTIONS } from '../../../context/types';
 import { resultService } from '../../../../api/results-service';
-import { Skeleton } from '@material-ui/lab';
 
 const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
 
@@ -46,9 +46,9 @@ export const Editor = () => {
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
-  const [ossLines, setOssLines] = useState<number[] | null>([]);
-  const [lines, setLines] = useState<number[] | null>([]);
-  const [fullFile, setFullFile] = useState<boolean | null>(null);
+  const [ossLines, setOssLines] = useState<number[]>([]);
+  const [lines, setLines] = useState<number[]>([]);
+  const [fullFile, setFullFile] = useState<boolean>(null);
 
   const init = () => {
     setMatchInfo(null);
@@ -96,7 +96,7 @@ export const Editor = () => {
   };
 
   const create = async (defaultInventory, selFiles) => {
-    const response = await inventoryService.getAll( {purl: defaultInventory.purl, version: defaultInventory.version} );
+    const response = await inventoryService.getAll({ purl: defaultInventory.purl, version: defaultInventory.version });
     const inventories = response.message || [];
 
     const showSelector = inventories.length > 0;
@@ -131,12 +131,12 @@ export const Editor = () => {
   };
 
   const onIdentifyPressed = async (result) => {
-    const inv = {
+    const inv: Partial<Inventory> = {
       component: result.component.name,
       version: result.component.version,
       url: result.component.url,
       purl: result.component.purl,
-      license: result.component.licenses[0]?.name,
+      license_name: result.component.licenses[0]?.name,
       usage: result.type,
     };
 
@@ -244,22 +244,21 @@ export const Editor = () => {
     <>
       <section id="editor" className="app-page">
         <header className="app-header">
-            <>
-              <div className="match-title">
-                <h2 className="header-subtitle back">
-                  <IconButton onClick={() => history.goBack()} component="span">
-                    <ArrowBackIcon />
-                  </IconButton>
-                  { inventories?.length === 0 && matchInfo?.length === 0 ? 'No match found' : 'Matches' }
-                </h2>
-              </div>
-              <header className="match-info-header">
-
-                { matchInfo && inventories ?
-                  <section className="content">
-                    <div className="match-info-default-container">
-                      {inventories.length > 0
-                        ? inventories.map((inventory) => (
+          <>
+            <div className="match-title">
+              <h2 className="header-subtitle back">
+                <IconButton onClick={() => history.goBack()} component="span">
+                  <ArrowBackIcon />
+                </IconButton>
+                {inventories?.length === 0 && matchInfo?.length === 0 ? 'No match found' : 'Matches'}
+              </h2>
+            </div>
+            <header className="match-info-header">
+              {matchInfo && inventories ? (
+                <section className="content">
+                  <div className="match-info-default-container">
+                    {inventories.length > 0
+                      ? inventories.map((inventory) => (
                           <MatchInfoCard
                             key={inventory.id}
                             selected={currentMatch === inventory}
@@ -276,9 +275,9 @@ export const Editor = () => {
                             onAction={(action) => onAction(action, inventory)}
                           />
                         ))
-                        : matchInfo.map((match, index) => (
+                      : matchInfo.map((match, index) => (
                           <MatchInfoCard
-                            key={index}
+                            key={match.id}
                             selected={currentMatch === match}
                             match={{
                               component: match.component.name,
@@ -293,17 +292,20 @@ export const Editor = () => {
                             onAction={(action) => onAction(action, match)}
                           />
                         ))}
-                    </div>
-                  </section>
-                  : <Skeleton variant="rect" width="50%" height={60} style={{marginBottom: 34}} />
-                }
+                  </div>
+                </section>
+              ) : (
+                <Skeleton variant="rect" width="50%" height={60} style={{ marginBottom: 34 }} />
+              )}
 
-                <div className="info-files">
-                  <LabelCard label="Source File" subLabel={file} status={null} />
-                  { matchInfo && currentMatch && <LabelCard label='Component File' subLabel={currentMatch.file} status={null} /> }
-                </div>
-              </header>
-            </>
+              <div className="info-files">
+                <LabelCard label="Source File" subLabel={file} status={null} />
+                {matchInfo && currentMatch && (
+                  <LabelCard label="Component File" subLabel={currentMatch.file} status={null} />
+                )}
+              </div>
+            </header>
+          </>
         </header>
 
         {fullFile ? (

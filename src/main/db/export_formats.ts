@@ -52,13 +52,13 @@ export class Formats extends Db {
               pkg.versionInfo = data[i].version;
               pkg.downloadLocation = data[i].purl;
               pkg.description = 'Detected by SCANOSS Inventorying Engine.';           
-              if(data[i].licenses_name!==undefined)
-              pkg.licenseConcluded = data[i].licenses_name;
+              if(data[i].license_name!==undefined)
+              pkg.licenseConcluded = data[i].license_name;
               else
               pkg.licenseConcluded='n/a';  
               document.Packages.push(pkg);
             }           
-            fs.writeFile(`${path}.spdx`, JSON.stringify(document), () => {
+            fs.writeFile(`${path}.spdx`, JSON.stringify(document,undefined,4), () => {
               resolve(true);
             });
           }

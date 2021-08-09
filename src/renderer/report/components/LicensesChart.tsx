@@ -1,40 +1,105 @@
 import React, { useEffect } from 'react';
-import { Chart } from 'chart.js'
+import { Chart } from 'chart.js';
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
 
-  useEffect( () => {
-      const chart = new Chart(chartRef.current, {
-        type: 'doughnut',
-        data: {
-          labels: data.map(d => d.label),
-          datasets: [{
+  // const counter = {
+  //   id: 'counter',
+  //   beforeDraw(chart, args, options) {
+  //     const {chartArea: { top, left, bottom, right, width, height },
+  //     } = chart;
+  //     chartRef.save();
+  //     chartRef.fillStyle = 'blue';
+  //     chartRef.fillRect(200, 200, 10, 10);
+  //     // x0 = starting point  on the horizontal level
+  //     // y0 = starting point  on the vertical level
+  //     // x1 = lenght of the shape in pixel on the horizontal level
+  //     // y1 = lenght of the shape in pixel on the vertical level
+  //   },
+  // };
+
+  // const licenseCounter = 9;
+
+  // const licenseCounterStructure = (
+  //   <div className="main-license-counter">
+  //     <div className="number-license-counter">{licenseCounter}</div>
+  //     <div className="number-license-label">Licenses found</div>
+  //   </div>
+  // );
+
+  // const image = new Image();
+  // image.src = 'https://www.chartjs.org/img/chartjs-logo.svg';
+
+  // const plugin = {
+  //   id: 'custom_canvas_background_image',
+  //   beforeDraw: (chart) => {
+  //     if (image.complete) {
+  //       const { ctx } = chart;
+  //       const { top, left, width, height } = chart.chartArea;
+  //       const x = left + width / 2 - image.width / 2;
+  //       const y = top + height / 2 - image.height / 2;
+  //       ctx.drawImage(image, x, y);
+  //     } else {
+  //       image.onload = () => chart.draw();
+  //     }
+  //   },
+  // };
+
+  useEffect(() => {
+    const chart = new Chart(chartRef.current, {
+      type: 'doughnut',
+      data: {
+        labels: data.map((d) => d.label),
+        datasets: [
+          {
             label: 'example',
-            data: data.map(d => d.value),
+            data: data.map((d) => d.value),
             borderWidth: 0,
             backgroundColor: [
-              'rgb(255, 99, 132)',
-              'rgb(54, 162, 235)',
-              'rgb(255, 205, 86)',
-              'rgb(103,86,255)',
-              'rgb(97,255,86)', // TODO: estos se tienen q generar automaticamente
+              '#E8B34B',
+              '#E22C2C',
+              '#5754D0',
+              '#9F69C0',
+              '#FE7F10',
+              '#E56399',
+              '#E637BF',
+              '#474647',
+              '#153243',
+              '#2DE1C2',
+              '#F05365',
+              '#A2D729',
+              '#3C91E6',
+              '#FA824C',
+              '#C94277',
+              '#E56B6F',
+              '#F71735',
+              '#011627',
+              '#724E91',
+              '#7D451B',
+              '#9BE564',
             ],
-          }]
+            cutout: '75%',
+          },
+        ],
+      },
+      options: {
+        plugins: {
+          legend: { display: false },
         },
-        options: {
-          plugins: {
-            legend: { position: 'right'}
-          }
-        }
-      });
+      },
+      // plugins: [plugin],
+    });
 
-      return () => chart.destroy();
-
+    return () => chart.destroy();
   }, [data]);
 
   return (
-    <canvas ref={chartRef} />
+    <div className="LicensesChart">
+      <div>
+        <canvas ref={chartRef} />
+      </div>
+    </div>
   );
 };
 

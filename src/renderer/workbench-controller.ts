@@ -1,14 +1,13 @@
+import { ipcRenderer } from 'electron';
 import { projectService } from '../api/project-service';
 import { componentService } from '../api/component-service';
-import { Component } from '../api/types';
+import { ComponentGroup } from '../api/types';
 import { sortComponents, transform } from '../utils/scan-util';
 import { IpcEvents } from '../ipc-events';
-import { ipcRenderer } from 'electron';
 
 const fs = require('original-fs').promises;
 
 export interface ScanResult {
-  scan: Record<string, unknown>;
   scanRoot: string;
   fileTree: any[];
 }
@@ -55,25 +54,23 @@ class WorkbenchController {
     return response.text();
   }
 
-  public async getComponents(): Promise<Component[]> {
-    const { data } = await componentService.getAll({});
-      console.log('COMPONENTS', data);
-    sortComponents(data)
+  public async getComponents(): Promise<ComponentGroup[]> {
+    const { data } = await componentService.getAllComponentGroup();
+    console.log('COMPONENTS', data);
+    sortComponents(data);
     return data;
   }
 
-  public async getComponent(id: number): Promise<Component> {
-    const response = await componentService.get({compid: id});
-    console.log('COMPONENT', response.data);
-    return response.data;
+  public async getComponent(purl: string): Promise<ComponentGroup> {
+    const { data } = await componentService.getComponentGroup({ purl });
+    console.log('COMPONENT', data);
+    return data;
   }
 
   private async generateScanResult(data): Promise<ScanResult> {
-    const scan = data.results;
     const tree = [data.logical_tree];
-   // transform(tree, scan);
+    // transform(tree, scan);
     return {
-      scan,
       scanRoot: data.scan_root,
       fileTree: tree,
     };

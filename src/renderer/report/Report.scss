@@ -1,13 +1,247 @@
 #Report {
   background-color: var(--background-color-primary);
+  min-width: 800px;
+
+  @media screen and (min-width: 1024px) {
+    padding-left: 180px;
+    padding-right: 180px;
+  }
+
+  .app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
   .report-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-column-gap: 15px;
+    grid-template-rows: repeat(4, max-content);
+    grid-template-columns: 1fr 1fr ;
+    grid-gap: 24px;
+    width: 100%;
+
+    .identification-progress {
+      grid-column: 1/3;
+    }
+
+    .matches-for-license {
+      grid-row: 2/5;
+      grid-column: 2/3;
+
+      .report-titles-container {
+        margin-bottom: 20px;
+        .report-titles {
+          color: #27272A;
+          font-size: 26px;
+          font-style: normal;
+          font-weight: 700;
+        }
+      }
+    }
+
+    .licenses-obligation {
+      grid-column: 1/3;
+    }
 
     .report-item {
       padding: 16px;
     }
+
+    .a {
+      width: 100%;
+      height: 150px;
+    }
+
+    .b {
+      display: flex;
+      flex-direction: column;
+      .report-titles-container {
+        .report-titles {
+          color: #27272A;
+          font-size: 26px;
+          font-style: normal;
+          font-weight: 700;
+        }
+      }
+      .report-second {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-gap: 10px;
+        justify-content: space-between;
+        align-items: center;
+
+        .LicensesChart {
+          padding: 24px 10px;
+          max-width: 300px;
+        }
+
+        .license-list {
+          overflow-y: scroll;
+          max-height: 320px;
+          overflow-x: hidden;
+          max-width: 300px;
+
+          .license-list-item {
+            display: flex;
+            align-items: center;
+            background-color: #FFFF;
+            margin-bottom: 4px;
+            padding: 12px;
+            border-radius: 4px;
+
+            &-selected {
+              background-color: #E4E4E7;
+              border-radius: 4px;
+            }
+
+            &:hover {
+              transition: ease-in 0.2s;
+              background-color: rgba(228, 228, 231, 1);
+              cursor: pointer;
+              ::-webkit-scrollbar-thumb:hover {
+                background: #555;
+              }
+            }
+
+
+            .license-list-item-color {
+              width: 24px;
+              height: 24px;
+              margin-right: 12px;
+              border-radius: 4px;
+            }
+
+            .license-list-item-name {
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 25px;
+              letter-spacing: 0em;
+              text-align: left;
+            }
+          }
+        }
+
+
+      }
+    }
+
+
+
+
+
+
+
+
+
+    .IdentificationProgress {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+
+      .identification-canvas-container {
+        margin-top: 30px;
+        height: 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .label {
+          color: #22C55E;
+          padding: 12;
+          font-size: 50px;
+          font-weight: 700;
+        }
+
+        .progress-bar {
+          padding: 0 20px;
+          width: 100%;
+        }
+      }
+
+      .report-titles-container {
+          .report-titles {
+            color: #27272A;
+            font-size: 26px;
+            font-style: normal;
+            font-weight: 700;
+          }
+
+      }
+
+
+    }
+
+    .total-files-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .total-files-label {
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+    }
+
+
+    .table-cell {
+      display: flex;
+      align-items: center;
+      color: #3B82F6;
+      & svg{
+        margin-right: 5px;
+      }
+
+    }
+
+    .matches {
+      .report-titles-container {
+
+        margin-bottom: 48px;
+
+          .report-titles {
+            color: #27272A;
+            font-size: 26px;
+            font-style: normal;
+            font-weight: 700;
+          }
+
+      }
+    }
+
+    .vulnerabilites {
+      .report-titles-container {
+
+        margin-bottom: 48px;
+
+          .report-titles {
+            color: #27272A;
+            font-size: 26px;
+            font-style: normal;
+            font-weight: 700;
+          }
+
+      }
+    }
+
+    .licenses-obligation {
+      .report-titles-container {
+
+        margin-bottom: 48px;
+
+          .report-titles {
+            color: #27272A;
+            font-size: 26px;
+            font-style: normal;
+            font-weight: 700;
+          }
+
+      }
+    }
+
+
+
   }
 }

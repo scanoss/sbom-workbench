@@ -10,12 +10,15 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 import { makeStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
 import { AppContext } from '../context/AppProvider';
 import { workspaceService } from '../../api/workspace-service';
 import { dialogController } from '../dialog-controller';
+import { DialogContext, IDialogContext } from '../context/DialogProvider';
+import { DIALOG_ACTIONS } from '../context/types';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -30,6 +33,11 @@ const useStyles = makeStyles((theme) => ({
   },
   input: {
     width: 400,
+  },
+  action: {
+    margin: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
   },
 }));
 
@@ -56,6 +64,7 @@ const Workspace = () => {
   const history = useHistory();
 
   const { setScanPath } = useContext<any>(AppContext);
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const [projects, setProjects] = useState<any[] | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -81,6 +90,17 @@ const Workspace = () => {
     if (projectPath) {
       setScanPath(projectPath);
       history.push('/workspace/new');
+    }
+  };
+
+  const onTrashHandler = async (path, e) => {
+    e.stopPropagation();
+    const { action } = await dialogCtrl.openConfirmDialog();
+    if (action == DIALOG_ACTIONS.OK) {
+      const { status } = await workspaceService.deleteProject(path);
+      if (status === 'ok') {
+        init();
+      }
     }
   };
 
@@ -123,9 +143,10 @@ const Workspace = () => {
               <Table className={classes.table} aria-label="projects table">
                 <TableHead className={classes.head}>
                   <TableRow>
-                    <TableCell>NAME</TableCell>
+                    <TableCell width="50%">NAME</TableCell>
                     <TableCell>DATE</TableCell>
                     <TableCell>TOTAL FILES</TableCell>
+                    <TableCell width={30} />
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -137,11 +158,20 @@ const Workspace = () => {
                         </TableCell>
                         <TableCell>{format(row.date)}</TableCell>
                         <TableCell>{row.files}</TableCell>
+                        <TableCell className={classes.action}>
+                          <IconButton
+                            aria-label="delete"
+                            className="btn-delete"
+                            onClick={(event) => onTrashHandler(row.work_root, event)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={3}>
+                      <TableCell colSpan={4}>
                         <p className="text-center">
                           Not projects found with <strong>{searchQuery}</strong>
                         </p>
@@ -156,13 +186,10 @@ const Workspace = () => {
           ) : (
             <div className="empty-container">
               <div className="empty-list">
-                <h3>Not projects yet</h3>
+                <h3>No projects found</h3>
                 <p>
-                  You can start scanning by
-                  <Link href="#" onClick={onNewProject}>
-                    creating a new project
-                  </Link>
-                  .
+                  You can start scanning by&nbsp;
+                  <Link onClick={onNewProject}>creating a new project</Link>.
                 </p>
               </div>
             </div>

@@ -1,22 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { AppContext, IAppContext } from '../context/AppProvider';
 import { useHistory } from 'react-router-dom';
-import { Chart, registerables } from 'chart.js'
+import { Chart, registerables } from 'chart.js';
+import { Button, Card, Fab, Tooltip } from '@material-ui/core';
+import GetAppIcon from '@material-ui/icons/GetApp';
+import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import LicensesChart from './components/LicensesChart';
-import { Card } from '@material-ui/core';
+import IdentificationProgress from './components/IdentificationProgress';
+import { AppContext, IAppContext } from '../context/AppProvider';
+import LicensesTable from './components/LicensesTable';
+import MatchesForLicense from './components/MatchesForLicense';
+import { report } from '../../api/report-service';
+import { dialogController } from '../dialog-controller';
+import { ExportFormat } from '../../api/export-service';
+
 Chart.register(...registerables);
-
-const LICENSES_DATA = [
-  {label: 'MIT', value: 15},
-  {label: 'Apache 2.0', value: 7},
-  {label: 'GNU (General Public License)', value: 5},
-  {label: 'Mozilla Public License', value: 3},
-  {label: 'Eclipse Public License', value: 2},
-];
-
-const PROGRESS_DATA = { identified: 4312, pending: 15749 };
 
 const Report = () => {
   const history = useHistory();
@@ -24,42 +23,103 @@ const Report = () => {
 
   const [progress, setProgress] = useState<any>(null);
   const [licenses, setLicenses] = useState<any[]>([]);
+  const [crypto, setCrypto] = useState<any[]>([]);
+  const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
 
-  const init = () => {
-    setProgress(PROGRESS_DATA);
-    setLicenses(LICENSES_DATA);
-  }
+  const init = async () => {
+    const a = await report.getSummary();
+    setProgress(a.data.summary);
+    setLicenses(a.data.licenses);
+  };
 
-  useEffect( init, []);
+  const onLicenseSelected = (license: string) => {
+    const matchedLicense = licenses.find((item) => item?.label === license);
+    setMatchedLicenseSelected(matchedLicense);
+  };
+
+  const onDownloadClickedExport = async () => {
+    const spdxPath = dialogController.showOpenDialog({ properties: ['openDirectory'] });
+    if (spdxPath) {
+      await ExportFormat.spdx(spdxPath);
+    }
+  };
+
+  useEffect(init, []);
 
   return (
     <>
       <section id="Report" className="app-page">
         <header className="app-header">
-          <div>
-            <h2 className="header-subtitle back">
-              <IconButton onClick={() => history.push('/workbench')} component="span">
-                <ArrowBackIcon />
-              </IconButton>
-              Reports
-            </h2>
-          </div>
+          {/* <h2 className="header-subtitle back">
+            <IconButton onClick={() => history.push('/workbench')} component="span">
+              <ArrowBackIcon />
+            </IconButton>
+            Reports
+          </h2> */}
+          <h3>REPORTS</h3>
+          <Button startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onDownloadClickedExport}>
+            Download
+          </Button>
         </header>
 
         <main className="app-content">
-          <section className='report-layout'>
-            <Card className="report-item">
-              <LicensesChart data={licenses} />
+          <section className="report-layout">
+            <Card className="report-item identification-progress">
+              {progress && <IdentificationProgress data={progress} />}
             </Card>
-            <Card className="report-item">
-              Match licenses
+            <Card className="report-item licenses">
+              <div className="b">
+                <div className="report-titles-container">
+                  <span className="report-titles">Licenses</span>
+                </div>
+                <div className="report-second">
+                  <LicensesChart data={licenses} />
+                  <LicensesTable
+                    matchedLicenseSelected={matchedLicenseSelected || licenses?.[0]}
+                    selectLicense={(license) => onLicenseSelected(license)}
+                    data={licenses}
+                  />
+                </div>
+              </div>
+            </Card>
+            <Card className="report-item matches-for-license">
+              <div className="report-titles-container">
+                <span className="report-titles">Matches for license</span>
+              </div>
+              <MatchesForLicense data={matchedLicenseSelected || licenses?.[0]} />
+            </Card>
+            <Card className="report-item matches">
+              <div className="d">
+                <div className="report-titles-container">
+                  <span className="report-titles">Matches</span>
+                </div>
+              </div>
+            </Card>
+            <Card className="report-item vulnerabilites">
+              <div className="e">
+                <div className="report-titles-container">
+                  <span className="report-titles">Vulnerabilites</span>
+                </div>
+              </div>
+            </Card>
+            <Card className="report-item licenses-obligation">
+              <div className="e">
+                <div className="report-titles-container">
+                  <span className="report-titles">License obligations</span>
+                </div>
+              </div>
             </Card>
           </section>
-
         </main>
       </section>
+
+      <Tooltip title="Identifications">
+        <Fab className="btn-export" onClick={() => history.push('/workbench')}>
+          <DescriptionOutlinedIcon />
+        </Fab>
+      </Tooltip>
     </>
   );
-}
+};
 
 export default Report;

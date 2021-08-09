@@ -63,14 +63,14 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const fetchData = async () => {
     if (open) {
-      const { comp } = await componentService.getCompVersions();
-      setData(comp);
-      setComponents(comp.map((item) => item.name));
+      const { data } = await componentService.getAllComponentGroup();
+      setData(data);
+      setComponents(data.map((item) => item.name));
     }
   };
 
   const handleClose = () => {
-    const inventory: Inventory = form;
+    const inventory: any = form;
     onClose(inventory);
   };
 
@@ -89,8 +89,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const isValid = () => {
-    const { version, component, url, purl, license } = form;
-    return license && version && component && url && purl;
+    const { version, component, url, purl, license_name } = form;
+    return license_name && version && component && url && purl;
   };
 
   useEffect(setDefaults, [inventory]);
@@ -116,7 +116,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   }, [versions]);
 
   useEffect(() => {
-    if (licenses && licenses[0]) setForm({ ...form, license: licenses[0] });
+    if (licenses && licenses[0]) setForm({ ...form, license_name: licenses[0] });
   }, [licenses]);
 
   return (
@@ -167,7 +167,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               fullWidth
               className={classes.input}
               options={licenses  || []}
-              value={form.license}
+              value={form.license_name}
               disableClearable
               renderInput={(params) => (
                 <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }} />

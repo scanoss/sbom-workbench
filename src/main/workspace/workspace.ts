@@ -2,9 +2,11 @@
 import { EventEmitter } from 'events';
 import { stripBasename } from 'history/PathUtils';
 import * as fs from 'fs';
+import path from 'path';
+
+import * as os from 'os';
 import * as Filtering from './filtering';
 import * as TreeStructure from './ProjectTree';
-import * as os from 'os';
 
 /**
  *
@@ -12,7 +14,8 @@ import * as os from 'os';
 // eslint-disable-next-line import/no-mutable-exports
 
 class Workspace extends EventEmitter {
-  name!: string;
+
+  private name: string;
 
   projectsList: TreeStructure.ProjectTree;
 
@@ -20,8 +23,9 @@ class Workspace extends EventEmitter {
 
   constructor() {
     super();
+    this.name = 'scanoss-workspace';
+    this.ws_path = `${os.homedir()}/${this.name}`;
     this.projectsList = new TreeStructure.ProjectTree('Unnamed');
-    this.ws_path = `${os.homedir()}/scanoss-workspace`;
   }
 
   newProject(scanPath: string, mailbox: any) {
@@ -29,6 +33,35 @@ class Workspace extends EventEmitter {
     this.projectsList.setMailbox(mailbox);
     this.projectsList.createScanProject(scanPath);
   }
+
+  deleteProject(projectPath: string): boolean {
+    if ((!projectPath.includes(this.ws_path)) || (!fs.existsSync(projectPath))) {return false;}
+    try {
+      console.log("Removing project: ", projectPath);
+      this.deleteFolderRecursive(projectPath);
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+    return true;
+  }
+
+  private deleteFolderRecursive (directoryPath) {
+    if (fs.existsSync(directoryPath)) {
+        fs.readdirSync(directoryPath).forEach((file, index) => {
+          const curPath = path.join(directoryPath, file);
+          if (fs.lstatSync(curPath).isDirectory()) {
+           // recurse
+            this.deleteFolderRecursive(curPath);
+          } else {
+            // delete file
+            fs.unlinkSync(curPath);
+          }
+        });
+        fs.rmdirSync(directoryPath);
+      }
+    };
+
 
   dirFirstFileAfter(a, b) {
     if (!a.isDirectory() && b.isDirectory()) return 1;
@@ -56,10 +89,10 @@ class Workspace extends EventEmitter {
           const metadata = JSON.parse(metadataAsText);
           projects.push(metadata);
         } else {
-          console.log(`Metadata on project ${projectPath} does not exist. `);
+          console.log(`Cannot load project ${projectPath} because it was scanned with an older version of Scannos-DT`);
           // TO DO: Create metadata in a project that does not exist.
-          //readProject
-          //savemetadata
+          // readProject
+          // savemetadata
         }
       }
 
@@ -69,7 +102,6 @@ class Workspace extends EventEmitter {
       return [];
     }
   }
-
 }
 
 function includeRoot(original: string, root: string) {
@@ -79,7 +111,6 @@ function excludeRoot(complete: string, root: string) {
   return complete.replace(root, '');
 }
 // eslint-disable-next-line consistent-return
-
 
 function onAddInventory(i: any, any: any) {
   throw new Error('Function not implemented.');
