@@ -4,8 +4,8 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router-dom';
 import { Chart, registerables } from 'chart.js';
 import { Button, Card, Fab, Tooltip } from '@material-ui/core';
-import GetAppIcon from '@material-ui/icons/GetApp';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import LicensesChart from './components/LicensesChart';
 import IdentificationProgress from './components/IdentificationProgress';
 import { AppContext, IAppContext } from '../context/AppProvider';
@@ -65,49 +65,37 @@ const Report = () => {
         <main className="app-content">
           <section className="report-layout">
             <Card className="report-item identification-progress">
+              <div className="report-title">Identification Progress</div>
               {progress && <IdentificationProgress data={progress} />}
             </Card>
+
             <Card className="report-item licenses">
-              <div className="b">
-                <div className="report-titles-container">
-                  <span className="report-titles">Licenses</span>
-                </div>
-                <div className="report-second">
-                  <LicensesChart data={licenses} />
-                  <LicensesTable
-                    matchedLicenseSelected={matchedLicenseSelected || licenses?.[0]}
-                    selectLicense={(license) => onLicenseSelected(license)}
-                    data={licenses}
-                  />
-                </div>
+              <div className="report-title">Licenses</div>
+              <div className="report-second">
+                <LicensesChart data={licenses} />
+                <LicensesTable
+                  matchedLicenseSelected={matchedLicenseSelected || licenses?.[0]}
+                  selectLicense={(license) => onLicenseSelected(license)}
+                  data={licenses}
+                />
               </div>
             </Card>
+
             <Card className="report-item matches-for-license">
-              <div className="report-titles-container">
-                <span className="report-titles">Matches for license</span>
-              </div>
+              <div className="report-title">Matches for license</div>
               <MatchesForLicense data={matchedLicenseSelected || licenses?.[0]} />
             </Card>
+
             <Card className="report-item matches">
-              <div className="d">
-                <div className="report-titles-container">
-                  <span className="report-titles">Matches</span>
-                </div>
-              </div>
+              <div className="report-title">Matches</div>
             </Card>
+
             <Card className="report-item vulnerabilites">
-              <div className="e">
-                <div className="report-titles-container">
-                  <span className="report-titles">Vulnerabilites</span>
-                </div>
-              </div>
+              <div className="report-title">Vulnerabilites</div>
             </Card>
+
             <Card className="report-item licenses-obligation">
-              <div className="e">
-                <div className="report-titles-container">
-                  <span className="report-titles">License obligations</span>
-                </div>
-              </div>
+              <div className="report-title">License obligations</div>
             </Card>
           </section>
         </main>
