@@ -4,7 +4,6 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router-dom';
 import { Chart, registerables } from 'chart.js';
 import { Button, Card, Fab, Tooltip } from '@material-ui/core';
-import GetAppIcon from '@material-ui/icons/GetApp';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import LicensesChart from './components/LicensesChart';
 import IdentificationProgress from './components/IdentificationProgress';
@@ -66,12 +65,12 @@ const Report = () => {
         <main className="app-content">
           <section className="report-layout">
             <Card className="report-item identification-progress">
+              <div className="report-title">Identification Progress</div>
               {progress && <IdentificationProgress data={progress} />}
             </Card>
+
             <Card className="report-item licenses">
-              <div className="report-titles-container">
-                <span className="report-titles">Licenses</span>
-              </div>
+              <div className="report-title">Licenses</div>
               <div className="report-second">
                 <LicensesChart data={licenses} />
                 <LicensesTable
@@ -81,27 +80,24 @@ const Report = () => {
                 />
               </div>
             </Card>
+
             <Card className="report-item matches-for-license">
-              <div className="report-titles-container">
-                <span className="report-titles">Matches for license</span>
-              </div>
+              <div className="report-title">Matches for license</div>
               <MatchesForLicense data={matchedLicenseSelected || licenses?.[0]} />
             </Card>
+
             <Card className="report-item matches">
-              <div className="report-titles-container">
-                <span className="report-titles">Matches</span>
-              </div>
+              <div className="report-title">Matches</div>
             </Card>
+
             <Card className="report-item vulnerabilites">
-              <div className="report-titles-container">
-                <span className="report-titles">Vulnerabilites</span>
-              </div>
+              <div className="report-title">Vulnerabilites</div>
             </Card>
+
             <Card className="report-item licenses-obligation">
-              <div className="report-titles-container">
-                <span className="report-titles">License obligations</span>
-              </div>
+              <div className="report-title">License obligations</div>
             </Card>
+
           </section>
         </main>
       </section>

@@ -2,16 +2,6 @@
   background-color: var(--background-color-primary);
   min-width: 800px;
 
-  @mixin titles-cards {
-
-      .report-titles {
-        color: #27272A;
-        font-size: 26px;
-        font-style: normal;
-        font-weight: 700;
-      }
-    }
-
   @media screen and (min-width: 1024px) {
     padding-left: 180px;
     padding-right: 180px;
@@ -26,9 +16,20 @@
   .report-layout {
     display: grid;
     grid-template-rows: repeat(4, max-content);
-    grid-template-columns: 1fr 1fr ;
+    grid-template-columns: 1fr 1fr;
     grid-gap: 24px;
     width: 100%;
+
+    .report-item {
+      padding: 16px;
+
+      .report-title {
+        color: #27272A;
+        font-size: 26px;
+        font-style: normal;
+        font-weight: 700;
+      }
+    }
 
     .identification-progress {
       grid-column: 1/3;
@@ -37,29 +38,16 @@
     .matches-for-license {
       grid-row: 2/5;
       grid-column: 2/3;
-
-      .report-titles-container {
-        margin-bottom: 20px;
-        @include titles-cards;
-      }
     }
 
     .licenses-obligation {
       grid-column: 1/3;
     }
 
-    .report-item {
-      padding: 16px;
-    }
-
-
-
-    .licenses {
+    .report-item.licenses {
       display: flex;
       flex-direction: column;
-      .report-titles-container {
-        @include titles-cards;
-      }
+
       .report-second {
         display: grid;
         grid-template-columns: 50% 50%;
@@ -100,7 +88,6 @@
               }
             }
 
-
             .license-list-item-color {
               width: 24px;
               height: 24px;
@@ -110,28 +97,19 @@
 
             .license-list-item-name {
               font-size: 16px;
-              font-style: normal;
               font-weight: 400;
               line-height: 25px;
-              letter-spacing: 0em;
               text-align: left;
             }
           }
         }
-
 
       }
     }
 
 
 
-
-
-
-
-
-
-    .IdentificationProgress {
+    #IdentificationProgress {
       display: flex;
       justify-content: center;
       flex-direction: column;
@@ -145,7 +123,7 @@
 
         .label {
           color: #22C55E;
-          padding: 12;
+          padding: 12px;
           font-size: 50px;
           font-weight: 700;
         }
@@ -155,12 +133,6 @@
           width: 100%;
         }
       }
-
-      .report-titles-container {
-        @include titles-cards;
-
-      }
-
 
     }
 
@@ -177,46 +149,15 @@
 
     }
 
-
     .table-cell {
       display: flex;
       align-items: center;
       color: #3B82F6;
-      & svg{
+      & svg {
         margin-right: 5px;
       }
 
     }
-
-    .matches {
-      .report-titles-container {
-
-        margin-bottom: 48px;
-
-        @include titles-cards;
-      }
-    }
-
-    .vulnerabilites {
-      .report-titles-container {
-
-        margin-bottom: 48px;
-
-        @include titles-cards;
-      }
-    }
-
-    .licenses-obligation {
-      .report-titles-container {
-
-        margin-bottom: 48px;
-
-        @include titles-cards;
-
-      }
-    }
-
-
 
   }
 }
