@@ -83,7 +83,7 @@ export const ComponentList = () => {
         <main className="app-content">
           {components && filterItems && filterItems.length > 0 ? (
             <section className="component-list">
-              {filterItems.slice(0, LIMIT).map((component) => (
+              {filterItems.slice(0, LIMIT).map((component, i) => (
                 <ComponentCard key={component.purl} component={component} onClick={onSelectComponent} />
               ))}
             </section>

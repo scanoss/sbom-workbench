@@ -13,7 +13,7 @@ import NewProject from './renderer/workspace/pages/NewProject/NewProject';
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#3B82F6',
+      main: '#6366F1',
     },
     secondary: {
       main: '#22C55E',
