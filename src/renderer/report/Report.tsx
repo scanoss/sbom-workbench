@@ -16,6 +16,7 @@ import { dialogController } from '../dialog-controller';
 import { ExportFormat } from '../../api/export-service';
 import MatchesChart from './components/MatchesChart';
 import VulnerabilitiesCard from './components/VulnerabilitiesCard';
+import LicensesObligations from './components/LicensesObligations';
 
 Chart.register(...registerables);
 
@@ -99,7 +100,7 @@ const Report = () => {
             </Card>
 
             <Card className="report-item licenses-obligation">
-              <div className="report-title">License obligations</div>
+              <LicensesObligations/>
             </Card>
           </section>
         </main>
