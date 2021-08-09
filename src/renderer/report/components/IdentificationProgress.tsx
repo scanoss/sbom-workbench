@@ -82,10 +82,7 @@ const LicensesChart = ({ data }) => {
   }, [data]);
 
   return (
-    <div className="IdentificationProgress">
-      <div className="report-titles-container">
-        <span className="report-titles">Identification Progress</span>
-      </div>
+    <div id="IdentificationProgress">
       <div className="identification-canvas-container">
         <span className="label">{percentage}%</span>
         <div className="progress-bar">
