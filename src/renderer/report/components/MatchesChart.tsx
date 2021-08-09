@@ -6,7 +6,7 @@ const MatchesChart = ({ data }) => {
   const [percentage, setPercentage] = useState<number>(0);
 
   useEffect(() => {
-    const percentage = Math.floor((data?.identifiedFiles + data?.ignoredFiles)*100 / data.detectedFiles) ;
+    const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
     const pending = 100 - percentage;
     setPercentage(percentage);
 
@@ -60,11 +60,11 @@ const MatchesChart = ({ data }) => {
           tooltip: {
             callbacks: {
               label() {
-                return (``);
+                return ``;
               },
               title() {
-                return (`Pending files\n${data?.pendingFiles}`);
-              }
+                return `${data?.pendingFiles} Files`;
+              },
             },
             displayColors: false,
           },
@@ -83,12 +83,18 @@ const MatchesChart = ({ data }) => {
 
   return (
     <div id="MatchesChart">
-      <div className="identification-canvas-container">
-        <span className="label">{percentage}%</span>
+      <div className="matches-canvas-container">
+        <div className="label-match-container">
+          <span className="label-match">{percentage}%</span>
+          <span className="label-match-sublabel">Match</span>
+        </div>
         <div className="progress-bar">
           <canvas ref={chartRef} />
         </div>
-        <span className="label">{percentage}%</span>
+        <div className="label-nomatch-container">
+          <span className="label-nomatch">{percentage}%</span>
+          <span className="label-nomatch-sublabel">No Match</span>
+        </div>
       </div>
       <div className="total-files-container">
         <span className="total-files-label">Total Files: {data.totalFiles}</span>
