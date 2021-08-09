@@ -174,3 +174,14 @@ a:hover {
 .text-center {
   text-align: center;
 }
+
+.MuiChip-root.identified {
+  border-radius: 4px;
+  background: #DCFCE7;
+  border: 1px solid var(--color-status-identified);;
+
+  color: var(--color-status-identified);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+}
