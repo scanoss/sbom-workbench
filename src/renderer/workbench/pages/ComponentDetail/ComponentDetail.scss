@@ -12,6 +12,44 @@ header.app-header {
 }
 
 #ComponentDetail {
+  .tabs {
+
+    .MuiPaper-root {
+      border-radius: 4px;
+    }
+
+    .MuiTabs-root, .MuiButtonBase-root {
+      min-height: 42px;
+    }
+
+    .MuiTab-wrapper {
+      font-weight: 400;
+      opacity: 0.7;
+      display: flex;
+      flex-direction: row;
+
+      &::before {
+        content: '';
+        width: 10px;
+        height: 10px;
+        background-color: lightgray;
+        border-radius: 50%;
+        margin-right: 7px;
+      }
+    }
+
+    .Mui-selected .MuiTab-wrapper {
+      font-weight: bold;
+      opacity: 1;
+    }
+
+    .MuiTab-root {
+      &:nth-child(1) .MuiTab-wrapper::before { background-color: var(--color-status-pending);}
+      &:nth-child(2) .MuiTab-wrapper::before { background-color: var(--color-status-identified);}
+      &:nth-child(3) .MuiTab-wrapper::before { background-color: var(--color-status-ignored);}
+    }
+  }
+
   .filter-container {
     display: flex;
     align-items: center;
@@ -21,9 +59,25 @@ header.app-header {
       margin-bottom: 0;
     }
 
-    .filter {
-      margin-top: 15px;
-      margin-left: 5px;
+    .btn-version {
+      $color:  black;
+
+      margin-top: 8px;
+      margin-left: 10px;
+      padding: 2px 2px 2px 8px;
+      font-weight: 600;
+      color: lighten($color, 20);
+      font-size: 1em;
+      background-color: #dbdbdb;
+
+      &:hover {
+        background-color: #d3d3d3;
+      }
+
+      &.selected {
+        color: var(--color-component)
+      }
+
     }
   }
 }
@@ -31,7 +85,7 @@ header.app-header {
 .file-list {
   display: grid;
   grid-template-columns: calc(50% - 7px) calc(50% - 7px);
-  grid-gap: 14px;
+  grid-gap: 10px;
 
   @media screen and (max-width: $default-width) {
     grid-template-columns: 100%;
