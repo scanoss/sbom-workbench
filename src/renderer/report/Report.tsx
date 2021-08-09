@@ -15,6 +15,7 @@ import { report } from '../../api/report-service';
 import { dialogController } from '../dialog-controller';
 import { ExportFormat } from '../../api/export-service';
 import MatchesChart from './components/MatchesChart';
+import VulnerabilitiesCard from './components/VulnerabilitiesCard';
 
 Chart.register(...registerables);
 
@@ -94,6 +95,7 @@ const Report = () => {
 
             <Card className="report-item vulnerabilites">
               <div className="report-title">Vulnerabilites</div>
+              <VulnerabilitiesCard/>
             </Card>
 
             <Card className="report-item licenses-obligation">

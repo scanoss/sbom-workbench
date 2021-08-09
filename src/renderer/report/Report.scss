@@ -211,12 +211,6 @@
 
         }
 
-
-
-
-
-
-
         .progress-bar {
           padding: 0 20px;
           width: 100%;
@@ -224,6 +218,65 @@
       }
 
     }
+
+
+
+      #VulnerabilitiesContainer {
+        display: flex;
+        align-items: flex-end;
+        margin-top: 20px;
+        .vulnerabilitie-container {
+          display: flex;
+          flex-direction: column;
+          width: fit-content;
+          align-items: center;
+          margin-right: 50px;
+
+          .vulnerabilitie-number {
+            color: #27272A;
+            font-size: 40px;
+          }
+
+          .critical-number {
+            font-size: 70px;
+            font-weight: 700;
+          }
+
+
+          .vulnerabilitie-label {
+            width: fit-content;
+            border-radius: 4px;
+            padding: 2px 12px;
+          }
+
+          .critical-label {
+            background-color: #EF4444;
+            color: #FFFFFF;
+          }
+
+          .high {
+            background-color: #FDBA74;
+            color: #C2410C;
+          }
+
+          .medium {
+            background-color: #FDE047;
+            color: #A16207;
+          }
+
+          .moderate {
+            background-color: #F4F4F5;
+            color: #A1A1AA;
+          }
+
+        }
+      }
+
+
+
+
+
+
 
   }
 }
