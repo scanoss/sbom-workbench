@@ -19,9 +19,12 @@ export class LicenseDb extends Db {
   }
 
   // CREATE LICENSE
-  bulkCreate(db:any,license: License) {
+  bulkCreate(db:any,license: Partial<License>) {
+    console.log(license.spdixid);
     return new Promise<License>((resolve, reject) => {
-      try {        
+      try { 
+        license.fulltext = 'AUTOMATIC IMPORT';
+        license.url = 'AUTOMATIC IMPORT';     
         db.run(query.COMPDB_LICENSES_INSERT,
           license.spdxid,
           license.name,

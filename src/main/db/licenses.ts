@@ -3139,12 +3139,5 @@ const licenses = [
         "name": "zlib/libpng License with Acknowledgement",
         "spdxid": "zlib-acknowledgement",
         "url": "https://fedoraproject.org/wiki/Licensing/ZlibWithAcknowledgement"
-    },
-    {
-        "fulltext": "NULL",
-        "id": 449,
-        "name": "NULL",
-        "spdxid": "NULL",
-        "url": "NULL"
-    }
+    }  
 ]

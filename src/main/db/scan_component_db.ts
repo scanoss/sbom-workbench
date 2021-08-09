@@ -266,18 +266,8 @@ export class ComponentDb extends Db {
   // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
   importUniqueFromFile() {
     const self = this;
-    const attachLicComp = {
-      license_id: 0,
-      compid: 0,
-    };
-    let license: License;
-    license = {
-      id: 0,
-      name: '',
-      spdxid: '',
-      fulltext: 'AUTOMATIC IMPORT',
-      url: 'AUTOMATIC IMPORT',
-    };
+    const attachLicComp :any = {};   
+    let license :any = {};
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -285,25 +275,17 @@ export class ComponentDb extends Db {
         db.serialize(async function () {
           db.run('begin transaction');
           for (const result of results) {
-            if (result.license !== 'NULL') {
+            if (result.license !== 'NULL') {             
               license.spdxid = result.license;
-              attachLicComp.license_id = await self.license.getLicenseIdFilter(
-                license
-              );
-              if (attachLicComp.license_id === 0) {
+              attachLicComp.license_id = await self.license.getLicenseIdFilter(license);            
+              if (attachLicComp.license_id === 0) {                    
                 license = await self.license.bulkCreate(db, license);
-                if (license.id) attachLicComp.license_id = license.id;
-              }
-            } else {
-              attachLicComp.license_id = await self.license.getLicenseIdFilter(
-                license
-              );
-            }
-            attachLicComp.compid = await self.componentNewImportFromResults(
-              db,
-              result
-            );
-            await self.license.bulkAttachLicensebyId(db, attachLicComp);
+                attachLicComp.license_id = license.id;
+              }      
+            }         
+              attachLicComp.compid = await self.componentNewImportFromResults(db,result); 
+              if(result.license !== 'NULL')
+              await self.license.bulkAttachLicensebyId(db, attachLicComp);
           }
           db.run('commit', () => {
             db.close();
@@ -327,7 +309,7 @@ export class ComponentDb extends Db {
         'AUTOMATIC IMPORT',
         data.url,
         data.purl,
-        function (this: any, err: any) {
+        function (this :any, err: any) {       
           resolve(this.lastID);
         }
       );
