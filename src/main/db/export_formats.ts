@@ -57,7 +57,7 @@ export class Formats extends Db {
               document.Packages.push(pkg);
             }
             fs.writeFile(
-              `${path}.spdx`,
+              `${path}`,
               JSON.stringify(document, undefined, 4),
               () => {
                 resolve(true);
@@ -82,7 +82,7 @@ export class Formats extends Db {
             if (err || data === undefined) resolve(false);
             else {
               const csvFile = this.csvCreate(data);
-              fs.writeFile(`${path}.csv`,csvFile,() => {
+              fs.writeFile(`${path}`,csvFile,() => {
                   resolve(true);
                 }
               );

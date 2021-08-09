@@ -9,8 +9,8 @@ class DialogController {
   }
 
   public showSaveDialog(options): string {
-    const result = dialog.showSaveDialogSync(remote.getCurrentWindow(), options);
-    return result ? result[0] : null;
+    const result = dialog.showSaveDialogSync(remote.getCurrentWindow(),options);    
+    return result;
   }
 
   public showError(title: string, content: string) {

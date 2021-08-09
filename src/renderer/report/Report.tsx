@@ -2,8 +2,20 @@ import React, { useContext, useEffect, useState } from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router-dom';
+import { withStyles } from '@material-ui/core/styles';
 import { Chart, registerables } from 'chart.js';
-import { Button, Card, Fab, Tooltip } from '@material-ui/core';
+import {
+  Button,
+  Card,
+  Fab,
+  Fade,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  MenuProps,
+  Tooltip,
+} from '@material-ui/core';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import LicensesChart from './components/LicensesChart';
@@ -14,8 +26,40 @@ import MatchesForLicense from './components/MatchesForLicense';
 import { report } from '../../api/report-service';
 import { dialogController } from '../dialog-controller';
 import { ExportFormat } from '../../api/export-service';
+import { projectService } from '../../api/project-service';
 
 Chart.register(...registerables);
+
+const StyledMenu = withStyles({
+  paper: {
+    border: '1px solid #d3d4d5',
+  },
+})((props: MenuProps) => (
+  <Menu
+    elevation={0}
+    getContentAnchorEl={null}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'center',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'center',
+    }}
+    {...props}
+  />
+));
+
+const StyledMenuItem = withStyles((theme) => ({
+  root: {
+    '&:focus': {
+      backgroundColor: theme.palette.primary.main,
+      '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+        color: theme.palette.common.white,
+      },
+    },
+  },
+}))(MenuItem);
 
 const Report = () => {
   const history = useHistory();
@@ -25,6 +69,8 @@ const Report = () => {
   const [licenses, setLicenses] = useState<any[]>([]);
   const [crypto, setCrypto] = useState<any[]>([]);
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
   const init = async () => {
     const a = await report.getSummary();
@@ -37,11 +83,33 @@ const Report = () => {
     setMatchedLicenseSelected(matchedLicense);
   };
 
-  const onDownloadClickedExport = async () => {
-    const spdxPath = dialogController.showOpenDialog({ properties: ['openDirectory'] });
-    if (spdxPath) {
-      await ExportFormat.spdx(spdxPath);
-    }
+  const onExportClicked = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  
+  const onCsvClickedExport = async () => {
+    await exportFile('csv');
+    handleClose();
+  };
+
+  const onSpdxClickedExport = async () => {    
+    await exportFile('spdx');
+    handleClose();
+  };
+
+  const exportFile = async (extension) => {
+    const defpath = await projectService.workspacePath();
+    const projectName = await projectService.getProjectName();
+    const path = dialogController.showSaveDialog({
+      defaultPath: `${defpath.data}/${projectName.data}/${projectName.data}.${extension}`,
+    });
+    if (extension === 'spdx') {
+      await ExportFormat.spdx(path);
+    } else if (extension === 'csv') await ExportFormat.csv(path);
   };
 
   useEffect(init, []);
@@ -57,9 +125,23 @@ const Report = () => {
             Reports
           </h2> */}
           <h3>REPORTS</h3>
-          <Button startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onDownloadClickedExport}>
-            Download
-          </Button>
+          <div>
+            <Button 
+            startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onExportClicked}>
+              Export
+            </Button>
+            <Menu
+              id="fade-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={open}
+              onClose={handleClose}
+              TransitionComponent={Fade}            
+            >
+              <MenuItem onClick={onSpdxClickedExport}>SPDX</MenuItem>
+              <MenuItem onClick={onCsvClickedExport}>CSV</MenuItem>
+            </Menu>
+          </div>
         </header>
 
         <main className="app-content">
