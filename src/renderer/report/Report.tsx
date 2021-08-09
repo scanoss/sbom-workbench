@@ -14,6 +14,7 @@ import MatchesForLicense from './components/MatchesForLicense';
 import { report } from '../../api/report-service';
 import { dialogController } from '../dialog-controller';
 import { ExportFormat } from '../../api/export-service';
+import MatchesChart from './components/MatchesChart';
 
 Chart.register(...registerables);
 
@@ -88,6 +89,7 @@ const Report = () => {
 
             <Card className="report-item matches">
               <div className="report-title">Matches</div>
+              <MatchesChart data={progress} />
             </Card>
 
             <Card className="report-item vulnerabilites">

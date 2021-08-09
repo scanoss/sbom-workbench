@@ -159,5 +159,33 @@
 
     }
 
+
+    #MatchesChart {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+
+      .identification-canvas-container {
+        margin-top: 30px;
+        height: 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .label {
+          color: #6366F1;
+          padding: 0px;
+          font-size: 40px;
+          font-weight: 400;
+        }
+
+        .progress-bar {
+          padding: 0 20px;
+          width: 100%;
+        }
+      }
+
+    }
+
   }
 }
