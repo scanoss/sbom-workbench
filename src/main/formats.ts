@@ -7,6 +7,7 @@ ipcMain.handle(IpcEvents.EXPORT_SPDX, async (event, path: string) => {
   let success: boolean;
   try {  
     success = await defaultProject.scans_db.formats.spdx(`${path}/${defaultProject.project_name}`);
+    success = await defaultProject.scans_db.formats.csv(`${path}/${defaultProject.project_name}`);
     if (success) {
       return { status: 'ok', message: 'SPDX export successfully', data: success };
     }
