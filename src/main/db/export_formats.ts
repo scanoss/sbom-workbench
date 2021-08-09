@@ -58,7 +58,7 @@ export class Formats extends Db {
               pkg.licenseConcluded='n/a';  
               document.Packages.push(pkg);
             }           
-            fs.writeFile(`${path}.spdx`, JSON.stringify(document), () => {
+            fs.writeFile(`${path}.spdx`, JSON.stringify(document,undefined,4), () => {
               resolve(true);
             });
           }

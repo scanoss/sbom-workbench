@@ -25,13 +25,15 @@ export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(nu
 export const WorkbenchProvider: React.FC = ({ children }) => {
   const { setScanBasePath } = React.useContext<any>(AppContext);
   const [state, dispatch] = React.useReducer(reducer, initialState);
-  const { scan, tree, file, component } = state;
+  const { loaded, tree, file, component } = state;
 
   const loadScan = async (path: string) => {
     try {
-      console.log('load scan');
-      const { scan, fileTree, scanRoot } = await workbenchController.loadScan(path);
-      dispatch(loadScanSuccess(scan, fileTree, []));
+      if (loaded) return true; // && state.path != path
+
+      console.log(`loading scan: ${path}`);
+      const { fileTree, scanRoot } = await workbenchController.loadScan(path);
+      dispatch(loadScanSuccess(fileTree, []));
       setScanBasePath(scanRoot);
       update();
       return true;
@@ -105,7 +107,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       detachFile,
       deleteInventory,
     }),
-    [state, dispatch, loadScan, createInventory, ignoreFile, restoreFile, attachFile, detachFile]
+    [state, dispatch, loadScan, createInventory, ignoreFile, restoreFile, attachFile, detachFile, deleteInventory]
   );
 
   return <WorkbenchContext.Provider value={value}>{children}</WorkbenchContext.Provider>;

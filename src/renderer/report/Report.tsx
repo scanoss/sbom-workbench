@@ -3,14 +3,16 @@ import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router-dom';
 import { Chart, registerables } from 'chart.js';
-import { Button, Card } from '@material-ui/core';
+import { Button, Card, Fab, Tooltip } from '@material-ui/core';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import LicensesChart from './components/LicensesChart';
 import IdentificationProgress from './components/IdentificationProgress';
 import { AppContext, IAppContext } from '../context/AppProvider';
 import LicensesTable from './components/LicensesTable';
 import MatchesForLicense from './components/MatchesForLicense';
 import { report } from '../../api/report-service';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import { dialogController } from '../dialog-controller';
 import { ExportFormat } from '../../api/export-service';
 
@@ -49,12 +51,13 @@ const Report = () => {
     <>
       <section id="Report" className="app-page">
         <header className="app-header">
-          <h2 className="header-subtitle back">
+          {/* <h2 className="header-subtitle back">
             <IconButton onClick={() => history.push('/workbench')} component="span">
               <ArrowBackIcon />
             </IconButton>
-            Back to workbench
-          </h2>
+            Reports
+          </h2> */}
+          <h3>REPORTS</h3>
           <Button startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onDownloadClickedExport}>
             Download
           </Button>
@@ -102,6 +105,12 @@ const Report = () => {
           </section>
         </main>
       </section>
+
+      <Tooltip title="Identifications">
+        <Fab className="btn-export" onClick={() => history.push('/workbench')}>
+          <DescriptionOutlinedIcon />
+        </Fab>
+      </Tooltip>
     </>
   );
 };
