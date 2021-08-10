@@ -23,7 +23,6 @@ import { FileList } from '../ComponentList/components/FileList';
 import { InventoryList } from '../ComponentList/components/InventoryList';
 import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
 import { DialogContext, IDialogContext } from '../../../context/DialogProvider';
-import { setFile } from '../../actions';
 import { inventoryService } from '../../../../api/inventory-service';
 import { componentService } from '../../../../api/component-service';
 
@@ -35,7 +34,7 @@ export const ComponentDetail = () => {
   const history = useHistory();
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { state, dispatch, createInventory, ignoreFile, restoreFile, attachFile } = useContext(
+  const { state, detachFile, createInventory, ignoreFile, restoreFile, attachFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
@@ -78,6 +77,9 @@ export const ComponentDetail = () => {
         break;
       case MATCH_CARD_ACTIONS.ACTION_IGNORE:
         onIgnorePressed(file);
+        break;
+      case MATCH_CARD_ACTIONS.ACTION_DETACH:
+        onDetachPressed(file);
         break;
       case MATCH_CARD_ACTIONS.ACTION_RESTORE:
         onRestorePressed(file);
@@ -131,6 +133,11 @@ export const ComponentDetail = () => {
     await restoreFile(selFiles);
     getFiles();
   };
+
+  const onDetachPressed = async (file) => {
+      // detachFile(file.inventory.id, [file.id]);
+      getFiles();
+  }
 
   const onRestorePressed = async (file) => {
     await restoreFile([file.id]);
@@ -215,7 +222,8 @@ export const ComponentDetail = () => {
       case 0:
         return <FileList files={filterFiles.pending} onAction={onAction} />;
       case 1:
-        return <InventoryList inventories={inventories} />;
+        /* return <InventoryList inventories={inventories} />; */
+        return <FileList files={filterFiles.identified} onAction={onAction} />;
       case 2:
         return <FileList files={filterFiles.ignored} onAction={onAction} />;
       default:
@@ -265,13 +273,13 @@ export const ComponentDetail = () => {
           </div>
 
           <section className="subheader">
-            <div className="tabs">
+            <div className="tabs d-flex">
               <Paper square>
                 <Tabs
                   selectionFollowsFocus
                   value={tab}
                   textColor="dark"
-                  TabIndicatorProps={{style: {display: 'none'}}}
+                  TabIndicatorProps={{ style: { display: 'none' } }}
                   onChange={(event, value) => setTab(value)}
                 >
                   <Tab label={`Pending (${version ? `${filterFiles.pending.length}/` : ''}${component?.summary.pending})`} />
@@ -279,6 +287,9 @@ export const ComponentDetail = () => {
                   <Tab label={`Ignored (${version ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`} />
                 </Tabs>
               </Paper>
+              <Button onClick={(event) => history.push('/workbench/inventory')}>
+                View groups
+              </Button>
             </div>
 
             {tab === 0 && (
