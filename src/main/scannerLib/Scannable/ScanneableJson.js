@@ -1,3 +1,4 @@
+import { Console } from 'console';
 import fs from 'fs';
 
 import { AbstractScannable } from './AbstractScannable.js';
@@ -43,9 +44,9 @@ export class ScannableJson extends AbstractScannable {
   }
 
   async prepare() {
-    this.#fileList = [];
     this.#generator = this.#createGenerator();
     this.#genHasNext = true;
-    return this.#fileList.length;
+    console.log(this.#jsonlist.length);
+    return this.#jsonlist.length;
   }
 }
