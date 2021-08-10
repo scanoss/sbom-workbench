@@ -160,9 +160,6 @@ export class InventoryDb extends Db {
           for (let i = 0; i < inventories.length; i += 1) {
             const comp = await this.component.getAll(inventories[i]);
             inventories[i].component = comp;
-            // Remove purl and version from inventory
-            delete inventories[i].purl;
-            delete inventories[i].version;
           }
           resolve(inventories);
         } else resolve([]);

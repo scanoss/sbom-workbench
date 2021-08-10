@@ -71,6 +71,8 @@ const Report = () => {
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const SPDX= 'spdx';
+  const CSV = 'csv';
 
   const init = async () => {
     const a = await report.getSummary();
@@ -92,12 +94,12 @@ const Report = () => {
   };
   
   const onCsvClickedExport = async () => {
-    await exportFile('csv');
+    await exportFile(CSV);
     handleClose();
   };
 
   const onSpdxClickedExport = async () => {    
-    await exportFile('spdx');
+    await exportFile(SPDX);
     handleClose();
   };
 
@@ -107,9 +109,10 @@ const Report = () => {
     const path = dialogController.showSaveDialog({
       defaultPath: `${defpath.data}/${projectName.data}/${projectName.data}.${extension}`,
     });
-    if (extension === 'spdx') {
-      await ExportFormat.spdx(path);
-    } else if (extension === 'csv') await ExportFormat.csv(path);
+    if (path) {
+      if (extension === SPDX) await ExportFormat.spdx(path);
+      else if (extension === CSV) await ExportFormat.csv(path);
+    }
   };
 
   useEffect(init, []);
