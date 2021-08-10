@@ -28,6 +28,8 @@ const Report = () => {
   const [licenses, setLicenses] = useState<any[]>([]);
   const [crypto, setCrypto] = useState<any[]>([]);
   const [vulnerabilites, setVulnerabilites] = useState<any[]>([]);
+  // use state for licenses table
+  const [licensesTable, setLicensesTable] = useState<any[]>([]);
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
 
   const init = async () => {
@@ -35,6 +37,7 @@ const Report = () => {
     setProgress(a?.data?.summary);
     setLicenses(a?.data?.licenses);
     setVulnerabilites(a?.data?.vulnerabilities);
+    setLicensesTable(a?.data?.licenses);
     console.log(a?.data);
   };
 
@@ -103,7 +106,7 @@ const Report = () => {
             </Card>
 
             <Card className="report-item licenses-obligation">
-              <LicensesObligations/>
+              <LicensesObligations data={licensesTable} />
             </Card>
           </section>
         </main>
