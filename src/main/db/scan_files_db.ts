@@ -14,6 +14,7 @@ import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { Component , Files } from '../../api/types';
 import { ComponentDb } from './scan_component_db';
+import { InventoryDb } from './scan_inventory_db';
 
 
 
@@ -24,9 +25,12 @@ const utilsDb = new UtilsDb();
 export class FilesDb extends Db {
   component: ComponentDb;
 
+  inventory: InventoryDb
+
   constructor(path: string) {
     super(path);
     this.component = new ComponentDb(path);
+    this.inventory = new InventoryDb(path);
   }
 
   get(file: Partial<Files>) {
@@ -75,10 +79,18 @@ export class FilesDb extends Db {
           const components:any = await self.component.getAll({
             purl: data.purl,
             version: data.version,
-          });              
+          });          
+          const inventories:any = await self.inventory.getAll({});
+          const index = inventories.reduce((acc,inventory)=>{
+
+            acc[inventory.id]=inventory;
+            return acc;
+          },{});        
           for (let i = 0; i < file.length; i += 1) {               
             file[i].component = components.find((component)=>file[i].version===component.version);
-          }     
+            if(file[i].inventoryid)
+              file[i].inventory = index[file[i].inventoryid];                         
+          }           
           resolve(file);
         }else
           resolve([]);

@@ -105,7 +105,7 @@ export const ComponentDetail = () => {
 
     const inv: Partial<Inventory> = {
       component: component?.name,
-      version: component?.versions[0].version,
+      version: version || component?.versions[0]?.version,
       license_name: component?.versions[0].licenses[0]?.name,
       url: component?.url,
       purl: component?.purl,
@@ -239,13 +239,13 @@ export const ComponentDetail = () => {
                 <h1 className="header-title">Matches</h1>
                 { (component?.versions?.length > 1) &&
                   <Button
-                    className="filter"
+                    className={`filter btn-version ${version ? 'selected' : ''}`}
                     aria-controls="menu"
                     aria-haspopup="true"
                     endIcon={<ArrowDropDownIcon />}
                     onClick={(event) => setAnchorEl(event.currentTarget)}
                   >
-                    { version ? version : 'version' }
+                    { version || 'version' }
                   </Button>
                 }
               </div>
@@ -268,9 +268,10 @@ export const ComponentDetail = () => {
             <div className="tabs">
               <Paper square>
                 <Tabs
+                  selectionFollowsFocus
                   value={tab}
-                  indicatorColor="primary"
-                  textColor="primary"
+                  textColor="dark"
+                  TabIndicatorProps={{style: {display: 'none'}}}
                   onChange={(event, value) => setTab(value)}
                 >
                   <Tab label={`Pending (${version ? `${filterFiles.pending.length}/` : ''}${component?.summary.pending})`} />

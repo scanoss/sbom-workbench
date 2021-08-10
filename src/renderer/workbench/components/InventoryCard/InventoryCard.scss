@@ -6,13 +6,30 @@
     border-left: 8px solid var(--color-status-identified);
 
     header {
-      h5 {
+      .MuiChip-root.identified {
+        position: absolute;
+        right: 16px;
+        top: 16px;
+      }
+
+      p {
         text-transform: capitalize;
-        font-size: 36px;
+        margin-bottom: 2px;
+        font-size: 16px;
         font-style: normal;
-        font-weight: 700;
+        font-weight: 600;
         letter-spacing: -0.02em;
       }
+    }
+
+    .notes {
+      margin-top: 16px;
+      font-style: italic;
+
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
     }
 
     footer {
@@ -44,16 +61,4 @@
   &.ignored::before {
     background-color: var(--color-status-ignored);
   }
-}
-
-// TODO: move to global
-.MuiChip-root.identified {
-  border-radius: 4px;
-  background: #DCFCE7;
-  border: 1px solid var(--color-status-identified);;
-
-  color: var(--color-status-identified);
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
 }

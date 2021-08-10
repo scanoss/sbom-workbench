@@ -20,20 +20,30 @@ const InventoryCard = ({ inventory, onSelect }: InventoryCardProps) => {
       <Card className="inventory-card" elevation={1}>
         <ButtonBase onClick={() => onSelect(inventory)}>
           <CardContent className="inventory-card-content">
-            <header className='header d-flex space-between'>
-              <div>
-                <Label label="USAGE" textColor="gray" />
-                <Typography component="h5" variant="h5">{inventory.usage}</Typography>
-              </div>
+            <header className="header">
+              <section className="info">
+                <div>
+                  <Label label="USAGE" textColor="gray" />
+                  <Typography component="p">{inventory.usage}</Typography>
+                </div>
+                <div>
+                  <Label label="VERSION" textColor="gray" />
+                  <Typography component="p">{inventory.version}</Typography>
+                </div>
+                <div>
+                  <Label label="LICENSE" textColor="gray" />
+                  <Typography component="p">{inventory.license_name}</Typography>
+                </div>
+              </section>
               <Chip className="identified" variant="outlined" label="Identified Group" />
             </header>
 
-            <Typography paragraph>
+            <Typography paragraph className="notes">
               {inventory.notes}
             </Typography>
 
             <footer>
-              <div className="link">Go to files   <ArrowForwardIcon /></div>
+              <div className="link">View files   <ArrowForwardIcon /></div>
             </footer>
           </CardContent>
         </ButtonBase>
