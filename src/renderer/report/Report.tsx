@@ -27,12 +27,15 @@ const Report = () => {
   const [progress, setProgress] = useState<any>(null);
   const [licenses, setLicenses] = useState<any[]>([]);
   const [crypto, setCrypto] = useState<any[]>([]);
+  const [vulnerabilites, setVulnerabilites] = useState<any[]>([]);
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
 
   const init = async () => {
     const a = await report.getSummary();
-    setProgress(a.data.summary);
-    setLicenses(a.data.licenses);
+    setProgress(a?.data?.summary);
+    setLicenses(a?.data?.licenses);
+    setVulnerabilites(a?.data?.vulnerabilities);
+    console.log(a?.data);
   };
 
   const onLicenseSelected = (license: string) => {
@@ -91,12 +94,12 @@ const Report = () => {
 
             <Card className="report-item matches">
               <div className="report-title">Matches</div>
-              <MatchesChart data={progress} />
+              {progress && <MatchesChart data={progress} />}
             </Card>
 
             <Card className="report-item vulnerabilites">
               <div className="report-title">Vulnerabilites</div>
-              <VulnerabilitiesCard/>
+              <VulnerabilitiesCard data={vulnerabilites} />
             </Card>
 
             <Card className="report-item licenses-obligation">

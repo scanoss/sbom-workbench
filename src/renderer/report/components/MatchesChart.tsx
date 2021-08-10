@@ -6,8 +6,8 @@ const MatchesChart = ({ data }) => {
   const [percentage, setPercentage] = useState<number>(0);
 
   useEffect(() => {
-    const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
-    const pending = 100 - percentage;
+    const percentage = Math.floor(((data?.detectedFiles) * 100) / data?.includedFiles);
+    const noMatches = 100 - percentage;
     setPercentage(percentage);
 
     const chart = new Chart(chartRef.current, {
@@ -24,7 +24,7 @@ const MatchesChart = ({ data }) => {
           },
           {
             label: 'Identified',
-            data: [pending],
+            data: [100 - percentage],
             borderWidth: 0,
             backgroundColor: ['#A5B4FC'],
             barThickness: 42,
@@ -63,7 +63,7 @@ const MatchesChart = ({ data }) => {
                 return ``;
               },
               title() {
-                return `${data?.pendingFiles} Files`;
+                return `${data?.detectedFiles} of ${data?.includedFiles} files scanned`;
               },
             },
             displayColors: false,
@@ -92,12 +92,12 @@ const MatchesChart = ({ data }) => {
           <canvas ref={chartRef} />
         </div>
         <div className="label-nomatch-container">
-          <span className="label-nomatch">{percentage}%</span>
+          <span className="label-nomatch">{100 - percentage}%</span>
           <span className="label-nomatch-sublabel">No Match</span>
         </div>
       </div>
       <div className="total-files-container">
-        <span className="total-files-label">Total Files: {data.totalFiles}</span>
+        <span className="total-files-label">Scanned Files: {data?.includedFiles}</span>
       </div>
     </div>
   );
