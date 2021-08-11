@@ -51,11 +51,13 @@ export default function MatchesForLicense({ data }) {
                 </TableCell>
                 <TableCell>{row?.copyleft === true ? <CheckIcon /> : <ClearIcon />}</TableCell>
                 <TableCell className="tableCellForLicensePill">
-                  {row?.incompatibles.map((license) => (
-                    <div key={license?.index} className="tinyPillLicenseContainer">
-                      <span className="tinyPillLicenseLabel">{license}</span>
-                    </div>
-                  ))}
+                  <div className="container-licenses-pills">
+                    {row?.incompatibles.map((license) => (
+                      <div key={license?.index} className="tinyPillLicenseContainer">
+                        <span className="tinyPillLicenseLabel">{license}</span>
+                      </div>
+                    ))}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
