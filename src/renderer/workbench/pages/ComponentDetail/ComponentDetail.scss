@@ -107,6 +107,23 @@ header.app-header {
       }
     }
   }
+
+  .file-group-container {
+    display: flex;
+    flex-direction: column;
+
+    .current {
+      order: 1;
+    }
+
+    .group {
+      margin-bottom: 12px;
+    }
+
+    .component {
+      color: var(--color-component);
+    }
+  }
 }
 
 .file-list {
@@ -127,5 +144,6 @@ header.app-header {
       width: calc(100% - 10px);
     }
   }
+
 }
 
