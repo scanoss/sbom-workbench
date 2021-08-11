@@ -66,7 +66,7 @@ const MatchCard = ({ label, status, onAction }: MatchCardProps) => {
                   <RestoreOutlined className="icon" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Details">
+              <Tooltip title="View group">
                 <IconButton onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_DETAIL)}>
                   <DescriptionOutlined />
                 </IconButton>
