@@ -272,29 +272,38 @@
         }
       }
 
-      .tableCellForLicensePill {
-        display: flex;
-        align-items: center;
-        overflow-x: scroll;
-        justify-content: center;
+      .tableRowLicense {
 
-        .tinyPillLicenseContainer {
-          background-color: #E4E4E7;
-          width: fit-content;
-          height: fit-content;
+
+        .tableCellForLicensePill {
           display: flex;
+          align-items: center;
+          overflow-x: scroll;
           justify-content: center;
-          padding: 2px 6px;
-          border-radius: 4px;
-          margin-right: 10px;
 
-          .tinyPillLicenseLabel{
-            color: #3F3F46;
-            font-size: 11px;
-            font-weight: 700;
+
+          .tinyPillLicenseContainer {
+            background-color: #E4E4E7;
+            width: fit-content;
+            height: fit-content;
+            display: flex;
+            justify-content: center;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 10px;
+
+            .tinyPillLicenseLabel{
+              color: #3F3F46;
+              font-size: 11px;
+              font-weight: 700;
+            }
           }
         }
+
+
+
       }
+
 
 
 
