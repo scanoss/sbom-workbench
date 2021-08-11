@@ -9,9 +9,14 @@ header.app-header {
   .header {
     align-items: flex-start;
   }
+
+
 }
 
 #ComponentDetail {
+  .app-content {
+    min-height: calc(100% - 300px);
+  }
 
   .tabs {
 
@@ -92,10 +97,14 @@ header.app-header {
       margin: 16px 0;
       background: #F4F4F5;
       padding: 8px 16px;
-      border-radius: 4;
+      border-radius: 4px;
 
-      font-weight: 500;
-      color: var(--color-primary)
+      font-weight: 300;
+      color: var(--color-primary);
+
+      b {
+        font-weight: 500;
+      }
     }
   }
 }
