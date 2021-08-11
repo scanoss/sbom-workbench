@@ -56,10 +56,7 @@ export class Formats extends Db {
               else pkg.licenseConcluded = 'n/a';
               document.Packages.push(pkg);
             }
-            fs.writeFile(
-              `${path}`,
-              JSON.stringify(document, undefined, 4),
-              () => {
+            await fs.writeFile(`${path}`,JSON.stringify(document, undefined, 4),() => {
                 resolve(true);
               }
             );
@@ -73,8 +70,7 @@ export class Formats extends Db {
 
   csv(path: string) {
     return new Promise<boolean>(async (resolve, reject) => {
-      try {
-        const timeStamp = this.utils.getTimeStamp();
+      try {        
         const db = await this.openDb();
         db.all(query.SQL_GET_CSV_DATA,
           async (err: any, data: any) => {
@@ -82,8 +78,8 @@ export class Formats extends Db {
             if (err || data === undefined) resolve(false);
             else {
               const csvFile = this.csvCreate(data);
-              fs.writeFile(`${path}`,csvFile,() => {
-                  resolve(true);
+              await fs.writeFile(`${path}`,csvFile,'utf-8',() => {
+                   resolve(true);
                 }
               );
             }

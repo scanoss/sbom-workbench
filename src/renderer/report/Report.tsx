@@ -109,7 +109,7 @@ const Report = () => {
     const path = dialogController.showSaveDialog({
       defaultPath: `${defpath.data}/${projectName.data}/${projectName.data}.${extension}`,
     });
-    if (path) {
+    if (path && path !== undefined) {
       if (extension === SPDX) await ExportFormat.spdx(path);
       else if (extension === CSV) await ExportFormat.csv(path);
     }
