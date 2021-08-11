@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { IconButton } from '@material-ui/core';
+import { IconButton, CircularProgress } from '@material-ui/core';
 import { Inventory } from '../../../../../api/types';
 import { inventoryService } from '../../../../../api/inventory-service';
 import { componentService } from '../../../../../api/component-service';
@@ -17,6 +17,7 @@ const style = {
     gridGap: '1.5em',
   },
 };
+
 export interface InventoryListProps {
   // inventories: Inventory[];
 }
@@ -26,7 +27,7 @@ export const InventoryList = (props: InventoryListProps) => {
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
 
-  const [inventories, setInventories] = useState<Inventory[]>([]);
+  const [inventories, setInventories] = useState<Inventory[]>(null);
 
   const onInit = async () => {
     getInventories();
@@ -44,6 +45,18 @@ export const InventoryList = (props: InventoryListProps) => {
   };
 
   useEffect(onInit, []);
+
+  const Loader = () => (
+    <div className="loader">
+      <CircularProgress size={24} />
+    </div>
+  );
+
+  const EmptyList = () => (
+    <p>
+      No groups identified for <b>this component</b>.
+    </p>
+  );
 
   return (
     <>
@@ -63,8 +76,11 @@ export const InventoryList = (props: InventoryListProps) => {
           </div>
         </header>
         <main className="app-content">
+          {!inventories && <Loader />}
+          {inventories && inventories.length === 0 && <EmptyList />}
+
           <section style={style.list}>
-            {inventories.map((inventory) => (
+            {inventories?.map((inventory) => (
               <InventoryCard key={inventory.id} inventory={inventory} onSelect={() => onInventorySelected(inventory)} />
             ))}
           </section>

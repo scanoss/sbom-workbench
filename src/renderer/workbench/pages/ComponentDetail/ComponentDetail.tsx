@@ -29,6 +29,7 @@ import { componentService } from '../../../../api/component-service';
 import { mapFiles } from '../../../../utils/scan-util';
 import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
 import { DIALOG_ACTIONS } from '../../../context/types';
+import IdentifiedList from '../ComponentList/components/IdentifiedList';
 
 export const ComponentDetail = () => {
   const history = useHistory();
@@ -67,26 +68,31 @@ export const ComponentDetail = () => {
     setInventories(response.message || []);
   };
 
-  const onAction = (file: string, action: MATCH_CARD_ACTIONS) => {
+  const onAction = async (file: any, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
         history.push(`/workbench/file?path=${file.path}`);
         break;
       case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
-        onIdentifyPressed(file);
+        await onIdentifyPressed(file);
         break;
       case MATCH_CARD_ACTIONS.ACTION_IGNORE:
-        onIgnorePressed(file);
+        await onIgnorePressed(file);
         break;
       case MATCH_CARD_ACTIONS.ACTION_DETACH:
-        onDetachPressed(file);
+        await onDetachPressed(file);
         break;
       case MATCH_CARD_ACTIONS.ACTION_RESTORE:
-        onRestorePressed(file);
+        await onRestorePressed(file);
+        break;
+      case MATCH_CARD_ACTIONS.ACTION_DETAIL:
+        await onDetailPressed(file);
         break;
       default:
         break;
     }
+
+    getFiles();
   };
 
   const onIdentifyPressed = async (file) => {
@@ -119,7 +125,6 @@ export const ComponentDetail = () => {
 
   const onIgnorePressed = async (file) => {
     await ignoreFile([file.id]);
-    getFiles();
   };
 
   const onIgnoreAllPressed = async () => {
@@ -135,14 +140,17 @@ export const ComponentDetail = () => {
   };
 
   const onDetachPressed = async (file) => {
-      // detachFile(file.inventory.id, [file.id]);
-      getFiles();
+      await detachFile(file.inventoryid, [file.id]);
   }
 
   const onRestorePressed = async (file) => {
     await restoreFile([file.id]);
-    getFiles();
   };
+
+  const onDetailPressed = async (file) => {
+    history.push(`/workbench/inventory/${file.inventoryid}`);
+  };
+
 
   const create = async (defaultInventory, selFiles) => {
     const showSelector = inventories.length > 0;
@@ -222,8 +230,7 @@ export const ComponentDetail = () => {
       case 0:
         return <FileList files={filterFiles.pending} onAction={onAction} />;
       case 1:
-        /* return <InventoryList inventories={inventories} />; */
-        return <FileList files={filterFiles.identified} onAction={onAction} />;
+        return <IdentifiedList files={filterFiles.identified} onAction={onAction} />;
       case 2:
         return <FileList files={filterFiles.ignored} onAction={onAction} />;
       default:
@@ -287,9 +294,6 @@ export const ComponentDetail = () => {
                   <Tab label={`Ignored (${version ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`} />
                 </Tabs>
               </Paper>
-              <Button onClick={(event) => history.push('/workbench/inventory')}>
-                View groups
-              </Button>
             </div>
 
             {tab === 0 && (
