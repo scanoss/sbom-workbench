@@ -8,28 +8,30 @@ import { FileList } from './FileList';
 export const IdentifiedList = ({ files, inventories, onAction }) => {
   const history = useHistory();
 
-  const [groups, setGroups] = useState();
+  const [groups, setGroups] = useState({});
 
   const fetchGroups = () => {
-    const group = {
-      'ansible': files,
-      'ansible-core': files,
-    }
-    setGroups(groups);
-  }
-
-  const groupBy = (arr, key) => {
-    return arr.reduce(function(rv, x) {
-      (rv[x[key]] = rv[x[key]] || []).push(x);
-      return rv;
+    const grupedFiles = files.reduce((acc, file) => {
+      if (!acc.hasOwnProperty(file.inventory.component.name)) acc[file.inventory.component.name] = [];
+      acc[file.inventory.component.name].push(file);
+      return acc;
     }, {});
+
+    console.log(grupedFiles);
+
+    setGroups(grupedFiles);
   };
 
   useEffect(fetchGroups, [files]);
 
   return (
     <>
-        {/* { Object.keys(groups).map((key) => <FileList files={groups[key]} onAction={onAction} />) } */}
+      {Object.keys(groups).map((key) => (
+        <div>
+          <h3> {key} </h3>
+          <FileList files={groups[key]} onAction={onAction} />
+        </div>
+      ))}
     </>
   );
 };
