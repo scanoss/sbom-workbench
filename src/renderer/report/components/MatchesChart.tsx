@@ -32,6 +32,7 @@ const MatchesChart = ({ data }) => {
         ],
       },
       options: {
+        responsive: true,
         maintainAspectRatio: false,
         indexAxis: 'y',
         scales: {
@@ -88,9 +89,7 @@ const MatchesChart = ({ data }) => {
           <span className="label-match">{percentage}%</span>
           <span className="label-match-sublabel">Match</span>
         </div>
-        <div className="progress-bar">
-          <canvas ref={chartRef} />
-        </div>
+        <canvas ref={chartRef} />
         <div className="label-nomatch-container">
           <span className="label-nomatch">{100 - percentage}%</span>
           <span className="label-nomatch-sublabel">No Match</span>

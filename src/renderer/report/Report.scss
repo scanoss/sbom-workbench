@@ -159,65 +159,75 @@
 
     }
 
+    .matches {
 
-    #MatchesChart {
-      display: flex;
-      justify-content: center;
-      flex-direction: column;
-
-      .matches-canvas-container {
-        margin-top: 30px;
-        height: 50px;
+      #MatchesChart {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        justify-content: center;
+        flex-direction: column;
 
-
-        .label-match-container {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          .label-match {
-            color: #6366F1;
-            padding: 0px;
-            font-size: 40px;
-            font-weight: 400;
-          }
-
-          .label-match-sublabel{
-            color: #27272A;
-            font-size: 14px;
-          }
-
-        }
-
-        .label-nomatch-container {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          .label-nomatch {
-            color: #A5B4FC;
-            padding: 0px;
-            font-size: 40px;
-            font-weight: 400;
-          }
-
-          .label-nomatch-sublabel {
-            color: #27272A;
-            font-size: 14px;
-          }
-
-        }
-
-        .progress-bar {
+        canvas {
           padding: 0 20px;
-          width: 100%;
+          max-width: 600px;
+          min-width: 200px;
         }
+
+        .matches-canvas-container {
+          margin-top: 30px;
+          height: 50px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+
+          .label-match-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            .label-match {
+              color: #6366F1;
+              padding: 0px;
+              font-size: 2em;
+              font-weight: 400;
+            }
+
+            .label-match-sublabel{
+              color: #27272A;
+              font-size: 14px;
+            }
+
+          }
+
+          .label-nomatch-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            .label-nomatch {
+              color: #A5B4FC;
+              padding: 0px;
+              font-size: 2em;
+              font-weight: 400;
+            }
+
+            .label-nomatch-sublabel {
+              color: #27272A;
+              font-size: 14px;
+            }
+
+          }
+
+
+        }
+
       }
 
     }
+
+
+
 
 
 
