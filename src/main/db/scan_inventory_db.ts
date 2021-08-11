@@ -77,23 +77,25 @@ export class InventoryDb extends Db {
 
   // CREATE NEW FILE INVENTORY
   async attachFileInventory(inventory: Partial<Inventory>) {
-    try {
-      const db = await this.openDb();
-      await this.updateIdentified(inventory);
-      db.serialize(function () {
-        db.run('begin transaction');
-        if (inventory.files)
-          for (const id of inventory.files) {
-            db.run(query.SQL_INSERT_FILE_INVENTORIES, id, inventory.id);
-          }
-        db.run('commit', () => {
-          db.close();
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        await this.updateIdentified(inventory);
+        db.serialize(function () {
+          db.run('begin transaction');
+          if (inventory.files)
+            for (const id of inventory.files) {
+              db.run(query.SQL_INSERT_FILE_INVENTORIES, id, inventory.id);
+            }
+          db.run('commit', () => {
+            db.close();
+            resolve(true);
+          });
         });
-      });
-    } catch (error) {
-      return Promise.reject(new Error('Unable to attach inventory'));
-    }
-    return Promise.resolve(true);
+      } catch (error) {
+        reject(new Error('Unable to attach inventory'));
+      }
+    });
   }
 
   // DETACH FILE INVENTORY
