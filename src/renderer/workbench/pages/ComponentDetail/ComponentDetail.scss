@@ -12,6 +12,7 @@ header.app-header {
 }
 
 #ComponentDetail {
+
   .tabs {
 
     .MuiPaper-root {
@@ -78,6 +79,23 @@ header.app-header {
         color: var(--color-component)
       }
 
+    }
+  }
+
+  footer.app-footer {
+    position: sticky;
+    bottom: 0;
+    overflow: hidden;
+    background-color: var(--background-color-primary);
+
+   .groups {
+      margin: 16px 0;
+      background: #F4F4F5;
+      padding: 8px 16px;
+      border-radius: 4;
+
+      font-weight: 500;
+      color: var(--color-primary)
     }
   }
 }

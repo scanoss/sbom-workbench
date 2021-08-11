@@ -230,7 +230,7 @@ export const ComponentDetail = () => {
       case 0:
         return <FileList files={filterFiles.pending} onAction={onAction} />;
       case 1:
-        return <IdentifiedList files={filterFiles.identified} onAction={onAction} />;
+        return <IdentifiedList files={filterFiles.identified} inventories={inventories} onAction={onAction} />;
       case 2:
         return <FileList files={filterFiles.ignored} onAction={onAction} />;
       default:
@@ -345,6 +345,15 @@ export const ComponentDetail = () => {
         </header>
 
         <main className="app-content">{filterFiles && renderTab()}</main>
+
+        <footer className="app-footer">
+          <div className="groups d-flex space-between align-center">
+            <div>
+              <div>You have identified {inventories?.length} groups to this component.</div>
+            </div>
+            <Button color="primary" onClick={(event) => history.push('/workbench/inventory')}>View groups</Button>
+          </div>
+        </footer>
       </section>
     </>
   );
