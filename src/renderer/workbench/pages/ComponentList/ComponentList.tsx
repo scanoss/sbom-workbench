@@ -70,9 +70,9 @@ export const ComponentList = () => {
               <h4 className="header-subtitle">{scanBasePath}</h4>
               <h1 className="header-title">Detected Components</h1>
             </div>
-            <Button startIcon={<DescriptionOutlinedIcon />} variant="text" color="primary" >
+            {/* <Button startIcon={<DescriptionOutlinedIcon />} variant="text" color="primary" >
                 View identified groups
-            </Button>
+            </Button> */}
           </div>
 
           <Paper component="form" className={classes.root}>
