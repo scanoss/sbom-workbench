@@ -49,7 +49,7 @@ export default function MatchesForLicense({ data }) {
                   </svg>
                   {row?.label}
                 </TableCell>
-                <TableCell>{row?.copyleft === true ? <CheckIcon /> : <ClearIcon />}</TableCell>
+                <TableCell>{row?.copyleft === true ? <CheckIcon style={{ fill: '#4ADE80' }} /> : <ClearIcon style={{ fill: '#F87171' }} />}</TableCell>
                 <TableCell className="tableCellForLicensePill">
                   <div className="container-licenses-pills">
                     {row?.incompatibles.map((license) => (
