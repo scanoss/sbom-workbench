@@ -12,8 +12,9 @@ export const IdentifiedList = ({ files, inventories, onAction }) => {
 
   const fetchGroups = () => {
     const grupedFiles = files.reduce((acc, file) => {
-      if (!acc.hasOwnProperty(file.inventory.component.name)) acc[file.inventory.component.name] = [];
-      acc[file.inventory.component.name].push(file);
+      const key = file.inventory.component.name;
+      if (!acc.hasOwnProperty(key)) acc[key] = [];
+      acc[key].push(file);
       return acc;
     }, {});
 
@@ -27,7 +28,7 @@ export const IdentifiedList = ({ files, inventories, onAction }) => {
   return (
     <>
       {Object.keys(groups).map((key) => (
-        <div>
+        <div key={key}>
           <h3> {key} </h3>
           <FileList files={groups[key]} onAction={onAction} />
         </div>
