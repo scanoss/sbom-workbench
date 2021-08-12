@@ -76,7 +76,7 @@ const Report = () => {
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const SPDX= 'spdx';
+  const SPDX = 'spdx';
   const CSV = 'csv';
 
   const init = async () => {
@@ -137,8 +137,7 @@ const Report = () => {
           </h2> */}
           <h3>REPORTS</h3>
           <div>
-            <Button
-            startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onExportClicked}>
+            <Button startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onExportClicked}>
               Export
             </Button>
             <Menu
