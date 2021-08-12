@@ -1,6 +1,12 @@
 #editor {
+  display: grid;
+
   .app-header {
     padding-bottom: 0;
+  }
+
+  .app-content {
+
   }
 }
 .match-title {
@@ -48,16 +54,20 @@
 
 .editors {
 
-  &-full {
+  &.editors-full {
     grid-template-columns: 100%;
   }
 
   .editor {
-    margin-bottom: 50px;
+    height: 100%;
+    overflow: hidden;
 
     pre {
       margin: 0;
+      padding: 0 !important;
+      height: 100%;
     }
+
     p {
       font-style: normal;
       font-weight: bold;
