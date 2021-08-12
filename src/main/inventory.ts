@@ -69,3 +69,15 @@ ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (event, arg: Partial<Inventory>
     return { status: 'fail' };
   }
 });
+
+
+ipcMain.handle(IpcEvents.INVENTORY_FROM_COMPONENT, async (event) => {
+  try {
+    const data = await defaultProject.scans_db.inventories.getFromComponent();
+    if (data) return { status: 'ok', message: 'Inventories from component', data };
+    return { status: 'error', message: 'Inventory from component was not successfully retrieve', data };
+  } catch (e) {
+    console.log('Catch an error on inventory: ', e);
+    return { status: 'fail' };
+  }
+});

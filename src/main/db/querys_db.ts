@@ -49,6 +49,9 @@ export class Querys {
   SQL_UPDATE_INVENTORY_BY_ID =
     'UPDATE inventories SET compid=?,version=?,purl=?,usage=?, notes=?, url=?, license_name=?  where id=?;';
 
+  SQL_SELECT_INVENTORY_COMPONENTS = `SELECT  i.id,i.usage,i.purl,i.notes,i.url,i.license_name,i.version,cv.name
+  FROM inventories i INNER JOIN component_versions cv ON cv.version=i.version AND cv.purl=i.purl;`;  
+
   //  UPDATE INVENTORY BY PURL/VERSION
   SQL_UPDATE_INVENTORY_BY_PURL_VERSION =
     'UPDATE inventories SET compid=?,version=?,purl=?,usage=?, notes=?, url=?, license_name=? where purl=? and version=?;';
