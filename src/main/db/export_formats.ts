@@ -40,7 +40,7 @@ export class Formats extends Db {
         db.all(query.SQL_GET_SPDX_COMP_DATA, async (err: any, data: any) => {
           db.close();
           if (err) resolve(false);
-          else {
+          else {           
             for (let i = 0; i < data.length; i += 1) {
               const pkg: any = {};
               const comp: any = await this.component.getAll(data[i]);
@@ -76,7 +76,7 @@ export class Formats extends Db {
         const db = await this.openDb();
         db.all(query.SQL_GET_CSV_DATA, async (err: any, data: any) => {
           db.close();
-          if (err || data === undefined) resolve(false);
+          if (err) resolve(false);          
           else {            
             const csv = this.csvCreate(data);
             await fs.writeFile(`${path}`, csv, 'utf-8', () => {
