@@ -5,7 +5,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import ViewModuleRoundedIcon from '@material-ui/icons/ViewModuleRounded';
-
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import { setComponent } from '../../actions';
@@ -52,7 +52,6 @@ export const RecognizedList = () => {
   const history = useHistory();
   const classes = useStyles();
 
-  const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const [inventoryList, setInventoryList] = useState<any>([]);
@@ -86,7 +85,7 @@ export const RecognizedList = () => {
         <header className="app-header">
           <div className="d-flex space-between align-center">
             <div>
-              <h4 className="header-subtitle">{scanBasePath}</h4>
+              <h4 className="header-subtitle">{state.name}</h4>
               <h1 className="header-title">Recognized Components</h1>
             </div>
             <ButtonGroup>
@@ -96,11 +95,11 @@ export const RecognizedList = () => {
                 color="primary"
                 onClick={() => history.push('/workbench')}
               >
-                Detected components
+                Detected
               </Button>
 
-              <Button startIcon={<DescriptionOutlinedIcon />} variant="contained" color="primary">
-                Recognized Components
+              <Button startIcon={<CheckCircleIcon />} variant="contained" color="primary">
+                Recognized
               </Button>
             </ButtonGroup>
           </div>

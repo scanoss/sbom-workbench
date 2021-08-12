@@ -34,13 +34,12 @@ import IdentifiedList from '../ComponentList/components/IdentifiedList';
 export const ComponentDetail = () => {
   const history = useHistory();
 
-  const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { state, detachFile, createInventory, ignoreFile, restoreFile, attachFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { component } = state;
+  const { name, component } = state;
 
   const [files, setFiles] = useState<any[]>([]);
   const [filterFiles, setFilterFiles] = useState<{ pending: any[], identified: any[], ignored: any[] }>();
@@ -207,9 +206,6 @@ export const ComponentDetail = () => {
 
   useEffect(() => {
     if (!files) return;
-
-    console.log('filter!');
-
     setFilterFiles({
       pending: files.filter((file) => file.status === 'pending'),
       identified: files.filter((file) => file.status === 'identified'),
@@ -254,7 +250,7 @@ export const ComponentDetail = () => {
                 <IconButton onClick={() => history.goBack()} component="span">
                   <ArrowBackIcon />
                 </IconButton>
-                {scanBasePath}
+                {name}
               </h4>
               <div className="filter-container">
                 <h1 className="header-title">Matches</h1>
