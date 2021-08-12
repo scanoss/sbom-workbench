@@ -20,7 +20,6 @@ export const InventoryDetail = () => {
   const history = useHistory();
   const { id } = useParams();
 
-  const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { detachFile, deleteInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -72,7 +71,6 @@ export const InventoryDetail = () => {
                 <IconButton onClick={() => history.goBack()} component="span">
                   <ArrowBackIcon />
                 </IconButton>
-                {scanBasePath}
               </h4>
             </div>
             {/* {inventory && <ComponentInfo component={inventory.component} />} */}

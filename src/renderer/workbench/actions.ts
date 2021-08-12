@@ -7,8 +7,9 @@ export const SET_COMPONENTS = 'APP/WORKBENCH/SET_COMPONENTS';
 export const SET_FILE = 'APP/WORKBENCH/SET_FILE';
 export const RESET = 'APP/WORKBENCH/RESET';
 
-export const loadScanSuccess = (tree, components: ComponentGroup[]) => ({
+export const loadScanSuccess = (name, tree, components: ComponentGroup[]) => ({
   type: LOAD_SCAN_SUCCESS,
+  name,
   tree,
   components,
 });

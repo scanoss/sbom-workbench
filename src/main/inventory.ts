@@ -7,7 +7,6 @@ import { defaultProject } from './workspace/ProjectTree';
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (event, invget: Partial<Inventory>) => {
   let inv: any;
   try {
-    await defaultProject.scans_db.formats.csv();
     inv = await defaultProject.scans_db.inventories.getAll(invget);
     return { status: 'ok', message: inv, data: inv };
   } catch (e) {

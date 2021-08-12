@@ -8,6 +8,7 @@ import { IpcEvents } from '../ipc-events';
 const fs = require('original-fs').promises;
 
 export interface ScanResult {
+  name: string;
   scanRoot: string;
   fileTree: any[];
 }
@@ -23,7 +24,6 @@ class WorkbenchController {
   public async loadScan(path: string): Promise<ScanResult> {
     const { data } = await projectService.load(path);
     console.log(data);
-
     return this.generateScanResult(data);
   }
 
@@ -69,8 +69,18 @@ class WorkbenchController {
 
   private async generateScanResult(data): Promise<ScanResult> {
     const tree = [data.logical_tree];
-    // transform(tree, scan);
+    const path = data.scan_root;
+
+    // TODO: get from scan result
+    let name = '';
+    try {
+      name = path.split('/')[path.split('/').length - 1];
+    } catch (e) {
+      console.log(e);
+    }
+
     return {
+      name,
       scanRoot: data.scan_root,
       fileTree: tree,
     };
