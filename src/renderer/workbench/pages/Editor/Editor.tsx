@@ -309,7 +309,7 @@ export const Editor = () => {
         </header>
 
         {fullFile ? (
-          <main className="editors-full app-content">
+          <main className="editors editors-full app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
                 <MemoCodeEditor content={localFileContent.content} highlight={lines} />
