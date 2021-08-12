@@ -9,9 +9,15 @@ header.app-header {
   .header {
     align-items: flex-start;
   }
+
+
 }
 
 #ComponentDetail {
+  .app-content {
+    min-height: calc(100% - 300px);
+  }
+
   .tabs {
 
     .MuiPaper-root {
@@ -80,6 +86,44 @@ header.app-header {
 
     }
   }
+
+  footer.app-footer {
+    position: sticky;
+    bottom: 0;
+    overflow: hidden;
+    background-color: var(--background-color-primary);
+
+   .groups {
+      margin: 16px 0;
+      background: #F4F4F5;
+      padding: 8px 16px;
+      border-radius: 4px;
+
+      font-weight: 300;
+      color: var(--color-primary);
+
+      b {
+        font-weight: 500;
+      }
+    }
+  }
+
+  .file-group-container {
+    display: flex;
+    flex-direction: column;
+
+    .current {
+      order: 1;
+    }
+
+    .group {
+      margin-bottom: 12px;
+    }
+
+    .component {
+      color: var(--color-component);
+    }
+  }
 }
 
 .file-list {
@@ -100,5 +144,6 @@ header.app-header {
       width: calc(100% - 10px);
     }
   }
+
 }
 
