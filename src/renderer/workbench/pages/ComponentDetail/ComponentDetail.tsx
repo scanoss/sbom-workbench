@@ -346,14 +346,14 @@ export const ComponentDetail = () => {
 
         <main className="app-content">{filterFiles && renderTab()}</main>
 
-        { inventories && inventories.length > 0 && (
+        {/* { inventories && inventories.length > 0 && (
           <footer className="app-footer">
             <div className="groups d-flex space-between align-center">
                <span>You have identified <b>{inventories.length} {inventories.length > 1 ? 'groups' : 'group'}</b> for this detected component.</span>
               <Button color="primary" onClick={(event) => history.push('/workbench/inventory')}>View groups</Button>
             </div>
           </footer>
-        ) }
+        ) } */}
       </section>
     </>
   );
