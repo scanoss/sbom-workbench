@@ -136,11 +136,17 @@ export class Querys {
   // GET ALL THE INVENTORIES
   SQL_GET_ALL_INVENTORIES = 'SELECT id,compid,usage,notes,url,license_name,purl,version from inventories;';
 
-  SQL_SELECT_FILES_FROM_PURL_VERSION =
-    'SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url FROM results r WHERE r.purl=? AND r.version=? GROUP BY r.file_path;';
+  SQL_SELECT_FILES_FROM_PURL_VERSION = `
+    SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, fi.inventoryid
+    FROM results r
+    LEFT JOIN file_inventories fi ON r.id=fi.resultid
+    WHERE r.purl=? AND r.version=? GROUP BY r.file_path;`;
 
     SQL_SELECT_FILES_FROM_PURL =
-    'SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl FROM results r WHERE r.purl=? GROUP BY r.file_path;';
+    `SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r
+    LEFT JOIN file_inventories fi ON r.id=fi.resultid
+    WHERE r.purl=?
+    GROUP BY r.file_path;`;
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE results.id=?;';
 
@@ -150,6 +156,9 @@ export class Querys {
 
   SQL_GET_SPDX_COMP_DATA =
     'SELECT cv.purl,cv.version,cv.url,cv.name,r.vendor,i.license_name FROM component_versions cv INNER JOIN inventories i ON cv.purl=i.purl AND cv.version=i.version INNER JOIN results r  ON r.version=i.version AND r.purl=i.purl GROUP BY i.version;';
+
+  SQL_GET_CSV_DATA =
+    `SELECT i.id,i.usage,i.notes,i.license_name,i.purl,i.version, group_concat(r.file_path,';') AS path FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN results r ON r.id=fi.resultid GROUP BY i.id;`;
 
   SQL_GET_ALL_SUMMARIES = 'SELECT compid,ignored,pending,identified FROM summary;';
 

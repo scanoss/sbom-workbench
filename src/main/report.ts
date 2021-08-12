@@ -74,8 +74,8 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
                 copyleft: false,
               };
               newLicense.label = result.licenses[0].name;
-              newLicense.patent_hints = (result.licenses[0].patent_hints === 'yes');
-              newLicense.copyleft = (result.licenses[0].copyleft === 'yes');
+              newLicense.patent_hints = result.licenses[0].patent_hints === 'yes';
+              newLicense.copyleft = result.licenses[0].copyleft === 'yes';
 
               newLicense.components.push({
                 name: result.component,

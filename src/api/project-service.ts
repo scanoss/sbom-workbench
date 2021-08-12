@@ -29,6 +29,11 @@ class ProjectService {
     const response = await ipcRenderer.invoke(IpcEvents.UTILS_DEFAULT_PROJECT_PATH);
     return response;
   }
+
+  public async getProjectName(): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.UTILS_PROJECT_NAME);
+    return response;
+  }
 }
 
 export const projectService = new ProjectService();
