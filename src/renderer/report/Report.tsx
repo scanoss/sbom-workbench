@@ -26,6 +26,9 @@ import MatchesForLicense from './components/MatchesForLicense';
 import { report } from '../../api/report-service';
 import { dialogController } from '../dialog-controller';
 import { ExportFormat } from '../../api/export-service';
+import MatchesChart from './components/MatchesChart';
+import VulnerabilitiesCard from './components/VulnerabilitiesCard';
+import LicensesObligations from './components/LicensesObligations';
 import { projectService } from '../../api/project-service';
 
 Chart.register(...registerables);
@@ -68,16 +71,22 @@ const Report = () => {
   const [progress, setProgress] = useState<any>(null);
   const [licenses, setLicenses] = useState<any[]>([]);
   const [crypto, setCrypto] = useState<any[]>([]);
+  const [vulnerabilites, setVulnerabilites] = useState<any[]>([]);
+  // use state for licenses table
+  const [licensesTable, setLicensesTable] = useState<any[]>([]);
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const SPDX= 'spdx';
+  const SPDX = 'spdx';
   const CSV = 'csv';
 
   const init = async () => {
     const a = await report.getSummary();
-    setProgress(a.data.summary);
-    setLicenses(a.data.licenses);
+    setProgress(a?.data?.summary);
+    setLicenses(a?.data?.licenses);
+    setVulnerabilites(a?.data?.vulnerabilities);
+    setLicensesTable(a?.data?.licenses);
+    console.log(a?.data);
   };
 
   const onLicenseSelected = (license: string) => {
@@ -92,13 +101,13 @@ const Report = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  
+
   const onCsvClickedExport = async () => {
     await exportFile(CSV);
     handleClose();
   };
 
-  const onSpdxClickedExport = async () => {    
+  const onSpdxClickedExport = async () => {
     await exportFile(SPDX);
     handleClose();
   };
@@ -129,8 +138,7 @@ const Report = () => {
           </h2> */}
           <h3>REPORTS</h3>
           <div>
-            <Button 
-            startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onExportClicked}>
+            <Button startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onExportClicked}>
               Export
             </Button>
             <Menu
@@ -139,7 +147,7 @@ const Report = () => {
               keepMounted
               open={open}
               onClose={handleClose}
-              TransitionComponent={Fade}            
+              TransitionComponent={Fade}
             >
               <MenuItem onClick={onSpdxClickedExport}>SPDX</MenuItem>
               <MenuItem onClick={onCsvClickedExport}>CSV</MenuItem>
@@ -173,14 +181,16 @@ const Report = () => {
 
             <Card className="report-item matches">
               <div className="report-title">Matches</div>
+              {progress && <MatchesChart data={progress} />}
             </Card>
 
             <Card className="report-item vulnerabilites">
               <div className="report-title">Vulnerabilites</div>
+              <VulnerabilitiesCard data={vulnerabilites} />
             </Card>
 
             <Card className="report-item licenses-obligation">
-              <div className="report-title">License obligations</div>
+              <LicensesObligations data={licensesTable} />
             </Card>
           </section>
         </main>
