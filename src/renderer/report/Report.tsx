@@ -29,6 +29,7 @@ import { ExportFormat } from '../../api/export-service';
 import MatchesChart from './components/MatchesChart';
 import VulnerabilitiesCard from './components/VulnerabilitiesCard';
 import LicensesObligations from './components/LicensesObligations';
+import { projectService } from '../../api/project-service';
 
 Chart.register(...registerables);
 
