@@ -220,11 +220,8 @@ export class InventoryDb extends Db {
           await self.attachFileInventory(inventory);
           const comp = await self.component.getAll(inventory);
           inventory.component = comp;
-          if (err) {
-            reject(new Error(err));
-          } else {
-            resolve(inventory);
-          }
+          if (err) reject(new Error(err));
+          else resolve(inventory);
         }
       );
     });
@@ -403,27 +400,24 @@ export class InventoryDb extends Db {
   }
 
   async delete(inventory: Partial<Inventory>) {
-    try {
-      // GET ALL DATA FROM INVENTORY ID
-      const inv: any = await this.get(inventory);
-      const db = await this.openDb();
-      db.serialize(function () {
-        db.run('begin transaction');
-        db.run(
-          // REVIEW
-          query.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION,
-          inv.id
-        );
-        db.run(query.SQL_DELETE_INVENTORY_BY_ID, inv.id);
-        db.run('commit', (err) => {
-          db.close();
-          if (err) return Promise.resolve(false);
+    return new Promise(async (resolve, reject) => {
+      try {
+        // GET ALL DATA FROM INVENTORY ID
+        const inv: any = await this.get(inventory);
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          db.run(query.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION, inv.id);
+          db.run(query.SQL_DELETE_INVENTORY_BY_ID, inv.id);
+          db.run('commit', () => {
+            db.close();
+            return resolve(true);
+          });
         });
-      });
-      return Promise.resolve(true);
-    } catch (error) {
-      return Promise.reject(new Error('detach files were not successfully'));
-    }
+      } catch (error) {
+        return reject(new Error('detach files were not successfully'));
+      }
+    });
   }
 
   getCurrentSummary() {

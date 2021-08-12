@@ -7,6 +7,13 @@ class Export {
     const response = await ipcRenderer.invoke(IpcEvents.EXPORT_SPDX, args);
     return response;
   }
+
+  public async csv(args: string | null = null): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.EXPORT_CSV, args);
+    return response;
+  }
+
+
 }
 
 export const ExportFormat = new Export();
