@@ -128,14 +128,20 @@ export const ComponentDetail = () => {
   };
 
   const onIgnoreAllPressed = async () => {
-    const selFiles = files.filter((file) => file.status === 'pending').map((file) => file.id);
+    const selFiles = filterFiles.pending.map((file) => file.id);
     await ignoreFile(selFiles);
     getFiles();
   };
 
   const onRestoreAllPressed = async () => {
-    const selFiles = files.filter((file) => file.status === 'ignored').map((file) => file.id);
+    const selFiles = filterFiles.ignored.map((file) => file.id);
     await restoreFile(selFiles);
+    getFiles();
+  };
+
+  const onDetachAllPressed = async () => {
+    const selFiles = filterFiles.identified.map((file) => file.id);
+    await detachFile(0, selFiles); // FIXME: 0 is hardcoded
     getFiles();
   };
 
@@ -285,7 +291,6 @@ export const ComponentDetail = () => {
                 <Tabs
                   selectionFollowsFocus
                   value={tab}
-                  textColor="dark"
                   TabIndicatorProps={{ style: { display: 'none' } }}
                   onChange={(event, value) => setTab(value)}
                 >
@@ -330,6 +335,16 @@ export const ComponentDetail = () => {
                   </Paper>
                 </Popper>
               </>
+            )}
+            {tab === 1 && (
+              <Button
+                disabled={component?.summary.identified === 0}
+                variant="contained"
+                color="secondary"
+                onClick={onDetachAllPressed}
+              >
+                Restore All ({component?.summary.identified})
+              </Button>
             )}
             {tab === 2 && (
               <Button
