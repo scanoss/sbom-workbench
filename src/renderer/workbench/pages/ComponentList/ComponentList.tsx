@@ -1,8 +1,9 @@
-import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
+import { makeStyles, Paper, IconButton, InputBase, Button } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
+import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import ComponentCard from '../../components/ComponentCard/ComponentCard';
@@ -64,8 +65,15 @@ export const ComponentList = () => {
     <>
       <section id="ComponentList" className="app-page">
         <header className="app-header">
-          <h4 className="header-subtitle">{scanBasePath}</h4>
-          <h1 className="header-title">Detected Components</h1>
+          <div className="d-flex space-between align-center">
+            <div>
+              <h4 className="header-subtitle">{scanBasePath}</h4>
+              <h1 className="header-title">Detected Components</h1>
+            </div>
+            {/* <Button startIcon={<DescriptionOutlinedIcon />} variant="text" color="primary" >
+                View identified groups
+            </Button> */}
+          </div>
 
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">
@@ -78,6 +86,7 @@ export const ComponentList = () => {
               inputProps={{ 'aria-label': 'search' }}
             />
           </Paper>
+
         </header>
 
         <main className="app-content">

@@ -23,19 +23,19 @@ import { FileList } from '../ComponentList/components/FileList';
 import { InventoryList } from '../ComponentList/components/InventoryList';
 import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
 import { DialogContext, IDialogContext } from '../../../context/DialogProvider';
-import { setFile } from '../../actions';
 import { inventoryService } from '../../../../api/inventory-service';
 import { componentService } from '../../../../api/component-service';
 
 import { mapFiles } from '../../../../utils/scan-util';
 import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
 import { DIALOG_ACTIONS } from '../../../context/types';
+import IdentifiedList from '../ComponentList/components/IdentifiedList';
 
 export const ComponentDetail = () => {
   const history = useHistory();
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { state, dispatch, createInventory, ignoreFile, restoreFile, attachFile } = useContext(
+  const { state, detachFile, createInventory, ignoreFile, restoreFile, attachFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
@@ -68,23 +68,31 @@ export const ComponentDetail = () => {
     setInventories(response.message || []);
   };
 
-  const onAction = (file: string, action: MATCH_CARD_ACTIONS) => {
+  const onAction = async (file: any, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
         history.push(`/workbench/file?path=${file.path}`);
         break;
       case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
-        onIdentifyPressed(file);
+        await onIdentifyPressed(file);
         break;
       case MATCH_CARD_ACTIONS.ACTION_IGNORE:
-        onIgnorePressed(file);
+        await onIgnorePressed(file);
+        break;
+      case MATCH_CARD_ACTIONS.ACTION_DETACH:
+        await onDetachPressed(file);
         break;
       case MATCH_CARD_ACTIONS.ACTION_RESTORE:
-        onRestorePressed(file);
+        await onRestorePressed(file);
+        break;
+      case MATCH_CARD_ACTIONS.ACTION_DETAIL:
+        await onDetailPressed(file);
         break;
       default:
         break;
     }
+
+    getFiles();
   };
 
   const onIdentifyPressed = async (file) => {
@@ -117,7 +125,6 @@ export const ComponentDetail = () => {
 
   const onIgnorePressed = async (file) => {
     await ignoreFile([file.id]);
-    getFiles();
   };
 
   const onIgnoreAllPressed = async () => {
@@ -132,10 +139,18 @@ export const ComponentDetail = () => {
     getFiles();
   };
 
+  const onDetachPressed = async (file) => {
+      await detachFile(file.inventoryid, [file.id]);
+  }
+
   const onRestorePressed = async (file) => {
     await restoreFile([file.id]);
-    getFiles();
   };
+
+  const onDetailPressed = async (file) => {
+    history.push(`/workbench/inventory/${file.inventoryid}`);
+  };
+
 
   const create = async (defaultInventory, selFiles) => {
     const showSelector = inventories.length > 0;
@@ -215,7 +230,7 @@ export const ComponentDetail = () => {
       case 0:
         return <FileList files={filterFiles.pending} onAction={onAction} />;
       case 1:
-        return <InventoryList inventories={inventories} />;
+        return <IdentifiedList files={filterFiles.identified} inventories={inventories} onAction={onAction} />;
       case 2:
         return <FileList files={filterFiles.ignored} onAction={onAction} />;
       default:
@@ -265,13 +280,13 @@ export const ComponentDetail = () => {
           </div>
 
           <section className="subheader">
-            <div className="tabs">
+            <div className="tabs d-flex">
               <Paper square>
                 <Tabs
                   selectionFollowsFocus
                   value={tab}
                   textColor="dark"
-                  TabIndicatorProps={{style: {display: 'none'}}}
+                  TabIndicatorProps={{ style: { display: 'none' } }}
                   onChange={(event, value) => setTab(value)}
                 >
                   <Tab label={`Pending (${version ? `${filterFiles.pending.length}/` : ''}${component?.summary.pending})`} />
@@ -330,6 +345,15 @@ export const ComponentDetail = () => {
         </header>
 
         <main className="app-content">{filterFiles && renderTab()}</main>
+
+        { inventories && inventories.length > 0 && (
+          <footer className="app-footer">
+            <div className="groups d-flex space-between align-center">
+               <span>You have identified <b>{inventories.length} {inventories.length > 1 ? 'groups' : 'group'}</b> for this detected component.</span>
+              <Button color="primary" onClick={(event) => history.push('/workbench/inventory')}>View groups</Button>
+            </div>
+          </footer>
+        ) }
       </section>
     </>
   );
