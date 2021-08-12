@@ -24,6 +24,7 @@ export interface InventoryListProps {
 
 export const InventoryList = (props: InventoryListProps) => {
   const history = useHistory();
+  const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const [inventories, setInventories] = useState<Inventory[]>(null);
@@ -67,7 +68,7 @@ export const InventoryList = (props: InventoryListProps) => {
                 <IconButton onClick={() => history.goBack()} component="span">
                   <ArrowBackIcon />
                 </IconButton>
-                {state.name}
+                {scanBasePath}
               </h4>
               <h1 className="header-title">Identified Groups</h1>
             </div>

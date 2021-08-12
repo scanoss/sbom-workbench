@@ -66,6 +66,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       const { data } = await componentService.getAllComponentGroup();
       setData(data);
       setComponents(data.map((item) => item.name));
+      if (form.component) {}
     }
   };
 
@@ -99,10 +100,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   useEffect(() => {
     const component = data.find((item) => item.name === form.component);
     if (component) {
-      setVersions(component?.versions.map((item) => item?.version));
-      setForm({ ...form, url: component?.url, purl: component?.purl });
+      setVersions(component?.versions.map((item) => item.version));
+      setForm({ ...form, url: component.url, purl: component.purl });
     }
-  }, [form.component] );
+  }, [form.component, components] );
 
   useEffect(() => {
     const lic = data.find((item) => item?.name === form?.component)

@@ -27,6 +27,8 @@ import { ComponentList } from './pages/ComponentList/ComponentList';
 import { ComponentDetail } from './pages/ComponentDetail/ComponentDetail';
 import { InventoryDetail } from './pages/InventoryDetail/InventoryDetail';
 import { reset } from './actions';
+import InventoryList from './pages/ComponentList/components/InventoryList';
+import RecognizedList from './pages/RecognizedList/RecognizedList';
 
 const Alert = ({ open, handleClose, path }) => {
   return (
@@ -110,14 +112,20 @@ const Workbench = () => {
               <Route exact path={path}>
                 <ComponentList />
               </Route>
+              <Route path={`${path}/recognized/`}>
+                <RecognizedList />
+              </Route>
               <Route path={`${path}/component/`}>
                 <ComponentDetail />
               </Route>
-              <Route path={`${path}/inventory/:id`}>
-                <InventoryDetail />
-              </Route>
               <Route path={`${path}/file`}>
                 <Editor />
+              </Route>
+              <Route exact path={`${path}/inventory`}>
+                <InventoryList />
+              </Route>
+              <Route path={`${path}/inventory/:id`}>
+                <InventoryDetail />
               </Route>
             </Switch>
           ) : (

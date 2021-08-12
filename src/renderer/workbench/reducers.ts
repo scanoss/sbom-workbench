@@ -2,6 +2,7 @@ import { LOAD_SCAN_FAIL, LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_COMPONENTS
 import { ComponentGroup } from '../../api/types';
 
 export interface State {
+  name: string;
   loaded: boolean;
   tree: any[];
   file: string | null;
@@ -10,6 +11,7 @@ export interface State {
 }
 
 export const initialState: State = {
+  name: null,
   loaded: false,
   tree: null,
   file: null,
@@ -20,9 +22,10 @@ export const initialState: State = {
 export default function reducer(state: State = initialState, action): State {
   switch (action.type) {
     case LOAD_SCAN_SUCCESS: {
-      const { tree, components } = action;
+      const { name, tree, components } = action;
       return {
         ...state,
+        name,
         loaded: true,
         tree,
         components,

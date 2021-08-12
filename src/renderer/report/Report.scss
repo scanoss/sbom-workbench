@@ -159,5 +159,183 @@
 
     }
 
+    .matches {
+
+      #MatchesChart {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+
+        canvas {
+          padding: 0 20px;
+          max-width: 600px;
+          min-width: 200px;
+        }
+
+        .matches-canvas-container {
+          margin-top: 30px;
+          height: 50px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+
+          .label-match-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            .label-match {
+              color: #6366F1;
+              padding: 0px;
+              font-size: 2em;
+              font-weight: 400;
+            }
+
+            .label-match-sublabel{
+              color: #27272A;
+              font-size: 14px;
+            }
+
+          }
+
+          .label-nomatch-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            .label-nomatch {
+              color: #A5B4FC;
+              padding: 0px;
+              font-size: 2em;
+              font-weight: 400;
+            }
+
+            .label-nomatch-sublabel {
+              color: #27272A;
+              font-size: 14px;
+            }
+
+          }
+
+
+        }
+
+      }
+
+    }
+
+
+
+
+
+
+      .vulnerabilites {
+
+        #VulnerabilitiesContainer {
+          display: flex;
+          align-items: flex-end;
+          margin-top: 20px;
+
+
+          .vulnerabilitie-container {
+            display: flex;
+            flex-direction: column;
+            width: fit-content;
+            align-items: center;
+            margin-right: 1vw;
+
+            .vulnerabilitie-number {
+              color: #27272A;
+              font-size: 1.5vw;
+            }
+
+            .critical-number {
+              font-size: 3vw;
+              font-weight: 700;
+            }
+
+
+            .vulnerabilitie-label {
+              width: fit-content;
+              border-radius: 4px;
+              padding: 2px 12px;
+            }
+
+            .critical-label {
+              background-color: #EF4444;
+              color: #FFFFFF;
+            }
+
+            .high {
+              background-color: #FDBA74;
+              color: #C2410C;
+            }
+
+            .medium {
+              background-color: #FDE047;
+              color: #A16207;
+            }
+
+            .moderate {
+              background-color: #F4F4F5;
+              color: #A1A1AA;
+            }
+
+          }
+        }
+      }
+
+      .tableRowLicense {
+
+
+        .tableCellForLicensePill {
+
+
+
+          .container-licenses-pills {
+            align-items: center;
+            overflow-x: scroll;
+            justify-content: center;
+            display: flex;
+            .tinyPillLicenseContainer {
+              background-color: #E4E4E7;
+              width: fit-content;
+              height: fit-content;
+              display: flex;
+              justify-content: center;
+              padding: 2px 6px;
+              border-radius: 4px;
+              margin-right: 10px;
+
+              .tinyPillLicenseLabel{
+                color: #3F3F46;
+                font-size: 11px;
+                font-weight: 700;
+              }
+            }
+
+          }
+
+
+        }
+
+
+
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
   }
 }

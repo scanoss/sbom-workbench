@@ -63,3 +63,8 @@ ipcMain.handle(IpcEvents.UTILS_DEFAULT_PROJECT_PATH, async (event) => {
     return { status: 'fail' };
   }
 });
+
+ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
+  const projectName = defaultProject.project_name;
+      return { status: 'ok', message: 'Project name retrieve succesfully', data: projectName };
+});

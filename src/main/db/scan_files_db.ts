@@ -15,6 +15,7 @@ import { UtilsDb } from './utils_db';
 import { Component , Files } from '../../api/types';
 import { ComponentDb } from './scan_component_db';
 import { InventoryDb } from './scan_inventory_db';
+import { InventoryFilesDb } from './scan_inventory_files_db';
 
 
 
@@ -27,10 +28,13 @@ export class FilesDb extends Db {
 
   inventory: InventoryDb
 
+  invFile : InventoryFilesDb;
+
   constructor(path: string) {
     super(path);
     this.component = new ComponentDb(path);
     this.inventory = new InventoryDb(path);
+    this.invFile = new InventoryFilesDb(path);
   }
 
   get(file: Partial<Files>) {
@@ -60,7 +64,7 @@ export class FilesDb extends Db {
         if(data.purl && data.version)
           result = await this.getByPurlVersion(data);
         else
-          result = await this.getByPurl(data);      
+          result = await this.getByPurl(data);
           resolve(result);
       }catch(error){
         console.log(error);
@@ -79,18 +83,17 @@ export class FilesDb extends Db {
           const components:any = await self.component.getAll({
             purl: data.purl,
             version: data.version,
-          });          
+          });
           const inventories:any = await self.inventory.getAll({});
           const index = inventories.reduce((acc,inventory)=>{
-
             acc[inventory.id]=inventory;
             return acc;
-          },{});        
-          for (let i = 0; i < file.length; i += 1) {               
+          },{});
+          for (let i = 0; i < file.length; i += 1) {
             file[i].component = components.find((component)=>file[i].version===component.version);
             if(file[i].inventoryid)
-              file[i].inventory = index[file[i].inventoryid];                         
-          }           
+              file[i].inventory = index[file[i].inventoryid];
+          }
           resolve(file);
         }else
           resolve([]);
@@ -114,8 +117,15 @@ export class FilesDb extends Db {
             purl: data.purl,
             version: data.version,
           });
+          const inventories:any = await self.inventory.getAll({});
+          const index = inventories.reduce((acc,inventory)=>{
+            acc[inventory.id]=inventory;
+            return acc;
+          },{});
           for (let i = 0; i < file.length; i += 1) {
             file[i].component = comp;
+            if(file[i].inventoryid)
+              file[i].inventory = index[file[i].inventoryid];
           }
          resolve(file);
         }else
@@ -148,20 +158,11 @@ export class FilesDb extends Db {
     });
   }
 
-  unignored(files: number[]) {
+  async unignored(files: number[]) {
     return new Promise(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        db.serialize(function () {
-          db.run('begin transaction');
-          for (let i = 0; i < files.length; i += 1) {
-            db.run(query.SQL_UPDATE_UNIGNORED_FILES, files[i]);
-          }
-          db.run('commit', () => {
-            db.close();
-            resolve(true);
-          });
-        });
+        const success = await this.invFile.unignored(files);
+        resolve(success)
       } catch (error) {
         reject(new Error('Unignore files were not successfully retrieved'));
       }
