@@ -53,7 +53,8 @@
 }
 
 .editors {
-  &-full {
+
+  &.editors-full {
     grid-template-columns: 100%;
   }
 
