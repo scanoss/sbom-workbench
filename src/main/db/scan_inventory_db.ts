@@ -315,26 +315,44 @@ export class InventoryDb extends Db {
   }
 
   // GET ALL THE INVENTORIES ATTACHED TO A COMPONENT
-  getAllAttachedToAComponent(component: any) {
+  getFromComponent() {
+    const self = this;
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(
-            query.SQL_SELECT_ALL_INVENTORIES_ATTACHED_TO_COMPONENT,
-            `${component.purl}`,
-            `${component.version}`,
-            (err: any, data: any) => {
-              db.close();
-              if (err) reject(new Error('[]'));
-              else resolve(data);
+          db.all(query.SQL_SELECT_INVENTORY_COMPONENTS, (err: any, data: any) => {
+            db.close();
+            if (err) resolve([]);
+            else {
+              const inventories = self.groupByComponentName(data);             
+              resolve(inventories);
             }
-          );
+          });
         });
       } catch (error) {
         reject(new Error('[]'));
       }
     });
+  }
+
+  private groupByComponentName(data: any) {
+    const aux = data.reduce((acc, value) => {
+      const key = value.name;
+      if (!acc.hasOwnProperty(key)) acc[`${key}`] = [];
+      acc[`${key}`].push(value);
+      return acc;
+    }, {});
+
+    const inventories = [];   
+    Object.entries(aux).forEach(([key, value]) => {
+      const inv:any = {};
+      inv.component=key;
+      inv.inventories=value;
+      inventories.push(inv);     
+  });  
+
+    return inventories;
   }
 
   // GET ALL THE INVENTORIES ATTACHED TO A FILE
@@ -345,7 +363,7 @@ export class InventoryDb extends Db {
         db.serialize(function () {
           db.all(query.SQL_SELECT_ALL_INVENTORIES_FROM_FILE, `${inventory.files[0]}`, (err: any, data: any) => {
             db.close();
-            if (err) reject(new Error('[]'));
+            if (err) resolve([]);
             else resolve(data);
           });
         });
