@@ -10,15 +10,21 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { ComponentDb } from './scan_component_db';
 import { Inventory } from '../../api/types';
+import { InventoryFilesDb } from './scan_inventory_files_db';
+
 
 const query = new Querys();
 
 export class InventoryDb extends Db {
   component: any;
 
+  files:any;
+
   constructor(path: string) {
     super(path);
-    this.component = new ComponentDb(path);
+    this.component = new ComponentDb(path);    
+    this.files = new InventoryFilesDb(path);
+    
   }
 
   private getByResultId(inventory: Partial<Inventory>) {
@@ -102,13 +108,14 @@ export class InventoryDb extends Db {
   async detachFileInventory(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.pending(inventory);
+        await this.files.unignored(inventory.files);
+        // await this.pending(inventory);       
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
           if (inventory.files) {
             for (const id of inventory.files) {
-              db.run(query.SQL_DELETE_FILE_INVENTORIES, id, inventory.id);
+              db.run(query.SQL_DELETE_FILE_INVENTORIES, id);
             }
             db.run('commit', () => {
               db.close();
@@ -375,29 +382,7 @@ export class InventoryDb extends Db {
       }
     });
   }
-
-  // TODO: workaround until change in DB
-  pending(inventory: Partial<Inventory>) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(function () {
-          db.run('begin transaction');
-          if (inventory.files) {
-            for (let i = 0; i < inventory.files.length; i += 1) {
-              db.run(query.SQL_SET_RESULTS_TO_PENDING_BY_PATH_PURL_VERSION, inventory.files[i]);
-            }
-          }
-          db.run('commit', () => {
-            db.close();
-            resolve(true);
-          });
-        });
-      } catch (error) {
-        reject(new Error('detach files were not successfully'));
-      }
-    });
-  }
+ 
 
   async delete(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
