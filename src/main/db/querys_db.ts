@@ -43,7 +43,7 @@ export class Querys {
   SQL_INSERT_FILE_INVENTORIES = 'INSERT into file_inventories (resultid,inventoryid) values (?,?);';
 
   // SQL DELETE FILE INVENTORY
-  SQL_DELETE_FILE_INVENTORIES = 'DELETE FROM file_inventories where resultid=? AND inventoryid=?;';
+  SQL_DELETE_FILE_INVENTORIES = 'DELETE FROM file_inventories where resultid=?;';
 
   //  UPDATE INVENTORY BY ID
   SQL_UPDATE_INVENTORY_BY_ID =

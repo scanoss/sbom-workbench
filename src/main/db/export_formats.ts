@@ -7,7 +7,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
 
-import { ExportToCsv } from 'export-to-csv';
 import { Db } from './db';
 
 import { spdx } from '../../api/spdx-versions';
@@ -56,7 +55,10 @@ export class Formats extends Db {
               else pkg.licenseConcluded = 'n/a';
               document.Packages.push(pkg);
             }
-            await fs.writeFile(`${path}`,JSON.stringify(document, undefined, 4),() => {
+            await fs.writeFile(
+              `${path}`,
+              JSON.stringify(document, undefined, 4),
+              () => {
                 resolve(true);
               }
             );
@@ -70,41 +72,31 @@ export class Formats extends Db {
 
   csv(path: string) {
     return new Promise<boolean>(async (resolve, reject) => {
-      try {        
+      try {
         const db = await this.openDb();
-        db.all(query.SQL_GET_CSV_DATA,
-          async (err: any, data: any) => {
-            db.close();
-            if (err || data === undefined) resolve(false);
-            else {
-              const csvFile = this.csvCreate(data);
-              await fs.writeFile(`${path}`,csvFile,'utf-8',() => {
-                   resolve(true);
-                }
-              );
-            }
+        db.all(query.SQL_GET_CSV_DATA, async (err: any, data: any) => {
+          db.close();
+          if (err || data === undefined) resolve(false);
+          else {            
+            const csv = this.csvCreate(data);
+            await fs.writeFile(`${path}`, csv, 'utf-8', () => {
+              resolve(true);
+            });
           }
-        );
+        });
       } catch (error) {
         reject(new Error('Unable to generate spdx file'));
       }
     });
   }
 
-  private csvCreate(data: any) {
-    const options = {
-      fieldSeparator: ',',
-      quoteStrings: '"',
-      decimalSeparator: '.',
-      showLabels: true,
-      showTitle: true,
-      title: 'CSV File',
-      useTextFile: false,
-      useBom: true,
-      useKeysAsHeaders: true,
-    };
-    const csvExporter = new ExportToCsv(options);
-    const csvFile = csvExporter.generateCsv(data, true);
-    return csvFile;
+  private csvCreate(inventories: any) {
+    let csv = `id,usage,notes,license_name,purl,path,version\r\n`;
+    for (const inventorie of inventories) {    
+      csv += `${inventorie.id},${inventorie.usage},${inventorie.notes},${inventorie.license_name},${inventorie.purl},"${inventorie.path}",${inventorie.version}\r\n`;
+    }
+  
+    return csv;
   }
+
 }
