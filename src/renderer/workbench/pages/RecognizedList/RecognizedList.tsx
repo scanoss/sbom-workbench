@@ -1,13 +1,17 @@
-import { makeStyles, Paper, IconButton, InputBase, Button } from '@material-ui/core';
+import { makeStyles, Paper, IconButton, InputBase, Button, ButtonGroup } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
+import ViewModuleRoundedIcon from '@material-ui/icons/ViewModuleRounded';
+
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import { setComponent } from '../../actions';
 import RecognizedCard from '../../components/RecognizedCard/RecognizedCard';
+import { inventoryService } from '../../../../api/inventory-service';
+import { componentService } from '../../../../api/component-service';
 
 const LIMIT = 100;
 
@@ -21,7 +25,7 @@ const filter = (items, query) => {
   }
 
   const result = items.filter((item) => {
-    const name = item.name.toLowerCase();
+    const name = item.component.toLowerCase();
     return name.includes(query.toLowerCase());
   });
 
@@ -51,15 +55,30 @@ export const RecognizedList = () => {
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
-  const { components } = state;
+  const [inventoryList, setInventoryList] = useState<any>([]);
 
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
-  const filterItems = filter(components, searchQuery);
 
-  const onSelectComponent = (component) => {
+  const filterItems = filter(inventoryList, searchQuery);
+
+  const onSelectComponent = async (grouped) => {
+    const { purl } = grouped.inventories[0];
+    const { data } = await componentService.getComponentGroup({ purl });
+    dispatch(setComponent(data));
     history.push(`/workbench/inventory`);
-    dispatch(setComponent(component));
   };
+
+  const init = async () => {
+    const { data } = await inventoryService.getFromComponent();
+    setInventoryList(data);
+  };
+
+  const cleanup = () => {};
+
+  useEffect(() => {
+    init();
+    return cleanup;
+  }, []);
 
   return (
     <>
@@ -70,14 +89,20 @@ export const RecognizedList = () => {
               <h4 className="header-subtitle">{scanBasePath}</h4>
               <h1 className="header-title">Recognized Components</h1>
             </div>
-            <Button
-              startIcon={<DescriptionOutlinedIcon />}
-              variant="text"
-              color="primary"
-              onClick={() => history.push('/workbench')}
-            >
-              View detected components
-            </Button>
+            <ButtonGroup>
+              <Button
+                startIcon={<ViewModuleRoundedIcon />}
+                variant="outlined"
+                color="primary"
+                onClick={() => history.push('/workbench')}
+              >
+                Detected components
+              </Button>
+
+              <Button startIcon={<DescriptionOutlinedIcon />} variant="contained" color="primary">
+                Recognized Components
+              </Button>
+            </ButtonGroup>
           </div>
 
           <Paper component="form" className={classes.root}>
@@ -91,19 +116,28 @@ export const RecognizedList = () => {
               inputProps={{ 'aria-label': 'search' }}
             />
           </Paper>
-
         </header>
 
         <main className="app-content">
-          {components && filterItems && filterItems.length > 0 ? (
+          {filterItems && filterItems.length > 0 ? (
             <section className="component-list">
-              {filterItems.slice(0, LIMIT).map((component, i) => (
-                <RecognizedCard key={component.purl} component={component} onClick={onSelectComponent} />
+              {filterItems.slice(0, LIMIT).map((inventory) => (
+                <RecognizedCard
+                  key={inventory.component}
+                  inventory={inventory}
+                  onClick={() => onSelectComponent(inventory)}
+                />
               ))}
             </section>
           ) : (
             <p>
-              Not results found with <strong>{searchQuery}</strong>
+              {searchQuery ? (
+                <>
+                  Not results found with <strong>{searchQuery} </strong>
+                </>
+              ) : (
+                <> Not results found</>
+              )}
             </p>
           )}
 

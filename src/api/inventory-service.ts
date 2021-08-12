@@ -34,12 +34,12 @@ class InventoryService {
     return response;
   }
 
-  public async getFromComponent(inventory: Partial<Inventory>): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents. INVENTORY_FROM_COMPONENT, inventory);
+  public async getFromComponent(): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_FROM_COMPONENT);
     return response;
   }
 
- 
+
 }
 
 export const inventoryService = new InventoryService();

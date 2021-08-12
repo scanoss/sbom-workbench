@@ -1,9 +1,11 @@
-import { makeStyles, Paper, IconButton, InputBase, Button } from '@material-ui/core';
+import { makeStyles, Paper, IconButton, InputBase, Button, ButtonGroup } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
+import ViewModuleRoundedIcon from '@material-ui/icons/ViewModuleRounded';
+
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import ComponentCard from '../../components/ComponentCard/ComponentCard';
@@ -70,14 +72,25 @@ export const ComponentList = () => {
               <h4 className="header-subtitle">{scanBasePath}</h4>
               <h1 className="header-title">Detected Components</h1>
             </div>
+            <ButtonGroup>
             <Button
-              startIcon={<DescriptionOutlinedIcon />}
-              variant="text"
-              color="primary"
-              onClick={() => history.push('/workbench/recognized')}
-            >
-              View recognized components
-            </Button>
+                startIcon={<ViewModuleRoundedIcon />}
+                variant="contained"
+                color="primary"
+              >
+                Detected components
+              </Button>
+              <Button
+                startIcon={<DescriptionOutlinedIcon />}
+                variant="outlined"
+                color="primary"
+                onClick={() => history.push('/workbench/recognized')}
+              >
+                Recognized Components
+              </Button>
+            </ButtonGroup>
+
+
           </div>
 
           <Paper component="form" className={classes.root}>
