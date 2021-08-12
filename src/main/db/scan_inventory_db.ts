@@ -12,19 +12,17 @@ import { ComponentDb } from './scan_component_db';
 import { Inventory } from '../../api/types';
 import { InventoryFilesDb } from './scan_inventory_files_db';
 
-
 const query = new Querys();
 
 export class InventoryDb extends Db {
   component: any;
 
-  files:any;
+  files: any;
 
   constructor(path: string) {
     super(path);
-    this.component = new ComponentDb(path);    
+    this.component = new ComponentDb(path);
     this.files = new InventoryFilesDb(path);
-    
   }
 
   private getByResultId(inventory: Partial<Inventory>) {
@@ -105,7 +103,8 @@ export class InventoryDb extends Db {
   }
 
   // DETACH FILE INVENTORY
-  async detachFileInventory(inventory: Partial<Inventory>) {
+  async detachFileInventory(inventory: Partial<Inventory>) {    
+    const self = this;
     return new Promise(async (resolve, reject) => {
       try {
         await this.files.unignored(inventory.files);
@@ -116,14 +115,61 @@ export class InventoryDb extends Db {
             for (const id of inventory.files) {
               db.run(query.SQL_DELETE_FILE_INVENTORIES, id);
             }
-            db.run('commit', () => {
+            db.run('commit', async () => {
               db.close();
-              resolve(true);
+              const success = await self.emptyInventory();
+              if (success) resolve(true);
             });
           } else resolve(false);
         });
       } catch (error) {
         reject(new Error('Unable to detach inventory'));
+      }
+    });
+  }
+
+  private emptyInventory() {
+    const self = this;
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          db.all(
+            `SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories);`,
+            async (err: any, inventories: any) => {
+              db.close();
+              if (err) resolve(true);
+              else if (inventories.length > 0) {
+                const success = await self.deleteAll(inventories);
+                if (success) resolve(true);
+              }
+            }
+          );
+        });
+      } catch (error) {
+        reject(new Error('Empty inventory error'));
+      }
+    });
+  }
+
+  private deleteAll(data: any[]) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          for (const inventory of data) {
+            db.run(query.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION, inventory.id);
+            db.run(query.SQL_DELETE_INVENTORY_BY_ID, inventory.id);
+          }
+          db.run('commit', () => {
+            db.close();
+            return resolve(true);
+          });
+        });
+      } catch (error) {
+        return reject(new Error('detach files were not successfully'));
       }
     });
   }
@@ -330,7 +376,7 @@ export class InventoryDb extends Db {
             db.close();
             if (err) resolve([]);
             else {
-              const inventories = self.groupByComponentName(data);             
+              const inventories = self.groupByComponentName(data);
               resolve(inventories);
             }
           });
@@ -349,13 +395,13 @@ export class InventoryDb extends Db {
       return acc;
     }, {});
 
-    const inventories = [];   
+    const inventories = [];
     Object.entries(aux).forEach(([key, value]) => {
-      const inv:any = {};
-      inv.component=key;
-      inv.inventories=value;
-      inventories.push(inv);     
-  });  
+      const inv: any = {};
+      inv.component = key;
+      inv.inventories = value;
+      inventories.push(inv);
+    });
 
     return inventories;
   }
@@ -399,7 +445,6 @@ export class InventoryDb extends Db {
       }
     });
   }
- 
 
   async delete(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
