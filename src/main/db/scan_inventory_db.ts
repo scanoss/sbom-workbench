@@ -103,7 +103,7 @@ export class InventoryDb extends Db {
   }
 
   // DETACH FILE INVENTORY
-  async detachFileInventory(inventory: Partial<Inventory>) {    
+  async detachFileInventory(inventory: Partial<Inventory>) {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
@@ -142,8 +142,8 @@ export class InventoryDb extends Db {
               if (err) resolve(true);
               else if (inventories.length > 0) {
                 const success = await self.deleteAll(inventories);
-                if (success) resolve(true);
               }
+              resolve(true);
             }
           );
         });

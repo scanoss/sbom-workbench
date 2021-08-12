@@ -158,7 +158,7 @@ export const Editor = () => {
     const fileResult = data?.files.find((item) => item.path === file);
     console.log(fileResult);
     if (fileResult) {
-      await detachFile(inventory.id, [fileResult.id]);
+      await detachFile([fileResult.id]);
       getInventories();
       getResults();
     }

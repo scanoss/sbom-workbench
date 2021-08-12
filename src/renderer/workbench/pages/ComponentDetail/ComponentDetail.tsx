@@ -140,12 +140,15 @@ export const ComponentDetail = () => {
 
   const onDetachAllPressed = async () => {
     const selFiles = filterFiles.identified.map((file) => file.id);
-    await detachFile(0, selFiles); // FIXME: 0 is hardcoded
+    console.log(selFiles)
+    await detachFile(selFiles);
     getFiles();
+    getInventories();
   };
 
   const onDetachPressed = async (file) => {
-      await detachFile(file.inventoryid, [file.id]);
+      await detachFile([file.id]);
+      getInventories();
   }
 
   const onRestorePressed = async (file) => {

@@ -51,7 +51,7 @@ export const InventoryDetail = () => {
         history.push(`/workbench/file?path=${file.path}`);
         break;
       case MATCH_CARD_ACTIONS.ACTION_DETACH:
-        detachFile(inventory?.id, [file.id]);
+        detachFile([file.id]);
         getInventory();
         break;
     }
