@@ -33,6 +33,13 @@ class InventoryService {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_DELETE, inventory);
     return response;
   }
+
+  public async getFromComponent(inventory: Partial<Inventory>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents. INVENTORY_FROM_COMPONENT, inventory);
+    return response;
+  }
+
+ 
 }
 
 export const inventoryService = new InventoryService();
