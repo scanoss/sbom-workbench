@@ -35,6 +35,8 @@ By using this tool you accept that the results provided do not represent any kin
 
 The source code is analyzed on the spot and is not transfered anywhere outside this computer.
 
+VERSION: ${app.getVersion()}
+
 Copyright (C) 2021 Scan Open Source Solutions S.L.`;
 
 export default class MenuBuilder {

@@ -15,9 +15,6 @@ import { UtilsDb } from './utils_db';
 import { Component , Files } from '../../api/types';
 import { ComponentDb } from './scan_component_db';
 import { InventoryDb } from './scan_inventory_db';
-import { InventoryFilesDb } from './scan_inventory_files_db';
-
-
 
 
 const query = new Querys();
@@ -25,33 +22,29 @@ const utilsDb = new UtilsDb();
 
 export class FilesDb extends Db {
   component: ComponentDb;
-
   inventory: InventoryDb
-
-  invFile : InventoryFilesDb;
 
   constructor(path: string) {
     super(path);
     this.component = new ComponentDb(path);
     this.inventory = new InventoryDb(path);
-    this.invFile = new InventoryFilesDb(path);
   }
 
   get(file: Partial<Files>) {
     return new Promise(async (resolve, reject) => {
-      try{
+      try {
         let result:any;
-      if (file.path)
-         result = await this.getByPath(file);
-      else
-        resolve([]);
+        if (file.path)
+          result = await this.getByPath(file);
+        else
+          resolve([]);
 
-      if(result!==undefined)
-      resolve(result);
+        if(result!==undefined)
+        resolve(result);
 
-    }catch(error){
-      reject(new Error('Unable to retrieve file'));
-    }
+      } catch(error){
+        reject(new Error('Unable to retrieve file'));
+      }
     });
   }
 
@@ -161,8 +154,17 @@ export class FilesDb extends Db {
   async unignored(files: number[]) {
     return new Promise(async (resolve, reject) => {
       try {
-        const success = await this.invFile.unignored(files);
-        resolve(success)
+        const db = await this.openDb();
+        db.serialize(() => {
+          const resultsid = `(${files.toString()});`;
+          const sqlUpdateUnignoreFiles = query.SQL_UPDATE_UNIGNORED_FILES + resultsid;
+          db.run('begin transaction');
+          db.run(sqlUpdateUnignoreFiles);
+          db.run('commit', () => {
+            db.close();
+            resolve(true);
+          });
+        });
       } catch (error) {
         reject(new Error('Unignore files were not successfully retrieved'));
       }

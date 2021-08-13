@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     top: theme.spacing(1),
     color: theme.palette.grey[500],
   },
-  okButton: {
+  deleteButton: {
     backgroundColor: theme.palette.error.main,
     color: 'white',
     '&:hover': {
@@ -39,12 +39,13 @@ const useStyles = makeStyles((theme) => ({
 interface ConfirmDialogProps {
   open: boolean;
   message: string;
+  button: any;
   onClose: (response: DialogResponse) => void;
 }
 
 export const ConfirmDialog = (props: ConfirmDialogProps) => {
   const classes = useStyles();
-  const { open, message, onClose } = props;
+  const { open, message, button, onClose } = props;
 
   const handleCancel = () => onClose({ action: DIALOG_ACTIONS.CANCEL });
   const handleAccept = () => onClose({ action: DIALOG_ACTIONS.OK });
@@ -69,8 +70,13 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
       </DialogContent>
       <DialogActions className={classes.actions}>
         <Button onClick={handleCancel}>Cancel</Button>
-        <Button className={classes.okButton} variant="contained" onClick={handleAccept}>
-          Delete
+        <Button
+          className={button?.role === 'delete' && classes.deleteButton}
+          color="secondary"
+          variant="contained"
+          onClick={handleAccept}
+        >
+          {button?.label}
         </Button>
       </DialogActions>
     </Dialog>
