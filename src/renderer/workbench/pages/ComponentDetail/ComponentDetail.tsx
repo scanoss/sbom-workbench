@@ -127,23 +127,31 @@ export const ComponentDetail = () => {
   };
 
   const onIgnoreAllPressed = async () => {
-    const selFiles = filterFiles.pending.map((file) => file.id);
-    await ignoreFile(selFiles);
-    getFiles();
+    const { action } = await dialogCtrl.openConfirmDialog();
+    if (action === DIALOG_ACTIONS.OK) {
+      const selFiles = filterFiles.pending.map((file) => file.id);
+      await ignoreFile(selFiles);
+      getFiles();
+    }
   };
 
   const onRestoreAllPressed = async () => {
-    const selFiles = filterFiles.ignored.map((file) => file.id);
-    await restoreFile(selFiles);
-    getFiles();
+    const { action } = await dialogCtrl.openConfirmDialog();
+    if (action === DIALOG_ACTIONS.OK) {
+      const selFiles = filterFiles.ignored.map((file) => file.id);
+      await restoreFile(selFiles);
+      getFiles();
+    }
   };
 
   const onDetachAllPressed = async () => {
-    const selFiles = filterFiles.identified.map((file) => file.id);
-    console.log(selFiles)
-    await detachFile(selFiles);
-    getFiles();
-    getInventories();
+    const { action } = await dialogCtrl.openConfirmDialog();
+    if (action === DIALOG_ACTIONS.OK) {
+      const selFiles = filterFiles.identified.map((file) => file.id);
+      await detachFile(selFiles);
+      getFiles();
+      getInventories();
+    }
   };
 
   const onDetachPressed = async (file) => {

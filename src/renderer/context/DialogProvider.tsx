@@ -8,7 +8,7 @@ import ConfirmDialog from '../ui/dialog/ConfirmDialog';
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
-  openConfirmDialog: (message?: string) => Promise<DialogResponse>;
+  openConfirmDialog: (message?: string, button?: any) => Promise<DialogResponse>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -55,14 +55,24 @@ export const DialogProvider: React.FC = ({ children }) => {
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     message?: string;
+    button?: any;
     onClose?: (response: DialogResponse) => void;
   }>({ open: false });
 
-  const openConfirmDialog = (message: string = 'Are you sure?'): Promise<DialogResponse> => {
+  const openConfirmDialog = (
+    message: string = 'Are you sure?',
+    button: {
+      label: string;
+      role: 'accept' | 'cancel' | 'delete';
+    } = {
+      label: 'OK',
+      role: 'accept',
+    }): Promise<DialogResponse> => {
     return new Promise<DialogResponse>((resolve) => {
       setConfirmDialog({
         open: true,
         message,
+        button,
         onClose: (response) => {
           setConfirmDialog((dialog) => ({ ...dialog, open: false }));
           resolve(response);
@@ -90,6 +100,7 @@ export const DialogProvider: React.FC = ({ children }) => {
       <ConfirmDialog
         open={confirmDialog.open}
         message={confirmDialog.message}
+        button={confirmDialog.button}
         onClose={(response) => confirmDialog.onClose && confirmDialog.onClose(response)}
       />
 
