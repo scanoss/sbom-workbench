@@ -11,19 +11,15 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { ComponentDb } from './scan_component_db';
 import { Inventory } from '../../api/types';
-import { InventoryFilesDb } from './scan_inventory_files_db';
 
 const query = new Querys();
 
 export class InventoryDb extends Db {
   component: any;
 
-  files: any;
-
   constructor(path: string) {
     super(path);
     this.component = new ComponentDb(path);
-    this.files = new InventoryFilesDb(path);
   }
 
   private getByResultId(inventory: Partial<Inventory>) {
