@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable consistent-return */
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable func-names */
@@ -107,20 +108,22 @@ export class InventoryDb extends Db {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
-        await this.files.unignored(inventory.files);
         const db = await this.openDb();
         db.serialize(function () {
+          const resultsid = `(${inventory.files.toString()});`;
+          const sqlDeleteFileInventory = query.SQL_DELETE_FILE_INVENTORIES + resultsid;
+          const sqlUpdateUnignoreFiles = query.SQL_UPDATE_UNIGNORED_FILES + resultsid;
           db.run('begin transaction');
           if (inventory.files) {
-            for (const id of inventory.files) {
-              db.run(query.SQL_DELETE_FILE_INVENTORIES, id);
-            }
+            db.run(sqlDeleteFileInventory);
+            db.run(sqlUpdateUnignoreFiles);
             db.run('commit', async () => {
               db.close();
               const success = await self.emptyInventory();
               if (success) resolve(true);
+              else resolve(false);
             });
-          } else resolve(false);
+          }
         });
       } catch (error) {
         reject(new Error('Unable to detach inventory'));
@@ -135,17 +138,12 @@ export class InventoryDb extends Db {
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
-          db.all(
-            `SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories);`,
-            async (err: any, inventories: any) => {
-              db.close();
-              if (err) resolve(true);
-              else if (inventories.length > 0) {
-                const success = await self.deleteAll(inventories);
-              }
-              resolve(true);
-            }
-          );
+          db.all(query.SQL_SELECT_INVENTORIES_NOT_HAVING_FILES, async (err: any, inventories: any) => {
+            db.close();
+            if (err) resolve(false);
+            if (inventories.length > 0) await self.deleteAllEmpty(inventories);
+            resolve(true);
+          });
         });
       } catch (error) {
         reject(new Error('Empty inventory error'));
@@ -153,19 +151,18 @@ export class InventoryDb extends Db {
     });
   }
 
-  private deleteAll(data: any[]) {
+  private deleteAllEmpty(data: any[]) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
           for (const inventory of data) {
-            db.run(query.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION, inventory.id);
             db.run(query.SQL_DELETE_INVENTORY_BY_ID, inventory.id);
           }
           db.run('commit', () => {
             db.close();
-            return resolve(true);
+            resolve(true);
           });
         });
       } catch (error) {
@@ -284,11 +281,16 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        if (inventory.files)
-          for (let i = 0; i < inventory.files.length; i += 1) {
-            db.run(query.SQL_FILES_UPDATE_IDENTIFIED, inventory.files[i]);
-          }
-        resolve(true);
+        db.serialize(function () {
+          const resultsid = `(${inventory.files.toString()});`;
+          const sqlUpdateIdentified = query.SQL_FILES_UPDATE_IDENTIFIED + resultsid;
+          db.run('begin transaction');
+          db.run(sqlUpdateIdentified);
+          db.run('commit', () => {
+            db.close();
+            return resolve(true);
+          });
+        });
       } catch (error) {
         reject(new Error('Unable to open db'));
       }

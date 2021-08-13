@@ -43,7 +43,7 @@ export class Querys {
   SQL_INSERT_FILE_INVENTORIES = 'INSERT into file_inventories (resultid,inventoryid) values (?,?);';
 
   // SQL DELETE FILE INVENTORY
-  SQL_DELETE_FILE_INVENTORIES = 'DELETE FROM file_inventories where resultid=?;';
+  SQL_DELETE_FILE_INVENTORIES = 'DELETE FROM file_inventories WHERE resultid IN ';
 
   //  UPDATE INVENTORY BY ID
   SQL_UPDATE_INVENTORY_BY_ID =
@@ -60,7 +60,7 @@ export class Querys {
     'UPDATE component_versions  SET name=?,version=?, description=?, url=?,purl=? where id=?;';
 
   SQL_FILES_UPDATE_IDENTIFIED =
-    'UPDATE results SET identified=1 where results.id=?';
+    'UPDATE results SET identified=1 WHERE id IN ';
 
   /** SQL COMPONENTS TABLES INSERT* */
   // SQL INSERT INTO LICENSES
@@ -153,7 +153,9 @@ export class Querys {
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE results.id=?;';
 
-  SQL_UPDATE_UNIGNORED_FILES = 'UPDATE results SET ignored=0,identified=0  WHERE results.id=?;';
+  SQL_UPDATE_UNIGNORED_FILES = 'UPDATE results SET ignored=0,identified=0  WHERE id IN ';
+
+  SQL_SELECT_INVENTORIES_NOT_HAVING_FILES = ` SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories);`
 
   SQL_GET_FILE_BY_PATH = 'SELECT file_path AS path,identified,ignored FROM results WHERE results.file_path=?;';
 
