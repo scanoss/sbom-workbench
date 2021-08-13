@@ -30,7 +30,7 @@
     ]
   },
   "build": {
-    "productName": "scanoss-dt",
+    "productName": "SCANOSS Desktop",
     "appId": "com.scanoss.desktop",
     "copyright": "Copyright © 2020,2021 SCANOSS.COM",
     "files": [
