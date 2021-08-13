@@ -74,7 +74,7 @@ const LicensesChart = ({ data }) => {
   }, [data]);
 
   return (
-    <div className="LicensesChart">
+    <div id="LicensesChart">
       <div>
         <canvas ref={chartRef} />
       </div>

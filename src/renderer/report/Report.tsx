@@ -164,7 +164,7 @@ const Report = () => {
 
             <Card className="report-item licenses">
               <div className="report-title">Licenses</div>
-              <div className="report-second">
+              <div id="report-second">
                 <LicensesChart data={licenses} />
                 <LicensesTable
                   matchedLicenseSelected={matchedLicenseSelected || licenses?.[0]}

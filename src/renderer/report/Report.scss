@@ -48,63 +48,6 @@
       display: flex;
       flex-direction: column;
 
-      .report-second {
-        display: grid;
-        grid-template-columns: 50% 50%;
-        grid-gap: 10px;
-        justify-content: space-between;
-        align-items: center;
-
-        .LicensesChart {
-          padding: 24px 10px;
-          max-width: 300px;
-        }
-
-        .license-list {
-          overflow-y: scroll;
-          max-height: 320px;
-          overflow-x: hidden;
-          max-width: 300px;
-
-          .license-list-item {
-            display: flex;
-            align-items: center;
-            background-color: #FFFF;
-            margin-bottom: 4px;
-            padding: 12px;
-            border-radius: 4px;
-
-            &-selected {
-              background-color: #E4E4E7;
-              border-radius: 4px;
-            }
-
-            &:hover {
-              transition: ease-in 0.2s;
-              background-color: rgba(228, 228, 231, 1);
-              cursor: pointer;
-              ::-webkit-scrollbar-thumb:hover {
-                background: #555;
-              }
-            }
-
-            .license-list-item-color {
-              width: 24px;
-              height: 24px;
-              margin-right: 12px;
-              border-radius: 4px;
-            }
-
-            .license-list-item-name {
-              font-size: 16px;
-              font-weight: 400;
-              line-height: 25px;
-              text-align: left;
-            }
-          }
-        }
-
-      }
     }
 
 
@@ -161,68 +104,7 @@
 
     .matches {
 
-      #MatchesChart {
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
 
-        canvas {
-          padding: 0 20px;
-          max-width: 600px;
-          min-width: 200px;
-        }
-
-        .matches-canvas-container {
-          margin-top: 30px;
-          height: 50px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-
-
-          .label-match-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-
-            .label-match {
-              color: #6366F1;
-              padding: 0px;
-              font-size: 2em;
-              font-weight: 400;
-            }
-
-            .label-match-sublabel{
-              color: #27272A;
-              font-size: 14px;
-            }
-
-          }
-
-          .label-nomatch-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            .label-nomatch {
-              color: #A5B4FC;
-              padding: 0px;
-              font-size: 2em;
-              font-weight: 400;
-            }
-
-            .label-nomatch-sublabel {
-              color: #27272A;
-              font-size: 14px;
-            }
-
-          }
-
-
-        }
-
-      }
 
     }
 
@@ -233,58 +115,7 @@
 
       .vulnerabilites {
 
-        #VulnerabilitiesContainer {
-          display: flex;
-          align-items: flex-end;
-          margin-top: 20px;
 
-
-          .vulnerabilitie-container {
-            display: flex;
-            flex-direction: column;
-            width: fit-content;
-            align-items: center;
-            margin-right: 1vw;
-
-            .vulnerabilitie-number {
-              color: #27272A;
-              font-size: 1.5vw;
-            }
-
-            .critical-number {
-              font-size: 3vw;
-              font-weight: 700;
-            }
-
-
-            .vulnerabilitie-label {
-              width: fit-content;
-              border-radius: 4px;
-              padding: 2px 12px;
-            }
-
-            .critical-label {
-              background-color: #EF4444;
-              color: #FFFFFF;
-            }
-
-            .high {
-              background-color: #FDBA74;
-              color: #C2410C;
-            }
-
-            .medium {
-              background-color: #FDE047;
-              color: #A16207;
-            }
-
-            .moderate {
-              background-color: #F4F4F5;
-              color: #A1A1AA;
-            }
-
-          }
-        }
       }
 
       .tableRowLicense {
