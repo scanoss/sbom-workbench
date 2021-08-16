@@ -208,51 +208,53 @@ a:hover {
   align-items: center;
 
 
-  #license-list {
-    overflow-y: scroll;
-    max-height: 320px;
-    overflow-x: hidden;
-    max-width: 300px;
 
-    .license-list-item {
-      display: flex;
-      align-items: center;
-      background-color: #FFFF;
-      margin-bottom: 4px;
-      padding: 12px;
+
+
+}
+
+.license-list {
+  overflow-y: scroll;
+  max-height: 320px;
+  overflow-x: hidden;
+  max-width: 300px;
+
+  .license-list-item {
+    display: flex;
+    align-items: center;
+    background-color: #FFFF;
+    margin-bottom: 4px;
+    padding: 12px;
+    border-radius: 4px;
+
+    &-selected {
+      background-color: #E4E4E7;
       border-radius: 4px;
+    }
 
-      &-selected {
-        background-color: #E4E4E7;
-        border-radius: 4px;
-      }
-
-      &:hover {
-        transition: ease-in 0.2s;
-        background-color: rgba(228, 228, 231, 1);
-        cursor: pointer;
-        ::-webkit-scrollbar-thumb:hover {
-          background: #555;
-        }
-      }
-
-      .license-list-item-color {
-        width: 24px;
-        height: 24px;
-        margin-right: 12px;
-        border-radius: 4px;
-      }
-
-      .license-list-item-name {
-        font-size: 16px;
-        font-weight: 400;
-        line-height: 25px;
-        text-align: left;
+    &:hover {
+      transition: ease-in 0.2s;
+      background-color: rgba(228, 228, 231, 1);
+      cursor: pointer;
+      ::-webkit-scrollbar-thumb:hover {
+        background: #555;
       }
     }
+
+    .license-list-item-color {
+      width: 24px;
+      height: 24px;
+      margin-right: 12px;
+      border-radius: 4px;
+    }
+
+    .license-list-item-name {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 25px;
+      text-align: left;
+    }
   }
-
-
 }
 
 #MatchesChart {

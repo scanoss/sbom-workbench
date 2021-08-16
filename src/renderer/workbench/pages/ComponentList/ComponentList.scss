@@ -1,3 +1,62 @@
+.scan-results-home {
+  height: 50vh;
+  background-color: #F4F4F5;
+  border-radius: 0px 0px 61px 61px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+
+  .div-charts-home {
+    //grid with two columns, in the first column one row, in the second one two rows
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-gap: 24px;
+    height: 60%;
+    width: 95%;
+    // * {
+    //   background-color: chartreuse;
+    // }
+    #licenses {
+      grid-row: 1/3;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0px;
+
+    }
+
+    #matches {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #vulnerabilities {
+      display: flex;
+      align-items: center;
+      padding-left: 24px;
+    }
+
+
+  }
+
+  .card-licenses-home {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+}
+
+
+#ScanResults {
+  margin-left: 75px;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+
 .component-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, 200px);

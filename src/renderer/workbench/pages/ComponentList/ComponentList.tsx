@@ -1,4 +1,4 @@
-import { makeStyles, Paper, IconButton, InputBase, Button, ButtonGroup } from '@material-ui/core';
+import { makeStyles, Paper, IconButton, InputBase, Button, ButtonGroup, Card } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
@@ -11,6 +11,11 @@ import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import ComponentCard from '../../components/ComponentCard/ComponentCard';
 import { setComponent } from '../../actions';
+import LicensesChart from '../../../report/components/LicensesChart';
+import LicensesTable from '../../../report/components/LicensesTable';
+import { report } from '../../../../api/report-service';
+import MatchesChart from '../../../report/components/MatchesChart';
+import VulnerabilitiesCard from '../../../report/components/VulnerabilitiesCard';
 
 const LIMIT = 100;
 
@@ -58,14 +63,52 @@ export const ComponentList = () => {
 
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filter(components, searchQuery);
+  const [licenses, setLicenses] = useState<any[]>([]);
+  const [vulnerabilites, setVulnerabilites] = useState<any[]>([]);
+  const [progress, setProgress] = useState<any>(null);
 
   const onSelectComponent = (component) => {
     history.push(`/workbench/component`);
     dispatch(setComponent(component));
   };
 
+  const init = async () => {
+    const a = await report.getSummary();
+    setProgress(a?.data?.summary);
+    setLicenses(a?.data?.licenses);
+    setVulnerabilites(a?.data?.vulnerabilities);
+    console.log(a?.data);
+  };
+
+  useEffect(init, []);
+
   return (
     <>
+      <section className="scan-results-home">
+        {/* <div className="d-flex space-between align-center">
+          <div>
+            <h1 id="ScanResults" className="header-title">
+              Scan Results
+            </h1>
+          </div>
+        </div> */}
+        <div className="div-charts-home">
+          <Card id="licenses" className="card-home ">
+            <LicensesChart data={licenses} />
+            <LicensesTable
+              matchedLicenseSelected={licenses?.[0]}
+              selectLicense={(license) => onLicenseSelected(license)}
+              data={licenses}
+            />
+          </Card>
+          <Card id="matches" className="card-home">
+            {progress && <MatchesChart data={progress} />}
+          </Card>
+          <Card className="card-home" id="vulnerabilities">
+            <VulnerabilitiesCard data={vulnerabilites} />
+          </Card>
+        </div>
+      </section>
       <section id="ComponentList" className="app-page">
         <header className="app-header">
           <div className="d-flex space-between align-center">
@@ -74,11 +117,7 @@ export const ComponentList = () => {
               <h1 className="header-title">Detected Components</h1>
             </div>
             <ButtonGroup>
-            <Button
-                startIcon={<ViewModuleRoundedIcon />}
-                variant="contained"
-                color="primary"
-              >
+              <Button startIcon={<ViewModuleRoundedIcon />} variant="contained" color="primary">
                 Detected
               </Button>
               <Button
@@ -90,8 +129,6 @@ export const ComponentList = () => {
                 Recognized
               </Button>
             </ButtonGroup>
-
-
           </div>
 
           <Paper component="form" className={classes.root}>
@@ -105,7 +142,6 @@ export const ComponentList = () => {
               inputProps={{ 'aria-label': 'search' }}
             />
           </Paper>
-
         </header>
 
         <main className="app-content">

@@ -3,7 +3,7 @@ import { getColor } from '../../../utils/utils';
 
 const LicensesTable = ({ data, selectLicense, matchedLicenseSelected }) => {
   return (
-    <div id="license-list">
+    <div className="license-list">
       {data.map((item, index) => {
         return (
           <div
