@@ -59,7 +59,7 @@ export class ResultsDb extends Db {
   }
 
   private insertResult(db: any, data: any, filePath: string) {
-    const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : 'NULL';
+    const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : null;
     db.run(
       query.SQL_INSERT_RESULTS,
       data.file_hash,

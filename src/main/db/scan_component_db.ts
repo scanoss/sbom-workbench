@@ -275,7 +275,7 @@ export class ComponentDb extends Db {
         db.serialize(async function () {
           db.run('begin transaction');
           for (const result of results) {
-            if (result.license !== 'NULL') {             
+            if (result.license !== null) {             
               license.spdxid = result.license;
               attachLicComp.license_id = await self.license.getLicenseIdFilter(license);            
               if (attachLicComp.license_id === 0) {                    
