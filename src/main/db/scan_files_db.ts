@@ -22,6 +22,7 @@ const utilsDb = new UtilsDb();
 
 export class FilesDb extends Db {
   component: ComponentDb;
+    
   inventory: InventoryDb
 
   constructor(path: string) {
