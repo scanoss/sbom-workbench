@@ -138,6 +138,10 @@ export class Scanner extends EventEmitter {
     this.#wfpFilePath = `${path}/winnowing.wfp`;
   }
 
+  getWinnowingPath(path) {
+    return this.#wfpFilePath;
+  }
+
   // Public Methods
   async scanFileTree(fileTreeDescriptor) {
     this.#scannable = new ScannableTree(fileTreeDescriptor);
