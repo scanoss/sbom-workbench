@@ -74,11 +74,7 @@ export const ComponentList = () => {
               <h1 className="header-title">Detected Components</h1>
             </div>
             <ButtonGroup>
-            <Button
-                startIcon={<ViewModuleRoundedIcon />}
-                variant="contained"
-                color="primary"
-              >
+              <Button startIcon={<ViewModuleRoundedIcon />} variant="contained" color="primary">
                 Detected
               </Button>
               <Button
@@ -87,11 +83,9 @@ export const ComponentList = () => {
                 color="primary"
                 onClick={() => history.push('/workbench/recognized')}
               >
-                Recognized
+                Identified
               </Button>
             </ButtonGroup>
-
-
           </div>
 
           <Paper component="form" className={classes.root}>
@@ -105,7 +99,6 @@ export const ComponentList = () => {
               inputProps={{ 'aria-label': 'search' }}
             />
           </Paper>
-
         </header>
 
         <main className="app-content">
@@ -117,7 +110,13 @@ export const ComponentList = () => {
             </section>
           ) : (
             <p>
-              Not results found with <strong>{searchQuery}</strong>
+              {searchQuery ? (
+                <>
+                  Not results found with <strong>{searchQuery} </strong>
+                </>
+              ) : (
+                <> Not components detected</>
+              )}
             </p>
           )}
 

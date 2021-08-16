@@ -1,6 +1,6 @@
 {
-  "name": "scanoss-desktop",
-  "productName": "SCANOSS DESKTOP",
+  "name": "scanoss-workbench",
+  "productName": "SCANOSS Audit Workbench",
   "description": "Desktop version to use SCANOSS OSS in your projects",
   "scripts": {
     "build": "concurrently \"yarn build:main\" \"yarn build:renderer\"",
@@ -30,8 +30,8 @@
     ]
   },
   "build": {
-    "productName": "SCANOSS Desktop",
-    "appId": "com.scanoss.desktop",
+    "productName": "SCANOSS Audit Workbench",
+    "appId": "com.scanoss.workbench",
     "copyright": "Copyright © 2020,2021 SCANOSS.COM",
     "files": [
       "dist/",

@@ -104,12 +104,12 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
               )}
               {status === 'identified' && (
                 <>
-                  <Tooltip title="Remove identified">
+                  <Tooltip title="Remove identification">
                     <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_DETACH)}>
                       <RestoreOutlined className="icon"/>
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="View group">
+                  <Tooltip title="View identification">
                     <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_DETAIL)}>
                       <DescriptionOutlined />
                     </IconButton>
