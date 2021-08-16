@@ -87,7 +87,7 @@ export const ComponentList = () => {
                 color="primary"
                 onClick={() => history.push('/workbench/recognized')}
               >
-                Recognized
+                Identified
               </Button>
             </ButtonGroup>
 
