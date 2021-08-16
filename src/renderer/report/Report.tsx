@@ -79,6 +79,7 @@ const Report = () => {
   const open = Boolean(anchorEl);
   const SPDX = 'spdx';
   const CSV = 'csv';
+  const RAW = 'json';
 
   const init = async () => {
     const a = await report.getSummary();
@@ -103,24 +104,30 @@ const Report = () => {
   };
 
   const onCsvClickedExport = async () => {
-    await exportFile(CSV);
+    await exportFile({ extension: CSV, export: CSV });
     handleClose();
   };
 
   const onSpdxClickedExport = async () => {
-    await exportFile(SPDX);
+    await exportFile({ extension: SPDX, export: SPDX });
     handleClose();
   };
 
-  const exportFile = async (extension) => {
+  const onRawClickedExport = async () => {
+    await exportFile({ extension: 'json', export: RAW });
+    handleClose();
+  };
+
+  const exportFile = async (data) => {
     const defpath = await projectService.workspacePath();
     const projectName = await projectService.getProjectName();
     const path = dialogController.showSaveDialog({
-      defaultPath: `${defpath.data}/${projectName.data}/${projectName.data}.${extension}`,
+      defaultPath: `${defpath.data}/${projectName.data}/${projectName.data}.${data.extension}`,
     });
     if (path && path !== undefined) {
-      if (extension === SPDX) await ExportFormat.spdx(path);
-      else if (extension === CSV) await ExportFormat.csv(path);
+      if (data.export === SPDX) await ExportFormat.spdx(path);
+      else if (data.export === CSV) await ExportFormat.csv(path);
+      else if (data.export === RAW) await ExportFormat.raw(path);
     }
   };
 
@@ -151,6 +158,7 @@ const Report = () => {
             >
               <MenuItem onClick={onSpdxClickedExport}>SPDX</MenuItem>
               <MenuItem onClick={onCsvClickedExport}>CSV</MenuItem>
+              <MenuItem onClick={onRawClickedExport}>RAW</MenuItem>
             </Menu>
           </div>
         </header>
