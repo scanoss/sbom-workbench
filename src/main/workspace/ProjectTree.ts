@@ -146,6 +146,7 @@ export class ProjectTree extends EventEmitter {
 
     this.scanner = new Scanner();
     this.scanner.setResultsPath(this.work_root);
+    this.scanner.setWinnowingPath(this.work_root);
     this.setScannerListeners();
   }
 

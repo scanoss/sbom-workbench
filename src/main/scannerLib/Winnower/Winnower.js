@@ -210,7 +210,9 @@ export class Winnower extends EventEmitter {
 
   #scannable;
 
-  #destFolder;
+  #tmpPath;
+
+  #wfpFilePath;
 
   #wfp;
 
@@ -252,7 +254,8 @@ export class Winnower extends EventEmitter {
     }
 
     if (this.#wfp.length + winnowingResult.length >= this.#WFP_FILE_MAX_SIZE) {
-      await this.#createWfpFile(this.#wfp, this.#destFolder, new Date().getTime());
+      await this.#createWfpFile(this.#wfp, this.#tmpPath, new Date().getTime());
+      await this.#appendWinnowingFile(this.#wfp, this.#wfpFilePath);
       this.#wfp = '';
     }
     this.#wfp += winnowingResult;
@@ -264,22 +267,30 @@ export class Winnower extends EventEmitter {
     this.emit(ScannerEvents.WINNOWING_NEW_WFP_FILE, `${dst}/${name}.wfp`);
   }
 
+  async #appendWinnowingFile(content, dst) {
+    await fs.promises.appendFile(dst, content);
+  }
+
   async #nextStepMachine() {
     if (!this.#continue) return;
     const scannableItem = await this.#scannable.getNextScannableItem();
     if (this.#scannable.hasNextScannableItem()) {
       this.#worker.postMessage(scannableItem);
     } else {
-      if (this.#wfp.length !== 0) await this.#createWfpFile(this.#wfp, this.#destFolder, new Date().getTime());
+      if (this.#wfp.length !== 0) {
+        await this.#createWfpFile(this.#wfp, this.#tmpPath, new Date().getTime());
+        await this.#appendWinnowingFile(this.#wfp, this.#wfpFilePath);
+      }
       this.#isRunning = false;
       this.emit(ScannerEvents.WINNOWING_FINISHED);
       this.#worker.terminate();
     }
   }
 
-  async startMachine(scannable, destPath) {
+  async startMachine(scannable, tmpPath, wfpFilePath) {
     this.#scannable = scannable;
-    this.#destFolder = destPath;
+    this.#tmpPath = tmpPath;
+    this.#wfpFilePath = wfpFilePath;
     this.#isRunning = true;
     this.emit(ScannerEvents.WINNOWING_STARTING);
     return this.#nextStepMachine();
