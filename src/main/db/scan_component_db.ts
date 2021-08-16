@@ -1,3 +1,5 @@
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-else-return */
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-cycle */
@@ -119,8 +121,8 @@ export class ComponentDb extends Db {
             else {
               const comp = self.processComponent(data);
               const summary: any = await self.allSummaries();
-              for (let i = 0; i < comp.length; i += 1) {
-                comp[i].summary = summary[i];
+              for (let i = 0; i < comp.length; i += 1) {                
+                 comp[i].summary = summary[comp[i].compid];
               }
               resolve(comp);
             }
@@ -414,19 +416,35 @@ export class ComponentDb extends Db {
   }
 
   allSummaries() {
+    const self = this;
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(query.SQL_GET_ALL_SUMMARIES, (err: any, summary: any) => {
+        db.all(query.SQL_GET_ALL_SUMMARIES, (err: any, data: any) => {
           db.close();
-          if (err) resolve({});
-          else resolve(summary);
+          if (err) resolve({});          
+          else{            
+            const summary = self.groupSummaryByCompid(data);            
+            resolve(summary);
+          }          
+            
         });
       } catch (error) {
         reject(error);
       }
     });
   }
+
+private groupSummaryByCompid(data:any){  
+    const aux = {};
+    for (const i of data) {
+      const key = i.compid;
+      const value =i;     
+      if(!aux.hasOwnProperty(i.compid)) aux[`${key}`];
+      aux[`${key}`]=value; 
+    }     
+    return aux;
+}
 
   private summaryByPurlVersion(data: any) {
     return new Promise(async (resolve, reject) => {
@@ -502,7 +520,7 @@ export class ComponentDb extends Db {
     try {
       const data = await this.getAll({});
       if (data) {
-        this.groupComponentsByPurl(data);
+        this.groupComponentsByPurl(data);     
         const comp = this.mergeComp(data);
         return await Promise.resolve(comp);
       } else {
@@ -554,6 +572,7 @@ export class ComponentDb extends Db {
     version.licenses = data.licenses.slice();
     version.version = data.version;
     // Total summary of each component
+   
     if (components.summary) {
       components.summary.identified += data.summary.identified;
       components.summary.ignored += data.summary.ignored;
