@@ -472,7 +472,7 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(
+        db.get(
           query.SQL_GET_SUMMARY_BY_PURL,
           data.purl,
           (err: any, summary: any) => {
@@ -498,19 +498,8 @@ export class ComponentDb extends Db {
         const data = await this.getAll(component);
         if (data) {
         this.groupComponentsByPurl(data);
-        const [comp] = await this.mergeComp(data);
-        const summary: any = await this.summaryByPurl(comp);
-        const sum: any = {
-          identified: 0,
-          pending: 0,
-          ignored: 0,
-        };
-        for (let i = 0; i < summary.length; i += 1) {
-          sum.identified += summary[i].identified;
-          sum.pending += summary[i].pending;
-          sum.ignored += summary[i].ignored;
-        }
-        comp.summary = sum;
+        const [comp] = await this.mergeComp(data);       
+        comp.summary = await this.summaryByPurl(comp);          
         resolve(comp);
       } else resolve([]);
     } catch (error) {
