@@ -171,7 +171,7 @@ export class Querys {
 
   SQL_GET_SUMMARY_BY_PURL = 'SELECT identified,pending,ignored FROM summary WHERE purl=?;';
 
-  SQL_GET_UNIQUE_COMPONENT = 'SELECT DISTINCT purl,version,license,component,url FROM results;';
+  SQL_GET_UNIQUE_COMPONENT = 'SELECT DISTINCT purl,version,license,component,url FROM results GROUP BY purl,version;';
 
   SQL_DELETE_INVENTORY_BY_ID = 'DELETE FROM inventories WHERE id=?;';
 
