@@ -80,6 +80,7 @@ const Report = () => {
   const SPDX = 'spdx';
   const CSV = 'csv';
   const RAW = 'json';
+  const WFP = 'wfp';
 
   const init = async () => {
     const a = await report.getSummary();
@@ -113,6 +114,12 @@ const Report = () => {
     handleClose();
   };
 
+  const onWfpClickedExport = async () => {
+    await exportFile({ extension: 'wfp', export: WFP });
+    handleClose();
+  };
+
+
   const onRawClickedExport = async () => {
     await exportFile({ extension: 'json', export: RAW });
     handleClose();
@@ -128,6 +135,7 @@ const Report = () => {
       if (data.export === SPDX) await ExportFormat.spdx(path);
       else if (data.export === CSV) await ExportFormat.csv(path);
       else if (data.export === RAW) await ExportFormat.raw(path);
+      else if (data.export === WFP) await ExportFormat.wfp(path);
     }
   };
 
@@ -158,7 +166,9 @@ const Report = () => {
             >
               <MenuItem onClick={onSpdxClickedExport}>SPDX</MenuItem>
               <MenuItem onClick={onCsvClickedExport}>CSV</MenuItem>
+              <MenuItem onClick={onWfpClickedExport}>WFP</MenuItem>
               <MenuItem onClick={onRawClickedExport}>RAW</MenuItem>
+
             </Menu>
           </div>
         </header>

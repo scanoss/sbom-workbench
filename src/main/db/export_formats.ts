@@ -109,4 +109,18 @@ export class Formats extends Db {
       }
     });
   }
+
+  wfp(path: string, winnowingPath :any) {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        await fs.copyFile(winnowingPath, path, (err) => {
+          if (err) throw err;
+          resolve(true);
+        });
+      } catch (error) {
+        reject(new Error('Unable to generate wfp file'));
+      }
+    });
+  }
+
 }
