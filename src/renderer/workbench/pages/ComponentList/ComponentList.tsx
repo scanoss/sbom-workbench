@@ -85,26 +85,24 @@ export const ComponentList = () => {
   return (
     <>
       <section className="scan-results-home">
-        {/* <div className="d-flex space-between align-center">
-          <div>
-            <h1 id="ScanResults" className="header-title">
-              Scan Results
-            </h1>
-          </div>
-        </div> */}
         <div className="div-charts-home">
-          <Card id="licenses" className="card-home ">
-            <LicensesChart data={licenses} />
-            <LicensesTable
-              matchedLicenseSelected={licenses?.[0]}
-              selectLicense={(license) => onLicenseSelected(license)}
-              data={licenses}
-            />
+          <Card id="licenses" className="report-item licenses">
+            <div className="report-title-home">LICENSES</div>
+            <div id="report-second">
+              <LicensesChart data={licenses} />
+              <LicensesTable
+                matchedLicenseSelected={licenses?.[0]}
+                selectLicense={(license) => onLicenseSelected(license)}
+                data={licenses}
+              />
+            </div>
           </Card>
-          <Card id="matches" className="card-home">
+          <Card className="report-item matches">
+            <div className="report-title-home">MATCHES</div>
             {progress && <MatchesChart data={progress} />}
           </Card>
-          <Card className="card-home" id="vulnerabilities">
+          <Card className="report-item vulnerabilites">
+            <div className="report-title-home">VULNERABILITIES</div>
             <VulnerabilitiesCard data={vulnerabilites} />
           </Card>
         </div>

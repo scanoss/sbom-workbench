@@ -203,21 +203,25 @@ a:hover {
 #report-second {
   display: grid;
   grid-template-columns: 50% 50%;
-  grid-gap: 10px;
+  grid-gap: 30px;
   justify-content: space-between;
   align-items: center;
-
-
-
-
-
 }
 
+.report-item {
+  padding: 16px;
+
+  .report-title {
+    color: #27272A;
+    font-size: 26px;
+    font-style: normal;
+    font-weight: 700;
+  }
+}
 .license-list {
   overflow-y: scroll;
-  max-height: 320px;
   overflow-x: hidden;
-  max-width: 300px;
+  width: 100%;
 
   .license-list-item {
     display: flex;
@@ -226,6 +230,7 @@ a:hover {
     margin-bottom: 4px;
     padding: 12px;
     border-radius: 4px;
+    margin-right: 20px;
 
     &-selected {
       background-color: #E4E4E7;
@@ -269,7 +274,7 @@ a:hover {
   }
 
   .matches-canvas-container {
-    margin-top: 30px;
+    margin-top: 20px;
     height: 50px;
     display: flex;
     justify-content: space-between;
@@ -323,7 +328,7 @@ a:hover {
 #VulnerabilitiesContainer {
   display: flex;
   align-items: flex-end;
-  margin-top: 20px;
+  margin-top: 10px;
 
 
   .vulnerabilitie-container {
@@ -370,6 +375,18 @@ a:hover {
       color: #A1A1AA;
     }
 
+  }
+}
+
+.total-files-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .total-files-label {
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
   }
 }
 
