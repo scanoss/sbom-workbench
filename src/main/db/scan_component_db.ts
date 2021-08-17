@@ -512,7 +512,7 @@ export class ComponentDb extends Db {
         }
         comp.summary = sum;
         resolve(comp);
-      } else resolve([]);      
+      } else resolve([]);
     } catch (error) {
       reject(new Error('Unable to get components grouped by purl'));
     }
@@ -578,7 +578,7 @@ export class ComponentDb extends Db {
     version.version = data.version;
     // Total summary of each component
 
-    if (components.summary) {
+    if (components.summary && data.summary) {
       components.summary.identified += data.summary.identified;
       components.summary.ignored += data.summary.ignored;
       components.summary.pending += data.summary.pending;
