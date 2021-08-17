@@ -51,10 +51,8 @@ export class ComponentDb extends Db {
         let component: any;
         if (data.purl && data.version)
           component = await this.getbyPurlVersion(data);
-        else if (data.purl)
-          component = await this.getByPurl(data);
-        else
-          component = await this.allComp();
+        else if (data.purl) component = await this.getByPurl(data);
+        else component = await this.allComp();
 
         if (component !== undefined) resolve(component);
         else resolve({});
@@ -122,7 +120,7 @@ export class ComponentDb extends Db {
               const comp = self.processComponent(data);
               const summary: any = await self.allSummaries();
               for (let i = 0; i < comp.length; i += 1) {
-                 comp[i].summary = summary[comp[i].compid];
+                comp[i].summary = summary[comp[i].compid];
               }
               resolve(comp);
             }
@@ -268,8 +266,8 @@ export class ComponentDb extends Db {
   // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
   importUniqueFromFile() {
     const self = this;
-    const attachLicComp :any = {};
-    let license :any = {};
+    const attachLicComp: any = {};
+    let license: any = {};
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -279,14 +277,19 @@ export class ComponentDb extends Db {
           for (const result of results) {
             if (result.license !== null) {
               license.spdxid = result.license;
-              attachLicComp.license_id = await self.license.getLicenseIdFilter(license);
+              attachLicComp.license_id = await self.license.getLicenseIdFilter(
+                license
+              );
               if (attachLicComp.license_id === 0) {
                 license = await self.license.bulkCreate(db, license);
                 attachLicComp.license_id = license.id;
               }
             }
-              attachLicComp.compid = await self.componentNewImportFromResults(db,result);
-              if(result.license !== 'NULL')
+            attachLicComp.compid = await self.componentNewImportFromResults(
+              db,
+              result
+            );
+            if (result.license !== 'NULL')
               await self.license.bulkAttachLicensebyId(db, attachLicComp);
           }
           db.run('commit', () => {
@@ -311,7 +314,7 @@ export class ComponentDb extends Db {
         'AUTOMATIC IMPORT',
         data.url,
         data.purl,
-        function (this :any, err: any) {
+        function (this: any, err: any) {
           resolve(this.lastID);
         }
       );
@@ -423,11 +426,10 @@ export class ComponentDb extends Db {
         db.all(query.SQL_GET_ALL_SUMMARIES, (err: any, data: any) => {
           db.close();
           if (err) resolve({});
-          else{
+          else {
             const summary = self.groupSummaryByCompid(data);
             resolve(summary);
           }
-
         });
       } catch (error) {
         reject(error);
@@ -435,16 +437,16 @@ export class ComponentDb extends Db {
     });
   }
 
-private groupSummaryByCompid(data:any){
+  private groupSummaryByCompid(data: any) {
     const aux = {};
     for (const i of data) {
       const key = i.compid;
-      const value =i;
-      if(!aux.hasOwnProperty(i.compid)) aux[`${key}`];
-      aux[`${key}`]=value;
+      const value = i;
+      if (!aux.hasOwnProperty(i.compid)) aux[`${key}`];
+      aux[`${key}`] = value;
     }
     return aux;
-}
+  }
 
   private summaryByPurlVersion(data: any) {
     return new Promise(async (resolve, reject) => {
@@ -475,11 +477,12 @@ private groupSummaryByCompid(data:any){
           data.purl,
           (err: any, summary: any) => {
             db.close();
-            if (err) resolve({
-              identified:0,
-              pending:0,
-              ignored:0
-            });
+            if (err)
+              resolve({
+                identified: 0,
+                pending: 0,
+                ignored: 0,
+              });
             else resolve(summary);
           }
         );
@@ -490,45 +493,45 @@ private groupSummaryByCompid(data:any){
   }
 
   async getComponentGroup(component: Partial<ComponentGroup>) {
-    try {
-      const data = await this.getAll(component);
-      if (data) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const data = await this.getAll(component);
+        if (data) {
         this.groupComponentsByPurl(data);
-        const [comp] = this.mergeComp(data);
+        const [comp] = await this.mergeComp(data);
         const summary: any = await this.summaryByPurl(comp);
-        const sum :any = {
-          identified:0,
-          pending:0,
-          ignored:0
-        }
+        const sum: any = {
+          identified: 0,
+          pending: 0,
+          ignored: 0,
+        };
         for (let i = 0; i < summary.length; i += 1) {
           sum.identified += summary[i].identified;
           sum.pending += summary[i].pending;
           sum.ignored += summary[i].ignored;
         }
-        comp.summary=sum;
-        return await Promise.resolve(comp);
-      } else {
-        return await Promise.resolve([]);
-      }
+        comp.summary = sum;
+        resolve(comp);
+      } else resolve([]);
     } catch (error) {
-      console.log(error);
+      reject(new Error('Unable to get components grouped by purl'));
     }
-  }
+  });
+}
 
   async getAllComponentGroup() {
-    try {
-      const data = await this.getAll({});
-      if (data) {
-        this.groupComponentsByPurl(data);
-        const comp = this.mergeComp(data);
-        return await Promise.resolve(comp);
-      } else {
-        return await Promise.resolve([]);
+    return new Promise(async (resolve, reject) => {
+      try {
+        const data = await this.getAll({});
+        if (data) {
+          this.groupComponentsByPurl(data);
+          const comp = await this.mergeComp(data);
+          resolve(comp);
+        } else resolve([]);
+      } catch (error) {
+        reject(new Error('Unable to get all component group'));
       }
-    } catch (error) {
-      console.log(error);
-    }
+    });
   }
 
   // Group components by purl
@@ -537,33 +540,35 @@ private groupSummaryByCompid(data:any){
   }
 
   private mergeComp(data: any) {
-    const components: any = [];
-    for (let i = 0; i < data.length; i += 1) {
-      const comp: any = {};
-      const version: any = {};
-      comp.summary = data[i].summary;
-      let mergeCounter = 0;
-      comp.name = data[i].name;
-      comp.purl = data[i].purl;
-      comp.url = data[i].url;
-      comp.versions = [];
-      version.licenses = data[i].licenses.slice();
-      version.version = data[i].version;
-      comp.versions.push(version);
-      components.push(comp);
-      mergeCounter = 0;
-      for (let j = i + 1; j < data.length; j += 1) {
-        if (data[i].purl !== data[j].purl) {
-          break;
+    return new Promise(async (resolve) => {
+      const components: any = [];
+      for (let i = 0; i < data.length; i += 1) {
+        const comp: any = {};
+        const version: any = {};
+        comp.summary = data[i].summary;
+        let mergeCounter = 0;
+        comp.name = data[i].name;
+        comp.purl = data[i].purl;
+        comp.url = data[i].url;
+        comp.versions = [];
+        version.licenses = data[i].licenses.slice();
+        version.version = data[i].version;
+        comp.versions.push(version);
+        components.push(comp);
+        mergeCounter = 0;
+        for (let j = i + 1; j < data.length; j += 1) {
+          if (data[i].purl !== data[j].purl) {
+            break;
+          }
+          if (data[i].purl === data[j].purl) {
+            this.mergeCompVersion(components[components.length - 1], data[j]);
+            mergeCounter += 1;
+          }
         }
-        if (data[i].purl === data[j].purl) {
-          this.mergeCompVersion(components[components.length - 1], data[j]);
-          mergeCounter += 1;
-        }
+        i += mergeCounter;
       }
-      i += mergeCounter;
-    }
-    return components;
+      resolve(components);
+    });
   }
 
   // Merge all versions for an specific component
