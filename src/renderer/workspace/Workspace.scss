@@ -5,7 +5,13 @@
     margin-top: 20px;
   }
 
+  .MuiPaper-root {
+    max-height: 100%;
+  }
+
   .MuiTableRow-root {
+
+
     .btn-delete {
       visibility: hidden;
     }
@@ -14,6 +20,8 @@
       visibility: visible;
     }
   }
+
+
 
   .empty-container {
     display: flex;
