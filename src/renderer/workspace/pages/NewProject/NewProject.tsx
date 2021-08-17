@@ -43,7 +43,7 @@ const NewProject = () => {
   };
 
   const handlerScannerStatus = (_event, args) => {
-    setProgress(args.completed);
+    setProgress(args.processed);
     setStage(args.stage);
   };
 
@@ -76,13 +76,29 @@ const NewProject = () => {
         </header>
         <main className="app-content">
           <div className="progressbar">
-            {stage === 'scanning' ? (
-              <LinearProgress variant="determinate" value={progress} />
-            ) : (
-              <LinearProgress variant="indeterminate" />
+
+            {stage === 'preparing' && (
+              <>
+                <LinearProgress variant="indeterminate"/>
+                <div className="stage-label"> {stage} </div>
+              </>
             )}
+
+            {stage === 'indexing' && (
+              <>
+                <LinearProgress variant="indeterminate"/>
+                <div className="stage-label"> {stage} ({progress}) </div>
+              </>
+            )}
+
+            {stage === 'scanning' && (
+              <>
+                <LinearProgress variant="determinate" value={progress} />
+                <div className="stage-label"> {stage} </div>
+              </>
+            )}
+
           </div>
-          <div className="stage-label"> {stage} </div>
         </main>
       </section>
     </>

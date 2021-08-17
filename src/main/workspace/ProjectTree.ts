@@ -169,8 +169,8 @@ export class ProjectTree extends EventEmitter {
       console.log(`New ${fileNumbers} files scanned`);
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
-        processed: this.filesSummary.include,
-        completed: (100 * this.processedFiles) / this.filesSummary.include,
+        // processed: this.filesSummary.include,
+        processed: (100 * this.processedFiles) / this.filesSummary.include,
       });
 
      this.attachComponent(data);
@@ -229,17 +229,23 @@ export class ProjectTree extends EventEmitter {
     }
 
     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'PREPARING',
+      stage: 'preparing',
       processed: 30,
     });
     // const i = 0;
     this.build_tree();
     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'PREPARING',
+      stage: 'preparing',
       processed: 60,
     });
     // apply filters.
     this.banned_list.loadDefault();
+
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: 'preparing',
+      processed: 100,
+    });
+
     this.indexScan(this.scan_root, this.logical_tree, this.banned_list);
 
     const summary = { total: 0, include: 0, filter: 0, files: [] };
@@ -249,10 +255,7 @@ export class ProjectTree extends EventEmitter {
     );
     this.filesToScan = summary.files;
     console.log(this.filesToScan);
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'PREPARING',
-      processed: 100,
-    });
+
 
     if (success) {
       console.log('licenses inserted successfully...');
@@ -342,10 +345,11 @@ export class ProjectTree extends EventEmitter {
 
     if (jsonScan.type === 'file') {
       this.filesIndexed += 1;
-      this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-        stage: `indexing`,
-        processed: this.filesIndexed,
-      });
+      if (this.filesIndexed % 100 === 0)
+        this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+          stage: `indexing`,
+          processed: this.filesIndexed,
+        });
       if (bannedList.evaluate(scanRoot + jsonScan.value)) {
         jsonScan.action = 'scan';
       } else {
