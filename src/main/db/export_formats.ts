@@ -91,9 +91,9 @@ export class Formats extends Db {
   }
 
   private csvCreate(inventories: any) {
-    let csv = `id,usage,notes,license_name,purl,path,version\r\n`;
+    let csv = `id,usage,notes,license_name,path,purl,version\r\n`;
     for (const inventorie of inventories) {
-      csv += `${inventorie.id},${inventorie.usage},${inventorie.notes},${inventorie.license_name},${inventorie.purl},"${inventorie.path}",${inventorie.version}\r\n`;
+      csv += `${inventorie.id},${inventorie.usage},${inventorie.notes},${inventorie.license_name},"${inventorie.path}","${inventorie.purl}",${inventorie.version}\r\n`;
     }
     return csv;
   }
