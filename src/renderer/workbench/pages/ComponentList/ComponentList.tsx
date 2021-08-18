@@ -98,8 +98,8 @@ export const ComponentList = () => {
               <div id="report-second">
                 <LicensesChart data={licenses} />
                 <LicensesTable
-                  matchedLicenseSelected={licenses?.[0]}
-                  selectLicense={(license) => onLicenseSelected(license)}
+                  matchedLicenseSelected={null}
+                  selectLicense={(license) => console.log(license)}
                   data={licenses}
                 />
               </div>
