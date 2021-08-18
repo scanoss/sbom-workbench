@@ -7,16 +7,12 @@ import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import ViewModuleRoundedIcon from '@material-ui/icons/ViewModuleRounded';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
-import ClearIcon from '@material-ui/icons/Clear';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import ComponentCard from '../../components/ComponentCard/ComponentCard';
 import { setComponent } from '../../actions';
-import LicensesChart from '../../../report/components/LicensesChart';
-import LicensesTable from '../../../report/components/LicensesTable';
-import { report } from '../../../../api/report-service';
-import MatchesChart from '../../../report/components/MatchesChart';
-import VulnerabilitiesCard from '../../../report/components/VulnerabilitiesCard';
+
+import ScanResults from './components/ScanResults';
 
 const LIMIT = 100;
 
@@ -64,10 +60,6 @@ export const ComponentList = () => {
 
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filter(components, searchQuery);
-  const [licenses, setLicenses] = useState<any[]>([]);
-  const [vulnerabilites, setVulnerabilites] = useState<any[]>([]);
-  const [progress, setProgress] = useState<any>(null);
-
   const [show, setShow] = useState<boolean>(true);
 
   const onSelectComponent = (component) => {
@@ -75,52 +67,9 @@ export const ComponentList = () => {
     dispatch(setComponent(component));
   };
 
-  const init = async () => {
-    const a = await report.getSummary();
-    setProgress(a?.data?.summary);
-    setLicenses(a?.data?.licenses);
-    setVulnerabilites(a?.data?.vulnerabilities);
-    console.log(a?.data);
-  };
-
-  useEffect(init, []);
-
   return (
     <>
-      {show ? (
-        <section className="scan-results-home">
-          <div className="div-scan-title">
-            <h1 className="header-title">Scan Results</h1>
-          </div>
-          <div className="div-charts-home">
-            <Card id="licenses" className="report-item licenses">
-              <div className="report-title-home">LICENSES</div>
-              <div id="report-second">
-                <LicensesChart data={licenses} />
-                <LicensesTable
-                  matchedLicenseSelected={null}
-                  selectLicense={(license) => console.log(license)}
-                  data={licenses}
-                />
-              </div>
-            </Card>
-            <Card className="report-item matches">
-              <div className="report-title-home">MATCHES</div>
-              {progress && <MatchesChart data={progress} />}
-            </Card>
-            <Card className="report-item vulnerabilites">
-              <div className="report-title-home">VULNERABILITIES</div>
-              <VulnerabilitiesCard data={vulnerabilites} />
-            </Card>
-          </div>
-          <Button style={{margin: '1vh'}} variant="outlined" color="primary" onClick={() => history.push('/report')}>
-            More Details{' '}
-          </Button>
-          <IconButton onClick={() => setShow(false)} component="span">
-            <ClearIcon />
-          </IconButton>
-        </section>
-      ) : null}
+      {show ? <ScanResults show={() => setShow(false)} /> : null}
       <section id="ComponentList" className="app-page">
         <header className="app-header">
           <div className="d-flex space-between align-center">
