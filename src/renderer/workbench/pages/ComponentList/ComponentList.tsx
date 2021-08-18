@@ -60,16 +60,22 @@ export const ComponentList = () => {
 
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filter(components, searchQuery);
-  const [show, setShow] = useState<boolean>(true);
+
+  const [show, setShow] = useState(localStorage.getItem(name) ? false : true);
 
   const onSelectComponent = (component) => {
     history.push(`/workbench/component`);
     dispatch(setComponent(component));
   };
 
+  const saveLocalStorage = () => {
+    setShow(false);
+    localStorage.setItem(name, false);
+  };
+
   return (
     <>
-      {show ? <ScanResults show={() => setShow(false)} /> : null}
+      {show ? <ScanResults show={() => saveLocalStorage()} /> : null}
       <section id="ComponentList" className="app-page">
         <header className="app-header">
           <div className="d-flex space-between align-center">
