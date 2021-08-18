@@ -195,7 +195,7 @@ a:hover {
 
 
 #LicensesChart {
-  padding: 24px 10px;
+  padding: 24px 0px;
   max-width: 300px;
 }
 
@@ -203,7 +203,6 @@ a:hover {
 #report-second {
   display: grid;
   grid-template-columns: 50% 50%;
-  grid-gap: 30px;
   justify-content: space-between;
   align-items: center;
 }
