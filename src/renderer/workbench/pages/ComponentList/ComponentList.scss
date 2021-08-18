@@ -1,12 +1,10 @@
 .scan-results-home {
-  height: 60vh;
   background-color: #F4F4F5;
   border-radius: 0px 0px 61px 61px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  width: 100%;
 
   .div-scan-title {
     width: 100%;
@@ -23,7 +21,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 5vh;
+    margin: 2vh;
   }
 
   .div-charts-home {
