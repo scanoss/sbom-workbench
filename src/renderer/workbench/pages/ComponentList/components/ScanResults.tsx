@@ -19,16 +19,19 @@ const ScanResults = ({ show }) => {
     setProgress(a?.data?.summary);
     setLicenses(a?.data?.licenses);
     setVulnerabilites(a?.data?.vulnerabilities);
-    console.log(a?.data);
   };
 
   useEffect(init, []);
-
   return (
     <section className="scan-results-home">
-      <div className="div-scan-title">
-        <h1 className="header-title">Scan Results</h1>
-      </div>
+      <header className="d-flex space-between align-center">
+        <div className="div-scan-title">
+          <h1 className="header-title">Scan Results</h1>
+        </div>
+        <Button variant="outlined" color="primary" onClick={() => history.push('/report')}>
+          More details
+        </Button>
+      </header>
       <div className="div-charts-home">
         <Card id="licenses" className="report-item licenses">
           <div className="report-title-home">LICENSES</div>
@@ -50,12 +53,11 @@ const ScanResults = ({ show }) => {
           <VulnerabilitiesCard data={vulnerabilites} />
         </Card>
       </div>
-      <Button style={{ marginTop: '2vh' }} variant="outlined" color="primary" onClick={() => history.push('/report')}>
-        More Details{' '}
-      </Button>
-      <IconButton style={{ marginTop: '1vh' }} onClick={() => show()} component="span">
-        <ClearIcon />
-      </IconButton>
+      <div className="btn-close">
+        <IconButton onClick={() => show()} component="span">
+          <ClearIcon />
+        </IconButton>
+      </div>
     </section>
   );
 };

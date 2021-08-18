@@ -61,22 +61,23 @@ export const ComponentList = () => {
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filter(components, searchQuery);
 
-  const [show, setShow] = useState(localStorage.getItem(name) ? false : true);
+  const [show, setShow] = useState<boolean>(!localStorage.getItem(name));
 
   const onSelectComponent = (component) => {
     history.push(`/workbench/component`);
     dispatch(setComponent(component));
   };
 
-  const saveLocalStorage = () => {
+  const setClose = () => {
     setShow(false);
-    localStorage.setItem(name, false);
+    localStorage.setItem(name, 'true');
   };
 
   return (
-    <>
-      {show ? <ScanResults show={() => saveLocalStorage()} /> : null}
-      <section id="ComponentList" className="app-page">
+    <div id="ComponentList">
+      {show && <ScanResults show={() => setClose()} />}
+
+      <section className="app-page">
         <header className="app-header">
           <div className="d-flex space-between align-center">
             <div>
@@ -139,7 +140,7 @@ export const ComponentList = () => {
           )}
         </main>
       </section>
-    </>
+    </div>
   );
 };
 

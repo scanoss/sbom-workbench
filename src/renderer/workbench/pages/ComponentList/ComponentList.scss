@@ -1,39 +1,31 @@
+#ComponentList {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+
+  .app-page {
+    height: 100%;
+  }
+}
+
 .scan-results-home {
   background-color: #F4F4F5;
-  border-radius: 0px 0px 61px 61px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  border-radius: 0px 0px 40px 40px;
+  padding: 0px 65px;
 
-  .div-scan-title {
-    width: 100%;
-    * {
-      padding-left: 2vw;
-    }
-    .button-close {
-      padding: 50px;
-    }
-  }
-
-  .close-button-div {
+  .btn-close {
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 2vh;
+    margin: 6px 0 4px;
   }
 
   .div-charts-home {
-    //grid with two columns, in the first column one row, in the second one two rows
+    width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    grid-gap: 24px;
-    width: 95%;
-    // * {
-    //   background-color: chartreuse;
-    // }
+    grid-gap: 16px;
 
     .report-title-home {
       color: #A1A1AA;
@@ -59,6 +51,47 @@
       display: flex;
       align-items: center;
       padding-left: 24px;
+    }
+
+    #MatchesChart {
+      .matches-canvas-container {
+        margin-top: 10px;
+      }
+      .total-files-label {
+        font-size: 12px;
+      }
+      .label-match, .label-nomatch {
+        text-align: center;
+      }
+    }
+
+    #LicensesChart {
+      max-width: 150px;
+      justify-self: center;
+    }
+
+    .license-list {
+      max-height: 200px;
+
+      .license-list-item {
+        padding: 0px;
+        pointer-events: none;
+      }
+
+      .license-list-item-name {
+        font-size: 12px;
+      }
+    }
+
+    #VulnerabilitiesContainer {
+      .critical-number {
+        font-size: 1.5vw;
+      }
+
+      .vulnerabilitie-label {
+        font-size: 12px;
+      }
+
     }
 
 
