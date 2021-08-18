@@ -86,7 +86,7 @@ export const RecognizedList = () => {
           <div className="d-flex space-between align-center">
             <div>
               <h4 className="header-subtitle">{state.name}</h4>
-              <h1 className="header-title">Recognized Components</h1>
+              <h1 className="header-title">Identified Components</h1>
             </div>
             <ButtonGroup>
               <Button
@@ -99,7 +99,7 @@ export const RecognizedList = () => {
               </Button>
 
               <Button startIcon={<CheckCircleIcon />} variant="contained" color="primary">
-                Recognized
+                Identified
               </Button>
             </ButtonGroup>
           </div>

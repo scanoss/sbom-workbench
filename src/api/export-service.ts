@@ -13,6 +13,17 @@ class Export {
     return response;
   }
 
+  public async wfp(args: string | null = null): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.EXPORT_WFP, args);
+    return response;
+  }
+
+
+  public async raw(args: string | null = null): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.EXPORT_RAW, args);
+    return response;
+  }
+
 
 }
 

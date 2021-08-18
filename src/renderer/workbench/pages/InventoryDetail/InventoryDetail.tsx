@@ -38,7 +38,10 @@ export const InventoryDetail = () => {
   };
 
   const onRemoveClicked = async () => {
-    const { action } = await dialogCtrl.openConfirmDialog('Are you sure you want to delete this group?');
+    const { action } = await dialogCtrl.openConfirmDialog('Are you sure you want to delete this group?', {
+      label: 'Delete',
+      role: 'delete',
+    });
     if (action == DIALOG_ACTIONS.OK) {
       await deleteInventory(inventory?.id);
       history.goBack();
@@ -51,7 +54,7 @@ export const InventoryDetail = () => {
         history.push(`/workbench/file?path=${file.path}`);
         break;
       case MATCH_CARD_ACTIONS.ACTION_DETACH:
-        detachFile(inventory?.id, [file.id]);
+        detachFile([file.id]);
         getInventory();
         break;
     }

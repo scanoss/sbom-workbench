@@ -40,7 +40,7 @@ export class Formats extends Db {
         db.all(query.SQL_GET_SPDX_COMP_DATA, async (err: any, data: any) => {
           db.close();
           if (err) resolve(false);
-          else {           
+          else {
             for (let i = 0; i < data.length; i += 1) {
               const pkg: any = {};
               const comp: any = await this.component.getAll(data[i]);
@@ -76,8 +76,8 @@ export class Formats extends Db {
         const db = await this.openDb();
         db.all(query.SQL_GET_CSV_DATA, async (err: any, data: any) => {
           db.close();
-          if (err) resolve(false);          
-          else {            
+          if (err) resolve(false);
+          else {
             const csv = this.csvCreate(data);
             await fs.writeFile(`${path}`, csv, 'utf-8', () => {
               resolve(true);
@@ -92,11 +92,35 @@ export class Formats extends Db {
 
   private csvCreate(inventories: any) {
     let csv = `id,usage,notes,license_name,purl,path,version\r\n`;
-    for (const inventorie of inventories) {    
+    for (const inventorie of inventories) {
       csv += `${inventorie.id},${inventorie.usage},${inventorie.notes},${inventorie.license_name},${inventorie.purl},"${inventorie.path}",${inventorie.version}\r\n`;
     }
-  
     return csv;
+  }
+
+  raw(path: string, results :any) {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+          await fs.writeFile(`${path}`, JSON.stringify(results, undefined, 4), 'utf-8', () => {
+          resolve(true);
+        });
+      } catch (error) {
+        reject(new Error('Unable to generate spdx file'));
+      }
+    });
+  }
+
+  wfp(path: string, winnowingPath :any) {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        await fs.copyFile(winnowingPath, path, (err) => {
+          if (err) throw err;
+          resolve(true);
+        });
+      } catch (error) {
+        reject(new Error('Unable to generate wfp file'));
+      }
+    });
   }
 
 }

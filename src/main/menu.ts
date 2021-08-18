@@ -23,7 +23,7 @@ const getAssetPath = (...paths: string[]): string => {
 return path.join(RESOURCES_PATH, ...paths);
 };
 
-const aboutText = `Scanoss Desktop brings free of charge, secure and anonymous Open Source Auditing to your desktop.
+const aboutText = `SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
 
@@ -34,6 +34,8 @@ You should have received a copy of the GNU General Public License along with thi
 By using this tool you accept that the results provided do not represent any kind of legal advise and are obtained against the data in the Scanoss Knowledgebase at the time of analysis.
 
 The source code is analyzed on the spot and is not transfered anywhere outside this computer.
+
+VERSION: ${app.getVersion()}
 
 Copyright (C) 2021 Scan Open Source Solutions S.L.`;
 

@@ -158,7 +158,7 @@ export const Editor = () => {
     const fileResult = data?.files.find((item) => item.path === file);
     console.log(fileResult);
     if (fileResult) {
-      await detachFile(inventory.id, [fileResult.id]);
+      await detachFile([fileResult.id]);
       getInventories();
       getResults();
     }
@@ -309,7 +309,7 @@ export const Editor = () => {
         </header>
 
         {fullFile ? (
-          <main className="editors-full app-content">
+          <main className="editors editors-full app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
                 <MemoCodeEditor content={localFileContent.content} highlight={lines} />

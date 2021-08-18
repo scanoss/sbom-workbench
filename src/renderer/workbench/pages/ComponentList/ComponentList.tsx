@@ -141,7 +141,7 @@ export const ComponentList = () => {
                 color="primary"
                 onClick={() => history.push('/workbench/recognized')}
               >
-                Recognized
+                Identified
               </Button>
             </ButtonGroup>
           </div>
@@ -168,7 +168,13 @@ export const ComponentList = () => {
             </section>
           ) : (
             <p>
-              Not results found with <strong>{searchQuery}</strong>
+              {searchQuery ? (
+                <>
+                  Not results found with <strong>{searchQuery} </strong>
+                </>
+              ) : (
+                <> Not components detected</>
+              )}
             </p>
           )}
 

@@ -27,9 +27,11 @@ export class Scanner extends EventEmitter {
 
   #dispatcher;
 
-  #wfpDestPath = `${os.tmpdir()}/ScanossDesktopApp`;
+  #tempPath = `${os.tmpdir()}/ScanossDesktopApp`;
 
-  #resultFilePath = `${this.#wfpDestPath}/result.json`;
+  #resultFilePath = `${this.#tempPath}/result.json`;
+
+  #wfpFilePath = `${this.#tempPath}/winnowing.wfp`;
 
   #tmpResult;
 
@@ -80,10 +82,7 @@ export class Scanner extends EventEmitter {
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_FINISHED, () => {
       if (!this.#winnower.isRunning()) {
-        const str = JSON.stringify(this.#tmpResult, null, 4);
-        fs.writeFileSync(this.#resultFilePath, str);
-        this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath);
-        console.log(`Scanned ${this.#scannedFiles} files`);
+        this.#storeResult();
       }
     });
 
@@ -94,6 +93,13 @@ export class Scanner extends EventEmitter {
 
     this.#tmpResult = {};
     this.#aborted = false;
+  }
+
+  #storeResult() {
+    const str = JSON.stringify(this.#tmpResult, null, 4);
+    fs.writeFileSync(this.#resultFilePath, str);
+    this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath);
+    console.log(`Scanned ${this.#scannedFiles} files`);
   }
 
   #errorHandler(error, origin) {
@@ -112,14 +118,28 @@ export class Scanner extends EventEmitter {
   }
 
   async #scan() {
-    await this.#scannable.prepare();
+    const totalFiles = await this.#scannable.prepare();
+
+    if (totalFiles === 0) {
+      this.#storeResult();
+      return;
+    }
+
     await this.#winnower.init();
     await this.#dispatcher.init();
-    await this.#winnower.startMachine(this.#scannable, this.#wfpDestPath);
+    await this.#winnower.startMachine(this.#scannable, this.#tempPath, this.#wfpFilePath);
   }
 
   setResultsPath(path) {
     this.#resultFilePath = `${path}/results.json`;
+  }
+
+  setWinnowingPath(path) {
+    this.#wfpFilePath = `${path}/winnowing.wfp`;
+  }
+
+  getWinnowingPath(path) {
+    return this.#wfpFilePath;
   }
 
   // Public Methods

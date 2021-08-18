@@ -20,19 +20,16 @@ export class LicenseDb extends Db {
 
   // CREATE LICENSE
   bulkCreate(db:any,license: Partial<License>) {
-    console.log(license.spdixid);
-    return new Promise<License>((resolve, reject) => {
+    return new Promise<any>((resolve, reject) => {
       try { 
         license.fulltext = 'AUTOMATIC IMPORT';
-        license.url = 'AUTOMATIC IMPORT';     
+        license.url = 'AUTOMATIC IMPORT';
         db.run(query.COMPDB_LICENSES_INSERT,
           license.spdxid,
-          license.name,
+          license.spdxid,
           license.fulltext,
           license.url,
-          function (this: any, err: any) {      
-            if (err || this.lastID === 0)
-              reject(new Error('The license was not created or already exist'));
+          function (this: any) {
             license.id = this.lastID;
             resolve(license);
           }
