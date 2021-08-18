@@ -5,8 +5,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   width: 100%;
 
+  .div-scan-title {
+    width: 100%;
+    * {
+      padding-left: 2vw;
+    }
+    .button-close {
+      padding: 50px;
+    }
+  }
+
+  .close-button-div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5vh;
+  }
 
   .div-charts-home {
     //grid with two columns, in the first column one row, in the second one two rows

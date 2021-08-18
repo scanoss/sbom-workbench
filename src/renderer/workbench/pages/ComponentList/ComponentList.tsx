@@ -85,6 +85,9 @@ export const ComponentList = () => {
   return (
     <>
       <section className="scan-results-home">
+        <div className="div-scan-title">
+          <h1 className="header-title">Scan Results</h1>
+        </div>
         <div className="div-charts-home">
           <Card id="licenses" className="report-item licenses">
             <div className="report-title-home">LICENSES</div>
@@ -105,6 +108,16 @@ export const ComponentList = () => {
             <div className="report-title-home">VULNERABILITIES</div>
             <VulnerabilitiesCard data={vulnerabilites} />
           </Card>
+        </div>
+        <div className="close-button-div">
+          <div onClick={() => console.log('Close')} className="button-close">
+            <svg width="15" height="15" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M6.48776 5.00008L9.85401 1.63383C10.0487 1.43914 10.0487 1.1232 9.85401 0.928203L9.07182 0.146016C8.87713 -0.0486719 8.56119 -0.0486719 8.36619 0.146016L5.00025 3.51258L1.634 0.146328C1.43932 -0.0483593 1.12338 -0.0483593 0.928379 0.146328L0.146504 0.928203C-0.0481836 1.12289 -0.0481836 1.43883 0.146504 1.63383L3.51275 5.00008L0.146504 8.36633C-0.0481836 8.56102 -0.0481836 8.87695 0.146504 9.07195L0.928692 9.85414C1.12338 10.0488 1.43932 10.0488 1.63432 9.85414L5.00025 6.48758L8.36651 9.85383C8.56119 10.0485 8.87713 10.0485 9.07213 9.85383L9.85432 9.07164C10.049 8.87695 10.049 8.56102 9.85432 8.36602L6.48776 5.00008Z"
+                fill="#71717A"
+              />
+            </svg>
+          </div>
         </div>
       </section>
       <section id="ComponentList" className="app-page">
