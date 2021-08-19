@@ -41,6 +41,7 @@ export enum IpcEvents {
 
   LICENSE_CREATE = 'LICENSE_CREATE',
   LICENSE_GET = 'LICENSE_GET',
+  LICENSE_GET_ALL = 'LICENSE_GET_ALL',
   LICENSE_DELETE = 'LICENSE_DELETE',
   LICENSE_UPDATE = 'LICENSE_UPDATE',
 
@@ -103,6 +104,7 @@ export const ipcRendererEvents = [
 
   IpcEvents.LICENSE_CREATE,
   IpcEvents.LICENSE_GET,
+  IpcEvents.LICENSE_GET_ALL,
   IpcEvents.LICENSE_UPDATE,
   IpcEvents.LICENSE_DELETE,
 

@@ -9,11 +9,13 @@ class LicenseService {
     return response;
   }
 
-  public async create(license: License): Promise<any> {
-    const response = await ipcRenderer.invoke(
-      IpcEvents.LICENSE_CREATE,
-      license
-    );
+  public async getAll(args: Partial<License>): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.LICENSE_GET_ALL, args);
+    return response;
+  }
+
+  public async create(license: License): Promise<License> {
+    const response = await ipcRenderer.invoke(IpcEvents.LICENSE_CREATE, license);
     return response;
   }
 }

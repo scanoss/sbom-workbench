@@ -1,26 +1,38 @@
 import { ipcMain } from 'electron';
 import { License } from '../api/types';
 import { IpcEvents } from '../ipc-events';
-import { defaultWorkspace } from './workspace/workspace';
+import { defaultProject } from './workspace/ProjectTree';
 
-ipcMain.handle(IpcEvents.LICENSE_GET, async (_event, licToGet: License) => {
+
+ipcMain.handle(IpcEvents.LICENSE_GET_ALL, async (event) => {
   let license: any;
   try {
-    license = await defaultWorkspace.scans_db.licenses.get(licToGet);
+    license = await defaultProject.scans_db.licenses.getAll();
+    return { status: 'ok', message: 'Licenses successfully retrieved', data: license };
   } catch (e) {
-    console.log('Catch an error: ', e);
+    console.log('Catch an error: ', e);   
+    return { status: 'fail' };
   }
-  return { status: 'ok', data: license };
 });
 
-ipcMain.handle(IpcEvents.LICENSE_CREATE, async (_event, arg: License) => {
-  let created: any;
+ipcMain.handle(IpcEvents.LICENSE_GET, async (_event, id: License) => {
   try {
-    created = await defaultWorkspace.scans_db.licenses.create(arg);
+    const license = await defaultProject.scans_db.licenses.get(id);
+    return { status: 'ok', message: 'Licenses successfully retrieved', data: license };
   } catch (e) {
     console.log('Catch an error: ', e);
+    return { status: 'fail' };
   }
-  console.log('License was created ');
-  console.log(arg);
-  return { status: 'ok', data: created };
+ 
+});
+
+ipcMain.handle(IpcEvents.LICENSE_CREATE, async (_event, newLicense: License) => {
+  let license: License;
+  try {
+    license = await defaultProject.scans_db.licenses.create(newLicense);
+    return { status: 'ok', message: 'License successfully created', data: license };
+  } catch (e) {
+    console.log('Catch an error: ', e);
+    return { status: 'fail' };
+  }
 });
