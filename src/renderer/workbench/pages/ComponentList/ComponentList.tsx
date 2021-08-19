@@ -61,22 +61,14 @@ export const ComponentList = () => {
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filter(components, searchQuery);
 
-  const [show, setShow] = useState<boolean>(!localStorage.getItem(name));
-
   const onSelectComponent = (component) => {
     history.push(`/workbench/component`);
     dispatch(setComponent(component));
   };
 
-  const setClose = () => {
-    setShow(false);
-    localStorage.setItem(name, 'true');
-  };
-
   return (
     <div id="ComponentList">
-      {show && <ScanResults show={() => setClose()} />}
-
+      <ScanResults name={name} />
       <section className="app-page">
         <header className="app-header">
           <div className="d-flex space-between align-center">
