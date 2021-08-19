@@ -18,6 +18,7 @@ import { UtilsDb } from './utils_db';
 import { Component, License, ComponentGroup } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
 
+
 const utilsDb = new UtilsDb();
 const query = new Querys();
 
@@ -472,7 +473,7 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(
+        db.get(
           query.SQL_GET_SUMMARY_BY_PURL,
           data.purl,
           (err: any, summary: any) => {
@@ -492,40 +493,27 @@ export class ComponentDb extends Db {
     });
   }
 
-  async getComponentGroup(component: Partial<ComponentGroup>) {
+  async getComponentGroup(component: Partial<ComponentGroup>) {  
     return new Promise(async (resolve, reject) => {
       try {
         const data = await this.getAll(component);
         if (data) {
-        this.groupComponentsByPurl(data);
-        const [comp] = await this.mergeComp(data);
-        const summary: any = await this.summaryByPurl(comp);
-        const sum: any = {
-          identified: 0,
-          pending: 0,
-          ignored: 0,
-        };
-        for (let i = 0; i < summary.length; i += 1) {
-          sum.identified += summary[i].identified;
-          sum.pending += summary[i].pending;
-          sum.ignored += summary[i].ignored;
-        }
-        comp.summary = sum;
-        resolve(comp);
-      } else resolve([]);
-    } catch (error) {
-      reject(new Error('Unable to get components grouped by purl'));
-    }
-  });
-}
+          const [comp] = await this.groupComponentsByPurl(data);
+          comp.summary = await this.summaryByPurl(comp);       
+          resolve(comp);
+        } else resolve([]);
+      } catch (error) {
+        reject(new Error('Unable to get components grouped by purl'));
+      }
+    });
+  }
 
   async getAllComponentGroup() {
     return new Promise(async (resolve, reject) => {
       try {
         const data = await this.getAll({});
         if (data) {
-          this.groupComponentsByPurl(data);
-          const comp = await this.mergeComp(data);
+          const comp = await this.groupComponentsByPurl(data);
           resolve(comp);
         } else resolve([]);
       } catch (error) {
@@ -534,55 +522,45 @@ export class ComponentDb extends Db {
     });
   }
 
-  // Group components by purl
-  private groupComponentsByPurl(data: any) {
-    data.sort((a, b) => a.purl.localeCompare(b.purl));
-  }
-
-  private mergeComp(data: any) {
-    return new Promise(async (resolve) => {
-      const components: any = [];
-      for (let i = 0; i < data.length; i += 1) {
-        const comp: any = {};
-        const version: any = {};
-        comp.summary = data[i].summary;
-        let mergeCounter = 0;
-        comp.name = data[i].name;
-        comp.purl = data[i].purl;
-        comp.url = data[i].url;
-        comp.versions = [];
-        version.licenses = data[i].licenses.slice();
-        version.version = data[i].version;
-        comp.versions.push(version);
-        components.push(comp);
-        mergeCounter = 0;
-        for (let j = i + 1; j < data.length; j += 1) {
-          if (data[i].purl !== data[j].purl) {
-            break;
-          }
-          if (data[i].purl === data[j].purl) {
-            this.mergeCompVersion(components[components.length - 1], data[j]);
-            mergeCounter += 1;
-          }
-        }
-        i += mergeCounter;
+  async groupComponentsByPurl(data: any) {
+    try {
+      const aux = {};
+      for (const component of data) {
+        if (!aux.hasOwnProperty(component.purl)) aux[component.purl] = [];
+        aux[component.purl].push(component);
       }
-      resolve(components);
-    });
+      const result = await this.mergeComponentByPurl(aux);
+      return result;
+    } catch (err) {
+      return ('Unable to group components');
+    }
   }
 
-  // Merge all versions for an specific component
-  private mergeCompVersion(components: any, data: any) {
-    const version: any = {};
-    version.licenses = data.licenses.slice();
-    version.version = data.version;
-    // Total summary of each component
-
-    if (components.summary && data.summary) {
-      components.summary.identified += data.summary.identified;
-      components.summary.ignored += data.summary.ignored;
-      components.summary.pending += data.summary.pending;
-    }
-    components.versions.push(version);
+  mergeComponentByPurl(data: Record<string, any>) {
+    return new Promise<any[]>(async (resolve, reject) => {
+      const result: any[] = []
+      for (const [key, value] of Object.entries(data)) {
+        const aux: any = {};
+        aux.summary = { ignored: 0, pending: 0, identified: 0 };
+        aux.versions = [];
+        for (const iterator of value) {
+          aux.name = iterator.name;
+          aux.purl = iterator.purl;
+          aux.url = iterator.url;
+          const version: any = {};
+          if (iterator.summary) {
+            aux.summary.ignored += iterator.summary.ignored;
+            aux.summary.pending += iterator.summary.pending;
+            aux.summary.identified += iterator.summary.identified;
+          }
+          version.version = iterator.version;
+          version.licenses = [];
+          version.licenses = iterator.licenses;
+          aux.versions.push(version);
+        }
+        result.push(aux);
+      }
+      resolve(result);
+    });
   }
 }
