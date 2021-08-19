@@ -53,7 +53,7 @@ $md: 780px;
 @import './renderer/report/Report.scss';
 @import './renderer/workspace/Workspace';
 @import './renderer/workspace/pages/NewProject/NewProject';
-
+@import './renderer/workbench/pages/ComponentList/components/ScanResults.scss';
 
 /* fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
