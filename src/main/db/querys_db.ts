@@ -64,7 +64,7 @@ export class Querys {
 
   /** SQL COMPONENTS TABLES INSERT* */
   // SQL INSERT INTO LICENSES
-  COMPDB_LICENSES_INSERT = 'INSERT OR IGNORE INTO licenses (spdxid,name,fulltext,url) VALUES(?,?,?,?);';
+  SQL_CREATE_LICENSE = 'INSERT OR IGNORE INTO licenses (spdxid,name,fulltext,url) VALUES(?,?,?,?);';
 
   // SQL INSERT INTO  COMPONENT VERSIONS
   COMPDB_SQL_COMP_VERSION_INSERT =
