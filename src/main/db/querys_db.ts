@@ -131,7 +131,7 @@ export class Querys {
     'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid;';
 
   // GET LICENSE
-  SQL_SELECT_LICENSE_BY_ID = 'SELECT id, spdxid, name, url FROM licenses WHERE id=?;';
+  SQL_SELECT_LICENSE = 'SELECT id, spdxid, name, url FROM licenses WHERE ';
 
  // GET LICENSES
  SQL_SELECT_ALL_LICENSES = 'SELECT id, spdxid, name, url FROM licenses;';

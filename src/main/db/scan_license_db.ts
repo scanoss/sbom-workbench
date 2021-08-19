@@ -102,11 +102,12 @@ export class LicenseDb extends Db {
   get(data: Partial<License>) {
     return new Promise<License>(async (resolve, reject) => {
       try {
+        const sqlGet = this.sqlGetLicenseQuery(data);
         const db = await this.openDb();
         db.serialize(function () {
-          db.get(query.SQL_SELECT_LICENSE_BY_ID, data.id, (err: any, license: any) => {
+          db.get(sqlGet, (err: any, license: any) => {
             db.close();
-            if (err) reject(new Error('Unable to get license by id'));
+            if (err || license === undefined) reject(new Error('Unable to get license by id'));
             resolve(license);
           });
         });
@@ -116,6 +117,15 @@ export class LicenseDb extends Db {
     });
   }
 
+  private sqlGetLicenseQuery(data: any) {
+    let sqlQuery: string;
+    if (data.name) sqlQuery = `${query.SQL_SELECT_LICENSE}name='${data.name}';`;
+    else if (data.spdxid) sqlQuery = `${query.SQL_SELECT_LICENSE}spdxid='${data.spdxid}';`;
+    else sqlQuery = `${query.SQL_SELECT_LICENSE}id=${data.id};`;
+    console.log(sqlQuery);
+    return sqlQuery;
+  }
+
   // GET LICENSE
   getAll() {
     return new Promise<License>(async (resolve, reject) => {
@@ -123,8 +133,8 @@ export class LicenseDb extends Db {
         const db = await this.openDb();
         db.serialize(function () {
           db.all(query.SQL_SELECT_ALL_LICENSES, (err: any, license: any) => {
-          db.close();
-          if (err) reject(new Error('Unable to get all licenses'));
+            db.close();
+            if (err) reject(new Error('Unable to get all licenses'));
             resolve(license);
           });
         });
