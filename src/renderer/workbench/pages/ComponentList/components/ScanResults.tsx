@@ -9,12 +9,12 @@ import LicensesChart from '../../../../report/components/LicensesChart';
 import LicensesTable from '../../../../report/components/LicensesTable';
 import { report } from '../../../../../api/report-service';
 
-const ScanResults = ({ show }) => {
+const ScanResults = ({ name }) => {
   const history = useHistory();
   const [licenses, setLicenses] = useState<any[]>([]);
   const [vulnerabilites, setVulnerabilites] = useState<any[]>([]);
   const [progress, setProgress] = useState<any>(null);
-  const [displayed, setDisplayed] = useState<any>(true);
+  const [displayed, setDisplayed] = useState<any>(localStorage.getItem(name) === 'true' || !localStorage.getItem(name));
 
   const init = async () => {
     const a = await report.getSummary();
@@ -23,9 +23,14 @@ const ScanResults = ({ show }) => {
     setVulnerabilites(a?.data?.vulnerabilities);
   };
 
+  const handleDisplayed = () => {
+    setDisplayed(!displayed);
+    localStorage.setItem(name, !displayed);
+  };
+
   useEffect(init, []);
   return (
-    <>
+    <div>
       {displayed ? (
         <section className="scan-results-home">
           <header className="d-flex space-between align-center">
@@ -61,13 +66,13 @@ const ScanResults = ({ show }) => {
       ) : null}
       <div
         onClick={() => {
-          setDisplayed(!displayed);
+          handleDisplayed();
         }}
         className="btn-close"
       >
         <div className="btn-slide-container">{displayed ? <ExpandLess /> : <ExpandMore />}</div>
       </div>
-    </>
+    </div>
   );
 };
 

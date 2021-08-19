@@ -1,7 +1,7 @@
 .scan-results-home {
     background-color: #F4F4F5;
     border-radius: 0px 0px 40px 40px;
-    padding: 0px 65px;
+    padding: 20px 65px;
 
 
 
@@ -89,8 +89,6 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
-
 
     &:hover {
       cursor: pointer;
@@ -105,11 +103,4 @@
       border-radius: 0px 0px 50% 50%;
       background-color: #f4f4f5;
     }
-  }
-
-
-  #ScanResults {
-    margin-left: 75px;
-    font-size: 30px;
-    font-weight: 700;
   }
