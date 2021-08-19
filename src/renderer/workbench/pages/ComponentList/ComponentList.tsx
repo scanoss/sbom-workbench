@@ -1,4 +1,4 @@
-import { makeStyles, Paper, IconButton, InputBase, Button, ButtonGroup } from '@material-ui/core';
+import { makeStyles, Paper, IconButton, InputBase, Button, ButtonGroup, Card } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
@@ -11,6 +11,8 @@ import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import ComponentCard from '../../components/ComponentCard/ComponentCard';
 import { setComponent } from '../../actions';
+
+import ScanResults from './components/ScanResults';
 
 const LIMIT = 100;
 
@@ -59,14 +61,23 @@ export const ComponentList = () => {
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filter(components, searchQuery);
 
+  const [show, setShow] = useState<boolean>(!localStorage.getItem(name));
+
   const onSelectComponent = (component) => {
     history.push(`/workbench/component`);
     dispatch(setComponent(component));
   };
 
+  const setClose = () => {
+    setShow(false);
+    localStorage.setItem(name, 'true');
+  };
+
   return (
-    <>
-      <section id="ComponentList" className="app-page">
+    <div id="ComponentList">
+      {show && <ScanResults show={() => setClose()} />}
+
+      <section className="app-page">
         <header className="app-header">
           <div className="d-flex space-between align-center">
             <div>
@@ -129,7 +140,7 @@ export const ComponentList = () => {
           )}
         </main>
       </section>
-    </>
+    </div>
   );
 };
 

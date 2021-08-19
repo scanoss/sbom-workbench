@@ -47,11 +47,12 @@ export class Formats extends Db {
               data[i].component = comp;
               pkg.name = data[i].component.name;
               pkg.supplier = data[i].vendor;
-              pkg.versionInfo = data[i].version;
-              pkg.downloadLocation = data[i].purl;
+              pkg.PackageVersion = data[i].version;
+              pkg.PackageSPDXIdentifier = data[i].purl;
+              pkg.PackageDownloadLocation=data[i].url;
               pkg.description = 'Detected by SCANOSS Inventorying Engine.';
               if (data[i].license_name !== undefined)
-                pkg.licenseConcluded = data[i].license_name;
+                pkg.ConcludedLicense = data[i].license_name;
               else pkg.licenseConcluded = 'n/a';
               document.Packages.push(pkg);
             }
@@ -91,9 +92,9 @@ export class Formats extends Db {
   }
 
   private csvCreate(inventories: any) {
-    let csv = `id,usage,notes,license_name,purl,path,version\r\n`;
+    let csv = `id,usage,notes,license_name,path,purl,version\r\n`;
     for (const inventorie of inventories) {
-      csv += `${inventorie.id},${inventorie.usage},${inventorie.notes},${inventorie.license_name},${inventorie.purl},"${inventorie.path}",${inventorie.version}\r\n`;
+      csv += `${inventorie.id},${inventorie.usage},${inventorie.notes},${inventorie.license_name},"${inventorie.path}","${inventorie.purl}",${inventorie.version}\r\n`;
     }
     return csv;
   }
