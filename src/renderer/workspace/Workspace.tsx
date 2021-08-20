@@ -71,8 +71,12 @@ const Workspace = () => {
   const filterProjects = filter(projects, searchQuery);
 
   const init = async () => {
-    const { data } = await workspaceService.getAllProjects();
-    setProjects(data);
+    try {
+      const projects = await workspaceService.getAllProjects();
+      setProjects(projects);
+    } catch (error) {
+      alert(error);
+    }
   };
 
   const cleanup = () => {};
@@ -95,17 +99,13 @@ const Workspace = () => {
 
   const onTrashHandler = async (path, e) => {
     e.stopPropagation();
-    const { action } = await dialogCtrl.openConfirmDialog(
-      'Are you sure you want to delete this project?',
-      {
-        label: 'Delete',
-        role: 'delete',
-      });
-    if (action == DIALOG_ACTIONS.OK) {
-      const { status } = await workspaceService.deleteProject(path);
-      if (status === 'ok') {
-        init();
-      }
+    const { action } = await dialogCtrl.openConfirmDialog('Are you sure you want to delete this project?', {
+      label: 'Delete',
+      role: 'delete',
+    });
+    if (action === DIALOG_ACTIONS.OK) {
+      await workspaceService.deleteProject(path);
+      init();
     }
   };
 

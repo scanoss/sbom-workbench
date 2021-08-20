@@ -62,6 +62,12 @@
     height: 100%;
     overflow: hidden;
 
+    span:not(.linenumber) {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      -webkit-user-drag: initial !important;
+    }
+
     pre {
       margin: 0;
       padding: 0 !important;
