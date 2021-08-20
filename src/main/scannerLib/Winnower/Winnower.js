@@ -298,6 +298,10 @@ export class Winnower extends EventEmitter {
 
   pause() {
     this.#continue = false;
+    const p = new Promise((resolve) => {
+      this.#worker.on('message', resolve());
+    });
+    return p;
   }
 
   resume() {

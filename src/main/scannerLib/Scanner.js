@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // 2.0
 import EventEmitter from 'events';
 import os from 'os';
@@ -21,6 +22,10 @@ import { ScannerEvents } from './ScannerEvents';
 
 export class Scanner extends EventEmitter {
   // Private properties
+  #DEFAULT_WORK_DIRECTORY = `${os.tmpdir()}/ScanossDesktopApp`;
+
+  #scannerId;
+
   #scannable;
 
   #winnower;
@@ -35,9 +40,11 @@ export class Scanner extends EventEmitter {
 
   #tmpResult;
 
-  #aborted;
+  #aborted; // Not used
 
   #scannedFiles;
+
+  #TempWorkPath;
 
   constructor() {
     super();
@@ -45,8 +52,6 @@ export class Scanner extends EventEmitter {
   }
 
   initialize() {
-    this.#scannedFiles = 0;
-
     this.#winnower = new Winnower();
     /* ******************* SETTING WINNOWING EVENTS ******************* */
     this.#winnower.on(ScannerEvents.WINNOWING_STARTING, () => {
@@ -62,7 +67,7 @@ export class Scanner extends EventEmitter {
     });
 
     this.#winnower.on('error', (error) => {
-      this.#errorHandler(error, 'WINNOWER');
+      this.#errorHandler(error, ScannerEvents.MODULE_WINNOWER);
     });
     /* ******************* SETTING WINNOWING EVENTS ******************* */
 
@@ -87,12 +92,17 @@ export class Scanner extends EventEmitter {
     });
 
     this.#dispatcher.on('error', (error) => {
-      this.#errorHandler(error, 'DISPATCHER');
+      this.#errorHandler(error, ScannerEvents.MODULE_DISPATCHER);
     });
     /* ******************* SETTING DISPATCHER EVENTS ******************** */
 
+    this.setTempWorkPath();
+
     this.#tmpResult = {};
+    this.#scannedFiles = 0;
     this.#aborted = false;
+
+    this.#scannerId = new Date().getTime();
   }
 
   #storeResult() {
@@ -103,16 +113,20 @@ export class Scanner extends EventEmitter {
   }
 
   #errorHandler(error, origin) {
-    if (origin === 'DISPATCHER') {
-      if (error.message === DispatcherEvents.ERROR_NETWORK_CONNECTIVITY) {
-        this.#aborted = true;
-        this.#winnower.pause(); //Only pause winnowing. Dispatcher is already paused
-        this.emit('error', new Error(ScannerEvents.ERROR_SCANNER_ABORTED));
+    if (origin === ScannerEvents.MODULE_DISPATCHER) {
+      //If this line is reached, dispatcher is paused and no promises pending
+
+      if (error.name === ScannerEvents.ERROR_SERVER_SIDE) {
+        console.log('Error en el lado del server');
       }
-      return;
+
+      this.#winnower.pause().then(()=>{
+        this.emit('error', error);
+      });
+
     }
 
-    if (origin === 'WINNOWER') {
+    if (origin === ScannerEvents.MODULE_WINNOWER) {
       console.log(error);
     }
   }
@@ -138,6 +152,12 @@ export class Scanner extends EventEmitter {
     this.#wfpFilePath = `${path}/winnowing.wfp`;
   }
 
+  setTempWorkPath(path) {
+    this.#TempWorkPath =  path;
+  }
+
+  getScannerId(){ return this.#scannerId; }
+
   getWinnowingPath(path) {
     return this.#wfpFilePath;
   }
@@ -162,10 +182,12 @@ export class Scanner extends EventEmitter {
   pause() {
     this.#winnower.pause();
     this.#dispatcher.pause();
-    this.#tmpResult = {};
   }
 
-  resume() {}
+  resume() {
+    this.#winnower.resume();
+    this.#dispatcher.resume();
+  }
 
   restart() {}
 

@@ -194,15 +194,21 @@ export class ProjectTree extends EventEmitter {
     });
 
     this.scanner.on('error', (error) => {
-      console.log(error.message);
+      console.log('Scanner error bubbled up. Resuming in 10 seconds');
+      setTimeout(() => {
+        console.log('Resuming scanner');
+        this.scanner.resume();
+      }, 10000);
 
-      if (error.message === ScannerEvents.ERROR_SCANNER_ABORTED) {
-        this.msgToUI.send(IpcEvents.SCANNER_ABORTED, error); // Emit only once
-        this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
-          success: false,
-          resultsPath: this.work_root,
-        });
-      }
+      //console.log(error.message);
+
+      // if (error.message === ScannerEvents.ERROR_SCANNER_ABORTED) {
+      //   this.msgToUI.send(IpcEvents.SCANNER_ABORTED, error); // Emit only once
+      //   this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
+      //     success: false,
+      //     resultsPath: this.work_root,
+      //   });
+      // }
     });
   }
 
