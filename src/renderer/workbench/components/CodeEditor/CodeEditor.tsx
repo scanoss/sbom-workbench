@@ -10,7 +10,7 @@ interface CodeEditorProps {
 
 const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
   const lines = range(parseInt(highlight?.split('-')[0], 10), parseInt(highlight?.split('-')[1], 10));
-
+  console.log(lines);
   return (
     <>
       <SyntaxHighlighter

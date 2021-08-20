@@ -292,7 +292,7 @@ export const Editor = () => {
           <main className="editors editors-full app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
-                <MemoCodeEditor content={localFileContent.content} highlight={currentMatch?.lines || null } />
+                <MemoCodeEditor content={localFileContent.content} highlight={currentMatch?.lines || null} />
               ) : null}
             </div>
           </main>
