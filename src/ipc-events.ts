@@ -108,7 +108,6 @@ export const ipcRendererEvents = [
   IpcEvents.LICENSE_UPDATE,
   IpcEvents.LICENSE_DELETE,
 
-
   IpcEvents.FILE_GET_CONTENT,
   IpcEvents.FILE_GET,
   IpcEvents.IGNORED_FILES,

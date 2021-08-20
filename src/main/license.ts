@@ -4,9 +4,8 @@ import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
 
 ipcMain.handle(IpcEvents.LICENSE_GET_ALL, async (event) => {
-  let license: any;
   try {
-    license = await defaultProject.scans_db.licenses.getAll();
+    const license = await defaultProject.scans_db.licenses.getAll();    
     return { status: 'ok', message: 'Licenses successfully retrieved', data: license };
   } catch (e) {
     console.log('Catch an error: ', e);

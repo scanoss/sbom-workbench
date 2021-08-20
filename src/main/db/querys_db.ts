@@ -14,7 +14,7 @@ export class Querys {
     'CREATE TABLE IF NOT EXISTS status (files integer, scanned integer default 0, status text, project integer, user text, message text, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, type text, size text);';
 
   COMPDB_SQL_CREATE_TABLE_COMPVERS =
-    'CREATE TABLE IF NOT EXISTS component_versions (id integer primary key asc, name text, version text not null, description text, url text, purl text, UNIQUE(name, version,description,url,purl));';
+    'CREATE TABLE IF NOT EXISTS component_versions (id integer primary key asc, name text, version text not null, description text, url text, purl text, UNIQUE(version,purl));';
 
   COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS =
     'CREATE TABLE IF NOT EXISTS license_component_version (id integer primary key asc, cvid integer not null, licid integer not null, unique(cvid,licid));';
@@ -68,7 +68,7 @@ export class Querys {
 
   // SQL INSERT INTO  COMPONENT VERSIONS
   COMPDB_SQL_COMP_VERSION_INSERT =
-    'INSERT OR IGNORE INTO component_versions  (name,version, description, url,purl) values (?,?,?,?,?);';
+    'INSERT OR IGNORE INTO component_versions  (name,version, description, url,purl) VALUES (?,?,?,?,?);';
 
   // ATTACH A COMPONENT TO A LICENSE
   SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID = 'INSERT or IGNORE INTO license_component_version (cvid,licid) values (?,?)';
