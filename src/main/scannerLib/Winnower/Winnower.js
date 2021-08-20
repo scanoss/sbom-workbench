@@ -11,7 +11,8 @@ parentPort.on('message', async (scannableItem) => {
     scannableItem.content,
     scannableItem.contentSource
   );
-  parentPort.postMessage(fingerprint);
+  scannableItem.fingerprint = fingerprint;
+  parentPort.postMessage(scannableItem);
 });
 
 
@@ -222,6 +223,8 @@ export class Winnower extends EventEmitter {
 
   #isRunning;
 
+  #winnowedList; // Keep a list of scannableItems processed in the current .wfp file. After a .wfp is created the list will clear
+
   constructor() {
     super();
     this.init();
@@ -229,10 +232,12 @@ export class Winnower extends EventEmitter {
 
   init() {
     this.#wfp = '';
+    this.#winnowedList = [];
     this.#continue = true;
     this.#worker = new Worker(stringWorker, { eval: true });
-    this.#worker.on('message', async (winnowingResult) => {
-      await this.#storeResult(winnowingResult);
+    this.#worker.on('message', async (scannableItem) => {
+      await this.#storeResult(scannableItem.fingerprint);
+      this.#winnowedList.push(scannableItem.contentSource);
       await this.#nextStepMachine();
     });
   }
@@ -264,7 +269,13 @@ export class Winnower extends EventEmitter {
   async #createWfpFile(content, dst, name) {
     if (!fs.existsSync(dst)) fs.mkdirSync(dst);
     await fs.promises.writeFile(`${dst}/${name}.wfp`, content);
+    await this.#persistWinnowedList();
     this.emit(ScannerEvents.WINNOWING_NEW_WFP_FILE, `${dst}/${name}.wfp`);
+  }
+
+  async #persistWinnowedList() {
+    await fs.promises.appendFile(`${this.#tmpPath}/winnowedList.json`, this.#winnowedList);
+    this.#winnowedList = [];
   }
 
   async #appendWinnowingFile(content, dst) {
@@ -314,4 +325,7 @@ export class Winnower extends EventEmitter {
   isRunning() {
     return this.#isRunning;
   }
+
+
+
 }

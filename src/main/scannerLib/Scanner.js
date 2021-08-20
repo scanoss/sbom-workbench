@@ -21,8 +21,8 @@ import { ScannerEvents } from './ScannerEvents';
 // -
 
 export class Scanner extends EventEmitter {
-  // Private properties
-  #DEFAULT_WORK_DIRECTORY = `${os.tmpdir()}/ScanossDesktopApp`;
+
+  #workDirectory;
 
   #scannerId;
 
@@ -32,11 +32,11 @@ export class Scanner extends EventEmitter {
 
   #dispatcher;
 
-  #tempPath = `${os.tmpdir()}/ScanossDesktopApp`;
+  #tempPath;
 
-  #resultFilePath = `${this.#tempPath}/result.json`;
+  #resultFilePath;
 
-  #wfpFilePath = `${this.#tempPath}/winnowing.wfp`;
+  #wfpFilePath;
 
   #tmpResult;
 
@@ -44,14 +44,14 @@ export class Scanner extends EventEmitter {
 
   #scannedFiles;
 
-  #TempWorkPath;
-
   constructor() {
     super();
     this.initialize();
   }
 
   initialize() {
+    this.#scannerId = new Date().getTime();
+
     this.#winnower = new Winnower();
     /* ******************* SETTING WINNOWING EVENTS ******************* */
     this.#winnower.on(ScannerEvents.WINNOWING_STARTING, () => {
@@ -87,7 +87,7 @@ export class Scanner extends EventEmitter {
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_FINISHED, () => {
       if (!this.#winnower.isRunning()) {
-        this.#storeResult();
+        this.#finishScan();
       }
     });
 
@@ -96,16 +96,22 @@ export class Scanner extends EventEmitter {
     });
     /* ******************* SETTING DISPATCHER EVENTS ******************** */
 
-    this.setTempWorkPath();
-
     this.#tmpResult = {};
     this.#scannedFiles = 0;
     this.#aborted = false;
-
-    this.#scannerId = new Date().getTime();
   }
 
-  #storeResult() {
+  setWorkDirectory(path) {
+    this.#workDirectory = path;
+    this.#tempPath = `${this.#workDirectory}/scanner-tmp`;
+    this.#resultFilePath = `${this.#workDirectory}/result.json`;
+    this.#wfpFilePath = `${this.#workDirectory}/winnowing.wfp`;
+
+    if (!fs.existsSync(this.#workDirectory)) fs.mkdirSync(this.#workDirectory);
+    if (!fs.existsSync(this.#tempPath)) fs.mkdirSync(this.#tempPath);
+  }
+
+  #finishScan() {
     const str = JSON.stringify(this.#tmpResult, null, 4);
     fs.writeFileSync(this.#resultFilePath, str);
     this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath);
@@ -132,31 +138,28 @@ export class Scanner extends EventEmitter {
   }
 
   async #scan() {
-    const totalFiles = await this.#scannable.prepare();
 
-    if (totalFiles === 0) {
-      this.#storeResult();
-      return;
+    // Ensures to create a unique folder for each scanner instance in case no workDirectory was specified.
+    if (this.#workDirectory === undefined) {
+      console.log("creating default workDirectory");
+      await this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
+      console.log("created default workDirectory");
     }
 
+    const totalFiles = await this.#scannable.prepare();
+    if (totalFiles === 0) {
+      this.#finishScan();
+      return;
+    }
     await this.#winnower.init();
     await this.#dispatcher.init();
+
     await this.#winnower.startMachine(this.#scannable, this.#tempPath, this.#wfpFilePath);
   }
 
-  setResultsPath(path) {
-    this.#resultFilePath = `${path}/results.json`;
+  getScannerId() {
+    return this.#scannerId;
   }
-
-  setWinnowingPath(path) {
-    this.#wfpFilePath = `${path}/winnowing.wfp`;
-  }
-
-  setTempWorkPath(path) {
-    this.#TempWorkPath =  path;
-  }
-
-  getScannerId(){ return this.#scannerId; }
 
   getWinnowingPath(path) {
     return this.#wfpFilePath;
@@ -189,9 +192,12 @@ export class Scanner extends EventEmitter {
     this.#dispatcher.resume();
   }
 
-  restart() {}
+  recovery(path) {
+    this.setWorkDirectory(path);
+  }
 
   isAbort() {
     return this.#aborted;
   }
+
 }
