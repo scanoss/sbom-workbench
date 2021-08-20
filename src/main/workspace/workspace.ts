@@ -14,7 +14,6 @@ import * as TreeStructure from './ProjectTree';
 // eslint-disable-next-line import/no-mutable-exports
 
 class Workspace extends EventEmitter {
-
   private name: string;
 
   projectsList: TreeStructure.ProjectTree;
@@ -34,34 +33,28 @@ class Workspace extends EventEmitter {
     this.projectsList.createScanProject(scanPath);
   }
 
-  deleteProject(projectPath: string): boolean {
-    if ((!projectPath.includes(this.ws_path)) || (!fs.existsSync(projectPath))) {return false;}
-    try {
-      console.log("Removing project: ", projectPath);
-      this.deleteFolderRecursive(projectPath);
-    } catch (e) {
-      console.log(e);
-      return false;
+  deleteProject(projectPath: string) {
+    if (!projectPath.includes(this.ws_path) || !fs.existsSync(projectPath)) {
+      throw new Error('Project does not exist');
     }
-    return true;
+    this.deleteFolderRecursive(projectPath);
   }
 
-  private deleteFolderRecursive (directoryPath) {
+  private deleteFolderRecursive(directoryPath) {
     if (fs.existsSync(directoryPath)) {
-        fs.readdirSync(directoryPath).forEach((file, index) => {
-          const curPath = path.join(directoryPath, file);
-          if (fs.lstatSync(curPath).isDirectory()) {
-           // recurse
-            this.deleteFolderRecursive(curPath);
-          } else {
-            // delete file
-            fs.unlinkSync(curPath);
-          }
-        });
-        fs.rmdirSync(directoryPath);
-      }
-    };
-
+      fs.readdirSync(directoryPath).forEach((file, index) => {
+        const curPath = path.join(directoryPath, file);
+        if (fs.lstatSync(curPath).isDirectory()) {
+          // recurse
+          this.deleteFolderRecursive(curPath);
+        } else {
+          // delete file
+          fs.unlinkSync(curPath);
+        }
+      });
+      fs.rmdirSync(directoryPath);
+    }
+  }
 
   dirFirstFileAfter(a, b) {
     if (!a.isDirectory() && b.isDirectory()) return 1;

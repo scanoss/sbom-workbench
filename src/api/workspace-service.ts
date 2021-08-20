@@ -1,17 +1,18 @@
 import { IpcEvents } from '../ipc-events';
+import { BaseService } from './base-service';
 import { Project } from './types';
 
 const { ipcRenderer } = require('electron');
 
-class WorkspaceService {
-  public async getAllProjects(): Promise<any> {
+class WorkspaceService extends BaseService {
+  public async getAllProjects(): Promise<Project[]> {
     const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_PROJECT_LIST);
-    return response;
+    return this.response(response);
   }
 
-  public async deleteProject(args): Promise<any> {
+  public async deleteProject(args): Promise<void> {
     const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_DELETE_PROJECT, args);
-    return response;
+    return this.response(response);
   }
 }
 
