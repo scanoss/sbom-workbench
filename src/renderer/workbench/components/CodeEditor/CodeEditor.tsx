@@ -14,10 +14,9 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
   const codeEditor = React.createRef();
 
   const automaticScrollHandler = async () => {
-    const arrayFromHTMLCollection = document.getElementsByClassName('language-javascript');
-    const arraysito = Array.from(arrayFromHTMLCollection);
-    await arraysito.forEach((element) => {
-      element.children[lines[0]].setAttribute('id', 'linelaited');
+    const HTMLCollection = document.getElementsByClassName('language-javascript');
+    Array.from(HTMLCollection).forEach((element) => {
+      element.children[150].setAttribute('id', 'linelaited');
     });
     const element = document.getElementById('linelaited');
     element?.scrollIntoView({ behavior: 'smooth' })
@@ -26,7 +25,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
 
   useEffect(() => {
     automaticScrollHandler();
-  }, [codeEditor]);
+  }, []);
 
   return (
     <>
