@@ -18,14 +18,13 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
       const lineas = element.children[0].children;
       const arrayLineas = Array.from(lineas);
       console.log(arrayLineas);
-      arrayLineas.forEach((linea) => {
+      arrayLineas.find((linea) => {
         if (linea.id === 'linelaited') {
           linea.scrollIntoView();
         }
-      })
+        return linea.id === 'linelaited';
+      });
     });
-    // const element = document.getElementById('linelaited');
-    // element?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
