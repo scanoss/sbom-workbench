@@ -77,8 +77,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const openLicenseDialog = async () => {
-    const newLicense = await dialogCtrl.openLicenseCreate();
-    if (newLicense) {
+    const newLicense = await dialogCtrl.openLicenseCreate();   
+    if ( newLicense && newLicense.data !== null) {
       licenses.push({ name: newLicense.data.name, type: 'cataloged' });
       setForm({ ...form, license_name: licenses[licenses.length - 1].name });
     }

@@ -1,27 +1,18 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import {
-  Dialog,
-  Paper,
-  DialogActions,
-  Button,
-  makeStyles,
-  InputBase,
-  Select,
-  MenuItem,
-  TextareaAutosize,
-  TextField,
-} from '@material-ui/core';
+import { Dialog, Paper, DialogActions, Button, makeStyles, InputBase, TextareaAutosize } from '@material-ui/core';
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { License } from '../../../../api/types';
 import { licenseService } from '../../../../api/license-service';
-import { ContactSupportOutlined } from '@material-ui/icons';
 import { DialogResponse, DIALOG_ACTIONS } from '../../../context/types';
 import { ResponseStatus } from '../../../../main/Response';
 
+// TO DO 
+import { DialogContext } from '../../../context/DialogProvider';
+
 const useStyles = makeStyles((theme) => ({
   dialog: {
-    width: 400,
+    width: 200,
   },
   paper: {
     padding: '2px 4px',
@@ -53,6 +44,7 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
   const classes = useStyles();
   const { open, onClose, onCancel } = props;
   const [form, setForm] = useState<Partial<License>>({});
+  const dialogCtrl = useContext<any>(DialogContext);
 
   const inputHandler = (e) => {
     setForm({
@@ -61,14 +53,17 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
     });
   };
 
-
-
   const handleClose = async () => {
-    const license: Partial<License> = form; 
+    const license: Partial<License> = form;
     const response = await licenseService.create(license);
     if (response.status === ResponseStatus.OK) onClose({ action: DIALOG_ACTIONS.OK, data: response.data });
-    else
-    console.log(response.status)
+    else {
+      const { action } = await dialogCtrl.openConfirmDialog('The license already exist in the catalog', {
+        label: 'acept',
+        role: 'acept',
+      });
+      onClose({ action: DIALOG_ACTIONS.CANCEL, data: null });
+    }
   };
 
   const isValid = () => {
@@ -78,40 +73,29 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
 
   return (
     <Dialog id="LicenseDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
-      <span className="dialog-title">License new</span>
-      <div className="component-version-container">
-        <div className="component-container">
-          <label>NAME</label>
+      <span className="dialog-title">Create license</span>
+      <div className="identity-license">
+        <div className="license-container">
+          <label>Name</label>
           <Paper component="form" className={classes.paper}>
             <InputBase
               name="name"
               fullWidth
               className={classes.input}
               value={form?.name}
+              placeholder="name"
               onChange={(e) => inputHandler(e)}
               required
             />
           </Paper>
         </div>
-        <div className="component-container">
-          <label>URL</label>
-          <Paper component="form" className={classes.paper}>
-            <InputBase
-              name="url"
-              fullWidth
-              className={classes.input}
-              value={form?.url}
-              onChange={(e) => inputHandler(e)}
-              required
-            />
-          </Paper>
-        </div>
-        <div className="component-container">
-          <label>SPDXID</label>
+        <div className="license-container">
+          <label>SPDX ID</label>
           <Paper component="form" className={classes.paper}>
             <InputBase
               name="spdxid"
               fullWidth
+              placeholder="SPDX ID"
               className={classes.input}
               value={form?.spdxid}
               onChange={(e) => inputHandler(e)}
@@ -119,11 +103,12 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
             />
           </Paper>
         </div>
-        <div>
-          <label>FULL TEXT</label>
+        <div className="license-container">
+          <label>Full text</label>
           <Paper component="form" className={classes.paper}>
             <TextareaAutosize
               name="fulltext"
+              placeholder="fulltext"
               value={form?.fulltext}
               className={classes.input}
               cols={30}
@@ -132,8 +117,21 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
             />
           </Paper>
         </div>
+        <div className="license-container">
+          <label>Url</label>
+          <Paper component="form" className={classes.paper}>
+            <InputBase
+              name="url"
+              placeholder="url"
+              fullWidth
+              className={classes.input}
+              value={form?.url}
+              onChange={(e) => inputHandler(e)}
+              required
+            />
+          </Paper>
+        </div>
       </div>
-
       <DialogActions>
         <Button onClick={onCancel}>Cancel</Button>
         <Button variant="contained" color="secondary" onClick={handleClose} disabled={!isValid()}>

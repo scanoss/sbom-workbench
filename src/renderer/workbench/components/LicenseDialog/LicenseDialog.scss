@@ -1,4 +1,10 @@
 #LicenseDialog {
+
+
+ .MuiDialog-paperWidthMd{
+    width: 500px;
+  }
+
     .dialog-title {
       padding: 20px;
       font-size: 24px;
@@ -11,8 +17,8 @@
     }
   
   
-    .identity-component {
-      background-color: rgba(244, 244, 245, 1);
+    .identity-license {
+      background-color:  #f4f4f5;;
       overflow: hidden;
   
       .component-version-container {
@@ -20,17 +26,17 @@
         grid-template-columns: 1.5fr 0.75fr;
         margin: 20px 12px;
   
-        .component-container {
+        .license-container {
           margin: 0 12px;
         }
       }
   
-      .component-container {
+      .license-container {
         margin: 20px 24px;
       }
   
       input {
-        height: 1.3em;
+        height: 1.2em;
       }
   
       label {
@@ -39,14 +45,7 @@
         font-size: 16px;
         font-weight: 400;
       }
-  
-      .usage-notes {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr;
-        grid-gap: 24px;
-        margin: 24px;
-      }
+      
   
       textarea {
         border: none;
