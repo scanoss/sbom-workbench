@@ -61,8 +61,10 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
     });
   };
 
+
+
   const handleClose = async () => {
-    const license: Partial<License> = form;
+    const license: Partial<License> = form; 
     const response = await licenseService.create(license);
     if (response.status === ResponseStatus.OK) onClose({ action: DIALOG_ACTIONS.OK, data: response.data });
     else
