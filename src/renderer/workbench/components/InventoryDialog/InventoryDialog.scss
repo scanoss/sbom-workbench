@@ -55,5 +55,18 @@
       box-shadow: none !important;
       resize: none;
     }
+  
+    .license-btn-container{
+      display: flex;
+      justify-content: space-around;   
+      align-items: baseline;
+      width: 15%; 
+    }
+
+
+
+  
+     
+  
   }
 }

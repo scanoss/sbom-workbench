@@ -1,0 +1,60 @@
+#LicenseDialog {
+    .dialog-title {
+      padding: 20px;
+      font-size: 24px;
+      font-style: normal;
+      font-weight: 400;
+      letter-spacing: 0em;
+      text-align: left;
+      border-bottom: 1px solid #D4D4D8;
+      display: block;
+    }
+  
+  
+    .identity-component {
+      background-color: rgba(244, 244, 245, 1);
+      overflow: hidden;
+  
+      .component-version-container {
+        display: grid;
+        grid-template-columns: 1.5fr 0.75fr;
+        margin: 20px 12px;
+  
+        .component-container {
+          margin: 0 12px;
+        }
+      }
+  
+      .component-container {
+        margin: 20px 24px;
+      }
+  
+      input {
+        height: 1.3em;
+      }
+  
+      label {
+        display: flex;
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: 400;
+      }
+  
+      .usage-notes {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
+        grid-gap: 24px;
+        margin: 24px;
+      }
+  
+      textarea {
+        border: none;
+        outline: 0px !important;
+        -webkit-appearance: none;
+        box-shadow: none !important;
+        resize: none;
+      }
+    }
+  }
+  

@@ -15,7 +15,7 @@ class LicenseService {
     return response;
   }
 
-  public async create(license: License): Promise<License> {
+  public async create(license: Partial<License>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.LICENSE_CREATE, license);
     return response;
   }

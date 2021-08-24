@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { InventoryDialog } from '../workbench/components/InventoryDialog/InventoryDialog';
-import { Inventory } from '../../api/types';
+import { Inventory, License } from '../../api/types';
 import { InventorySelectorDialog } from '../workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse } from './types';
 import ConfirmDialog from '../ui/dialog/ConfirmDialog';
+import { LicenseDialog } from '../workbench/components/LicenseDialog/LicenseDialog'
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any) => Promise<DialogResponse>;
+  openLicenseCreate: () => Promise<License>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -81,8 +83,27 @@ export const DialogProvider: React.FC = ({ children }) => {
     });
   };
 
+  const [licenseDialogSelector, setLicenseDialog] = useState<{
+    open: boolean;
+    onClose?: (response: DialogResponse) => void;
+  }>({ open: false });
+
+  const openLicenseCreate = () => {  
+    return new Promise<License>((resolve) => {
+      setLicenseDialog({      
+        open: true,
+        onClose: (response) => {
+          setLicenseDialog((dialog) => ({ ...dialog, open: false }));
+           resolve(response);
+        },
+      });
+    });
+  };
+
+
+
   return (
-    <DialogContext.Provider value={{ openInventory, openInventorySelector, openConfirmDialog }}>
+    <DialogContext.Provider value={{ openInventory, openInventorySelector, openConfirmDialog, openLicenseCreate }}>
       {children}
       <InventoryDialog
         open={inventoryDialog.open}
@@ -104,6 +125,11 @@ export const DialogProvider: React.FC = ({ children }) => {
         onClose={(response) => confirmDialog.onClose && confirmDialog.onClose(response)}
       />
 
+      <LicenseDialog
+        open={licenseDialogSelector.open}
+        onCancel={() => licenseDialogSelector.onClose && licenseDialogSelector.onClose(null)}
+        onClose={(response) => licenseDialogSelector.onClose && licenseDialogSelector.onClose(response)}
+      />
     </DialogContext.Provider>
   );
 };
