@@ -17,6 +17,7 @@ import { inventoryService } from '../../../../api/inventory-service';
 import { setFile } from '../../actions';
 import { DIALOG_ACTIONS } from '../../../context/types';
 import { resultService } from '../../../../api/results-service';
+import NoMatchFound from '../../components/NoMatchFound/NoMatchFound';
 
 const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
 
@@ -303,11 +304,17 @@ export const Editor = () => {
                 <MemoCodeEditor content={localFileContent.content} highlight={currentMatch?.lines || null} />
               ) : null}
             </div>
-            <div className="editor">
-              {currentMatch && remoteFileContent?.content ? (
-                <MemoCodeEditor content={remoteFileContent.content} highlight={currentMatch?.oss_lines || null} />
-              ) : null}
-            </div>
+            {inventories?.length === 0 && matchInfo?.length === 0 ? (
+              <div className="editor">
+                <NoMatchFound />
+              </div>
+            ) : (
+              <div className="editor">
+                {currentMatch && remoteFileContent?.content ? (
+                  <MemoCodeEditor content={remoteFileContent.content} highlight={currentMatch?.oss_lines || null} />
+                ) : null}
+              </div>
+            )}
           </main>
         )}
       </section>
