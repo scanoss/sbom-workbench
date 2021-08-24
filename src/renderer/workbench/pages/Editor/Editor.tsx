@@ -133,12 +133,12 @@ export const Editor = () => {
 
   const onIdentifyPressed = async (result) => {
     const inv: Partial<Inventory> = {
-      component: result.component.name,
-      version: result.component.version,
-      url: result.component.url,
-      purl: result.component.purl,
-      license_name: result.component.licenses[0]?.name,
-      usage: result.type,
+      component: result.component.name || null,
+      version: result.component.version || null,
+      url: result.component.url || null,
+      purl: result.component.purl || null,
+      license_name: result.component.licenses[0]?.name || null,
+      usage: result.type || null,
     };
 
     create(inv, [result.id]);
@@ -219,6 +219,19 @@ export const Editor = () => {
       default:
         break;
     }
+  };
+
+  const identifyHandler = () => {
+    const inv: Partial<Inventory> = {
+      component: '',
+      version: '',
+      url: '',
+      purl: '',
+      license_name: '',
+      usage: '',
+    };
+
+    create(inv, []);
   };
 
   return (
@@ -306,7 +319,7 @@ export const Editor = () => {
             </div>
             {inventories?.length === 0 && matchInfo?.length === 0 ? (
               <div className="editor">
-                <NoMatchFound />
+                <NoMatchFound identifyHandler={() => identifyHandler()} />
               </div>
             ) : (
               <div className="editor">
