@@ -48,5 +48,11 @@
         }
       }
     }
+
+    .btn-copy {
+      visibility: hidden
+    }
+
+    &:hover .btn-copy {visibility: visible;}
   }
 }
