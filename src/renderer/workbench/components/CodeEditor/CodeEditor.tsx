@@ -5,30 +5,25 @@ import { range } from '../../../../utils/utils';
 
 interface CodeEditorProps {
   content: string;
-  highlight?: number[] | null;
+  highlight: number[];
 }
 
 const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
-  const lines = range(parseInt(highlight?.split('-')[0], 10), parseInt(highlight?.split('-')[1], 10));
+  const lines = highlight && range(parseInt(highlight.split('-')[0], 10), parseInt(highlight.split('-')[1], 10));
 
-  const automaticScrollHandler = () => {
-    const editor = document.getElementsByClassName('code-viewer');
-    console.log(editor);
-    Array.from(editor).forEach((element) => {
-      const lineas = element.children[0].children;
-      const arrayLineas = Array.from(lineas);
-      console.log(arrayLineas);
-      arrayLineas.find((linea) => {
-        if (linea.id === 'linelaited') {
-          linea.scrollIntoView();
-        }
-        return linea.id === 'linelaited';
-      });
+  const scroll = () => {
+    // FIXME: select only for this component
+    const editor = document.querySelectorAll('.code-viewer');
+    editor.forEach((element) => {
+      const line = element.querySelector('.line-highlighted');
+      if (line) {
+        line.scrollIntoView({ behavior: 'smooth' });
+      }
     });
   };
 
   useEffect(() => {
-    automaticScrollHandler();
+    scroll();
   }, []);
 
   return (
@@ -40,15 +35,10 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
         language="javascript"
         showLineNumbers
         lineProps={(line) => {
-          const style = { display: 'block', backgroundColor: 'inherit' };
           if (lines && lines.includes(line)) {
-            style.backgroundColor = '#ebe92252';
-            return { style, id: 'linelaited' };
+            return { class: 'line-highlighted' };
           }
-          return { style };
-        }}
-        onScroll={() => {
-          console.log('scrolleandoooooo');
+          return {};
         }}
       >
         {content.slice(0, 30000)}

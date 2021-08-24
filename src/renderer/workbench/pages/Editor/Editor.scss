@@ -62,6 +62,11 @@
     height: 100%;
     overflow: hidden;
 
+    .line-highlighted {
+      display: block;
+      background-color: #ebe92252 !important;
+    }
+
     pre {
       margin: 0;
       padding: 0 !important;
