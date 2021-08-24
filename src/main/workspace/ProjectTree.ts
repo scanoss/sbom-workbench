@@ -145,7 +145,7 @@ export class ProjectTree extends EventEmitter {
     this.scans_db = new ScanDb(p.work_root);
 
     this.scanner = new Scanner();
-    this.scanner.setWorkDirectory(this.work_root);
+    this.scanner.setWorkDirectory(p.work_root);
 
 
     this.setScannerListeners();
@@ -195,21 +195,16 @@ export class ProjectTree extends EventEmitter {
     });
 
     this.scanner.on('error', (error) => {
-      console.log('Scanner error bubbled up. Resuming in 10 seconds');
+
+
+
+      this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error)
+
       setTimeout(() => {
         console.log('Resuming scanner');
         this.scanner.resume();
-      }, 10000);
+      }, 15000);
 
-      //console.log(error.message);
-
-      // if (error.message === ScannerEvents.ERROR_SCANNER_ABORTED) {
-      //   this.msgToUI.send(IpcEvents.SCANNER_ABORTED, error); // Emit only once
-      //   this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
-      //     success: false,
-      //     resultsPath: this.work_root,
-      //   });
-      // }
     });
   }
 

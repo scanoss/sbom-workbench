@@ -23,6 +23,7 @@ const NewProject = () => {
   const init = async () => {
     ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
     ipcRenderer.on(IpcEvents.SCANNER_FINISH_SCAN, handlerScannerFinish);
+    ipcRenderer.on(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
 
     try {
       setProjectName(scanPath.split('/')[scanPath.split('/').length - 1]);
@@ -35,6 +36,7 @@ const NewProject = () => {
   const cleanup = () => {
     ipcRenderer.removeListener(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
     ipcRenderer.removeListener(IpcEvents.SCANNER_FINISH_SCAN, handlerScannerFinish);
+    ipcRenderer.removeListener(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
   };
 
   const onShowScan = (path) => {
@@ -46,6 +48,13 @@ const NewProject = () => {
     setProgress(args.processed);
     setStage(args.stage);
   };
+
+  const handlerScannerError = (_event, args) => {
+    console.log(args);
+    alert(args);
+
+
+  }
 
   const handlerScannerFinish = (_event, args) => {
     if (args.success) {

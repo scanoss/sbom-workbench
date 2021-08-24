@@ -87,7 +87,7 @@ export class Dispatcher extends EventEmitter {
   resume() {
     this.#status = DispatcherEvents.STATUS_RUNNING;
     this.#pQueue.removeListener('next');
-    this.#counterLeftToError = 5000;
+    this.#counterLeftToError = 20;
     for (const wfpPathFailed in this.#wfpFailed) this.dispatchWfpFile(wfpPathFailed);
     this.#pQueue.start();
   }
@@ -144,7 +144,7 @@ export class Dispatcher extends EventEmitter {
 
       const response = await p1;
       if (!response.ok || this.#counterLeftToError <= 0) {
-        this.#counterLeftToError = 5000;
+        this.#counterLeftToError = 20;
         const err = new Error('Potato error');
         err.code = '009';
         err.name = ScannerEvents.ERROR_SERVER_SIDE;
@@ -158,7 +158,8 @@ export class Dispatcher extends EventEmitter {
       return await Promise.resolve();
     } catch (error) {
       this.#setWfpAsFailed(wfpFilePath);
-      throw new Error(error);
+      if (error.name !== ScannerEvents.ERROR_SERVER_SIDE) error.name = ScannerEvents.ERROR_CLIENT_SIDE;
+      throw error;
     }
   }
 }
