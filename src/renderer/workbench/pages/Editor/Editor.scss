@@ -62,6 +62,11 @@
     height: 100%;
     overflow: hidden;
 
+    .line-highlighted {
+      display: block;
+      background-color: #ebe92252 !important;
+    }
+
     span:not(.linenumber) {
       user-select: text !important;
       -webkit-user-select: text !important;
