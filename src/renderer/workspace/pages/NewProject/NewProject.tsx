@@ -10,6 +10,8 @@ import * as controller from '../../../home/HomeController';
 
 import { IpcEvents } from '../../../../ipc-events';
 
+import { DialogContext } from '../../../context/DialogProvider';
+
 const { ipcRenderer } = require('electron');
 
 const NewProject = () => {
@@ -19,6 +21,7 @@ const NewProject = () => {
   const [projectName, setProjectName] = useState<string>();
   const [progress, setProgress] = useState<number>(0);
   const [stage, setStage] = useState<string>('');
+  const dialogCtrl = useContext<any>(DialogContext); // ??
 
   const init = async () => {
     ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
@@ -49,9 +52,15 @@ const NewProject = () => {
     setStage(args.stage);
   };
 
-  const handlerScannerError = (_event, args) => {
+  const handlerScannerError = async (_event, args) => {
     console.log(args);
-    alert(args);
+    // alert(args);
+    const errorMessage = args.message;
+    const message = 'The scanner will resume in 15 secs.'
+    const { action } = await dialogCtrl.openConfirmDialog(`${args.message} \n ${message}`);
+    console.log(action);
+
+    ipcRenderer.send(IpcEvents.SCANNER_RESUME);
 
 
   }
@@ -104,6 +113,13 @@ const NewProject = () => {
               <>
                 <LinearProgress variant="determinate" value={progress} />
                 <div className="stage-label"> {stage} </div>
+              </>
+            )}
+
+            {stage === 'resuming' && (
+              <>
+                <LinearProgress variant="determinate" value={progress} />
+                <div className="stage-label"> RESUMING SCANNER </div>
               </>
             )}
 

@@ -120,20 +120,21 @@ export class Scanner extends EventEmitter {
 
   #errorHandler(error, origin) {
     if (origin === ScannerEvents.MODULE_DISPATCHER) {
-      //If this line is reached, dispatcher is paused and no promises pending
+      // If this line is reached, dispatcher is paused and no promises pending
 
       if (error.name === ScannerEvents.ERROR_SERVER_SIDE) {
         console.log('Error en el lado del server');
       }
 
-      this.#winnower.pause().then(()=>{
-        this.emit('error', error);
-      });
+      this.#winnower.pause();
+      this.emit('error', error);
+
 
     }
 
     if (origin === ScannerEvents.MODULE_WINNOWER) {
       console.log(error);
+      this.emit('error', error);
     }
   }
 
@@ -141,9 +142,7 @@ export class Scanner extends EventEmitter {
 
     // Ensures to create a unique folder for each scanner instance in case no workDirectory was specified.
     if (this.#workDirectory === undefined) {
-      console.log("creating default workDirectory");
       await this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
-      console.log("created default workDirectory");
     }
 
     const totalFiles = await this.#scannable.prepare();

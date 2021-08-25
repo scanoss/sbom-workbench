@@ -17,6 +17,7 @@ import { licenses } from '../db/licenses';
 import { Scanner } from '../scannerLib/Scanner';
 import { ScannerEvents } from '../scannerLib/ScannerEvents';
 import { IpcEvents } from '../../ipc-events';
+import { ipcMain } from 'electron';
 
 // const fs = require('fs');
 const path = require('path');
@@ -64,6 +65,7 @@ export class ProjectTree extends EventEmitter {
     this.banned_list = new Filtering.BannedList('NoFilter');
     // forces a singleton instance, will be killed in a multiproject domain
     defaultProject = this;
+
   }
 
   set_scan_root(root: string) {
@@ -103,7 +105,12 @@ export class ProjectTree extends EventEmitter {
     this.scans_db = new ScanDb(rootOfProject);
     await this.scans_db.init();
     this.scanner = new Scanner();
+
+
+
   }
+
+
 
   saveScanProject() {
     const file = fs.writeFileSync(`${this.work_root}/tree.json`, JSON.stringify(this).toString());
@@ -195,17 +202,50 @@ export class ProjectTree extends EventEmitter {
     });
 
     this.scanner.on('error', (error) => {
-
-
-
-      this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error)
-
-      setTimeout(() => {
-        console.log('Resuming scanner');
-        this.scanner.resume();
-      }, 15000);
-
+      this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
+
+    ipcMain.on(IpcEvents.SCANNER_RESUME, async (event, arg: IInitScan) => {
+      this.resumeScanner();
+    });
+
+  }
+
+  resumeScanner() {
+
+    const timeout = 15; //En segs.
+    let tickCounter = 0;
+
+    const timerID = setInterval(() => {
+
+      console.log(`Resuming scanner in ${timeout - tickCounter} secs...`);
+      tickCounter += 1;
+
+      if(tickCounter >= timeout) {
+           this.scanner.resume();
+           clearInterval(timerID);
+      }
+
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: 'resuming',
+      // processed: this.filesSummary.include,
+      processed: (100 * tickCounter) / timeout,
+    });
+
+
+
+    }, 1000);
+
+
+
+
+
+
+    // setTimeout(() => {
+    //   console.log('Resuming scanner');
+    //   this.scanner.resume();
+    // }, 15000);
+
   }
 
   startScan() {

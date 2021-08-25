@@ -61,7 +61,7 @@ export class Dispatcher extends EventEmitter {
 
     this.#wfpFailed = {};
 
-    this.#counterLeftToError = 20;
+    this.#counterLeftToError = 3;
 
     // Only works for pQueue@7.x.x versions
     // this.#pQueue.on('error', (error) => {
@@ -87,13 +87,12 @@ export class Dispatcher extends EventEmitter {
   resume() {
     this.#status = DispatcherEvents.STATUS_RUNNING;
     this.#pQueue.removeListener('next');
-    this.#counterLeftToError = 20;
+    this.#counterLeftToError = 3;
     for (const wfpPathFailed in this.#wfpFailed) this.dispatchWfpFile(wfpPathFailed);
     this.#pQueue.start();
   }
 
   #setWfpAsFailed(wfpPath) {
-    console.log(wfpPath);
     if (this.#wfpFailed.hasOwnProperty(wfpPath)) this.#wfpFailed[wfpPath] += 1;
     else this.#wfpFailed[wfpPath] = 1;
   }
@@ -117,8 +116,9 @@ export class Dispatcher extends EventEmitter {
       // Once all the promises are resolved or rejected emit the error event.
       const nextHandler = () => {
         if (this.#pQueue.pending === 0) {
-          this.emit('error', this.#error);
           this.#pQueue.removeListener(nextHandler);
+          this.emit('error', this.#error);
+
         }
       };
 
@@ -144,7 +144,7 @@ export class Dispatcher extends EventEmitter {
 
       const response = await p1;
       if (!response.ok || this.#counterLeftToError <= 0) {
-        this.#counterLeftToError = 20;
+        this.#counterLeftToError = 3;
         const err = new Error('Potato error');
         err.code = '009';
         err.name = ScannerEvents.ERROR_SERVER_SIDE;
