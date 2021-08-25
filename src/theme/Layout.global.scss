@@ -1,8 +1,13 @@
 .app-page {
   display: grid;
-  height: 100vh;
+  height: 100%; // 100vh;
   padding: 30px 65px;
   grid-template-rows: auto 1fr;
+}
+
+.SplitPane, #Report {
+  height: calc(100% - var(--appbar-height)) !important;
+  margin-top: var(--appbar-height) !important;
 }
 
 .app-header {
@@ -52,4 +57,8 @@
     overflow-y: hidden;
     padding: 3px 0;
   }
+}
+
+#Workbench .app-page {
+  padding: 0px 40px 30px;
 }

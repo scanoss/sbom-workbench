@@ -71,7 +71,7 @@ export const ComponentList = () => {
       <ScanResults name={name} />
       <section className="app-page">
         <header className="app-header">
-          <div className="d-flex space-between align-center">
+          {/* <div className="d-flex space-between align-center">
             <div>
               <h4 className="header-subtitle">{name}</h4>
               <h1 className="header-title">Detected Components</h1>
@@ -89,7 +89,7 @@ export const ComponentList = () => {
                 Identified
               </Button>
             </ButtonGroup>
-          </div>
+          </div> */}
 
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">

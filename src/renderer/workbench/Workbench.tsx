@@ -31,24 +31,6 @@ import InventoryList from './pages/ComponentList/components/InventoryList';
 import RecognizedList from './pages/RecognizedList/RecognizedList';
 import AppBar from './components/AppBar/AppBar';
 
-const Alert = ({ open, handleClose, path }) => {
-  return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle id="alert-dialog-title">SPXD Export</DialogTitle>
-      <DialogContent>
-        <DialogContentText id="alert-dialog-description">
-          The operation has been completed successfully. You can find results in {path}
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="primary" autoFocus>
-          OK
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
-
 const Workbench = () => {
   const history = useHistory();
   const { path, url } = useRouteMatch();
@@ -66,15 +48,6 @@ const Workbench = () => {
     if (!result) {
       dialogController.showError('Error', 'Cannot read scan.');
     }
-  };
-
-  const onDownloadClickedExport = async () => {
-    history.push('/report');
-  };
-
-  const onBackClicked = () => {
-    dispatch(reset());
-    history.push('/');
   };
 
   const onDestroy = () => {};
@@ -96,7 +69,7 @@ const Workbench = () => {
             <FileTree />
           </div>
         </aside>
-        <main className="match-info">
+        <main id="Workbench" className="match-info">
           {loaded ? (
             <Switch>
               <Route exact path={path}>
@@ -125,14 +98,6 @@ const Workbench = () => {
           )}
         </main>
       </SplitPane>
-
-      <Tooltip title="Reports">
-        <Fab className="btn-export" onClick={onDownloadClickedExport}>
-          <BarChartIcon />
-        </Fab>
-      </Tooltip>
-
-      <Alert open={open} handleClose={() => setOpen(false)} path={savePath} />
     </div>
   );
 };
