@@ -19,10 +19,11 @@ export enum MATCH_CARD_ACTIONS {
 interface MatchCardProps {
   label: string | null;
   status: string | null;
+  type: string | null;
   onAction: (action: number) => void;
 }
 
-const MatchCard = ({ label, status, onAction }: MatchCardProps) => {
+const MatchCard = ({ label, status, onAction, type }: MatchCardProps) => {
   const [isShow, setIsShow] = React.useState(false);
 
   return (
@@ -38,6 +39,7 @@ const MatchCard = ({ label, status, onAction }: MatchCardProps) => {
         <div className="match-card-buttons">
           {status === 'pending' && isShow && (
             <>
+              <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
               <Tooltip title="Identify">
                 <IconButton onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IDENTIFY)}>
                   <CheckIcon className="icon check" />
