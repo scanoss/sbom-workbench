@@ -43,6 +43,7 @@ export const Editor = () => {
   const { file } = state;
 
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
+  const [nomatch, setNoMatch] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
@@ -89,11 +90,17 @@ export const Editor = () => {
   const getInventories = async () => {
     const { data } = await inventoryService.getAll({ files: [file] });
     setInventories(data);
+    console.log(data);
   };
 
   const getResults = async () => {
     const { data } = await resultService.get(file);
     setMatchInfo(mapFiles(data));
+  };
+
+  const getNoMatch = async () => {
+    const { data } = await resultService.getNoMatch(file);
+    return data;
   };
 
   const create = async (defaultInventory, selFiles) => {
@@ -133,12 +140,12 @@ export const Editor = () => {
 
   const onIdentifyPressed = async (result) => {
     const inv: Partial<Inventory> = {
-      component: result.component.name || null,
-      version: result.component.version || null,
-      url: result.component.url || null,
-      purl: result.component.purl || null,
-      license_name: result.component.licenses[0]?.name || null,
-      usage: result.type || null,
+      component: result.component.name,
+      version: result.component.version,
+      url: result.component.url,
+      purl: result.component.purl,
+      license_name: result.component.licenses[0]?.name,
+      usage: result.type,
     };
 
     create(inv, [result.id]);
@@ -221,7 +228,9 @@ export const Editor = () => {
     }
   };
 
-  const identifyHandler = () => {
+  const identifyHandler = async () => {
+    const response = await getNoMatch();
+    console.log(response);
     const inv: Partial<Inventory> = {
       component: '',
       version: '',
@@ -231,7 +240,7 @@ export const Editor = () => {
       usage: '',
     };
 
-    create(inv, []);
+    create(inv, [response.id]);
   };
 
   return (
