@@ -17,8 +17,11 @@ class ResultService {
     const response = await ipcRenderer.invoke(IpcEvents.RESULTS_GET, path);
     return response;
   }
+
+  public async getNoMatch(path: string): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.RESULTS_GET_NO_MATCH, path);
+    return response;
+  }
 }
-
-
 
 export const resultService = new ResultService();
