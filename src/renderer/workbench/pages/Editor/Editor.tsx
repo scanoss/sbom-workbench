@@ -43,7 +43,6 @@ export const Editor = () => {
   const { file } = state;
 
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
-  const [nomatch, setNoMatch] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
@@ -98,14 +97,12 @@ export const Editor = () => {
     setMatchInfo(mapFiles(data));
   };
 
-  const getNoMatch = async () => {
-    const { data } = await resultService.getNoMatch(file);
-    return data;
-  };
-
   const create = async (defaultInventory, selFiles) => {
-    const response = await inventoryService.getAll({ purl: defaultInventory.purl, version: defaultInventory.version });
-    const inventories = response.message || [];
+    let inventories = [];
+    if (defaultInventory.purl && defaultInventory.version) {
+      const response = await inventoryService.getAll({ purl: defaultInventory.purl, version: defaultInventory.version });
+      inventories = response.message || [];
+    }
 
     const showSelector = inventories.length > 0;
     let action = DIALOG_ACTIONS.NEW;
@@ -229,18 +226,9 @@ export const Editor = () => {
   };
 
   const identifyHandler = async () => {
-    const response = await getNoMatch();
-    console.log(response);
-    const inv: Partial<Inventory> = {
-      component: '',
-      version: '',
-      url: '',
-      purl: '',
-      license_name: '',
-      usage: '',
-    };
-
-    create(inv, [response.id]);
+    const { data } = await resultService.getNoMatch(file);
+    console.log(data);
+    create({}, [data.id]);
   };
 
   return (
