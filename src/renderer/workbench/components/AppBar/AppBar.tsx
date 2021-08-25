@@ -86,13 +86,17 @@ const AppTitle = ({ title }) => {
   const curLoc = useLocation();
   const [section, setSection] = useState('');
 
+  // FIXME: create app.routes.ts and set data for each route
   const routes = [
     { path: '/workbench', title: 'Detected components' },
-    { path: '/workbench/editor', title: 'Matches' },
-
+    { path: '/workbench/component', title: 'Detected components' },
+    { path: '/workbench/file', title: 'Matches' },
     { path: '/report', title: 'Reports' },
     { path: '/workbench/recognized', title: 'Identified components' },
+    { path: '/workbench/inventory', title: 'Identified components' },
   ];
+
+  // workbench/report   workbecnh/detected   work/identified
 
   useEffect(() => {
     const curTitle = routes.find((item) => item.path === curLoc.pathname);
@@ -129,25 +133,10 @@ const Export = () => {
     setAnchorEl(null);
   };
 
-  const onCsvClickedExport = async () => {
-    await exportFile({ extension: CSV, export: CSV });
+  const onExport = async (extension) => {
+    await exportFile({ extension, export: extension });
     handleClose();
-  };
-
-  const onSpdxClickedExport = async () => {
-    await exportFile({ extension: SPDX, export: SPDX });
-    handleClose();
-  };
-
-  const onWfpClickedExport = async () => {
-    await exportFile({ extension: 'wfp', export: WFP });
-    handleClose();
-  };
-
-  const onRawClickedExport = async () => {
-    await exportFile({ extension: 'json', export: RAW });
-    handleClose();
-  };
+  }
 
   const exportFile = async (data) => {
     const defpath = await projectService.workspacePath();
@@ -162,16 +151,17 @@ const Export = () => {
       else if (data.export === WFP) await ExportFormat.wfp(path);
     }
   };
+
   return (
     <div>
       <Button startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onExportClicked}>
         Export
       </Button>
       <Menu id="fade-menu" anchorEl={anchorEl} keepMounted open={open} onClose={handleClose} TransitionComponent={Fade}>
-        <MenuItem onClick={onSpdxClickedExport}>SPDX</MenuItem>
-        <MenuItem onClick={onCsvClickedExport}>CSV</MenuItem>
-        <MenuItem onClick={onWfpClickedExport}>WFP</MenuItem>
-        <MenuItem onClick={onRawClickedExport}>RAW</MenuItem>
+        <MenuItem onClick={() => onExport(SPDX)}>SPDX</MenuItem>
+        <MenuItem onClick={() => onExport(CSV)}>CSV</MenuItem>
+        <MenuItem onClick={() => onExport(WFP)}>WFP</MenuItem>
+        <MenuItem onClick={() => onExport(RAW)}>RAW</MenuItem>
       </Menu>
     </div>
   );
@@ -179,7 +169,7 @@ const Export = () => {
 
 const AppBar = ({ exp }) => {
   const history = useHistory();
-  const { state, dispatch, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const onBackPressed = () => {
     dispatch(reset());
