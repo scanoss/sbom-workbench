@@ -40,12 +40,13 @@ interface ConfirmDialogProps {
   open: boolean;
   message: string;
   button: any;
+  hideDeleteButton: boolean;
   onClose: (response: DialogResponse) => void;
 }
 
 export const ConfirmDialog = (props: ConfirmDialogProps) => {
   const classes = useStyles();
-  const { open, message, button, onClose } = props;
+  const { open, message, button, hideDeleteButton, onClose } = props;
 
   const handleCancel = () => onClose({ action: DIALOG_ACTIONS.CANCEL });
   const handleAccept = () => onClose({ action: DIALOG_ACTIONS.OK });
@@ -69,7 +70,7 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
         </DialogContentText>
       </DialogContent>
       <DialogActions className={classes.actions}>
-        <Button onClick={handleCancel}>Cancel</Button>
+        {!hideDeleteButton && <Button onClick={handleCancel}>Cancel</Button>}
         <Button
           className={button?.role === 'delete' && classes.deleteButton}
           color="secondary"

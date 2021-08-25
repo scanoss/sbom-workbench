@@ -57,8 +57,15 @@ const NewProject = () => {
     // alert(args);
     const errorMessage = args.message;
     const message = 'The scanner will resume in 15 secs.'
-    const { action } = await dialogCtrl.openConfirmDialog(`${args.message} \n ${message}`);
-    console.log(action);
+    const { action } = await dialogCtrl.openConfirmDialog(
+      `${args.message} \n ${message}`,
+      {
+        label: 'OK',
+        role: 'accept',
+      },
+      true
+      );
+
 
     ipcRenderer.send(IpcEvents.SCANNER_RESUME);
 
