@@ -73,11 +73,12 @@ const AppMenu = () => {
   );
 };
 
-const AppProgress = () => {
+const AppProgress = ({ progress }) => {
+
   return (
     <section id="AppProgress">
-      <p>50%</p>
-      <LinearProgress className="progress" variant="determinate" value={50} />
+      <p>{progress}%</p>
+      <LinearProgress color="secondary" className="progress" variant="determinate" value={progress} />
     </section>
   );
 };
@@ -210,7 +211,7 @@ const AppBar = ({ exp }) => {
 
           <AppTitle title={state.name} />
 
-          <div className="slot end">{exp && <Export />}</div>
+          <div className="slot end">{!exp ? <AppProgress progress={state.progress} /> : <Export />}</div>
         </Toolbar>
       </MaterialAppBar>
     </>
