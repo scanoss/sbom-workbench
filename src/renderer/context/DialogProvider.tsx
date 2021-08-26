@@ -9,7 +9,7 @@ import { LicenseDialog } from '../workbench/components/LicenseDialog/LicenseDial
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
-  openConfirmDialog: (message?: string, button?: any) => Promise<DialogResponse>;
+  openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
   openLicenseCreate: () => Promise<License>;
 }
 
@@ -58,6 +58,7 @@ export const DialogProvider: React.FC = ({ children }) => {
     open: boolean;
     message?: string;
     button?: any;
+    hideDeleteButton?: boolean;
     onClose?: (response: DialogResponse) => void;
   }>({ open: false });
 
@@ -69,12 +70,15 @@ export const DialogProvider: React.FC = ({ children }) => {
     } = {
       label: 'OK',
       role: 'accept',
-    }): Promise<DialogResponse> => {
+    },
+    hideDeleteButton = false
+  ): Promise<DialogResponse> => {
     return new Promise<DialogResponse>((resolve) => {
       setConfirmDialog({
         open: true,
         message,
         button,
+        hideDeleteButton,
         onClose: (response) => {
           setConfirmDialog((dialog) => ({ ...dialog, open: false }));
           resolve(response);
@@ -121,6 +125,7 @@ export const DialogProvider: React.FC = ({ children }) => {
       <ConfirmDialog
         open={confirmDialog.open}
         message={confirmDialog.message}
+        hideDeleteButton={confirmDialog.hideDeleteButton}
         button={confirmDialog.button}
         onClose={(response) => confirmDialog.onClose && confirmDialog.onClose(response)}
       />

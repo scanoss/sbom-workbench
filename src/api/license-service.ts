@@ -1,10 +1,10 @@
 import { IpcEvents } from '../ipc-events';
 import { License } from './types';
+import { BaseService } from './base-service';
 
 const { ipcRenderer } = require('electron');
 
-class LicenseService {
-
+class LicenseService extends BaseService {
   public async get(args: Partial<License>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.LICENSE_GET, args);
     return response;
@@ -17,7 +17,7 @@ class LicenseService {
 
   public async create(license: Partial<License>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.LICENSE_CREATE, license);
-    return response;
+    return this.response(response);  
   }
 }
 

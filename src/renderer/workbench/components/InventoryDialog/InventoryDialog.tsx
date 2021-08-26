@@ -19,6 +19,7 @@ import { InventoryForm } from '../../../context/types';
 import { componentService } from '../../../../api/component-service';
 import { licenseService } from '../../../../api/license-service';
 import { DialogContext } from '../../../context/DialogProvider';
+import { ResponseStatus } from '../../../../main/Response';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -71,16 +72,14 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       const lic = await licenseService.getAll();
       setLicensesAll(lic.data);
       setComponents(data.map((item) => item.name));
-      if (form.component) {
-      }
     }
   };
 
   const openLicenseDialog = async () => {
-    const newLicense = await dialogCtrl.openLicenseCreate();   
-    if ( newLicense && newLicense.data !== null) {
-      licenses.push({ name: newLicense.data.name, type: 'cataloged' });
-      setForm({ ...form, license_name: licenses[licenses.length - 1].name });
+    const response = await dialogCtrl.openLicenseCreate();
+    if (response && response.action !== ResponseStatus.OK) {
+      setLicenses([...licenses, { name: response.data.name, type: 'cataloged' }]);
+      setForm({ ...form, license_name: response.data.name });
     }
   };
 
@@ -190,14 +189,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           </div>
         </div>
         <div className="component-container">
-          <div className="license-btn-container">
+          <div className="license-btn-label-container">
             <div className="license-label-container">
               <label>License</label>
             </div>
-            <div>
-              <Button onClick={openLicenseDialog} className="create-license-btn">
-                +
-              </Button>
+            <div className="license-btn-container">
+              <Button onClick={openLicenseDialog}>+</Button>
             </div>
           </div>
           <Paper component="form" className={classes.paper}>
@@ -207,9 +204,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               className={classes.input}
               options={licenses || []}
               groupBy={(option) => option?.type}
-              // getOptionLabel={(option) => option?.name}
-              // value={form?.license_name}
-              // defaultValue = {form.license_name}
+              // getOptionLabel={(option) => (option?.name ? option.indicatorName : '')}
+              value={form.license_name}
               getOptionSelected={(option, value) => option.name === form.license_name}
               getOptionLabel={(option) => option.name}
               disableClearable

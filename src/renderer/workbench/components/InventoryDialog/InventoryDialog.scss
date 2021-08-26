@@ -56,17 +56,16 @@
       resize: none;
     }
   
-    .license-btn-container{
+    .license-btn-label-container{
       display: flex;
-      justify-content: space-around;   
-      align-items: baseline;
-      width: 15%; 
+      justify-content: space-between;   
+      align-items: baseline;   
+    }      
+    
+
+    .license-btn-container{
+      width: 53px; 
     }
-
-
-
-  
-     
   
   }
 }

@@ -7,7 +7,7 @@ import { licenseService } from '../../../../api/license-service';
 import { DialogResponse, DIALOG_ACTIONS } from '../../../context/types';
 import { ResponseStatus } from '../../../../main/Response';
 
-// TO DO 
+// TO DO
 import { DialogContext } from '../../../context/DialogProvider';
 
 const useStyles = makeStyles((theme) => ({
@@ -54,15 +54,16 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
   };
 
   const handleClose = async () => {
-    const license: Partial<License> = form;
-    const response = await licenseService.create(license);
-    if (response.status === ResponseStatus.OK) onClose({ action: DIALOG_ACTIONS.OK, data: response.data });
-    else {
-      const { action } = await dialogCtrl.openConfirmDialog('The license already exist in the catalog', {
-        label: 'acept',
-        role: 'acept',
-      });
-      onClose({ action: DIALOG_ACTIONS.CANCEL, data: null });
+    try {
+      const license: Partial<License> = form;
+      const response = await licenseService.create(license);
+      onClose({ action: DIALOG_ACTIONS.OK, data: response });
+    } catch (error) {
+      await dialogCtrl.openConfirmDialog(
+        'The license already exist in the catalog',
+        { label: 'acept', role: 'acept' },
+        true
+      );
     }
   };
 
