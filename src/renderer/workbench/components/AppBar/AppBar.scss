@@ -66,6 +66,12 @@
     display: flex;
     align-items: center;
 
+    p {
+      color: var(--color-status-identified);
+      font-weight: 700;
+    }
+
+
   .progress {
       margin-left: 5px;
       width: 250px;
