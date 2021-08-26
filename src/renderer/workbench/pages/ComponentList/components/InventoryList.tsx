@@ -63,15 +63,8 @@ export const InventoryList = (props: InventoryListProps) => {
         <header className="app-header">
           <div className="header">
             <div>
-              <h4 className="header-subtitle back">
-                <IconButton onClick={() => history.goBack()} component="span">
-                  <ArrowBackIcon />
-                </IconButton>
-                {state.name}
-              </h4>
-              <h1 className="header-title">Identified Groups</h1>
+              <ComponentInfo component={state.component} />
             </div>
-            <ComponentInfo component={state.component} />
           </div>
         </header>
         <main className="app-content">

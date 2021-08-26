@@ -7,17 +7,12 @@ import { Chart, registerables } from 'chart.js';
 import {
   Button,
   Card,
-  Fab,
   Fade,
-  ListItemIcon,
-  ListItemText,
   Menu,
   MenuItem,
   MenuProps,
   Tooltip,
 } from '@material-ui/core';
-import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
-import GetAppIcon from '@material-ui/icons/GetApp';
 import LicensesChart from './components/LicensesChart';
 import IdentificationProgress from './components/IdentificationProgress';
 import { AppContext, IAppContext } from '../context/AppProvider';
@@ -30,6 +25,7 @@ import MatchesChart from './components/MatchesChart';
 import VulnerabilitiesCard from './components/VulnerabilitiesCard';
 import LicensesObligations from './components/LicensesObligations';
 import { projectService } from '../../api/project-service';
+import AppBar from '../workbench/components/AppBar/AppBar';
 
 Chart.register(...registerables);
 
@@ -72,15 +68,8 @@ const Report = () => {
   const [licenses, setLicenses] = useState<any[]>([]);
   const [crypto, setCrypto] = useState<any[]>([]);
   const [vulnerabilites, setVulnerabilites] = useState<any[]>([]);
-  // use state for licenses table
   const [licensesTable, setLicensesTable] = useState<any[]>([]);
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const SPDX = 'spdx';
-  const CSV = 'csv';
-  const RAW = 'json';
-  const WFP = 'wfp';
 
   const init = async () => {
     const a = await report.getSummary();
@@ -96,83 +85,12 @@ const Report = () => {
     setMatchedLicenseSelected(matchedLicense);
   };
 
-  const onExportClicked = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const onCsvClickedExport = async () => {
-    await exportFile({ extension: CSV, export: CSV });
-    handleClose();
-  };
-
-  const onSpdxClickedExport = async () => {
-    await exportFile({ extension: SPDX, export: SPDX });
-    handleClose();
-  };
-
-  const onWfpClickedExport = async () => {
-    await exportFile({ extension: 'wfp', export: WFP });
-    handleClose();
-  };
-
-
-  const onRawClickedExport = async () => {
-    await exportFile({ extension: 'json', export: RAW });
-    handleClose();
-  };
-
-  const exportFile = async (data) => {
-    const defpath = await projectService.workspacePath();
-    const projectName = await projectService.getProjectName();
-    const path = dialogController.showSaveDialog({
-      defaultPath: `${defpath.data}/${projectName.data}/${projectName.data}.${data.extension}`,
-    });
-    if (path && path !== undefined) {
-      if (data.export === SPDX) await ExportFormat.spdx(path);
-      else if (data.export === CSV) await ExportFormat.csv(path);
-      else if (data.export === RAW) await ExportFormat.raw(path);
-      else if (data.export === WFP) await ExportFormat.wfp(path);
-    }
-  };
-
   useEffect(init, []);
 
   return (
     <>
+      <AppBar exp />
       <section id="Report" className="app-page">
-        <header className="app-header">
-          {/* <h2 className="header-subtitle back">
-            <IconButton onClick={() => history.push('/workbench')} component="span">
-              <ArrowBackIcon />
-            </IconButton>
-            Reports
-          </h2> */}
-          <h3>REPORTS</h3>
-          <div>
-            <Button startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onExportClicked}>
-              Export
-            </Button>
-            <Menu
-              id="fade-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={open}
-              onClose={handleClose}
-              TransitionComponent={Fade}
-            >
-              <MenuItem onClick={onSpdxClickedExport}>SPDX</MenuItem>
-              <MenuItem onClick={onCsvClickedExport}>CSV</MenuItem>
-              <MenuItem onClick={onWfpClickedExport}>WFP</MenuItem>
-              <MenuItem onClick={onRawClickedExport}>RAW</MenuItem>
-
-            </Menu>
-          </div>
-        </header>
-
         <main className="app-content">
           <section className="report-layout">
             <Card className="report-item identification-progress">
@@ -213,12 +131,6 @@ const Report = () => {
           </section>
         </main>
       </section>
-
-      <Tooltip title="Identifications">
-        <Fab className="btn-export" onClick={() => history.push('/workbench')}>
-          <DescriptionOutlinedIcon />
-        </Fab>
-      </Tooltip>
     </>
   );
 };

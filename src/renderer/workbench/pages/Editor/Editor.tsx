@@ -236,14 +236,14 @@ export const Editor = () => {
       <section id="editor" className="app-page">
         <header className="app-header">
           <>
-            <div className="match-title">
+            {/* <div className="match-title">
               <h2 className="header-subtitle back">
                 <IconButton onClick={() => history.goBack()} component="span">
                   <ArrowBackIcon />
                 </IconButton>
                 {inventories?.length === 0 && matchInfo?.length === 0 ? 'No match found' : 'Matches'}
               </h2>
-            </div>
+            </div> */}
             <header className="match-info-header">
               {matchInfo && inventories ? (
                 <section className="content">

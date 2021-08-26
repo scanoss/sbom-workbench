@@ -68,16 +68,6 @@ export const InventoryDetail = () => {
     <>
       <section className="app-page">
         <header className="app-header">
-          <div className="header">
-            <div>
-              <h4 className="header-subtitle back">
-                <IconButton onClick={() => history.goBack()} component="span">
-                  <ArrowBackIcon />
-                </IconButton>
-              </h4>
-            </div>
-            {/* {inventory && <ComponentInfo component={inventory.component} />} */}
-          </div>
           <div className="identified-info-card">
             <IconButton className="btn-delete" onClick={onRemoveClicked}>
               <DeleteOutlineOutlinedIcon />

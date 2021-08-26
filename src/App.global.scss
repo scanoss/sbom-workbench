@@ -32,6 +32,7 @@ $md: 780px;
 
 /* components */
 @import './renderer/home/Home';
+@import './renderer/workbench/components/AppBar/AppBar';
 @import './renderer/workbench/Workbench';
 @import 'renderer/workbench/pages/Editor/Editor';
 @import './renderer/workbench/pages/ComponentList/ComponentList';
