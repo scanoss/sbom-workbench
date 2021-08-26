@@ -86,6 +86,8 @@ const AppTitle = ({ title }) => {
   const curLoc = useLocation();
   const [section, setSection] = useState('');
 
+  const max = 15;
+
   // FIXME: create app.routes.ts and set data for each route
   const routes = [
     { path: '/workbench', title: 'Detected components' },
@@ -107,7 +109,21 @@ const AppTitle = ({ title }) => {
 
   return (
     <section id="AppTitle">
-      <span>{title}</span>
+      {title && (
+        <>
+          <span>
+            {title.length > max ? (
+              <>
+                <Tooltip title={title}>
+                  <span>{title.substring(0, max - 3)}...</span>
+                </Tooltip>
+              </>
+            ) : (
+              title
+            )}
+          </span>
+        </>
+      )}
       <ChevronRightOutlinedIcon fontSize="small" />
       <Typography variant="h6" className="title-main">
         {section}
@@ -136,7 +152,7 @@ const Export = () => {
   const onExport = async (extension) => {
     await exportFile({ extension, export: extension });
     handleClose();
-  }
+  };
 
   const exportFile = async (data) => {
     const defpath = await projectService.workspacePath();
@@ -181,9 +197,11 @@ const AppBar = ({ exp }) => {
       <MaterialAppBar id="AppBar" elevation={1}>
         <Toolbar>
           <div className="slot start">
-            <IconButton onClick={onBackPressed} edge="start" color="inherit" aria-label="menu">
-              <HomeOutlinedIcon />
-            </IconButton>
+            <Tooltip title="Back to projects">
+              <IconButton onClick={onBackPressed} edge="start" color="inherit" aria-label="menu">
+                <HomeOutlinedIcon />
+              </IconButton>
+            </Tooltip>
             <Divider orientation="vertical" flexItem />
             <Navigation />
             <Divider orientation="vertical" flexItem />
@@ -192,7 +210,7 @@ const AppBar = ({ exp }) => {
 
           <AppTitle title={state.name} />
 
-          <div className="slot end">{!exp ? <AppProgress /> : <Export />}</div>
+          <div className="slot end">{exp && <Export />}</div>
         </Toolbar>
       </MaterialAppBar>
     </>
