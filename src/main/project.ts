@@ -68,3 +68,8 @@ ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
   const projectName = defaultProject.project_name;
       return { status: 'ok', message: 'Project name retrieve succesfully', data: projectName };
 });
+
+ipcMain.handle(IpcEvents.UTILS_GET_NODE_FROM_PATH, (event,path: string) => {
+  const node = defaultProject.getNodeFromPath(path)
+  return { status: 'ok', message: 'Node from path retrieve succesfully', data: node };
+});
