@@ -10,18 +10,12 @@ class ProjectService {
   }
 
   public async create(project: Project): Promise<any> {
-    const response = await ipcRenderer.invoke(
-      IpcEvents.PROJECT_CREATE_SCAN,
-      project
-    );
+    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_CREATE_SCAN, project);
     return response;
   }
 
   public async load(path: string): Promise<any> {
-    const response = await ipcRenderer.invoke(
-      IpcEvents.PROJECT_LOAD_SCAN,
-      path
-    );
+    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_LOAD_SCAN, path);
     return response;
   }
 
@@ -35,8 +29,8 @@ class ProjectService {
     return response;
   }
 
-  public async getNodeFromPath(): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.UTILS_GET_NODE_FROM_PATH);
+  public async getNodeFromPath(path: string): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.UTILS_GET_NODE_FROM_PATH, path);
     return response;
   }
 

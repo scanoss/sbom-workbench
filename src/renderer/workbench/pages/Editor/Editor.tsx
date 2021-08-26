@@ -226,8 +226,9 @@ export const Editor = () => {
   };
 
   const identifyHandler = async () => {
+    console.log(file);
     const { data } = await resultService.getNoMatch(file);
-    console.log(data);
+  
     create({}, [data.id]);
   };
 
