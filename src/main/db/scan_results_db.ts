@@ -127,7 +127,7 @@ export class ResultsDb extends Db {
   }
 
   // GET RESULTS
-  get(path: string) {
+  getAll(path: string) {
     let results: any;
     return new Promise(async (resolve, reject) => {
       try {
