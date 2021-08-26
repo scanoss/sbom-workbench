@@ -65,6 +65,11 @@ export class ProjectTree extends EventEmitter {
     this.banned_list = new Filtering.BannedList('NoFilter');
     // forces a singleton instance, will be killed in a multiproject domain
     defaultProject = this;
+
+
+    let archivo=fs.readFileSync('/home/oscar/backendgo.txt');
+    let lineas = archivo.toString().split('\n');
+    console.log(lineas)
   }
 
   set_scan_root(root: string) {
