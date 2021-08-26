@@ -17,10 +17,11 @@ export class Dispatcher extends EventEmitter {
   #CLIENT_TIMESTAMP = 'scanner.c/1.0.0';
 
   // API URL
-  #API_URL = 'https://osskb.org/api/scan/direct';
+  // #API_URL = 'https://osskb.org/api/scan/direct';
+  #API_URL = 'http://51.255.68.110:8886/api/scan/direct';
 
   // Level of concurrency
-  #CONCURRENCY_LIMIT = 10;
+  #CONCURRENCY_LIMIT = 15;
 
   // Timeout for each transaction
   #TIMEOUT = 60000;
@@ -34,8 +35,6 @@ export class Dispatcher extends EventEmitter {
   #status;
 
   #error;
-
-  #counterLeftToError;
 
   #wfpFailed;
 
@@ -61,8 +60,6 @@ export class Dispatcher extends EventEmitter {
 
     this.#wfpFailed = {};
 
-    this.#counterLeftToError = 3;
-
     // Only works for pQueue@7.x.x versions
     // this.#pQueue.on('error', (error) => {
     //   console.log("ERROR CATCHED....");
@@ -87,7 +84,6 @@ export class Dispatcher extends EventEmitter {
   resume() {
     this.#status = DispatcherEvents.STATUS_RUNNING;
     this.#pQueue.removeListener('next');
-    this.#counterLeftToError = 3;
     for (const wfpPathFailed in this.#wfpFailed) this.dispatchWfpFile(wfpPathFailed);
     this.#pQueue.start();
   }
@@ -143,10 +139,10 @@ export class Dispatcher extends EventEmitter {
       });
 
       const response = await p1;
-      if (!response.ok || this.#counterLeftToError <= 0) {
-        this.#counterLeftToError = 3;
-        const err = new Error('Potato error');
-        err.code = '009';
+      if (!response.ok) {
+        const msg = await response.text();
+        const err = new Error(msg);
+        err.code = response.status;
         err.name = ScannerEvents.ERROR_SERVER_SIDE;
         throw err;
       }
@@ -154,11 +150,11 @@ export class Dispatcher extends EventEmitter {
       dataAsText = await response.text();
       dataAsObj = JSON.parse(dataAsText);
       this.emit(ScannerEvents.DISPATCHER_NEW_DATA, new DispatcherResponse(dataAsObj, wfpFilePath));
-      this.#counterLeftToError -= 1;
       return await Promise.resolve();
     } catch (error) {
       this.#setWfpAsFailed(wfpFilePath);
       if (error.name !== ScannerEvents.ERROR_SERVER_SIDE) error.name = ScannerEvents.ERROR_CLIENT_SIDE;
+      console.log(error);
       throw error;
     }
   }

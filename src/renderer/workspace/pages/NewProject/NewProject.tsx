@@ -56,9 +56,8 @@ const NewProject = () => {
     console.log(args);
     // alert(args);
     const errorMessage = args.message;
-    const message = 'The scanner will resume in 15 secs.'
     const { action } = await dialogCtrl.openConfirmDialog(
-      `${args.message} \n ${message}`,
+      `${errorMessage}`,
       {
         label: 'OK',
         role: 'accept',
