@@ -17,6 +17,7 @@ import { inventoryService } from '../../../../api/inventory-service';
 import { setFile } from '../../actions';
 import { DIALOG_ACTIONS } from '../../../context/types';
 import { resultService } from '../../../../api/results-service';
+import NoMatchFound from '../../components/NoMatchFound/NoMatchFound';
 
 const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
 
@@ -88,6 +89,7 @@ export const Editor = () => {
   const getInventories = async () => {
     const { data } = await inventoryService.getAll({ files: [file] });
     setInventories(data);
+    console.log(data);
   };
 
   const getResults = async () => {
@@ -96,8 +98,11 @@ export const Editor = () => {
   };
 
   const create = async (defaultInventory, selFiles) => {
-    const response = await inventoryService.getAll({ purl: defaultInventory.purl, version: defaultInventory.version });
-    const inventories = response.message || [];
+    let inventories = [];
+    if (defaultInventory.purl && defaultInventory.version) {
+      const response = await inventoryService.getAll({ purl: defaultInventory.purl, version: defaultInventory.version });
+      inventories = response.message || [];
+    }
 
     const showSelector = inventories.length > 0;
     let action = DIALOG_ACTIONS.NEW;
@@ -220,6 +225,12 @@ export const Editor = () => {
     }
   };
 
+  const identifyHandler = async () => {
+    const { data } = await resultService.getNoMatch(file);
+    console.log(data);
+    create({}, [data.id]);
+  };
+
   return (
     <>
       <section id="editor" className="app-page">
@@ -303,11 +314,17 @@ export const Editor = () => {
                 <MemoCodeEditor content={localFileContent.content} highlight={currentMatch?.lines || null} />
               ) : null}
             </div>
-            <div className="editor">
-              {currentMatch && remoteFileContent?.content ? (
-                <MemoCodeEditor content={remoteFileContent.content} highlight={currentMatch?.oss_lines || null} />
-              ) : null}
-            </div>
+            {inventories?.length === 0 && matchInfo?.length === 0 ? (
+              <div className="editor">
+                <NoMatchFound identifyHandler={() => identifyHandler()} />
+              </div>
+            ) : (
+              <div className="editor">
+                {currentMatch && remoteFileContent?.content ? (
+                  <MemoCodeEditor content={remoteFileContent.content} highlight={currentMatch?.oss_lines || null} />
+                ) : null}
+              </div>
+            )}
           </main>
         )}
       </section>
