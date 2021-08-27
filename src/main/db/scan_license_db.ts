@@ -8,8 +8,6 @@ import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { License } from '../../api/types';
 
-
-
 const query = new Querys();
 const utilsDb = new UtilsDb();
 
@@ -19,12 +17,13 @@ export class LicenseDb extends Db {
   }
 
   // CREATE LICENSE
-  bulkCreate(db:any,license: Partial<License>) {
+  bulkCreate(db: any, license: Partial<License>) {
     return new Promise<any>((resolve, reject) => {
-      try { 
+      try {
         license.fulltext = 'AUTOMATIC IMPORT';
         license.url = 'AUTOMATIC IMPORT';
-        db.run(query.COMPDB_LICENSES_INSERT,
+        db.run(
+          query.COMPDB_LICENSES_INSERT,
           license.spdxid,
           license.spdxid,
           license.fulltext,
@@ -40,27 +39,19 @@ export class LicenseDb extends Db {
     });
   }
 
-
   // CREATE LICENSE
   create(license: License) {
     return new Promise<License>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         const stmt = db.prepare(query.COMPDB_LICENSES_INSERT);
-        stmt.run(
-          license.spdxid,
-          license.name,
-          license.fulltext,
-          license.url,
-          function (this: any, err: any) {
-            db.close();
-            if (err || this.lastID === 0)
-              reject(new Error('The license was not created or already exist'));
-            license.id = this.lastID;           
-            stmt.finalize();
-            resolve(license);
-          }
-        );
+        stmt.run(license.spdxid, license.name, license.fulltext, license.url, function (this: any, err: any) {
+          db.close();
+          if (err || this.lastID === 0) reject(new Error('The license was not created or already exist'));
+          license.id = this.lastID;
+          stmt.finalize();
+          resolve(license);
+        });
       } catch (error) {
         reject(new Error('The license was not created'));
       }
@@ -93,24 +84,18 @@ export class LicenseDb extends Db {
     });
   }
 
-  importFromJSON(json: Record<any, any>) {   
+  importFromJSON(json: Record<any, any>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.run("begin transaction");
+          db.run('begin transaction');
           for (const [key, license] of Object.entries(json)) {
-            db.run(
-              query.COMPDB_LICENSES_INSERT,
-              license.spdxid,
-              license.name,
-              license.fulltext,
-              license.url
-            );
+            db.run(query.COMPDB_LICENSES_INSERT, license.spdxid, license.name, license.fulltext, license.url);
           }
-          db.run("commit");
-          db.close();          
-        });        
+          db.run('commit');
+          db.close();
+        });
         resolve(true);
       } catch (error) {
         reject(new Error('Unable to insert licenses'));
@@ -124,22 +109,17 @@ export class LicenseDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         if (license.id) id = license.id;
-        else if (license.name || license.spdxid)
-          id = await this.getLicenseIdFilter(license);
+        else if (license.name || license.spdxid) id = await this.getLicenseIdFilter(license);
         else {
           id = '%';
         }
 
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(
-            query.COMPDB_SQL_LICENSE_ALL,
-            `${id}`,
-            (err: any, licenses: any) => {
-              if (err) reject(new Error('[]'));
-              else resolve(licenses);
-            }
-          );
+          db.all(query.COMPDB_SQL_LICENSE_ALL, `${id}`, (err: any, licenses: any) => {
+            if (err) reject(new Error('[]'));
+            else resolve(licenses);
+          });
         });
         db.close();
       } catch (error) {
@@ -148,10 +128,9 @@ export class LicenseDb extends Db {
     });
   }
 
-
   // GET LICENSE ID FROM SPDXID OR LICENSE NAME
   public async getLicenseIdFilter(license: License) {
-    return new Promise <number>(async (resolve, reject) => {
+    return new Promise<number>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         const filter = this.licenseNameSpdxidFilter(license);
@@ -163,10 +142,10 @@ export class LicenseDb extends Db {
             query.COMPDB_SQL_GET_LICENSE_ID_FROM_SPDX_NAME,
             `${filter.name}`,
             `${filter.spdxid}`,
-            (err: any, lic: any) => {             
-              db.close();                 
-               if (err || lic===undefined) resolve(0);
-               else resolve(lic.id);
+            (err: any, lic: any) => {
+              db.close();
+              if (err || lic === undefined) resolve(0);
+              else resolve(lic.id);
             }
           );
         });
@@ -178,7 +157,7 @@ export class LicenseDb extends Db {
 
   /** *LICENSE FILTER** */
   // Filter to perform the query with license name or spdixid
-  private licenseNameSpdxidFilter(license: any) { 
+  private licenseNameSpdxidFilter(license: any) {
     const filter = {
       name: null,
       spdxid: null,
@@ -216,16 +195,14 @@ export class LicenseDb extends Db {
     });
   }
 
-  bulkAttachLicensebyId(db:any,data: any){
+  bulkAttachLicensebyId(db: any, data: any) {
     return new Promise(async (resolve, reject) => {
-    db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID,data.compid, data.license_id, (err: any) => {
-      if (err) reject(new Error('License was not attached'));  
-      resolve(true);
+      db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
+        if (err) reject(new Error('License was not attached'));
+        resolve(true);
+      });
     });
-   });
   }
-  
-
 
   // Attach license to component version by id
   private attachLicensebyId(data: any) {
@@ -287,20 +264,13 @@ export class LicenseDb extends Db {
       try {
         const db = await this.openDb();
         const stmt = db.prepare(query.COMPDB_LICENSES_INSERT);
-        stmt.run(
-          license.spdxid,
-          license.name,
-          license.fulltext,
-          license.url,
-          function (this: any, err: any) {
-            db.close();
-            if (err || this.lastID === 0)
-              reject(new Error('The license was not created or already exist'));
-            license.id = this.lastID;
-            stmt.finalize();
-            resolve(license);
-          }
-        );
+        stmt.run(license.spdxid, license.name, license.fulltext, license.url, function (this: any, err: any) {
+          db.close();
+          if (err || this.lastID === 0) reject(new Error('The license was not created or already exist'));
+          license.id = this.lastID;
+          stmt.finalize();
+          resolve(license);
+        });
       } catch (error) {
         reject(new Error('The license was not created'));
       }

@@ -190,6 +190,9 @@ export class ComponentDb extends Db {
   create(component: any) {
     return new Promise(async (resolve, reject) => {
       try {
+       const attach:any={};
+       const license: any = {};
+       license.name=component.license_name;
         const db = await this.openDb();
         const stmt = db.prepare(query.COMPDB_SQL_COMP_VERSION_INSERT);
         db.serialize(function () {
@@ -199,10 +202,13 @@ export class ComponentDb extends Db {
             component.description,
             component.url,
             component.purl,
-            function (this: any, err: any) {
+           async function (this: any, err: any) {
               db.close();
               if (err) reject(new Error('error'));
+              attach.license_id = await this.license.getLicenseIdFilter(license);
+
               resolve(this.lastID);
+              
             }
           );
         });
