@@ -1,9 +1,10 @@
 import { IpcEvents } from '../ipc-events';
 import { Project } from './types';
+import { BaseService } from './base-service';
 
 const { ipcRenderer } = require('electron');
 
-class ProjectService {
+class ProjectService extends BaseService {
   public async get(args: Partial<Project>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_GET, args);
     return response;
@@ -31,7 +32,7 @@ class ProjectService {
 
   public async getNodeFromPath(path: string): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.UTILS_GET_NODE_FROM_PATH, path);
-    return response;
+    return this.response(response);
   }
 
 }

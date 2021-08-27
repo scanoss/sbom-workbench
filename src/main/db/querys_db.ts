@@ -96,7 +96,7 @@ export class Querys {
     "SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype!='none' order by file_path;";
 
   SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH =
-    "SELECT DISTINCT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype='none' order by file_path;";
+    "SELECT DISTINCT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype='none' ORDER BY file_path;";
 
   // GET ALL THE INVENTORIES ATTACHED TO A COMPONENT
   SQL_SELECT_ALL_INVENTORIES_ATTACHED_TO_COMPONENT =

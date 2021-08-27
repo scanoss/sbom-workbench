@@ -1,8 +1,10 @@
 import { IpcEvents } from '../ipc-events';
+import { BaseService } from './base-service';
 
 const { ipcRenderer } = require('electron');
 
-class ResultService {
+
+class ResultService extends BaseService {
   public async ignored(files: number[]): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.IGNORED_FILES, files);
     return response;
@@ -21,6 +23,11 @@ class ResultService {
   public async getNoMatch(path: string): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.RESULTS_GET_NO_MATCH, path);
     return response;
+  }
+
+  public async createFiltered(path: string): Promise<any> { 
+    const response = await ipcRenderer.invoke(IpcEvents.RESULTS_ADD_FILTERED_FILE, path);
+    return this.response(response);
   }
 }
 

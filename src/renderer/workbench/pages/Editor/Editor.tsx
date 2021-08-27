@@ -61,7 +61,6 @@ export const Editor = () => {
 
     getInventories();
     getResults();
-    getFileFromPath();
 
     if (file) {
       loadLocalFile(file);
@@ -91,17 +90,12 @@ export const Editor = () => {
   const getInventories = async () => {
     const { data } = await inventoryService.getAll({ files: [file] });
     setInventories(data);
+    console.log(data);
   };
 
   const getResults = async () => {
     const { data } = await resultService.get(file);
     setMatchInfo(mapFiles(data));
-  };
-
-  const getFileFromPath = async () => {
-    console.log(file);
-    const { data } = await projectService.getNodeFromPath(file);
-    console.log(data);
   };
 
   const create = async (defaultInventory, selFiles) => {
@@ -233,8 +227,15 @@ export const Editor = () => {
   };
 
   const identifyHandler = async () => {
-    console.log(file);
+    const node = await projectService.getNodeFromPath(file);
+    console.log(node.action)
+    if (node.action === 'filter') {
+      console.log("aca");
+      await resultService.createFiltered(file);
+      node.action = 'scan';
+    }
     const { data } = await resultService.getNoMatch(file);
+    console.log(data);
 
     create({}, [data.id]);
   };

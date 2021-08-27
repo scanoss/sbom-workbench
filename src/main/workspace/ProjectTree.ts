@@ -293,27 +293,22 @@ export class ProjectTree extends EventEmitter {
   getNodeFromPath(mypath: string) {
     let res: string[];
     // eslint-disable-next-line prefer-const
-
-    console.log(mypath);
     if (!mypath || !mypath.includes('/')) throw new Error(`Error on path: "${mypath}`);
 
     res = mypath.split('/');
     if (res[0] === '') res.shift();
     if (res[res.length - 1] === '') res.pop();
-
-    // if (this.logical_tree.label === res[0] && res.length === 1) {
-    //   return this.logical_tree;
-    // }
-
-    let nodes = this.logical_tree.children;
-    console.log(nodes);
-    for (let i=0 ; i<(res.length)-1 ; i += 1) {
+    const nodes = this.logical_tree.children;
+    let nodeFound: any = {};
+    for (let i = 0; i < res.length - 1; i += 1) {
       const path = res[i];
-      const nodeFound = nodes.find((node) => {
-        if(node.type === 'folder' && node.label === path) return node;
+       nodeFound = nodes.find((node) => {
+        if (node.type === 'folder' && node.label === path) return node;
       });
     }
-    const nodeFound = nodes.find((node)=> {if (node.type === 'file' && node.label === res[res.length-1]) return node;})
+     nodeFound = nodes.find((node) => {
+      if (node.type === 'file' && node.label === res[res.length - 1]) return node;
+    });
     if (nodeFound) return nodeFound;
     return {};
   }

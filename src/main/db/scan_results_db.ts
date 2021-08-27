@@ -44,7 +44,7 @@ export class ResultsDb extends Db {
             for (let i = 0; i < value.length; i += 1) {
               const filePath = key;
               data = value[i];
-              self.insertResult(db, data, filePath);
+              self.insertResultBulk(db, data, filePath);
             }
           }
           db.run('commit', () => {
@@ -58,7 +58,45 @@ export class ResultsDb extends Db {
     });
   }
 
-  private insertResult(db: any, data: any, filePath: string) {
+  async insertFiltered(path: string) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run(
+            query.SQL_INSERT_RESULTS,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'none',
+            null,
+            null,
+            path,
+            0,
+            0,
+            null,
+            function (this: any, err: any) {
+              if (err) throw err;
+              db.close();
+              resolve(this.lastID);
+            }
+          );
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  private insertResultBulk(db: any, data: any, filePath: string) {
     const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : null;
     db.run(
       query.SQL_INSERT_RESULTS,
