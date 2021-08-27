@@ -18,6 +18,7 @@ import { setFile } from '../../actions';
 import { DIALOG_ACTIONS } from '../../../context/types';
 import { resultService } from '../../../../api/results-service';
 import NoMatchFound from '../../components/NoMatchFound/NoMatchFound';
+import { projectService } from '../../../../api/project-service';
 
 const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
 
@@ -60,6 +61,7 @@ export const Editor = () => {
 
     getInventories();
     getResults();
+    getFileFromPath();
 
     if (file) {
       loadLocalFile(file);
@@ -89,12 +91,17 @@ export const Editor = () => {
   const getInventories = async () => {
     const { data } = await inventoryService.getAll({ files: [file] });
     setInventories(data);
-    console.log(data);
   };
 
   const getResults = async () => {
     const { data } = await resultService.get(file);
     setMatchInfo(mapFiles(data));
+  };
+
+  const getFileFromPath = async () => {
+    console.log(file);
+    const { data } = await projectService.getNodeFromPath(file);
+    console.log(data);
   };
 
   const create = async (defaultInventory, selFiles) => {
@@ -228,7 +235,7 @@ export const Editor = () => {
   const identifyHandler = async () => {
     console.log(file);
     const { data } = await resultService.getNoMatch(file);
-  
+
     create({}, [data.id]);
   };
 
