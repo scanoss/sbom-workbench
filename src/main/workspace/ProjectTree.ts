@@ -293,6 +293,10 @@ export class ProjectTree extends EventEmitter {
   getNodeFromPath(mypath: string) {
     let res: string[];
     // eslint-disable-next-line prefer-const
+
+    console.log(mypath);
+    if (!mypath || !mypath.includes('/')) throw new Error(`Error on path: "${mypath}`);
+
     res = mypath.split('/');
     if (res[0] === '') res.shift();
     if (res[res.length - 1] === '') res.pop();

@@ -70,6 +70,10 @@ ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
 });
 
 ipcMain.handle(IpcEvents.UTILS_GET_NODE_FROM_PATH, (event,path: string) => {
-  const node = defaultProject.getNodeFromPath(path)
-  return { status: 'ok', message: 'Node from path retrieve succesfully', data: node };
+  try {
+    const node = defaultProject.getNodeFromPath(path);
+    return { status: 'ok', message: 'Node from path retrieve succesfully', data: node };
+  } catch (e) {
+    return { status: 'fail', message: e.message };
+  }
 });
