@@ -11,15 +11,20 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { ComponentDb } from './scan_component_db';
 import { Inventory } from '../../api/types';
+import { ResultsDb } from './scan_results_db';
+
 
 const query = new Querys();
 
 export class InventoryDb extends Db {
   component: any;
 
+  results: ResultsDb;
+
   constructor(path: string) {
     super(path);
     this.component = new ComponentDb(path);
+    this.results = new ResultsDb(path);
   }
 
   private getByResultId(inventory: Partial<Inventory>) {
@@ -105,16 +110,16 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(function () {
+        db.serialize(async function () {
           const resultsid = `(${inventory.files.toString()});`;
           const sqlDeleteFileInventory = query.SQL_DELETE_FILE_INVENTORIES + resultsid;
-          const sqlUpdateUnignoreFiles = query.SQL_UPDATE_UNIGNORED_FILES + resultsid;
+          await self.results.restore(inventory.files);
           db.run('begin transaction');
           if (inventory.files) {
             db.run(sqlDeleteFileInventory);
-            db.run(sqlUpdateUnignoreFiles);
             db.run('commit', async () => {
               db.close();
+
               const success = await self.emptyInventory();
               if (success) resolve(true);
               else resolve(false);
@@ -126,6 +131,8 @@ export class InventoryDb extends Db {
       }
     });
   }
+
+ 
 
   private emptyInventory() {
     const self = this;

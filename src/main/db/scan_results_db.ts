@@ -76,7 +76,7 @@ export class ResultsDb extends Db {
             null,
             null,
             null,
-            'none',
+            'forceinclude',
             null,
             null,
             path,
@@ -180,4 +180,46 @@ export class ResultsDb extends Db {
       }
     });
   }
+
+  async updateResult(path: string) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run(query.SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH, 'forcenomatch', path, function (this: any, err: any) {
+            if (err) throw err;
+            db.close();
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async restore(files: number[]) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(() => {
+          const resultsid = `(${files.toString()});`;
+          const sqlRestoreIdentified = query.SQL_RESTORE_IDENTIFIED_FILE_SNIPPET + resultsid;
+          const sqlRestoreNoMatch = query.SQL_RESTORE_NOMATCH_FILE + resultsid;
+          const sqlRestoreFiltered = query.SQL_RESTORE_FILTERED_FILE + resultsid;
+          db.run('begin transaction');
+          db.run(sqlRestoreIdentified);
+          db.run(sqlRestoreNoMatch);
+          db.run(sqlRestoreFiltered);
+          db.run('commit', () => {
+            db.close();
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        reject(new Error('Unignore files were not successfully retrieved'));
+      }
+    });
+  }
+
 }
