@@ -25,3 +25,4 @@ export interface InventoryForm {
   usage: string;
   notes: string;
 }
+

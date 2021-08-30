@@ -23,6 +23,7 @@ import './main/file';
 import './main/formats';
 import './main/workspace';
 import './main/report';
+import './main/license';
 
 import { IpcEvents } from './ipc-events';
 import { workspace } from './main/workspace/workspace';

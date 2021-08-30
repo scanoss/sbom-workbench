@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     borderTop: '1px solid #D4D4D8',
     backgroundColor: '#f4f4f5',
-  }
+  },
 }));
 
 interface ConfirmDialogProps {
@@ -65,9 +65,7 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
         <IconButton aria-label="close" className={classes.closeButton} onClick={handleCancel}>
           <CloseIcon />
         </IconButton>
-        <DialogContentText className={classes.text}>
-          {message}
-        </DialogContentText>
+        <DialogContentText className={classes.text}>{message}</DialogContentText>
       </DialogContent>
       <DialogActions className={classes.actions}>
         {!hideDeleteButton && <Button onClick={handleCancel}>Cancel</Button>}
