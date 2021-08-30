@@ -208,7 +208,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               options={licenses || []}
               groupBy={(option) => option?.type}
               // getOptionLabel={(option) => (option?.name ? option.indicatorName : '')}
-              value={form.license_name}
+              value={form.license_name || ''}
               getOptionSelected={(option) => option.name === form.license_name}
               getOptionLabel={(option) => option.name || option}
               disableClearable
@@ -221,23 +221,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               )}
               onChange={(e, value) => autocompleteHandler('license_name', value.name)}
             />
-            {/* <Autocomplete
-                fullWidth
-                className={classes.input}
-                options={licenses || []}
-                groupBy={(option) => option?.type}
-                value={form?.license_name}
-                getOptionSelected={(option) => option === form.license_name}
-                getOptionLabel={(option) => option.name || option}
-                disableClearable
-                onChange={(e, value) => autocompleteHandler('license_name', value.name)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
-                  />
-                )}
-              /> */}
           </Paper>
         </div>
         <div className="component-container">
