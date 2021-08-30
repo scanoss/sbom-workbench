@@ -68,3 +68,6 @@ ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
   const projectName = defaultProject.project_name;
       return { status: 'ok', message: 'Project name retrieve succesfully', data: projectName };
 });
+
+
+

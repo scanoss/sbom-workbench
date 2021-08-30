@@ -181,3 +181,6 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   await workspace.projectsList.prepare_scan();
   workspace.projectsList.startScan();
 });
+
+
+
