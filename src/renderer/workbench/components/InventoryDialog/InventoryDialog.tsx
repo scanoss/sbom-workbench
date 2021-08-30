@@ -10,8 +10,10 @@ import {
   MenuItem,
   TextareaAutosize,
   TextField,
+  IconButton,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
+import AddIcon from '@material-ui/icons/Add';
 import React, { useEffect, useState, useContext } from 'react';
 import { Autocomplete } from '@material-ui/lab';
 import { Inventory } from '../../../../api/types';
@@ -54,33 +56,38 @@ interface InventoryDialogProps {
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
+  const dialogCtrl = useContext<any>(DialogContext);
+
   const { open, inventory, onClose, onCancel } = props;
+
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
   const [data, setData] = useState<any[]>([]);
   const [components, setComponents] = useState<any[]>();
   const [versions, setVersions] = useState<any[]>();
   const [licenses, setLicenses] = useState<any[]>();
   const [licensesAll, setLicensesAll] = useState<any[]>();
-  const dialogCtrl = useContext<any>(DialogContext);
 
   const setDefaults = () => setForm(inventory);
 
   const fetchData = async () => {
     if (open) {
-      const { data } = await componentService.getAllComponentGroup();
-      setData(data);
-      const lic = await licenseService.getAll();
-      setLicensesAll(lic.data);
-      setComponents(data.map((item) => item.name));
+      const componentsResponse = await componentService.getAllComponentGroup();
+      const licensesResponse = await licenseService.getAll();
+
+      setData(componentsResponse.data);
+      setComponents(componentsResponse.data.map((item) => item.name));
+
+      const catalogue = licensesResponse.data.map((item) => ({ name: item.name, type: 'Cataloged' }));
+      setLicensesAll(catalogue);
+      setLicenses(catalogue);
     }
   };
 
   const openLicenseDialog = async () => {
     const response = await dialogCtrl.openLicenseCreate();
     if (response && response.action === ResponseStatus.OK) {
-      setLicenses([...licenses, { name: response.data.name, type: 'cataloged' }]);
+      setLicenses([...licenses, { name: response.data.name, type: 'Cataloged' }]);
       setForm({ ...form, license_name: response.data.name });
-      console.log(response.data);
     }
   };
 
@@ -97,20 +104,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const autocompleteHandler = (name, value) => {
-    console.log(value);
     setForm({
       ...form,
       [name]: value,
     });
-  };
-
-  useEffect(() => {
-    console.log(form);
-  }, [form])
-
-  const updateLicenses = (lic) => {
-    if (lic) lic.push(...licensesAll.map((item) => ({ name: item.name, type: 'cataloged' })));
-    setLicenses(lic);
   };
 
   const isValid = () => {
@@ -133,18 +130,17 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     const lic = data
       .find((item) => item?.name === form?.component)
       ?.versions.find((item) => item.version === form.version)
-      ?.licenses.map((item) => ({ name: item.name, type: 'matched' }));
-    updateLicenses(lic);
+      ?.licenses.map((item) => ({ name: item.name, type: 'Matched' }));
+
+    if (lic) {
+      setLicenses([...lic, ...licensesAll]);
+      setForm({ ...form, license_name: lic[0]?.name });
+    }
   }, [form.version]);
 
   useEffect(() => {
     if (versions && versions[0]) setForm({ ...form, version: versions[0] });
   }, [versions]);
-
-  useEffect(() => {
-    console.log(licenses);
-    if (licenses && licenses[0]) setForm({ ...form, license_name: licenses[0]?.name });
-  }, [licenses]);
 
   return (
     <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
@@ -199,7 +195,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <label>License</label>
             </div>
             <div className="license-btn-container">
-              <Button onClick={openLicenseDialog}>+</Button>
+              <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
+                <AddIcon fontSize="inherit" />
+              </IconButton>
             </div>
           </div>
           <Paper component="form" className={classes.paper}>

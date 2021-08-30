@@ -84,7 +84,6 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
               fullWidth
               className={classes.input}
               value={form?.name}
-              placeholder="name"
               onChange={(e) => inputHandler(e)}
               required
             />
@@ -96,7 +95,6 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
             <InputBase
               name="spdxid"
               fullWidth
-              placeholder="SPDX ID"
               className={classes.input}
               value={form?.spdxid}
               onChange={(e) => inputHandler(e)}
@@ -109,7 +107,6 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
           <Paper component="form" className={classes.paper}>
             <TextareaAutosize
               name="fulltext"
-              placeholder="fulltext"
               value={form?.fulltext}
               className={classes.input}
               cols={30}
@@ -119,11 +116,10 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
           </Paper>
         </div>
         <div className="license-container">
-          <label>Url</label>
+          <label>URL</label>
           <Paper component="form" className={classes.paper}>
             <InputBase
               name="url"
-              placeholder="url"
               fullWidth
               className={classes.input}
               value={form?.url}
