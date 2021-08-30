@@ -35,6 +35,8 @@ export class Querys {
   SQL_INSERT_RESULTS =
     'INSERT or IGNORE INTO results (md5_file,vendor,component,version,latest_version,license,url,lines,oss_lines,matched,filename,idtype,md5_comp,purl,file_path,identified,ignored,file_url) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
+  SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH = 'UPDATE results SET idtype=? WHERE file_path=?';
+
   // SQL NEW INVENTORY
   SQL_SCAN_INVENTORY_INSERT =
     'INSERT INTO inventories (compid,version ,purl ,usage, notes, url, license_name) values (?,?,?,?,?,?,?);';
@@ -96,7 +98,7 @@ export class Querys {
     "SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype!='none' order by file_path;";
 
   SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH =
-    "SELECT DISTINCT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype='none' ORDER BY file_path;";
+    'SELECT DISTINCT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? ORDER BY file_path;';
 
   // GET ALL THE INVENTORIES ATTACHED TO A COMPONENT
   SQL_SELECT_ALL_INVENTORIES_ATTACHED_TO_COMPONENT =
@@ -155,7 +157,11 @@ export class Querys {
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE results.id=?;';
 
-  SQL_UPDATE_UNIGNORED_FILES = 'UPDATE results SET ignored=0,identified=0  WHERE id IN ';
+  SQL_RESTORE_IDENTIFIED_FILE = `UPDATE results SET ignored=0,identified=0  WHERE idtype='file' AND id IN `;
+
+  SQL_RESTORE_NOMATCH_FILE = `UPDATE results SET ignored=0,identified=0,idtype='none' WHERE idtype='forcenomatch' AND id IN `;
+
+  SQL_RESTORE_FILTERED_FILE = `DELETE FROM results WHERE idtype='forceinclude' AND id IN`;
 
   SQL_SELECT_INVENTORIES_NOT_HAVING_FILES = ` SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories);`;
 
@@ -183,5 +189,5 @@ export class Querys {
     'UPDATE results SET identified=0 WHERE id IN (SELECT resultid FROM file_inventories where inventoryid=?)';
 
   SQL_GET_RESULTS_SUMMARY =
-    'SELECT (select count(*) from results r where r.identified = 1) as "identified", (select count(*)  from results r where r.ignored = 1 ) as "ignored", (select count(*) from results r where (r.identified = 0 AND r.ignored = 0 and md5_file !="" )) as "pending", (select count(*) FROM results WHERE md5_file !="") as "detected" ';
+    'SELECT (select count(*) from results r where r.identified = 1) as "identified", (select count(*)  from results r where r.ignored = 1 ) as "ignored", (select count(*) from results r where (r.identified = 0 AND r.ignored = 0 and md5_file !="" )) as "pending", (select count(*) FROM results WHERE idtype !="none") as "detected" ';
 }

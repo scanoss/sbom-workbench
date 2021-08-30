@@ -152,26 +152,6 @@ export class FilesDb extends Db {
     });
   }
 
-  async unignored(files: number[]) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(() => {
-          const resultsid = `(${files.toString()});`;
-          const sqlUpdateUnignoreFiles = query.SQL_UPDATE_UNIGNORED_FILES + resultsid;
-          db.run('begin transaction');
-          db.run(sqlUpdateUnignoreFiles);
-          db.run('commit', () => {
-            db.close();
-            resolve(true);
-          });
-        });
-      } catch (error) {
-        reject(new Error('Unignore files were not successfully retrieved'));
-      }
-    });
-  }
-
   private getByPath(file: Partial<File>) {
     return new Promise(async (resolve, reject) => {
       try {

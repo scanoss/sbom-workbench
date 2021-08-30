@@ -101,7 +101,10 @@ export const Editor = () => {
   const create = async (defaultInventory, selFiles) => {
     let inventories = [];
     if (defaultInventory.purl && defaultInventory.version) {
-      const response = await inventoryService.getAll({ purl: defaultInventory.purl, version: defaultInventory.version });
+      const response = await inventoryService.getAll({
+        purl: defaultInventory.purl,
+        version: defaultInventory.version,
+      });
       inventories = response.message || [];
     }
 
@@ -228,14 +231,13 @@ export const Editor = () => {
 
   const identifyHandler = async () => {
     const node = await projectService.getNodeFromPath(file);
-    console.log(node.action)
+    console.log(node);
     if (node.action === 'filter') {
-      console.log("aca");
-      await resultService.createFiltered(file);
-      node.action = 'scan';
-    }
+      await resultService.createFiltered(file); // idtype=forceinclude
+    } else await resultService.updateNoMatchToFile(file);
+    // update No match
+
     const { data } = await resultService.getNoMatch(file);
-    console.log(data);
 
     create({}, [data.id]);
   };
@@ -283,7 +285,7 @@ export const Editor = () => {
                               component: match.component.name,
                               version: match.component.version,
                               usage: match.type,
-                              license: match.component.licenses[0]?.name,
+                              license: match.component.licenses && match.component.licenses[0]?.name,
                               url: match.component.url,
                               purl: match.component.purl,
                             }}
