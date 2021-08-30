@@ -1,6 +1,6 @@
 .scan-results-home {
     background-color: #F4F4F5;
-    border-radius: 0px 0px 40px 40px;
+    border-radius: 0px 0px 10px 10px;
     padding: 10px 65px 5px;
 
     .header-title {
@@ -90,7 +90,7 @@
   .btn-close {
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
 
     &:hover {
       cursor: pointer;
@@ -99,6 +99,7 @@
     .btn-slide-container {
       width: 40px;
       height: 20px;
+      margin-right: 20px;
       display: flex;
       justify-content: center;
       align-items: center;

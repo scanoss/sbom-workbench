@@ -63,7 +63,7 @@ export const DialogProvider: React.FC = ({ children }) => {
   }>({ open: false });
 
   const openConfirmDialog = (
-    message: string = 'Are you sure?',
+    message = 'Are you sure?',
     button: {
       label: string;
       role: 'accept' | 'cancel' | 'delete';
@@ -92,9 +92,9 @@ export const DialogProvider: React.FC = ({ children }) => {
     onClose?: (response: DialogResponse) => void;
   }>({ open: false });
 
-  const openLicenseCreate = () => {  
+  const openLicenseCreate = () => {
     return new Promise<License>((resolve) => {
-      setLicenseDialog({      
+      setLicenseDialog({
         open: true,
         onClose: (response) => {
           setLicenseDialog((dialog) => ({ ...dialog, open: false }));
@@ -124,6 +124,7 @@ export const DialogProvider: React.FC = ({ children }) => {
 
       <ConfirmDialog
         open={confirmDialog.open}
+        hideDeleteButton={confirmDialog.hideDeleteButton}
         message={confirmDialog.message}
         hideDeleteButton={confirmDialog.hideDeleteButton}
         button={confirmDialog.button}

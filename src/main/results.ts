@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron';
+import path from 'path';
 import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
 
@@ -21,3 +22,8 @@ ipcMain.handle(IpcEvents.RESULTS_GET, async (event, arg: string) => {
   return { status: 'error', message: 'Files were not successfully retrieved' };
 });
 
+ipcMain.handle(IpcEvents.RESULTS_GET_NO_MATCH, async (event, filePath: string) => {
+  const result = await defaultProject.scans_db.results.getNoMatch(filePath);
+  if (result) return { status: 'ok', message: 'Results succesfully retrieved', data: result };
+  return { status: 'error', message: 'Files were not successfully retrieved' };
+});

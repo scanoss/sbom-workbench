@@ -32,6 +32,7 @@ $md: 780px;
 
 /* components */
 @import './renderer/home/Home';
+@import './renderer/workbench/components/AppBar/AppBar';
 @import './renderer/workbench/Workbench';
 @import 'renderer/workbench/pages/Editor/Editor';
 @import './renderer/workbench/pages/ComponentList/ComponentList';
@@ -50,6 +51,7 @@ $md: 780px;
 @import './renderer/workbench/components/InventoryDialog/InventoryDialog';
 @import './renderer/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 @import './renderer/workbench/components/ComponentInfo/ComponentInfo.scss';
+@import './renderer/workbench/components/NoMatchFound/NoMatchFound.scss';
 @import './renderer/report/Report.scss';
 @import './renderer/workspace/Workspace';
 @import './renderer/workspace/pages/NewProject/NewProject';

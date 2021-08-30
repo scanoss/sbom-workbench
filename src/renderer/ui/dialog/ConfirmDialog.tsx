@@ -68,7 +68,7 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
         <DialogContentText className={classes.text}>{message}</DialogContentText>
       </DialogContent>
       <DialogActions className={classes.actions}>
-      {!hideDeleteButton && <Button onClick={handleCancel}>Cancel</Button>}
+        {!hideDeleteButton && <Button onClick={handleCancel}>Cancel</Button>}
         <Button
           className={button?.role === 'delete' && classes.deleteButton}
           color="secondary"

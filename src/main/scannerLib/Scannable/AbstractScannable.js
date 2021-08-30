@@ -13,4 +13,10 @@ export class AbstractScannable {
   }
 
   hasNextScannableItem() {}
+
+  // Rename other functions
+  #isEmpty(){}
+
+  #getNext(){}
+
 }

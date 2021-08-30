@@ -17,7 +17,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
     editor.forEach((element) => {
       const line = element.querySelector('.line-highlighted');
       if (line) {
-        line.scrollIntoView({ behavior: 'smooth' });
+        line.scrollIntoView();
       }
     });
   };
