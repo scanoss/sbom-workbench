@@ -39,7 +39,7 @@ const MatchCard = ({ label, status, onAction, type }: MatchCardProps) => {
         <div className="match-card-buttons">
           {status === 'pending' && isShow && (
             <>
-              <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+              <span className="type">{type}</span>
               <Tooltip title="Identify">
                 <IconButton onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IDENTIFY)}>
                   <CheckIcon className="icon check" />

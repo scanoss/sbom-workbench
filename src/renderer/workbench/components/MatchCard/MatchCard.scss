@@ -43,10 +43,12 @@
       transition: opacity 200ms ease;
       align-items: center;
 
-      span {
+      span.type {
         font-size: 20px;
         font-weight: 700;
         color: $indentified-green;
+        margin-right: 16px;
+        text-transform: capitalize;
       }
 
       .check {
