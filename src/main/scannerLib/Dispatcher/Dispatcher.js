@@ -8,17 +8,14 @@ import PQueue from 'p-queue';
 import { ScannerEvents } from '../ScannerEvents';
 import { DispatcherResponse } from './DispatcherResponse';
 import { DispatcherEvents } from './DispatcherEvents';
-
-// TO DO:
-// - Add #CLIENT_TIMESTAMP to the fetch header
+import { app } from 'electron';
 
 export class Dispatcher extends EventEmitter {
   // Client Timestamp
-  #CLIENT_TIMESTAMP = 'scanner.c/1.0.0';
+  #CLIENT_TIMESTAMP = app.getVersion();
 
   // API URL
-  // #API_URL = 'https://osskb.org/api/scan/direct';
-  #API_URL = 'http://51.255.68.110:8886/api/scan/direct';
+  #API_URL = 'https://osskb.org/api/scan/direct';
 
   // Level of concurrency
   #CONCURRENCY_LIMIT = 15;
@@ -93,7 +90,6 @@ export class Dispatcher extends EventEmitter {
     else this.#wfpFailed[wfpPath] = 1;
   }
 
-
   dispatchWfpFile(wfpPath) {
     this.#pQueue
       .add(() => this.#dispatch(wfpPath))
@@ -114,7 +110,6 @@ export class Dispatcher extends EventEmitter {
         if (this.#pQueue.pending === 0) {
           this.#pQueue.removeListener(nextHandler);
           this.emit('error', this.#error);
-
         }
       };
 
@@ -130,14 +125,14 @@ export class Dispatcher extends EventEmitter {
       const form = new FormData();
       form.append('filename', Buffer.from(wfpContent), 'data.wfp');
 
-      this.emit(ScannerEvents.DISPATCHER_WFP_SENDED, wfpFilePath);
-
       // Fetch
       const p1 = fetch(this.#API_URL, {
         method: 'post',
         body: form,
+        headers: { 'User-Agent': this.#CLIENT_TIMESTAMP },
       });
 
+      this.emit(ScannerEvents.DISPATCHER_WFP_SENDED, wfpFilePath);
       const response = await p1;
       if (!response.ok) {
         const msg = await response.text();
