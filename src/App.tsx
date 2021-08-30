@@ -36,7 +36,7 @@ export default function App() {
       <MuiThemeProvider theme={theme}>
         <AppProvider>
           <DialogProvider>
-            <Route path="/" exact component={Workspace} />
+            <Route path="/" exact component={Workspace} title="tes" />
             <Route path="/workspace/new" exact component={NewProject} />
             <WorkbenchProvider>
                 <Route path="/workbench" component={Workbench} />

@@ -19,9 +19,7 @@ export const ComponentInfo = ({ component }: { component: any }) => {
     <div className="component-info">
       <div onMouseEnter={() => setOver(true)} onMouseLeave={() => setOver(false)} className="container-component-info">
         <div className="main-info">
-          <img alt="component logo" className="logo" src={componentDefault} />
           <div>
-            <Label label={version} textColor="gray" />
             <Title title={component?.name} />
           </div>
         </div>

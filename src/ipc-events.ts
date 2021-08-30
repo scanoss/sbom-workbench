@@ -53,6 +53,7 @@ export enum IpcEvents {
   FILE_GET = 'FILE_GET',
 
   RESULTS_GET = 'RESULTS_GET',
+  RESULTS_GET_NO_MATCH = 'RESULTS_GET_NO_MATCH',
 
   EXPORT_SPDX = 'EXPORT_SPDX',
   EXPORT_CSV = 'EXPORT_CSV',
@@ -117,6 +118,7 @@ export const ipcRendererEvents = [
   IpcEvents.UNIGNORED_FILES,
 
   IpcEvents.RESULTS_GET,
+  IpcEvents.RESULTS_GET_NO_MATCH,
 
   IpcEvents.EXPORT_SPDX,
   IpcEvents.EXPORT_CSV,

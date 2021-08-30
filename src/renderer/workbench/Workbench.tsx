@@ -29,24 +29,7 @@ import { InventoryDetail } from './pages/InventoryDetail/InventoryDetail';
 import { reset } from './actions';
 import InventoryList from './pages/ComponentList/components/InventoryList';
 import RecognizedList from './pages/RecognizedList/RecognizedList';
-
-const Alert = ({ open, handleClose, path }) => {
-  return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle id="alert-dialog-title">SPXD Export</DialogTitle>
-      <DialogContent>
-        <DialogContentText id="alert-dialog-description">
-          The operation has been completed successfully. You can find results in {path}
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="primary" autoFocus>
-          OK
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
+import AppBar from './components/AppBar/AppBar';
 
 const Workbench = () => {
   const history = useHistory();
@@ -67,15 +50,6 @@ const Workbench = () => {
     }
   };
 
-  const onDownloadClickedExport = async () => {
-    history.push('/report');
-  };
-
-  const onBackClicked = () => {
-    dispatch(reset());
-    history.push('/');
-  };
-
   const onDestroy = () => {};
 
   useEffect(() => {
@@ -85,28 +59,17 @@ const Workbench = () => {
 
   return (
     <div>
+      <AppBar />
       <SplitPane split="vertical" minSize={300} defaultSize={300}>
         <aside className="panel explorer">
-          <Box boxShadow={1}>
-            <header>
-              <div className="d-flex align-center">
-                <IconButton onClick={onBackClicked} aria-label="back" size="small">
-                  <ArrowBackIcon fontSize="small" />
-                </IconButton>
-                <span className="title">Projects</span>
-              </div>
-              <Link to="/workbench">
-                <IconButton>
-                  <HomeIcon />
-                </IconButton>
-              </Link>
-            </header>
-          </Box>
+          {/* <Box boxShadow={1}>
+
+          </Box> */}
           <div className="file-tree-container">
             <FileTree />
           </div>
         </aside>
-        <main className="match-info">
+        <main id="Workbench" className="match-info">
           {loaded ? (
             <Switch>
               <Route exact path={path}>
@@ -135,14 +98,6 @@ const Workbench = () => {
           )}
         </main>
       </SplitPane>
-
-      <Tooltip title="Reports">
-        <Fab className="btn-export" onClick={onDownloadClickedExport}>
-          <BarChartIcon />
-        </Fab>
-      </Tooltip>
-
-      <Alert open={open} handleClose={() => setOpen(false)} path={savePath} />
     </div>
   );
 };

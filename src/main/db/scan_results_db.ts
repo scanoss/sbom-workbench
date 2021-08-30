@@ -43,7 +43,7 @@ export class ResultsDb extends Db {
           for (const [key, value] of Object.entries(result)) {
             for (let i = 0; i < value.length; i += 1) {
               const filePath = key;
-              data = value[i];       
+              data = value[i];
               self.insertResult(db, data, filePath);
             }
           }
@@ -114,15 +114,27 @@ export class ResultsDb extends Db {
     });
   }
 
+  // GET RESULT
+  async getNoMatch(path: string) {
+    const db = await this.openDb();
+    return new Promise<any>(async (resolve) => {
+      db.get(query.SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH, path, (err: any, data: any) => {
+        db.close();
+        if (err) resolve([]);
+        else resolve(data);
+      });
+    });
+  }
+
   // GET RESULTS
   get(path: string) {
     let results: any;
     return new Promise(async (resolve, reject) => {
       try {
-        results = await this.getResult(path);  
-        for (let i = 0; i < results.length; i += 1) {     
+        results = await this.getResult(path);
+        for (let i = 0; i < results.length; i += 1) {
           const comp = await this.component.getAll(results[i]);
-          results[i].component = comp;           
+          results[i].component = comp;
         }
         resolve(results);
       } catch (error) {

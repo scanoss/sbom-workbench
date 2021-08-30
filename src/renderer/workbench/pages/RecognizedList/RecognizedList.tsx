@@ -83,7 +83,7 @@ export const RecognizedList = () => {
     <>
       <section id="RecognizedList" className="app-page">
         <header className="app-header">
-          <div className="d-flex space-between align-center">
+          {/* <div className="d-flex space-between align-center">
             <div>
               <h4 className="header-subtitle">{state.name}</h4>
               <h1 className="header-title">Identified Components</h1>
@@ -102,7 +102,7 @@ export const RecognizedList = () => {
                 Identified
               </Button>
             </ButtonGroup>
-          </div>
+          </div> */}
 
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">

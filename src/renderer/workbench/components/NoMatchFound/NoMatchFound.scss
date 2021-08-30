@@ -1,0 +1,20 @@
+.no-match-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+
+  .no-match-content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    .no-match-title {
+      font-size: 30px;
+      margin-bottom: 15px;
+    }
+  }
+}
+

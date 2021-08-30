@@ -16,6 +16,7 @@ import { useHistory } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { Inventory } from '../../../../api/types';
@@ -29,7 +30,7 @@ import { componentService } from '../../../../api/component-service';
 import { mapFiles } from '../../../../utils/scan-util';
 import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
 import { DIALOG_ACTIONS } from '../../../context/types';
-import IdentifiedList from '../ComponentList/components/IdentifiedList';
+import { IdentifiedList } from '../ComponentList/components/IdentifiedList';
 
 export const ComponentDetail = () => {
   const history = useHistory();
@@ -257,24 +258,28 @@ export const ComponentDetail = () => {
         <header className="app-header">
           <div className="header">
             <div>
-              <h4 className="header-subtitle back">
+              {/* <h4 className="header-subtitle back">
                 <IconButton onClick={() => history.goBack()} component="span">
                   <ArrowBackIcon />
                 </IconButton>
                 {name}
-              </h4>
+              </h4> */}
               <div className="filter-container">
-                <h1 className="header-title">Matches</h1>
-                { (component?.versions?.length > 1) &&
-                  <Button
-                    className={`filter btn-version ${version ? 'selected' : ''}`}
-                    aria-controls="menu"
-                    aria-haspopup="true"
-                    endIcon={<ArrowDropDownIcon />}
-                    onClick={(event) => setAnchorEl(event.currentTarget)}
-                  >
-                    { version || 'version' }
-                  </Button>
+                <ComponentInfo component={component} />
+                <ChevronRightOutlinedIcon fontSize="small" />
+                { (component?.versions?.length > 1) ? (
+                  <>
+                    <Button
+                      className={`filter btn-version ${version ? 'selected' : ''}`}
+                      aria-controls="menu"
+                      aria-haspopup="true"
+                      endIcon={<ArrowDropDownIcon />}
+                      onClick={(event) => setAnchorEl(event.currentTarget)}
+                    >
+                      { version || 'version' }
+                    </Button>
+                  </>
+                ) : <> {component.versions[0].version }</>
                 }
               </div>
               <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleCloseVersionGroup}>
@@ -289,7 +294,6 @@ export const ComponentDetail = () => {
               </Menu>
             </div>
 
-            <ComponentInfo component={component} />
           </div>
 
           <section className="subheader">
