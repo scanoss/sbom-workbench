@@ -13,7 +13,6 @@ import { ComponentDb } from './scan_component_db';
 import { Inventory } from '../../api/types';
 import { ResultsDb } from './scan_results_db';
 
-
 const query = new Querys();
 
 export class InventoryDb extends Db {

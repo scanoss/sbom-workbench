@@ -76,13 +76,14 @@ export class ResultsDb extends Db {
             null,
             null,
             null,
-            'forceinclude',
+            'file',
             null,
             null,
             path,
             0,
             0,
             null,
+            'filtered',
             function (this: any, err: any) {
               if (err) throw err;
               db.close();
@@ -117,7 +118,8 @@ export class ResultsDb extends Db {
       filePath,
       0,
       0,
-      data.file_url
+      data.file_url,
+      'engine'
     );
   }
 
@@ -186,7 +188,7 @@ export class ResultsDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.run(query.SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH, 'forcenomatch', path, function (this: any, err: any) {
+          db.run(query.SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH, 'nomatch', path, function (this: any, err: any) {
             if (err) throw err;
             db.close();
             resolve(true);
@@ -204,8 +206,8 @@ export class ResultsDb extends Db {
         const db = await this.openDb();
         db.serialize(() => {
           const resultsid = `(${files.toString()});`;
-          const sqlRestoreIdentified = query.SQL_RESTORE_IDENTIFIED_FILE_SNIPPET + resultsid;
-          const sqlRestoreNoMatch = query.SQL_RESTORE_NOMATCH_FILE + resultsid;
+          const sqlRestoreIdentified = query.SQL_RESTORE_IDENTIFIED_FILE_SNIPPET + resultsid; // No miro tipo
+          const sqlRestoreNoMatch = query.SQL_RESTORE_NOMATCH_FILE + resultsid; 
           const sqlRestoreFiltered = query.SQL_RESTORE_FILTERED_FILE + resultsid;
           db.run('begin transaction');
           db.run(sqlRestoreIdentified);
