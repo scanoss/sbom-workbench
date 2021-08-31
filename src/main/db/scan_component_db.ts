@@ -17,6 +17,7 @@ import { Db } from './db';
 import { UtilsDb } from './utils_db';
 import { Component, License, ComponentGroup } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
+import { ErrorTwoTone } from '@material-ui/icons';
 
 
 const utilsDb = new UtilsDb();
@@ -186,29 +187,30 @@ export class ComponentDb extends Db {
     });
   }
 
+
   // CREATE COMPONENT
-  create(component: any) {
+ create(component: any) {
     return new Promise(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        const stmt = db.prepare(query.COMPDB_SQL_COMP_VERSION_INSERT);
+        const db = await this.openDb();       
         db.serialize(function () {
-          stmt.run(
+          db.run(query.COMPDB_SQL_COMP_VERSION_INSERT,
             component.name,
             component.version,
-            component.description,
-            component.url,
+            component.description?component.description:'n/a',
+            component.url?component.url:'n/a',
             component.purl,
             function (this: any, err: any) {
               db.close();
-              if (err) reject(new Error('error'));
-              resolve(this.lastID);
+              if (err) reject(new Error('Unable to create component'));
+              if (this.lastID===0) reject (new Error('Component already exists'));
+              component.id=this.lastID;
+              resolve(component);
             }
           );
-        });
-        stmt.finalize();
+        });   
       } catch (error) {
-        reject(new Error('[]'));
+        reject(new Error(error));
       }
     });
   }
@@ -319,60 +321,6 @@ export class ComponentDb extends Db {
           resolve(this.lastID);
         }
       );
-    });
-  }
-
-  // IMPORT COMPONENTS FROM JSON
-  importFromJSON(component: any) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        for (let i = 0; i < component.length; i += 1) {
-          await this.componentNewImport(db, component[i]);
-        }
-        db.close();
-        resolve(true);
-      } catch (error) {
-        reject(new Error('Unable to import scan results'));
-      }
-    });
-  }
-
-  // IMPORT COMPONENT FROM FILE
-  importFromFile(path: string) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const results: Record<any, any> = await utilsDb.readFile(path);
-        const db = await this.openDb();
-        for (let i = 0; i < results.length; i += 1) {
-          await this.componentNewImport(db, results[i]);
-        }
-        db.close();
-        resolve(true);
-      } catch (error) {
-        reject(new Error('Unable to import scan results'));
-      }
-    });
-  }
-
-  // COMPONENT NEW
-  private componentNewImport(db: any, data: any) {
-    return new Promise(async (resolve, reject) => {
-      db.serialize(function () {
-        const stmt = db.prepare(query.COMPDB_SQL_COMP_VERSION_INSERT);
-        stmt.run(
-          data.name,
-          data.version,
-          data.description,
-          data.url,
-          data.purl,
-          (err: any) => {
-            if (err) reject(new Error('error'));
-          }
-        );
-        stmt.finalize();
-        resolve(true);
-      });
     });
   }
 
