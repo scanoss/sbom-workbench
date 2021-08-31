@@ -17,6 +17,7 @@ import { Autocomplete } from '@material-ui/lab';
 import { Inventory } from '../../../../api/types';
 import { InventoryForm } from '../../../context/types';
 import { componentService } from '../../../../api/component-service';
+import ComponentDialog from '../ComponentDialog/ComponentDialog';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -58,6 +59,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const [components, setComponents] = useState<any[]>();
   const [versions, setVersions] = useState<any[]>();
   const [licenses, setLicenses] = useState<any[]>();
+  const [showComponentDialog, setShowComponentDialog] = useState<boolean[]>(false);
 
   const setDefaults = () => setForm(inventory);
 
@@ -126,6 +128,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       <div className="identity-component">
         <div className="component-version-container">
           <div className="component-container">
+          <Button onClick={() => setShowComponentDialog(true)}>+</Button>
             <label>Component</label>
             <Paper className={classes.paper}>
               <SearchIcon className={classes.iconButton}  />
@@ -245,6 +248,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           Identify
         </Button>
       </DialogActions>
+      {showComponentDialog ? <ComponentDialog /> : null}
     </Dialog>
   );
 };
