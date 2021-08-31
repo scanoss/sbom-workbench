@@ -63,7 +63,7 @@ const AppMenu = () => {
         </Tooltip>
       </NavLink>
       <NavLink to="/report" activeClassName="active">
-        <Tooltip title="Identified components">
+        <Tooltip title="Reports">
           <Button color="inherit">
             <InsertChartOutlinedTwoToneIcon />
           </Button>

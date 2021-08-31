@@ -10,14 +10,18 @@ import {
   MenuItem,
   TextareaAutosize,
   TextField,
+  IconButton,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
-import React, { useEffect, useState } from 'react';
+import AddIcon from '@material-ui/icons/Add';
+import React, { useEffect, useState, useContext } from 'react';
 import { Autocomplete } from '@material-ui/lab';
 import { Inventory } from '../../../../api/types';
 import { InventoryForm } from '../../../context/types';
 import { componentService } from '../../../../api/component-service';
-import ComponentDialog from '../ComponentDialog/ComponentDialog';
+import { licenseService } from '../../../../api/license-service';
+import { DialogContext } from '../../../context/DialogProvider';
+import { ResponseStatus } from '../../../../main/Response';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -52,23 +56,39 @@ interface InventoryDialogProps {
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
-  const { open, inventory, onClose, onCancel } = props;
-  const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
+  const dialogCtrl = useContext<any>(DialogContext);
 
+  const { open, inventory, onClose, onCancel } = props;
+
+  const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
   const [data, setData] = useState<any[]>([]);
   const [components, setComponents] = useState<any[]>();
   const [versions, setVersions] = useState<any[]>();
   const [licenses, setLicenses] = useState<any[]>();
+  const [licensesAll, setLicensesAll] = useState<any[]>();
   const [showComponentDialog, setShowComponentDialog] = useState<boolean[]>(false);
 
   const setDefaults = () => setForm(inventory);
 
   const fetchData = async () => {
     if (open) {
-      const { data } = await componentService.getAllComponentGroup();
-      setData(data);
-      setComponents(data.map((item) => item.name));
-      if (form.component) {}
+      const componentsResponse = await componentService.getAllComponentGroup();
+      const licensesResponse = await licenseService.getAll();
+
+      setData(componentsResponse.data);
+      setComponents(componentsResponse.data.map((item) => item.name));
+
+      const catalogue = licensesResponse.data.map((item) => ({ name: item.name, type: 'Cataloged' }));
+      setLicensesAll(catalogue);
+      setLicenses(catalogue);
+    }
+  };
+
+  const openLicenseDialog = async () => {
+    const response = await dialogCtrl.openLicenseCreate();
+    if (response && response.action === ResponseStatus.OK) {
+      setLicenses([...licenses, { name: response.data.name, type: 'Cataloged' }]);
+      setForm({ ...form, license_name: response.data.name });
     }
   };
 
@@ -105,22 +125,23 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       setVersions(component?.versions.map((item) => item.version));
       setForm({ ...form, url: component.url, purl: component.purl });
     }
-  }, [form.component, components] );
+  }, [form.component, components]);
 
   useEffect(() => {
-    const lic = data.find((item) => item?.name === form?.component)
-      ?.versions.find((item) => item?.version === form.version)
-      ?.licenses.map((item) => item?.name)
-    setLicenses(lic);
+    const lic = data
+      .find((item) => item?.name === form?.component)
+      ?.versions.find((item) => item.version === form.version)
+      ?.licenses.map((item) => ({ name: item.name, type: 'Matched' }));
+
+    if (lic) {
+      setLicenses([...lic, ...licensesAll]);
+      setForm({ ...form, license_name: lic[0]?.name });
+    }
   }, [form.version]);
 
   useEffect(() => {
     if (versions && versions[0]) setForm({ ...form, version: versions[0] });
   }, [versions]);
-
-  useEffect(() => {
-    if (licenses && licenses[0]) setForm({ ...form, license_name: licenses[0] });
-  }, [licenses]);
 
   return (
     <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
@@ -131,7 +152,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <Button onClick={() => setShowComponentDialog(true)}>+</Button>
             <label>Component</label>
             <Paper className={classes.paper}>
-              <SearchIcon className={classes.iconButton}  />
+              <SearchIcon className={classes.iconButton} />
               <Autocomplete
                 fullWidth
                 className={classes.input}
@@ -140,7 +161,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 disableClearable
                 onChange={(e, value) => autocompleteHandler('component', value)}
                 renderInput={(params) => (
-                  <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }} />
+                  <TextField
+                    {...params}
+                    InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
+                  />
                 )}
               />
             </Paper>
@@ -148,7 +172,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <div className="component-container">
             <label>Version</label>
             <Paper component="form" className={classes.paper}>
-              <SearchIcon className={classes.iconButton}  />
+              <SearchIcon className={classes.iconButton} />
               <Autocomplete
                 fullWidth
                 className={classes.input}
@@ -157,26 +181,47 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 disableClearable
                 onChange={(e, value) => autocompleteHandler('version', value)}
                 renderInput={(params) => (
-                  <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }} />
+                  <TextField
+                    required
+                    {...params}
+                    InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
+                  />
                 )}
               />
             </Paper>
           </div>
         </div>
         <div className="component-container">
-          <label>License</label>
+          <div className="license-btn-label-container">
+            <div className="license-label-container">
+              <label>License</label>
+            </div>
+            <div className="license-btn-container">
+              <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
+                <AddIcon fontSize="inherit" />
+              </IconButton>
+            </div>
+          </div>
           <Paper component="form" className={classes.paper}>
-            <SearchIcon className={classes.iconButton}  />
+            <SearchIcon className={classes.iconButton} />
             <Autocomplete
               fullWidth
               className={classes.input}
-              options={licenses  || []}
-              value={form.license_name}
+              options={licenses || []}
+              groupBy={(option) => option?.type}
+              // getOptionLabel={(option) => (option?.name ? option.indicatorName : '')}
+              value={form.license_name || ''}
+              getOptionSelected={(option) => option.name === form.license_name}
+              getOptionLabel={(option) => option.name || option}
               disableClearable
               renderInput={(params) => (
-                <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }} />
+                <TextField
+                  required
+                  {...params}
+                  InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
+                />
               )}
-              onChange={(e, value) => autocompleteHandler('license_name', value)}
+              onChange={(e, value) => autocompleteHandler('license_name', value.name)}
             />
           </Paper>
         </div>

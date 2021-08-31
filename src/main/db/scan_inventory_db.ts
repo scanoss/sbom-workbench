@@ -211,7 +211,7 @@ export class InventoryDb extends Db {
           resolve(inventories);
         } else resolve([]);
       } catch (error) {
-        reject(new Error('error'));
+        reject(new Error(error));
       }
     });
   }
