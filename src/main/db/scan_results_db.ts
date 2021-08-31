@@ -206,7 +206,7 @@ export class ResultsDb extends Db {
         const db = await this.openDb();
         db.serialize(() => {
           const resultsid = `(${files.toString()});`;
-          const sqlRestoreIdentified = query.SQL_RESTORE_IDENTIFIED_FILE_SNIPPET + resultsid; // No miro tipo
+          const sqlRestoreIdentified = query.SQL_RESTORE_IDENTIFIED_FILE_SNIPPET + resultsid; 
           const sqlRestoreNoMatch = query.SQL_RESTORE_NOMATCH_FILE + resultsid; 
           const sqlRestoreFiltered = query.SQL_RESTORE_FILTERED_FILE + resultsid;
           db.run('begin transaction');
