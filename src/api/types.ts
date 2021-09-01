@@ -38,7 +38,7 @@ export interface License {
 export interface NewComponent {
   name: string;
   version: string;
-  license_id: string;
+  license_id: number;
   purl: string;
   url: string;
 }

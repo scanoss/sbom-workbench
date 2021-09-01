@@ -54,7 +54,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   const fetchData = async () => {
     if (open) {
       const licensesResponse = await licenseService.getAll();
-      const catalogue = licensesResponse.data.map((item) => ({ name: item.name, type: 'Cataloged' }));
+      const catalogue = licensesResponse.data
       setLicenses(catalogue);
     }
   };
@@ -74,8 +74,16 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   const handleClose = async () => {
     try {
       console.log('form', form);
+      const component: Partial<NewComponent> = form;
+      // const response = await licenseService.create(component);
+      onClose({ action: DIALOG_ACTIONS.OK, data: response });
     } catch (error) {
       console.log('error', error);
+      await dialogCtrl.openConfirmDialog(
+        'The component already exist in the catalog',
+        { label: 'acept', role: 'acept' },
+        true
+      );
     }
   };
 
@@ -137,7 +145,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                   InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
                 />
               )}
-              onChange={(e, value) => inputHandler('license_id', value?.name)}
+              onChange={(e, value) => inputHandler('license_id', value.id)}
             />
           </Paper>
         </div>  
