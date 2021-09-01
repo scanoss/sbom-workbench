@@ -14,12 +14,18 @@
 
 import { Querys } from './querys_db';
 import { Db } from './db';
-import { UtilsDb } from './utils_db';
-import { Component, License, ComponentGroup } from '../../api/types';
+import { Component , ComponentGroup } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
 
+export interface ComponentParams {
+  source?: ComponentSource,
+}
 
-const utilsDb = new UtilsDb();
+export enum ComponentSource {
+    ENGINE = 'engine',   
+}
+
+
 const query = new Querys();
 
 export class ComponentDb extends Db {
@@ -46,15 +52,17 @@ export class ComponentDb extends Db {
     });
   }
 
-  getAll(data: any) {
+  getAll(data: any, params? :ComponentParams) {
     return new Promise(async (resolve, reject) => {
       try {
         let component: any;
         if (data.purl && data.version)
           component = await this.getbyPurlVersion(data);
-        else if (data.purl) component = await this.getByPurl(data);
-        else component = await this.allComp();
-
+        else if (data.purl) {
+          component = await this.getByPurl(data);
+        } else {        
+          component = await this.allComp(params);
+        }
         if (component !== undefined) resolve(component);
         else resolve({});
       } catch (error) {
@@ -108,13 +116,14 @@ export class ComponentDb extends Db {
     a.licenses.push(preLicense);
   }
 
-  allComp() {
+  private allComp(params:ComponentParams) {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
+        const sqlGetComp = params?.source===ComponentSource.ENGINE ? query.SQL_GET_ALL_DETECTED_COMPONENTS : query.SQL_GET_ALL_COMPONENTS;
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(query.SQL_GET_ALL_COMPONENTS, async (err: any, data: any) => {
+          db.all(sqlGetComp, async (err: any, data: any) => {
             db.close();
             if (err) resolve([]);
             else {
@@ -129,6 +138,7 @@ export class ComponentDb extends Db {
         });
       } catch (error) {
         console.log(error);
+        reject(error);
       }
     });
   }
@@ -188,33 +198,35 @@ export class ComponentDb extends Db {
 
   // CREATE COMPONENT
   create(component: any) {
+    const self = this;
     return new Promise(async (resolve, reject) => {
       try {
-       const attach:any={};
-       const license: any = {};
-       license.name=component.license_name;
         const db = await this.openDb();
-        const stmt = db.prepare(query.COMPDB_SQL_COMP_VERSION_INSERT);
         db.serialize(function () {
-          stmt.run(
+          db.run(
+            query.COMPDB_SQL_COMP_VERSION_INSERT,
             component.name,
             component.version,
-            component.description,
-            component.url,
+            component.description ? component.description : 'n/a',
+            component.url ? component.url : 'n/a',
             component.purl,
-           async function (this: any, err: any) {
+            'manual',
+            async function (this: any, err: any) {
               db.close();
-              if (err) reject(new Error('error'));
-              attach.license_id = await this.license.getLicenseIdFilter(license);
-
-              resolve(this.lastID);
-              
+              if (err) reject(new Error('Unable to create component'));
+              if (this.lastID === 0)
+                reject(new Error('Component already exists'));
+              await self.license.licenseAttach({
+                license_id: component.license_id,
+                compid: this.lastID,
+              });
+              const newComp = await self.get({ compid: this.lastID });
+              resolve(newComp);
             }
           );
         });
-        stmt.finalize();
       } catch (error) {
-        reject(new Error('[]'));
+        reject(new Error(error));
       }
     });
   }
@@ -313,7 +325,7 @@ export class ComponentDb extends Db {
 
   // COMPONENT NEW
   private componentNewImportFromResults(db: any, data: any) {
-    return new Promise<number>(async (resolve, reject) => {
+    return new Promise<number>(async (resolve) => {
       db.run(
         query.COMPDB_SQL_COMP_VERSION_INSERT,
         data.component,
@@ -321,64 +333,11 @@ export class ComponentDb extends Db {
         'AUTOMATIC IMPORT',
         data.url,
         data.purl,
+        'engine',
         function (this: any, err: any) {
           resolve(this.lastID);
         }
       );
-    });
-  }
-
-  // IMPORT COMPONENTS FROM JSON
-  importFromJSON(component: any) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        for (let i = 0; i < component.length; i += 1) {
-          await this.componentNewImport(db, component[i]);
-        }
-        db.close();
-        resolve(true);
-      } catch (error) {
-        reject(new Error('Unable to import scan results'));
-      }
-    });
-  }
-
-  // IMPORT COMPONENT FROM FILE
-  importFromFile(path: string) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const results: Record<any, any> = await utilsDb.readFile(path);
-        const db = await this.openDb();
-        for (let i = 0; i < results.length; i += 1) {
-          await this.componentNewImport(db, results[i]);
-        }
-        db.close();
-        resolve(true);
-      } catch (error) {
-        reject(new Error('Unable to import scan results'));
-      }
-    });
-  }
-
-  // COMPONENT NEW
-  private componentNewImport(db: any, data: any) {
-    return new Promise(async (resolve, reject) => {
-      db.serialize(function () {
-        const stmt = db.prepare(query.COMPDB_SQL_COMP_VERSION_INSERT);
-        stmt.run(
-          data.name,
-          data.version,
-          data.description,
-          data.url,
-          data.purl,
-          (err: any) => {
-            if (err) reject(new Error('error'));
-          }
-        );
-        stmt.finalize();
-        resolve(true);
-      });
     });
   }
 
@@ -499,13 +458,14 @@ export class ComponentDb extends Db {
     });
   }
 
-  async getComponentGroup(component: Partial<ComponentGroup>) {  
+
+  async getComponentGroup(component: Partial<ComponentGroup>) {
     return new Promise(async (resolve, reject) => {
       try {
         const data = await this.getAll(component);
         if (data) {
           const [comp] = await this.groupComponentsByPurl(data);
-          comp.summary = await this.summaryByPurl(comp);       
+          comp.summary = await this.summaryByPurl(comp);
           resolve(comp);
         } else resolve([]);
       } catch (error) {
@@ -514,10 +474,10 @@ export class ComponentDb extends Db {
     });
   }
 
-  async getAllComponentGroup() {
+  async getAllComponentGroup(params: ComponentParams) {
     return new Promise(async (resolve, reject) => {
-      try {
-        const data = await this.getAll({});
+      try {     
+        const data = await this.getAll({},params);
         if (data) {
           const comp = await this.groupComponentsByPurl(data);
           resolve(comp);
@@ -538,13 +498,13 @@ export class ComponentDb extends Db {
       const result = await this.mergeComponentByPurl(aux);
       return result;
     } catch (err) {
-      return ('Unable to group components');
+      return 'Unable to group components';
     }
   }
 
   mergeComponentByPurl(data: Record<string, any>) {
-    return new Promise<any[]>(async (resolve, reject) => {
-      const result: any[] = []
+    return new Promise<any[]>(async (resolve) => {
+      const result: any[] = [];
       for (const [key, value] of Object.entries(data)) {
         const aux: any = {};
         aux.summary = { ignored: 0, pending: 0, identified: 0 };

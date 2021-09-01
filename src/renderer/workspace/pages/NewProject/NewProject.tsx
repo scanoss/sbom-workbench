@@ -10,6 +10,8 @@ import * as controller from '../../../home/HomeController';
 
 import { IpcEvents } from '../../../../ipc-events';
 
+import { DialogContext } from '../../../context/DialogProvider';
+
 const { ipcRenderer } = require('electron');
 
 const NewProject = () => {
@@ -19,10 +21,12 @@ const NewProject = () => {
   const [projectName, setProjectName] = useState<string>();
   const [progress, setProgress] = useState<number>(0);
   const [stage, setStage] = useState<string>('');
+  const dialogCtrl = useContext<any>(DialogContext); // ??
 
   const init = async () => {
     ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
     ipcRenderer.on(IpcEvents.SCANNER_FINISH_SCAN, handlerScannerFinish);
+    ipcRenderer.on(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
 
     try {
       setProjectName(scanPath.split('/')[scanPath.split('/').length - 1]);
@@ -35,6 +39,7 @@ const NewProject = () => {
   const cleanup = () => {
     ipcRenderer.removeListener(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
     ipcRenderer.removeListener(IpcEvents.SCANNER_FINISH_SCAN, handlerScannerFinish);
+    ipcRenderer.removeListener(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
   };
 
   const onShowScan = (path) => {
@@ -46,6 +51,25 @@ const NewProject = () => {
     setProgress(args.processed);
     setStage(args.stage);
   };
+
+  const handlerScannerError = async (_event, args) => {
+    console.log(args);
+    // alert(args);
+    const errorMessage = args.message;
+    const { action } = await dialogCtrl.openConfirmDialog(
+      `${errorMessage}`,
+      {
+        label: 'OK',
+        role: 'accept',
+      },
+      true
+      );
+
+
+    ipcRenderer.send(IpcEvents.SCANNER_RESUME);
+
+
+  }
 
   const handlerScannerFinish = (_event, args) => {
     if (args.success) {
@@ -95,6 +119,13 @@ const NewProject = () => {
               <>
                 <LinearProgress variant="determinate" value={progress} />
                 <div className="stage-label"> {stage} </div>
+              </>
+            )}
+
+            {stage === 'resuming' && (
+              <>
+                <LinearProgress variant="determinate" value={progress} />
+                <div className="stage-label"> RESUMING SCANNER </div>
               </>
             )}
 

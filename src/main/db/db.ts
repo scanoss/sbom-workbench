@@ -68,7 +68,7 @@ export class Db {
         db.serialize(function () {
           db.run("begin transaction");
           db.run(
-            'CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url) AS SELECT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;'
+            'CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url,source) AS SELECT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url,comp.source FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;'
           );
           db.run(
             'CREATE VIEW IF NOT EXISTS license_view (cvid,name,spdxid,url,license_id) AS SELECT lcv.cvid,lic.name,lic.spdxid,lic.url,lic.id FROM license_component_version AS lcv LEFT JOIN licenses AS lic ON lcv.licid=lic.id;'
