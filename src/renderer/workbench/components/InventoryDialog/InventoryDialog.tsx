@@ -156,8 +156,16 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       <div className="identity-component">
         <div className="component-version-container">
           <div className="component-container">
-          <Button onClick={openComponentDialog}>+</Button>
-            <label>Component</label>
+            <div className="license-btn-label-container">
+            <div className="license-label-container">
+              <label>Component</label>
+            </div>
+            <div className="license-btn-container">
+              <IconButton color="inherit" size="small" onClick={openComponentDialog}>
+                <AddIcon fontSize="inherit" />
+              </IconButton>
+            </div>
+          </div>
             <Paper className={classes.paper}>
               <SearchIcon className={classes.iconButton} />
               <Autocomplete
