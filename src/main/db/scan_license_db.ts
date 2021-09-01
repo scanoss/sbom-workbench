@@ -122,7 +122,6 @@ export class LicenseDb extends Db {
     if (data.name) sqlQuery = `${query.SQL_SELECT_LICENSE}name='${data.name}';`;
     else if (data.spdxid) sqlQuery = `${query.SQL_SELECT_LICENSE}spdxid='${data.spdxid}';`;
     else sqlQuery = `${query.SQL_SELECT_LICENSE}id=${data.id};`;
-    console.log(sqlQuery);
     return sqlQuery;
   }
 
