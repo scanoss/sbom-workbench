@@ -95,6 +95,10 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
 
   const openLicenseDialog = async () => {
     const response = await dialogCtrl.openLicenseCreate();
+    if (response && response.action === ResponseStatus.OK) {
+      setLicenses([...licenses, response.data]);
+      console.log('response', response);
+    }
   };
   
 
