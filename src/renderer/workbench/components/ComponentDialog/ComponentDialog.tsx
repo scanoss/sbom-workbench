@@ -50,13 +50,13 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   const { licenses } = props;
   const [form, setForm] = useState<Partial<NewComponent>>({});
   const dialogCtrl = useContext<any>(DialogContext);
-  const [licensesArray, setLicensesArray] = useState<any[]>([]);
 
 
-  const inputHandler = (e) => {
+
+  const inputHandler = (name, value) => {
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
@@ -96,7 +96,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               className={classes.input}
               value={form?.name}
               placeholder="Component"    
-              onChange={(e) => inputHandler(e)}
+              onChange={(e) => inputHandler('component',  e.target.value)}
               required
             />
           </Paper>
@@ -110,7 +110,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               className={classes.input}
               value={form?.version}
               placeholder="Version"
-              onChange={(e) => inputHandler(e)}
+              onChange={(e) => inputHandler('version',  e.target.value)}
               required
             />
           </Paper>
@@ -124,12 +124,17 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               fullWidth
               className={classes.input}
               options={licenses || []}
-              // value={form.license_name}
+              value={form?.license_id}
+              getOptionLabel={(option) => option.name || option}
               disableClearable
               renderInput={(params) => (
-                <TextField required {...params} InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }} />
+                <TextField
+                  required
+                  {...params}
+                  InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
+                />
               )}
-            //   onChange={(e, value) => autocompleteHandler('license_name', value)}
+              onChange={(e, value) => inputHandler('license_id', value?.name)}
             />
           </Paper>
         </div>
@@ -142,7 +147,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               fullWidth
               className={classes.input}
               value={form?.purl}
-              onChange={(e) => inputHandler(e)}
+              onChange={(e) => inputHandler('purl',  e.target.value)}
               required
             />
           </Paper>
@@ -157,7 +162,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               fullWidth
               className={classes.input}
               value={form?.url}
-              onChange={(e) => inputHandler(e)}
+              onChange={(e) => inputHandler('url',  e.target.value)}
               required
             />
           </Paper>

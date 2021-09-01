@@ -22,6 +22,7 @@ import { componentService } from '../../../../api/component-service';
 import { licenseService } from '../../../../api/license-service';
 import { DialogContext } from '../../../context/DialogProvider';
 import { ResponseStatus } from '../../../../main/Response';
+import ComponentDialog from '../ComponentDialog/ComponentDialog';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -293,7 +294,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           Identify
         </Button>
       </DialogActions>
-      {showComponentDialog ? <ComponentDialog /> : null}
+      {showComponentDialog ? <ComponentDialog licenses={licenses} /> : null}
     </Dialog>
   );
 };
