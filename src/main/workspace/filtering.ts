@@ -5,6 +5,8 @@ import * as fs from 'fs';
 import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
 import { defaultBannedList } from './filtering/defaultFilter';
 
+const fpath = require('path');
+
 class AbstractFilter {
   // path: string | undefined;
   condition: string;
@@ -36,6 +38,7 @@ class NameFilter extends AbstractFilter {
       return !(path.indexOf(this.value) >= 0);
     }
     if (this.condition === 'fullmatch') return path === this.value;
+    if (this.condition === 'starts') return fpath.basename(path).indexOf(this.value) === -1;
     return true;
   }
 }
@@ -178,10 +181,8 @@ export class BannedList {
       if (a[i].ftype === 'EXTENSION') this.addFilter(new ExtensionFilter(a[i].condition, a[i].value));
       if (a[i].ftype === 'CONTENT') this.addFilter(new ContentFilter(a[i].condition, a[i].value));
     }
-   // console.log("loading "+ this.filters);
+    // console.log("loading "+ this.filters);
   }
-
-
 }
 // export class BannedList
 // module.exports = {
