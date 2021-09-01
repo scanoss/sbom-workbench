@@ -230,16 +230,22 @@ export const Editor = () => {
   };
 
   const identifyHandler = async () => {
-    const node = await projectService.getNodeFromPath(file);
-    console.log(node);
-    if (node.action === 'filter') {
-      await resultService.createFiltered(file); // idtype=forceinclude
-    } else await resultService.updateNoMatchToFile(file);
-    // update No match
+    const response = await dialogCtrl.openInventory({});
+    if (response) {
+      const node = await projectService.getNodeFromPath(file);
+      if (node.action === 'filter') {
+        await resultService.createFiltered(file); // idtype=forceinclude
+      } else await resultService.updateNoMatchToFile(file);
 
-    const { data } = await resultService.getNoMatch(file);
+      const { data } = await resultService.getNoMatch(file);
 
-    create({}, [data.id]);
+      await createInventory({
+        ...response,
+        files: [data.id],
+      });
+      getInventories();
+      getResults();
+    }
   };
 
   return (
