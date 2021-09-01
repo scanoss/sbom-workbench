@@ -33,19 +33,20 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     borderTop: '1px solid #D4D4D8',
     backgroundColor: '#f4f4f5',
-  }
+  },
 }));
 
 interface ConfirmDialogProps {
   open: boolean;
   message: string;
   button: any;
+  hideDeleteButton: boolean;
   onClose: (response: DialogResponse) => void;
 }
 
 export const ConfirmDialog = (props: ConfirmDialogProps) => {
   const classes = useStyles();
-  const { open, message, button, onClose } = props;
+  const { open, message, button, hideDeleteButton, onClose } = props;
 
   const handleCancel = () => onClose({ action: DIALOG_ACTIONS.CANCEL });
   const handleAccept = () => onClose({ action: DIALOG_ACTIONS.OK });
@@ -64,12 +65,10 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
         <IconButton aria-label="close" className={classes.closeButton} onClick={handleCancel}>
           <CloseIcon />
         </IconButton>
-        <DialogContentText className={classes.text}>
-          {message}
-        </DialogContentText>
+        <DialogContentText className={classes.text}>{message}</DialogContentText>
       </DialogContent>
       <DialogActions className={classes.actions}>
-        <Button onClick={handleCancel}>Cancel</Button>
+        {!hideDeleteButton && <Button onClick={handleCancel}>Cancel</Button>}
         <Button
           className={button?.role === 'delete' && classes.deleteButton}
           color="secondary"

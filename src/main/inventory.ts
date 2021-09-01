@@ -69,7 +69,6 @@ ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (event, arg: Partial<Inventory>
   }
 });
 
-
 ipcMain.handle(IpcEvents.INVENTORY_FROM_COMPONENT, async (event) => {
   try {
     const data = await defaultProject.scans_db.inventories.getFromComponent();

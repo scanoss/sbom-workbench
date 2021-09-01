@@ -23,6 +23,7 @@ import './main/file';
 import './main/formats';
 import './main/workspace';
 import './main/report';
+import './main/license';
 
 import { IpcEvents } from './ipc-events';
 import { workspace } from './main/workspace/workspace';
@@ -181,3 +182,6 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   await workspace.projectsList.prepare_scan();
   workspace.projectsList.startScan();
 });
+
+
+

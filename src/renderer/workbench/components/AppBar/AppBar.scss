@@ -24,6 +24,8 @@
   }
 
   #Navigation {
+    display: flex;
+
     .MuiButtonBase-root:last-child {
       margin-left: -12px;
     }
@@ -48,6 +50,8 @@
   }
 
   #AppMenu {
+    display: flex;
+
     .MuiButtonBase-root {
       padding: 0;
       min-width: 56px;

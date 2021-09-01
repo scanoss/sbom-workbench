@@ -6,9 +6,17 @@ const LicensesChart = ({ data }) => {
   const [percentage, setPercentage] = useState<number>(0);
 
   useEffect(() => {
-    const percentage = Math.floor((data?.identifiedFiles + data?.ignoredFiles)*100 / data.detectedFiles) ;
+    const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
     const pending = 100 - percentage;
     setPercentage(percentage);
+
+    const tooltipPlugin = Chart.registry.getPlugin('tooltip');
+    tooltipPlugin.positioners.custom = function (elements, eventPosition) {
+      return {
+        x: eventPosition.x,
+        y: eventPosition.y,
+      };
+    };
 
     const chart = new Chart(chartRef.current, {
       type: 'bar',
@@ -58,13 +66,14 @@ const LicensesChart = ({ data }) => {
         },
         plugins: {
           tooltip: {
+            position: 'custom',
             callbacks: {
-              label() {
-                return (``);
-              },
               title() {
-                return (`Pending files\n${data?.pendingFiles}`);
-              }
+                return `Pending files\n${data?.pendingFiles}`;
+              },
+              label() {
+                return ``;
+              },
             },
             displayColors: false,
           },
