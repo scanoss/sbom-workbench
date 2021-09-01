@@ -1,8 +1,8 @@
 /* eslint-disable max-classes-per-file */
 import { EventEmitter } from 'events';
 import * as os from 'os';
-import { connect } from 'http2';
 import fs from 'fs';
+import { ipcMain } from 'electron';
 import { Inventory, Project } from '../../api/types';
 // import * as fs from 'fs';
 // import * as Filtering from './filtering';
@@ -17,7 +17,7 @@ import { licenses } from '../db/licenses';
 import { Scanner } from '../scannerLib/Scanner';
 import { ScannerEvents } from '../scannerLib/ScannerEvents';
 import { IpcEvents } from '../../ipc-events';
-import { ipcMain } from 'electron';
+import { defaultBannedList } from './filtering/defaultFilter';
 
 // const fs = require('fs');
 const path = require('path');
@@ -103,6 +103,8 @@ export class ProjectTree extends EventEmitter {
     this.project_name = a.project_name;
     this.filesSummary = a.filesSummary;
     this.scans_db = new ScanDb(rootOfProject);
+    this.banned_list = new Filtering.BannedList('NoFilter');
+    this.banned_list.load(`${this.work_root}/filter.json`);
     await this.scans_db.init();
     this.scanner = new Scanner();
 
@@ -116,8 +118,8 @@ export class ProjectTree extends EventEmitter {
     const file = fs.writeFileSync(`${this.work_root}/tree.json`, JSON.stringify(this).toString());
 
     // Save metadata
-    let self = this;
-    let metadata = {
+    const self = this;
+    const metadata = {
       id: 'NULL',
       name: self.scan_root.split('/').pop(), // Get the folder name
       work_root: self.work_root,
@@ -148,6 +150,12 @@ export class ProjectTree extends EventEmitter {
       //  this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, { reason: 'projectExists', severity: 'warning' });
       // this.cleanProject();
     }
+
+    if (!fs.existsSync(`${this.work_root}/filter.json`)) {
+      console.log('No banned list defined. Setting default list.');
+       fs.writeFileSync(`${this.work_root}/filter.json`, JSON.stringify(defaultBannedList).toString());
+    } else console.log('Filters were already defined');
+    this.banned_list.load(`${this.work_root}/filter.json`);
 
     this.scans_db = new ScanDb(p.work_root);
 
@@ -281,7 +289,8 @@ export class ProjectTree extends EventEmitter {
       processed: 60,
     });
     // apply filters.
-    this.banned_list.loadDefault();
+    // this.banned_list.loadDefault();
+    // this.banned_list.save(`${this.work_root}/filter.json`);
 
     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'preparing',
