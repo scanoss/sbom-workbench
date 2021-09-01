@@ -93,6 +93,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }
   };
 
+  const openComponentDialog = async () => {
+    const response = await dialogCtrl.openComponentDialog();
+  }
+
+
+
   const handleClose = () => {
     const inventory: any = form;
     onClose(inventory);
@@ -150,7 +156,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       <div className="identity-component">
         <div className="component-version-container">
           <div className="component-container">
-          <Button onClick={() => setShowComponentDialog(true)}>+</Button>
+          <Button onClick={openComponentDialog}>+</Button>
             <label>Component</label>
             <Paper className={classes.paper}>
               <SearchIcon className={classes.iconButton} />
@@ -294,7 +300,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           Identify
         </Button>
       </DialogActions>
-      {showComponentDialog ? <ComponentDialog licenses={licenses} /> : null}
+      
     </Dialog>
   );
 };

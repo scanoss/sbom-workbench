@@ -38,16 +38,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface ComponentDialogProps {
-  // open: boolean;
-  // onClose: (response: DialogResponse) => void;
-  // onCancel: () => void;
+  open: boolean;
+  onClose: (response: DialogResponse) => void;
+  onCancel: () => void;
   licenses: any[];
 }
 
 export const ComponentDialog = (props: ComponentDialogProps) => {
   const classes = useStyles();
-  // const { open, onClose, onCancel, licenses } = props;
-  const { licenses } = props;
+  const { open, onClose, onCancel, licenses } = props;
   const [form, setForm] = useState<Partial<NewComponent>>({});
   const dialogCtrl = useContext<any>(DialogContext);
 
@@ -137,7 +136,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               onChange={(e, value) => inputHandler('license_id', value?.name)}
             />
           </Paper>
-        </div>
+        </div>  
         <div className="license-container">
           <label>PURL</label>
           <Paper component="form" className={classes.paper}>
@@ -169,10 +168,8 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
         </div>
       </div>
       <DialogActions>
-        <Button >Cancel</Button>
-        <Button variant="contained" color="secondary" onClick={() => {
-          console.log(form);
-        }} >
+        <Button onClick={onCancel}>Cancel</Button>
+        <Button variant="contained" color="secondary" onClick={handleClose}>
           Create
         </Button>
       </DialogActions>
