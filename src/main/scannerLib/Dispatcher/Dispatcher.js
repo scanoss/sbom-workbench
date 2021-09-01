@@ -1,3 +1,5 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 import EventEmitter from 'events';
 import fetch from 'node-fetch';
 import FormData from 'form-data';
@@ -6,19 +8,17 @@ import PQueue from 'p-queue';
 import { ScannerEvents } from '../ScannerEvents';
 import { DispatcherResponse } from './DispatcherResponse';
 import { DispatcherEvents } from './DispatcherEvents';
-
-// TO DO:
-// - Add #CLIENT_TIMESTAMP to the fetch header
+import { app } from 'electron';
 
 export class Dispatcher extends EventEmitter {
   // Client Timestamp
-  #CLIENT_TIMESTAMP = 'scanner.c/1.0.0';
+  #CLIENT_TIMESTAMP = app.getVersion();
 
   // API URL
   #API_URL = 'https://osskb.org/api/scan/direct';
 
   // Level of concurrency
-  #CONCURRENCY_LIMIT = 10;
+  #CONCURRENCY_LIMIT = 15;
 
   // Timeout for each transaction
   #TIMEOUT = 60000;
@@ -29,8 +29,11 @@ export class Dispatcher extends EventEmitter {
   // Promises queue
   #pQueue;
 
-  // Error counter (Resets every time a transaction is complete)
-  #networkErrorCounter;
+  #status;
+
+  #error;
+
+  #wfpFailed;
 
   constructor() {
     super();
@@ -45,11 +48,14 @@ export class Dispatcher extends EventEmitter {
     });
 
     this.#pQueue.clear();
-    if (this.isPaused()) this.#pQueue.start();
 
     this.#pQueue.on('idle', () => {
-      this.emit(ScannerEvents.DISPATCHER_FINISHED)
+      this.emit(ScannerEvents.DISPATCHER_FINISHED);
     });
+
+    this.#status = DispatcherEvents.STATUS_RUNNING;
+
+    this.#wfpFailed = {};
 
     // Only works for pQueue@7.x.x versions
     // this.#pQueue.on('error', (error) => {
@@ -68,16 +74,20 @@ export class Dispatcher extends EventEmitter {
     this.#pQueue.pause();
   }
 
-  isPaused() {
-    return this.#pQueue.isPaused;
-  }
-
   pause() {
     this.#pQueue.pause();
   }
 
   resume() {
+    this.#status = DispatcherEvents.STATUS_RUNNING;
+    this.#pQueue.removeListener('next');
+    for (const wfpPathFailed in this.#wfpFailed) this.dispatchWfpFile(wfpPathFailed);
     this.#pQueue.start();
+  }
+
+  #setWfpAsFailed(wfpPath) {
+    if (this.#wfpFailed.hasOwnProperty(wfpPath)) this.#wfpFailed[wfpPath] += 1;
+    else this.#wfpFailed[wfpPath] = 1;
   }
 
   dispatchWfpFile(wfpPath) {
@@ -89,19 +99,21 @@ export class Dispatcher extends EventEmitter {
   }
 
   #errorHandler(error) {
-    if (
-      error.message === DispatcherEvents.ERROR_NETWORK_CONNECTIVITY ||
-      error.name === DispatcherEvents.ERROR_TRANSACTION_TIMEOUT
-    ) {
-      if (!this.isPaused()) {
-        this.pause();
-        console.log(`Error detected ${error}. Stopping Scanner`);
-      }
+    if (this.#status !== DispatcherEvents.STATUS_ERROR) {
+      // Ensures to handle only the first error received (There are many promises running at any time)
+      this.#status = DispatcherEvents.STATUS_ERROR;
+      this.#error = error;
+      this.pause();
 
-      // Wait until all promises are resolved or rejected. Could be timeout or Network error
-      if (this.#pQueue.pending <= 0) {
-        this.emit('error', new Error(DispatcherEvents.ERROR_NETWORK_CONNECTIVITY));
-      }
+      // Once all the promises are resolved or rejected emit the error event.
+      const nextHandler = () => {
+        if (this.#pQueue.pending === 0) {
+          this.#pQueue.removeListener(nextHandler);
+          this.emit('error', this.#error);
+        }
+      };
+
+      this.#pQueue.on('next', nextHandler);
     }
   }
 
@@ -113,17 +125,21 @@ export class Dispatcher extends EventEmitter {
       const form = new FormData();
       form.append('filename', Buffer.from(wfpContent), 'data.wfp');
 
-      this.emit(ScannerEvents.DISPATCHER_WFP_SENDED, wfpFilePath);
-
       // Fetch
       const p1 = fetch(this.#API_URL, {
         method: 'post',
         body: form,
+        headers: { 'User-Agent': this.#CLIENT_TIMESTAMP },
       });
 
+      this.emit(ScannerEvents.DISPATCHER_WFP_SENDED, wfpFilePath);
       const response = await p1;
       if (!response.ok) {
-        throw new Error('Server communication failed');
+        const msg = await response.text();
+        const err = new Error(msg);
+        err.code = response.status;
+        err.name = ScannerEvents.ERROR_SERVER_SIDE;
+        throw err;
       }
 
       dataAsText = await response.text();
@@ -131,10 +147,10 @@ export class Dispatcher extends EventEmitter {
       this.emit(ScannerEvents.DISPATCHER_NEW_DATA, new DispatcherResponse(dataAsObj, wfpFilePath));
       return await Promise.resolve();
     } catch (error) {
-      if (error.code === 'EAI_AGAIN') {
-        throw new Error(DispatcherEvents.ERROR_NETWORK_CONNECTIVITY);
-      }
-      throw new Error(error);
+      this.#setWfpAsFailed(wfpFilePath);
+      if (error.name !== ScannerEvents.ERROR_SERVER_SIDE) error.name = ScannerEvents.ERROR_CLIENT_SIDE;
+      console.log(error);
+      throw error;
     }
   }
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import IconButton from '@material-ui/core/IconButton';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -17,6 +17,8 @@ import { inventoryService } from '../../../../api/inventory-service';
 import { setFile } from '../../actions';
 import { DIALOG_ACTIONS } from '../../../context/types';
 import { resultService } from '../../../../api/results-service';
+import NoMatchFound from '../../components/NoMatchFound/NoMatchFound';
+import { projectService } from '../../../../api/project-service';
 
 const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
 
@@ -46,8 +48,8 @@ export const Editor = () => {
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
-  const [ossLines, setOssLines] = useState<number[]>([]);
-  const [lines, setLines] = useState<number[]>([]);
+  // const [ossLines, setOssLines] = useState<number[]>([]);
+  // const [lines, setLines] = useState<number[]>([]);
   const [fullFile, setFullFile] = useState<boolean>(null);
 
   const init = () => {
@@ -88,6 +90,7 @@ export const Editor = () => {
   const getInventories = async () => {
     const { data } = await inventoryService.getAll({ files: [file] });
     setInventories(data);
+    console.log(data);
   };
 
   const getResults = async () => {
@@ -96,8 +99,14 @@ export const Editor = () => {
   };
 
   const create = async (defaultInventory, selFiles) => {
-    const response = await inventoryService.getAll({ purl: defaultInventory.purl, version: defaultInventory.version });
-    const inventories = response.message || [];
+    let inventories = [];
+    if (defaultInventory.purl && defaultInventory.version) {
+      const response = await inventoryService.getAll({
+        purl: defaultInventory.purl,
+        version: defaultInventory.version,
+      });
+      inventories = response.message || [];
+    }
 
     const showSelector = inventories.length > 0;
     let action = DIALOG_ACTIONS.NEW;
@@ -198,26 +207,6 @@ export const Editor = () => {
     }
   }, [currentMatch]);
 
-  useEffect(() => {
-    if (!currentMatch) {
-      return;
-    }
-
-    const linesOss =
-      currentMatch.id === 'file'
-        ? null
-        : range(parseInt(currentMatch.oss_lines.split('-')[0], 10), parseInt(currentMatch.oss_lines.split('-')[1], 10));
-
-    setOssLines(linesOss);
-
-    const lineasLocales =
-      currentMatch.id === 'file'
-        ? null
-        : range(parseInt(currentMatch.lines.split('-')[0], 10), parseInt(currentMatch.lines.split('-')[1], 10));
-
-    setLines(lineasLocales);
-  }, [currentMatch]);
-
   const onAction = (action: MATCH_INFO_CARD_ACTIONS, result: any = null) => {
     switch (action) {
       case MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY:
@@ -240,19 +229,38 @@ export const Editor = () => {
     }
   };
 
+  const identifyHandler = async () => {
+    const response = await dialogCtrl.openInventory({});
+    if (response) {
+      const node = await projectService.getNodeFromPath(file);
+      if (node.action === 'filter') {
+        await resultService.createFiltered(file); // idtype=forceinclude
+      } else await resultService.updateNoMatchToFile(file);
+
+      const { data } = await resultService.getNoMatch(file);
+
+      await createInventory({
+        ...response,
+        files: [data.id],
+      });
+      getInventories();
+      getResults();
+    }
+  };
+
   return (
     <>
       <section id="editor" className="app-page">
         <header className="app-header">
           <>
-            <div className="match-title">
+            {/* <div className="match-title">
               <h2 className="header-subtitle back">
                 <IconButton onClick={() => history.goBack()} component="span">
                   <ArrowBackIcon />
                 </IconButton>
                 {inventories?.length === 0 && matchInfo?.length === 0 ? 'No match found' : 'Matches'}
               </h2>
-            </div>
+            </div> */}
             <header className="match-info-header">
               {matchInfo && inventories ? (
                 <section className="content">
@@ -283,7 +291,7 @@ export const Editor = () => {
                               component: match.component.name,
                               version: match.component.version,
                               usage: match.type,
-                              license: match.component.licenses[0]?.name,
+                              license: match.component.licenses && match.component.licenses[0]?.name,
                               url: match.component.url,
                               purl: match.component.purl,
                             }}
@@ -312,7 +320,7 @@ export const Editor = () => {
           <main className="editors editors-full app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
-                <MemoCodeEditor content={localFileContent.content} highlight={lines} />
+                <MemoCodeEditor content={localFileContent.content} highlight={currentMatch?.lines || null} />
               ) : null}
             </div>
           </main>
@@ -320,14 +328,20 @@ export const Editor = () => {
           <main className="editors app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
-                <MemoCodeEditor content={localFileContent.content} highlight={lines} />
+                <MemoCodeEditor content={localFileContent.content} highlight={currentMatch?.lines || null} />
               ) : null}
             </div>
-            <div className="editor">
-              {currentMatch && remoteFileContent?.content ? (
-                <MemoCodeEditor content={remoteFileContent.content} highlight={ossLines} />
-              ) : null}
-            </div>
+            {inventories?.length === 0 && matchInfo?.length === 0 ? (
+              <div className="editor">
+                <NoMatchFound identifyHandler={() => identifyHandler()} />
+              </div>
+            ) : (
+              <div className="editor">
+                {currentMatch && remoteFileContent?.content ? (
+                  <MemoCodeEditor content={remoteFileContent.content} highlight={currentMatch?.oss_lines || null} />
+                ) : null}
+              </div>
+            )}
           </main>
         )}
       </section>

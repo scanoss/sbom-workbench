@@ -1,8 +1,8 @@
 /* eslint-disable max-classes-per-file */
 import { EventEmitter } from 'events';
 import * as os from 'os';
-import { connect } from 'http2';
 import fs from 'fs';
+import { ipcMain } from 'electron';
 import { Inventory, Project } from '../../api/types';
 // import * as fs from 'fs';
 // import * as Filtering from './filtering';
@@ -65,6 +65,7 @@ export class ProjectTree extends EventEmitter {
     this.banned_list = new Filtering.BannedList('NoFilter');
     // forces a singleton instance, will be killed in a multiproject domain
     defaultProject = this;
+
   }
 
   set_scan_root(root: string) {
@@ -106,7 +107,12 @@ export class ProjectTree extends EventEmitter {
     this.banned_list.load(`${this.work_root}/filter.json`);
     await this.scans_db.init();
     this.scanner = new Scanner();
+
+
+
   }
+
+
 
   saveScanProject() {
     const file = fs.writeFileSync(`${this.work_root}/tree.json`, JSON.stringify(this).toString());
@@ -154,8 +160,9 @@ export class ProjectTree extends EventEmitter {
     this.scans_db = new ScanDb(p.work_root);
 
     this.scanner = new Scanner();
-    this.scanner.setResultsPath(this.work_root);
-    this.scanner.setWinnowingPath(this.work_root);
+    this.scanner.setWorkDirectory(p.work_root);
+
+
     this.setScannerListeners();
   }
 
@@ -203,16 +210,50 @@ export class ProjectTree extends EventEmitter {
     });
 
     this.scanner.on('error', (error) => {
-      console.log(error.message);
-
-      if (error.message === ScannerEvents.ERROR_SCANNER_ABORTED) {
-        this.msgToUI.send(IpcEvents.SCANNER_ABORTED, error); // Emit only once
-        this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
-          success: false,
-          resultsPath: this.work_root,
-        });
-      }
+      this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
+
+    ipcMain.on(IpcEvents.SCANNER_RESUME, async (event, arg: IInitScan) => {
+      this.resumeScanner();
+    });
+
+  }
+
+  resumeScanner() {
+
+    const timeout = 15; //En segs.
+    let tickCounter = 0;
+
+    const timerID = setInterval(() => {
+
+      console.log(`Resuming scanner in ${timeout - tickCounter} secs...`);
+      tickCounter += 1;
+
+      if(tickCounter >= timeout) {
+           this.scanner.resume();
+           clearInterval(timerID);
+      }
+
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: 'resuming',
+      // processed: this.filesSummary.include,
+      processed: (100 * tickCounter) / timeout,
+    });
+
+
+
+    }, 1000);
+
+
+
+
+
+
+    // setTimeout(() => {
+    //   console.log('Resuming scanner');
+    //   this.scanner.resume();
+    // }, 15000);
+
   }
 
   startScan() {
@@ -298,6 +339,29 @@ export class ProjectTree extends EventEmitter {
   set_filter_file(pathToFilter: string): boolean {
     this.banned_list.load(pathToFilter);
     return true;
+  }
+
+  getNodeFromPath(mypath: string) {
+    let res: string[];
+    // eslint-disable-next-line prefer-const
+    if (!mypath || !mypath.includes('/')) throw new Error(`Error on path: "${mypath}`);
+
+    res = mypath.split('/');
+    if (res[0] === '') res.shift();
+    if (res[res.length - 1] === '') res.pop();
+    const nodes = this.logical_tree.children;
+    let nodeFound: any = {};
+    for (let i = 0; i < res.length - 1; i += 1) {
+      const path = res[i];
+       nodeFound = nodes.find((node) => {
+        if (node.type === 'folder' && node.label === path) return node;
+      });
+    }
+     nodeFound = nodes.find((node) => {
+      if (node.type === 'file' && node.label === res[res.length - 1]) return node;
+    });
+    if (nodeFound) return nodeFound;
+    return {};
   }
 
   get_proxy_leaf(leaf: any): any {

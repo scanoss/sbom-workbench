@@ -49,7 +49,7 @@
 }
 
 .info-files {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .editors {
@@ -61,6 +61,11 @@
   .editor {
     height: 100%;
     overflow: hidden;
+
+    .line-highlighted {
+      display: block;
+      background-color: #ebe92252 !important;
+    }
 
     span:not(.linenumber) {
       user-select: text !important;

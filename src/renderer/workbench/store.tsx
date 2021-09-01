@@ -4,8 +4,9 @@ import { AppContext } from '../context/AppProvider';
 import { Inventory } from '../../api/types';
 import { inventoryService } from '../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
-import { loadScanSuccess, setComponent, setComponents } from './actions';
+import { loadScanSuccess, setComponent, setComponents, setProgress } from './actions';
 import { resultService } from '../../api/results-service';
+import { report } from '../../api/report-service';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
@@ -90,6 +91,10 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
     const components = await workbenchController.getComponents();
     dispatch(setComponents(components));
+
+    const { data } = await report.getSummary();
+    dispatch(setProgress(data.summary));
+    console.log(data.summary);
   };
 
   const value = React.useMemo(() => ({

@@ -3,6 +3,7 @@ import { create } from 'electron-log';
 // import { Component } from 'react';
 import { Inventory, Component, Project } from '../api/types';
 import { IpcEvents } from '../ipc-events';
+import { Response } from './Response';
 
 
 import { workspace } from './workspace/workspace';
@@ -67,4 +68,13 @@ ipcMain.handle(IpcEvents.UTILS_DEFAULT_PROJECT_PATH, async (event) => {
 ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
   const projectName = defaultProject.project_name;
       return { status: 'ok', message: 'Project name retrieve succesfully', data: projectName };
+});
+
+ipcMain.handle(IpcEvents.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
+  try {
+    const node = defaultProject.getNodeFromPath(path);
+    return Response.ok({ message: 'Node from path retrieve succesfully', data: node });
+  } catch (e) {
+    return Response.fail({ message: e.message });
+  }
 });

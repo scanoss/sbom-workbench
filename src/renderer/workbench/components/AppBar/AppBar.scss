@@ -1,0 +1,85 @@
+#AppBar {
+  background-color: white;
+  color: #A1A1AA;
+
+  .MuiToolbar-root {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    justify-content: space-between;
+    flex-direction: row;
+  }
+
+  .slot {
+    display: flex;
+    align-items: center;
+
+    &.end {
+      text-align: right;
+      margin-left: auto;
+    }
+  }
+
+  .MuiDivider-root {
+    margin: 13px 5px;
+  }
+
+  #Navigation {
+    display: flex;
+
+    .MuiButtonBase-root:last-child {
+      margin-left: -12px;
+    }
+  }
+
+  #AppTitle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: #A1A1AA;
+    font-size: 16px;
+    font-weight: 400;
+
+    line-height: 20px;
+
+    .title-main {
+      color: var(--color-font);
+      font-size: 20px;
+      font-weight: 700;
+    }
+  }
+
+  #AppMenu {
+    display: flex;
+
+    .MuiButtonBase-root {
+      padding: 0;
+      min-width: 56px;
+      height: 48px;
+      margin: 0 2px;
+      color: #A1A1AA;
+    }
+
+    .active .MuiButtonBase-root {
+      color: var(--color-primary);
+      background-color: #F4F4F5
+    }
+  }
+
+  #AppProgress {
+    display: flex;
+    align-items: center;
+
+    p {
+      color: var(--color-status-identified);
+      font-weight: 700;
+    }
+
+
+  .progress {
+      margin-left: 5px;
+      width: 250px;
+      height: 10px;
+    }
+  }
+}

@@ -1,9 +1,10 @@
-import { LOAD_SCAN_FAIL, LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_COMPONENTS, SET_FILE } from './actions';
+import { LOAD_SCAN_FAIL, LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_COMPONENTS, SET_FILE, SET_PROGRESS } from './actions';
 import { ComponentGroup } from '../../api/types';
 
 export interface State {
   name: string;
   loaded: boolean;
+  progress: number,
   tree: any[];
   file: string | null;
   components: ComponentGroup[];
@@ -13,6 +14,7 @@ export interface State {
 export const initialState: State = {
   name: null,
   loaded: false,
+  progress: 0,
   tree: null,
   file: null,
   components: null,
@@ -35,6 +37,14 @@ export default function reducer(state: State = initialState, action): State {
       return {
         ...state,
         loaded: false,
+      };
+    }
+    case SET_PROGRESS: {
+      const { summary } = action;
+      const progress = Math.floor(((summary?.identifiedFiles + summary?.ignoredFiles) * 100) / summary?.detectedFiles);
+      return {
+        ...state,
+        progress,
       };
     }
     case SET_COMPONENTS: {

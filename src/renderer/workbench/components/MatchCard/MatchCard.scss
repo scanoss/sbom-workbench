@@ -41,6 +41,15 @@
       right: 0px;
       opacity: 0;
       transition: opacity 200ms ease;
+      align-items: center;
+
+      span.type {
+        font-size: 20px;
+        font-weight: 700;
+        color: $indentified-green;
+        margin-right: 16px;
+        text-transform: capitalize;
+      }
 
       .check {
         color: $indentified-green;

@@ -1,18 +1,12 @@
-import { makeStyles, Paper, IconButton, InputBase, Button, ButtonGroup, Card } from '@material-ui/core';
+import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
-import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
-import ViewModuleRoundedIcon from '@material-ui/icons/ViewModuleRounded';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import ComponentCard from '../../components/ComponentCard/ComponentCard';
 import { setComponent } from '../../actions';
-
-import ScanResults from './components/ScanResults';
 
 const LIMIT = 100;
 
@@ -68,10 +62,9 @@ export const ComponentList = () => {
 
   return (
     <div id="ComponentList">
-      <ScanResults name={name} />
       <section className="app-page">
         <header className="app-header">
-          <div className="d-flex space-between align-center">
+          {/* <div className="d-flex space-between align-center">
             <div>
               <h4 className="header-subtitle">{name}</h4>
               <h1 className="header-title">Detected Components</h1>
@@ -89,7 +82,7 @@ export const ComponentList = () => {
                 Identified
               </Button>
             </ButtonGroup>
-          </div>
+          </div> */}
 
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">

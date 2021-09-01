@@ -2,7 +2,7 @@ export class Querys {
   /** SQL CREATE SCAN TABLES * */
 
   SQL_CREATE_TABLE_RESULTS =
-    'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,file_path text ,fileid integer, vendor text, component text, version text, latest_version text, cpe text, license text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,identified integer,ignored integer,file_url text);';
+    'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,file_path text ,fileid integer, vendor text, component text, version text, latest_version text, cpe text, license text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,identified integer,ignored integer,file_url text,source text);';
 
   SQL_CREATE_TABLE_FILE_INVENTORIES =
     'CREATE TABLE IF NOT EXISTS file_inventories (id integer primary key asc, resultid integer not null, inventoryid integer not null, FOREIGN KEY (inventoryid) REFERENCES inventories(id) ON DELETE CASCADE);';
@@ -14,7 +14,7 @@ export class Querys {
     'CREATE TABLE IF NOT EXISTS status (files integer, scanned integer default 0, status text, project integer, user text, message text, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, type text, size text);';
 
   COMPDB_SQL_CREATE_TABLE_COMPVERS =
-    'CREATE TABLE IF NOT EXISTS component_versions (id integer primary key asc, name text, version text not null, description text, url text, purl text, UNIQUE(name, version,description,url,purl));';
+    'CREATE TABLE IF NOT EXISTS component_versions (id integer primary key asc, name text, version text not null, description text, url text, purl text,source text, UNIQUE(version,purl));';
 
   COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS =
     'CREATE TABLE IF NOT EXISTS license_component_version (id integer primary key asc, cvid integer not null, licid integer not null, unique(cvid,licid));';
@@ -33,7 +33,9 @@ export class Querys {
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS
   SQL_INSERT_RESULTS =
-    'INSERT or IGNORE INTO results (md5_file,vendor,component,version,latest_version,license,url,lines,oss_lines,matched,filename,idtype,md5_comp,purl,file_path,identified,ignored,file_url) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+    'INSERT or IGNORE INTO results (md5_file,vendor,component,version,latest_version,license,url,lines,oss_lines,matched,filename,idtype,md5_comp,purl,file_path,identified,ignored,file_url,source) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+
+  SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH = `UPDATE results SET source=?,idtype='file' WHERE file_path=?`;
 
   // SQL NEW INVENTORY
   SQL_SCAN_INVENTORY_INSERT =
@@ -50,7 +52,7 @@ export class Querys {
     'UPDATE inventories SET compid=?,version=?,purl=?,usage=?, notes=?, url=?, license_name=?  where id=?;';
 
   SQL_SELECT_INVENTORY_COMPONENTS = `SELECT  i.id,i.usage,i.purl,i.notes,i.url,i.license_name,i.version,cv.name
-  FROM inventories i INNER JOIN component_versions cv ON cv.version=i.version AND cv.purl=i.purl;`;  
+  FROM inventories i INNER JOIN component_versions cv ON cv.version=i.version AND cv.purl=i.purl;`;
 
   //  UPDATE INVENTORY BY PURL/VERSION
   SQL_UPDATE_INVENTORY_BY_PURL_VERSION =
@@ -59,16 +61,15 @@ export class Querys {
   SQL_COMPDB_COMP_VERSION_UPDATE =
     'UPDATE component_versions  SET name=?,version=?, description=?, url=?,purl=? where id=?;';
 
-  SQL_FILES_UPDATE_IDENTIFIED =
-    'UPDATE results SET identified=1 WHERE id IN ';
+  SQL_FILES_UPDATE_IDENTIFIED = 'UPDATE results SET identified=1 WHERE id IN ';
 
   /** SQL COMPONENTS TABLES INSERT* */
   // SQL INSERT INTO LICENSES
-  COMPDB_LICENSES_INSERT = 'INSERT OR IGNORE INTO licenses (spdxid,name,fulltext,url) VALUES(?,?,?,?);';
+  SQL_CREATE_LICENSE = 'INSERT OR IGNORE INTO licenses (spdxid,name,fulltext,url) VALUES(?,?,?,?);';
 
   // SQL INSERT INTO  COMPONENT VERSIONS
   COMPDB_SQL_COMP_VERSION_INSERT =
-    'INSERT OR IGNORE INTO component_versions  (name,version, description, url,purl) values (?,?,?,?,?);';
+    'INSERT OR IGNORE INTO component_versions  (name,version, description, url,purl,source) VALUES (?,?,?,?,?,?);';
 
   // ATTACH A COMPONENT TO A LICENSE
   SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID = 'INSERT or IGNORE INTO license_component_version (cvid,licid) values (?,?)';
@@ -81,19 +82,23 @@ export class Querys {
 
   /** *** SQL SCAN GET * **** */
   SQL_SCAN_SELECT_INVENTORIES_FROM_PATH =
-    'SELECT i.id,i.usage,i.compid,i.notes,i.url,i.license_name,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid INNER JOIN results r ON r.id=fi.resultid WHERE r.file_path=?;'
+    'SELECT i.id,i.usage,i.compid,i.notes,i.url,i.license_name,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid INNER JOIN results r ON r.id=fi.resultid WHERE r.file_path=?;';
 
-  SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION=
+  SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION =
     'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.license_name,i.purl,i.version FROM inventories i WHERE i.purl=? AND i.version=?;';
 
   // GET INVENTORY BY ID
-  SQL_GET_INVENTORY_BY_PURL = 'SELECT id,compid,usage,notes,url,license_name,purl,version FROM inventories WHERE purl=?;';
+  SQL_GET_INVENTORY_BY_PURL =
+    'SELECT id,compid,usage,notes,url,license_name,purl,version FROM inventories WHERE purl=?;';
 
   // GET INVENTORY BY ID
   SQL_GET_INVENTORY_BY_ID = 'SELECT id,compid,usage,notes,url,license_name,purl,version FROM inventories WHERE id=?;';
 
   SQL_SCAN_SELECT_FILE_RESULTS =
     "SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype!='none' order by file_path;";
+
+  SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH =
+    'SELECT DISTINCT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? ORDER BY file_path;';
 
   // GET ALL THE INVENTORIES ATTACHED TO A COMPONENT
   SQL_SELECT_ALL_INVENTORIES_ATTACHED_TO_COMPONENT =
@@ -130,8 +135,14 @@ export class Querys {
   SQL_GET_ALL_COMPONENTS =
     'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid;';
 
-  // GET LICENSES
-  COMPDB_SQL_LICENSE_ALL = 'SELECT id, spdxid, name, url from licenses where id like ? ;';
+   // GET ALL COMPONENTES
+  SQL_GET_ALL_DETECTED_COMPONENTS = 'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE source="engine";';
+
+  // GET LICENSE
+  SQL_SELECT_LICENSE = 'SELECT id, spdxid, name, url FROM licenses WHERE ';
+
+ // GET LICENSES
+ SQL_SELECT_ALL_LICENSES = 'SELECT id, spdxid, name, url FROM licenses;';
 
   // GET LICENSE ID BY NAME OR SPDXID
   COMPDB_SQL_GET_LICENSE_ID_FROM_SPDX_NAME = 'SELECT id FROM licenses WHERE licenses.name=? or licenses.spdxid=?;';
@@ -145,43 +156,44 @@ export class Querys {
     LEFT JOIN file_inventories fi ON r.id=fi.resultid
     WHERE r.purl=? AND r.version=? GROUP BY r.file_path;`;
 
-    SQL_SELECT_FILES_FROM_PURL =
-    `SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r
+  SQL_SELECT_FILES_FROM_PURL = `SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r
     LEFT JOIN file_inventories fi ON r.id=fi.resultid
     WHERE r.purl=?
     GROUP BY r.file_path;`;
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE results.id=?;';
 
-  SQL_UPDATE_UNIGNORED_FILES = 'UPDATE results SET ignored=0,identified=0  WHERE id IN ';
+  SQL_RESTORE_IDENTIFIED_FILE_SNIPPET = `UPDATE results SET ignored=0,identified=0 WHERE id IN `;
 
-  SQL_SELECT_INVENTORIES_NOT_HAVING_FILES = ` SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories);`
+  SQL_RESTORE_NOMATCH_FILE = `UPDATE results SET ignored=0,identified=0,idtype='none' WHERE source='nomatch' AND id IN `;
+
+  SQL_RESTORE_FILTERED_FILE = `DELETE FROM results WHERE source='filtered' AND id IN`;
+
+  SQL_SELECT_INVENTORIES_NOT_HAVING_FILES = ` SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories);`;
 
   SQL_GET_FILE_BY_PATH = 'SELECT file_path AS path,identified,ignored FROM results WHERE results.file_path=?;';
 
   SQL_GET_SPDX_COMP_DATA =
-    'SELECT DISTINCT cv.purl,cv.version,cv.url,cv.name,r.vendor,i.license_name FROM component_versions cv INNER JOIN inventories i ON cv.purl=i.purl AND cv.version=i.version INNER JOIN results r  ON r.version=i.version AND r.purl=i.purl GROUP BY i.version;';
+    'SELECT DISTINCT cv.purl,cv.version,cv.url,cv.name,i.license_name FROM component_versions cv INNER JOIN inventories i ON cv.purl=i.purl AND cv.version=i.version GROUP BY i.version;';
 
-  SQL_GET_CSV_DATA =
-    `SELECT i.id,i.usage,i.notes,i.license_name,i.purl,i.version,r.file_path AS path FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN results r ON r.id=fi.resultid;`;
+  SQL_GET_CSV_DATA = `SELECT i.id,i.usage,i.notes,i.license_name,i.purl,i.version,r.file_path AS path FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN results r ON r.id=fi.resultid;`;
 
   SQL_GET_ALL_SUMMARIES = 'SELECT compid,ignored,pending,identified FROM summary;';
 
   SQL_GET_SUMMARY_BY_PURL_VERSION = 'SELECT identified,pending,ignored FROM summary WHERE purl=? AND version=?;';
 
-  SQL_GET_SUMMARY_BY_PURL = 'SELECT SUM(identified) AS identified,SUM(pending) AS pending,SUM(ignored) AS ignored FROM summary WHERE purl=? GROUP BY purl;';
+  SQL_GET_SUMMARY_BY_PURL =
+    'SELECT SUM(identified) AS identified,SUM(pending) AS pending,SUM(ignored) AS ignored FROM summary WHERE purl=? GROUP BY purl;';
 
   SQL_GET_UNIQUE_COMPONENT = 'SELECT DISTINCT purl,version,license,component,url FROM results GROUP BY purl,version;';
 
   SQL_DELETE_INVENTORY_BY_ID = 'DELETE FROM inventories WHERE id=?;';
 
-  SQL_SET_RESULTS_TO_PENDING_BY_PATH_PURL_VERSION =
-    'UPDATE results SET ignored=0,identified=0 WHERE results.id = ?;';
+  SQL_SET_RESULTS_TO_PENDING_BY_PATH_PURL_VERSION = 'UPDATE results SET ignored=0,identified=0 WHERE results.id = ?;';
 
   SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION =
     'UPDATE results SET identified=0 WHERE id IN (SELECT resultid FROM file_inventories where inventoryid=?)';
 
-    SQL_GET_RESULTS_SUMMARY =
-    'SELECT (select count(*) from results r where r.identified = 1) as "identified", (select count(*)  from results r where r.ignored = 1 ) as "ignored", (select count(*) from results r where (r.identified = 0 AND r.ignored = 0 and md5_file !="" )) as "pending", (select count(*) FROM results WHERE md5_file !="") as "detected" ';
+  SQL_GET_RESULTS_SUMMARY =
+    `SELECT (SELECT COUNT(*) FROM results r WHERE r.identified = 1 AND md5_file!="") AS "identified", (SELECT COUNT(*) FROM results r WHERE r.ignored = 1 AND md5_file!="" ) AS "ignored", (SELECT COUNT(*) FROM results r WHERE (r.identified = 0 AND r.ignored = 0 AND md5_file!="" AND source="engine")) AS "pending", (SELECT COUNT(*) FROM results WHERE idtype !="none" AND md5_file!="" AND source="engine") AS "detected";`;
 }
-
