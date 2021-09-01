@@ -44,7 +44,7 @@ export class ResultsDb extends Db {
             for (let i = 0; i < value.length; i += 1) {
               const filePath = key;
               data = value[i];
-              self.insertResult(db, data, filePath);
+              self.insertResultBulk(db, data, filePath);
             }
           }
           db.run('commit', () => {
@@ -58,7 +58,46 @@ export class ResultsDb extends Db {
     });
   }
 
-  private insertResult(db: any, data: any, filePath: string) {
+  async insertFiltered(path: string) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run(
+            query.SQL_INSERT_RESULTS,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'file',
+            null,
+            null,
+            path,
+            0,
+            0,
+            null,
+            'filtered',
+            function (this: any, err: any) {
+              if (err) throw err;
+              db.close();
+              resolve(this.lastID);
+            }
+          );
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  private insertResultBulk(db: any, data: any, filePath: string) {
     const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : null;
     db.run(
       query.SQL_INSERT_RESULTS,
@@ -79,7 +118,8 @@ export class ResultsDb extends Db {
       filePath,
       0,
       0,
-      data.file_url
+      data.file_url,
+      'engine'
     );
   }
 
@@ -127,7 +167,7 @@ export class ResultsDb extends Db {
   }
 
   // GET RESULTS
-  get(path: string) {
+  getAll(path: string) {
     let results: any;
     return new Promise(async (resolve, reject) => {
       try {
@@ -142,4 +182,46 @@ export class ResultsDb extends Db {
       }
     });
   }
+
+  async updateResult(path: string) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run(query.SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH, 'nomatch', path, function (this: any, err: any) {
+            if (err) throw err;
+            db.close();
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async restore(files: number[]) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(() => {
+          const resultsid = `(${files.toString()});`;
+          const sqlRestoreIdentified = query.SQL_RESTORE_IDENTIFIED_FILE_SNIPPET + resultsid; 
+          const sqlRestoreNoMatch = query.SQL_RESTORE_NOMATCH_FILE + resultsid; 
+          const sqlRestoreFiltered = query.SQL_RESTORE_FILTERED_FILE + resultsid;
+          db.run('begin transaction');
+          db.run(sqlRestoreIdentified);
+          db.run(sqlRestoreNoMatch);
+          db.run(sqlRestoreFiltered);
+          db.run('commit', () => {
+            db.close();
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        reject(new Error('Unignore files were not successfully retrieved'));
+      }
+    });
+  }
+
 }

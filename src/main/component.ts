@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron';
 import { Component, License, ComponentGroup } from '../api/types';
 import { IpcEvents } from '../ipc-events';
+import { ComponentParams } from './db/scan_component_db';
 import { defaultProject } from './workspace/ProjectTree';
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (event, component: Component) => {
@@ -29,8 +30,8 @@ ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (event, component: Component
   return { status: 'ok', message: 'test', data };
 });
 
-ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET_ALL, async (event) => {
-  const data = await defaultProject.scans_db.components.getAllComponentGroup();
+ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET_ALL, async (event, params: ComponentParams) => {
+  const data = await defaultProject.scans_db.components.getAllComponentGroup(params);
   return { status: 'ok', message: 'Components group retrieve successfully', data };
 });
 

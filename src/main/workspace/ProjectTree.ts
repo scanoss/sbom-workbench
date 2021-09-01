@@ -119,7 +119,7 @@ export class ProjectTree extends EventEmitter {
     let self = this;
     let metadata = {
       id: 'NULL',
-      name: self.scan_root.split('/').pop(),  // Get the folder name
+      name: self.scan_root.split('/').pop(), // Get the folder name
       work_root: self.work_root,
       scan_root: self.scan_root,
       files: self.filesSummary.include,
@@ -181,7 +181,7 @@ export class ProjectTree extends EventEmitter {
         processed: (100 * this.processedFiles) / this.filesSummary.include,
       });
 
-     this.attachComponent(data);
+      this.attachComponent(data);
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
@@ -298,7 +298,6 @@ export class ProjectTree extends EventEmitter {
     this.filesToScan = summary.files;
     console.log(this.filesToScan);
 
-
     if (success) {
       console.log('licenses inserted successfully...');
       return true;
@@ -315,7 +314,7 @@ export class ProjectTree extends EventEmitter {
     let files: string[];
     files = inv.files;
     for (i = 0; i < inv.files.length; i += 1) {
-         insertInventory(this.logical_tree, files[i], inv);
+      insertInventory(this.logical_tree, files[i], inv);
     }
   }
 
@@ -331,6 +330,29 @@ export class ProjectTree extends EventEmitter {
   set_filter_file(pathToFilter: string): boolean {
     this.banned_list.load(pathToFilter);
     return true;
+  }
+
+  getNodeFromPath(mypath: string) {
+    let res: string[];
+    // eslint-disable-next-line prefer-const
+    if (!mypath || !mypath.includes('/')) throw new Error(`Error on path: "${mypath}`);
+
+    res = mypath.split('/');
+    if (res[0] === '') res.shift();
+    if (res[res.length - 1] === '') res.pop();
+    const nodes = this.logical_tree.children;
+    let nodeFound: any = {};
+    for (let i = 0; i < res.length - 1; i += 1) {
+      const path = res[i];
+       nodeFound = nodes.find((node) => {
+        if (node.type === 'folder' && node.label === path) return node;
+      });
+    }
+     nodeFound = nodes.find((node) => {
+      if (node.type === 'file' && node.label === res[res.length - 1]) return node;
+    });
+    if (nodeFound) return nodeFound;
+    return {};
   }
 
   get_proxy_leaf(leaf: any): any {

@@ -4,6 +4,7 @@ import { componentService } from '../api/component-service';
 import { ComponentGroup } from '../api/types';
 import { sortComponents, transform } from '../utils/scan-util';
 import { IpcEvents } from '../ipc-events';
+import { ComponentSource } from '../main/db/scan_component_db';
 
 const fs = require('original-fs').promises;
 
@@ -55,7 +56,7 @@ class WorkbenchController {
   }
 
   public async getComponents(): Promise<ComponentGroup[]> {
-    const { data } = await componentService.getAllComponentGroup();
+    const { data } = await componentService.getAllComponentGroup({ source: ComponentSource.ENGINE });
     console.log('COMPONENTS', data);
     sortComponents(data);
     return data;

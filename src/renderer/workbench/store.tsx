@@ -94,6 +94,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
     const { data } = await report.getSummary();
     dispatch(setProgress(data.summary));
+    console.log(data.summary);
   };
 
   const value = React.useMemo(() => ({

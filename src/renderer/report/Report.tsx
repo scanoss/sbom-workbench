@@ -77,7 +77,7 @@ const Report = () => {
     setLicenses(a?.data?.licenses);
     setVulnerabilites(a?.data?.vulnerabilities);
     setLicensesTable(a?.data?.licenses);
-    console.log(a?.data);
+    console.log(a?.data.summary);
   };
 
   const onLicenseSelected = (license: string) => {
