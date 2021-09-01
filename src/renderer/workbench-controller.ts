@@ -4,7 +4,7 @@ import { componentService } from '../api/component-service';
 import { ComponentGroup } from '../api/types';
 import { sortComponents, transform } from '../utils/scan-util';
 import { IpcEvents } from '../ipc-events';
-import { ComponentSource, ComponentStatus } from '../main/db/scan_component_db';
+import { ComponentSource } from '../main/db/scan_component_db';
 
 const fs = require('original-fs').promises;
 
