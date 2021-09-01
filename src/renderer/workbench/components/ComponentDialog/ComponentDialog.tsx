@@ -76,7 +76,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     try {
       console.log('form', form);
       const component: Partial<NewComponent> = form;
-      // const response = await licenseService.create(component);
+      const response = await componentService.create(component);
       onClose({ action: DIALOG_ACTIONS.OK, data: response });
     } catch (error) {
       console.log('error', error);
