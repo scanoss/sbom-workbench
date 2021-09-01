@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { Dialog, Paper, DialogActions, Button, makeStyles, InputBase, TextareaAutosize, TextField } from '@material-ui/core';
+import { Dialog, Paper, DialogActions, Button, makeStyles, InputBase, TextareaAutosize, TextField, IconButton } from '@material-ui/core';
 
 import React, { useContext, useEffect, useState } from 'react';
 import { NewComponent } from '../../../../api/types';
@@ -7,6 +7,7 @@ import { NewComponent } from '../../../../api/types';
 import { DialogResponse, DIALOG_ACTIONS } from '../../../context/types';
 import { ResponseStatus } from '../../../../main/Response';
 import SearchIcon from '@material-ui/icons/Search';
+import AddIcon from '@material-ui/icons/Add';
 import { Autocomplete } from '@material-ui/lab';
 import { componentService } from '../../../../api/component-service';
 import { licenseService } from '../../../../api/license-service';
@@ -91,6 +92,10 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     const { name, version, license_id, purl, url } = form;
     return name && version && license_id && purl && url;
   };
+
+  const openLicenseDialog = async () => {
+    const response = await dialogCtrl.openLicenseCreate();
+  };
   
 
   return (
@@ -128,7 +133,16 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
         </div>
         </div>
         <div className="license-container">
-        <label>License</label>
+        <div className="btn-label-container">
+            <div className="license-label-container">
+              <label>License</label>
+            </div>
+            <div className="license-btn-container">
+              <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
+                <AddIcon fontSize="inherit" />
+              </IconButton>
+            </div>
+          </div>
           <Paper component="form" className={classes.paper}>
             <SearchIcon className={classes.iconButton}  />
             <Autocomplete

@@ -156,11 +156,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       <div className="identity-component">
         <div className="component-version-container">
           <div className="component-container">
-            <div className="license-btn-label-container">
-            <div className="license-label-container">
+            <div className="btn-label-container">
+            <div className="component-label-container">
               <label>Component</label>
             </div>
-            <div className="license-btn-container">
+            <div className="component-btn-container">
               <IconButton color="inherit" size="small" onClick={openComponentDialog}>
                 <AddIcon fontSize="inherit" />
               </IconButton>
@@ -207,7 +207,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           </div>
         </div>
         <div className="component-container">
-          <div className="license-btn-label-container">
+          <div className="btn-label-container">
             <div className="license-label-container">
               <label>License</label>
             </div>

@@ -33,6 +33,11 @@
      
          .license-container {
            margin: 20px 24px;
+           .btn-label-container{
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+          }
          }
      
          input {
