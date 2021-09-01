@@ -9,6 +9,7 @@ import { ResponseStatus } from '../../../../main/Response';
 import SearchIcon from '@material-ui/icons/Search';
 import { Autocomplete } from '@material-ui/lab';
 import { componentService } from '../../../../api/component-service';
+import { licenseService } from '../../../../api/license-service';
 
 // TO DO
 import { DialogContext } from '../../../context/DialogProvider';
@@ -41,15 +42,24 @@ interface ComponentDialogProps {
   open: boolean;
   onClose: (response: DialogResponse) => void;
   onCancel: () => void;
-  licenses: any[];
 }
 
 export const ComponentDialog = (props: ComponentDialogProps) => {
   const classes = useStyles();
-  const { open, onClose, onCancel, licenses } = props;
+  const { open, onClose, onCancel } = props;
   const [form, setForm] = useState<Partial<NewComponent>>({});
   const dialogCtrl = useContext<any>(DialogContext);
+  const [licenses, setLicenses] = useState<any[]>();
+  
+  const fetchData = async () => {
+    if (open) {
+      const licensesResponse = await licenseService.getAll();
+      const catalogue = licensesResponse.data.map((item) => ({ name: item.name, type: 'Cataloged' }));
+      setLicenses(catalogue);
+    }
+  };
 
+  useEffect(() => fetchData(), [open]);
 
 
   const inputHandler = (name, value) => {
@@ -63,15 +73,9 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
 
   const handleClose = async () => {
     try {
-      const component: Partial<NewComponent> = form;
-      // const response = await licenseService.create(license);
-      onClose({ action: DIALOG_ACTIONS.OK, data: response });
+      console.log('form', form);
     } catch (error) {
-      await dialogCtrl.openConfirmDialog(
-        'The license already exist in the catalog',
-        { label: 'acept', role: 'acept' },
-        true
-      );
+      console.log('error', error);
     }
   };
 
