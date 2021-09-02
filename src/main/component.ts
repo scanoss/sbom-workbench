@@ -3,6 +3,7 @@ import { Component, License, ComponentGroup } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { ComponentParams } from './db/scan_component_db';
 import { defaultProject } from './workspace/ProjectTree';
+import { Response } from './Response';
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (event, component: Component) => {
   const data = await defaultProject.scans_db.components.getAll(component);
@@ -15,8 +16,13 @@ ipcMain.handle(IpcEvents.COMPONENT_GET, async (event, component: Component) => {
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, component: Component) => {
-  await defaultProject.scans_db.components.create(component);
-  return { status: 'ok', message: 'test' };
+  try {
+    const newComp = await defaultProject.scans_db.components.create(component);;
+    return Response.ok({ message: 'Component created successfully', data: newComp });
+  } catch (error) {
+    console.log('Catch an error: ', error);
+    return Response.fail({ message: error.message });v
+  }
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE, async (event, comp: Component, lic: License) => {

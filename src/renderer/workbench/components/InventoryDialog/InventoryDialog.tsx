@@ -78,7 +78,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
       setData(componentsResponse.data);
       setComponents(componentsResponse.data.map((item) => item.name));
-
+      console.log(componentsResponse.data);
       const catalogue = licensesResponse.data.map((item) => ({ name: item.name, type: 'Cataloged' }));
       setLicensesAll(catalogue);
       setLicenses(catalogue);
@@ -88,6 +88,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const openLicenseDialog = async () => {
     const response = await dialogCtrl.openLicenseCreate();
     if (response && response.action === ResponseStatus.OK) {
+      console.log(response)
       setLicenses([...licenses, { name: response.data.name, type: 'Cataloged' }]);
       setForm({ ...form, license_name: response.data.name });
     }
@@ -95,8 +96,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const openComponentDialog = async () => {
     const response = await dialogCtrl.openComponentDialog();
+    if (response && response.action === ResponseStatus.OK) {
+      console.log(response);
+    }
   }
-
 
 
   const handleClose = () => {

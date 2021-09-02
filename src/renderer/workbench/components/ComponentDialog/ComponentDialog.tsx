@@ -116,7 +116,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               className={classes.input}
               value={form?.name}
               placeholder="Component"    
-              onChange={(e) => inputHandler('component',  e.target.value)}
+              onChange={(e) => inputHandler(e.target.name,  e.target.value)}
               required
             />
           </Paper>
@@ -130,7 +130,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               className={classes.input}
               value={form?.version}
               placeholder="Version"
-              onChange={(e) => inputHandler('version',  e.target.value)}
+              onChange={(e) => inputHandler(e.target.name,  e.target.value)}
               required
             />
           </Paper>
@@ -153,7 +153,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               fullWidth
               className={classes.input}
               options={licenses || []}
-              value={form?.license_id}
+              // value={form?.license_id}
               getOptionLabel={(option) => option.name || option}
               disableClearable
               renderInput={(params) => (
@@ -176,7 +176,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               fullWidth
               className={classes.input}
               value={form?.purl}
-              onChange={(e) => inputHandler('purl',  e.target.value)}
+              onChange={(e) => inputHandler(e.target.name,  e.target.value)}
               required
             />
           </Paper>
@@ -191,7 +191,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               fullWidth
               className={classes.input}
               value={form?.url}
-              onChange={(e) => inputHandler('url',  e.target.value)}
+              onChange={(e) => inputHandler(e.target.name,  e.target.value)}
               required
             />
           </Paper>

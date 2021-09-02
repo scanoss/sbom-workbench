@@ -1,10 +1,11 @@
 import { IpcEvents } from '../ipc-events';
 import { ComponentParams } from '../main/db/scan_component_db';
 import { Component, License,ComponentGroup } from './types';
+import { BaseService } from './base-service';
 
 const { ipcRenderer } = require('electron');
 
-class ComponentService {
+class ComponentService extends BaseService {
   public async get(args: Partial<Component>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET, args);
     return response;
@@ -17,7 +18,7 @@ class ComponentService {
 
   public async create(component: Component): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_CREATE, component);
-    return response;
+    return this.response(response);
   }
 
   public async delete(component: Partial<Component>): Promise<any> {
