@@ -251,8 +251,8 @@ export class ProjectTree extends EventEmitter {
   startScan() {
     console.log(`SCANNER: Start scanning path=${this.scan_root}`);
 
-    this.scanner.scanJsonList(this.filesToScan, this.scan_root);
-    // this.scanner.scanFolder(this.scan_root);
+    // this.scanner.scanJsonList(this.filesToScan, this.scan_root);
+    this.scanner.scanList(this.filesToScan, this.scan_root);
   }
 
   setMailbox(mailbox: Electron.WebContents) {

@@ -5,10 +5,6 @@ import os from 'os';
 import fs from 'fs';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { AbstractScannable } from './Scannable/AbstractScannable';
-import { ScannableTree } from './Scannable/ScannableTree';
-import { ScannableFolder } from './Scannable/ScannableFolder';
-import { ScannableJson } from './Scannable/ScanneableJson';
 import { Winnower } from './Winnower/Winnower';
 import { Dispatcher } from './Dispatcher/Dispatcher';
 import { DispatcherEvents } from './Dispatcher/DispatcherEvents';
@@ -137,6 +133,35 @@ export class Scanner extends EventEmitter {
       this.emit('error', error);
     }
   }
+
+  #createOutputFiles() {
+    if (!fs.existsSync(this.#wfpFilePath)) fs.writeFileSync(this.#wfpFilePath, '');
+    if (!fs.existsSync(this.#resultFilePath)) fs.writeFileSync(this.#resultFilePath, '');
+  }
+
+  async scanList(fileList, scanRoot = '') {
+    // Ensures to create a unique folder for each scanner instance in case no workDirectory was specified.
+    if (this.#workDirectory === undefined) {
+      await this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
+    }
+
+    this.#createOutputFiles();
+
+    if (!fileList.length) {
+      this.#finishScan();
+      return;
+    }
+
+    // await fs.promises.appendFile(dst, content);
+
+    await this.#winnower.init();
+    await this.#dispatcher.init();
+
+    await this.#winnower.startWinnowing(fileList, scanRoot, this.#tempPath);
+
+  }
+
+
 
   async #scan() {
 
