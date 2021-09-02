@@ -67,7 +67,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const [versions, setVersions] = useState<any[]>();
   const [licenses, setLicenses] = useState<any[]>();
   const [licensesAll, setLicensesAll] = useState<any[]>();
-  const [showComponentDialog, setShowComponentDialog] = useState<boolean[]>(false);
 
   const setDefaults = () => setForm(inventory);
 
@@ -78,7 +77,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
       setData(componentsResponse.data);
       setComponents(componentsResponse.data.map((item) => item.name));
-      console.log(componentsResponse.data);
       const catalogue = licensesResponse.data.map((item) => ({ name: item.name, type: 'Cataloged' }));
       setLicensesAll(catalogue);
       setLicenses(catalogue);
@@ -88,7 +86,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const openLicenseDialog = async () => {
     const response = await dialogCtrl.openLicenseCreate();
     if (response && response.action === ResponseStatus.OK) {
-      console.log(response)
       setLicenses([...licenses, { name: response.data.name, type: 'Cataloged' }]);
       setForm({ ...form, license_name: response.data.name });
     }
@@ -97,18 +94,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const openComponentDialog = async () => {
     const response = await dialogCtrl.openComponentDialog();
     if (response && response.action === ResponseStatus.OK) {
-      setComponents([...components, response.data.name ]);
-      setForm({ ...form, component: response.data.name });
+      const { name, version, licenses, purl, url } = response.data;
+      setComponents([...components, response.data.name]);
+      setForm({ ...form, component: name, version, license_name: licenses[0].name, purl, url });
     }
-  }
-
-
-  useEffect(() => {
-    console.log(components)
-    console.log(form)
-  }, [openComponentDialog])
-
-
+  };
 
   const handleClose = () => {
     const inventory: any = form;
@@ -143,7 +133,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       setVersions(component?.versions.map((item) => item.version));
       setForm({ ...form, url: component.url, purl: component.purl });
     }
-  }, [form.component, components]);
+  }, [form.component]);
 
   useEffect(() => {
     const lic = data
@@ -168,15 +158,15 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         <div className="component-version-container">
           <div className="component-container">
             <div className="btn-label-container">
-            <div className="component-label-container">
-              <label>Component</label>
+              <div className="component-label-container">
+                <label>Component</label>
+              </div>
+              <div className="component-btn-container">
+                <IconButton color="inherit" size="small" onClick={openComponentDialog}>
+                  <AddIcon fontSize="inherit" />
+                </IconButton>
+              </div>
             </div>
-            <div className="component-btn-container">
-              <IconButton color="inherit" size="small" onClick={openComponentDialog}>
-                <AddIcon fontSize="inherit" />
-              </IconButton>
-            </div>
-          </div>
             <Paper className={classes.paper}>
               <SearchIcon className={classes.iconButton} />
               <Autocomplete
@@ -319,7 +309,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           Identify
         </Button>
       </DialogActions>
-      
     </Dialog>
   );
 };
