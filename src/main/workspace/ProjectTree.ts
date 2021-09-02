@@ -18,6 +18,7 @@ import { Scanner } from '../scannerLib/Scanner';
 import { ScannerEvents } from '../scannerLib/ScannerEvents';
 import { IpcEvents } from '../../ipc-events';
 import { ipcMain } from 'electron';
+import { timeStamp } from 'console';
 
 // const fs = require('fs');
 const path = require('path');
@@ -163,6 +164,7 @@ export class ProjectTree extends EventEmitter {
     if (fs.existsSync(`${this.work_root}/results.json`)) fs.unlinkSync(`${this.work_root}/results.json`);
     if (fs.existsSync(`${this.work_root}/scan_db`)) fs.unlinkSync(`${this.work_root}/scan_db`);
     if (fs.existsSync(`${this.work_root}/tree.json`)) fs.unlinkSync(`${this.work_root}/tree.json`);
+    this.scanner.cleanWorkDirectory();
   }
 
   // Return fileList
@@ -172,9 +174,11 @@ export class ProjectTree extends EventEmitter {
     this.scanner.on(ScannerEvents.WINNOWING_FINISHED, () => console.log('Winnowing Finished...'));
     this.scanner.on(ScannerEvents.DISPATCHER_WFP_SENDED, (dir) => console.log(`Sending WFP file ${dir} to server`));
 
-    this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
-      this.processedFiles += fileNumbers;
-      console.log(`New ${fileNumbers} files scanned`);
+    this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (data, dispatcherResponse) => {
+
+      const filesScanned = dispatcherResponse.getFilesScanned();
+      this.processedFiles += filesScanned.length;
+      console.log(`New ${filesScanned.length} files scanned`);
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
         // processed: this.filesSummary.include,
