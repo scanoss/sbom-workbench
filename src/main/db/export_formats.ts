@@ -43,7 +43,7 @@ export class Formats extends Db {
           else {
             for (let i = 0; i < data.length; i += 1) {
               const pkg: any = {};      
-              pkg.name = data[i].component.name;         
+              pkg.name = data[i].name;         
               pkg.PackageVersion = data[i].version;
               pkg.PackageSPDXIdentifier = data[i].purl;
               pkg.PackageDownloadLocation=data[i].url;

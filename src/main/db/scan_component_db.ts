@@ -108,11 +108,9 @@ export class ComponentDb extends Db {
   // merge component b into a
   private mergeComponents(a: any, b: any) {
     const preLicense: any = {};
-
     preLicense.id = b.license_id;
     preLicense.name = b.license_name;
     preLicense.spdxid = b.license_spdxid;
-
     a.licenses.push(preLicense);
   }
 
@@ -232,7 +230,7 @@ export class ComponentDb extends Db {
   }
 
   // GET COMPONENT VERSIONS
-  getById(id: number) {
+ private getById(id: number) {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
@@ -384,7 +382,7 @@ export class ComponentDb extends Db {
     }
   }
 
-  allSummaries() {
+  private allSummaries() {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
@@ -488,7 +486,7 @@ export class ComponentDb extends Db {
     });
   }
 
-  async groupComponentsByPurl(data: any) {
+ private async groupComponentsByPurl(data: any) {
     try {
       const aux = {};
       for (const component of data) {
@@ -502,7 +500,7 @@ export class ComponentDb extends Db {
     }
   }
 
-  mergeComponentByPurl(data: Record<string, any>) {
+  private mergeComponentByPurl(data: Record<string, any>) {
     return new Promise<any[]>(async (resolve) => {
       const result: any[] = [];
       for (const [key, value] of Object.entries(data)) {

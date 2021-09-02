@@ -3,6 +3,7 @@ import { Component, License, ComponentGroup } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { ComponentParams } from './db/scan_component_db';
 import { defaultProject } from './workspace/ProjectTree';
+import { Response } from './Response';
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (event, component: Component) => {
   const data = await defaultProject.scans_db.components.getAll(component);
@@ -32,10 +33,21 @@ ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (event, component: Component
 
 ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET_ALL, async (event, params: ComponentParams) => {
   const data = await defaultProject.scans_db.components.getAllComponentGroup(params);
-  return { status: 'ok', message: 'Components group retrieve successfully', data };
+  return {
+    status: 'ok',
+    message: 'Components group retrieve successfully',
+    data,
+  };
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET, async (_event, component: Partial<ComponentGroup>) => {
   const data = await defaultProject.scans_db.components.getComponentGroup(component);
-  return { status: 'ok', message: 'Component group retrieve successfully', data };
+  return {
+    status: 'ok',
+    message: 'Component group retrieve successfully',
+    data,
+  };
 });
+
+
+

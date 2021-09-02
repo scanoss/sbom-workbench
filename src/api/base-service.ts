@@ -5,7 +5,6 @@ export class BaseService {
     if (response.status === ResponseStatus.FAIL) {
       throw new Error(response.message);
     }
-
     return response.data;
   }
 }
