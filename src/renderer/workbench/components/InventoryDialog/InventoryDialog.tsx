@@ -22,6 +22,7 @@ import { componentService } from '../../../../api/component-service';
 import { licenseService } from '../../../../api/license-service';
 import { DialogContext } from '../../../context/DialogProvider';
 import { ResponseStatus } from '../../../../main/Response';
+import ComponentDialog from '../ComponentDialog/ComponentDialog';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -76,7 +77,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
       setData(componentsResponse.data);
       setComponents(componentsResponse.data.map((item) => item.name));
-
       const catalogue = licensesResponse.data.map((item) => ({ name: item.name, type: 'Cataloged' }));
       setLicensesAll(catalogue);
       setLicenses(catalogue);
@@ -88,6 +88,15 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     if (response && response.action === ResponseStatus.OK) {
       setLicenses([...licenses, { name: response.data.name, type: 'Cataloged' }]);
       setForm({ ...form, license_name: response.data.name });
+    }
+  };
+
+  const openComponentDialog = async () => {
+    const response = await dialogCtrl.openComponentDialog();
+    if (response && response.action === ResponseStatus.OK) {
+      const { name, version, licenses, purl, url } = response.data;
+      setComponents([...components, response.data.name]);
+      setForm({ ...form, component: name, version, license_name: licenses[0].name, purl, url });
     }
   };
 
@@ -124,7 +133,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       setVersions(component?.versions.map((item) => item.version));
       setForm({ ...form, url: component.url, purl: component.purl });
     }
-  }, [form.component, components]);
+  }, [form.component]);
 
   useEffect(() => {
     const lic = data
@@ -148,7 +157,16 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       <div className="identity-component">
         <div className="component-version-container">
           <div className="component-container">
-            <label>Component</label>
+            <div className="btn-label-container">
+              <div className="component-label-container">
+                <label>Component</label>
+              </div>
+              <div className="component-btn-container">
+                <IconButton color="inherit" size="small" onClick={openComponentDialog}>
+                  <AddIcon fontSize="inherit" />
+                </IconButton>
+              </div>
+            </div>
             <Paper className={classes.paper}>
               <SearchIcon className={classes.iconButton} />
               <Autocomplete
@@ -169,7 +187,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           </div>
           <div className="component-container">
             <label>Version</label>
-            <Paper component="form" className={classes.paper}>
+            <Paper className={classes.paper}>
               <SearchIcon className={classes.iconButton} />
               <Autocomplete
                 fullWidth
@@ -190,7 +208,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           </div>
         </div>
         <div className="component-container">
-          <div className="license-btn-label-container">
+          <div className="btn-label-container">
             <div className="license-label-container">
               <label>License</label>
             </div>
@@ -200,7 +218,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               </IconButton>
             </div>
           </div>
-          <Paper component="form" className={classes.paper}>
+          <Paper className={classes.paper}>
             <SearchIcon className={classes.iconButton} />
             <Autocomplete
               fullWidth
@@ -225,7 +243,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         </div>
         <div className="component-container">
           <label>URL</label>
-          <Paper component="form" className={classes.paper}>
+          <Paper className={classes.paper}>
             <InputBase
               name="url"
               fullWidth
@@ -239,7 +257,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         </div>
         <div className="component-container">
           <label>PURL</label>
-          <Paper component="form" className={classes.paper}>
+          <Paper className={classes.paper}>
             <InputBase
               name="purl"
               fullWidth
@@ -254,7 +272,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         <div className="usage-notes">
           <div>
             <label>Usage</label>
-            <Paper component="form" className={classes.paper}>
+            <Paper className={classes.paper}>
               <Select
                 name="usage"
                 fullWidth
@@ -271,7 +289,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           </div>
           <div>
             <label>Notes</label>
-            <Paper component="form" className={classes.paper}>
+            <Paper className={classes.paper}>
               <TextareaAutosize
                 name="notes"
                 value={form?.notes}

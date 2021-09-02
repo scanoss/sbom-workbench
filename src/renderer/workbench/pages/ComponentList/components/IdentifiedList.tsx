@@ -1,6 +1,4 @@
 import Button from '@material-ui/core/Button';
-import { group } from 'console';
-import { setgroups } from 'process';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { WorkbenchContext, IWorkbenchContext } from '../../../store';
@@ -14,10 +12,9 @@ export const IdentifiedList = ({ files, inventories, onAction }) => {
 
   const fetchGroups = () => {
     const grupedFiles = files.reduce((acc, file) => {
-      console.log(file);    
       const key = file.inventory.component.name;
       if (!acc.hasOwnProperty(key)) acc[key] = [];
-      acc[key].push(file);      
+      acc[key].push(file);
       return acc;
     }, {});
 

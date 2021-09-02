@@ -77,7 +77,7 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
   return (
     <Dialog id="LicenseDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
       <span className="dialog-title">Create license</span>
-      <form action="#" onSubmit={handleClose}>
+      <form onSubmit={handleClose}>
         <div className="identity-license">
           <div className="license-container">
             <label>Name</label>
