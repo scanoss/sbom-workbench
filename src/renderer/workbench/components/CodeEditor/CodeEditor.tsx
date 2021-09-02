@@ -3,13 +3,37 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { range } from '../../../../utils/utils';
 
+const LINES_MAX = 1000;
+const LINES_OFFSET = 50;
+
 interface CodeEditorProps {
   content: string;
-  highlight: number[];
+  highlight: string;
 }
 
 const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
-  const lines = highlight && range(parseInt(highlight.split('-')[0], 10), parseInt(highlight.split('-')[1], 10));
+  const file = content.split('\n');
+
+  let lines = null;
+  let code = null;
+  let start = 1;
+  let end = LINES_MAX;
+
+  if (highlight && highlight !== 'all') {
+    const [rangeStart, rangeEnd] = highlight.split('-');
+    lines = range(parseInt(rangeStart, 10), parseInt(rangeEnd, 10));
+    if (file.length > LINES_MAX) {
+      start = Math.max(parseInt(rangeStart, 10) - LINES_OFFSET, 1);
+      end = parseInt(rangeEnd, 10) + LINES_OFFSET;
+    }
+  }
+
+  code = file.slice(start, end).join('\n');
+
+  const truncatedStart = start - 1;
+  const truncatedEnd = file.length - end;
+
+  console.log(highlight);
 
   const scroll = () => {
     // FIXME: select only for this component
@@ -29,10 +53,14 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
   return (
     <>
       <SyntaxHighlighter
-        className="code-viewer"
+        className={`
+          code-viewer
+          ${truncatedStart > 0 ? 'truncatedStart' : ''}
+          ${truncatedEnd > 0 ? 'truncatedEnd' : ''}`}
         wrapLongLines
         style={nord}
         language="javascript"
+        startingLineNumber={start}
         showLineNumbers
         lineProps={(line) => {
           if (lines && lines.includes(line)) {
@@ -41,7 +69,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
           return {};
         }}
       >
-        {content.slice(0, 30000)}
+        {code}
       </SyntaxHighlighter>
     </>
   );
