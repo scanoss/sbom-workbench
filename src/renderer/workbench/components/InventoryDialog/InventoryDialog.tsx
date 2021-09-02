@@ -187,7 +187,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           </div>
           <div className="component-container">
             <label>Version</label>
-            <Paper component="form" className={classes.paper}>
+            <Paper className={classes.paper}>
               <SearchIcon className={classes.iconButton} />
               <Autocomplete
                 fullWidth
@@ -218,7 +218,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               </IconButton>
             </div>
           </div>
-          <Paper component="form" className={classes.paper}>
+          <Paper className={classes.paper}>
             <SearchIcon className={classes.iconButton} />
             <Autocomplete
               fullWidth
@@ -243,7 +243,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         </div>
         <div className="component-container">
           <label>URL</label>
-          <Paper component="form" className={classes.paper}>
+          <Paper className={classes.paper}>
             <InputBase
               name="url"
               fullWidth
@@ -257,7 +257,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         </div>
         <div className="component-container">
           <label>PURL</label>
-          <Paper component="form" className={classes.paper}>
+          <Paper className={classes.paper}>
             <InputBase
               name="purl"
               fullWidth
@@ -272,7 +272,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         <div className="usage-notes">
           <div>
             <label>Usage</label>
-            <Paper component="form" className={classes.paper}>
+            <Paper className={classes.paper}>
               <Select
                 name="usage"
                 fullWidth
@@ -289,7 +289,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           </div>
           <div>
             <label>Notes</label>
-            <Paper component="form" className={classes.paper}>
+            <Paper className={classes.paper}>
               <TextareaAutosize
                 name="notes"
                 value={form?.notes}
