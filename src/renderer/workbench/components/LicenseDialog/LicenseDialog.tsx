@@ -53,7 +53,9 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
     });
   };
 
-  const handleClose = async () => {
+  const handleClose = async (e) => {
+    e.preventDefault();
+    console.log(e);
     try {
       const license: Partial<License> = form;
       const response = await licenseService.create(license);
@@ -75,66 +77,68 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
   return (
     <Dialog id="LicenseDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
       <span className="dialog-title">Create license</span>
-      <div className="identity-license">
-        <div className="license-container">
-          <label>Name</label>
-          <Paper component="form" className={classes.paper}>
-            <InputBase
-              name="name"
-              fullWidth
-              className={classes.input}
-              value={form?.name}
-              onChange={(e) => inputHandler(e)}
-              required
-            />
-          </Paper>
+      <form action="#" onSubmit={handleClose}>
+        <div className="identity-license">
+          <div className="license-container">
+            <label>Name</label>
+            <Paper className={classes.paper}>
+              <InputBase
+                name="name"
+                fullWidth
+                className={classes.input}
+                value={form?.name}
+                onChange={(e) => inputHandler(e)}
+                required
+              />
+            </Paper>
+          </div>
+          <div className="license-container">
+            <label>SPDX ID</label>
+            <Paper className={classes.paper}>
+              <InputBase
+                name="spdxid"
+                fullWidth
+                className={classes.input}
+                value={form?.spdxid}
+                onChange={(e) => inputHandler(e)}
+                required
+              />
+            </Paper>
+          </div>
+          <div className="license-container">
+            <label>Full text</label>
+            <Paper className={classes.paper}>
+              <TextareaAutosize
+                name="fulltext"
+                value={form?.fulltext}
+                className={classes.input}
+                cols={30}
+                rows={8}
+                onChange={(e) => inputHandler(e)}
+              />
+            </Paper>
+          </div>
+          <div className="license-container">
+            <label>URL</label>
+            <Paper className={classes.paper}>
+              <InputBase
+                name="url"
+                fullWidth
+                className={classes.input}
+                value={form?.url}
+                onChange={(e) => inputHandler(e)}
+                required
+              />
+            </Paper>
+          </div>
         </div>
-        <div className="license-container">
-          <label>SPDX ID</label>
-          <Paper component="form" className={classes.paper}>
-            <InputBase
-              name="spdxid"
-              fullWidth
-              className={classes.input}
-              value={form?.spdxid}
-              onChange={(e) => inputHandler(e)}
-              required
-            />
-          </Paper>
-        </div>
-        <div className="license-container">
-          <label>Full text</label>
-          <Paper component="form" className={classes.paper}>
-            <TextareaAutosize
-              name="fulltext"
-              value={form?.fulltext}
-              className={classes.input}
-              cols={30}
-              rows={8}
-              onChange={(e) => inputHandler(e)}
-            />
-          </Paper>
-        </div>
-        <div className="license-container">
-          <label>URL</label>
-          <Paper component="form" className={classes.paper}>
-            <InputBase
-              name="url"
-              fullWidth
-              className={classes.input}
-              value={form?.url}
-              onChange={(e) => inputHandler(e)}
-              required
-            />
-          </Paper>
-        </div>
-      </div>
-      <DialogActions>
-        <Button onClick={onCancel}>Cancel</Button>
-        <Button variant="contained" color="secondary" onClick={handleClose} disabled={!isValid()}>
-          Create
-        </Button>
-      </DialogActions>
+        <DialogActions>
+          <Button onClick={onCancel}>Cancel</Button>
+          <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
+            Create
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 };
