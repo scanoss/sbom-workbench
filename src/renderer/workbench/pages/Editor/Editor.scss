@@ -54,6 +54,32 @@
 
 .editors {
 
+  .code-viewer.truncatedStart code > span:first-child, .code-viewer.truncatedEnd code > span:last-child {
+    position: relative;
+
+    &::before {
+      content: 'Content too long, file was truncated';
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      font-size: 10px;
+    }
+  }
+
+  .code-viewer.truncatedStart code > span:first-child {
+    padding-top: 35px;
+    &::before {
+      top: 10px;
+     }
+  }
+
+  .code-viewer.truncatedEnd code > span:last-child {
+    padding-bottom: 35px;
+    &::before {
+      bottom: 10px;
+     }
+  }
+
   &.editors-full {
     grid-template-columns: 100%;
   }
