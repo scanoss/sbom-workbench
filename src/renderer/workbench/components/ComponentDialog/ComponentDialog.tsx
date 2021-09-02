@@ -1,14 +1,24 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { Dialog, Paper, DialogActions, Button, makeStyles, InputBase, TextareaAutosize, TextField, IconButton } from '@material-ui/core';
+import {
+  Dialog,
+  Paper,
+  DialogActions,
+  Button,
+  makeStyles,
+  InputBase,
+  TextareaAutosize,
+  TextField,
+  IconButton,
+} from '@material-ui/core';
 
 import React, { useContext, useEffect, useState } from 'react';
+import SearchIcon from '@material-ui/icons/Search';
+import AddIcon from '@material-ui/icons/Add';
+import { Autocomplete } from '@material-ui/lab';
 import { NewComponent } from '../../../../api/types';
 
 import { DialogResponse, DIALOG_ACTIONS } from '../../../context/types';
 import { ResponseStatus } from '../../../../main/Response';
-import SearchIcon from '@material-ui/icons/Search';
-import AddIcon from '@material-ui/icons/Add';
-import { Autocomplete } from '@material-ui/lab';
 import { componentService } from '../../../../api/component-service';
 import { licenseService } from '../../../../api/license-service';
 
@@ -51,17 +61,16 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   const [form, setForm] = useState<Partial<NewComponent>>({});
   const dialogCtrl = useContext<any>(DialogContext);
   const [licenses, setLicenses] = useState<any[]>();
-  
+
   const fetchData = async () => {
     if (open) {
       const licensesResponse = await licenseService.getAll();
-      const catalogue = licensesResponse.data
+      const catalogue = licensesResponse.data;
       setLicenses(catalogue);
     }
   };
 
   useEffect(() => fetchData(), [open]);
-
 
   const inputHandler = (name, value) => {
     setForm({
@@ -70,11 +79,9 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     });
   };
 
-
-
-  const handleClose = async () => {
+  const handleClose = async (e) => {
+    e.preventDefault();
     try {
-      console.log('form', form);
       const component: Partial<NewComponent> = form;
       const response = await componentService.create(component);
       onClose({ action: DIALOG_ACTIONS.OK, data: response });
@@ -100,109 +107,110 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
       console.log('response', response);
     }
   };
-  
 
   return (
     <Dialog id="ComponentDialog" maxWidth="md" scroll="body" fullWidth open={open}>
       <span className="dialog-title">Create component</span>
-      <div className="identity-license">
-      <div className="component-version-container">
-        <div className="license-container">
-          <label>Component</label>
-          <Paper component="form" className={classes.paper}>
-            <InputBase
-              name="name"
-              fullWidth
-              className={classes.input}
-              value={form?.name}
-              placeholder="Component"    
-              onChange={(e) => inputHandler(e.target.name,  e.target.value)}
-              required
-            />
-          </Paper>
-        </div>
-        <div className="license-container">
-          <label>Version</label>
-          <Paper component="form" className={classes.paper}>
-            <InputBase
-              name="version"
-              fullWidth
-              className={classes.input}
-              value={form?.version}
-              placeholder="Version"
-              onChange={(e) => inputHandler(e.target.name,  e.target.value)}
-              required
-            />
-          </Paper>
-        </div>
-        </div>
-        <div className="license-container">
-        <div className="btn-label-container">
-            <div className="license-label-container">
-              <label>License</label>
+      <form onSubmit={handleClose}>
+        <div className="identity-license">
+          <div className="component-version-container">
+            <div className="license-container">
+              <label>Component</label>
+              <Paper className={classes.paper}>
+                <InputBase
+                  name="name"
+                  fullWidth
+                  className={classes.input}
+                  value={form?.name}
+                  placeholder="Component"
+                  onChange={(e) => inputHandler(e.target.name, e.target.value)}
+                  required
+                />
+              </Paper>
             </div>
-            <div className="license-btn-container">
-              <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
-                <AddIcon fontSize="inherit" />
-              </IconButton>
+            <div className="license-container">
+              <label>Version</label>
+              <Paper className={classes.paper}>
+                <InputBase
+                  name="version"
+                  fullWidth
+                  className={classes.input}
+                  value={form?.version}
+                  placeholder="Version"
+                  onChange={(e) => inputHandler(e.target.name, e.target.value)}
+                  required
+                />
+              </Paper>
             </div>
           </div>
-          <Paper component="form" className={classes.paper}>
-            <SearchIcon className={classes.iconButton}  />
-            <Autocomplete
-              fullWidth
-              className={classes.input}
-              options={licenses || []}
-              // value={form?.license_id}
-              getOptionLabel={(option) => option.name || option}
-              disableClearable
-              renderInput={(params) => (
-                <TextField
-                  required
-                  {...params}
-                  InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
-                />
-              )}
-              onChange={(e, value) => inputHandler('license_id', value.id)}
-            />
-          </Paper>
-        </div>  
-        <div className="license-container">
-          <label>PURL</label>
-          <Paper component="form" className={classes.paper}>
-            <InputBase
-              name="purl"
-              placeholder="PURL"
-              fullWidth
-              className={classes.input}
-              value={form?.purl}
-              onChange={(e) => inputHandler(e.target.name,  e.target.value)}
-              required
-            />
-          </Paper>
+          <div className="license-container">
+            <div className="btn-label-container">
+              <div className="license-label-container">
+                <label>License</label>
+              </div>
+              <div className="license-btn-container">
+                <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
+                  <AddIcon fontSize="inherit" />
+                </IconButton>
+              </div>
+            </div>
+            <Paper className={classes.paper}>
+              <SearchIcon className={classes.iconButton} />
+              <Autocomplete
+                fullWidth
+                className={classes.input}
+                options={licenses || []}
+                // value={form?.license_id}
+                getOptionLabel={(option) => option.name || option}
+                disableClearable
+                renderInput={(params) => (
+                  <TextField
+                    required
+                    {...params}
+                    InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
+                  />
+                )}
+                onChange={(e, value) => inputHandler('license_id', value.id)}
+              />
+            </Paper>
+          </div>
+          <div className="license-container">
+            <label>PURL</label>
+            <Paper className={classes.paper}>
+              <InputBase
+                name="purl"
+                placeholder="PURL"
+                fullWidth
+                className={classes.input}
+                value={form?.purl}
+                onChange={(e) => inputHandler(e.target.name, e.target.value)}
+                required
+              />
+            </Paper>
+          </div>
+
+          <div className="license-container">
+            <label>URL</label>
+            <Paper className={classes.paper}>
+              <InputBase
+                name="url"
+                placeholder="URL"
+                fullWidth
+                className={classes.input}
+                value={form?.url}
+                onChange={(e) => inputHandler(e.target.name, e.target.value)}
+                required
+              />
+            </Paper>
+          </div>
         </div>
-        
-        <div className="license-container">
-          <label>URL</label>
-          <Paper component="form" className={classes.paper}>
-            <InputBase
-              name="url"
-              placeholder="URL"
-              fullWidth
-              className={classes.input}
-              value={form?.url}
-              onChange={(e) => inputHandler(e.target.name,  e.target.value)}
-              required
-            />
-          </Paper>
-        </div>
-      </div>
-      <DialogActions>
-        <Button onClick={onCancel}>Cancel</Button>
-        <Button variant="contained" color="secondary" onClick={handleClose}>
-          Create
-        </Button>
-      </DialogActions>
+        <DialogActions>
+          <Button onClick={onCancel}>Cancel</Button>
+          <Button type="submit" variant="contained" color="secondary">
+            Create
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 };
