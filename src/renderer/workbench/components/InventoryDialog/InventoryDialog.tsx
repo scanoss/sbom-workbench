@@ -97,9 +97,17 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const openComponentDialog = async () => {
     const response = await dialogCtrl.openComponentDialog();
     if (response && response.action === ResponseStatus.OK) {
-      console.log(response);
+      setComponents([...components, response.data.name ]);
+      setForm({ ...form, component: response.data.name });
     }
   }
+
+
+  useEffect(() => {
+    console.log(components)
+    console.log(form)
+  }, [openComponentDialog])
+
 
 
   const handleClose = () => {
