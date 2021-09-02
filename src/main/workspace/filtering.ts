@@ -3,6 +3,9 @@
 // eslint-disable-next-line max-classes-per-file
 import * as fs from 'fs';
 import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
+import { defaultBannedList } from './filtering/defaultFilter';
+
+const fpath = require('path');
 
 class AbstractFilter {
   // path: string | undefined;
@@ -35,6 +38,7 @@ class NameFilter extends AbstractFilter {
       return !(path.indexOf(this.value) >= 0);
     }
     if (this.condition === 'fullmatch') return path === this.value;
+    if (this.condition === 'starts') return fpath.basename(path).indexOf(this.value) === -1;
     return true;
   }
 }
@@ -46,7 +50,7 @@ class ContentFilter extends AbstractFilter {
   }
 
   evaluate(path: string): boolean {
-    const binary = isBinaryFileSync(path)
+    const binary = isBinaryFileSync(path);
 
     if (this.condition === '=' && this.value === 'BINARY' && binary) return false;
     if (this.condition === '!=' && this.value === 'TEXT' && binary) return false;
@@ -63,8 +67,6 @@ class ExtensionFilter extends AbstractFilter {
   }
 
   evaluate(path: string): boolean {
-
-
     return !path.endsWith(this.value);
   }
 }
@@ -76,9 +78,7 @@ class SizeFilter extends AbstractFilter {
   }
 
   evaluate(path: string): boolean {
-     const stat = fs.statSync(path);
-
-
+    const stat = fs.statSync(path);
 
     if (this.condition === '>') {
       if (stat.size > parseInt(this.value, 10)) {
@@ -169,7 +169,10 @@ export class BannedList {
   load(path: string) {
     // const file = fs.readFileSync("/home/oscar/filters.txt", "utf8");
     const file = fs.readFileSync(path, 'utf8');
-    const a = JSON.parse(file);
+    const f = JSON.parse(file);
+    const a = f.filters;
+    this.name = f.name;
+
     let i: number;
     for (i = 0; i < a.length; i += 1) {
       if (a[i].ftype === 'NAME') this.addFilter(new NameFilter(a[i].condition, a[i].value));
@@ -178,16 +181,7 @@ export class BannedList {
       if (a[i].ftype === 'EXTENSION') this.addFilter(new ExtensionFilter(a[i].condition, a[i].value));
       if (a[i].ftype === 'CONTENT') this.addFilter(new ContentFilter(a[i].condition, a[i].value));
     }
-  }
-
-  loadDefault() {
-    console.log('Applying default filters');
-    this.addFilter(new SizeFilter('<', "100"));
-    this.addFilter(new ContentFilter('=', 'BINARY'));
-    this.addFilter(new ExtensionFilter('=', '.txt'));
-    this.addFilter(new NameFilter('contains', '.git'));
-    this.addFilter(new NameFilter('contains', 'node_modules'));
-    this.addFilter(new NameFilter('contains', '.asar'));
+    // console.log("loading "+ this.filters);
   }
 }
 // export class BannedList
