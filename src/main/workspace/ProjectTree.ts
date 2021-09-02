@@ -4,6 +4,7 @@ import * as os from 'os';
 import fs from 'fs';
 import { ipcMain } from 'electron';
 import { Inventory, Project } from '../../api/types';
+import { app } from 'electron';
 // import * as fs from 'fs';
 // import * as Filtering from './filtering';
 // import { eventNames } from 'process';
@@ -118,9 +119,11 @@ export class ProjectTree extends EventEmitter {
     const file = fs.writeFileSync(`${this.work_root}/tree.json`, JSON.stringify(this).toString());
 
     // Save metadata
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     const metadata = {
       id: 'NULL',
+      appVersion: app.getVersion(),
       name: self.scan_root.split('/').pop(), // Get the folder name
       work_root: self.work_root,
       scan_root: self.scan_root,
