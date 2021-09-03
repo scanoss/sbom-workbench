@@ -34,6 +34,14 @@ export interface License {
   url: string;
   fulltext: string;
 }
+
+export interface NewComponentDTO {
+  name: string;
+  version: string;
+  license_id: number;
+  purl: string;
+  url: string;
+}
 export interface ItemInclude {
   path: string;
   recursive: boolean;

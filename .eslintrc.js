@@ -16,13 +16,7 @@ module.exports = {
     'jsx-a11y/anchor-is-valid': ['off'],
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['warn'],
-    /* '@typescript-eslint/naming-convention': [
-      'warn',
-      {
-        selector: 'variable',
-        format: ['camelCase'],
-      },
-    ], */
+    '@typescript-eslint/naming-convention': ['warn'],
   },
   parserOptions: {
     ecmaVersion: 2020,

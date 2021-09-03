@@ -1,6 +1,6 @@
 import { IpcEvents } from '../ipc-events';
 import { ComponentParams } from '../main/db/scan_component_db';
-import { Component, License,ComponentGroup } from './types';
+import { Component, License,ComponentGroup, NewComponentDTO } from './types';
 import { BaseService } from './base-service';
 
 const { ipcRenderer } = require('electron');
@@ -16,9 +16,9 @@ class ComponentService extends BaseService {
     return response;
   }
 
-  public async create(component: Component): Promise<any> {
+  public async create(component: Partial<NewComponentDTO>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_CREATE, component);
-    return response;
+    return this.response(response);
   }
 
   public async delete(component: Partial<Component>): Promise<any> {

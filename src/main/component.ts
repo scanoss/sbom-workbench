@@ -16,8 +16,13 @@ ipcMain.handle(IpcEvents.COMPONENT_GET, async (event, component: Component) => {
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, component: Component) => {
-  await defaultProject.scans_db.components.create(component);
-  return { status: 'ok', message: 'test' };
+  try {
+    const newComp = await defaultProject.scans_db.components.create(component);;
+    return Response.ok({ message: 'Component created successfully', data: newComp });
+  } catch (error) {
+    console.log('Catch an error: ', error);
+    return Response.fail({ message: error.message });v
+  }
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE, async (event, comp: Component, lic: License) => {
