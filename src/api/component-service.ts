@@ -50,7 +50,6 @@ class ComponentService extends BaseService {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GROUP_GET, component);
     return response;
   }
-
 }
 
 export const componentService = new ComponentService();
