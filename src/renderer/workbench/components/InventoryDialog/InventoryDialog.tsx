@@ -77,7 +77,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
       setData(componentsResponse.data);
       setComponents(componentsResponse.data.map((item) => item.name));
-      const catalogue = licensesResponse.data.map((item) => ({ name: item.name, type: 'Cataloged' }));
+      const catalogue = licensesResponse.data.map((item) => ({
+        name: item.name,
+        type: 'Cataloged',
+      }));
       setLicensesAll(catalogue);
       setLicenses(catalogue);
     }
@@ -91,12 +94,36 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }
   };
 
+  const openComponentVersionDialog = async () => {
+    const response = await dialogCtrl.openComponentDialog({ name: form.component, purl: form.purl, url: form.url });
+    if (response && response.action === ResponseStatus.OK) {
+      const { name, version, licenses, purl, url } = response.data;
+      setComponents([...components, response.data.name]);
+      setForm({
+        ...form,
+        component: name,
+        version,
+        license_name: licenses[0].name,
+        purl,
+        url,
+      });
+    }
+  };
+
+
   const openComponentDialog = async () => {
     const response = await dialogCtrl.openComponentDialog();
     if (response && response.action === ResponseStatus.OK) {
       const { name, version, licenses, purl, url } = response.data;
       setComponents([...components, response.data.name]);
-      setForm({ ...form, component: name, version, license_name: licenses[0].name, purl, url });
+      setForm({
+        ...form,
+        component: name,
+        version,
+        license_name: licenses[0].name,
+        purl,
+        url,
+      });
     }
   };
 
@@ -179,14 +206,27 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
+                    InputProps={{
+                      ...params.InputProps,
+                      disableUnderline: true,
+                      className: classes.autocomplete,
+                    }}
                   />
                 )}
               />
             </Paper>
           </div>
           <div className="component-container">
-            <label>Version</label>
+            <div className="btn-label-container">
+              <div className="component-label-container">
+                <label>Version</label>
+              </div>
+              <div className="component-btn-container">
+                <IconButton color="inherit" size="small" onClick={openComponentVersionDialog}>
+                  <AddIcon fontSize="inherit" />
+                </IconButton>
+              </div>
+            </div>
             <Paper className={classes.paper}>
               <SearchIcon className={classes.iconButton} />
               <Autocomplete
@@ -200,7 +240,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   <TextField
                     required
                     {...params}
-                    InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
+                    InputProps={{
+                      ...params.InputProps,
+                      disableUnderline: true,
+                      className: classes.autocomplete,
+                    }}
                   />
                 )}
               />
@@ -234,7 +278,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 <TextField
                   required
                   {...params}
-                  InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
+                  InputProps={{
+                    ...params.InputProps,
+                    disableUnderline: true,
+                    className: classes.autocomplete,
+                  }}
                 />
               )}
               onChange={(e, value) => autocompleteHandler('license_name', value.name)}

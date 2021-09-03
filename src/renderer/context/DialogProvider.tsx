@@ -12,7 +12,7 @@ export interface IDialogContext {
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
   openLicenseCreate: () => Promise<DialogResponse>;
-  openComponentDialog: () => Promise<DialogResponse>;
+  openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -108,13 +108,17 @@ export const DialogProvider: React.FC = ({ children }) => {
 
   const [componentDialog, setComponentDialog] = useState<{
     open: boolean;
+    component: Partial<NewComponentDTO>;
+    label?: string;
     onClose?: (response: DialogResponse) => void;
-  }>({ open: false });
+  }>({ open: false , component: {} });
 
-  const openComponentDialog = () => {
+  const openComponentDialog = (component: Partial<NewComponentDTO> = {}, label = 'Create component') => {
     return new Promise<DialogResponse>((resolve) => {
       setComponentDialog({
         open: true,
+        component,
+        label,
         onClose: (response) => {
           setComponentDialog((dialog) => ({ ...dialog, open: false }));
           resolve(response);
@@ -151,6 +155,8 @@ export const DialogProvider: React.FC = ({ children }) => {
 
       <ComponentDialog
         open={componentDialog.open}
+        label={componentDialog.label}
+        component={componentDialog.component}
         onCancel={() => componentDialog.onClose && componentDialog.onClose(null)}
         onClose={(response) => componentDialog.onClose && componentDialog.onClose(response)}
       />
