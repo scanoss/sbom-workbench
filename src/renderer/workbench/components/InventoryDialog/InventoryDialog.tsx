@@ -75,8 +75,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       const componentsResponse = await componentService.getAllComponentGroup();
       const licensesResponse = await licenseService.getAll();
 
-      console.log("Components" , componentsResponse);
-
       setData(componentsResponse.data);
       setComponents(componentsResponse.data.map((item) => item.name));
       const catalogue = licensesResponse.data.map((item) => ({
@@ -115,7 +113,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }
   };
 
-
   const openComponentDialog = async () => {
     const response = await dialogCtrl.openComponentDialog();
     if (response && response.action === ResponseStatus.OK) {
@@ -132,7 +129,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }
   };
 
-  const handleClose = () => {
+  const handleClose = (e) => {
+    e.preventDefault();
     const inventory: any = form;
     onClose(inventory);
   };
@@ -152,8 +150,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const isValid = () => {
-    const { version, component, url, purl, license_name } = form;
-    return license_name && version && component && url && purl;
+    const { version, component, url, purl, license_name, usage } = form;
+    return license_name && version && component && url && purl && usage;
   };
 
   useEffect(setDefaults, [inventory]);
@@ -186,48 +184,84 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   return (
     <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
       <span className="dialog-title">Identify Component</span>
-      <div className="identity-component">
-        <div className="component-version-container">
-          <div className="component-container">
-            <div className="btn-label-container">
-              <div className="component-label-container">
-                <label>Component</label>
+      <form onSubmit={handleClose}>
+        <div className="identity-component">
+          <div className="component-version-container">
+            <div className="component-container">
+              <div className="btn-label-container">
+                <div className="component-label-container">
+                  <label>Component</label>
+                </div>
+                <div className="component-btn-container">
+                  <IconButton color="inherit" size="small" onClick={openComponentDialog}>
+                    <AddIcon fontSize="inherit" />
+                  </IconButton>
+                </div>
               </div>
-              <div className="component-btn-container">
-                <IconButton color="inherit" size="small" onClick={openComponentDialog}>
-                  <AddIcon fontSize="inherit" />
-                </IconButton>
-              </div>
+              <Paper className={classes.paper}>
+                <SearchIcon className={classes.iconButton} />
+                <Autocomplete
+                  fullWidth
+                  className={classes.input}
+                  options={components || []}
+                  value={form?.component || ''}
+                  disableClearable
+                  onChange={(e, value) => autocompleteHandler('component', value)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      InputProps={{
+                        ...params.InputProps,
+                        disableUnderline: true,
+                        className: classes.autocomplete,
+                      }}
+                    />
+                  )}
+                />
+              </Paper>
             </div>
-            <Paper className={classes.paper}>
-              <SearchIcon className={classes.iconButton} />
-              <Autocomplete
-                fullWidth
-                className={classes.input}
-                options={components || []}
-                value={form?.component}
-                disableClearable
-                onChange={(e, value) => autocompleteHandler('component', value)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    InputProps={{
-                      ...params.InputProps,
-                      disableUnderline: true,
-                      className: classes.autocomplete,
-                    }}
-                  />
-                )}
-              />
-            </Paper>
+            <div className="component-container">
+              <div className="btn-label-container">
+                <div className="component-label-container">
+                  <label>Version</label>
+                </div>
+                <div className="component-btn-container">
+                  <IconButton color="inherit" size="small" onClick={openComponentVersionDialog}>
+                    <AddIcon fontSize="inherit" />
+                  </IconButton>
+                </div>
+              </div>
+              <Paper className={classes.paper}>
+                <SearchIcon className={classes.iconButton} />
+                <Autocomplete
+                  fullWidth
+                  className={classes.input}
+                  options={versions || []}
+                  value={form?.version || ''}
+                  disableClearable
+                  onChange={(e, value) => autocompleteHandler('version', value)}
+                  renderInput={(params) => (
+                    <TextField
+                      required
+                      {...params}
+                      InputProps={{
+                        ...params.InputProps,
+                        disableUnderline: true,
+                        className: classes.autocomplete,
+                      }}
+                    />
+                  )}
+                />
+              </Paper>
+            </div>
           </div>
           <div className="component-container">
             <div className="btn-label-container">
-              <div className="component-label-container">
-                <label>Version</label>
+              <div className="license-label-container">
+                <label>License</label>
               </div>
-              <div className="component-btn-container">
-                <IconButton color="inherit" size="small" onClick={openComponentVersionDialog}>
+              <div className="license-btn-container">
+                <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
                   <AddIcon fontSize="inherit" />
                 </IconButton>
               </div>
@@ -237,10 +271,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <Autocomplete
                 fullWidth
                 className={classes.input}
-                options={versions || []}
-                value={form?.version}
+                options={licenses || []}
+                groupBy={(option) => option?.type}
+                // getOptionLabel={(option) => (option?.name ? option.indicatorName : '')}
+                value={form.license_name || ''}
+                getOptionSelected={(option) => option.name === form.license_name}
+                getOptionLabel={(option) => option.name || option}
                 disableClearable
-                onChange={(e, value) => autocompleteHandler('version', value)}
                 renderInput={(params) => (
                   <TextField
                     required
@@ -252,116 +289,78 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                     }}
                   />
                 )}
+                onChange={(e, value) => autocompleteHandler('license_name', value.name)}
               />
             </Paper>
           </div>
-        </div>
-        <div className="component-container">
-          <div className="btn-label-container">
-            <div className="license-label-container">
-              <label>License</label>
-            </div>
-            <div className="license-btn-container">
-              <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
-                <AddIcon fontSize="inherit" />
-              </IconButton>
-            </div>
-          </div>
-          <Paper className={classes.paper}>
-            <SearchIcon className={classes.iconButton} />
-            <Autocomplete
-              fullWidth
-              className={classes.input}
-              options={licenses || []}
-              groupBy={(option) => option?.type}
-              // getOptionLabel={(option) => (option?.name ? option.indicatorName : '')}
-              value={form.license_name || ''}
-              getOptionSelected={(option) => option.name === form.license_name}
-              getOptionLabel={(option) => option.name || option}
-              disableClearable
-              renderInput={(params) => (
-                <TextField
-                  required
-                  {...params}
-                  InputProps={{
-                    ...params.InputProps,
-                    disableUnderline: true,
-                    className: classes.autocomplete,
-                  }}
-                />
-              )}
-              onChange={(e, value) => autocompleteHandler('license_name', value.name)}
-            />
-          </Paper>
-        </div>
-        <div className="component-container">
-          <label>URL</label>
-          <Paper className={classes.paper}>
-            <InputBase
-              name="url"
-              fullWidth
-              readOnly
-              className={classes.input}
-              value={form?.url}
-              onChange={(e) => inputHandler(e)}
-              required
-            />
-          </Paper>
-        </div>
-        <div className="component-container">
-          <label>PURL</label>
-          <Paper className={classes.paper}>
-            <InputBase
-              name="purl"
-              fullWidth
-              readOnly
-              value={form?.purl}
-              className={classes.input}
-              onChange={(e) => inputHandler(e)}
-              required
-            />
-          </Paper>
-        </div>
-        <div className="usage-notes">
-          <div>
-            <label>Usage</label>
+          <div className="component-container">
+            <label>URL</label>
             <Paper className={classes.paper}>
-              <Select
-                name="usage"
+              <InputBase
+                name="url"
                 fullWidth
-                value={form?.usage}
+                readOnly
                 className={classes.input}
-                disableUnderline
+                value={form?.url}
                 onChange={(e) => inputHandler(e)}
-              >
-                <MenuItem value="file">File</MenuItem>
-                <MenuItem value="snippet">Snippet</MenuItem>
-                <MenuItem value="pre-requisite">Pre-requisite</MenuItem>
-              </Select>
-            </Paper>
-          </div>
-          <div>
-            <label>Notes</label>
-            <Paper className={classes.paper}>
-              <TextareaAutosize
-                name="notes"
-                value={form?.notes}
-                className={classes.input}
-                cols={30}
-                rows={8}
-                onChange={(e) => inputHandler(e)}
+                required
               />
             </Paper>
           </div>
+          <div className="component-container">
+            <label>PURL</label>
+            <Paper className={classes.paper}>
+              <InputBase
+                name="purl"
+                fullWidth
+                readOnly
+                value={form?.purl || ''}
+                className={classes.input}
+                onChange={(e) => inputHandler(e)}
+                required
+              />
+            </Paper>
+          </div>
+          <div className="usage-notes">
+            <div>
+              <label>Usage</label>
+              <Paper className={classes.paper}>
+                <Select
+                  name="usage"
+                  fullWidth
+                  value={form?.usage || ''}
+                  className={classes.input}
+                  disableUnderline
+                  onChange={(e) => inputHandler(e)}
+                >
+                  <MenuItem value="file">File</MenuItem>
+                  <MenuItem value="snippet">Snippet</MenuItem>
+                  <MenuItem value="pre-requisite">Pre-requisite</MenuItem>
+                </Select>
+              </Paper>
+            </div>
+            <div>
+              <label>Notes</label>
+              <Paper className={classes.paper}>
+                <TextareaAutosize
+                  name="notes"
+                  value={form?.notes || ''}
+                  className={classes.input}
+                  cols={30}
+                  rows={8}
+                  onChange={(e) => inputHandler(e)}
+                />
+              </Paper>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <DialogActions>
-        <Button onClick={onCancel}>Cancel</Button>
-        <Button variant="contained" color="secondary" onClick={handleClose} disabled={!isValid()}>
-          Identify
-        </Button>
-      </DialogActions>
+        <DialogActions>
+          <Button onClick={onCancel}>Cancel</Button>
+          <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
+            Identify
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 };

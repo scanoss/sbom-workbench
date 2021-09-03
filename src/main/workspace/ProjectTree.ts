@@ -357,11 +357,11 @@ export class ProjectTree extends EventEmitter {
     for (let i = 0; i < res.length - 1; i += 1) {
       const path = res[i];
        nodeFound = nodes.find((node) => {
-        if (node.type === 'folder' && node.label === path) return node;
+        return (node.type === 'folder' && node.label === path);
       });
     }
      nodeFound = nodes.find((node) => {
-      if (node.type === 'file' && node.label === res[res.length - 1]) return node;
+      return (node.type === 'file' && node.label === res[res.length - 1]);
     });
     if (nodeFound) return nodeFound;
     return {};

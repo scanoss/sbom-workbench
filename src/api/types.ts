@@ -53,6 +53,7 @@ export interface Project {
   scan_root: string;
   default_licenses: string;
   default_components: string;
+  appVersion: string;
 }
 
 export interface Files {

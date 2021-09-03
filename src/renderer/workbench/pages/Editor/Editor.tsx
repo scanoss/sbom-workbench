@@ -233,11 +233,16 @@ export const Editor = () => {
     const response = await dialogCtrl.openInventory({});
     if (response) {
       const node = await projectService.getNodeFromPath(file);
+
+
       if (node.action === 'filter') {
         await resultService.createFiltered(file); // idtype=forceinclude
       } else await resultService.updateNoMatchToFile(file);
 
       const { data } = await resultService.getNoMatch(file);
+
+      // FIXME: until getNode works ok
+      if (!data) return;
 
       await createInventory({
         ...response,
