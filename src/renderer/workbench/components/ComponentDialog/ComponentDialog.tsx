@@ -1,28 +1,15 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import {
-  Dialog,
-  Paper,
-  DialogActions,
-  Button,
-  makeStyles,
-  InputBase,
-  TextareaAutosize,
-  TextField,
-  IconButton,
-} from '@material-ui/core';
+import { Dialog, Paper, DialogActions, Button, makeStyles, InputBase, TextField, IconButton } from '@material-ui/core';
 
 import React, { useContext, useEffect, useState } from 'react';
 import SearchIcon from '@material-ui/icons/Search';
 import AddIcon from '@material-ui/icons/Add';
 import { Autocomplete } from '@material-ui/lab';
-import { NewComponent } from '../../../../api/types';
-
+import { NewComponentDTO } from '../../../../api/types';
 import { DialogResponse, DIALOG_ACTIONS } from '../../../context/types';
 import { ResponseStatus } from '../../../../main/Response';
 import { componentService } from '../../../../api/component-service';
 import { licenseService } from '../../../../api/license-service';
-
-// TO DO
 import { DialogContext } from '../../../context/DialogProvider';
 
 const useStyles = makeStyles((theme) => ({
@@ -58,7 +45,7 @@ interface ComponentDialogProps {
 export const ComponentDialog = (props: ComponentDialogProps) => {
   const classes = useStyles();
   const { open, onClose, onCancel } = props;
-  const [form, setForm] = useState<Partial<NewComponent>>({});
+  const [form, setForm] = useState<Partial<NewComponentDTO>>({});
   const dialogCtrl = useContext<any>(DialogContext);
   const [licenses, setLicenses] = useState<any[]>();
 
@@ -82,16 +69,22 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   const handleClose = async (e) => {
     e.preventDefault();
     try {
-      const component: Partial<NewComponent> = form;
-      const response = await componentService.create(component);
+      const response = await componentService.create(form);
       onClose({ action: DIALOG_ACTIONS.OK, data: response });
     } catch (error) {
       console.log('error', error);
       await dialogCtrl.openConfirmDialog(
-        'The component already exist in the catalog',
+        error.message,
         { label: 'acept', role: 'acept' },
         true
       );
+    }
+  };
+
+  const openLicenseDialog = async () => {
+    const response = await dialogCtrl.openLicenseCreate();
+    if (response && response.action === ResponseStatus.OK) {
+      setLicenses([...licenses, response.data]);
     }
   };
 
@@ -100,16 +93,8 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     return name && version && license_id && purl && url;
   };
 
-  const openLicenseDialog = async () => {
-    const response = await dialogCtrl.openLicenseCreate();
-    if (response && response.action === ResponseStatus.OK) {
-      setLicenses([...licenses, response.data]);
-      console.log('response', response);
-    }
-  };
-
   return (
-    <Dialog id="ComponentDialog" maxWidth="md" scroll="body" fullWidth open={open}>
+    <Dialog id="ComponentDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
       <span className="dialog-title">Create component</span>
       <form onSubmit={handleClose}>
         <div className="identity-license">
@@ -206,7 +191,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
         </div>
         <DialogActions>
           <Button onClick={onCancel}>Cancel</Button>
-          <Button type="submit" variant="contained" color="secondary">
+          <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
             Create
           </Button>
         </DialogActions>

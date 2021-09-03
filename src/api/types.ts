@@ -35,7 +35,7 @@ export interface License {
   fulltext: string;
 }
 
-export interface NewComponent {
+export interface NewComponentDTO {
   name: string;
   version: string;
   license_id: number;

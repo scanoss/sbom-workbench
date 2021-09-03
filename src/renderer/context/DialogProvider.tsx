@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { InventoryDialog } from '../workbench/components/InventoryDialog/InventoryDialog';
-import { Component, Inventory, License, NewComponent } from '../../api/types';
+import { Component, Inventory, License, NewComponentDTO } from '../../api/types';
 import { InventorySelectorDialog } from '../workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse } from './types';
-import ConfirmDialog from '../ui/dialog/ConfirmDialog';
+import { ConfirmDialog } from '../ui/dialog/ConfirmDialog';
 import { LicenseDialog } from '../workbench/components/LicenseDialog/LicenseDialog';
 import { ComponentDialog } from '../workbench/components/ComponentDialog/ComponentDialog';
 
@@ -11,8 +11,8 @@ export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
-  openLicenseCreate: () => Promise<License>;
-  openComponentDialog: () => Promise<NewComponent>;
+  openLicenseCreate: () => Promise<DialogResponse>;
+  openComponentDialog: () => Promise<DialogResponse>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -95,7 +95,7 @@ export const DialogProvider: React.FC = ({ children }) => {
   }>({ open: false });
 
   const openLicenseCreate = () => {
-    return new Promise<License>((resolve) => {
+    return new Promise<DialogResponse>((resolve) => {
       setLicenseDialog({
         open: true,
         onClose: (response) => {
@@ -112,7 +112,7 @@ export const DialogProvider: React.FC = ({ children }) => {
   }>({ open: false });
 
   const openComponentDialog = () => {
-    return new Promise<Component>((resolve) => {
+    return new Promise<DialogResponse>((resolve) => {
       setComponentDialog({
         open: true,
         onClose: (response) => {
@@ -145,7 +145,6 @@ export const DialogProvider: React.FC = ({ children }) => {
         open={confirmDialog.open}
         hideDeleteButton={confirmDialog.hideDeleteButton}
         message={confirmDialog.message}
-        hideDeleteButton={confirmDialog.hideDeleteButton}
         button={confirmDialog.button}
         onClose={(response) => confirmDialog.onClose && confirmDialog.onClose(response)}
       />
