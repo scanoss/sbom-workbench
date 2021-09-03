@@ -198,7 +198,7 @@ export class InventoryDb extends Db {
   }
 
   // GET ALL INVENTORIES BY PURL, VERSION OR FILES
-  getAll(inventory: Partial<Inventory>) {
+  getAll(inventory: Partial<Inventory>) { 
     return new Promise(async (resolve, reject) => {
       try {
         let inventories: any;

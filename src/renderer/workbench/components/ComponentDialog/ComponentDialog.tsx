@@ -40,14 +40,22 @@ interface ComponentDialogProps {
   open: boolean;
   onClose: (response: DialogResponse) => void;
   onCancel: () => void;
+  component: Partial<NewComponentDTO>;
+  label: string;
 }
 
 export const ComponentDialog = (props: ComponentDialogProps) => {
   const classes = useStyles();
-  const { open, onClose, onCancel } = props;
+  const { open, onClose, onCancel, component, label } = props;
   const [form, setForm] = useState<Partial<NewComponentDTO>>({});
   const dialogCtrl = useContext<any>(DialogContext);
   const [licenses, setLicenses] = useState<any[]>();
+  const [readOnly, setReadOnly] = useState<boolean>();
+
+  const setDefaults = () => {
+    setForm(component);
+    setReadOnly(!!component.name);
+  };
 
   const fetchData = async () => {
     if (open) {
@@ -58,6 +66,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   };
 
   useEffect(() => fetchData(), [open]);
+  useEffect(setDefaults, [component]);
 
   const inputHandler = (name, value) => {
     setForm({
@@ -73,11 +82,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
       onClose({ action: DIALOG_ACTIONS.OK, data: response });
     } catch (error) {
       console.log('error', error);
-      await dialogCtrl.openConfirmDialog(
-        error.message,
-        { label: 'acept', role: 'acept' },
-        true
-      );
+      await dialogCtrl.openConfirmDialog(error.message, { label: 'acept', role: 'acept' }, true);
     }
   };
 
@@ -95,7 +100,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
 
   return (
     <Dialog id="ComponentDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
-      <span className="dialog-title">Create component</span>
+      <span className="dialog-title">{label}</span>
       <form onSubmit={handleClose}>
         <div className="identity-license">
           <div className="component-version-container">
@@ -105,6 +110,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                 <InputBase
                   name="name"
                   fullWidth
+                  readOnly={readOnly}
                   className={classes.input}
                   value={form?.name}
                   placeholder="Component"
@@ -164,6 +170,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
             <Paper className={classes.paper}>
               <InputBase
                 name="purl"
+                readOnly={readOnly}
                 placeholder="PURL"
                 fullWidth
                 className={classes.input}
@@ -179,6 +186,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
             <Paper className={classes.paper}>
               <InputBase
                 name="url"
+                readOnly={readOnly}
                 placeholder="URL"
                 fullWidth
                 className={classes.input}
