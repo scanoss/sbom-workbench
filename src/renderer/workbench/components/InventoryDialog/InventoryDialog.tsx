@@ -76,7 +76,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       const licensesResponse = await licenseService.getAll();
 
       setData(componentsResponse.data);
-      setComponents(componentsResponse.data.map((item) => item.name));
+      setComponents(componentsResponse.data);
       const catalogue = licensesResponse.data.map((item) => ({
         name: item.name,
         type: 'Cataloged',
@@ -158,12 +158,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   useEffect(() => fetchData(), [open]);
 
   useEffect(() => {
-    const component = data.find((item) => item.name === form.component);
+    const component = data.find((item) => item.purl === form.purl);
     if (component) {
       setVersions(component?.versions.map((item) => item.version));
-      setForm({ ...form, url: component.url, purl: component.purl });
+      setForm({ ...form, url: component.url, component: component.name, purl: component.purl });
     }
-  }, [form.component]);
+  }, [form.purl]);
 
   useEffect(() => {
     const lic = data
@@ -204,9 +204,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   fullWidth
                   className={classes.input}
                   options={components || []}
-                  value={form?.component || ''}
+                  value={{ name: form?.component, purl: form?.purl }}
+                  getOptionSelected={(option, value) => option.purl === value.purl}
+                  getOptionLabel={(option) => option.name}
                   disableClearable
-                  onChange={(e, value) => autocompleteHandler('component', value)}
+                  onChange={(e, value) => autocompleteHandler('purl', value.purl)}
                   renderInput={(params) => (
                     <TextField
                       {...params}
