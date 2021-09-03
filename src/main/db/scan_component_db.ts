@@ -145,11 +145,11 @@ export class ComponentDb extends Db {
   private getByPurl(data: any) {
     const self = this;
     return new Promise(async (resolve, reject) => {
-      try {
+      try {    
         const db = await this.openDb();
         db.all(
-          query.SQL_GET_COMPONENT_BY_PURL,
-          data.purl,
+          query.SQL_GET_COMPONENT_BY_PURL_ENGINE,
+          data.purl,data.purl,
           async (err: any, component: any) => {
             db.close();
             if (err) resolve(undefined);
@@ -457,7 +457,7 @@ export class ComponentDb extends Db {
   }
 
 
-  async getComponentGroup(component: Partial<ComponentGroup>) {
+  async getComponentGroup(component: Partial<ComponentGroup>) { 
     return new Promise(async (resolve, reject) => {
       try {
         const data = await this.getAll(component);

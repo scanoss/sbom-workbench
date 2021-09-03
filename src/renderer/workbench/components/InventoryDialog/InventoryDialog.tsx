@@ -75,6 +75,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       const componentsResponse = await componentService.getAllComponentGroup();
       const licensesResponse = await licenseService.getAll();
 
+      console.log("Components" , componentsResponse);
+
       setData(componentsResponse.data);
       setComponents(componentsResponse.data.map((item) => item.name));
       const catalogue = licensesResponse.data.map((item) => ({
@@ -95,7 +97,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const openComponentVersionDialog = async () => {
-    const response = await dialogCtrl.openComponentDialog({ name: form.component, purl: form.purl, url: form.url });
+    const response = await dialogCtrl.openComponentDialog(
+      { name: form.component, purl: form.purl, url: form.url },
+      'Add Version'
+    );
     if (response && response.action === ResponseStatus.OK) {
       const { name, version, licenses, purl, url } = response.data;
       setComponents([...components, response.data.name]);

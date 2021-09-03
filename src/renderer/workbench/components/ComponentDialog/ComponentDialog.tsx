@@ -50,9 +50,11 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   const [form, setForm] = useState<Partial<NewComponentDTO>>({});
   const dialogCtrl = useContext<any>(DialogContext);
   const [licenses, setLicenses] = useState<any[]>();
+  const [readOnly, setReadOnly] = useState<boolean>();
 
   const setDefaults = () => {
     setForm(component);
+    setReadOnly(!!component.name);
   };
 
   const fetchData = async () => {
@@ -105,28 +107,16 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
             <div className="license-container">
               <label>Component</label>
               <Paper className={classes.paper}>
-                {form.name != null ? (
-                  <InputBase
-                    name="name"
-                    fullWidth
-                    readOnly
-                    className={classes.input}
-                    value={form?.name}
-                    placeholder="Component"
-                    onChange={(e) => inputHandler(e.target.name, e.target.value)}
-                    required
-                  />
-                ) : (
-                  <InputBase
-                    name="name"
-                    fullWidth                    
-                    className={classes.input}
-                    value={form?.name}
-                    placeholder="Component"
-                    onChange={(e) => inputHandler(e.target.name, e.target.value)}
-                    required
-                  />
-                )}
+                <InputBase
+                  name="name"
+                  fullWidth
+                  readOnly={readOnly}
+                  className={classes.input}
+                  value={form?.name}
+                  placeholder="Component"
+                  onChange={(e) => inputHandler(e.target.name, e.target.value)}
+                  required
+                />
               </Paper>
             </div>
             <div className="license-container">
@@ -180,6 +170,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
             <Paper className={classes.paper}>
               <InputBase
                 name="purl"
+                readOnly={readOnly}
                 placeholder="PURL"
                 fullWidth
                 className={classes.input}
@@ -195,6 +186,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
             <Paper className={classes.paper}>
               <InputBase
                 name="url"
+                readOnly={readOnly}
                 placeholder="URL"
                 fullWidth
                 className={classes.input}

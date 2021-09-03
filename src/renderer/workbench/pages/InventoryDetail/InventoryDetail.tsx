@@ -26,9 +26,8 @@ export const InventoryDetail = () => {
   const [inventory, setInventory] = useState<Inventory>();
   const [files, setFiles] = useState<string[]>([]);
 
-  const getInventory = async () => {
+  const getInventory = async () => {    
     const response = await inventoryService.get({ id });
-
     if (response.status === 'fail') {
       history.goBack();
       return;
@@ -82,7 +81,7 @@ export const InventoryDetail = () => {
               </div>
               <div className="info">
                 <Label label="VERSION" textColor="gray" />
-                <h4>{inventory?.version}</h4>
+                <h4>{inventory?.component.version}</h4>
               </div>
               <div className="info">
                 <Label label="LICENSE" textColor="gray" />
