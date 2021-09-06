@@ -32,7 +32,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
   let licenses: licenseEntry[];
   let crypto: cryptoEntry[];
   let inventory: inventoryProgress;
-  const vulnerabilities = { critical: 0, high: 0, medium: 0, moderate: 0 };
+  const vulnerabilities = { critical: 0, high: 0, low: 0, moderate: 0 };
   licenses = [];
   crypto = [{ label: 'None', files: [], value: 0 }];
   let tempSummary: any;
@@ -57,7 +57,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
   summary.identifiedFiles = tempSummary[0].identified;
   summary.ignoredFiles = tempSummary[0].ignored;
   summary.detectedFiles = tempSummary[0].detected;
-  const vulnerabilitiesLists = { critical: [], high: [], moderate: [], medium: [] };
+  const vulnerabilitiesLists = { critical: [], high: [], moderate: [], low: [] };
   try {
     const a = defaultProject.results;
     for (const [key, results] of Object.entries(a)) {
@@ -135,8 +135,8 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
                 if (!vulnerabilitiesLists.high.some((vl)=>vl.ID===v.ID)) vulnerabilitiesLists.high.push(v);
               } else if (v.severity === 'MODERATE') {
                 if (!vulnerabilitiesLists.moderate.some((vl)=>vl.ID===v.ID))  vulnerabilitiesLists.moderate.push(v);
-              } else if (v.severity === 'MEDIUM') {
-                if (!vulnerabilitiesLists.medium.some((vl)=>vl.ID===v.ID)) vulnerabilitiesLists.medium.push(v);
+              } else if (v.severity === 'LOW') {
+                if (!vulnerabilitiesLists.low.some((vl)=>vl.ID===v.ID)) vulnerabilitiesLists.low.push(v);
               }
             }
           }
@@ -147,7 +147,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
     vulnerabilities.critical = vulnerabilitiesLists.critical.length;
     vulnerabilities.high = vulnerabilitiesLists.high.length;
     vulnerabilities.moderate = vulnerabilitiesLists.moderate.length;
-    vulnerabilities.medium = vulnerabilitiesLists.medium.length;
+    vulnerabilities.low = vulnerabilitiesLists.low.length;
 
     if (licenses) checkForIncompatibilities(licenses);
     // un-comment next line to output report data
