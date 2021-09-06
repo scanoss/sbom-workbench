@@ -432,6 +432,12 @@ export class ProjectTree extends EventEmitter {
         jsonScan.action = 'filter';
       }
     } else if (jsonScan.type === 'folder') {
+      if (bannedList.evaluate(scanRoot + jsonScan.value)) {
+        jsonScan.action = 'scan';
+      } else {
+        jsonScan.action = 'filter';
+      }
+
       for (i = 0; i < jsonScan.children.length; i += 1) this.indexScan(scanRoot, jsonScan.children[i], bannedList);
     }
   }
@@ -456,6 +462,10 @@ function summarizeTree(root: any, tree: any, summary: any) {
     return summary;
   }
   if (tree.type === 'folder') {
+    if (tree.action === 'filter') {
+
+      tree.className = 'filter-item';
+    } else
     for (j = 0; j < tree.children.length; j += 1) {
       summary = summarizeTree(root, tree.children[j], summary);
     }
