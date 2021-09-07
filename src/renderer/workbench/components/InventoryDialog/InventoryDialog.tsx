@@ -163,7 +163,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       setVersions(component?.versions.map((item) => item.version));
       setForm({ ...form, url: component.url, component: component.name, purl: component.purl });
     }
-  }, [form.purl]);
+  }, [form.purl, data]);
 
   useEffect(() => {
     const lic = data
