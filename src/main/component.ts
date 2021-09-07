@@ -53,6 +53,3 @@ ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET, async (_event, component: Partial<
     data,
   };
 });
-
-
-
