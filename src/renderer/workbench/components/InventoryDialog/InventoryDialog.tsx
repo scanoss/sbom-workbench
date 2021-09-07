@@ -96,7 +96,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const openComponentVersionDialog = async () => {
     const response = await dialogCtrl.openComponentDialog(
-      { name: form.component, purl: form.purl, url: form.url },
+      { name: form.component, purl: form.purl, url: form.url, license_name: form.license_name },
       'Add Version'
     );
     if (response && response.action === ResponseStatus.OK) {
