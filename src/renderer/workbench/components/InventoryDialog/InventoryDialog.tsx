@@ -46,6 +46,14 @@ const useStyles = makeStyles((theme) => ({
   actions: {
     backgroundColor: 'var(--background-color-primary)',
   },
+  option: {
+    display: 'flex',
+    flexDirection: 'column',
+    '& span.middle': {
+      fontSize: '0.8rem',
+      color: '#6c6c6e',
+    }
+  }
 }));
 
 interface InventoryDialogProps {
@@ -207,6 +215,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   value={{ name: form?.component, purl: form?.purl }}
                   getOptionSelected={(option, value) => option.purl === value.purl}
                   getOptionLabel={(option) => option.name}
+                  renderOption={(option) => (
+                    <div className={classes.option}>
+                      <span>{option.name}</span>
+                      <span className="middle">{option.purl}</span>
+                    </div>
+                  )}
                   disableClearable
                   onChange={(e, value) => autocompleteHandler('purl', value.purl)}
                   renderInput={(params) => (
@@ -275,7 +289,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 className={classes.input}
                 options={licenses || []}
                 groupBy={(option) => option?.type}
-                // getOptionLabel={(option) => (option?.name ? option.indicatorName : '')}
                 value={form.license_name || ''}
                 getOptionSelected={(option) => option.name === form.license_name}
                 getOptionLabel={(option) => option.name || option}
