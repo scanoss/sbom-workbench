@@ -170,7 +170,8 @@ export const ComponentDetail = () => {
 
 
   const create = async (defaultInventory, selFiles) => {
-    const showSelector = inventories.length > 0;
+    // const showSelector = inventories.length > 0;
+    const showSelector = false; // TO DO UNTIL VALIDATE 
     let action = DIALOG_ACTIONS.NEW;
     let inventory;
 
