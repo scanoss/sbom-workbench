@@ -33,8 +33,6 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
   const truncatedStart = start - 1;
   const truncatedEnd = file.length - end;
 
-  console.log(highlight);
-
   const scroll = () => {
     // FIXME: select only for this component
     const editor = document.querySelectorAll('.code-viewer');

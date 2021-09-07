@@ -90,7 +90,6 @@ export const Editor = () => {
   const getInventories = async () => {
     const { data } = await inventoryService.getAll({ files: [file] });
     setInventories(data);
-    console.log(data);
   };
 
   const getResults = async () => {
@@ -108,7 +107,8 @@ export const Editor = () => {
       inventories = response.message || [];
     }
 
-    const showSelector = inventories.length > 0;
+    // const showSelector = inventories.length > 0;
+    const showSelector = false; // TO DO UNTIL VALIDATE
     let action = DIALOG_ACTIONS.NEW;
     let inventory;
 
@@ -233,7 +233,6 @@ export const Editor = () => {
     const response = await dialogCtrl.openInventory({});
     if (response) {
       const node = await projectService.getNodeFromPath(file);
-
 
       if (node.action === 'filter') {
         await resultService.createFiltered(file); // idtype=forceinclude
