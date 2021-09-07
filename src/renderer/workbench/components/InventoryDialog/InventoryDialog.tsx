@@ -159,13 +159,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   useEffect(() => {
     const component = data.find((item) => item.purl === form.purl);
-    console.log(component)
     if (component) {
       setVersions(component?.versions.map((item) => item.version));
       setForm({ ...form, url: component.url, component: component.name, purl: component.purl });
-      console.log(component)
     }
-    
   }, [form.purl, data]);
 
   useEffect(() => {
