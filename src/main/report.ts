@@ -143,7 +143,6 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
         }
       }
     }
-    console.log(JSON.stringify(vulnerabilitiesLists));
     vulnerabilities.critical = vulnerabilitiesLists.critical.length;
     vulnerabilities.high = vulnerabilitiesLists.high.length;
     vulnerabilities.moderate = vulnerabilitiesLists.moderate.length;

@@ -38,6 +38,7 @@ export interface License {
 export interface NewComponentDTO {
   name: string;
   version: string;
+  license_name: string;
   license_id: number;
   purl: string;
   url: string;

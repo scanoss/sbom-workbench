@@ -22,7 +22,7 @@ export interface ComponentParams {
 }
 
 export enum ComponentSource {
-    ENGINE = 'engine',   
+    ENGINE = 'engine',
 }
 
 
@@ -60,7 +60,7 @@ export class ComponentDb extends Db {
           component = await this.getbyPurlVersion(data);
         else if (data.purl) {
           component = await this.getByPurl(data);
-        } else {        
+        } else {
           component = await this.allComp(params);
         }
         if (component !== undefined) resolve(component);
@@ -145,7 +145,7 @@ export class ComponentDb extends Db {
   private getByPurl(data: any) {
     const self = this;
     return new Promise(async (resolve, reject) => {
-      try {    
+      try {
         const db = await this.openDb();
         db.all(
           query.SQL_GET_COMPONENT_BY_PURL_ENGINE,
@@ -457,7 +457,7 @@ export class ComponentDb extends Db {
   }
 
 
-  async getComponentGroup(component: Partial<ComponentGroup>) { 
+  async getComponentGroup(component: Partial<ComponentGroup>) {
     return new Promise(async (resolve, reject) => {
       try {
         const data = await this.getAll(component);
@@ -474,7 +474,7 @@ export class ComponentDb extends Db {
 
   async getAllComponentGroup(params: ComponentParams) {
     return new Promise(async (resolve, reject) => {
-      try {     
+      try {
         const data = await this.getAll({},params);
         if (data) {
           const comp = await this.groupComponentsByPurl(data);
@@ -524,6 +524,7 @@ export class ComponentDb extends Db {
         }
         result.push(aux);
       }
+      result.sort((a, b) => a.name.localeCompare(b.name));
       resolve(result);
     });
   }
