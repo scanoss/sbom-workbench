@@ -59,14 +59,23 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
 
   const fetchData = async () => {
     if (open) {
-      const licensesResponse = await licenseService.getAll();
-      const catalogue = licensesResponse.data;
-      setLicenses(catalogue);
+      const { data } = await licenseService.getAll();
+      setLicenses(data);
+    }
+  };
+
+  const getLicense = () => {
+    if (!form.license_id && form.license_name) {
+      const license = licenses.find((l) => l.name === form.license_name);
+      if (license) {
+        setForm({ ...form, license_id: license.id });
+      }
     }
   };
 
   useEffect(() => fetchData(), [open]);
   useEffect(setDefaults, [component]);
+  useEffect(getLicense, [licenses]);
 
   const inputHandler = (name, value) => {
     setForm({
@@ -90,6 +99,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     const response = await dialogCtrl.openLicenseCreate();
     if (response && response.action === ResponseStatus.OK) {
       setLicenses([...licenses, response.data]);
+      setForm({ ...form, license_id: response.data.id, license_name: response.data.name });
     }
   };
 
@@ -151,8 +161,9 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                 fullWidth
                 className={classes.input}
                 options={licenses || []}
-                // value={form?.license_id}
-                getOptionLabel={(option) => option.name || option}
+                value={{ id: form?.license_id, name: form?.license_name }}
+                getOptionSelected={(option, value) => option.id === value.id}
+                getOptionLabel={(option) => option.name || ''}
                 disableClearable
                 renderInput={(params) => (
                   <TextField
@@ -161,41 +172,43 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                     InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
                   />
                 )}
-                onChange={(e, value) => inputHandler('license_id', value.id)}
+                onChange={(e, { id, name }) => setForm({ ...form, license_id: id, license_name: name })}
               />
             </Paper>
           </div>
-          <div className="license-container">
-            <label>PURL</label>
-            <Paper className={classes.paper}>
-              <InputBase
-                name="purl"
-                readOnly={readOnly}
-                placeholder="PURL"
-                fullWidth
-                className={classes.input}
-                value={form?.purl}
-                onChange={(e) => inputHandler(e.target.name, e.target.value)}
-                required
-              />
-            </Paper>
-          </div>
+          {!readOnly && (
+            <>
+              <div className="license-container">
+                <label>PURL</label>
+                <Paper className={classes.paper}>
+                  <InputBase
+                    name="purl"
+                    placeholder="PURL"
+                    fullWidth
+                    className={classes.input}
+                    value={form?.purl}
+                    onChange={(e) => inputHandler(e.target.name, e.target.value)}
+                    required
+                  />
+                </Paper>
+              </div>
 
-          <div className="license-container">
-            <label>URL</label>
-            <Paper className={classes.paper}>
-              <InputBase
-                name="url"
-                readOnly={readOnly}
-                placeholder="URL"
-                fullWidth
-                className={classes.input}
-                value={form?.url}
-                onChange={(e) => inputHandler(e.target.name, e.target.value)}
-                required
-              />
-            </Paper>
-          </div>
+              <div className="license-container">
+                <label>URL</label>
+                <Paper className={classes.paper}>
+                  <InputBase
+                    name="url"
+                    placeholder="URL"
+                    fullWidth
+                    className={classes.input}
+                    value={form?.url}
+                    onChange={(e) => inputHandler(e.target.name, e.target.value)}
+                    required
+                  />
+                </Paper>
+              </div>
+            </>
+          )}
         </div>
         <DialogActions>
           <Button onClick={onCancel}>Cancel</Button>
