@@ -62,6 +62,8 @@ export const Editor = () => {
     }
   };
 
+  const destroy = () => dispatch(setFile(null));
+
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false });
@@ -200,7 +202,10 @@ export const Editor = () => {
       const path = new URLSearchParams(data.search).get('path');
       dispatch(setFile(path));
     });
-    return unlisten;
+    return () => {
+      unlisten();
+      destroy();
+    };
   }, []);
 
   useEffect(() => {
