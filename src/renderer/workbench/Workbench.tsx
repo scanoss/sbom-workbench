@@ -44,7 +44,8 @@ const Workbench = () => {
   const [savePath, setSavePath] = useState<string>();
 
   const onInit = async () => {
-    const result = scanPath ? await loadScan(scanPath) : false;
+    const { path } = scanPath;
+    const result = path ? await loadScan(path) : false;
     if (!result) {
       dialogController.showError('Error', 'Cannot read scan.');
     }
