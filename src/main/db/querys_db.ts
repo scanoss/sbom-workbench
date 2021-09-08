@@ -176,7 +176,12 @@ export class Querys {
   SQL_GET_SPDX_COMP_DATA =
     'SELECT DISTINCT cv.purl,cv.version,cv.url,cv.name,i.license_name FROM component_versions cv INNER JOIN inventories i ON cv.purl=i.purl AND cv.version=i.version GROUP BY i.version;';
 
-  SQL_GET_CSV_DATA = `SELECT i.id,i.usage,i.notes,i.license_name,i.purl,i.version,r.file_path AS path FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN results r ON r.id=fi.resultid;`;
+
+  SQL_GET_CSV_DATA = `SELECT i.id AS inventoryId,r.id AS resultID,i.usage,i.notes,i.license_name AS identified_license,r.license AS detected_license,i.purl,i.version,r.file_path AS path,cv.name AS identified_component,r.component AS detected_component
+  FROM inventories i 
+  INNER JOIN file_inventories fi ON fi.inventoryid=i.id 
+  LEFT JOIN results r ON r.id=fi.resultid INNER JOIN component_versions cv ON cv.purl=i.purl AND cv.version = i.version 
+  ORDER BY i.id;`;
 
   SQL_GET_ALL_SUMMARIES = 'SELECT compid,ignored,pending,identified FROM summary;';
 
