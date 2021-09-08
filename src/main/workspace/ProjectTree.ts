@@ -352,13 +352,14 @@ export class ProjectTree extends EventEmitter {
     res = mypath.split('/');
     if (res[0] === '') res.shift();
     if (res[res.length - 1] === '') res.pop();
-    const nodes = this.logical_tree.children;
+    let nodes = this.logical_tree.children;
     let nodeFound: any = {};
     for (let i = 0; i < res.length - 1; i += 1) {
       const path = res[i];
        nodeFound = nodes.find((node) => {
         return (node.type === 'folder' && node.label === path);
       });
+      nodes = nodeFound.children;
     }
      nodeFound = nodes.find((node) => {
       return (node.type === 'file' && node.label === res[res.length - 1]);
