@@ -171,7 +171,7 @@ export const ComponentDetail = () => {
 
   const create = async (defaultInventory, selFiles) => {
     // const showSelector = inventories.length > 0;
-    const showSelector = false; // TO DO UNTIL VALIDATE 
+    const showSelector = false; // TO DO UNTIL VALIDATE
     let action = DIALOG_ACTIONS.NEW;
     let inventory;
 
@@ -259,12 +259,6 @@ export const ComponentDetail = () => {
         <header className="app-header">
           <div className="header">
             <div>
-              {/* <h4 className="header-subtitle back">
-                <IconButton onClick={() => history.goBack()} component="span">
-                  <ArrowBackIcon />
-                </IconButton>
-                {name}
-              </h4> */}
               <div className="filter-container">
                 <ComponentInfo component={component} />
                 <ChevronRightOutlinedIcon fontSize="small" />
@@ -372,15 +366,6 @@ export const ComponentDetail = () => {
         </header>
 
         <main className="app-content">{filterFiles && renderTab()}</main>
-
-        {/* { inventories && inventories.length > 0 && (
-          <footer className="app-footer">
-            <div className="groups d-flex space-between align-center">
-               <span>You have identified <b>{inventories.length} {inventories.length > 1 ? 'groups' : 'group'}</b> for this detected component.</span>
-              <Button color="primary" onClick={(event) => history.push('/workbench/inventory')}>View groups</Button>
-            </div>
-          </footer>
-        ) } */}
       </section>
     </>
   );

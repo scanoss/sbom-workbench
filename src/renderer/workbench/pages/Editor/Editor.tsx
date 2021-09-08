@@ -1,11 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import IconButton from '@material-ui/core/IconButton';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 import { DialogContext, IDialogContext } from '../../../context/DialogProvider';
-import { range } from '../../../../utils/utils';
 import { workbenchController } from '../../../workbench-controller';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
 import { Inventory } from '../../../../api/types';
@@ -20,7 +17,7 @@ import { resultService } from '../../../../api/results-service';
 import NoMatchFound from '../../components/NoMatchFound/NoMatchFound';
 import { projectService } from '../../../../api/project-service';
 
-const MemoCodeEditor = React.memo(CodeEditor); // TODO: move inside editor page
+const MemoCodeEditor = React.memo(CodeEditor);
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -48,8 +45,6 @@ export const Editor = () => {
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
-  // const [ossLines, setOssLines] = useState<number[]>([]);
-  // const [lines, setLines] = useState<number[]>([]);
   const [fullFile, setFullFile] = useState<boolean>(null);
 
   const init = () => {
@@ -66,6 +61,8 @@ export const Editor = () => {
       loadLocalFile(file);
     }
   };
+
+  const destroy = () => dispatch(setFile(null));
 
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
@@ -108,7 +105,7 @@ export const Editor = () => {
     }
 
     // const showSelector = inventories.length > 0;
-    const showSelector = false; // TO DO UNTIL VALIDATE
+    const showSelector = false; // TODO: UNTIL VALIDATE
     let action = DIALOG_ACTIONS.NEW;
     let inventory;
 
@@ -152,6 +149,29 @@ export const Editor = () => {
     create(inv, [result.id]);
   };
 
+  const onIdentifyFilterPressed = async () => {
+    const response = await dialogCtrl.openInventory({});
+    if (response) {
+      const node = await projectService.getNodeFromPath(file);
+
+      if (node.action === 'filter') {
+        await resultService.createFiltered(file); // idtype=forceinclude
+      } else await resultService.updateNoMatchToFile(file);
+
+      const { data } = await resultService.getNoMatch(file);
+
+      // FIXME: until getNode works ok
+      if (!data) return;
+
+      await createInventory({
+        ...response,
+        files: [data.id],
+      });
+      getInventories();
+      getResults();
+    }
+  };
+
   const onIgnorePressed = async (result) => {
     await ignoreFile([result.id]);
     getResults();
@@ -165,7 +185,6 @@ export const Editor = () => {
   const onDetachPressed = async (inventory) => {
     const { data } = await inventoryService.get({ id: inventory.id });
     const fileResult = data?.files.find((item) => item.path === file);
-    console.log(fileResult);
     if (fileResult) {
       await detachFile([fileResult.id]);
       getInventories();
@@ -174,7 +193,6 @@ export const Editor = () => {
   };
 
   const onDetailPressed = async (result) => {
-    console.log(result);
     history.push(`/workbench/inventory/${result.id}`);
   };
 
@@ -184,7 +202,10 @@ export const Editor = () => {
       const path = new URLSearchParams(data.search).get('path');
       dispatch(setFile(path));
     });
-    return unlisten;
+    return () => {
+      unlisten();
+      destroy();
+    };
   }, []);
 
   useEffect(() => {
@@ -201,7 +222,7 @@ export const Editor = () => {
 
   useEffect(() => {
     if (currentMatch) {
-      const full = currentMatch?.lines === 'all';
+      const full = currentMatch?.type === 'file';
       setFullFile(full);
       if (!full) loadRemoteFile(currentMatch.md5_file);
     }
@@ -229,42 +250,11 @@ export const Editor = () => {
     }
   };
 
-  const identifyHandler = async () => {
-    const response = await dialogCtrl.openInventory({});
-    if (response) {
-      const node = await projectService.getNodeFromPath(file);
-
-      if (node.action === 'filter') {
-        await resultService.createFiltered(file); // idtype=forceinclude
-      } else await resultService.updateNoMatchToFile(file);
-
-      const { data } = await resultService.getNoMatch(file);
-
-      // FIXME: until getNode works ok
-      if (!data) return;
-
-      await createInventory({
-        ...response,
-        files: [data.id],
-      });
-      getInventories();
-      getResults();
-    }
-  };
-
   return (
     <>
       <section id="editor" className="app-page">
         <header className="app-header">
           <>
-            {/* <div className="match-title">
-              <h2 className="header-subtitle back">
-                <IconButton onClick={() => history.goBack()} component="span">
-                  <ArrowBackIcon />
-                </IconButton>
-                {inventories?.length === 0 && matchInfo?.length === 0 ? 'No match found' : 'Matches'}
-              </h2>
-            </div> */}
             <header className="match-info-header">
               {matchInfo && inventories ? (
                 <section className="content">
@@ -312,7 +302,7 @@ export const Editor = () => {
 
               <div className="info-files">
                 <LabelCard label="Source File" subLabel={file} status={null} />
-                {matchInfo && currentMatch && (
+                {matchInfo && currentMatch && currentMatch.file && (
                   <LabelCard label="Component File" subLabel={currentMatch.file} status={null} />
                 )}
               </div>
@@ -337,7 +327,7 @@ export const Editor = () => {
             </div>
             {inventories?.length === 0 && matchInfo?.length === 0 ? (
               <div className="editor">
-                <NoMatchFound identifyHandler={() => identifyHandler()} />
+                <NoMatchFound identifyHandler={() => onIdentifyFilterPressed()} />
               </div>
             ) : (
               <div className="editor">
