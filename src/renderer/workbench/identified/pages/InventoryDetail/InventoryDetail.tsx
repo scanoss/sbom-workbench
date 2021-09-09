@@ -4,17 +4,17 @@ import { useHistory, useParams } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
-import { IWorkbenchContext, WorkbenchContext } from '../../store';
-import { Inventory } from '../../../../api/types';
+import { IWorkbenchContext, WorkbenchContext } from '../../../store';
+import { Inventory } from '../../../../../api/types';
 import { FileList } from './components/FileList';
-import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
-import { inventoryService } from '../../../../api/inventory-service';
-import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
-import Label from '../../components/Label/Label';
-import { mapFiles } from '../../../../utils/scan-util';
-import { AppContext, IAppContext } from '../../../context/AppProvider';
-import { DialogContext, IDialogContext } from '../../../context/DialogProvider';
-import { DIALOG_ACTIONS } from '../../../context/types';
+import { ComponentInfo } from '../../../components/ComponentInfo/ComponentInfo';
+import { inventoryService } from '../../../../../api/inventory-service';
+import { MATCH_CARD_ACTIONS } from '../../../components/MatchCard/MatchCard';
+import Label from '../../../components/Label/Label';
+import { mapFiles } from '../../../../../utils/scan-util';
+import { AppContext, IAppContext } from '../../../../context/AppProvider';
+import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
+import { DIALOG_ACTIONS } from '../../../../context/types';
 
 export const InventoryDetail = () => {
   const history = useHistory();
@@ -26,7 +26,7 @@ export const InventoryDetail = () => {
   const [inventory, setInventory] = useState<Inventory>();
   const [files, setFiles] = useState<string[]>([]);
 
-  const getInventory = async () => {    
+  const getInventory = async () => {
     const response = await inventoryService.get({ id });
     if (response.status === 'fail') {
       history.goBack();
@@ -50,11 +50,13 @@ export const InventoryDetail = () => {
   const onAction = (file: number, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push(`/workbench/file?path=${file.path}`);
+        history.push(`/workbench/detected/file?path=${file.path}`);
         break;
       case MATCH_CARD_ACTIONS.ACTION_DETACH:
         detachFile([file.id]);
         getInventory();
+        break;
+      default:
         break;
     }
   };

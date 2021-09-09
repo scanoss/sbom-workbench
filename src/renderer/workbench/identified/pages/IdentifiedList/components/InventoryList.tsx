@@ -1,14 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { IconButton, CircularProgress } from '@material-ui/core';
-import { Inventory } from '../../../../../api/types';
-import { inventoryService } from '../../../../../api/inventory-service';
-import { componentService } from '../../../../../api/component-service';
-import InventoryCard from '../../../components/InventoryCard/InventoryCard';
-import { AppContext, IAppContext } from '../../../../context/AppProvider';
-import { ComponentInfo } from '../../../components/ComponentInfo/ComponentInfo';
-import { IWorkbenchContext, WorkbenchContext } from '../../../store';
+import { CircularProgress } from '@material-ui/core';
+import InventoryCard from '../../../../components/InventoryCard/InventoryCard';
+import { ComponentInfo } from '../../../../components/ComponentInfo/ComponentInfo';
+import { inventoryService } from '../../../../../../api/inventory-service';
+import { Inventory } from '../../../../../../api/types';
+import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 
 const style = {
   list: {
@@ -40,7 +37,7 @@ export const InventoryList = (props: InventoryListProps) => {
   };
 
   const onInventorySelected = async (inventory: Inventory) => {
-    history.push(`/workbench/inventory/${inventory.id}`);
+    history.push(`/workbench/identified/inventory/${inventory.id}`);
   };
 
   useEffect(onInit, []);

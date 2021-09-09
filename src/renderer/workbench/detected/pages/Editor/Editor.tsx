@@ -1,21 +1,21 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
-import { IWorkbenchContext, WorkbenchContext } from '../../store';
-import { DialogContext, IDialogContext } from '../../../context/DialogProvider';
-import { workbenchController } from '../../../workbench-controller';
-import { AppContext, IAppContext } from '../../../context/AppProvider';
-import { Inventory } from '../../../../api/types';
-import LabelCard from '../../components/LabelCard/LabelCard';
-import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../components/MatchInfoCard/MatchInfoCard';
-import { mapFiles } from '../../../../utils/scan-util';
-import CodeEditor from '../../components/CodeEditor/CodeEditor';
-import { inventoryService } from '../../../../api/inventory-service';
-import { setFile } from '../../actions';
-import { DIALOG_ACTIONS } from '../../../context/types';
-import { resultService } from '../../../../api/results-service';
-import NoMatchFound from '../../components/NoMatchFound/NoMatchFound';
-import { projectService } from '../../../../api/project-service';
+import { IWorkbenchContext, WorkbenchContext } from '../../../store';
+import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
+import { workbenchController } from '../../../../workbench-controller';
+import { AppContext, IAppContext } from '../../../../context/AppProvider';
+import { Inventory } from '../../../../../api/types';
+import LabelCard from '../../../components/LabelCard/LabelCard';
+import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../components/MatchInfoCard/MatchInfoCard';
+import { mapFiles } from '../../../../../utils/scan-util';
+import CodeEditor from '../../../components/CodeEditor/CodeEditor';
+import { inventoryService } from '../../../../../api/inventory-service';
+import { setFile } from '../../../actions';
+import { DIALOG_ACTIONS } from '../../../../context/types';
+import { resultService } from '../../../../../api/results-service';
+import NoMatchFound from '../../../components/NoMatchFound/NoMatchFound';
+import { projectService } from '../../../../../api/project-service';
 
 const MemoCodeEditor = React.memo(CodeEditor);
 

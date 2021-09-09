@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {
   Button,
   ButtonGroup,
@@ -13,24 +12,20 @@ import {
 } from '@material-ui/core';
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import IconButton from '@material-ui/core/IconButton';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
-import { WorkbenchContext, IWorkbenchContext } from '../../store';
-import { AppContext, IAppContext } from '../../../context/AppProvider';
-import { Inventory } from '../../../../api/types';
+import { WorkbenchContext, IWorkbenchContext } from '../../../store';
+import { Inventory } from '../../../../../api/types';
 import { FileList } from '../ComponentList/components/FileList';
-import { InventoryList } from '../ComponentList/components/InventoryList';
-import { ComponentInfo } from '../../components/ComponentInfo/ComponentInfo';
-import { DialogContext, IDialogContext } from '../../../context/DialogProvider';
-import { inventoryService } from '../../../../api/inventory-service';
-import { componentService } from '../../../../api/component-service';
+import { ComponentInfo } from '../../../components/ComponentInfo/ComponentInfo';
+import { componentService } from '../../../../../api/component-service';
 
-import { mapFiles } from '../../../../utils/scan-util';
-import { MATCH_CARD_ACTIONS } from '../../components/MatchCard/MatchCard';
-import { DIALOG_ACTIONS } from '../../../context/types';
 import { IdentifiedList } from '../ComponentList/components/IdentifiedList';
+import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
+import { inventoryService } from '../../../../../api/inventory-service';
+import { DIALOG_ACTIONS } from '../../../../context/types';
+import { MATCH_CARD_ACTIONS } from '../../../components/MatchCard/MatchCard';
+import { mapFiles } from '../../../../../utils/scan-util';
 
 export const ComponentDetail = () => {
   const history = useHistory();
@@ -71,7 +66,7 @@ export const ComponentDetail = () => {
   const onAction = async (file: any, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push(`/workbench/file?path=${file.path}`);
+        history.push(`/workbench/detected/file?path=${file.path}`);
         break;
       case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
         await onIdentifyPressed(file);

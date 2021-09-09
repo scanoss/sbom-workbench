@@ -89,7 +89,6 @@ const Report = () => {
 
   return (
     <>
-      <AppBar exp />
       <section id="Report" className="app-page">
         <main className="app-content">
           <section className="report-layout">

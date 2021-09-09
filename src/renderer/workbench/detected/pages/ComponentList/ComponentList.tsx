@@ -1,17 +1,12 @@
-import { makeStyles, Paper, IconButton, InputBase, Button, ButtonGroup } from '@material-ui/core';
+import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
-import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
-import ViewModuleRoundedIcon from '@material-ui/icons/ViewModuleRounded';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import { AppContext, IAppContext } from '../../../context/AppProvider';
-import { WorkbenchContext, IWorkbenchContext } from '../../store';
-import { setComponent } from '../../actions';
-import RecognizedCard from '../../components/RecognizedCard/RecognizedCard';
-import { inventoryService } from '../../../../api/inventory-service';
-import { componentService } from '../../../../api/component-service';
+import { AppContext, IAppContext } from '../../../../context/AppProvider';
+import { WorkbenchContext, IWorkbenchContext } from '../../../store';
+import ComponentCard from '../../../components/ComponentCard/ComponentCard';
+import { setComponent } from '../../../actions';
 
 const LIMIT = 100;
 
@@ -25,7 +20,7 @@ const filter = (items, query) => {
   }
 
   const result = items.filter((item) => {
-    const name = item.component.toLowerCase();
+    const name = item.name.toLowerCase();
     return name.includes(query.toLowerCase());
   });
 
@@ -48,57 +43,42 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const RecognizedList = () => {
+export const ComponentList = () => {
   const history = useHistory();
   const classes = useStyles();
 
+  const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
-  const [inventoryList, setInventoryList] = useState<any>([]);
+  const { name, components } = state;
 
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
+  const filterItems = filter(components, searchQuery);
 
-  const filterItems = filter(inventoryList, searchQuery);
-
-  const onSelectComponent = async (grouped) => {
-    const { purl } = grouped.inventories[0];
-    const { data } = await componentService.getComponentGroup({ purl });
-    dispatch(setComponent(data));
-    history.push(`/workbench/inventory`);
+  const onSelectComponent = (component) => {
+    history.push(`/workbench/detected/component`);
+    dispatch(setComponent(component));
   };
-
-  const init = async () => {
-    const { data } = await inventoryService.getFromComponent();
-    setInventoryList(data);
-  };
-
-  const cleanup = () => {};
-
-  useEffect(() => {
-    init();
-    return cleanup;
-  }, []);
 
   return (
-    <>
-      <section id="RecognizedList" className="app-page">
+    <div id="ComponentList">
+      <section className="app-page">
         <header className="app-header">
           {/* <div className="d-flex space-between align-center">
             <div>
-              <h4 className="header-subtitle">{state.name}</h4>
-              <h1 className="header-title">Identified Components</h1>
+              <h4 className="header-subtitle">{name}</h4>
+              <h1 className="header-title">Detected Components</h1>
             </div>
             <ButtonGroup>
-              <Button
-                startIcon={<ViewModuleRoundedIcon />}
-                variant="outlined"
-                color="primary"
-                onClick={() => history.push('/workbench')}
-              >
+              <Button startIcon={<ViewModuleRoundedIcon />} variant="contained" color="primary">
                 Detected
               </Button>
-
-              <Button startIcon={<CheckCircleIcon />} variant="contained" color="primary">
+              <Button
+                startIcon={<CheckCircleIcon />}
+                variant="outlined"
+                color="primary"
+                onClick={() => history.push('/workbench/recognized')}
+              >
                 Identified
               </Button>
             </ButtonGroup>
@@ -118,14 +98,10 @@ export const RecognizedList = () => {
         </header>
 
         <main className="app-content">
-          {filterItems && filterItems.length > 0 ? (
+          {components && filterItems && filterItems.length > 0 ? (
             <section className="component-list">
-              {filterItems.slice(0, LIMIT).map((inventory) => (
-                <RecognizedCard
-                  key={inventory.component}
-                  inventory={inventory}
-                  onClick={() => onSelectComponent(inventory)}
-                />
+              {filterItems.slice(0, LIMIT).map((component, i) => (
+                <ComponentCard key={component.purl} component={component} onClick={onSelectComponent} />
               ))}
             </section>
           ) : (
@@ -135,7 +111,7 @@ export const RecognizedList = () => {
                   Not results found with <strong>{searchQuery} </strong>
                 </>
               ) : (
-                <> Not results found</>
+                <> Not components detected</>
               )}
             </p>
           )}
@@ -149,8 +125,8 @@ export const RecognizedList = () => {
           )}
         </main>
       </section>
-    </>
+    </div>
   );
 };
 
-export default RecognizedList;
+export default ComponentList;

@@ -6,7 +6,6 @@ import { WorkbenchProvider } from './renderer/workbench/store';
 import { DialogProvider } from './renderer/context/DialogProvider';
 import Workbench from './renderer/workbench/Workbench';
 import AppProvider from './renderer/context/AppProvider';
-import Report from './renderer/report/Report';
 import Workspace from './renderer/workspace/Workspace';
 import NewProject from './renderer/workspace/pages/NewProject/NewProject';
 
@@ -36,11 +35,10 @@ export default function App() {
       <MuiThemeProvider theme={theme}>
         <AppProvider>
           <DialogProvider>
-            <Route path="/" exact component={Workspace} title="tes" />
+            <Route path="/" exact component={Workspace} />
             <Route path="/workspace/new" exact component={NewProject} />
             <WorkbenchProvider>
-                <Route path="/workbench" component={Workbench} />
-                <Route path="/report" component={Report} />
+              <Route path="/workbench" component={Workbench} />
             </WorkbenchProvider>
           </DialogProvider>
         </AppProvider>

@@ -48,21 +48,21 @@ const AppMenu = () => {
 
   return (
     <section id="AppMenu">
-      <NavLink to="/workbench" exact activeClassName="active">
+      <NavLink to="/workbench/detected" activeClassName="active">
         <Tooltip title="Detected components">
           <Button color="inherit">
             <GavelIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/recognized" exact activeClassName="active">
+      <NavLink to="/workbench/identified" activeClassName="active">
         <Tooltip title="Identified components">
           <Button color="inherit">
             <CheckCircleOutlineOutlinedIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/report" activeClassName="active">
+      <NavLink to="/workbench/report" activeClassName="active">
         <Tooltip title="Reports">
           <Button color="inherit">
             <InsertChartOutlinedTwoToneIcon />

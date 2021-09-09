@@ -1,7 +1,7 @@
 import Button from '@material-ui/core/Button';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { WorkbenchContext, IWorkbenchContext } from '../../../store';
+import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import { FileList } from './FileList';
 
 export const IdentifiedList = ({ files, inventories, onAction }) => {

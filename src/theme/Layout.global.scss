@@ -5,7 +5,7 @@
   grid-template-rows: auto 1fr;
 }
 
-.SplitPane, #Report {
+.SplitPane {
   height: calc(100% - var(--appbar-height)) !important;
   margin-top: var(--appbar-height) !important;
 }

@@ -1,12 +1,13 @@
-import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
+import { makeStyles, Paper, IconButton, InputBase, Button, ButtonGroup } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
-import { AppContext, IAppContext } from '../../../context/AppProvider';
-import { WorkbenchContext, IWorkbenchContext } from '../../store';
-import ComponentCard from '../../components/ComponentCard/ComponentCard';
-import { setComponent } from '../../actions';
+import { componentService } from '../../../../../api/component-service';
+import { inventoryService } from '../../../../../api/inventory-service';
+import { setComponent } from '../../../actions';
+import { WorkbenchContext, IWorkbenchContext } from '../../../store';
+import RecognizedCard from '../../../components/RecognizedCard/RecognizedCard';
 
 const LIMIT = 100;
 
@@ -20,7 +21,7 @@ const filter = (items, query) => {
   }
 
   const result = items.filter((item) => {
-    const name = item.name.toLowerCase();
+    const name = item.component.toLowerCase();
     return name.includes(query.toLowerCase());
   });
 
@@ -43,47 +44,41 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const ComponentList = () => {
+export const IdentifiedList = () => {
   const history = useHistory();
   const classes = useStyles();
 
-  const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
-  const { name, components } = state;
+  const [inventoryList, setInventoryList] = useState<any>([]);
 
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
-  const filterItems = filter(components, searchQuery);
 
-  const onSelectComponent = (component) => {
-    history.push(`/workbench/component`);
-    dispatch(setComponent(component));
+  const filterItems = filter(inventoryList, searchQuery);
+
+  const onSelectComponent = async (grouped) => {
+    const { purl } = grouped.inventories[0];
+    const { data } = await componentService.getComponentGroup({ purl });
+    dispatch(setComponent(data));
+    history.push(`/workbench/identified/inventory`);
   };
 
-  return (
-    <div id="ComponentList">
-      <section className="app-page">
-        <header className="app-header">
-          {/* <div className="d-flex space-between align-center">
-            <div>
-              <h4 className="header-subtitle">{name}</h4>
-              <h1 className="header-title">Detected Components</h1>
-            </div>
-            <ButtonGroup>
-              <Button startIcon={<ViewModuleRoundedIcon />} variant="contained" color="primary">
-                Detected
-              </Button>
-              <Button
-                startIcon={<CheckCircleIcon />}
-                variant="outlined"
-                color="primary"
-                onClick={() => history.push('/workbench/recognized')}
-              >
-                Identified
-              </Button>
-            </ButtonGroup>
-          </div> */}
+  const init = async () => {
+    const { data } = await inventoryService.getFromComponent();
+    setInventoryList(data);
+  };
 
+  const cleanup = () => {};
+
+  useEffect(() => {
+    init();
+    return cleanup;
+  }, []);
+
+  return (
+    <>
+      <section id="IdentifiedList" className="app-page">
+        <header className="app-header">
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">
               <SearchIcon />
@@ -98,10 +93,14 @@ export const ComponentList = () => {
         </header>
 
         <main className="app-content">
-          {components && filterItems && filterItems.length > 0 ? (
+          {filterItems && filterItems.length > 0 ? (
             <section className="component-list">
-              {filterItems.slice(0, LIMIT).map((component, i) => (
-                <ComponentCard key={component.purl} component={component} onClick={onSelectComponent} />
+              {filterItems.slice(0, LIMIT).map((inventory) => (
+                <RecognizedCard
+                  key={inventory.component}
+                  inventory={inventory}
+                  onClick={() => onSelectComponent(inventory)}
+                />
               ))}
             </section>
           ) : (
@@ -111,7 +110,7 @@ export const ComponentList = () => {
                   Not results found with <strong>{searchQuery} </strong>
                 </>
               ) : (
-                <> Not components detected</>
+                <> Not results found</>
               )}
             </p>
           )}
@@ -125,8 +124,8 @@ export const ComponentList = () => {
           )}
         </main>
       </section>
-    </div>
+    </>
   );
 };
 
-export default ComponentList;
+export default IdentifiedList;
