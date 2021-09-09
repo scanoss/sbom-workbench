@@ -43,7 +43,7 @@ export class Formats extends Db {
           else {
             for (let i = 0; i < data.length; i += 1) {
               const pkg: any = {};      
-              pkg.name = data[i].component.name;         
+              pkg.name = data[i].name;         
               pkg.PackageVersion = data[i].version;
               pkg.PackageSPDXIdentifier = data[i].purl;
               pkg.PackageDownloadLocation=data[i].url;
@@ -68,18 +68,18 @@ export class Formats extends Db {
     });
   }
 
-  csv(path: string) {
+   csv(path: string) {   
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.all(query.SQL_GET_CSV_DATA, async (err: any, data: any) => {
           db.close();
           if (err) resolve(false);
-          else {
+          else {                  
             const csv = this.csvCreate(data);
             await fs.writeFile(`${path}`, csv, 'utf-8', () => {
               resolve(true);
-            });
+           });
           }
         });
       } catch (error) {
@@ -89,9 +89,9 @@ export class Formats extends Db {
   }
 
   private csvCreate(inventories: any) {
-    let csv = `id,usage,notes,license_name,path,purl,version\r\n`;
-    for (const inventorie of inventories) {
-      csv += `${inventorie.id},${inventorie.usage},${inventorie.notes},${inventorie.license_name},"${inventorie.path}","${inventorie.purl}",${inventorie.version}\r\n`;
+    let csv = `inventory_ID,usage,notes,identified_license,detected_license,identified_component,detected_component,path,purl,version\r\n`;
+    for (const inventory of inventories) {
+      csv += `${inventory.inventoryId},${inventory.usage},${inventory.notes},${inventory.identified_license},${inventory.detected_license? inventory.detected_license:'n/a'},${inventory.identified_component},${inventory.detected_component?inventory.detected_component:'n/a'},"${inventory.path}","${inventory.purl}",${inventory.version}\r\n`;
     }
     return csv;
   }

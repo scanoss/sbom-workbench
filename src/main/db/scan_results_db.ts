@@ -59,6 +59,7 @@ export class ResultsDb extends Db {
   }
 
   async insertFiltered(path: string) {
+    console.log(path);
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -87,6 +88,7 @@ export class ResultsDb extends Db {
             function (this: any, err: any) {
               if (err) throw err;
               db.close();
+              console.log(this.lastID);
               resolve(this.lastID);
             }
           );
@@ -206,8 +208,8 @@ export class ResultsDb extends Db {
         const db = await this.openDb();
         db.serialize(() => {
           const resultsid = `(${files.toString()});`;
-          const sqlRestoreIdentified = query.SQL_RESTORE_IDENTIFIED_FILE_SNIPPET + resultsid; 
-          const sqlRestoreNoMatch = query.SQL_RESTORE_NOMATCH_FILE + resultsid; 
+          const sqlRestoreIdentified = query.SQL_RESTORE_IDENTIFIED_FILE_SNIPPET + resultsid;
+          const sqlRestoreNoMatch = query.SQL_RESTORE_NOMATCH_FILE + resultsid;
           const sqlRestoreFiltered = query.SQL_RESTORE_FILTERED_FILE + resultsid;
           db.run('begin transaction');
           db.run(sqlRestoreIdentified);

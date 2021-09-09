@@ -128,8 +128,8 @@ export class Querys {
   SQL_GET_COMPONENT_BY_PURL_VERSION =
     'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.purl=? and cv.version=?;';
 
-  SQL_GET_COMPONENT_BY_PURL =
-    ' SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE comp.purl=?;';
+  SQL_GET_COMPONENT_BY_PURL_ENGINE =
+    ' SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE comp.source=(SELECT source FROM components WHERE purl=? limit 1) AND comp.purl=?;';
 
   // GET ALL COMPONENTES
   SQL_GET_ALL_COMPONENTS =
@@ -142,7 +142,7 @@ export class Querys {
   SQL_SELECT_LICENSE = 'SELECT id, spdxid, name, url FROM licenses WHERE ';
 
  // GET LICENSES
- SQL_SELECT_ALL_LICENSES = 'SELECT id, spdxid, name, url FROM licenses;';
+ SQL_SELECT_ALL_LICENSES = 'SELECT id, spdxid, name, url FROM licenses ORDER BY name ASC;';
 
   // GET LICENSE ID BY NAME OR SPDXID
   COMPDB_SQL_GET_LICENSE_ID_FROM_SPDX_NAME = 'SELECT id FROM licenses WHERE licenses.name=? or licenses.spdxid=?;';
@@ -176,7 +176,13 @@ export class Querys {
   SQL_GET_SPDX_COMP_DATA =
     'SELECT DISTINCT cv.purl,cv.version,cv.url,cv.name,i.license_name FROM component_versions cv INNER JOIN inventories i ON cv.purl=i.purl AND cv.version=i.version GROUP BY i.version;';
 
-  SQL_GET_CSV_DATA = `SELECT i.id,i.usage,i.notes,i.license_name,i.purl,i.version,r.file_path AS path FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN results r ON r.id=fi.resultid;`;
+
+  SQL_GET_CSV_DATA = `SELECT DISTINCT i.id AS inventoryId,r.id AS resultID,i.usage,i.notes,i.license_name AS identified_license,l.name AS detected_license,i.purl,i.version,r.file_path AS path,cv.name AS identified_component,r.component AS detected_component
+  FROM inventories i 
+  INNER JOIN file_inventories fi ON fi.inventoryid=i.id 
+  LEFT JOIN results r ON r.id=fi.resultid INNER JOIN component_versions cv ON cv.purl=i.purl AND cv.version = i.version 
+  LEFT JOIN licenses l ON l.name IN (SELECT l.name FROM licenses l INNER JOIN results r ON l.spdxid=r.license AND r.id=fi.resultid )
+  ORDER BY i.id;`;
 
   SQL_GET_ALL_SUMMARIES = 'SELECT compid,ignored,pending,identified FROM summary;';
 

@@ -73,7 +73,7 @@ const Workspace = () => {
   const init = async () => {
     try {
       const projects = await workspaceService.getAllProjects();
-      setProjects(projects);
+      setProjects(projects.filter((item) => item.appVersion));
     } catch (error) {
       alert(error);
     }
@@ -81,8 +81,8 @@ const Workspace = () => {
 
   const cleanup = () => {};
 
-  const onShowScan = (path) => {
-    setScanPath(path);
+  const onShowScan = (project) => {
+    setScanPath(project.work_root);
     history.push('/workbench');
   };
 
@@ -157,7 +157,7 @@ const Workspace = () => {
                 <TableBody>
                   {filterProjects.length !== 0 ? (
                     filterProjects.map((row) => (
-                      <TableRow hover key={row.name} className={classes.row} onClick={() => onShowScan(row.work_root)}>
+                      <TableRow hover key={row.name} className={classes.row} onClick={() => onShowScan(row)}>
                         <TableCell component="th" scope="row">
                           {row.name}
                         </TableCell>

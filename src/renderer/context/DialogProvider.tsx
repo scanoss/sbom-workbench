@@ -1,16 +1,20 @@
+/* eslint-disable import/no-cycle */
+
 import React, { useState } from 'react';
-import { InventoryDialog } from '../workbench/components/InventoryDialog/InventoryDialog';
-import { Inventory, License } from '../../api/types';
+import { InventoryDialog } from '../ui/dialog/InventoryDialog';
+import { Component, Inventory, License, NewComponentDTO } from '../../api/types';
 import { InventorySelectorDialog } from '../workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse } from './types';
-import ConfirmDialog from '../ui/dialog/ConfirmDialog';
-import { LicenseDialog } from '../workbench/components/LicenseDialog/LicenseDialog'
+import { ConfirmDialog } from '../ui/dialog/ConfirmDialog';
+import { LicenseDialog } from '../ui/dialog/LicenseDialog';
+import { ComponentDialog } from '../ui/dialog/ComponentDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
-  openLicenseCreate: () => Promise<License>;
+  openLicenseCreate: () => Promise<DialogResponse>;
+  openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -93,21 +97,42 @@ export const DialogProvider: React.FC = ({ children }) => {
   }>({ open: false });
 
   const openLicenseCreate = () => {
-    return new Promise<License>((resolve) => {
+    return new Promise<DialogResponse>((resolve) => {
       setLicenseDialog({
         open: true,
         onClose: (response) => {
           setLicenseDialog((dialog) => ({ ...dialog, open: false }));
-           resolve(response);
+          resolve(response);
         },
       });
     });
   };
 
+  const [componentDialog, setComponentDialog] = useState<{
+    open: boolean;
+    component: Partial<NewComponentDTO>;
+    label?: string;
+    onClose?: (response: DialogResponse) => void;
+  }>({ open: false , component: {} });
 
+  const openComponentDialog = (component: Partial<NewComponentDTO> = {}, label = 'Create Component') => {
+    return new Promise<DialogResponse>((resolve) => {
+      setComponentDialog({
+        open: true,
+        component,
+        label,
+        onClose: (response) => {
+          setComponentDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(response);
+        },
+      });
+    });
+  };
 
   return (
-    <DialogContext.Provider value={{ openInventory, openInventorySelector, openConfirmDialog, openLicenseCreate }}>
+    <DialogContext.Provider
+      value={{ openInventory, openInventorySelector, openConfirmDialog, openLicenseCreate, openComponentDialog }}
+    >
       {children}
       <InventoryDialog
         open={inventoryDialog.open}
@@ -126,9 +151,16 @@ export const DialogProvider: React.FC = ({ children }) => {
         open={confirmDialog.open}
         hideDeleteButton={confirmDialog.hideDeleteButton}
         message={confirmDialog.message}
-        hideDeleteButton={confirmDialog.hideDeleteButton}
         button={confirmDialog.button}
         onClose={(response) => confirmDialog.onClose && confirmDialog.onClose(response)}
+      />
+
+      <ComponentDialog
+        open={componentDialog.open}
+        label={componentDialog.label}
+        component={componentDialog.component}
+        onCancel={() => componentDialog.onClose && componentDialog.onClose(null)}
+        onClose={(response) => componentDialog.onClose && componentDialog.onClose(response)}
       />
 
       <LicenseDialog

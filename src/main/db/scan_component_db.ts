@@ -22,7 +22,7 @@ export interface ComponentParams {
 }
 
 export enum ComponentSource {
-    ENGINE = 'engine',   
+    ENGINE = 'engine',
 }
 
 
@@ -60,7 +60,7 @@ export class ComponentDb extends Db {
           component = await this.getbyPurlVersion(data);
         else if (data.purl) {
           component = await this.getByPurl(data);
-        } else {        
+        } else {
           component = await this.allComp(params);
         }
         if (component !== undefined) resolve(component);
@@ -108,11 +108,9 @@ export class ComponentDb extends Db {
   // merge component b into a
   private mergeComponents(a: any, b: any) {
     const preLicense: any = {};
-
     preLicense.id = b.license_id;
     preLicense.name = b.license_name;
     preLicense.spdxid = b.license_spdxid;
-
     a.licenses.push(preLicense);
   }
 
@@ -150,8 +148,8 @@ export class ComponentDb extends Db {
       try {
         const db = await this.openDb();
         db.all(
-          query.SQL_GET_COMPONENT_BY_PURL,
-          data.purl,
+          query.SQL_GET_COMPONENT_BY_PURL_ENGINE,
+          data.purl,data.purl,
           async (err: any, component: any) => {
             db.close();
             if (err) resolve(undefined);
@@ -232,7 +230,7 @@ export class ComponentDb extends Db {
   }
 
   // GET COMPONENT VERSIONS
-  getById(id: number) {
+ private getById(id: number) {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
@@ -384,7 +382,7 @@ export class ComponentDb extends Db {
     }
   }
 
-  allSummaries() {
+  private allSummaries() {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
@@ -476,7 +474,7 @@ export class ComponentDb extends Db {
 
   async getAllComponentGroup(params: ComponentParams) {
     return new Promise(async (resolve, reject) => {
-      try {     
+      try {
         const data = await this.getAll({},params);
         if (data) {
           const comp = await this.groupComponentsByPurl(data);
@@ -488,7 +486,7 @@ export class ComponentDb extends Db {
     });
   }
 
-  async groupComponentsByPurl(data: any) {
+ private async groupComponentsByPurl(data: any) {
     try {
       const aux = {};
       for (const component of data) {
@@ -502,7 +500,7 @@ export class ComponentDb extends Db {
     }
   }
 
-  mergeComponentByPurl(data: Record<string, any>) {
+  private mergeComponentByPurl(data: Record<string, any>) {
     return new Promise<any[]>(async (resolve) => {
       const result: any[] = [];
       for (const [key, value] of Object.entries(data)) {
@@ -526,6 +524,7 @@ export class ComponentDb extends Db {
         }
         result.push(aux);
       }
+      result.sort((a, b) => a.name.localeCompare(b.name));
       resolve(result);
     });
   }

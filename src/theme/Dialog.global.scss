@@ -1,4 +1,5 @@
 .dialog {
+
   .MuiDialogTitle-root {
     font-size: 24px;
     font-style: normal;
@@ -12,4 +13,102 @@
   .MuiDialogContent-root {
     background-color: #f4f4f5;
   }
+
+  .dialog-title {
+    padding: 20px;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0em;
+    text-align: left;
+    border-bottom: 1px solid #D4D4D8;
+    display: block;
+  }
+
+  .dialog-content {
+      padding: 20px 24px;
+      background-color: rgba(244, 244, 245, 1);
+      overflow: hidden;
+  }
+
+  .dialog-content > .dialog-form-field {
+    &:first-child { margin-top: 0; }
+  }
+
+  .dialog-content > .dialog-row:first-child > .dialog-form-field {
+      margin-top: 0;
+  }
+
+
+  .dialog-form-field {
+    margin: 20px 0 0;
+
+    .dialog-form-field-label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+
+      button {
+        margin-left: 4px;
+      }
+    }
+
+    label {
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    .dialog-form-field-control {
+      display: flex;
+      align-items: center;
+    }
+
+    .autocomplete-dialog {
+      color: #6c6c6e;
+    }
+
+    textarea {
+      border: none;
+      outline: 0px !important;
+      -webkit-appearance: none;
+      box-shadow: none !important;
+      resize: none;
+      color: #6c6c6e;
+    }
+
+    input, select, .MuiSelect-root {
+      height: 48px;
+      padding: 0px 10px;
+      color: #6c6c6e;
+    }
+
+    .MuiSelect-root {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+    /* ,
+    iconButton: {
+      padding: 7,
+    },
+    input: {
+      color: '#6c6c6e',
+      padding: theme.spacing(0.5),
+    },
+    autocomplete: {
+      color: '#6c6c6e',
+    },
+    actions: {
+      backgroundColor: 'var(--background-color-primary)',
+    },
+    option: {
+      display: 'flex',
+      flexDirection: 'column',
+      '& span.middle': {
+        fontSize: '0.8rem',
+        color: '#6c6c6e',
+      }
+    }
+  }));*/
 }

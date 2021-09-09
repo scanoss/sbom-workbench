@@ -32,7 +32,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
   let licenses: licenseEntry[];
   let crypto: cryptoEntry[];
   let inventory: inventoryProgress;
-  const vulnerabilities = { critical: 0, high: 0, medium: 0, moderate: 0 };
+  const vulnerabilities = { critical: 0, high: 0, low: 0, moderate: 0 };
   licenses = [];
   crypto = [{ label: 'None', files: [], value: 0 }];
   let tempSummary: any;
@@ -57,6 +57,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
   summary.identifiedFiles = tempSummary[0].identified;
   summary.ignoredFiles = tempSummary[0].ignored;
   summary.detectedFiles = tempSummary[0].detected;
+  const vulnerabilitiesLists = { critical: [], high: [], moderate: [], low: [] };
   try {
     const a = defaultProject.results;
     for (const [key, results] of Object.entries(a)) {
@@ -127,15 +128,26 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
             let i = 0;
             for (i = 0; i < result.vulnerabilities.length; i++) {
               const v = result.vulnerabilities[i];
-              if (v.severity === 'CRITICAL') vulnerabilities.critical += 1;
-              else if (v.severity === 'HIGH') vulnerabilities.high += 1;
-              else if (v.severity === 'MODERATE') vulnerabilities.moderate += 1;
-              else if (v.severity === 'MEDIUM') vulnerabilities.medium += 1;
+
+              if (v.severity === 'CRITICAL') {
+                if (!vulnerabilitiesLists.critical.some((vl)=>vl.ID===v.ID)) vulnerabilitiesLists.critical.push(v);
+              } else if (v.severity === 'HIGH') {
+                if (!vulnerabilitiesLists.high.some((vl)=>vl.ID===v.ID)) vulnerabilitiesLists.high.push(v);
+              } else if (v.severity === 'MODERATE') {
+                if (!vulnerabilitiesLists.moderate.some((vl)=>vl.ID===v.ID))  vulnerabilitiesLists.moderate.push(v);
+              } else if (v.severity === 'LOW') {
+                if (!vulnerabilitiesLists.low.some((vl)=>vl.ID===v.ID)) vulnerabilitiesLists.low.push(v);
+              }
             }
           }
         }
       }
     }
+    vulnerabilities.critical = vulnerabilitiesLists.critical.length;
+    vulnerabilities.high = vulnerabilitiesLists.high.length;
+    vulnerabilities.moderate = vulnerabilitiesLists.moderate.length;
+    vulnerabilities.low = vulnerabilitiesLists.low.length;
+
     if (licenses) checkForIncompatibilities(licenses);
     // un-comment next line to output report data
     // console.log(JSON.stringify({ licenses, crypto, summary }));

@@ -131,8 +131,6 @@ export class InventoryDb extends Db {
     });
   }
 
- 
-
   private emptyInventory() {
     const self = this;
     return new Promise(async (resolve, reject) => {
@@ -252,29 +250,58 @@ export class InventoryDb extends Db {
     });
   }
 
+  private async isInventory(inventory: Partial<Inventory>) {
+    const db = await this.openDb();
+    return new Promise<Partial<Inventory>>(async (resolve, reject) => {
+      try {
+        db.get(
+          `SELECT id FROM inventories WHERE purl=? AND notes=? AND version=? AND usage=?;`,
+          inventory.purl,
+          inventory.notes ? inventory.notes : 'n/a',
+          inventory.version,
+          inventory.usage,
+          async function (err: any, inv: any) {
+            if (err) throw Error('Unable to get existing inventory');
+            resolve(inv);
+          }
+        );
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
   // NEW INVENTORY
   async create(inventory: Partial<Inventory>) {
     const self = this;
-    const db = await this.openDb();
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
-      db.run(
-        query.SQL_SCAN_INVENTORY_INSERT,
-        inventory.compid ? inventory.compid : 0,
-        inventory.version,
-        inventory.purl,
-        inventory.usage ? inventory.usage : 'n/a',
-        inventory.notes ? inventory.notes : 'n/a',
-        inventory.url ? inventory.url : 'n/a',
-        inventory.license_name ? inventory.license_name : 'n/a',
-        async function (this: any, err: any) {
-          inventory.id = this.lastID;
-          await self.attachFileInventory(inventory);
-          const comp = await self.component.getAll(inventory);
-          inventory.component = comp;
-          if (err) reject(new Error(err));
-          else resolve(inventory);
-        }
-      );
+      try {
+        const inv = await this.isInventory(inventory);
+        if (!inv) {
+          const db = await this.openDb();
+          db.run(
+            query.SQL_SCAN_INVENTORY_INSERT,
+            inventory.compid ? inventory.compid : 0,
+            inventory.version,
+            inventory.purl,
+            inventory.usage ? inventory.usage : 'n/a',
+            inventory.notes ? inventory.notes : 'n/a',
+            inventory.url ? inventory.url : 'n/a',
+            inventory.license_name ? inventory.license_name : 'n/a',
+            async function (this: any, err: any) {
+              inventory.id = this.lastID;
+              if (err) reject(new Error(err));
+            }
+          );
+        } else inventory.id = inv.id;
+
+        await self.attachFileInventory(inventory);
+        const comp = await self.component.getAll(inventory);
+        inventory.component = comp;
+        resolve(inventory);
+      } catch (e) {
+        reject(e);
+      }
     });
   }
 

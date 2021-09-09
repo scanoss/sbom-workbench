@@ -1,9 +1,10 @@
 /* eslint-disable max-classes-per-file */
 import { EventEmitter } from 'events';
 import * as os from 'os';
-import { connect } from 'http2';
 import fs from 'fs';
+import { ipcMain } from 'electron';
 import { Inventory, Project } from '../../api/types';
+import { app } from 'electron';
 // import * as fs from 'fs';
 // import * as Filtering from './filtering';
 // import { eventNames } from 'process';
@@ -19,6 +20,7 @@ import { ScannerEvents } from '../scannerLib/ScannerEvents';
 import { IpcEvents } from '../../ipc-events';
 import { ipcMain } from 'electron';
 import { timeStamp } from 'console';
+import { defaultBannedList } from './filtering/defaultFilter';
 
 // const fs = require('fs');
 const path = require('path');
@@ -104,6 +106,8 @@ export class ProjectTree extends EventEmitter {
     this.project_name = a.project_name;
     this.filesSummary = a.filesSummary;
     this.scans_db = new ScanDb(rootOfProject);
+    this.banned_list = new Filtering.BannedList('NoFilter');
+    this.banned_list.load(`${this.work_root}/filter.json`);
     await this.scans_db.init();
     this.scanner = new Scanner();
 
@@ -117,9 +121,11 @@ export class ProjectTree extends EventEmitter {
     const file = fs.writeFileSync(`${this.work_root}/tree.json`, JSON.stringify(this).toString());
 
     // Save metadata
-    let self = this;
-    let metadata = {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
+    const metadata = {
       id: 'NULL',
+      appVersion: app.getVersion(),
       name: self.scan_root.split('/').pop(), // Get the folder name
       work_root: self.work_root,
       scan_root: self.scan_root,
@@ -149,6 +155,12 @@ export class ProjectTree extends EventEmitter {
       //  this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, { reason: 'projectExists', severity: 'warning' });
       // this.cleanProject();
     }
+
+    if (!fs.existsSync(`${this.work_root}/filter.json`)) {
+      console.log('No banned list defined. Setting default list.');
+       fs.writeFileSync(`${this.work_root}/filter.json`, JSON.stringify(defaultBannedList).toString());
+    } else console.log('Filters were already defined');
+    this.banned_list.load(`${this.work_root}/filter.json`);
 
     this.scans_db = new ScanDb(p.work_root);
 
@@ -285,7 +297,8 @@ export class ProjectTree extends EventEmitter {
       processed: 60,
     });
     // apply filters.
-    this.banned_list.loadDefault();
+    // this.banned_list.loadDefault();
+    // this.banned_list.save(`${this.work_root}/filter.json`);
 
     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'preparing',
@@ -344,16 +357,17 @@ export class ProjectTree extends EventEmitter {
     res = mypath.split('/');
     if (res[0] === '') res.shift();
     if (res[res.length - 1] === '') res.pop();
-    const nodes = this.logical_tree.children;
+    let nodes = this.logical_tree.children;
     let nodeFound: any = {};
     for (let i = 0; i < res.length - 1; i += 1) {
       const path = res[i];
        nodeFound = nodes.find((node) => {
-        if (node.type === 'folder' && node.label === path) return node;
+        return (node.type === 'folder' && node.label === path);
       });
+      nodes = nodeFound.children;
     }
      nodeFound = nodes.find((node) => {
-      if (node.type === 'file' && node.label === res[res.length - 1]) return node;
+      return (node.type === 'file' && node.label === res[res.length - 1]);
     });
     if (nodeFound) return nodeFound;
     return {};
@@ -424,6 +438,12 @@ export class ProjectTree extends EventEmitter {
         jsonScan.action = 'filter';
       }
     } else if (jsonScan.type === 'folder') {
+      if (bannedList.evaluate(scanRoot + jsonScan.value)) {
+        jsonScan.action = 'scan';
+      } else {
+        jsonScan.action = 'filter';
+      }
+
       for (i = 0; i < jsonScan.children.length; i += 1) this.indexScan(scanRoot, jsonScan.children[i], bannedList);
     }
   }
@@ -448,6 +468,10 @@ function summarizeTree(root: any, tree: any, summary: any) {
     return summary;
   }
   if (tree.type === 'folder') {
+    if (tree.action === 'filter') {
+
+      tree.className = 'filter-item';
+    } else
     for (j = 0; j < tree.children.length; j += 1) {
       summary = summarizeTree(root, tree.children[j], summary);
     }
