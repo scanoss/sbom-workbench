@@ -30,12 +30,15 @@ $md: 780px;
 @import './theme/Dialog.global.scss';
 
 /* components */
-@import 'renderer/features/workbench/components/AppBar/AppBar';
+@import 'renderer/features/workspace/Workspace';
+@import 'renderer/features/workspace/pages/NewProject/NewProject';
 @import 'renderer/features/workbench/Workbench';
+@import 'renderer/features/workbench/pages/report/Report.scss';
 @import 'renderer/features/workbench/pages/detected/pages/Editor/Editor';
 @import 'renderer/features/workbench/pages/detected/pages/ComponentList/ComponentList';
 @import 'renderer/features/workbench/pages/detected/pages/ComponentDetail/ComponentDetail';
 @import 'renderer/features/workbench/pages/identified/pages/InventoryDetail/InventoryDetail.scss';
+@import 'renderer/features/workbench/components/AppBar/AppBar';
 @import 'renderer/features/workbench/components/FileTree/FileTree';
 @import 'renderer/features/workbench/components/ComponentCard/ComponentCard';
 @import 'renderer/features/workbench/components/RecognizedCard/RecognizedCard';
@@ -49,9 +52,7 @@ $md: 780px;
 @import 'renderer/features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 @import 'renderer/features/workbench/components/ComponentInfo/ComponentInfo.scss';
 @import 'renderer/features/workbench/components/NoMatchFound/NoMatchFound.scss';
-@import 'renderer/features/workbench/pages/report/Report.scss';
-@import 'renderer/features/workspace/Workspace';
-@import 'renderer/features/workspace/pages/NewProject/NewProject';
+
 
 /* fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');

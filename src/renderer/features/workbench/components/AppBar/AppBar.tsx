@@ -48,21 +48,21 @@ const AppMenu = () => {
 
   return (
     <section id="AppMenu">
-      <NavLink to="/workbench/detected" activeClassName="active">
+      <NavLink to="/workbench/detected" activeClassName="active" tabIndex={-1}>
         <Tooltip title="Detected components">
           <Button color="inherit">
             <GavelIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/identified" activeClassName="active">
+      <NavLink to="/workbench/identified" activeClassName="active" tabIndex={-1}>
         <Tooltip title="Identified components">
           <Button color="inherit">
             <CheckCircleOutlineOutlinedIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/report" activeClassName="active">
+      <NavLink to="/workbench/report" activeClassName="active" tabIndex={-1}>
         <Tooltip title="Reports">
           <Button color="inherit">
             <InsertChartOutlinedTwoToneIcon />
@@ -74,7 +74,6 @@ const AppMenu = () => {
 };
 
 const AppProgress = ({ progress }) => {
-
   return (
     <section id="AppProgress">
       <p>{progress}%</p>
@@ -91,18 +90,14 @@ const AppTitle = ({ title }) => {
 
   // FIXME: create app.routes.ts and set data for each route
   const routes = [
-    { path: '/workbench', title: 'Detected components' },
-    { path: '/workbench/component', title: 'Detected components' },
-    { path: '/workbench/file', title: 'Matches' },
-    { path: '/report', title: 'Reports' },
-    { path: '/workbench/recognized', title: 'Identified components' },
-    { path: '/workbench/inventory', title: 'Identified components' },
+    { path: '/workbench/detected/file', title: 'Matches' },
+    { path: '/workbench/detected', title: 'Detected components' },
+    { path: '/workbench/identified', title: 'Identified components' },
+    { path: '/workbench/report', title: 'Reports' },
   ];
 
-  // workbench/report   workbecnh/detected   work/identified
-
   useEffect(() => {
-    const curTitle = routes.find((item) => item.path === curLoc.pathname);
+    const curTitle = routes.find((item) => curLoc.pathname.startsWith(item.path));
     if (curTitle && curTitle.title) {
       setSection(curTitle.title);
     }
@@ -186,7 +181,9 @@ const Export = () => {
 
 const AppBar = ({ exp }) => {
   const history = useHistory();
+  const { pathname } = useLocation();
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const report = pathname.startsWith('/workbench/report');
 
   const onBackPressed = () => {
     dispatch(reset());
@@ -211,7 +208,7 @@ const AppBar = ({ exp }) => {
 
           <AppTitle title={state.name} />
 
-          <div className="slot end">{!exp ? <AppProgress progress={state.progress} /> : <Export />}</div>
+          <div className="slot end">{!report ? <AppProgress progress={state.progress} /> : <Export />}</div>
         </Toolbar>
       </MaterialAppBar>
     </>
