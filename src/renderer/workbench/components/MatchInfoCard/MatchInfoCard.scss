@@ -122,9 +122,8 @@
 
 .popover-container {
   position: absolute;
-  left: 0;
-  top: 100%;
-  padding-top: 6px;
+  margin-top: -5px;
+  padding-top: 5px;
   z-index: 9999;
 }
 

@@ -35,16 +35,18 @@
 
   }
 }
-.content{
-  width: 100%; 
-  // overflow-y:auto;
- // max-height: 160px;
+.content {
+  width: 100%;
+  position: relative;
 }
 
 .match-info-default-container {
   display: grid;
   grid-template-columns: calc(50% - 7px) calc(50% - 7px);
   grid-gap: 10px;
+
+  overflow-y: auto;
+  max-height: 160px;
 
   @media screen and (max-width: $default-width) {
    grid-template-columns: 100%;

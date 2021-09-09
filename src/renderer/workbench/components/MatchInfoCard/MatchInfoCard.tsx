@@ -50,32 +50,6 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
                   <span className="usage-label">USAGE</span>
                 )}
                 <span className="usage-value">{match.usage}</span>
-                
-                {over ? (
-                  <div className="popover-container">
-                    <div className="component-details-matchinfo">
-                      <div className="tiny-container-detail-matchinfo">
-                        <p className="title-detail-matchinfo">License</p>
-                        <p className="desc-detail-matchinfo">{match?.license}</p>
-                      </div>
-                      <div className="tiny-container-detail-matchinfo">
-                        <p className="title-detail-matchinfo">PURL</p>
-                        <p className="desc-detail-matchinfo">{match?.purl}</p>
-                      </div>
-                      <div className="tiny-container-detail-matchinfo">
-                        <p className="title-detail-matchinfo">URL</p>
-                        <a
-                          href={match?.url}
-                          target="_blank"
-                          className="desc-detail-matchinfo url-matchinfo"
-                          rel="noreferrer"
-                        >
-                          {match?.url}
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
               </div>
             </div>
             <div className="match-info-card-buttons">
@@ -106,7 +80,7 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
                 <>
                   <Tooltip title="Remove identification">
                     <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_DETACH)}>
-                      <RestoreOutlined className="icon"/>
+                      <RestoreOutlined className="icon" />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="View identification">
@@ -119,6 +93,27 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
             </div>
           </div>
         </div>
+
+        {over && (
+          <div className="popover-container"  onMouseEnter={() => setOver(true)} onMouseLeave={() => setOver(false)} >
+            <div className="component-details-matchinfo">
+              <div className="tiny-container-detail-matchinfo">
+                <p className="title-detail-matchinfo">License</p>
+                <p className="desc-detail-matchinfo">{match?.license}</p>
+              </div>
+              <div className="tiny-container-detail-matchinfo">
+                <p className="title-detail-matchinfo">PURL</p>
+                <p className="desc-detail-matchinfo">{match?.purl}</p>
+              </div>
+              <div className="tiny-container-detail-matchinfo">
+                <p className="title-detail-matchinfo">URL</p>
+                <a href={match?.url} target="_blank" className="desc-detail-matchinfo url-matchinfo" rel="noreferrer">
+                  {match?.url}
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
       </article>
     </>
   );
