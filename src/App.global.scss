@@ -12,7 +12,6 @@ $indentified-green: #22c55e;
 $ignored-gray: #a1a1aa;
 $nomatch-black: #27272a;
 $blue-scanoss: #3B82F6;
-;
 
 // Screen sizes
 $default-width: 1280px;
@@ -48,8 +47,6 @@ $md: 780px;
 @import './renderer/workbench/components/LabelCard/LabelCard';
 @import './renderer/workbench/components/MatchInfoCard/MatchInfoCard';
 @import './renderer/workbench/components/InventoryCard/InventoryCard';
-@import './renderer/workbench/components/InventoryDialog/InventoryDialog';
-@import './renderer/workbench/components/ComponentDialog/ComponentDialog.scss';
 @import './renderer/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 @import './renderer/workbench/components/ComponentInfo/ComponentInfo.scss';
 @import './renderer/workbench/components/NoMatchFound/NoMatchFound.scss';
@@ -57,7 +54,6 @@ $md: 780px;
 @import './renderer/workspace/Workspace';
 @import './renderer/workspace/pages/NewProject/NewProject';
 @import './renderer/workbench/pages/ComponentList/components/ScanResults.scss';
-@import './renderer/workbench/components/LicenseDialog/LicenseDialog.scss';
 
 /* fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');

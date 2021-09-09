@@ -1,38 +1,41 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { Dialog, Paper, DialogActions, Button, makeStyles, InputBase, TextField, IconButton } from '@material-ui/core';
 
+import {
+  Dialog,
+  Tooltip,
+  Paper,
+  DialogActions,
+  Button,
+  makeStyles,
+  InputBase,
+  TextField,
+  IconButton,
+} from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import SearchIcon from '@material-ui/icons/Search';
 import AddIcon from '@material-ui/icons/Add';
 import { Autocomplete } from '@material-ui/lab';
-import { NewComponentDTO } from '../../../../api/types';
-import { DialogResponse, DIALOG_ACTIONS } from '../../../context/types';
-import { ResponseStatus } from '../../../../main/Response';
-import { componentService } from '../../../../api/component-service';
-import { licenseService } from '../../../../api/license-service';
-import { DialogContext } from '../../../context/DialogProvider';
+import { NewComponentDTO } from '../../../api/types';
+import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
+import { ResponseStatus } from '../../../main/Response';
+import { componentService } from '../../../api/component-service';
+import { licenseService } from '../../../api/license-service';
+import { DialogContext } from '../../context/DialogProvider';
 
 const useStyles = makeStyles((theme) => ({
-  dialog: {
-    width: 200,
+  size: {
+    '& .MuiDialog-paperWidthMd': {
+      width: '500px',
+    },
   },
-  paper: {
-    padding: '2px 4px',
-    display: 'flex',
-    alignItems: 'center',
+  componentVersion: {
+    display: 'grid',
+    gridTemplateColumns: '1.5fr 0.75fr',
+    gridGap: '20px',
   },
-  iconButton: {
-    padding: 7,
-  },
-  input: {
-    color: '#6c6c6e',
-    padding: theme.spacing(0.5),
-  },
-  autocomplete: {
-    color: '#6c6c6e',
-  },
-  actions: {
-    backgroundColor: 'var(--background-color-primary)',
+  search: {
+    padding: '10px 0px 10px 10px',
   },
 }));
 
@@ -109,19 +112,27 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   };
 
   return (
-    <Dialog id="ComponentDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
+    <Dialog
+      id="ComponentDialog"
+      className={`${classes.size} dialog`}
+      maxWidth="md"
+      scroll="body"
+      fullWidth
+      open={open}
+      onClose={onCancel}
+    >
       <span className="dialog-title">{label}</span>
+
       <form onSubmit={handleClose}>
-        <div className="identity-license">
-          <div className="component-version-container">
-            <div className="license-container">
-              <label>Component</label>
-              <Paper className={classes.paper}>
+        <div className="dialog-content">
+          <div className={`${classes.componentVersion} dialog-row`}>
+            <div className="dialog-form-field">
+              <label className="dialog-form-field-label">Component</label>
+              <Paper className="dialog-form-field-control">
                 <InputBase
                   name="name"
                   fullWidth
                   readOnly={readOnly}
-                  className={classes.input}
                   value={form?.name}
                   placeholder="Component"
                   onChange={(e) => inputHandler(e.target.name, e.target.value)}
@@ -129,13 +140,13 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                 />
               </Paper>
             </div>
-            <div className="license-container">
-              <label>Version</label>
-              <Paper className={classes.paper}>
+
+            <div className="dialog-form-field">
+              <label className="dialog-form-field-label">Version</label>
+              <Paper className="dialog-form-field-control">
                 <InputBase
                   name="version"
                   fullWidth
-                  className={classes.input}
                   value={form?.version}
                   placeholder="Version"
                   onChange={(e) => inputHandler(e.target.name, e.target.value)}
@@ -144,22 +155,20 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               </Paper>
             </div>
           </div>
-          <div className="license-container">
-            <div className="btn-label-container">
-              <div className="license-label-container">
-                <label>License</label>
-              </div>
-              <div className="license-btn-container">
+
+          <div className="dialog-form-field">
+            <div className="dialog-form-field-label">
+              <label>License</label>
+              <Tooltip title="Add new license">
                 <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
                   <AddIcon fontSize="inherit" />
                 </IconButton>
-              </div>
+              </Tooltip>
             </div>
-            <Paper className={classes.paper}>
-              <SearchIcon className={classes.iconButton} />
+            <Paper className="dialog-form-field-control">
+              <SearchIcon className={classes.search} />
               <Autocomplete
                 fullWidth
-                className={classes.input}
                 options={licenses || []}
                 value={{ id: form?.license_id, name: form?.license_name }}
                 getOptionSelected={(option, value) => option.id === value.id}
@@ -176,16 +185,16 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               />
             </Paper>
           </div>
+
           {!readOnly && (
             <>
-              <div className="license-container">
-                <label>PURL</label>
-                <Paper className={classes.paper}>
+              <div className="dialog-form-field">
+                <label className="dialog-form-field-label">PURL</label>
+                <Paper className="dialog-form-field-control">
                   <InputBase
                     name="purl"
                     placeholder="PURL"
                     fullWidth
-                    className={classes.input}
                     value={form?.purl}
                     onChange={(e) => inputHandler(e.target.name, e.target.value)}
                     required
@@ -193,14 +202,13 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                 </Paper>
               </div>
 
-              <div className="license-container">
-                <label>URL</label>
-                <Paper className={classes.paper}>
+              <div className="dialog-form-field">
+                <label className="dialog-form-field-label">URL</label>
+                <Paper className="dialog-form-field-control">
                   <InputBase
                     name="url"
                     placeholder="URL"
                     fullWidth
-                    className={classes.input}
                     value={form?.url}
                     onChange={(e) => inputHandler(e.target.name, e.target.value)}
                     required
@@ -210,6 +218,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
             </>
           )}
         </div>
+
         <DialogActions>
           <Button onClick={onCancel}>Cancel</Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>

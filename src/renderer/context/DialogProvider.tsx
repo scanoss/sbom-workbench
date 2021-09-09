@@ -1,11 +1,13 @@
+/* eslint-disable import/no-cycle */
+
 import React, { useState } from 'react';
-import { InventoryDialog } from '../workbench/components/InventoryDialog/InventoryDialog';
+import { InventoryDialog } from '../ui/dialog/InventoryDialog';
 import { Component, Inventory, License, NewComponentDTO } from '../../api/types';
 import { InventorySelectorDialog } from '../workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse } from './types';
 import { ConfirmDialog } from '../ui/dialog/ConfirmDialog';
-import { LicenseDialog } from '../workbench/components/LicenseDialog/LicenseDialog';
-import { ComponentDialog } from '../workbench/components/ComponentDialog/ComponentDialog';
+import { LicenseDialog } from '../ui/dialog/LicenseDialog';
+import { ComponentDialog } from '../ui/dialog/ComponentDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
@@ -113,7 +115,7 @@ export const DialogProvider: React.FC = ({ children }) => {
     onClose?: (response: DialogResponse) => void;
   }>({ open: false , component: {} });
 
-  const openComponentDialog = (component: Partial<NewComponentDTO> = {}, label = 'Create component') => {
+  const openComponentDialog = (component: Partial<NewComponentDTO> = {}, label = 'Create Component') => {
     return new Promise<DialogResponse>((resolve) => {
       setComponentDialog({
         open: true,
