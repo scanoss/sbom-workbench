@@ -178,7 +178,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
           </div>
           {!readOnly && (
             <>
-              <div className="license-container">
+              <div className={"license-container"}>
                 <label>PURL</label>
                 <Paper className={classes.paper}>
                   <InputBase

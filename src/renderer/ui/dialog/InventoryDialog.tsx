@@ -16,35 +16,27 @@ import SearchIcon from '@material-ui/icons/Search';
 import AddIcon from '@material-ui/icons/Add';
 import React, { useEffect, useState, useContext } from 'react';
 import { Autocomplete } from '@material-ui/lab';
-import { Inventory } from '../../../../api/types';
-import { InventoryForm } from '../../../context/types';
-import { componentService } from '../../../../api/component-service';
-import { licenseService } from '../../../../api/license-service';
-import { DialogContext } from '../../../context/DialogProvider';
-import { ResponseStatus } from '../../../../main/Response';
-import ComponentDialog from '../ComponentDialog/ComponentDialog';
+import { Inventory } from '../../../api/types';
+import { InventoryForm } from '../../context/types';
+import { componentService } from '../../../api/component-service';
+import { licenseService } from '../../../api/license-service';
+import { DialogContext } from '../../context/DialogProvider';
+import { ResponseStatus } from '../../../main/Response';
+import ComponentDialog from '../../workbench/components/ComponentDialog/ComponentDialog';
 
 const useStyles = makeStyles((theme) => ({
-  dialog: {
-    width: 400,
+  usageNotes: {
+    display: 'grid',
+    gridTemplateColumns: '0.75fr 1fr',
+    gridGap: '20px',
   },
-  paper: {
-    padding: '2px 4px',
-    display: 'flex',
-    alignItems: 'center',
+  componentVersion: {
+    display: 'grid',
+    gridTemplateColumns: '1.5fr 0.75fr',
+    gridGap: '20px',
   },
-  iconButton: {
-    padding: 7,
-  },
-  input: {
-    color: '#6c6c6e',
-    padding: theme.spacing(0.5),
-  },
-  autocomplete: {
-    color: '#6c6c6e',
-  },
-  actions: {
-    backgroundColor: 'var(--background-color-primary)',
+  search: {
+    padding: '10px 0px 10px 10px',
   },
   option: {
     display: 'flex',
@@ -52,8 +44,8 @@ const useStyles = makeStyles((theme) => ({
     '& span.middle': {
       fontSize: '0.8rem',
       color: '#6c6c6e',
-    }
-  }
+    },
+  },
 }));
 
 interface InventoryDialogProps {
@@ -190,27 +182,30 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   }, [versions]);
 
   return (
-    <Dialog id="InventoryDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
+    <Dialog
+      id="InventoryDialog"
+      className="dialog"
+      maxWidth="md"
+      scroll="body"
+      fullWidth
+      open={open}
+      onClose={onCancel}
+    >
       <span className="dialog-title">Identify Component</span>
       <form onSubmit={handleClose}>
-        <div className="identity-component">
-          <div className="component-version-container">
-            <div className="component-container">
-              <div className="btn-label-container">
-                <div className="component-label-container">
-                  <label>Component</label>
-                </div>
-                <div className="component-btn-container">
-                  <IconButton color="inherit" size="small" onClick={openComponentDialog}>
-                    <AddIcon fontSize="inherit" />
-                  </IconButton>
-                </div>
+        <div className="dialog-content">
+          <div className={`${classes.componentVersion} dialog-row`}>
+            <div className="dialog-form-field">
+              <div className="dialog-form-field-label">
+                <label>Component</label>
+                <IconButton color="inherit" size="small" onClick={openComponentDialog}>
+                  <AddIcon fontSize="inherit" />
+                </IconButton>
               </div>
-              <Paper className={classes.paper}>
-                <SearchIcon className={classes.iconButton} />
+              <Paper className="dialog-form-field-control">
+                <SearchIcon className={classes.search} />
                 <Autocomplete
                   fullWidth
-                  className={classes.input}
                   options={components || []}
                   value={{ name: form?.component, purl: form?.purl }}
                   getOptionSelected={(option, value) => option.purl === value.purl}
@@ -229,29 +224,24 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       InputProps={{
                         ...params.InputProps,
                         disableUnderline: true,
-                        className: classes.autocomplete,
+                        className: 'autocomplete-option',
                       }}
                     />
                   )}
                 />
               </Paper>
             </div>
-            <div className="component-container">
-              <div className="btn-label-container">
-                <div className="component-label-container">
-                  <label>Version</label>
-                </div>
-                <div className="component-btn-container">
-                  <IconButton color="inherit" size="small" onClick={openComponentVersionDialog}>
-                    <AddIcon fontSize="inherit" />
-                  </IconButton>
-                </div>
+            <div className="dialog-form-field">
+              <div className="dialog-form-field-label">
+                <label>Version</label>
+                <IconButton color="inherit" size="small" onClick={openComponentVersionDialog}>
+                  <AddIcon fontSize="inherit" />
+                </IconButton>
               </div>
-              <Paper className={classes.paper}>
-                <SearchIcon className={classes.iconButton} />
+              <Paper className="dialog-form-field-control">
+                <SearchIcon className={classes.search} />
                 <Autocomplete
                   fullWidth
-                  className={classes.input}
                   options={versions || []}
                   value={form?.version || ''}
                   disableClearable
@@ -263,7 +253,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       InputProps={{
                         ...params.InputProps,
                         disableUnderline: true,
-                        className: classes.autocomplete,
+                        className: 'autocomplete-option',
                       }}
                     />
                   )}
@@ -271,80 +261,75 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               </Paper>
             </div>
           </div>
-          <div className="component-container">
-            <div className="btn-label-container">
-              <div className="license-label-container">
+
+          <div className="dialog-row">
+            <div className="dialog-form-field">
+              <div className="dialog-form-field-label">
                 <label>License</label>
-              </div>
-              <div className="license-btn-container">
                 <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
                   <AddIcon fontSize="inherit" />
                 </IconButton>
               </div>
+              <Paper className="dialog-form-field-control">
+                <SearchIcon className={classes.search} />
+                <Autocomplete
+                  fullWidth
+                  options={licenses || []}
+                  groupBy={(option) => option?.type}
+                  value={form.license_name || ''}
+                  getOptionSelected={(option) => option.name === form.license_name}
+                  getOptionLabel={(option) => option.name || option}
+                  disableClearable
+                  renderInput={(params) => (
+                    <TextField
+                      required
+                      {...params}
+                      InputProps={{
+                        ...params.InputProps,
+                        disableUnderline: true,
+                        className: 'autocomplete-option',
+                      }}
+                    />
+                  )}
+                  onChange={(e, value) => autocompleteHandler('license_name', value.name)}
+                />
+              </Paper>
             </div>
-            <Paper className={classes.paper}>
-              <SearchIcon className={classes.iconButton} />
-              <Autocomplete
-                fullWidth
-                className={classes.input}
-                options={licenses || []}
-                groupBy={(option) => option?.type}
-                value={form.license_name || ''}
-                getOptionSelected={(option) => option.name === form.license_name}
-                getOptionLabel={(option) => option.name || option}
-                disableClearable
-                renderInput={(params) => (
-                  <TextField
-                    required
-                    {...params}
-                    InputProps={{
-                      ...params.InputProps,
-                      disableUnderline: true,
-                      className: classes.autocomplete,
-                    }}
-                  />
-                )}
-                onChange={(e, value) => autocompleteHandler('license_name', value.name)}
-              />
-            </Paper>
           </div>
-          <div className="component-container">
-            <label>URL</label>
-            <Paper className={classes.paper}>
-              <InputBase
-                name="url"
-                fullWidth
-                readOnly
-                className={classes.input}
-                value={form?.url}
-                onChange={(e) => inputHandler(e)}
-                required
-              />
-            </Paper>
+
+          <div className="dialog-row">
+            <div className="dialog-form-field">
+              <label className="dialog-form-field-label">URL</label>
+              <Paper className="dialog-form-field-control">
+                <InputBase name="url" fullWidth readOnly value={form?.url} onChange={(e) => inputHandler(e)} required />
+              </Paper>
+            </div>
           </div>
-          <div className="component-container">
-            <label>PURL</label>
-            <Paper className={classes.paper}>
-              <InputBase
-                name="purl"
-                fullWidth
-                readOnly
-                value={form?.purl || ''}
-                className={classes.input}
-                onChange={(e) => inputHandler(e)}
-                required
-              />
-            </Paper>
+
+          <div className="dialog-row">
+            <div className="dialog-form-field">
+              <label className="dialog-form-field-label">PURL</label>
+              <Paper className="dialog-form-field-control">
+                <InputBase
+                  name="purl"
+                  fullWidth
+                  readOnly
+                  value={form?.purl || ''}
+                  onChange={(e) => inputHandler(e)}
+                  required
+                />
+              </Paper>
+            </div>
           </div>
-          <div className="usage-notes">
-            <div>
-              <label>Usage</label>
-              <Paper className={classes.paper}>
+
+          <div className={`${classes.usageNotes} dialog-row`}>
+            <div className="dialog-form-field">
+              <label className="dialog-form-field-label">Usage</label>
+              <Paper className="dialog-form-field-control">
                 <Select
                   name="usage"
                   fullWidth
                   value={form?.usage || ''}
-                  className={classes.input}
                   disableUnderline
                   onChange={(e) => inputHandler(e)}
                 >
@@ -354,13 +339,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 </Select>
               </Paper>
             </div>
-            <div>
-              <label>Notes</label>
-              <Paper className={classes.paper}>
+
+            <div className="dialog-form-field">
+              <label className="dialog-form-field-label">Notes</label>
+              <Paper className="dialog-form-field-control">
                 <TextareaAutosize
                   name="notes"
                   value={form?.notes || ''}
-                  className={classes.input}
                   cols={30}
                   rows={8}
                   onChange={(e) => inputHandler(e)}
