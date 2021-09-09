@@ -14,8 +14,6 @@
     background-color: #f4f4f5;
   }
 
-
-
   .dialog-title {
     padding: 20px;
     font-size: 24px;
@@ -28,15 +26,23 @@
   }
 
   .dialog-content {
+      padding: 20px 24px;
       background-color: rgba(244, 244, 245, 1);
       overflow: hidden;
   }
 
-  .dialog-row {
-    margin: 20px 24px;
+  .dialog-content > .dialog-form-field {
+    &:first-child { margin-top: 0; }
   }
 
+  .dialog-content > .dialog-row:first-child > .dialog-form-field {
+      margin-top: 0;
+  }
+
+
   .dialog-form-field {
+    margin: 20px 0 0;
+
     .dialog-form-field-label {
       display: flex;
       align-items: center;

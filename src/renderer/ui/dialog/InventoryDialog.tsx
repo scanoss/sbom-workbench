@@ -1,4 +1,6 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable jsx-a11y/label-has-associated-control */
+
 import {
   Dialog,
   Paper,
@@ -25,6 +27,11 @@ import { DialogContext } from '../../context/DialogProvider';
 import { ResponseStatus } from '../../../main/Response';
 
 const useStyles = makeStyles((theme) => ({
+  size: {
+    '& .MuiDialog-paperWidthMd': {
+      width: '700px',
+    },
+  },
   usageNotes: {
     display: 'grid',
     gridTemplateColumns: '0.75fr 1fr',
@@ -52,7 +59,7 @@ interface InventoryDialogProps {
   open: boolean;
   inventory: Partial<InventoryForm>;
   onClose: (inventory: Inventory) => void;
-  onCancel?: () => void;
+  onCancel: () => void;
 }
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
@@ -184,7 +191,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   return (
     <Dialog
       id="InventoryDialog"
-      className="dialog"
+      className={`${classes.size} dialog`}
       maxWidth="md"
       scroll="body"
       fullWidth
@@ -192,6 +199,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       onClose={onCancel}
     >
       <span className="dialog-title">Identify Component</span>
+
       <form onSubmit={handleClose}>
         <div className="dialog-content">
           <div className={`${classes.componentVersion} dialog-row`}>
@@ -233,6 +241,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 />
               </Paper>
             </div>
+
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
                 <label>Version</label>
