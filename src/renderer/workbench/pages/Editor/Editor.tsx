@@ -153,7 +153,7 @@ export const Editor = () => {
     const response = await dialogCtrl.openInventory({});
     if (response) {
       const node = await projectService.getNodeFromPath(file);
-
+      console.log(node);
       if (node.action === 'filter') {
         await resultService.createFiltered(file); // idtype=forceinclude
       } else await resultService.updateNoMatchToFile(file);
