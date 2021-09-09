@@ -50,7 +50,7 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
                   <span className="usage-label">USAGE</span>
                 )}
                 <span className="usage-value">{match.usage}</span>
-
+                
                 {over ? (
                   <div className="popover-container">
                     <div className="component-details-matchinfo">
