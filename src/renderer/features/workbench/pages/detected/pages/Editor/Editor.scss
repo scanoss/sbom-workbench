@@ -49,8 +49,9 @@
 
   overflow-y: auto;
   max-height: 160px;
+  padding: 3px 0;
 
-  @media screen and (max-width: $default-width) {
+  @media screen and (max-width: $md) {
    grid-template-columns: 100%;
     .match-card {
       margin: 0;
