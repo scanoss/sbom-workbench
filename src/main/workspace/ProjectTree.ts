@@ -266,6 +266,9 @@ export class ProjectTree extends EventEmitter {
     console.log(`SCANNER: Start scanning path=${this.scan_root}`);
 
     // this.scanner.scanJsonList(this.filesToScan, this.scan_root);
+    // eslint-disable-next-line prettier/prettier
+    this.filesToScan.forEach((value, index, arr) => {arr[index] = { path: arr[index], scanMode: "MD5_SCAN" } } )
+    console.log(this.filesToScan);
     this.scanner.scanList(this.filesToScan, this.scan_root);
   }
 
