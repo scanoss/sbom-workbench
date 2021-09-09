@@ -2,12 +2,12 @@ import React from 'react';
 import { HashRouter, Route } from 'react-router-dom';
 import './App.global.scss';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import { WorkbenchProvider } from './renderer/workbench/store';
+import { WorkbenchProvider } from './renderer/features/workbench/store';
 import { DialogProvider } from './renderer/context/DialogProvider';
-import Workbench from './renderer/workbench/Workbench';
+import Workbench from './renderer/features/workbench/Workbench';
 import AppProvider from './renderer/context/AppProvider';
-import Workspace from './renderer/workspace/Workspace';
-import NewProject from './renderer/workspace/pages/NewProject/NewProject';
+import Workspace from './renderer/features/workspace/Workspace';
+import NewProject from './renderer/features/workspace/pages/NewProject/NewProject';
 
 const theme = createMuiTheme({
   palette: {

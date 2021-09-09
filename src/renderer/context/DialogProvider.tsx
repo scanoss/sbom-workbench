@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { InventoryDialog } from '../ui/dialog/InventoryDialog';
 import { Component, Inventory, License, NewComponentDTO } from '../../api/types';
-import { InventorySelectorDialog } from '../workbench/components/InventorySelectorDialog/InventorySelectorDialog';
+import { InventorySelectorDialog } from '../features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse } from './types';
 import { ConfirmDialog } from '../ui/dialog/ConfirmDialog';
 import { LicenseDialog } from '../ui/dialog/LicenseDialog';
