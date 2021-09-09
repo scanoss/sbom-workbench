@@ -30,30 +30,29 @@ $md: 780px;
 @import './theme/Dialog.global.scss';
 
 /* components */
-@import './renderer/home/Home';
-@import './renderer/workbench/components/AppBar/AppBar';
-@import './renderer/workbench/Workbench';
-@import 'renderer/workbench/pages/Editor/Editor';
-@import './renderer/workbench/pages/ComponentList/ComponentList';
-@import './renderer/workbench/pages/ComponentDetail/ComponentDetail';
-@import './renderer/workbench/pages/InventoryDetail/InventoryDetail.scss';
-@import './renderer/workbench/components/FileTree/FileTree';
-@import './renderer/workbench/components/ComponentCard/ComponentCard';
-@import './renderer/workbench/components/RecognizedCard/RecognizedCard';
-@import './renderer/workbench/components/Label/Label';
-@import './renderer/workbench/components/Pill/Pill';
-@import './renderer/workbench/components/Title/Title';
-@import './renderer/workbench/components/MatchCard/MatchCard';
-@import './renderer/workbench/components/LabelCard/LabelCard';
-@import './renderer/workbench/components/MatchInfoCard/MatchInfoCard';
-@import './renderer/workbench/components/InventoryCard/InventoryCard';
-@import './renderer/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
-@import './renderer/workbench/components/ComponentInfo/ComponentInfo.scss';
-@import './renderer/workbench/components/NoMatchFound/NoMatchFound.scss';
-@import './renderer/report/Report.scss';
-@import './renderer/workspace/Workspace';
-@import './renderer/workspace/pages/NewProject/NewProject';
-@import './renderer/workbench/pages/ComponentList/components/ScanResults.scss';
+@import 'renderer/features/workspace/Workspace';
+@import 'renderer/features/workspace/pages/NewProject/NewProject';
+@import 'renderer/features/workbench/Workbench';
+@import 'renderer/features/workbench/pages/report/Report.scss';
+@import 'renderer/features/workbench/pages/detected/pages/Editor/Editor';
+@import 'renderer/features/workbench/pages/detected/pages/ComponentList/ComponentList';
+@import 'renderer/features/workbench/pages/detected/pages/ComponentDetail/ComponentDetail';
+@import 'renderer/features/workbench/pages/identified/pages/InventoryDetail/InventoryDetail.scss';
+@import 'renderer/features/workbench/components/AppBar/AppBar';
+@import 'renderer/features/workbench/components/FileTree/FileTree';
+@import 'renderer/features/workbench/components/ComponentCard/ComponentCard';
+@import 'renderer/features/workbench/components/RecognizedCard/RecognizedCard';
+@import 'renderer/features/workbench/components/Label/Label';
+@import 'renderer/features/workbench/components/Pill/Pill';
+@import 'renderer/features/workbench/components/Title/Title';
+@import 'renderer/features/workbench/components/MatchCard/MatchCard';
+@import 'renderer/features/workbench/components/LabelCard/LabelCard';
+@import 'renderer/features/workbench/components/MatchInfoCard/MatchInfoCard';
+@import 'renderer/features/workbench/components/InventoryCard/InventoryCard';
+@import 'renderer/features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
+@import 'renderer/features/workbench/components/ComponentInfo/ComponentInfo.scss';
+@import 'renderer/features/workbench/components/NoMatchFound/NoMatchFound.scss';
+
 
 /* fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
