@@ -2,35 +2,22 @@
 import { Dialog, Paper, DialogActions, Button, makeStyles, InputBase, TextareaAutosize } from '@material-ui/core';
 
 import React, { useContext, useEffect, useState } from 'react';
-import { License } from '../../../../api/types';
-import { licenseService } from '../../../../api/license-service';
-import { DialogResponse, DIALOG_ACTIONS } from '../../../context/types';
-import { ResponseStatus } from '../../../../main/Response';
+import { License } from '../../../api/types';
+import { licenseService } from '../../../api/license-service';
+import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
+import { ResponseStatus } from '../../../main/Response';
 
 // TO DO
-import { DialogContext } from '../../../context/DialogProvider';
+import { DialogContext } from '../../context/DialogProvider';
 
 const useStyles = makeStyles((theme) => ({
-  dialog: {
-    width: 200,
+  size: {
+    '& .MuiDialog-paperWidthMd': {
+      width: '500px',
+    },
   },
-  paper: {
-    padding: '2px 4px',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  iconButton: {
-    padding: 7,
-  },
-  input: {
-    color: '#6c6c6e',
-    padding: theme.spacing(0.5),
-  },
-  autocomplete: {
-    color: '#6c6c6e',
-  },
-  actions: {
-    backgroundColor: 'var(--background-color-primary)',
+  search: {
+    padding: '10px 0px 10px 10px',
   },
 }));
 
@@ -55,7 +42,6 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
 
   const handleClose = async (e) => {
     e.preventDefault();
-    console.log(e);
     try {
       const license: Partial<License> = form;
       const response = await licenseService.create(license);
@@ -75,56 +61,60 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
   };
 
   return (
-    <Dialog id="LicenseDialog" maxWidth="md" scroll="body" fullWidth open={open} onClose={onCancel}>
-      <span className="dialog-title">Create license</span>
+    <Dialog
+      id="LicenseDialog"
+      maxWidth="md"
+      scroll="body"
+      className={`${classes.size} dialog`}
+      fullWidth
+      open={open}
+      onClose={onCancel}
+    >
+      <span className="dialog-title">Create License</span>
       <form onSubmit={handleClose}>
-        <div className="identity-license">
-          <div className="license-container">
-            <label>Name</label>
-            <Paper className={classes.paper}>
+        <div className="dialog-content">
+          <div className="dialog-form-field">
+            <label className="dialog-form-field-label">Name</label>
+            <Paper className="dialog-form-field-control">
               <InputBase
                 name="name"
                 fullWidth
-                className={classes.input}
                 value={form?.name}
                 onChange={(e) => inputHandler(e)}
                 required
               />
             </Paper>
           </div>
-          <div className="license-container">
-            <label>SPDX ID</label>
-            <Paper className={classes.paper}>
+          <div className="dialog-form-field">
+            <label className="dialog-form-field-label">SPDX ID</label>
+            <Paper className="dialog-form-field-control">
               <InputBase
                 name="spdxid"
                 fullWidth
-                className={classes.input}
                 value={form?.spdxid}
                 onChange={(e) => inputHandler(e)}
                 required
               />
             </Paper>
           </div>
-          <div className="license-container">
-            <label>Full text</label>
-            <Paper className={classes.paper}>
+          <div className="dialog-form-field">
+            <label className="dialog-form-field-label">Full text</label>
+            <Paper className="dialog-form-field-control">
               <TextareaAutosize
                 name="fulltext"
                 value={form?.fulltext}
-                className={classes.input}
                 cols={30}
                 rows={8}
                 onChange={(e) => inputHandler(e)}
               />
             </Paper>
           </div>
-          <div className="license-container">
-            <label>URL</label>
-            <Paper className={classes.paper}>
+          <div className="dialog-form-field">
+            <label className="dialog-form-field-label">URL</label>
+            <Paper className="dialog-form-field-control">
               <InputBase
                 name="url"
                 fullWidth
-                className={classes.input}
                 value={form?.url}
                 onChange={(e) => inputHandler(e)}
                 required
