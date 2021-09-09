@@ -18,8 +18,6 @@ import { licenses } from '../db/licenses';
 import { Scanner } from '../scannerLib/Scanner';
 import { ScannerEvents } from '../scannerLib/ScannerEvents';
 import { IpcEvents } from '../../ipc-events';
-import { ipcMain } from 'electron';
-import { timeStamp } from 'console';
 import { defaultBannedList } from './filtering/defaultFilter';
 
 // const fs = require('fs');

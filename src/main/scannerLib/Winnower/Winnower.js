@@ -8,11 +8,22 @@ const stringWorker = `
 const { parentPort } = require('worker_threads');
 
 parentPort.on('message', async (scannableItem) => {
-  const fingerprint = wfp_for_content(
-    scannableItem.content,
-    scannableItem.contentSource
-  );
+
+  let fingerprint;
+  if ( scannableItem.scanMode === "FULL_SCAN") {
+    fingerprint = wfp_for_content(
+      scannableItem.content,
+      scannableItem.contentSource
+    );
+  } else {
+    fingerprint = wfp_only_md5(
+      scannableItem.content,
+      scannableItem.contentSource
+    );
+  }
+
   scannableItem.fingerprint = fingerprint;
+
   parentPort.postMessage(scannableItem);
 });
 
@@ -59,9 +70,14 @@ function min_hex_array(array) {
 }
 
 function wfp_for_content(contents, contentSource) {
+  let wfp = wfp_only_md5(contents, contentSource);
+  wfp += calc_wfp(contents);
+  return wfp;
+}
+
+function wfp_only_md5(contents, contentSource) {
   const file_md5 = crypto.createHash('md5').update(contents).digest('hex');
   let wfp = 'file=' + String(file_md5) + ',' + String(contents.length) + ',' + String(contentSource)+ String.fromCharCode(10);
-  wfp += calc_wfp(contents);
   return wfp;
 }
 
@@ -271,11 +287,23 @@ export class Winnower extends EventEmitter {
   }
 
   async #getNextScannableItem() {
-    const contentSource = this.#fileList[this.#fileListIndex].replace(this.#scanRoot, '');
-    const content = await fs.promises.readFile(this.#fileList[this.#fileListIndex]);
+    let path = this.#fileList[this.#fileListIndex];
+    let scanMode = 'FULL_SCAN';
+
+    // Some items in this.#fileList could be an object cointaining the scanMode (FULL_SCAN or MD5_SCAN)
+    if (typeof this.#fileList[this.#fileListIndex] === 'object') {
+      path = this.#fileList[this.#fileListIndex].path;
+      scanMode = this.#fileList[this.#fileListIndex].scanMode;
+    }
+
+    const contentSource = path.replace(this.#scanRoot, '');
+    const content = await fs.promises.readFile(path);
     this.#fileListIndex += 1;
     if (this.#fileListIndex >= this.#fileList.length) return null;
-    return new ScannableItem(contentSource, content);
+
+    const scannable = new ScannableItem(contentSource, content, scanMode);
+
+    return scannable;
   }
 
   async #nextStepMachine() {

@@ -136,7 +136,7 @@ export class Scanner extends EventEmitter {
   }
 
   async scanList(fileList, scanRoot = '') {
-    // Ensures to create a unique folder for each scanner instance in case no workDirectory was specified.
+    // Ensures to create a unique folder for each scanner instance in case of workDirectory was not specified.
     if (this.#workDirectory === undefined) {
       await this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
     }
