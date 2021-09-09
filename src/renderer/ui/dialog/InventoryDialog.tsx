@@ -23,7 +23,6 @@ import { componentService } from '../../../api/component-service';
 import { licenseService } from '../../../api/license-service';
 import { DialogContext } from '../../context/DialogProvider';
 import { ResponseStatus } from '../../../main/Response';
-import ComponentDialog from '../../workbench/components/ComponentDialog/ComponentDialog';
 
 const useStyles = makeStyles((theme) => ({
   usageNotes: {
