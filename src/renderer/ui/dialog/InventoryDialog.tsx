@@ -11,6 +11,7 @@ import {
   TextareaAutosize,
   TextField,
   IconButton,
+  Tooltip,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import AddIcon from '@material-ui/icons/Add';
@@ -198,9 +199,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
                 <label>Component</label>
-                <IconButton color="inherit" size="small" onClick={openComponentDialog}>
-                  <AddIcon fontSize="inherit" />
-                </IconButton>
+                <Tooltip title="Add new component">
+                  <IconButton color="inherit" size="small" onClick={openComponentDialog}>
+                    <AddIcon fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
               </div>
               <Paper className="dialog-form-field-control">
                 <SearchIcon className={classes.search} />
@@ -234,9 +237,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
                 <label>Version</label>
-                <IconButton color="inherit" size="small" onClick={openComponentVersionDialog}>
-                  <AddIcon fontSize="inherit" />
-                </IconButton>
+                <Tooltip title="Add new version">
+                  <IconButton color="inherit" size="small" onClick={openComponentVersionDialog}>
+                    <AddIcon fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
               </div>
               <Paper className="dialog-form-field-control">
                 <SearchIcon className={classes.search} />
@@ -266,9 +271,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
                 <label>License</label>
-                <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
-                  <AddIcon fontSize="inherit" />
-                </IconButton>
+                <Tooltip title="Add new license">
+                  <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
+                    <AddIcon fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
               </div>
               <Paper className="dialog-form-field-control">
                 <SearchIcon className={classes.search} />
