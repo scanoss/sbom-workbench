@@ -4,6 +4,12 @@ import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
 
+
+export enum FileType {
+    BYNARY = 'bynary',
+}
+
+
 ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
   const fileContent = { content: '' };
   // filePath = filePath.replace(defaultProject.getScanRoot(),'');
@@ -11,7 +17,7 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
     const isBin = isBinaryFileSync(filePath);
 
     if (isBin) {
-      fileContent.content = `Can not show content of binary file ${filePath} (yet ;-) )`;
+      fileContent.content = FileType.BYNARY;
     } else {
       const file = fs.readFileSync(filePath).toString();
       fileContent.content = file;

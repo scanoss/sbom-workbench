@@ -16,6 +16,7 @@ import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { resultService } from '../../../../../../../api/results-service';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import { projectService } from '../../../../../../../api/project-service';
+import { FileType } from '../../../../../../../main/file';
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -68,6 +69,7 @@ export const Editor = () => {
     try {
       setLocalFileContent({ content: null, error: false });
       const content = await workbenchController.fetchLocalFile(scanBasePath + path);
+      if (content === FileType.BYNARY) throw new Error(FileType.BYNARY);
       setLocalFileContent({ content, error: false });
     } catch (error) {
       setLocalFileContent({ content: null, error: true });

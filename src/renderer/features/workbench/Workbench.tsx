@@ -15,6 +15,7 @@ import Report from './pages/report/Report';
 
 const Workbench = () => {
   const { path } = useRouteMatch();
+ 
   const { pathname } = useLocation();
 
   const { state, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
