@@ -3,11 +3,8 @@ import { ipcMain } from 'electron';
 import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
+import { FileType } from '../api/types';
 
-
-export enum FileType {
-    BYNARY = 'bynary',
-}
 
 
 ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
@@ -17,7 +14,7 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
     const isBin = isBinaryFileSync(filePath);
 
     if (isBin) {
-      fileContent.content = FileType.BYNARY;
+      fileContent.content = FileType.BINARY;
     } else {
       const file = fs.readFileSync(filePath).toString();
       fileContent.content = file;
