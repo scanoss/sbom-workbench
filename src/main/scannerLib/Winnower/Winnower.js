@@ -2,16 +2,28 @@ import { Worker, isMainThread, parentPort } from 'worker_threads';
 import fs from 'fs';
 import EventEmitter from 'events';
 import { ScannerEvents } from '../ScannerEvents.js';
+import { ScannableItem } from '../Scannable/ScannableItem.js';
 
 const stringWorker = `
 const { parentPort } = require('worker_threads');
 
 parentPort.on('message', async (scannableItem) => {
-  const fingerprint = wfp_for_content(
-    scannableItem.content,
-    scannableItem.contentSource
-  );
+
+  let fingerprint;
+  if ( scannableItem.scanMode === "FULL_SCAN") {
+    fingerprint = wfp_for_content(
+      scannableItem.content,
+      scannableItem.contentSource
+    );
+  } else {
+    fingerprint = wfp_only_md5(
+      scannableItem.content,
+      scannableItem.contentSource
+    );
+  }
+
   scannableItem.fingerprint = fingerprint;
+
   parentPort.postMessage(scannableItem);
 });
 
@@ -58,9 +70,14 @@ function min_hex_array(array) {
 }
 
 function wfp_for_content(contents, contentSource) {
+  let wfp = wfp_only_md5(contents, contentSource);
+  wfp += calc_wfp(contents);
+  return wfp;
+}
+
+function wfp_only_md5(contents, contentSource) {
   const file_md5 = crypto.createHash('md5').update(contents).digest('hex');
   let wfp = 'file=' + String(file_md5) + ',' + String(contents.length) + ',' + String(contentSource)+ String.fromCharCode(10);
-  wfp += calc_wfp(contents);
   return wfp;
 }
 
@@ -209,11 +226,13 @@ export class Winnower extends EventEmitter {
   // Configurable parameters
   #WFP_FILE_MAX_SIZE = 64 * 1000;
 
-  #scannable;
+  #fileList;
+
+  #fileListIndex;
 
   #tmpPath;
 
-  #wfpFilePath;
+  #scanRoot;
 
   #wfp;
 
@@ -223,8 +242,6 @@ export class Winnower extends EventEmitter {
 
   #isRunning;
 
-  #winnowedList; // Keep a list of scannableItems processed in the current .wfp file. After a .wfp is created the list will clear
-
   constructor() {
     super();
     this.init();
@@ -232,12 +249,10 @@ export class Winnower extends EventEmitter {
 
   init() {
     this.#wfp = '';
-    this.#winnowedList = [];
     this.#continue = true;
     this.#worker = new Worker(stringWorker, { eval: true });
     this.#worker.on('message', async (scannableItem) => {
       await this.#storeResult(scannableItem.fingerprint);
-      this.#winnowedList.push(scannableItem.contentSource);
       await this.#nextStepMachine();
     });
   }
@@ -260,7 +275,6 @@ export class Winnower extends EventEmitter {
 
     if (this.#wfp.length + winnowingResult.length >= this.#WFP_FILE_MAX_SIZE) {
       await this.#createWfpFile(this.#wfp, this.#tmpPath, new Date().getTime());
-      await this.#appendWinnowingFile(this.#wfp, this.#wfpFilePath);
       this.#wfp = '';
     }
     this.#wfp += winnowingResult;
@@ -269,28 +283,37 @@ export class Winnower extends EventEmitter {
   async #createWfpFile(content, dst, name) {
     if (!fs.existsSync(dst)) fs.mkdirSync(dst);
     await fs.promises.writeFile(`${dst}/${name}.wfp`, content);
-    await this.#persistWinnowedList();
     this.emit(ScannerEvents.WINNOWING_NEW_WFP_FILE, `${dst}/${name}.wfp`);
   }
 
-  async #persistWinnowedList() {
-    await fs.promises.appendFile(`${this.#tmpPath}/winnowedList.json`, this.#winnowedList);
-    this.#winnowedList = [];
-  }
+  async #getNextScannableItem() {
+    let path = this.#fileList[this.#fileListIndex];
+    let scanMode = 'FULL_SCAN';
 
-  async #appendWinnowingFile(content, dst) {
-    await fs.promises.appendFile(dst, content);
+    // Some items in this.#fileList could be an object cointaining the scanMode (FULL_SCAN or MD5_SCAN)
+    if (typeof this.#fileList[this.#fileListIndex] === 'object') {
+      path = this.#fileList[this.#fileListIndex].path;
+      scanMode = this.#fileList[this.#fileListIndex].scanMode;
+    }
+
+    const contentSource = path.replace(this.#scanRoot, '');
+    const content = await fs.promises.readFile(path);
+    this.#fileListIndex += 1;
+    if (this.#fileListIndex >= this.#fileList.length) return null;
+
+    const scannable = new ScannableItem(contentSource, content, scanMode);
+
+    return scannable;
   }
 
   async #nextStepMachine() {
     if (!this.#continue) return;
-    const scannableItem = await this.#scannable.getNextScannableItem();
-    if (this.#scannable.hasNextScannableItem()) {
+    const scannableItem = await this.#getNextScannableItem();
+    if (scannableItem) {
       this.#worker.postMessage(scannableItem);
     } else {
       if (this.#wfp.length !== 0) {
         await this.#createWfpFile(this.#wfp, this.#tmpPath, new Date().getTime());
-        await this.#appendWinnowingFile(this.#wfp, this.#wfpFilePath);
       }
       this.#isRunning = false;
       this.emit(ScannerEvents.WINNOWING_FINISHED);
@@ -298,10 +321,13 @@ export class Winnower extends EventEmitter {
     }
   }
 
-  async startMachine(scannable, tmpPath, wfpFilePath) {
-    this.#scannable = scannable;
+
+
+  async startWinnowing(fileList, scanRoot, tmpPath) {
+    this.#fileList = fileList;
+    this.#fileListIndex = 0;
+    this.#scanRoot = scanRoot;
     this.#tmpPath = tmpPath;
-    this.#wfpFilePath = wfpFilePath;
     this.#isRunning = true;
     this.emit(ScannerEvents.WINNOWING_STARTING);
     return this.#nextStepMachine();

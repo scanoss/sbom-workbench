@@ -144,7 +144,8 @@ export class Dispatcher extends EventEmitter {
 
       dataAsText = await response.text();
       dataAsObj = JSON.parse(dataAsText);
-      this.emit(ScannerEvents.DISPATCHER_NEW_DATA, new DispatcherResponse(dataAsObj, wfpFilePath));
+      const dispatcherResponse = new DispatcherResponse(dataAsObj, wfpFilePath);
+      this.emit(ScannerEvents.DISPATCHER_NEW_DATA, dispatcherResponse);
       return await Promise.resolve();
     } catch (error) {
       this.#setWfpAsFailed(wfpFilePath);

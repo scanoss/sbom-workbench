@@ -1,26 +1,27 @@
 import fs from 'fs';
 
 export class DispatcherResponse {
-  // Contains the server response
-  #serverData;
+
+  #serverResponse;
 
   // Path to the wfp sended to the server
   #wfpFilePath;
 
-  constructor(serverData, wfpFilePath) {
-    this.#serverData = serverData;
+  constructor(serverResponse, wfpFilePath) {
+    this.#serverResponse = serverResponse;
     this.#wfpFilePath = wfpFilePath;
+    this.#verifyResponse();
   }
 
-  getServerData() {
-    return this.#serverData;
+  getServerResponse() {
+    return this.#serverResponse;
   }
 
   getWfpContent() {
     return fs.readFileSync(this.#wfpFilePath);
   }
 
-  getAssociatedWfp() {
+  getWfpFilePath() {
     return this.#wfpFilePath;
   }
 
@@ -28,18 +29,19 @@ export class DispatcherResponse {
     return ((str || '').match(re) || []).length;
   }
 
-  // This function checks the number of files in the .wfp are equal to the server response
-  // return the match number
-  getNumberOfFiles() {
+  #verifyResponse() {
     const wfpContent = String(fs.readFileSync(this.#wfpFilePath));
     const wfpNumFiles = this.#matchRegex(wfpContent, /file=/g);
 
-    const serverResponseNumFiles = Object.keys(this.#serverData).length;
+    const serverResponseNumFiles = Object.keys(this.#serverResponse).length;
 
     if (wfpNumFiles !== serverResponseNumFiles) {
-      console.log(`Files on .wfp does not match on server response ${this.#wfpFilePath}`);
+      console.log(`The numbers of files in ${this.#wfpFilePath} does not match with the server response`);
+      throw new Error(`The numbers of files in ${this.#wfpFilePath} does not match with the server response`);
     }
+  }
 
-    return serverResponseNumFiles;
+  getFilesScanned() {
+    return Object.keys(this.#serverResponse);
   }
 }

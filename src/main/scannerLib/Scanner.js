@@ -2,13 +2,9 @@
 // 2.0
 import EventEmitter from 'events';
 import os from 'os';
-import fs from 'fs';
+import fs, { unlink, unlinkSync } from 'fs';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { AbstractScannable } from './Scannable/AbstractScannable';
-import { ScannableTree } from './Scannable/ScannableTree';
-import { ScannableFolder } from './Scannable/ScannableFolder';
-import { ScannableJson } from './Scannable/ScanneableJson';
 import { Winnower } from './Winnower/Winnower';
 import { Dispatcher } from './Dispatcher/Dispatcher';
 import { DispatcherEvents } from './Dispatcher/DispatcherEvents';
@@ -37,12 +33,6 @@ export class Scanner extends EventEmitter {
   #resultFilePath;
 
   #wfpFilePath;
-
-  #tmpResult;
-
-  #aborted; // Not used
-
-  #scannedFiles;
 
   constructor() {
     super();
@@ -77,12 +67,10 @@ export class Scanner extends EventEmitter {
       this.emit(ScannerEvents.DISPATCHER_WFP_SENDED, wfpPath);
     });
 
-    this.#dispatcher.on(ScannerEvents.DISPATCHER_NEW_DATA, (dispatcherResponse) => {
-      const serverResponse = dispatcherResponse.getServerData();
-      const serverResposeNumFiles = dispatcherResponse.getNumberOfFiles();
-      this.#scannedFiles += serverResposeNumFiles;
-      Object.assign(this.#tmpResult, serverResponse);
-      this.emit(ScannerEvents.DISPATCHER_NEW_DATA, serverResponse, serverResposeNumFiles);
+    this.#dispatcher.on(ScannerEvents.DISPATCHER_NEW_DATA, async (dispatcherResponse) => {
+      await this.#persistOutputFiles(dispatcherResponse.getWfpContent(), dispatcherResponse.getServerResponse());
+      await fs.promises.unlink(dispatcherResponse.getWfpFilePath());
+      this.emit(ScannerEvents.DISPATCHER_NEW_DATA, dispatcherResponse.getServerResponse(), dispatcherResponse);
     });
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_FINISHED, () => {
@@ -95,10 +83,6 @@ export class Scanner extends EventEmitter {
       this.#errorHandler(error, ScannerEvents.MODULE_DISPATCHER);
     });
     /* ******************* SETTING DISPATCHER EVENTS ******************** */
-
-    this.#tmpResult = {};
-    this.#scannedFiles = 0;
-    this.#aborted = false;
   }
 
   setWorkDirectory(path) {
@@ -111,25 +95,22 @@ export class Scanner extends EventEmitter {
     if (!fs.existsSync(this.#tempPath)) fs.mkdirSync(this.#tempPath);
   }
 
+  cleanWorkDirectory() {
+    if (fs.existsSync(this.#tempPath)) fs.rmdirSync(this.#tempPath, { recursive: true });
+    if (fs.existsSync(this.#resultFilePath)) fs.unlinkSync(this.#resultFilePath);
+    if (fs.existsSync(this.#wfpFilePath)) fs.unlinkSync(this.#wfpFilePath);
+  }
+
   #finishScan() {
-    const str = JSON.stringify(this.#tmpResult, null, 4);
-    fs.writeFileSync(this.#resultFilePath, str);
+    if (fs.existsSync(this.#tempPath)) fs.rmdirSync(this.#tempPath, { recursive: true });
     this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath);
-    console.log(`Scanned ${this.#scannedFiles} files`);
   }
 
   #errorHandler(error, origin) {
     if (origin === ScannerEvents.MODULE_DISPATCHER) {
-      // If this line is reached, dispatcher is paused and no promises pending
-
-      if (error.name === ScannerEvents.ERROR_SERVER_SIDE) {
-        console.log('Error en el lado del server');
-      }
-
+      // If this line is reached, dispatcher is already paused and no promises pending
       this.#winnower.pause();
       this.emit('error', error);
-
-
     }
 
     if (origin === ScannerEvents.MODULE_WINNOWER) {
@@ -138,47 +119,47 @@ export class Scanner extends EventEmitter {
     }
   }
 
-  async #scan() {
+  #createOutputFiles() {
+    if (!fs.existsSync(this.#wfpFilePath)) fs.writeFileSync(this.#wfpFilePath, '');
+    if (!fs.existsSync(this.#resultFilePath)) fs.writeFileSync(this.#resultFilePath, JSON.stringify({}));
+  }
 
-    // Ensures to create a unique folder for each scanner instance in case no workDirectory was specified.
+  #persistOutputFiles(wfpContent, serverResponse) {
+    fs.appendFileSync(this.#wfpFilePath, wfpContent);
+
+    const storedResultStr = fs.readFileSync(this.#resultFilePath);
+    const storedResultObj = JSON.parse(storedResultStr);
+    Object.assign(storedResultObj, serverResponse);
+    const newResultStr = JSON.stringify(storedResultObj, null, 4);
+    fs.writeFileSync(this.#resultFilePath, newResultStr);
+
+  }
+
+  async scanList(fileList, scanRoot = '') {
+    // Ensures to create a unique folder for each scanner instance in case of workDirectory was not specified.
     if (this.#workDirectory === undefined) {
       await this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
     }
 
-    const totalFiles = await this.#scannable.prepare();
-    if (totalFiles === 0) {
+    this.#createOutputFiles();
+
+    if (!fileList.length) {
       this.#finishScan();
       return;
     }
+
+    // await fs.promises.appendFile(dst, content);
+
     await this.#winnower.init();
     await this.#dispatcher.init();
 
-    await this.#winnower.startMachine(this.#scannable, this.#tempPath, this.#wfpFilePath);
+    await this.#winnower.startWinnowing(fileList, scanRoot, this.#tempPath);
+
   }
+
 
   getScannerId() {
     return this.#scannerId;
-  }
-
-  getWinnowingPath(path) {
-    return this.#wfpFilePath;
-  }
-
-  // Public Methods
-  async scanFileTree(fileTreeDescriptor) {
-    this.#scannable = new ScannableTree(fileTreeDescriptor);
-    await this.#scan();
-  }
-
-  async scanJsonList(jsonList, scanRoot) {
-    this.#scannable = new ScannableJson(jsonList);
-    this.#scannable.setScanRoot(scanRoot);
-    await this.#scan();
-  }
-
-  async scanFolder(dirPath) {
-    this.#scannable = new ScannableFolder(dirPath);
-    await this.#scan();
   }
 
   pause() {
@@ -189,14 +170,6 @@ export class Scanner extends EventEmitter {
   resume() {
     this.#winnower.resume();
     this.#dispatcher.resume();
-  }
-
-  recovery(path) {
-    this.setWorkDirectory(path);
-  }
-
-  isAbort() {
-    return this.#aborted;
   }
 
 }
