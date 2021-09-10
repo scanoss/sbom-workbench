@@ -19,6 +19,7 @@ import { Scanner } from '../scannerLib/Scanner';
 import { ScannerEvents } from '../scannerLib/ScannerEvents';
 import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
+import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
 
 // const fs = require('fs');
 const path = require('path');
@@ -109,8 +110,6 @@ export class ProjectTree extends EventEmitter {
     await this.scans_db.init();
     this.scanner = new Scanner();
 
-
-
   }
 
 
@@ -164,7 +163,6 @@ export class ProjectTree extends EventEmitter {
 
     this.scanner = new Scanner();
     this.scanner.setWorkDirectory(p.work_root);
-
 
     this.setScannerListeners();
   }
@@ -252,23 +250,12 @@ export class ProjectTree extends EventEmitter {
 
 
 
-
-
-
-    // setTimeout(() => {
-    //   console.log('Resuming scanner');
-    //   this.scanner.resume();
-    // }, 15000);
-
   }
 
   startScan() {
     console.log(`SCANNER: Start scanning path=${this.scan_root}`);
 
-    // this.scanner.scanJsonList(this.filesToScan, this.scan_root);
     // eslint-disable-next-line prettier/prettier
-    this.filesToScan.forEach((value, index, arr) => {arr[index] = { path: arr[index], scanMode: "MD5_SCAN" } } )
-    console.log(this.filesToScan);
     this.scanner.scanList(this.filesToScan, this.scan_root);
   }
 
@@ -423,6 +410,15 @@ export class ProjectTree extends EventEmitter {
     setUseFile(a, true, recursive);
   }
 
+  scanMode(filePath: string) {
+    if (!isBinaryFileSync(filePath))
+      return "FULL_SCAN";
+    else
+      return "MD5_SCAN";
+  }
+
+
+
   indexScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
     let i = 0;
 
@@ -435,6 +431,7 @@ export class ProjectTree extends EventEmitter {
         });
       if (bannedList.evaluate(scanRoot + jsonScan.value)) {
         jsonScan.action = 'scan';
+        jsonScan.scanMode = this.scanMode(scanRoot + jsonScan.value);
       } else {
         jsonScan.action = 'filter';
       }
@@ -461,7 +458,7 @@ function summarizeTree(root: any, tree: any, summary: any) {
       tree.className = 'filter-item';
     } else if (tree.include === true) {
       summary.include += 1;
-      summary.files.push(`${root}${tree.value}`);
+      summary.files.push({ path: `${root}${tree.value}`, scanMode: tree.scanMode });
     } else {
       tree.className = 'exclude-item';
     }
