@@ -1,0 +1,143 @@
+#editor {
+  display: grid;
+
+  .app-header {
+    padding-bottom: 0;
+  }
+
+  .app-content {
+
+  }
+}
+
+.match-title {
+  margin-bottom: 10px;
+
+  .header-subtitle {
+    text-transform: none;
+    font-size: 28px;
+  }
+}
+
+.match-info-header {
+  margin-bottom: 10px;
+
+  .content {
+   // display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    padding: 0;
+    height: 100%;
+    align-items: center;
+
+    @media screen and (max-width: $default-width) {
+
+    }
+
+  }
+}
+.content {
+  width: 100%;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.match-info-default-container {
+  display: grid;
+  grid-template-columns: calc(50% - 7px) calc(50% - 7px);
+  grid-gap: 10px;
+
+  overflow-y: auto;
+  max-height: 160px;
+  padding: 3px 0;
+
+  @media screen and (max-width: $md) {
+   grid-template-columns: 100%;
+    .match-card {
+      margin: 0;
+    }
+  }
+}
+
+
+// .match-info-default-container {
+//   display: flex;
+//   width: calc(50% - 10px);
+//   min-width: 500px;
+// }
+
+.info-files, .editors {
+  display: grid;
+  grid-template-columns: calc(50% - 10px) 50%;
+  grid-gap: 10px;
+}
+
+.info-files {
+  margin-top: 10px;
+}
+
+.editors {
+
+  .code-viewer.truncatedStart code > span:first-child, .code-viewer.truncatedEnd code > span:last-child {
+    position: relative;
+
+    &::before {
+      content: 'Content too long, file was truncated';
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      font-size: 10px;
+    }
+  }
+
+  .code-viewer.truncatedStart code > span:first-child {
+    padding-top: 35px;
+    &::before {
+      top: 10px;
+     }
+  }
+
+  .code-viewer.truncatedEnd code > span:last-child {
+    padding-bottom: 35px;
+    &::before {
+      bottom: 10px;
+     }
+  }
+
+  &.editors-full {
+    grid-template-columns: 100%;
+  }
+
+  .editor {
+    height: 100%;
+    overflow: hidden;
+
+    .line-highlighted {
+      display: block;
+      background-color: #ebe92252 !important;
+    }
+
+    span:not(.linenumber) {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      -webkit-user-drag: initial !important;
+    }
+
+    pre {
+      margin: 0;
+      padding: 0 !important;
+      height: 100%;
+    }
+
+    p {
+      font-style: normal;
+      font-weight: bold;
+      font-size: 20px;
+      padding: 0;
+      margin: 0;
+    }
+  }
+}
+
+
+
