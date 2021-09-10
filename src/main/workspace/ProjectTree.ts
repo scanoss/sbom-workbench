@@ -19,6 +19,7 @@ import { Scanner } from '../scannerLib/Scanner';
 import { ScannerEvents } from '../scannerLib/ScannerEvents';
 import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
+import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
 
 // const fs = require('fs');
 const path = require('path');
@@ -111,8 +112,6 @@ export class ProjectTree extends EventEmitter {
     await this.scans_db.init();
     this.scanner = new Scanner();
 
-
-
   }
 
 
@@ -167,7 +166,6 @@ export class ProjectTree extends EventEmitter {
     this.scanner = new Scanner();
     this.scanner.setWorkDirectory(p.work_root);
 
-
     this.setScannerListeners();
   }
 
@@ -176,6 +174,7 @@ export class ProjectTree extends EventEmitter {
     if (fs.existsSync(`${this.work_root}/results.json`)) fs.unlinkSync(`${this.work_root}/results.json`);
     if (fs.existsSync(`${this.work_root}/scan_db`)) fs.unlinkSync(`${this.work_root}/scan_db`);
     if (fs.existsSync(`${this.work_root}/tree.json`)) fs.unlinkSync(`${this.work_root}/tree.json`);
+    this.scanner.cleanWorkDirectory();
   }
 
   // Return fileList
@@ -185,9 +184,11 @@ export class ProjectTree extends EventEmitter {
     this.scanner.on(ScannerEvents.WINNOWING_FINISHED, () => console.log('Winnowing Finished...'));
     this.scanner.on(ScannerEvents.DISPATCHER_WFP_SENDED, (dir) => console.log(`Sending WFP file ${dir} to server`));
 
-    this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (data, fileNumbers) => {
-      this.processedFiles += fileNumbers;
-      console.log(`New ${fileNumbers} files scanned`);
+    this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (data, dispatcherResponse) => {
+
+      const filesScanned = dispatcherResponse.getFilesScanned();
+      this.processedFiles += filesScanned.length;
+      console.log(`New ${filesScanned.length} files scanned`);
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
         // processed: this.filesSummary.include,
@@ -251,21 +252,13 @@ export class ProjectTree extends EventEmitter {
 
 
 
-
-
-
-    // setTimeout(() => {
-    //   console.log('Resuming scanner');
-    //   this.scanner.resume();
-    // }, 15000);
-
   }
 
   startScan() {
     console.log(`SCANNER: Start scanning path=${this.scan_root}`);
 
-    this.scanner.scanJsonList(this.filesToScan, this.scan_root);
-    // this.scanner.scanFolder(this.scan_root);
+    // eslint-disable-next-line prettier/prettier
+    this.scanner.scanList(this.filesToScan, this.scan_root);
   }
 
   setMailbox(mailbox: Electron.WebContents) {
@@ -419,6 +412,15 @@ export class ProjectTree extends EventEmitter {
     setUseFile(a, true, recursive);
   }
 
+  scanMode(filePath: string) {
+    if (!isBinaryFileSync(filePath))
+      return "FULL_SCAN";
+    else
+      return "MD5_SCAN";
+  }
+
+
+
   indexScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
     let i = 0;
 
@@ -431,6 +433,7 @@ export class ProjectTree extends EventEmitter {
         });
       if (bannedList.evaluate(scanRoot + jsonScan.value)) {
         jsonScan.action = 'scan';
+        jsonScan.scanMode = this.scanMode(scanRoot + jsonScan.value);
       } else {
         jsonScan.action = 'filter';
       }
@@ -457,7 +460,7 @@ function summarizeTree(root: any, tree: any, summary: any) {
       tree.className = 'filter-item';
     } else if (tree.include === true) {
       summary.include += 1;
-      summary.files.push(`${root}${tree.value}`);
+      summary.files.push({ path: `${root}${tree.value}`, scanMode: tree.scanMode });
     } else {
       tree.className = 'exclude-item';
     }
