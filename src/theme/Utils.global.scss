@@ -1,0 +1,55 @@
+// flex and grid
+
+.d-flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.align-center {
+  align-items: center;
+}
+
+
+// margins and padding
+
+@mixin loop($className, $styleName) {
+  $max: 50;
+  $offset: 5;
+  $unit: 'px';
+  $i: 0;
+  @while $i <= $max {
+    #{$className + $i} {
+      #{$styleName}: #{$i}px !important;
+    }
+    $i: $i + $offset;
+  }
+}
+
+@include loop('.m-', 'margin');
+@include loop('.mt-', 'margin-top');
+@include loop('.mb-', 'margin-bottom');
+@include loop('.ml-', 'margin-left');
+@include loop('.mr-', 'margin-right');
+@include loop('.p-', 'padding');
+@include loop('.pt-', 'padding-top');
+@include loop('.pb-', 'padding-bottom');
+@include loop('.pl-', 'padding-left');
+@include loop('.pr-', 'padding-right');
+
+
+// text
+
+.text-center {
+  text-align: center;
+}

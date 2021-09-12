@@ -1,0 +1,47 @@
+body {
+  position: relative;
+  color: #27272A !important;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0;
+  overflow-y: hidden;
+  margin: 0;
+  padding: 0;
+
+  height: 100vh;
+  min-width: 800px;
+  background-color: var(--background-color-primary);
+
+  > #root {
+    height: 100%;
+  }
+}
+
+*, *::after, *::before {
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-app-region: no-drag;
+}
+
+a {
+  text-decoration: none;
+  height: fit-content;
+  width: fit-content;
+
+  &:hover {
+    opacity: 1;
+    text-decoration: none;
+  }
+
+}
+
+
+.MuiChip-root.identified {
+  border-radius: 4px;
+  background: #DCFCE7;
+  border: 1px solid var(--color-status-identified);;
+
+  color: var(--color-status-identified);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+}
