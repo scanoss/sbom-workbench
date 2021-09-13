@@ -16,12 +16,6 @@ import { ComponentDb } from './scan_component_db';
 const utilsDb = new UtilsDb();
 const query = new Querys();
 
-interface Summary {
-  identified: number;
-  ignored: number;
-  pending: number;
-}
-
 export class ResultsDb extends Db {
   component: ComponentDb;
 
@@ -59,7 +53,6 @@ export class ResultsDb extends Db {
   }
 
   async insertFiltered(path: string) {
-    console.log(path);
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -88,7 +81,6 @@ export class ResultsDb extends Db {
             function (this: any, err: any) {
               if (err) throw err;
               db.close();
-              console.log(this.lastID);
               resolve(this.lastID);
             }
           );
