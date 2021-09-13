@@ -11,11 +11,11 @@ import { AppContext, IAppContext } from '../../context/AppProvider';
 import AppBar from './components/AppBar/AppBar';
 import Detected from './pages/detected/Detected';
 import Identified from './pages/identified/Identified';
-import Report from './pages/report/Report';
+import Reports from './pages/report/Reports';
 
 const Workbench = () => {
   const { path } = useRouteMatch();
- 
+
   const { pathname } = useLocation();
 
   const { state, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
@@ -42,8 +42,14 @@ const Workbench = () => {
   return (
     <div>
       <AppBar />
-      <SplitPane split="vertical" minSize={280} maxSize={450} defaultSize={300} pane1Style={report ? { display: 'none' } : { }}>
-        <aside className="panel explorer" >
+      <SplitPane
+        split="vertical"
+        minSize={280}
+        maxSize={450}
+        defaultSize={300}
+        pane1Style={report ? { display: 'none' } : {}}
+      >
+        <aside className="panel explorer">
           <div className="file-tree-container">
             <FileTree />
           </div>
@@ -53,7 +59,7 @@ const Workbench = () => {
             <Switch>
               <Route path={`${path}/identified`} component={Identified} />
               <Route path={`${path}/detected`} component={Detected} />
-              <Route path={`${path}/report`} component={Report} />
+              <Route path={`${path}/report`} component={Reports} />
 
               <Redirect from={path} to={`${path}/detected`} />
             </Switch>
