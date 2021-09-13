@@ -9,7 +9,7 @@ class DialogController {
   }
 
   public showSaveDialog(options): string {
-    const result = dialog.showSaveDialogSync(remote.getCurrentWindow(),options);    
+    const result = dialog.showSaveDialogSync(remote.getCurrentWindow(), options);
     return result;
   }
 

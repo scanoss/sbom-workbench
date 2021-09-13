@@ -6,8 +6,6 @@ import { sortComponents, transform } from '../utils/scan-util';
 import { IpcEvents } from '../ipc-events';
 import { ComponentSource } from '../main/db/scan_component_db';
 
-const fs = require('original-fs').promises;
-
 export interface ScanResult {
   name: string;
   scanRoot: string;
@@ -24,7 +22,6 @@ class WorkbenchController {
    */
   public async loadScan(path: string): Promise<ScanResult> {
     const { data } = await projectService.load(path);
-    console.log("DATA",data);
     return this.generateScanResult(data);
   }
 
@@ -57,14 +54,12 @@ class WorkbenchController {
 
   public async getComponents(): Promise<ComponentGroup[]> {
     const { data } = await componentService.getAllComponentGroup({ source: ComponentSource.ENGINE });
-    console.log('COMPONENTS', data);
     sortComponents(data);
     return data;
   }
 
   public async getComponent(purl: string): Promise<ComponentGroup> {
     const { data } = await componentService.getComponentGroup({ purl });
-    console.log('COMPONENT', data);
     return data;
   }
 

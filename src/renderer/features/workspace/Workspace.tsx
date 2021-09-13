@@ -11,35 +11,12 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import DeleteIcon from '@material-ui/icons/Delete';
-
-import { makeStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
 import { AppContext } from '../../context/AppProvider';
 import { workspaceService } from '../../../api/workspace-service';
 import { dialogController } from '../../dialog-controller';
 import { DialogContext, IDialogContext } from '../../context/DialogProvider';
 import { DIALOG_ACTIONS } from '../../context/types';
-
-const useStyles = makeStyles((theme) => ({
-  table: {
-    minWidth: 650,
-  },
-  head: {
-    backgroundColor: '#F4F4F5',
-    fontWeight: 600,
-  },
-  row: {
-    cursor: 'pointer',
-  },
-  input: {
-    width: 400,
-  },
-  action: {
-    margin: 0,
-    paddingTop: 0,
-    paddingBottom: 0,
-  },
-}));
 
 const filter = (items, query) => {
   if (!items) return null;
@@ -114,8 +91,6 @@ const Workspace = () => {
     return cleanup;
   }, []);
 
-  const classes = useStyles();
-
   return (
     <>
       <section id="Workspace" className="app-page">
@@ -129,7 +104,7 @@ const Workspace = () => {
                     <SearchIcon />
                   </IconButton>
                   <InputBase
-                    className={classes.input}
+                    className="search-input"
                     onKeyUp={(e: any) => setSearchQuery(e.target.value)}
                     placeholder="Search..."
                     inputProps={{ 'aria-label': 'search', maxLength: 20 }}
@@ -145,8 +120,8 @@ const Workspace = () => {
         <main className="app-content">
           {projects && projects.length > 0 ? (
             <TableContainer component={Paper}>
-              <Table className={classes.table} aria-label="projects table">
-                <TableHead className={classes.head}>
+              <Table className="projects-table" aria-label="projects table">
+                <TableHead>
                   <TableRow>
                     <TableCell width="50%">NAME</TableCell>
                     <TableCell>DATE</TableCell>
@@ -157,13 +132,13 @@ const Workspace = () => {
                 <TableBody>
                   {filterProjects.length !== 0 ? (
                     filterProjects.map((row) => (
-                      <TableRow hover key={row.name} className={classes.row} onClick={() => onShowScan(row)}>
+                      <TableRow hover key={row.name} onClick={() => onShowScan(row)}>
                         <TableCell component="th" scope="row">
                           {row.name}
                         </TableCell>
                         <TableCell>{format(row.date)}</TableCell>
                         <TableCell>{row.files}</TableCell>
-                        <TableCell className={classes.action}>
+                        <TableCell className="row-actions">
                           <IconButton
                             aria-label="delete"
                             className="btn-delete"

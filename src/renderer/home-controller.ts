@@ -9,7 +9,7 @@ export const scan = (path: string) => {
 
 export const open = async (path: string) => {
    const response = await projectService.load(path);
-   console.log(response);
+   return response;
 };
 
 export const defaultWorkspacePath = async () => {
