@@ -161,7 +161,7 @@ export class Querys {
     WHERE r.purl=?
     GROUP BY r.file_path;`;
 
-  SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE results.id=?;';
+  SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE id IN ';
 
   SQL_RESTORE_IDENTIFIED_FILE_SNIPPET = `UPDATE results SET ignored=0,identified=0 WHERE id IN `;
 
