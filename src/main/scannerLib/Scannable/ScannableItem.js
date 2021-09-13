@@ -3,9 +3,14 @@ export class ScannableItem {
 
   content;
 
-  constructor(contentSource, content) {
+  scanMode;
+
+  fingerprint;
+
+  constructor(contentSource, content, scanMode) {
     this.contentSource = contentSource;
     this.content = content;
+    this.scanMode = scanMode;
   }
 
   getContent() {
@@ -15,4 +20,6 @@ export class ScannableItem {
   getContentSource() {
     return this.contentSource;
   }
+
+
 }

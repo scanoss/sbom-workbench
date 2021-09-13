@@ -77,3 +77,7 @@ export interface ComponentGroup {
     identified: number;
   };
 }
+
+export enum FileType {
+  BINARY = 'binary',
+}

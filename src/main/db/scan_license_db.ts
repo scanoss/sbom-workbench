@@ -17,7 +17,7 @@ export class LicenseDb extends Db {
   }
 
   // CREATE LICENSE
-  bulkCreate(db: any, license: Partial<License>) {
+  public bulkCreate(db: any, license: Partial<License>) {
     return new Promise<any>((resolve, reject) => {
       try {
         license.fulltext = 'AUTOMATIC IMPORT';
@@ -40,7 +40,7 @@ export class LicenseDb extends Db {
   }
 
   // CREATE LICENSE
-  create(license: License) {
+  public create(license: License) {
     return new Promise<License>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -61,7 +61,7 @@ export class LicenseDb extends Db {
   }
 
   // INSERT LICENSES FROM A FILE
-  importFromFile(path: string) {
+  public importFromFile(path: string) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -79,7 +79,7 @@ export class LicenseDb extends Db {
     });
   }
 
-  importFromJSON(json: Record<any, any>) {
+  public importFromJSON(json: Record<any, any>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -99,7 +99,7 @@ export class LicenseDb extends Db {
   }
 
   // GET LICENSE
-  get(data: Partial<License>) {
+  public get(data: Partial<License>) {
     return new Promise<License>(async (resolve, reject) => {
       try {
         const sqlGet = this.sqlGetLicenseQuery(data);
@@ -126,7 +126,7 @@ export class LicenseDb extends Db {
   }
 
   // GET LICENSE
-  getAll() {
+  public getAll() {
     return new Promise<License>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -188,7 +188,7 @@ export class LicenseDb extends Db {
   }
 
   // ATTACH LICENSE TO A COMPONENT VERSION
-  licenseAttach(data: any) {
+  public licenseAttach(data: any) {
     return new Promise(async (resolve, reject) => {
       try {
         if (data.license_id && data.compid) {
@@ -209,7 +209,7 @@ export class LicenseDb extends Db {
     });
   }
 
-  bulkAttachLicensebyId(db: any, data: any) {
+  public bulkAttachLicensebyId(db: any, data: any) {
     return new Promise(async (resolve, reject) => {
       db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
         if (err) reject(new Error('License was not attached'));

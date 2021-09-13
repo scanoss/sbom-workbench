@@ -46,25 +46,19 @@
   display: grid;
   grid-template-columns: calc(50% - 7px) calc(50% - 7px);
   grid-gap: 10px;
-
   overflow-y: auto;
   max-height: 160px;
   padding: 3px 0;
 
-  @media screen and (max-width: $md) {
+
+
+  @media screen and (max-width: 1100px) {
    grid-template-columns: 100%;
     .match-card {
       margin: 0;
     }
   }
 }
-
-
-// .match-info-default-container {
-//   display: flex;
-//   width: calc(50% - 10px);
-//   min-width: 500px;
-// }
 
 .info-files, .editors {
   display: grid;

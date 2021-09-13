@@ -224,7 +224,7 @@ export class ComponentDb extends Db {
           );
         });
       } catch (error) {
-        reject(new Error(error));
+        reject(error);
       }
     });
   }

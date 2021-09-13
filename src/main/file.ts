@@ -3,6 +3,9 @@ import { ipcMain } from 'electron';
 import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
+import { FileType } from '../api/types';
+
+
 
 ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
   const fileContent = { content: '' };
@@ -11,7 +14,7 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
     const isBin = isBinaryFileSync(filePath);
 
     if (isBin) {
-      fileContent.content = `Can not show content of binary file ${filePath} (yet ;-) )`;
+      fileContent.content = FileType.BINARY;
     } else {
       const file = fs.readFileSync(filePath).toString();
       fileContent.content = file;

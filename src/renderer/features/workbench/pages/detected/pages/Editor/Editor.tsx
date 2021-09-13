@@ -5,7 +5,7 @@ import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
 import { workbenchController } from '../../../../../../workbench-controller';
 import { AppContext, IAppContext } from '../../../../../../context/AppProvider';
-import { Inventory } from '../../../../../../../api/types';
+import { FileType, Inventory } from '../../../../../../../api/types';
 import LabelCard from '../../../../components/LabelCard/LabelCard';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
 import { mapFiles } from '../../../../../../../utils/scan-util';
@@ -16,6 +16,8 @@ import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { resultService } from '../../../../../../../api/results-service';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import { projectService } from '../../../../../../../api/project-service';
+
+
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -68,6 +70,8 @@ export const Editor = () => {
     try {
       setLocalFileContent({ content: null, error: false });
       const content = await workbenchController.fetchLocalFile(scanBasePath + path);
+
+      if (content === FileType.BINARY) throw new Error(FileType.BINARY);
       setLocalFileContent({ content, error: false });
     } catch (error) {
       setLocalFileContent({ content: null, error: true });
