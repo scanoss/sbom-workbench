@@ -24,7 +24,7 @@ class WorkbenchController {
    */
   public async loadScan(path: string): Promise<ScanResult> {
     const { data } = await projectService.load(path);
-    console.log(data);
+    console.log("DATA",data);
     return this.generateScanResult(data);
   }
 

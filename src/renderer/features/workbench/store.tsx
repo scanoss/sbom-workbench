@@ -16,7 +16,7 @@ export interface IWorkbenchContext {
   attachFile: (inventoryId: number, files: number[]) => Promise<boolean>;
   detachFile: (files: number[]) => Promise<boolean>;
   deleteInventory: (inventoryId: number) => Promise<boolean>;
-
+  
   state: State;
   dispatch: any;
 }

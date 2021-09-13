@@ -7,6 +7,7 @@ import { Editor } from './pages/Editor/Editor';
 const Detected = () => {
   const history = useHistory();
   const { path, url } = useRouteMatch();
+ 
 
   return (
     <Switch>
