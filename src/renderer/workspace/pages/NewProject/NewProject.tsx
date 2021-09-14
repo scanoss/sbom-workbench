@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { IconButton, LinearProgress } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { AppContext, IAppContext } from '../../../context/AppProvider';
@@ -74,6 +75,26 @@ const NewProject = () => {
 
   }
 
+  const onCancelHandler = async (_event) => {
+    console.log("Button pressed");
+
+    const { action } = await dialogCtrl.openConfirmDialog(
+      `Are you sure you want to stop the scanner?`,
+      {
+        label: 'OK',
+        role: 'accept',
+      },
+      false
+      );
+      if(action === 'ok') {
+        // Call to the service and stop scanner.
+        console.log("stop scanner");
+      }
+
+    //ipcRenderer.send(IpcEvents.PROJECT_STOP);
+
+  }
+
   const handlerScannerFinish = (_event, args) => {
     if (args.success) {
       onShowScan(args.resultsPath);
@@ -103,18 +124,20 @@ const NewProject = () => {
         </header>
         <main className="app-content">
           <div className="progressbar">
-
             {stage === 'preparing' && (
               <>
-                <LinearProgress variant="indeterminate"/>
+                <LinearProgress variant="indeterminate" />
                 <div className="stage-label"> {stage} </div>
               </>
             )}
 
             {stage === 'indexing' && (
               <>
-                <LinearProgress variant="indeterminate"/>
-                <div className="stage-label"> {stage} ({progress}) </div>
+                <LinearProgress variant="indeterminate" />
+                <div className="stage-label">
+                  {' '}
+                  {stage} ({progress}){' '}
+                </div>
               </>
             )}
 
@@ -132,6 +155,13 @@ const NewProject = () => {
               </>
             )}
 
+            <IconButton
+              aria-label="cancel-scan"
+              className="btn-cancel"
+              onClick={(event) => onCancelHandler(event)}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
           </div>
         </main>
       </section>
