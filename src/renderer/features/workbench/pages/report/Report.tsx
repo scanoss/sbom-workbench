@@ -1,8 +1,9 @@
 import { ButtonGroup, Button, Tooltip, createStyles, makeStyles } from '@material-ui/core';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, Redirect, Route, Switch, useRouteMatch } from 'react-router-dom';
 import DetectedReport from './pages/DetectedReport';
 import IdentifiedReport from './pages/IdentifiedReport';
+import { report } from '../../../../../api/report-service';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -19,14 +20,14 @@ const Nav = () => {
   const classes = useStyles();
 
   return (
-    <section id="AppMenu">
-      <ButtonGroup variant="contained">
+    <section className="nav">
+      <ButtonGroup variant="contained" disableElevation>
         <NavLink to={`${path}/detected`} activeClassName="active" tabIndex={-1}>
           <Tooltip
             title="Potential Bill of Materials based on automatic detection"
             classes={{ tooltip: classes.tooltip }}
           >
-            <Button color="inherit">Detected</Button>
+            <Button size="large">Detected</Button>
           </Tooltip>
         </NavLink>
         <NavLink to={`${path}/identified`} activeClassName="active" tabIndex={-1}>
@@ -34,7 +35,7 @@ const Nav = () => {
             title="Actual Bill of Materials based on confirmed identifications"
             classes={{ tooltip: classes.tooltip }}
           >
-            <Button color="inherit">Identified</Button>
+            <Button size="large">Identified</Button>
           </Tooltip>
         </NavLink>
       </ButtonGroup>
@@ -45,6 +46,19 @@ const Nav = () => {
 const Reports = () => {
   const { path } = useRouteMatch();
 
+  const [detectedData, setDetectedData] = useState(null);
+  const [identifiedData, setIdentifiedData] = useState(null);
+
+  const init = async () => {
+    const detected = await report.getSummary();
+    const identified = await report.getSummary();
+
+    setDetectedData(detected.data);
+    setIdentifiedData(identified.data);
+  };
+
+  useEffect(init, []);
+
   return (
     <>
       <section id="Report" className="app-page">
@@ -53,7 +67,9 @@ const Reports = () => {
         </header>
         <main className="app-content">
           <Switch>
-            <Route exact path={`${path}/detected`} component={DetectedReport} />
+            <Route exact path={`${path}/detected`}>
+              {detectedData && <DetectedReport data={detectedData} />}
+            </Route>
             <Route exact path={`${path}/identified`} component={IdentifiedReport} />
             <Redirect from={path} to={`${path}/detected`} />
           </Switch>

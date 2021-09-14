@@ -7,8 +7,21 @@
     padding-right: 180px !important;
   }
 
-  .app-content {
-    margin-top: 20px;
+  .nav {
+    .MuiButton-root {
+      background: #D4D4D8;
+      color: #505055;
+      font-weight: 600;
+      padding: 8px 20px;
+    }
+
+    .active {
+      .MuiButton-root {
+        background-color: white;
+        color: black;
+      }
+    }
+
   }
 
   .report-layout {
