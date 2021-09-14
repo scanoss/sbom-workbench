@@ -50,11 +50,15 @@ const Reports = () => {
   const [identifiedData, setIdentifiedData] = useState(null);
 
   const init = async () => {
+    const summary = await report.getSummary()
     const detected = await report.detected();
-    const identified = await report.getSummary();
+    const identified = await report.idetified();
 
-    setDetectedData(detected.data);
-    setIdentifiedData(identified.data);
+    console.log("detected", detected);
+    console.log("identified", identified);
+
+    setDetectedData({ ...detected, summary });
+    setIdentifiedData({ ...identified, summary });
   };
 
   useEffect(init, []);
@@ -70,7 +74,9 @@ const Reports = () => {
             <Route exact path={`${path}/detected`}>
               {detectedData && <DetectedReport data={detectedData} />}
             </Route>
-            <Route exact path={`${path}/identified`} component={IdentifiedReport} />
+            <Route exact path={`${path}/identified`}>
+              {identifiedData && <IdentifiedReport data={identifiedData} />}
+            </Route>
             <Redirect from={path} to={`${path}/detected`} />
           </Switch>
         </main>

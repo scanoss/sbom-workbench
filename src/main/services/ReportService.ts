@@ -41,7 +41,20 @@ class ReportService {
         return acc;
       }, {});
 
-      return result;
+      /*
+        [
+          {
+            label: "MIT 3.0",
+            components: [{name: ...}, {}],
+          },
+          {
+          }
+        ]
+
+
+       */
+
+      return { licenses: result };
     } catch (error) {
       return error;
     }

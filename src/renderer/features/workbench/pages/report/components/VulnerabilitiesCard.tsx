@@ -1,6 +1,7 @@
 import React from 'react';
 
 const VulnerabilitiesCard = ({ data }) => {
+  console.log("VUL", data)
   return (
     <div id="VulnerabilitiesContainer">
       <div className="vulnerabilitie-container">

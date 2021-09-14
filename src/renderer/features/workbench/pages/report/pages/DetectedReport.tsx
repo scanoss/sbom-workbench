@@ -45,11 +45,11 @@ const DetectedReport = ({ data }) => {
 
         <Card className="report-item vulnerabilites">
           <div className="report-title">Vulnerabilites</div>
-          <VulnerabilitiesCard data={data.vulnerabilites} />
+          <VulnerabilitiesCard data={data.vulnerabilities} />
         </Card>
 
         <Card className="report-item licenses-obligation">
-          <LicensesObligations data={data.licensesTable} />
+          <LicensesObligations data={data.licenses} />
         </Card>
       </section>
     </>

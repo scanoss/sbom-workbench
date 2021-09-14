@@ -21,49 +21,37 @@ import { report } from '../../../../../../api/report-service';
 
 Chart.register(...registerables);
 
-const IdentifiedReport = () => {
-  const [progress, setProgress] = useState<any>(null);
-  const [licenses, setLicenses] = useState<any[]>([]);
-  const [licensesTable, setLicensesTable] = useState<any[]>([]);
+const IdentifiedReport = ({ data }) => {
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
 
-  const init = async () => {
-    const { data } = await report.getSummary();
-    setProgress(data?.summary);
-    setLicenses(data?.licenses);
-    setLicensesTable(data?.licenses);
-  };
-
   const onLicenseSelected = (license: string) => {
-    const matchedLicense = licenses.find((item) => item?.label === license);
+    const matchedLicense = data.licenses.find((item) => item?.label === license);
     setMatchedLicenseSelected(matchedLicense);
   };
-
-  useEffect(init, []);
 
   return (
     <>
       <section className="report-layout identified">
         <Card className="report-item identification-progress">
           <div className="report-title">Identification Progress</div>
-          {progress && <IdentificationProgress data={progress} />}
+          <IdentificationProgress data={data.summary} />
         </Card>
 
         <Card className="report-item licenses">
           <div className="report-title">Licenses</div>
           <div id="report-second">
-            <LicensesChart data={licenses} />
+            <LicensesChart data={data.licenses} />
             <LicensesTable
-              matchedLicenseSelected={matchedLicenseSelected || licenses?.[0]}
+              matchedLicenseSelected={matchedLicenseSelected || data.licenses?.[0]}
               selectLicense={(license) => onLicenseSelected(license)}
-              data={licenses}
+              data={data.licenses}
             />
           </div>
         </Card>
 
         <Card className="report-item matches-for-license">
           <div className="report-title">Matches for license</div>
-          <MatchesForLicense data={matchedLicenseSelected || licenses?.[0]} />
+          <MatchesForLicense data={matchedLicenseSelected || data.licenses?.[0]} />
         </Card>
       </section>
     </>
