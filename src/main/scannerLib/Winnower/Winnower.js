@@ -287,6 +287,9 @@ export class Winnower extends EventEmitter {
   }
 
   async #getNextScannableItem() {
+
+    if (this.#fileListIndex >= this.#fileList.length) return null;
+
     let path = this.#fileList[this.#fileListIndex];
     let scanMode = 'FULL_SCAN';
 
@@ -298,11 +301,9 @@ export class Winnower extends EventEmitter {
 
     const contentSource = path.replace(this.#scanRoot, '');
     const content = await fs.promises.readFile(path);
+
     this.#fileListIndex += 1;
-    if (this.#fileListIndex >= this.#fileList.length) return null;
-
     const scannable = new ScannableItem(contentSource, content, scanMode);
-
     return scannable;
   }
 

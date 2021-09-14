@@ -21,10 +21,7 @@ import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
 import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
 
-// const fs = require('fs');
 const path = require('path');
-
-// const { EventEmitter } = require('events');
 
 const cont = 0;
 
@@ -413,13 +410,46 @@ export class ProjectTree extends EventEmitter {
   }
 
   scanMode(filePath: string) {
-    if (!isBinaryFileSync(filePath))
-      return "FULL_SCAN";
-    else
-      return "MD5_SCAN";
+    // eslint-disable-next-line prettier/prettier
+    const skipExtentions = new Set ([".exe", ".zip", ".tar", ".tgz", ".gz", ".rar", ".jar", ".war", ".ear", ".class", ".pyc", ".o", ".a", ".so", ".obj", ".dll", ".lib", ".out", ".app", ".doc", ".docx", ".xls", ".xlsx", ".ppt" ]);
+    const skipStartWith = ["{","[","<?xml","<html","<ac3d","<!doc"];
+    const MAX_LONG_LINE_CHARS = 1000;
+    const MIN_FILE_SIZE = 256;
+
+    // Filter by extension
+    const ext = path.extname(filePath);
+    if (skipExtentions.has(ext)) {
+      console.log(`${filePath} will scan in md5 mode. Reason: filter by extensions`);
+      return 'MD5_SCAN';
+    }
+
+    // Filter by min size
+    const fileSize = fs.statSync(filePath).size;
+    if (fileSize < MIN_FILE_SIZE) {
+      console.log(`${filePath} will scan in md5 mode. Reason: filter by extensions`);
+      return 'MD5_SCAN';
+    }
+
+    const file = fs.readFileSync(filePath, 'utf8');
+    for (const skip of skipStartWith) {
+      if (file.startsWith(skip)) {
+        console.log(`${filePath} will scan in md5 mode. Reason: start with ${skip}`);
+        return 'MD5_SCAN';
+      }
+    }
+
+    if (isBinaryFileSync(filePath)) {
+      console.log(`${filePath} will scan in md5 mode. Reason: is binary file`);
+      return 'MD5_SCAN';
+    }
+
+    if (file.split('\n').length > MAX_LONG_LINE_CHARS) {
+      console.log(`${filePath} will scan in md5 mode. Reason: has too many lines`);
+      return 'MD5_SCAN';
+    }
+
+    return 'FULL_SCAN';
   }
-
-
 
   indexScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
     let i = 0;
