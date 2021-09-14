@@ -50,7 +50,7 @@ const Reports = () => {
   const [identifiedData, setIdentifiedData] = useState(null);
 
   const init = async () => {
-    const detected = await report.getSummary();
+    const detected = await report.detected();
     const identified = await report.getSummary();
 
     setDetectedData(detected.data);

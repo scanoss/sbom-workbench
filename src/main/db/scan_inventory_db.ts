@@ -493,7 +493,7 @@ export class InventoryDb extends Db {
           });
         });
       } catch (error) {
-        return reject(new Error('detach files were not successfully'));
+        return reject(new Error('files were not successfully detached'));
       }
     });
   }
@@ -505,12 +505,12 @@ export class InventoryDb extends Db {
         db.serialize(function () {
           db.all(query.SQL_GET_RESULTS_SUMMARY, (err: any, data: any) => {
             db.close();
-            if (err) reject(new Error('{}'));
+            if (err) throw new Error('summary were not successfully retrieved');
             else resolve(data);
           });
         });
       } catch (error) {
-        reject(new Error('{}'));
+        reject(error);
       }
     });
   }

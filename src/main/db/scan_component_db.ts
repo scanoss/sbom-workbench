@@ -14,17 +14,16 @@
 
 import { Querys } from './querys_db';
 import { Db } from './db';
-import { Component , ComponentGroup } from '../../api/types';
+import { Component, ComponentGroup } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
 
 export interface ComponentParams {
-  source?: ComponentSource,
+  source?: ComponentSource;
 }
 
 export enum ComponentSource {
-    ENGINE = 'engine',
+  ENGINE = 'engine',
 }
-
 
 const query = new Querys();
 
@@ -52,7 +51,7 @@ export class ComponentDb extends Db {
     });
   }
 
-  getAll(data: any, params? :ComponentParams) {
+  getAll(data: any, params?: ComponentParams) {
     return new Promise(async (resolve, reject) => {
       try {
         let component: any;
@@ -114,11 +113,14 @@ export class ComponentDb extends Db {
     a.licenses.push(preLicense);
   }
 
-  private allComp(params:ComponentParams) {
+  private allComp(params: ComponentParams) {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
-        const sqlGetComp = params?.source===ComponentSource.ENGINE ? query.SQL_GET_ALL_DETECTED_COMPONENTS : query.SQL_GET_ALL_COMPONENTS;
+        const sqlGetComp =
+          params?.source === ComponentSource.ENGINE
+            ? query.SQL_GET_ALL_DETECTED_COMPONENTS
+            : query.SQL_GET_ALL_COMPONENTS;
         const db = await this.openDb();
         db.serialize(function () {
           db.all(sqlGetComp, async (err: any, data: any) => {
@@ -149,7 +151,8 @@ export class ComponentDb extends Db {
         const db = await this.openDb();
         db.all(
           query.SQL_GET_COMPONENT_BY_PURL_ENGINE,
-          data.purl,data.purl,
+          data.purl,
+          data.purl,
           async (err: any, component: any) => {
             db.close();
             if (err) resolve(undefined);
@@ -230,7 +233,7 @@ export class ComponentDb extends Db {
   }
 
   // GET COMPONENT VERSIONS
- private getById(id: number) {
+  private getById(id: number) {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
@@ -456,7 +459,6 @@ export class ComponentDb extends Db {
     });
   }
 
-
   async getComponentGroup(component: Partial<ComponentGroup>) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -475,7 +477,7 @@ export class ComponentDb extends Db {
   async getAllComponentGroup(params: ComponentParams) {
     return new Promise(async (resolve, reject) => {
       try {
-        const data = await this.getAll({},params);
+        const data = await this.getAll({}, params);
         if (data) {
           const comp = await this.groupComponentsByPurl(data);
           resolve(comp);
@@ -486,7 +488,7 @@ export class ComponentDb extends Db {
     });
   }
 
- private async groupComponentsByPurl(data: any) {
+  private async groupComponentsByPurl(data: any) {
     try {
       const aux = {};
       for (const component of data) {
@@ -526,6 +528,26 @@ export class ComponentDb extends Db {
       }
       result.sort((a, b) => a.name.localeCompare(b.name));
       resolve(result);
+    });
+  }
+
+  public getIdentifiedForReport() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.all(`SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name,l.spdxid 
+        FROM component_versions c 
+        INNER JOIN inventories i ON c.purl=i.purl AND c.version=i.version 
+        INNER JOIN licenses l ON l.name=i.license_name ORDER BY license_name;`,
+          (err: any, data: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(data);
+          }
+        );
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 }

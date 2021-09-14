@@ -29,7 +29,7 @@ ipcMain.handle(IpcEvents.LICENSE_CREATE, async (_event, newLicense: License) => 
   try {
     license = await defaultProject.scans_db.licenses.create(newLicense);
     return Response.ok({ message: 'License created successfully', data: license });
-  } catch (error) {
+  } catch (error: any) {
     console.log('Catch an error: ', error);
     return Response.fail({ message: error.message });
   }
