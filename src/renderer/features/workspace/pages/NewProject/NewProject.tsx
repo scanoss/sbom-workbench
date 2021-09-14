@@ -2,16 +2,18 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { IconButton, LinearProgress } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import CloseIcon from '@material-ui/icons/Close';
 import { AppContext } from '../../../../context/AppProvider';
 import * as controller from '../../../../home-controller';
 import { IpcEvents } from '../../../../../ipc-events';
 import { DialogContext } from '../../../../context/DialogProvider';
+
 const { ipcRenderer } = require('electron');
 
 const NewProject = () => {
   const history = useHistory();
 
-  const { scanPath, setScanPath } = useContext<any>(AppContext);
+  const { scanPath, setScanPath } = useContext(AppContext) as IAppContext;
   const [projectName, setProjectName] = useState<string>();
   const [progress, setProgress] = useState<number>(0);
   const [stage, setStage] = useState<string>('');
@@ -23,8 +25,11 @@ const NewProject = () => {
     ipcRenderer.on(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
 
     try {
-      setProjectName(scanPath.split('/')[scanPath.split('/').length - 1]);
-      controller.scan(scanPath);
+      const { path, action } = scanPath;
+      setProjectName(path.split('/')[path.split('/').length - 1]);
+
+      if (action === 'resume') controller.resume(path);
+      else controller.scan(path);
     } catch (e) {
       console.log(e);
     }
@@ -37,7 +42,7 @@ const NewProject = () => {
   };
 
   const onShowScan = (path) => {
-    setScanPath(path);
+    setScanPath({ path, action: 'none' });
     history.push('/workbench');
   };
 
@@ -62,6 +67,26 @@ const NewProject = () => {
 
     ipcRenderer.send(IpcEvents.SCANNER_RESUME);
 
+
+  }
+
+  const onCancelHandler = async (_event) => {
+    console.log("Button pressed");
+
+    const { action } = await dialogCtrl.openConfirmDialog(
+      `Are you sure you want to stop the scanner?`,
+      {
+        label: 'OK',
+        role: 'accept',
+      },
+      false
+      );
+      if(action === 'ok') {
+        // Call to the service and stop scanner.
+        console.log("stop scanner");
+      }
+
+    //ipcRenderer.send(IpcEvents.PROJECT_STOP);
 
   }
 
@@ -94,18 +119,20 @@ const NewProject = () => {
         </header>
         <main className="app-content">
           <div className="progressbar">
-
             {stage === 'preparing' && (
               <>
-                <LinearProgress variant="indeterminate"/>
+                <LinearProgress variant="indeterminate" />
                 <div className="stage-label"> {stage} </div>
               </>
             )}
 
             {stage === 'indexing' && (
               <>
-                <LinearProgress variant="indeterminate"/>
-                <div className="stage-label"> {stage} ({progress}) </div>
+                <LinearProgress variant="indeterminate" />
+                <div className="stage-label">
+                  {' '}
+                  {stage} ({progress}){' '}
+                </div>
               </>
             )}
 
@@ -123,6 +150,13 @@ const NewProject = () => {
               </>
             )}
 
+            <IconButton
+              aria-label="cancel-scan"
+              className="btn-cancel"
+              onClick={(event) => onCancelHandler(event)}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
           </div>
         </main>
       </section>

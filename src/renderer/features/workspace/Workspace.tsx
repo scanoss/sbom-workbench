@@ -11,6 +11,9 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import DeleteIcon from '@material-ui/icons/Delete';
+import RestoreIcon from '@material-ui/icons/Restore';
+
+import { makeStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
 import { AppContext } from '../../context/AppProvider';
 import { workspaceService } from '../../../api/workspace-service';
@@ -59,7 +62,7 @@ const Workspace = () => {
   const cleanup = () => {};
 
   const onShowScan = (project) => {
-    setScanPath(project.work_root);
+    setScanPath({ path: project.work_root, action: 'none' });
     history.push('/workbench');
   };
 
@@ -69,7 +72,7 @@ const Workspace = () => {
     });
 
     if (projectPath) {
-      setScanPath(projectPath);
+      setScanPath({ path: projectPath, action: 'scan'});
       history.push('/workspace/new');
     }
   };
@@ -84,6 +87,12 @@ const Workspace = () => {
       await workspaceService.deleteProject(path);
       init();
     }
+  };
+
+  const onRestoreHandler = async (path, e) => {
+    e.stopPropagation();
+    setScanPath({ path, action: 'resume' });
+    history.push('/workspace/new');
   };
 
   useEffect(() => {
@@ -139,6 +148,15 @@ const Workspace = () => {
                         <TableCell>{format(row.date)}</TableCell>
                         <TableCell>{row.files}</TableCell>
                         <TableCell className="row-actions">
+                          {row.files > 100 ? (
+                            <IconButton
+                              aria-label="restore"
+                              className="btn-restore"
+                              onClick={(event) => onRestoreHandler(row.work_root, event)}
+                            >
+                              <RestoreIcon fontSize="small" />
+                            </IconButton>
+                          ) : null}
                           <IconButton
                             aria-label="delete"
                             className="btn-delete"
