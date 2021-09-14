@@ -1,10 +1,15 @@
+
 import { defaultProject } from '../workspace/ProjectTree';
 
+
 class ReportService {
+
+
   public async getReportSummary() {
     try {
       let tempSummary: any = {};
-      tempSummary = await defaultProject.scans_db.inventories.getCurrentSummary();
+      tempSummary =
+        await defaultProject.scans_db.inventories.getCurrentSummary();
       const projectSummary = defaultProject.filesSummary;
       const summary = {
         totalFiles: 0,
@@ -19,7 +24,10 @@ class ReportService {
       summary.totalFiles = projectSummary.total;
       summary.includedFiles = projectSummary.include;
       summary.filteredFiles = projectSummary.filter;
-      summary.scannedFiles = tempSummary[0].identified + tempSummary[0].ignored + tempSummary[0].pending;
+      summary.scannedFiles =
+        tempSummary[0].identified +
+        tempSummary[0].ignored +
+        tempSummary[0].pending;
       summary.pendingFiles = tempSummary[0].pending;
       summary.identifiedFiles = tempSummary[0].identified;
       summary.ignoredFiles = tempSummary[0].ignored;
@@ -34,27 +42,30 @@ class ReportService {
     try {
       let data: any = [];
       data = await defaultProject.scans_db.components.getIdentifiedForReport();
-      const result = data.reduce((acc: any, value) => {
-        const key = value.spdxid;
-        if (!Object.prototype.hasOwnProperty.call(acc, key)) acc[`${key}`] = [];
-        acc[`${key}`].push({ name: value.comp_name, version: value.version, purl: value.purl, url: value.url });
+      const processData = data.reduce((acc, value) => {
+        const key = value.spdxid; 
+         if (!Object.prototype.hasOwnProperty.call(acc, key)) acc[`${key}`] = [];
+        acc[`${key}`].push({
+          name: value.comp_name,
+          version: value.version,
+          purl: value.purl,
+          url: value.url,
+          vendor: value.comp_name,
+        });
         return acc;
-      }, {});
+      }, {} as Record<string, []>);
+      const licenses = [];
 
-      /*
-        [
-          {
-            label: "MIT 3.0",
-            components: [{name: ...}, {}],
-          },
-          {
-          }
-        ]
+      Object.entries(processData).forEach(([key, value]: [string, any]) => {
+        const aux: any = {};
+        aux.label = key;
+        aux.components = [];
+        aux.components = value;
+        aux.value = value.length;
+        licenses.push(aux);
+      });
 
-
-       */
-
-      return { licenses: result };
+      return { licenses };
     } catch (error) {
       return error;
     }
