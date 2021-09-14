@@ -69,6 +69,7 @@ export enum IpcEvents {
 
   REPORT_INVENTORY_PROGRESS = 'REPORT_INVENTORY_PROGRESS',
   REPORT_SUMMARY = 'REPORT_SUMMARY',
+  REPORT_DETECTED = 'REPORT_DETECTED',
 }
 
 export const ipcMainEvents = [
@@ -132,6 +133,7 @@ export const ipcRendererEvents = [
 
   IpcEvents.REPORT_INVENTORY_PROGRESS,
   IpcEvents.REPORT_SUMMARY,
+  IpcEvents.REPORT_DETECTED,
 
   IpcEvents.UTILS_DEFAULT_PROJECT_PATH,
   IpcEvents.UTILS_PROJECT_NAME,

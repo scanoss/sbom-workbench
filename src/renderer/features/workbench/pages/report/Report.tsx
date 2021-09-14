@@ -72,8 +72,8 @@ const Report = () => {
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
 
   const init = async () => {
-    const a = await report.getSummary();
-    setProgress(a?.data?.summary);
+    const a = await report.detected();
+    // setProgress(a?.data?.summary);
     setLicenses(a?.data?.licenses);
     setVulnerabilites(a?.data?.vulnerabilities);
     setLicensesTable(a?.data?.licenses);

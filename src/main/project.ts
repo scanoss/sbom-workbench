@@ -40,8 +40,7 @@ function getUserHome() {
 }
 
 ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (_event, arg: Project) => {
-  const { path } = arg;
-  console.log(arg);
+  const { path } = arg; 
   ws = new Workspace();
   ws.newProject(path, _event.sender);
   console.log(ws.projectsList);

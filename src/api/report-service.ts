@@ -1,12 +1,18 @@
 import { IpcEvents } from '../ipc-events';
+import { BaseService } from './base-service';
 
 const { ipcRenderer } = require('electron');
 
-class ReportService {
+class ReportService extends BaseService {
   public async getSummary(args: string | null = null): Promise<any> {
 
     const response = await ipcRenderer.invoke(IpcEvents.REPORT_SUMMARY, args);
-       return response;
+    return this.response(response);
+  }
+
+  public async detected(args: string | null = null): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.REPORT_DETECTED, args);
+    return this.response(response);
   }
 
   public async getInventoryProgress(args: string | null = null): Promise<any> {
