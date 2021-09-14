@@ -4,15 +4,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { Chart, registerables } from 'chart.js';
-import {
-  Button,
-  Card,
-  Fade,
-  Menu,
-  MenuItem,
-  MenuProps,
-  Tooltip,
-} from '@material-ui/core';
+import { Button, Card, Fade, Menu, MenuItem, MenuProps, Tooltip } from '@material-ui/core';
 import LicensesChart from './components/LicensesChart';
 import IdentificationProgress from './components/IdentificationProgress';
 import { AppContext, IAppContext } from '../../../../context/AppProvider';
@@ -72,12 +64,12 @@ const Report = () => {
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
 
   const init = async () => {
-    const a = await report.detected();
+    const a = await report.detected();    
     // setProgress(a?.data?.summary);
-    setLicenses(a?.data?.licenses);
-    setVulnerabilites(a?.data?.vulnerabilities);
-    setLicensesTable(a?.data?.licenses);
-    console.log(a?.data.summary);
+    setLicenses(a?.licenses);
+    setVulnerabilites(a?.vulnerabilities);
+    setLicensesTable(a?.licenses);
+    //  console.log(a?.summary);
   };
 
   const onLicenseSelected = (license: string) => {

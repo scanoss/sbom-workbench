@@ -3,7 +3,8 @@ import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
 import { Response } from './Response';
-import { reportAdapter } from './adapter/reporAdapter';
+import { reportService } from './services/ReportService';
+
 
 
 
@@ -33,8 +34,18 @@ interface inventoryProgress {
 
 ipcMain.handle(IpcEvents.REPORT_SUMMARY, async () => {
   try {
-    const summary = await reportAdapter.getReportSummary();
-    return Response.ok({ message: 'Summary retrieve successfully', data: summary });
+    const summary = await reportService.getReportSummary();
+    return Response.ok({ message: 'Summary retrieve successfully retrieved', data: summary });
+  } catch (error: any) {
+    console.log('Catch an error: ', error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+ipcMain.handle(IpcEvents.REPORT_IDENTIFIED, async () => {
+  try {
+    const identified = await reportService.getReportIdentified();
+    return Response.ok({ message: 'Identified report successfully retrieved', data: identified });
   } catch (error: any) {
     console.log('Catch an error: ', error);
     return Response.fail({ message: error.message });
@@ -144,6 +155,8 @@ ipcMain.handle(IpcEvents.REPORT_DETECTED, async (event, arg: string) => {
     if (licenses) checkForIncompatibilities(licenses);
     // un-comment next line to output report data
     // console.log(JSON.stringify({ licenses, crypto, summary }));
+
+   
     return {
       status: 'ok',
       message: 'SPDX export successfully',

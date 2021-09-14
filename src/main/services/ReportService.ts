@@ -1,10 +1,10 @@
 import { defaultProject } from '../workspace/ProjectTree';
 
-class ReportAdapter {
+class ReportService {
   public async getReportSummary() {
-    try {      
+    try {
       let tempSummary: any = {};
-      tempSummary = await defaultProject.scans_db.inventories.getCurrentSummary();  
+      tempSummary = await defaultProject.scans_db.inventories.getCurrentSummary();
       const projectSummary = defaultProject.filesSummary;
       const summary = {
         totalFiles: 0,
@@ -29,6 +29,23 @@ class ReportAdapter {
       return error;
     }
   }
+
+  public async getReportIdentified() {
+    try {
+      let data: any = [];
+      data = await defaultProject.scans_db.components.getIdentifiedForReport();
+      const result = data.reduce((acc: any, value) => {
+        const key = value.spdxid;
+        if (!Object.prototype.hasOwnProperty.call(acc, key)) acc[`${key}`] = [];
+        acc[`${key}`].push({ name: value.comp_name, version: value.version, purl: value.purl, url: value.url });
+        return acc;
+      }, {});
+
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
 }
 
-export const reportAdapter = new ReportAdapter();
+export const reportService = new ReportService();
