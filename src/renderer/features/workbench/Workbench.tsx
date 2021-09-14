@@ -11,7 +11,7 @@ import { AppContext, IAppContext } from '../../context/AppProvider';
 import AppBar from './components/AppBar/AppBar';
 import Detected from './pages/detected/Detected';
 import Identified from './pages/identified/Identified';
-import Reports from './pages/report/Reports';
+import Reports from './pages/report/Report';
 
 const Workbench = () => {
   const { path } = useRouteMatch();
