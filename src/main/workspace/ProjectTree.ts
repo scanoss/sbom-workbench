@@ -413,8 +413,7 @@ export class ProjectTree extends EventEmitter {
     // eslint-disable-next-line prettier/prettier
     const skipExtentions = new Set ([".exe", ".zip", ".tar", ".tgz", ".gz", ".rar", ".jar", ".war", ".ear", ".class", ".pyc", ".o", ".a", ".so", ".obj", ".dll", ".lib", ".out", ".app", ".doc", ".docx", ".xls", ".xlsx", ".ppt" ]);
     const skipStartWith = ["{","[","<?xml","<html","<ac3d","<!doc"];
-    const MAX_LONG_LINE_CHARS = 1000;
-    const MIN_FILE_SIZE = 256;
+    const MIN_FILE_SIZE = 256; //In Bytes
 
     // Filter by extension
     const ext = path.extname(filePath);
@@ -430,6 +429,7 @@ export class ProjectTree extends EventEmitter {
       return 'MD5_SCAN';
     }
 
+    // if start with pattern
     const file = fs.readFileSync(filePath, 'utf8');
     for (const skip of skipStartWith) {
       if (file.startsWith(skip)) {
@@ -438,13 +438,9 @@ export class ProjectTree extends EventEmitter {
       }
     }
 
+    // if binary
     if (isBinaryFileSync(filePath)) {
       console.log(`${filePath} will scan in md5 mode. Reason: is binary file`);
-      return 'MD5_SCAN';
-    }
-
-    if (file.split('\n').length > MAX_LONG_LINE_CHARS) {
-      console.log(`${filePath} will scan in md5 mode. Reason: has too many lines`);
       return 'MD5_SCAN';
     }
 
