@@ -11,12 +11,15 @@ import { DispatcherEvents } from './Dispatcher/DispatcherEvents';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { DispatcherResponse } from './Dispatcher/DispatcherResponse';
 import { ScannerEvents } from './ScannerEvents';
+import { ScannerCfg } from './ScannerCfg';
 
 // TO DO:
 // - Split ScannerEvents into ExternalEvents and InternalEvents
-// -
+// - Implement a static atribute to keep track of the scannerId
 
 export class Scanner extends EventEmitter {
+
+  #scannerCfg;
 
   #workDirectory;
 
@@ -36,16 +39,23 @@ export class Scanner extends EventEmitter {
 
   #scanFinished;
 
-  constructor() {
+  #processingNewData;
+
+  constructor(scannerCfg = new ScannerCfg()) {
     super();
-    this.initialize();
+    this.#scannerCfg = scannerCfg;
+    this.init();
   }
 
-  initialize() {
+  init() {
     this.#scannerId = new Date().getTime();
     this.#scanFinished = false;
+    this.#processingNewData = false;
 
-    this.#winnower = new Winnower();
+    this.#winnower = new Winnower(this.#scannerCfg);
+    this.#dispatcher = new Dispatcher(this.#scannerCfg);
+
+
     /* ******************* SETTING WINNOWING EVENTS ******************* */
     this.#winnower.on(ScannerEvents.WINNOWING_STARTING, () => {
       this.emit(ScannerEvents.WINNOWING_STARTING);
@@ -64,23 +74,26 @@ export class Scanner extends EventEmitter {
     });
     /* ******************* SETTING WINNOWING EVENTS ******************* */
 
-    this.#dispatcher = new Dispatcher();
+
     /* ******************* SETTING DISPATCHER EVENTS ******************** */
     this.#dispatcher.on(ScannerEvents.DISPATCHER_WFP_SENDED, (wfpPath) => {
       this.emit(ScannerEvents.DISPATCHER_WFP_SENDED, wfpPath);
     });
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_NEW_DATA, async (dispatcherResponse) => {
+      this.processingNewData = true;
       await this.#persistOutputFiles(dispatcherResponse.getWfpContent(), dispatcherResponse.getServerResponse());
       await fs.promises.unlink(dispatcherResponse.getWfpFilePath());
       this.emit(ScannerEvents.DISPATCHER_NEW_DATA, dispatcherResponse.getServerResponse(), dispatcherResponse);
+      this.processingNewData = false;
 
       if (this.#scanFinished) this.#finishScan();
     });
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_FINISHED, () => {
       if (!this.#winnower.isRunning()) {
-        this.#scanFinished = true;
+        if (this.processingNewData) this.#scanFinished = true;
+        else this.#finishScan();
       }
     });
 

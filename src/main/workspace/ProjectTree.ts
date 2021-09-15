@@ -300,7 +300,7 @@ export class ProjectTree extends EventEmitter {
       `Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`
     );
     this.filesToScan = summary.files;
-    console.log(this.filesToScan);
+    //console.log(this.filesToScan);
 
     if (success) {
       console.log('licenses inserted successfully...');
@@ -418,14 +418,12 @@ export class ProjectTree extends EventEmitter {
     // Filter by extension
     const ext = path.extname(filePath);
     if (skipExtentions.has(ext)) {
-      console.log(`${filePath} will scan in md5 mode. Reason: filter by extensions`);
       return 'MD5_SCAN';
     }
 
     // Filter by min size
     const fileSize = fs.statSync(filePath).size;
     if (fileSize < MIN_FILE_SIZE) {
-      console.log(`${filePath} will scan in md5 mode. Reason: filter by extensions`);
       return 'MD5_SCAN';
     }
 
@@ -433,14 +431,12 @@ export class ProjectTree extends EventEmitter {
     const file = fs.readFileSync(filePath, 'utf8');
     for (const skip of skipStartWith) {
       if (file.startsWith(skip)) {
-        console.log(`${filePath} will scan in md5 mode. Reason: start with ${skip}`);
         return 'MD5_SCAN';
       }
     }
 
     // if binary
     if (isBinaryFileSync(filePath)) {
-      console.log(`${filePath} will scan in md5 mode. Reason: is binary file`);
       return 'MD5_SCAN';
     }
 
