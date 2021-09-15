@@ -164,7 +164,7 @@ export const ComponentDetail = () => {
   };
 
   const onDetailPressed = async (file) => {
-    history.push(`/workbench/inventory/${file.inventoryid}`);
+    history.push(`/workbench/identified/inventory/${file.inventoryid}`);
   };
 
   const create = async (defaultInventory, selFiles) => {
