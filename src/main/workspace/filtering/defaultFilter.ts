@@ -7,6 +7,7 @@ const defaultBannedList = {
     { condition: 'contains', value: 'LICENSE', ftype: 'NAME' },
     { condition: 'contains', value: '.git', ftype: 'NAME' },
     { condition: 'starts', value: '.asar', ftype: 'NAME' },
+    { condition: 'starts', value: '.', ftype: 'NAME' },
     { condition: '=', value: '.adoc', ftype: 'EXTENSION' },
     { condition: '=', value: '.am', ftype: 'EXTENSION' },
     { condition: '=', value: '.asciidoc', ftype: 'EXTENSION' },

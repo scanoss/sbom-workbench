@@ -38,8 +38,13 @@ class NameFilter extends AbstractFilter {
       return !(path.indexOf(this.value) >= 0);
     }
     if (this.condition === 'fullmatch') return path === this.value;
-    if (this.condition === 'starts') return fpath.basename(path).indexOf(this.value) === -1;
-    return true;
+    if (this.condition === 'starts') {
+     let filename: string;
+     filename = fpath.basename(path);
+     console.log(filename + " starts with "+this.value+" is "+filename.startsWith(this.value));
+      return !filename.startsWith(this.value);
+
+    }  return true;
   }
 }
 
