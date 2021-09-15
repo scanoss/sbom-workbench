@@ -1,88 +1,64 @@
-import React, { useContext, useEffect, useState } from 'react';
-import IconButton from '@material-ui/core/IconButton';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { useHistory } from 'react-router-dom';
-import { withStyles } from '@material-ui/core/styles';
-import { Chart, registerables } from 'chart.js';
-import {
-  Button,
-  Card,
-  Fade,
-  Menu,
-  MenuItem,
-  MenuProps,
-  Tooltip,
-} from '@material-ui/core';
-import LicensesChart from './components/LicensesChart';
-import IdentificationProgress from './components/IdentificationProgress';
-import { AppContext, IAppContext } from '../../../../context/AppProvider';
-import LicensesTable from './components/LicensesTable';
-import MatchesForLicense from './components/MatchesForLicense';
+import { ButtonGroup, Button, Tooltip, createStyles, makeStyles } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { NavLink, Redirect, Route, Switch, useRouteMatch } from 'react-router-dom';
+import DetectedReport from './pages/DetectedReport';
+import IdentifiedReport from './pages/IdentifiedReport';
 import { report } from '../../../../../api/report-service';
-import { dialogController } from '../../../../dialog-controller';
-import { ExportFormat } from '../../../../../api/export-service';
-import MatchesChart from './components/MatchesChart';
-import VulnerabilitiesCard from './components/VulnerabilitiesCard';
-import LicensesObligations from './components/LicensesObligations';
-import { projectService } from '../../../../../api/project-service';
-import AppBar from '../../components/AppBar/AppBar';
 
-Chart.register(...registerables);
-
-const StyledMenu = withStyles({
-  paper: {
-    border: '1px solid #d3d4d5',
-  },
-})((props: MenuProps) => (
-  <Menu
-    elevation={0}
-    getContentAnchorEl={null}
-    anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'center',
-    }}
-    transformOrigin={{
-      vertical: 'top',
-      horizontal: 'center',
-    }}
-    {...props}
-  />
-));
-
-const StyledMenuItem = withStyles((theme) => ({
-  root: {
-    '&:focus': {
-      backgroundColor: theme.palette.primary.main,
-      '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-        color: theme.palette.common.white,
-      },
+const useStyles = makeStyles(() =>
+  createStyles({
+    tooltip: {
+      textAlign: 'center',
+      fontSize: '.75rem',
+      maxWidth: 140,
     },
-  },
-}))(MenuItem);
+  })
+);
 
-const Report = () => {
-  const history = useHistory();
-  const { scanBasePath } = useContext(AppContext) as IAppContext;
+const Nav = () => {
+  const { path } = useRouteMatch();
+  const classes = useStyles();
 
-  const [progress, setProgress] = useState<any>(null);
-  const [licenses, setLicenses] = useState<any[]>([]);
-  const [crypto, setCrypto] = useState<any[]>([]);
-  const [vulnerabilites, setVulnerabilites] = useState<any[]>([]);
-  const [licensesTable, setLicensesTable] = useState<any[]>([]);
-  const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
+  return (
+    <section className="nav">
+      <ButtonGroup variant="contained" disableElevation>
+        <NavLink to={`${path}/detected`} activeClassName="active" tabIndex={-1}>
+          <Tooltip
+            title="Potential Bill of Materials based on automatic detection"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <Button size="large">Detected</Button>
+          </Tooltip>
+        </NavLink>
+        <NavLink to={`${path}/identified`} activeClassName="active" tabIndex={-1}>
+          <Tooltip
+            title="Actual Bill of Materials based on confirmed identifications"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <Button size="large">Identified</Button>
+          </Tooltip>
+        </NavLink>
+      </ButtonGroup>
+    </section>
+  );
+};
+
+const Reports = () => {
+  const { path } = useRouteMatch();
+
+  const [detectedData, setDetectedData] = useState(null);
+  const [identifiedData, setIdentifiedData] = useState(null);
 
   const init = async () => {
-    const a = await report.getSummary();
-    setProgress(a?.data?.summary);
-    setLicenses(a?.data?.licenses);
-    setVulnerabilites(a?.data?.vulnerabilities);
-    setLicensesTable(a?.data?.licenses);
-    console.log(a?.data.summary);
-  };
+    const summary = await report.getSummary()
+    const detected = await report.detected();
+    const identified = await report.idetified();
 
-  const onLicenseSelected = (license: string) => {
-    const matchedLicense = licenses.find((item) => item?.label === license);
-    setMatchedLicenseSelected(matchedLicense);
+    console.log("detected", detected);
+    console.log("identified", identified);
+
+    setDetectedData({ ...detected, summary });
+    setIdentifiedData({ ...identified, summary });
   };
 
   useEffect(init, []);
@@ -90,48 +66,23 @@ const Report = () => {
   return (
     <>
       <section id="Report" className="app-page">
+        <header className="app-header">
+          <Nav />
+        </header>
         <main className="app-content">
-          <section className="report-layout">
-            <Card className="report-item identification-progress">
-              <div className="report-title">Identification Progress</div>
-              {progress && <IdentificationProgress data={progress} />}
-            </Card>
-
-            <Card className="report-item licenses">
-              <div className="report-title">Licenses</div>
-              <div id="report-second">
-                <LicensesChart data={licenses} />
-                <LicensesTable
-                  matchedLicenseSelected={matchedLicenseSelected || licenses?.[0]}
-                  selectLicense={(license) => onLicenseSelected(license)}
-                  data={licenses}
-                />
-              </div>
-            </Card>
-
-            <Card className="report-item matches-for-license">
-              <div className="report-title">Matches for license</div>
-              <MatchesForLicense data={matchedLicenseSelected || licenses?.[0]} />
-            </Card>
-
-            <Card className="report-item matches">
-              <div className="report-title">Matches</div>
-              {progress && <MatchesChart data={progress} />}
-            </Card>
-
-            <Card className="report-item vulnerabilites">
-              <div className="report-title">Vulnerabilites</div>
-              <VulnerabilitiesCard data={vulnerabilites} />
-            </Card>
-
-            <Card className="report-item licenses-obligation">
-              <LicensesObligations data={licensesTable} />
-            </Card>
-          </section>
+          <Switch>
+            <Route exact path={`${path}/detected`}>
+              {detectedData && <DetectedReport data={detectedData} />}
+            </Route>
+            <Route exact path={`${path}/identified`}>
+              {identifiedData && <IdentifiedReport data={identifiedData} />}
+            </Route>
+            <Redirect from={path} to={`${path}/detected`} />
+          </Switch>
         </main>
       </section>
     </>
   );
 };
 
-export default Report;
+export default Reports;

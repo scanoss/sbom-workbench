@@ -12,6 +12,11 @@ import * as TreeStructure from './ProjectTree';
  *
  */
 // eslint-disable-next-line import/no-mutable-exports
+const defaultCfg = {
+  DEFAULT_URL_API: 0,
+  AVAILABLE_URL_API: ['https://osskb.org/api/scan/direct'],
+  SCAN_MODE: 'FULL_SCAN',
+};
 
 class Workspace extends EventEmitter {
   private name: string;
@@ -24,13 +29,36 @@ class Workspace extends EventEmitter {
     super();
     this.name = 'scanoss-workspace';
     this.ws_path = `${os.homedir()}/${this.name}`;
+
+    if (!fs.existsSync(`${this.ws_path}`)) fs.mkdirSync(`${this.ws_path}`);
+
+    if (!fs.existsSync(`${this.ws_path}/defaultCfg.json`)) {
+      fs.writeFileSync(`${this.ws_path}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
+    }
+
     this.projectsList = new TreeStructure.ProjectTree('Unnamed');
   }
 
   newProject(scanPath: string, mailbox: any) {
     this.projectsList = new TreeStructure.ProjectTree('Unnamed');
     this.projectsList.setMailbox(mailbox);
+
+    // Copy the default workspace configuration to the project folder
+    const projectPath = `${this.ws_path}/${path.basename(scanPath)}`;
+    const projectCfgPath = `${projectPath}/projectCfg.json`;
+    if (!fs.existsSync(projectPath)) fs.mkdirSync(`${projectPath}`);
+    if (!fs.existsSync(`${projectCfgPath}`)) {
+      const projectCfg = {
+        DEFAULT_URL_API: defaultCfg.AVAILABLE_URL_API[defaultCfg.DEFAULT_URL_API],
+        SCAN_MODE: defaultCfg.SCAN_MODE,
+      };
+      const projectCfgStr = JSON.stringify(projectCfg, null, 4);
+      fs.writeFileSync(projectCfgPath, projectCfgStr);
+    }
+
     this.projectsList.createScanProject(scanPath);
+
+
   }
 
   deleteProject(projectPath: string) {

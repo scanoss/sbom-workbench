@@ -3,7 +3,7 @@ import { getColor } from '../../../../../../utils/utils';
 
 const LicensesTable = ({ data, selectLicense, matchedLicenseSelected }) => {
   return (
-    <div className="license-list">
+    <div id="LicenseTable" className="license-list">
       {data.map((item, index) => {
         return (
           <div
@@ -13,8 +13,8 @@ const LicensesTable = ({ data, selectLicense, matchedLicenseSelected }) => {
               matchedLicenseSelected && matchedLicenseSelected.label === item.label ? 'license-list-item-selected' : ''
             }`}
           >
-            <div style={{ backgroundColor: getColor(index) }} className="license-list-item-color" />
-            <div className="license-list-item-name">{item.label}</div>
+            <span style={{ backgroundColor: getColor(index) }} className="license-list-item-color" />
+            <span className="license-list-item-name">{item.label}</span>
           </div>
         );
       })}

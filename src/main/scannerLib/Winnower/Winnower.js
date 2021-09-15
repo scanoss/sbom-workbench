@@ -3,6 +3,7 @@ import fs from 'fs';
 import EventEmitter from 'events';
 import { ScannerEvents } from '../ScannerEvents.js';
 import { ScannableItem } from '../Scannable/ScannableItem.js';
+import { ScannerCfg } from '../ScannerCfg.js';
 
 const stringWorker = `
 const { parentPort } = require('worker_threads');
@@ -223,8 +224,7 @@ function crc32c_hex(str) {
 `;
 
 export class Winnower extends EventEmitter {
-  // Configurable parameters
-  #WFP_FILE_MAX_SIZE = 64 * 1000;
+  #scannerCfg;
 
   #fileList;
 
@@ -244,8 +244,9 @@ export class Winnower extends EventEmitter {
 
   #waitingWorkerResponse;
 
-  constructor() {
+  constructor(scannerCfg = new ScannerCfg()) {
     super();
+    this.#scannerCfg = scannerCfg;
     this.init();
   }
 
@@ -263,8 +264,8 @@ export class Winnower extends EventEmitter {
 
   async #storeResult(winnowingResult) {
     // When the fingerprint of one file is bigger than 64Kb, truncate to the last 64Kb line.
-    if (winnowingResult.length > this.#WFP_FILE_MAX_SIZE) {
-      let truncateStringOnIndex = this.#WFP_FILE_MAX_SIZE;
+    if (winnowingResult.length > this.#scannerCfg.WFP_FILE_MAX_SIZE) {
+      let truncateStringOnIndex = this.#scannerCfg.WFP_FILE_MAX_SIZE;
       let keepRemovingCharacters = true;
       while (keepRemovingCharacters) {
         if (winnowingResult[truncateStringOnIndex] === '\n') keepRemovingCharacters = false;
@@ -277,7 +278,7 @@ export class Winnower extends EventEmitter {
       winnowingResult += '\n';
     }
 
-    if (this.#wfp.length + winnowingResult.length >= this.#WFP_FILE_MAX_SIZE) {
+    if (this.#wfp.length + winnowingResult.length >= this.#scannerCfg.WFP_FILE_MAX_SIZE) {
       await this.#createWfpFile(this.#wfp, this.#tmpPath, new Date().getTime());
       this.#wfp = '';
     }
@@ -327,8 +328,6 @@ export class Winnower extends EventEmitter {
     }
   }
 
-
-
   async startWinnowing(fileList, scanRoot, tmpPath) {
     this.#fileList = fileList;
     this.#fileListIndex = 0;
@@ -368,7 +367,4 @@ export class Winnower extends EventEmitter {
   isRunning() {
     return this.#isRunning;
   }
-
-
-
 }

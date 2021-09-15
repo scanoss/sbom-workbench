@@ -38,7 +38,11 @@ export const ComponentDetail = () => {
   const { name, component } = state;
 
   const [files, setFiles] = useState<any[]>([]);
-  const [filterFiles, setFilterFiles] = useState<{ pending: any[], identified: any[], ignored: any[] }>();
+  const [filterFiles, setFilterFiles] = useState<{ pending: any[]; identified: any[]; ignored: any[] }>({
+    pending: [],
+    identified: [],
+    ignored: [],
+  });
 
   const [inventories, setInventories] = useState<Inventory[]>([]);
   const [versions, setVersions] = useState<any[]>(null);
@@ -57,7 +61,7 @@ export const ComponentDetail = () => {
   };
 
   const getInventories = async () => {
-    const query =  version ? { purl: component.purl, version } : { purl: component.purl };
+    const query = version ? { purl: component.purl, version } : { purl: component.purl };
     const response = await inventoryService.getAll(query);
     console.log('INVENTORIES BY COMP', response);
     setInventories(response.message || []);
@@ -91,7 +95,7 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyPressed = async (file) => {
-   const inv: Partial<Inventory> = {
+    const inv: Partial<Inventory> = {
       component: file.component.name,
       url: file.component.url,
       purl: file.component.purl,
@@ -151,18 +155,17 @@ export const ComponentDetail = () => {
   };
 
   const onDetachPressed = async (file) => {
-      await detachFile([file.id]);
-      getInventories();
-  }
+    await detachFile([file.id]);
+    getInventories();
+  };
 
   const onRestorePressed = async (file) => {
     await restoreFile([file.id]);
   };
 
   const onDetailPressed = async (file) => {
-    history.push(`/workbench/inventory/${file.inventoryid}`);
+    history.push(`/workbench/identified/inventory/${file.inventoryid}`);
   };
-
 
   const create = async (defaultInventory, selFiles) => {
     // const showSelector = inventories.length > 0;
@@ -257,7 +260,7 @@ export const ComponentDetail = () => {
               <div className="filter-container">
                 <ComponentInfo component={component} />
                 <ChevronRightOutlinedIcon fontSize="small" />
-                { (component?.versions?.length > 1) ? (
+                {component?.versions?.length > 1 ? (
                   <>
                     <Button
                       className={`filter btn-version ${version ? 'selected' : ''}`}
@@ -266,11 +269,12 @@ export const ComponentDetail = () => {
                       endIcon={<ArrowDropDownIcon />}
                       onClick={(event) => setAnchorEl(event.currentTarget)}
                     >
-                      { version || 'version' }
+                      {version || 'version'}
                     </Button>
                   </>
-                ) : <> {component.versions[0].version }</>
-                }
+                ) : (
+                  <> {component.versions[0].version}</>
+                )}
               </div>
               <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleCloseVersionGroup}>
                 <MenuItem key="all" onClick={() => handleVersionSelected(null)}>
@@ -283,7 +287,6 @@ export const ComponentDetail = () => {
                 ))}
               </Menu>
             </div>
-
           </div>
 
           <section className="subheader">
@@ -295,9 +298,17 @@ export const ComponentDetail = () => {
                   TabIndicatorProps={{ style: { display: 'none' } }}
                   onChange={(event, value) => setTab(value)}
                 >
-                  <Tab label={`Pending (${version ? `${filterFiles.pending.length}/` : ''}${component?.summary.pending})`} />
-                  <Tab label={`Identified (${version ? `${filterFiles.identified.length}/` : ''}${component?.summary.identified})`} />
-                  <Tab label={`Ignored (${version ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`} />
+                  <Tab
+                    label={`Pending (${version ? `${filterFiles.pending.length}/` : ''}${component?.summary.pending})`}
+                  />
+                  <Tab
+                    label={`Identified (${version ? `${filterFiles.identified.length}/` : ''}${
+                      component?.summary.identified
+                    })`}
+                  />
+                  <Tab
+                    label={`Ignored (${version ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`}
+                  />
                 </Tabs>
               </Paper>
             </div>
@@ -305,14 +316,14 @@ export const ComponentDetail = () => {
             {tab === 0 && (
               <>
                 <ButtonGroup
-                  disabled={component?.summary.pending === 0}
+                  disabled={filterFiles.pending.length === 0}
                   ref={anchorRef}
                   variant="contained"
                   color="secondary"
                   aria-label="split button"
                 >
                   <Button variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
-                    Identify All ({component?.summary.pending})
+                    Identify All ({filterFiles.pending.length})
                   </Button>
                   <Button color="secondary" size="small" onClick={() => setOpen((prevOpen) => !prevOpen)}>
                     <ArrowDropDownIcon />
@@ -339,22 +350,22 @@ export const ComponentDetail = () => {
             )}
             {tab === 1 && (
               <Button
-                disabled={component?.summary.identified === 0}
+                disabled={filterFiles.identified.length === 0}
                 variant="contained"
                 color="secondary"
                 onClick={onDetachAllPressed}
               >
-                Restore All ({component?.summary.identified})
+                Restore All ({filterFiles.identified.length})
               </Button>
             )}
             {tab === 2 && (
               <Button
-                disabled={component?.summary.ignored === 0}
+                disabled={filterFiles.ignored.length === 0}
                 variant="contained"
                 color="secondary"
                 onClick={onRestoreAllPressed}
               >
-                Restore All ({component?.summary.ignored})
+                Restore All ({filterFiles.ignored.length})
               </Button>
             )}
           </section>

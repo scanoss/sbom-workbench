@@ -35,9 +35,9 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
   const [over, setOver] = useState<boolean>(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const ref = React.useRef();
-  const refParent = document.querySelector('#editor .content');
 
   const handlerOpen = (e) => {
+    const refParent = document.querySelector('#editor .content');
     const x = ref.current.getBoundingClientRect().left - refParent.getBoundingClientRect().left;
     const y = ref.current.getBoundingClientRect().top - refParent.getBoundingClientRect().top + 62;
 
@@ -52,8 +52,8 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
           <div className={`match-info-card-content status-${status}`}>
             <div onMouseEnter={handlerOpen} onMouseLeave={() => setOver(false)} className="label-info-div">
               <img alt="component logo" className="logo-match-info-card" src={componentDefault} />
-              <span className="component-span">{match.component}</span>              
-              <span className="version-span">{match.version}</span>         
+              <span className="component-span">{match.component}</span>
+              <span className="version-span">{match.version}</span>
               <div className="usage-div">
                 {status === 'pending' || status === 'ignored' ? (
                   <span className="usage-label">DETECTED</span>

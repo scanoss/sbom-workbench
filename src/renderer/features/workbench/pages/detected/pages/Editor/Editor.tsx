@@ -146,7 +146,7 @@ export const Editor = () => {
       version: result.component.version,
       url: result.component.url,
       purl: result.component.purl,
-      license_name: result.component.licenses[0]?.name,
+      license_name: result.component.licenses ? result.component.licenses[0]?.name : null,
       usage: result.type,
     };
 
@@ -154,10 +154,11 @@ export const Editor = () => {
   };
 
   const onIdentifyFilterPressed = async () => {
-    const response = await dialogCtrl.openInventory({});
+    const response = await dialogCtrl.openInventory({
+      usage: 'file',
+    });
     if (response) {
       const node = await projectService.getNodeFromPath(file);
-      console.log(node);
       if (node.action === 'filter') {
         await resultService.createFiltered(file); // idtype=forceinclude
       } else await resultService.updateNoMatchToFile(file);
@@ -197,7 +198,7 @@ export const Editor = () => {
   };
 
   const onDetailPressed = async (result) => {
-    history.push(`/workbench/inventory/${result.id}`);
+    history.push(`/workbench/identified/inventory/${result.id}`);
   };
 
   useEffect(() => {

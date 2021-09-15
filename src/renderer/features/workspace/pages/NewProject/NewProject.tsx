@@ -43,7 +43,7 @@ const NewProject = () => {
 
   const onShowScan = (path) => {
     setScanPath({ path, action: 'none' });
-    history.push('/workbench');
+    history.push('/workbench/report');
   };
 
   const handlerScannerStatus = (_event, args) => {

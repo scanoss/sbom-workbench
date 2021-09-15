@@ -8,25 +8,11 @@ import PQueue from 'p-queue';
 import { ScannerEvents } from '../ScannerEvents';
 import { DispatcherResponse } from './DispatcherResponse';
 import { DispatcherEvents } from './DispatcherEvents';
-import { app } from 'electron';
+import { ScannerCfg } from '../ScannerCfg';
 
 export class Dispatcher extends EventEmitter {
-  // Client Timestamp
-  #CLIENT_TIMESTAMP = app.getVersion();
+  #scannerCfg;
 
-  // API URL
-  #API_URL = 'https://osskb.org/api/scan/direct';
-
-  // Level of concurrency
-  #CONCURRENCY_LIMIT = 15;
-
-  // Timeout for each transaction
-  #TIMEOUT = 60000;
-
-  // Max number of retries for each transaction
-  #RETRIES = 3;
-
-  // Promises queue
   #pQueue;
 
   #status;
@@ -37,15 +23,16 @@ export class Dispatcher extends EventEmitter {
 
   #continue;
 
-  constructor() {
+  constructor(scannerCfg = new ScannerCfg()) {
     super();
+    this.#scannerCfg = scannerCfg;
     this.init();
   }
 
   init() {
     this.#pQueue = new PQueue({
-      concurrency: this.#CONCURRENCY_LIMIT,
-      timeout: this.#TIMEOUT,
+      concurrency: this.#scannerCfg.CONCURRENCY_LIMIT,
+      timeout: this.#scannerCfg.TIMEOUT,
       throwOnTimeout: true,
     });
 
@@ -61,15 +48,6 @@ export class Dispatcher extends EventEmitter {
 
     this.#wfpFailed = {};
 
-    // Only works for pQueue@7.x.x versions
-    // this.#pQueue.on('error', (error) => {
-    //   console.log("ERROR CATCHED....");
-    //   this.#errorHandler(error);
-    // });
-  }
-
-  setApiUrl(url) {
-    this.#API_URL = url;
   }
 
   stop() {
@@ -139,10 +117,10 @@ export class Dispatcher extends EventEmitter {
       form.append('filename', Buffer.from(wfpContent), 'data.wfp');
 
       // Fetch
-      const p1 = fetch(this.#API_URL, {
+      const p1 = fetch(this.#scannerCfg.API_URL, {
         method: 'post',
         body: form,
-        headers: { 'User-Agent': this.#CLIENT_TIMESTAMP },
+        headers: { 'User-Agent': this.#scannerCfg.CLIENT_TIMESTAMP },
       });
 
       this.emit(ScannerEvents.DISPATCHER_WFP_SENDED, wfpFilePath);

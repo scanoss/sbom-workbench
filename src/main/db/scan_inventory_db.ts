@@ -255,11 +255,12 @@ export class InventoryDb extends Db {
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
         db.get(
-          `SELECT id FROM inventories WHERE purl=? AND notes=? AND version=? AND usage=?;`,
+          `SELECT id FROM inventories WHERE purl=? AND notes=? AND version=? AND usage=? AND license_name=?;`,
           inventory.purl,
           inventory.notes ? inventory.notes : 'n/a',
           inventory.version,
           inventory.usage,
+          inventory.license_name,
           async function (err: any, inv: any) {
             if (err) throw Error('Unable to get existing inventory');
             resolve(inv);
@@ -493,7 +494,7 @@ export class InventoryDb extends Db {
           });
         });
       } catch (error) {
-        return reject(new Error('detach files were not successfully'));
+        return reject(new Error('files were not successfully detached'));
       }
     });
   }
@@ -505,12 +506,12 @@ export class InventoryDb extends Db {
         db.serialize(function () {
           db.all(query.SQL_GET_RESULTS_SUMMARY, (err: any, data: any) => {
             db.close();
-            if (err) reject(new Error('{}'));
+            if (err) throw new Error('summary were not successfully retrieved');
             else resolve(data);
           });
         });
       } catch (error) {
-        reject(new Error('{}'));
+        reject(error);
       }
     });
   }

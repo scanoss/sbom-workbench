@@ -108,7 +108,7 @@ const Workspace = () => {
           <section className="subheader">
             <div>
               {projects && projects.length > 0 && (
-                <Paper component="form">
+                <Paper>
                   <IconButton>
                     <SearchIcon />
                   </IconButton>
