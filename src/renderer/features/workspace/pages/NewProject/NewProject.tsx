@@ -7,6 +7,7 @@ import { AppContext } from '../../../../context/AppProvider';
 import * as controller from '../../../../home-controller';
 import { IpcEvents } from '../../../../../ipc-events';
 import { DialogContext } from '../../../../context/DialogProvider';
+import { projectService } from '../../../../../api/project-service';
 
 const { ipcRenderer } = require('electron');
 
@@ -65,7 +66,7 @@ const NewProject = () => {
       );
 
 
-    ipcRenderer.send(IpcEvents.SCANNER_RESUME);
+    //ipcRenderer.send(IpcEvents.SCANNER_RESUME);
 
 
   }
@@ -83,6 +84,7 @@ const NewProject = () => {
       );
       if(action === 'ok') {
         // Call to the service and stop scanner.
+        await projectService.stop();
         console.log("stop scanner");
       }
 

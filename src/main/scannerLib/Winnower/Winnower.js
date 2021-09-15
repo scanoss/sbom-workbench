@@ -247,10 +247,10 @@ export class Winnower extends EventEmitter {
   constructor(scannerCfg = new ScannerCfg()) {
     super();
     this.#scannerCfg = scannerCfg;
-    this.init();
+    this.#init();
   }
 
-  init() {
+  #init() {
     this.#wfp = '';
     this.#continue = true;
     this.#waitingWorkerResponse = false;
@@ -347,10 +347,7 @@ export class Winnower extends EventEmitter {
   }
 
   pause() {
-    this.#continue = false;
-    this.#worker.removeAllListeners();
-    this.#worker.terminate();
-    this.init();
+
   }
 
   resume() {
@@ -360,7 +357,10 @@ export class Winnower extends EventEmitter {
   }
 
   stop() {
-
+    this.#continue = false;
+    this.#worker.removeAllListeners();
+    this.#worker.terminate();
+    this.#init();
     //clean the .wfp files
   }
 

@@ -137,6 +137,7 @@ export class ProjectTree extends EventEmitter {
   }
 
   async stopScanProject() {
+    console.log("stopping scanner");
     await this.scanner.stop();
     this.saveScanProject();
   }

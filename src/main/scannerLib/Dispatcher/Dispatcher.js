@@ -26,10 +26,10 @@ export class Dispatcher extends EventEmitter {
   constructor(scannerCfg = new ScannerCfg()) {
     super();
     this.#scannerCfg = scannerCfg;
-    this.init();
+    this.#init();
   }
 
-  init() {
+  #init() {
     this.#pQueue = new PQueue({
       concurrency: this.#scannerCfg.CONCURRENCY_LIMIT,
       timeout: this.#scannerCfg.TIMEOUT,
@@ -55,12 +55,12 @@ export class Dispatcher extends EventEmitter {
     this.#pQueue.clear();
     this.#pQueue.pause();
 
-    this.#pQueue.on('idle', () => {
-      return new Promise((resolve) => {
-        this.init();
-        resolve();
-      });
-    });
+    // this.#pQueue.on('idle', () => {
+    //   return new Promise((resolve) => {
+    //     this.init();
+    //     resolve();
+    //   });
+    // });
   }
 
   pause() {

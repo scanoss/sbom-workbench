@@ -44,20 +44,22 @@ export class Scanner extends EventEmitter {
   constructor(scannerCfg = new ScannerCfg()) {
     super();
     this.#scannerCfg = scannerCfg;
+    this.#scannerId = new Date().getTime();
     this.#init();
-    this.#setWinnowerListeners();
-    this.#setDispatcherListeners();
   }
 
   #init() {
-    this.#scannerId = new Date().getTime();
     this.#scanFinished = false;
     this.#processingNewData = false;
 
     this.#winnower = new Winnower(this.#scannerCfg);
     this.#dispatcher = new Dispatcher(this.#scannerCfg);
 
+    this.#setWinnowerListeners();
+    this.#setDispatcherListeners();
+  }
 
+  #setWinnowerListeners(){
     /* ******************* SETTING WINNOWING EVENTS ******************* */
     this.#winnower.on(ScannerEvents.WINNOWING_STARTING, () => {
       this.emit(ScannerEvents.WINNOWING_STARTING);
@@ -75,8 +77,9 @@ export class Scanner extends EventEmitter {
       this.#errorHandler(error, ScannerEvents.MODULE_WINNOWER);
     });
     /* ******************* SETTING WINNOWING EVENTS ******************* */
+  }
 
-
+  #setDispatcherListeners() {
     /* ******************* SETTING DISPATCHER EVENTS ******************** */
     this.#dispatcher.on(ScannerEvents.DISPATCHER_WFP_SENDED, (wfpPath) => {
       this.emit(ScannerEvents.DISPATCHER_WFP_SENDED, wfpPath);
@@ -105,10 +108,6 @@ export class Scanner extends EventEmitter {
     /* ******************* SETTING DISPATCHER EVENTS ******************** */
   }
 
-  #setWinnowerListeners(){}
-
-  #setDispatcherListeners(){}
-
   setWorkDirectory(path) {
     this.#workDirectory = path;
     this.#tempPath = `${this.#workDirectory}/scanner-tmp`;
@@ -133,7 +132,7 @@ export class Scanner extends EventEmitter {
   #errorHandler(error, origin) {
     if (origin === ScannerEvents.MODULE_DISPATCHER) {
       // If this line is reached, dispatcher is already paused and no promises pending
-      this.#winnower.pause();
+      this.stop();
       this.emit('error', error);
     }
 
@@ -159,6 +158,8 @@ export class Scanner extends EventEmitter {
   }
 
   async scanList(fileList, scanRoot = '') {
+    this.#init();
+
     // Ensures to create a unique folder for each scanner instance in case of workDirectory was not specified.
     if (this.#workDirectory === undefined) {
       await this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
@@ -171,13 +172,8 @@ export class Scanner extends EventEmitter {
       return;
     }
 
-    // await fs.promises.appendFile(dst, content);
 
-    await this.#winnower.init();
-    await this.#dispatcher.init();
-
-    await this.#winnower.startWinnowing(fileList, scanRoot, this.#tempPath);
-
+    this.#winnower.startWinnowing(fileList, scanRoot, this.#tempPath);
   }
 
 
@@ -204,11 +200,12 @@ export class Scanner extends EventEmitter {
     this.#dispatcher.resume();
   }
 
-  async stop() {
-    await this.#winnower.stop();
-    await this.#dispatcher.stop();
+  stop() {
+    this.#winnower.removeAllListeners();
+    this.#dispatcher.removeAllListeners();
+
+    this.#winnower.stop();
+    this.#dispatcher.stop();
   }
 
-
-  // Cuando hay un error paro el dispatcher y el winnower y emito el evento
 }

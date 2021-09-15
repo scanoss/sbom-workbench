@@ -42,7 +42,7 @@ function getUserHome() {
 }
 
 ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (_event, arg: Project) => {
-  const { path } = arg; 
+  const { path } = arg;
   ws = new Workspace();
   ws.newProject(path, _event.sender);
   console.log(ws.projectsList);
@@ -53,12 +53,12 @@ ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (_event, arg: Project) => {
   };
 });
 
-
-ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event, arg: Project) => {
-  ws.projectsList.stopScanProject(arg);
+ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
+  ws = workspace;
+  ws.projectsList.stopScanProject();
 });
 
-ipcMain.on(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: IInitScan) => {
+ipcMain.on(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
   const { path } = arg;
   workspace.newProject(path,event.sender);
   ws.projectsList.resumeScanProject(arg);
