@@ -27,4 +27,4 @@ class ReportService extends BaseService {
 
 
 
-export const report = new ReportService();
+export const reportService = new ReportService();

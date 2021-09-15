@@ -6,7 +6,7 @@ import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
 import { loadScanSuccess, setComponent, setComponents, setProgress } from './actions';
 import { resultService } from '../../../api/results-service';
-import { report } from '../../../api/report-service';
+import { reportService } from '../../../api/report-service';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
@@ -92,7 +92,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     const components = await workbenchController.getComponents();
     dispatch(setComponents(components));
 
-    const summary = await report.getSummary();
+    const summary = await reportService.getSummary();
     dispatch(setProgress(summary));
   };
 

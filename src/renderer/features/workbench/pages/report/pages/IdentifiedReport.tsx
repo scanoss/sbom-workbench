@@ -7,17 +7,26 @@ import LicensesChart from '../components/LicensesChart';
 import IdentificationProgress from '../components/IdentificationProgress';
 import LicensesTable from '../components/LicensesTable';
 import MatchesForLicense from '../components/MatchesForLicense';
+import { setReport } from '../../../actions';
+import { WorkbenchContext, IWorkbenchContext } from '../../../store';
 
 Chart.register(...registerables);
 
 const IdentifiedReport = ({ data }) => {
+  const history = useHistory();
+  const { dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
+
   const isEmpty = data.licenses.length === 0;
+
   const onLicenseSelected = (license: string) => {
     const matchedLicense = data.licenses.find((item) => item?.label === license);
     setMatchedLicenseSelected(matchedLicense);
   };
-  const history = useHistory();
+
+  useEffect(() => dispatch(setReport('identified')), []);
+
   return (
     <>
       {isEmpty ? (

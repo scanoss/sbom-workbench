@@ -1,9 +1,10 @@
 import { ButtonGroup, Button, Tooltip, createStyles, makeStyles } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, Redirect, Route, Switch, useRouteMatch } from 'react-router-dom';
 import DetectedReport from './pages/DetectedReport';
 import IdentifiedReport from './pages/IdentifiedReport';
-import { report } from '../../../../../api/report-service';
+import { reportService } from '../../../../../api/report-service';
+import { WorkbenchContext, IWorkbenchContext } from '../../store';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -45,17 +46,17 @@ const Nav = () => {
 
 const Reports = () => {
   const { path } = useRouteMatch();
+  const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
+
+  const { report } = state;
 
   const [detectedData, setDetectedData] = useState(null);
   const [identifiedData, setIdentifiedData] = useState(null);
 
   const init = async () => {
-    const summary = await report.getSummary()
-    const detected = await report.detected();
-    const identified = await report.idetified();
-
-    console.log("detected", detected);
-    console.log("identified", identified);
+    const summary = await reportService.getSummary();
+    const detected = await reportService.detected();
+    const identified = await reportService.idetified();
 
     setDetectedData({ ...detected, summary });
     setIdentifiedData({ ...identified, summary });
@@ -77,7 +78,7 @@ const Reports = () => {
             <Route exact path={`${path}/identified`}>
               {identifiedData && <IdentifiedReport data={identifiedData} />}
             </Route>
-            <Redirect from={path} to={`${path}/detected`} />
+            <Redirect from={path} to={`${path}/${report}`} />
           </Switch>
         </main>
       </section>

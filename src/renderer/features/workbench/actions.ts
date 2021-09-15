@@ -6,6 +6,8 @@ export const SET_PROGRESS = 'APP/WORKBENCH/SET_PROGRESS';
 export const SET_COMPONENT = 'APP/WORKBENCH/SET_COMPONENT';
 export const SET_COMPONENTS = 'APP/WORKBENCH/SET_COMPONENTS';
 export const SET_FILE = 'APP/WORKBENCH/SET_FILE';
+export const SET_REPORT = 'APP/WORKBENCH/SET_REPORT';
+
 export const RESET = 'APP/WORKBENCH/RESET';
 
 export const loadScanSuccess = (name, tree, components: ComponentGroup[]) => ({
@@ -33,6 +35,11 @@ export const setComponents = (components: ComponentGroup[]) => ({
 export const setFile = (file: string) => ({
   type: SET_FILE,
   file,
+});
+
+export const setReport = (report: 'detected' | 'identified') => ({
+  type: SET_REPORT,
+  report,
 });
 
 export const reset = () => ({

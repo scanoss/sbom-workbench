@@ -1,4 +1,4 @@
-import { LOAD_SCAN_FAIL, LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_COMPONENTS, SET_FILE, SET_PROGRESS } from './actions';
+import { LOAD_SCAN_FAIL, LOAD_SCAN_SUCCESS, RESET, SET_COMPONENT, SET_COMPONENTS, SET_FILE, SET_PROGRESS, SET_REPORT } from './actions';
 import { ComponentGroup } from '../../../api/types';
 
 export interface State {
@@ -9,6 +9,7 @@ export interface State {
   file: string | null;
   components: ComponentGroup[];
   component: ComponentGroup;
+  report: 'detected' | 'identified';
 }
 
 export const initialState: State = {
@@ -19,6 +20,7 @@ export const initialState: State = {
   file: null,
   components: null,
   component: null,
+  report: 'detected',
 };
 
 export default function reducer(state: State = initialState, action): State {
@@ -66,6 +68,13 @@ export default function reducer(state: State = initialState, action): State {
       return {
         ...state,
         file,
+      };
+    }
+    case SET_REPORT: {
+      const { report } = action;
+      return {
+        ...state,
+        report,
       };
     }
     case RESET:
