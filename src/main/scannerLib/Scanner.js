@@ -34,7 +34,9 @@ export class Scanner extends EventEmitter {
 
   #wfpFilePath;
 
-  #scanFinished;
+  #scanFinished; // Both flags are used to prevent a race condition between DISPATCHER.NEW_DATA and DISPATCHER_FINISHED
+
+  #processingNewData; // Both flags are used to prevent a race condition between DISPATCHER.NEW_DATA and DISPATCHER_FINISHED
 
   constructor() {
     super();
@@ -71,16 +73,19 @@ export class Scanner extends EventEmitter {
     });
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_NEW_DATA, async (dispatcherResponse) => {
+      this.#processingNewData = true;
       await this.#persistOutputFiles(dispatcherResponse.getWfpContent(), dispatcherResponse.getServerResponse());
       await fs.promises.unlink(dispatcherResponse.getWfpFilePath());
       this.emit(ScannerEvents.DISPATCHER_NEW_DATA, dispatcherResponse.getServerResponse(), dispatcherResponse);
+      this.#processingNewData = true;
 
       if (this.#scanFinished) this.#finishScan();
     });
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_FINISHED, () => {
       if (!this.#winnower.isRunning()) {
-        this.#scanFinished = true;
+        if (this.#processingNewData) this.#scanFinished = true;
+        else this.#finishScan();
       }
     });
 
@@ -169,6 +174,19 @@ export class Scanner extends EventEmitter {
   pause() {
     this.#winnower.pause();
     this.#dispatcher.pause();
+
+    // return new Promise((resolve,reject) => {
+    //   this.#winnower.pause();
+    //   this.#dispatcher.pause();
+    //   this.#dispatcher.on(ScannerEvents.DISPATCHER_FINISHED, () => {
+    //     if (!this.#winnower.isRunning()) resolve();
+    //   })
+    // });
+  }
+
+  async stop() {
+    await this.#winnower.stop();
+    await this.#dispatcher.stop();
   }
 
   resume() {
@@ -176,4 +194,6 @@ export class Scanner extends EventEmitter {
     this.#dispatcher.resume();
   }
 
+
+  // Cuando hay un error paro el dispatcher y el winnower y emito el evento
 }

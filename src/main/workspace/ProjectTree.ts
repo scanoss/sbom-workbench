@@ -58,6 +58,8 @@ export class ProjectTree extends EventEmitter {
 
   filesToScan: [];
 
+  filesScanned: [];
+
   constructor(name: string) {
     super();
     this.work_root = '';
@@ -94,7 +96,7 @@ export class ProjectTree extends EventEmitter {
     this.emit('treeBuilt', this.logical_tree);
   }
 
-  async loadScanProject(rootOfProject: string) {
+  async openScanProject(rootOfProject: string) {
     const file = fs.readFileSync(`${rootOfProject}/tree.json`, 'utf8');
     const a = JSON.parse(file);
     this.logical_tree = a.logical_tree;
@@ -103,12 +105,13 @@ export class ProjectTree extends EventEmitter {
     this.scan_root = a.scan_root;
     this.project_name = a.project_name;
     this.filesSummary = a.filesSummary;
+    this.filesScanned = a.filesScanned;
+    this.filesToScan = a.filesToScan;
     this.scans_db = new ScanDb(rootOfProject);
     this.banned_list = new Filtering.BannedList('NoFilter');
     this.banned_list.load(`${this.work_root}/filter.json`);
     await this.scans_db.init();
     this.scanner = new Scanner();
-
   }
 
 
@@ -130,6 +133,24 @@ export class ProjectTree extends EventEmitter {
     };
 
     fs.writeFileSync(`${this.work_root}/metadata.json`, JSON.stringify(metadata).toString());
+  }
+
+  async stopScanProject() {
+    await this.scanner.stop();
+    this.saveScanProject();
+  }
+
+  resumeScanProject(path) {
+    this.openScanProject(path);
+
+    // Here the performance can be improved using getNodeFrompath to get
+    // the array position of a specific path
+    for (fileScannable of this.filesScanned) {
+      const index = this.filesToScan.indexOf(fileScannable);
+      this.filesToScan.slice(index,index);
+    }
+
+    this.startScan();
   }
 
   createScanProject(scanPath: string) {
@@ -158,6 +179,8 @@ export class ProjectTree extends EventEmitter {
     } else console.log('Filters were already defined');
     this.banned_list.load(`${this.work_root}/filter.json`);
 
+    this.filesScanned = [];
+
     this.scans_db = new ScanDb(p.work_root);
 
     this.scanner = new Scanner();
@@ -183,7 +206,7 @@ export class ProjectTree extends EventEmitter {
 
     this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (data, dispatcherResponse) => {
 
-      const filesScanned = dispatcherResponse.getFilesScanned();
+      const filesScanned: Array<any> = dispatcherResponse.getFilesScanned();
       this.processedFiles += filesScanned.length;
       console.log(`New ${filesScanned.length} files scanned`);
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
@@ -192,6 +215,7 @@ export class ProjectTree extends EventEmitter {
         processed: (100 * this.processedFiles) / this.filesSummary.include,
       });
 
+      this.filesScanned.push(...filesScanned);
       this.attachComponent(data);
     });
 
@@ -261,8 +285,6 @@ export class ProjectTree extends EventEmitter {
   setMailbox(mailbox: Electron.WebContents) {
     this.msgToUI = mailbox;
   }
-
-  stopScan() {}
 
   async prepare_scan() {
     let success;

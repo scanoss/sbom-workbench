@@ -242,6 +242,8 @@ export class Winnower extends EventEmitter {
 
   #isRunning;
 
+  #waitingWorkerResponse;
+
   constructor() {
     super();
     this.init();
@@ -250,6 +252,7 @@ export class Winnower extends EventEmitter {
   init() {
     this.#wfp = '';
     this.#continue = true;
+    this.#waitingWorkerResponse = false;
     this.#worker = new Worker(stringWorker, { eval: true });
     this.#worker.on('message', async (scannableItem) => {
       await this.#storeResult(scannableItem.fingerprint);
@@ -311,6 +314,7 @@ export class Winnower extends EventEmitter {
     if (!this.#continue) return;
     const scannableItem = await this.#getNextScannableItem();
     if (scannableItem) {
+      this.#waitingWorkerResponse = true;
       this.#worker.postMessage(scannableItem);
     } else {
       if (this.#wfp.length !== 0) {
@@ -343,7 +347,12 @@ export class Winnower extends EventEmitter {
     this.#nextStepMachine();
   }
 
-  restart() {}
+  stop() {
+    this.#continue = false;
+    this.#worker.removeAllListeners();
+    this.#worker.terminate();
+    this.init();
+  }
 
   isRunning() {
     return this.#isRunning;

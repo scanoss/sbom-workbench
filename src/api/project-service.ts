@@ -16,7 +16,7 @@ class ProjectService extends BaseService {
   }
 
   public async load(path: string): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_LOAD_SCAN, path);
+    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_OPEN_SCAN, path);
     return response;
   }
 

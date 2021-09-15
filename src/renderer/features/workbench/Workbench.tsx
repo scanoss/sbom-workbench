@@ -15,7 +15,7 @@ import Report from './pages/report/Report';
 
 const Workbench = () => {
   const { path } = useRouteMatch();
- 
+
   const { pathname } = useLocation();
 
   const { state, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
@@ -26,7 +26,8 @@ const Workbench = () => {
   const report = pathname.startsWith('/workbench/report');
 
   const onInit = async () => {
-    const result = scanPath ? await loadScan(scanPath) : false;
+    const { path } = scanPath;
+    const result = path ? await loadScan(path) : false;
     if (!result) {
       dialogController.showError('Error', 'Cannot read scan.');
     }

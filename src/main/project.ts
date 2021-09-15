@@ -13,12 +13,14 @@ const os = require('os');
 const fs = require('fs');
 
 let ws: Workspace;
-ipcMain.handle(IpcEvents.PROJECT_LOAD_SCAN, async (_event, arg: any) => {
+
+
+ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (_event, arg: any) => {
   let created: any;
   console.log(arg);
   ws = workspace;
   ws.newProject(arg, _event.sender);
-  ws.projectsList.loadScanProject(arg);
+  ws.projectsList.openScanProject(arg);
 
   const response = {
     logical_tree: ws.projectsList.logical_tree,
@@ -51,6 +53,18 @@ ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (_event, arg: Project) => {
     data: ws, // ws.directory_tree.project,
   };
 });
+
+
+ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event, arg: Project) => {
+  ws.projectsList.stopScanProject(arg);
+});
+
+ipcMain.on(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: IInitScan) => {
+  const { path } = arg;
+  workspace.newProject(path,event.sender);
+  ws.projectsList.resumeScanProject(arg);
+});
+
 
 ipcMain.handle(IpcEvents.UTILS_DEFAULT_PROJECT_PATH, async (event) => {
   try {

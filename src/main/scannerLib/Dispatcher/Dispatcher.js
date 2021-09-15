@@ -35,6 +35,8 @@ export class Dispatcher extends EventEmitter {
 
   #wfpFailed;
 
+  #continue;
+
   constructor() {
     super();
     this.init();
@@ -55,6 +57,8 @@ export class Dispatcher extends EventEmitter {
 
     this.#status = DispatcherEvents.STATUS_RUNNING;
 
+    this.#continue = true;
+
     this.#wfpFailed = {};
 
     // Only works for pQueue@7.x.x versions
@@ -69,14 +73,23 @@ export class Dispatcher extends EventEmitter {
   }
 
   stop() {
-    this.#pQueue.removeListener('idle');
+    this.#pQueue.removeAllListeners();
     this.#pQueue.clear();
     this.#pQueue.pause();
+
+    this.#pQueue.on('idle', () => {
+      return new Promise((resolve) => {
+        this.init();
+        resolve();
+      });
+    });
   }
 
   pause() {
     this.#pQueue.pause();
   }
+
+  isDone(){}
 
   resume() {
     this.#status = DispatcherEvents.STATUS_RUNNING;
