@@ -1,7 +1,6 @@
 const defaultBannedList = {
   name: 'Default',
   filters: [
-    { condition: '<', value: '100', ftype: 'SIZE' },
     { condition: '=', value: '.txt', ftype: 'EXTENSION' },
     { condition: 'contains', value: '.git', ftype: 'NAME' },
     { condition: 'contains', value: 'node_modules', ftype: 'NAME' },
