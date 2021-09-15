@@ -2,6 +2,11 @@ import { Filter } from '@material-ui/icons';
 import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
+import { Response } from './Response';
+import { reportService } from './services/ReportService';
+
+
+
 
 interface licenseEntry {
   label: string;
@@ -27,7 +32,28 @@ interface inventoryProgress {
   acceptedComponents: number;
 }
 
-ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
+ipcMain.handle(IpcEvents.REPORT_SUMMARY, async () => {
+  try {
+    const summary = await reportService.getReportSummary();
+    return Response.ok({ message: 'Summary retrieve successfully retrieved', data: summary });
+  } catch (error: any) {
+    console.log('Catch an error: ', error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+ipcMain.handle(IpcEvents.REPORT_IDENTIFIED, async () => {
+  try {
+    const identified = await reportService.getReportIdentified();
+    return Response.ok({ message: 'Identified report successfully retrieved', data: identified });
+  } catch (error: any) {
+    console.log('Catch an error: ', error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+ipcMain.handle(IpcEvents.REPORT_DETECTED, async (event, arg: string) => {
+  const vulnerabilitiesLists = { critical: [], high: [], moderate: [], low: [] };
   let success: boolean;
   let licenses: licenseEntry[];
   let crypto: cryptoEntry[];
@@ -35,29 +61,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
   const vulnerabilities = { critical: 0, high: 0, low: 0, moderate: 0 };
   licenses = [];
   crypto = [{ label: 'None', files: [], value: 0 }];
-  let tempSummary: any;
-  tempSummary = await defaultProject.scans_db.inventories.getCurrentSummary();
-  const projectSummary = defaultProject.filesSummary;
-  // total, filter, include
-  const summary = {
-    totalFiles: 0,
-    includedFiles: 0,
-    filteredFiles: 0,
-    scannedFiles: 0,
-    pendingFiles: 0,
-    identifiedFiles: 0,
-    ignoredFiles: 0,
-    detectedFiles: 0,
-  };
-  summary.totalFiles = projectSummary.total;
-  summary.includedFiles = projectSummary.include;
-  summary.filteredFiles = projectSummary.filter;
-  summary.scannedFiles = tempSummary[0].identified + tempSummary[0].ignored + tempSummary[0].pending;
-  summary.pendingFiles = tempSummary[0].pending;
-  summary.identifiedFiles = tempSummary[0].identified;
-  summary.ignoredFiles = tempSummary[0].ignored;
-  summary.detectedFiles = tempSummary[0].detected;
-  const vulnerabilitiesLists = { critical: [], high: [], moderate: [], low: [] };
+
   try {
     const a = defaultProject.results;
     for (const [key, results] of Object.entries(a)) {
@@ -130,13 +134,13 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
               const v = result.vulnerabilities[i];
 
               if (v.severity === 'CRITICAL') {
-                if (!vulnerabilitiesLists.critical.some((vl)=>vl.ID===v.ID)) vulnerabilitiesLists.critical.push(v);
+                if (!vulnerabilitiesLists.critical.some((vl) => vl.ID === v.ID)) vulnerabilitiesLists.critical.push(v);
               } else if (v.severity === 'HIGH') {
-                if (!vulnerabilitiesLists.high.some((vl)=>vl.ID===v.ID)) vulnerabilitiesLists.high.push(v);
+                if (!vulnerabilitiesLists.high.some((vl) => vl.ID === v.ID)) vulnerabilitiesLists.high.push(v);
               } else if (v.severity === 'MODERATE') {
-                if (!vulnerabilitiesLists.moderate.some((vl)=>vl.ID===v.ID))  vulnerabilitiesLists.moderate.push(v);
+                if (!vulnerabilitiesLists.moderate.some((vl) => vl.ID === v.ID)) vulnerabilitiesLists.moderate.push(v);
               } else if (v.severity === 'LOW') {
-                if (!vulnerabilitiesLists.low.some((vl)=>vl.ID===v.ID)) vulnerabilitiesLists.low.push(v);
+                if (!vulnerabilitiesLists.low.some((vl) => vl.ID === v.ID)) vulnerabilitiesLists.low.push(v);
               }
             }
           }
@@ -151,10 +155,12 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async (event, arg: string) => {
     if (licenses) checkForIncompatibilities(licenses);
     // un-comment next line to output report data
     // console.log(JSON.stringify({ licenses, crypto, summary }));
+
+   
     return {
       status: 'ok',
       message: 'SPDX export successfully',
-      data: { licenses, crypto, summary, vulnerabilities },
+      data: { licenses, crypto, vulnerabilities },
     };
   } catch (e) {
     console.log('Catch an error: ', e);
@@ -197,6 +203,7 @@ ipcMain.handle(IpcEvents.REPORT_INVENTORY_PROGRESS, async (event, arg: string) =
     return { status: 'fail' };
   }
 });
+
 function checkForIncompatibilities(licenses: licenseEntry[]) {
   let l = 0;
   let i = 0;

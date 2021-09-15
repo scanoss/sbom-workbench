@@ -16,7 +16,7 @@ export interface IWorkbenchContext {
   attachFile: (inventoryId: number, files: number[]) => Promise<boolean>;
   detachFile: (files: number[]) => Promise<boolean>;
   deleteInventory: (inventoryId: number) => Promise<boolean>;
-  
+
   state: State;
   dispatch: any;
 }
@@ -92,9 +92,8 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     const components = await workbenchController.getComponents();
     dispatch(setComponents(components));
 
-    const { data } = await report.getSummary();
-    dispatch(setProgress(data.summary));
-    console.log(data.summary);
+    const summary = await report.getSummary();
+    dispatch(setProgress(summary));
   };
 
   const value = React.useMemo(() => ({
