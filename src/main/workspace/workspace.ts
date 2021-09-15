@@ -29,6 +29,9 @@ class Workspace extends EventEmitter {
     super();
     this.name = 'scanoss-workspace';
     this.ws_path = `${os.homedir()}/${this.name}`;
+
+    if (!fs.existsSync(`${this.ws_path}`)) fs.mkdirSync(`${this.ws_path}`);
+
     if (!fs.existsSync(`${this.ws_path}/defaultCfg.json`)) {
       fs.writeFileSync(`${this.ws_path}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
     }
