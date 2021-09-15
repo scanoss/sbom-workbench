@@ -44,7 +44,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async () => {
 
 ipcMain.handle(IpcEvents.REPORT_IDENTIFIED, async () => {
   try {
-    const identified = await reportService.getReportIdentified(); 
+    const identified = await reportService.getReportIdentified();
     return Response.ok({ message: 'Identified report successfully retrieved', data: identified });
   } catch (error: any) {
     console.log('Catch an error: ', error);

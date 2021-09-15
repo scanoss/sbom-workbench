@@ -255,11 +255,12 @@ export class InventoryDb extends Db {
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
         db.get(
-          `SELECT id FROM inventories WHERE purl=? AND notes=? AND version=? AND usage=?;`,
+          `SELECT id FROM inventories WHERE purl=? AND notes=? AND version=? AND usage=? AND license_name=?;`,
           inventory.purl,
           inventory.notes ? inventory.notes : 'n/a',
           inventory.version,
           inventory.usage,
+          inventory.license_name,
           async function (err: any, inv: any) {
             if (err) throw Error('Unable to get existing inventory');
             resolve(inv);

@@ -535,7 +535,7 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(`SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name,l.spdxid 
+        db.all(`SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name 
         FROM component_versions c 
         INNER JOIN inventories i ON c.purl=i.purl AND c.version=i.version 
         INNER JOIN licenses l ON l.name=i.license_name ORDER BY license_name;`,

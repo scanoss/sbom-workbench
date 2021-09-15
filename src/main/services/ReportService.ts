@@ -1,15 +1,10 @@
-
 import { defaultProject } from '../workspace/ProjectTree';
 
-
 class ReportService {
-
-
   public async getReportSummary() {
     try {
       let tempSummary: any = {};
-      tempSummary =
-        await defaultProject.scans_db.inventories.getCurrentSummary();
+      tempSummary = await defaultProject.scans_db.inventories.getCurrentSummary();
       const projectSummary = defaultProject.filesSummary;
       const summary = {
         totalFiles: 0,
@@ -24,10 +19,7 @@ class ReportService {
       summary.totalFiles = projectSummary.total;
       summary.includedFiles = projectSummary.include;
       summary.filteredFiles = projectSummary.filter;
-      summary.scannedFiles =
-        tempSummary[0].identified +
-        tempSummary[0].ignored +
-        tempSummary[0].pending;
+      summary.scannedFiles = tempSummary[0].identified + tempSummary[0].ignored + tempSummary[0].pending;
       summary.pendingFiles = tempSummary[0].pending;
       summary.identifiedFiles = tempSummary[0].identified;
       summary.ignoredFiles = tempSummary[0].ignored;
@@ -41,30 +33,34 @@ class ReportService {
   public async getReportIdentified() {
     try {
       let data: any = [];
-      data = await defaultProject.scans_db.components.getIdentifiedForReport();
-      const processData = data.reduce((acc, value) => {
-        const key = value.spdxid; 
-         if (!Object.prototype.hasOwnProperty.call(acc, key)) acc[`${key}`] = [];
-        acc[`${key}`].push({
-          name: value.comp_name,
-          version: value.version,
-          purl: value.purl,
-          url: value.url,
-          vendor: value.comp_name,
-        });
-        return acc;
-      }, {} as Record<string, []>);
+      data = await defaultProject.scans_db.components.getIdentifiedForReport();    
       const licenses = [];
-
-      Object.entries(processData).forEach(([key, value]: [string, any]) => {
+      data.forEach((element) => {
         const aux: any = {};
-        aux.label = key;
-        aux.components = [];
-        aux.components = value;
-        aux.value = value.length;
-        licenses.push(aux);
+        const index = licenses.findIndex((obj) => obj.label === element.license_name);
+        if (index >= 0) {
+          licenses[index].components.push({
+            name: element.comp_name,
+            vendor: element.comp_name,
+            url: element.url,
+            purl: element.pur,
+            version: element.version,
+          });
+          licenses[index].value += 1;
+        } else {
+          aux.components = [];
+          aux.components.push({
+            name: element.comp_name,
+            vendor: element.comp_name,
+            url: element.url,
+            purl: element.purl,
+            version: element.version,
+          });
+          aux.value = 1;
+          aux.label = element.license_name;
+          licenses.push(aux);
+        }
       });
-
       return { licenses };
     } catch (error) {
       return error;
