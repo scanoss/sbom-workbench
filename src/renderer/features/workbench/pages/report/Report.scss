@@ -26,7 +26,7 @@
 
   .empty-container{
     width : 100%;
-    height: 70vh; 
+    height: 70vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -42,7 +42,9 @@
   .report-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-gap: 24px;
+    grid-gap: 20px;
+    margin-bottom: 16px;
+
 
     &.detected {
       grid-template-rows: repeat(3, max-content);
@@ -59,21 +61,21 @@
 
     &.identified {
       grid-template-rows: repeat(4, max-content);
-      
+
       .identification-progress {
         grid-column: 1/3;
       }
-    }  
+    }
 
-  
+
     .report-item {
       padding: 16px;
 
       .report-title {
         color: #27272A;
-        font-size: 26px;
+        font-size: 18px;
         font-style: normal;
-        font-weight: 700;
+        font-weight: 600;
       }
     }
 
@@ -88,21 +90,24 @@
       flex-direction: column;
 
       .identification-canvas-container {
-        margin-top: 30px;
-        height: 50px;
+        margin-top: 22px;
+        height: 38px;
+        width: 100%;
         display: flex;
         justify-content: space-between;
-        align-items: center;
+
 
         .label {
+          float: left;
+          text-align: center;
           color: #22C55E;
-          padding: 12px;
-          font-size: 50px;
+          margin-top: -6px;
+          font-size: 34px;
           font-weight: 700;
         }
+
         .progress-bar {
-          padding: 0 20px;
-          width: 100%;
+          width: 91%;
         }
       }
     }
@@ -117,17 +122,17 @@
       }
     }
 
-
-      .vulnerabilites { }
       .tableRowLicense {
-
+        .MuiTableCell-root {
+          padding: 8px 16px;
+        }
         .tableCellForLicensePill {
 
           .container-licenses-pills {
-            align-items: center;
-            overflow-x: scroll;
-            justify-content: center;
             display: flex;
+            align-items: center;
+            justify-content: center;
+
             .tinyPillLicenseContainer {
               background-color: #E4E4E7;
               width: fit-content;
@@ -151,8 +156,8 @@
 }
 
 #LicensesChart {
-  padding: 24px 0px;
-  max-width: 250px;
+  padding: 8px 0 4px;
+  max-width: 220px;
   justify-self: center;
 }
 
@@ -163,16 +168,6 @@
   align-items: center;
 }
 
-.report-item {
-  padding: 16px;
-
-  .report-title {
-    color: #27272A;
-    font-size: 26px;
-    font-style: normal;
-    font-weight: 700;
-  }
-}
 
 #LicenseTable.license-list {
   overflow-y: scroll;
@@ -205,7 +200,7 @@
     }
 
     .license-list-item-name {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 400;
     }
   }
@@ -275,7 +270,7 @@
   display: flex;
   align-items: flex-end;
   margin-top: 10px;
-
+  justify-content: center;
 
   .vulnerabilitie-container {
     display: flex;
@@ -286,14 +281,8 @@
 
     .vulnerabilitie-number {
       color: #27272A;
-      font-size: 1.5vw;
+      font-size: 24px;
     }
-
-    .critical-number {
-      font-size: 3vw;
-      font-weight: 700;
-    }
-
 
     .vulnerabilitie-label {
       width: fit-content;
@@ -311,14 +300,14 @@
       color: #C2410C;
     }
 
-    .medium {
+    .moderate {
       background-color: #FDE047;
       color: #A16207;
     }
 
-    .moderate {
-      background-color: #F4F4F5;
-      color: #A1A1AA;
+    .low {
+      background-color: #c7c7cc;
+      color: #454547;
     }
   }
 }
