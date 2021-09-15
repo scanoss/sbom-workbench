@@ -17,6 +17,7 @@ import { ScanDb } from '../db/scan_db';
 import { licenses } from '../db/licenses';
 import { Scanner } from '../scannerLib/Scanner';
 import { ScannerEvents } from '../scannerLib/ScannerEvents';
+import { ScannerCfg } from '../scannerLib/ScannerCfg';
 import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
 import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
@@ -160,7 +161,12 @@ export class ProjectTree extends EventEmitter {
 
     this.scans_db = new ScanDb(p.work_root);
 
-    this.scanner = new Scanner();
+    const projectCfg = JSON.parse(fs.readFileSync(`${this.work_root}/projectCfg.json`,'utf8'));
+    const scannerCfg: ScannerCfg = new ScannerCfg();
+    scannerCfg.API_URL = projectCfg.DEFAULT_URL_API;
+
+    this.scanner = new Scanner(scannerCfg);
+
     this.scanner.setWorkDirectory(p.work_root);
 
     this.setScannerListeners();
@@ -410,6 +416,10 @@ export class ProjectTree extends EventEmitter {
   }
 
   scanMode(filePath: string) {
+
+    //if es full hacer lo que sigue abajo
+    //sino retornar lo que tenga por default;
+
     // eslint-disable-next-line prettier/prettier
     const skipExtentions = new Set ([".exe", ".zip", ".tar", ".tgz", ".gz", ".rar", ".jar", ".war", ".ear", ".class", ".pyc", ".o", ".a", ".so", ".obj", ".dll", ".lib", ".out", ".app", ".doc", ".docx", ".xls", ".xlsx", ".ppt" ]);
     const skipStartWith = ["{","[","<?xml","<html","<ac3d","<!doc"];
