@@ -256,6 +256,7 @@ export class Winnower extends EventEmitter {
     this.#worker = new Worker(stringWorker, { eval: true });
     this.#worker.on('message', async (scannableItem) => {
       await this.#storeResult(scannableItem.fingerprint);
+      this.#waitingWorkerResponse = false;
       await this.#nextStepMachine();
     });
   }
@@ -338,20 +339,30 @@ export class Winnower extends EventEmitter {
     return this.#nextStepMachine();
   }
 
+  recoveryIndex() {
+    // Explore this.#tmpPath directory, open the last .wfp file
+    // Search in this .wfp for the last file winnowed
+    // Search in the #fileList the index corresponing to the last file winnowed
+    // and return the index
+    return this.#fileListIndex;
+  }
+
   pause() {
     this.#continue = false;
+    this.#worker.removeAllListeners();
+    this.#worker.terminate();
+    this.init();
   }
 
   resume() {
+    this.#fileListIndex = this.recoveryIndex();
     this.#continue = true;
     this.#nextStepMachine();
   }
 
   stop() {
-    this.#continue = false;
-    this.#worker.removeAllListeners();
-    this.#worker.terminate();
-    this.init();
+
+    //clean the .wfp files
   }
 
   isRunning() {

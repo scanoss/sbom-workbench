@@ -40,10 +40,12 @@ export class Scanner extends EventEmitter {
 
   constructor() {
     super();
-    this.initialize();
+    this.#init();
+    this.#setWinnowerListeners();
+    this.#setDispatcherListeners();
   }
 
-  initialize() {
+  #init() {
     this.#scannerId = new Date().getTime();
     this.#scanFinished = false;
 
@@ -94,6 +96,10 @@ export class Scanner extends EventEmitter {
     });
     /* ******************* SETTING DISPATCHER EVENTS ******************** */
   }
+
+  #setWinnowerListeners(){}
+
+  #setDispatcherListeners(){}
 
   setWorkDirectory(path) {
     this.#workDirectory = path;
@@ -184,14 +190,15 @@ export class Scanner extends EventEmitter {
     // });
   }
 
-  async stop() {
-    await this.#winnower.stop();
-    await this.#dispatcher.stop();
-  }
 
   resume() {
     this.#winnower.resume();
     this.#dispatcher.resume();
+  }
+
+  async stop() {
+    await this.#winnower.stop();
+    await this.#dispatcher.stop();
   }
 
 
