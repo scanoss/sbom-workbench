@@ -9,6 +9,7 @@ import {
   Fade,
   Menu,
   MenuItem,
+  withStyles,
 } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import HomeOutlinedIcon from '@material-ui/icons/HomeOutlined';
@@ -128,7 +129,7 @@ const AppTitle = ({ title }) => {
   );
 };
 
-const Export = () => {
+const Export = ({ progress }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -166,12 +167,31 @@ const Export = () => {
 
   return (
     <div>
-      <Button startIcon={<GetAppIcon />} variant="contained" color="primary" onClick={onExportClicked}>
+      <Button
+        startIcon={<GetAppIcon />}
+        aria-controls="customized-menu"
+        aria-haspopup="true"
+        variant="contained"
+        color="primary"
+        onClick={onExportClicked}
+      >
         Export
       </Button>
-      <Menu id="fade-menu" anchorEl={anchorEl} keepMounted open={open} onClose={handleClose} TransitionComponent={Fade}>
-        <MenuItem onClick={() => onExport(SPDX)}>SPDX</MenuItem>
-        <MenuItem onClick={() => onExport(CSV)}>CSV</MenuItem>
+      <Menu
+        style={{ marginTop: '35px' }}
+        id="fade-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={open}
+        onClose={handleClose}
+        TransitionComponent={Fade}
+      >
+        <MenuItem disabled={progress < 100} onClick={() => onExport(SPDX)}>
+          SPDX
+        </MenuItem>
+        <MenuItem disabled={progress < 100} onClick={() => onExport(CSV)}>
+          CSV
+        </MenuItem>
         <MenuItem onClick={() => onExport(WFP)}>WFP</MenuItem>
         <MenuItem onClick={() => onExport(RAW)}>RAW</MenuItem>
       </Menu>
@@ -208,7 +228,9 @@ const AppBar = ({ exp }) => {
 
           <AppTitle title={state.name} />
 
-          <div className="slot end">{!report ? <AppProgress progress={state.progress} /> : <Export />}</div>
+          <div className="slot end">
+            {!report ? <AppProgress progress={state.progress} /> : <Export progress={state.progress} />}
+          </div>
         </Toolbar>
       </MaterialAppBar>
     </>
