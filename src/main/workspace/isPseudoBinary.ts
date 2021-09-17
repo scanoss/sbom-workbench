@@ -25,18 +25,28 @@ export function isPseudoBinary(filePath: string): boolean {
     return true;
   }
 
-  // if start with pattern
-  const file = fs.readFileSync(filePath, 'utf8');
+  // if binary
+  if (isBinaryFileSync(filePath)) {
+    return true;
+  }
+
+  //if start with pattern
+  const file = getFirstLine(filePath);
   for (const skip of skipStartWith) {
     if (file.startsWith(skip)) {
       return true;
     }
   }
 
-  // if binary
-  if (isBinaryFileSync(filePath)) {
-    return true;
-  }
 
   return false;
+}
+
+function getFirstLine(fpath) {
+  const MAX_BYTES = 100;
+  const fileDescriptor = fs.openSync(fpath, 'r');
+  const allocBuffer = Buffer.alloc(MAX_BYTES);
+  const bytesRead = fs.readSync(fileDescriptor, allocBuffer, 0, MAX_BYTES, 0);
+  fs.closeSync(fileDescriptor);
+  return allocBuffer.toString('utf8');
 }
