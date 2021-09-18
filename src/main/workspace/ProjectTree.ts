@@ -21,6 +21,7 @@ import { ScannerCfg } from '../scannerLib/ScannerCfg';
 import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
 import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
+import { isPseudoBinary } from './isPseudoBinary';
 
 const path = require('path');
 
@@ -416,40 +417,7 @@ export class ProjectTree extends EventEmitter {
   }
 
   scanMode(filePath: string) {
-
-    //if es full hacer lo que sigue abajo
-    //sino retornar lo que tenga por default;
-
-    // eslint-disable-next-line prettier/prettier
-    const skipExtentions = new Set ([".exe", ".zip", ".tar", ".tgz", ".gz", ".rar", ".jar", ".war", ".ear", ".class", ".pyc", ".o", ".a", ".so", ".obj", ".dll", ".lib", ".out", ".app", ".doc", ".docx", ".xls", ".xlsx", ".ppt" ]);
-    const skipStartWith = ["{","[","<?xml","<html","<ac3d","<!doc"];
-    const MIN_FILE_SIZE = 256; //In Bytes
-
-    // Filter by extension
-    const ext = path.extname(filePath);
-    if (skipExtentions.has(ext)) {
-      return 'MD5_SCAN';
-    }
-
-    // Filter by min size
-    const fileSize = fs.statSync(filePath).size;
-    if (fileSize < MIN_FILE_SIZE) {
-      return 'MD5_SCAN';
-    }
-
-    // if start with pattern
-    const file = fs.readFileSync(filePath, 'utf8');
-    for (const skip of skipStartWith) {
-      if (file.startsWith(skip)) {
-        return 'MD5_SCAN';
-      }
-    }
-
-    // if binary
-    if (isBinaryFileSync(filePath)) {
-      return 'MD5_SCAN';
-    }
-
+    if (isPseudoBinary(filePath)) return 'MD5_SCAN';
     return 'FULL_SCAN';
   }
 
@@ -472,11 +440,12 @@ export class ProjectTree extends EventEmitter {
     } else if (jsonScan.type === 'folder') {
       if (bannedList.evaluate(scanRoot + jsonScan.value)) {
         jsonScan.action = 'scan';
+        for (i = 0; i < jsonScan.children.length; i += 1) this.indexScan(scanRoot, jsonScan.children[i], bannedList);
       } else {
         jsonScan.action = 'filter';
       }
 
-      for (i = 0; i < jsonScan.children.length; i += 1) this.indexScan(scanRoot, jsonScan.children[i], bannedList);
+
     }
   }
 }
@@ -661,7 +630,7 @@ function dirTree(root: string, filename: string) {
       components: [],
       children: undefined,
       include: true,
-      action: 'scan',
+      action: 'filter',
       showCheckbox: false,
     };
 
@@ -684,7 +653,7 @@ function dirTree(root: string, filename: string) {
       inventories: [],
       components: [],
       include: true,
-      action: 'scan',
+      action: 'filter',
       showCheckbox: false,
     };
   }

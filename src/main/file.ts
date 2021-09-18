@@ -4,6 +4,7 @@ import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
 import { FileType } from '../api/types';
+import { isPseudoBinary } from './workspace/isPseudoBinary';
 
 
 
@@ -11,7 +12,7 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
   const fileContent = { content: '' };
   // filePath = filePath.replace(defaultProject.getScanRoot(),'');
   try {
-    const isBin = isBinaryFileSync(filePath);
+    const isBin = isPseudoBinary(filePath);
 
     if (isBin) {
       fileContent.content = FileType.BINARY;
