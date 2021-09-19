@@ -10,8 +10,8 @@ class ProjectService extends BaseService {
     return response;
   }
 
-  public async resume(project: Project): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_RESUME_SCAN, project);
+  public async resume(path: string): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_RESUME_SCAN, path);
     return response;
   }
 

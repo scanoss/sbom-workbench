@@ -148,7 +148,7 @@ const Workspace = () => {
                         <TableCell>{format(row.date)}</TableCell>
                         <TableCell>{row.files}</TableCell>
                         <TableCell className="row-actions">
-                          {row.files > 100 ? (
+                          {row.status === "SCANNING" ? (
                             <IconButton
                               aria-label="restore"
                               className="btn-restore"

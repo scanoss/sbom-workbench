@@ -57,9 +57,9 @@ export class ProjectTree extends EventEmitter {
 
   filesIndexed = 0;
 
-  filesToScan: [];
+  filesToScan: {};
 
-  filesScanned: [];
+  metadata;
 
   constructor(name: string) {
     super();
@@ -106,34 +106,23 @@ export class ProjectTree extends EventEmitter {
     this.scan_root = a.scan_root;
     this.project_name = a.project_name;
     this.filesSummary = a.filesSummary;
-    this.filesScanned = a.filesScanned;
+    this.metadata = a.metadata;
     this.filesToScan = a.filesToScan;
     this.scans_db = new ScanDb(rootOfProject);
     this.banned_list = new Filtering.BannedList('NoFilter');
     this.banned_list.load(`${this.work_root}/filter.json`);
     await this.scans_db.init();
-    this.scanner = new Scanner();
   }
 
-
+  saveMetadata() {
+    fs.writeFileSync(`${this.work_root}/metadata.json`, JSON.stringify(this.metadata).toString());
+  }
 
   saveScanProject() {
     const file = fs.writeFileSync(`${this.work_root}/tree.json`, JSON.stringify(this).toString());
 
-    // Save metadata
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
-    const metadata = {
-      id: 'NULL',
-      appVersion: app.getVersion(),
-      name: self.scan_root.split('/').pop(), // Get the folder name
-      work_root: self.work_root,
-      scan_root: self.scan_root,
-      files: self.filesSummary.include,
-      date: new Date().toISOString(),
-    };
 
-    fs.writeFileSync(`${this.work_root}/metadata.json`, JSON.stringify(metadata).toString());
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
   }
 
   async stopScanProject() {
@@ -142,17 +131,12 @@ export class ProjectTree extends EventEmitter {
     this.saveScanProject();
   }
 
-  resumeScanProject(path) {
+  resumeScanProject(path, msgToUI) {
+    console.log("Resumiendo escanner");
+    this.msgToUI = msgToUI;
     this.openScanProject(path);
-
-    // Here the performance can be improved using getNodeFrompath to get
-    // the array position of a specific path
-    for (fileScannable of this.filesScanned) {
-      const index = this.filesToScan.indexOf(fileScannable);
-      this.filesToScan.slice(index,index);
-    }
-
-    this.startScan();
+    this.initializeScanner();
+    this.scanner.scanList(this.filesToScan, this.scan_root);
   }
 
   createScanProject(scanPath: string) {
@@ -181,19 +165,23 @@ export class ProjectTree extends EventEmitter {
     } else console.log('Filters were already defined');
     this.banned_list.load(`${this.work_root}/filter.json`);
 
-    this.filesScanned = [];
 
     this.scans_db = new ScanDb(p.work_root);
 
-    const projectCfg = JSON.parse(fs.readFileSync(`${this.work_root}/projectCfg.json`,'utf8'));
-    const scannerCfg: ScannerCfg = new ScannerCfg();
-    scannerCfg.API_URL = projectCfg.DEFAULT_URL_API;
+    this.metadata = {
+      id: 'NULL',
+      appVersion: app.getVersion(),
+      name: this.scan_root.split('/').pop(), // Get the folder name
+      work_root: this.work_root,
+      scan_root: this.scan_root,
+      status: "CREATED",
+      files: 0,
+      date: new Date().toISOString(),
+    };
+    this.saveMetadata();
 
-    this.scanner = new Scanner(scannerCfg);
+    this.initializeScanner();
 
-    this.scanner.setWorkDirectory(p.work_root);
-
-    this.setScannerListeners();
   }
 
   cleanProject() {
@@ -202,6 +190,15 @@ export class ProjectTree extends EventEmitter {
     if (fs.existsSync(`${this.work_root}/scan_db`)) fs.unlinkSync(`${this.work_root}/scan_db`);
     if (fs.existsSync(`${this.work_root}/tree.json`)) fs.unlinkSync(`${this.work_root}/tree.json`);
     this.scanner.cleanWorkDirectory();
+  }
+
+  initializeScanner() {
+    const projectCfg = JSON.parse(fs.readFileSync(`${this.work_root}/projectCfg.json`,'utf8'));
+    const scannerCfg: ScannerCfg = new ScannerCfg();
+    scannerCfg.API_URL = projectCfg.DEFAULT_URL_API;
+    this.scanner = new Scanner(scannerCfg);
+    this.scanner.setWorkDirectory(this.work_root);
+    this.setScannerListeners();
   }
 
   // Return fileList
@@ -216,14 +213,18 @@ export class ProjectTree extends EventEmitter {
       const filesScanned: Array<any> = dispatcherResponse.getFilesScanned();
       this.processedFiles += filesScanned.length;
       console.log(`New ${filesScanned.length} files scanned`);
+
+      for(const file of filesScanned) delete this.filesToScan[`${this.scan_root}${file}`];
+      this.saveScanProject();
+
+      this.attachComponent(data);
+
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
         // processed: this.filesSummary.include,
         processed: (100 * this.processedFiles) / this.filesSummary.include,
       });
 
-      this.filesScanned.push(...filesScanned);
-      this.attachComponent(data);
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
@@ -236,6 +237,9 @@ export class ProjectTree extends EventEmitter {
       this.results = JSON.parse(a);
 
       this.saveScanProject();
+
+      this.metadata.status = "SCANNED";
+      this.saveMetadata();
 
       this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
         success: true,
@@ -252,6 +256,7 @@ export class ProjectTree extends EventEmitter {
     });
 
   }
+
 
   resumeScanner() {
 
@@ -285,6 +290,9 @@ export class ProjectTree extends EventEmitter {
   startScan() {
     console.log(`SCANNER: Start scanning path=${this.scan_root}`);
 
+    this.metadata.status = "SCANNING";
+    this.saveMetadata();
+    this.saveScanProject();
     // eslint-disable-next-line prettier/prettier
     this.scanner.scanList(this.filesToScan, this.scan_root);
   }
@@ -323,13 +331,17 @@ export class ProjectTree extends EventEmitter {
 
     this.indexScan(this.scan_root, this.logical_tree, this.banned_list);
 
-    const summary = { total: 0, include: 0, filter: 0, files: [] };
+    const summary = { total: 0, include: 0, filter: 0, files: {} };
     this.filesSummary = summarizeTree(this.scan_root, this.logical_tree, summary);
     console.log(
       `Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`
     );
     this.filesToScan = summary.files;
-    //console.log(this.filesToScan);
+
+
+    this.metadata.status = 'READY';
+    this.metadata.files = summary.include;
+    this.saveMetadata();
 
     if (success) {
       console.log('licenses inserted successfully...');
@@ -515,7 +527,7 @@ function summarizeTree(root: any, tree: any, summary: any) {
       tree.className = 'filter-item';
     } else if (tree.include === true) {
       summary.include += 1;
-      summary.files.push({ path: `${root}${tree.value}`, scanMode: tree.scanMode });
+      summary.files[`${root}${tree.value}`] = tree.scanMode;
     } else {
       tree.className = 'exclude-item';
     }

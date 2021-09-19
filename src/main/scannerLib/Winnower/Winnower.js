@@ -226,6 +226,8 @@ function crc32c_hex(str) {
 export class Winnower extends EventEmitter {
   #scannerCfg;
 
+  #files;
+
   #fileList;
 
   #fileListIndex;
@@ -295,14 +297,8 @@ export class Winnower extends EventEmitter {
 
     if (this.#fileListIndex >= this.#fileList.length) return null;
 
-    let path = this.#fileList[this.#fileListIndex];
-    let scanMode = 'FULL_SCAN';
-
-    // Some items in this.#fileList could be an object cointaining the scanMode (FULL_SCAN or MD5_SCAN)
-    if (typeof this.#fileList[this.#fileListIndex] === 'object') {
-      path = this.#fileList[this.#fileListIndex].path;
-      scanMode = this.#fileList[this.#fileListIndex].scanMode;
-    }
+    const path = this.#fileList[this.#fileListIndex][0];
+    const scanMode = this.#fileList[this.#fileListIndex][1];
 
     const contentSource = path.replace(this.#scanRoot, '');
     const content = await fs.promises.readFile(path);
@@ -328,8 +324,9 @@ export class Winnower extends EventEmitter {
     }
   }
 
-  async startWinnowing(fileList, scanRoot, tmpPath) {
-    this.#fileList = fileList;
+  async startWinnowing(files, scanRoot, tmpPath) {
+    this.#files = files;
+    this.#fileList = Object.entries(this.#files);
     this.#fileListIndex = 0;
     this.#scanRoot = scanRoot;
     this.#tmpPath = tmpPath;

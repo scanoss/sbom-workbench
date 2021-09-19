@@ -23,9 +23,9 @@ export class Scanner extends EventEmitter {
 
   #workDirectory;
 
-  #scannerId;
+  #scanRoot
 
-  #scannable;
+  #scannerId;
 
   #winnower;
 
@@ -157,9 +157,10 @@ export class Scanner extends EventEmitter {
     fs.writeFileSync(this.#resultFilePath, newResultStr);
   }
 
-  async scanList(fileList, scanRoot = '') {
+  async scanList(files, scanRoot = '') {
     this.#init();
 
+    this.#scanRoot = scanRoot;
     // Ensures to create a unique folder for each scanner instance in case of workDirectory was not specified.
     if (this.#workDirectory === undefined) {
       await this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
@@ -167,13 +168,13 @@ export class Scanner extends EventEmitter {
 
     this.#createOutputFiles();
 
-    if (!fileList.length) {
+    if (!Object.entries(files).length) {
       this.#finishScan();
       return;
     }
 
 
-    this.#winnower.startWinnowing(fileList, scanRoot, this.#tempPath);
+    this.#winnower.startWinnowing(files, scanRoot, this.#tempPath);
   }
 
 

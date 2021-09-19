@@ -58,10 +58,10 @@ ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
   ws.projectsList.stopScanProject();
 });
 
-ipcMain.on(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
-  const { path } = arg;
-  workspace.newProject(path,event.sender);
-  ws.projectsList.resumeScanProject(arg);
+ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
+  const path = arg;
+  ws = workspace;
+  ws.projectsList.resumeScanProject(path,event.sender);
 });
 
 
