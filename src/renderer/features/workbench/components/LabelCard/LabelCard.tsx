@@ -8,9 +8,10 @@ interface LabelCardProps {
   label: string | null;
   status: string | null;
   subLabel: string | null;
+  completeFilePath: string | null;
 }
 
-const LabelCard = ({ label, status, subLabel }: LabelCardProps) => {
+const LabelCard = ({ label, status, subLabel, completeFilePath }: LabelCardProps) => {
   const onCopy = (label: string) => {
     navigator.clipboard.writeText(label);
   };
@@ -20,10 +21,12 @@ const LabelCard = ({ label, status, subLabel }: LabelCardProps) => {
       <div className="label-card-content">
         <div className="label-div">
           <span className="label-title">{label}</span>
-          <div className="directory-div">
-            <AccountTreeIcon className="label-icon" />
-            <Label label={subLabel} textColor="black" tooltip />
-          </div>
+          <Tooltip title={completeFilePath}>
+            <div className="directory-div">
+              <AccountTreeIcon className="label-icon" />
+                <Label label={subLabel} textColor="black" />
+            </div>
+          </Tooltip>
         </div>
         <Tooltip title="Copy file path to clipboard">
           <IconButton size="small" className="btn-copy" onClick={() => onCopy(subLabel)}>
