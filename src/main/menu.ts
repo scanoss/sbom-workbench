@@ -187,7 +187,7 @@ export default class MenuBuilder {
         ],
       },
       {
-        label: 'Edit',
+        label: '&Edit',
         submenu: [
           /* {role: 'undo'},
           {role: 'redo'},
