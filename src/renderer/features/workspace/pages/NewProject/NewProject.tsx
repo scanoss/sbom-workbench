@@ -85,7 +85,7 @@ const NewProject = () => {
       if(action === 'ok') {
         // Call to the service and stop scanner.
         await projectService.stop();
-        console.log("stop scanner");
+        history.goBack();
       }
 
     //ipcRenderer.send(IpcEvents.PROJECT_STOP);

@@ -132,8 +132,12 @@ export class ProjectTree extends EventEmitter {
   }
 
   resumeScanProject(path, msgToUI) {
-    console.log("Resumiendo escanner");
     this.msgToUI = msgToUI;
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: 'scanning',
+      // processed: this.filesSummary.include,
+      processed: (100 * this.processedFiles) / this.filesSummary.include,
+    });
     this.openScanProject(path);
     this.initializeScanner();
     this.scanner.scanList(this.filesToScan, this.scan_root);
