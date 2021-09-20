@@ -300,7 +300,7 @@ export class Winnower extends EventEmitter {
       scanMode = this.#fileList[this.#fileListIndex].scanMode;
     }
 
-    const contentSource = path.replace(this.#scanRoot, '');
+    const contentSource = path.replace(`${this.#scanRoot}/`, '');
     const content = await fs.promises.readFile(path);
 
     this.#fileListIndex += 1;
