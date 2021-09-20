@@ -145,7 +145,7 @@ export const ComponentDetail = () => {
   };
 
   const onDetachAllPressed = async () => {
-    const { action } = await dialogCtrl.openConfirmDialog();
+    const { action } = await dialogCtrl.openConfirmDialog(`Are you sure you want to Ignore ${filterFiles.identified.length} ${filterFiles.identified.length === 1 ? 'file' : 'files'}?`);
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.identified.map((file) => file.id);
       await detachFile(selFiles);
