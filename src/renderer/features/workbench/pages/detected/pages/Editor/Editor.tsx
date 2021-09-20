@@ -16,6 +16,7 @@ import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { resultService } from '../../../../../../../api/results-service';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import { projectService } from '../../../../../../../api/project-service';
+import { Tooltip } from '@material-ui/core';
 
 
 
@@ -255,6 +256,14 @@ export const Editor = () => {
     }
   };
 
+  // shorter function
+  const getLastNameFromPath = (path: string) => {
+    if (path) {
+      const parts = path.split('/');
+      return parts[parts.length - 1];
+    } else return '';
+  }
+
   return (
     <>
       <section id="editor" className="app-page">
@@ -306,9 +315,9 @@ export const Editor = () => {
               )}
 
               <div className="info-files">
-                <LabelCard label="Source File" subLabel={file} status={null} />
+                <LabelCard label="Source File" subLabel={getLastNameFromPath(file)} status={null} completeFilePath={file}/>
                 {matchInfo && currentMatch && currentMatch.file && (
-                  <LabelCard label="Component File" subLabel={currentMatch.file} status={null} />
+                  <LabelCard label="Component File" subLabel={getLastNameFromPath(currentMatch.file)} status={null} completeFilePath={currentMatch.file}/>
                 )}
               </div>
             </header>
