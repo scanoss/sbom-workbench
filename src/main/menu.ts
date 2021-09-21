@@ -107,9 +107,8 @@ export default class MenuBuilder {
           {role: 'delete'},
           {role: 'selectall'} */
         ]
-    }
+    };
 
-       
     const subMenuViewDev: MenuItemConstructorOptions = {
       label: 'View',
       submenu: [
@@ -134,10 +133,7 @@ export default class MenuBuilder {
             this.mainWindow.webContents.toggleDevTools();
           },
         },
-      ],
-      
-
-      
+      ]
     };
     const subMenuViewProd: MenuItemConstructorOptions = {
       label: 'View',
