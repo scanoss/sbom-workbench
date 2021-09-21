@@ -33,6 +33,7 @@ class WorkbenchController {
    * @memberof WorkbenchController
    */
   public async fetchLocalFile(path: string): Promise<string> {
+    console.log(path)
     const { data } = await ipcRenderer.invoke(IpcEvents.FILE_GET_CONTENT, path);
     return data.content;
   }

@@ -70,7 +70,7 @@ export const Editor = () => {
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false });
-      const content = await workbenchController.fetchLocalFile(scanBasePath + path);
+      const content = await workbenchController.fetchLocalFile(scanBasePath + "/" + path);
 
       if (content === FileType.BINARY) throw new Error(FileType.BINARY);
       setLocalFileContent({ content, error: false });
