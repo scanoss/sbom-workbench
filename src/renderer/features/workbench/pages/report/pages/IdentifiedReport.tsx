@@ -9,10 +9,25 @@ import LicensesTable from '../components/LicensesTable';
 import MatchesForLicense from '../components/MatchesForLicense';
 import { setReport } from '../../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../../store';
+import { ExportFormat } from '../../../../../../api/export-service';
+import { HashType } from '../../../../../../main/db/export_formats';
+
+const { shell } = require('electron');
 
 Chart.register(...registerables);
 
 const IdentifiedReport = ({ data }) => {
+  const notarizeSBOM = async () => {
+    const hash = await ExportFormat.notarizeSBOM(HashType.SHA256);
+
+    const response = await fetch('https://sbom.info/', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/x-www-form-urlencoded' }, // this line is important, if this content-type is not set it wont work
+      body: `hash=${hash}&type=${HashType.SHA256}`,
+  });
+  console.log(response);
+  };
+
   const history = useHistory();
   const { dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
@@ -63,6 +78,11 @@ const IdentifiedReport = ({ data }) => {
               <div className="report-title">Matches for license</div>
               <MatchesForLicense data={matchedLicenseSelected || data.licenses?.[0]} />
             </Card>
+            <div>
+              <button type="button" onClick={notarizeSBOM}>
+                Notarize SBOM
+              </button>
+            </div>
           </section>
         </>
       )}

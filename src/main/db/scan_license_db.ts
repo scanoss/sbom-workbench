@@ -5,11 +5,11 @@
 /* eslint-disable no-restricted-syntax */
 import { Querys } from './querys_db';
 import { Db } from './db';
-import { UtilsDb } from './utils_db';
+import { utilDb } from './utils_db';
 import { License } from '../../api/types';
 
 const query = new Querys();
-const utilsDb = new UtilsDb();
+
 
 export class LicenseDb extends Db {
   constructor(path: string) {
@@ -65,7 +65,7 @@ export class LicenseDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        const json: Record<any, any> = await utilsDb.readFile(path);
+        const json: Record<any, any> = await utilDb.readFile(path);
         for (const [key, license] of Object.entries(json)) {
           db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, (err: any) => {
             if (err) reject(new Error('Unable to insert licenses'));
