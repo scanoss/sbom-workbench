@@ -94,6 +94,21 @@ export default class MenuBuilder {
         },
       ],
     };
+    const subMenuEdit: MenuItemConstructorOptions = {
+        label: '&Edit',
+        submenu: [
+          /* {role: 'undo'},
+          {role: 'redo'},
+          {type: 'separator'}, */
+          {role: 'cut'},
+          {role: 'copy'},
+          {role: 'paste'},
+          /* {role: 'pasteandmatchstyle'},
+          {role: 'delete'},
+          {role: 'selectall'} */
+        ]
+    };
+
     const subMenuViewDev: MenuItemConstructorOptions = {
       label: 'View',
       submenu: [
@@ -118,7 +133,7 @@ export default class MenuBuilder {
             this.mainWindow.webContents.toggleDevTools();
           },
         },
-      ],
+      ]
     };
     const subMenuViewProd: MenuItemConstructorOptions = {
       label: 'View',
@@ -168,7 +183,7 @@ export default class MenuBuilder {
         ? subMenuViewDev
         : subMenuViewProd;
 
-    return [subMenuAbout, subMenuView, subMenuWindow, subMenuHelp];
+    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
   }
 
   buildDefaultTemplate() {
@@ -185,6 +200,20 @@ export default class MenuBuilder {
             },
           },
         ],
+      },
+      {
+        label: '&Edit',
+        submenu: [
+          /* {role: 'undo'},
+          {role: 'redo'},
+          {type: 'separator'}, */
+          {role: 'cut'},
+          {role: 'copy'},
+          {role: 'paste'},
+          /* {role: 'pasteandmatchstyle'},
+          {role: 'delete'},
+          {role: 'selectall'} */
+        ]
       },
       {
         label: '&View',
