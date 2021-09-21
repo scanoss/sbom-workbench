@@ -16,11 +16,11 @@ interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
 }
 
 const RESOURCES_PATH = app.isPackaged
-? path.join(process.resourcesPath, 'assets')
-: path.join(__dirname, '../../assets');
+  ? path.join(process.resourcesPath, 'assets')
+  : path.join(__dirname, '../../assets');
 
 const getAssetPath = (...paths: string[]): string => {
-return path.join(RESOURCES_PATH, ...paths);
+  return path.join(RESOURCES_PATH, ...paths);
 };
 
 const aboutText = `SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.
@@ -51,8 +51,11 @@ Copyright (C) 2021 Scan Open Source Solutions S.L.
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
 
-  constructor(mainWindow: BrowserWindow) {
+  mainURL: string;
+
+  constructor(mainWindow: BrowserWindow, main: string) {
     this.mainWindow = mainWindow;
+    this.mainURL = main;
   }
 
   buildMenu(): Menu {
@@ -272,12 +275,34 @@ export default class MenuBuilder {
           {
             label: 'About',
             click() {
+              const aboutWindow = new BrowserWindow({
+                parent: self.mainWindow,
+                resizable: false,
+                width: 500,
+                height: 500,
+                modal: true,
+                autoHideMenuBar: true,
+                backgroundColor: '#e4e4e7',
+                webPreferences: {
+                  nodeIntegration: true,
+                  enableRemoteModule: true,
+                  devTools: false,
+                },
+              });
+
+              aboutWindow.webContents.on('new-window', (event, url) => {
+                event.preventDefault();
+                shell.openExternal(url);
+              });
+
+              aboutWindow.loadURL(`${self.mainURL}#/about`);
+
               const image = nativeImage.createFromPath(getAssetPath('icon.png'));
-              dialog.showMessageBox(self.mainWindow, {
+              /* dialog.showMessageBox(self.mainWindow, {
                 title: `${app.getName()} ${app.getVersion()}`,
                 message: aboutText,
                 icon: image,
-              });
+              }); */
             },
           },
         ],

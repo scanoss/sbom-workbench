@@ -256,13 +256,6 @@ export const Editor = () => {
     }
   };
 
-  // shorter function
-  const getLastNameFromPath = (path: string) => {
-    if (path) {
-      const parts = path.split('/');
-      return parts[parts.length - 1];
-    } else return '';
-  }
 
   return (
     <>
@@ -315,7 +308,7 @@ export const Editor = () => {
               )}
 
               <div className="info-files">
-                <LabelCard label="Source File" subLabel={getLastNameFromPath(file)} status={null} completeFilePath={file}/>
+                <LabelCard label="Source File" file={file} status={null} />
                 {matchInfo && currentMatch && currentMatch.file && (
                   <LabelCard label="Component File" subLabel={getLastNameFromPath(currentMatch.file)} status={null} completeFilePath={currentMatch.file}/>
                 )}
