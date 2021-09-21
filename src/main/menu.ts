@@ -35,9 +35,18 @@ By using this tool you accept that the results provided do not represent any kin
 
 The source code is analyzed on the spot and is not transfered anywhere outside this computer.
 
+OSADL Attribution Notice:
+The raw data of the OSADL Open Source License Checklists are licensed under the Creative Commons Attribution 4.0 International license (CC-BY-4.0), https://creativecommons.org/licenses/by/4.0/
+
+© 2017 - 2020 Open Source Automation Development Lab (OSADL) eG and contributors, info@osadl.org
+
+For further information about the project see the description at www.osadl.org/checklists
+
 VERSION: ${app.getVersion()}
 
-Copyright (C) 2021 Scan Open Source Solutions S.L.`;
+Copyright (C) 2021 Scan Open Source Solutions S.L.
+
+`;
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
