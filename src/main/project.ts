@@ -19,6 +19,9 @@ ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (_event, arg: any) => {
   let created: any;
   console.log(arg);
   ws = workspace;
+
+
+
   ws.newProject(arg, _event.sender);
   ws.projectsList.openScanProject(arg);
 

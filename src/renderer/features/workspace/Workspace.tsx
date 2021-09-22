@@ -100,6 +100,10 @@ const Workspace = () => {
     return cleanup;
   }, []);
 
+const isProjectFinished = (project): boolean => {
+  return project.status === 'SCANNED';
+}
+
   return (
     <>
       <section id="Workspace" className="app-page">
@@ -141,14 +145,23 @@ const Workspace = () => {
                 <TableBody>
                   {filterProjects.length !== 0 ? (
                     filterProjects.map((row) => (
-                      <TableRow hover key={row.name} onClick={() => onShowScan(row)}>
+                      <TableRow
+                        className={ isProjectFinished(row) ? 'scanning-not-complete' : 'scanning-complete'}
+                        hover
+                        key={row.name}
+                        onClick={() => {
+                          if (!isProjectFinished(row)) {onShowScan(row)};
+                        }}
+                      >
                         <TableCell component="th" scope="row">
                           {row.name}
                         </TableCell>
                         <TableCell>{format(row.date)}</TableCell>
                         <TableCell>{row.files}</TableCell>
                         <TableCell className="row-actions">
-                          {row.status === "SCANNING" ? (
+                        <div className="btn-actions">
+                          {isProjectFinished(row) ? (
+
                             <IconButton
                               aria-label="restore"
                               className="btn-restore"
@@ -164,6 +177,7 @@ const Workspace = () => {
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
+                        </div>
                         </TableCell>
                       </TableRow>
                     ))

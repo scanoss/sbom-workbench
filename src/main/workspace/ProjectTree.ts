@@ -255,10 +255,6 @@ export class ProjectTree extends EventEmitter {
       this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
 
-    ipcMain.on(IpcEvents.SCANNER_RESUME, async (event, arg: IInitScan) => {
-      this.resumeScanner();
-    });
-
   }
 
 

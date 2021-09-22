@@ -64,6 +64,7 @@ const NewProject = () => {
       },
       true
       );
+      history.goBack();
 
 
     //ipcRenderer.send(IpcEvents.SCANNER_RESUME);
