@@ -495,7 +495,7 @@ function getLeaf(arbol: any, mypath: string): any {
   if (arbol.type === 'folder') {
     for (j = 0; j < arbol.children.length; j += 1) {
       if (arbol.children[j].type === 'folder' && arbol.children[j].label === res[1]) {
-        const newpath = mypath.replace(`${res[0]}/`, '');
+        const newpath = mypath.replace(`${res[0]}`, '');
         return getLeaf(arbol.children[j], newpath);
       }
       if (arbol.children[j].type === 'file' && arbol.children[j].label === res[1]) {

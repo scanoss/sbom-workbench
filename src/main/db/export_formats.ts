@@ -42,8 +42,8 @@ export class Formats extends Db {
           if (err) resolve(false);
           else {
             for (let i = 0; i < data.length; i += 1) {
-              const pkg: any = {};      
-              pkg.name = data[i].name;         
+              const pkg: any = {};
+              pkg.name = data[i].name;
               pkg.PackageVersion = data[i].version;
               pkg.PackageSPDXIdentifier = data[i].purl;
               pkg.PackageDownloadLocation=data[i].url;
@@ -68,14 +68,14 @@ export class Formats extends Db {
     });
   }
 
-   csv(path: string) {   
+   csv(path: string) {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.all(query.SQL_GET_CSV_DATA, async (err: any, data: any) => {
           db.close();
           if (err) resolve(false);
-          else {                  
+          else {
             const csv = this.csvCreate(data);
             await fs.writeFile(`${path}`, csv, 'utf-8', () => {
               resolve(true);
@@ -98,8 +98,16 @@ export class Formats extends Db {
 
   raw(path: string, results :any) {
     return new Promise<boolean>(async (resolve, reject) => {
+      let out={}
       try {
-          await fs.writeFile(`${path}`, JSON.stringify(results, undefined, 4), 'utf-8', () => {
+
+         for (const [key, obj] of Object.entries(results)) {
+          let vKey = key;
+          if(key.charAt(0)==='/') vKey = key.substring(1)
+        out[vKey]=obj;
+        }
+
+        await fs.writeFile(`${path}`, JSON.stringify(out, undefined, 4), 'utf-8', () => {
           resolve(true);
         });
       } catch (error) {
