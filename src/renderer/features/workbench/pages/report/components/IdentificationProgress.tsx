@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Chart } from 'chart.js';
 import { Button, Tooltip } from '@material-ui/core';
-import PublishSharpIcon from '@material-ui/icons/PublishSharp';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import { shell } from 'electron';
 import { ExportFormat } from '../../../../../../api/export-service';
 import { HashType } from '../../../../../../main/db/export_formats';
@@ -10,16 +10,24 @@ import { projectService } from '../../../../../../api/project-service';
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
   const [percentage, setPercentage] = useState<number>(0);
+  const [token, setToken] = useState<string>(null);
 
   const notarizeSBOM = async () => {
     const hash = await ExportFormat.notarizeSBOM(HashType.SHA256);
-    shell.openExternal(`https://sbom.info/?hash=${hash}&type=${HashType.SHA256}`);
+    shell.openExternal(`https://sbom.info/?hash=${hash}&type=${HashType.SHA256}&token=${token}`);
+  };
+
+  const readToken = async () => {
+    const response = await projectService.getToken();
+    setToken(response);
   };
 
   useEffect(() => {
     const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
     const pending = 100 - percentage;
     setPercentage(percentage);
+
+    readToken();
 
     const tooltipPlugin = Chart.registry.getPlugin('tooltip');
     tooltipPlugin.positioners.custom = function (elements, eventPosition) {
@@ -115,15 +123,15 @@ const LicensesChart = ({ data }) => {
         </span>
       </div>
       <div className="notarize-container">
-        {percentage < 100 ? (
+        {percentage < 100 || !token ? (
           <>
-            <Tooltip title="Identification progress must be 100%">
+            <Tooltip title="Identification progress is not 100% or your token is not defined">
               <span>
                 <Button
-                  disabled={percentage < 100}
+                  disabled
                   variant="contained"
                   color="secondary"
-                  startIcon={<PublishSharpIcon />}
+                  endIcon={<OpenInNewIcon />}
                   type="button"
                   onClick={notarizeSBOM}
                 >
@@ -136,7 +144,7 @@ const LicensesChart = ({ data }) => {
           <Button
             variant="contained"
             color="secondary"
-            startIcon={<PublishSharpIcon />}
+            endIcon={<OpenInNewIcon />}
             type="button"
             onClick={notarizeSBOM}
           >
