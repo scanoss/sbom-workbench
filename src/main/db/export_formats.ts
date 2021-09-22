@@ -12,29 +12,31 @@ import { Db } from './db';
 import { spdx } from '../../api/spdx-versions';
 import { ComponentDb } from './scan_component_db';
 import { Querys } from './querys_db';
-
-import { UtilsDb } from './utils_db';
+import { utilDb } from './utils_db';
 
 const fs = require('fs');
+const os = require('os');
+const crypto = require('crypto');
 
 const query = new Querys();
 
-export class Formats extends Db {
-  utils: UtilsDb;
+export enum HashType {
+  SHA256 = 'sha256',
+}
 
+export class Formats extends Db {
   component: ComponentDb;
 
   constructor(path: string) {
     super(path);
     this.component = new ComponentDb(path);
-    this.utils = new UtilsDb();
   }
 
   spdx(path: string) {
     const document = spdx;
     return new Promise<boolean>(async (resolve, reject) => {
       try {
-        const timeStamp = this.utils.getTimeStamp();
+        const timeStamp = utilDb.getTimeStamp();
         document.creationInfo.created = timeStamp;
         const db = await this.openDb();
         db.all(query.SQL_GET_SPDX_COMP_DATA, async (err: any, data: any) => {
@@ -46,7 +48,7 @@ export class Formats extends Db {
               pkg.name = data[i].name;
               pkg.PackageVersion = data[i].version;
               pkg.PackageSPDXIdentifier = data[i].purl;
-              pkg.PackageDownloadLocation=data[i].url;
+              pkg.PackageDownloadLocation = data[i].url;
               pkg.description = 'Detected by SCANOSS Inventorying Engine.';
               if (data[i].license_name !== undefined)
                 pkg.ConcludedLicense = data[i].license_name;
@@ -68,7 +70,7 @@ export class Formats extends Db {
     });
   }
 
-   csv(path: string) {
+  csv(path: string) {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -79,7 +81,7 @@ export class Formats extends Db {
             const csv = this.csvCreate(data);
             await fs.writeFile(`${path}`, csv, 'utf-8', () => {
               resolve(true);
-           });
+            });
           }
         });
       } catch (error) {
@@ -91,22 +93,26 @@ export class Formats extends Db {
   private csvCreate(inventories: any) {
     let csv = `inventory_ID,usage,notes,identified_license,detected_license,identified_component,detected_component,path,purl,version\r\n`;
     for (const inventory of inventories) {
-      csv += `${inventory.inventoryId},${inventory.usage},${inventory.notes},${inventory.identified_license},${inventory.detected_license? inventory.detected_license:'n/a'},${inventory.identified_component},${inventory.detected_component?inventory.detected_component:'n/a'},"${inventory.path}","${inventory.purl}",${inventory.version}\r\n`;
+      csv += `${inventory.inventoryId},${inventory.usage},${inventory.notes},${
+        inventory.identified_license
+      },${inventory.detected_license ? inventory.detected_license : 'n/a'},${
+        inventory.identified_component
+      },${
+        inventory.detected_component ? inventory.detected_component : 'n/a'
+      },"${inventory.path}","${inventory.purl}",${inventory.version}\r\n`;
     }
     return csv;
   }
 
-  raw(path: string, results :any) {
+  raw(path: string, results: any) {
     return new Promise<boolean>(async (resolve, reject) => {
-      let out={}
+      const out={}
       try {
-
-         for (const [key, obj] of Object.entries(results)) {
+        for (const [key, obj] of Object.entries(results)) {
           let vKey = key;
           if(key.charAt(0)==='/') vKey = key.substring(1)
-        out[vKey]=obj;
+            out[vKey]=obj;
         }
-
         await fs.writeFile(`${path}`, JSON.stringify(out, undefined, 4), 'utf-8', () => {
           resolve(true);
         });
@@ -116,7 +122,7 @@ export class Formats extends Db {
     });
   }
 
-  wfp(path: string, winnowingPath :any) {
+  wfp(path: string, winnowingPath: any) {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         await fs.copyFile(winnowingPath, path, (err) => {
@@ -129,4 +135,17 @@ export class Formats extends Db {
     });
   }
 
+  public async notarizeSBOM(type: String) {
+    return new Promise<boolean>(async (resolve, reject) => {
+      const path = `${os.tmpdir()}/spdx`;
+      const success = await this.spdx(path);
+      if (!success) reject(new Error('Unable to generate hash'));      
+
+      const fileBuffer = fs.readFileSync(path);
+      const hashSum = crypto.createHash(type);
+      hashSum.update(fileBuffer);
+      const hex = hashSum.digest('hex');  
+      resolve(hex);
+    });
+  }
 }

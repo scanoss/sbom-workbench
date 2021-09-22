@@ -10,9 +10,14 @@ import MatchesForLicense from '../components/MatchesForLicense';
 import { setReport } from '../../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../../store';
 
+
+const { shell } = require('electron');
+
 Chart.register(...registerables);
 
 const IdentifiedReport = ({ data }) => {
+
+
   const history = useHistory();
   const { dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 

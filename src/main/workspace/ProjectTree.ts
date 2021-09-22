@@ -448,6 +448,13 @@ export class ProjectTree extends EventEmitter {
 
     }
   }
+
+
+  public getToken(){
+    const txt = fs.readFileSync(`${this.work_root}/projectCfg.json`,'utf8');
+    const cfg = JSON.parse(txt);
+    return cfg.TOKEN || null ;
+  }
 }
 
 /* AUXILIARY FUNCTIONS */
@@ -581,34 +588,7 @@ function insertComponent(tree: any, mypath: string, comp: Component): any {
   arbol.components.push(component);
   arbol.className = 'match-info-result';
 }
-/*
-function recurseJSON(jsonScan: any, banned_list: Filtering.BannedList): any {
-  let i = 0;
-  if (jsonScan.type === 'file') {
-    if (banned_list.evaluate(jsonScan.path)) {
-      jsonScan.action = 'scan';
-    } else {
-      jsonScan.action = 'filter';
-    }
-  } else if (jsonScan.type === 'folder') {
-    for (i = 0; i < jsonScan.children.length; i += 1) recurseJSON(jsonScan.children[i], banned_list);
-  }
-} */
-/*
-function indexScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
-  let i = 0;
 
-  if (jsonScan.type === 'file') {
-    if (bannedList.evaluate(scanRoot + jsonScan.value)) {
-      jsonScan.action = 'scan';
-    } else {
-      jsonScan.action = 'filter';
-    }
-  } else if (jsonScan.type === 'folder') {
-    for (i = 0; i < jsonScan.children.length; i += 1) indexScan(scanRoot, jsonScan.children[i], bannedList);
-  }
-}
-*/
 function dirFirstFileAfter(a, b) {
   if (!a.isDirectory() && b.isDirectory()) return 1;
   if (a.isDirectory() && !b.isDirectory()) return -1;
