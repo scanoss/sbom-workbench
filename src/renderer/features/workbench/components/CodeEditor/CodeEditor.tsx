@@ -16,7 +16,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
 
   let lines = null;
   let code = null;
-  let start = 1;
+  let start = 0;
   let end = LINES_MAX;
 
   if (highlight && highlight !== 'all') {

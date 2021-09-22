@@ -10,20 +10,31 @@ const About = () => {
       style={{
         fontSize: '0.75rem',
         fontWeight: 600,
-        margin: '1rem 0',
-        padding: '0 2rem',
         height: '100%',
-        overflow: 'scroll',
         display: 'grid',
+        gridTemplateRows: 'auto 1fr',
       }}
     >
-      <div className="logo" />
-
-      <div className="info">
+      <header
+        style={{
+          padding: '1rem 2rem 0',
+        }}
+      >
         <div className="d-flex align-center">
-          <img src={icon} alt="logo" className="mr-10"/>
-          <p style={{fontSize: '0.9rem'}}>SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.</p>
+          <img src={icon} alt="logo" className="mr-10" />
+          <p style={{ fontSize: '0.9rem' }}>
+            SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.
+          </p>
         </div>
+      </header>
+
+      <div
+        style={{
+          padding: '0 2rem',
+          height: '100%',
+          overflowY: 'scroll',
+        }}
+      >
         <p>
           This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
           Public License as published by the Free Software Foundation, version 2.
