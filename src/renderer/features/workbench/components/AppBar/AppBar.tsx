@@ -29,6 +29,7 @@ import { ExportFormat } from '../../../../../api/export-service';
 import { projectService } from '../../../../../api/project-service';
 import { dialogController } from '../../../../dialog-controller';
 
+
 const Navigation = () => {
   const history = useHistory();
 
@@ -126,6 +127,28 @@ const AppTitle = ({ title }) => {
         {section}
       </Typography>
     </section>
+  );
+};
+
+const Notarize = () => {
+  const dialogCtrl = useContext<any>(DialogContext);
+  const notarizeSBOM = async () => {  
+      const hash = await ExportFormat.notarizeSBOM(HashType.SHA256);
+    shell.openExternal(`https://sbom.info/?Hash=${hash}&type=${HashType.SHA256}&token=gato`);
+  };
+
+  return (
+    <div className="notarize-container">
+      <Button
+        variant="contained"
+        color="secondary"
+        startIcon={<PublishSharpIcon />}
+        type="button"
+        onClick={notarizeSBOM}
+      >
+        Post to SBOM ledger
+      </Button>
+    </div>
   );
 };
 

@@ -1,9 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Chart } from 'chart.js';
+import { Button, Tooltip } from '@material-ui/core';
+import PublishSharpIcon from '@material-ui/icons/PublishSharp';
+import { shell } from 'electron';
+import { ExportFormat } from '../../../../../../api/export-service';
+import { HashType } from '../../../../../../main/db/export_formats';
+import { projectService } from '../../../../../../api/project-service';
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
   const [percentage, setPercentage] = useState<number>(0);
+
+  const notarizeSBOM = async () => {
+    const hash = await ExportFormat.notarizeSBOM(HashType.SHA256);
+    shell.openExternal(`https://sbom.info/?hash=${hash}&type=${HashType.SHA256}`);
+  };
 
   useEffect(() => {
     const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
@@ -100,6 +111,36 @@ const LicensesChart = ({ data }) => {
       </div>
       <div className="total-files-container">
         <span className="total-files-label">Total Files: {data.totalFiles}</span>
+      </div>
+      <div className="notarize-container">
+        {percentage < 100 ? (
+          <>
+            <Tooltip title="Identification progress must be 100%">
+              <span>
+                <Button
+                  disabled={percentage < 100}
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<PublishSharpIcon />}
+                  type="button"
+                  onClick={notarizeSBOM}
+                >
+                  Post to SBOM ledger
+                </Button>
+              </span>
+            </Tooltip>
+          </>
+        ) : (
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<PublishSharpIcon />}
+            type="button"
+            onClick={notarizeSBOM}
+          >
+            Post to SBOM ledger
+          </Button>
+        )}
       </div>
     </div>
   );
