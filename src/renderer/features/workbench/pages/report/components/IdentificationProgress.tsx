@@ -110,7 +110,9 @@ const LicensesChart = ({ data }) => {
         </div>
       </div>
       <div className="total-files-container">
-        <span className="total-files-label">Total Files: {data.totalFiles}</span>
+        <span className="total-files-label">
+          <strong>{data.totalFiles}</strong> total files
+        </span>
       </div>
       <div className="notarize-container">
         {percentage < 100 ? (
