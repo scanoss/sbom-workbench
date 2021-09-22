@@ -6,6 +6,7 @@ import { AppContext } from '../../../../context/AppProvider';
 import * as controller from '../../../../home-controller';
 import { IpcEvents } from '../../../../../ipc-events';
 import { DialogContext } from '../../../../context/DialogProvider';
+
 const { ipcRenderer } = require('electron');
 
 const NewProject = () => {

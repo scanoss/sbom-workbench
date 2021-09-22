@@ -16,6 +16,7 @@ const defaultCfg = {
   DEFAULT_URL_API: 0,
   AVAILABLE_URL_API: ['https://osskb.org/api/scan/direct'],
   SCAN_MODE: 'FULL_SCAN',
+  TOKEN: ''
 };
 
 class Workspace extends EventEmitter {
