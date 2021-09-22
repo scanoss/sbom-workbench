@@ -1,5 +1,6 @@
 import React from 'react';
 import icon from '../../../../assets/icon.png';
+import LicensesText from './LicensesText';
 
 const electron = window.require('electron');
 const { app } = electron.remote;
@@ -33,6 +34,7 @@ const About = () => {
           padding: '0 2rem',
           height: '100%',
           overflowY: 'scroll',
+          textAlign: 'justify',
         }}
       >
         <p>
@@ -69,6 +71,9 @@ const About = () => {
         <p>For further information about the project see the description at www.osadl.org/checklists</p>
         <p>VERSION: {app.getVersion()}</p>
         <p>Copyright &copy; {new Date().getFullYear()} Scan Open Source Solutions S.L.</p>
+        <p>
+          <LicensesText />
+        </p>
       </div>
     </div>
   );
