@@ -17,7 +17,7 @@ ipcMain.handle(IpcEvents.UNIGNORED_FILES, async (event, arg: number[]) => {
 });
 
 ipcMain.handle(IpcEvents.RESULTS_GET, async (event, arg: string) => {
-  if (arg !== null && arg.charAt(0) === '/') arg = arg.substring(1);
+ // if (arg !== null && arg.charAt(0) === '/') arg = arg.substring(1);
   const result = await defaultProject.scans_db.results.getAll(arg);
   if (result)
     return {

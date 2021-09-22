@@ -106,15 +106,16 @@ export class Formats extends Db {
 
   raw(path: string, results: any) {
     return new Promise<boolean>(async (resolve, reject) => {
+      const out={}
       try {
-        await fs.writeFile(
-          `${path}`,
-          JSON.stringify(results, undefined, 4),
-          'utf-8',
-          () => {
-            resolve(true);
-          }
-        );
+        for (const [key, obj] of Object.entries(results)) {
+          let vKey = key;
+          if(key.charAt(0)==='/') vKey = key.substring(1)
+            out[vKey]=obj;
+        }
+        await fs.writeFile(`${path}`, JSON.stringify(out, undefined, 4), 'utf-8', () => {
+          resolve(true);
+        });
       } catch (error) {
         reject(new Error('Unable to generate spdx file'));
       }
