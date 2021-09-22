@@ -39,9 +39,9 @@ const IdentifiedReport = ({ data }) => {
           <div className="empty-container">
             <div className="report-message">
               <InsertDriveFileOutlinedIcon fontSize="inherit" color="primary" style={{ fontSize: '100px' }} />
-              <h2>Nothing identified yet</h2>
-              <Button variant="outlined" color="primary" onClick={() => history.push('/workbench/detected')}>
-                Start identification
+              <h2>Nothing identified yet.</h2>
+              <Button variant="contained" color="primary" onClick={() => history.push('/workbench/detected')}>
+                START IDENTIFICATION
               </Button>
             </div>
           </div>

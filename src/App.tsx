@@ -8,6 +8,7 @@ import Workbench from './renderer/features/workbench/Workbench';
 import AppProvider from './renderer/context/AppProvider';
 import Workspace from './renderer/features/workspace/Workspace';
 import NewProject from './renderer/features/workspace/pages/NewProject/NewProject';
+import About from './renderer/features/about/About';
 
 const theme = createMuiTheme({
   palette: {
@@ -40,6 +41,7 @@ export default function App() {
             <WorkbenchProvider>
               <Route path="/workbench" component={Workbench} />
             </WorkbenchProvider>
+            <Route path="/about" exact component={About} />
           </DialogProvider>
         </AppProvider>
       </MuiThemeProvider>
