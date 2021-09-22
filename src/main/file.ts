@@ -6,13 +6,21 @@ import { defaultProject } from './workspace/ProjectTree';
 import { FileType } from '../api/types';
 import { isPseudoBinary } from './workspace/isPseudoBinary';
 
+const path = require('path');
 
+const allowExtension = new Set ([".json", ".htm", ".html", ".xml"]);
 
 ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
   const fileContent = { content: '' };
-  // filePath = filePath.replace(defaultProject.getScanRoot(),'');
   try {
-    const isBin = isPseudoBinary(filePath);
+    // TODO: remove when isPsuedoBinary is fixed
+    const ext = path.extname(filePath);
+    let isBin = false;
+    if (allowExtension.has(ext)) {
+      isBin = false;
+    } else {
+      isBin = isPseudoBinary(filePath);
+    }
 
     if (isBin) {
       fileContent.content = FileType.BINARY;
