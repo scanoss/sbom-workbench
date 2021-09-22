@@ -52,6 +52,7 @@ class Workspace extends EventEmitter {
       const projectCfg = {
         DEFAULT_URL_API: defaultCfg.AVAILABLE_URL_API[defaultCfg.DEFAULT_URL_API],
         SCAN_MODE: defaultCfg.SCAN_MODE,
+        TOKEN: defaultCfg.TOKEN,
       };
       const projectCfgStr = JSON.stringify(projectCfg, null, 4);
       fs.writeFileSync(projectCfgPath, projectCfgStr);

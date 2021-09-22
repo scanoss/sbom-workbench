@@ -10,7 +10,7 @@ import { projectService } from '../../../../../../api/project-service';
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
   const [percentage, setPercentage] = useState<number>(0);
-  const [token, setToken] = useState<string>(null);
+  const [token, setToken] = useState<string>('');
 
   const notarizeSBOM = async () => {
     const hash = await ExportFormat.notarizeSBOM(HashType.SHA256);
@@ -123,7 +123,7 @@ const LicensesChart = ({ data }) => {
         </span>
       </div>
       <div className="notarize-container">
-        {percentage < 100 || !token ? (
+        {percentage < 100 || !token.length ? (
           <>
             <Tooltip title="Identification progress is not 100% or your token is not defined">
               <span>

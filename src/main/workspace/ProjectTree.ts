@@ -453,7 +453,7 @@ export class ProjectTree extends EventEmitter {
   public getToken(){
     const txt = fs.readFileSync(`${this.work_root}/projectCfg.json`,'utf8');
     const cfg = JSON.parse(txt);
-    return cfg.TOKEN || null ;
+    return cfg.TOKEN;
   }
 }
 
