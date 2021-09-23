@@ -60,8 +60,8 @@ const NewProject = () => {
       true
       );
 
-
-    ipcRenderer.send(IpcEvents.SCANNER_RESUME);
+      history.goBack();
+    //ipcRenderer.send(IpcEvents.SCANNER_RESUME);
 
 
   }

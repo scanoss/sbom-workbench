@@ -133,16 +133,15 @@ export class Scanner extends EventEmitter {
   }
 
   #errorHandler(error, origin) {
-    if (origin === ScannerEvents.MODULE_DISPATCHER) {
-      // If this line is reached, dispatcher is already paused and no promises pending
-      this.#winnower.pause();
-      this.emit('error', error);
-    }
+    console.log("SCANNER: Stopped");
+    console.log(error);
+    this.stop();
+    this.emit('error', error);
 
-    if (origin === ScannerEvents.MODULE_WINNOWER) {
-      console.log(error);
-      this.emit('error', error);
+    if (origin === ScannerEvents.MODULE_DISPATCHER) {
+      if (error.wfpFailedPath) fs.copyFileSync(error.wfpFailedPath, `${this.#tempPath}/failed.wfp`);
     }
+    if (origin === ScannerEvents.MODULE_WINNOWER) {}
   }
 
   #createOutputFiles() {
@@ -194,6 +193,14 @@ export class Scanner extends EventEmitter {
   resume() {
     this.#winnower.resume();
     this.#dispatcher.resume();
+  }
+
+  stop() {
+    this.#winnower.removeAllListeners();
+    this.#dispatcher.removeAllListeners();
+
+    this.#winnower.stop();
+    this.#dispatcher.stop();
   }
 
 }
