@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-globals */
+import { Button } from '@material-ui/core';
 import React from 'react';
 import icon from '../../../../assets/icon.png';
 import LicensesText from './LicensesText';
@@ -13,17 +15,17 @@ const About = () => {
         fontWeight: 600,
         height: '100%',
         display: 'grid',
-        gridTemplateRows: 'auto 1fr',
+        gridTemplateRows: 'auto 1fr auto',
       }}
     >
       <header
         style={{
-          padding: '1rem 2rem 0',
+          padding: '1rem 1.25rem 0 2rem',
         }}
       >
         <div className="d-flex align-center">
           <img src={icon} alt="logo" className="mr-10" />
-          <p style={{ fontSize: '0.9rem' }}>
+          <p style={{ fontSize: '0.9rem' }} className="ml-5">
             SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.
           </p>
         </div>
@@ -31,7 +33,7 @@ const About = () => {
 
       <div
         style={{
-          padding: '0 2rem',
+          padding: '0 1.25rem 0 2rem',
           height: '100%',
           overflowY: 'scroll',
           textAlign: 'justify',
@@ -75,6 +77,22 @@ const About = () => {
           <LicensesText />
         </p>
       </div>
+      <footer
+        style={{
+          margin: 10,
+          textAlign: 'right',
+        }}
+      >
+        <button
+          style={{
+            padding: '6px 15px',
+          }}
+          type="button"
+          onClick={close}
+        >
+          OK
+        </button>
+      </footer>
     </div>
   );
 };
