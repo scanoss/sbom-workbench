@@ -25,12 +25,15 @@ class Workspace extends EventEmitter {
 
   metadataList: Array<Metadata>;
 
-  projectsList: Project;
+  projectList: Array<Project>;
+
+  projectsListOld: Project;
 
   ws_path: string;
 
   constructor() {
     super();
+    this.projectList = [];
     // this.name = 'scanoss-workspace';
     // this.ws_path = `${os.homedir()}/${this.name}`;
 
@@ -40,7 +43,7 @@ class Workspace extends EventEmitter {
     //   fs.writeFileSync(`${this.ws_path}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
     // }
 
-    // this.projectsList = new TreeStructure.ProjectTree('Unnamed');
+    // this.projectsListOld = new TreeStructure.ProjectTree('Unnamed');
 
 
     // console.log(mt);
@@ -73,28 +76,47 @@ class Workspace extends EventEmitter {
 
   }
 
+  public createFolderIfNotExist() {
+    console.log(`[ WORKSPACE ]: `);
+    fs.mkdirSync(`${this.ws_path}`);
+
+  }
+
+  private initWorkspaceFileSystem(){
+
+    if (!fs.existsSync(`${this.ws_path}`)) fs.mkdirSync(this.ws_path);
+
+    if (!fs.existsSync(`${this.ws_path}/defaultCfg.json`))
+      fs.writeFileSync(`${this.ws_path}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
+
+  }
+
   public async load(workspacePath: string) {
 
-
-
-    //this.projectsList = [];
     this.ws_path = workspacePath;
 
-    console.log(`WORKSPACE: Loading projects....`);
-    this.metadataList = await this.getAllMetadata();
+    this.initWorkspaceFileSystem();
+
+    if (this.projectList.length) {
+      console.log(`[ WORKSPACE ]: Closing opened projects`);
+      this.projectList = [];
+    }
+
+    console.log(`[ WORKSPACE ]: Reading projects....`);
+    const projectPaths = await this.getAllProjectsPaths();
+    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) => Project.build(projectPath));
+
+    let projectsReaded = (await Promise.allSettled(projectArray).catch((e) => {
+      console.log(`Error reading project: ${e.path}`);
+    })) as PromiseSettledResult<Project>[];
+
+    projectsReaded = projectsReaded.filter((p) => (p.status === 'fulfilled'));
+    this.projectList = projectsReaded.map((p) => (p as PromiseFulfilledResult<Project>).value);
 
 
-    // this.projectsList = this.metadataList.map((mt: Metadata) => {
-    //   return new Project(mt);
-    // }
 
 
 
-    // if (!fs.existsSync(`${this.ws_path}`)) fs.mkdirSync(`${this.ws_path}`);
-
-    // if (!fs.existsSync(`${this.ws_path}/defaultCfg.json`)) {
-    //   fs.writeFileSync(`${this.ws_path}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
-    // }
 
 
 
@@ -112,16 +134,16 @@ class Workspace extends EventEmitter {
     // return new Workspace(lista de proyectos);
   }
 
-  public createProject(mt: Metadata) {
-    // this.projectsList.add(new Project(mt));
-    // return
+  public addProject(p: Project) {
+    this.projectList.push(p);
+    return this.projectList.length - 1;
   }
 
 
 
   newProject(scanPath: string, mailbox: any) {
-    this.projectsList = new Project('Unnamed');
-    this.projectsList.setMailbox(mailbox);
+    this.projectsListOld = new Project('Unnamed');
+    this.projectsListOld.setMailbox(mailbox);
 
     // Copy the default workspace configuration to the project folder
     const projectPath = `${this.ws_path}/${path.basename(scanPath)}`;
@@ -136,7 +158,7 @@ class Workspace extends EventEmitter {
       fs.writeFileSync(projectCfgPath, projectCfgStr);
     }
 
-    this.projectsList.createScanProject(scanPath);
+    this.projectsListOld.createScanProject(scanPath);
 
 
   }
@@ -168,6 +190,13 @@ class Workspace extends EventEmitter {
     if (!a.isDirectory() && b.isDirectory()) return 1;
     if (a.isDirectory() && !b.isDirectory()) return -1;
     return 0;
+  }
+
+  public async getAllProjectsPaths(){
+    const workspaceStuff = await fs.promises.readdir(this.ws_path, { withFileTypes: true });
+    const projectsDirEnt = workspaceStuff.filter((dirent) => {return !dirent.isSymbolicLink() && !dirent.isFile();})
+    const projectPaths = projectsDirEnt.map((dirent) => `${this.ws_path}/${dirent.name}`);
+    return projectPaths;
   }
 
   public async getAllMetadata() {

@@ -65,18 +65,22 @@ export class Project extends EventEmitter {
 
   projectMetadata: Metadata;
 
-  constructor(name: string) {
+  constructor(mt: Metadata) {
     super();
     this.work_root = '';
     this.scan_root = '';
-    this.project_name = name;
+    this.project_name = mt.getName();
     this.banned_list = new Filtering.BannedList('NoFilter');
     // forces a singleton instance, will be killed in a multiproject domain
     defaultProject = this;
 
   }
 
-
+  public static async build(pathToProject: string): Promise<Project> {
+    const mt: Metadata = await Metadata.build(`${pathToProject}/metadata.json`);
+    const p: Project = new Project(mt);
+    return p;
+  }
 
   set_scan_root(root: string) {
     this.scan_root = root;

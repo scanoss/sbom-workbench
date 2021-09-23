@@ -30,7 +30,7 @@ export class Metadata {
 
   }
 
-  public static async build(pathToMetadata: string) {
+  public static async build(pathToMetadata: string): Promise<Metadata> {
     const data: Metadata = await Metadata.readFromPath(pathToMetadata);
     const mt = new Metadata(data);
     mt.myPath = pathToMetadata;
