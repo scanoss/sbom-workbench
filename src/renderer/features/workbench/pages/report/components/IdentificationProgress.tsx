@@ -21,7 +21,8 @@ const LicensesChart = ({ data }) => {
     const response = await projectService.getToken();
     setToken(response);
   };
-
+console.log(token);
+console.log(token.length);
   useEffect(() => {
     const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
     const pending = 100 - percentage;
@@ -122,7 +123,7 @@ const LicensesChart = ({ data }) => {
           <strong>{data.totalFiles}</strong> total files
         </span>
       </div>
-      <div className="notarize-container">
+      <div className={token ? 'notarize-container' : 'hide'}>
         {percentage < 100 || !token.length ? (
           <>
             <Tooltip title="Identification progress is not 100% or your token is not defined">
@@ -152,7 +153,7 @@ const LicensesChart = ({ data }) => {
           </Button>
         )}
       </div>
-    </div>
+    </div> 
   );
 };
 
