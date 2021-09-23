@@ -11,7 +11,7 @@ export class ScannerCfg {
   CONCURRENCY_LIMIT = 15;
 
   // Timeout for each transaction
-  TIMEOUT = 60000;
+  TIMEOUT = 120000;
 
   // The maximum size for each .wfp file
   WFP_FILE_MAX_SIZE = 64 * 1000;
