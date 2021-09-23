@@ -41,7 +41,7 @@ const IdentifiedReport = ({ data }) => {
               <InsertDriveFileOutlinedIcon fontSize="inherit" color="primary" style={{ fontSize: '100px' }} />
               <h2>Nothing identified yet.</h2>
               <Button variant="contained" color="primary" onClick={() => history.push('/workbench/detected')}>
-                START IDENTIFICATION
+                Start Identification
               </Button>
             </div>
           </div>
