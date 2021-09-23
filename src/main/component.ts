@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { Component, License, ComponentGroup } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { ComponentParams } from './db/scan_component_db';
-import { defaultProject } from './workspace/ProjectTree';
+import { defaultProject } from './workspace/Project';
 import { Response } from './Response';
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (event, component: Component) => {

@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import path from 'path';
 import { IpcEvents } from '../ipc-events';
-import { defaultProject } from './workspace/ProjectTree';
+import { defaultProject } from './workspace/Project';
 import { Response } from './Response';
 
 ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {

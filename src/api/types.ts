@@ -49,7 +49,7 @@ export interface ItemInclude {
   action: boolean;
 }
 
-export interface Project {
+export interface IProject {
   work_root: string;
   scan_root: string;
   default_licenses: string;

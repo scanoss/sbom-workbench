@@ -1,4 +1,5 @@
 import { IpcEvents } from '../ipc-events';
+import { Metadata } from '../main/workspace/Metadata';
 import { Inventory } from './types';
 
 const { ipcRenderer } = require('electron');

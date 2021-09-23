@@ -1,4 +1,4 @@
-import { defaultProject } from '../workspace/ProjectTree';
+import { defaultProject } from '../workspace/Project';
 
 class ReportService {
   public async getReportSummary() {
@@ -33,7 +33,7 @@ class ReportService {
   public async getReportIdentified() {
     try {
       let data: any = [];
-      data = await defaultProject.scans_db.components.getIdentifiedForReport();    
+      data = await defaultProject.scans_db.components.getIdentifiedForReport();
       const licenses = [];
       data.forEach((element) => {
         const aux: any = {};

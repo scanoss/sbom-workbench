@@ -24,6 +24,7 @@ import './main/formats';
 import './main/workspace';
 import './main/report';
 import './main/license';
+import * as os from 'os';
 
 import { IpcEvents } from './ipc-events';
 import { workspace } from './main/workspace/workspace';
@@ -35,6 +36,7 @@ import { Scanner } from './main/scannerLib/Scanner';
 import { SCANNER_EVENTS } from './main/scannerLib/ScannerEvents';
 import { fstat } from 'fs';
 import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
+import Workspace from './renderer/features/workspace/Workspace';
 const basepath = require('path');
 const fs = require('fs');
 
@@ -171,10 +173,10 @@ export interface IInitScan {
   // filter: IFilter[];
 }
 
-let ws: Workspace;
 async function mainLogic() {
-  // ws =  new Workspace();
+  await workspace.load(`${os.homedir()}/scanoss-workspace`);
 }
+
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   const { path } = arg;

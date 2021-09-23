@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import * as os from 'os';
 import fs from 'fs';
 import { ipcMain } from 'electron';
-import { Inventory, Project } from '../../api/types';
+import { Inventory, IProject } from '../../api/types';
 import { app } from 'electron';
 // import * as fs from 'fs';
 // import * as Filtering from './filtering';
@@ -21,18 +21,22 @@ import { ScannerCfg } from '../scannerLib/ScannerCfg';
 import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
 import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
+import { Metadata } from './Metadata';
 
 const path = require('path');
 
-const cont = 0;
+export enum ProjectState{
+  CREATED,
+  READY_TO_SCAN,
+  SCANNING,
+  SCANNED,
+};
 
-let defaultProject: ProjectTree;
+let defaultProject: Project;
 
 export { defaultProject };
 
-
-
-export class ProjectTree extends EventEmitter {
+export class Project extends EventEmitter {
   work_root: string;
 
   scan_root: string;
@@ -59,7 +63,7 @@ export class ProjectTree extends EventEmitter {
 
   filesToScan: {};
 
-  metadata;
+  projectMetadata: Metadata;
 
   constructor(name: string) {
     super();
@@ -71,6 +75,8 @@ export class ProjectTree extends EventEmitter {
     defaultProject = this;
 
   }
+
+
 
   set_scan_root(root: string) {
     this.scan_root = root;
@@ -255,6 +261,7 @@ export class ProjectTree extends EventEmitter {
       this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
 
+
   }
 
 
@@ -362,6 +369,8 @@ export class ProjectTree extends EventEmitter {
       insertInventory(this.logical_tree, files[i], inv);
     }
   }
+
+  // close() {this.tree = null}
 
   attachComponent(comp: any) {
     for (const [key, value] of Object.entries(comp)) {

@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { ipcMain } from 'electron';
 import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
-import { defaultProject } from './workspace/ProjectTree';
+import { defaultProject } from './workspace/Project';
 import { FileType } from '../api/types';
 
 

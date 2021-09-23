@@ -3,10 +3,12 @@ import { EventEmitter } from 'events';
 import { stripBasename } from 'history/PathUtils';
 import * as fs from 'fs';
 import path from 'path';
+import { Metadata } from './Metadata';
+import { Project } from './Project';
 
 import * as os from 'os';
 import * as Filtering from './filtering';
-import * as TreeStructure from './ProjectTree';
+import * as TreeStructure from './Project';
 
 /**
  *
@@ -21,26 +23,104 @@ const defaultCfg = {
 class Workspace extends EventEmitter {
   private name: string;
 
-  projectsList: TreeStructure.ProjectTree;
+  metadataList: Array<Metadata>;
+
+  projectsList: Project;
 
   ws_path: string;
 
   constructor() {
     super();
-    this.name = 'scanoss-workspace';
-    this.ws_path = `${os.homedir()}/${this.name}`;
+    // this.name = 'scanoss-workspace';
+    // this.ws_path = `${os.homedir()}/${this.name}`;
 
-    if (!fs.existsSync(`${this.ws_path}`)) fs.mkdirSync(`${this.ws_path}`);
+    // if (!fs.existsSync(`${this.ws_path}`)) fs.mkdirSync(`${this.ws_path}`);
 
-    if (!fs.existsSync(`${this.ws_path}/defaultCfg.json`)) {
-      fs.writeFileSync(`${this.ws_path}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
-    }
+    // if (!fs.existsSync(`${this.ws_path}/defaultCfg.json`)) {
+    //   fs.writeFileSync(`${this.ws_path}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
+    // }
 
-    this.projectsList = new TreeStructure.ProjectTree('Unnamed');
+    // this.projectsList = new TreeStructure.ProjectTree('Unnamed');
+
+
+    // console.log(mt);
+
+    // explora el directorio en busca de metadata.json
+    // voy creando un nuevo proyecto con el json metadata new Project(mt:metadata)
+    // for(folder)
+    //   Metadata.build(pathAlMetadata).then((mt) => {
+    //     this.projectList.add(new ProjectTree(mt))
+    //  });
+
+    //  for (folder)
+    //   mt new MediaMetadata(path)
+    //   mt.init()
+    //   new ProjectTree(mt)
+
+    //   ProjectList. add (new TreeStructure.ProjectTree(mt));
+
+
+    // Luego agrego el proyecto creado a la lista de projectos del workspace
+
+    //En el momento que pidan el listado de proyectos, la lista ya esta cargada.
+    //pArr = [new ProjectTree({}:metadata ), new ProjectTree(),new ProjectTree()]
+
+    // Cuando la UI selecciona un proyecto, devolveria un id representando
+    // el indice del array.
+
+
+    //IMPORTANTE: hacer tambien una funcion en workspace para cerrar el proyecto i.
+
   }
 
+  public async load(workspacePath: string) {
+
+
+
+    //this.projectsList = [];
+    this.ws_path = workspacePath;
+
+    console.log(`WORKSPACE: Loading projects....`);
+    this.metadataList = await this.getAllMetadata();
+
+
+    // this.projectsList = this.metadataList.map((mt: Metadata) => {
+    //   return new Project(mt);
+    // }
+
+
+
+    // if (!fs.existsSync(`${this.ws_path}`)) fs.mkdirSync(`${this.ws_path}`);
+
+    // if (!fs.existsSync(`${this.ws_path}/defaultCfg.json`)) {
+    //   fs.writeFileSync(`${this.ws_path}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
+    // }
+
+
+
+    // await  creo el folder workspace y retorno el wspath default que utilizo
+
+
+    // this.projectList =  metadataArr.map((mt: Metadata) => {
+    //   new Project(mt);
+    //    return mt;
+    //   });
+
+
+
+    // genero una lista de proyectos con su metadata - devuelvo la lista de proyectos
+    // return new Workspace(lista de proyectos);
+  }
+
+  public createProject(mt: Metadata) {
+    // this.projectsList.add(new Project(mt));
+    // return
+  }
+
+
+
   newProject(scanPath: string, mailbox: any) {
-    this.projectsList = new TreeStructure.ProjectTree('Unnamed');
+    this.projectsList = new Project('Unnamed');
     this.projectsList.setMailbox(mailbox);
 
     // Copy the default workspace configuration to the project folder
@@ -90,6 +170,20 @@ class Workspace extends EventEmitter {
     return 0;
   }
 
+  public async getAllMetadata() {
+    const workspaceStuff = await fs.promises.readdir(this.ws_path, { withFileTypes: true });
+    const projectsPaths = workspaceStuff.filter((dirent) => {return !dirent.isSymbolicLink() && !dirent.isFile();})
+    const metadataPaths = projectsPaths.map((dirent) => `${this.ws_path}/${dirent.name}/metadata.json`);
+
+    const metadataArray: Promise<Metadata>[] = metadataPaths.map((metadataPath) => Metadata.build(metadataPath));
+    const metadata = await Promise.all(metadataArray).catch((e) => {
+      console.log(`Error reading metadata: ${e.path}`);
+      throw e;
+    });
+
+    return metadata;
+  }
+
   async listProjects() {
     const projects: Array<any> = [];
     try {
@@ -99,7 +193,7 @@ class Workspace extends EventEmitter {
         .filter((dirent) => {
           return !dirent.isSymbolicLink() && !dirent.isFile();
         })
-        .map((dirent) => `${this.ws_path}/${dirent.name}`);
+        .map((dirent) => `${this.ws_path}/${dirent.name}/metadata.json`);
 
       // eslint-disable-next-line no-restricted-syntax
       for (const projectPath of projectPaths) {

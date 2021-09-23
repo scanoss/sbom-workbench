@@ -5,7 +5,7 @@ import { BaseService } from './base-service';
 const { ipcRenderer } = require('electron');
 
 class ProjectService extends BaseService {
-  public async get(args: Partial<Project>): Promise<any> {
+  public async get(args: Partial<IProject>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_GET, args);
     return response;
   }

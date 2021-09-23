@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
-import { defaultProject } from './workspace/ProjectTree';
+import { defaultProject } from './workspace/Project';
 
 
 ipcMain.handle(IpcEvents.EXPORT_SPDX, async (event, path: string) => {

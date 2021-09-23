@@ -1,7 +1,7 @@
 import { Filter } from '@material-ui/icons';
 import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
-import { defaultProject } from './workspace/ProjectTree';
+import { defaultProject } from './workspace/Project';
 import { Response } from './Response';
 import { reportService } from './services/ReportService';
 
@@ -156,7 +156,7 @@ ipcMain.handle(IpcEvents.REPORT_DETECTED, async (event, arg: string) => {
     // un-comment next line to output report data
     // console.log(JSON.stringify({ licenses, crypto, summary }));
 
-   
+
     return {
       status: 'ok',
       message: 'SPDX export successfully',

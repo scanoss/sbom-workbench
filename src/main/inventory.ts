@@ -2,7 +2,7 @@ import { ContactSupportOutlined } from '@material-ui/icons';
 import { ipcMain } from 'electron';
 import { Inventory } from '../api/types';
 import { IpcEvents } from '../ipc-events';
-import { defaultProject } from './workspace/ProjectTree';
+import { defaultProject } from './workspace/Project';
 
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (event, invget: Partial<Inventory>) => {
   let inv: any;

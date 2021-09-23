@@ -1,13 +1,13 @@
 import { ipcMain } from 'electron';
 import { create } from 'electron-log';
 // import { Component } from 'react';
-import { Inventory, Component, Project } from '../api/types';
+import { Inventory, Component, IProject } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
 
 
 import { workspace } from './workspace/workspace';
-import { defaultProject } from './workspace/ProjectTree';
+import { defaultProject, Project } from './workspace/Project';
 
 const os = require('os');
 const fs = require('fs');
@@ -20,6 +20,9 @@ ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (_event, arg: any) => {
   console.log(arg);
   ws = workspace;
 
+
+  // p = new ProjectTree();
+  // p.loadFromPath()
 
 
   ws.newProject(arg, _event.sender);
