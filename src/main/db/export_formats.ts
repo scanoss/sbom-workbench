@@ -113,7 +113,7 @@ export class Formats extends Db {
           if(key.charAt(0)==='/') vKey = key.substring(1)
             out[vKey]=obj;
         }
-        await fs.writeFile(`${path}`, JSON.stringify(out, undefined, 4), 'utf-8', () => {
+        await fs.writeFile(`${path}`, JSON.stringify(out, undefined, 2), 'utf-8', () => {
           resolve(true);
         });
       } catch (error) {
