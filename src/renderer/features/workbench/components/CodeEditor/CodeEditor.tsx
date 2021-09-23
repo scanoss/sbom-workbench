@@ -58,7 +58,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
         wrapLongLines
         style={nord}
         language="javascript"
-        startingLineNumber={start}
+        startingLineNumber={start + 1}
         showLineNumbers
         lineProps={(line) => {
           if (lines && lines.includes(line)) {
