@@ -38,6 +38,11 @@ const defaultBannedList = {
 
     { condition: 'starts', value: '.asar', ftype: 'NAME', scope: 'FILE' },
 
+
+    { condition: 'ends', value: 'news', ftype: 'NAME', scope: 'FILE' },
+    { condition: 'ends', value: 'authors', ftype: 'NAME', scope: 'FILE' },
+
+
     { condition: 'ends', value: '-doc', ftype: 'NAME', scope: 'FILE' },
     { condition: 'ends', value: 'changelog', ftype: 'NAME', scope: 'FILE' },
     { condition: 'ends', value: 'config', ftype: 'NAME', scope: 'FILE' },
