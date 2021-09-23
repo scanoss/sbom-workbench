@@ -38,6 +38,8 @@ class NameFilter extends AbstractFilter {
   evaluate(path: string): boolean {
     // console.log(path.indexOf(this.value));
     // return !(this.value.indexOf(path) >= 0);
+    this.value = this.value.toLowerCase();
+    path = path.toLowerCase();
 
     if (this.condition === 'contains') {
       return !(path.indexOf(this.value) >= 0);
@@ -86,6 +88,8 @@ class ExtensionFilter extends AbstractFilter {
   }
 
   evaluate(path: string): boolean {
+    path = path.toLowerCase();
+    this.value = this.value.toLowerCase();
     return !path.endsWith(this.value);
   }
 }
