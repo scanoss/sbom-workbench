@@ -43,7 +43,10 @@ export default function reducer(state: State = initialState, action): State {
     }
     case SET_PROGRESS: {
       const { summary } = action;
-      const progress = Math.floor(((summary?.identifiedFiles + summary?.ignoredFiles) * 100) / summary?.detectedFiles);
+      const progress =
+        summary?.detectedFiles === 0
+          ? 100
+          : Math.floor(((summary?.identifiedFiles + summary?.ignoredFiles) * 100) / summary?.detectedFiles);
       return {
         ...state,
         progress,

@@ -30,19 +30,32 @@ const DetectedReport = ({ data }) => {
       <section className="report-layout detected">
         <Card className="report-item licenses">
           <div className="report-title">Licenses</div>
-          <div id="report-second">
-            <LicensesChart data={data.licenses} />
-            <LicensesTable
-              matchedLicenseSelected={matchedLicenseSelected || data.licenses?.[0]}
-              selectLicense={(license) => onLicenseSelected(license)}
-              data={data.licenses}
-            />
-          </div>
+          {
+            data.licenses.length > 0 ? (
+              <div id="report-second">
+                <LicensesChart data={data.licenses} />
+                <LicensesTable
+                  matchedLicenseSelected={matchedLicenseSelected || data.licenses?.[0]}
+                  selectLicense={(license) => onLicenseSelected(license)}
+                  data={data.licenses}
+                />
+              </div>
+            ) : (
+              <span className="report-empty">No licenses detected</span>
+            )
+          }
+          
         </Card>
 
         <Card className="report-item matches-for-license">
           <div className="report-title">Matches for license</div>
-          <MatchesForLicense data={matchedLicenseSelected || data.licenses?.[0]} />
+          {
+            data.licenses.length > 0 ? (
+              <MatchesForLicense data={matchedLicenseSelected || data.licenses?.[0]} />
+            ) : (
+              <span className="report-empty">No licenses detected</span>
+            )
+          }
         </Card>
 
         <Card className="report-item matches">
