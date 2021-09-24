@@ -77,11 +77,26 @@
         font-style: normal;
         font-weight: 600;
       }
+
+      .report-empty {
+        font-size: 18px;
+        font-weight: 400;
+        color: #6B7381;
+        margin-top: 6px;
+      }
     }
 
     .report-item.licenses {
       display: flex;
       flex-direction: column;
+
+      .report-empty {
+        font-size: 18px;
+        font-weight: 400;
+        color: #6B7381;
+        margin-top: 6px;
+      }
+
     }
 
     #IdentificationProgress {
@@ -106,6 +121,12 @@
           margin-top: -6px;
           font-size: 34px;
           font-weight: 700;
+        }
+
+        .label-not-found {
+          font-size: 24px;
+          font-weight: 400;
+          color: #6B7381;
         }
 
         .progress-bar {

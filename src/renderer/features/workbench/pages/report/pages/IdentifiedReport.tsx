@@ -55,6 +55,8 @@ const IdentifiedReport = ({ data }) => {
             </Card>
             <Card className="report-item licenses">
               <div className="report-title">Licenses</div>
+              {
+            data.licenses.length > 0 ? (
               <div id="report-second">
                 <LicensesChart data={data.licenses} />
                 <LicensesTable
@@ -63,10 +65,20 @@ const IdentifiedReport = ({ data }) => {
                   data={data.licenses}
                 />
               </div>
+            ) : (
+              <span className="report-empty">No licenses detected</span>
+            )
+          }
             </Card>
             <Card className="report-item matches-for-license">
               <div className="report-title">Matches for license</div>
+              {
+            data.licenses.length > 0 ? (
               <MatchesForLicense data={matchedLicenseSelected || data.licenses?.[0]} />
+            ) : (
+              <span className="report-empty">No licenses detected</span>
+            )
+          }
             </Card>
           </section>
         </>

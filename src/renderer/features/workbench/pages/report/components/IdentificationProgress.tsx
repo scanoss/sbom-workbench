@@ -111,10 +111,19 @@ const LicensesChart = ({ data }) => {
   return (
     <div id="IdentificationProgress">
       <div className="identification-canvas-container">
-        <span className="label">{percentage}%</span>
-        <div className="progress-bar">
-          <canvas ref={chartRef} />
-        </div>
+        {
+          isNaN(percentage) ? (
+            <span className="label-not-found">No licenses detected</span>
+          ) : (
+            <>
+              <span className="label">{percentage}%</span>
+              <div className="progress-bar">
+                <canvas ref={chartRef} />
+              </div>
+            </>
+          )
+        }
+        
       </div>
       <div className="total-files-container">
         <span className="total-files-label">
