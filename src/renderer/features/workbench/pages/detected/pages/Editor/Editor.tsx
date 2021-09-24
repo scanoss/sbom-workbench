@@ -170,9 +170,11 @@ export const Editor = () => {
   };
 
   useEffect(() => {
-    dispatch(setFile(query.get('path')));
+    const path = decodeURIComponent(query.get('path'));
+
+    dispatch(setFile(path));
     const unlisten = history.listen((data) => {
-      const path = new URLSearchParams(data.search).get('path');
+      const path = decodeURIComponent(new URLSearchParams(data.search).get('path'));
       dispatch(setFile(path));
     });
     return () => {

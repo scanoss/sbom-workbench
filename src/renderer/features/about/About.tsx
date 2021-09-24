@@ -20,16 +20,23 @@ const About = () => {
     >
       <header
         style={{
-          padding: '1rem 1.25rem 0 2rem',
+          textAlign: 'justify',
+          padding: '1rem 2rem 0 2rem',
         }}
       >
         <div className="d-flex align-center">
           <img src={icon} alt="logo" className="mr-10" />
-          <p style={{ fontSize: '0.9rem' }} className="ml-5">
-            SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.
-          </p>
+          <div>
+            <p style={{ fontSize: '0.9rem', marginBottom: 0 }} className="ml-5">
+              SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', margin: 0 }}
+              className="text-right">VERSION: {app.getVersion()}</p>
+          </div>
         </div>
       </header>
+
 
       <div
         style={{
@@ -71,7 +78,6 @@ const About = () => {
         </p>
         <p>© 2017 - 2020 Open Source Automation Development Lab (OSADL) eG and contributors, info@osadl.org</p>
         <p>For further information about the project see the description at www.osadl.org/checklists</p>
-        <p>VERSION: {app.getVersion()}</p>
         <p>Copyright &copy; {new Date().getFullYear()} Scan Open Source Solutions S.L.</p>
         <p>
           <LicensesText />
