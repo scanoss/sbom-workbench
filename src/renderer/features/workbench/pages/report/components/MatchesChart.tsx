@@ -86,7 +86,7 @@ const MatchesChart = ({ data }) => {
     <div id="MatchesChart">
       {
         isNaN(percentage) ? (
-          <span className="report-empty">No licenses detected</span>
+          <span className="report-empty">No matches found</span>
         ) : (
           <>
           <div className="matches-canvas-container">

@@ -41,7 +41,7 @@ const DetectedReport = ({ data }) => {
                 />
               </div>
             ) : (
-              <span className="report-empty">No licenses detected</span>
+              <span className="report-empty">No licenses found</span>
             )
           }
           
@@ -53,7 +53,7 @@ const DetectedReport = ({ data }) => {
             data.licenses.length > 0 ? (
               <MatchesForLicense data={matchedLicenseSelected || data.licenses?.[0]} />
             ) : (
-              <span className="report-empty">No licenses detected</span>
+              <span className="report-empty">No matches found</span>
             )
           }
         </Card>

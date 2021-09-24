@@ -113,7 +113,7 @@ const LicensesChart = ({ data }) => {
       <div className="identification-canvas-container">
         {
           isNaN(percentage) ? (
-            <span className="label-not-found">No licenses detected</span>
+            <span className="label-not-found">No components found</span>
           ) : (
             <>
               <span className="label">{percentage}%</span>

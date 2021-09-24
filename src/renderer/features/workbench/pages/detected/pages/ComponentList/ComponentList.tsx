@@ -111,7 +111,7 @@ export const ComponentList = () => {
                   Not results found with <strong>{searchQuery} </strong>
                 </>
               ) : (
-                <> Not components detected</>
+                <>No components were detected</>
               )}
             </p>
           )}
