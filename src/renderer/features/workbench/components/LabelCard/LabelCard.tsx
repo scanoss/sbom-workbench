@@ -28,7 +28,7 @@ const LabelCard = ({ label, file, status }: LabelCardProps) => {
       <div className="label-card-content">
         <div className="label-div">
           <span className="label-title">{label}</span>
-          <Tooltip title={file}>
+          <Tooltip title={file || ''}>
             <div className="directory-div">
               <AccountTreeIcon className="label-icon" />
               <Label label={getFileName(file)} textColor="black" />
