@@ -10,14 +10,11 @@ import MatchesForLicense from '../components/MatchesForLicense';
 import { setReport } from '../../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../../store';
 
-
 const { shell } = require('electron');
 
 Chart.register(...registerables);
 
 const IdentifiedReport = ({ data }) => {
-
-
   const history = useHistory();
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
@@ -55,30 +52,26 @@ const IdentifiedReport = ({ data }) => {
             </Card>
             <Card className="report-item licenses">
               <div className="report-title">Licenses</div>
-              {
-            data.licenses.length > 0 ? (
-              <div id="report-second">
-                <LicensesChart data={data.licenses} />
-                <LicensesTable
-                  matchedLicenseSelected={matchedLicenseSelected || data.licenses?.[0]}
-                  selectLicense={(license) => onLicenseSelected(license)}
-                  data={data.licenses}
-                />
-              </div>
-            ) : (
-              <span className="report-empty">No licenses detected</span>
-            )
-          }
+              {data.licenses.length > 0 ? (
+                <div id="report-second">
+                  <LicensesChart data={data.licenses} />
+                  <LicensesTable
+                    matchedLicenseSelected={matchedLicenseSelected || data.licenses?.[0]}
+                    selectLicense={(license) => onLicenseSelected(license)}
+                    data={data.licenses}
+                  />
+                </div>
+              ) : (
+                <p className="report-empty">No licenses found</p>
+              )}
             </Card>
             <Card className="report-item matches-for-license">
               <div className="report-title">Matches for license</div>
-              {
-            data.licenses.length > 0 ? (
-              <MatchesForLicense data={matchedLicenseSelected || data.licenses?.[0]} />
-            ) : (
-              <span className="report-empty">No licenses detected</span>
-            )
-          }
+              {data.licenses.length > 0 ? (
+                <MatchesForLicense data={matchedLicenseSelected || data.licenses?.[0]} />
+              ) : (
+                <p className="report-empty">No matches found</p>
+              )}
             </Card>
           </section>
         </>
