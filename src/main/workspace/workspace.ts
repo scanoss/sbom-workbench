@@ -12,7 +12,7 @@ import * as TreeStructure from './ProjectTree';
  *
  */
 // eslint-disable-next-line import/no-mutable-exports
-const defaultCfg = {
+let defaultCfg = {
   DEFAULT_URL_API: 0,
   AVAILABLE_URL_API: ['https://osskb.org/api/scan/direct'],
   SCAN_MODE: 'FULL_SCAN',
@@ -36,6 +36,7 @@ class Workspace extends EventEmitter {
     if (!fs.existsSync(`${this.ws_path}/defaultCfg.json`)) {
       fs.writeFileSync(`${this.ws_path}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
     }
+    defaultCfg = JSON.parse(fs.readFileSync(`${this.ws_path}/defaultCfg.json`, 'utf8'));
 
     this.projectsList = new TreeStructure.ProjectTree('Unnamed');
   }
