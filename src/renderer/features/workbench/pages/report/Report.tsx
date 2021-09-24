@@ -56,7 +56,7 @@ const Reports = () => {
   const init = async () => {
     const summary = await reportService.getSummary();
     const detected = await reportService.detected();
-    const identified = await reportService.idetified();    
+    const identified = await reportService.idetified();  
 
     setDetectedData({ ...detected, summary });
     setIdentifiedData({ ...identified, summary });

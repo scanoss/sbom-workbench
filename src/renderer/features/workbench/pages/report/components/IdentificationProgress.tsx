@@ -21,8 +21,6 @@ const LicensesChart = ({ data }) => {
     const response = await projectService.getToken();
     setToken(response);
   };
-console.log(token);
-console.log(token.length);
   useEffect(() => {
     const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
     const pending = 100 - percentage;

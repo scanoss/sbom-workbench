@@ -2,11 +2,14 @@ import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
 import { Response } from './Response';
+import { reportService } from './services/ReportService';
 
-ipcMain.handle(IpcEvents.EXPORT_SPDX, async (event, path: string, state: boolean) => {
+ipcMain.handle(IpcEvents.EXPORT_SPDX, async (event, path: string) => {
   let success: boolean;
   try {
-    success = await defaultProject.scans_db.formats.spdx(path, state);
+    const data: any = await reportService.getReportSummary();
+    const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
+    success = await defaultProject.scans_db.formats.spdx(path, percentage);
     if (success) {
       return { status: 'ok', message: 'SPDX exported successfully', data: success };
     }
@@ -20,7 +23,9 @@ ipcMain.handle(IpcEvents.EXPORT_SPDX, async (event, path: string, state: boolean
 ipcMain.handle(IpcEvents.EXPORT_CSV, async (event, path: string) => {
   let success: boolean;
   try {
-    success = await defaultProject.scans_db.formats.csv(`${path}`);
+    const data: any = await reportService.getReportSummary();
+    const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
+    success = await defaultProject.scans_db.formats.csv(path, percentage);
     if (success) {
       return { status: 'ok', message: 'CSV exported successfully', data: success };
     }

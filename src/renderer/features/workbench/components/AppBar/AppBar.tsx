@@ -129,29 +129,8 @@ const AppTitle = ({ title }) => {
   );
 };
 
-const Notarize = () => {
-  const dialogCtrl = useContext<any>(DialogContext);
-  const notarizeSBOM = async () => {
-    const hash = await ExportFormat.notarizeSBOM(HashType.SHA256);
-    shell.openExternal(`https://sbom.info/?Hash=${hash}&type=${HashType.SHA256}&token=gato`);
-  };
 
-  return (
-    <div className="notarize-container">
-      <Button
-        variant="contained"
-        color="secondary"
-        startIcon={<PublishSharpIcon />}
-        type="button"
-        onClick={notarizeSBOM}
-      >
-        Post to SBOM ledger
-      </Button>
-    </div>
-  );
-};
-
-const Export = ({ progress }) => {
+const Export = ({ state }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -168,8 +147,8 @@ const Export = ({ progress }) => {
     setAnchorEl(null);
   };
 
-  const onExport = async (extension, state?) => {
-    await exportFile({ extension, export: extension, state });
+  const onExport = async (extension) => {
+    await exportFile({ extension, export: extension });
     handleClose();
   };
 
@@ -180,7 +159,7 @@ const Export = ({ progress }) => {
       defaultPath: `${defpath.data}/${projectName.data}/${projectName.data}.${data.extension}`,
     });
     if (path && path !== undefined) {
-      if (data.export === SPDX) await ExportFormat.spdx(path, data.state);
+      if (data.export === SPDX) await ExportFormat.spdx(path);
       else if (data.export === CSV) await ExportFormat.csv(path);
       else if (data.export === RAW) await ExportFormat.raw(path);
       else if (data.export === WFP) await ExportFormat.wfp(path);
@@ -209,10 +188,10 @@ const Export = ({ progress }) => {
         TransitionComponent={Fade}
       >
         
-        <MenuItem disabled={progress < 100} onClick={() => onExport(CSV)}>
+        <MenuItem disabled={state.progress === 0} onClick={() => onExport(CSV)}>
           CSV
         </MenuItem>
-        <MenuItem disabled={progress === 0} onClick={() => onExport(SPDX, progress < 100)}>
+        <MenuItem disabled={state.progress === 0} onClick={() => onExport(SPDX)}>
           SPDX
         </MenuItem>
         <MenuItem onClick={() => onExport(WFP)}>WFP</MenuItem>
@@ -227,6 +206,7 @@ const AppBar = ({ exp }) => {
   const { pathname } = useLocation();
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
   const report = pathname.startsWith('/workbench/report');
+
 
   const onBackPressed = () => {
     dispatch(reset());
@@ -252,7 +232,7 @@ const AppBar = ({ exp }) => {
           <AppTitle title={state.name} />
 
           <div className="slot end">
-            {!report ? <AppProgress progress={state.progress} /> : <Export progress={state.progress} />}
+            {!report ? <AppProgress progress={state.progress} /> : <Export state={state} />}
           </div>
         </Toolbar>
       </MaterialAppBar>

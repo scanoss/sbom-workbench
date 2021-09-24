@@ -16,9 +16,6 @@ const useStyles = makeStyles({
 
 export default function MatchesForLicense({ data }) {
   const classes = useStyles();
-
-  console.log(data);
-
   return (
     <>
       <TableContainer >
@@ -33,8 +30,8 @@ export default function MatchesForLicense({ data }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data?.components.map((row) => (
-              <TableRow key={row.name}>
+            {data?.components.map((row,index) => (
+              <TableRow key={index}>
                 <TableCell component="th" scope="row" align="left">
                   <div className="table-cell" >
                     <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -43,11 +40,11 @@ export default function MatchesForLicense({ data }) {
                         fill="#3B82F6"
                       />
                     </svg>
-                    {row?.name}
+                    {row.name}
                   </div>
                 </TableCell>
-                <TableCell>{row?.vendor}</TableCell>
-                <TableCell align="right">{row?.version}</TableCell>
+                <TableCell>{row.vendor}</TableCell>
+                <TableCell align="right">{row.version}</TableCell>
               </TableRow>
             ))}
           </TableBody>
