@@ -41,16 +41,16 @@ export const InventoryDetail = () => {
       label: 'Delete',
       role: 'delete',
     });
-    if (action == DIALOG_ACTIONS.OK) {
+    if (action === DIALOG_ACTIONS.OK) {
       await deleteInventory(inventory?.id);
       history.goBack();
     }
   };
 
-  const onAction = (file: number, action: MATCH_CARD_ACTIONS) => {
+  const onAction = (file: any, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push(`/workbench/detected/file?path=${file.path}`);
+        history.push(`/workbench/detected/file?path=${encodeURIComponent(file.path)}`);
         break;
       case MATCH_CARD_ACTIONS.ACTION_DETACH:
         detachFile([file.id]);

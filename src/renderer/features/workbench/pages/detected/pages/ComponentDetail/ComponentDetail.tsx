@@ -70,7 +70,7 @@ export const ComponentDetail = () => {
   const onAction = async (file: any, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push(`/workbench/detected/file?path=${file.path}`);
+        history.push(`/workbench/detected/file?path=${encodeURIComponent(file.path)}`);
         break;
       case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
         await onIdentifyPressed(file);
