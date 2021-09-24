@@ -14,6 +14,8 @@ import { ComponentDb } from './scan_component_db';
 import { Querys } from './querys_db';
 import { utilDb } from './utils_db';
 
+const pathLib = require('path');
+
 const fs = require('fs');
 const os = require('os');
 const crypto = require('crypto');
@@ -32,8 +34,9 @@ export class Formats extends Db {
     this.component = new ComponentDb(path);
   }
 
-  spdx(path: string) {
-    const document = spdx;
+  spdx(path: string, state: boolean) {  
+    const document = spdx;      
+    const auxPath = state ? `${pathLib.dirname(path)}/(uncompleted)${pathLib.basename(path)}` : path;      
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const timeStamp = utilDb.getTimeStamp();
@@ -55,10 +58,8 @@ export class Formats extends Db {
               else pkg.licenseConcluded = 'n/a';
               document.Packages.push(pkg);
             }
-            await fs.writeFile(
-              `${path}`,
-              JSON.stringify(document, undefined, 4),
-              () => {
+
+            await fs.writeFile(auxPath,JSON.stringify(document, undefined, 4), () => {
                 resolve(true);
               }
             );

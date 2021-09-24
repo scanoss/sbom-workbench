@@ -3,10 +3,10 @@ import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
 import { Response } from './Response';
 
-ipcMain.handle(IpcEvents.EXPORT_SPDX, async (event, path: string) => {
+ipcMain.handle(IpcEvents.EXPORT_SPDX, async (event, path: string, state: boolean) => {
   let success: boolean;
   try {
-    success = await defaultProject.scans_db.formats.spdx(`${path}`);
+    success = await defaultProject.scans_db.formats.spdx(path, state);
     if (success) {
       return { status: 'ok', message: 'SPDX exported successfully', data: success };
     }

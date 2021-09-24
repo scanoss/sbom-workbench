@@ -29,7 +29,6 @@ import { ExportFormat } from '../../../../../api/export-service';
 import { projectService } from '../../../../../api/project-service';
 import { dialogController } from '../../../../dialog-controller';
 
-
 const Navigation = () => {
   const history = useHistory();
 
@@ -132,8 +131,8 @@ const AppTitle = ({ title }) => {
 
 const Notarize = () => {
   const dialogCtrl = useContext<any>(DialogContext);
-  const notarizeSBOM = async () => {  
-      const hash = await ExportFormat.notarizeSBOM(HashType.SHA256);
+  const notarizeSBOM = async () => {
+    const hash = await ExportFormat.notarizeSBOM(HashType.SHA256);
     shell.openExternal(`https://sbom.info/?Hash=${hash}&type=${HashType.SHA256}&token=gato`);
   };
 
@@ -169,8 +168,8 @@ const Export = ({ progress }) => {
     setAnchorEl(null);
   };
 
-  const onExport = async (extension) => {
-    await exportFile({ extension, export: extension });
+  const onExport = async (extension, state?) => {
+    await exportFile({ extension, export: extension, state });
     handleClose();
   };
 
@@ -181,7 +180,7 @@ const Export = ({ progress }) => {
       defaultPath: `${defpath.data}/${projectName.data}/${projectName.data}.${data.extension}`,
     });
     if (path && path !== undefined) {
-      if (data.export === SPDX) await ExportFormat.spdx(path);
+      if (data.export === SPDX) await ExportFormat.spdx(path, data.state);
       else if (data.export === CSV) await ExportFormat.csv(path);
       else if (data.export === RAW) await ExportFormat.raw(path);
       else if (data.export === WFP) await ExportFormat.wfp(path);
@@ -209,11 +208,12 @@ const Export = ({ progress }) => {
         onClose={handleClose}
         TransitionComponent={Fade}
       >
-        <MenuItem disabled={progress < 100} onClick={() => onExport(SPDX)}>
-          SPDX
-        </MenuItem>
+        
         <MenuItem disabled={progress < 100} onClick={() => onExport(CSV)}>
           CSV
+        </MenuItem>
+        <MenuItem disabled={progress === 0} onClick={() => onExport(SPDX, progress < 100)}>
+          SPDX
         </MenuItem>
         <MenuItem onClick={() => onExport(WFP)}>WFP</MenuItem>
         <MenuItem onClick={() => onExport(RAW)}>RAW</MenuItem>
