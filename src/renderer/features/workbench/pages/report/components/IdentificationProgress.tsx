@@ -18,8 +18,8 @@ const LicensesChart = ({ data }) => {
   };
 
   const readToken = async () => {
-    const response = await projectService.getToken();
-    setToken(response);
+    const token = await projectService.getToken();
+    setToken(token || '');
   };
   useEffect(() => {
     const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
@@ -111,19 +111,16 @@ const LicensesChart = ({ data }) => {
   return (
     <div id="IdentificationProgress">
       <div className="identification-canvas-container">
-        {
-          isNaN(percentage) ? (
-            <span className="label-not-found">No components found</span>
-          ) : (
-            <>
-              <span className="label">{percentage}%</span>
-              <div className="progress-bar">
-                <canvas ref={chartRef} />
-              </div>
-            </>
-          )
-        }
-        
+        {Number.isNaN(percentage) ? (
+          <span className="label-not-found">No licenses detected</span>
+        ) : (
+          <>
+            <span className="label">{percentage}%</span>
+            <div className="progress-bar">
+              <canvas ref={chartRef} />
+            </div>
+          </>
+        )}
       </div>
       <div className="total-files-container">
         <span className="total-files-label">
@@ -160,7 +157,7 @@ const LicensesChart = ({ data }) => {
           </Button>
         )}
       </div>
-    </div> 
+    </div>
   );
 };
 
