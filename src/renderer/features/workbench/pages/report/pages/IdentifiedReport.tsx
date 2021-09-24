@@ -19,11 +19,11 @@ const IdentifiedReport = ({ data }) => {
 
 
   const history = useHistory();
-  const { dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
 
-  const isEmpty = data.licenses.length === 0;
+  const isEmpty = state.progress === 0;
 
   const onLicenseSelected = (license: string) => {
     const matchedLicense = data.licenses.find((item) => item?.label === license);

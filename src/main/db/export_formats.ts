@@ -13,6 +13,9 @@ import { spdx } from '../../api/spdx-versions';
 import { ComponentDb } from './scan_component_db';
 import { Querys } from './querys_db';
 import { utilDb } from './utils_db';
+import { InventoryDb } from './scan_inventory_db';
+
+const pathLib = require('path');
 
 const fs = require('fs');
 const os = require('os');
@@ -27,13 +30,17 @@ export enum HashType {
 export class Formats extends Db {
   component: ComponentDb;
 
+  inventory: InventoryDb;
+
   constructor(path: string) {
     super(path);
     this.component = new ComponentDb(path);
+    this.inventory= new InventoryDb(path);
   }
 
-  spdx(path: string) {
-    const document = spdx;
+  async spdx(path: string,percentage: number) {
+    const document = spdx;      
+    const auxPath = percentage<100 ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;      
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const timeStamp = utilDb.getTimeStamp();
@@ -55,10 +62,8 @@ export class Formats extends Db {
               else pkg.licenseConcluded = 'n/a';
               document.Packages.push(pkg);
             }
-            await fs.writeFile(
-              `${path}`,
-              JSON.stringify(document, undefined, 4),
-              () => {
+
+            await fs.writeFile(auxPath,JSON.stringify(document, undefined, 4), () => {
                 resolve(true);
               }
             );
@@ -70,7 +75,8 @@ export class Formats extends Db {
     });
   }
 
-  csv(path: string) {
+  csv(path: string, percentage: number) {
+    const auxPath = percentage<100 ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;   
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -79,7 +85,7 @@ export class Formats extends Db {
           if (err) resolve(false);
           else {
             const csv = this.csvCreate(data);
-            await fs.writeFile(`${path}`, csv, 'utf-8', () => {
+            await fs.writeFile(auxPath, csv, 'utf-8', () => {
               resolve(true);
             });
           }

@@ -4,8 +4,8 @@ import { BaseService } from './base-service';
 const { ipcRenderer } = require('electron');
 
 class Export extends BaseService {
-  public async spdx(args: string | null = null): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.EXPORT_SPDX, args);
+  public async spdx(path: string): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.EXPORT_SPDX, path);
     return response;
   }
 
@@ -18,7 +18,6 @@ class Export extends BaseService {
     const response = await ipcRenderer.invoke(IpcEvents.EXPORT_WFP, args);
     return response;
   }
-
 
   public async raw(args: string | null = null): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.EXPORT_RAW, args);
