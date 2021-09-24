@@ -255,7 +255,8 @@
     "react-split-pane": "^0.1.92",
     "react-syntax-highlighter": "^15.4.3",
     "regenerator-runtime": "^0.13.5",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "^0.5.19",
+    "uuid": "^8.3.2"
   },
   "devEngines": {
     "node": ">=10.x",

@@ -9,6 +9,7 @@ import { Project } from './Project';
 import * as os from 'os';
 import * as Filtering from './filtering';
 import * as TreeStructure from './Project';
+import { IProject } from '../../api/types';
 
 /**
  *
@@ -29,115 +30,69 @@ class Workspace extends EventEmitter {
 
   projectsListOld: Project;
 
-  ws_path: string;
+  wsPath: string;
 
   constructor() {
     super();
     this.projectList = [];
-    // this.name = 'scanoss-workspace';
-    // this.ws_path = `${os.homedir()}/${this.name}`;
-
-    // if (!fs.existsSync(`${this.ws_path}`)) fs.mkdirSync(`${this.ws_path}`);
-
-    // if (!fs.existsSync(`${this.ws_path}/defaultCfg.json`)) {
-    //   fs.writeFileSync(`${this.ws_path}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
-    // }
-
-    // this.projectsListOld = new TreeStructure.ProjectTree('Unnamed');
-
-
-    // console.log(mt);
-
-    // explora el directorio en busca de metadata.json
-    // voy creando un nuevo proyecto con el json metadata new Project(mt:metadata)
-    // for(folder)
-    //   Metadata.build(pathAlMetadata).then((mt) => {
-    //     this.projectList.add(new ProjectTree(mt))
-    //  });
-
-    //  for (folder)
-    //   mt new MediaMetadata(path)
-    //   mt.init()
-    //   new ProjectTree(mt)
-
-    //   ProjectList. add (new TreeStructure.ProjectTree(mt));
-
-
-    // Luego agrego el proyecto creado a la lista de projectos del workspace
-
-    //En el momento que pidan el listado de proyectos, la lista ya esta cargada.
-    //pArr = [new ProjectTree({}:metadata ), new ProjectTree(),new ProjectTree()]
-
-    // Cuando la UI selecciona un proyecto, devolveria un id representando
-    // el indice del array.
-
-
-    //IMPORTANTE: hacer tambien una funcion en workspace para cerrar el proyecto i.
-
-  }
-
-  public createFolderIfNotExist() {
-    console.log(`[ WORKSPACE ]: `);
-    fs.mkdirSync(`${this.ws_path}`);
-
-  }
-
-  private initWorkspaceFileSystem(){
-
-    if (!fs.existsSync(`${this.ws_path}`)) fs.mkdirSync(this.ws_path);
-
-    if (!fs.existsSync(`${this.ws_path}/defaultCfg.json`))
-      fs.writeFileSync(`${this.ws_path}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
-
   }
 
   public async load(workspacePath: string) {
-
-    this.ws_path = workspacePath;
-
+    if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes
+    this.wsPath = workspacePath;
     this.initWorkspaceFileSystem();
-
-    if (this.projectList.length) {
-      console.log(`[ WORKSPACE ]: Closing opened projects`);
-      this.projectList = [];
-    }
-
     console.log(`[ WORKSPACE ]: Reading projects....`);
     const projectPaths = await this.getAllProjectsPaths();
-    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) => Project.build(projectPath));
+    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) => Project.readFromPath(projectPath));
 
-    let projectsReaded = (await Promise.allSettled(projectArray).catch((e) => {
-      console.log(`Error reading project: ${e.path}`);
-    })) as PromiseSettledResult<Project>[];
-
+    let projectsReaded = (await Promise.allSettled(projectArray)) as PromiseSettledResult<Project>[];
     projectsReaded = projectsReaded.filter((p) => (p.status === 'fulfilled'));
     this.projectList = projectsReaded.map((p) => (p as PromiseFulfilledResult<Project>).value);
+  }
 
+  public getProjectsDtos(): Array<IProject> {
+    const projectsDtos: Array<IProject> = this.projectList.map((p) => p.getDto());
+    return projectsDtos;
+  }
 
+  public loadProjectByUUID(uuid: string) {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const p of this.projectList) {
+      if (p.getUUID() === uuid) {
+        p.load();
+        break;
+      }
+    }
+  }
 
+  public getMyPath() {
+    return this.wsPath;
+  }
 
-
-
-
-
-    // await  creo el folder workspace y retorno el wspath default que utilizo
-
-
-    // this.projectList =  metadataArr.map((mt: Metadata) => {
-    //   new Project(mt);
-    //    return mt;
-    //   });
-
-
-
-    // genero una lista de proyectos con su metadata - devuelvo la lista de proyectos
-    // return new Workspace(lista de proyectos);
+  public close() {
+    console.log(`[ WORKSPACE ]: Closing opened projects`);
+    this.projectList = [];
   }
 
   public addProject(p: Project) {
     this.projectList.push(p);
     return this.projectList.length - 1;
   }
+
+  private initWorkspaceFileSystem() {
+    if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
+    if (!fs.existsSync(`${this.wsPath}/defaultCfg.json`))
+      fs.writeFileSync(`${this.wsPath}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
+  }
+
+  private async getAllProjectsPaths(){
+    const workspaceStuff = await fs.promises.readdir(this.wsPath, { withFileTypes: true });
+    const projectsDirEnt = workspaceStuff.filter((dirent) => {return !dirent.isSymbolicLink() && !dirent.isFile();})
+    const projectPaths = projectsDirEnt.map((dirent) => `${this.wsPath}/${dirent.name}`);
+    return projectPaths;
+  }
+
+
 
 
 
@@ -146,7 +101,7 @@ class Workspace extends EventEmitter {
     this.projectsListOld.setMailbox(mailbox);
 
     // Copy the default workspace configuration to the project folder
-    const projectPath = `${this.ws_path}/${path.basename(scanPath)}`;
+    const projectPath = `${this.wsPath}/${path.basename(scanPath)}`;
     const projectCfgPath = `${projectPath}/projectCfg.json`;
     if (!fs.existsSync(projectPath)) fs.mkdirSync(`${projectPath}`);
     if (!fs.existsSync(`${projectCfgPath}`)) {
@@ -164,7 +119,7 @@ class Workspace extends EventEmitter {
   }
 
   deleteProject(projectPath: string) {
-    if (!projectPath.includes(this.ws_path) || !fs.existsSync(projectPath)) {
+    if (!projectPath.includes(this.wsPath) || !fs.existsSync(projectPath)) {
       throw new Error('Project does not exist');
     }
     this.deleteFolderRecursive(projectPath);
@@ -192,37 +147,19 @@ class Workspace extends EventEmitter {
     return 0;
   }
 
-  public async getAllProjectsPaths(){
-    const workspaceStuff = await fs.promises.readdir(this.ws_path, { withFileTypes: true });
-    const projectsDirEnt = workspaceStuff.filter((dirent) => {return !dirent.isSymbolicLink() && !dirent.isFile();})
-    const projectPaths = projectsDirEnt.map((dirent) => `${this.ws_path}/${dirent.name}`);
-    return projectPaths;
-  }
 
-  public async getAllMetadata() {
-    const workspaceStuff = await fs.promises.readdir(this.ws_path, { withFileTypes: true });
-    const projectsPaths = workspaceStuff.filter((dirent) => {return !dirent.isSymbolicLink() && !dirent.isFile();})
-    const metadataPaths = projectsPaths.map((dirent) => `${this.ws_path}/${dirent.name}/metadata.json`);
 
-    const metadataArray: Promise<Metadata>[] = metadataPaths.map((metadataPath) => Metadata.build(metadataPath));
-    const metadata = await Promise.all(metadataArray).catch((e) => {
-      console.log(`Error reading metadata: ${e.path}`);
-      throw e;
-    });
-
-    return metadata;
-  }
 
   async listProjects() {
     const projects: Array<any> = [];
     try {
       const projectPaths = fs
-        .readdirSync(this.ws_path, { withFileTypes: true })
+        .readdirSync(this.wsPath, { withFileTypes: true })
         .sort(this.dirFirstFileAfter)
         .filter((dirent) => {
           return !dirent.isSymbolicLink() && !dirent.isFile();
         })
-        .map((dirent) => `${this.ws_path}/${dirent.name}/metadata.json`);
+        .map((dirent) => `${this.wsPath}/${dirent.name}/metadata.json`);
 
       // eslint-disable-next-line no-restricted-syntax
       for (const projectPath of projectPaths) {

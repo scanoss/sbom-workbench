@@ -1,3 +1,5 @@
+import { ProjectState } from "../main/workspace/Project";
+
 export interface Inventory {
   id?: number;
   compid: number;
@@ -43,6 +45,7 @@ export interface NewComponentDTO {
   purl: string;
   url: string;
 }
+
 export interface ItemInclude {
   path: string;
   recursive: boolean;
@@ -50,12 +53,24 @@ export interface ItemInclude {
 }
 
 export interface IProject {
-  work_root: string;
-  scan_root: string;
-  default_licenses: string;
-  default_components: string;
   appVersion: string;
+  date: string;
+  name: string;
+  workRoot: string;
+  scanRoot: string;
+  state: ProjectState;
+  fileCounter: number;
+  api: string;
+  token: string;
+  uuid: string;
+
+  work_root?: string;
+  scan_root?: string;
+  default_licenses?: string;
+  default_components?: string;
 }
+
+
 
 export interface Files {
   md5?: string;

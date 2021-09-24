@@ -28,7 +28,8 @@ import * as os from 'os';
 
 import { IpcEvents } from './ipc-events';
 import { workspace } from './main/workspace/workspace';
-import { ItemExclude, Project } from './api/types';
+import { ItemExclude, IProject } from './api/types';
+import { Project } from './main/workspace/Project';
 import { ScanDb } from './main/db/scan_db';
 import { licenses } from './main/db/licenses';
 
@@ -37,6 +38,7 @@ import { SCANNER_EVENTS } from './main/scannerLib/ScannerEvents';
 import { fstat } from 'fs';
 import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
 import Workspace from './renderer/features/workspace/Workspace';
+import { Metadata } from './main/workspace/Metadata';
 const basepath = require('path');
 const fs = require('fs');
 
@@ -148,15 +150,6 @@ app.on('window-all-closed', () => {
   }
 });
 
-
-
-// app
-//   .whenReady()
-//   .then(async () => {
-//     return Promise.all([createWindow(), mainLogic()]);
-//   })
-//   .catch(console.log);
-
 app.whenReady().then(createWindow).then(mainLogic).catch(console.log);
 
 app.on('activate', () => {
@@ -175,6 +168,53 @@ export interface IInitScan {
 
 async function mainLogic() {
   await workspace.load(`${os.homedir()}/scanoss-workspace`);
+
+
+  //Esto se va a llamar en el servicio de listar los proyectos
+  console.log(workspace.getProjectsDtos());
+
+
+  // Esto se va a llamar para crear un nuevo proyecto
+  // De la UI viene
+  /*
+    name
+    scanPath (Ahora viene solamente esto);
+    API
+    Token
+  */
+
+  const scanPath = '/home/ubuntu/Projects/delete_me/filters';
+  const projectName = path.basename(scanPath);
+
+
+
+  const p: Project = await Project.new(workspace.getMyPath(), projectName, scanPath);
+
+  // p.setScanPath();
+  // p.setFilters();
+  // p.setApi();
+  // p.setToken();
+
+  // p.startScanning();
+
+  workspace.addProject(p);
+
+  return p.getDto();
+
+  // p.setName();
+  // p.setScanPath();
+  // p.setAPI();
+  // p.setToken();
+  //
+  //return p.getUUID();
+/************************************************************** */
+
+
+/************************************************************** */
+  // de aca para abajo es un servicio de carga de proyecto. recibiria un UUID
+  workspace.loadProjectByUUID('asdasd');
+
+  /************************************************************** */
 }
 
 

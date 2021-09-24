@@ -67,19 +67,43 @@ export class Project extends EventEmitter {
 
   constructor(mt: Metadata) {
     super();
+    this.projectMetadata = mt;
     this.work_root = '';
     this.scan_root = '';
     this.project_name = mt.getName();
     this.banned_list = new Filtering.BannedList('NoFilter');
     // forces a singleton instance, will be killed in a multiproject domain
-    defaultProject = this;
-
+   // defaultProject = this;
   }
 
-  public static async build(pathToProject: string): Promise<Project> {
-    const mt: Metadata = await Metadata.build(`${pathToProject}/metadata.json`);
+  public static async readFromPath(pathToProject: string): Promise<Project> {
+    const mt: Metadata = await Metadata.readFromPath(`${pathToProject}/metadata.json`);
     const p: Project = new Project(mt);
     return p;
+  }
+
+  public static async new(pathToProject: string, name: string, scanPath: string): Promise<Project> {
+    const mt: Metadata = await Metadata.new(`${pathToProject}/metadata.json`, name, scanPath);
+
+    const p: Project = new Project(mt);
+    return p;
+  }
+
+  public setScanPath(name: string){
+    this.projectMetadata.setName(name);
+  }
+
+
+  public async load() {
+    return 1;
+  }
+
+  public getUUID() {
+    return this.projectMetadata.getUUID();
+  }
+
+  public getDto() {
+    return this.projectMetadata.getDto();
   }
 
   set_scan_root(root: string) {
