@@ -39,7 +39,8 @@ export class Formats extends Db {
   }
 
   async spdx(path: string,percentage: number) {
-    const document = spdx;      
+    const document = spdx;
+    document.Packages=[];       
     const auxPath = percentage<100 ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;      
     return new Promise<boolean>(async (resolve, reject) => {
       try {
