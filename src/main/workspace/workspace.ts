@@ -44,9 +44,8 @@ class Workspace extends EventEmitter {
     console.log(`[ WORKSPACE ]: Reading projects....`);
     const projectPaths = await this.getAllProjectsPaths();
     const projectArray: Promise<Project>[] = projectPaths.map((projectPath) => Project.readFromPath(projectPath));
-
-    let projectsReaded = (await Promise.allSettled(projectArray)) as PromiseSettledResult<Project>[];
-    projectsReaded = projectsReaded.filter((p) => (p.status === 'fulfilled'));
+    let projectsReaded = ((await Promise.allSettled(projectArray)) as PromiseSettledResult<Project>[]);
+    projectsReaded = projectsReaded.filter((p) => p.status === 'fulfilled');
     this.projectList = projectsReaded.map((p) => (p as PromiseFulfilledResult<Project>).value);
   }
 
@@ -55,14 +54,19 @@ class Workspace extends EventEmitter {
     return projectsDtos;
   }
 
-  public loadProjectByUUID(uuid: string) {
+  public loadProjectByPath(path: string) {
     // eslint-disable-next-line no-restricted-syntax
     for (const p of this.projectList) {
-      if (p.getUUID() === uuid) {
+      if (p.myPath === path) {
         p.load();
         break;
       }
     }
+  }
+
+  public closeAllProjects() {
+    for (const p of this.projectList) p.close();
+
   }
 
   public getMyPath() {
@@ -74,8 +78,14 @@ class Workspace extends EventEmitter {
     this.projectList = [];
   }
 
-  public addProject(p: Project) {
+  public async addProject(p: Project) {
+    const pName: string = p.getDto().name;
+    const pDirectory = `${this.wsPath}/${pName}`;
+    await fs.promises.mkdir(pDirectory);
+    p.setMyPath(pDirectory);
+    await p.save();
     this.projectList.push(p);
+
     return this.projectList.length - 1;
   }
 

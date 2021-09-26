@@ -27,22 +27,18 @@ export class Metadata {
 
   private uuid: string;
 
-  constructor(name: string, scanPath: string) {
+  constructor(name: string) {
     this.name = name;
-    this.scanRoot = scanPath;
     this.appVersion = app.getVersion();
     this.date = new Date().toISOString();
     this.uuid = (Math.random() * 9999999).toString();
   }
 
   public static async readFromPath(pathToMetadata: string): Promise<Metadata> {
-
     const mtDto: Metadata = JSON.parse(await fs.promises.readFile(pathToMetadata, 'utf8'));
-    const mt = new Metadata('', '');
+    const mt = new Metadata('');
 
-
-
-    mt.setMyPath(mtDto.myPath);
+    mt.setMyPath(pathToMetadata);
     mt.setAppVersion(mtDto.appVersion);
     mt.setDate(mtDto.date);
     mt.setName(mtDto.name);
@@ -54,23 +50,12 @@ export class Metadata {
     mt.setToken(mtDto.token);
     mt.setUuid(mtDto.uuid);
 
-
-    mt.myPath = pathToMetadata;
-
-    return mt;
-  }
-
-  public static async new(pathToMetadata: string, name: string, scanPath: string): Promise<Metadata> {
-    const mt: Metadata = new Metadata(name, scanPath);
-    mt.myPath = pathToMetadata;
-    const str = JSON.stringify(this, null, 2);
-    await fs.promises.writeFile(pathToMetadata, str);
     return mt;
   }
 
   public async save() {
-    // const str = JSON.stringify(this, null, 2);
-    // await fs.promises.writeFile(this.myPath, str);
+    const str = JSON.stringify(this, null, 2);
+    await fs.promises.writeFile(`${this.myPath}/metadata.json`, str);
   }
 
 
@@ -79,17 +64,14 @@ export class Metadata {
 
   public setMyPath(myPath: string) {
     this.myPath = myPath;
-    this.save();
   }
 
   public setAppVersion(appVersion: string) {
     this.appVersion = appVersion;
-    this.save();
   }
 
   public setName(name: string){
     this.name = name;
-    this.save();
   }
 
   public setDate(date: string){
@@ -97,45 +79,34 @@ export class Metadata {
   }
 
   public setWorkRoot(workRoot: string) {
-    this.workRoot= workRoot;
-    this.save();
+    this.workRoot = workRoot;
   }
 
   public setScanRoot(scanRoot: string) {
-    this.scanRoot=scanRoot;
-    this.save();
+    this.scanRoot = scanRoot;
   }
 
   public setState(s: ProjectState) {
     this.state = s;
-    this.save();
   }
 
   public setApi(api: string) {
     this.api = api;
-    this.save();
   }
 
   public setToken(token: string) {
     this.token = token;
-    this.save();
   }
 
+  public setUuid(uuid: string) {
+    this.uuid = uuid;
+  }
 
- public setUuid(uuid: string){
-   this.uuid = uuid;
-   this.save();
- }
-
-  public setFileCounter(c: number){
+  public setFileCounter(c: number) {
     this.fileCounter = c;
-    this.save();
   }
 
-
-
-
-  public getName(){
+  public getName() {
     return this.name;
   }
 
@@ -145,6 +116,10 @@ export class Metadata {
 
   public getUUID() {
     return this.uuid;
+  }
+
+  public getScanRoot() {
+    return this.scanRoot;
   }
 
   public getDto(): IProject {

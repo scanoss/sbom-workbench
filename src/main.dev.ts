@@ -183,36 +183,24 @@ async function mainLogic() {
     Token
   */
 
-  const scanPath = '/home/ubuntu/Projects/delete_me/filters';
+  const scanPath = '/home/ubuntu/Projects/delete_me/google-research';
   const projectName = path.basename(scanPath);
 
+  const p: Project = new Project(projectName);
+  p.setScanPath(scanPath);
+  p.setMailbox(null);
+
+  await workspace.addProject(p);  //Save to local storage;
 
 
-  const p: Project = await Project.new(workspace.getMyPath(), projectName, scanPath);
-
-  // p.setScanPath();
-  // p.setFilters();
-  // p.setApi();
-  // p.setToken();
-
-  // p.startScanning();
-
-  workspace.addProject(p);
-
-  return p.getDto();
-
-  // p.setName();
-  // p.setScanPath();
-  // p.setAPI();
-  // p.setToken();
-  //
-  //return p.getUUID();
-/************************************************************** */
+  await p.startScanner();
+  // return p.getDto();
+  // const p: Project = await Project.new(workspace.getMyPath(), projectName, scanPath);
 
 
-/************************************************************** */
-  // de aca para abajo es un servicio de carga de proyecto. recibiria un UUID
-  workspace.loadProjectByUUID('asdasd');
+  /************************************************************** */
+  // Cuando termina el proyecto es necesario . recibiria un UUID
+  //workspace.openProjectByPath('asdasd');
 
   /************************************************************** */
 }
