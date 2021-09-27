@@ -1,8 +1,7 @@
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { app } from 'electron';
-import { ProjectState, ScanState } from './Project';
-import { IProject } from '../../api/types';
+import { IProject, ScanState } from '../../api/types';
 
 export class Metadata {
 
@@ -60,7 +59,7 @@ export class Metadata {
     this.appVersion = appVersion;
   }
 
-  public setName(name: string){
+  public setName(name: string) {
     this.name = name;
   }
 
@@ -78,6 +77,10 @@ export class Metadata {
 
   public setScannerState(s: ScanState) {
     this.scannerState = s;
+  }
+
+  public getScannerState(): ScanState {
+    return this.scannerState;
   }
 
   public setApi(api: string) {

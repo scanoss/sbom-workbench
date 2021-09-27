@@ -1,13 +1,8 @@
-import { Filter } from '@material-ui/icons';
 import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
-import { defaultProject } from './workspace/Project';
 import { Response } from './Response';
 import { reportService } from './services/ReportService';
 import { workspace } from './workspace/workspace';
-
-
-
 
 interface licenseEntry {
   label: string;

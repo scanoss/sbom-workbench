@@ -1,7 +1,6 @@
 import { ipcMain } from 'electron';
 import { License } from '../api/types';
 import { IpcEvents } from '../ipc-events';
-import { defaultProject } from './workspace/Project';
 import { Response } from './Response';
 import { workspace } from './workspace/workspace';
 

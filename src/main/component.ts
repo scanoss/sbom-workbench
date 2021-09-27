@@ -2,7 +2,6 @@ import { ipcMain } from 'electron';
 import { Component, License, ComponentGroup } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { ComponentParams } from './db/scan_component_db';
-import { defaultProject } from './workspace/Project';
 import { Response } from './Response';
 import { workspace } from './workspace/workspace';
 

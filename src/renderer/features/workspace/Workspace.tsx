@@ -20,6 +20,8 @@ import { workspaceService } from '../../../api/workspace-service';
 import { dialogController } from '../../dialog-controller';
 import { DialogContext, IDialogContext } from '../../context/DialogProvider';
 import { DIALOG_ACTIONS } from '../../context/types';
+import { IProject, ScanState } from '../../../api/types';
+
 
 const filter = (items, query) => {
   if (!items) return null;
@@ -101,8 +103,8 @@ const Workspace = () => {
     return cleanup;
   }, []);
 
-const isProjectFinished = (project): boolean => {
-  return project.status === 'SCANNED';
+const isProjectFinished = (project: IProject): boolean => {
+  return project.scannerState === ScanState.SCANNED;
 }
 
   return (
@@ -147,7 +149,7 @@ const isProjectFinished = (project): boolean => {
                   {filterProjects.length !== 0 ? (
                     filterProjects.map((row) => (
                       <TableRow
-                        className={ isProjectFinished(row) ? 'scanning-not-complete' : 'scanning-complete'}
+                        className={isProjectFinished(row) ? 'scanning-not-complete' : 'scanning-complete'}
                         hover
                         key={row.name}
                         onClick={() => {

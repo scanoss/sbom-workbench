@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
-import { defaultProject } from './workspace/Project';
+import { Project } from './workspace/Project';
 import { workspace } from './workspace/workspace';
 
 
@@ -51,7 +51,8 @@ ipcMain.handle(IpcEvents.EXPORT_WFP, async (event, path: string) => {
 ipcMain.handle(IpcEvents.EXPORT_RAW, async (event, path: string) => {
   let success: boolean;
   try {
-    success =  await workspace.getOpenedProjects()[0].scans_db.formats.raw(`${path}`,defaultProject.results);
+    const p: Project = workspace.getOpenedProjects()[0];
+    success =  await p.scans_db.formats.raw(`${path}`,p.getResults());
     if (success) {
       return { status: 'ok', message: 'RAW exported successfully', data: success };
     }

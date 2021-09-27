@@ -1,19 +1,10 @@
 import { ipcMain } from 'electron';
-import { create } from 'electron-log';
-// import { Component } from 'react';
-import { Inventory, Component, IProject } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
-
-
 import { workspace } from './workspace/workspace';
-import { defaultProject, Project } from './workspace/Project';
 
 const os = require('os');
 const fs = require('fs');
-
-let ws: Workspace;
-//export let defaultProject: Project;
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (_event, arg: any) => {
   let created: any;
@@ -41,13 +32,19 @@ function getUserHome() {
   return process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 }
 
-ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (_event, arg: Project) => {
+ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (event, arg: Project) => {
+    const { path } = arg;
 
+    const projectName = basepath.basename(path);
+    const p: Project = new Project(projectName);
+    await workspace.addProject(p);
+    p.setScanPath(path);
+    p.setMailbox(event.sender);
+    await p.startScanner();
 });
 
 ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
-  ws = workspace;
-  ws.projectsList.stopScanProject();
+  await workspace.getOpenedProjects()[0].close();
 });
 
 ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {

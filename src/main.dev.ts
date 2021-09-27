@@ -170,18 +170,6 @@ export interface IInitScan {
 
 async function mainLogic() {
   await workspace.read(`${os.homedir()}/scanoss-workspace`);
-
-
-  //Esto se va a llamar en el servicio de listar los proyectos
-
-
-  // //Abrir un proyecto
-  // //await workspace.openProjectByPath();
-
-  // //Resumir un proyecto
-  // //workspace.resumeProjectByPath()
-
-
 }
 
 
@@ -195,12 +183,4 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
 
   p.setMailbox(event.sender);
   await p.startScanner();
-
-
-  // workspace.newProject(path,event.sender);
-  // await workspace.projectsList.prepare_scan();
-  // workspace.projectsList.startScan();
 });
-
-
-

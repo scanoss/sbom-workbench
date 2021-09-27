@@ -1,4 +1,14 @@
-import { ProjectState, ScanState } from "../main/workspace/Project";
+export enum ScanState {
+  CREATED = 'CREATED',
+  READY_TO_SCAN = 'READY_TO_SCAN',
+  SCANNING = 'SCANNING',
+  SCANNED = 'SCANNED',
+}
+
+export enum ProjectState {
+  OPENED,
+  CLOSED,
+}
 
 export interface Inventory {
   id?: number;

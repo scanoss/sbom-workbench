@@ -1,16 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { EventEmitter } from 'events';
-import * as os from 'os';
 import fs from 'fs';
-import { ipcMain } from 'electron';
-import { Inventory, IProject } from '../../api/types';
-import { app } from 'electron';
-// import * as fs from 'fs';
-// import * as Filtering from './filtering';
-// import { eventNames } from 'process';
-/* const aFilter=require('./salida')
- const blist =require('./salida') */
-// import * as Emmiter from 'events';
+import { Component, Inventory, ProjectState, ScanState } from '../../api/types';
 
 import * as Filtering from './filtering';
 import { ScanDb } from '../db/scan_db';
@@ -20,26 +11,10 @@ import { ScannerEvents } from '../scannerLib/ScannerEvents';
 import { ScannerCfg } from '../scannerLib/ScannerCfg';
 import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
-import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
+import { isBinaryFileSync } from 'isbinaryfile';
 import { Metadata } from './Metadata';
 
 const path = require('path');
-
-export enum ScanState {
-  CREATED = 'CREATED',
-  READY_TO_SCAN = 'READY_TO_SCAN',
-  SCANNING = 'SCANNING',
-  SCANNED = 'SCANNED',
-}
-
-export enum ProjectState {
-  OPENED,
-  CLOSED,
-}
-
-let defaultProject: Project;
-
-export { defaultProject };
 
 export class Project extends EventEmitter {
   work_root: string;
@@ -76,9 +51,7 @@ export class Project extends EventEmitter {
     super();
     this.metadata = new Metadata(name);
     this.state = ProjectState.CLOSED;
-    //this.banned_list = new Filtering.BannedList('NoFilter');
-    // forces a singleton instance, will be killed in a multiproject domain
-   // defaultProject = this;
+    console.log(`[ PROJECT ]: Creating project ${name}`);
   }
 
   public static async readFromPath(pathToProject: string): Promise<Project> {
@@ -89,35 +62,6 @@ export class Project extends EventEmitter {
     return p;
   }
 
-  public setState(state: ProjectState) {
-    this.state = state;
-  }
-
-  public getState() {
-    return this.state;
-  }
-
-  public setMetadata(mt: Metadata) {
-    this.metadata = mt;
-  }
-
-  public setScanPath(name: string) {
-    this.metadata.setScanRoot(name);
-    this.metadata.save();
-  }
-
-  public setMyPath(myPath: string) {
-    this.metadata.setMyPath(myPath);
-    this.metadata.save();
-  }
-
-  public getMyPath() {
-    return this.metadata.getMyPath();
-  }
-
-  public getProjectName() {
-    return this.metadata.getName();
-  }
 
   public save(): void {
     this.metadata.save();
@@ -136,48 +80,21 @@ export class Project extends EventEmitter {
     this.scans_db = new ScanDb(this.metadata.getMyPath());
     await this.scans_db.init();
     return true;
-
-    //this.work_root = a.work_root;
-    //this.results = a.results;
-    //this.scan_root = a.scan_root;
-    //this.project_name = a.project_name;
-    //this.filesSummary = a.filesSummary;
-    //this.filesToScan = a.filesToScan;
   }
 
-  public close() {
+  public async close() {
+    console.log( `[ PROJECT ]: Closing project ${this.metadata.getMyPath()}`);
     this.state = ProjectState.CLOSED;
+    if( this.metadata.getScannerState() === ScanState.SCANNING ) await this.scanner.stop();
+    this.scanner.removeAllListeners();
     this.logical_tree = null;
     this.scans_db = null;
-    this.scanner = null;
     this.filesToScan = null;
     this.results = null;
   }
 
-  public getUUID(): string {
-    return this.metadata.getUUID();
-  }
-
-  public getDto() {
-    return this.metadata.getDto();
-  }
-
-  getScanRoot(): string {
-    return this.metadata.getScanRoot();
-  }
-
-  public getResults() {
-    return this.results;
-  }
-
-  build_tree() {
-    const scanPath = this.metadata.getScanRoot();
-    this.logical_tree = dirTree(scanPath, scanPath);
-    this.emit('treeBuilt', this.logical_tree);
-  }
-
   public async startScanner() {
-    this.state = ProjectState.CLOSED;
+    this.state = ProjectState.OPENED;
     const myPath = this.metadata.getMyPath();
 
     this.project_name = this.metadata.getName(); // To keep compatibility
@@ -225,9 +142,9 @@ export class Project extends EventEmitter {
   }
 
   async stopScanProject() {
-    console.log("stopping scanner");
+    console.log(`[ SCANNER ]: Stopping scanner of project ${this.metadata.getMyPath()}`);
     await this.scanner.stop();
-    this.saveScanProject();
+    this.save();
   }
 
   resumeScanProject(path, msgToUI) {
@@ -294,7 +211,7 @@ export class Project extends EventEmitter {
       this.results = JSON.parse(a);
 
       this.save();
-      this.close();
+      await this.close();
 
       this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
         success: true,
@@ -352,6 +269,58 @@ export class Project extends EventEmitter {
 
   setMailbox(mailbox: Electron.WebContents) {
     this.msgToUI = mailbox;
+  }
+
+  public setState(state: ProjectState) {
+    this.state = state;
+  }
+
+  public getState() {
+    return this.state;
+  }
+
+  public setMetadata(mt: Metadata) {
+    this.metadata = mt;
+  }
+
+  public setScanPath(name: string) {
+    this.metadata.setScanRoot(name);
+    this.metadata.save();
+  }
+
+  public setMyPath(myPath: string) {
+    this.metadata.setMyPath(myPath);
+    this.metadata.save();
+  }
+
+  public getMyPath() {
+    return this.metadata.getMyPath();
+  }
+
+  public getProjectName() {
+    return this.metadata.getName();
+  }
+
+  public getUUID(): string {
+    return this.metadata.getUUID();
+  }
+
+  public getDto() {
+    return this.metadata.getDto();
+  }
+
+  getScanRoot(): string {
+    return this.metadata.getScanRoot();
+  }
+
+  public getResults() {
+    return this.results;
+  }
+
+  build_tree() {
+    const scanPath = this.metadata.getScanRoot();
+    this.logical_tree = dirTree(scanPath, scanPath);
+    this.emit('treeBuilt', this.logical_tree);
   }
 
   getLogicalTree() {

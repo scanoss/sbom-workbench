@@ -4,12 +4,8 @@ import { stripBasename } from 'history/PathUtils';
 import * as fs from 'fs';
 import path from 'path';
 import { Metadata } from './Metadata';
-
-
-import * as os from 'os';
-import * as Filtering from './filtering';
-import { Project, ProjectState} from './Project';
-import { IProject } from '../../api/types';
+import { Project } from './Project';
+import { IProject, ProjectState } from '../../api/types';
 
 /**
  *
@@ -117,11 +113,11 @@ class Workspace extends EventEmitter {
     }
   }
 
-  public closeProjectByPath(path: string) {
+  public async closeProjectByPath(path: string) {
     // eslint-disable-next-line no-restricted-syntax
     for (const p of this.projectList) {
-      if (p.myPath === path) {
-        p.close();
+      if (p.getMyPath() === path) {
+        await p.close();
         break;
       }
     }

@@ -1,8 +1,7 @@
 import { ipcMain } from 'electron';
-import path from 'path';
 import { IpcEvents } from '../ipc-events';
-import { defaultProject } from './workspace/Project';
 import { Response } from './Response';
+import { Project } from './workspace/Project';
 import { workspace } from './workspace/workspace';
 
 ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
@@ -44,11 +43,12 @@ ipcMain.handle(IpcEvents.RESULTS_GET_NO_MATCH, async (event, filePath: string) =
 
 ipcMain.handle(IpcEvents.RESULTS_ADD_FILTERED_FILE, async (event, filePath: string) => {
   try {
-    const node = workspace.getOpenedProjects()[0].getNodeFromPath(filePath);
+    const p: Project = workspace.getOpenedProjects()[0];
+    const node = p.getNodeFromPath(filePath);
     node.action = 'scan';
     node.className = 'match-info-result';
-    const result = await workspace.getOpenedProjects()[0].scans_db.results.insertFiltered(filePath);
-    defaultProject.saveScanProject();   // TO DO
+    const result = await p.scans_db.results.insertFiltered(filePath);
+    p.save();
     return Response.ok({
       message: 'Results succesfully retrieved',
       data: result,
