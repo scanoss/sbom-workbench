@@ -10,10 +10,11 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import path from 'path';
+
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import path from 'path';
 import MenuBuilder from './main/menu';
 import './main/inventory';
 import './main/component';
@@ -41,6 +42,7 @@ import Workspace from './renderer/features/workspace/Workspace';
 import { Metadata } from './main/workspace/Metadata';
 const basepath = require('path');
 const fs = require('fs');
+
 
 export default class AppUpdater {
   constructor() {
@@ -167,50 +169,37 @@ export interface IInitScan {
 }
 
 async function mainLogic() {
-  await workspace.load(`${os.homedir()}/scanoss-workspace`);
+  await workspace.read(`${os.homedir()}/scanoss-workspace`);
 
 
   //Esto se va a llamar en el servicio de listar los proyectos
-  console.log(workspace.getProjectsDtos());
 
 
-  // Esto se va a llamar para crear un nuevo proyecto
-  // De la UI viene
-  /*
-    name
-    scanPath (Ahora viene solamente esto);
-    API
-    Token
-  */
+  // //Abrir un proyecto
+  // //await workspace.openProjectByPath();
 
-  const scanPath = '/home/ubuntu/Projects/delete_me/google-research';
-  const projectName = path.basename(scanPath);
-
-  const p: Project = new Project(projectName);
-  p.setScanPath(scanPath);
-  p.setMailbox(null);
-
-  await workspace.addProject(p);  //Save to local storage;
+  // //Resumir un proyecto
+  // //workspace.resumeProjectByPath()
 
 
-  await p.startScanner();
-  // return p.getDto();
-  // const p: Project = await Project.new(workspace.getMyPath(), projectName, scanPath);
-
-
-  /************************************************************** */
-  // Cuando termina el proyecto es necesario . recibiria un UUID
-  //workspace.openProjectByPath('asdasd');
-
-  /************************************************************** */
 }
 
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   const { path } = arg;
-  workspace.newProject(path,event.sender);
-  await workspace.projectsList.prepare_scan();
-  workspace.projectsList.startScan();
+
+  const projectName = basepath.basename(path);
+  const p: Project = new Project(projectName);
+  await workspace.addProject(p);
+  p.setScanPath(path);
+
+  p.setMailbox(event.sender);
+  await p.startScanner();
+
+
+  // workspace.newProject(path,event.sender);
+  // await workspace.projectsList.prepare_scan();
+  // workspace.projectsList.startScan();
 });
 
 

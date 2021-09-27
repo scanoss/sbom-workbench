@@ -1,11 +1,11 @@
-import { defaultProject } from '../workspace/Project';
+import { workspace } from '../workspace/workspace';
 
 class ReportService {
   public async getReportSummary() {
     try {
       let tempSummary: any = {};
-      tempSummary = await defaultProject.scans_db.inventories.getCurrentSummary();
-      const projectSummary = defaultProject.filesSummary;
+      tempSummary = await workspace.getOpenedProjects()[0].scans_db.inventories.getCurrentSummary();
+      const projectSummary = workspace.getOpenedProjects()[0].filesSummary;
       const summary = {
         totalFiles: 0,
         includedFiles: 0,
@@ -33,7 +33,7 @@ class ReportService {
   public async getReportIdentified() {
     try {
       let data: any = [];
-      data = await defaultProject.scans_db.components.getIdentifiedForReport();
+      data = await workspace.getOpenedProjects()[0].scans_db.components.getIdentifiedForReport();
       const licenses = [];
       data.forEach((element) => {
         const aux: any = {};

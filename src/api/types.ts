@@ -1,4 +1,4 @@
-import { ProjectState } from "../main/workspace/Project";
+import { ProjectState, ScanState } from "../main/workspace/Project";
 
 export interface Inventory {
   id?: number;
@@ -56,16 +56,15 @@ export interface IProject {
   appVersion: string;
   date: string;
   name: string;
-  workRoot: string;
-  scanRoot: string;
-  state: ProjectState;
-  fileCounter: number;
+  work_root: string;
+  scan_root: string;
+  scannerState: ScanState;
+  files: number;
   api: string;
   token: string;
   uuid: string;
 
-  work_root?: string;
-  scan_root?: string;
+
   default_licenses?: string;
   default_components?: string;
 }

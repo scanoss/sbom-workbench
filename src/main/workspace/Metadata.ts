@@ -1,11 +1,10 @@
 import fs from 'fs';
-import { ProjectState } from './Project';
+import { v4 as uuidv4 } from 'uuid';
 import { app } from 'electron';
+import { ProjectState, ScanState } from './Project';
 import { IProject } from '../../api/types';
 
-
 export class Metadata {
-  private myPath: string;
 
   private appVersion: string;
 
@@ -13,13 +12,13 @@ export class Metadata {
 
   private name: string;
 
-  private workRoot: string;
+  private work_root: string;
 
-  private scanRoot: string;
+  private scan_root: string;
 
-  private state: ProjectState;
+  private scannerState: ScanState;
 
-  private fileCounter: number;
+  private files: number;
 
   private api: string;
 
@@ -31,39 +30,30 @@ export class Metadata {
     this.name = name;
     this.appVersion = app.getVersion();
     this.date = new Date().toISOString();
-    this.uuid = (Math.random() * 9999999).toString();
+    this.uuid = uuidv4();
   }
 
-  public static async readFromPath(pathToMetadata: string): Promise<Metadata> {
-    const mtDto: Metadata = JSON.parse(await fs.promises.readFile(pathToMetadata, 'utf8'));
+  public static async readFromPath(pathToProject: string): Promise<Metadata> {
+    const fileMt: Metadata = JSON.parse(await fs.promises.readFile(`${pathToProject}/metadata.json`, 'utf8'));
     const mt = new Metadata('');
 
-    mt.setMyPath(pathToMetadata);
-    mt.setAppVersion(mtDto.appVersion);
-    mt.setDate(mtDto.date);
-    mt.setName(mtDto.name);
-    mt.setWorkRoot(mtDto.workRoot);
-    mt.setScanRoot(mtDto.scanRoot);
-    mt.setState(mtDto.state);
-    mt.setFileCounter(mtDto.fileCounter);
-    mt.setApi(mtDto.api);
-    mt.setToken(mtDto.token);
-    mt.setUuid(mtDto.uuid);
+    mt.setMyPath(pathToProject);
+    mt.setAppVersion(fileMt.appVersion);
+    mt.setDate(fileMt.date);
+    mt.setName(fileMt.name);
+    mt.setScanRoot(fileMt.scan_root);
+    mt.setScannerState(fileMt.scannerState);
+    mt.setFileCounter(fileMt.files);
+    mt.setApi(fileMt.api);
+    mt.setToken(fileMt.token);
+    mt.setUuid(fileMt.uuid);
 
     return mt;
   }
 
-  public async save() {
+  public save(): void {
     const str = JSON.stringify(this, null, 2);
-    await fs.promises.writeFile(`${this.myPath}/metadata.json`, str);
-  }
-
-
-
-
-
-  public setMyPath(myPath: string) {
-    this.myPath = myPath;
+    fs.writeFileSync(`${this.work_root}/metadata.json`, str);
   }
 
   public setAppVersion(appVersion: string) {
@@ -78,16 +68,16 @@ export class Metadata {
     this.date = date;
   }
 
-  public setWorkRoot(workRoot: string) {
-    this.workRoot = workRoot;
+  public setMyPath(workRoot: string) {
+    this.work_root = workRoot;
   }
 
   public setScanRoot(scanRoot: string) {
-    this.scanRoot = scanRoot;
+    this.scan_root = scanRoot;
   }
 
-  public setState(s: ProjectState) {
-    this.state = s;
+  public setScannerState(s: ScanState) {
+    this.scannerState = s;
   }
 
   public setApi(api: string) {
@@ -103,23 +93,27 @@ export class Metadata {
   }
 
   public setFileCounter(c: number) {
-    this.fileCounter = c;
+    this.files = c;
   }
 
   public getName() {
     return this.name;
   }
 
-  public getMyPath() {
-    return this.myPath;
+  public getMyPath(): string {
+    return this.work_root;
   }
 
-  public getUUID() {
+  public getUUID(): string {
     return this.uuid;
   }
 
   public getScanRoot() {
-    return this.scanRoot;
+    return this.scan_root;
+  }
+
+  public getState() {
+    return this.scannerState;
   }
 
   public getDto(): IProject {
@@ -127,10 +121,10 @@ export class Metadata {
       appVersion: this.appVersion,
       date: this.date,
       name: this.name,
-      workRoot: this.workRoot,
-      scanRoot: this.scanRoot,
-      state: this.state,
-      fileCounter: this.fileCounter,
+      work_root: this.work_root,
+      scan_root: this.scan_root,
+      scannerState: this.scannerState,
+      files: this.files,
       api: this.api,
       token: this.token,
       uuid: this.uuid,

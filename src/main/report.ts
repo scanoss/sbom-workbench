@@ -4,6 +4,7 @@ import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/Project';
 import { Response } from './Response';
 import { reportService } from './services/ReportService';
+import { workspace } from './workspace/workspace';
 
 
 
@@ -63,7 +64,7 @@ ipcMain.handle(IpcEvents.REPORT_DETECTED, async (event, arg: string) => {
   crypto = [{ label: 'None', files: [], value: 0 }];
 
   try {
-    const a = defaultProject.results;
+    const a = workspace.getOpenedProjects()[0].getResults();
     for (const [key, results] of Object.entries(a)) {
       for (const result of results) {
         if (result.id != 'none') {
@@ -173,8 +174,8 @@ ipcMain.handle(IpcEvents.REPORT_INVENTORY_PROGRESS, async (event, arg: string) =
 
   let inventory: inventoryProgress;
   try {
-    const tempSummary = await defaultProject.scans_db.inventories.getCurrentSummary();
-    const projectSummary = defaultProject.filesSummary;
+    const tempSummary = await workspace.getOpenedProjects()[0].scans_db.inventories.getCurrentSummary();
+    const projectSummary = workspace.getOpenedProjects()[0].filesSummary;
     // total, filter, include
     const summary = {
       totalFiles: 0,

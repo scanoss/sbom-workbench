@@ -1,12 +1,13 @@
 import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/Project';
+import { workspace } from './workspace/workspace';
 
 
 ipcMain.handle(IpcEvents.EXPORT_SPDX, async (event, path: string) => {
   let success: boolean;
   try {
-    success = await defaultProject.scans_db.formats.spdx(`${path}`);
+    success = await workspace.getOpenedProjects()[0].scans_db.formats.spdx(`${path}`);
     if (success) {
       return { status: 'ok', message: 'SPDX exported successfully', data: success };
     }
@@ -20,7 +21,7 @@ ipcMain.handle(IpcEvents.EXPORT_SPDX, async (event, path: string) => {
 ipcMain.handle(IpcEvents.EXPORT_CSV, async (event, path: string) => {
   let success: boolean;
   try {
-    success = await defaultProject.scans_db.formats.csv(`${path}`);
+    success = await workspace.getOpenedProjects()[0].scans_db.formats.csv(`${path}`);
     if (success) {
       return { status: 'ok', message: 'CSV exported successfully', data: success };
     }
@@ -36,7 +37,7 @@ ipcMain.handle(IpcEvents.EXPORT_CSV, async (event, path: string) => {
 ipcMain.handle(IpcEvents.EXPORT_WFP, async (event, path: string) => {
   let success: boolean;
   try {
-    success =  await defaultProject.scans_db.formats.wfp(`${path}`, `${defaultProject.work_root}/winnowing.wfp`);
+    success =  await workspace.getOpenedProjects()[0].scans_db.formats.wfp(`${path}`, `${workspace.getOpenedProjects()[0].getWorkRoot()}/winnowing.wfp`);
     if (success) {
       return { status: 'ok', message: 'WFP exported successfully', data: success };
     }
@@ -50,7 +51,7 @@ ipcMain.handle(IpcEvents.EXPORT_WFP, async (event, path: string) => {
 ipcMain.handle(IpcEvents.EXPORT_RAW, async (event, path: string) => {
   let success: boolean;
   try {
-    success =  await defaultProject.scans_db.formats.raw(`${path}`,defaultProject.results);
+    success =  await workspace.getOpenedProjects()[0].scans_db.formats.raw(`${path}`,defaultProject.results);
     if (success) {
       return { status: 'ok', message: 'RAW exported successfully', data: success };
     }

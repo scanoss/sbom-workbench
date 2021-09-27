@@ -13,26 +13,20 @@ const os = require('os');
 const fs = require('fs');
 
 let ws: Workspace;
-
+//export let defaultProject: Project;
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (_event, arg: any) => {
   let created: any;
-  console.log(arg);
-  ws = workspace;
 
 
-  // p = new ProjectTree();
-  // p.loadFromPath()
-
-
-  ws.newProject(arg, _event.sender);
-  ws.projectsList.openScanProject(arg);
+  const p: Project = await workspace.openProjectByPath(arg);
 
   const response = {
-    logical_tree: ws.projectsList.logical_tree,
-    work_root: ws.projectsList.work_root,
-    results: ws.projectsList.results,
-    scan_root: ws.projectsList.scan_root,
+    logical_tree: p.getLogicalTree(),
+    work_root: p.getMyPath(),
+    results: p.getResults(),
+    scan_root: p.getScanRoot(),
+    uuid: p.getUUID(),
   };
 
   return {
@@ -48,15 +42,7 @@ function getUserHome() {
 }
 
 ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (_event, arg: Project) => {
-  const { path } = arg;
-  ws = new Workspace();
-  ws.newProject(path, _event.sender);
-  console.log(ws.projectsList);
-  return {
-    status: 'ok',
-    message: 'Project loaded',
-    data: ws, // ws.directory_tree.project,
-  };
+
 });
 
 ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
@@ -85,13 +71,13 @@ ipcMain.handle(IpcEvents.UTILS_DEFAULT_PROJECT_PATH, async (event) => {
 });
 
 ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
-  const projectName = defaultProject.project_name;
+  const projectName = workspace.getOpenedProjects()[0].project_name;
       return { status: 'ok', message: 'Project name retrieve succesfully', data: projectName };
 });
 
 ipcMain.handle(IpcEvents.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
   try {
-    const node = defaultProject.getNodeFromPath(path);
+    const node = workspace.getOpenedProjects()[0].getNodeFromPath(path);
     return Response.ok({ message: 'Node from path retrieve succesfully', data: node });
   } catch (e) {
     return Response.fail({ message: e.message });

@@ -4,11 +4,11 @@ import { stripBasename } from 'history/PathUtils';
 import * as fs from 'fs';
 import path from 'path';
 import { Metadata } from './Metadata';
-import { Project } from './Project';
+
 
 import * as os from 'os';
 import * as Filtering from './filtering';
-import * as TreeStructure from './Project';
+import { Project, ProjectState} from './Project';
 import { IProject } from '../../api/types';
 
 /**
@@ -28,6 +28,7 @@ class Workspace extends EventEmitter {
 
   projectList: Array<Project>;
 
+
   projectsListOld: Project;
 
   wsPath: string;
@@ -37,14 +38,16 @@ class Workspace extends EventEmitter {
     this.projectList = [];
   }
 
-  public async load(workspacePath: string) {
+  public async read(workspacePath: string) {
     if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes
     this.wsPath = workspacePath;
     this.initWorkspaceFileSystem();
     console.log(`[ WORKSPACE ]: Reading projects....`);
     const projectPaths = await this.getAllProjectsPaths();
-    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) => Project.readFromPath(projectPath));
-    let projectsReaded = ((await Promise.allSettled(projectArray)) as PromiseSettledResult<Project>[]);
+    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) => Project.readFromPath(projectPath)
+    .then((p) => {console.log(`[ WORKSPACE ]: Successfully readed project ${projectPath}`); return p;})
+    .catch((e) => { console.log(`[ WORKSPACE ]: Cannot read project ${projectPath}`); throw e;}));
+    let projectsReaded = (await Promise.allSettled(projectArray)) as PromiseSettledResult<Project>[];
     projectsReaded = projectsReaded.filter((p) => p.status === 'fulfilled');
     this.projectList = projectsReaded.map((p) => (p as PromiseFulfilledResult<Project>).value);
   }
@@ -54,36 +57,116 @@ class Workspace extends EventEmitter {
     return projectsDtos;
   }
 
-  public loadProjectByPath(path: string) {
+  public getOpenedProjects(): Array<Project> {
+    const openedProjects: Array<Project> = new Array<Project>();
+    // eslint-disable-next-line no-restricted-syntax
+    for (const p of this.projectList) if (p.getState() === ProjectState.OPENED ) openedProjects.push(p);
+    return openedProjects;
+  }
+
+  public existProject(p: Project) {
+    // eslint-disable-next-line no-restricted-syntax
+    for (let i = 0; i < this.projectList.length; i += 1)
+      if (this.projectList[i].getProjectName() === p.getProjectName()) return i;
+    return -1;
+  }
+
+  public async removeProject(p: Project) {
+    console.log(`[ WORKSPACE ]: Removing project ${p.getProjectName()}`);
+    for (let i = 0; i < this.projectList.length; i += 1)
+      if (this.projectList[i].getProjectName() === p.getProjectName()) {
+        // eslint-disable-next-line no-await-in-loop
+        await fs.promises.rmdir(this.projectList[i].getMyPath(), { recursive: true });
+        this.projectList.splice(i, 1);
+        return true;
+      }
+    return false;
+  }
+
+
+
+  public async removeProjectByPath(path: string) {
+    const p = this.getProjectByPath(path);
+    await this.removeProject(p);
+    return true;
+  }
+
+  public getProjectByPath(path: string): Project {
+    for (let i = 0 ; i< this.projectList.length ; i += 1 )
+      if (this.projectList[i].getMyPath() === path)
+        return this.projectList[i];
+    return null;
+  }
+
+  public getProjectByUuid(uuid: string) {
+    for (let i = 0 ; i< this.projectList.length ; i += 1 )
+      if (this.projectList[i].getUUID() === uuid) return this.projectList[i];
+    return null;
+  }
+
+
+
+
+  public closeProjectByUuid(uuid: string) {
     // eslint-disable-next-line no-restricted-syntax
     for (const p of this.projectList) {
-      if (p.myPath === path) {
-        p.load();
+      if (p.getUUID() === uuid) {
+        p.close();
         break;
       }
     }
   }
 
-  public closeAllProjects() {
-    for (const p of this.projectList) p.close();
+  public closeProjectByPath(path: string) {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const p of this.projectList) {
+      if (p.myPath === path) {
+        p.close();
+        break;
+      }
+    }
+  }
 
+  public async openProjectByPath(path: string) {
+    this.closeAllProjects();
+    console.log(`[ WORKSPACE ]: Openning project ${path}`);
+    // eslint-disable-next-line no-restricted-syntax
+    const p: Project = this.getProjectByPath(path);
+    await p.open();
+    return p;
+  }
+
+  public resumeProjectByPath(path: string) {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const p of this.projectList) {
+      if (p.myPath === path) {
+        p.resume();
+        break;
+      }
+    }
   }
 
   public getMyPath() {
     return this.wsPath;
   }
 
-  public close() {
+  public closeAllProjects() {
     console.log(`[ WORKSPACE ]: Closing opened projects`);
-    this.projectList = [];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const p of this.projectList) if (p.getState() === ProjectState.OPENED) p.close();
   }
 
   public async addProject(p: Project) {
-    const pName: string = p.getDto().name;
-    const pDirectory = `${this.wsPath}/${pName}`;
+    console.log(`[ WORKSPACE ]: Adding project ${p.getProjectName()} to workspace`);
+
+    const pIndex = this.existProject(p);
+    if (pIndex > -1) await this.removeProjectByIndex(pIndex);
+
+    const pDirectory = `${this.wsPath}/${p.getProjectName()}`;
     await fs.promises.mkdir(pDirectory);
     p.setMyPath(pDirectory);
     await p.save();
+
     this.projectList.push(p);
 
     return this.projectList.length - 1;
@@ -95,8 +178,11 @@ class Workspace extends EventEmitter {
       fs.writeFileSync(`${this.wsPath}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
   }
 
-  private async getAllProjectsPaths(){
-    const workspaceStuff = await fs.promises.readdir(this.wsPath, { withFileTypes: true });
+  private async getAllProjectsPaths() {
+    const workspaceStuff = await fs.promises.readdir(this.wsPath, { withFileTypes: true }).catch((e) => {
+      console.log(`[ WORKSPACE ]: Cannot read the workspace directory ${this.wsPath}`);
+      console.log(e);
+    });
     const projectsDirEnt = workspaceStuff.filter((dirent) => {return !dirent.isSymbolicLink() && !dirent.isFile();})
     const projectPaths = projectsDirEnt.map((dirent) => `${this.wsPath}/${dirent.name}`);
     return projectPaths;
@@ -106,27 +192,27 @@ class Workspace extends EventEmitter {
 
 
 
-  newProject(scanPath: string, mailbox: any) {
-    this.projectsListOld = new Project('Unnamed');
-    this.projectsListOld.setMailbox(mailbox);
+  // newProject(scanPath: string, mailbox: any) {
+  //   this.projectsListOld = new Project('Unnamed');
+  //   this.projectsListOld.setMailbox(mailbox);
 
-    // Copy the default workspace configuration to the project folder
-    const projectPath = `${this.wsPath}/${path.basename(scanPath)}`;
-    const projectCfgPath = `${projectPath}/projectCfg.json`;
-    if (!fs.existsSync(projectPath)) fs.mkdirSync(`${projectPath}`);
-    if (!fs.existsSync(`${projectCfgPath}`)) {
-      const projectCfg = {
-        DEFAULT_URL_API: defaultCfg.AVAILABLE_URL_API[defaultCfg.DEFAULT_URL_API],
-        SCAN_MODE: defaultCfg.SCAN_MODE,
-      };
-      const projectCfgStr = JSON.stringify(projectCfg, null, 4);
-      fs.writeFileSync(projectCfgPath, projectCfgStr);
-    }
+  //   // Copy the default workspace configuration to the project folder
+  //   const projectPath = `${this.wsPath}/${path.basename(scanPath)}`;
+  //   const projectCfgPath = `${projectPath}/projectCfg.json`;
+  //   if (!fs.existsSync(projectPath)) fs.mkdirSync(`${projectPath}`);
+  //   if (!fs.existsSync(`${projectCfgPath}`)) {
+  //     const projectCfg = {
+  //       DEFAULT_URL_API: defaultCfg.AVAILABLE_URL_API[defaultCfg.DEFAULT_URL_API],
+  //       SCAN_MODE: defaultCfg.SCAN_MODE,
+  //     };
+  //     const projectCfgStr = JSON.stringify(projectCfg, null, 4);
+  //     fs.writeFileSync(projectCfgPath, projectCfgStr);
+  //   }
 
-    this.projectsListOld.createScanProject(scanPath);
+  //   this.projectsListOld.createScanProject(scanPath);
 
 
-  }
+  // }
 
   deleteProject(projectPath: string) {
     if (!projectPath.includes(this.wsPath) || !fs.existsSync(projectPath)) {

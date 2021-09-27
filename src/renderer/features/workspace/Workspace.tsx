@@ -62,6 +62,7 @@ const Workspace = () => {
   const cleanup = () => {};
 
   const onShowScan = (project) => {
+    console.log(project);
     setScanPath({ path: project.work_root, action: 'none' });
     history.push('/workbench');
   };
