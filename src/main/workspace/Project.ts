@@ -75,6 +75,7 @@ export class Project extends EventEmitter {
     this.logical_tree = a.logical_tree;
     this.results = a.results;
     this.filesToScan = a.filesToScan;
+    this.processedFiles = a.processedFiles;
     this.filesSummary = a.filesSummary;
     this.scans_db = new ScanDb(this.metadata.getMyPath());
     await this.scans_db.init();
@@ -139,7 +140,7 @@ export class Project extends EventEmitter {
     if (this.metadata.getState() !== ScanState.SCANNING) return false;
     await this.open();
 
-    console.log(`[ PROJECT ]: Pending ${Object.keys(this.filesToScan).length} files`)
+    console.log(`[ PROJECT ]: Resuming scanned, pending ${Object.keys(this.filesToScan).length} files`)
     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'scanning',
       processed: (100 * this.processedFiles) / this.filesSummary.include,
