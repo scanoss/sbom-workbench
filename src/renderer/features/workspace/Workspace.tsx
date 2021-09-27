@@ -65,8 +65,10 @@ const Workspace = () => {
 
   const onShowScan = (project) => {
     console.log(project);
-    setScanPath({ path: project.work_root, action: 'none' });
-    history.push('/workbench');
+    if (isProjectFinished(project)) {
+      setScanPath({ path: project.work_root, action: 'none' });
+      history.push('/workbench');
+    }
   };
 
   const onNewProject = () => {
@@ -149,11 +151,11 @@ const isProjectFinished = (project: IProject): boolean => {
                   {filterProjects.length !== 0 ? (
                     filterProjects.map((row) => (
                       <TableRow
-                        className={isProjectFinished(row) ? 'scanning-not-complete' : 'scanning-complete'}
+                        className={isProjectFinished(row) ? 'scanning-complete' : 'scanning-not-complete'}
                         hover
                         key={row.name}
                         onClick={() => {
-                          if (!isProjectFinished(row)) {onShowScan(row)};
+                          onShowScan(row);
                         }}
                       >
                         <TableCell component="th" scope="row">
@@ -163,7 +165,7 @@ const isProjectFinished = (project: IProject): boolean => {
                         <TableCell>{row.files}</TableCell>
                         <TableCell className="row-actions">
                         <div className="btn-actions">
-                          {isProjectFinished(row) ? (
+                          {!isProjectFinished(row) ? (
 
                             <IconButton
                               aria-label="restore"

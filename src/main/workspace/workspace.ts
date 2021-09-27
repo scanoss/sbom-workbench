@@ -117,6 +117,7 @@ class Workspace extends EventEmitter {
     // eslint-disable-next-line no-restricted-syntax
     for (const p of this.projectList) {
       if (p.getMyPath() === path) {
+        // eslint-disable-next-line no-await-in-loop
         await p.close();
         break;
       }
@@ -153,11 +154,12 @@ class Workspace extends EventEmitter {
   }
 
   public async addProject(p: Project) {
+    if (this.existProject(p) > -1) {
+      console.log(`[ WORKSPACE ]: Project already exist and will be replaced`);
+      await this.removeProject(p);
+    }
+
     console.log(`[ WORKSPACE ]: Adding project ${p.getProjectName()} to workspace`);
-
-    const pIndex = this.existProject(p);
-    if (pIndex > -1) await this.removeProjectByIndex(pIndex);
-
     const pDirectory = `${this.wsPath}/${p.getProjectName()}`;
     await fs.promises.mkdir(pDirectory);
     p.setMyPath(pDirectory);

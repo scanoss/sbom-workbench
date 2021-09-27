@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
+import { Project } from './workspace/Project';
 import { workspace } from './workspace/workspace';
 
 const os = require('os');
@@ -49,8 +50,9 @@ ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
 
 ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
   const path = arg;
-  ws = workspace;
-  ws.projectsList.resumeScanProject(path,event.sender);
+  const p: Project = workspace.getProjectByPath(path);
+  p.setMailbox(event.sender);
+  await p.resumeScanner();
 });
 
 

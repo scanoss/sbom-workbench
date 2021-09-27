@@ -51,7 +51,6 @@ export class Project extends EventEmitter {
     super();
     this.metadata = new Metadata(name);
     this.state = ProjectState.CLOSED;
-    console.log(`[ PROJECT ]: Creating project ${name}`);
   }
 
   public static async readFromPath(pathToProject: string): Promise<Project> {
@@ -85,8 +84,9 @@ export class Project extends EventEmitter {
   public async close() {
     console.log( `[ PROJECT ]: Closing project ${this.metadata.getMyPath()}`);
     this.state = ProjectState.CLOSED;
-    if( this.metadata.getScannerState() === ScanState.SCANNING ) await this.scanner.stop();
+    await this.scanner.stop();
     this.scanner.removeAllListeners();
+    this.scanner = null;
     this.logical_tree = null;
     this.scans_db = null;
     this.filesToScan = null;
@@ -104,9 +104,9 @@ export class Project extends EventEmitter {
 
 
     if (!fs.existsSync(`${myPath}/filter.json`)) {
-      console.log('No banned list defined. Setting default list.');
+      //console.log('No banned list defined. Setting default list.');
        fs.writeFileSync(`${myPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
-    } else console.log('Filters were already defined');
+    } //else console.log('Filters were already defined');
     this.banned_list.load(`${myPath}/filter.json`);
 
     this.scans_db = new ScanDb(myPath);
@@ -120,7 +120,7 @@ export class Project extends EventEmitter {
     const summary = { total: 0, include: 0, filter: 0, files: {} };
     this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
     console.log(
-      `Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`
+      `[ FILTERS ]: Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`
     );
     this.filesToScan = summary.files;
 
@@ -135,28 +135,18 @@ export class Project extends EventEmitter {
   }
 
 
-  public async resume() {
-    if (this.metadata.getState() !== ProjectState.SCANNING) throw new Error('Cannot resume the project. Please, delete and re-scan')
+  public async resumeScanner() {
+    if (this.metadata.getState() !== ScanState.SCANNING) return false;
+    await this.open();
 
-
-  }
-
-  async stopScanProject() {
-    console.log(`[ SCANNER ]: Stopping scanner of project ${this.metadata.getMyPath()}`);
-    await this.scanner.stop();
-    this.save();
-  }
-
-  resumeScanProject(path, msgToUI) {
-    this.msgToUI = msgToUI;
+    console.log(`[ PROJECT ]: Pending ${Object.keys(this.filesToScan).length} files`)
     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'scanning',
-      // processed: this.filesSummary.include,
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
-    this.openScanProject(path);
+
     this.initializeScanner();
-    this.scanner.scanList(this.filesToScan, this.scan_root);
+    this.startScan();
   }
 
 
@@ -188,11 +178,13 @@ export class Project extends EventEmitter {
       this.processedFiles += filesScanned.length;
       console.log(`[ SCANNER ]: New ${filesScanned.length} files scanned`);
 
-      for(const file of filesScanned) delete this.filesToScan[`${this.scan_root}${file}`];
-      this.save();
+      // eslint-disable-next-line no-restricted-syntax
+      for (const file of filesScanned) delete this.filesToScan[`${this.metadata.getScanRoot()}${file}`];
+
 
       this.attachComponent(data);
 
+      this.save();
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
         // processed: this.filesSummary.include,
@@ -210,6 +202,7 @@ export class Project extends EventEmitter {
       const a = fs.readFileSync(`${resPath}`, 'utf8');
       this.results = JSON.parse(a);
 
+      this.metadata.setScannerState(ScanState.SCANNED);
       this.save();
       await this.close();
 
@@ -229,34 +222,6 @@ export class Project extends EventEmitter {
   }
 
 
-  resumeScanner() {
-
-    const timeout = 15; //En segs.
-    let tickCounter = 0;
-
-    const timerID = setInterval(() => {
-
-      console.log(`Resuming scanner in ${timeout - tickCounter} secs...`);
-      tickCounter += 1;
-
-      if(tickCounter >= timeout) {
-           this.scanner.resume();
-           clearInterval(timerID);
-      }
-
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'resuming',
-      // processed: this.filesSummary.include,
-      processed: (100 * tickCounter) / timeout,
-    });
-
-
-
-    }, 1000);
-
-
-
-  }
 
   startScan() {
     console.log(`[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`);
