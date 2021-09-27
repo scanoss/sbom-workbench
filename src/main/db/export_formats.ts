@@ -7,13 +7,16 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
 
+
+import { SPDXV20 } from '../../api/SPDXV20';
 import { Db } from './db';
 
-import { spdx } from '../../api/spdx-versions';
+
 import { ComponentDb } from './scan_component_db';
 import { Querys } from './querys_db';
 import { utilDb } from './utils_db';
 import { InventoryDb } from './scan_inventory_db';
+
 
 const pathLib = require('path');
 
@@ -39,7 +42,9 @@ export class Formats extends Db {
   }
 
   async spdx(path: string,percentage: number) {
-    const document = spdx;
+    const spdx = new SPDXV20();
+    const document = spdx.template();
+
     document.Packages=[];       
     const auxPath = percentage<100 ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;      
     return new Promise<boolean>(async (resolve, reject) => {
@@ -145,7 +150,7 @@ export class Formats extends Db {
   public async notarizeSBOM(type: String) {
     return new Promise<boolean>(async (resolve, reject) => {
       const path = `${os.tmpdir()}/spdx`;
-      const success = await this.spdx(path);
+      const success = await this.spdx(path,100);
       if (!success) reject(new Error('Unable to generate hash'));      
 
       const fileBuffer = fs.readFileSync(path);
