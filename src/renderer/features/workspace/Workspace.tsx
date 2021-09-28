@@ -105,9 +105,9 @@ const Workspace = () => {
     return cleanup;
   }, []);
 
-const isProjectFinished = (project: IProject): boolean => {
-  return project.scannerState === ScanState.SCANNED;
-}
+  const isProjectFinished = (project: IProject): boolean => {
+    return project.scannerState === ScanState.SCANNED || !project.scannerState;
+  }
 
   return (
     <>

@@ -124,6 +124,11 @@ export class Scanner extends EventEmitter {
     if (fs.existsSync(this.#wfpFilePath)) fs.unlinkSync(this.#wfpFilePath);
   }
 
+  cleanTmpDirectory() {
+    if (fs.existsSync(this.#tempPath)) fs.rmdirSync(this.#tempPath, { recursive: true });
+    if (!fs.existsSync(this.#tempPath)) fs.mkdirSync(this.#tempPath);
+  }
+
   #finishScan() {
     // if (fs.existsSync(this.#tempPath)) fs.rmdirSync(this.#tempPath, { recursive: true });
     this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath);

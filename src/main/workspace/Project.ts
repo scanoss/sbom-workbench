@@ -61,12 +61,6 @@ export class Project extends EventEmitter {
     return p;
   }
 
-
-  public save(): void {
-    this.metadata.save();
-    fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this).toString());
-  }
-
   public async open(): Promise<boolean> {
     if (this.state === ProjectState.OPENED) return false;
     this.state = ProjectState.OPENED;
@@ -94,62 +88,50 @@ export class Project extends EventEmitter {
     this.results = null;
   }
 
+  public save(): void {
+    this.metadata.save();
+    fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this).toString());
+  }
+
   public async startScanner() {
     this.state = ProjectState.OPENED;
     const myPath = this.metadata.getMyPath();
-
     this.project_name = this.metadata.getName(); // To keep compatibility
     this.banned_list = new Filtering.BannedList('NoFilter');
-
     this.cleanProject();
-
-
-    if (!fs.existsSync(`${myPath}/filter.json`)) {
-      //console.log('No banned list defined. Setting default list.');
-       fs.writeFileSync(`${myPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
-    } //else console.log('Filters were already defined');
+    if (!fs.existsSync(`${myPath}/filter.json`))
+      fs.writeFileSync(`${myPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
     this.banned_list.load(`${myPath}/filter.json`);
-
     this.scans_db = new ScanDb(myPath);
-    await this.scans_db.init();  // TO DO: Add setMyPath;
+    await this.scans_db.init();
     await this.scans_db.licenses.importFromJSON(licenses);
-
     this.build_tree();
-
     this.indexScan(this.metadata.getScanRoot(), this.logical_tree, this.banned_list);
-
     const summary = { total: 0, include: 0, filter: 0, files: {} };
     this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
-    console.log(
-      `[ FILTERS ]: Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`
-    );
+    console.log(`[ FILTERS ]: Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`);
     this.filesToScan = summary.files;
-
     this.metadata.setScannerState(ScanState.READY_TO_SCAN);
     this.metadata.setFileCounter(summary.include);
     this.metadata.save();
-
-
     this.initializeScanner();
     this.scanner.cleanWorkDirectory();
     this.startScan();
   }
 
-
   public async resumeScanner() {
     if (this.metadata.getState() !== ScanState.SCANNING) return false;
     await this.open();
-
-    console.log(`[ PROJECT ]: Resuming scanned, pending ${Object.keys(this.filesToScan).length} files`)
+    this.initializeScanner();
+    console.log(`[ PROJECT ]: Removing temporary files from previous scan`);
+    this.scanner.cleanTmpDirectory();
+    console.log(`[ PROJECT ]: Resuming scanner, pending ${Object.keys(this.filesToScan).length} files`)
     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'scanning',
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
-
-    this.initializeScanner();
     this.startScan();
   }
-
 
   cleanProject() {
     if (fs.existsSync(`${this.metadata.getMyPath()}/results.json`)) fs.unlinkSync(`${this.metadata.getMyPath()}/results.json`);
@@ -158,75 +140,56 @@ export class Project extends EventEmitter {
   }
 
   initializeScanner() {
-    //const projectCfg = JSON.parse(fs.readFileSync(`${this.work_root}/projectCfg.json`,'utf8'));
+    const projectCfg = JSON.parse(fs.readFileSync(`${this.metadata.getMyPath()}/projectCfg.json`,'utf8'));
     const scannerCfg: ScannerCfg = new ScannerCfg();
-    //scannerCfg.API_URL = projectCfg.DEFAULT_URL_API;
+    scannerCfg.API_URL = projectCfg.DEFAULT_URL_API;
     this.scanner = new Scanner(scannerCfg);
     this.scanner.setWorkDirectory(this.metadata.getMyPath());
     this.setScannerListeners();
   }
 
-  // Return fileList
   setScannerListeners() {
     this.scanner.on(ScannerEvents.WINNOWING_STARTING, () => console.log('[ SCANNER ]: Starting Winnowing...'));
     this.scanner.on(ScannerEvents.WINNOWING_NEW_WFP_FILE, (dir) => console.log(`[ SCANNER ]: New WFP File`));
     this.scanner.on(ScannerEvents.WINNOWING_FINISHED, () => console.log('[ SCANNER ]: Winnowing Finished...'));
     this.scanner.on(ScannerEvents.DISPATCHER_WFP_SENDED, (dir) => console.log(`[ SCANNER ]: Sending WFP file ${dir} to server`));
-
     this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (data, dispatcherResponse) => {
-
       const filesScanned: Array<any> = dispatcherResponse.getFilesScanned();
       this.processedFiles += filesScanned.length;
       console.log(`[ SCANNER ]: New ${filesScanned.length} files scanned`);
-
       // eslint-disable-next-line no-restricted-syntax
       for (const file of filesScanned) delete this.filesToScan[`${this.metadata.getScanRoot()}${file}`];
-
-
       this.attachComponent(data);
-
       this.save();
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
-        // processed: this.filesSummary.include,
         processed: (100 * this.processedFiles) / this.filesSummary.include,
       });
-
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
       console.log(`[ SCANNER ]: Scan Finished... Results on: ${resPath}`);
-
-      const succesRes = await this.scans_db.results.insertFromFile(resPath);
-      if (succesRes) await this.scans_db.components.importUniqueFromFile();
-
-      const a = fs.readFileSync(`${resPath}`, 'utf8');
-      this.results = JSON.parse(a);
-
+      await this.scans_db.results.insertFromFile(resPath);
+      await this.scans_db.components.importUniqueFromFile();
+      this.results = JSON.parse(fs.readFileSync(`${resPath}`, 'utf8'));
       this.metadata.setScannerState(ScanState.SCANNED);
       this.save();
       await this.close();
-
       this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
         success: true,
         resultsPath: this.metadata.getMyPath(),
       });
-
-
     });
 
     this.scanner.on('error', (error) => {
+      this.save();
+      this.close();
       this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
-
-
   }
-
-
 
   startScan() {
     console.log(`[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`);
-
     this.metadata.setScannerState(ScanState.SCANNING);
     this.save();
     // eslint-disable-next-line prettier/prettier
@@ -301,8 +264,6 @@ export class Project extends EventEmitter {
       insertInventory(this.logical_tree, files[i], inv);
     }
   }
-
-
 
   attachComponent(comp: any) {
     for (const [key, value] of Object.entries(comp)) {
@@ -392,14 +353,10 @@ export class Project extends EventEmitter {
   }
 
   scanMode(filePath: string) {
-
-    //if es full hacer lo que sigue abajo
-    //sino retornar lo que tenga por default;
-
     // eslint-disable-next-line prettier/prettier
     const skipExtentions = new Set ([".exe", ".zip", ".tar", ".tgz", ".gz", ".rar", ".jar", ".war", ".ear", ".class", ".pyc", ".o", ".a", ".so", ".obj", ".dll", ".lib", ".out", ".app", ".doc", ".docx", ".xls", ".xlsx", ".ppt" ]);
     const skipStartWith = ["{","[","<?xml","<html","<ac3d","<!doc"];
-    const MIN_FILE_SIZE = 256; //In Bytes
+    const MIN_FILE_SIZE = 256;
 
     // Filter by extension
     const ext = path.extname(filePath);
@@ -431,7 +388,6 @@ export class Project extends EventEmitter {
 
   indexScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
     let i = 0;
-
     if (jsonScan.type === 'file') {
       this.filesIndexed += 1;
       if (this.filesIndexed % 100 === 0)

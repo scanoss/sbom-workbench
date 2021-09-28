@@ -158,15 +158,13 @@ class Workspace extends EventEmitter {
       console.log(`[ WORKSPACE ]: Project already exist and will be replaced`);
       await this.removeProject(p);
     }
-
     console.log(`[ WORKSPACE ]: Adding project ${p.getProjectName()} to workspace`);
     const pDirectory = `${this.wsPath}/${p.getProjectName()}`;
     await fs.promises.mkdir(pDirectory);
+    await fs.promises.copyFile(`${this.getMyPath()}/defaultCfg.json`, `${pDirectory}/projectCfg.json`);
     p.setMyPath(pDirectory);
     await p.save();
-
     this.projectList.push(p);
-
     return this.projectList.length - 1;
   }
 
