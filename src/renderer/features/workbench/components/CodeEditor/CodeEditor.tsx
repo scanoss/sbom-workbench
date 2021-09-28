@@ -55,7 +55,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
           code-viewer
           ${truncatedStart > 0 ? 'truncatedStart' : ''}
           ${truncatedEnd > 0 ? 'truncatedEnd' : ''}`}
-        wrapLongLines
+        wrapLines
         style={nord}
         language="javascript"
         startingLineNumber={start + 1}
