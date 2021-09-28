@@ -3,6 +3,8 @@ import { IpcEvents } from '../ipc-events';
 import { defaultProject } from './workspace/ProjectTree';
 import { Response } from './Response';
 import { reportService } from './services/ReportService';
+import { workspace } from './workspace/workspace';
+
 
 ipcMain.handle(IpcEvents.EXPORT_SPDX, async (event, path: string) => {
   let success: boolean;

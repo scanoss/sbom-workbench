@@ -43,7 +43,25 @@ export class Db {
     });
   }
 
-  protected openDb(): Promise<any> {
+  public open(path :string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const db: any = new sqlite3.Database(
+        path,
+        sqlite3.OPEN_READWRITE,
+        (err: any) => {
+          if (err) {
+            reject(err);
+          }
+          db.run('PRAGMA journal_mode = WAL;');
+          db.run('PRAGMA synchronous = OFF');
+          db.run('PRAGMA foreign_keys = ON;');
+          resolve(db);
+        }
+      );
+    });
+  }
+
+  public openDb(): Promise<any> {
     return new Promise((resolve, reject) => {
       const db: any = new sqlite3.Database(
         this.dbPath,

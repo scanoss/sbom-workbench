@@ -15,6 +15,12 @@ import { Querys } from './querys_db';
 import { utilDb } from './utils_db';
 import { InventoryDb } from './scan_inventory_db';
 
+
+import { Spdxv20 } from '../export/Model/format/Spdxv20';
+import { Export } from '../export/Export';
+import { FormatVersion } from '../export/Format';
+
+
 const pathLib = require('path');
 
 const fs = require('fs');
@@ -39,42 +45,51 @@ export class Formats extends Db {
   }
 
   async spdx(path: string,percentage: number) {
-    const document = spdx;
-    document.Packages=[];       
-    const auxPath = percentage<100 ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;      
+    Export.setFormat(FormatVersion.SPDX20)
+    const exp = new Export();
+     await exp.generate();
+    await exp.save(path);
     return new Promise<boolean>(async (resolve, reject) => {
-      try {
-        const timeStamp = utilDb.getTimeStamp();
-        document.creationInfo.created = timeStamp;
-        const db = await this.openDb();
-        db.all(query.SQL_GET_SPDX_COMP_DATA, async (err: any, data: any) => {
-          db.close();
-          if (err) resolve(false);
-          else {
-            for (let i = 0; i < data.length; i += 1) {
-              const pkg: any = {};
-              pkg.name = data[i].name;
-              pkg.PackageVersion = data[i].version;
-              pkg.PackageSPDXIdentifier = data[i].purl;
-              pkg.PackageDownloadLocation = data[i].url;
-              pkg.description = 'Detected by SCANOSS Inventorying Engine.';
-              if (data[i].license_name !== undefined)
-                pkg.ConcludedLicense = data[i].license_name;
-              else pkg.licenseConcluded = 'n/a';
-              document.Packages.push(pkg);
-            }
+    try{
+     
+    
+        const auxPath = percentage<100 ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path; 
+        await fs.writeFile(auxPath,JSON.stringify(spdx, undefined, 4), () => {  resolve(true); }  );
+      
+     
+    } catch (error) {
+  reject(new Error('Unable to generate spdx file'));
 
-            await fs.writeFile(auxPath,JSON.stringify(document, undefined, 4), () => {
-                resolve(true);
-              }
-            );
-          }
-        });
-      } catch (error) {
-        reject(new Error('Unable to generate spdx file'));
-      }
-    });
+}
+});
   }
+    // const document = spdx;
+    // document.Packages=[];       
+    // const auxPath = percentage<100 ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;      
+    // return new Promise<boolean>(async (resolve, reject) => {
+    //   try {
+    //     const timeStamp = utilDb.getTimeStamp();
+    //     document.creationInfo.created = timeStamp;
+    //     const db = await this.openDb();
+    //     db.all(query.SQL_GET_SPDX_COMP_DATA, async (err: any, data: any) => {
+    //       db.close();
+    //       if (err) resolve(false);
+    //       else {
+    //         for (let i = 0; i < data.length; i += 1) {
+    //           const pkg: any = {};
+    //           pkg.name = data[i].name;
+    //           pkg.PackageVersion = data[i].version;
+    //           pkg.PackageSPDXIdentifier = data[i].purl;
+    //           pkg.PackageDownloadLocation = data[i].url;
+    //           pkg.description = 'Detected by SCANOSS Inventorying Engine.';
+    //           if (data[i].license_name !== undefined)
+    //             pkg.ConcludedLicense = data[i].license_name;
+    //           else pkg.licenseConcluded = 'n/a';
+    //           document.Packages.push(pkg);
+    //         }
+    
+  
+
 
   csv(path: string, percentage: number) {
     const auxPath = percentage<100 ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;   
