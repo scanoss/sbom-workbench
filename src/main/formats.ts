@@ -36,8 +36,6 @@ ipcMain.handle(IpcEvents.EXPORT, async (event, path: string, ext: FormatVersion)
 
 ipcMain.handle(IpcEvents.EXPORT_NOTARIZE_SBOM, async (event, type: string) => {
   try {
-    //  Export.save();
-
     Export.setFormat(FormatVersion.SPDX20);
     const data = await Export.generate();
     const fileBuffer = data;

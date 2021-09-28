@@ -6,7 +6,7 @@ export class Spdxv20 extends Format {
   public async generate() {
     const data = await this.export.getSpdxData();
     const spdx = Spdxv20.template();
-    spdx.Packages = [];
+    spdx.Packages=[];
     spdx.creationInfo.created = utilDb.getTimeStamp();
     for (let i = 0; i < data.length; i += 1) {
       const pkg: any = {};

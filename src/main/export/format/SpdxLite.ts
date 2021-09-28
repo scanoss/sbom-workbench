@@ -2,12 +2,11 @@ import { utilDb } from '../../db/utils_db';
 import { Format } from '../Format';
 
 export class SpdxLite extends Format {
-  
- // @override
-    public async generate() {
+  // @override
+  public async generate() {
     const data = await this.export.getSpdxData();
     const spdx = SpdxLite.template();
-    spdx.Packages=[];
+    spdx.Packages = [];
     spdx.creationInfo.created = utilDb.getTimeStamp();
     for (let i = 0; i < data.length; i += 1) {
       const pkg: any = {};
@@ -20,7 +19,7 @@ export class SpdxLite extends Format {
       else pkg.licenseConcluded = 'n/a';
       spdx.Packages.push(pkg);
     }
-    return JSON.stringify(spdx, undefined, 4);;
+    return JSON.stringify(spdx, undefined, 4);
   }
 
   private static template() {
@@ -41,6 +40,5 @@ export class SpdxLite extends Format {
       Packages: [] as any,
     };
     return spdx;
- 
-}
+  }
 }
