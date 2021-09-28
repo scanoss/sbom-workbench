@@ -10,6 +10,19 @@ export enum ProjectState {
   CLOSED,
 }
 
+export interface IProjectCfg {
+  DEFAULT_URL_API: string;
+  TOKEN: string;
+  SCAN_MODE: string;
+}
+
+export interface IWorkspaceCfg {
+  DEFAULT_URL_API: number;
+  AVAILABLE_URL_API: Array<string>;
+  TOKEN: string;
+  SCAN_MODE: string;
+}
+
 export interface Inventory {
   id?: number;
   compid: number;

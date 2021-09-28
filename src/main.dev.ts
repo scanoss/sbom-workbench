@@ -179,9 +179,9 @@ ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
 
   const projectName = basepath.basename(path);
   const p: Project = new Project(projectName);
-  await workspace.addProject(p);
   p.setScanPath(path);
-
   p.setMailbox(event.sender);
+
+  await workspace.addProject(p);
   await p.startScanner();
 });

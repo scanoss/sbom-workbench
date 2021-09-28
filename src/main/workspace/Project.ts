@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { EventEmitter } from 'events';
 import fs from 'fs';
-import { Component, Inventory, ProjectState, ScanState } from '../../api/types';
+import { Component, Inventory, IProjectCfg, ProjectState, ScanState } from '../../api/types';
 
 import * as Filtering from './filtering';
 import { ScanDb } from '../db/scan_db';
@@ -47,6 +47,8 @@ export class Project extends EventEmitter {
 
   state: ProjectState;
 
+  config: IProjectCfg;
+
   constructor(name: string) {
     super();
     this.metadata = new Metadata(name);
@@ -73,6 +75,10 @@ export class Project extends EventEmitter {
     this.filesSummary = a.filesSummary;
     this.scans_db = new ScanDb(this.metadata.getMyPath());
     await this.scans_db.init();
+
+    const projectCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/projectCfg.json`, 'utf8');
+    this.config = JSON.parse(projectCfg) as IProjectCfg;
+
     return true;
   }
 
@@ -86,11 +92,13 @@ export class Project extends EventEmitter {
     this.scans_db = null;
     this.filesToScan = null;
     this.results = null;
+    this.config = null;
   }
 
   public save(): void {
     this.metadata.save();
     fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this).toString());
+    fs.writeFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, JSON.stringify(this.config, null, 2));
   }
 
   public async startScanner() {
@@ -140,9 +148,8 @@ export class Project extends EventEmitter {
   }
 
   initializeScanner() {
-    const projectCfg = JSON.parse(fs.readFileSync(`${this.metadata.getMyPath()}/projectCfg.json`,'utf8'));
     const scannerCfg: ScannerCfg = new ScannerCfg();
-    scannerCfg.API_URL = projectCfg.DEFAULT_URL_API;
+    scannerCfg.API_URL = this.config.DEFAULT_URL_API;
     this.scanner = new Scanner(scannerCfg);
     this.scanner.setWorkDirectory(this.metadata.getMyPath());
     this.setScannerListeners();
@@ -181,9 +188,9 @@ export class Project extends EventEmitter {
       });
     });
 
-    this.scanner.on('error', (error) => {
+    this.scanner.on('error', async (error) => {
       this.save();
-      this.close();
+      await this.close();
       this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
   }
@@ -214,12 +221,15 @@ export class Project extends EventEmitter {
 
   public setScanPath(name: string) {
     this.metadata.setScanRoot(name);
-    this.metadata.save();
   }
 
   public setMyPath(myPath: string) {
     this.metadata.setMyPath(myPath);
     this.metadata.save();
+  }
+
+  public setConfig(cfg: IProjectCfg){
+    this.config = cfg;
   }
 
   public getMyPath() {

@@ -5,30 +5,25 @@ import * as fs from 'fs';
 import path from 'path';
 import { Metadata } from './Metadata';
 import { Project } from './Project';
-import { IProject, ProjectState } from '../../api/types';
+import { IProject, IProjectCfg, IWorkspaceCfg, ProjectState } from '../../api/types';
 
 /**
  *
  */
 // eslint-disable-next-line import/no-mutable-exports
-let defaultCfg = {
+const DEFAULT_WORKSPACE_CONFIG: IWorkspaceCfg = {
   DEFAULT_URL_API: 0,
   AVAILABLE_URL_API: ['https://osskb.org/api/scan/direct'],
   SCAN_MODE: 'FULL_SCAN',
-  TOKEN: ''
+  TOKEN: '',
 };
 
 class Workspace extends EventEmitter {
-  private name: string;
-
-  metadataList: Array<Metadata>;
-
   projectList: Array<Project>;
 
-
-  projectsListOld: Project;
-
   wsPath: string;
+
+  workspaceConfig: IWorkspaceCfg;
 
   constructor() {
     super();
@@ -36,9 +31,9 @@ class Workspace extends EventEmitter {
   }
 
   public async read(workspacePath: string) {
-    if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes
     this.wsPath = workspacePath;
-    this.initWorkspaceFileSystem();
+    await this.initWorkspaceFileSystem();
+    // if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes
     console.log(`[ WORKSPACE ]: Reading projects....`);
     const projectPaths = await this.getAllProjectsPaths();
     const projectArray: Promise<Project>[] = projectPaths.map((projectPath) => Project.readFromPath(projectPath)
@@ -163,17 +158,30 @@ class Workspace extends EventEmitter {
     console.log(`[ WORKSPACE ]: Adding project ${p.getProjectName()} to workspace`);
     const pDirectory = `${this.wsPath}/${p.getProjectName()}`;
     await fs.promises.mkdir(pDirectory);
-    await fs.promises.copyFile(`${this.getMyPath()}/defaultCfg.json`, `${pDirectory}/projectCfg.json`);
     p.setMyPath(pDirectory);
+    p.setConfig(this.createProjectCfg());
     await p.save();
     this.projectList.push(p);
     return this.projectList.length - 1;
   }
 
-  private initWorkspaceFileSystem() {
+  private createProjectCfg(): IProjectCfg {
+    const projectCfg: IProjectCfg = {
+      DEFAULT_URL_API: this.workspaceConfig.AVAILABLE_URL_API[this.workspaceConfig.DEFAULT_URL_API],
+      SCAN_MODE: this.workspaceConfig.SCAN_MODE,
+      TOKEN: this.workspaceConfig.TOKEN,
+    };
+    return projectCfg;
+  }
+
+  private async initWorkspaceFileSystem() {
     if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
+
     if (!fs.existsSync(`${this.wsPath}/defaultCfg.json`))
-      fs.writeFileSync(`${this.wsPath}/defaultCfg.json`, JSON.stringify(defaultCfg, null, 4));
+      fs.writeFileSync(`${this.wsPath}/defaultCfg.json`, JSON.stringify(DEFAULT_WORKSPACE_CONFIG, null, 2));
+
+    const cfg = await fs.promises.readFile(`${this.wsPath}/defaultCfg.json`, 'utf8');
+    this.workspaceConfig = JSON.parse(cfg) as IWorkspaceCfg;
   }
 
   private async getAllProjectsPaths() {
@@ -185,32 +193,6 @@ class Workspace extends EventEmitter {
     const projectPaths = projectsDirEnt.map((dirent) => `${this.wsPath}/${dirent.name}`);
     return projectPaths;
   }
-
-
-
-
-
-  // newProject(scanPath: string, mailbox: any) {
-  //   this.projectsListOld = new Project('Unnamed');
-  //   this.projectsListOld.setMailbox(mailbox);
-
-  //   // Copy the default workspace configuration to the project folder
-  //   const projectPath = `${this.wsPath}/${path.basename(scanPath)}`;
-  //   const projectCfgPath = `${projectPath}/projectCfg.json`;
-  //   if (!fs.existsSync(projectPath)) fs.mkdirSync(`${projectPath}`);
-  //   if (!fs.existsSync(`${projectCfgPath}`)) {
-  //     const projectCfg = {
-  //       DEFAULT_URL_API: defaultCfg.AVAILABLE_URL_API[defaultCfg.DEFAULT_URL_API],
-  //       SCAN_MODE: defaultCfg.SCAN_MODE,
-  //     };
-  //     const projectCfgStr = JSON.stringify(projectCfg, null, 4);
-  //     fs.writeFileSync(projectCfgPath, projectCfgStr);
-  //   }
-
-  //   this.projectsListOld.createScanProject(scanPath);
-
-
-  // }
 
   deleteProject(projectPath: string) {
     if (!projectPath.includes(this.wsPath) || !fs.existsSync(projectPath)) {

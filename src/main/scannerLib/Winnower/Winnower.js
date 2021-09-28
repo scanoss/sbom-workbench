@@ -357,7 +357,7 @@ export class Winnower extends EventEmitter {
     this.#continue = false;
     this.#worker.removeAllListeners();
     this.#worker.terminate();
-    this.init();
+    this.#init();
     //clean the .wfp files
   }
 
