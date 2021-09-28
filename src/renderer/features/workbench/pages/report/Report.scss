@@ -140,11 +140,20 @@
       display: flex;
       align-items: center;
       color: #3B82F6;
+      word-break: break-all;
 
       svg {
         margin-right: 5px;
       }
     }
+
+    // .vendor-table {
+    //   word-break: break-all;
+    // }
+
+    // .version-table {
+    //   word-break: break-all;
+    // }
 
       .tableRowLicense {
         .MuiTableCell-root {
