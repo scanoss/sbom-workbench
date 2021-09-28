@@ -1,9 +1,12 @@
-// eslint-disable-next-line import/no-cycle
 
-import fs from 'fs';
-import { Spdx } from './Spdx';
+
+
+
+
 
 import { utilDb } from '../../db/utils_db';
+
+import { Spdx } from './Spdx';
 
 const pathLib = require('path');
 
@@ -11,8 +14,9 @@ const pathLib = require('path');
 
 export class SpdxLite extends Spdx {
   
+ // @override
     public async generate() {
-    const data = await super.getData();
+    const data = await this.getData();
     const spdx = SpdxLite.template();
     spdx.Packages=[];
     spdx.creationInfo.created = utilDb.getTimeStamp();
@@ -27,7 +31,7 @@ export class SpdxLite extends Spdx {
       else pkg.licenseConcluded = 'n/a';
       spdx.Packages.push(pkg);
     }
-    return spdx;
+    return JSON.stringify(spdx, undefined, 4);;
   }
 
   private static template() {
@@ -48,19 +52,6 @@ export class SpdxLite extends Spdx {
       Packages: [] as any,
     };
     return spdx;
-  }
-
-
-  public async save(path: string, complete?: boolean) {
-    return new Promise<boolean>((resolve, reject) => {
-      try {
-        const auxPath = complete ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;
-        fs.writeFile(auxPath, JSON.stringify(this.spdxFile, undefined, 4), () => {
-          resolve(true);
-        });
-      } catch (error) {
-        reject(new Error('Unable to generate spdx file'));
-      }
-    });
-  }
+ 
+}
 }

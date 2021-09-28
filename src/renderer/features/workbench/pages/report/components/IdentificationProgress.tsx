@@ -4,8 +4,8 @@ import { Button, Tooltip } from '@material-ui/core';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import { shell } from 'electron';
 import { ExportFormat } from '../../../../../../api/export-service';
-import { HashType } from '../../../../../../main/db/export_formats';
 import { projectService } from '../../../../../../api/project-service';
+import { HashType } from '../../../../../../api/types';
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();

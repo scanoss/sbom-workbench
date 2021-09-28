@@ -1,21 +1,20 @@
-/* eslint-disable no-async-promise-executor */
 
-import fs from 'fs';
-import { Spdx } from './Spdx';
+
+
 
 import { utilDb } from '../../db/utils_db';
 
+import { Spdx } from './Spdx';
+
 const pathLib = require('path');
 
-
-
 export class Spdxv20 extends Spdx {
-  private spdxFile: {};
 
+  // @override
   public async generate() {
-    const data = await super.getData();
+    const data = await this.getData();
     const spdx = Spdxv20.template();
-    spdx.Packages = [];
+    spdx.Packages=[];
     spdx.creationInfo.created = utilDb.getTimeStamp();
     for (let i = 0; i < data.length; i += 1) {
       const pkg: any = {};
@@ -28,7 +27,7 @@ export class Spdxv20 extends Spdx {
       else pkg.licenseConcluded = 'n/a';
       spdx.Packages.push(pkg);
     }
-    this.spdxFile = spdx;
+    return JSON.stringify(spdx, undefined, 4);;
   }
 
   private static template() {
@@ -51,16 +50,5 @@ export class Spdxv20 extends Spdx {
     return spdx;
   }
 
-  public async save(path: string, complete?: boolean) {
-    return new Promise<boolean>((resolve, reject) => {
-      try {
-        const auxPath = complete ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;
-        fs.writeFile(auxPath, JSON.stringify(this.spdxFile, undefined, 4), () => {
-          resolve(true);
-        });
-      } catch (error) {
-        reject(new Error('Unable to generate spdx file'));
-      }
-    });
-  }
+ 
 }

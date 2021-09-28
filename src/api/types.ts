@@ -81,3 +81,7 @@ export interface ComponentGroup {
 export enum FileType {
   BINARY = 'binary',
 }
+
+export enum HashType {
+  SHA256 = 'sha256',
+}
