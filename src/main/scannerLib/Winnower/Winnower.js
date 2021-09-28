@@ -300,7 +300,7 @@ export class Winnower extends EventEmitter {
     const path = this.#fileList[this.#fileListIndex][0];
     const scanMode = this.#fileList[this.#fileListIndex][1];
 
-    const contentSource = path.replace(this.#scanRoot, '');
+    const contentSource = path.replace(`${this.#scanRoot}`, '');
     const content = await fs.promises.readFile(path);
 
     this.#fileListIndex += 1;
@@ -357,9 +357,11 @@ export class Winnower extends EventEmitter {
     this.#continue = false;
     this.#worker.removeAllListeners();
     this.#worker.terminate();
-    this.#init();
+    this.init();
     //clean the .wfp files
   }
+
+  restart() {}
 
   isRunning() {
     return this.#isRunning;

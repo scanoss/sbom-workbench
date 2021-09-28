@@ -106,7 +106,8 @@ const createWindow = async () => {
     },
   });
 
-  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  const mainURL = `file://${__dirname}/index.html`;
+  mainWindow.loadURL(mainURL);
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -126,7 +127,7 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
+  const menuBuilder = new MenuBuilder(mainWindow, mainURL);
   menuBuilder.buildMenu();
 
   // Open urls in the user's browser

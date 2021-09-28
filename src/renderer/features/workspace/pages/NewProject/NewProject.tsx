@@ -55,7 +55,7 @@ const NewProject = () => {
   const handlerScannerError = async (_event, args) => {
     console.log(args);
     // alert(args);
-    const errorMessage = args.message;
+    const errorMessage = `An error occurred while scanning. Please try again`;//args.message;
     const { action } = await dialogCtrl.openConfirmDialog(
       `${errorMessage}`,
       {

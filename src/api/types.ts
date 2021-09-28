@@ -13,7 +13,7 @@ export enum ProjectState {
 export interface Inventory {
   id?: number;
   compid: number;
-  component: Component | string;
+  component: Component;
   purl: string;
   version: string;
   usage: string;

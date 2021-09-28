@@ -121,6 +121,10 @@
       margin: 0;
       padding: 0 !important;
       height: 100%;
+
+      code {
+        display: grid;
+      }
     }
 
     p {

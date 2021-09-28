@@ -16,7 +16,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
 
   let lines = null;
   let code = null;
-  let start = 1;
+  let start = 0;
   let end = LINES_MAX;
 
   if (highlight && highlight !== 'all') {
@@ -55,10 +55,10 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
           code-viewer
           ${truncatedStart > 0 ? 'truncatedStart' : ''}
           ${truncatedEnd > 0 ? 'truncatedEnd' : ''}`}
-        wrapLongLines
+        wrapLines
         style={nord}
         language="javascript"
-        startingLineNumber={start}
+        startingLineNumber={start + 1}
         showLineNumbers
         lineProps={(line) => {
           if (lines && lines.includes(line)) {

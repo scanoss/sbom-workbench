@@ -45,6 +45,11 @@ class ProjectService extends BaseService {
     return this.response(response);
   }
 
+  public async getToken(): Promise <any> {
+    const response = await ipcRenderer.invoke(IpcEvents.GET_TOKEN);
+    return this.response(response);
+  }
+
 }
 
 export const projectService = new ProjectService();

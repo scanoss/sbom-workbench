@@ -13,6 +13,9 @@ import { DispatcherResponse } from './Dispatcher/DispatcherResponse';
 import { ScannerEvents } from './ScannerEvents';
 import { ScannerCfg } from './ScannerCfg';
 
+const sortPaths = require ('sort-paths');
+
+
 // TO DO:
 // - Split ScannerEvents into ExternalEvents and InternalEvents
 // - Implement a static atribute to keep track of the scannerId
@@ -86,8 +89,8 @@ export class Scanner extends EventEmitter {
     });
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_NEW_DATA, async (dispatcherResponse) => {
-      this.#processingNewData = true;
-      await this.#persistOutputFiles(dispatcherResponse.getWfpContent(), dispatcherResponse.getServerResponse());
+      this.processingNewData = true;
+      await this.#appendOutputFiles(dispatcherResponse.getWfpContent(), dispatcherResponse.getServerResponse());
       await fs.promises.unlink(dispatcherResponse.getWfpFilePath());
       this.emit(ScannerEvents.DISPATCHER_NEW_DATA, dispatcherResponse.getServerResponse(), dispatcherResponse);
       this.#processingNewData = false;
@@ -130,7 +133,12 @@ export class Scanner extends EventEmitter {
   }
 
   #finishScan() {
-    // if (fs.existsSync(this.#tempPath)) fs.rmdirSync(this.#tempPath, { recursive: true });
+    const results = JSON.parse(fs.readFileSync(this.#resultFilePath, 'utf8'));
+    const sortedPaths = sortPaths(Object.keys(results), '/');
+    const resultSorted = {};
+    // eslint-disable-next-line no-restricted-syntax
+    for (const key of sortedPaths) resultSorted[key] = results[key];
+    fs.writeFileSync(this.#resultFilePath, JSON.stringify(resultSorted, null,4));
     this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath);
   }
 
@@ -139,7 +147,9 @@ export class Scanner extends EventEmitter {
     this.stop();
     this.emit('error', error);
 
-    if (origin === ScannerEvents.MODULE_DISPATCHER) {}
+    if (origin === ScannerEvents.MODULE_DISPATCHER) {
+      if (error.wfpFailedPath) fs.copyFileSync(error.wfpFailedPath, `${this.#tempPath}/failed.wfp`);
+    }
     if (origin === ScannerEvents.MODULE_WINNOWER) {}
   }
 
@@ -148,9 +158,8 @@ export class Scanner extends EventEmitter {
     if (!fs.existsSync(this.#resultFilePath)) fs.writeFileSync(this.#resultFilePath, JSON.stringify({}));
   }
 
-  #persistOutputFiles(wfpContent, serverResponse) {
+  #appendOutputFiles(wfpContent, serverResponse) {
     fs.appendFileSync(this.#wfpFilePath, wfpContent);
-
     const storedResultStr = fs.readFileSync(this.#resultFilePath);
     const storedResultObj = JSON.parse(storedResultStr);
     Object.assign(storedResultObj, serverResponse);

@@ -12,12 +12,9 @@ import { mapFiles } from '../../../../../../../utils/scan-util';
 import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import { inventoryService } from '../../../../../../../api/inventory-service';
 import { setFile } from '../../../../actions';
-import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { resultService } from '../../../../../../../api/results-service';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import { projectService } from '../../../../../../../api/project-service';
-
-
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -69,8 +66,7 @@ export const Editor = () => {
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false });
-      const content = await workbenchController.fetchLocalFile(scanBasePath + path);
-
+      const content = await workbenchController.fetchLocalFile(`${scanBasePath}/${path}`);
       if (content === FileType.BINARY) throw new Error(FileType.BINARY);
       setLocalFileContent({ content, error: false });
     } catch (error) {
@@ -99,44 +95,15 @@ export const Editor = () => {
   };
 
   const create = async (defaultInventory, selFiles) => {
-    let inventories = [];
-    if (defaultInventory.purl && defaultInventory.version) {
-      const response = await inventoryService.getAll({
-        purl: defaultInventory.purl,
-        version: defaultInventory.version,
-      });
-      inventories = response.message || [];
-    }
+    const inventory = await dialogCtrl.openInventory(defaultInventory);
+    if (!inventory) return;
 
-    // const showSelector = inventories.length > 0;
-    const showSelector = false; // TODO: UNTIL VALIDATE
-    let action = DIALOG_ACTIONS.NEW;
-    let inventory;
+    const newInventory = await createInventory({
+      ...inventory,
+      files: selFiles,
+    });
 
-    if (showSelector) {
-      const response = await dialogCtrl.openInventorySelector(inventories);
-      action = response.action;
-      inventory = response.inventory;
-    }
-
-    if (action === DIALOG_ACTIONS.CANCEL) return;
-
-    if (action === DIALOG_ACTIONS.NEW) {
-      inventory = await dialogCtrl.openInventory(defaultInventory);
-      if (!inventory) return;
-
-      const newInventory = await createInventory({
-        ...inventory,
-        files: selFiles,
-      });
-      setInventories((previous) => [...previous, newInventory]);
-    }
-
-    if (action === DIALOG_ACTIONS.OK) {
-      await attachFile(inventory.id, selFiles);
-      setInventories((previous) => [...previous, inventory]); // TODO: full update
-    }
-
+    setInventories((previous) => [...previous, newInventory]);
     getResults();
   };
 
@@ -153,7 +120,7 @@ export const Editor = () => {
     create(inv, [result.id]);
   };
 
-  const onIdentifyFilterPressed = async () => {
+  const onNoMatchIdentifyPressed = async () => {
     const response = await dialogCtrl.openInventory({
       usage: 'file',
     });
@@ -172,6 +139,7 @@ export const Editor = () => {
         ...response,
         files: [data.id],
       });
+
       getInventories();
       getResults();
     }
@@ -202,9 +170,11 @@ export const Editor = () => {
   };
 
   useEffect(() => {
-    dispatch(setFile(query.get('path')));
+    const path = decodeURIComponent(query.get('path'));
+
+    dispatch(setFile(path));
     const unlisten = history.listen((data) => {
-      const path = new URLSearchParams(data.search).get('path');
+      const path = decodeURIComponent(new URLSearchParams(data.search).get('path'));
       dispatch(setFile(path));
     });
     return () => {
@@ -306,9 +276,9 @@ export const Editor = () => {
               )}
 
               <div className="info-files">
-                <LabelCard label="Source File" subLabel={file} status={null} />
+                <LabelCard label="Source File" file={file} status={null} />
                 {matchInfo && currentMatch && currentMatch.file && (
-                  <LabelCard label="Component File" subLabel={currentMatch.file} status={null} />
+                  <LabelCard label="Component File" status={null} file={currentMatch.file}/>
                 )}
               </div>
             </header>
@@ -332,7 +302,7 @@ export const Editor = () => {
             </div>
             {inventories?.length === 0 && matchInfo?.length === 0 ? (
               <div className="editor">
-                <NoMatchFound identifyHandler={() => onIdentifyFilterPressed()} />
+                <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} />
               </div>
             ) : (
               <div className="editor">

@@ -1,14 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Chart } from 'chart.js';
+import { Button, Tooltip } from '@material-ui/core';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import { shell } from 'electron';
+import { ExportFormat } from '../../../../../../api/export-service';
+import { HashType } from '../../../../../../main/db/export_formats';
+import { projectService } from '../../../../../../api/project-service';
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
   const [percentage, setPercentage] = useState<number>(0);
+  const [token, setToken] = useState<string>('');
 
+  const notarizeSBOM = async () => {
+    const hash = await ExportFormat.notarizeSBOM(HashType.SHA256);
+    shell.openExternal(`https://sbom.info/?hash=${hash}&type=${HashType.SHA256}&token=${token}`);
+  };
+
+  const readToken = async () => {
+    const token = await projectService.getToken();
+    setToken(token || '');
+  };
   useEffect(() => {
     const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
     const pending = 100 - percentage;
     setPercentage(percentage);
+
+    readToken();
 
     const tooltipPlugin = Chart.registry.getPlugin('tooltip');
     tooltipPlugin.positioners.custom = function (elements, eventPosition) {
@@ -93,13 +111,51 @@ const LicensesChart = ({ data }) => {
   return (
     <div id="IdentificationProgress">
       <div className="identification-canvas-container">
-        <span className="label">{percentage}%</span>
-        <div className="progress-bar">
-          <canvas ref={chartRef} />
-        </div>
+        {Number.isNaN(percentage) ? (
+          <span className="label-not-found">No matches found</span>
+        ) : (
+          <>
+            <span className="label">{percentage}%</span>
+            <div className="progress-bar">
+              <canvas ref={chartRef} />
+            </div>
+          </>
+        )}
       </div>
       <div className="total-files-container">
-        <span className="total-files-label">Total Files: {data.totalFiles}</span>
+        <span className="total-files-label">
+          <strong>{data.totalFiles}</strong> total files
+        </span>
+      </div>
+      <div className={token ? 'notarize-container' : 'hide'}>
+        {percentage < 100 || !token.length ? (
+          <>
+            <Tooltip title="Identification progress is not 100% or your token is not defined">
+              <span>
+                <Button
+                  disabled
+                  variant="contained"
+                  color="secondary"
+                  endIcon={<OpenInNewIcon />}
+                  type="button"
+                  onClick={notarizeSBOM}
+                >
+                  Post to SBOM ledger
+                </Button>
+              </span>
+            </Tooltip>
+          </>
+        ) : (
+          <Button
+            variant="contained"
+            color="secondary"
+            endIcon={<OpenInNewIcon />}
+            type="button"
+            onClick={notarizeSBOM}
+          >
+            Post to SBOM ledger
+          </Button>
+        )}
       </div>
     </div>
   );

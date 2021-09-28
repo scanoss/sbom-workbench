@@ -84,20 +84,28 @@ const MatchesChart = ({ data }) => {
 
   return (
     <div id="MatchesChart">
-      <div className="matches-canvas-container">
-        <div className="label-match-container">
-          <span className="label-match">{percentage}%</span>
-          <span className="label-match-sublabel">Match</span>
-        </div>
-        <canvas ref={chartRef} />
-        <div className="label-nomatch-container">
-          <span className="label-nomatch">{100 - percentage}%</span>
-          <span className="label-nomatch-sublabel">No Match</span>
-        </div>
-      </div>
-      <div className="total-files-container">
+      {
+        Number.isNaN(percentage) ? (
+          <p className="report-empty">No matches found</p>
+        ) : (
+          <>
+          <div className="matches-canvas-container">
+          <div className="label-match-container">
+            <span className="label-match">{percentage}%</span>
+            <span className="label-match-sublabel">Match</span>
+          </div>
+          <canvas ref={chartRef} />
+          <div className="label-nomatch-container">
+            <span className="label-nomatch">{100 - percentage}%</span>
+            <span className="label-nomatch-sublabel">No Match</span>
+          </div>
+          </div>
+          <div className="total-files-container">
         <span className="total-files-label">Scanned Files: {data?.includedFiles}</span>
       </div>
+          </>
+        )
+      }
     </div>
   );
 };

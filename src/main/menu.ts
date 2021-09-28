@@ -1,13 +1,4 @@
-import {
-  app,
-  Menu,
-  shell,
-  BrowserWindow,
-  MenuItemConstructorOptions,
-  dialog,
-  nativeImage,
-} from 'electron';
-
+import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions, dialog, nativeImage } from 'electron';
 import path from 'path';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
@@ -16,48 +7,29 @@ interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
 }
 
 const RESOURCES_PATH = app.isPackaged
-? path.join(process.resourcesPath, 'assets')
-: path.join(__dirname, '../../assets');
+  ? path.join(process.resourcesPath, 'assets')
+  : path.join(__dirname, '../../assets');
 
 const getAssetPath = (...paths: string[]): string => {
-return path.join(RESOURCES_PATH, ...paths);
+  return path.join(RESOURCES_PATH, ...paths);
 };
-
-const aboutText = `SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-By using this tool you accept that the results provided do not represent any kind of legal advise and are obtained against the data in the Scanoss Knowledgebase at the time of analysis.
-
-The source code is analyzed on the spot and is not transfered anywhere outside this computer.
-
-VERSION: ${app.getVersion()}
-
-Copyright (C) 2021 Scan Open Source Solutions S.L.`;
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
 
-  constructor(mainWindow: BrowserWindow) {
+  mainURL: string;
+
+  constructor(mainWindow: BrowserWindow, main: string) {
     this.mainWindow = mainWindow;
+    this.mainURL = main;
   }
 
   buildMenu(): Menu {
-    if (
-      process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
-    ) {
+    if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
       this.setupDevelopmentEnvironment();
     }
 
-    const template =
-      process.platform === 'darwin'
-        ? this.buildDarwinTemplate()
-        : this.buildDefaultTemplate();
+    const template = process.platform === 'darwin' ? this.buildDarwinTemplate() : this.buildDefaultTemplate();
 
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
@@ -94,6 +66,21 @@ export default class MenuBuilder {
         },
       ],
     };
+    const subMenuEdit: MenuItemConstructorOptions = {
+      label: '&Edit',
+      submenu: [
+        /* {role: 'undo'},
+          {role: 'redo'},
+          {type: 'separator'}, */
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        /* {role: 'pasteandmatchstyle'},
+          {role: 'delete'},
+          {role: 'selectall'} */
+      ],
+    };
+
     const subMenuViewDev: MenuItemConstructorOptions = {
       label: 'View',
       submenu: [
@@ -151,28 +138,19 @@ export default class MenuBuilder {
         {
           label: 'About',
           click() {
-            const image = nativeImage.createFromPath(getAssetPath('icon.png'));
-            dialog.showMessageBox(self.mainWindow, {
-              title: `${app.getName()} ${app.getVersion()}`,
-              message: aboutText,
-              icon: image,
-            });
+            self.buildAboutDialog();
           },
         },
       ],
     };
 
     const subMenuView =
-      process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
-        ? subMenuViewDev
-        : subMenuViewProd;
+      process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true' ? subMenuViewDev : subMenuViewProd;
 
-    return [subMenuAbout, subMenuView, subMenuWindow, subMenuHelp];
+    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
   }
 
   buildDefaultTemplate() {
-    const self = this;
     const templateDefault = [
       {
         label: '&File',
@@ -187,10 +165,23 @@ export default class MenuBuilder {
         ],
       },
       {
+        label: '&Edit',
+        submenu: [
+          /* {role: 'undo'},
+          {role: 'redo'},
+          {type: 'separator'}, */
+          { role: 'cut' },
+          { role: 'copy' },
+          { role: 'paste' },
+          /* {role: 'pasteandmatchstyle'},
+          {role: 'delete'},
+          {role: 'selectall'} */
+        ],
+      },
+      {
         label: '&View',
         submenu:
-          process.env.NODE_ENV === 'development' ||
-          process.env.DEBUG_PROD === 'true'
+          process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
             ? [
                 {
                   label: '&Reload',
@@ -203,9 +194,7 @@ export default class MenuBuilder {
                   label: 'Toggle &Full Screen',
                   accelerator: 'F11',
                   click: () => {
-                    this.mainWindow.setFullScreen(
-                      !this.mainWindow.isFullScreen()
-                    );
+                    this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
                   },
                 },
                 {
@@ -221,9 +210,7 @@ export default class MenuBuilder {
                   label: 'Toggle &Full Screen',
                   accelerator: 'F11',
                   click: () => {
-                    this.mainWindow.setFullScreen(
-                      !this.mainWindow.isFullScreen()
-                    );
+                    this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
                   },
                 },
               ],
@@ -233,13 +220,8 @@ export default class MenuBuilder {
         submenu: [
           {
             label: 'About',
-            click() {
-              const image = nativeImage.createFromPath(getAssetPath('icon.png'));
-              dialog.showMessageBox(self.mainWindow, {
-                title: `${app.getName()} ${app.getVersion()}`,
-                message: aboutText,
-                icon: image,
-              });
+            click: () => {
+              this.buildAboutDialog();
             },
           },
         ],
@@ -247,5 +229,36 @@ export default class MenuBuilder {
     ];
 
     return templateDefault;
+  }
+
+  buildAboutDialog() {
+    const aboutWindow = new BrowserWindow({
+      parent: this.mainWindow,
+      resizable: false,
+      width: 500,
+      height: 500,
+      modal: true,
+      autoHideMenuBar: true,
+      backgroundColor: '#e4e4e7',
+      webPreferences: {
+        nodeIntegration: true,
+        enableRemoteModule: true,
+        devTools: false,
+      },
+    });
+
+    aboutWindow.webContents.on('before-input-event', (event, input) => {
+      if (input.key.toLowerCase() === 'escape') {
+        event.preventDefault()
+        aboutWindow.close();
+      }
+    });
+
+    aboutWindow.webContents.on('new-window', (event, url) => {
+      event.preventDefault();
+      shell.openExternal(url);
+    });
+
+    aboutWindow.loadURL(`${this.mainURL}#/about`);
   }
 }

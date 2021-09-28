@@ -11,10 +11,11 @@ import { IProject, ProjectState } from '../../api/types';
  *
  */
 // eslint-disable-next-line import/no-mutable-exports
-const defaultCfg = {
+let defaultCfg = {
   DEFAULT_URL_API: 0,
   AVAILABLE_URL_API: ['https://osskb.org/api/scan/direct'],
   SCAN_MODE: 'FULL_SCAN',
+  TOKEN: ''
 };
 
 class Workspace extends EventEmitter {
@@ -112,6 +113,7 @@ class Workspace extends EventEmitter {
       }
     }
   }
+
 
   public async closeProjectByPath(path: string) {
     // eslint-disable-next-line no-restricted-syntax

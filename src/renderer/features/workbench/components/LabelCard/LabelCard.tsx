@@ -6,13 +6,21 @@ import Label from '../Label/Label';
 
 interface LabelCardProps {
   label: string | null;
+  file: string | null;
   status: string | null;
-  subLabel: string | null;
 }
 
-const LabelCard = ({ label, status, subLabel }: LabelCardProps) => {
+const LabelCard = ({ label, file, status }: LabelCardProps) => {
   const onCopy = (label: string) => {
     navigator.clipboard.writeText(label);
+  };
+
+  const getFileName = (path: string) => {
+    if (path) {
+      const parts = path.split('/');
+      return parts[parts.length - 1];
+    }
+    return '';
   };
 
   return (
@@ -20,13 +28,15 @@ const LabelCard = ({ label, status, subLabel }: LabelCardProps) => {
       <div className="label-card-content">
         <div className="label-div">
           <span className="label-title">{label}</span>
-          <div className="directory-div">
-            <AccountTreeIcon className="label-icon" />
-            <Label label={subLabel} textColor="black" tooltip />
-          </div>
+          <Tooltip title={file || ''}>
+            <div className="directory-div">
+              <AccountTreeIcon className="label-icon" />
+              <Label label={getFileName(file)} textColor="black" />
+            </div>
+          </Tooltip>
         </div>
         <Tooltip title="Copy file path to clipboard">
-          <IconButton size="small" className="btn-copy" onClick={() => onCopy(subLabel)}>
+          <IconButton size="small" className="btn-copy" onClick={() => onCopy(file)}>
             <FileCopyOutlinedIcon fontSize="inherit" />
           </IconButton>
         </Tooltip>

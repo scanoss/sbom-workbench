@@ -70,7 +70,7 @@ export const ComponentDetail = () => {
   const onAction = async (file: any, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push(`/workbench/detected/file?path=${file.path}`);
+        history.push(`/workbench/detected/file?path=${encodeURIComponent(file.path)}`);
         break;
       case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
         await onIdentifyPressed(file);
@@ -127,7 +127,7 @@ export const ComponentDetail = () => {
   };
 
   const onIgnoreAllPressed = async () => {
-    const { action } = await dialogCtrl.openConfirmDialog();
+    const { action } = await dialogCtrl.openConfirmDialog(`Are you sure you want to ignore ${filterFiles.pending.length} ${filterFiles.pending.length === 1 ? 'file' : 'files'}?`);
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.pending.map((file) => file.id);
       await ignoreFile(selFiles);
@@ -136,7 +136,8 @@ export const ComponentDetail = () => {
   };
 
   const onRestoreAllPressed = async () => {
-    const { action } = await dialogCtrl.openConfirmDialog();
+    const { action } = await dialogCtrl.openConfirmDialog(`Are you sure you want to restore ${filterFiles.ignored.length} ${filterFiles.ignored.length === 1 ? 'file' : 'files'}?`);
+
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.ignored.map((file) => file.id);
       await restoreFile(selFiles);
@@ -145,7 +146,7 @@ export const ComponentDetail = () => {
   };
 
   const onDetachAllPressed = async () => {
-    const { action } = await dialogCtrl.openConfirmDialog();
+    const { action } = await dialogCtrl.openConfirmDialog(`Are you sure you want to restore ${filterFiles.identified.length} ${filterFiles.identified.length === 1 ? 'file' : 'files'}?`);
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.identified.map((file) => file.id);
       await detachFile(selFiles);

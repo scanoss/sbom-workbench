@@ -404,12 +404,20 @@ export class Project extends EventEmitter {
     } else if (jsonScan.type === 'folder') {
       if (bannedList.evaluate(scanRoot + jsonScan.value)) {
         jsonScan.action = 'scan';
+        for (i = 0; i < jsonScan.children.length; i += 1) this.indexScan(scanRoot, jsonScan.children[i], bannedList);
       } else {
         jsonScan.action = 'filter';
       }
 
-      for (i = 0; i < jsonScan.children.length; i += 1) this.indexScan(scanRoot, jsonScan.children[i], bannedList);
+
     }
+  }
+
+
+  public getToken(){
+    const txt = fs.readFileSync(`${this.work_root}/projectCfg.json`,'utf8');
+    const cfg = JSON.parse(txt);
+    return cfg.TOKEN;
   }
 }
 
@@ -458,7 +466,7 @@ function getLeaf(arbol: any, mypath: string): any {
   if (arbol.type === 'folder') {
     for (j = 0; j < arbol.children.length; j += 1) {
       if (arbol.children[j].type === 'folder' && arbol.children[j].label === res[1]) {
-        const newpath = mypath.replace(`${res[0]}/`, '');
+        const newpath = mypath.replace(`${res[0]}`, '');
         return getLeaf(arbol.children[j], newpath);
       }
       if (arbol.children[j].type === 'file' && arbol.children[j].label === res[1]) {
@@ -566,7 +574,7 @@ function dirTree(root: string, filename: string) {
       components: [],
       children: undefined,
       include: true,
-      action: 'scan',
+      action: 'filter',
       showCheckbox: false,
     };
 
@@ -589,7 +597,7 @@ function dirTree(root: string, filename: string) {
       inventories: [],
       components: [],
       include: true,
-      action: 'scan',
+      action: 'filter',
       showCheckbox: false,
     };
   }

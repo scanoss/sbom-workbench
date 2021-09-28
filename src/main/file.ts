@@ -4,11 +4,23 @@ import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
 import { FileType } from '../api/types';
 import { workspace } from './workspace/workspace';
+import { isPseudoBinary } from './workspace/isPseudoBinary';
+
+const path = require('path');
+
+const allowExtension = new Set ([".json", ".htm", ".html", ".xml"]);
 
 ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
   const fileContent = { content: '' };
   try {
-    const isBin = isBinaryFileSync(filePath);
+    // TODO: remove when isPsuedoBinary is fixed
+    const ext = path.extname(filePath);
+    let isBin = false;
+    if (allowExtension.has(ext)) {
+      isBin = false;
+    } else {
+      isBin = isPseudoBinary(filePath);
+    }
 
     if (isBin) {
       fileContent.content = FileType.BINARY;

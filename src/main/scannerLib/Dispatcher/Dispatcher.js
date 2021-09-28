@@ -90,22 +90,7 @@ export class Dispatcher extends EventEmitter {
   }
 
   #errorHandler(error) {
-    if (this.#status !== DispatcherEvents.STATUS_ERROR) {
-      // Ensures to handle only the first error received (There are many promises running at any time)
-      this.#status = DispatcherEvents.STATUS_ERROR;
-      this.#error = error;
-      this.pause();
-
-      // Once all the promises are resolved or rejected emit the error event.
-      const nextHandler = () => {
-        if (this.#pQueue.pending === 0) {
-          this.#pQueue.removeListener(nextHandler);
-          this.emit('error', this.#error);
-        }
-      };
-
-      this.#pQueue.on('next', nextHandler);
-    }
+    this.emit('error', error);
   }
 
   async #dispatch(wfpFilePath) {
@@ -141,7 +126,7 @@ export class Dispatcher extends EventEmitter {
     } catch (error) {
       this.#setWfpAsFailed(wfpFilePath);
       if (error.name !== ScannerEvents.ERROR_SERVER_SIDE) error.name = ScannerEvents.ERROR_CLIENT_SIDE;
-      console.log(error);
+      error.wfpFailedPath = wfpFilePath;
       throw error;
     }
   }

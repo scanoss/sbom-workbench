@@ -15,10 +15,13 @@ class AbstractFilter {
 
   ftype: string;
 
+  scope: string;
+
   constructor(condition: string, value: string) {
     this.condition = condition;
     this.value = value;
     this.ftype = 'NONE';
+    this.scope = 'ALL';
   }
 
   evaluate(path: string): boolean {
@@ -26,27 +29,44 @@ class AbstractFilter {
   }
 }
 class NameFilter extends AbstractFilter {
-  constructor(condition: string, value: string) {
+  constructor(condition: string, value: string, scope: string) {
     super(condition, value);
     this.ftype = 'NAME';
+    this.scope = scope || super.scope;
   }
 
   evaluate(path: string): boolean {
     // console.log(path.indexOf(this.value));
     // return !(this.value.indexOf(path) >= 0);
+    this.value = this.value.toLowerCase();
+    path = path.toLowerCase();
+
     if (this.condition === 'contains') {
       return !(path.indexOf(this.value) >= 0);
     }
-    if (this.condition === 'fullmatch') return path === this.value;
-    if (this.condition === 'starts') return fpath.basename(path).indexOf(this.value) === -1;
+    if (this.condition === 'fullmatch') return (fpath.basename(path) !== this.value);
+    if (this.condition === 'starts') {
+     let filename: string;
+     filename = fpath.basename(path);
+    return !filename.startsWith(this.value);
+
+    }
+    if (this.condition === 'ends') {
+      let filename: string;
+      filename = fpath.basename(path);
+       return !filename.endsWith(this.value);
+
+     }
+
     return true;
   }
 }
 
 class ContentFilter extends AbstractFilter {
-  constructor(condition: string, value: string) {
+  constructor(condition: string, value: string, scope: string) {
     super(condition, value);
     this.ftype = 'CONTENT';
+    this.scope = scope || super.scope; // Verificar
   }
 
   evaluate(path: string): boolean {
@@ -61,20 +81,24 @@ class ContentFilter extends AbstractFilter {
 }
 
 class ExtensionFilter extends AbstractFilter {
-  constructor(condition: string, value: string) {
+  constructor(condition: string, value: string, scope: string) {
     super(condition, value);
     this.ftype = 'EXTENSION';
+    this.scope = scope || super.scope; // Verificar
   }
 
   evaluate(path: string): boolean {
+    path = path.toLowerCase();
+    this.value = this.value.toLowerCase();
     return !path.endsWith(this.value);
   }
 }
 
 class SizeFilter extends AbstractFilter {
-  constructor(condition: string, value: string) {
+  constructor(condition: string, value: string, scope: string) {
     super(condition, value);
     this.ftype = 'SIZE';
+    this.scope = scope || super.scope; // Verificar
   }
 
   evaluate(path: string): boolean {
@@ -107,9 +131,10 @@ class SizeFilter extends AbstractFilter {
   }
 }
 class DateFilter extends AbstractFilter {
-  constructor(condition: string, value: string) {
+  constructor(condition: string, value: string, scope: string) {
     super(condition, value);
     this.ftype = 'DATE';
+    this.scope = scope || super.scope; // Verificar
   }
 
   evaluate(path: string): boolean {
@@ -154,9 +179,25 @@ export class BannedList {
   }
 
   evaluate(path: string): boolean {
+
+    const pathStat = fs.lstatSync(path);
+
     let i: number;
     for (i = 0; i < this.filters.length; i += 1) {
-      if (!this.filters[i].evaluate(path)) return false;
+
+      const evaluation = this.filters[i].evaluate(path);
+
+      if (  this.filters[i].scope === 'FOLDER' &&
+            pathStat.isDirectory() &&
+            !evaluation) return false;
+
+      if (  this.filters[i].scope === 'FILE' &&
+            pathStat.isFile() &&
+            !evaluation) return false;
+
+      if (  this.filters[i].scope === 'ALL' &&
+            !evaluation) return false;
+
     }
     return true;
   }
@@ -175,11 +216,12 @@ export class BannedList {
 
     let i: number;
     for (i = 0; i < a.length; i += 1) {
-      if (a[i].ftype === 'NAME') this.addFilter(new NameFilter(a[i].condition, a[i].value));
-      if (a[i].ftype === 'DATE') this.addFilter(new DateFilter(a[i].condition, a[i].value));
-      if (a[i].ftype === 'SIZE') this.addFilter(new SizeFilter(a[i].condition, a[i].value));
-      if (a[i].ftype === 'EXTENSION') this.addFilter(new ExtensionFilter(a[i].condition, a[i].value));
-      if (a[i].ftype === 'CONTENT') this.addFilter(new ContentFilter(a[i].condition, a[i].value));
+      const scope = a[i].scope || 'ALL';
+      if (a[i].ftype === 'NAME') this.addFilter(new NameFilter(a[i].condition, a[i].value, scope));
+      if (a[i].ftype === 'DATE') this.addFilter(new DateFilter(a[i].condition, a[i].value, scope));
+      if (a[i].ftype === 'SIZE') this.addFilter(new SizeFilter(a[i].condition, a[i].value, scope));
+      if (a[i].ftype === 'EXTENSION') this.addFilter(new ExtensionFilter(a[i].condition, a[i].value, scope));
+      if (a[i].ftype === 'CONTENT') this.addFilter(new ContentFilter(a[i].condition, a[i].value, scope));
     }
     // console.log("loading "+ this.filters);
   }

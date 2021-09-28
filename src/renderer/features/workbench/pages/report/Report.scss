@@ -77,11 +77,26 @@
         font-style: normal;
         font-weight: 600;
       }
+
+      .report-empty {
+        font-size: 16px;
+        font-weight: 400;
+        color: #6B7381;
+        margin-top: 6px;
+      }
     }
 
     .report-item.licenses {
       display: flex;
       flex-direction: column;
+
+      .report-empty {
+        font-size: 16px;
+        font-weight: 400;
+        color: #6B7381;
+        margin-top: 6px;
+      }
+
     }
 
     #IdentificationProgress {
@@ -99,6 +114,8 @@
 
         .label {
           float: left;
+          margin-left: auto;
+          margin-right: auto;
           text-align: center;
           color: #22C55E;
           margin-top: -6px;
@@ -106,8 +123,15 @@
           font-weight: 700;
         }
 
+        .label-not-found {
+          margin-top: -16px;
+          font-size: 16px;
+          font-weight: 400;
+          color: #6B7381;
+        }
+
         .progress-bar {
-          width: 91%;
+          width: 90%;
         }
       }
     }
@@ -318,8 +342,19 @@
   align-items: center;
 
   .total-files-label {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 14px;
     text-align: center;
   }
+}
+
+.notarize-container{
+  display: flex;
+  justify-content: center;
+  flex-flow: row;
+  margin-top: 20px;
+
+}
+
+.hide{
+  display:none;
 }

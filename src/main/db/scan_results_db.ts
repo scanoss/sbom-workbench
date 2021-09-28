@@ -10,10 +10,10 @@
 
 import { Querys } from './querys_db';
 import { Db } from './db';
-import { UtilsDb } from './utils_db';
+import { utilDb } from './utils_db';
 import { ComponentDb } from './scan_component_db';
 
-const utilsDb = new UtilsDb();
+
 const query = new Querys();
 
 export class ResultsDb extends Db {
@@ -29,7 +29,7 @@ export class ResultsDb extends Db {
     return new Promise(async (resolve) => {
       try {
         const self = this;
-        const result: Record<any, any> = await utilsDb.readFile(resultPath);
+        const result: Record<any, any> = await utilDb.readFile(resultPath);
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
