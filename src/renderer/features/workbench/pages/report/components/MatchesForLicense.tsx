@@ -44,12 +44,12 @@ export default function MatchesForLicense({ data }) {
                   </div>
                 </TableCell>
                 <TableCell>
-                <div className="vendor-table">
+                <div className="break-word-table">
                     {row.vendor}
                   </div>
                 </TableCell>
                 <TableCell align="right">
-                  <div className="version-table">
+                  <div className="break-word-table">
                     {row.version}
                   </div>
                 </TableCell>
