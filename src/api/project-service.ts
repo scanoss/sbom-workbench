@@ -5,8 +5,18 @@ import { BaseService } from './base-service';
 const { ipcRenderer } = require('electron');
 
 class ProjectService extends BaseService {
-  public async get(args: Partial<Project>): Promise<any> {
+  public async get(args: Partial<IProject>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_GET, args);
+    return response;
+  }
+
+  public async resume(path: string): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_RESUME_SCAN, path);
+    return response;
+  }
+
+  public async stop(): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_STOP_SCAN);
     return response;
   }
 
@@ -16,7 +26,7 @@ class ProjectService extends BaseService {
   }
 
   public async load(path: string): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_LOAD_SCAN, path);
+    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_OPEN_SCAN, path);
     return response;
   }
 

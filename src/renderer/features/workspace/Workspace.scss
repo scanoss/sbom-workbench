@@ -24,12 +24,27 @@
       .MuiTableRow-root {
         cursor: pointer;
 
-        .btn-delete {
-          visibility: hidden;
+        &.scanning-not-complete {
+
+          cursor: default;
+
+          .MuiTableCell-root{
+            color: grey;
+          }
+          //opacity: 0.5;
+
+          //pointer-events: none;
         }
 
-        &:hover .btn-delete {
+        .btn-actions {
+          visibility: hidden;
+          display: flex;
+          justify-content: flex-end;
+        }
+
+        &:hover .btn-actions {
           visibility: visible;
+
         }
       }
 

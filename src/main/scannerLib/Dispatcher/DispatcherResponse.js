@@ -10,7 +10,7 @@ export class DispatcherResponse {
   constructor(serverResponse, wfpFilePath) {
     this.#serverResponse = serverResponse;
     this.#wfpFilePath = wfpFilePath;
-    this.#verifyResponse();
+    // this.#verifyResponse();
   }
 
   getServerResponse() {

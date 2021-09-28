@@ -2,8 +2,8 @@ import * as fs from 'fs';
 import { ipcMain } from 'electron';
 import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
-import { defaultProject } from './workspace/ProjectTree';
 import { FileType } from '../api/types';
+import { workspace } from './workspace/workspace';
 import { isPseudoBinary } from './workspace/isPseudoBinary';
 
 const path = require('path');
@@ -42,7 +42,7 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
 ipcMain.handle(IpcEvents.FILE_GET, async (_event, arg: Partial<File>) => {
   let data;
   try {
-    data = await defaultProject.scans_db.files.get(arg);
+    data = await workspace.getOpenedProjects()[0].scans_db.files.get(arg);
     if (data) return { status: 'ok', message: 'Get file', data };
     return { status: 'ok', message: 'Get file', data };
   } catch (error) {

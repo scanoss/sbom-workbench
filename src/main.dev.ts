@@ -10,10 +10,11 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import path from 'path';
+
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import path from 'path';
 import MenuBuilder from './main/menu';
 import './main/inventory';
 import './main/component';
@@ -24,10 +25,12 @@ import './main/formats';
 import './main/workspace';
 import './main/report';
 import './main/license';
+import * as os from 'os';
 
 import { IpcEvents } from './ipc-events';
 import { workspace } from './main/workspace/workspace';
-import { ItemExclude, Project } from './api/types';
+import { ItemExclude, IProject } from './api/types';
+import { Project } from './main/workspace/Project';
 import { ScanDb } from './main/db/scan_db';
 import { licenses } from './main/db/licenses';
 
@@ -35,8 +38,11 @@ import { Scanner } from './main/scannerLib/Scanner';
 import { SCANNER_EVENTS } from './main/scannerLib/ScannerEvents';
 import { fstat } from 'fs';
 import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
+import Workspace from './renderer/features/workspace/Workspace';
+import { Metadata } from './main/workspace/Metadata';
 const basepath = require('path');
 const fs = require('fs');
+
 
 export default class AppUpdater {
   constructor() {
@@ -147,15 +153,6 @@ app.on('window-all-closed', () => {
   }
 });
 
-
-
-// app
-//   .whenReady()
-//   .then(async () => {
-//     return Promise.all([createWindow(), mainLogic()]);
-//   })
-//   .catch(console.log);
-
 app.whenReady().then(createWindow).then(mainLogic).catch(console.log);
 
 app.on('activate', () => {
@@ -172,17 +169,19 @@ export interface IInitScan {
   // filter: IFilter[];
 }
 
-let ws: Workspace;
 async function mainLogic() {
-  // ws =  new Workspace();
+  await workspace.read(`${os.homedir()}/scanoss-workspace`);
 }
+
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   const { path } = arg;
-  workspace.newProject(path,event.sender);
-  await workspace.projectsList.prepare_scan();
-  workspace.projectsList.startScan();
+
+  const projectName = basepath.basename(path);
+  const p: Project = new Project(projectName);
+  p.setScanPath(path);
+  p.setMailbox(event.sender);
+
+  await workspace.addProject(p);
+  await p.startScanner();
 });
-
-
-
