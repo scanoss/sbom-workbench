@@ -30,7 +30,7 @@ const useStyles = makeStyles({
     right: 0,
     position: 'absolute',
     display: 'flex',
-    alignItems: 'center',  
+    alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FEFFFE',
     zIndex: -1,
@@ -65,14 +65,15 @@ const CircularComponent = (props) => {
             <CircularProgress
               variant="determinate"
               className={classes.trackCircularProgress}
-              size={'30vw'}
-              thickness={4}
+              size={'400px'}
+              thickness={3}
               value={100}
+              
             />
           <CircularProgress
             variant="indeterminate"
-            size={'30vw'}
-            thickness={4}
+            size={'400px'}
+            thickness={3}
             className={classes.circularProgress}
             disableShrink />
         </Box>
