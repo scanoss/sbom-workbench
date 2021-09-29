@@ -21,13 +21,15 @@ export class Dispatcher extends EventEmitter {
 
   #wfpFailed;
 
+  #continue;
+
   constructor(scannerCfg = new ScannerCfg()) {
     super();
     this.#scannerCfg = scannerCfg;
-    this.init();
+    this.#init();
   }
 
-  init() {
+  #init() {
     this.#pQueue = new PQueue({
       concurrency: this.#scannerCfg.CONCURRENCY_LIMIT,
       timeout: this.#scannerCfg.TIMEOUT,
@@ -42,6 +44,8 @@ export class Dispatcher extends EventEmitter {
 
     this.#status = DispatcherEvents.STATUS_RUNNING;
 
+    this.#continue = true;
+
     this.#wfpFailed = {};
 
   }
@@ -50,11 +54,20 @@ export class Dispatcher extends EventEmitter {
     this.#pQueue.removeAllListeners();
     this.#pQueue.clear();
     this.#pQueue.pause();
+
+    // this.#pQueue.on('idle', () => {
+    //   return new Promise((resolve) => {
+    //     this.init();
+    //     resolve();
+    //   });
+    // });
   }
 
   pause() {
     this.#pQueue.pause();
   }
+
+  isDone(){}
 
   resume() {
     this.#status = DispatcherEvents.STATUS_RUNNING;

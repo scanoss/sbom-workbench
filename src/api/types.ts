@@ -1,3 +1,28 @@
+export enum ScanState {
+  CREATED = 'CREATED',
+  READY_TO_SCAN = 'READY_TO_SCAN',
+  SCANNING = 'SCANNING',
+  SCANNED = 'SCANNED',
+}
+
+export enum ProjectState {
+  OPENED,
+  CLOSED,
+}
+
+export interface IProjectCfg {
+  DEFAULT_URL_API: string;
+  TOKEN: string;
+  SCAN_MODE: string;
+}
+
+export interface IWorkspaceCfg {
+  DEFAULT_URL_API: number;
+  AVAILABLE_URL_API: Array<string>;
+  TOKEN: string;
+  SCAN_MODE: string;
+}
+
 export interface Inventory {
   id?: number;
   compid: number;
@@ -43,19 +68,31 @@ export interface NewComponentDTO {
   purl: string;
   url: string;
 }
+
 export interface ItemInclude {
   path: string;
   recursive: boolean;
   action: boolean;
 }
 
-export interface Project {
+export interface IProject {
+  appVersion: string;
+  date: string;
+  name: string;
   work_root: string;
   scan_root: string;
-  default_licenses: string;
-  default_components: string;
-  appVersion: string;
+  scannerState: ScanState;
+  files: number;
+  api: string;
+  token: string;
+  uuid: string;
+
+
+  default_licenses?: string;
+  default_components?: string;
 }
+
+
 
 export interface Files {
   md5?: string;

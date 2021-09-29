@@ -7,6 +7,12 @@ export const scan = (path: string) => {
   ipcRenderer.send(IpcEvents.SCANNER_INIT_SCAN, { path });
 };
 
+export const resume = async (path: string) => {
+  const response = await projectService.resume(path);
+
+};
+
+
 export const open = async (path: string) => {
    const response = await projectService.load(path);
    return response;

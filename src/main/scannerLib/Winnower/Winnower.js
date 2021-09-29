@@ -226,6 +226,8 @@ function crc32c_hex(str) {
 export class Winnower extends EventEmitter {
   #scannerCfg;
 
+  #files;
+
   #fileList;
 
   #fileListIndex;
@@ -242,18 +244,22 @@ export class Winnower extends EventEmitter {
 
   #isRunning;
 
+  #waitingWorkerResponse;
+
   constructor(scannerCfg = new ScannerCfg()) {
     super();
     this.#scannerCfg = scannerCfg;
-    this.init();
+    this.#init();
   }
 
-  init() {
+  #init() {
     this.#wfp = '';
     this.#continue = true;
+    this.#waitingWorkerResponse = false;
     this.#worker = new Worker(stringWorker, { eval: true });
     this.#worker.on('message', async (scannableItem) => {
       await this.#storeResult(scannableItem.fingerprint);
+      this.#waitingWorkerResponse = false;
       await this.#nextStepMachine();
     });
   }
@@ -291,14 +297,8 @@ export class Winnower extends EventEmitter {
 
     if (this.#fileListIndex >= this.#fileList.length) return null;
 
-    let path = this.#fileList[this.#fileListIndex];
-    let scanMode = 'FULL_SCAN';
-
-    // Some items in this.#fileList could be an object cointaining the scanMode (FULL_SCAN or MD5_SCAN)
-    if (typeof this.#fileList[this.#fileListIndex] === 'object') {
-      path = this.#fileList[this.#fileListIndex].path;
-      scanMode = this.#fileList[this.#fileListIndex].scanMode;
-    }
+    const path = this.#fileList[this.#fileListIndex][0];
+    const scanMode = this.#fileList[this.#fileListIndex][1];
 
     const contentSource = path.replace(`${this.#scanRoot}`, '');
     const content = await fs.promises.readFile(path);
@@ -312,6 +312,7 @@ export class Winnower extends EventEmitter {
     if (!this.#continue) return;
     const scannableItem = await this.#getNextScannableItem();
     if (scannableItem) {
+      this.#waitingWorkerResponse = true;
       this.#worker.postMessage(scannableItem);
     } else {
       if (this.#wfp.length !== 0) {
@@ -323,8 +324,9 @@ export class Winnower extends EventEmitter {
     }
   }
 
-  async startWinnowing(fileList, scanRoot, tmpPath) {
-    this.#fileList = fileList;
+  async startWinnowing(files, scanRoot, tmpPath) {
+    this.#files = files;
+    this.#fileList = Object.entries(this.#files);
     this.#fileListIndex = 0;
     this.#scanRoot = scanRoot;
     this.#tmpPath = tmpPath;
@@ -333,21 +335,29 @@ export class Winnower extends EventEmitter {
     return this.#nextStepMachine();
   }
 
+  recoveryIndex() {
+    // Explore this.#tmpPath directory, open the last .wfp file
+    // Search in this .wfp for the last file winnowed
+    // Search in the #fileList the index corresponing to the last file winnowed
+    // and return the index
+    return this.#fileListIndex;
+  }
+
   pause() {
-    this.#continue = false;
+
   }
 
   resume() {
+    this.#fileListIndex = this.recoveryIndex();
     this.#continue = true;
     this.#nextStepMachine();
   }
-
 
   stop() {
     this.#continue = false;
     this.#worker.removeAllListeners();
     this.#worker.terminate();
-    this.init();
+    this.#init();
     //clean the .wfp files
   }
 

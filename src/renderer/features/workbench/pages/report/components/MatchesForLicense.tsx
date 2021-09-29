@@ -43,8 +43,16 @@ export default function MatchesForLicense({ data }) {
                     {row.name}
                   </div>
                 </TableCell>
-                <TableCell>{row.vendor}</TableCell>
-                <TableCell align="right">{row.version}</TableCell>
+                <TableCell>
+                <div className="break-word-table">
+                    {row.vendor}
+                  </div>
+                </TableCell>
+                <TableCell align="right">
+                  <div className="break-word-table">
+                    {row.version}
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

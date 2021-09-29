@@ -11,12 +11,17 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import DeleteIcon from '@material-ui/icons/Delete';
+import RestoreIcon from '@material-ui/icons/Restore';
+
+import { makeStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
 import { AppContext } from '../../context/AppProvider';
 import { workspaceService } from '../../../api/workspace-service';
 import { dialogController } from '../../dialog-controller';
 import { DialogContext, IDialogContext } from '../../context/DialogProvider';
 import { DIALOG_ACTIONS } from '../../context/types';
+import { IProject, ScanState } from '../../../api/types';
+
 
 const filter = (items, query) => {
   if (!items) return null;
@@ -59,8 +64,11 @@ const Workspace = () => {
   const cleanup = () => {};
 
   const onShowScan = (project) => {
-    setScanPath(project.work_root);
-    history.push('/workbench');
+    console.log(project);
+    if (isProjectFinished(project)) {
+      setScanPath({ path: project.work_root, action: 'none' });
+      history.push('/workbench');
+    }
   };
 
   const onNewProject = () => {
@@ -69,7 +77,7 @@ const Workspace = () => {
     });
 
     if (projectPath) {
-      setScanPath(projectPath);
+      setScanPath({ path: projectPath, action: 'scan'});
       history.push('/workspace/new');
     }
   };
@@ -86,10 +94,20 @@ const Workspace = () => {
     }
   };
 
+  const onRestoreHandler = async (path, e) => {
+    e.stopPropagation();
+    setScanPath({ path, action: 'resume' });
+    history.push('/workspace/new');
+  };
+
   useEffect(() => {
     init();
     return cleanup;
   }, []);
+
+  const isProjectFinished = (project: IProject): boolean => {
+    return project.scannerState === ScanState.SCANNED || !project.scannerState;
+  }
 
   return (
     <>
@@ -132,13 +150,31 @@ const Workspace = () => {
                 <TableBody>
                   {filterProjects.length !== 0 ? (
                     filterProjects.map((row) => (
-                      <TableRow hover key={row.name} onClick={() => onShowScan(row)}>
+                      <TableRow
+                        className={isProjectFinished(row) ? 'scanning-complete' : 'scanning-not-complete'}
+                        hover
+                        key={row.name}
+                        onClick={() => {
+                          onShowScan(row);
+                        }}
+                      >
                         <TableCell component="th" scope="row">
                           {row.name}
                         </TableCell>
                         <TableCell>{format(row.date)}</TableCell>
                         <TableCell>{row.files}</TableCell>
                         <TableCell className="row-actions">
+                        <div className="btn-actions">
+                          {!isProjectFinished(row) ? (
+
+                            <IconButton
+                              aria-label="restore"
+                              className="btn-restore"
+                              onClick={(event) => onRestoreHandler(row.work_root, event)}
+                            >
+                              <RestoreIcon fontSize="small" />
+                            </IconButton>
+                          ) : null}
                           <IconButton
                             aria-label="delete"
                             className="btn-delete"
@@ -146,6 +182,7 @@ const Workspace = () => {
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
+                        </div>
                         </TableCell>
                       </TableRow>
                     ))

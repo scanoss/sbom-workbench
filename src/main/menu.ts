@@ -1,5 +1,6 @@
-import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions, dialog, nativeImage } from 'electron';
+import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions } from 'electron';
 import path from 'path';
+import { IpcEvents } from '../ipc-events';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -58,6 +59,13 @@ export default class MenuBuilder {
       label: 'Scanoss',
       submenu: [
         {
+          label: '&Settings',
+          accelerator: 'Command+Alt+S',
+          click: () => {
+            this.mainWindow.webContents.send(IpcEvents.MENU_OPEN_SETTINGS);
+          },
+        },
+        {
           label: 'Quit',
           accelerator: 'Command+Q',
           click: () => {
@@ -68,17 +76,7 @@ export default class MenuBuilder {
     };
     const subMenuEdit: MenuItemConstructorOptions = {
       label: '&Edit',
-      submenu: [
-        /* {role: 'undo'},
-          {role: 'redo'},
-          {type: 'separator'}, */
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        /* {role: 'pasteandmatchstyle'},
-          {role: 'delete'},
-          {role: 'selectall'} */
-      ],
+      submenu: [{ role: 'cut' }, { role: 'copy' }, { role: 'paste' }],
     };
 
     const subMenuViewDev: MenuItemConstructorOptions = {
@@ -155,6 +153,13 @@ export default class MenuBuilder {
       {
         label: '&File',
         submenu: [
+          {
+            label: '&Settings',
+            accelerator: 'Ctrl+Alt+S',
+            click: () => {
+              this.mainWindow.webContents.send(IpcEvents.MENU_OPEN_SETTINGS);
+            },
+          },
           {
             label: '&Close',
             accelerator: 'Ctrl+W',

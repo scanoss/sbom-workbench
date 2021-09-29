@@ -1,16 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { EventEmitter } from 'events';
-import * as os from 'os';
 import fs from 'fs';
-import { ipcMain } from 'electron';
-import { Inventory, Project } from '../../api/types';
-import { app } from 'electron';
-// import * as fs from 'fs';
-// import * as Filtering from './filtering';
-// import { eventNames } from 'process';
-/* const aFilter=require('./salida')
- const blist =require('./salida') */
-// import * as Emmiter from 'events';
+import { Component, Inventory, IProjectCfg, ProjectState, ScanState } from '../../api/types';
 
 import * as Filtering from './filtering';
 import { ScanDb } from '../db/scan_db';
@@ -20,20 +11,12 @@ import { ScannerEvents } from '../scannerLib/ScannerEvents';
 import { ScannerCfg } from '../scannerLib/ScannerCfg';
 import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
-import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
-import { isPseudoBinary } from './isPseudoBinary';
+import { isBinaryFileSync } from 'isbinaryfile';
+import { Metadata } from './Metadata';
 
 const path = require('path');
 
-const cont = 0;
-
-let defaultProject: ProjectTree;
-
-export { defaultProject };
-
-
-
-export class ProjectTree extends EventEmitter {
+export class Project extends EventEmitter {
   work_root: string;
 
   scan_root: string;
@@ -58,262 +41,225 @@ export class ProjectTree extends EventEmitter {
 
   filesIndexed = 0;
 
-  filesToScan: [];
+  filesToScan: {};
+
+  metadata: Metadata;
+
+  state: ProjectState;
+
+  config: IProjectCfg;
 
   constructor(name: string) {
     super();
-    this.work_root = '';
-    this.scan_root = '';
-    this.project_name = name;
-    this.banned_list = new Filtering.BannedList('NoFilter');
-    // forces a singleton instance, will be killed in a multiproject domain
-    defaultProject = this;
-
+    this.metadata = new Metadata(name);
+    this.state = ProjectState.CLOSED;
   }
 
-  set_scan_root(root: string) {
-    this.scan_root = root;
+  public static async readFromPath(pathToProject: string): Promise<Project> {
+    const mt: Metadata = await Metadata.readFromPath(pathToProject);
+    const p: Project = new Project(mt.getName());
+    p.setState(ProjectState.CLOSED);
+    p.setMetadata(mt);
+    return p;
   }
 
-  set_project_name(name: string) {
-    this.project_name = name;
-  }
-
-  set_work_root(root: string) {
-    this.work_root = root;
-  }
-
-  getScanRoot(): string {
-    return this.scan_root;
-  }
-
-  getWorkRoot(): string {
-    return this.work_root;
-  }
-
-  build_tree() {
-    this.logical_tree = dirTree(this.scan_root, this.scan_root);
-    this.emit('treeBuilt', this.logical_tree);
-  }
-
-  async loadScanProject(rootOfProject: string) {
-    const file = fs.readFileSync(`${rootOfProject}/tree.json`, 'utf8');
-    const a = JSON.parse(file);
+  public async open(): Promise<boolean> {
+    if (this.state === ProjectState.OPENED) return false;
+    this.state = ProjectState.OPENED;
+    const project = await fs.promises.readFile(`${this.metadata.getMyPath()}/tree.json`, 'utf8');
+    const a = JSON.parse(project);
     this.logical_tree = a.logical_tree;
-    this.work_root = a.work_root;
     this.results = a.results;
-    this.scan_root = a.scan_root;
-    this.project_name = a.project_name;
+    this.filesToScan = a.filesToScan;
+    this.processedFiles = a.processedFiles;
     this.filesSummary = a.filesSummary;
-    this.scans_db = new ScanDb(rootOfProject);
-    this.banned_list = new Filtering.BannedList('NoFilter');
-    this.banned_list.load(`${this.work_root}/filter.json`);
+    this.scans_db = new ScanDb(this.metadata.getMyPath());
     await this.scans_db.init();
-    this.scanner = new Scanner();
 
+    const projectCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/projectCfg.json`, 'utf8');
+    this.config = JSON.parse(projectCfg) as IProjectCfg;
+
+    return true;
   }
 
-
-
-  saveScanProject() {
-    const file = fs.writeFileSync(`${this.work_root}/tree.json`, JSON.stringify(this).toString());
-
-    // Save metadata
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
-    const metadata = {
-      id: 'NULL',
-      appVersion: app.getVersion(),
-      name: self.scan_root.split('/').pop(), // Get the folder name
-      work_root: self.work_root,
-      scan_root: self.scan_root,
-      files: self.filesSummary.include,
-      date: new Date().toISOString(),
-    };
-
-    fs.writeFileSync(`${this.work_root}/metadata.json`, JSON.stringify(metadata).toString());
+  public async close() {
+    console.log( `[ PROJECT ]: Closing project ${this.metadata.getMyPath()}`);
+    this.state = ProjectState.CLOSED;
+    await this.scanner.stop();
+    this.scanner.removeAllListeners();
+    this.scanner = null;
+    this.logical_tree = null;
+    this.scans_db = null;
+    this.filesToScan = null;
+    this.results = null;
+    this.config = null;
   }
 
-  createScanProject(scanPath: string) {
-    const p: Project = {
-      work_root: `${getUserHome()}/scanoss-workspace/${path.basename(scanPath)}`,
-      scan_root: scanPath,
-      default_components: '',
-      default_licenses: '',
-    };
-    this.set_work_root(p.work_root);
-    this.set_scan_root(p.scan_root);
-    this.set_project_name(`${path.basename(scanPath)}`);
-    if (!fs.existsSync(`${getUserHome()}/scanoss-workspace`)) {
-      fs.mkdirSync(`${getUserHome()}/scanoss-workspace/`);
-    }
-    if (!fs.existsSync(p.work_root)) {
-      fs.mkdirSync(p.work_root);
-    } else {
-      //  this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, { reason: 'projectExists', severity: 'warning' });
-      // this.cleanProject();
-    }
+  public save(): void {
+    this.metadata.save();
+    fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this).toString());
+    fs.writeFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, JSON.stringify(this.config, null, 2));
+  }
 
-    if (!fs.existsSync(`${this.work_root}/filter.json`)) {
-      console.log('No banned list defined. Setting default list.');
-       fs.writeFileSync(`${this.work_root}/filter.json`, JSON.stringify(defaultBannedList).toString());
-    } else console.log('Filters were already defined');
-    this.banned_list.load(`${this.work_root}/filter.json`);
+  public async startScanner() {
+    this.state = ProjectState.OPENED;
+    const myPath = this.metadata.getMyPath();
+    this.project_name = this.metadata.getName(); // To keep compatibility
+    this.banned_list = new Filtering.BannedList('NoFilter');
+    this.cleanProject();
+    if (!fs.existsSync(`${myPath}/filter.json`))
+      fs.writeFileSync(`${myPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
+    this.banned_list.load(`${myPath}/filter.json`);
+    this.scans_db = new ScanDb(myPath);
+    await this.scans_db.init();
+    await this.scans_db.licenses.importFromJSON(licenses);
+    this.build_tree();
+    this.indexScan(this.metadata.getScanRoot(), this.logical_tree, this.banned_list);
+    const summary = { total: 0, include: 0, filter: 0, files: {} };
+    this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
+    console.log(`[ FILTERS ]: Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`);
+    this.filesToScan = summary.files;
+    this.metadata.setScannerState(ScanState.READY_TO_SCAN);
+    this.metadata.setFileCounter(summary.include);
+    this.metadata.save();
+    this.initializeScanner();
+    this.scanner.cleanWorkDirectory();
+    this.startScan();
+  }
 
-    this.scans_db = new ScanDb(p.work_root);
-
-    const projectCfg = JSON.parse(fs.readFileSync(`${this.work_root}/projectCfg.json`,'utf8'));
-    const scannerCfg: ScannerCfg = new ScannerCfg();
-    scannerCfg.API_URL = projectCfg.DEFAULT_URL_API;
-
-    this.scanner = new Scanner(scannerCfg);
-
-    this.scanner.setWorkDirectory(p.work_root);
-
-    this.setScannerListeners();
+  public async resumeScanner() {
+    if (this.metadata.getState() !== ScanState.SCANNING) return false;
+    await this.open();
+    this.initializeScanner();
+    console.log(`[ PROJECT ]: Removing temporary files from previous scan`);
+    this.scanner.cleanTmpDirectory();
+    console.log(`[ PROJECT ]: Resuming scanner, pending ${Object.keys(this.filesToScan).length} files`)
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: 'scanning',
+      processed: (100 * this.processedFiles) / this.filesSummary.include,
+    });
+    this.startScan();
   }
 
   cleanProject() {
-    console.log(`${this.work_root}/tree.json`);
-    if (fs.existsSync(`${this.work_root}/results.json`)) fs.unlinkSync(`${this.work_root}/results.json`);
-    if (fs.existsSync(`${this.work_root}/scan_db`)) fs.unlinkSync(`${this.work_root}/scan_db`);
-    if (fs.existsSync(`${this.work_root}/tree.json`)) fs.unlinkSync(`${this.work_root}/tree.json`);
-    this.scanner.cleanWorkDirectory();
+    if (fs.existsSync(`${this.metadata.getMyPath()}/results.json`)) fs.unlinkSync(`${this.metadata.getMyPath()}/results.json`);
+    if (fs.existsSync(`${this.metadata.getMyPath()}/scan_db`)) fs.unlinkSync(`${this.metadata.getMyPath()}/scan_db`);
+    if (fs.existsSync(`${this.metadata.getMyPath()}/tree.json`)) fs.unlinkSync(`${this.metadata.getMyPath()}/tree.json`);
   }
 
-  // Return fileList
+  initializeScanner() {
+    const scannerCfg: ScannerCfg = new ScannerCfg();
+    scannerCfg.API_URL = this.config.DEFAULT_URL_API;
+    this.scanner = new Scanner(scannerCfg);
+    this.scanner.setWorkDirectory(this.metadata.getMyPath());
+    this.setScannerListeners();
+  }
+
   setScannerListeners() {
-    this.scanner.on(ScannerEvents.WINNOWING_STARTING, () => console.log('Starting Winnowing...'));
-    this.scanner.on(ScannerEvents.WINNOWING_NEW_WFP_FILE, (dir) => console.log(`New WFP File on: ${dir}`));
-    this.scanner.on(ScannerEvents.WINNOWING_FINISHED, () => console.log('Winnowing Finished...'));
-    this.scanner.on(ScannerEvents.DISPATCHER_WFP_SENDED, (dir) => console.log(`Sending WFP file ${dir} to server`));
-
+    this.scanner.on(ScannerEvents.WINNOWING_STARTING, () => console.log('[ SCANNER ]: Starting Winnowing...'));
+    this.scanner.on(ScannerEvents.WINNOWING_NEW_WFP_FILE, (dir) => console.log(`[ SCANNER ]: New WFP File`));
+    this.scanner.on(ScannerEvents.WINNOWING_FINISHED, () => console.log('[ SCANNER ]: Winnowing Finished...'));
+    this.scanner.on(ScannerEvents.DISPATCHER_WFP_SENDED, (dir) => console.log(`[ SCANNER ]: Sending WFP file ${dir} to server`));
     this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (data, dispatcherResponse) => {
-
-      const filesScanned = dispatcherResponse.getFilesScanned();
+      const filesScanned: Array<any> = dispatcherResponse.getFilesScanned();
       this.processedFiles += filesScanned.length;
-      console.log(`New ${filesScanned.length} files scanned`);
+      console.log(`[ SCANNER ]: New ${filesScanned.length} files scanned`);
+      // eslint-disable-next-line no-restricted-syntax
+      for (const file of filesScanned) delete this.filesToScan[`${this.metadata.getScanRoot()}${file}`];
+      this.attachComponent(data);
+      this.save();
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
-        // processed: this.filesSummary.include,
         processed: (100 * this.processedFiles) / this.filesSummary.include,
       });
-
-      this.attachComponent(data);
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
-      console.log(`Scan Finished... Results on: ${resPath}`);
-
-      const succesRes = await this.scans_db.results.insertFromFile(resPath);
-      if (succesRes) await this.scans_db.components.importUniqueFromFile();
-
-      const a = fs.readFileSync(`${resPath}`, 'utf8');
-      this.results = JSON.parse(a);
-
-      this.saveScanProject();
-
+      console.log(`[ SCANNER ]: Scan Finished... Results on: ${resPath}`);
+      await this.scans_db.results.insertFromFile(resPath);
+      await this.scans_db.components.importUniqueFromFile();
+      this.results = JSON.parse(fs.readFileSync(`${resPath}`, 'utf8'));
+      this.metadata.setScannerState(ScanState.SCANNED);
+      this.save();
+      await this.close();
       this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
         success: true,
-        resultsPath: this.work_root,
+        resultsPath: this.metadata.getMyPath(),
       });
     });
 
-    this.scanner.on('error', (error) => {
+    this.scanner.on('error', async (error) => {
+      this.save();
+      await this.close();
       this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
-
-    ipcMain.on(IpcEvents.SCANNER_RESUME, async (event, arg: IInitScan) => {
-      this.resumeScanner();
-    });
-
-  }
-
-  resumeScanner() {
-
-    const timeout = 15; //En segs.
-    let tickCounter = 0;
-
-    const timerID = setInterval(() => {
-
-      console.log(`Resuming scanner in ${timeout - tickCounter} secs...`);
-      tickCounter += 1;
-
-      if(tickCounter >= timeout) {
-           this.scanner.resume();
-           clearInterval(timerID);
-      }
-
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'resuming',
-      // processed: this.filesSummary.include,
-      processed: (100 * tickCounter) / timeout,
-    });
-
-
-
-    }, 1000);
-
-
-
   }
 
   startScan() {
-    console.log(`SCANNER: Start scanning path=${this.scan_root}`);
-
+    console.log(`[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`);
+    this.metadata.setScannerState(ScanState.SCANNING);
+    this.save();
     // eslint-disable-next-line prettier/prettier
-    this.scanner.scanList(this.filesToScan, this.scan_root);
+    this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
   }
 
   setMailbox(mailbox: Electron.WebContents) {
     this.msgToUI = mailbox;
   }
 
-  stopScan() {}
+  public setState(state: ProjectState) {
+    this.state = state;
+  }
 
-  async prepare_scan() {
-    let success;
-    this.cleanProject();
-    const created = await this.scans_db.init();
-    if (created) {
-      console.log('Inserting licenses...');
-      success = await this.scans_db.licenses.importFromJSON(licenses);
-    }
+  public getState() {
+    return this.state;
+  }
 
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'preparing',
-      processed: 30,
-    });
-    // const i = 0;
-    this.build_tree();
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'preparing',
-      processed: 60,
-    });
-    // apply filters.
-    // this.banned_list.loadDefault();
-    // this.banned_list.save(`${this.work_root}/filter.json`);
+  public setMetadata(mt: Metadata) {
+    this.metadata = mt;
+  }
 
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'preparing',
-      processed: 100,
-    });
+  public setScanPath(name: string) {
+    this.metadata.setScanRoot(name);
+  }
 
-    this.indexScan(this.scan_root, this.logical_tree, this.banned_list);
+  public setMyPath(myPath: string) {
+    this.metadata.setMyPath(myPath);
+    this.metadata.save();
+  }
 
-    const summary = { total: 0, include: 0, filter: 0, files: [] };
-    this.filesSummary = summarizeTree(this.scan_root, this.logical_tree, summary);
-    console.log(
-      `Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`
-    );
-    this.filesToScan = summary.files;
-    //console.log(this.filesToScan);
+  public setConfig(cfg: IProjectCfg){
+    this.config = cfg;
+  }
 
-    if (success) {
-      console.log('licenses inserted successfully...');
-      return true;
-    }
-    return false;
+  public getMyPath() {
+    return this.metadata.getMyPath();
+  }
+
+  public getProjectName() {
+    return this.metadata.getName();
+  }
+
+  public getUUID(): string {
+    return this.metadata.getUUID();
+  }
+
+  public getDto() {
+    return this.metadata.getDto();
+  }
+
+  getScanRoot(): string {
+    return this.metadata.getScanRoot();
+  }
+
+  public getResults() {
+    return this.results;
+  }
+
+  build_tree() {
+    const scanPath = this.metadata.getScanRoot();
+    this.logical_tree = dirTree(scanPath, scanPath);
+    this.emit('treeBuilt', this.logical_tree);
   }
 
   getLogicalTree() {
@@ -417,13 +363,41 @@ export class ProjectTree extends EventEmitter {
   }
 
   scanMode(filePath: string) {
-    if (isPseudoBinary(filePath)) return 'MD5_SCAN';
+    // eslint-disable-next-line prettier/prettier
+    const skipExtentions = new Set ([".exe", ".zip", ".tar", ".tgz", ".gz", ".rar", ".jar", ".war", ".ear", ".class", ".pyc", ".o", ".a", ".so", ".obj", ".dll", ".lib", ".out", ".app", ".doc", ".docx", ".xls", ".xlsx", ".ppt" ]);
+    const skipStartWith = ["{","[","<?xml","<html","<ac3d","<!doc"];
+    const MIN_FILE_SIZE = 256;
+
+    // Filter by extension
+    const ext = path.extname(filePath);
+    if (skipExtentions.has(ext)) {
+      return 'MD5_SCAN';
+    }
+
+    // Filter by min size
+    const fileSize = fs.statSync(filePath).size;
+    if (fileSize < MIN_FILE_SIZE) {
+      return 'MD5_SCAN';
+    }
+
+    // if start with pattern
+    const file = fs.readFileSync(filePath, 'utf8');
+    for (const skip of skipStartWith) {
+      if (file.startsWith(skip)) {
+        return 'MD5_SCAN';
+      }
+    }
+
+    // if binary
+    if (isBinaryFileSync(filePath)) {
+      return 'MD5_SCAN';
+    }
+
     return 'FULL_SCAN';
   }
 
   indexScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
     let i = 0;
-
     if (jsonScan.type === 'file') {
       this.filesIndexed += 1;
       if (this.filesIndexed % 100 === 0)
@@ -468,7 +442,7 @@ function summarizeTree(root: any, tree: any, summary: any) {
       tree.className = 'filter-item';
     } else if (tree.include === true) {
       summary.include += 1;
-      summary.files.push({ path: `${root}${tree.value}`, scanMode: tree.scanMode });
+      summary.files[`${root}${tree.value}`] = tree.scanMode;
     } else {
       tree.className = 'exclude-item';
     }
@@ -638,9 +612,4 @@ function dirTree(root: string, filename: string) {
     };
   }
   return info;
-}
-
-function getUserHome() {
-  // Return the value using process.env
-  return os.homedir(); // process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 }
