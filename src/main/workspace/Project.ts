@@ -83,7 +83,8 @@ export class Project extends EventEmitter {
   }
 
   public async close() {
-    console.log( `[ PROJECT ]: Closing project ${this.metadata.getMyPath()}`);
+    await this.save();
+    console.log( `[ PROJECT ]: Closing project ${this.metadata.getName()}`);
     this.state = ProjectState.CLOSED;
     await this.scanner.stop();
     this.scanner.removeAllListeners();
@@ -99,6 +100,7 @@ export class Project extends EventEmitter {
     this.metadata.save();
     fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this).toString());
     fs.writeFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, JSON.stringify(this.config, null, 2));
+    console.log(`[ PROJECT ]: Project saved`);
   }
 
   public async startScanner() {
@@ -156,31 +158,27 @@ export class Project extends EventEmitter {
   }
 
   setScannerListeners() {
-    this.scanner.on(ScannerEvents.WINNOWING_STARTING, () => console.log('[ SCANNER ]: Starting Winnowing...'));
-    this.scanner.on(ScannerEvents.WINNOWING_NEW_WFP_FILE, (dir) => console.log(`[ SCANNER ]: New WFP File`));
-    this.scanner.on(ScannerEvents.WINNOWING_FINISHED, () => console.log('[ SCANNER ]: Winnowing Finished...'));
-    this.scanner.on(ScannerEvents.DISPATCHER_WFP_SENDED, (dir) => console.log(`[ SCANNER ]: Sending WFP file ${dir} to server`));
-    this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (data, dispatcherResponse) => {
-      const filesScanned: Array<any> = dispatcherResponse.getFilesScanned();
-      this.processedFiles += filesScanned.length;
-      console.log(`[ SCANNER ]: New ${filesScanned.length} files scanned`);
+    this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (response) => {
+      this.processedFiles += response.getNumberOfFilesScanned();
+      const filesScanned = response.getFilesScanned();
       // eslint-disable-next-line no-restricted-syntax
       for (const file of filesScanned) delete this.filesToScan[`${this.metadata.getScanRoot()}${file}`];
-      this.attachComponent(data);
-      this.save();
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
         processed: (100 * this.processedFiles) / this.filesSummary.include,
       });
     });
 
+    this.scanner.on(ScannerEvents.RESULTS_APPENDED, async (response) => {
+      this.attachComponent(response.getServerResponse());
+      this.save();
+    });
+
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
-      console.log(`[ SCANNER ]: Scan Finished... Results on: ${resPath}`);
       await this.scans_db.results.insertFromFile(resPath);
       await this.scans_db.components.importUniqueFromFile();
-      this.results = JSON.parse(fs.readFileSync(`${resPath}`, 'utf8'));
+      this.results = JSON.parse(await fs.promises.readFile(`${resPath}`, 'utf8'));
       this.metadata.setScannerState(ScanState.SCANNED);
-      this.save();
       await this.close();
       this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
         success: true,
@@ -197,6 +195,10 @@ export class Project extends EventEmitter {
 
   startScan() {
     console.log(`[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`);
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: 'scanning',
+      processed: (100 * this.processedFiles) / this.filesSummary.include,
+    });
     this.metadata.setScannerState(ScanState.SCANNING);
     this.save();
     // eslint-disable-next-line prettier/prettier

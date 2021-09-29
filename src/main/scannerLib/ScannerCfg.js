@@ -15,4 +15,7 @@ export class ScannerCfg {
 
   // The maximum size for each .wfp file
   WFP_FILE_MAX_SIZE = 64 * 1000;
+
+  // After reach x number of server responses persist files and emit event
+  MAX_RESPONSES_IN_BUFFER = 50;
 }

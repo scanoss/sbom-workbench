@@ -14,7 +14,8 @@ parentPort.on('message', async (scannableItem) => {
   if ( scannableItem.scanMode === "FULL_SCAN") {
     fingerprint = wfp_for_content(
       scannableItem.content,
-      scannableItem.contentSource
+      scannableItem.contentSource,
+      scannableItem.maxSizeWfp
     );
   } else {
     fingerprint = wfp_only_md5(
@@ -70,9 +71,9 @@ function min_hex_array(array) {
   return min;
 }
 
-function wfp_for_content(contents, contentSource) {
-  let wfp = wfp_only_md5(contents, contentSource);
-  wfp += calc_wfp(contents);
+function wfp_for_content(content, contentSource, maxSize) {
+  let wfp = wfp_only_md5(content, contentSource);
+  wfp += calc_wfp(content, maxSize);
   return wfp;
 }
 
@@ -82,7 +83,7 @@ function wfp_only_md5(contents, contentSource) {
   return wfp;
 }
 
-function calc_wfp(contents) {
+function calc_wfp(contents, maxSize) {
   let gram = '';
   const window = [];
   let normalized = 0;
@@ -95,6 +96,9 @@ function calc_wfp(contents) {
   let wfp = '';
 
   for (let i = 0; i < contents.length; i++) {
+    if(wfp.length > maxSize)
+      return wfp;
+
     const byte = contents[i];
     if (byte == ASCII_LF) {
       line += 1;
@@ -304,7 +308,7 @@ export class Winnower extends EventEmitter {
     const content = await fs.promises.readFile(path);
 
     this.#fileListIndex += 1;
-    const scannable = new ScannableItem(contentSource, content, scanMode);
+    const scannable = new ScannableItem(content, contentSource, scanMode, this.#scannerCfg.WFP_FILE_MAX_SIZE);
     return scannable;
   }
 

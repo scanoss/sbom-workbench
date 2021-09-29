@@ -90,6 +90,32 @@ export class Dispatcher extends EventEmitter {
   }
 
   #errorHandler(error) {
+
+    // a) El server cierra el socket 'ECONNRESET' Seguir reintentando n veces
+    // b) Hay timeout en el .wfp 'TIMEOUT'  Tendria que reintentar x veces ese especifico wfp
+    // c) Error en el parser error directo
+    // d) Error en la coneccion internet error directo
+    // e) Couta terminada error directo
+    // f) Cliente desactualizado error directo
+
+    // switch(error.code) {
+    //   case 'ECONNRESET': // Server closes the socket.
+    //     break;
+
+    //   default:
+
+    // }
+
+
+    // if (error.code === 'ECONNRESET')
+    //   // Se agrega al final de la cola y que no se alla mandado mas de x veces
+    // if (error.code === 'PARSER-ERROR')
+    //   this.emit('error', error);
+
+    // if ( this.#wfpFailed[error.wfpFailedPath] > 3 ) {
+    //   this.emit('error', error);
+    // }
+
     this.emit('error', error);
   }
 
@@ -97,7 +123,7 @@ export class Dispatcher extends EventEmitter {
     try {
       let dataAsText = '';
       let dataAsObj = {};
-      const wfpContent = fs.readFileSync(wfpFilePath);
+      const wfpContent = await fs.promises.readFile(wfpFilePath);
       const form = new FormData();
       form.append('filename', Buffer.from(wfpContent), 'data.wfp');
 
@@ -120,7 +146,7 @@ export class Dispatcher extends EventEmitter {
 
       dataAsText = await response.text();
       dataAsObj = JSON.parse(dataAsText);
-      const dispatcherResponse = new DispatcherResponse(dataAsObj, wfpFilePath);
+      const dispatcherResponse = new DispatcherResponse(dataAsObj, wfpContent.toString(), wfpFilePath);
       this.emit(ScannerEvents.DISPATCHER_NEW_DATA, dispatcherResponse);
       return await Promise.resolve();
     } catch (error) {

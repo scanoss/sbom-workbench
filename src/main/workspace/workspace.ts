@@ -145,7 +145,7 @@ class Workspace extends EventEmitter {
   }
 
   public closeAllProjects() {
-    console.log(`[ WORKSPACE ]: Closing opened projects`);
+    console.log(`[ WORKSPACE ]: Closing all opened projects`);
     // eslint-disable-next-line no-restricted-syntax
     for (const p of this.projectList) if (p.getState() === ProjectState.OPENED) p.close();
   }
