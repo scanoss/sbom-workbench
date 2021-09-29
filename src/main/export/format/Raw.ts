@@ -3,6 +3,11 @@ import { Format } from '../Format';
 
 export class Raw extends Format {
 
+  constructor(){
+    super();
+    this.extension = '.json';
+  }
+
  // @override   
   public async generate() {
     const data = this.export.getRawData();

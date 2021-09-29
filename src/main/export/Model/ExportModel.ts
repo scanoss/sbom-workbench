@@ -9,7 +9,7 @@ import { defaultProject } from '../../workspace/ProjectTree';
 export class ExportModel {
   private db: sqlite3;
 
-  private query;
+  private query: Querys;
 
   constructor() {
     this.db = new sqlite3.Database(`${defaultProject.work_root}/scan_db`, sqlite3.OPEN_READWRITE);

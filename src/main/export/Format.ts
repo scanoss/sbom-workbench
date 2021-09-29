@@ -4,7 +4,7 @@ import { ExportModel } from './Model/ExportModel';
 export abstract class Format {
   protected export: ExportModel;
 
-  private extension;
+  protected extension: string;
 
   constructor() {
     this.export = new ExportModel();
@@ -14,18 +14,10 @@ export abstract class Format {
 
   public async save(path: string) {
     const file = await this.generate();
-    return new Promise<boolean>((resolve, reject) => {
-      try {
-        fs.writeFile(`${path}.${this.extension}`, file, () => {
-          resolve(true);
-        });
-      } catch (error) {
-        reject(new Error('Unable to generate spdx file'));
-      }
-    });
-  }
-
-  public setExtension(extension: string) {
-    this.extension = extension;
+    try {
+      return await fs.promises.writeFile(`${path}${this.extension}`, file);
+    } catch (error) {
+      return error;
+    }
   }
 }

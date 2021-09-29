@@ -183,7 +183,10 @@ const Export = ({ state }) => {
           CSV
         </MenuItem>
         <MenuItem disabled={state.progress === 0} onClick={() => onExport(FormatVersion.SPDX20)}>
-          SPDX
+          SPDX 2.0
+        </MenuItem>
+        <MenuItem disabled={state.progress === 0} onClick={() => onExport(FormatVersion.SPDXLITE)}>
+          SPDX Lite
         </MenuItem>
         <MenuItem onClick={() => onExport(FormatVersion.WFP)}>WFP</MenuItem>
         <MenuItem onClick={() => onExport(FormatVersion.RAW)}>RAW</MenuItem>

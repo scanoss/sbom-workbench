@@ -2,6 +2,13 @@ import { utilDb } from '../../db/utils_db';
 import { Format } from '../Format';
 
 export class Spdxv20 extends Format {
+
+
+  constructor(){
+    super();
+    this.extension = '.SPDXV2.0.spdx';
+  }
+
   // @override
   public async generate() {
     const data = await this.export.getSpdxData();

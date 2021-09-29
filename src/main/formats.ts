@@ -11,17 +11,17 @@ const pathLib = require('path');
 
 const crypto = require('crypto');
 
-ipcMain.handle(IpcEvents.EXPORT, async (event, path: string, ext: FormatVersion) => {
+ipcMain.handle(IpcEvents.EXPORT, async (event, path: string, format: FormatVersion) => {
   let success: boolean;
   try {
     let auxPath = path;
-    if (ext === FormatVersion.CSV || ext === FormatVersion.SPDX20 || ext === FormatVersion.SPDXLITE) {
+    if (format === FormatVersion.CSV || format === FormatVersion.SPDX20 || format === FormatVersion.SPDXLITE) {
       const data: any = await reportService.getReportSummary();
       const complete = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles) < 100;
       auxPath = complete ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;
     }
 
-    Export.setFormat(ext);
+    Export.setFormat(format);
     success = await Export.save(auxPath);
     if (success) {
       return { status: 'ok', message: 'File successfully', data: success };

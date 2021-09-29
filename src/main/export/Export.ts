@@ -11,25 +11,15 @@ import { Raw } from './format/Raw';
 import { Wfp } from './format/Wfp';
 import { FormatVersion } from '../../api/types';
 
-enum Extensions {
-  SPDX = 'spdx',
-  CSV = 'csv',
-  RAW = 'json',
-  WFP = 'wfp',
-}
-
 export class Export {
   private static format: Format;
 
   public static async save(path: string) {
-    return new Promise<boolean>(async (resolve, reject) => {
-      try {
-        await Export.format.save(path);
-        resolve(true);
-      } catch (error) {
-        reject(new Error('Unable to generate spdx file'));
-      }
-    });
+    try {
+      return await Export.format.save(path);
+    } catch (error) {
+      return error;
+    }
   }
 
   public static async generate() {
@@ -44,24 +34,20 @@ export class Export {
   public static setFormat(format: string) {
     switch (format as FormatVersion) {
       case FormatVersion.SPDX20:
-        this.format = new Spdxv20();
-        this.format.setExtension(Extensions.SPDX);
+        Export.format = new Spdxv20();
         break;
       case FormatVersion.SPDXLITE:
-        this.format = new SpdxLite();
-        this.format.setExtension(Extensions.SPDX);
+        Export.format = new SpdxLite();
         break;
       case FormatVersion.CSV:
-        this.format = new Csv();
-        this.format.setExtension(Extensions.CSV);
+        Export.format = new Csv();
         break;
       case FormatVersion.RAW:
-        this.format = new Raw();
-        this.format.setExtension(Extensions.RAW);
+        Export.format = new Raw();
+
         break;
       case FormatVersion.WFP:
-        this.format = new Wfp();
-        this.format.setExtension(Extensions.WFP);
+        Export.format = new Wfp();
         break;
 
       default:
