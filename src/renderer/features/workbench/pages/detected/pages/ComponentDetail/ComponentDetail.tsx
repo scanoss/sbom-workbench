@@ -26,16 +26,17 @@ import { inventoryService } from '../../../../../../../api/inventory-service';
 import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import { mapFiles } from '../../../../../../../utils/scan-util';
+import { setVersion } from '../../../../actions';
 
 export const ComponentDetail = () => {
   const history = useHistory();
 
-  const { state, detachFile, createInventory, ignoreFile, restoreFile, attachFile } = useContext(
+  const { state, dispatch, detachFile, createInventory, ignoreFile, restoreFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { name, component } = state;
+  const { name, component, version } = state;
 
   const [files, setFiles] = useState<any[]>([]);
   const [filterFiles, setFilterFiles] = useState<{ pending: any[]; identified: any[]; ignored: any[] }>({
@@ -46,7 +47,6 @@ export const ComponentDetail = () => {
 
   const [inventories, setInventories] = useState<Inventory[]>([]);
   const [versions, setVersions] = useState<any[]>(null);
-  const [version, setVersion] = useState<string>(null);
 
   const anchorRef = useRef<HTMLDivElement>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -169,32 +169,15 @@ export const ComponentDetail = () => {
   };
 
   const create = async (defaultInventory, selFiles) => {
-    // const showSelector = inventories.length > 0;
-    const showSelector = false; // TO DO UNTIL VALIDATE
-    let action = DIALOG_ACTIONS.NEW;
-    let inventory;
+    const inventory = await dialogCtrl.openInventory(defaultInventory);
+    if (!inventory) return;
 
-    if (showSelector) {
-      const response = await dialogCtrl.openInventorySelector(inventories);
-      action = response.action;
-      inventory = response.inventory;
-    }
+    const newInventory = await createInventory({
+      ...inventory,
+      files: selFiles,
+    });
 
-    if (action === DIALOG_ACTIONS.CANCEL) return;
-
-    if (action === DIALOG_ACTIONS.NEW) {
-      inventory = await dialogCtrl.openInventory(defaultInventory);
-      if (!inventory) return;
-
-      const newInventory = await createInventory({
-        ...inventory,
-        files: selFiles,
-      });
-      setInventories((previous) => [...previous, newInventory]);
-    } else if (action === DIALOG_ACTIONS.OK) {
-      await attachFile(inventory.id, selFiles);
-    }
-
+    setInventories((previous) => [...previous, newInventory]);
     getFiles();
     setTab(1);
   };
@@ -204,7 +187,8 @@ export const ComponentDetail = () => {
   };
 
   const handleVersionSelected = (version: string) => {
-    setVersion(version);
+    //setVersion(version);
+    dispatch(setVersion(version));
     setAnchorEl(null);
   };
 

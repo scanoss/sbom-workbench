@@ -2,8 +2,9 @@ import {
   LOAD_SCAN_FAIL,
   LOAD_SCAN_SUCCESS,
   RESET,
-  SET_COMPONENT,
   SET_COMPONENTS,
+  SET_COMPONENT,
+  SET_VERSION,
   SET_FILE,
   SET_PROGRESS,
   SET_REPORT,
@@ -18,6 +19,7 @@ export interface State {
   file: string | null;
   components: ComponentGroup[];
   component: ComponentGroup;
+  version: string;
   report: 'detected' | 'identified';
 }
 
@@ -29,6 +31,7 @@ export const initialState: State = {
   file: null,
   components: null,
   component: null,
+  version: null,
   report: 'detected',
 };
 
@@ -73,7 +76,15 @@ export default function reducer(state: State = initialState, action): State {
       return {
         ...state,
         component,
+        version: null,
       };
+    }
+    case SET_VERSION: {
+      const { version } = action;
+      return {
+        ...state,
+        version,
+      }
     }
     case SET_FILE: {
       const { file } = action;
