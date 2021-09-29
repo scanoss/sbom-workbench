@@ -95,6 +95,7 @@ const useStyles = makeStyles({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'column',
+    marginTop: '50px',
   },
   number: {
     fontSize: '4em',
@@ -111,7 +112,7 @@ const useStyles = makeStyles({
     zIndex: 5,
   },
   pauseContainer: {
-    marginTop: '5px',
+    marginTop: '20px',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

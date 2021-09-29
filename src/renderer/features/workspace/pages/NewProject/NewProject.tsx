@@ -96,7 +96,7 @@ const NewProject = () => {
 
   const handlerScannerFinish = (_event, args) => {
     if (args.success) {
-      onShowScan(args.resultsPath);
+      // onShowScan(args.resultsPath);
     } else {
       // showError();
     }
