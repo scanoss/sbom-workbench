@@ -46,10 +46,10 @@ export default class App {
   }
 
   setupAppMenuListeners() {
-    /* ipcRenderer.on(IpcEvents.MENU_OPEN, async (_event) => {
-      console.log('menu open');
+    /* ipcRenderer.on(IpcEvents.MENU_OPEN_SETTINGS, async (event) => {
+      console.log('menu open', event);
+      // window.location.hash = '/workbench/detected';
     }); */
-
   }
 
   private loadTheme(): Theme {

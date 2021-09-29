@@ -186,7 +186,7 @@ const Export = ({ state }) => {
         onClose={handleClose}
         TransitionComponent={Fade}
       >
-        
+
         <MenuItem disabled={state.progress === 0} onClick={() => onExport(CSV)}>
           CSV
         </MenuItem>
