@@ -21,8 +21,8 @@ const CircularComponent = ({stage, progress, pauseScan}: CircularComponentProps)
   const classes = useStyles();
 
     return (
-    <Box className={classes.parentBox}>
-      <Box className={classes.circleParentBox}>
+    <div className={classes.parentBox}>
+      <div className={classes.circleParentBox}>
             <CircularProgress
               variant="determinate"
               className={classes.trackCircularProgress}
@@ -35,11 +35,11 @@ const CircularComponent = ({stage, progress, pauseScan}: CircularComponentProps)
             size={'400px'}
             thickness={3}
             className={classes.circularProgress}
-            disableShrink 
+            disableShrink
             {...{value: progress}}
             />
-        </Box>
-    <Box
+        </div>
+    <div
       className={classes.typographyContainer}
     >
       <div className={classes.numberStageContainer}>
@@ -50,14 +50,14 @@ const CircularComponent = ({stage, progress, pauseScan}: CircularComponentProps)
           {stage.toUpperCase()}
         </span>
       </div>
-       <div  className={classes.pauseContainer}>
-          <IconButton onClick={() => console.log('i feel it coming')}>
-            <PauseIcon />
-            <span className={classes.pause}>Pause</span>
-          </IconButton> 
-       </div>
-    </Box>
-  </Box>
+      <div className={classes.pauseContainer}>
+        <IconButton onClick={() => pauseScan()}>
+          <PauseIcon />
+          <span className={classes.pause}>Pause</span>
+        </IconButton> 
+      </div>
+    </div>
+  </div>
     )
 }
 
@@ -72,6 +72,8 @@ const useStyles = makeStyles({
   },
   trackCircularProgress: {
     color: '#d5d2d8',
+    background: '#fefffe',
+    borderRadius: '50%',
   },
   circularProgress: {
     color: '#7D01F7',
@@ -86,11 +88,7 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FEFFFE',
     flexDirection: 'column',
-    zIndex: -1,
-    borderRadius: '50%',
-
   },
   numberStageContainer: {
     display: 'flex',
@@ -113,11 +111,10 @@ const useStyles = makeStyles({
     zIndex: 5,
   },
   pauseContainer: {
-    marginTop: '20px',
+    marginTop: '5px',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 5,
   },
 });
 
