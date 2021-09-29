@@ -73,7 +73,7 @@ ipcMain.handle(IpcEvents.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
 
 ipcMain.handle(IpcEvents.GET_TOKEN, (event) => {
   try {
-    const token = defaultProject.getToken();
+    const token = workspace.getOpenedProjects()[0].getToken();
     return Response.ok({ message: 'Node from path retrieve succesfully', data: token });
   } catch (e :any) {
     return Response.fail({ message: e.message });
