@@ -140,10 +140,15 @@
       display: flex;
       align-items: center;
       color: #3B82F6;
+      word-break: break-all;
 
       svg {
         margin-right: 5px;
       }
+    }
+
+    .break-word-table {
+      word-break: break-all;
     }
 
       .tableRowLicense {
