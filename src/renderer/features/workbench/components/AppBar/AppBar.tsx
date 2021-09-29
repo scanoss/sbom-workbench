@@ -28,6 +28,10 @@ import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import { ExportFormat } from '../../../../../api/export-service';
 import { projectService } from '../../../../../api/project-service';
 import { dialogController } from '../../../../dialog-controller';
+import { FormatVersion, IProject } from '../../../../../api/types';
+import { workspace } from '../../../../../main/workspace/workspace';
+import { workspaceService } from '../../../../../api/workspace-service';
+
 
 const Navigation = () => {
   const history = useHistory();
@@ -129,14 +133,9 @@ const AppTitle = ({ title }) => {
   );
 };
 
-
 const Export = ({ state }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const SPDX = 'spdx';
-  const CSV = 'csv';
-  const RAW = 'json';
-  const WFP = 'wfp';
+  const open = Boolean(anchorEl); 
 
   const onExportClicked = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -146,22 +145,18 @@ const Export = ({ state }) => {
     setAnchorEl(null);
   };
 
-  const onExport = async (extension) => {
-    await exportFile({ extension, export: extension });
+  const onExport = async (format: FormatVersion ) => {
+    await exportFile(format);
     handleClose();
   };
 
-  const exportFile = async (data) => {
-    const defpath = await projectService.workspacePath();
-    const projectName = await projectService.getProjectName();
+  const exportFile = async (format : FormatVersion) => {
+    const data: IProject = await workspaceService.getProjectDTO();
     const path = dialogController.showSaveDialog({
-      defaultPath: `${defpath.data}/${projectName.data}/${projectName.data}.${data.extension}`,
+      defaultPath: `${data.work_root}/${data.name}`,
     });
     if (path && path !== undefined) {
-      if (data.export === SPDX) await ExportFormat.spdx(path);
-      else if (data.export === CSV) await ExportFormat.csv(path);
-      else if (data.export === RAW) await ExportFormat.raw(path);
-      else if (data.export === WFP) await ExportFormat.wfp(path);
+      await ExportFormat.export(path, format);
     }
   };
 
@@ -186,15 +181,17 @@ const Export = ({ state }) => {
         onClose={handleClose}
         TransitionComponent={Fade}
       >
-
-        <MenuItem disabled={state.progress === 0} onClick={() => onExport(CSV)}>
+        <MenuItem disabled={state.progress === 0} onClick={() => onExport(FormatVersion.CSV)}>
           CSV
         </MenuItem>
-        <MenuItem disabled={state.progress === 0} onClick={() => onExport(SPDX)}>
-          SPDX
+        <MenuItem disabled={state.progress === 0} onClick={() => onExport(FormatVersion.SPDX20)}>
+          SPDX 2.0
         </MenuItem>
-        <MenuItem onClick={() => onExport(WFP)}>WFP</MenuItem>
-        <MenuItem onClick={() => onExport(RAW)}>RAW</MenuItem>
+        <MenuItem disabled={state.progress === 0} onClick={() => onExport(FormatVersion.SPDXLITE)}>
+          SPDX Lite
+        </MenuItem>
+        <MenuItem onClick={() => onExport(FormatVersion.WFP)}>WFP</MenuItem>
+        <MenuItem onClick={() => onExport(FormatVersion.RAW)}>RAW</MenuItem>
       </Menu>
     </div>
   );
@@ -205,7 +202,6 @@ const AppBar = ({ exp }) => {
   const { pathname } = useLocation();
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
   const report = pathname.startsWith('/workbench/report');
-
 
   const onBackPressed = () => {
     dispatch(reset());

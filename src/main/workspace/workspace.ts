@@ -37,7 +37,7 @@ class Workspace extends EventEmitter {
     console.log(`[ WORKSPACE ]: Reading projects....`);
     const projectPaths = await this.getAllProjectsPaths();
     const projectArray: Promise<Project>[] = projectPaths.map((projectPath) => Project.readFromPath(projectPath)
-    .then((p) => {console.log(`[ WORKSPACE ]: Successfully readed project ${projectPath}`); return p;})
+    .then((p) => {console.log(`[ WORKSPACE ]: Successfully read project ${projectPath}`); return p;})
     .catch((e) => { console.log(`[ WORKSPACE ]: Cannot read project ${projectPath}`); throw e;}));
     let projectsReaded = (await Promise.allSettled(projectArray)) as PromiseSettledResult<Project>[];
     projectsReaded = projectsReaded.filter((p) => p.status === 'fulfilled');

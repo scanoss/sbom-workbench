@@ -30,10 +30,6 @@ class ProjectService extends BaseService {
     return response;
   }
 
-  public async workspacePath(): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.UTILS_DEFAULT_PROJECT_PATH);
-    return response;
-  }
 
   public async getProjectName(): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.UTILS_PROJECT_NAME);

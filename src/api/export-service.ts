@@ -1,26 +1,12 @@
 import { IpcEvents } from '../ipc-events';
 import { BaseService } from './base-service';
+import { FormatVersion } from './types';
 
 const { ipcRenderer } = require('electron');
 
 class Export extends BaseService {
-  public async spdx(path: string): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.EXPORT_SPDX, path);
-    return response;
-  }
-
-  public async csv(args: string | null = null): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.EXPORT_CSV, args);
-    return response;
-  }
-
-  public async wfp(args: string | null = null): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.EXPORT_WFP, args);
-    return response;
-  }
-
-  public async raw(args: string | null = null): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.EXPORT_RAW, args);
+  public async export(path: string, ext: FormatVersion): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.EXPORT, path, ext);
     return response;
   }
 
