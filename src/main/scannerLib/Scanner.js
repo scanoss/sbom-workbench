@@ -47,6 +47,8 @@ export class Scanner extends EventEmitter {
 
   #responseBuffer;
 
+  #processedFiles;
+
   constructor(scannerCfg = new ScannerCfg()) {
     super();
     this.#scannerCfg = scannerCfg;
@@ -57,6 +59,7 @@ export class Scanner extends EventEmitter {
   #init() {
     this.#scanFinished = false;
     this.#processingNewData = false;
+    this.#processedFiles = 0;
     this.#responseBuffer = [];
 
     this.#winnower = new Winnower(this.#scannerCfg);
@@ -67,20 +70,9 @@ export class Scanner extends EventEmitter {
   }
 
   #setWinnowerListeners(){
-    /* ******************* SETTING WINNOWING EVENTS ******************* */
-    this.#winnower.on(ScannerEvents.WINNOWING_STARTING, () => {
-      console.log('[ SCANNER ]: Starting Winnowing...');
-      this.emit(ScannerEvents.WINNOWING_STARTING);
-    });
-
-    this.#winnower.on(ScannerEvents.WINNOWING_NEW_WFP_FILE, (wfpPath) => {
-      console.log(`[ SCANNER ]: New WFP file ${path.basename(wfpPath)}`);
-      this.#dispatcher.dispatchWfpFile(wfpPath);
-      this.emit(ScannerEvents.WINNOWING_NEW_WFP_FILE, wfpPath);
-    });
-    this.#winnower.on(ScannerEvents.WINNOWING_FINISHED, () => {
-      console.log('[ SCANNER ]: Winnowing Finished...');
-      this.emit(ScannerEvents.WINNOWING_FINISHED);
+    this.#winnower.on(ScannerEvents.WINNOWING_NEW_CONTENT, (wfpContent) => {
+      console.log(`[ SCANNER ]: New WFP content`);
+      this.#dispatcher.dispatchWfpContent(wfpContent);
     });
 
     this.#winnower.on('error', (error) => {
@@ -91,13 +83,19 @@ export class Scanner extends EventEmitter {
 
   #setDispatcherListeners() {
     /* ******************* SETTING DISPATCHER EVENTS ******************** */
-    this.#dispatcher.on(ScannerEvents.DISPATCHER_WFP_SENDED, (wfpPath) => {
-      console.log(`[ SCANNER ]: Sending WFP file ${path.basename(wfpPath)} to server`)
-      this.emit(ScannerEvents.DISPATCHER_WFP_SENDED, wfpPath);
+    this.#dispatcher.on(ScannerEvents.DISPATCHER_QUEUE_SIZE_MAX_LIMIT, () => {
+      console.log(`[ SCANNER ]: Maximum queue size reached. Winnower will be paused`);
+      this.#winnower.pause();
+    });
+
+    this.#dispatcher.on(ScannerEvents.DISPATCHER_QUEUE_SIZE_MIN_LIMIT, () => {
+      console.log(`[ SCANNER ]: Minimum queue size reached. Winnower will be resumed`);
+      this.#winnower.resume();
     });
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_NEW_DATA, async (response) => {
       this.processingNewData = true;
+      this.#processedFiles += response.getNumberOfFilesScanned();
       console.log(`[ SCANNER ]: Received results of ${response.getNumberOfFilesScanned()} files`);
 
       this.emit(ScannerEvents.DISPATCHER_NEW_DATA, response);
@@ -112,7 +110,7 @@ export class Scanner extends EventEmitter {
     });
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_FINISHED, async () => {
-      if (!this.#winnower.isRunning()) {
+      if (!this.#winnower.hasPendingFiles()) {
         if (this.#processingNewData) this.#scanFinished = true;
         else await this.#finishScan();
       }
@@ -149,14 +147,15 @@ export class Scanner extends EventEmitter {
 
     await this.#appendOutputFiles(wfpContent, serverResponse);
 
-    // Deletes wfp already processed
-    const pDelete = [];
-    // eslint-disable-next-line no-restricted-syntax
-    for (const dResponse of this.#responseBuffer) {
-      const p = fs.promises.unlink(dResponse.getWfpFilePath());
-      pDelete.push(p);
-    }
-    await Promise.all(pDelete);
+    // // Deletes wfp already processed
+    // const pDelete = [];
+    // // eslint-disable-next-line no-restricted-syntax
+    // for (const dResponse of this.#responseBuffer) {
+    //   const p = fs.promises.unlink(dResponse.getWfpFilePath());
+    //   pDelete.push(p);
+    // }
+    // await Promise.all(pDelete);
+
     this.#responseBuffer = [];
     const responses = new DispatcherResponse(serverResponse, wfpContent);
     console.log(`[ SCANNER ]: Persisted results of ${responses.getNumberOfFilesScanned()} files...`);
@@ -192,7 +191,8 @@ export class Scanner extends EventEmitter {
     // eslint-disable-next-line no-restricted-syntax
     for (const key of sortedPaths) resultSorted[key] = results[key];
     await fs.promises.writeFile(this.#resultFilePath, JSON.stringify(resultSorted, null,2));
-    console.log(`[ SCANNER ]: Scan Finished... Results on: ${this.#resultFilePath}`);
+    console.log(`[ SCANNER ]: Scan finished (analized ${this.#processedFiles} files)`);
+    console.log(`[ SCANNER ]: Results on: ${this.#resultFilePath}`);
     this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath);
   }
 
@@ -248,9 +248,9 @@ export class Scanner extends EventEmitter {
   }
 
   stop() {
+    console.log(`[ SCANNER ]: Closing scanner`);
     this.#winnower.removeAllListeners();
     this.#dispatcher.removeAllListeners();
-
     this.#winnower.stop();
     this.#dispatcher.stop();
   }

@@ -115,11 +115,13 @@ export class Project extends EventEmitter {
     this.scans_db = new ScanDb(myPath);
     await this.scans_db.init();
     await this.scans_db.licenses.importFromJSON(licenses);
+    console.log(`[ PROJECT ]: Building tree`);
     this.build_tree();
+    console.log(`[ PROJECT ]: Applying filters to the tree`);
     this.indexScan(this.metadata.getScanRoot(), this.logical_tree, this.banned_list);
     const summary = { total: 0, include: 0, filter: 0, files: {} };
     this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
-    console.log(`[ FILTERS ]: Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`);
+    console.log(`[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`);
     this.filesToScan = summary.files;
     this.metadata.setScannerState(ScanState.READY_TO_SCAN);
     this.metadata.setFileCounter(summary.include);
@@ -171,7 +173,7 @@ export class Project extends EventEmitter {
 
     this.scanner.on(ScannerEvents.RESULTS_APPENDED, async (response) => {
       this.attachComponent(response.getServerResponse());
-      this.save();
+      await this.save();
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {

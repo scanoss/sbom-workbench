@@ -18,4 +18,9 @@ export class ScannerCfg {
 
   // After reach x number of server responses persist files and emit event
   MAX_RESPONSES_IN_BUFFER = 50;
+
+  DISPATCHER_QUEUE_SIZE_MAX_LIMIT = 100;
+
+  DISPATCHER_QUEUE_SIZE_MIN_LIMIT = 50;
+
 }

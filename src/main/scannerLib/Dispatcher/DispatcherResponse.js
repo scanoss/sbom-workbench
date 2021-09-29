@@ -5,13 +5,10 @@ export class DispatcherResponse {
 
   #wfpContent;
 
-  #wfpFilePath;
-
   #filesScanned;
 
-  constructor(serverResponse, wfpContent, wfpFilePath) {
+  constructor(serverResponse, wfpContent) {
     this.#serverResponse = serverResponse;
-    this.#wfpFilePath = wfpFilePath;
     this.#wfpContent = wfpContent;
     this.#filesScanned = Object.keys(this.#serverResponse);
     // this.#verifyResponse();
@@ -25,23 +22,14 @@ export class DispatcherResponse {
     return this.#wfpContent;
   }
 
-  getWfpFilePath() {
-    return this.#wfpFilePath;
-  }
-
   #matchRegex(str, re = /file=/g) {
     return ((str || '').match(re) || []).length;
   }
 
   #verifyResponse() {
     const wfpNumFiles = this.#matchRegex(this.#wfpContent, /file=/g);
-
     const serverResponseNumFiles = Object.keys(this.#serverResponse).length;
-
-    if (wfpNumFiles !== serverResponseNumFiles) {
-      console.log(`The numbers of files in ${this.#wfpFilePath} does not match with the server response`);
-      throw new Error(`The numbers of files in ${this.#wfpFilePath} does not match with the server response`);
-    }
+    if (wfpNumFiles !== serverResponseNumFiles) throw new Error(`The numbers of files in the wfp sended does not match with the server response`);
   }
 
   getFilesScanned() {
