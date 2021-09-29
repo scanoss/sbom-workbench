@@ -73,7 +73,7 @@ const NewProject = () => {
 
   }
 
-  const onCancelHandler = async (_event) => {
+  const onPauseHandler = async () => {
     console.log("Button pressed");
 
     const { action } = await dialogCtrl.openConfirmDialog(
@@ -123,45 +123,9 @@ const NewProject = () => {
         </header>
         <main className="app-content">
           <div className="progressbar">
-            {stage === 'preparing' && (
-              <>
-
-                <div className="stage-label"> {stage} </div>
-              </>
-            )}
-
-            {stage === 'indexing' && (
-              <>
-                <CircularComponent  />
-                <div className="stage-label">
-                  {' '}
-                  {stage} ({progress}){' '}
+          <div className="circular-progress-container">
+                  <CircularComponent stage={stage} progress={progress} pauseScan={() => onPauseHandler()} />
                 </div>
-              </>
-            )}
-
-            {stage === 'scanning' && (
-              <>
-                <div className="circular-progress-container">
-                  <CircularComponent  />
-                </div>
-              </>
-            )}
-
-            {stage === 'resuming' && (
-              <>
-                <CircularComponent />
-                <div className="stage-label"> RESUMING SCANNER </div>
-              </>
-            )}
-
-            {/* <IconButton
-              aria-label="cancel-scan"
-              className="btn-cancel"
-              onClick={(event) => onCancelHandler(event)}
-            >
-              <CloseIcon fontSize="small" />
-            </IconButton> */}
           </div>
         </main>
       </section>
