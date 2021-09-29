@@ -56,18 +56,6 @@ ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
 });
 
 
-ipcMain.handle(IpcEvents.UTILS_DEFAULT_PROJECT_PATH, async (event) => {
-  try {
-    let path = `${os.homedir()}/scanoss-workspace`;
-    if (!fs.existsSync(path)){
-      path=os.homedir();
-    }
-      return { status: 'ok', message: 'SPDX export successfully', data: path };
-  } catch (e) {
-    console.log('Catch an error: ', e);
-    return { status: 'fail' };
-  }
-});
 
 ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
   const projectName = workspace.getOpenedProjects()[0].project_name;

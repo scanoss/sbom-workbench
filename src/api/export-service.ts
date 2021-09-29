@@ -5,7 +5,7 @@ import { FormatVersion } from './types';
 const { ipcRenderer } = require('electron');
 
 class Export extends BaseService {
-  public async spdx(path: string, ext: FormatVersion): Promise<any> {
+  public async export(path: string, ext: FormatVersion): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.EXPORT, path, ext);
     return response;
   }

@@ -28,7 +28,10 @@ import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import { ExportFormat } from '../../../../../api/export-service';
 import { projectService } from '../../../../../api/project-service';
 import { dialogController } from '../../../../dialog-controller';
-import { FormatVersion } from '../../../../../api/types';
+import { FormatVersion, IProject } from '../../../../../api/types';
+import { workspace } from '../../../../../main/workspace/workspace';
+import { workspaceService } from '../../../../../api/workspace-service';
+
 
 const Navigation = () => {
   const history = useHistory();
@@ -148,13 +151,12 @@ const Export = ({ state }) => {
   };
 
   const exportFile = async (format : FormatVersion) => {
-    const defpath = await projectService.workspacePath();
-    const projectName = await projectService.getProjectName();
+    const data: IProject = await workspaceService.getProjectDTO();
     const path = dialogController.showSaveDialog({
-      defaultPath: `${defpath.data}/${projectName.data}/${projectName.data}`,
+      defaultPath: `${data.work_root}/${data.name}`,
     });
     if (path && path !== undefined) {
-      await ExportFormat.spdx(path, format);
+      await ExportFormat.export(path, format);
     }
   };
 

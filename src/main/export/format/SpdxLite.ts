@@ -1,4 +1,4 @@
-import { defaultProject } from '../../workspace/ProjectTree';
+import { workspace } from '../../workspace/workspace';
 import { Format } from '../Format';
 
 export class SpdxLite extends Format {
@@ -30,7 +30,9 @@ export class SpdxLite extends Format {
   }
 
   private static templateHeader() {
-    const template = `DocumentName: ${defaultProject.project_name}\nDocumentNamespace: https://example.com/example-v1.0\nCreator: Person: 'Tool: SCANOSS Inventory Engine', 'Organization: http://scanoss.com'\n\r`;
+    const template = `DocumentName: ${workspace
+      .getOpenedProjects()[0]
+      .getProjectName()}\nDocumentNamespace: https://example.com/example-v1.0\nCreator: Person: 'Tool: SCANOSS Inventory Engine', 'Organization: http://scanoss.com'\n\r`;
     return template;
   }
 }
