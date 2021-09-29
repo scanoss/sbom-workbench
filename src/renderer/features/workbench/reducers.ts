@@ -7,7 +7,7 @@ import {
   SET_VERSION,
   SET_FILE,
   SET_PROGRESS,
-  SET_REPORT,
+  SET_HISTORY,
 } from './actions';
 import { ComponentGroup } from '../../../api/types';
 
@@ -20,7 +20,10 @@ export interface State {
   components: ComponentGroup[];
   component: ComponentGroup;
   version: string;
-  report: 'detected' | 'identified';
+  history: {
+    report: 'detected' | 'identified';
+    section: number;
+  }
 }
 
 export const initialState: State = {
@@ -32,7 +35,10 @@ export const initialState: State = {
   components: null,
   component: null,
   version: null,
-  report: 'detected',
+  history: {
+    report: 'detected',
+    section: null,
+  },
 };
 
 export default function reducer(state: State = initialState, action): State {
@@ -77,6 +83,10 @@ export default function reducer(state: State = initialState, action): State {
         ...state,
         component,
         version: null,
+        history: {
+          ...state.history,
+          section: null,
+        },
       };
     }
     case SET_VERSION: {
@@ -93,11 +103,14 @@ export default function reducer(state: State = initialState, action): State {
         file,
       };
     }
-    case SET_REPORT: {
-      const { report } = action;
+    case SET_HISTORY: {
+      const { crumb } = action;
       return {
         ...state,
-        report,
+        history: {
+          ...state.history,
+          ...crumb,
+        },
       };
     }
     case RESET:

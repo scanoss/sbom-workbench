@@ -48,7 +48,7 @@ const Reports = () => {
   const { path } = useRouteMatch();
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
 
-  const { report } = state;
+  const { history } = state;
 
   const [detectedData, setDetectedData] = useState(null);
   const [identifiedData, setIdentifiedData] = useState(null);
@@ -56,7 +56,7 @@ const Reports = () => {
   const init = async () => {
     const summary = await reportService.getSummary();
     const detected = await reportService.detected();
-    const identified = await reportService.idetified();  
+    const identified = await reportService.idetified();
 
     setDetectedData({ ...detected, summary });
     setIdentifiedData({ ...identified, summary });
@@ -78,7 +78,7 @@ const Reports = () => {
             <Route exact path={`${path}/identified`}>
               {identifiedData && <IdentifiedReport data={identifiedData} />}
             </Route>
-            <Redirect from={path} to={`${path}/${report}`} />
+            <Redirect from={path} to={`${path}/${history.report}`} />
           </Switch>
         </main>
       </section>

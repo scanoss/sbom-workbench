@@ -7,7 +7,7 @@ export const SET_COMPONENTS = 'APP/WORKBENCH/SET_COMPONENTS';
 export const SET_COMPONENT = 'APP/WORKBENCH/SET_COMPONENT';
 export const SET_VERSION = 'APP/WORKBENCH/SET_VERSION';
 export const SET_FILE = 'APP/WORKBENCH/SET_FILE';
-export const SET_REPORT = 'APP/WORKBENCH/SET_REPORT';
+export const SET_HISTORY = 'APP/WORKBENCH/SET_HISTORY';
 
 export const RESET = 'APP/WORKBENCH/RESET';
 
@@ -43,9 +43,9 @@ export const setFile = (file: string) => ({
   file,
 });
 
-export const setReport = (report: 'detected' | 'identified') => ({
-  type: SET_REPORT,
-  report,
+export const setHistoryCrumb = (crumb) => ({
+  type: SET_HISTORY,
+  crumb,
 });
 
 export const reset = () => ({

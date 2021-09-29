@@ -26,7 +26,7 @@ import { inventoryService } from '../../../../../../../api/inventory-service';
 import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import { mapFiles } from '../../../../../../../utils/scan-util';
-import { setVersion } from '../../../../actions';
+import { setHistoryCrumb, setVersion } from '../../../../actions';
 
 // inner components
 const VersionSelector = ({ versions, version, onSelect }) => {
@@ -113,7 +113,7 @@ export const ComponentDetail = () => {
   const [inventories, setInventories] = useState<Inventory[]>([]);
 
   const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState<number>(component?.summary?.pending !== 0 ? 0 : 1);
+  const [tab, setTab] = useState<number>(state.history.section || 0);
 
   const getFiles = async () => {
     const response = await componentService.getFiles({ purl: component.purl, version });
@@ -281,6 +281,10 @@ export const ComponentDetail = () => {
     getFiles();
     getInventories();
   }, [version]);
+
+  useEffect(() => {
+    dispatch(setHistoryCrumb({ section: tab }));
+  }, [tab]);
 
   const renderTab = () => {
     switch (tab) {
