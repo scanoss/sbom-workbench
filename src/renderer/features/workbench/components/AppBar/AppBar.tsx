@@ -74,11 +74,11 @@ const AppMenu = () => {
   );
 };
 
-const AppProgress = ({ progress }) => {
+const AppProgress = ({ progress }) => { 
   return (
     <section id="AppProgress">
-      <p>{progress}%</p>
-      <LinearProgress color="secondary" className="progress" variant="determinate" value={progress} />
+      <p>{Math.trunc(progress)}%</p>
+      <LinearProgress color="secondary" className="progress" variant="determinate" value={Math.trunc(progress)} />
     </section>
   );
 };
@@ -133,7 +133,6 @@ const AppTitle = ({ title }) => {
 const Export = ({ state }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-
   const SPDX = 'spdx';
   const CSV = 'csv';
   const RAW = 'json';
