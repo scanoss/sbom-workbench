@@ -35,8 +35,6 @@ export class Scanner extends EventEmitter {
 
   #dispatcher;
 
-  #tempPath;
-
   #resultFilePath;
 
   #wfpFilePath;
@@ -97,14 +95,9 @@ export class Scanner extends EventEmitter {
       this.processingNewData = true;
       this.#processedFiles += response.getNumberOfFilesScanned();
       console.log(`[ SCANNER ]: Received results of ${response.getNumberOfFilesScanned()} files`);
-
       this.emit(ScannerEvents.DISPATCHER_NEW_DATA, response);
       this.#insertIntoBuffer(response);
-      if (this.#bufferReachedLimit()) {
-        const responses = await this.#bufferToFiles();
-        this.emit(ScannerEvents.RESULTS_APPENDED, responses);
-      }
-
+      if (this.#bufferReachedLimit()) await this.#bufferToFiles();
       this.#processingNewData = false;
       if (this.#scanFinished) await this.#finishScan();
     });
@@ -144,43 +137,25 @@ export class Scanner extends EventEmitter {
       const serverResponseToAppend = dispatcherResponse.getServerResponse();
       Object.assign(serverResponse, serverResponseToAppend);
     }
-
     await this.#appendOutputFiles(wfpContent, serverResponse);
-
-    // // Deletes wfp already processed
-    // const pDelete = [];
-    // // eslint-disable-next-line no-restricted-syntax
-    // for (const dResponse of this.#responseBuffer) {
-    //   const p = fs.promises.unlink(dResponse.getWfpFilePath());
-    //   pDelete.push(p);
-    // }
-    // await Promise.all(pDelete);
-
     this.#responseBuffer = [];
     const responses = new DispatcherResponse(serverResponse, wfpContent);
     console.log(`[ SCANNER ]: Persisted results of ${responses.getNumberOfFilesScanned()} files...`);
+    this.emit(ScannerEvents.RESULTS_APPENDED, responses);
     return responses;
   }
 
   setWorkDirectory(workDirectory) {
     this.#workDirectory = workDirectory;
-    this.#tempPath = `${this.#workDirectory}/scanner-tmp`;
     this.#resultFilePath = `${this.#workDirectory}/result.json`;
     this.#wfpFilePath = `${this.#workDirectory}/winnowing.wfp`;
 
     if (!fs.existsSync(this.#workDirectory)) fs.mkdirSync(this.#workDirectory);
-    if (!fs.existsSync(this.#tempPath)) fs.mkdirSync(this.#tempPath);
   }
 
   cleanWorkDirectory() {
-    if (fs.existsSync(this.#tempPath)) fs.rmdirSync(this.#tempPath, { recursive: true });
     if (fs.existsSync(this.#resultFilePath)) fs.unlinkSync(this.#resultFilePath);
     if (fs.existsSync(this.#wfpFilePath)) fs.unlinkSync(this.#wfpFilePath);
-  }
-
-  cleanTmpDirectory() {
-    if (fs.existsSync(this.#tempPath)) fs.rmdirSync(this.#tempPath, { recursive: true });
-    if (!fs.existsSync(this.#tempPath)) fs.mkdirSync(this.#tempPath);
   }
 
   async #finishScan() {
@@ -201,9 +176,7 @@ export class Scanner extends EventEmitter {
     this.stop();
     this.emit('error', error);
 
-    if (origin === ScannerEvents.MODULE_DISPATCHER) {
-      if (error.wfpFailedPath) fs.copyFileSync(error.wfpFailedPath, `${this.#tempPath}/failed.wfp`);
-    }
+    if (origin === ScannerEvents.MODULE_DISPATCHER) {}
     if (origin === ScannerEvents.MODULE_WINNOWER) {}
   }
 
@@ -230,7 +203,7 @@ export class Scanner extends EventEmitter {
       await this.#finishScan();
       return;
     }
-    this.#winnower.startWinnowing(files, scanRoot, this.#tempPath);
+    this.#winnower.startWinnowing(files, scanRoot);
   }
 
   getScannerId() {

@@ -234,8 +234,6 @@ export class Winnower extends EventEmitter {
 
   #fileListIndex;
 
-  #tmpPath;
-
   #scanRoot;
 
   #wfp;
@@ -255,7 +253,6 @@ export class Winnower extends EventEmitter {
 
   #init() {
     this.#wfp = '';
-    this.#tmpPath = '';
     this.#scanRoot = '';
     this.#continue = true;
     this.isRunning = false;
@@ -293,16 +290,13 @@ export class Winnower extends EventEmitter {
     }
 
     if (this.#wfp.length + winnowingResult.length >= this.#scannerCfg.WFP_FILE_MAX_SIZE) {
-      await this.#processPackedWfp(this.#wfp);
+      this.#processPackedWfp(this.#wfp);
       this.#wfp = '';
     }
     this.#wfp += winnowingResult;
   }
 
-  async #processPackedWfp(content) {
-    //const timestamp = new Date().getTime();
-    //await fs.promises.writeFile(`${this.#tmpPath}/${timestamp}.wfp`, content);
-    //this.emit(ScannerEvents.WINNOWING_NEW_WFP_FILE, `${this.#tmpPath}/${timestamp}.wfp`);
+  #processPackedWfp(content) {
     this.emit(ScannerEvents.WINNOWING_NEW_CONTENT, content);
   }
 
@@ -324,7 +318,7 @@ export class Winnower extends EventEmitter {
       this.#worker.postMessage(scannableItem);
     } else {
       if (this.#wfp.length !== 0) {
-        await this.#processPackedWfp(this.#wfp);
+        this.#processPackedWfp(this.#wfp);
       }
       this.#isRunning = false;
       console.log('[ SCANNER ]: Winnowing Finished...');
@@ -332,13 +326,11 @@ export class Winnower extends EventEmitter {
     }
   }
 
-  async startWinnowing(files, scanRoot, tmpPath) {
+  async startWinnowing(files, scanRoot) {
     console.log('[ SCANNER ]: Starting Winnowing...');
     this.#scanRoot = scanRoot;
-    this.#tmpPath = tmpPath;
     this.#isRunning = true;
     this.#fileList = Object.entries(files);
-    if (!fs.existsSync(this.#tmpPath)) await fs.promises.mkdir(this.#tmpPath);
     this.#nextStepMachine();
   }
 

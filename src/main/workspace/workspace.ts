@@ -52,7 +52,7 @@ class Workspace extends EventEmitter {
   public getOpenedProjects(): Array<Project> {
     const openedProjects: Array<Project> = new Array<Project>();
     // eslint-disable-next-line no-restricted-syntax
-    for (const p of this.projectList) if (p.getState() === ProjectState.OPENED ) openedProjects.push(p);
+    for (const p of this.projectList) if (p.getState() === ProjectState.OPENED) openedProjects.push(p);
     return openedProjects;
   }
 
@@ -77,21 +77,20 @@ class Workspace extends EventEmitter {
 
 
 
-  public async removeProjectByPath(path: string) {
-    const p = this.getProjectByPath(path);
+  public async removeProjectByPath(pPath: string) {
+    const p = this.getProjectByPath(pPath);
     await this.removeProject(p);
     return true;
   }
 
-  public getProjectByPath(path: string): Project {
-    for (let i = 0 ; i< this.projectList.length ; i += 1 )
-      if (this.projectList[i].getMyPath() === path)
-        return this.projectList[i];
+  public getProjectByPath(pPath: string): Project {
+    for (let i = 0; i < this.projectList.length; i += 1)
+      if (this.projectList[i].getMyPath() === pPath) return this.projectList[i];
     return null;
   }
 
   public getProjectByUuid(uuid: string) {
-    for (let i = 0 ; i< this.projectList.length ; i += 1 )
+    for (let i = 0; i < this.projectList.length; i += 1)
       if (this.projectList[i].getUUID() === uuid) return this.projectList[i];
     return null;
   }
@@ -121,11 +120,11 @@ class Workspace extends EventEmitter {
     }
   }
 
-  public async openProjectByPath(path: string) {
-    this.closeAllProjects();
-    console.log(`[ WORKSPACE ]: Openning project ${path}`);
+  public async openProjectByPath(pPath: string) {
+    await this.closeAllProjects();
+    console.log(`[ WORKSPACE ]: Opening project ${pPath}`);
     // eslint-disable-next-line no-restricted-syntax
-    const p: Project = this.getProjectByPath(path);
+    const p: Project = this.getProjectByPath(pPath);
     await p.open();
     return p;
   }
@@ -144,10 +143,10 @@ class Workspace extends EventEmitter {
     return this.wsPath;
   }
 
-  public closeAllProjects() {
+  public async closeAllProjects() {
     console.log(`[ WORKSPACE ]: Closing all opened projects`);
     // eslint-disable-next-line no-restricted-syntax
-    for (const p of this.projectList) if (p.getState() === ProjectState.OPENED) p.close();
+    for (const p of this.projectList) if (p.getState() === ProjectState.OPENED) await p.close();
   }
 
   public async addProject(p: Project) {

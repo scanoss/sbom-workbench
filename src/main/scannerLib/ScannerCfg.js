@@ -22,5 +22,4 @@ export class ScannerCfg {
   DISPATCHER_QUEUE_SIZE_MAX_LIMIT = 100;
 
   DISPATCHER_QUEUE_SIZE_MIN_LIMIT = 50;
-
 }

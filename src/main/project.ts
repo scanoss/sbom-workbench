@@ -12,11 +12,12 @@ ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (_event, arg: any) => {
 
 
   const p: Project = await workspace.openProjectByPath(arg);
+  const r = await p.getResults();
 
   const response = {
     logical_tree: p.getLogicalTree(),
     work_root: p.getMyPath(),
-    results: p.getResults(),
+    results: r,
     scan_root: p.getScanRoot(),
     uuid: p.getUUID(),
   };
@@ -45,6 +46,7 @@ ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (event, arg: Project) => {
 });
 
 ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
+  await workspace.getOpenedProjects()[0].save();
   await workspace.getOpenedProjects()[0].close();
 });
 
