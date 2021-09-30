@@ -7,10 +7,13 @@ export class ScannableItem {
 
   fingerprint;
 
-  constructor(contentSource, content, scanMode) {
+  maxSizeWfp;
+
+  constructor(content, contentSource, scanMode, maxSizeWfp) {
     this.contentSource = contentSource;
     this.content = content;
     this.scanMode = scanMode;
+    this.maxSizeWfp = maxSizeWfp;
   }
 
   getContent() {

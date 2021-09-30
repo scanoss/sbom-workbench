@@ -14,7 +14,8 @@ parentPort.on('message', async (scannableItem) => {
   if ( scannableItem.scanMode === "FULL_SCAN") {
     fingerprint = wfp_for_content(
       scannableItem.content,
-      scannableItem.contentSource
+      scannableItem.contentSource,
+      scannableItem.maxSizeWfp
     );
   } else {
     fingerprint = wfp_only_md5(
@@ -70,9 +71,9 @@ function min_hex_array(array) {
   return min;
 }
 
-function wfp_for_content(contents, contentSource) {
-  let wfp = wfp_only_md5(contents, contentSource);
-  wfp += calc_wfp(contents);
+function wfp_for_content(content, contentSource, maxSize) {
+  let wfp = wfp_only_md5(content, contentSource);
+  wfp += calc_wfp(content, maxSize);
   return wfp;
 }
 
@@ -82,7 +83,7 @@ function wfp_only_md5(contents, contentSource) {
   return wfp;
 }
 
-function calc_wfp(contents) {
+function calc_wfp(contents, maxSize) {
   let gram = '';
   const window = [];
   let normalized = 0;
@@ -95,6 +96,9 @@ function calc_wfp(contents) {
   let wfp = '';
 
   for (let i = 0; i < contents.length; i++) {
+    if(wfp.length > maxSize)
+      return wfp;
+
     const byte = contents[i];
     if (byte == ASCII_LF) {
       line += 1;
@@ -226,13 +230,9 @@ function crc32c_hex(str) {
 export class Winnower extends EventEmitter {
   #scannerCfg;
 
-  #files;
-
   #fileList;
 
   #fileListIndex;
-
-  #tmpPath;
 
   #scanRoot;
 
@@ -244,27 +244,36 @@ export class Winnower extends EventEmitter {
 
   #isRunning;
 
-  #waitingWorkerResponse;
-
   constructor(scannerCfg = new ScannerCfg()) {
     super();
     this.#scannerCfg = scannerCfg;
     this.#init();
+    this.#prepareWorker();
   }
 
   #init() {
     this.#wfp = '';
+    this.#scanRoot = '';
     this.#continue = true;
-    this.#waitingWorkerResponse = false;
+    this.isRunning = false;
+    this.#fileList = [];
+    this.#fileListIndex = 0;
+  }
+
+  #prepareWorker() {
     this.#worker = new Worker(stringWorker, { eval: true });
     this.#worker.on('message', async (scannableItem) => {
-      await this.#storeResult(scannableItem.fingerprint);
-      this.#waitingWorkerResponse = false;
+      await this.#winnowerPacker(scannableItem.fingerprint);
       await this.#nextStepMachine();
     });
   }
 
-  async #storeResult(winnowingResult) {
+  #forceStopWorker() {
+    this.#worker.removeAllListeners();
+    this.#worker.terminate();
+  }
+
+  async #winnowerPacker(winnowingResult) {
     // When the fingerprint of one file is bigger than 64Kb, truncate to the last 64Kb line.
     if (winnowingResult.length > this.#scannerCfg.WFP_FILE_MAX_SIZE) {
       let truncateStringOnIndex = this.#scannerCfg.WFP_FILE_MAX_SIZE;
@@ -281,30 +290,24 @@ export class Winnower extends EventEmitter {
     }
 
     if (this.#wfp.length + winnowingResult.length >= this.#scannerCfg.WFP_FILE_MAX_SIZE) {
-      await this.#createWfpFile(this.#wfp, this.#tmpPath, new Date().getTime());
+      this.#processPackedWfp(this.#wfp);
       this.#wfp = '';
     }
     this.#wfp += winnowingResult;
   }
 
-  async #createWfpFile(content, dst, name) {
-    if (!fs.existsSync(dst)) fs.mkdirSync(dst);
-    await fs.promises.writeFile(`${dst}/${name}.wfp`, content);
-    this.emit(ScannerEvents.WINNOWING_NEW_WFP_FILE, `${dst}/${name}.wfp`);
+  #processPackedWfp(content) {
+    this.emit(ScannerEvents.WINNOWING_NEW_CONTENT, content);
   }
 
   async #getNextScannableItem() {
-
     if (this.#fileListIndex >= this.#fileList.length) return null;
-
     const path = this.#fileList[this.#fileListIndex][0];
     const scanMode = this.#fileList[this.#fileListIndex][1];
-
     const contentSource = path.replace(`${this.#scanRoot}`, '');
     const content = await fs.promises.readFile(path);
-
     this.#fileListIndex += 1;
-    const scannable = new ScannableItem(contentSource, content, scanMode);
+    const scannable = new ScannableItem(content, contentSource, scanMode, this.#scannerCfg.WFP_FILE_MAX_SIZE);
     return scannable;
   }
 
@@ -312,58 +315,48 @@ export class Winnower extends EventEmitter {
     if (!this.#continue) return;
     const scannableItem = await this.#getNextScannableItem();
     if (scannableItem) {
-      this.#waitingWorkerResponse = true;
       this.#worker.postMessage(scannableItem);
     } else {
       if (this.#wfp.length !== 0) {
-        await this.#createWfpFile(this.#wfp, this.#tmpPath, new Date().getTime());
+        this.#processPackedWfp(this.#wfp);
       }
       this.#isRunning = false;
-      this.emit(ScannerEvents.WINNOWING_FINISHED);
-      this.#worker.terminate();
+      console.log('[ SCANNER ]: Winnowing Finished...');
+      this.#forceStopWorker();
     }
   }
 
-  async startWinnowing(files, scanRoot, tmpPath) {
-    this.#files = files;
-    this.#fileList = Object.entries(this.#files);
-    this.#fileListIndex = 0;
+  async startWinnowing(files, scanRoot) {
+    console.log('[ SCANNER ]: Starting Winnowing...');
     this.#scanRoot = scanRoot;
-    this.#tmpPath = tmpPath;
     this.#isRunning = true;
-    this.emit(ScannerEvents.WINNOWING_STARTING);
-    return this.#nextStepMachine();
-  }
-
-  recoveryIndex() {
-    // Explore this.#tmpPath directory, open the last .wfp file
-    // Search in this .wfp for the last file winnowed
-    // Search in the #fileList the index corresponing to the last file winnowed
-    // and return the index
-    return this.#fileListIndex;
+    this.#fileList = Object.entries(files);
+    this.#nextStepMachine();
   }
 
   pause() {
-
+    console.log('[ SCANNER ]: Winnowing paused...');
+    this.#continue = false;
+    this.#forceStopWorker();
+    this.#prepareWorker();
   }
 
   resume() {
-    this.#fileListIndex = this.recoveryIndex();
+    console.log('[ SCANNER ]: Winnowing resumed...');
     this.#continue = true;
     this.#nextStepMachine();
   }
 
   stop() {
     this.#continue = false;
-    this.#worker.removeAllListeners();
-    this.#worker.terminate();
+    this.isRunning = false;
+    this.#forceStopWorker();
+    this.#prepareWorker();
     this.#init();
-    //clean the .wfp files
   }
 
-  restart() {}
-
-  isRunning() {
+  hasPendingFiles() {
     return this.#isRunning;
   }
+
 }

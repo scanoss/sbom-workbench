@@ -64,12 +64,10 @@ export class Project extends EventEmitter {
   }
 
   public async open(): Promise<boolean> {
-    if (this.state === ProjectState.OPENED) return false;
     this.state = ProjectState.OPENED;
     const project = await fs.promises.readFile(`${this.metadata.getMyPath()}/tree.json`, 'utf8');
     const a = JSON.parse(project);
     this.logical_tree = a.logical_tree;
-    this.results = a.results;
     this.filesToScan = a.filesToScan;
     this.processedFiles = a.processedFiles;
     this.filesSummary = a.filesSummary;
@@ -83,22 +81,24 @@ export class Project extends EventEmitter {
   }
 
   public async close() {
-    console.log( `[ PROJECT ]: Closing project ${this.metadata.getMyPath()}`);
+    console.log( `[ PROJECT ]: Closing project ${this.metadata.getName()}`);
     this.state = ProjectState.CLOSED;
-    await this.scanner.stop();
+
+    console.log(this.scanner);
     this.scanner.removeAllListeners();
+    await this.scanner.stop();
     this.scanner = null;
     this.logical_tree = null;
     this.scans_db = null;
     this.filesToScan = null;
-    this.results = null;
     this.config = null;
   }
 
   public save(): void {
     this.metadata.save();
-    fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this).toString());
+    fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this));
     fs.writeFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, JSON.stringify(this.config, null, 2));
+    console.log(`[ PROJECT ]: Project saved`);
   }
 
   public async startScanner() {
@@ -113,26 +113,26 @@ export class Project extends EventEmitter {
     this.scans_db = new ScanDb(myPath);
     await this.scans_db.init();
     await this.scans_db.licenses.importFromJSON(licenses);
+    console.log(`[ PROJECT ]: Building tree`);
     this.build_tree();
+    console.log(`[ PROJECT ]: Applying filters to the tree`);
     this.indexScan(this.metadata.getScanRoot(), this.logical_tree, this.banned_list);
     const summary = { total: 0, include: 0, filter: 0, files: {} };
     this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
-    console.log(`[ FILTERS ]: Total: ${this.filesSummary.total} Filter:${this.filesSummary.filter} Include:${this.filesSummary.include}`);
+    console.log(`[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`);
     this.filesToScan = summary.files;
     this.metadata.setScannerState(ScanState.READY_TO_SCAN);
     this.metadata.setFileCounter(summary.include);
-    this.metadata.save();
     this.initializeScanner();
     this.scanner.cleanWorkDirectory();
     this.startScan();
   }
 
   public async resumeScanner() {
+    this.state = ProjectState.OPENED;
     if (this.metadata.getState() !== ScanState.SCANNING) return false;
     await this.open();
     this.initializeScanner();
-    console.log(`[ PROJECT ]: Removing temporary files from previous scan`);
-    this.scanner.cleanTmpDirectory();
     console.log(`[ PROJECT ]: Resuming scanner, pending ${Object.keys(this.filesToScan).length} files`)
     this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'scanning',
@@ -156,31 +156,27 @@ export class Project extends EventEmitter {
   }
 
   setScannerListeners() {
-    this.scanner.on(ScannerEvents.WINNOWING_STARTING, () => console.log('[ SCANNER ]: Starting Winnowing...'));
-    this.scanner.on(ScannerEvents.WINNOWING_NEW_WFP_FILE, (dir) => console.log(`[ SCANNER ]: New WFP File`));
-    this.scanner.on(ScannerEvents.WINNOWING_FINISHED, () => console.log('[ SCANNER ]: Winnowing Finished...'));
-    this.scanner.on(ScannerEvents.DISPATCHER_WFP_SENDED, (dir) => console.log(`[ SCANNER ]: Sending WFP file ${dir} to server`));
-    this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (data, dispatcherResponse) => {
-      const filesScanned: Array<any> = dispatcherResponse.getFilesScanned();
-      this.processedFiles += filesScanned.length;
-      console.log(`[ SCANNER ]: New ${filesScanned.length} files scanned`);
+    this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (response) => {
+      this.processedFiles += response.getNumberOfFilesScanned();
+      const filesScanned = response.getFilesScanned();
       // eslint-disable-next-line no-restricted-syntax
       for (const file of filesScanned) delete this.filesToScan[`${this.metadata.getScanRoot()}${file}`];
-      this.attachComponent(data);
-      this.save();
       this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
         processed: (100 * this.processedFiles) / this.filesSummary.include,
       });
     });
 
+    this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response) => {
+      this.attachComponent(response.getServerResponse());
+      this.save();
+    });
+
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
-      console.log(`[ SCANNER ]: Scan Finished... Results on: ${resPath}`);
       await this.scans_db.results.insertFromFile(resPath);
       await this.scans_db.components.importUniqueFromFile();
-      this.results = JSON.parse(fs.readFileSync(`${resPath}`, 'utf8'));
       this.metadata.setScannerState(ScanState.SCANNED);
-      this.save();
+      this.metadata.save();
       await this.close();
       this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
         success: true,
@@ -197,6 +193,10 @@ export class Project extends EventEmitter {
 
   startScan() {
     console.log(`[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`);
+    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: 'scanning',
+      processed: (100 * this.processedFiles) / this.filesSummary.include,
+    });
     this.metadata.setScannerState(ScanState.SCANNING);
     this.save();
     // eslint-disable-next-line prettier/prettier
@@ -252,8 +252,8 @@ export class Project extends EventEmitter {
     return this.metadata.getScanRoot();
   }
 
-  public getResults() {
-    return this.results;
+  public async getResults() {
+    return JSON.parse(await fs.promises.readFile(`${this.metadata.getMyPath()}/result.json`, 'utf8'));
   }
 
   build_tree() {
