@@ -15,7 +15,7 @@ import { InventoryDb } from './scan_inventory_db';
 import { ResultsDb } from './scan_results_db';
 import { LicenseDb } from './scan_license_db';
 import { ComponentDb } from './scan_component_db';
-import { Formats } from './export_formats';
+// import { Formats } from './export_formats';
 
 const query = new Querys();
 
@@ -32,7 +32,7 @@ export class ScanDb extends Db {
 
   lastID: any;
 
-  formats : Formats;
+//  formats : Formats;
 
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
   constructor(path:string) {
@@ -42,7 +42,7 @@ export class ScanDb extends Db {
     this.results = new ResultsDb(path);
     this.licenses = new LicenseDb(path);
     this.components = new ComponentDb(path);
-    this.formats = new Formats(path);
+    // this.formats = new Formats(path);
   }
 
  

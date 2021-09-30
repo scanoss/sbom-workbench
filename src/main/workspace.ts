@@ -6,6 +6,7 @@ import { Project } from './workspace/Project';
 import { WSA_E_CANCELLED } from 'constants';
 import Workspace from '../renderer/features/workspace/Workspace';
 import { Dashboard } from '@material-ui/icons';
+import { IProject } from '../api/types';
 ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
 
   try {
@@ -27,5 +28,16 @@ ipcMain.handle(IpcEvents.WORKSPACE_DELETE_PROJECT, async (event, projectPath: st
   } catch (error) {
     console.error(error);
     return Response.fail({ message: error.message });
+  }
+});
+
+
+ipcMain.handle(IpcEvents.UTILS_GET_PROJECT_DTO, async (event) => {
+  try {
+    const path: IProject = workspace.getOpenedProjects()[0].getDto();
+    return Response.ok({ message: 'Project path succesfully retrieved', data: path });      
+  } catch (e:any) {
+    console.log('Catch an error: ', e);
+    return Response.fail({ message: e.message });
   }
 });

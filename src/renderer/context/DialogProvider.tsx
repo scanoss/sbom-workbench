@@ -1,6 +1,7 @@
 /* eslint-disable import/no-cycle */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ipcRenderer } from 'electron';
 import { InventoryDialog } from '../ui/dialog/InventoryDialog';
 import { Component, Inventory, License, NewComponentDTO } from '../../api/types';
 import { InventorySelectorDialog } from '../features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
@@ -8,6 +9,7 @@ import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorRespons
 import { ConfirmDialog } from '../ui/dialog/ConfirmDialog';
 import { LicenseDialog } from '../ui/dialog/LicenseDialog';
 import { ComponentDialog } from '../ui/dialog/ComponentDialog';
+import { IpcEvents } from '../../ipc-events';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
@@ -128,6 +130,21 @@ export const DialogProvider: React.FC = ({ children }) => {
       });
     });
   };
+
+  const handleOpenSettings = () => {
+    console.error('Function not implemented.');
+  };
+
+  const setupAppMenuListeners = () => {
+    ipcRenderer.on(IpcEvents.MENU_OPEN_SETTINGS, handleOpenSettings);
+  };
+
+  const removeAppMenuListeners = () => {
+    ipcRenderer.removeListener(IpcEvents.MENU_OPEN_SETTINGS, handleOpenSettings);
+  };
+
+  useEffect(setupAppMenuListeners, []);
+  useEffect(() => () => removeAppMenuListeners(), []);
 
   return (
     <DialogContext.Provider
