@@ -14,8 +14,6 @@ interface CircularComponentProps {
 
 const CircularComponent = ({stage, progress, pauseScan}: CircularComponentProps) => {
 
-  console.log(progress);
-
   const variant = (stage === 'preparing' || stage === 'indexing') ? 'indeterminate' : 'determinate';
 
   const classes = useStyles();
