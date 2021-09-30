@@ -111,6 +111,10 @@
       background-color: #ebe92252 !important; // 266a8452
     }
 
+    .linenumber {
+      color: #eeeeee;
+    }
+
     span:not(.linenumber) {
       user-select: text !important;
       -webkit-user-select: text !important;
