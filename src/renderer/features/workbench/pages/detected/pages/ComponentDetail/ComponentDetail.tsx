@@ -289,11 +289,11 @@ export const ComponentDetail = () => {
   const renderTab = () => {
     switch (tab) {
       case 0:
-        return <FileList files={filterFiles.pending} onAction={onAction} />;
+        return <FileList files={filterFiles.pending} emptyMessage="No pending files" onAction={onAction} />;
       case 1:
         return <IdentifiedList files={filterFiles.identified} inventories={inventories} onAction={onAction} />;
       case 2:
-        return <FileList files={filterFiles.ignored} onAction={onAction} />;
+        return <FileList files={filterFiles.ignored} emptyMessage="No ignored files" onAction={onAction} />;
       default:
         return 'no data';
     }

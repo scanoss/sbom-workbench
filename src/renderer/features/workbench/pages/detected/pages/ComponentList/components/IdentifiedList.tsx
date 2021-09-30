@@ -37,6 +37,8 @@ export const IdentifiedList = ({ files, inventories, onAction }) => {
           <FileList files={groups[key]} onAction={onAction} />
         </section>
       ))}
+
+      {Object.keys(groups).length === 0 && <p>No identified files</p>}
     </div>
   );
 };

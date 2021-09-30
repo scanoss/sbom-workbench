@@ -66,7 +66,7 @@ const Workbench = () => {
             </Switch>
           ) : (
             <div className="loader">
-              <CircularProgress size={24} />
+              <CircularProgress size={30} />
             </div>
           )}
         </main>
