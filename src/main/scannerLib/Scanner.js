@@ -13,6 +13,7 @@ import { DispatcherEvents } from './Dispatcher/DispatcherEvents';
 import { DispatcherResponse } from './Dispatcher/DispatcherResponse';
 import { ScannerEvents } from './ScannerEvents';
 import { ScannerCfg } from './ScannerCfg';
+import { DispatchableItem } from './Dispatcher/DispatchableItem';
 
 const sortPaths = require ('sort-paths');
 
@@ -67,10 +68,11 @@ export class Scanner extends EventEmitter {
     this.#setDispatcherListeners();
   }
 
-  #setWinnowerListeners(){
-    this.#winnower.on(ScannerEvents.WINNOWING_NEW_CONTENT, (wfpContent) => {
+  #setWinnowerListeners() {
+    this.#winnower.on(ScannerEvents.WINNOWING_NEW_CONTENT, (winnowerResponse) => {
       console.log(`[ SCANNER ]: New WFP content`);
-      this.#dispatcher.dispatchWfpContent(wfpContent);
+      const disptItem = new DispatchableItem(winnowerResponse);
+      this.#dispatcher.dispatchItem(disptItem);
     });
 
     this.#winnower.on('error', (error) => {
@@ -172,7 +174,6 @@ export class Scanner extends EventEmitter {
   }
 
   #errorHandler(error, origin) {
-    console.log(error);
     this.stop();
     this.emit('error', error);
 
@@ -222,9 +223,10 @@ export class Scanner extends EventEmitter {
 
   stop() {
     console.log(`[ SCANNER ]: Closing scanner`);
+    this.#dispatcher.stop();
+    this.#winnower.stop();
     this.#winnower.removeAllListeners();
     this.#dispatcher.removeAllListeners();
-    this.#winnower.stop();
-    this.#dispatcher.stop();
+    this.#init();
   }
 }

@@ -9,6 +9,8 @@ import { ScannerEvents } from '../ScannerEvents';
 import { DispatcherResponse } from './DispatcherResponse';
 import { DispatcherEvents } from './DispatcherEvents';
 import { ScannerCfg } from '../ScannerCfg';
+import { VerticalAlignCenterSharp } from '@material-ui/icons';
+import { Resolver } from 'dns';
 
 export class Dispatcher extends EventEmitter {
   #scannerCfg;
@@ -26,6 +28,8 @@ export class Dispatcher extends EventEmitter {
   #queueMaxLimitReached;
 
   #queueMinLimitReached;
+
+  #recoverableErrors;
 
   constructor(scannerCfg = new ScannerCfg()) {
     super();
@@ -51,9 +55,13 @@ export class Dispatcher extends EventEmitter {
       }
     });
     this.#continue = true;
-    this.#wfpFailed = {};
+    this.#wfpFailed = [];
     this.#queueMaxLimitReached = false;
     this.#queueMinLimitReached = true;
+
+    this.#recoverableErrors = new Set();
+    this.#recoverableErrors.add('ECONNRESET');
+    this.#recoverableErrors.add('TIMEOUT');
   }
 
   stop() {
@@ -71,11 +79,9 @@ export class Dispatcher extends EventEmitter {
     this.#pQueue.start();
   }
 
-  dispatchWfpContent(wfpContent) {
-    this.#pQueue
-      .add(() => this.#dispatch(wfpContent))
-      .catch((error) => {
-        this.#errorHandler(error);
+  dispatchItem(disptItem) {
+    this.#pQueue.add(() => this.#dispatch(disptItem)).catch((error) => {
+        this.#errorHandler(error, disptItem);
       });
 
     if ( (this.#pQueue.size + this.#pQueue.pending) >= this.#scannerCfg.DISPATCHER_QUEUE_SIZE_MAX_LIMIT && !this.#queueMaxLimitReached) {
@@ -85,66 +91,70 @@ export class Dispatcher extends EventEmitter {
     }
   }
 
-  #errorHandler(error) {
-    // a) El server cierra el socket 'ECONNRESET' Seguir reintentando n veces
-    // b) Hay timeout en el .wfp 'TIMEOUT'  Tendria que reintentar x veces ese especifico wfp
-    // c) Error en el parser error directo
-    // d) Error en la coneccion internet error directo
-    // e) Couta terminada error directo
-    // f) Cliente desactualizado error directo
+  #resolvePromisesAndEmitError(error) {
+    if (!this.#pQueue.pending) {
+      this.emit('error', error);
+      this.#pQueue.removeAllListeners();
+      return;
+    }
+    this.#pQueue.pause();
+    this.#pQueue.on('next', () => {
+      console.log(`PROMESAS PENDIENTES: ${this.#pQueue.pending}`);
+      if (this.#pQueue.pending === 0) {
+        this.emit('error', error);
+      }
+    });
 
-    // switch(error.code) {
-    //   case 'ECONNRESET': // Server closes the socket.
-    //     break;
+  }
 
-    //   default:
+  #errorHandler(error, disptItem) {
+    if (error.name === 'TimeoutError') {
+      // eslint-disable-next-line no-param-reassign
+      error = new Error('TIMEOUT');
+      error.code = 'TIMEOUT';
+    }
 
-    // }
+    if (this.#recoverableErrors.has(error.code)) {
+      console.log(`[ SCANNER ]: Recoverable error happened sending WFP. Reason: ${error.code}`);
+      disptItem.increaseErrorCounter();
+      if (disptItem.getErrorCounter() >= 1) {
 
+      }
+      console.log("Agregando item de nuevo a la cola");
+      this.#dispatch(disptItem);
+      return;
+    }
 
-    // if (error.code === 'ECONNRESET')
-    //   // Se agrega al final de la cola y que no se alla mandado mas de x veces
-    // if (error.code === 'PARSER-ERROR')
-    //   this.emit('error', error);
-
-    // if ( this.#wfpFailed[error.wfpFailedPath] > 3 ) {
-    //   this.emit('error', error);
-    // }
-
+    this.stop();
     this.emit('error', error);
   }
 
-  async #dispatch(wfpContent) {
-    try {
-      let dataAsText = '';
-      let dataAsObj = {};
-      const form = new FormData();
-      form.append('filename', wfpContent, 'data.wfp');
+  async #dispatch(disptItem) {
+    let dataAsText = '';
+    let dataAsObj = {};
+    const form = new FormData();
+    form.append('filename', disptItem.getContent(), 'data.wfp');
 
-      // Fetch
-      const p1 = fetch(this.#scannerCfg.API_URL, {
-        method: 'post',
-        body: form,
-        headers: { 'User-Agent': this.#scannerCfg.CLIENT_TIMESTAMP },
-      });
+    // Fetch
+    const p1 = fetch(this.#scannerCfg.API_URL, {
+      method: 'post',
+      body: form,
+      headers: { 'User-Agent': this.#scannerCfg.CLIENT_TIMESTAMP },
+    });
 
-      this.emit(ScannerEvents.DISPATCHER_WFP_SENDED);
-      const response = await p1;
-      if (!response.ok) {
-        const msg = await response.text();
-        const err = new Error(msg);
-        err.code = response.status;
-        err.name = ScannerEvents.ERROR_SERVER_SIDE;
-        throw err;
-      }
-      dataAsText = await response.text();
-      dataAsObj = JSON.parse(dataAsText);
-      const dispatcherResponse = new DispatcherResponse(dataAsObj, wfpContent);
-      this.emit(ScannerEvents.DISPATCHER_NEW_DATA, dispatcherResponse);
-      return await Promise.resolve();
-    } catch (error) {
-        if (error.name !== ScannerEvents.ERROR_SERVER_SIDE) error.name = ScannerEvents.ERROR_CLIENT_SIDE;
-        throw error;
+    this.emit(ScannerEvents.DISPATCHER_WFP_SENDED);
+    const response = await p1;
+    if (!response.ok) {
+      const msg = await response.text();
+      const err = new Error(msg);
+      err.code = response.status;
+      err.name = ScannerEvents.ERROR_SERVER_SIDE;
+      throw err;
     }
+    dataAsText = await response.text();
+    dataAsObj = JSON.parse(dataAsText);
+    const dispatcherResponse = new DispatcherResponse(dataAsObj, disptItem.getContent());
+    this.emit(ScannerEvents.DISPATCHER_NEW_DATA, dispatcherResponse);
+    return Promise.resolve();
   }
 }

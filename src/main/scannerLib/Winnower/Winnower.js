@@ -4,6 +4,7 @@ import EventEmitter from 'events';
 import { ScannerEvents } from '../ScannerEvents.js';
 import { ScannableItem } from '../Scannable/ScannableItem.js';
 import { ScannerCfg } from '../ScannerCfg.js';
+import { WinnowerResponse } from './WinnowerResponse.js';
 
 const stringWorker = `
 const { parentPort } = require('worker_threads');
@@ -297,7 +298,8 @@ export class Winnower extends EventEmitter {
   }
 
   #processPackedWfp(content) {
-    this.emit(ScannerEvents.WINNOWING_NEW_CONTENT, content);
+    const wnRsp = new WinnowerResponse(content);
+    this.emit(ScannerEvents.WINNOWING_NEW_CONTENT, wnRsp);
   }
 
   async #getNextScannableItem() {

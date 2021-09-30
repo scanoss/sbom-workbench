@@ -83,8 +83,6 @@ export class Project extends EventEmitter {
   public async close() {
     console.log( `[ PROJECT ]: Closing project ${this.metadata.getName()}`);
     this.state = ProjectState.CLOSED;
-
-    console.log(this.scanner);
     this.scanner.removeAllListeners();
     await this.scanner.stop();
     this.scanner = null;
