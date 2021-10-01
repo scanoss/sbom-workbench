@@ -36,9 +36,18 @@ class Workspace extends EventEmitter {
     // if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes
     console.log(`[ WORKSPACE ]: Reading projects....`);
     const projectPaths = await this.getAllProjectsPaths();
-    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) => Project.readFromPath(projectPath)
-    .then((p) => {console.log(`[ WORKSPACE ]: Successfully read project ${projectPath}`); return p;})
-    .catch((e) => { console.log(`[ WORKSPACE ]: Cannot read project ${projectPath}`); throw e;}));
+    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) =>
+      Project.readFromPath(projectPath)
+        .then((p) => {
+          console.log(`[ WORKSPACE ]: Successfully read project ${projectPath}`);
+          return p;
+        })
+        .catch((e) => {
+          console.log(`[ WORKSPACE ]: Cannot read project ${projectPath}`);
+          throw e;
+        })
+    );
+
     let projectsReaded = (await Promise.allSettled(projectArray)) as PromiseSettledResult<Project>[];
     projectsReaded = projectsReaded.filter((p) => p.status === 'fulfilled');
     this.projectList = projectsReaded.map((p) => (p as PromiseFulfilledResult<Project>).value);
@@ -52,7 +61,9 @@ class Workspace extends EventEmitter {
   public getOpenedProjects(): Array<Project> {
     const openedProjects: Array<Project> = new Array<Project>();
     // eslint-disable-next-line no-restricted-syntax
-    for (const p of this.projectList) if (p.getState() === ProjectState.OPENED) openedProjects.push(p);
+    for (const p of this.projectList) {
+      if (p.getState() === ProjectState.OPENED) openedProjects.push(p);
+    }
     return openedProjects;
   }
 
@@ -75,8 +86,6 @@ class Workspace extends EventEmitter {
     return false;
   }
 
-
-
   public async removeProjectByPath(pPath: string) {
     const p = this.getProjectByPath(pPath);
     await this.removeProject(p);
@@ -95,9 +104,6 @@ class Workspace extends EventEmitter {
     return null;
   }
 
-
-
-
   public closeProjectByUuid(uuid: string) {
     // eslint-disable-next-line no-restricted-syntax
     for (const p of this.projectList) {
@@ -107,7 +113,6 @@ class Workspace extends EventEmitter {
       }
     }
   }
-
 
   public async closeProjectByPath(path: string) {
     // eslint-disable-next-line no-restricted-syntax
@@ -188,7 +193,9 @@ class Workspace extends EventEmitter {
       console.log(`[ WORKSPACE ]: Cannot read the workspace directory ${this.wsPath}`);
       console.log(e);
     });
-    const projectsDirEnt = workspaceStuff.filter((dirent) => {return !dirent.isSymbolicLink() && !dirent.isFile();})
+    const projectsDirEnt = workspaceStuff.filter((dirent) => {
+      return !dirent.isSymbolicLink() && !dirent.isFile();
+    });
     const projectPaths = projectsDirEnt.map((dirent) => `${this.wsPath}/${dirent.name}`);
     return projectPaths;
   }
@@ -221,9 +228,6 @@ class Workspace extends EventEmitter {
     if (a.isDirectory() && !b.isDirectory()) return -1;
     return 0;
   }
-
-
-
 
   async listProjects() {
     const projects: Array<any> = [];
