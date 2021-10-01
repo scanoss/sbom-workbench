@@ -21,7 +21,6 @@ export class WorkspaceFileModel implements IWorkspaceModel {
 
   public async setWSConfig(path: string, config: Partial<IWorkspaceCfg>) {
     try {
-     
       if (await this.wsUtils.fileExist(`${path}/${this.fileName}`)) {
         const file = fs.promises.readFile(`${path}/${this.fileName}`);
         const aux = { ...file, ...config };
