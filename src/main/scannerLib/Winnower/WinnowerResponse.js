@@ -14,4 +14,9 @@ export class WinnowerResponse {
   getContent() {
     return this.#wfpContent;
   }
+
+  getFilesWinnowed() {
+    return ((this.#wfpContent || '').match(/file=/g) || []).length;
+  }
+
 }

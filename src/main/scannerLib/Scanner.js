@@ -48,6 +48,8 @@ export class Scanner extends EventEmitter {
 
   #processedFiles;
 
+  #isStopped;
+
   constructor(scannerCfg = new ScannerCfg()) {
     super();
     this.#scannerCfg = scannerCfg;
@@ -60,7 +62,7 @@ export class Scanner extends EventEmitter {
     this.#processingNewData = false;
     this.#processedFiles = 0;
     this.#responseBuffer = [];
-
+    this.#isStopped = false;
     this.#winnower = new Winnower(this.#scannerCfg);
     this.#dispatcher = new Dispatcher(this.#scannerCfg);
 
@@ -78,11 +80,9 @@ export class Scanner extends EventEmitter {
     this.#winnower.on('error', (error) => {
       this.#errorHandler(error, ScannerEvents.MODULE_WINNOWER);
     });
-    /* ******************* SETTING WINNOWING EVENTS ******************* */
   }
 
   #setDispatcherListeners() {
-    /* ******************* SETTING DISPATCHER EVENTS ******************** */
     this.#dispatcher.on(ScannerEvents.DISPATCHER_QUEUE_SIZE_MAX_LIMIT, () => {
       console.log(`[ SCANNER ]: Maximum queue size reached. Winnower will be paused`);
       this.#winnower.pause();
@@ -114,7 +114,6 @@ export class Scanner extends EventEmitter {
     this.#dispatcher.on('error', (error) => {
       this.#errorHandler(error, ScannerEvents.MODULE_DISPATCHER);
     });
-    /* ******************* SETTING DISPATCHER EVENTS ******************** */
   }
 
   #insertIntoBuffer(dispatcherResponse) {
@@ -174,11 +173,13 @@ export class Scanner extends EventEmitter {
   }
 
   #errorHandler(error, origin) {
+    //console.log(error);
     this.stop();
-    this.emit('error', error);
 
     if (origin === ScannerEvents.MODULE_DISPATCHER) {}
     if (origin === ScannerEvents.MODULE_WINNOWER) {}
+
+    this.emit('error', error);
   }
 
   #createOutputFiles() {
@@ -222,11 +223,18 @@ export class Scanner extends EventEmitter {
   }
 
   stop() {
-    console.log(`[ SCANNER ]: Closing scanner`);
-    this.#dispatcher.stop();
-    this.#winnower.stop();
+    this.#isStopped = true;
+    console.log(`[ SCANNER ]: Stopping scanner`);
     this.#winnower.removeAllListeners();
     this.#dispatcher.removeAllListeners();
+    this.#dispatcher.stop();
+    this.#winnower.stop();
     this.#init();
   }
+
+  isStopped() {
+    return this.#isStopped;
+  }
+
+
 }

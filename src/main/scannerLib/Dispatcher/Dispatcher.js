@@ -3,23 +3,22 @@
 import EventEmitter from 'events';
 import fetch from 'node-fetch';
 import FormData from 'form-data';
-import fs from 'fs';
 import PQueue from 'p-queue';
 import { ScannerEvents } from '../ScannerEvents';
 import { DispatcherResponse } from './DispatcherResponse';
-import { DispatcherEvents } from './DispatcherEvents';
 import { ScannerCfg } from '../ScannerCfg';
-import { VerticalAlignCenterSharp } from '@material-ui/icons';
-import { Resolver } from 'dns';
+import { GlobalControllerAborter } from './GlobalControllerAborter';
 
 export class Dispatcher extends EventEmitter {
   #scannerCfg;
 
   #pQueue;
 
-  #status;
+  #globalAbortController;
 
   #error;
+
+  #onErrorStatus;
 
   #wfpFailed;
 
@@ -40,8 +39,6 @@ export class Dispatcher extends EventEmitter {
   #init() {
     this.#pQueue = new PQueue({
       concurrency: this.#scannerCfg.CONCURRENCY_LIMIT,
-      timeout: this.#scannerCfg.TIMEOUT,
-      throwOnTimeout: true,
     });
     this.#pQueue.clear();
     this.#pQueue.on('idle', () => {
@@ -56,8 +53,11 @@ export class Dispatcher extends EventEmitter {
     });
     this.#continue = true;
     this.#wfpFailed = [];
+    this.#onErrorStatus = false;
     this.#queueMaxLimitReached = false;
     this.#queueMinLimitReached = true;
+
+    this.#globalAbortController = new GlobalControllerAborter();
 
     this.#recoverableErrors = new Set();
     this.#recoverableErrors.add('ECONNRESET');
@@ -70,91 +70,82 @@ export class Dispatcher extends EventEmitter {
     this.#pQueue.pause();
   }
 
-  pause() {
-    this.#pQueue.pause();
-  }
-
-  resume() {
-    for (const wfpPathFailed in this.#wfpFailed) this.dispatchWfpFile(wfpPathFailed);
-    this.#pQueue.start();
-  }
-
   dispatchItem(disptItem) {
-    this.#pQueue.add(() => this.#dispatch(disptItem)).catch((error) => {
-        this.#errorHandler(error, disptItem);
-      });
+    this.#pQueue.add(() => this.#dispatch(disptItem));
 
-    if ( (this.#pQueue.size + this.#pQueue.pending) >= this.#scannerCfg.DISPATCHER_QUEUE_SIZE_MAX_LIMIT && !this.#queueMaxLimitReached) {
+    if (
+      this.#pQueue.size + this.#pQueue.pending >= this.#scannerCfg.DISPATCHER_QUEUE_SIZE_MAX_LIMIT &&
+      !this.#queueMaxLimitReached
+    ) {
       this.emit(ScannerEvents.DISPATCHER_QUEUE_SIZE_MAX_LIMIT);
       this.#queueMaxLimitReached = true;
       this.#queueMinLimitReached = false;
     }
   }
 
-  #resolvePromisesAndEmitError(error) {
-    if (!this.#pQueue.pending) {
-      this.emit('error', error);
-      this.#pQueue.removeAllListeners();
-      return;
-    }
-    this.#pQueue.pause();
-    this.#pQueue.on('next', () => {
-      console.log(`PROMESAS PENDIENTES: ${this.#pQueue.pending}`);
-      if (this.#pQueue.pending === 0) {
-        this.emit('error', error);
-      }
-    });
-
-  }
-
-  #errorHandler(error, disptItem) {
-    if (error.name === 'TimeoutError') {
-      // eslint-disable-next-line no-param-reassign
-      error = new Error('TIMEOUT');
-      error.code = 'TIMEOUT';
-    }
-
-    if (this.#recoverableErrors.has(error.code)) {
-      console.log(`[ SCANNER ]: Recoverable error happened sending WFP. Reason: ${error.code}`);
-      disptItem.increaseErrorCounter();
-      if (disptItem.getErrorCounter() >= 1) {
-
-      }
-      console.log("Agregando item de nuevo a la cola");
-      this.#dispatch(disptItem);
-      return;
-    }
-
+  #handleUnrecoverableError(error, disptItem) {
+    console.log(`[ SCANNER ]: Unrecoverable dispatcher error. Stopping...`);
     this.stop();
+    this.#globalAbortController.abortAll();
     this.emit('error', error);
   }
 
-  async #dispatch(disptItem) {
-    let dataAsText = '';
-    let dataAsObj = {};
-    const form = new FormData();
-    form.append('filename', disptItem.getContent(), 'data.wfp');
+  #errorHandler(error, disptItem) {
+    if (error.name === 'AbortError') error.name = 'TIMEOUT';
 
-    // Fetch
-    const p1 = fetch(this.#scannerCfg.API_URL, {
-      method: 'post',
-      body: form,
-      headers: { 'User-Agent': this.#scannerCfg.CLIENT_TIMESTAMP },
-    });
+    if (!this.#globalAbortController.isAborting()) {
+      if (this.#recoverableErrors.has(error.code) || this.#recoverableErrors.has(error.name)) {
+        disptItem.increaseErrorCounter();
+        if (disptItem.getErrorCounter() >= this.#scannerCfg.MAX_RETRIES_FOR_RECOVERABLES_ERRORS) {
+          this.#handleUnrecoverableError(error, disptItem);
+          return;
+        }
+        const leftRetry = this.#scannerCfg.MAX_RETRIES_FOR_RECOVERABLES_ERRORS - disptItem.getErrorCounter();
+        console.log(`[ SCANNER ]: Recoverable error happened sending WFP content to server. Reason: ${error.code || error.name}`);
+        this.#dispatch(disptItem);
+        return;
+      }
 
-    this.emit(ScannerEvents.DISPATCHER_WFP_SENDED);
-    const response = await p1;
-    if (!response.ok) {
-      const msg = await response.text();
-      const err = new Error(msg);
-      err.code = response.status;
-      err.name = ScannerEvents.ERROR_SERVER_SIDE;
-      throw err;
+      this.#handleUnrecoverableError(error, disptItem);
     }
-    dataAsText = await response.text();
-    dataAsObj = JSON.parse(dataAsText);
-    const dispatcherResponse = new DispatcherResponse(dataAsObj, disptItem.getContent());
-    this.emit(ScannerEvents.DISPATCHER_NEW_DATA, dispatcherResponse);
-    return Promise.resolve();
+  }
+
+  async #dispatch(disptItem) {
+    const timeoutController = this.#globalAbortController.getAbortController();
+    const timeoutId = setTimeout(() => timeoutController.abort(), this.#scannerCfg.TIMEOUT);
+    try {
+      const form = new FormData();
+      form.append('filename', disptItem.getContent(), 'data.wfp');
+      this.emit(ScannerEvents.DISPATCHER_WFP_SENDED);
+      const response = await fetch(this.#scannerCfg.API_URL, {
+        method: 'post',
+        body: form,
+        headers: { 'User-Agent': this.#scannerCfg.CLIENT_TIMESTAMP },
+        signal: timeoutController.signal,
+      });
+
+      clearTimeout(timeoutId);
+      this.#globalAbortController.removeAbortController(timeoutController);
+
+      if (!response.ok) {
+        const msg = await response.text();
+        const err = new Error(msg);
+        err.code = response.status;
+        err.name = ScannerEvents.ERROR_SERVER_SIDE;
+        throw err;
+      }
+
+      const dataAsText = await response.text();
+      const dataAsObj = JSON.parse(dataAsText);
+
+      const dispatcherResponse = new DispatcherResponse(dataAsObj, disptItem.getContent());
+      this.emit(ScannerEvents.DISPATCHER_NEW_DATA, dispatcherResponse);
+      return Promise.resolve();
+    } catch (e) {
+        clearTimeout(timeoutId);
+        this.#globalAbortController.removeAbortController(timeoutController);
+        this.#errorHandler(e, disptItem);
+        return Promise.resolve();
+    }
   }
 }

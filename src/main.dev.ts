@@ -153,7 +153,7 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.whenReady().then(createWindow).then(mainLogic).catch(console.log);
+app.whenReady().then(mainLogic)//.then(createWindow).catch(console.log);
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
@@ -171,6 +171,15 @@ export interface IInitScan {
 
 async function mainLogic() {
   await workspace.read(`${os.homedir()}/scanoss-workspace`);
+
+
+    const path = "/home/ubuntu/scanoss-workspace/qtbase";
+    const p: Project = workspace.getProjectByPath(path);
+    // p.setMailbox(event.sender);
+    await p.resumeScanner();
+
+
+
 }
 
 

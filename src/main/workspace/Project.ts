@@ -81,10 +81,9 @@ export class Project extends EventEmitter {
   }
 
   public async close() {
-    console.log( `[ PROJECT ]: Closing project ${this.metadata.getName()}`);
+    if (this.scanner && this.scanner.isStopped()) this.scanner.stop();
+    console.log(`[ PROJECT ]: Closing project ${this.metadata.getName()}`);
     this.state = ProjectState.CLOSED;
-    this.scanner.removeAllListeners();
-    await this.scanner.stop();
     this.scanner = null;
     this.logical_tree = null;
     this.scans_db = null;
@@ -132,7 +131,7 @@ export class Project extends EventEmitter {
     await this.open();
     this.initializeScanner();
     console.log(`[ PROJECT ]: Resuming scanner, pending ${Object.keys(this.filesToScan).length} files`)
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'scanning',
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
@@ -159,7 +158,7 @@ export class Project extends EventEmitter {
       const filesScanned = response.getFilesScanned();
       // eslint-disable-next-line no-restricted-syntax
       for (const file of filesScanned) delete this.filesToScan[`${this.metadata.getScanRoot()}${file}`];
-      this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
         processed: (100 * this.processedFiles) / this.filesSummary.include,
       });
@@ -176,7 +175,7 @@ export class Project extends EventEmitter {
       this.metadata.setScannerState(ScanState.SCANNED);
       this.metadata.save();
       await this.close();
-      this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
+      this.sendToUI(IpcEvents.SCANNER_FINISH_SCAN, {
         success: true,
         resultsPath: this.metadata.getMyPath(),
       });
@@ -185,13 +184,13 @@ export class Project extends EventEmitter {
     this.scanner.on('error', async (error) => {
       this.save();
       await this.close();
-      this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
+      this.sendToUI(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
   }
 
   startScan() {
     console.log(`[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`);
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'scanning',
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
@@ -199,6 +198,10 @@ export class Project extends EventEmitter {
     this.save();
     // eslint-disable-next-line prettier/prettier
     this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
+  }
+
+  sendToUI(eventName, data: any) {
+    if (this.msgToUI) this.msgToUI.send(eventName, data);
   }
 
   setMailbox(mailbox: Electron.WebContents) {
@@ -399,7 +402,7 @@ export class Project extends EventEmitter {
     if (jsonScan.type === 'file') {
       this.filesIndexed += 1;
       if (this.filesIndexed % 100 === 0)
-        this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+          this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
           stage: `indexing`,
           processed: this.filesIndexed,
         });
