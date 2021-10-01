@@ -3,7 +3,7 @@ import { Component, License, ComponentGroup } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { ComponentParams } from './db/scan_component_db';
 import { Response } from './Response';
-import { workspace } from './workspace/workspace';
+import { workspace } from './workspace/Workspace';
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (event, component: Component) => {
   const data = await workspace.getOpenedProjects()[0].scans_db.components.getAll(component);

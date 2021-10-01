@@ -1,4 +1,4 @@
-import { workspace } from '../../workspace/workspace';
+import { workspace } from '../../workspace/Workspace';
 import { Format } from '../Format';
 
 export class SpdxLite extends Format {

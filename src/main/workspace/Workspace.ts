@@ -6,6 +6,8 @@ import path from 'path';
 import { Metadata } from './Metadata';
 import { Project } from './Project';
 import { IProject, IProjectCfg, IWorkspaceCfg, ProjectState } from '../../api/types';
+import { WorkspaceFileModel } from './workspaceModel/WorkspaceFileModel';
+import { IWorkspaceModel } from './workspaceModel/IWorkspaceModel';
 
 /**
  *
@@ -21,6 +23,8 @@ const DEFAULT_WORKSPACE_CONFIG: IWorkspaceCfg = {
 class Workspace extends EventEmitter {
   projectList: Array<Project>;
 
+  workspaceModel: IWorkspaceModel;
+
   wsPath: string;
 
   workspaceConfig: IWorkspaceCfg;
@@ -28,6 +32,7 @@ class Workspace extends EventEmitter {
   constructor() {
     super();
     this.projectList = [];
+    this.workspaceModel = new WorkspaceFileModel();
   }
 
   public async read(workspacePath: string) {
@@ -36,9 +41,17 @@ class Workspace extends EventEmitter {
     // if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes
     console.log(`[ WORKSPACE ]: Reading projects....`);
     const projectPaths = await this.getAllProjectsPaths();
-    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) => Project.readFromPath(projectPath)
-    .then((p) => {console.log(`[ WORKSPACE ]: Successfully read project ${projectPath}`); return p;})
-    .catch((e) => { console.log(`[ WORKSPACE ]: Cannot read project ${projectPath}`); throw e;}));
+    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) =>
+      Project.readFromPath(projectPath)
+        .then((p) => {
+          console.log(`[ WORKSPACE ]: Successfully read project ${projectPath}`);
+          return p;
+        })
+        .catch((e) => {
+          console.log(`[ WORKSPACE ]: Cannot read project ${projectPath}`);
+          throw e;
+        })
+    );
     let projectsReaded = (await Promise.allSettled(projectArray)) as PromiseSettledResult<Project>[];
     projectsReaded = projectsReaded.filter((p) => p.status === 'fulfilled');
     this.projectList = projectsReaded.map((p) => (p as PromiseFulfilledResult<Project>).value);
@@ -75,8 +88,6 @@ class Workspace extends EventEmitter {
     return false;
   }
 
-
-
   public async removeProjectByPath(pPath: string) {
     const p = this.getProjectByPath(pPath);
     await this.removeProject(p);
@@ -95,9 +106,6 @@ class Workspace extends EventEmitter {
     return null;
   }
 
-
-
-
   public closeProjectByUuid(uuid: string) {
     // eslint-disable-next-line no-restricted-syntax
     for (const p of this.projectList) {
@@ -107,7 +115,6 @@ class Workspace extends EventEmitter {
       }
     }
   }
-
 
   public async closeProjectByPath(path: string) {
     // eslint-disable-next-line no-restricted-syntax
@@ -132,7 +139,7 @@ class Workspace extends EventEmitter {
   public resumeProjectByPath(path: string) {
     // eslint-disable-next-line no-restricted-syntax
     for (const p of this.projectList) {
-      if (p.myPath === path) {
+      if (p.getMyPath() === path) {
         p.resume();
         break;
       }
@@ -158,29 +165,36 @@ class Workspace extends EventEmitter {
     const pDirectory = `${this.wsPath}/${p.getProjectName()}`;
     await fs.promises.mkdir(pDirectory);
     p.setMyPath(pDirectory);
-    p.setConfig(this.createProjectCfg());
+    p.setConfig(await this.createProjectCfg());
     await p.save();
     this.projectList.push(p);
     return this.projectList.length - 1;
   }
 
-  private createProjectCfg(): IProjectCfg {
+  private mergeWsCfgToPjCfg(workspace: IWorkspaceCfg): IProjectCfg {
     const projectCfg: IProjectCfg = {
-      DEFAULT_URL_API: this.workspaceConfig.AVAILABLE_URL_API[this.workspaceConfig.DEFAULT_URL_API],
-      SCAN_MODE: this.workspaceConfig.SCAN_MODE,
-      TOKEN: this.workspaceConfig.TOKEN,
+      DEFAULT_URL_API: workspace.AVAILABLE_URL_API[workspace.DEFAULT_URL_API],
+      TOKEN: workspace.TOKEN,
+      SCAN_MODE: workspace.SCAN_MODE,
     };
     return projectCfg;
   }
 
+  private async createProjectCfg(): Promise<IProjectCfg> {
+    try {
+      const cfg = await this.workspaceModel.getWSConfig(this.wsPath);
+      const cfgWorkspace: IWorkspaceCfg = JSON.parse(cfg);
+      if (cfgWorkspace.AVAILABLE_URL_API.length > 0 && cfgWorkspace.DEFAULT_URL_API >= 0)
+        return this.mergeWsCfgToPjCfg(cfgWorkspace);
+    } catch (e) {
+      return this.mergeWsCfgToPjCfg(this.workspaceConfig);
+    }
+    return this.mergeWsCfgToPjCfg(this.workspaceConfig);
+  }
+
   private async initWorkspaceFileSystem() {
     if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
-
-    if (!fs.existsSync(`${this.wsPath}/defaultCfg.json`))
-      fs.writeFileSync(`${this.wsPath}/defaultCfg.json`, JSON.stringify(DEFAULT_WORKSPACE_CONFIG, null, 2));
-
-    const cfg = await fs.promises.readFile(`${this.wsPath}/defaultCfg.json`, 'utf8');
-    this.workspaceConfig = JSON.parse(cfg) as IWorkspaceCfg;
+    this.workspaceConfig = DEFAULT_WORKSPACE_CONFIG;
   }
 
   private async getAllProjectsPaths() {
@@ -188,7 +202,9 @@ class Workspace extends EventEmitter {
       console.log(`[ WORKSPACE ]: Cannot read the workspace directory ${this.wsPath}`);
       console.log(e);
     });
-    const projectsDirEnt = workspaceStuff.filter((dirent) => {return !dirent.isSymbolicLink() && !dirent.isFile();})
+    const projectsDirEnt = workspaceStuff.filter((dirent) => {
+      return !dirent.isSymbolicLink() && !dirent.isFile();
+    });
     const projectPaths = projectsDirEnt.map((dirent) => `${this.wsPath}/${dirent.name}`);
     return projectPaths;
   }
@@ -222,9 +238,6 @@ class Workspace extends EventEmitter {
     return 0;
   }
 
-
-
-
   async listProjects() {
     const projects: Array<any> = [];
     try {
@@ -256,6 +269,24 @@ class Workspace extends EventEmitter {
     } catch (e) {
       console.log(e);
       return [];
+    }
+  }
+
+  public async getWSConfig(): Promise<IWorkspaceCfg> {
+    try {
+      const wsConf: IWorkspaceCfg = await this.workspaceModel.getWSConfig(this.wsPath);
+      return wsConf;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  public async setWSConfig(config: Partial<IWorkspaceCfg>) {
+    try {
+      if (await this.workspaceModel.setWSConfig(this.wsPath, config)) return config;
+      throw new Error('Unable to write config file');
+    } catch (e) {
+      return new Error('Workspace config was not set successfully');
     }
   }
 }

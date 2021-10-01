@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import { ItemInclude } from '../api/types';
 import { IpcEvents } from '../ipc-events';
-import { defaultWorkspace } from './workspace/workspace';
+import { defaultWorkspace } from './workspace/Workspace';
 // import { Component } from '../renderer/workbench/WorkbenchProvider';
 
 ipcMain.handle(IpcEvents.ITEM_INCLUDE, (event, arg: ItemInclude) => {

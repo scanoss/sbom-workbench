@@ -29,7 +29,7 @@ import { ExportFormat } from '../../../../../api/export-service';
 import { projectService } from '../../../../../api/project-service';
 import { dialogController } from '../../../../dialog-controller';
 import { FormatVersion, IProject } from '../../../../../api/types';
-import { workspace } from '../../../../../main/workspace/workspace';
+import { workspace } from '../../../../../main/workspace/Workspace';
 import { workspaceService } from '../../../../../api/workspace-service';
 
 
