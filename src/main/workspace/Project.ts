@@ -82,11 +82,11 @@ export class Project extends EventEmitter {
 
   public async close() {
     console.log( `[ PROJECT ]: Closing project ${this.metadata.getName()}`);
-    this.state = ProjectState.CLOSED;
-
-    console.log(this.scanner);
-    this.scanner.removeAllListeners();
-    await this.scanner.stop();
+    this.state = ProjectState.CLOSED;  
+    if(this.scanner){
+      this.scanner.removeAllListeners();
+      await this.scanner.stop();
+    }
     this.scanner = null;
     this.logical_tree = null;
     this.scans_db = null;
@@ -425,7 +425,7 @@ export class Project extends EventEmitter {
 
 
   public getToken(){
-    const txt = fs.readFileSync(`${this.work_root}/projectCfg.json`,'utf8');
+    const txt = fs.readFileSync(`${this.metadata.getMyPath()}/projectCfg.json`,'utf8');
     const cfg = JSON.parse(txt);
     return cfg.TOKEN;
   }

@@ -59,7 +59,8 @@ ipcMain.handle(IpcEvents.REPORT_DETECTED, async (event, arg: string) => {
   crypto = [{ label: 'None', files: [], value: 0 }];
 
   try {
-    const a = workspace.getOpenedProjects()[0].getResults();
+    
+    const a = await workspace.getOpenedProjects()[0].getResults();    
     for (const [key, results] of Object.entries(a)) {
       for (const result of results) {
         if (result.id != 'none') {
