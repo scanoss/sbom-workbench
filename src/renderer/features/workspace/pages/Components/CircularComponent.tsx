@@ -1,29 +1,28 @@
-import { Box, CircularProgress, IconButton, Typography } from '@material-ui/core';
-import { grey } from "@material-ui/core/colors";
+import { Box, CircularProgress, IconButton, Typography, makeStyles, Button } from '@material-ui/core';
+import { grey } from '@material-ui/core/colors';
 import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@material-ui/core';
+
 import PauseIcon from '@material-ui/icons/Pause';
 
-
-
 interface CircularComponentProps {
-  stage: String;
-  progress: Number;
+  stage: string;
+  progress: number;
   pauseScan: () => void;
 }
 
 const trackColor = '#D4D4D8';
-const textColor = '#71717A';  
+const textColor = '#71717A';
 const backgroundColor = '#fefffe';
 
 const useStyles = makeStyles((theme) => ({
   parentBox: {
     position: 'relative',
+    marginBottom: 60,
   },
   circleParentBox: {
     display: 'flex',
-    alignItems: 'center',  
-    justifyContent: 'center', 
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   trackCircularProgress: {
     color: trackColor,
@@ -63,7 +62,6 @@ const useStyles = makeStyles((theme) => ({
   },
   pause: {
     color: textColor,
-    fontSize: '0.75em',
     zIndex: 5,
   },
   pauseContainer: {
@@ -74,56 +72,46 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CircularComponent = ({stage, progress, pauseScan}: CircularComponentProps) => {
-
-  const variant = (stage === 'preparing' || stage === 'indexing') ? 'indeterminate' : 'determinate';
+const CircularComponent = ({ stage, progress, pauseScan }: CircularComponentProps) => {
+  const variant = stage === 'preparing' || stage === 'indexing' ? 'indeterminate' : 'determinate';
 
   const classes = useStyles();
 
-    return (
+  return (
     <div className={classes.parentBox}>
       <div className={classes.circleParentBox}>
-            <CircularProgress
-              variant="determinate"
-              className={classes.trackCircularProgress}
-              size={'400px'}
-              thickness={3}
-              value={100}
-            />
-          <CircularProgress
-            variant={variant}
-            size={'400px'}
-            thickness={3}
-            className={classes.circularProgress}
-            disableShrink
-            {...{value: progress}}
-            />
-        </div>
-    <div
-      className={classes.typographyContainer}
-    >
-      <div className={classes.numberStageContainer}>
-        <span className={classes.number}>
-          {Math.round(progress)}{variant === 'determinate' ? '%' : ''}
-        </span>
-        <span className={classes.stage}>
-          {stage.toUpperCase()}
-        </span>
+        <CircularProgress
+          variant="determinate"
+          className={classes.trackCircularProgress}
+          size="340px"
+          thickness={3}
+          value={100}
+        />
+        <CircularProgress
+          variant={variant}
+          size="340px"
+          thickness={3}
+          className={classes.circularProgress}
+          disableShrink
+          {...{ value: progress }}
+        />
       </div>
-      <div className={classes.pauseContainer}>
-        <IconButton onClick={() => pauseScan()}>
-          <PauseIcon />
-          <span className={classes.pause}>Pause</span>
-        </IconButton> 
+      <div className={classes.typographyContainer}>
+        <div className={classes.numberStageContainer}>
+          <span className={classes.number}>
+            {Math.round(progress)}
+            {variant === 'determinate' ? '%' : ''}
+          </span>
+          <span className={classes.stage}>{stage.toUpperCase()}</span>
+        </div>
+        <div className={classes.pauseContainer}>
+          <Button startIcon={<PauseIcon />} onClick={pauseScan}>
+            <span className={classes.pause}>PAUSE</span>
+          </Button>
+        </div>
       </div>
     </div>
-  </div>
-    )
-}
+  );
+};
 
-
-
-
-
-
-export default CircularComponent
+export default CircularComponent;
