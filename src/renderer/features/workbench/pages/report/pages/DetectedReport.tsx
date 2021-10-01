@@ -7,7 +7,7 @@ import MatchesForLicense from '../components/MatchesForLicense';
 import MatchesChart from '../components/MatchesChart';
 import VulnerabilitiesCard from '../components/VulnerabilitiesCard';
 import LicensesObligations from '../components/LicensesObligations';
-import { setReport } from '../../../actions';
+import { setHistoryCrumb } from '../../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../../store';
 
 Chart.register(...registerables);
@@ -22,8 +22,7 @@ const DetectedReport = ({ data }) => {
     setMatchedLicenseSelected(matchedLicense);
   };
 
-  useEffect(() => dispatch(setReport('detected')), []);
-
+  useEffect(() => dispatch(setHistoryCrumb({ report: 'detected' })), []);
 
   return (
     <>
