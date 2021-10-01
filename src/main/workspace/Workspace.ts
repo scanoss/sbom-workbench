@@ -65,7 +65,9 @@ class Workspace extends EventEmitter {
   public getOpenedProjects(): Array<Project> {
     const openedProjects: Array<Project> = new Array<Project>();
     // eslint-disable-next-line no-restricted-syntax
-    for (const p of this.projectList) if (p.getState() === ProjectState.OPENED) openedProjects.push(p);
+    for (const p of this.projectList) {
+      if (p.getState() === ProjectState.OPENED) openedProjects.push(p);
+    }
     return openedProjects;
   }
 

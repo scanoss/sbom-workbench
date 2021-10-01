@@ -2,11 +2,12 @@ import {
   LOAD_SCAN_FAIL,
   LOAD_SCAN_SUCCESS,
   RESET,
-  SET_COMPONENT,
   SET_COMPONENTS,
+  SET_COMPONENT,
+  SET_VERSION,
   SET_FILE,
   SET_PROGRESS,
-  SET_REPORT,
+  SET_HISTORY,
 } from './actions';
 import { ComponentGroup } from '../../../api/types';
 
@@ -18,7 +19,11 @@ export interface State {
   file: string | null;
   components: ComponentGroup[];
   component: ComponentGroup;
-  report: 'detected' | 'identified';
+  version: string;
+  history: {
+    report: 'detected' | 'identified';
+    section: number;
+  }
 }
 
 export const initialState: State = {
@@ -29,7 +34,11 @@ export const initialState: State = {
   file: null,
   components: null,
   component: null,
-  report: 'detected',
+  version: null,
+  history: {
+    report: 'detected',
+    section: null,
+  },
 };
 
 export default function reducer(state: State = initialState, action): State {
@@ -73,7 +82,19 @@ export default function reducer(state: State = initialState, action): State {
       return {
         ...state,
         component,
+        version: null,
+        history: {
+          ...state.history,
+          section: null,
+        },
       };
+    }
+    case SET_VERSION: {
+      const { version } = action;
+      return {
+        ...state,
+        version,
+      }
     }
     case SET_FILE: {
       const { file } = action;
@@ -82,11 +103,14 @@ export default function reducer(state: State = initialState, action): State {
         file,
       };
     }
-    case SET_REPORT: {
-      const { report } = action;
+    case SET_HISTORY: {
+      const { crumb } = action;
       return {
         ...state,
-        report,
+        history: {
+          ...state.history,
+          ...crumb,
+        },
       };
     }
     case RESET:
