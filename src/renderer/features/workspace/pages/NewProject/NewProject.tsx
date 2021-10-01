@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { IconButton, LinearProgress } from '@material-ui/core';
+import { Box, CircularProgress, IconButton, LinearProgress, Typography } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import CloseIcon from '@material-ui/icons/Close';
 import { AppContext } from '../../../../context/AppProvider';
@@ -8,6 +8,7 @@ import * as controller from '../../../../home-controller';
 import { IpcEvents } from '../../../../../ipc-events';
 import { DialogContext } from '../../../../context/DialogProvider';
 import { projectService } from '../../../../../api/project-service';
+import CircularComponent from '../Components/CircularComponent';
 
 const { ipcRenderer } = require('electron');
 
@@ -72,7 +73,7 @@ const NewProject = () => {
 
   }
 
-  const onCancelHandler = async (_event) => {
+  const onPauseHandler = async () => {
     console.log("Button pressed");
 
     const { action } = await dialogCtrl.openConfirmDialog(
@@ -95,7 +96,7 @@ const NewProject = () => {
 
   const handlerScannerFinish = (_event, args) => {
     if (args.success) {
-      onShowScan(args.resultsPath);
+      // onShowScan(args.resultsPath);
     } else {
       // showError();
     }
@@ -122,49 +123,16 @@ const NewProject = () => {
         </header>
         <main className="app-content">
           <div className="progressbar">
-            {stage === 'preparing' && (
-              <>
-                <LinearProgress variant="indeterminate" />
-                <div className="stage-label"> {stage} </div>
-              </>
-            )}
-
-            {stage === 'indexing' && (
-              <>
-                <LinearProgress variant="indeterminate" />
-                <div className="stage-label">
-                  {' '}
-                  {stage} ({progress}){' '}
-                </div>
-              </>
-            )}
-
-            {stage === 'scanning' && (
-              <>
-                <LinearProgress variant="determinate" value={progress} />
-                <div className="stage-label"> {stage} </div>
-              </>
-            )}
-
-            {stage === 'resuming' && (
-              <>
-                <LinearProgress variant="determinate" value={progress} />
-                <div className="stage-label"> RESUMING SCANNER </div>
-              </>
-            )}
-
-            <IconButton
-              aria-label="cancel-scan"
-              className="btn-cancel"
-              onClick={(event) => onCancelHandler(event)}
-            >
-              <CloseIcon fontSize="small" />
-            </IconButton>
+            <div className="circular-progress-container">
+              <CircularComponent stage={stage} progress={progress} pauseScan={() => onPauseHandler()} />
+            </div>
           </div>
         </main>
       </section>
     </>
   );
 };
+
+
 
 export default NewProject;
