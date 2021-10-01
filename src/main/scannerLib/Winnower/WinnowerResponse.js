@@ -16,7 +16,13 @@ export class WinnowerResponse {
   }
 
   getFilesWinnowed() {
-    return ((this.#wfpContent || '').match(/file=/g) || []).length;
+    const files = [];
+    const regExp = new RegExp(/,(\/.*)/g);
+    let result;
+    // eslint-disable-next-line no-cond-assign
+    while ((result = regExp.exec(this.#wfpContent))) files.push(result[1]);
+
+    return files;
   }
 
 }

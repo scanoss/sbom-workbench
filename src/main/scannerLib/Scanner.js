@@ -48,7 +48,7 @@ export class Scanner extends EventEmitter {
 
   #processedFiles;
 
-  #isStopped;
+  #isRunning;
 
   constructor(scannerCfg = new ScannerCfg()) {
     super();
@@ -62,7 +62,7 @@ export class Scanner extends EventEmitter {
     this.#processingNewData = false;
     this.#processedFiles = 0;
     this.#responseBuffer = [];
-    this.#isStopped = false;
+    this.#isRunning = false;
     this.#winnower = new Winnower(this.#scannerCfg);
     this.#dispatcher = new Dispatcher(this.#scannerCfg);
 
@@ -109,6 +109,11 @@ export class Scanner extends EventEmitter {
         if (this.#processingNewData) this.#scanFinished = true;
         else await this.#finishScan();
       }
+    });
+
+    this.#dispatcher.on(ScannerEvents.DISPATCHER_ITEM_NO_DISPATCHED, (disptItem) => {
+      const filesNotScanned = disptItem.getWinnowerResponse().getFilesWinnowed();
+      console.log(filesNotScanned);
     });
 
     this.#dispatcher.on('error', (error) => {
@@ -169,15 +174,16 @@ export class Scanner extends EventEmitter {
     await fs.promises.writeFile(this.#resultFilePath, JSON.stringify(resultSorted, null,2));
     console.log(`[ SCANNER ]: Scan finished (analized ${this.#processedFiles} files)`);
     console.log(`[ SCANNER ]: Results on: ${this.#resultFilePath}`);
+    this.#isRunning = false;
     this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath);
   }
 
   #errorHandler(error, origin) {
-    //console.log(error);
     this.stop();
-
     if (origin === ScannerEvents.MODULE_DISPATCHER) {}
     if (origin === ScannerEvents.MODULE_WINNOWER) {}
+
+    console.log(`[ SCANNER ]: Error reason ${error}`);
 
     this.emit('error', error);
   }
@@ -213,18 +219,20 @@ export class Scanner extends EventEmitter {
   }
 
   pause() {
+    this.#isRunning = false;
     this.#winnower.pause();
     this.#dispatcher.pause();
   }
 
   resume() {
+    this.#isRunning = true;
     this.#winnower.resume();
     this.#dispatcher.resume();
   }
 
   stop() {
-    this.#isStopped = true;
     console.log(`[ SCANNER ]: Stopping scanner`);
+    this.#isRunning = false;
     this.#winnower.removeAllListeners();
     this.#dispatcher.removeAllListeners();
     this.#dispatcher.stop();
@@ -232,8 +240,8 @@ export class Scanner extends EventEmitter {
     this.#init();
   }
 
-  isStopped() {
-    return this.#isStopped;
+  isRunning() {
+    return this.#isRunning;
   }
 
 

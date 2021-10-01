@@ -16,14 +16,6 @@ export class Dispatcher extends EventEmitter {
 
   #globalAbortController;
 
-  #error;
-
-  #onErrorStatus;
-
-  #wfpFailed;
-
-  #continue;
-
   #queueMaxLimitReached;
 
   #queueMinLimitReached;
@@ -51,9 +43,6 @@ export class Dispatcher extends EventEmitter {
         this.#queueMaxLimitReached = false;
       }
     });
-    this.#continue = true;
-    this.#wfpFailed = [];
-    this.#onErrorStatus = false;
     this.#queueMaxLimitReached = false;
     this.#queueMinLimitReached = true;
 
@@ -65,9 +54,9 @@ export class Dispatcher extends EventEmitter {
   }
 
   stop() {
-    this.#pQueue.removeAllListeners();
     this.#pQueue.clear();
     this.#pQueue.pause();
+    this.#globalAbortController.abortAll();
   }
 
   dispatchItem(disptItem) {
@@ -83,21 +72,24 @@ export class Dispatcher extends EventEmitter {
     }
   }
 
-  #handleUnrecoverableError(error, disptItem) {
-    console.log(`[ SCANNER ]: Unrecoverable dispatcher error. Stopping...`);
-    this.stop();
-    this.#globalAbortController.abortAll();
+  #handleUnrecoverableError(error) {
     this.emit('error', error);
   }
 
-  #errorHandler(error, disptItem) {
-    if (error.name === 'AbortError') error.name = 'TIMEOUT';
+  #emitNoDispatchedItem(disptItem) {
+    console.log(`[ SCANNER ]: WFP content sended to many times. Some files won't be scanned`);
+    console.log(`[ SCANNER ]: You will find a list with all the files skipped by the scanner`);
+    this.emit(ScannerEvents.DISPATCHER_ITEM_NO_DISPATCHED, disptItem);
+  }
 
+  #errorHandler(error, disptItem) {
     if (!this.#globalAbortController.isAborting()) {
+      if (error.name === 'AbortError') error.name = 'TIMEOUT';
       if (this.#recoverableErrors.has(error.code) || this.#recoverableErrors.has(error.name)) {
         disptItem.increaseErrorCounter();
         if (disptItem.getErrorCounter() >= this.#scannerCfg.MAX_RETRIES_FOR_RECOVERABLES_ERRORS) {
-          this.#handleUnrecoverableError(error, disptItem);
+          if (this.#scannerCfg.ABORT_ON_MAX_RETRIES) this.#handleUnrecoverableError(error, disptItem);
+          else this.#emitNoDispatchedItem(disptItem);
           return;
         }
         const leftRetry = this.#scannerCfg.MAX_RETRIES_FOR_RECOVERABLES_ERRORS - disptItem.getErrorCounter();
@@ -105,8 +97,7 @@ export class Dispatcher extends EventEmitter {
         this.#dispatch(disptItem);
         return;
       }
-
-      this.#handleUnrecoverableError(error, disptItem);
+      this.#handleUnrecoverableError(error);
     }
   }
 
@@ -115,7 +106,8 @@ export class Dispatcher extends EventEmitter {
     const timeoutId = setTimeout(() => timeoutController.abort(), this.#scannerCfg.TIMEOUT);
     try {
       const form = new FormData();
-      form.append('filename', disptItem.getContent(), 'data.wfp');
+      const wfpContent = disptItem.getContent();
+      form.append('filename', Buffer.from(wfpContent), 'data.wfp');
       this.emit(ScannerEvents.DISPATCHER_WFP_SENDED);
       const response = await fetch(this.#scannerCfg.API_URL, {
         method: 'post',

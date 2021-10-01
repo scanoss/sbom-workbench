@@ -11,16 +11,16 @@ export class ScannerCfg {
   CONCURRENCY_LIMIT = 15;
 
   // Timeout for each transaction
-  TIMEOUT = 3000;
+  TIMEOUT = 8000;
 
   // The maximum size for each .wfp file
   WFP_FILE_MAX_SIZE = 64 * 1000;
 
-  // After x retries of timeout or serverClosed connection of specific wfp
-  // scanner will automatially stop.
-  MAX_RETRIES_FOR_RECOVERABLES_ERRORS = 10;
+  MAX_RETRIES_FOR_RECOVERABLES_ERRORS = 3;
 
-  // After reach x number of server responses persist files and emit event
+  ABORT_ON_MAX_RETRIES = true;
+
+  // Persist results after [ X ] number of server responses.
   MAX_RESPONSES_IN_BUFFER = 50;
 
   DISPATCHER_QUEUE_SIZE_MAX_LIMIT = 100;
