@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-export class WsUtils {
+class WsUtils {
   public async fileExist(file: string): Promise<boolean> {
     return fs.promises
       .access(file, fs.constants.F_OK)
@@ -8,3 +8,5 @@ export class WsUtils {
       .catch(() => false);
   }
 }
+
+export const wsUtils = new WsUtils();
