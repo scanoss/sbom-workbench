@@ -17,12 +17,6 @@ ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (event, invget: Partial<Invent
 ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Partial<Inventory>) => {
   let inv: any;
   try {
-    // const cfg = await  workspace.getWSConfig(); 
-    // console.log(cfg);
-
-
-    workspace.setWSConfig({ DEFAULT_URL_API: -1, AVAILABLE_URL_API: [], TOKEN: '', SCAN_MODE: '' });
-
     inv = await workspace.getOpenedProjects()[0].scans_db.inventories.get(invget);
     return { status: 'ok', message: 'Inventory retrieve successfully', data: inv };
   } catch (e) {

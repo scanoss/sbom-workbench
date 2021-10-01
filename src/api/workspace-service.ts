@@ -23,7 +23,7 @@ class WorkspaceService extends BaseService {
     return this.response(response);
   }
 
-  public async setWSConfig(conf: IWorkspaceCfg): Promise<any> {
+  public async setWSConfig(conf: Partial<IWorkspaceCfg>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_SET_WS_CONFIG, conf);
     return this.response(response);
   }
