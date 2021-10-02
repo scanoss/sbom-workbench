@@ -58,13 +58,12 @@ export class Scanner extends EventEmitter {
     super();
     this.#scannerCfg = scannerCfg;
     this.#scannerId = new Date().getTime();
-    // this.#init();
   }
 
   #init() {
     this.#scanFinished = false;
     this.#processingNewData = false;
-    this.#isRunning = false;
+    this.#isRunning = true;
     this.#processedFiles = 0;
     this.#responseBuffer = [];
     this.filesToScan = {};
