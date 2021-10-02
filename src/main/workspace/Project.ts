@@ -41,7 +41,9 @@ export class Project extends EventEmitter {
 
   filesIndexed = 0;
 
-  filesToScan: {};
+  filesToScan: any;
+
+  filesNotScanned: any;
 
   metadata: Metadata;
 
@@ -118,6 +120,7 @@ export class Project extends EventEmitter {
     this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
     console.log(`[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`);
     this.filesToScan = summary.files;
+    this.filesNotScanned = {};
     this.metadata.setScannerState(ScanState.READY_TO_SCAN);
     this.metadata.setFileCounter(summary.include);
     this.initializeScanner();
@@ -136,6 +139,7 @@ export class Project extends EventEmitter {
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
     this.startScan();
+    return true;
   }
 
   cleanProject() {
@@ -164,12 +168,13 @@ export class Project extends EventEmitter {
       });
     });
 
-    this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response) => {
+    this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response, filesNotScanned) => {
       this.attachComponent(response.getServerResponse());
+      Object.assign(this.filesNotScanned, filesNotScanned);
       this.save();
     });
 
-    this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
+    this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath, filesNotScanned) => {
       await this.scans_db.results.insertFromFile(resPath);
       await this.scans_db.components.importUniqueFromFile();
       this.metadata.setScannerState(ScanState.SCANNED);
@@ -231,6 +236,10 @@ export class Project extends EventEmitter {
 
   public setConfig(cfg: IProjectCfg){
     this.config = cfg;
+  }
+
+  public getFilesNotScanned() {
+    return this.filesNotScanned;
   }
 
   public getMyPath() {

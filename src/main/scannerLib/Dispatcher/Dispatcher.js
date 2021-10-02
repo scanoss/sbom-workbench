@@ -33,9 +33,11 @@ export class Dispatcher extends EventEmitter {
       concurrency: this.#scannerCfg.CONCURRENCY_LIMIT,
     });
     this.#pQueue.clear();
+
     this.#pQueue.on('idle', () => {
       this.emit(ScannerEvents.DISPATCHER_FINISHED);
     });
+
     this.#pQueue.on('next', () => {
       if ((this.#pQueue.size + this.#pQueue.pending) < this.#scannerCfg.DISPATCHER_QUEUE_SIZE_MIN_LIMIT && !this.#queueMinLimitReached) {
         this.emit(ScannerEvents.DISPATCHER_QUEUE_SIZE_MIN_LIMIT);
@@ -43,6 +45,7 @@ export class Dispatcher extends EventEmitter {
         this.#queueMaxLimitReached = false;
       }
     });
+
     this.#queueMaxLimitReached = false;
     this.#queueMinLimitReached = true;
 
@@ -78,7 +81,6 @@ export class Dispatcher extends EventEmitter {
 
   #emitNoDispatchedItem(disptItem) {
     console.log(`[ SCANNER ]: WFP content sended to many times. Some files won't be scanned`);
-    console.log(`[ SCANNER ]: You will find a list with all the files skipped by the scanner`);
     this.emit(ScannerEvents.DISPATCHER_ITEM_NO_DISPATCHED, disptItem);
   }
 
@@ -88,13 +90,13 @@ export class Dispatcher extends EventEmitter {
       if (this.#recoverableErrors.has(error.code) || this.#recoverableErrors.has(error.name)) {
         disptItem.increaseErrorCounter();
         if (disptItem.getErrorCounter() >= this.#scannerCfg.MAX_RETRIES_FOR_RECOVERABLES_ERRORS) {
+          this.#emitNoDispatchedItem(disptItem);
           if (this.#scannerCfg.ABORT_ON_MAX_RETRIES) this.#handleUnrecoverableError(error, disptItem);
-          else this.#emitNoDispatchedItem(disptItem);
           return;
         }
         const leftRetry = this.#scannerCfg.MAX_RETRIES_FOR_RECOVERABLES_ERRORS - disptItem.getErrorCounter();
         console.log(`[ SCANNER ]: Recoverable error happened sending WFP content to server. Reason: ${error.code || error.name}`);
-        this.#dispatch(disptItem);
+        this.dispatchItem(disptItem);
         return;
       }
       this.#handleUnrecoverableError(error);
@@ -138,6 +140,7 @@ export class Dispatcher extends EventEmitter {
         this.#globalAbortController.removeAbortController(timeoutController);
         this.#errorHandler(e, disptItem);
         return Promise.resolve();
+
     }
   }
 }

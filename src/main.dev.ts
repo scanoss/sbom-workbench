@@ -172,14 +172,10 @@ export interface IInitScan {
 async function mainLogic() {
   await workspace.read(`${os.homedir()}/scanoss-workspace`);
 
-
-    const path = "/home/ubuntu/scanoss-workspace/qtbase";
-    const p: Project = workspace.getProjectByPath(path);
-    // p.setMailbox(event.sender);
-    await p.resumeScanner();
-
-
-
+  const p: Project = new Project('DonJuan');
+  await workspace.addProject(p);
+  await p.setScanPath('/home/ubuntu/Projects/delete_me/tensorflow');
+  await p.startScanner();
 }
 
 
