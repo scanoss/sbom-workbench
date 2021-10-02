@@ -5,6 +5,7 @@ import { ScannerEvents } from '../ScannerEvents.js';
 import { ScannableItem } from '../Scannable/ScannableItem.js';
 import { ScannerCfg } from '../ScannerCfg.js';
 import { WinnowerResponse } from './WinnowerResponse.js';
+import { file } from '@babel/types';
 
 const stringWorker = `
 const { parentPort } = require('worker_threads');
@@ -231,13 +232,13 @@ function crc32c_hex(str) {
 export class Winnower extends EventEmitter {
   #scannerCfg;
 
-  #fileList;
+  fileList;
 
-  #fileListIndex;
+  fileListIndex;
 
-  #scanRoot;
+  scanRoot;
 
-  #wfp;
+  wfp;
 
   #worker;
 
@@ -253,12 +254,12 @@ export class Winnower extends EventEmitter {
   }
 
   #init() {
-    this.#wfp = '';
-    this.#scanRoot = '';
+    this.wfp = '';
+    this.scanRoot = '';
     this.#continue = true;
     this.isRunning = false;
-    this.#fileList = [];
-    this.#fileListIndex = 0;
+    this.fileList = [];
+    this.fileListIndex = 0;
   }
 
   #prepareWorker() {
@@ -267,6 +268,26 @@ export class Winnower extends EventEmitter {
       await this.#winnowerPacker(scannableItem.fingerprint);
       await this.#nextStepMachine();
     });
+  }
+
+  #recoveryIndex() {
+    // Files: contains all files winnowed but not packed yet
+    const files = new WinnowerResponse(this.wfp, this.scanRoot).getFilesWinnowed();
+    if (files.length) {
+      const lastFileWinnowed = files[files.length - 1];
+      let i = 0;
+      while (i <= files.length && lastFileWinnowed !== this.fileList[this.fileListIndex - i][0]) {
+        i += 1;
+      }
+      // If file already winnowed cannot be found in fileList emit an error.
+      if (i > files.length) {
+        this.emit('error', new Error('Cannot recovery index on winnower'));
+        return -1;
+      }
+      this.fileListIndex -= i;
+      if (this.fileList[this.fileListIndex][0] === lastFileWinnowed) this.fileListIndex += 1;
+    }
+    return 0;
   }
 
   #forceStopWorker() {
@@ -290,25 +311,25 @@ export class Winnower extends EventEmitter {
       winnowingResult += '\n';
     }
 
-    if (this.#wfp.length + winnowingResult.length >= this.#scannerCfg.WFP_FILE_MAX_SIZE) {
-      this.#processPackedWfp(this.#wfp);
-      this.#wfp = '';
+    if (this.wfp.length + winnowingResult.length >= this.#scannerCfg.WFP_FILE_MAX_SIZE) {
+      this.#processPackedWfp(this.wfp);
+      this.wfp = '';
     }
-    this.#wfp += winnowingResult;
+    this.wfp += winnowingResult;
   }
 
   #processPackedWfp(content) {
-    const wnRsp = new WinnowerResponse(content);
+    const wnRsp = new WinnowerResponse(content, this.scanRoot);
     this.emit(ScannerEvents.WINNOWING_NEW_CONTENT, wnRsp);
   }
 
   async #getNextScannableItem() {
-    if (this.#fileListIndex >= this.#fileList.length) return null;
-    const path = this.#fileList[this.#fileListIndex][0];
-    const scanMode = this.#fileList[this.#fileListIndex][1];
-    const contentSource = path.replace(`${this.#scanRoot}`, '');
+    if (this.fileListIndex >= this.fileList.length) return null;
+    const path = this.fileList[this.fileListIndex][0];
+    const scanMode = this.fileList[this.fileListIndex][1];
+    const contentSource = path.replace(`${this.scanRoot}`, '');
     const content = await fs.promises.readFile(path);
-    this.#fileListIndex += 1;
+    this.fileListIndex += 1;
     const scannable = new ScannableItem(content, contentSource, scanMode, this.#scannerCfg.WFP_FILE_MAX_SIZE);
     return scannable;
   }
@@ -319,8 +340,8 @@ export class Winnower extends EventEmitter {
     if (scannableItem) {
       this.#worker.postMessage(scannableItem);
     } else {
-      if (this.#wfp.length !== 0) {
-        this.#processPackedWfp(this.#wfp);
+      if (this.wfp.length !== 0) {
+        this.#processPackedWfp(this.wfp);
       }
       this.#isRunning = false;
       console.log('[ SCANNER ]: Winnowing Finished...');
@@ -330,9 +351,9 @@ export class Winnower extends EventEmitter {
 
   async startWinnowing(files, scanRoot) {
     console.log('[ SCANNER ]: Starting Winnowing...');
-    this.#scanRoot = scanRoot;
+    this.scanRoot = scanRoot;
     this.#isRunning = true;
-    this.#fileList = Object.entries(files);
+    this.fileList = Object.entries(files);
     this.#nextStepMachine();
   }
 
@@ -346,6 +367,7 @@ export class Winnower extends EventEmitter {
   resume() {
     console.log('[ SCANNER ]: Winnowing resumed...');
     this.#continue = true;
+    this.#recoveryIndex();
     this.#nextStepMachine();
   }
 

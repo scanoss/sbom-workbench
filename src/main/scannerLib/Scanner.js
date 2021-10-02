@@ -50,19 +50,25 @@ export class Scanner extends EventEmitter {
 
   #isRunning;
 
+  filesToScan;
+
+  filesNotScanned;
+
   constructor(scannerCfg = new ScannerCfg()) {
     super();
     this.#scannerCfg = scannerCfg;
     this.#scannerId = new Date().getTime();
-    this.#init();
+    // this.#init();
   }
 
   #init() {
     this.#scanFinished = false;
     this.#processingNewData = false;
+    this.#isRunning = false;
     this.#processedFiles = 0;
     this.#responseBuffer = [];
-    this.#isRunning = false;
+    this.filesToScan = {};
+    this.filesNotScanned = {};
     this.#winnower = new Winnower(this.#scannerCfg);
     this.#dispatcher = new Dispatcher(this.#scannerCfg);
 
@@ -99,7 +105,7 @@ export class Scanner extends EventEmitter {
       console.log(`[ SCANNER ]: Received results of ${response.getNumberOfFilesScanned()} files`);
       this.emit(ScannerEvents.DISPATCHER_NEW_DATA, response);
       this.#insertIntoBuffer(response);
-      if (this.#bufferReachedLimit()) await this.#bufferToFiles();
+      if (this.#bufferReachedLimit()) this.#bufferToFiles();
       this.#processingNewData = false;
       if (this.#scanFinished) await this.#finishScan();
     });
@@ -113,12 +119,20 @@ export class Scanner extends EventEmitter {
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_ITEM_NO_DISPATCHED, (disptItem) => {
       const filesNotScanned = disptItem.getWinnowerResponse().getFilesWinnowed();
-      console.log(filesNotScanned);
+      this.#appendFilesToNotScanned(filesNotScanned);
     });
 
     this.#dispatcher.on('error', (error) => {
       this.#errorHandler(error, ScannerEvents.MODULE_DISPATCHER);
     });
+  }
+
+  #appendFilesToNotScanned(fileList) {
+    const obj = {};
+    // eslint-disable-next-line no-restricted-syntax
+    for (const file of fileList) obj[file] = this.filesToScan[file];
+    Object.assign(this.filesNotScanned, obj);
+    return this.filesNotScanned;
   }
 
   #insertIntoBuffer(dispatcherResponse) {
@@ -134,7 +148,7 @@ export class Scanner extends EventEmitter {
     return false;
   }
 
-  async #bufferToFiles() {
+  #bufferToFiles() {
     let wfpContent = '';
     const serverResponse = {};
     // eslint-disable-next-line no-restricted-syntax
@@ -143,11 +157,11 @@ export class Scanner extends EventEmitter {
       const serverResponseToAppend = dispatcherResponse.getServerResponse();
       Object.assign(serverResponse, serverResponseToAppend);
     }
-    await this.#appendOutputFiles(wfpContent, serverResponse);
+    this.#appendOutputFiles(wfpContent, serverResponse);
     this.#responseBuffer = [];
     const responses = new DispatcherResponse(serverResponse, wfpContent);
     console.log(`[ SCANNER ]: Persisted results of ${responses.getNumberOfFilesScanned()} files...`);
-    this.emit(ScannerEvents.RESULTS_APPENDED, responses);
+    this.emit(ScannerEvents.RESULTS_APPENDED, responses, this.filesNotScanned);
     return responses;
   }
 
@@ -165,17 +179,17 @@ export class Scanner extends EventEmitter {
   }
 
   async #finishScan() {
-    if (!this.#isBufferEmpty()) await this.#bufferToFiles();
+    if (!this.#isBufferEmpty()) this.#bufferToFiles();
     const results = JSON.parse(await fs.promises.readFile(this.#resultFilePath, 'utf8'));
     const sortedPaths = sortPaths(Object.keys(results), '/');
     const resultSorted = {};
     // eslint-disable-next-line no-restricted-syntax
     for (const key of sortedPaths) resultSorted[key] = results[key];
     await fs.promises.writeFile(this.#resultFilePath, JSON.stringify(resultSorted, null,2));
-    console.log(`[ SCANNER ]: Scan finished (analized ${this.#processedFiles} files)`);
+    console.log(`[ SCANNER ]: Scan finished (Scanned: ${this.#processedFiles}, Not Scanned: ${Object.keys(this.filesNotScanned).length})`);
     console.log(`[ SCANNER ]: Results on: ${this.#resultFilePath}`);
     this.#isRunning = false;
-    this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath);
+    this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath, this.filesNotScanned);
   }
 
   #errorHandler(error, origin) {
@@ -203,15 +217,18 @@ export class Scanner extends EventEmitter {
   }
 
   async scanList(files, scanRoot = '') {
-    this.#scanRoot = scanRoot;
     this.#init();
-    if (this.#workDirectory === undefined) await this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
-    this.#createOutputFiles();
+
     if (!Object.entries(files).length) {
       await this.#finishScan();
       return;
     }
-    this.#winnower.startWinnowing(files, scanRoot);
+
+    this.filesToScan = files;
+    this.#scanRoot = scanRoot;
+    if (this.#workDirectory === undefined) await this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
+    this.#createOutputFiles();
+    this.#winnower.startWinnowing(this.filesToScan, scanRoot);
   }
 
   getScannerId() {
@@ -237,7 +254,6 @@ export class Scanner extends EventEmitter {
     this.#dispatcher.removeAllListeners();
     this.#dispatcher.stop();
     this.#winnower.stop();
-    this.#init();
   }
 
   isRunning() {

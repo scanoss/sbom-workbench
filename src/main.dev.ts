@@ -153,7 +153,7 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.whenReady().then(mainLogic)//.then(createWindow).catch(console.log);
+app.whenReady().then(mainLogic).then(createWindow).catch(console.log);
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
@@ -166,31 +166,18 @@ app.on('activate', () => {
 export interface IInitScan {
   path: string;
   scanId?: string;
-  // filter: IFilter[];
 }
 
 async function mainLogic() {
   await workspace.read(`${os.homedir()}/scanoss-workspace`);
-
-
-    const path = "/home/ubuntu/scanoss-workspace/qtbase";
-    const p: Project = workspace.getProjectByPath(path);
-    // p.setMailbox(event.sender);
-    await p.resumeScanner();
-
-
-
 }
-
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   const { path } = arg;
-
   const projectName = basepath.basename(path);
   const p: Project = new Project(projectName);
+  await workspace.addProject(p);
   p.setScanPath(path);
   p.setMailbox(event.sender);
-
-  await workspace.addProject(p);
   await p.startScanner();
 });

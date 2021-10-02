@@ -3,8 +3,11 @@ export class WinnowerResponse {
 
   #date;
 
-  constructor(wfpContent) {
+  #scanRoot;
+
+  constructor(wfpContent, scanRoot = '') {
     this.#wfpContent = wfpContent;
+    this.#scanRoot = scanRoot;
   }
 
   isEqual(winnowerResponse) {
@@ -20,9 +23,7 @@ export class WinnowerResponse {
     const regExp = new RegExp(/,(\/.*)/g);
     let result;
     // eslint-disable-next-line no-cond-assign
-    while ((result = regExp.exec(this.#wfpContent))) files.push(result[1]);
-
-    return files;
+    while ((result = regExp.exec(this.#wfpContent))) files.push(this.#scanRoot + result[1]);
+    return files || '';
   }
-
 }
