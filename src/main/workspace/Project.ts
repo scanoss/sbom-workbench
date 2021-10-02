@@ -436,7 +436,7 @@ export class Project extends EventEmitter {
 
 
   public getToken(){
-    const txt = fs.readFileSync(`${this.work_root}/projectCfg.json`,'utf8');
+    const txt = fs.readFileSync(`${this.metadata.getMyPath()}/projectCfg.json`,'utf8');
     const cfg = JSON.parse(txt);
     return cfg.TOKEN;
   }

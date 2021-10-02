@@ -7,7 +7,7 @@ import LicensesChart from '../components/LicensesChart';
 import IdentificationProgress from '../components/IdentificationProgress';
 import LicensesTable from '../components/LicensesTable';
 import MatchesForLicense from '../components/MatchesForLicense';
-import { setReport } from '../../../actions';
+import { setHistoryCrumb } from '../../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../../store';
 
 const { shell } = require('electron');
@@ -27,7 +27,7 @@ const IdentifiedReport = ({ data }) => {
     setMatchedLicenseSelected(matchedLicense);
   };
 
-  useEffect(() => dispatch(setReport('identified')), []);
+  useEffect(() => dispatch(setHistoryCrumb({ report: 'identified' })), []);
 
   return (
     <>

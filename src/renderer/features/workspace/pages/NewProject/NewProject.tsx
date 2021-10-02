@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { IconButton, LinearProgress } from '@material-ui/core';
+import { IconButton } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import CloseIcon from '@material-ui/icons/Close';
-import { AppContext } from '../../../../context/AppProvider';
+import { AppContext, IAppContext } from '../../../../context/AppProvider';
 import * as controller from '../../../../home-controller';
 import { IpcEvents } from '../../../../../ipc-events';
 import { DialogContext } from '../../../../context/DialogProvider';
 import { projectService } from '../../../../../api/project-service';
+import CircularComponent from '../Components/CircularComponent';
 
 const { ipcRenderer } = require('electron');
 
@@ -53,9 +53,7 @@ const NewProject = () => {
   };
 
   const handlerScannerError = async (_event, args) => {
-    console.log(args);
-    // alert(args);
-    const errorMessage = `An error occurred while scanning. Please try again`;//args.message;
+    const errorMessage = `An error occurred while scanning. Please try again`; // args.message;
     const { action } = await dialogCtrl.openConfirmDialog(
       `${errorMessage}`,
       {
@@ -63,18 +61,13 @@ const NewProject = () => {
         role: 'accept',
       },
       true
-      );
-      history.goBack();
+    );
+    history.goBack();
 
+    // ipcRenderer.send(IpcEvents.SCANNER_RESUME);
+  };
 
-    //ipcRenderer.send(IpcEvents.SCANNER_RESUME);
-
-
-  }
-
-  const onCancelHandler = async (_event) => {
-    console.log("Button pressed");
-
+  const onPauseHandler = async () => {
     const { action } = await dialogCtrl.openConfirmDialog(
       `Are you sure you want to stop the scanner?`,
       {
@@ -82,22 +75,18 @@ const NewProject = () => {
         role: 'accept',
       },
       false
-      );
-      if(action === 'ok') {
-        // Call to the service and stop scanner.
-        await projectService.stop();
-        history.goBack();
-      }
+    );
+    if (action === 'ok') {
+      await projectService.stop();
+      history.goBack();
+    }
 
-    //ipcRenderer.send(IpcEvents.PROJECT_STOP);
-
-  }
+    // ipcRenderer.send(IpcEvents.PROJECT_STOP);
+  };
 
   const handlerScannerFinish = (_event, args) => {
     if (args.success) {
       onShowScan(args.resultsPath);
-    } else {
-      // showError();
     }
   };
 
@@ -122,44 +111,9 @@ const NewProject = () => {
         </header>
         <main className="app-content">
           <div className="progressbar">
-            {stage === 'preparing' && (
-              <>
-                <LinearProgress variant="indeterminate" />
-                <div className="stage-label"> {stage} </div>
-              </>
-            )}
-
-            {stage === 'indexing' && (
-              <>
-                <LinearProgress variant="indeterminate" />
-                <div className="stage-label">
-                  {' '}
-                  {stage} ({progress}){' '}
-                </div>
-              </>
-            )}
-
-            {stage === 'scanning' && (
-              <>
-                <LinearProgress variant="determinate" value={progress} />
-                <div className="stage-label"> {stage} </div>
-              </>
-            )}
-
-            {stage === 'resuming' && (
-              <>
-                <LinearProgress variant="determinate" value={progress} />
-                <div className="stage-label"> RESUMING SCANNER </div>
-              </>
-            )}
-
-            <IconButton
-              aria-label="cancel-scan"
-              className="btn-cancel"
-              onClick={(event) => onCancelHandler(event)}
-            >
-              <CloseIcon fontSize="small" />
-            </IconButton>
+            <div className="circular-progress-container">
+              <CircularComponent stage={stage} progress={progress} pauseScan={() => onPauseHandler()} />
+            </div>
           </div>
         </main>
       </section>
