@@ -48,6 +48,11 @@
       align-items: center;
       margin-bottom: 8px;
 
+      .optional {
+        font-style: italic;
+        opacity: 0.6;
+      }
+
       button {
         margin-left: 4px;
       }
