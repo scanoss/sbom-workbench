@@ -3,7 +3,7 @@ import { ipcMain } from 'electron';
 import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
 import { FileType } from '../api/types';
-import { workspace } from './workspace/workspace';
+import { workspace } from './workspace/Workspace';
 import { isPseudoBinary } from './workspace/isPseudoBinary';
 
 const path = require('path');

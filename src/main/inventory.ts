@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import { Inventory } from '../api/types';
 import { IpcEvents } from '../ipc-events';
-import { workspace } from './workspace/workspace';
+import { workspace } from './workspace/Workspace';
 
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (event, invget: Partial<Inventory>) => {
   let inv: any;

@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
 import { Project } from './workspace/Project';
-import { workspace } from './workspace/workspace';
+import { workspace } from './workspace/Workspace';
 
 ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
   const data = await workspace.getOpenedProjects()[0].scans_db.files.ignored(arg);

@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
 import { Project } from './workspace/Project';
-import { workspace } from './workspace/workspace';
+import { workspace } from './workspace/Workspace';
 
 const os = require('os');
 const fs = require('fs');

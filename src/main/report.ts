@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
 import { reportService } from './services/ReportService';
-import { workspace } from './workspace/workspace';
+import { workspace } from './workspace/Workspace';
 
 interface licenseEntry {
   label: string;

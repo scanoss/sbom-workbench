@@ -3,7 +3,7 @@ import sqlite3 from 'sqlite3';
 import fs from 'fs';
 
 import { Querys } from '../../db/querys_db';
-import { workspace } from '../../workspace/workspace';
+import { workspace } from '../../workspace/Workspace';
 
 export class ExportModel {
   private db: sqlite3;

@@ -28,7 +28,7 @@ import './main/license';
 import * as os from 'os';
 
 import { IpcEvents } from './ipc-events';
-import { workspace } from './main/workspace/workspace';
+import { workspace } from './main/workspace/Workspace';
 import { ItemExclude, IProject } from './api/types';
 import { Project } from './main/workspace/Project';
 import { ScanDb } from './main/db/scan_db';
