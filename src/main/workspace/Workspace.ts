@@ -165,7 +165,12 @@ class Workspace extends EventEmitter {
     }
     console.log(`[ WORKSPACE ]: Adding project ${p.getProjectName()} to workspace`);
     const pDirectory = `${this.wsPath}/${p.getProjectName()}`;
-    await fs.promises.mkdir(pDirectory);
+
+    if (!fs.existsSync(`${pDirectory}`)) await fs.promises.mkdir(pDirectory);
+    const files = await fs.promises.readdir(pDirectory);
+    const unlinkPromises = files.map(filename => fs.promises.unlink(`${pDirectory}/${filename}`));
+    await Promise.all(unlinkPromises);
+
     p.setMyPath(pDirectory);
     p.setConfig(await this.createProjectCfg());
     await p.save();

@@ -69,25 +69,6 @@
 
         font-size: 16px;
         font-weight: 400;
-
-        &::before {
-          content: ' ';
-          display: inline-block;
-          margin-right: 5px;
-          width: 10px;
-          height: 10px;
-          border-radius: 100%;
-        }
-
-        &.pending::before {
-          background-color: var(--color-status-pending);
-        }
-        &.identified::before {
-          background-color: var(--color-status-identified);
-        }
-        &.ignored::before {
-          background-color: var(--color-status-ignored);
-        }
       }
     }
   }

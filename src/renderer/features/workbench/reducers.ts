@@ -15,6 +15,7 @@ export interface State {
   name: string;
   loaded: boolean;
   progress: number;
+  summary: any;
   tree: any[];
   file: string | null;
   components: ComponentGroup[];
@@ -30,6 +31,7 @@ export const initialState: State = {
   name: null,
   loaded: false,
   progress: 0,
+  summary: null,
   tree: null,
   file: null,
   components: null,
@@ -67,6 +69,7 @@ export default function reducer(state: State = initialState, action): State {
           : ((summary?.identifiedFiles + summary?.ignoredFiles) * 100) / summary?.detectedFiles;
       return {
         ...state,
+        summary,
         progress,
       };
     }
