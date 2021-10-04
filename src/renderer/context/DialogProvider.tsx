@@ -3,19 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import { ipcRenderer } from 'electron';
 import { InventoryDialog } from '../ui/dialog/InventoryDialog';
-import { Component, Inventory, License, NewComponentDTO } from '../../api/types';
+import { Component, Inventory, IWorkspaceCfg, License, NewComponentDTO } from '../../api/types';
 import { InventorySelectorDialog } from '../features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse } from './types';
 import { ConfirmDialog } from '../ui/dialog/ConfirmDialog';
 import { LicenseDialog } from '../ui/dialog/LicenseDialog';
 import { ComponentDialog } from '../ui/dialog/ComponentDialog';
 import { IpcEvents } from '../../ipc-events';
+import SettingsDialog from '../ui/dialog/SettingsDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
   openLicenseCreate: () => Promise<DialogResponse>;
+  openSettings: () => Promise<DialogResponse>;
   openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
 }
 
@@ -110,6 +112,24 @@ export const DialogProvider: React.FC = ({ children }) => {
     });
   };
 
+  const [settingsDialogSelector, setSettingsDialog] = useState<{
+    open: boolean;
+    onClose?: (response: DialogResponse) => void;
+  }>({ open: false });
+
+  const openSettings = () => {
+    return new Promise<DialogResponse>((resolve) => {
+      setSettingsDialog({
+        open: true,
+        onClose: (response) => {
+          setSettingsDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(response);
+        },
+      });
+    });
+  };
+
+
   const [componentDialog, setComponentDialog] = useState<{
     open: boolean;
     component: Partial<NewComponentDTO>;
@@ -148,7 +168,7 @@ export const DialogProvider: React.FC = ({ children }) => {
 
   return (
     <DialogContext.Provider
-      value={{ openInventory, openInventorySelector, openConfirmDialog, openLicenseCreate, openComponentDialog }}
+      value={{ openInventory, openInventorySelector, openConfirmDialog, openLicenseCreate, openComponentDialog, openSettings }}
     >
       {children}
       <InventoryDialog
@@ -185,6 +205,13 @@ export const DialogProvider: React.FC = ({ children }) => {
         onCancel={() => licenseDialogSelector.onClose && licenseDialogSelector.onClose(null)}
         onClose={(response) => licenseDialogSelector.onClose && licenseDialogSelector.onClose(response)}
       />
+
+      <SettingsDialog
+        open={settingsDialogSelector.open}
+        onCancel={() => settingsDialogSelector.onClose && settingsDialogSelector.onClose(null)}
+        onClose={(response) => settingsDialogSelector.onClose && settingsDialogSelector.onClose(response)}
+      />
+
     </DialogContext.Provider>
   );
 };

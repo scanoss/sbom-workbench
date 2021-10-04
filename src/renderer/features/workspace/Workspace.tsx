@@ -21,6 +21,7 @@ import { dialogController } from '../../dialog-controller';
 import { DialogContext, IDialogContext } from '../../context/DialogProvider';
 import { DIALOG_ACTIONS } from '../../context/types';
 import { IProject, ScanState } from '../../../api/types';
+import { ResponseStatus } from '../../../main/Response';
 
 
 const filter = (items, query) => {
@@ -82,6 +83,17 @@ const Workspace = () => {
     }
   };
 
+  const [settings, setSettings] = useState<any[]>();
+
+  const openSettingsDialog = async () => {
+    console.log('opened')
+    const response = await dialogCtrl.openSettings();
+    // if (response && response.action === ResponseStatus.OK) {
+    //   setSettings([...settings, { name: response.data.name, type: 'Cataloged' }]);
+    // }
+    console.log(response);
+  }
+
   const onTrashHandler = async (path, e) => {
     e.stopPropagation();
     const { action } = await dialogCtrl.openConfirmDialog('Are you sure you want to delete this project?', {
@@ -132,6 +144,9 @@ const Workspace = () => {
             </div>
             <Button startIcon={<AddIcon />} variant="contained" color="primary" onClick={onNewProject}>
               New project
+            </Button>
+            <Button variant="contained" color="primary" onClick={openSettingsDialog}>
+              Settings
             </Button>
           </section>
         </header>
