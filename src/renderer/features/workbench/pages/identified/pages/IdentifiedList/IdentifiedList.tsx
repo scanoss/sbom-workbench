@@ -9,7 +9,7 @@ import { setComponent } from '../../../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import RecognizedCard from '../../../../components/RecognizedCard/RecognizedCard';
 
-const LIMIT = 100;
+const LIMIT = 80;
 
 const filter = (items, query) => {
   if (!items) {
@@ -48,6 +48,9 @@ export const IdentifiedList = () => {
   const history = useHistory();
   const classes = useStyles();
 
+  const [page, setPage] = useState(1);
+  const ITEMS = page * LIMIT;
+
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const [inventoryList, setInventoryList] = useState<any>([]);
@@ -68,6 +71,17 @@ export const IdentifiedList = () => {
     setInventoryList(data);
   };
 
+  const handleScroll = (e) => {
+    const isBottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 50;
+    if (isBottom) {
+      paginate();
+    }
+  };
+
+  const paginate = () => {
+    setPage(page + 1);
+  };
+
   const cleanup = () => {};
 
   useEffect(() => {
@@ -77,7 +91,7 @@ export const IdentifiedList = () => {
 
   return (
     <>
-      <section id="IdentifiedList" className="app-page">
+      <section className="app-page" onScroll={handleScroll}>
         <header className="app-header">
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">
@@ -95,7 +109,7 @@ export const IdentifiedList = () => {
         <main className="app-content">
           {filterItems && filterItems.length > 0 ? (
             <section className="component-list">
-              {filterItems.slice(0, LIMIT).map((inventory) => (
+              {filterItems.slice(0, ITEMS).map((inventory) => (
                 <RecognizedCard
                   key={inventory.component}
                   inventory={inventory}
@@ -115,10 +129,10 @@ export const IdentifiedList = () => {
             </p>
           )}
 
-          {filterItems?.length > LIMIT && (
+          {filterItems?.length > ITEMS && (
             <Alert className="my-5" severity="info">
               <strong>
-                Showing {LIMIT} of {filterItems.length} components
+                Showing {ITEMS} of {filterItems.length} components
               </strong>
             </Alert>
           )}

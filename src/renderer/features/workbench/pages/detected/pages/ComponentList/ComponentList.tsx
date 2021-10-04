@@ -1,4 +1,4 @@
-import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
+import { makeStyles, Paper, IconButton, InputBase, Link } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
@@ -8,7 +8,7 @@ import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import { setComponent } from '../../../../actions';
 
-const LIMIT = 100;
+const LIMIT = 80;
 
 const filter = (items, query) => {
   if (!items) {
@@ -47,6 +47,9 @@ export const ComponentList = () => {
   const history = useHistory();
   const classes = useStyles();
 
+  const [page, setPage] = useState(1);
+  const ITEMS = page * LIMIT;
+
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
@@ -60,30 +63,21 @@ export const ComponentList = () => {
     dispatch(setComponent(component));
   };
 
+  const handleScroll = (e) => {
+    const isBottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 50;
+    if (isBottom) {
+      paginate();
+    }
+  };
+
+  const paginate = () => {
+    setPage(page + 1);
+  };
+
   return (
     <div id="ComponentList">
-      <section className="app-page">
+      <section className="app-page" onScroll={handleScroll}>
         <header className="app-header">
-          {/* <div className="d-flex space-between align-center">
-            <div>
-              <h4 className="header-subtitle">{name}</h4>
-              <h1 className="header-title">Detected Components</h1>
-            </div>
-            <ButtonGroup>
-              <Button startIcon={<ViewModuleRoundedIcon />} variant="contained" color="primary">
-                Detected
-              </Button>
-              <Button
-                startIcon={<CheckCircleIcon />}
-                variant="outlined"
-                color="primary"
-                onClick={() => history.push('/workbench/recognized')}
-              >
-                Identified
-              </Button>
-            </ButtonGroup>
-          </div> */}
-
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">
               <SearchIcon />
@@ -100,7 +94,7 @@ export const ComponentList = () => {
         <main className="app-content">
           {components && filterItems && filterItems.length > 0 ? (
             <section className="component-list">
-              {filterItems.slice(0, LIMIT).map((component, i) => (
+              {filterItems.slice(0, ITEMS).map((component, i) => (
                 <ComponentCard key={component.purl} component={component} onClick={onSelectComponent} />
               ))}
             </section>
@@ -116,10 +110,10 @@ export const ComponentList = () => {
             </p>
           )}
 
-          {filterItems?.length > LIMIT && (
-            <Alert className="my-5" severity="info">
+          {filterItems?.length > ITEMS && (
+            <Alert className="mb-3" severity="info">
               <strong>
-                Showing {LIMIT} of {filterItems.length} components
+                Showing {ITEMS} of {filterItems.length} components.
               </strong>
             </Alert>
           )}

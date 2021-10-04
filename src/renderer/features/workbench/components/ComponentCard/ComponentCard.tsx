@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Typography, Tooltip, ButtonBase } from '@material-ui/core';
+import { Card, CardContent, Tooltip, ButtonBase } from '@material-ui/core';
 import componentDefault from '../../../../../../assets/imgs/component-default.svg';
 import { ComponentGroup } from '../../../../../api/types';
 
@@ -21,11 +21,13 @@ const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
             </figure>
             <div className="component-card-info">
               <p>{multiple ? `${component.versions.length} versions` : component.versions[0].version}</p>
-              <Tooltip title={component.name}>
-                <Typography variant="h6" gutterBottom>
-                  {component.name}
-                </Typography>
-              </Tooltip>
+              {component.name.length > 15 ? (
+                <Tooltip title={component.name}>
+                  <h6>{component.name}</h6>
+                </Tooltip>
+              ) : (
+                <h6>{component.name}</h6>
+              )}
             </div>
             <div className="component-card-files">
               {component.summary.identified !== 0 ? (
