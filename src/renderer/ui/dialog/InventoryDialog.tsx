@@ -115,7 +115,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         version,
         license_name: licenses[0].name,
         purl,
-        url,
+        url: url || '',
       });
     }
   };
@@ -131,7 +131,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         version,
         license_name: licenses[0].name,
         purl,
-        url,
+        url: url || '',
       });
     }
   };
@@ -158,7 +158,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const isValid = () => {
     const { version, component, url, purl, license_name, usage } = form;
-    return license_name && version && component && url && purl && usage;
+    return license_name && version && component && purl && usage;
   };
 
   useEffect(setDefaults, [inventory]);
@@ -168,7 +168,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     const component = data.find((item) => item.purl === form.purl);
     if (component) {
       setVersions(component?.versions.map((item) => item.version));
-      setForm({ ...form, url: component.url, component: component.name, purl: component.purl });
+      setForm({ ...form, url: component.url || '', component: component.name, purl: component.purl });
     }
   }, [form.purl, data]);
 
@@ -314,9 +314,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
           <div className="dialog-row">
             <div className="dialog-form-field">
-              <label className="dialog-form-field-label">URL</label>
+              <label className="dialog-form-field-label">
+                URL <span className="optional">- Optional</span>
+              </label>
               <Paper className="dialog-form-field-control">
-                <InputBase name="url" fullWidth readOnly value={form?.url} onChange={(e) => inputHandler(e)} required />
+                <InputBase name="url" fullWidth readOnly value={form?.url} onChange={(e) => inputHandler(e)} />
               </Paper>
             </div>
           </div>
@@ -356,7 +358,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             </div>
 
             <div className="dialog-form-field">
-              <label className="dialog-form-field-label">Notes</label>
+              <label className="dialog-form-field-label">
+                Notes <span className="optional">- Optional</span>
+              </label>
               <Paper className="dialog-form-field-control">
                 <TextareaAutosize
                   name="notes"
