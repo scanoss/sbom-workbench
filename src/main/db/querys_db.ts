@@ -157,9 +157,9 @@ export class Querys {
     WHERE r.purl=? AND r.version=? GROUP BY r.file_path;`;
 
   SQL_SELECT_FILES_FROM_PURL = `SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r
-    LEFT JOIN file_inventories fi ON r.id=fi.resultid
-    WHERE r.purl=?
-    GROUP BY r.file_path;`;
+   LEFT JOIN file_inventories fi ON r.id=fi.resultid
+   WHERE r.purl=?
+   GROUP BY r.file_path;`; 
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE results SET ignored=1,identified=0 WHERE id IN ';
 
