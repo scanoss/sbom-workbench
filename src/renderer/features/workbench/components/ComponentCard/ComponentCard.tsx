@@ -29,13 +29,13 @@ const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
             </div>
             <div className="component-card-files">
               {component.summary.identified !== 0 ? (
-                <span className="info-count identified">{component.summary.identified}</span>
+                <span className="info-count has-status-bullet identified">{component.summary.identified}</span>
               ) : null}
               {component.summary.pending !== 0 ? (
-                <span className="info-count pending">{component.summary.pending}</span>
+                <span className="info-count has-status-bullet pending">{component.summary.pending}</span>
               ) : null}
               {component.summary.ignored !== 0 ? (
-                <span className="info-count ignored">{component.summary.ignored}</span>
+                <span className="info-count has-status-bullet ignored">{component.summary.ignored}</span>
               ) : null}
             </div>
           </CardContent>

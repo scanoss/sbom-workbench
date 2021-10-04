@@ -45,3 +45,26 @@ a {
   font-style: normal;
   font-weight: 400;
 }
+
+
+.has-status-bullet {
+  &::before {
+    content: ' ';
+    display: inline-block;
+    margin-right: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  &.pending::before {
+    background-color: var(--color-status-pending);
+  }
+  &.identified::before {
+    background-color: var(--color-status-identified);
+  }
+  &.ignored::before {
+    background-color: var(--color-status-ignored);
+    background-color: #A1A1AA
+  }
+}

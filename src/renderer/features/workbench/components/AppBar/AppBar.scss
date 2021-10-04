@@ -67,16 +67,17 @@
   }
 
   #AppProgress {
-    display: flex;
-    align-items: center;
+    .progress-container {
+      display: flex;
+      align-items: center;
+    }
 
     p {
       color: var(--color-status-identified);
       font-weight: 700;
     }
 
-
-  .progress {
+    .progress {
       margin-left: 5px;
       width: 250px;
       height: 10px;
@@ -86,5 +87,15 @@
   .notarize-container{
     margin-left: 10px;
   }
-  
+
+}
+
+#ProgressTooltip {
+  header .title {
+    margin-top: 4px;
+    font-size: .9rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
 }

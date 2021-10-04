@@ -93,6 +93,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     dispatch(setComponents(components));
 
     const summary = await reportService.getSummary();
+    console.log(summary);
     dispatch(setProgress(summary));
   };
 
