@@ -41,7 +41,9 @@ export class Project extends EventEmitter {
 
   filesIndexed = 0;
 
-  filesToScan: {};
+  filesToScan: any;
+
+  filesNotScanned: any;
 
   metadata: Metadata;
 
@@ -69,6 +71,7 @@ export class Project extends EventEmitter {
     const a = JSON.parse(project);
     this.logical_tree = a.logical_tree;
     this.filesToScan = a.filesToScan;
+    this.filesNotScanned = a.filesNotScanned;
     this.processedFiles = a.processedFiles;
     this.filesSummary = a.filesSummary;
     this.scans_db = new ScanDb(this.metadata.getMyPath());
@@ -81,12 +84,9 @@ export class Project extends EventEmitter {
   }
 
   public async close() {
-    console.log( `[ PROJECT ]: Closing project ${this.metadata.getName()}`);
-    this.state = ProjectState.CLOSED;  
-    if(this.scanner){
-      this.scanner.removeAllListeners();
-      await this.scanner.stop();
-    }
+    if (this.scanner && this.scanner.isRunning()) this.scanner.stop();
+    console.log(`[ PROJECT ]: Closing project ${this.metadata.getName()}`);
+    this.state = ProjectState.CLOSED;
     this.scanner = null;
     this.logical_tree = null;
     this.scans_db = null;
@@ -121,6 +121,7 @@ export class Project extends EventEmitter {
     this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
     console.log(`[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`);
     this.filesToScan = summary.files;
+    this.filesNotScanned = {};
     this.metadata.setScannerState(ScanState.READY_TO_SCAN);
     this.metadata.setFileCounter(summary.include);
     this.initializeScanner();
@@ -134,11 +135,12 @@ export class Project extends EventEmitter {
     await this.open();
     this.initializeScanner();
     console.log(`[ PROJECT ]: Resuming scanner, pending ${Object.keys(this.filesToScan).length} files`)
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'scanning',
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
     this.startScan();
+    return true;
   }
 
   cleanProject() {
@@ -161,24 +163,25 @@ export class Project extends EventEmitter {
       const filesScanned = response.getFilesScanned();
       // eslint-disable-next-line no-restricted-syntax
       for (const file of filesScanned) delete this.filesToScan[`${this.metadata.getScanRoot()}${file}`];
-      this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+      this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: 'scanning',
         processed: (100 * this.processedFiles) / this.filesSummary.include,
       });
     });
 
-    this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response) => {
+    this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response, filesNotScanned) => {
       this.attachComponent(response.getServerResponse());
+      Object.assign(this.filesNotScanned, filesNotScanned);
       this.save();
     });
 
-    this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath) => {
+    this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath, filesNotScanned) => {
       await this.scans_db.results.insertFromFile(resPath);
       await this.scans_db.components.importUniqueFromFile();
       this.metadata.setScannerState(ScanState.SCANNED);
       this.metadata.save();
       await this.close();
-      this.msgToUI.send(IpcEvents.SCANNER_FINISH_SCAN, {
+      this.sendToUI(IpcEvents.SCANNER_FINISH_SCAN, {
         success: true,
         resultsPath: this.metadata.getMyPath(),
       });
@@ -187,13 +190,13 @@ export class Project extends EventEmitter {
     this.scanner.on('error', async (error) => {
       this.save();
       await this.close();
-      this.msgToUI.send(IpcEvents.SCANNER_ERROR_STATUS, error);
+      this.sendToUI(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
   }
 
   startScan() {
     console.log(`[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`);
-    this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'scanning',
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
@@ -201,6 +204,10 @@ export class Project extends EventEmitter {
     this.save();
     // eslint-disable-next-line prettier/prettier
     this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
+  }
+
+  sendToUI(eventName, data: any) {
+    if (this.msgToUI) this.msgToUI.send(eventName, data);
   }
 
   setMailbox(mailbox: Electron.WebContents) {
@@ -230,6 +237,10 @@ export class Project extends EventEmitter {
 
   public setConfig(cfg: IProjectCfg){
     this.config = cfg;
+  }
+
+  public getFilesNotScanned() {
+    return this.filesNotScanned;
   }
 
   public getMyPath() {
@@ -401,7 +412,7 @@ export class Project extends EventEmitter {
     if (jsonScan.type === 'file') {
       this.filesIndexed += 1;
       if (this.filesIndexed % 100 === 0)
-        this.msgToUI.send(IpcEvents.SCANNER_UPDATE_STATUS, {
+          this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
           stage: `indexing`,
           processed: this.filesIndexed,
         });
