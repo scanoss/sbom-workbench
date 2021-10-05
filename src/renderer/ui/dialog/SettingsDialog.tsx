@@ -40,22 +40,21 @@ interface SettingDialogProps {
 const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
   const [value, setValue] = useState(null);
 
-  const [urls, setUrls] = useState([{ title: 'The Shawshank Redemption', year: 1994 },
-  { title: 'The Godfather', year: 1972 },
-  { title: 'The Godfather: Part II', year: 1974 },
-  { title: 'The Dark Knight', year: 2008 },
-  { title: '12 Angry Men', year: 1957 },
-  { title: "Schindler's List", year: 1993 },
-  { title: 'Pulp Fiction', year: 1994 },]);
+  const [urls, setUrls] = useState([{url: 'www.facebook.com'}, {url: 'www.google.com'},
+  {url: 'www.amazon.com'},
+  {url: 'www.twitter.com'},
+  {url: 'www.reddit.com'},
+  {url: 'www.taringa.com'},]);
 
   const classes = useStyles();
 
   useEffect(() => {
-    if (open) {
-      //do something
-      console.log('open is', open);
-    }
-  }, [open]);
+    // if (open) {
+    //   //do something
+    //   console.log('open is', open);
+    // }
+    console.log(value);
+  }, [value]);
 
   const handleClose = async (e) => {
     e.preventDefault();
@@ -86,13 +85,16 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                 onChange={(event, newValue) => {
                   if (typeof newValue === 'string') {
                     setValue({
-                      title: newValue,
+                      url: newValue,
                     });
                   } else if (newValue && newValue.inputValue) {
                     // Create a new value from the user input
                     setValue({
-                      title: newValue.inputValue,
+                      url: newValue.inputValue,
                     });
+                    setUrls([...urls, {
+                      url: newValue.inputValue,
+                    }])
                   } else {
                     setValue(newValue);
                   }
@@ -103,12 +105,12 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   const { inputValue } = params;
                   // Suggest the creation of a new value
                   const isExisting = options.some(
-                    (option) => inputValue === option.title
+                    (option) => inputValue === option.url
                   );
                   if (inputValue !== '' && !isExisting) {
                     filtered.push({
                       inputValue,
-                      title: `Add "${inputValue}"`,
+                      url: `Add "${inputValue}"`,
                     });
                   }
 
@@ -129,9 +131,9 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                     return option.inputValue;
                   }
                   // Regular option
-                  return option.title;
+                  return option.url;
                 }}
-                renderOption={(props, option) => <li {...props}>{option.title}</li>}
+                renderOption={(option, props) => <li {...props}>{option.url}</li>}
                 // freeSolo
                 renderInput={(params) => <TextField {...params} 
                 InputProps={{...params.InputProps, disableUnderline: true}} />}
