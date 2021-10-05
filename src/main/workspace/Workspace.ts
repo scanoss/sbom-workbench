@@ -168,7 +168,7 @@ class Workspace extends EventEmitter {
 
     if (!fs.existsSync(`${pDirectory}`)) await fs.promises.mkdir(pDirectory);
     const files = await fs.promises.readdir(pDirectory);
-    const unlinkPromises = files.map(filename => fs.promises.unlink(`${pDirectory}/${filename}`));
+    const unlinkPromises = files.map((filename) => fs.promises.unlink(`${pDirectory}/${filename}`));
     await Promise.all(unlinkPromises);
 
     p.setMyPath(pDirectory);
@@ -290,7 +290,8 @@ class Workspace extends EventEmitter {
 
   public async setWSConfig(config: Partial<IWorkspaceCfg>) {
     try {
-      if (await this.workspaceModel.setWSConfig(this.wsPath, config)) return config;
+      const configuration = config.AVAILABLE_URL_API.length === 0 ? DEFAULT_WORKSPACE_CONFIG : config;
+      if (await this.workspaceModel.setWSConfig(this.wsPath, configuration)) return configuration;
       throw new Error('Unable to write config file');
     } catch (e) {
       return new Error('Workspace config was not set successfully');

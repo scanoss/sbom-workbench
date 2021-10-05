@@ -61,16 +61,16 @@ const VersionSelector = ({ versions, version, onSelect, component }) => {
       </div>
       <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem key="all" onClick={() => handleSelected(null)}>
-          <div className="version-Container">
+          <div className="version-container">
             <div className="version"> All versions</div>
-            <div className="files-Counter">{totalFiles}</div>
+            <div className="files-counter">{totalFiles}</div>
           </div>
         </MenuItem>
         {versions?.map(({ version, files }) => (
           <MenuItem key={version} onClick={() => handleSelected(version)}>
-            <div className="version-Container">
+            <div className="version-container">
               <div className="version"> {version}</div>
-              <div className="files-Counter">{files}</div>
+              <div className="files-counter">{files}</div>
             </div>
           </MenuItem>
         ))}

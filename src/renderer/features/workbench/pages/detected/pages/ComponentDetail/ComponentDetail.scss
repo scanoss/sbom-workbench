@@ -152,7 +152,7 @@ header.app-header {
   width: 170px;
 }
 
-.version-Container{
+.version-container{
   display: flex;
   flex-flow: row;
   justify-content: space-between;
@@ -167,10 +167,10 @@ header.app-header {
   width: 80%;
 }
 
-.files-Counter{
+.files-counter{
   width: 20%;
   color:#949496;
- text-align: left;
+ text-align: right;
  
 
 }
