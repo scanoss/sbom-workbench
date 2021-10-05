@@ -29,11 +29,13 @@ import { mapFiles } from '../../../../../../../utils/scan-util';
 import { setHistoryCrumb, setVersion } from '../../../../actions';
 
 // inner components
-const VersionSelector = ({ versions, version, onSelect }) => {
+const VersionSelector = ({ versions, version, onSelect, component }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const totalFiles = component.summary.ignored + component.summary.pending + component.summary.identified;
 
   const handleSelected = (version: string) => {
     setAnchorEl(null);
@@ -59,11 +61,17 @@ const VersionSelector = ({ versions, version, onSelect }) => {
       </div>
       <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem key="all" onClick={() => handleSelected(null)}>
-          All versions
+          <div className="version-Container">
+            <div className="version"> All versions</div>
+            <div className="files-Counter">{totalFiles}</div>
+          </div>
         </MenuItem>
         {versions?.map(({ version, files }) => (
           <MenuItem key={version} onClick={() => handleSelected(version)}>
-            {version}<span className="filesCounter"> {files}</span>
+            <div className="version-Container">
+              <div className="version"> {version}</div>
+              <div className="files-Counter">{files}</div>
+            </div>
           </MenuItem>
         ))}
       </Menu>
@@ -82,13 +90,15 @@ const TabNavigation = ({ tab, version, component, filterFiles, onSelect }) => {
           onChange={(event, value) => onSelect(value)}
         >
           <Tab label={`Pending (${version ? `${filterFiles.pending.length}/` : ''}${component?.summary.pending})`} />
-          <Tab label={`Identified (${version ? `${filterFiles.identified.length}/` : ''}${component?.summary.identified})`} />
+          <Tab
+            label={`Identified (${version ? `${filterFiles.identified.length}/` : ''}${component?.summary.identified})`}
+          />
           <Tab label={`Ignored (${version ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`} />
         </Tabs>
       </Paper>
     </div>
   );
-}
+};
 
 export const ComponentDetail = () => {
   const history = useHistory();
@@ -310,6 +320,7 @@ export const ComponentDetail = () => {
                 versions={component?.versions}
                 version={version}
                 onSelect={(version) => dispatch(setVersion(version))}
+                component={component}
               />
             </div>
           </div>

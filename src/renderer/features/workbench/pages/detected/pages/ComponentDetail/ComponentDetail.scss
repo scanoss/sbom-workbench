@@ -148,7 +148,29 @@ header.app-header {
 
 }
 
-.filesCounter{
-  margin-left: 50px;
+.MuiList-root.MuiMenu-list.MuiList-padding{
+  width: 170px;
+}
+
+.version-Container{
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+  width: 100%;
+
+}
+
+.version{
+  display: flex;
+  justify-content: flex-start;
+  flex-flow: wrap;  
+  width: 80%;
+}
+
+.files-Counter{
+  width: 20%;
   color:#949496;
+ text-align: left;
+ 
+
 }

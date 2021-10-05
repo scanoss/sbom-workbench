@@ -481,8 +481,7 @@ export class ComponentDb extends Db {
       try {
         const data = await this.getAll({}, params);
         if (data) {       
-          const comp = await this.groupComponentsByPurl(data);
-          console.log(JSON.stringify(comp,undefined,4));
+          const comp = await this.groupComponentsByPurl(data);         
           resolve(comp);
         } else resolve([]);
       } catch (error) {
