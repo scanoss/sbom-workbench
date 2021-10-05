@@ -16,7 +16,6 @@ import Autocomplete, {
 import AddIcon from '@material-ui/icons/Add';
 import React, { useEffect, useState } from 'react';
 import { DialogResponse } from '../../context/types';
-import { url } from 'inspector';
 import { IWorkspaceCfg } from '../../../api/types';
 
 const filter = createFilterOptions();
@@ -41,41 +40,52 @@ interface SettingDialogProps {
 
 const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
   
-  const [selectedUrl, setSelectedUrl] = useState(null);
+  const [indexSelectedUrl, setIndexSelectedUrl] = useState(0);
   const [sbomLedger, setSbomLedger] = useState(null); 
 
-  const [urls, setUrls] = useState([{url: 'www.facebook.com'}, {url: 'www.google.com'},
-  {url: 'www.amazon.com'},
-  {url: 'www.twitter.com'},
-  {url: 'www.reddit.com'},
-  {url: 'www.taringa.com'},]);
+
+  const [urls, setUrls] = useState([]);
 
   const classes = useStyles();
 
   const submit = () => {
     const config:Partial<IWorkspaceCfg> = {
-      DEFAULT_URL_API: urls.findIndex(url => url.url === selectedUrl.url),
-      AVAILABLE_URL_API: urls.map((url) => url.url),
-      TOKEN: sbomLedger,
+      DEFAULT_URL_API: urls.findIndex(url => url.url === indexSelectedUrl.url) || null,
+      AVAILABLE_URL_API: urls.map((url) => url.url) || null,
+      TOKEN: sbomLedger || null,
     }
     console.log(config);
+
   }
 
-  // const setDefault = (partialWorkspaceCfg) => {
-  //   partialWorkspaceCfg destruct
-  // }
+
+ const setDefault = (partialWorkspaceCfg) => {
+    console.log(partialWorkspaceCfg);
+    setIndexSelectedUrl(partialWorkspaceCfg.DEFAULT_URL_API);
+    setSbomLedger(partialWorkspaceCfg.TOKEN);
+    const {AVAILABLE_URL_API, DEFAULT_URL_API} = partialWorkspaceCfg;
+    const newArray = AVAILABLE_URL_API.map((str: string) => ({url: str}));
+    setUrls(newArray);
+    console.log(newArray);
+  }
 
   useEffect(() => {
     if (open) {
       //do something
       // consultar servicio
+      const config:Partial<IWorkspaceCfg> = {
+        DEFAULT_URL_API: 5,
+        AVAILABLE_URL_API: ['www.cancu0.com', 'www.cancu1.com', 'www.cancu2.com', 'www.cancu3.com', 'www.cancu4.com', 'www.cancu5.com', 'www.cancu6.com', 'www.cancu7.com'],
+        TOKEN: 'lkjdfasnda',
+      }
+      setDefault(config)
     }
   }, [open]);
 
   useEffect(() => {
     console.log(sbomLedger);
-    console.log(selectedUrl);
-  }, [sbomLedger, selectedUrl])
+    console.log(indexSelectedUrl);
+  }, [sbomLedger, indexSelectedUrl])
 
   const handleClose = async (e) => {
     e.preventDefault();
@@ -99,25 +109,25 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
           </div>
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">Knowledgebase API</label>
-            <Paper>
+            <Paper> 
               <Autocomplete
-                value={selectedUrl}
+                value={urls[indexSelectedUrl]}
                 className={classes.search}
                 onChange={(event, newValue) => {
                   if (typeof newValue === 'string') {
-                    setSelectedUrl({
+                    setIndexSelectedUrl({
                       url: newValue,
                     });
                   } else if (newValue && newValue.inputValue) {
                     // Create a new value from the user input
-                    setSelectedUrl({
+                    setIndexSelectedUrl({
                       url: newValue.inputValue,
                     });
                     setUrls([...urls, {
                       url: newValue.inputValue,
                     }])
                   } else {
-                    setSelectedUrl(newValue);
+                    setIndexSelectedUrl(newValue);
                   }
                 }}
                 filterOptions={(options, params) => {
@@ -142,6 +152,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                 handleHomeEndKeys
                 id="free-solo-with-text-demo"
                 options={urls}
+
                 getOptionLabel={(option) => {
                   // Value selected with enter, right from the input
                   if (typeof option === 'string') {
@@ -167,7 +178,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
               <InputBase
                 name="url"
                 fullWidth
-                // value={form?.url}
+                value={sbomLedger}
                 onChange={(e) => setSbomLedger(e.target.value)}
                 required
               />
@@ -175,8 +186,8 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
           </div>
         </div>
         <DialogActions>
-          <Button>Back</Button>
-          <Button type="submit" variant="contained" color="secondary" onClick={submit}>
+          <Button onClick={onCancel}>Back</Button>
+          <Button type="submit" variant="contained" color="secondary" >
             Save
           </Button>
         </DialogActions>
