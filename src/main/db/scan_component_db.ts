@@ -82,6 +82,8 @@ export class ComponentDb extends Db {
       transformation.purl = data[i].purl;
       transformation.url = data[i].comp_url;
       transformation.version = data[i].version;
+      if(data[i].filesCount)
+      transformation.filesCount=data[i].filesCount;
 
       if (data[i].license_id) {
         preLicense.id = data[i].license_id;
@@ -126,7 +128,7 @@ export class ComponentDb extends Db {
           db.all(sqlGetComp, async (err: any, data: any) => {
             db.close();
             if (err) resolve([]);
-            else {
+            else {            
               const comp = self.processComponent(data);
               const summary: any = await self.allSummaries();
               for (let i = 0; i < comp.length; i += 1) {
@@ -478,8 +480,9 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const data = await this.getAll({}, params);
-        if (data) {
+        if (data) {       
           const comp = await this.groupComponentsByPurl(data);
+          console.log(JSON.stringify(comp,undefined,4));
           resolve(comp);
         } else resolve([]);
       } catch (error) {
@@ -494,7 +497,7 @@ export class ComponentDb extends Db {
       for (const component of data) {
         if (!aux.hasOwnProperty(component.purl)) aux[component.purl] = [];
         aux[component.purl].push(component);
-      }
+      }    
       const result = await this.mergeComponentByPurl(aux);
       return result;
     } catch (err) {
@@ -520,6 +523,7 @@ export class ComponentDb extends Db {
             aux.summary.identified += iterator.summary.identified;
           }
           version.version = iterator.version;
+          version.files = iterator.filesCount;
           version.licenses = [];
           version.licenses = iterator.licenses;
           aux.versions.push(version);

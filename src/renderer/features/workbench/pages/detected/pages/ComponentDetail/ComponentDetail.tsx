@@ -31,7 +31,6 @@ import { setHistoryCrumb, setVersion } from '../../../../actions';
 // inner components
 const VersionSelector = ({ versions, version, onSelect }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -62,9 +61,9 @@ const VersionSelector = ({ versions, version, onSelect }) => {
         <MenuItem key="all" onClick={() => handleSelected(null)}>
           All versions
         </MenuItem>
-        {versions?.map(({ version }) => (
+        {versions?.map(({ version, files }) => (
           <MenuItem key={version} onClick={() => handleSelected(version)}>
-            {version}
+            {version}<span className="filesCounter"> {files}</span>
           </MenuItem>
         ))}
       </Menu>

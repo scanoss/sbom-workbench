@@ -136,7 +136,13 @@ export class Querys {
     'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid;';
 
    // GET ALL COMPONENTES
-  SQL_GET_ALL_DETECTED_COMPONENTS = 'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE source="engine";';
+  // SQL_GET_ALL_DETECTED_COMPONENTS = 'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE source="engine";';
+
+  SQL_GET_ALL_DETECTED_COMPONENTS = `SELECT filesVersion.filesCount,matched.comp_url,matched.compid,matched.comp_name,matched.license_url,matched.license_name,matched.license_spdxid,matched.purl,matched.version,matched.license_id  FROM (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE source="engine") AS matched
+  LEFT JOIN (SELECT COUNT(*) AS filesCount ,r.version,r.purl FROM results  r WHERE r.source='engine' AND r.version!='' GROUP BY  r.version) AS filesVersion
+  ON filesVersion.version=matched.version AND filesVersion.purl=matched.purl;`;
+  
+
 
   // GET ALL LICENSES
   SQL_SELECT_LICENSE = 'SELECT id, spdxid, name, url FROM licenses WHERE ';
