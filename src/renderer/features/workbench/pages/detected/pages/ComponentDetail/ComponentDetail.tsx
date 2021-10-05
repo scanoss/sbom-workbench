@@ -59,7 +59,7 @@ const VersionSelector = ({ versions, version, onSelect, component }) => {
           versions[0].version
         )}
       </div>
-      <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+      <Menu id="VersionSelectorList" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem key="all" onClick={() => handleSelected(null)}>
           <div className="version-container">
             <div className="version"> All versions</div>

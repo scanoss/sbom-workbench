@@ -148,29 +148,23 @@ header.app-header {
 
 }
 
-.MuiList-root.MuiMenu-list.MuiList-padding{
-  width: 170px;
+#VersionSelectorList .MuiList-root.MuiMenu-list.MuiList-padding {
+  min-width: 170px;
+
+  .version-container {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    width: 100%;
+
+    .version {
+      margin-right: 5px;
+    }
+
+    .files-counter {
+      color:#949496;
+    }
+
+  }
 }
 
-.version-container{
-  display: flex;
-  flex-flow: row;
-  justify-content: space-between;
-  width: 100%;
-
-}
-
-.version{
-  display: flex;
-  justify-content: flex-start;
-  flex-flow: wrap;  
-  width: 80%;
-}
-
-.files-counter{
-  width: 20%;
-  color:#949496;
- text-align: right;
- 
-
-}
