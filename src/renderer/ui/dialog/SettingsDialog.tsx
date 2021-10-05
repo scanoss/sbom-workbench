@@ -16,6 +16,8 @@ import Autocomplete, {
 import AddIcon from '@material-ui/icons/Add';
 import React, { useEffect, useState } from 'react';
 import { DialogResponse } from '../../context/types';
+import { url } from 'inspector';
+import { IWorkspaceCfg } from '../../../api/types';
 
 const filter = createFilterOptions();
 
@@ -38,7 +40,9 @@ interface SettingDialogProps {
 }
 
 const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
-  const [value, setValue] = useState(null);
+  
+  const [selectedUrl, setSelectedUrl] = useState(null);
+  const [sbomLedger, setSbomLedger] = useState(null); 
 
   const [urls, setUrls] = useState([{url: 'www.facebook.com'}, {url: 'www.google.com'},
   {url: 'www.amazon.com'},
@@ -48,13 +52,30 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
 
   const classes = useStyles();
 
+  const submit = () => {
+    const config:Partial<IWorkspaceCfg> = {
+      DEFAULT_URL_API: urls.findIndex(url => url.url === selectedUrl.url),
+      AVAILABLE_URL_API: urls.map((url) => url.url),
+      TOKEN: sbomLedger,
+    }
+    console.log(config);
+  }
+
+  // const setDefault = (partialWorkspaceCfg) => {
+  //   partialWorkspaceCfg destruct
+  // }
+
   useEffect(() => {
-    // if (open) {
-    //   //do something
-    //   console.log('open is', open);
-    // }
-    console.log(value);
-  }, [value]);
+    if (open) {
+      //do something
+      // consultar servicio
+    }
+  }, [open]);
+
+  useEffect(() => {
+    console.log(sbomLedger);
+    console.log(selectedUrl);
+  }, [sbomLedger, selectedUrl])
 
   const handleClose = async (e) => {
     e.preventDefault();
@@ -80,23 +101,23 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
             <label className="dialog-form-field-label">Knowledgebase API</label>
             <Paper>
               <Autocomplete
-                value={value}
+                value={selectedUrl}
                 className={classes.search}
                 onChange={(event, newValue) => {
                   if (typeof newValue === 'string') {
-                    setValue({
+                    setSelectedUrl({
                       url: newValue,
                     });
                   } else if (newValue && newValue.inputValue) {
                     // Create a new value from the user input
-                    setValue({
+                    setSelectedUrl({
                       url: newValue.inputValue,
                     });
                     setUrls([...urls, {
                       url: newValue.inputValue,
                     }])
                   } else {
-                    setValue(newValue);
+                    setSelectedUrl(newValue);
                   }
                 }}
                 filterOptions={(options, params) => {
@@ -147,7 +168,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                 name="url"
                 fullWidth
                 // value={form?.url}
-                // onChange={(e) => inputHandler(e)}
+                onChange={(e) => setSbomLedger(e.target.value)}
                 required
               />
             </Paper>
@@ -155,7 +176,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
         </div>
         <DialogActions>
           <Button>Back</Button>
-          <Button type="submit" variant="contained" color="secondary">
+          <Button type="submit" variant="contained" color="secondary" onClick={submit}>
             Save
           </Button>
         </DialogActions>
