@@ -1,95 +1,141 @@
-import { Button, Dialog, DialogActions, InputBase, makeStyles, Paper, TextareaAutosize } from '@material-ui/core'
-import React, { useEffect } from 'react'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  IconButton,
+  InputBase,
+  makeStyles,
+  Paper,
+  TextareaAutosize,
+  Tooltip,
+} from '@material-ui/core';
+import TextField from '@material-ui/core/TextField';
+import Autocomplete, {
+  createFilterOptions,
+} from '@material-ui/lab/Autocomplete';
+import AddIcon from '@material-ui/icons/Add';
+import React, { useEffect, useState } from 'react';
 import { DialogResponse } from '../../context/types';
 
+const filter = createFilterOptions();
 
 const useStyles = makeStyles((theme) => ({
-    size: {
-      '& .MuiDialog-paperWidthMd': {
-        width: '500px',
-      },
+  size: {
+    '& .MuiDialog-paperWidthMd': {
+      width: '500px',
     },
-    search: {
-      padding: '10px 0px 10px 10px',
-    },
+  },
+  search: {
+    padding: '0px 10px',
+    
+  },
 }));
 
-
 interface SettingDialogProps {
-    open: boolean;
-    onClose: (response: DialogResponse) => void;
-    onCancel: () => void;
+  open: boolean;
+  onClose: (response: DialogResponse) => void;
+  onCancel: () => void;
 }
-  
 
-const SettingDialog = ({open, onClose, onCancel}: SettingDialogProps) => {
+const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
+  const [value, setValue] = useState(null);
 
-    
-    const classes = useStyles();
+  const [urls, setUrls] = useState([]);
 
-    useEffect(() => {
-       if (open) {
-            //do something
-            console.log('open is', open);
-       }
-    }, [open]);
+  const classes = useStyles();
 
+  useEffect(() => {
+    if (open) {
+      //do something
+      console.log('open is', open);
+    }
+  }, [open]);
 
-    const handleClose = async (e) => {
-        e.preventDefault();
-        console.log('opened')
-    };
+  const handleClose = async (e) => {
+    e.preventDefault();
+    console.log('opened');
+  };
 
-
-    return (
-        <Dialog
-            id="LicenseDialog"
-            maxWidth="md"
-            scroll="body"
-            className={`${classes.size} dialog`}
-            fullWidth open={open}
+  return (
+    <Dialog
+      id="LicenseDialog"
+      maxWidth="md"
+      scroll="body"
+      className={`${classes.size} dialog`}
+      fullWidth
+      open={open}
     >
       <span className="dialog-title">Settings</span>
       <form onSubmit={handleClose}>
         <div className="dialog-content">
           <div className="dialog-form-field">
-            <label className="dialog-form-field-label">Name</label>
-            <Paper className="dialog-form-field-control">
-              <InputBase
-                name="name"
-                fullWidth
-                // value={form?.name}
-                // onChange={(e) => inputHandler(e)}
-                required
+            <label className="dialog-form-field-label">API Connections</label>
+          </div>
+          <div className="dialog-form-field">
+            <label className="dialog-form-field-label">Knowledgebase API</label>
+            <Paper>
+              <Autocomplete
+                value={value}
+                className={classes.search}
+                onChange={(event, newValue) => {
+                  if (typeof newValue === 'string') {
+                    setValue({
+                      title: newValue,
+                    });
+                  } else if (newValue && newValue.inputValue) {
+                    // Create a new value from the user input
+                    setValue({
+                      title: newValue.inputValue,
+                    });
+                  } else {
+                    setValue(newValue);
+                  }
+                }}
+                filterOptions={(options, params) => {
+                  const filtered = filter(options, params);
+
+                  const { inputValue } = params;
+                  // Suggest the creation of a new value
+                  const isExisting = options.some(
+                    (option) => inputValue === option.title
+                  );
+                  if (inputValue !== '' && !isExisting) {
+                    filtered.push({
+                      inputValue,
+                      title: `Add "${inputValue}"`,
+                    });
+                  }
+
+                  return filtered;
+                }}
+                selectOnFocus
+                clearOnBlur
+                handleHomeEndKeys
+                id="free-solo-with-text-demo"
+                options={urls}
+                getOptionLabel={(option) => {
+                  // Value selected with enter, right from the input
+                  if (typeof option === 'string') {
+                    return option;
+                  }
+                  // Add "xxx" option created dynamically
+                  if (option.inputValue) {
+                    return option.inputValue;
+                  }
+                  // Regular option
+                  return option.title;
+                }}
+                renderOption={(props, option) => (
+                  <li {...props}>{option.title}</li>
+                )}
+                freeSolo
+                renderInput={(params) => <TextField {...params} 
+                InputProps={{...params.InputProps, disableUnderline: true}} />}
               />
             </Paper>
           </div>
           <div className="dialog-form-field">
-            <label className="dialog-form-field-label">SPDX ID</label>
-            <Paper className="dialog-form-field-control">
-              <InputBase
-                name="spdxid"
-                fullWidth
-                // value={form?.spdxid}
-                // onChange={(e) => inputHandler(e)}
-                required
-              />
-            </Paper>
-          </div>
-          <div className="dialog-form-field">
-            <label className="dialog-form-field-label">Full text</label>
-            <Paper className="dialog-form-field-control">
-              <TextareaAutosize
-                name="fulltext"
-                // value={form?.fulltext}
-                cols={30}
-                rows={8}
-                // onChange={(e) => inputHandler(e)}
-              />
-            </Paper>
-          </div>
-          <div className="dialog-form-field">
-            <label className="dialog-form-field-label">URL</label>
+            <label className="dialog-form-field-label">SBOM Ledger API</label>
             <Paper className="dialog-form-field-control">
               <InputBase
                 name="url"
@@ -102,14 +148,14 @@ const SettingDialog = ({open, onClose, onCancel}: SettingDialogProps) => {
           </div>
         </div>
         <DialogActions>
-          <Button>Cancel</Button>
-          <Button type="submit" variant="contained" color="secondary" >
-            Create
+          <Button>Back</Button>
+          <Button type="submit" variant="contained" color="secondary">
+            Save
           </Button>
         </DialogActions>
       </form>
     </Dialog>
-    )
-}
+  );
+};
 
-export default SettingDialog
+export default SettingDialog;
