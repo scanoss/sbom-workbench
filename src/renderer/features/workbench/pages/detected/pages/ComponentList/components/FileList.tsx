@@ -34,7 +34,7 @@ export const FileList = ({ files, filter, emptyMessage, onAction }: FileListProp
       </section>
 
       {filteredFiles.length > MAX_FILES && (
-        <Alert className="my-5" severity="info">
+        <Alert className="mt-3 mb-3" severity="info">
           <strong>{filteredFiles.length - MAX_FILES}</strong> files more...
         </Alert>
       )}

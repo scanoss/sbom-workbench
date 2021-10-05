@@ -107,8 +107,8 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   };
 
   const isValid = () => {
-    const { name, version, license_id, purl, url } = form;
-    return name && version && license_id && purl && url;
+    const { name, version, license_id, purl } = form;
+    return name && version && license_id && purl;
   };
 
   return (
@@ -203,7 +203,9 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               </div>
 
               <div className="dialog-form-field">
-                <label className="dialog-form-field-label">URL</label>
+                <label className="dialog-form-field-label">
+                  URL <span className="optional">- Optional</span>
+                </label>
                 <Paper className="dialog-form-field-control">
                   <InputBase
                     name="url"
@@ -211,7 +213,6 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                     fullWidth
                     value={form?.url}
                     onChange={(e) => inputHandler(e.target.name, e.target.value)}
-                    required
                   />
                 </Paper>
               </div>

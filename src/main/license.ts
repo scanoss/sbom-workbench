@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { License } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
-import { workspace } from './workspace/workspace';
+import { workspace } from './workspace/Workspace';
 
 ipcMain.handle(IpcEvents.LICENSE_GET_ALL, async (event) => {
   try {
