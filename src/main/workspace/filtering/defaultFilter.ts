@@ -1,7 +1,9 @@
-// ------ NEW FILTERS SYNC WITH PYTHON CLIENT 16/09/2021 ------ //
+// ------ FILTERS SYNC WITH PYTHON CLIENT 06/10/2021 ------ //
 const defaultBannedList = {
   name: 'Default',
   filters: [
+    { condition: '=', value: '0', ftype: 'SIZE', scope: 'FILE' },
+
     //Folders and files filters
     { condition: 'starts', value: '.', ftype: 'NAME' },
 
