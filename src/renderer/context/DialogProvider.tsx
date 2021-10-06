@@ -95,7 +95,7 @@ export const DialogProvider: React.FC = ({ children }) => {
     });
   };
 
-  const [licenseDialogSelector, setLicenseDialog] = useState<{
+  const [licenseDialog, setLicenseDialog] = useState<{
     open: boolean;
     onClose?: (response: DialogResponse) => void;
   }>({ open: false });
@@ -112,7 +112,7 @@ export const DialogProvider: React.FC = ({ children }) => {
     });
   };
 
-  const [settingsDialogSelector, setSettingsDialog] = useState<{
+  const [settingsDialog, setSettingsDialog] = useState<{
     open: boolean;
     onClose?: (response: DialogResponse) => void;
   }>({ open: false });
@@ -168,7 +168,14 @@ export const DialogProvider: React.FC = ({ children }) => {
 
   return (
     <DialogContext.Provider
-      value={{ openInventory, openInventorySelector, openConfirmDialog, openLicenseCreate, openComponentDialog, openSettings }}
+      value={{
+        openInventory,
+        openInventorySelector,
+        openConfirmDialog,
+        openLicenseCreate,
+        openComponentDialog,
+        openSettings,
+      }}
     >
       {children}
       <InventoryDialog
@@ -201,17 +208,16 @@ export const DialogProvider: React.FC = ({ children }) => {
       />
 
       <LicenseDialog
-        open={licenseDialogSelector.open}
-        onCancel={() => licenseDialogSelector.onClose && licenseDialogSelector.onClose(null)}
-        onClose={(response) => licenseDialogSelector.onClose && licenseDialogSelector.onClose(response)}
+        open={licenseDialog.open}
+        onCancel={() => licenseDialog.onClose && licenseDialog.onClose(null)}
+        onClose={(response) => licenseDialog.onClose && licenseDialog.onClose(response)}
       />
 
       <SettingsDialog
-        open={settingsDialogSelector.open}
-        onCancel={() => settingsDialogSelector.onClose && settingsDialogSelector.onClose(null)}
-        onClose={(response) => settingsDialogSelector.onClose && settingsDialogSelector.onClose(response)}
+        open={settingsDialog.open}
+        onCancel={() => settingsDialog.onClose && settingsDialog.onClose(null)}
+        onClose={(response) => settingsDialog.onClose && settingsDialog.onClose(response)}
       />
-
     </DialogContext.Provider>
   );
 };

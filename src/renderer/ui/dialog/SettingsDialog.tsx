@@ -28,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
   },
   search: {
     padding: '0px 15px',
-    
   },
 }));
 
@@ -39,39 +38,29 @@ interface SettingDialogProps {
 }
 
 const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
-  
-  const [indexSelectedUrl, setIndexSelectedUrl] = useState(0);
-  const [sbomLedger, setSbomLedger] = useState(null); 
-
-
+  const [selectedUrl, setSelectedUrl] = useState(null);
   const [urls, setUrls] = useState([]);
+  const [sbomLedgerToken, setSbomLedgerToken] = useState(null);
 
   const classes = useStyles();
 
   const submit = () => {
-    const config:Partial<IWorkspaceCfg> = {
-      DEFAULT_URL_API: urls.findIndex(url => url.url === indexSelectedUrl.url) || null,
-      AVAILABLE_URL_API: urls.map((url) => url.url) || null,
-      TOKEN: sbomLedger || null,
-    }
+    const config: Partial<IWorkspaceCfg> = {
+      DEFAULT_URL_API: urls.findIndex(({ url }) => url === selectedUrl.url),
+      AVAILABLE_URL_API: urls.map(({ url }) => url),
+      TOKEN: sbomLedgerToken,
+    };
     console.log(config);
+  };
 
-  }
-
-
- const setDefault = (partialWorkspaceCfg) => {
-    console.log(partialWorkspaceCfg);
-    setIndexSelectedUrl(partialWorkspaceCfg.DEFAULT_URL_API);
-    setSbomLedger(partialWorkspaceCfg.TOKEN);
-    const {AVAILABLE_URL_API, DEFAULT_URL_API} = partialWorkspaceCfg;
-    const newArray = AVAILABLE_URL_API.map((str: string) => ({url: str}));
-    setUrls(newArray);
-    console.log(newArray);
-  }
+  const setDefault = (config: Partial<IWorkspaceCfg>) => {
+    setSelectedUrl({url: config.AVAILABLE_URL_API[config.DEFAULT_URL_API]});
+    setSbomLedgerToken(config.TOKEN);
+    setUrls(config.AVAILABLE_URL_API.map((url) => ({ url })));
+  };
 
   useEffect(() => {
     if (open) {
-      //do something
       // consultar servicio
       const config:Partial<IWorkspaceCfg> = {
         DEFAULT_URL_API: 5,
@@ -82,52 +71,48 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
     }
   }, [open]);
 
-  useEffect(() => {
-    console.log(sbomLedger);
-    console.log(indexSelectedUrl);
-  }, [sbomLedger, indexSelectedUrl])
-
   const handleClose = async (e) => {
     e.preventDefault();
-    console.log('opened');
+    submit();
   };
 
   return (
     <Dialog
-      id="LicenseDialog"
+      id="SettingsDialog"
       maxWidth="md"
       scroll="body"
       className={`${classes.size} dialog`}
       fullWidth
       open={open}
+      onClose={onCancel}
     >
       <span className="dialog-title">Settings</span>
       <form onSubmit={handleClose}>
         <div className="dialog-content">
           <div className="dialog-form-field">
-            <label className="dialog-form-field-label">API Connections</label>
+            <label className="dialog-form-field-label"><b>API Connections</b></label>
           </div>
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">Knowledgebase API</label>
-            <Paper> 
+            <Paper>
               <Autocomplete
-                value={urls[indexSelectedUrl]}
+                value={selectedUrl}
                 className={classes.search}
                 onChange={(event, newValue) => {
                   if (typeof newValue === 'string') {
-                    setIndexSelectedUrl({
+                    setSelectedUrl({
                       url: newValue,
                     });
                   } else if (newValue && newValue.inputValue) {
                     // Create a new value from the user input
-                    setIndexSelectedUrl({
+                    setSelectedUrl({
                       url: newValue.inputValue,
                     });
                     setUrls([...urls, {
                       url: newValue.inputValue,
                     }])
                   } else {
-                    setIndexSelectedUrl(newValue);
+                    setSelectedUrl(newValue);
                   }
                 }}
                 filterOptions={(options, params) => {
@@ -135,9 +120,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
 
                   const { inputValue } = params;
                   // Suggest the creation of a new value
-                  const isExisting = options.some(
-                    (option) => inputValue === option.url
-                  );
+                  const isExisting = options.some((option) => inputValue === option.url);
                   if (inputValue !== '' && !isExisting) {
                     filtered.push({
                       inputValue,
@@ -150,7 +133,6 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                 selectOnFocus
                 clearOnBlur
                 handleHomeEndKeys
-                id="free-solo-with-text-demo"
                 options={urls}
 
                 getOptionLabel={(option) => {
@@ -167,27 +149,32 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                 }}
                 renderOption={(option, props) => <li {...props}>{option.url}</li>}
                 // freeSolo
-                renderInput={(params) => <TextField {...params} 
+                renderInput={(params) => <TextField {...params}
                 InputProps={{...params.InputProps, disableUnderline: true}} />}
               />
             </Paper>
+            <p className="dialog-form-field-hint">
+              This value is optional for dedicated SCANOSS server instances. When this value is empty, scans will
+              be launched against our free of charge public service. If you are interested in a dedicated instance with
+              guaranteed availability and throughput please contact us at sales@scanoss.com.
+            </p>
           </div>
-          <div className="dialog-form-field">
-            <label className="dialog-form-field-label">SBOM Ledger API</label>
+          <div className="dialog-form-field mt-3">
+            <label className="dialog-form-field-label">SBOM Ledger Token</label>
             <Paper className="dialog-form-field-control">
               <InputBase
                 name="url"
                 fullWidth
-                value={sbomLedger}
-                onChange={(e) => setSbomLedger(e.target.value)}
+                value={sbomLedgerToken}
+                onChange={(e) => setSbomLedgerToken(e.target.value)}
                 required
               />
             </Paper>
           </div>
         </div>
         <DialogActions>
-          <Button onClick={onCancel}>Back</Button>
-          <Button type="submit" variant="contained" color="secondary" >
+          <Button onClick={onCancel}>Cancel</Button>
+          <Button type="submit" variant="contained" color="secondary">
             Save
           </Button>
         </DialogActions>
