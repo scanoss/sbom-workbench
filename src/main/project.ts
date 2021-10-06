@@ -4,12 +4,10 @@ import { Response } from './Response';
 import { Project } from './workspace/Project';
 import { workspace } from './workspace/Workspace';
 
-const os = require('os');
-const fs = require('fs');
+
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (_event, arg: any) => {
   let created: any;
-
 
   const p: Project = await workspace.openProjectByPath(arg);
   const r = await p.getResults();
@@ -35,14 +33,14 @@ function getUserHome() {
 }
 
 ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (event, arg: Project) => {
-    const { path } = arg;
+  const { path } = arg;
 
-    const projectName = basepath.basename(path);
-    const p: Project = new Project(projectName);
-    await workspace.addProject(p);
-    p.setScanPath(path);
-    p.setMailbox(event.sender);
-    await p.startScanner();
+  const projectName = basepath.basename(path);
+  const p: Project = new Project(projectName);
+  await workspace.addProject(p);
+  p.setScanPath(path);
+  p.setMailbox(event.sender);
+  await p.startScanner();
 });
 
 ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
@@ -57,27 +55,25 @@ ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
   await p.resumeScanner();
 });
 
-
-
 ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
   const projectName = workspace.getOpenedProjects()[0].project_name;
-      return { status: 'ok', message: 'Project name retrieve succesfully', data: projectName };
+  return { status: 'ok', message: 'Project name retrieve succesfully', data: projectName };
 });
 
 ipcMain.handle(IpcEvents.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
-  try {   
+  try {
     const node = workspace.getOpenedProjects()[0].getNodeFromPath(path);
     return Response.ok({ message: 'Node from path retrieve succesfully', data: node });
-  } catch (e) {
+  } catch (e: any) {
     return Response.fail({ message: e.message });
   }
 });
 
 ipcMain.handle(IpcEvents.GET_TOKEN, (event) => {
-  try {   
+  try {
     const token = workspace.getOpenedProjects()[0].getToken();
     return Response.ok({ message: 'Node from path retrieve succesfully', data: token });
-  } catch (e :any) {
+  } catch (e: any) {
     return Response.fail({ message: e.message });
   }
 });

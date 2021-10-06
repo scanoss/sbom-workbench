@@ -15,6 +15,7 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import path from 'path';
+import * as os from 'os';
 import MenuBuilder from './main/menu';
 import './main/inventory';
 import './main/component';
@@ -25,7 +26,8 @@ import './main/formats';
 import './main/workspace';
 import './main/report';
 import './main/license';
-import * as os from 'os';
+import './main/controllers/userSetting';
+
 
 import { IpcEvents } from './ipc-events';
 import { workspace } from './main/workspace/Workspace';
@@ -40,8 +42,9 @@ import { fstat } from 'fs';
 import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
 import Workspace from './renderer/features/workspace/Workspace';
 import { Metadata } from './main/workspace/Metadata';
+import { userSetting } from './main/UserSetting';
 const basepath = require('path');
-const fs = require('fs');
+
 
 
 export default class AppUpdater {
@@ -168,14 +171,17 @@ export interface IInitScan {
   scanId?: string;
 }
 
+// Supuesto servicio de carga de workspace
 async function mainLogic() {
   await workspace.read(`${os.homedir()}/scanoss-workspace`);
+  await userSetting.read(`${os.homedir()}/scanoss-workspace`);
 }
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
   const { path } = arg;
   const projectName = basepath.basename(path);
   const p: Project = new Project(projectName);
+  // p.setConfig();
   await workspace.addProject(p);
   p.setScanPath(path);
   p.setMailbox(event.sender);
