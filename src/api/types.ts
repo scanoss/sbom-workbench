@@ -129,4 +129,5 @@ export enum FormatVersion {
   CSV = 'CSV',
   RAW = 'RAW',
   WFP = 'WFP',
+  SPDXLITEJSON = 'SPDXLITEJSON',
 }

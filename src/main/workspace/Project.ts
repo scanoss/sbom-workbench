@@ -97,6 +97,7 @@ export class Project extends EventEmitter {
   public save(): void {
     this.metadata.save();
     fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this));
+    console.log("PROJECT Config ",this.config)
     fs.writeFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, JSON.stringify(this.config, null, 2));
     console.log(`[ PROJECT ]: Project saved`);
   }

@@ -178,7 +178,7 @@ class Workspace extends EventEmitter {
     return this.projectList.length - 1;
   }
 
-  private mergeWsCfgToPjCfg(workspace: IWorkspaceCfg): IProjectCfg {
+  private mergeWsCfgToPjCfg(workspace: IWorkspaceCfg): IProjectCfg {   
     const projectCfg: IProjectCfg = {
       DEFAULT_URL_API: workspace.AVAILABLE_URL_API[workspace.DEFAULT_URL_API],
       TOKEN: workspace.TOKEN,
@@ -191,6 +191,7 @@ class Workspace extends EventEmitter {
     try {
       const cfg = await this.workspaceModel.getWSConfig(this.wsPath);
       const cfgWorkspace: IWorkspaceCfg = JSON.parse(cfg);
+     
       if (cfgWorkspace.AVAILABLE_URL_API.length > 0 && cfgWorkspace.DEFAULT_URL_API >= 0)
         return this.mergeWsCfgToPjCfg(cfgWorkspace);
     } catch (e) {
