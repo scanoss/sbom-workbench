@@ -1,14 +1,8 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  InputBase,
-  makeStyles,
-  Paper,
-} from '@material-ui/core';
+import { Button, Dialog, DialogActions, IconButton, InputBase, makeStyles, Paper } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import React, { useEffect, useState } from 'react';
+import DeleteIcon from '@material-ui/icons/Delete';
 import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
 import { IWorkspaceCfg } from '../../../api/types';
 import { workspaceService } from '../../../api/workspace-service';
@@ -18,11 +12,16 @@ const filter = createFilterOptions();
 const useStyles = makeStyles((theme) => ({
   size: {
     '& .MuiDialog-paperWidthMd': {
-      width: '500px',
+      width: '600px',
     },
   },
   search: {
     padding: '0px 15px',
+  },
+  new: {
+    fontSize: '0.9rem',
+    fontWeight: 600,
+    color: theme.palette.primary.light,
   },
 }));
 
@@ -54,7 +53,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
     const { DEFAULT_URL_API, AVAILABLE_URL_API, TOKEN } = config;
 
     const urlsDefault = AVAILABLE_URL_API ? AVAILABLE_URL_API.map((url) => ({ url })) : [];
-    const selectedUrlDefault = AVAILABLE_URL_API ? { url: AVAILABLE_URL_API[DEFAULT_URL_API] } : null;
+    const selectedUrlDefault = AVAILABLE_URL_API && AVAILABLE_URL_API[DEFAULT_URL_API] ? { url: AVAILABLE_URL_API[DEFAULT_URL_API] } : null;
 
     setSbomLedgerToken(TOKEN);
     setUrls(urlsDefault);
@@ -63,8 +62,36 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
 
   const fetchConfig = async () => {
     const config = await workspaceService.getWSConfig();
-    console.log('config', config);
     setDefault(config || {});
+  };
+
+  const handleClose = (e) => {
+    e.preventDefault();
+    submit();
+  };
+
+  const handleOnChange = (event, newValue) => {
+    if (typeof newValue === 'string') {
+      setSelectedUrl({
+        url: newValue,
+      });
+    } else if (newValue && newValue.new) {
+      const value = {
+        url: newValue.inputValue,
+      };
+      setSelectedUrl(value);
+      setUrls([...urls, value]);
+    } else {
+      setSelectedUrl(newValue);
+    }
+  };
+
+  const handleTrash = (e, option) => {
+    e.stopPropagation();
+    setUrls(urls.filter((url) => url.url !== option.url));
+    if (selectedUrl && option.url === selectedUrl.url) {
+      setSelectedUrl(null);
+    }
   };
 
   useEffect(() => {
@@ -72,11 +99,6 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
       fetchConfig();
     }
   }, [open]);
-
-  const handleClose = async (e) => {
-    e.preventDefault();
-    submit();
-  };
 
   return (
     <Dialog
@@ -104,24 +126,17 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
               <Autocomplete
                 value={selectedUrl}
                 className={classes.search}
-                onChange={(event, newValue) => {
-                  if (typeof newValue === 'string') {
-                    setSelectedUrl({
-                      url: newValue,
-                    });
-                  } else if (newValue && newValue.inputValue) {
-                    // Create a new value from the user input
-                    setSelectedUrl({
-                      url: newValue.inputValue,
-                    });
-                    setUrls([
-                      ...urls,
-                      {
-                        url: newValue.inputValue,
-                      },
-                    ]);
-                  } else {
-                    setSelectedUrl(newValue);
+                onChange={handleOnChange}
+                onKeyPress={(e: any) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const { value } = e.target;
+                    const isExisting = urls.some((option) => value === option.url);
+                    if (!isExisting) {
+                      handleOnChange(e, { new: true, inputValue: value });
+                    } else {
+                      setSelectedUrl({ url: value });
+                    }
                   }
                 }}
                 filterOptions={(options, params) => {
@@ -133,7 +148,8 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   if (inputValue !== '' && !isExisting) {
                     filtered.push({
                       inputValue,
-                      url: `Add "${inputValue}"`,
+                      new: true,
+                      url: `Click or enter to add "${inputValue}"`,
                     });
                   }
 
@@ -155,8 +171,25 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   // Regular option
                   return option.url;
                 }}
-                renderOption={(option, props) => <li {...props}>{option.url}</li>}
-                // freeSolo
+                renderOption={(option, props) =>
+                  option.new ? (
+                    <li {...props} className={classes.new}>
+                      {option.url}
+                    </li>
+                  ) : (
+                    <li {...props} className="w-100 d-flex space-between align-center">
+                      {option.url}
+                      <IconButton
+                        size="small"
+                        aria-label="delete"
+                        className="btn-delete"
+                        onClick={(e) => handleTrash(e, option)}
+                      >
+                        <DeleteIcon fontSize="inherit" />
+                      </IconButton>
+                    </li>
+                  )
+                }
                 renderInput={(params) => (
                   <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
                 )}
