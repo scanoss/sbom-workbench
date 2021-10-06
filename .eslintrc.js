@@ -17,6 +17,8 @@ module.exports = {
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['warn'],
     '@typescript-eslint/naming-convention': ['warn'],
+    'react/jsx-props-no-spreading': 'off',
+    'jsx-a11y/label-has-associated-control': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

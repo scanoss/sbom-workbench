@@ -65,7 +65,6 @@ const Workspace = () => {
   const cleanup = () => {};
 
   const onShowScan = (project) => {
-    console.log(project);
     if (isProjectFinished(project)) {
       setScanPath({ path: project.work_root, action: 'none' });
       history.push('/workbench');
@@ -82,17 +81,6 @@ const Workspace = () => {
       history.push('/workspace/new');
     }
   };
-
-  const [settings, setSettings] = useState<any[]>();
-
-  const openSettingsDialog = async () => {
-    console.log('opened')
-    const response = await dialogCtrl.openSettings();
-    // if (response && response.action === ResponseStatus.OK) {
-    //   setSettings([...settings, { name: response.data.name, type: 'Cataloged' }]);
-    // }
-    console.log(response);
-  }
 
   const onTrashHandler = async (path, e) => {
     e.stopPropagation();
@@ -144,9 +132,6 @@ const Workspace = () => {
             </div>
             <Button startIcon={<AddIcon />} variant="contained" color="primary" onClick={onNewProject}>
               New project
-            </Button>
-            <Button variant="contained" color="primary" onClick={openSettingsDialog}>
-              Settings
             </Button>
           </section>
         </header>

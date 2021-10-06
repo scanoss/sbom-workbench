@@ -190,9 +190,7 @@ class Workspace extends EventEmitter {
   private async createProjectCfg(): Promise<IProjectCfg> {
     try {
       const cfg = await this.workspaceModel.getWSConfig(this.wsPath);
-      const cfgWorkspace: IWorkspaceCfg = JSON.parse(cfg);
-      if (cfgWorkspace.AVAILABLE_URL_API.length > 0 && cfgWorkspace.DEFAULT_URL_API >= 0)
-        return this.mergeWsCfgToPjCfg(cfgWorkspace);
+      if (cfg.AVAILABLE_URL_API.length > 0 && cfg.DEFAULT_URL_API >= 0) return this.mergeWsCfgToPjCfg(cfg);
     } catch (e) {
       return this.mergeWsCfgToPjCfg(this.workspaceConfig);
     }
@@ -290,8 +288,7 @@ class Workspace extends EventEmitter {
 
   public async setWSConfig(config: Partial<IWorkspaceCfg>) {
     try {
-      const configuration = config.AVAILABLE_URL_API.length === 0 ? DEFAULT_WORKSPACE_CONFIG : config;
-      if (await this.workspaceModel.setWSConfig(this.wsPath, configuration)) return configuration;
+      if (await this.workspaceModel.setWSConfig(this.wsPath, config)) return await this.getWSConfig();
       throw new Error('Unable to write config file');
     } catch (e) {
       return new Error('Workspace config was not set successfully');

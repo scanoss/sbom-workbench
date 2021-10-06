@@ -152,7 +152,7 @@ export const DialogProvider: React.FC = ({ children }) => {
   };
 
   const handleOpenSettings = () => {
-    console.error('Function not implemented.');
+    openSettings();
   };
 
   const setupAppMenuListeners = () => {
