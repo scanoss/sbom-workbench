@@ -24,15 +24,15 @@
 // margins and padding
 
 @mixin loop($className, $styleName) {
-  $max: 50;
+  $max: 10;
   $offset: 5;
   $unit: 'px';
   $i: 0;
   @while $i <= $max {
     #{$className + $i} {
-      #{$styleName}: #{$i}px !important;
+      #{$styleName}: #{$i*$offset}px !important;
     }
-    $i: $i + $offset;
+    $i: $i + 1;
   }
 }
 

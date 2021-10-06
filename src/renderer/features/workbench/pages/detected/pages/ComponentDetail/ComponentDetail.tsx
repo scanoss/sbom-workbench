@@ -26,16 +26,91 @@ import { inventoryService } from '../../../../../../../api/inventory-service';
 import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import { mapFiles } from '../../../../../../../utils/scan-util';
+import { setHistoryCrumb, setVersion } from '../../../../actions';
+
+// inner components
+const VersionSelector = ({ versions, version, onSelect, component }) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const totalFiles = component.summary.ignored + component.summary.pending + component.summary.identified;
+
+  const handleSelected = (version: string) => {
+    setAnchorEl(null);
+    onSelect(version);
+  };
+
+  return (
+    <>
+      <div>
+        {versions?.length > 1 ? (
+          <Button
+            className={`filter btn-version ${version ? 'selected' : ''}`}
+            aria-controls="menu"
+            aria-haspopup="true"
+            endIcon={<ArrowDropDownIcon />}
+            onClick={(event) => setAnchorEl(event.currentTarget)}
+          >
+            {version || 'version'}
+          </Button>
+        ) : (
+          versions[0].version
+        )}
+      </div>
+      <Menu id="VersionSelectorList" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+        <MenuItem key="all" onClick={() => handleSelected(null)}>
+          <div className="version-container">
+            <div className="version"> All versions</div>
+            <div className="files-counter">{totalFiles}</div>
+          </div>
+        </MenuItem>
+        {versions?.map(({ version, files }) => (
+          <MenuItem key={version} onClick={() => handleSelected(version)}>
+            <div className="version-container">
+              <div className="version"> {version}</div>
+              <div className="files-counter">{files}</div>
+            </div>
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
+  );
+};
+
+const TabNavigation = ({ tab, version, component, filterFiles, onSelect }) => {
+  return (
+    <div className="tabs d-flex">
+      <Paper square>
+        <Tabs
+          selectionFollowsFocus
+          value={tab}
+          TabIndicatorProps={{ style: { display: 'none' } }}
+          onChange={(event, value) => onSelect(value)}
+        >
+          <Tab label={`Pending (${version ? `${filterFiles.pending.length}/` : ''}${component?.summary.pending})`} />
+          <Tab
+            label={`Identified (${version ? `${filterFiles.identified.length}/` : ''}${component?.summary.identified})`}
+          />
+          <Tab label={`Ignored (${version ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`} />
+        </Tabs>
+      </Paper>
+    </div>
+  );
+};
 
 export const ComponentDetail = () => {
   const history = useHistory();
 
-  const { state, detachFile, createInventory, ignoreFile, restoreFile, attachFile } = useContext(
+  const { state, dispatch, detachFile, createInventory, ignoreFile, restoreFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { name, component } = state;
+  const { name, component, version } = state;
+
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   const [files, setFiles] = useState<any[]>([]);
   const [filterFiles, setFilterFiles] = useState<{ pending: any[]; identified: any[]; ignored: any[] }>({
@@ -45,14 +120,9 @@ export const ComponentDetail = () => {
   });
 
   const [inventories, setInventories] = useState<Inventory[]>([]);
-  const [versions, setVersions] = useState<any[]>(null);
-  const [version, setVersion] = useState<string>(null);
 
-  const anchorRef = useRef<HTMLDivElement>(null);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const [open, setOpen] = React.useState(false);
-  const [tab, setTab] = useState<number>(component?.summary?.pending !== 0 ? 0 : 1);
+  const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<number>(state.history.section || 0);
 
   const getFiles = async () => {
     const response = await componentService.getFiles({ purl: component.purl, version });
@@ -127,7 +197,11 @@ export const ComponentDetail = () => {
   };
 
   const onIgnoreAllPressed = async () => {
-    const { action } = await dialogCtrl.openConfirmDialog(`Are you sure you want to ignore ${filterFiles.pending.length} ${filterFiles.pending.length === 1 ? 'file' : 'files'}?`);
+    const { action } = await dialogCtrl.openConfirmDialog(
+      `Are you sure you want to ignore ${filterFiles.pending.length} ${
+        filterFiles.pending.length === 1 ? 'file' : 'files'
+      }?`
+    );
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.pending.map((file) => file.id);
       await ignoreFile(selFiles);
@@ -136,7 +210,11 @@ export const ComponentDetail = () => {
   };
 
   const onRestoreAllPressed = async () => {
-    const { action } = await dialogCtrl.openConfirmDialog(`Are you sure you want to restore ${filterFiles.ignored.length} ${filterFiles.ignored.length === 1 ? 'file' : 'files'}?`);
+    const { action } = await dialogCtrl.openConfirmDialog(
+      `Are you sure you want to restore ${filterFiles.ignored.length} ${
+        filterFiles.ignored.length === 1 ? 'file' : 'files'
+      }?`
+    );
 
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.ignored.map((file) => file.id);
@@ -146,7 +224,11 @@ export const ComponentDetail = () => {
   };
 
   const onDetachAllPressed = async () => {
-    const { action } = await dialogCtrl.openConfirmDialog(`Are you sure you want to restore ${filterFiles.identified.length} ${filterFiles.identified.length === 1 ? 'file' : 'files'}?`);
+    const { action } = await dialogCtrl.openConfirmDialog(
+      `Are you sure you want to restore ${filterFiles.identified.length} ${
+        filterFiles.identified.length === 1 ? 'file' : 'files'
+      }?`
+    );
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.identified.map((file) => file.id);
       await detachFile(selFiles);
@@ -169,43 +251,17 @@ export const ComponentDetail = () => {
   };
 
   const create = async (defaultInventory, selFiles) => {
-    // const showSelector = inventories.length > 0;
-    const showSelector = false; // TO DO UNTIL VALIDATE
-    let action = DIALOG_ACTIONS.NEW;
-    let inventory;
+    const inventory = await dialogCtrl.openInventory(defaultInventory);
+    if (!inventory) return;
 
-    if (showSelector) {
-      const response = await dialogCtrl.openInventorySelector(inventories);
-      action = response.action;
-      inventory = response.inventory;
-    }
+    const newInventory = await createInventory({
+      ...inventory,
+      files: selFiles,
+    });
 
-    if (action === DIALOG_ACTIONS.CANCEL) return;
-
-    if (action === DIALOG_ACTIONS.NEW) {
-      inventory = await dialogCtrl.openInventory(defaultInventory);
-      if (!inventory) return;
-
-      const newInventory = await createInventory({
-        ...inventory,
-        files: selFiles,
-      });
-      setInventories((previous) => [...previous, newInventory]);
-    } else if (action === DIALOG_ACTIONS.OK) {
-      await attachFile(inventory.id, selFiles);
-    }
-
+    setInventories((previous) => [...previous, newInventory]);
     getFiles();
     setTab(1);
-  };
-
-  const handleCloseVersionGroup = () => {
-    setAnchorEl(null);
-  };
-
-  const handleVersionSelected = (version: string) => {
-    setVersion(version);
-    setAnchorEl(null);
   };
 
   const handleCloseButtonGroup = (event: React.MouseEvent<Document, MouseEvent>) => {
@@ -226,10 +282,6 @@ export const ComponentDetail = () => {
   }, [files]);
 
   useEffect(() => {
-    setVersions(component ? component.versions : null);
-  }, [component]);
-
-  useEffect(() => {
     setFilterFiles({
       pending: [],
       identified: [],
@@ -239,14 +291,18 @@ export const ComponentDetail = () => {
     getInventories();
   }, [version]);
 
+  useEffect(() => {
+    dispatch(setHistoryCrumb({ section: tab }));
+  }, [tab]);
+
   const renderTab = () => {
     switch (tab) {
       case 0:
-        return <FileList files={filterFiles.pending} onAction={onAction} />;
+        return <FileList files={filterFiles.pending} emptyMessage="No pending files" onAction={onAction} />;
       case 1:
         return <IdentifiedList files={filterFiles.identified} inventories={inventories} onAction={onAction} />;
       case 2:
-        return <FileList files={filterFiles.ignored} onAction={onAction} />;
+        return <FileList files={filterFiles.ignored} emptyMessage="No ignored files" onAction={onAction} />;
       default:
         return 'no data';
     }
@@ -257,62 +313,26 @@ export const ComponentDetail = () => {
       <section id="ComponentDetail" className="app-page">
         <header className="app-header">
           <div className="header">
-            <div>
-              <div className="filter-container">
-                <ComponentInfo component={component} />
-                <ChevronRightOutlinedIcon fontSize="small" />
-                {component?.versions?.length > 1 ? (
-                  <>
-                    <Button
-                      className={`filter btn-version ${version ? 'selected' : ''}`}
-                      aria-controls="menu"
-                      aria-haspopup="true"
-                      endIcon={<ArrowDropDownIcon />}
-                      onClick={(event) => setAnchorEl(event.currentTarget)}
-                    >
-                      {version || 'version'}
-                    </Button>
-                  </>
-                ) : (
-                  <> {component.versions[0].version}</>
-                )}
-              </div>
-              <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleCloseVersionGroup}>
-                <MenuItem key="all" onClick={() => handleVersionSelected(null)}>
-                  All versions
-                </MenuItem>
-                {versions?.map(({ version }) => (
-                  <MenuItem key={version} onClick={() => handleVersionSelected(version)}>
-                    {version}
-                  </MenuItem>
-                ))}
-              </Menu>
+            <div className="filter-container">
+              <ComponentInfo component={component} />
+              <ChevronRightOutlinedIcon fontSize="small" />
+              <VersionSelector
+                versions={component?.versions}
+                version={version}
+                onSelect={(version) => dispatch(setVersion(version))}
+                component={component}
+              />
             </div>
           </div>
 
           <section className="subheader">
-            <div className="tabs d-flex">
-              <Paper square>
-                <Tabs
-                  selectionFollowsFocus
-                  value={tab}
-                  TabIndicatorProps={{ style: { display: 'none' } }}
-                  onChange={(event, value) => setTab(value)}
-                >
-                  <Tab
-                    label={`Pending (${version ? `${filterFiles.pending.length}/` : ''}${component?.summary.pending})`}
-                  />
-                  <Tab
-                    label={`Identified (${version ? `${filterFiles.identified.length}/` : ''}${
-                      component?.summary.identified
-                    })`}
-                  />
-                  <Tab
-                    label={`Ignored (${version ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`}
-                  />
-                </Tabs>
-              </Paper>
-            </div>
+            <TabNavigation
+              tab={tab}
+              version={version}
+              component={component}
+              filterFiles={filterFiles}
+              onSelect={(tab) => setTab(tab)}
+            />
 
             {tab === 0 && (
               <>

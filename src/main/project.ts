@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
 import { Project } from './workspace/Project';
-import { workspace } from './workspace/workspace';
+import { workspace } from './workspace/Workspace';
 
 const os = require('os');
 const fs = require('fs');
@@ -65,7 +65,7 @@ ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
 });
 
 ipcMain.handle(IpcEvents.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
-  try {
+  try {   
     const node = workspace.getOpenedProjects()[0].getNodeFromPath(path);
     return Response.ok({ message: 'Node from path retrieve succesfully', data: node });
   } catch (e) {
@@ -74,7 +74,7 @@ ipcMain.handle(IpcEvents.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
 });
 
 ipcMain.handle(IpcEvents.GET_TOKEN, (event) => {
-  try {
+  try {   
     const token = workspace.getOpenedProjects()[0].getToken();
     return Response.ok({ message: 'Node from path retrieve succesfully', data: token });
   } catch (e :any) {

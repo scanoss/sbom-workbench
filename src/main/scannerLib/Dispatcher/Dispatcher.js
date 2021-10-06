@@ -3,29 +3,24 @@
 import EventEmitter from 'events';
 import fetch from 'node-fetch';
 import FormData from 'form-data';
-import fs from 'fs';
 import PQueue from 'p-queue';
 import { ScannerEvents } from '../ScannerEvents';
 import { DispatcherResponse } from './DispatcherResponse';
-import { DispatcherEvents } from './DispatcherEvents';
 import { ScannerCfg } from '../ScannerCfg';
+import { GlobalControllerAborter } from './GlobalControllerAborter';
 
 export class Dispatcher extends EventEmitter {
   #scannerCfg;
 
   #pQueue;
 
-  #status;
-
-  #error;
-
-  #wfpFailed;
-
-  #continue;
+  #globalAbortController;
 
   #queueMaxLimitReached;
 
   #queueMinLimitReached;
+
+  #recoverableErrors;
 
   constructor(scannerCfg = new ScannerCfg()) {
     super();
@@ -36,13 +31,13 @@ export class Dispatcher extends EventEmitter {
   #init() {
     this.#pQueue = new PQueue({
       concurrency: this.#scannerCfg.CONCURRENCY_LIMIT,
-      timeout: this.#scannerCfg.TIMEOUT,
-      throwOnTimeout: true,
     });
     this.#pQueue.clear();
+
     this.#pQueue.on('idle', () => {
       this.emit(ScannerEvents.DISPATCHER_FINISHED);
     });
+
     this.#pQueue.on('next', () => {
       if ((this.#pQueue.size + this.#pQueue.pending) < this.#scannerCfg.DISPATCHER_QUEUE_SIZE_MIN_LIMIT && !this.#queueMinLimitReached) {
         this.emit(ScannerEvents.DISPATCHER_QUEUE_SIZE_MIN_LIMIT);
@@ -50,86 +45,82 @@ export class Dispatcher extends EventEmitter {
         this.#queueMaxLimitReached = false;
       }
     });
-    this.#continue = true;
-    this.#wfpFailed = {};
+
     this.#queueMaxLimitReached = false;
     this.#queueMinLimitReached = true;
+
+    this.#globalAbortController = new GlobalControllerAborter();
+
+    this.#recoverableErrors = new Set();
+    this.#recoverableErrors.add('ECONNRESET');
+    this.#recoverableErrors.add('TIMEOUT');
   }
 
   stop() {
-    this.#pQueue.removeAllListeners();
     this.#pQueue.clear();
     this.#pQueue.pause();
+    this.#globalAbortController.abortAll();
   }
 
-  pause() {
-    this.#pQueue.pause();
-  }
+  dispatchItem(disptItem) {
+    this.#pQueue.add(() => this.#dispatch(disptItem));
 
-  resume() {
-    for (const wfpPathFailed in this.#wfpFailed) this.dispatchWfpFile(wfpPathFailed);
-    this.#pQueue.start();
-  }
-
-  dispatchWfpContent(wfpContent) {
-    this.#pQueue
-      .add(() => this.#dispatch(wfpContent))
-      .catch((error) => {
-        this.#errorHandler(error);
-      });
-
-    if ( (this.#pQueue.size + this.#pQueue.pending) >= this.#scannerCfg.DISPATCHER_QUEUE_SIZE_MAX_LIMIT && !this.#queueMaxLimitReached) {
+    if (
+      this.#pQueue.size + this.#pQueue.pending >= this.#scannerCfg.DISPATCHER_QUEUE_SIZE_MAX_LIMIT &&
+      !this.#queueMaxLimitReached
+    ) {
       this.emit(ScannerEvents.DISPATCHER_QUEUE_SIZE_MAX_LIMIT);
       this.#queueMaxLimitReached = true;
       this.#queueMinLimitReached = false;
     }
   }
 
-  #errorHandler(error) {
-    // a) El server cierra el socket 'ECONNRESET' Seguir reintentando n veces
-    // b) Hay timeout en el .wfp 'TIMEOUT'  Tendria que reintentar x veces ese especifico wfp
-    // c) Error en el parser error directo
-    // d) Error en la coneccion internet error directo
-    // e) Couta terminada error directo
-    // f) Cliente desactualizado error directo
-
-    // switch(error.code) {
-    //   case 'ECONNRESET': // Server closes the socket.
-    //     break;
-
-    //   default:
-
-    // }
-
-
-    // if (error.code === 'ECONNRESET')
-    //   // Se agrega al final de la cola y que no se alla mandado mas de x veces
-    // if (error.code === 'PARSER-ERROR')
-    //   this.emit('error', error);
-
-    // if ( this.#wfpFailed[error.wfpFailedPath] > 3 ) {
-    //   this.emit('error', error);
-    // }
-
+  #handleUnrecoverableError(error) {
     this.emit('error', error);
   }
 
-  async #dispatch(wfpContent) {
-    try {
-      let dataAsText = '';
-      let dataAsObj = {};
-      const form = new FormData();
-      form.append('filename', wfpContent, 'data.wfp');
+  #emitNoDispatchedItem(disptItem) {
+    console.log(`[ SCANNER ]: WFP content sended to many times. Some files won't be scanned`);
+    this.emit(ScannerEvents.DISPATCHER_ITEM_NO_DISPATCHED, disptItem);
+  }
 
-      // Fetch
-      const p1 = fetch(this.#scannerCfg.API_URL, {
+  #errorHandler(error, disptItem) {
+    if (!this.#globalAbortController.isAborting()) {
+      if (error.name === 'AbortError') error.name = 'TIMEOUT';
+      if (this.#recoverableErrors.has(error.code) || this.#recoverableErrors.has(error.name)) {
+        disptItem.increaseErrorCounter();
+        if (disptItem.getErrorCounter() >= this.#scannerCfg.MAX_RETRIES_FOR_RECOVERABLES_ERRORS) {
+          this.#emitNoDispatchedItem(disptItem);
+          if (this.#scannerCfg.ABORT_ON_MAX_RETRIES) this.#handleUnrecoverableError(error, disptItem);
+          return;
+        }
+        const leftRetry = this.#scannerCfg.MAX_RETRIES_FOR_RECOVERABLES_ERRORS - disptItem.getErrorCounter();
+        console.log(`[ SCANNER ]: Recoverable error happened sending WFP content to server. Reason: ${error.code || error.name}`);
+        this.dispatchItem(disptItem);
+        return;
+      }
+      this.#handleUnrecoverableError(error);
+    }
+  }
+
+  async #dispatch(disptItem) {
+    const timeoutController = this.#globalAbortController.getAbortController();
+    const timeoutId = setTimeout(() => timeoutController.abort(), this.#scannerCfg.TIMEOUT);
+    try {
+      const form = new FormData();
+      const wfpContent = disptItem.getContent();
+      form.append('filename', Buffer.from(wfpContent), 'data.wfp');
+      this.emit(ScannerEvents.DISPATCHER_WFP_SENDED);
+      const response = await fetch(this.#scannerCfg.API_URL, {
         method: 'post',
         body: form,
         headers: { 'User-Agent': this.#scannerCfg.CLIENT_TIMESTAMP },
+        signal: timeoutController.signal,
       });
 
-      this.emit(ScannerEvents.DISPATCHER_WFP_SENDED);
-      const response = await p1;
+      clearTimeout(timeoutId);
+      this.#globalAbortController.removeAbortController(timeoutController);
+
       if (!response.ok) {
         const msg = await response.text();
         const err = new Error(msg);
@@ -137,14 +128,19 @@ export class Dispatcher extends EventEmitter {
         err.name = ScannerEvents.ERROR_SERVER_SIDE;
         throw err;
       }
-      dataAsText = await response.text();
-      dataAsObj = JSON.parse(dataAsText);
-      const dispatcherResponse = new DispatcherResponse(dataAsObj, wfpContent);
+
+      const dataAsText = await response.text();
+      const dataAsObj = JSON.parse(dataAsText);
+
+      const dispatcherResponse = new DispatcherResponse(dataAsObj, disptItem.getContent());
       this.emit(ScannerEvents.DISPATCHER_NEW_DATA, dispatcherResponse);
-      return await Promise.resolve();
-    } catch (error) {
-        if (error.name !== ScannerEvents.ERROR_SERVER_SIDE) error.name = ScannerEvents.ERROR_CLIENT_SIDE;
-        throw error;
+      return Promise.resolve();
+    } catch (e) {
+        clearTimeout(timeoutId);
+        this.#globalAbortController.removeAbortController(timeoutController);
+        this.#errorHandler(e, disptItem);
+        return Promise.resolve();
+
     }
   }
 }

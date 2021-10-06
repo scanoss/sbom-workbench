@@ -108,7 +108,11 @@
 
     .line-highlighted {
       display: block;
-      background-color: #ebe92252 !important;
+      background-color: #ebe92252 !important; // 266a8452
+    }
+
+    .linenumber {
+      color: #eeeeee;
     }
 
     span:not(.linenumber) {

@@ -148,3 +148,23 @@ header.app-header {
 
 }
 
+#VersionSelectorList .MuiList-root.MuiMenu-list.MuiList-padding {
+  min-width: 170px;
+
+  .version-container {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    width: 100%;
+
+    .version {
+      margin-right: 5px;
+    }
+
+    .files-counter {
+      color:#949496;
+    }
+
+  }
+}
+

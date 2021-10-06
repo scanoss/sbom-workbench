@@ -1,4 +1,4 @@
-import { workspace } from '../workspace/workspace';
+import { workspace } from '../workspace/Workspace';
 
 class ReportService {
   public async getReportSummary() {

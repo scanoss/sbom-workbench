@@ -55,6 +55,7 @@ class WorkbenchController {
 
   public async getComponents(): Promise<ComponentGroup[]> {
     const { data } = await componentService.getAllComponentGroup({ source: ComponentSource.ENGINE });
+    console.log(data);
     sortComponents(data);
     return data;
   }

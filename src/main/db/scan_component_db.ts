@@ -82,6 +82,8 @@ export class ComponentDb extends Db {
       transformation.purl = data[i].purl;
       transformation.url = data[i].comp_url;
       transformation.version = data[i].version;
+      if(data[i].filesCount)
+      transformation.filesCount=data[i].filesCount;
 
       if (data[i].license_id) {
         preLicense.id = data[i].license_id;
@@ -126,7 +128,7 @@ export class ComponentDb extends Db {
           db.all(sqlGetComp, async (err: any, data: any) => {
             db.close();
             if (err) resolve([]);
-            else {
+            else {            
               const comp = self.processComponent(data);
               const summary: any = await self.allSummaries();
               for (let i = 0; i < comp.length; i += 1) {
@@ -209,7 +211,7 @@ export class ComponentDb extends Db {
             component.name,
             component.version,
             component.description ? component.description : 'n/a',
-            component.url ? component.url : 'n/a',
+            component.url ? component.url : null,
             component.purl,
             'manual',
             async function (this: any, err: any) {
@@ -478,8 +480,8 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const data = await this.getAll({}, params);
-        if (data) {
-          const comp = await this.groupComponentsByPurl(data);
+        if (data) {       
+          const comp = await this.groupComponentsByPurl(data);         
           resolve(comp);
         } else resolve([]);
       } catch (error) {
@@ -494,7 +496,7 @@ export class ComponentDb extends Db {
       for (const component of data) {
         if (!aux.hasOwnProperty(component.purl)) aux[component.purl] = [];
         aux[component.purl].push(component);
-      }
+      }    
       const result = await this.mergeComponentByPurl(aux);
       return result;
     } catch (err) {
@@ -520,6 +522,7 @@ export class ComponentDb extends Db {
             aux.summary.identified += iterator.summary.identified;
           }
           version.version = iterator.version;
+          version.files = iterator.filesCount;
           version.licenses = [];
           version.licenses = iterator.licenses;
           aux.versions.push(version);
@@ -535,9 +538,9 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(`SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name 
-        FROM component_versions c 
-        INNER JOIN inventories i ON c.purl=i.purl AND c.version=i.version 
+        db.all(`SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name
+        FROM component_versions c
+        INNER JOIN inventories i ON c.purl=i.purl AND c.version=i.version
         INNER JOIN licenses l ON l.name=i.license_name ORDER BY license_name;`,
           (err: any, data: any) => {
             db.close();

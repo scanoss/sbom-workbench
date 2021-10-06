@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
 import { reportService } from './services/ReportService';
-import { workspace } from './workspace/workspace';
+import { workspace } from './workspace/Workspace';
 
 interface licenseEntry {
   label: string;
@@ -59,7 +59,8 @@ ipcMain.handle(IpcEvents.REPORT_DETECTED, async (event, arg: string) => {
   crypto = [{ label: 'None', files: [], value: 0 }];
 
   try {
-    const a = workspace.getOpenedProjects()[0].getResults();
+    
+    const a = await workspace.getOpenedProjects()[0].getResults();    
     for (const [key, results] of Object.entries(a)) {
       for (const result of results) {
         if (result.id != 'none') {
