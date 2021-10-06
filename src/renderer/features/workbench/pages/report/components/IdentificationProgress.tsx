@@ -4,7 +4,6 @@ import { Button, Tooltip } from '@material-ui/core';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import { shell } from 'electron';
 import { ExportFormat } from '../../../../../../api/export-service';
-import { projectService } from '../../../../../../api/project-service';
 import { HashType } from '../../../../../../api/types';
 import { userSettingService } from '../../../../../../api/userSetting-service';
 

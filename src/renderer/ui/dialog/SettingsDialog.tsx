@@ -64,7 +64,6 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
 
   const fetchConfig = async () => {
     const config = await userSettingService.get();
-    console.log('config', config);
     setDefault( config || {});
   };
 

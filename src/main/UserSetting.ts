@@ -2,10 +2,6 @@ import fs from 'fs';
 import { IProject, IWorkspaceCfg } from '../api/types';
 import { wsUtils } from './workspace/WsUtils/WsUtils';
 
-/*
- {TOKEN: 'asdsa', AVAILABLE_} <-- userSetting.get()
-*/
-
 class UserSetting {
   private myPath: string;
 
@@ -13,21 +9,19 @@ class UserSetting {
 
   private store: IWorkspaceCfg;
 
-  private defaultStore: IWorkspaceCfg;
+  private defaultStore: IWorkspaceCfg = {
+    TOKEN: '',
+    DEFAULT_URL_API: 0,
+    AVAILABLE_URL_API: ['https://osskb.org/api/scan/direct'],
+    SCAN_MODE: 'FULL_SCAN',
+  };
 
   constructor() {
     this.name = 'defaultCfg.json';
-    this.defaultStore = {
-      TOKEN: '',
-      DEFAULT_URL_API: 0,
-      AVAILABLE_URL_API: ['https://osskb.org/api/scan/direct'],
-      SCAN_MODE: 'FULL_SCAN',
-    };
     this.store = this.defaultStore;
   }
 
   public set(setting: Partial<IWorkspaceCfg>) {
-      console.log(setting);
     this.store = { ...this.store, ...setting };
     return this.store;
   }
@@ -37,12 +31,16 @@ class UserSetting {
   }
 
   public get(): Partial<IWorkspaceCfg> {
-    return this.store;
+    return JSON.parse(JSON.stringify(this.store));
   }
 
   public getSetting(key: string) {
     const setting = { key: this.store[key] } as Partial<IWorkspaceCfg>;
     return setting;
+  }
+
+  public getDefault(): IWorkspaceCfg {
+    return this.defaultStore;
   }
 
   public async read(path: string) {

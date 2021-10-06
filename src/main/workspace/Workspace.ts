@@ -1,44 +1,17 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { EventEmitter } from 'events';
-import { stripBasename } from 'history/PathUtils';
 import * as fs from 'fs';
-import path from 'path';
-import { Metadata } from './Metadata';
 import { Project } from './Project';
-import { IProject, IProjectCfg, IWorkspaceCfg, ProjectState } from '../../api/types';
-import { WorkspaceFileModel } from './workspaceModel/WorkspaceFileModel';
-import { IWorkspaceModel } from './workspaceModel/IWorkspaceModel';
-import { userSetting } from '../UserSetting';
-
-/**
- *
- */
-// eslint-disable-next-line import/no-mutable-exports
-
-// MOVE TO AppConfig
-const DEFAULT_WORKSPACE_CONFIG: IWorkspaceCfg = {
-  DEFAULT_URL_API: 0,
-  AVAILABLE_URL_API: ['https://osskb.org/api/scan/direct'],
-  SCAN_MODE: 'FULL_SCAN',
-  TOKEN: '',
-};
+import { IProject, ProjectState } from '../../api/types';
 
 class Workspace extends EventEmitter {
+  private projectList: Array<Project>;
 
-  projectList: Array<Project>;
-
-  // MOVE TO AppConfig
-  workspaceModel: IWorkspaceModel;
-
-  wsPath: string;
-
-  // MOVE TO AppConfig
-  workspaceConfig: IWorkspaceCfg;
+  private wsPath: string;
 
   constructor() {
     super();
     this.projectList = [];
-    this.workspaceModel = new WorkspaceFileModel();
   }
 
   public async read(workspacePath: string) {
@@ -184,28 +157,8 @@ class Workspace extends EventEmitter {
     return this.projectList.length - 1;
   }
 
-  private mergeWsCfgToPjCfg(workspace: IWorkspaceCfg): IProjectCfg {
-    const projectCfg: IProjectCfg = {
-      DEFAULT_URL_API: workspace.AVAILABLE_URL_API[workspace.DEFAULT_URL_API],
-      TOKEN: workspace.TOKEN,
-      SCAN_MODE: workspace.SCAN_MODE,
-    };
-    return projectCfg;
-  }
-
-  private async createProjectCfg(): Promise<IProjectCfg> {
-    try {
-      const cfg = await this.workspaceModel.getWSConfig(this.wsPath);
-      if (cfg.AVAILABLE_URL_API.length > 0 && cfg.DEFAULT_URL_API >= 0) return this.mergeWsCfgToPjCfg(cfg);
-    } catch (e) {
-      return this.mergeWsCfgToPjCfg(this.workspaceConfig);
-    }
-    return this.mergeWsCfgToPjCfg(this.workspaceConfig);
-  }
-
   private async initWorkspaceFileSystem() {
-    if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
-    this.workspaceConfig = DEFAULT_WORKSPACE_CONFIG;
+    if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);   
   }
 
   private async getAllProjectsPaths() {
@@ -220,102 +173,6 @@ class Workspace extends EventEmitter {
     return projectPaths;
   }
 
-  deleteProject(projectPath: string) {
-    if (!projectPath.includes(this.wsPath) || !fs.existsSync(projectPath)) {
-      throw new Error('Project does not exist');
-    }
-    this.deleteFolderRecursive(projectPath);
-  }
-
-  private deleteFolderRecursive(directoryPath) {
-    if (fs.existsSync(directoryPath)) {
-      fs.readdirSync(directoryPath).forEach((file, index) => {
-        const curPath = path.join(directoryPath, file);
-        if (fs.lstatSync(curPath).isDirectory()) {
-          // recurse
-          this.deleteFolderRecursive(curPath);
-        } else {
-          // delete file
-          fs.unlinkSync(curPath);
-        }
-      });
-      fs.rmdirSync(directoryPath);
-    }
-  }
-
-  dirFirstFileAfter(a, b) {
-    if (!a.isDirectory() && b.isDirectory()) return 1;
-    if (a.isDirectory() && !b.isDirectory()) return -1;
-    return 0;
-  }
-
-
-  // TO DO REMOVE
-  async listProjects() {
-    const projects: Array<any> = [];
-    try {
-      const projectPaths = fs
-        .readdirSync(this.wsPath, { withFileTypes: true })
-        .sort(this.dirFirstFileAfter)
-        .filter((dirent) => {
-          return !dirent.isSymbolicLink() && !dirent.isFile();
-        })
-        .map((dirent) => `${this.wsPath}/${dirent.name}/metadata.json`);
-
-      // eslint-disable-next-line no-restricted-syntax
-      for (const projectPath of projectPaths) {
-        const metadataPath = `${projectPath}/metadata.json`;
-
-        if (fs.existsSync(metadataPath)) {
-          const metadataAsText = fs.readFileSync(metadataPath, 'utf8');
-          const metadata = JSON.parse(metadataAsText);
-          projects.push(metadata);
-        } else {
-          console.log(`Cannot load project ${projectPath} because it was scanned with an older version of Scannos-DT`);
-          // TO DO: Create metadata in a project that does not exist.
-          // readProject
-          // savemetadata
-        }
-      }
-
-      return projects;
-    } catch (e) {
-      console.log(e);
-      return [];
-    }
-  }
-
-
-  // MOVE TO APP SETTINGS
-  public async getWSConfig(): Promise<IWorkspaceCfg> {
-    try {
-      const wsConf: IWorkspaceCfg = await this.workspaceModel.getWSConfig(this.wsPath);
-      return wsConf;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  public async setWSConfig(config: Partial<IWorkspaceCfg>) {
-    try {
-      if (await this.workspaceModel.setWSConfig(this.wsPath, config)) return await this.getWSConfig();
-      throw new Error('Unable to write config file');
-    } catch (e) {
-      return new Error('Workspace config was not set successfully');
-    }
-  }
-}
-
-function includeRoot(original: string, root: string) {
-  return `${root}/${original}`;
-}
-function excludeRoot(complete: string, root: string) {
-  return complete.replace(root, '');
-}
-// eslint-disable-next-line consistent-return
-
-function onAddInventory(i: any, any: any) {
-  throw new Error('Function not implemented.');
 }
 
 export const workspace = new Workspace();

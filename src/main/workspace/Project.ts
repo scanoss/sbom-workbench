@@ -161,16 +161,8 @@ export class Project extends EventEmitter {
 
   initializeScanner() {
     const scannerCfg: ScannerCfg = new ScannerCfg();
-    // CURRENT 
-    // scannerCfg.API_URL = this.config.DEFAULT_URL_API;
-
-    // osskg.com/sdfsdf/dsf/sfd
-    console.log(userSetting.get());
     const { DEFAULT_URL_API, AVAILABLE_URL_API } = userSetting.get();
     scannerCfg.API_URL = AVAILABLE_URL_API[DEFAULT_URL_API];
-
-    console.log(scannerCfg.API_URL);
-
     this.scanner = new Scanner(scannerCfg);
     this.scanner.setWorkDirectory(this.metadata.getMyPath());
     this.setScannerListeners();
