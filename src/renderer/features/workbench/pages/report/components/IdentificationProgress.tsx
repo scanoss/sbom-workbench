@@ -6,6 +6,8 @@ import { shell } from 'electron';
 import { ExportFormat } from '../../../../../../api/export-service';
 import { projectService } from '../../../../../../api/project-service';
 import { HashType } from '../../../../../../api/types';
+import { userSettingService } from '../../../../../../api/userSetting-service';
+
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
@@ -18,8 +20,8 @@ const LicensesChart = ({ data }) => {
   };
 
   const readToken = async () => {
-    const token = await projectService.getToken();
-    setToken(token || '');
+    const { TOKEN } = await userSettingService.get();
+    setToken(TOKEN || '');
   };
   useEffect(() => {
     const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);

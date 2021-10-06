@@ -13,6 +13,7 @@ import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
 import { isBinaryFileSync } from 'isbinaryfile';
 import { Metadata } from './Metadata';
+import { userSetting } from '../UserSetting';
 
 const path = require('path');
 
@@ -78,8 +79,16 @@ export class Project extends EventEmitter {
     await this.scans_db.init();
 
     // const projectCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/projectCfg.json`, 'utf8');
-    const projectCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/../defaultCfg.json`, 'utf8');
-    this.config = JSON.parse(projectCfg) as IProjectCfg;
+    // const projectCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/../defaultCfg.json`, 'utf8');
+    // this.config = JSON.parse(projectCfg) as IProjectCfg;
+
+    // if(fs.existsSync(`${this.metadata.getMyPath()}/projectCfg.json`)){
+    //   const pCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/projectCfg.json`, 'utf8');
+    //   const pObjCfg = JSON.parse(pCfg) as IProjectCfg;
+    //   this.config = (...pObjCfg, ...usertSetting.getAll()) as IProjectCfg;
+    // } else {
+    //   this.config = appSetting.getAll();
+    // }
 
     return true;
   }
@@ -92,13 +101,13 @@ export class Project extends EventEmitter {
     this.logical_tree = null;
     this.scans_db = null;
     this.filesToScan = null;
-    this.config = null;
+   // this.config = null;
   }
 
   public save(): void {
     this.metadata.save();
     fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this));
-    fs.writeFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, JSON.stringify(this.config, null, 2));
+    // fs.writeFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, JSON.stringify(this.config, null, 2));
     console.log(`[ PROJECT ]: Project saved`);
   }
 
@@ -152,7 +161,16 @@ export class Project extends EventEmitter {
 
   initializeScanner() {
     const scannerCfg: ScannerCfg = new ScannerCfg();
-    scannerCfg.API_URL = this.config.DEFAULT_URL_API;
+    // CURRENT 
+    // scannerCfg.API_URL = this.config.DEFAULT_URL_API;
+
+    // osskg.com/sdfsdf/dsf/sfd
+    console.log(userSetting.get());
+    const { DEFAULT_URL_API, AVAILABLE_URL_API } = userSetting.get();
+    scannerCfg.API_URL = AVAILABLE_URL_API[DEFAULT_URL_API];
+
+    console.log(scannerCfg.API_URL);
+
     this.scanner = new Scanner(scannerCfg);
     this.scanner.setWorkDirectory(this.metadata.getMyPath());
     this.setScannerListeners();
@@ -236,9 +254,9 @@ export class Project extends EventEmitter {
     this.metadata.save();
   }
 
-  public setConfig(cfg: IProjectCfg){
-    this.config = cfg;
-  }
+  // public setConfig(cfg: IProjectCfg){
+  //   this.config = cfg;
+  // }
 
   public getFilesNotScanned() {
     return this.filesNotScanned;

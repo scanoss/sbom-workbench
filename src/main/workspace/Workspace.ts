@@ -8,11 +8,14 @@ import { Project } from './Project';
 import { IProject, IProjectCfg, IWorkspaceCfg, ProjectState } from '../../api/types';
 import { WorkspaceFileModel } from './workspaceModel/WorkspaceFileModel';
 import { IWorkspaceModel } from './workspaceModel/IWorkspaceModel';
+import { userSetting } from '../UserSetting';
 
 /**
  *
  */
 // eslint-disable-next-line import/no-mutable-exports
+
+// MOVE TO AppConfig
 const DEFAULT_WORKSPACE_CONFIG: IWorkspaceCfg = {
   DEFAULT_URL_API: 0,
   AVAILABLE_URL_API: ['https://osskb.org/api/scan/direct'],
@@ -21,12 +24,15 @@ const DEFAULT_WORKSPACE_CONFIG: IWorkspaceCfg = {
 };
 
 class Workspace extends EventEmitter {
+
   projectList: Array<Project>;
 
+  // MOVE TO AppConfig
   workspaceModel: IWorkspaceModel;
 
   wsPath: string;
 
+  // MOVE TO AppConfig
   workspaceConfig: IWorkspaceCfg;
 
   constructor() {
@@ -172,7 +178,7 @@ class Workspace extends EventEmitter {
     await Promise.all(unlinkPromises);
 
     p.setMyPath(pDirectory);
-    p.setConfig(await this.createProjectCfg());
+    // p.setConfig(await this.createProjectCfg());
     await p.save();
     this.projectList.push(p);
     return this.projectList.length - 1;
@@ -243,6 +249,8 @@ class Workspace extends EventEmitter {
     return 0;
   }
 
+
+  // TO DO REMOVE
   async listProjects() {
     const projects: Array<any> = [];
     try {
@@ -277,6 +285,8 @@ class Workspace extends EventEmitter {
     }
   }
 
+
+  // MOVE TO APP SETTINGS
   public async getWSConfig(): Promise<IWorkspaceCfg> {
     try {
       const wsConf: IWorkspaceCfg = await this.workspaceModel.getWSConfig(this.wsPath);

@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react';
 import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
 import { IWorkspaceCfg } from '../../../api/types';
 import { workspaceService } from '../../../api/workspace-service';
+import { userSettingService } from '../../../api/userSetting-service';
 
 const filter = createFilterOptions();
 
@@ -46,7 +47,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
       TOKEN: sbomLedgerToken || null,
     };
 
-    await workspaceService.setWSConfig(config);
+    await userSettingService.set(config);
     onClose({ action: DIALOG_ACTIONS.OK });
   };
 
@@ -62,7 +63,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
   };
 
   const fetchConfig = async () => {
-    const config = await workspaceService.getWSConfig();
+    const config = await userSettingService.get();
     console.log('config', config);
     setDefault(config || {});
   };

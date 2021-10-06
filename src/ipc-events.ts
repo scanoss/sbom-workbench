@@ -78,6 +78,10 @@ export enum IpcEvents {
   REPORT_SUMMARY = 'REPORT_SUMMARY',
   REPORT_DETECTED = 'REPORT_DETECTED',
   REPORT_IDENTIFIED = 'REPORT_IDENTIFIED',
+
+  USER_SETTING_SET = 'USER_SETTING_SET',
+  USER_SETTING_GET = 'USER_SETTING_GET', 
+
 }
 
 export const ipcMainEvents = [
@@ -152,4 +156,7 @@ export const ipcRendererEvents = [
   IpcEvents.WORKSPACE_DELETE_PROJECT,
   IpcEvents.WORKSPACE_GET_WS_CONFIG,
   IpcEvents.WORKSPACE_SET_WS_CONFIG,
+
+  IpcEvents.USER_SETTING_SET,
+  IpcEvents.USER_SETTING_GET,
 ];

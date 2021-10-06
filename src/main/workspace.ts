@@ -41,7 +41,7 @@ ipcMain.handle(IpcEvents.UTILS_GET_PROJECT_DTO, async (event) => {
 });
 
 ipcMain.handle(IpcEvents.WORKSPACE_GET_WS_CONFIG, async (event)=> {
-  try {
+  try {    
     const config: IWorkspaceCfg = await workspace.getWSConfig();
     return Response.ok({ message: 'Project path succesfully retrieved', data: config });
   } catch (e: any) {

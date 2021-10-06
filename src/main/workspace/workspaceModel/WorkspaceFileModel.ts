@@ -7,8 +7,14 @@ import { wsUtils } from '../WsUtils/WsUtils';
 export class WorkspaceFileModel implements IWorkspaceModel {
   private fileName: string;
 
+  private path: string;
+
   constructor() {
     this.fileName = 'defaultCfg.json';
+  }
+
+  public setPath(path: string){
+    this.path=path;
   }
 
   public async getWSConfig(path: string): Promise<IWorkspaceCfg> {
