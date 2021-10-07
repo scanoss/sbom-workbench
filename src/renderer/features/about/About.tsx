@@ -25,9 +25,9 @@ const About = () => {
         }}
       >
         <div className="d-flex align-center">
-          <img src={icon} alt="logo" className="mr-10" />
+          <img src={icon} alt="logo" className="mr-4" />
           <div>
-            <p style={{ fontSize: '0.9rem', marginBottom: 0 }} className="ml-5">
+            <p style={{ fontSize: '0.9rem', marginBottom: 0 }}>
               SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.
             </p>
             <p
