@@ -9,25 +9,27 @@ const pathLib = require('path');
 
 const crypto = require('crypto');
 
-ipcMain.handle(IpcEvents.EXPORT, async (_event, path: string, format: FormatVersion) => { 
+ipcMain.handle(IpcEvents.EXPORT, async (_event, path: string, format: FormatVersion) => {
   try {
     let auxPath = path;
-    if (format === FormatVersion.CSV || format === FormatVersion.SPDX20 || format === FormatVersion.SPDXLITE) {
+    if (
+      format === FormatVersion.CSV ||
+      format === FormatVersion.SPDX20 ||
+      format === FormatVersion.SPDXLITE ||
+      format === FormatVersion.SPDXLITEJSON
+    ) {
       const data: any = await reportService.getReportSummary();
       const complete = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles) < 100;
       auxPath = complete ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;
-     }
+    }
     Export.setFormat(format);
-    let success = await Export.save(auxPath);
-    if (success) 
-      return { status: 'ok', message: 'File successfully', data: success };   
-
-  } catch (e) {
+    const success = await Export.save(auxPath);
+    return Response.ok( { message: 'File exported successfully', data: success });
+  } catch (e:any) {
     console.log('Catch an error: ', e);
-    return { status: 'fail' };
+    return Response.fail({ message: e.message });
   }
 });
-
 
 ipcMain.handle(IpcEvents.EXPORT_NOTARIZE_SBOM, async (event, type: string) => {
   try {
