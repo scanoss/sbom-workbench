@@ -128,8 +128,15 @@ export class Querys {
   SQL_GET_COMPONENT_BY_PURL_VERSION =
     'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.purl=? and cv.version=?;';
 
-  SQL_GET_COMPONENT_BY_PURL_ENGINE =
-    ' SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE comp.source=(SELECT source FROM components WHERE purl=? limit 1) AND comp.purl=?;';
+  SQL_GET_COMPONENT_BY_PURL_ENGINE = `SELECT counter.filesCount,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id
+    FROM 
+    (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp 
+    LEFT JOIN license_view lic ON comp.id=lic.cvid
+     WHERE comp.source=(SELECT source FROM components WHERE purl=? limit 1)
+     AND comp.purl=?) AS comp 
+     LEFT JOIN (SELECT DISTINCT r.purl, r.version, COUNT (*) AS filesCount FROM results  r WHERE r.source='engine' AND r.version!='' GROUP BY  r.purl,r.version ) as counter
+     ON counter.purl=comp.purl AND counter.version=comp.version;`
+        
 
   // GET ALL COMPONENTES
   SQL_GET_ALL_COMPONENTS =
