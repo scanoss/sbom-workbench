@@ -46,7 +46,7 @@ const format = (date) => {
 const Workspace = () => {
   const history = useHistory();
 
-  const { setScanPath } = useContext<any>(AppContext);
+  const { setScanPath, newProject } = useContext<any>(AppContext);
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const [projects, setProjects] = useState<any[] | null>(null);
@@ -72,14 +72,7 @@ const Workspace = () => {
   };
 
   const onNewProject = () => {
-    const projectPath = dialogController.showOpenDialog({
-      properties: ['openDirectory'],
-    });
-
-    if (projectPath) {
-      setScanPath({ path: projectPath, action: 'scan'});
-      history.push('/workspace/new');
-    }
+    newProject();
   };
 
   const onTrashHandler = async (path, e) => {

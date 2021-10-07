@@ -87,12 +87,9 @@ export interface IProject {
   token: string;
   uuid: string;
 
-
   default_licenses?: string;
   default_components?: string;
 }
-
-
 
 export interface Files {
   md5?: string;

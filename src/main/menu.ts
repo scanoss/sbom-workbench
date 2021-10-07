@@ -59,6 +59,13 @@ export default class MenuBuilder {
       label: 'Scanoss',
       submenu: [
         {
+          label: '&New project',
+          accelerator: 'Command+N',
+          click: () => {
+            this.mainWindow.webContents.send(IpcEvents.MENU_NEW_PROJECT);
+          },
+        },
+        {
           label: '&Settings',
           accelerator: 'Command+Alt+S',
           click: () => {
@@ -153,6 +160,13 @@ export default class MenuBuilder {
       {
         label: '&File',
         submenu: [
+          {
+            label: '&New project',
+            accelerator: 'Ctrl+N',
+            click: () => {
+              this.mainWindow.webContents.send(IpcEvents.MENU_NEW_PROJECT);
+            },
+          },
           {
             label: '&Settings',
             accelerator: 'Ctrl+Alt+S',
