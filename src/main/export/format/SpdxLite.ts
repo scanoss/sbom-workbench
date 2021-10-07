@@ -4,7 +4,7 @@ import { Format } from '../Format';
 export class SpdxLite extends Format {
   constructor() {
     super();
-    this.extension = 'SPDXLite.spdx';
+    this.extension = '.SPDXLite.spdx';
   }
 
   // @override
@@ -17,11 +17,11 @@ export class SpdxLite extends Format {
         data[i].version
       }\nPackageFileName:-\nPackageDownloadLocation: ${data[i].purl}\nFilesAnalyzed: false\nPackageHomePage: ${
         data[i].url
-      }\nConcludedLicense: ${data[i].license_name}\nPackageLicenseInfoFromFiles: ${
-        data[i].license_name
-      }\nDeclaredLicense: ${data[i].declareLicense}\nCommentsonLicense:${
-        data[i].notes !== 'n/a' ? data[i].notes : '-'
-      }\nCopyrightText: - \n\r`;
+      }\nConcludedLicense: ${
+        data[i].license_name !== undefined ? data[i].license_name : data[i].license_name
+      }\nPackageLicenseInfoFromFiles: ${data[i].license_name}\nDeclaredLicense: ${
+        data[i].declareLicense
+      }\nCommentsonLicense:${data[i].notes !== 'n/a' ? data[i].notes : '-'}\nCopyrightText: - \n\r`;
 
       body += `${bodyTemplate}`;
     }

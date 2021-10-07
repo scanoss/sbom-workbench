@@ -10,6 +10,7 @@ import { Csv } from './format/Csv';
 import { Raw } from './format/Raw';
 import { Wfp } from './format/Wfp';
 import { FormatVersion } from '../../api/types';
+import { SpdxLiteJson } from './format/SpdxLiteJson';
 
 export class Export {
   private static format: Format;
@@ -44,14 +45,15 @@ export class Export {
         break;
       case FormatVersion.RAW:
         Export.format = new Raw();
-
         break;
       case FormatVersion.WFP:
         Export.format = new Wfp();
         break;
-
+      case FormatVersion.SPDXLITEJSON:
+        Export.format = new SpdxLiteJson();
+        break;
       default:
-      // code block
+    
     }
   }
 }
