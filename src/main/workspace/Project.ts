@@ -108,7 +108,7 @@ export class Project extends EventEmitter {
     this.metadata.save();
     fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this));
     // fs.writeFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, JSON.stringify(this.config, null, 2));
-    console.log(`[ PROJECT ]: Project saved`);
+    console.log(`[ PROJECT ]: Project ${this.metadata.getName()} saved`);
   }
 
   public async startScanner() {

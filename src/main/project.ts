@@ -44,8 +44,15 @@ ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (event, arg: Project) => {
 });
 
 ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
-  await workspace.getOpenedProjects()[0].save();
-  await workspace.getOpenedProjects()[0].close();
+  const projectList = workspace.getOpenedProjects();
+  let pPromises = [];
+  for(let p of projectList) pPromises.push(p.save());
+  await Promise.all(pPromises);
+
+  pPromises = [];
+  for(let p of projectList) pPromises.push(p.close());
+  await Promise.all(pPromises);
+
 });
 
 ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
