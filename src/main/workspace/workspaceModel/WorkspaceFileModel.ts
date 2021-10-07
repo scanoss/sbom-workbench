@@ -7,15 +7,19 @@ import { wsUtils } from '../WsUtils/WsUtils';
 export class WorkspaceFileModel implements IWorkspaceModel {
   private fileName: string;
 
+  private path: string;
 
   constructor() {
     this.fileName = 'defaultCfg.json';
-  
   }
 
-  public async getWSConfig(path: string) {
-    const cfg = fs.promises.readFile(`${path}/${this.fileName}`, 'utf8');
-    return cfg;
+  public setPath(path: string){
+    this.path=path;
+  }
+
+  public async getWSConfig(path: string): Promise<IWorkspaceCfg> {
+    const cfg = await fs.promises.readFile(`${path}/${this.fileName}`, 'utf8');
+    return JSON.parse(cfg);
   }
 
   public async setWSConfig(path: string, config: Partial<IWorkspaceCfg>) {

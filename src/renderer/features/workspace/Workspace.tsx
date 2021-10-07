@@ -21,6 +21,7 @@ import { dialogController } from '../../dialog-controller';
 import { DialogContext, IDialogContext } from '../../context/DialogProvider';
 import { DIALOG_ACTIONS } from '../../context/types';
 import { IProject, ScanState } from '../../../api/types';
+import { ResponseStatus } from '../../../main/Response';
 
 
 const filter = (items, query) => {
@@ -64,7 +65,6 @@ const Workspace = () => {
   const cleanup = () => {};
 
   const onShowScan = (project) => {
-    console.log(project);
     if (isProjectFinished(project)) {
       setScanPath({ path: project.work_root, action: 'none' });
       history.push('/workbench');
