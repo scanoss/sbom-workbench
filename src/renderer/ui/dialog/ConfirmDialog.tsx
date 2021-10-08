@@ -1,4 +1,13 @@
-import { Dialog, DialogActions, Button, makeStyles, DialogContentText, Card, DialogContent, Tooltip } from '@material-ui/core';
+import {
+  Dialog,
+  DialogActions,
+  Button,
+  makeStyles,
+  DialogContentText,
+  Card,
+  DialogContent,
+  Tooltip,
+} from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
@@ -25,9 +34,10 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: 'white !important',
   },
   text: {
-    width: '60%',
+    width: '90%',
     fontSize: '20px',
     color: '#27272A !important',
+    whiteSpace: 'pre-line',
   },
   actions: {
     padding: theme.spacing(2),
@@ -65,7 +75,9 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
         <IconButton aria-label="close" className={classes.closeButton} onClick={handleCancel}>
           <CloseIcon />
         </IconButton>
-        <DialogContentText className={classes.text}>{message}</DialogContentText>
+        <DialogContentText className={classes.text}>
+          <div dangerouslySetInnerHTML={{ __html: message }} />
+        </DialogContentText>
       </DialogContent>
       <DialogActions className={classes.actions}>
         {!hideDeleteButton && <Button onClick={handleCancel}>Cancel</Button>}

@@ -52,10 +52,13 @@ const NewProject = () => {
     setStage(args.stage);
   };
 
-  const handlerScannerError = async (_event, args) => {
-    const err = args;
-    const errorMessage = `${err.name || ''} ${err.message || ''} ${err.code || ''} `; // args.message;
-    const { action } = await dialogCtrl.openConfirmDialog(
+  const handlerScannerError = async (_event, err) => {
+    const errorMessage = `<strong>Scan Paused</strong>
+
+    <span style="font-style: italic;">${err.name || ''} ${err.message || ''} ${err.code || ''}</span>
+    Please try again later.`;
+
+    await dialogCtrl.openConfirmDialog(
       `${errorMessage}`,
       {
         label: 'OK',
@@ -64,8 +67,6 @@ const NewProject = () => {
       true
     );
     history.goBack();
-
-    // ipcRenderer.send(IpcEvents.SCANNER_RESUME);
   };
 
   const onPauseHandler = async () => {
