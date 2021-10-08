@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { Button, IconButton, InputBase, Link } from '@material-ui/core';
+import { Button, IconButton, InputBase, Link, Tooltip } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -22,7 +22,6 @@ import { DialogContext, IDialogContext } from '../../context/DialogProvider';
 import { DIALOG_ACTIONS } from '../../context/types';
 import { IProject, ScanState } from '../../../api/types';
 import { ResponseStatus } from '../../../main/Response';
-
 
 const filter = (items, query) => {
   if (!items) return null;
@@ -100,7 +99,7 @@ const Workspace = () => {
 
   const isProjectFinished = (project: IProject): boolean => {
     return project.scannerState === ScanState.SCANNED || !project.scannerState;
-  }
+  };
 
   return (
     <>
@@ -157,25 +156,29 @@ const Workspace = () => {
                         <TableCell>{format(row.date)}</TableCell>
                         <TableCell>{row.files}</TableCell>
                         <TableCell className="row-actions">
-                        <div className="btn-actions">
-                          {!isProjectFinished(row) ? (
+                          <div className="btn-actions">
+                            {!isProjectFinished(row) ? (
+                              <Tooltip title="Resume scan">
+                                <IconButton
+                                  aria-label="restore"
+                                  className="btn-restore"
+                                  onClick={(event) => onRestoreHandler(row.work_root, event)}
+                                >
+                                  <RestoreIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            ) : null}
 
-                            <IconButton
-                              aria-label="restore"
-                              className="btn-restore"
-                              onClick={(event) => onRestoreHandler(row.work_root, event)}
-                            >
-                              <RestoreIcon fontSize="small" />
-                            </IconButton>
-                          ) : null}
-                          <IconButton
-                            aria-label="delete"
-                            className="btn-delete"
-                            onClick={(event) => onTrashHandler(row.work_root, event)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </div>
+                            <Tooltip title="Remove project">
+                              <IconButton
+                                aria-label="delete"
+                                className="btn-delete"
+                                onClick={(event) => onTrashHandler(row.work_root, event)}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))
