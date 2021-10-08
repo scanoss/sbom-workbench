@@ -36,6 +36,10 @@ export default merge(baseConfig, {
     minimizer: [
       new TerserPlugin({
         parallel: true,
+        terserOptions: {
+          keep_classnames: /AbortSignal/,
+          keep_fnames: /AbortSignal/,
+        }
       }),
     ]
   },
