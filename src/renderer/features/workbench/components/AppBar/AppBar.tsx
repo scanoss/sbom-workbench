@@ -227,7 +227,7 @@ const Export = ({ state }) => {
           SPDX Lite
         </MenuItem> */}
         <MenuItem disabled={state.progress === 0} onClick={() => onExport(FormatVersion.SPDXLITEJSON)}>
-          SPDX
+          SPDX Lite
         </MenuItem>
         <MenuItem onClick={() => onExport(FormatVersion.WFP)}>WFP</MenuItem>
         <MenuItem onClick={() => onExport(FormatVersion.RAW)}>RAW</MenuItem>
