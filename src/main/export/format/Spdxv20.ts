@@ -6,7 +6,7 @@ export class Spdxv20 extends Format {
 
   constructor(){
     super();
-    this.extension = '.SPDXV2.0.spdx';
+    this.extension = '-SPDXV20.json';
   }
 
   // @override
