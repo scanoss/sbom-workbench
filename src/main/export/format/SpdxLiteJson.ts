@@ -22,7 +22,7 @@ export class SpdxLiteJson extends Format {
       pkg.PackageSPDXID = `${data[i].purl}@${data[i].version}`;
       pkg.PackageVersion = data[i].version;
       pkg.PackageDownloadLocation = data[i].url;
-      pkg.ConcludedLicense = data[i].license_name !== undefined ? data[i].license_name : data[i].license_name;
+      pkg.ConcludedLicense = data[i].concludedLicense;
       pkg.DeclaredLicense = data[i].declareLicense;
       spdx.Packages.push(pkg);
     }

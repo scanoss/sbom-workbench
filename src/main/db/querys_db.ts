@@ -135,8 +135,7 @@ export class Querys {
      WHERE comp.source=(SELECT source FROM components WHERE purl=? limit 1)
      AND comp.purl=?) AS comp 
      LEFT JOIN (SELECT DISTINCT r.purl, r.version, COUNT (*) AS filesCount FROM results  r WHERE r.source='engine' AND r.version!='' GROUP BY  r.purl,r.version ) as counter
-     ON counter.purl=comp.purl AND counter.version=comp.version;`
-        
+     ON counter.purl=comp.purl AND counter.version=comp.version;`;
 
   // GET ALL COMPONENTES
   SQL_GET_ALL_COMPONENTS =
@@ -182,9 +181,16 @@ export class Querys {
 
   SQL_GET_FILE_BY_PATH = 'SELECT file_path AS path,identified,ignored FROM results WHERE results.file_path=?;';
 
-  SQL_GET_SPDX_COMP_DATA = `SELECT DISTINCT c.purl,c.version,c.url,c.name,i.license_name,i.notes ,l.name AS declareLicense
-    FROM components c INNER JOIN inventories i ON c.purl=i.purl 
-    INNER JOIN license_view l ON c.id=l.cvid AND c.version=i.version GROUP BY i.version;`;
+  // SQL_GET_SPDX_COMP_DATA = `SELECT DISTINCT c.purl,c.version,c.url,c.name,i.license_name,i.notes ,l.name AS declareLicense
+  //   FROM components c INNER JOIN inventories i ON c.purl=i.purl
+  //   INNER JOIN license_view l ON c.id=l.cvid AND c.version=i.version GROUP BY i.version;`;
+
+  SQL_GET_SPDX_COMP_DATA = `SELECT data.purl,data.version,data.url,data.name,data.license_name,data.notes,data.declareLicense,lic.spdxid AS concludedLicense FROM 
+  (SELECT DISTINCT c.purl,c.version,c.url,c.name,i.license_name,i.notes ,l.spdxid AS declareLicense
+      FROM components c INNER JOIN inventories i ON c.purl=i.purl 
+      INNER JOIN license_view l ON c.id=l.cvid AND c.version=i.version GROUP BY i.version)AS data 
+    LEFT JOIN
+    (SELECT  name,spdxid FROM licenses  GROUP BY name) AS lic ON data.license_name=lic.name;`;
 
   SQL_GET_CSV_DATA = `SELECT DISTINCT i.id AS inventoryId,r.id AS resultID,i.usage,i.notes,i.license_name AS identified_license,l.name AS detected_license,i.purl,i.version,r.file_path AS path,cv.name AS identified_component,r.component AS detected_component
   FROM inventories i 
