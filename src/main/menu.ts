@@ -67,7 +67,7 @@ export default class MenuBuilder {
         },
         {
           label: '&Settings',
-          accelerator: 'Command+Alt+S',
+          accelerator: 'Command+,',
           click: () => {
             this.mainWindow.webContents.send(IpcEvents.MENU_OPEN_SETTINGS);
           },
