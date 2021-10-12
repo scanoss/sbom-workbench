@@ -42,6 +42,7 @@ const NewProject = () => {
     ipcRenderer.removeListener(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
   };
 
+
   const onShowScan = (path) => {
     setScanPath({ path, action: 'none' });
     history.push('/workbench/report');
@@ -66,12 +67,12 @@ const NewProject = () => {
       },
       true
     );
-    history.goBack();
+    history.push('');
   };
 
   const onPauseHandler = async () => {
     const { action } = await dialogCtrl.openConfirmDialog(
-      `Are you sure you want to stop the scanner?`,
+      `Are you sure you want to pause the scanner?`,
       {
         label: 'OK',
         role: 'accept',
@@ -80,7 +81,7 @@ const NewProject = () => {
     );
     if (action === 'ok') {
       await projectService.stop();
-      history.goBack();
+      history.push('');
     }
 
     // ipcRenderer.send(IpcEvents.PROJECT_STOP);
@@ -103,7 +104,7 @@ const NewProject = () => {
         <header className="app-header">
           <div>
             <h4 className="header-subtitle back">
-              <IconButton onClick={() => history.goBack()} component="span">
+              <IconButton onClick={onPauseHandler} component="span">
                 <ArrowBackIcon />
               </IconButton>
               SCANNING
