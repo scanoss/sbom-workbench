@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
@@ -93,11 +94,11 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     dispatch(setComponents(components));
 
     const summary = await reportService.getSummary();
-    console.log(summary);
     dispatch(setProgress(summary));
   };
 
-  const value = React.useMemo(() => ({
+  const value = React.useMemo(
+    () => ({
       state,
       dispatch,
 
