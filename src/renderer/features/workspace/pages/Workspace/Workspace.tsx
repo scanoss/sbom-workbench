@@ -15,13 +15,13 @@ import RestoreIcon from '@material-ui/icons/Restore';
 
 import { makeStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
-import { AppContext } from '../../context/AppProvider';
-import { workspaceService } from '../../../api/workspace-service';
-import { dialogController } from '../../dialog-controller';
-import { DialogContext, IDialogContext } from '../../context/DialogProvider';
-import { DIALOG_ACTIONS } from '../../context/types';
-import { IProject, ScanState } from '../../../api/types';
+
 import { ResponseStatus } from '../../../main/Response';
+import { AppContext } from '../../../../context/AppProvider';
+import { IProject, ScanState } from '../../../../../api/types';
+import { workspaceService } from '../../../../../api/workspace-service';
+import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
+import { DIALOG_ACTIONS } from '../../../../context/types';
 
 const filter = (items, query) => {
   if (!items) return null;

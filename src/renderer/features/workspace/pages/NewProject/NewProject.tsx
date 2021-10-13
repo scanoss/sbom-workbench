@@ -67,7 +67,7 @@ const NewProject = () => {
       },
       true
     );
-    history.push('');
+    history.push('/workspace');
   };
 
   const onPauseHandler = async () => {
@@ -81,7 +81,7 @@ const NewProject = () => {
     );
     if (action === 'ok') {
       await projectService.stop();
-      history.push('');
+      history.push('/workspace');
     }
 
     // ipcRenderer.send(IpcEvents.PROJECT_STOP);

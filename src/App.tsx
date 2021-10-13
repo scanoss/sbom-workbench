@@ -1,18 +1,15 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { HashRouter, Route } from 'react-router-dom';
+import { HashRouter, Redirect, Route } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider, Theme } from '@material-ui/core/styles';
-import { ipcRenderer } from 'electron';
 import { WorkbenchProvider } from './renderer/features/workbench/store';
 import { DialogProvider } from './renderer/context/DialogProvider';
 import Workbench from './renderer/features/workbench/Workbench';
 import AppProvider from './renderer/context/AppProvider';
-import Workspace from './renderer/features/workspace/Workspace';
-import NewProject from './renderer/features/workspace/pages/NewProject/NewProject';
+import Workspace from './renderer/features/workspace';
 import About from './renderer/features/about/About';
 
 import './App.global.scss';
-import { IpcEvents } from './ipc-events';
 
 export default class App {
   /**
@@ -28,12 +25,13 @@ export default class App {
         <MuiThemeProvider theme={theme}>
           <AppProvider>
             <DialogProvider>
-              <Route path="/" exact component={Workspace} />
-              <Route path="/workspace/new" exact component={NewProject} />
+              <Route path="/workspace" component={Workspace} />
               <WorkbenchProvider>
                 <Route path="/workbench" component={Workbench} />
               </WorkbenchProvider>
               <Route path="/about" exact component={About} />
+
+              <Redirect from="/" to="/workspace" />
             </DialogProvider>
           </AppProvider>
         </MuiThemeProvider>
