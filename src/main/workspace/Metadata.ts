@@ -27,7 +27,7 @@ export class Metadata {
 
   constructor(name: string) {
     this.name = name;
-    this.appVersion = app.getVersion();
+    this.appVersion = app.getVersion();  // si no estamos en prod, leemos la version del package.json
     this.date = new Date().toISOString();
     this.uuid = uuidv4();
   }

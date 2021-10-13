@@ -1,3 +1,4 @@
+import { app } from 'electron';
 import fs from 'fs';
 import { IProject, IWorkspaceCfg } from '../api/types';
 import { wsUtils } from './workspace/WsUtils/WsUtils';
@@ -11,13 +12,14 @@ class UserSetting {
 
   private defaultStore: IWorkspaceCfg = {
     TOKEN: '',
-    DEFAULT_URL_API: 0,
-    AVAILABLE_URL_API: ['https://osskb.org/api/scan/direct'],
+    DEFAULT_API_INDEX: 0,
+    APIS: [{ URL: 'https://osskb.org/api/scan/direct', API_KEY: '', DESCRIPTION: '' }],
     SCAN_MODE: 'FULL_SCAN',
+    VERSION: app.getVersion(),
   };
 
   constructor() {
-    this.name = 'defaultCfg.json';
+    this.name = 'workspaceCfg.json';
     this.store = this.defaultStore;
   }
 
