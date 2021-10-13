@@ -19,7 +19,7 @@
 @import './theme/Utils.global.scss';
 
 /* components */
-@import 'renderer/features/workspace/Workspace';
+@import 'renderer/features/workspace/pages/Workspace/Workspace';
 @import 'renderer/features/workspace/pages/NewProject/NewProject';
 @import 'renderer/features/workbench/Workbench';
 @import 'renderer/features/workbench/pages/report/Report.scss';
