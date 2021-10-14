@@ -3,6 +3,8 @@ import fs from 'fs';
 import { IProject, IWorkspaceCfg } from '../api/types';
 import { wsUtils } from './workspace/WsUtils/WsUtils';
 
+import packageJson from '../package.json';
+
 class UserSetting {
   private myPath: string;
 
@@ -15,7 +17,7 @@ class UserSetting {
     DEFAULT_API_INDEX: 0,
     APIS: [{ URL: 'https://osskb.org/api/scan/direct', API_KEY: '', DESCRIPTION: '' }],
     SCAN_MODE: 'FULL_SCAN',
-    VERSION: app.getVersion(),
+    VERSION: app.isPackaged === true ? app.getVersion(): packageJson.version,
   };
 
   constructor() {

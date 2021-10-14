@@ -22,3 +22,7 @@ export function wsCfgUpdate(wsPath: string) {
 }
 
 
+export function updateVersion(wsPath :string){
+  console.log("UPDATING...");
+}
+

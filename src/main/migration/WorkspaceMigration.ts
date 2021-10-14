@@ -12,11 +12,10 @@ export class WorkspaceMigration extends Migration {
   constructor(appVersion: string, wsPath: string) {
     super(appVersion);
     this.wsPath = wsPath;
-    this.scripts = {
-      '0.12.0': [],
-      '3.0.0': [],
-      '3.5.0': [],
-      '4.0.0': [],
+    this.scripts = {      
+      '0.10.0': [],
+      '0.11.0': [],
+      '0.11.1': [update000.updateVersion], // Build
     };
   }
 
