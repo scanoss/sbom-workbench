@@ -244,7 +244,7 @@ const AppBar = ({ exp }) => {
 
   const onBackPressed = () => {
     dispatch(reset());
-    history.push('/');
+    history.push('/workspace');
   };
 
   return (
