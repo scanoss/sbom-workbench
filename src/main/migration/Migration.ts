@@ -11,9 +11,9 @@ export abstract class Migration {
     const oldestCompatibleVersion: string = Object.keys(scripts)[0];
     if (myVersion < oldestCompatibleVersion)
       throw new Error(`Cannot upgrade version ${myVersion} to ${oldestCompatibleVersion}`);
-    for (const [scriptsVersion, scriptsList] of Object.entries(scripts)) {
-      if (scriptsVersion >= myVersion) for (const script of scriptsList) script(this.getPath());
-    }
+    Object.entries(scripts).forEach(([scriptsVersion, scriptsList]) => {
+      if (scriptsVersion >= myVersion) scriptsList.forEach((script) => script(this.getPath()));
+    });
   }
 
   public abstract getScripts(): Record<string, Array<(path: string) => void>>;

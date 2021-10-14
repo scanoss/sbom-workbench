@@ -11,7 +11,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
-import { dbUpdate1 } from './main/migration/scripts/1-0-0';
+import { wsCfgUpdate } from './main/migration/scripts/0-0-0';
 
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
@@ -177,32 +177,17 @@ export interface IInitScan {
   scanId?: string;
 }
 
-
 async function mainLogic() {
-
-
-//  await userSetting.read(`${os.homedir()}/scanoss-workspace`); // Lee y si no existe lo crea
-  
-
-  // Migracion (Relativa a dos versiones atras o absoluta tambien limitado)
-  //  |-> Cambiar los spdx
-  //  |-> Agregar el api key
-  //
-  // Logger
-
   const root = `${os.homedir()}/scanoss-workspace`;
 
   // This lines will be removed
   if (fs.existsSync(`${root}/defaultCfg.json`)) {
-    dbUpdate1(root);
+    wsCfgUpdate(root);
   }
-
 
   await workspace.read(root);
   await userSetting.read(root);
   new WorkspaceMigration(userSetting.get().VERSION, root).up();
-
-  // new ProjectMigration(projectPath).up();  
 }
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {

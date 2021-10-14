@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Migration } from './Migration';
-import * as update000 from './scripts/1-0-0';
+import * as update000 from './scripts/0-0-0';
 
 
 export class WorkspaceMigration extends Migration {
