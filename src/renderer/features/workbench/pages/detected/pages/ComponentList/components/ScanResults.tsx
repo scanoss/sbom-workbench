@@ -17,7 +17,7 @@ const ScanResults = ({ name }) => {
   const [displayed, setDisplayed] = useState<any>(localStorage.getItem(name) === 'true' || !localStorage.getItem(name));
 
   const init = async () => {
-    const a = await report.getSummary();
+    const a = await report.getSummary();  
     setProgress(a?.data?.summary);
     setLicenses(a?.data?.licenses);
     setVulnerabilites(a?.data?.vulnerabilities);
