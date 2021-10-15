@@ -12,7 +12,7 @@ export class WorkspaceMigration extends Migration {
     super(appVersion);
     this.wsPath = wsPath;
     this.scripts = {
-      '0.11.1': [], //Oldest compatible version
+      '0.11.1': [], // Oldest compatible version
     };
   }
 

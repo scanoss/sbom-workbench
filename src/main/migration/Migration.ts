@@ -9,14 +9,12 @@ export abstract class Migration {
     const scripts = this.getScripts();
     const myVersion: string = this.getVersion();
     const oldestCompatibleVersion: string = Object.keys(scripts)[0];
-    if (this.compareVersions(myVersion, oldestCompatibleVersion) === -1) // myVersion < oldCom....
+    if (this.compareVersions(myVersion, oldestCompatibleVersion) === -1)
+      // myVersion < oldCom....
       throw new Error(`Cannot upgrade version ${myVersion}`);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [scriptsVersion, scriptsList] of Object.entries(scripts)) {
-      if (this.compareVersions(myVersion, scriptsVersion) === -1)
-        // eslint-disable-next-line no-restricted-syntax
-        for (const script of scriptsList) script(this.getPath());
-    }
+    Object.entries(scripts).forEach(([scriptsVersion, values]) => {
+      if (this.compareVersions(myVersion, scriptsVersion) === -1) values.forEach((script) => script(this.getPath()));
+    }, this);
   }
 
   public abstract getScripts(): Record<string, Array<(path: string) => void>>;
