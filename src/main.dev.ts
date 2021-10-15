@@ -10,15 +10,14 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-
-import { wsCfgUpdate } from './main/migration/scripts/0-0-0';
-
+import fs from 'fs';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import path from 'path';
 import * as os from 'os';
-import fs from 'fs';
+import { wsCfgUpdate } from './main/migration/scripts/0-0-0';
+
 import MenuBuilder from './main/menu';
 import './main/inventory';
 import './main/component';
@@ -31,27 +30,16 @@ import './main/report';
 import './main/license';
 import './main/controllers/userSetting';
 
-
 import { IpcEvents } from './ipc-events';
 import { workspace } from './main/workspace/Workspace';
-import { ItemExclude, IProject } from './api/types';
+
 import { Project } from './main/workspace/Project';
-import { ScanDb } from './main/db/scan_db';
-import { licenses } from './main/db/licenses';
 
-import { Scanner } from './main/scannerLib/Scanner';
-import { SCANNER_EVENTS } from './main/scannerLib/ScannerEvents';
-import { fstat } from 'fs';
-import { isBinaryFile, isBinaryFileSync } from 'isbinaryfile';
-import Workspace from './renderer/features/workspace/Workspace';
-import { Metadata } from './main/workspace/Metadata';
 import { userSetting } from './main/UserSetting';
-import { Migration } from './main/migration/Migration';
+
 import { WorkspaceMigration } from './main/migration/WorkspaceMigration';
+
 const basepath = require('path');
-
-
-
 
 export default class AppUpdater {
   constructor() {
@@ -68,10 +56,7 @@ if (process.env.NODE_ENV === 'production') {
   sourceMapSupport.install();
 }
 
-if (
-  process.env.NODE_ENV === 'development' ||
-  process.env.DEBUG_PROD === 'true'
-) {
+if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
   require('electron-debug')();
 }
 
@@ -89,10 +74,7 @@ const installExtensions = async () => {
 };
 
 const createWindow = async () => {
-  if (
-    process.env.NODE_ENV === 'development' ||
-    process.env.DEBUG_PROD === 'true'
-  ) {
+  if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
     await installExtensions();
   }
 

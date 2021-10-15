@@ -1,6 +1,5 @@
 import { app } from 'electron';
 import fs from 'fs';
-import { IWorkspaceCfg } from '../../../api/types';
 import packageJson from '../../../package.json'
 
 export function wsCfgUpdate(wsPath: string) {
