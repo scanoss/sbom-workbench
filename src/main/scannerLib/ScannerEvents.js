@@ -21,4 +21,6 @@ export const ScannerEvents = {
 
   SCAN_DONE: 'SCAN_DONE',
   RESULTS_APPENDED: 'RESULTS_APPENDED',
+
+  SCANNER_LOG: 'SCANNER_LOG',
 };

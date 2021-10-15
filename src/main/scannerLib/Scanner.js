@@ -185,10 +185,14 @@ export class Scanner extends EventEmitter {
     // eslint-disable-next-line no-restricted-syntax
     for (const key of sortedPaths) resultSorted[key] = results[key];
     await fs.promises.writeFile(this.#resultFilePath, JSON.stringify(resultSorted, null,2));
-    console.log(`[ SCANNER ]: Scan finished (Scanned: ${this.#processedFiles}, Not Scanned: ${Object.keys(this.filesNotScanned).length})`);
-    console.log(`[ SCANNER ]: Results on: ${this.#resultFilePath}`);
+    this.#reportLog(`[ SCANNER ]: Scan finished (Scanned: ${this.#processedFiles}, Not Scanned: ${Object.keys(this.filesNotScanned).length})`);
+    this.#reportLog(`[ SCANNER ]: Results on: ${this.#resultFilePath}`);
     this.#isRunning = false;
     this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath, this.filesNotScanned);
+  }
+
+  #reportLog(txt, level = 'info') {
+    this.emit(ScannerEvents.SCANNER_LOG, txt, level);
   }
 
   #errorHandler(error, origin) {

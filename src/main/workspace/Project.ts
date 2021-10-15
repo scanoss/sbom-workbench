@@ -2,8 +2,8 @@
 import { EventEmitter } from 'events';
 import fs from 'fs';
 import { isBinaryFileSync } from 'isbinaryfile';
+import log from 'electron-log';
 import { Component, Inventory, IProjectCfg, ProjectState, ScanState } from '../../api/types';
-
 import * as Filtering from './filtering';
 import { ScanDb } from '../db/scan_db';
 import { licenses } from '../db/licenses';
@@ -15,7 +15,7 @@ import { defaultBannedList } from './filtering/defaultFilter';
 import { Metadata } from './Metadata';
 import { userSetting } from '../UserSetting';
 import { ProjectMigration } from '../migration/ProjectMigration';
-import packageJson from '../../package.json';
+
 
 const path = require('path');
 
@@ -54,6 +54,8 @@ export class Project extends EventEmitter {
 
   config: IProjectCfg;
 
+  logg: any;
+
   constructor(name: string) {
     super();
     this.metadata = new Metadata(name);
@@ -79,6 +81,7 @@ export class Project extends EventEmitter {
 
   public async open(): Promise<boolean> {
     this.state = ProjectState.OPENED;
+    log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`;
     const project = await fs.promises.readFile(`${this.metadata.getMyPath()}/tree.json`, 'utf8');
     const a = JSON.parse(project);
     this.logical_tree = a.logical_tree;
@@ -106,7 +109,7 @@ export class Project extends EventEmitter {
 
   public async close() {
     if (this.scanner && this.scanner.isRunning()) this.scanner.stop();
-    console.log(`[ PROJECT ]: Closing project ${this.metadata.getName()}`);
+    log.info(`%c[ PROJECT ]: Closing project ${this.metadata.getName()}`, ' color: green');
     this.state = ProjectState.CLOSED;
     this.scanner = null;
     this.logical_tree = null;
@@ -119,10 +122,11 @@ export class Project extends EventEmitter {
     this.metadata.save();
     fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this));
     // fs.writeFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, JSON.stringify(this.config, null, 2));
-    console.log(`[ PROJECT ]: Project ${this.metadata.getName()} saved`);
+    log.info(`%c[ PROJECT ]: Project ${this.metadata.getName()} saved`,'color:green');
   }
 
   public async startScanner() {
+    log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`;
     this.state = ProjectState.OPENED;
     const myPath = this.metadata.getMyPath();
     this.project_name = this.metadata.getName(); // To keep compatibility
@@ -134,13 +138,13 @@ export class Project extends EventEmitter {
     this.scans_db = new ScanDb(myPath);
     await this.scans_db.init();
     await this.scans_db.licenses.importFromJSON(licenses);
-    console.log(`[ PROJECT ]: Building tree`);
+    log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
     this.build_tree();
-    console.log(`[ PROJECT ]: Applying filters to the tree`);
+    log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
     this.indexScan(this.metadata.getScanRoot(), this.logical_tree, this.banned_list);
     const summary = { total: 0, include: 0, filter: 0, files: {} };
     this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
-    console.log(`[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`);
+    log.info(`%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,'color: green');
     this.filesToScan = summary.files;
     this.filesNotScanned = {};
     this.metadata.setScannerState(ScanState.READY_TO_SCAN);
@@ -155,7 +159,7 @@ export class Project extends EventEmitter {
     if (this.metadata.getState() !== ScanState.SCANNING) return false;
     await this.open();
     this.initializeScanner();
-    console.log(`[ PROJECT ]: Resuming scanner, pending ${Object.keys(this.filesToScan).length} files`)
+    log.info(`%c[ PROJECT ]: Resuming scanner, pending ${Object.keys(this.filesToScan).length} files`, 'color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'scanning',
       processed: (100 * this.processedFiles) / this.filesSummary.include,
@@ -210,6 +214,10 @@ export class Project extends EventEmitter {
       });
     });
 
+    this.scanner.on(ScannerEvents.SCANNER_LOG, (message, level) => {
+      log.info(message);
+    });
+
     this.scanner.on('error', async (error) => {
       this.save();
       await this.close();
@@ -218,7 +226,7 @@ export class Project extends EventEmitter {
   }
 
   startScan() {
-    console.log(`[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`);
+    log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, ' color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'scanning',
       processed: (100 * this.processedFiles) / this.filesSummary.include,
