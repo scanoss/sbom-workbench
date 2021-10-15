@@ -8,12 +8,15 @@ export abstract class Migration {
   public up() {
     const scripts = this.getScripts();
     const myVersion: string = this.getVersion();
-    const oldestCompatibleVersion: string = Object.keys(scripts)[0];  
-    if (myVersion < oldestCompatibleVersion)
-      throw new Error(`Cannot upgrade version ${myVersion} to ${oldestCompatibleVersion}`);
-    Object.entries(scripts).forEach(([scriptsVersion, scriptsList]) => {
-      if (scriptsVersion >= myVersion) scriptsList.forEach((script) => script(this.getPath()));
-    });
+    const oldestCompatibleVersion: string = Object.keys(scripts)[0];
+    if (this.compareVersions(myVersion, oldestCompatibleVersion) === -1) // myVersion < oldCom....
+      throw new Error(`Cannot upgrade version ${myVersion}`);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [scriptsVersion, scriptsList] of Object.entries(scripts)) {
+      if (this.compareVersions(myVersion, scriptsVersion) === -1)
+        // eslint-disable-next-line no-restricted-syntax
+        for (const script of scriptsList) script(this.getPath());
+    }
   }
 
   public abstract getScripts(): Record<string, Array<(path: string) => void>>;
@@ -22,5 +25,16 @@ export abstract class Migration {
 
   public getVersion() {
     return this.version;
+  }
+
+  public compareVersions(ver1: string, ver2: string): number {
+    const v1 = ver1.split('.').map((num) => parseInt(num, 10));
+    const v2 = ver2.split('.').map((num) => parseInt(num, 10));
+
+    for (let i = 0; i < v1.length; i += 1) {
+      if (v1[i] > v2[i]) return 1;
+      if (v1[i] < v2[i]) return -1;
+    }
+    return 0;
   }
 }

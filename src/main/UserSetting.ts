@@ -55,7 +55,7 @@ class UserSetting {
   }
 
   public async save() {
-    await fs.promises.writeFile(`${this.myPath}/${this.name}`, JSON.stringify(this.store), 'utf8');
+    await fs.promises.writeFile(`${this.myPath}/${this.name}`, JSON.stringify(this.store,undefined, 2), 'utf8');
   }
 
   public setMyPath(path: string) {

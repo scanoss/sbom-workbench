@@ -110,9 +110,11 @@ class Workspace extends EventEmitter {
 
   public async openProjectByPath(pPath: string) {
     await this.closeAllProjects();
-    console.log(`[ WORKSPACE ]: Opening project ${pPath}`);
+
     // eslint-disable-next-line no-restricted-syntax
     const p: Project = this.getProjectByPath(pPath);
+    p.upgrade();
+    console.log(`[ WORKSPACE ]: Opening project ${pPath}`);
     await p.open();
     return p;
   }
@@ -158,7 +160,7 @@ class Workspace extends EventEmitter {
   }
 
   private async initWorkspaceFileSystem() {
-    if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);   
+    if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
   }
 
   private async getAllProjectsPaths() {

@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { EventEmitter } from 'events';
 import fs from 'fs';
+import { isBinaryFileSync } from 'isbinaryfile';
 import { Component, Inventory, IProjectCfg, ProjectState, ScanState } from '../../api/types';
 
 import * as Filtering from './filtering';
@@ -11,9 +12,10 @@ import { ScannerEvents } from '../scannerLib/ScannerEvents';
 import { ScannerCfg } from '../scannerLib/ScannerCfg';
 import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
-import { isBinaryFileSync } from 'isbinaryfile';
 import { Metadata } from './Metadata';
 import { userSetting } from '../UserSetting';
+import { ProjectMigration } from '../migration/ProjectMigration';
+import packageJson from '../../package.json';
 
 const path = require('path');
 
@@ -64,6 +66,15 @@ export class Project extends EventEmitter {
     p.setState(ProjectState.CLOSED);
     p.setMetadata(mt);
     return p;
+  }
+
+  public upgrade(): void {
+    if (this.metadata.getVersion() === '11.4.9') {
+      this.metadata.setAppVersion("0.4.1");
+      this.save();
+    }
+    const pMigration = new ProjectMigration(this.metadata.getVersion(), this.metadata.getMyPath());
+    pMigration.up();
   }
 
   public async open(): Promise<boolean> {
@@ -161,8 +172,9 @@ export class Project extends EventEmitter {
 
   initializeScanner() {
     const scannerCfg: ScannerCfg = new ScannerCfg();
-    const { DEFAULT_URL_API, AVAILABLE_URL_API } = userSetting.get();
-    scannerCfg.API_URL = AVAILABLE_URL_API[DEFAULT_URL_API];
+    const { DEFAULT_API_INDEX, APIS } = userSetting.get();
+    scannerCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
+    scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
     this.scanner = new Scanner(scannerCfg);
     this.scanner.setWorkDirectory(this.metadata.getMyPath());
     this.setScannerListeners();
