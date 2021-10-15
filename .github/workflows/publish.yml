@@ -3,11 +3,11 @@ name: Publish
 on:
   push:
     branches:
-      - macos-build
+      - master
 
 jobs:
   publish:
-    runs-on: self-hosted
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
