@@ -12,9 +12,7 @@ export class ProjectMigration extends Migration {
     super(appVersion);
     this.projPath = projPath;
     this.scripts = {
-      '0.4.1': [(a)=>{console.log(`Se ejecuto el primer script`)}], // Oldest compatible version
-      '0.11.2': [(a)=>{console.log(`Ejecutada actualizacion 0.11.2`)}], // Latest build
-      '0.15.0': [(a)=>{console.log(`Ejecutada actualizacion 0.15.0`)}]
+      '0.8.0': [], // Oldest compatible version
     };
   }
 
