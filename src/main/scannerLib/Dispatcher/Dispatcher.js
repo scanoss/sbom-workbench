@@ -75,8 +75,8 @@ export class Dispatcher extends EventEmitter {
     }
   }
 
-  #handleUnrecoverableError(error) {
-    this.emit('error', error);
+  #handleUnrecoverableError(error,disptItem) {
+    this.emit('error', error, disptItem);
   }
 
   #emitNoDispatchedItem(disptItem) {
@@ -99,7 +99,7 @@ export class Dispatcher extends EventEmitter {
         this.dispatchItem(disptItem);
         return;
       }
-      this.#handleUnrecoverableError(error);
+      this.#handleUnrecoverableError(error, disptItem);
     }
   }
 
