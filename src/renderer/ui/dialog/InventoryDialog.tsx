@@ -67,7 +67,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const dialogCtrl = useContext<any>(DialogContext);
 
   const { open, inventory, onClose, onCancel } = props;
-
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
   const [data, setData] = useState<any[]>([]);
   const [components, setComponents] = useState<any[]>();
@@ -82,9 +81,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       const componentsResponse = await componentService.getAllComponentGroup();
       const licensesResponse = await licenseService.getAll();
 
+     
       setData(componentsResponse.data);
       setComponents(componentsResponse.data);
       const catalogue = licensesResponse.data.map((item) => ({
+        spdxid: item.spdxid,
         name: item.name,
         type: 'Cataloged',
       }));
@@ -139,6 +140,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const handleClose = (e) => {
     e.preventDefault();
     const inventory: any = form;
+    inventory.spdxid = form.license_name;
     onClose(inventory);
   };
 
@@ -292,7 +294,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   options={licenses || []}
                   groupBy={(option) => option?.type}
                   value={form.license_name || ''}
-                  getOptionSelected={(option) => option.name === form.license_name}
+                  getOptionSelected={(option) => option.spdxid === form.spdxid}
                   getOptionLabel={(option) => option.name || option}
                   disableClearable
                   renderInput={(params) => (
@@ -306,7 +308,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       }}
                     />
                   )}
-                  onChange={(e, value) => autocompleteHandler('license_name', value.name)}
+                  onChange={(e, value) => autocompleteHandler('license_name', value.spdxid)}
                 />
               </Paper>
             </div>

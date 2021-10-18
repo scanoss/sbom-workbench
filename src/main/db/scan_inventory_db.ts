@@ -255,7 +255,7 @@ export class InventoryDb extends Db {
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
         db.get(
-          `SELECT id FROM inventories WHERE purl=? AND notes=? AND version=? AND usage=? AND license_name=?;`,
+          `SELECT id FROM inventories WHERE purl=? AND notes=? AND version=? AND usage=? AND spdxid=?;`,
           inventory.purl,
           inventory.notes ? inventory.notes : 'n/a',
           inventory.version,
@@ -288,7 +288,7 @@ export class InventoryDb extends Db {
             inventory.usage ? inventory.usage : 'n/a',
             inventory.notes ? inventory.notes : 'n/a',
             inventory.url ? inventory.url : 'n/a',
-            inventory.license_name ? inventory.license_name : 'n/a',
+            inventory.spdxid ? inventory.spdxid : 'n/a',
             async function (this: any, err: any) {
               inventory.id = this.lastID;
               if (err) reject(new Error(err));

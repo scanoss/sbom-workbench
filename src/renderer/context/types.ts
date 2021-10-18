@@ -24,5 +24,6 @@ export interface InventoryForm {
   purl: string;
   usage: string;
   notes: string;
+  spdxid: string;
 }
 
