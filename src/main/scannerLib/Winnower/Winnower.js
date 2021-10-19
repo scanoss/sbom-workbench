@@ -344,13 +344,13 @@ export class Winnower extends EventEmitter {
         this.#processPackedWfp(this.wfp);
       }
       this.#isRunning = false;
-      console.log('[ SCANNER ]: Winnowing Finished...');
+      this.emit(ScannerEvents.WINNOWER_LOG, '[ SCANNER ]: Winnowing Finished...');
       this.#forceStopWorker();
     }
   }
 
   async startWinnowing(files, scanRoot) {
-    console.log('[ SCANNER ]: Starting Winnowing...');
+    this.emit(ScannerEvents.WINNOWER_LOG, '[ SCANNER ]: Starting Winnowing...');
     this.scanRoot = scanRoot;
     this.#isRunning = true;
     this.fileList = Object.entries(files);
@@ -358,14 +358,14 @@ export class Winnower extends EventEmitter {
   }
 
   pause() {
-    console.log('[ SCANNER ]: Winnowing paused...');
+    this.emit(ScannerEvents.WINNOWER_LOG, '[ SCANNER ]: Winnowing paused...');
     this.#continue = false;
     this.#forceStopWorker();
     this.#prepareWorker();
   }
 
   resume() {
-    console.log('[ SCANNER ]: Winnowing resumed...');
+    this.emit(ScannerEvents.WINNOWER_LOG, '[ SCANNER ]: Winnowing resumed...');
     this.#continue = true;
     this.#recoveryIndex();
     this.#nextStepMachine();
