@@ -21,9 +21,8 @@ export function dbMigration(projectPath: string){
                 db.run('INSERT INTO licenses SELECT * from old_licenses;');
                 db.run('DROP TABLE old_licenses;');
                 db.run('CREATE TABLE old_inventories AS select * from inventories;');
-                db.run('DROP TABLE inventories;');
-                db.run('CREATE TABLE inventories (id integer primary key,version text not null ,compid integer not null,purl text, usage text, notes text, url text, spdxid text);');
-                db.run('INSERT INTO inventories SELECT * from old_inventories;');
+                db.run('ALTER TABLE inventories RENAME COLUMN license_name TO spdxid;')
+                db.run('UPDATE inventories set spdxid=(SELECT l.spdxid from licenses l INNER JOIN old_inventories oi ON oi.license_name=l.name WHERE inventories.id=oi.id);');              
                 db.run('DROP TABLE old_inventories;');
                 db.run('commit',()=>{
                     db.close();
