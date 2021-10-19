@@ -2,12 +2,14 @@ import sqlite3 from 'sqlite3';
 import { app } from 'electron';
 import fs from 'fs';
 import packageJson from '../../../package.json'
+import log from 'electron-log';
 
 
-export function dbMigration(projectPath: string){
-    console.log("[DB MIGRATION] ON PROCESS...");
+export function dbMigration(projectPath: string){ 
+    log.info("%c[MIGRATION] IN PROGRESS...", 'color: green');
     const db: any = new sqlite3.Database(`${projectPath}/scan_db`,sqlite3.OPEN_READWRITE,(err: any) => {
            if (err) {
+               log.error(err);
             throw new Error("Unable to migrate db database");            
           }
             db.serialize(function() {
@@ -21,7 +23,7 @@ export function dbMigration(projectPath: string){
                 db.run('INSERT INTO licenses SELECT * from old_licenses;');
                 db.run('DROP TABLE old_licenses;');
                 db.run('CREATE TABLE old_inventories AS select * from inventories;');
-                db.run('ALTER TABLE inventories RENAME COLUMN license_name TO spdxid;')
+                db.run('ALTER TABLE inventories RENAME COLUMN license_name TO spdxid;');
                 db.run('UPDATE inventories set spdxid=(SELECT l.spdxid from licenses l INNER JOIN old_inventories oi ON oi.license_name=l.name WHERE inventories.id=oi.id);');              
                 db.run('DROP TABLE old_inventories;');
                 db.run('commit',()=>{
@@ -32,10 +34,11 @@ export function dbMigration(projectPath: string){
        });
 
     updateMetadataVersion(projectPath);
-    console.log("[DB MIGRATION] FINISHED");     
+     log.info("%c[MIGRATION] FINISHED", 'color: green');        
 }
 
 function updateMetadataVersion(projectPath: string){
+    log.info("%c[MIGRATION] UPDATING PROJECT VERSION...", 'color: green');
     const metadata = fs.readFileSync(`${projectPath}/metadata.json`, 'utf8');
     const settings = JSON.parse(metadata); 
     settings.appVersion= app.isPackaged === true ? app.getVersion() : packageJson.version;   
