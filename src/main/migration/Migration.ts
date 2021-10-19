@@ -1,4 +1,5 @@
-
+import { app } from 'electron';
+import packageJson from '../../package.json';
 
 export abstract class Migration {
   private version: string;
@@ -7,7 +8,7 @@ export abstract class Migration {
     this.version = version;
   }
 
-  public up() {   
+  public up(): string {   
     const scripts = this.getScripts();    
     const myVersion: string = this.getVersion();
     const oldestCompatibleVersion: string = Object.keys(scripts)[0];
@@ -16,7 +17,9 @@ export abstract class Migration {
       throw new Error(`Cannot upgrade version ${myVersion}`);
     Object.entries(scripts).forEach(([scriptsVersion, values]) => {     
       if (this.compareVersions(myVersion, scriptsVersion) === -1) values.forEach((script) => script(this.getPath()));
-    }, this);
+    }, this);      
+    const latestVersion = app.isPackaged === true ? app.getVersion() : packageJson.version; 
+    return  latestVersion;
   }
 
   public abstract getScripts(): Record<string, Array<(path: string) => void>>;

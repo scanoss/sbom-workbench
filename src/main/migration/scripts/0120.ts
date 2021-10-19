@@ -1,7 +1,5 @@
 import sqlite3 from 'sqlite3';
-import { app } from 'electron';
 import fs from 'fs';
-import packageJson from '../../../package.json'
 import log from 'electron-log';
 
 
@@ -32,16 +30,9 @@ export function dbMigration(projectPath: string){
 
             })
        });
-
-    updateMetadataVersion(projectPath);
+   
      log.info("%c[MIGRATION] FINISHED", 'color: green');        
 }
 
-function updateMetadataVersion(projectPath: string){
-    log.info("%c[MIGRATION] UPDATING PROJECT VERSION...", 'color: green');
-    const metadata = fs.readFileSync(`${projectPath}/metadata.json`, 'utf8');
-    const settings = JSON.parse(metadata); 
-    settings.appVersion= app.isPackaged === true ? app.getVersion() : packageJson.version;   
-    fs.writeFileSync(`${projectPath}/metadata.json`, JSON.stringify(settings, undefined, 2), 'utf8');
-}
+
 
