@@ -80,7 +80,7 @@ export class Dispatcher extends EventEmitter {
   }
 
   #emitNoDispatchedItem(disptItem) {
-    console.log(`[ SCANNER ]: WFP content sended to many times. Some files won't be scanned`);
+    this.emit(ScannerEvents.DISPATCHER_LOG, `[ SCANNER ]: WFP content sended to many times. Some files won't be scanned`);
     this.emit(ScannerEvents.DISPATCHER_ITEM_NO_DISPATCHED, disptItem);
   }
 
@@ -95,7 +95,7 @@ export class Dispatcher extends EventEmitter {
           return;
         }
         const leftRetry = this.#scannerCfg.MAX_RETRIES_FOR_RECOVERABLES_ERRORS - disptItem.getErrorCounter();
-        console.log(`[ SCANNER ]: Recoverable error happened sending WFP content to server. Reason: ${error.code || error.name}`);
+        this.emit(ScannerEvents.DISPATCHER_LOG,`[ SCANNER ]: Recoverable error happened sending WFP content to server. Reason: ${error.code || error.name}`);
         this.dispatchItem(disptItem);
         return;
       }
