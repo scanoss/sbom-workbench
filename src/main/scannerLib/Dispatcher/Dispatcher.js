@@ -75,8 +75,8 @@ export class Dispatcher extends EventEmitter {
     }
   }
 
-  #handleUnrecoverableError(error) {
-    this.emit('error', error);
+  #handleUnrecoverableError(error,disptItem) {
+    this.emit('error', error, disptItem);
   }
 
   #emitNoDispatchedItem(disptItem) {
@@ -99,7 +99,7 @@ export class Dispatcher extends EventEmitter {
         this.dispatchItem(disptItem);
         return;
       }
-      this.#handleUnrecoverableError(error);
+      this.#handleUnrecoverableError(error, disptItem);
     }
   }
 
@@ -114,7 +114,7 @@ export class Dispatcher extends EventEmitter {
       const response = await fetch(this.#scannerCfg.API_URL, {
         method: 'post',
         body: form,
-        headers: { 'User-Agent': this.#scannerCfg.CLIENT_TIMESTAMP },
+        headers: { 'User-Agent': this.#scannerCfg.CLIENT_TIMESTAMP, 'X-Session': this.#scannerCfg.API_KEY },
         signal: timeoutController.signal,
       });
 

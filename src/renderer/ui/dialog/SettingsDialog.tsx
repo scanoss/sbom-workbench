@@ -40,9 +40,12 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
 
   const submit = async () => {
     const config: Partial<IWorkspaceCfg> = {
-      DEFAULT_URL_API: selectedUrl ? urls.findIndex(({ url }) => url === selectedUrl.url) : -1,
-      AVAILABLE_URL_API: urls.map(({ url }) => url),
-      TOKEN: sbomLedgerToken || null,
+      TOKEN: null,
+      DEFAULT_API_INDEX: -1,
+      APIS: [],
+      // APIS: selectedUrl ? urls.findIndex(({ url }) => url === selectedUrl.url) : -1,
+      // AVAILABLE_URL_API: urls.map(({ url }) => url),
+      // TOKEN: sbomLedgerToken || null,
     };
 
     await userSettingService.set(config);
@@ -50,10 +53,10 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
   };
 
   const setDefault = (config: Partial<IWorkspaceCfg>) => {
-    const { DEFAULT_URL_API, AVAILABLE_URL_API, TOKEN } = config;
+    const { DEFAULT_API_INDEX, APIS, TOKEN } = config;
 
-    const urlsDefault = AVAILABLE_URL_API ? AVAILABLE_URL_API.map((url) => ({ url })) : [];
-    const selectedUrlDefault = AVAILABLE_URL_API && AVAILABLE_URL_API[DEFAULT_URL_API] ? { url: AVAILABLE_URL_API[DEFAULT_URL_API] } : null;
+    const urlsDefault = APIS ? APIS.map((url) => ({ url })) : [];
+    const selectedUrlDefault = APIS && APIS[DEFAULT_API_INDEX] ? { url: APIS[DEFAULT_API_INDEX] } : null;
 
     setSbomLedgerToken(TOKEN);
     setUrls(urlsDefault);

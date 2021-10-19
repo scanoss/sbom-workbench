@@ -17,10 +17,11 @@ export interface IProjectCfg {
 }
 
 export interface IWorkspaceCfg {
-  DEFAULT_URL_API: number;
-  AVAILABLE_URL_API: Array<string>;
+  DEFAULT_API_INDEX: number;
+  APIS: Array<Record<string, string>>;
   TOKEN: string;
   SCAN_MODE: string;
+  VERSION: string;
 }
 
 export interface Inventory {

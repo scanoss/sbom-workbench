@@ -2,6 +2,7 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { app } from 'electron';
 import { IProject, ScanState } from '../../api/types';
+import packageJson from '../../package.json';
 
 export class Metadata {
 
@@ -27,7 +28,7 @@ export class Metadata {
 
   constructor(name: string) {
     this.name = name;
-    this.appVersion = app.getVersion();
+    this.appVersion = app.isPackaged === true ? app.getVersion() : packageJson.version;
     this.date = new Date().toISOString();
     this.uuid = uuidv4();
   }
@@ -57,6 +58,10 @@ export class Metadata {
 
   public setAppVersion(appVersion: string) {
     this.appVersion = appVersion;
+  }
+
+  public getVersion(): string {
+    return this.appVersion;
   }
 
   public setName(name: string) {

@@ -7,6 +7,8 @@ export class ScannerCfg {
   // API URL
   API_URL = 'https://osskb.org/api/scan/direct';
 
+  API_KEY = '';
+
   // Level of concurrency
   CONCURRENCY_LIMIT = 15;
 
