@@ -8,15 +8,13 @@ export abstract class Migration {
   }
 
   public up() {   
-    const scripts = this.getScripts();
-    console.log(scripts);
+    const scripts = this.getScripts();    
     const myVersion: string = this.getVersion();
     const oldestCompatibleVersion: string = Object.keys(scripts)[0];
     if (this.compareVersions(myVersion, oldestCompatibleVersion) === -1)
       // myVersion < oldCom....
       throw new Error(`Cannot upgrade version ${myVersion}`);
-    Object.entries(scripts).forEach(([scriptsVersion, values]) => {
-      console.log(values);
+    Object.entries(scripts).forEach(([scriptsVersion, values]) => {     
       if (this.compareVersions(myVersion, scriptsVersion) === -1) values.forEach((script) => script(this.getPath()));
     }, this);
   }
