@@ -47,6 +47,7 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
   const initial = {
     URL: '',
     API_KEY: '',
+    DESCRIPTION: '',
   };
   const [data, setData] = useState<any>(initial);
 
