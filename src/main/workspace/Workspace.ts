@@ -113,9 +113,9 @@ class Workspace extends EventEmitter {
 
     // eslint-disable-next-line no-restricted-syntax
     const p: Project = this.getProjectByPath(pPath);
-    p.upgrade();
     console.log(`[ WORKSPACE ]: Opening project ${pPath}`);
     await p.open();
+    p.upgrade();
     return p;
   }
 
