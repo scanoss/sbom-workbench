@@ -8,7 +8,6 @@ import fs, { unlink, unlinkSync } from 'fs';
 import path from 'path';
 import { Winnower } from './Winnower/Winnower';
 import { Dispatcher } from './Dispatcher/Dispatcher';
-import { DispatcherEvents } from './Dispatcher/DispatcherEvents';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { DispatcherResponse } from './Dispatcher/DispatcherResponse';
 import { ScannerEvents } from './ScannerEvents';
@@ -77,9 +76,13 @@ export class Scanner extends EventEmitter {
 
   #setWinnowerListeners() {
     this.#winnower.on(ScannerEvents.WINNOWING_NEW_CONTENT, (winnowerResponse) => {
-      console.log(`[ SCANNER ]: New WFP content`);
+      this.#reportLog(`[ SCANNER ]: New WFP content`);
       const disptItem = new DispatchableItem(winnowerResponse);
       this.#dispatcher.dispatchItem(disptItem);
+    });
+
+    this.#winnower.on(ScannerEvents.WINNOWER_LOG, (msg) => {
+      this.#reportLog(msg);
     });
 
     this.#winnower.on('error', (error) => {
@@ -89,19 +92,19 @@ export class Scanner extends EventEmitter {
 
   #setDispatcherListeners() {
     this.#dispatcher.on(ScannerEvents.DISPATCHER_QUEUE_SIZE_MAX_LIMIT, () => {
-      console.log(`[ SCANNER ]: Maximum queue size reached. Winnower will be paused`);
+      this.#reportLog(`[ SCANNER ]: Maximum queue size reached. Winnower will be paused`);
       this.#winnower.pause();
     });
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_QUEUE_SIZE_MIN_LIMIT, () => {
-      console.log(`[ SCANNER ]: Minimum queue size reached. Winnower will be resumed`);
+      this.#reportLog(`[ SCANNER ]: Minimum queue size reached. Winnower will be resumed`);
       this.#winnower.resume();
     });
 
     this.#dispatcher.on(ScannerEvents.DISPATCHER_NEW_DATA, async (response) => {
       this.processingNewData = true;
       this.#processedFiles += response.getNumberOfFilesScanned();
-      console.log(`[ SCANNER ]: Received results of ${response.getNumberOfFilesScanned()} files`);
+      this.#reportLog(`[ SCANNER ]: Received results of ${response.getNumberOfFilesScanned()} files`);
       this.emit(ScannerEvents.DISPATCHER_NEW_DATA, response);
       this.#insertIntoBuffer(response);
       if (this.#bufferReachedLimit()) this.#bufferToFiles();
@@ -119,6 +122,10 @@ export class Scanner extends EventEmitter {
     this.#dispatcher.on(ScannerEvents.DISPATCHER_ITEM_NO_DISPATCHED, (disptItem) => {
       const filesNotScanned = disptItem.getWinnowerResponse().getFilesWinnowed();
       this.#appendFilesToNotScanned(filesNotScanned);
+    });
+
+    this.#winnower.on(ScannerEvents.DISPATCHER_LOG, (msg) => {
+      this.#reportLog(msg);
     });
 
     this.#dispatcher.on('error', (error) => {
@@ -159,7 +166,7 @@ export class Scanner extends EventEmitter {
     this.#appendOutputFiles(wfpContent, serverResponse);
     this.#responseBuffer = [];
     const responses = new DispatcherResponse(serverResponse, wfpContent);
-    console.log(`[ SCANNER ]: Persisted results of ${responses.getNumberOfFilesScanned()} files...`);
+    this.#reportLog(`[ SCANNER ]: Persisted results of ${responses.getNumberOfFilesScanned()} files...`);
     this.emit(ScannerEvents.RESULTS_APPENDED, responses, this.filesNotScanned);
     return responses;
   }
@@ -200,7 +207,7 @@ export class Scanner extends EventEmitter {
     if (origin === ScannerEvents.MODULE_DISPATCHER) {}
     if (origin === ScannerEvents.MODULE_WINNOWER) {}
 
-    console.log(`[ SCANNER ]: Error reason ${error}`);
+    this.#reportLog(`[ SCANNER ]: Error reason ${error}`);
 
     this.emit('error', error);
   }
@@ -251,7 +258,7 @@ export class Scanner extends EventEmitter {
   }
 
   stop() {
-    console.log(`[ SCANNER ]: Stopping scanner`);
+    this.#reportLog(`[ SCANNER ]: Stopping scanner`);
     this.#isRunning = false;
     this.#winnower.removeAllListeners();
     this.#dispatcher.removeAllListeners();

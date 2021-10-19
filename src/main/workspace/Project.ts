@@ -54,8 +54,6 @@ export class Project extends EventEmitter {
 
   config: IProjectCfg;
 
-  logg: any;
-
   constructor(name: string) {
     super();
     this.metadata = new Metadata(name);
@@ -109,7 +107,7 @@ export class Project extends EventEmitter {
 
   public async close() {
     if (this.scanner && this.scanner.isRunning()) this.scanner.stop();
-    log.info(`%c[ PROJECT ]: Closing project ${this.metadata.getName()}`, ' color: green');
+    log.info(`%c[ PROJECT ]: Closing project ${this.metadata.getName()}`, 'color: green');
     this.state = ProjectState.CLOSED;
     this.scanner = null;
     this.logical_tree = null;
@@ -151,6 +149,7 @@ export class Project extends EventEmitter {
     this.metadata.setFileCounter(summary.include);
     this.initializeScanner();
     this.scanner.cleanWorkDirectory();
+    this.save();
     this.startScan();
   }
 
@@ -215,7 +214,7 @@ export class Project extends EventEmitter {
     });
 
     this.scanner.on(ScannerEvents.SCANNER_LOG, (message, level) => {
-      log.info(message);
+      log.info(`%c${message}`, 'color: green');
     });
 
     this.scanner.on('error', async (error) => {
@@ -226,13 +225,13 @@ export class Project extends EventEmitter {
   }
 
   startScan() {
-    log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, ' color: green');
+    log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, 'color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: 'scanning',
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
     this.metadata.setScannerState(ScanState.SCANNING);
-    this.save();
+    this.metadata.save();
     // eslint-disable-next-line prettier/prettier
     this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
   }
@@ -612,7 +611,6 @@ function dirFirstFileAfter(a, b) {
 }
 
 function dirTree(root: string, filename: string) {
-  // console.log(filename)
   const stats = fs.lstatSync(filename);
   let info;
 

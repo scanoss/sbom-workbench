@@ -3,6 +3,7 @@ import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import { Project } from './Project';
 import { IProject, ProjectState } from '../../api/types';
+import log from 'electron-log';
 
 class Workspace extends EventEmitter {
   private projectList: Array<Project>;
@@ -17,17 +18,18 @@ class Workspace extends EventEmitter {
   public async read(workspacePath: string) {
     this.wsPath = workspacePath;
     await this.initWorkspaceFileSystem();
+    log.transports.file.resolvePath = () => `${this.wsPath}/ws.log`;
     // if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes
-    console.log(`[ WORKSPACE ]: Reading projects....`);
+    log.info(`%c[ WORKSPACE ]: Reading projects....`, 'color: green');
     const projectPaths = await this.getAllProjectsPaths();
     const projectArray: Promise<Project>[] = projectPaths.map((projectPath) =>
       Project.readFromPath(projectPath)
         .then((p) => {
-          console.log(`[ WORKSPACE ]: Successfully read project ${projectPath}`);
+          log.info(`%c[ WORKSPACE ]: Successfully read project ${projectPath}`, 'color: green');
           return p;
         })
         .catch((e) => {
-          console.log(`[ WORKSPACE ]: Cannot read project ${projectPath}`);
+          log.info(`%c[ WORKSPACE ]: Cannot read project ${projectPath}`, 'color: green');
           throw e;
         })
     );
@@ -58,7 +60,7 @@ class Workspace extends EventEmitter {
   }
 
   public async removeProject(p: Project) {
-    console.log(`[ WORKSPACE ]: Removing project ${p.getProjectName()}`);
+    log.info(`%c[ WORKSPACE ]: Removing project ${p.getProjectName()}`, 'color: green');
     for (let i = 0; i < this.projectList.length; i += 1)
       if (this.projectList[i].getProjectName() === p.getProjectName()) {
         // eslint-disable-next-line no-await-in-loop
@@ -114,7 +116,7 @@ class Workspace extends EventEmitter {
     // eslint-disable-next-line no-restricted-syntax
     const p: Project = this.getProjectByPath(pPath);
     p.upgrade();
-    console.log(`[ WORKSPACE ]: Opening project ${pPath}`);
+    log.info(`%c[ WORKSPACE ]: Opening project ${pPath}`, 'color: green');
     await p.open();
     return p;
   }
@@ -134,17 +136,17 @@ class Workspace extends EventEmitter {
   }
 
   public async closeAllProjects() {
-    console.log(`[ WORKSPACE ]: Closing all opened projects`);
+    log.info(`%c[ WORKSPACE ]: Closing all opened projects`, 'color: green');
     // eslint-disable-next-line no-restricted-syntax
     for (const p of this.projectList) if (p.getState() === ProjectState.OPENED) await p.close();
   }
 
   public async addProject(p: Project) {
     if (this.existProject(p) > -1) {
-      console.log(`[ WORKSPACE ]: Project already exist and will be replaced`);
+      log.info(`%c[ WORKSPACE ]: Project already exist and will be replaced`, 'color: green');
       await this.removeProject(p);
     }
-    console.log(`[ WORKSPACE ]: Adding project ${p.getProjectName()} to workspace`);
+    log.info(`%c[ WORKSPACE ]: Adding project ${p.getProjectName()} to workspace`, 'color: green');
     const pDirectory = `${this.wsPath}/${p.getProjectName()}`;
 
     if (!fs.existsSync(`${pDirectory}`)) await fs.promises.mkdir(pDirectory);
@@ -165,7 +167,7 @@ class Workspace extends EventEmitter {
 
   private async getAllProjectsPaths() {
     const workspaceStuff = await fs.promises.readdir(this.wsPath, { withFileTypes: true }).catch((e) => {
-      console.log(`[ WORKSPACE ]: Cannot read the workspace directory ${this.wsPath}`);
+      log.info(`%c[ WORKSPACE ]: Cannot read the workspace directory ${this.wsPath}`, 'color: green');
       console.log(e);
     });
     const projectsDirEnt = workspaceStuff.filter((dirent) => {
