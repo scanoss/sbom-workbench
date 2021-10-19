@@ -128,7 +128,9 @@ export class Scanner extends EventEmitter {
       this.#reportLog(msg);
     });
 
-    this.#dispatcher.on('error', (error) => {
+    this.#dispatcher.on('error', (error, disptItem) => {
+      const wfpContent = disptItem.getWinnowerResponse().getContent();
+      fs.writeFileSync(`${this.#workDirectory}/failed.wfp`, wfpContent, 'utf8');
       this.#errorHandler(error, ScannerEvents.MODULE_DISPATCHER);
     });
   }
