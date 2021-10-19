@@ -16,7 +16,7 @@ export abstract class Migration {
       throw new Error(`Cannot upgrade version ${myVersion}`);
     Object.entries(scripts).forEach(([scriptsVersion, values]) => {     
       if (this.compareVersions(myVersion, scriptsVersion) === -1) values.forEach((script) => script(this.getPath()));
-    }, this);
+    }, this);    
   }
 
   public abstract getScripts(): Record<string, Array<(path: string) => void>>;

@@ -89,6 +89,7 @@ export class Project extends EventEmitter {
     this.filesSummary = a.filesSummary;
     this.scans_db = new ScanDb(this.metadata.getMyPath());
     await this.scans_db.init();
+    this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
 
     // const projectCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/projectCfg.json`, 'utf8');
     // const projectCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/../defaultCfg.json`, 'utf8');
