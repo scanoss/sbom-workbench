@@ -124,7 +124,7 @@ export const IdentifiedList = () => {
                   Not results found with <strong>{searchQuery} </strong>
                 </>
               ) : (
-                <> Not results found</>
+                <> No components were identified</>
               )}
             </p>
           )}

@@ -87,7 +87,7 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
           </div>
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">
-              API TOKEN <span className="optional">- Optional</span>
+              API KEY <span className="optional">- Optional</span>
             </label>
             <Paper className="dialog-form-field-control">
               <InputBase
@@ -274,7 +274,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                       return option.inputValue;
                     }
                     // Regular option
-                    return option.URL;
+                    return `${option.URL} ${option.API_KEY ? `(${option.API_KEY})` : ''}`;
                   }}
                   renderOption={(option, props) =>
                     option.new ? (
