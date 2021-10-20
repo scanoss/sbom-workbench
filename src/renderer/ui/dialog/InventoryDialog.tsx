@@ -25,6 +25,7 @@ import { componentService } from '../../../api/component-service';
 import { licenseService } from '../../../api/license-service';
 import { DialogContext } from '../../context/DialogProvider';
 import { ResponseStatus } from '../../../main/Response';
+import { licenseHelper } from '../../../main/helpers/LicenseHelper';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -168,11 +169,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   useEffect(() => fetchData(), [open]);
 
   useEffect(() => {
-    if (inventory.spdxid) {
+    if (licenses && licenses.length > 0 && !form.spdxid) {
       setForm({ ...form, spdxid: inventory.spdxid });
-      inventory.spdxid = null;
     }
-  }, [licenses, inventory]);
+  }, [licenses]);
 
   useEffect(() => {
     const component = data.find((item) => item.purl === form.purl);
