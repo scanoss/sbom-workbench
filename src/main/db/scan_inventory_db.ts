@@ -260,7 +260,7 @@ export class InventoryDb extends Db {
           inventory.notes ? inventory.notes : 'n/a',
           inventory.version,
           inventory.usage,
-          inventory.license_name,
+          inventory.spdxid,
           async function (err: any, inv: any) {
             if (err) throw Error('Unable to get existing inventory');
             resolve(inv);
@@ -274,6 +274,7 @@ export class InventoryDb extends Db {
 
   // NEW INVENTORY
   async create(inventory: Partial<Inventory>) {
+   
     const self = this;
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
@@ -295,7 +296,6 @@ export class InventoryDb extends Db {
             }
           );
         } else inventory.id = inv.id;
-
         await self.attachFileInventory(inventory);
         const comp = await self.component.getAll(inventory);
         inventory.component = comp;
