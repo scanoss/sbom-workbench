@@ -168,8 +168,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   useEffect(() => fetchData(), [open]);
 
   useEffect(() => {
-    setForm({ ...form, spdxid: inventory.spdxid });
-  }, [licensesAll]);
+    if (inventory.spdxid) {
+      setForm({ ...form, spdxid: inventory.spdxid });
+      inventory.spdxid = null;
+    }
+  }, [licenses, inventory]);
 
   useEffect(() => {
     const component = data.find((item) => item.purl === form.purl);
@@ -180,10 +183,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   }, [form.purl, data]);
 
   useEffect(() => {
+    console.log(data);
     const lic = data
       .find((item) => item?.name === form?.component)
       ?.versions.find((item) => item.version === form.version)
-      ?.licenses.map((item) => ({ name: item.name, type: 'Matched' }));
+      ?.licenses.map((item) => ({ spdix: item.spdix, name: item.name, type: 'Matched' }));
 
     if (lic) {
       setLicenses([...lic, ...licensesAll]);
