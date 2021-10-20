@@ -37,7 +37,7 @@ class ReportService {
       const licenses = [];
       data.forEach((element) => {
         const aux: any = {};
-        const index = licenses.findIndex((obj) => obj.label === element.license_name);
+        const index = licenses.findIndex((obj) => obj.label === element.spdxid);
         if (index >= 0) {
           licenses[index].components.push({
             name: element.comp_name,
@@ -57,7 +57,7 @@ class ReportService {
             version: element.version,
           });
           aux.value = 1;
-          aux.label = element.license_name;
+          aux.label = element.spdxid;
           licenses.push(aux);
         }
       });
