@@ -9,6 +9,9 @@ import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
 
 // TO DO
 import { DialogContext } from '../../context/DialogProvider';
+import { licenseHelper } from '../../../main/helpers/LicenseHelper';
+
+
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -56,8 +59,8 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
   };
 
   const isValid = () => {
-    const { name , fulltext } = form;
-    return name && fulltext ;
+    const { name, fulltext } = form;
+    return name && fulltext;
   };
 
   return (
@@ -78,6 +81,9 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
             <Paper className="dialog-form-field-control">
               <InputBase name="name" fullWidth value={form?.name} onChange={(e) => inputHandler(e)}  />
             </Paper>
+            <p className="dialog-form-field-hint">
+              SpdxID: {form?.name ? licenseHelper.licenseNameToSPDXID(form.name) : '-'}
+            </p>
           </div>
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">Full text</label>

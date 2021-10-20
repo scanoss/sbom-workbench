@@ -19,11 +19,9 @@ export interface InventoryForm {
   id?: string;
   component: string;
   version: string;
-  license_name: string;
+  spdxid: string;
   url: string;
   purl: string;
   usage: string;
   notes: string;
-  spdxid: string;
 }
-

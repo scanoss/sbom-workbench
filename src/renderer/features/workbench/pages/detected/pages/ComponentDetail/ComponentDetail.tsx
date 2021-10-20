@@ -170,7 +170,7 @@ export const ComponentDetail = () => {
       url: file.component.url,
       purl: file.component.purl,
       version: file.component.version,
-      license_name: file.component.licenses[0]?.name,
+      spdxid: file.component.licenses[0]?.spdxid,
       usage: file.type,
     };
 
@@ -183,11 +183,13 @@ export const ComponentDetail = () => {
     const inv: Partial<Inventory> = {
       component: component?.name,
       version: version || component?.versions[0]?.version,
-      license_name: component?.versions[0].licenses[0]?.name,
+      spdxid: component?.versions[0].licenses[0]?.spdxid,
       url: component?.url,
       purl: component?.purl,
       usage: 'file',
     };
+
+    console.log(component?.versions[0].licenses);
 
     create(inv, selFiles);
   };

@@ -15,6 +15,7 @@ import { setFile } from '../../../../actions';
 import { resultService } from '../../../../../../../api/results-service';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import { projectService } from '../../../../../../../api/project-service';
+import { InventoryForm } from '../../../../../../context/types';
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -108,12 +109,12 @@ export const Editor = () => {
   };
 
   const onIdentifyPressed = async (result) => {
-    const inv: Partial<Inventory> = {
+    const inv: Partial<InventoryForm> = {
       component: result.component.name,
       version: result.component.version,
       url: result.component.url,
       purl: result.component.purl,
-      license_name: result.component.licenses ? result.component.licenses[0]?.name : null,
+      spdxid: result.component.licenses ? result.component.licenses[0]?.spdxid : null,
       usage: result.type,
     };
 

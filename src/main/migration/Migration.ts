@@ -8,21 +8,18 @@ export abstract class Migration {
     this.version = version;
   }
 
-  public up(): string {   
-    const scripts = this.getScripts();    
+  public up(): string {
+    const scripts = this.getScripts();
     const myVersion: string = this.getVersion();
     const oldestCompatibleVersion: string = Object.keys(scripts)[0];
     if (this.compareVersions(myVersion, oldestCompatibleVersion) === -1)
       // myVersion < oldCom....
       throw new Error(`Cannot upgrade version ${myVersion}`);
-    Object.entries(scripts).forEach(([scriptsVersion, values]) => {     
+    Object.entries(scripts).forEach(([scriptsVersion, values]) => {
       if (this.compareVersions(myVersion, scriptsVersion) === -1) values.forEach((script) => script(this.getPath()));
-
-    }, this);      
-    const latestVersion = app.isPackaged === true ? app.getVersion() : packageJson.version; 
-    return  latestVersion;
-    }, this);    
-
+    }, this);
+    const latestVersion = app.isPackaged === true ? app.getVersion() : packageJson.version;
+    return latestVersion;
   }
 
   public abstract getScripts(): Record<string, Array<(path: string) => void>>;

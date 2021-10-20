@@ -81,7 +81,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       const componentsResponse = await componentService.getAllComponentGroup();
       const licensesResponse = await licenseService.getAll();
 
-     
       setData(componentsResponse.data);
       setComponents(componentsResponse.data);
       const catalogue = licensesResponse.data.map((item) => ({
@@ -97,14 +96,17 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const openLicenseDialog = async () => {
     const response = await dialogCtrl.openLicenseCreate();
     if (response && response.action === ResponseStatus.OK) {
-      setLicenses([...licenses, { name: response.data.name, type: 'Cataloged' }]);
-      setForm({ ...form, license_name: response.data.name });
+      setLicenses([...licenses, { spdxid: response.data.spdxid, name: response.data.name, type: 'Cataloged' }]);
+      setForm({ ...form, spdxid: response.data.spdxid });
     }
   };
 
   const openComponentVersionDialog = async () => {
+    // FIXME: This is a hack to get the component name, should be change component dialog to use spdxid.
+    const license = licenses.find((item) => item.spdxid === form.spdxid);
+
     const response = await dialogCtrl.openComponentDialog(
-      { name: form.component, purl: form.purl, url: form.url, license_name: form.license_name },
+      { name: form.component, purl: form.purl, url: form.url, license_name: license?.name },
       'Add Version'
     );
     if (response && response.action === ResponseStatus.OK) {
@@ -114,7 +116,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         ...form,
         component: name,
         version,
-        license_name: licenses[0].name,
+        spdxid: licenses[0].spdxid,
         purl,
         url: url || '',
       });
@@ -130,18 +132,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         ...form,
         component: name,
         version,
-        license_name: licenses[0].name,
+        spdxid: licenses[0].spdxid,
         purl,
         url: url || '',
       });
     }
-  };
-
-  const handleClose = (e) => {
-    e.preventDefault();
-    const inventory: any = form;
-    inventory.spdxid = form.license_name;
-    onClose(inventory);
   };
 
   const inputHandler = (e) => {
@@ -159,12 +154,22 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const isValid = () => {
-    const { version, component, url, purl, license_name, usage } = form;
-    return license_name && version && component && purl && usage;
+    const { version, component, url, purl, spdxid, usage } = form;
+    return spdxid && version && component && purl && usage;
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    const inventory: any = form;
+    onClose(inventory);
   };
 
   useEffect(setDefaults, [inventory]);
   useEffect(() => fetchData(), [open]);
+
+  useEffect(() => {
+    setForm({ ...form, spdxid: inventory.spdxid });
+  }, [licensesAll]);
 
   useEffect(() => {
     const component = data.find((item) => item.purl === form.purl);
@@ -182,7 +187,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
     if (lic) {
       setLicenses([...lic, ...licensesAll]);
-      setForm({ ...form, license_name: lic[0]?.name });
+      setForm({ ...form, spdxid: lic[0]?.spdxid });
     }
   }, [form.version]);
 
@@ -202,7 +207,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     >
       <span className="dialog-title">Identify Component</span>
 
-      <form onSubmit={handleClose}>
+      <form onSubmit={onSubmit}>
         <div className="dialog-content">
           <div className={`${classes.componentVersion} dialog-row`}>
             <div className="dialog-form-field">
@@ -293,7 +298,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   fullWidth
                   options={licenses || []}
                   groupBy={(option) => option?.type}
-                  value={form.license_name || ''}
+                  value={
+                    licenses && form.spdxid
+                      ? { spdxid: form.spdxid, name: licenses.find((item) => item.spdxid === form.spdxid)?.name }
+                      : ''
+                  }
                   getOptionSelected={(option) => option.spdxid === form.spdxid}
                   getOptionLabel={(option) => option.name || option}
                   disableClearable
@@ -308,7 +317,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       }}
                     />
                   )}
-                  onChange={(e, value) => autocompleteHandler('license_name', value.spdxid)}
+                  onChange={(e, value) => autocompleteHandler('spdxid', value.spdxid)}
                 />
               </Paper>
             </div>
