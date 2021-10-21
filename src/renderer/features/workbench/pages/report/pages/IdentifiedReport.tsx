@@ -19,7 +19,7 @@ Chart.register(...registerables);
 const IdentifiedReport = ({ data }) => {
   const history = useHistory();
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const [licenses, setLicenses] = useState(null);
+  const [obligations, setObligations] = useState(null);
 
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
 
@@ -27,8 +27,10 @@ const IdentifiedReport = ({ data }) => {
 
   const init = async () => {
     console.log(data);
-    const licenses = await obligationsService.getObligations(['GPL-2.0-only', 'GPL-2.0-or-later', 'MIT', 'GPL-3.0-only']);
-    setLicenses(licenses);
+    const licenses = data.licenses.map((license) => license.label);
+    console.log(licenses);
+    const obligations = await obligationsService.getObligations(licenses);
+    setObligations(obligations);
   };
 
   const onLicenseSelected = (license: string) => {
@@ -85,7 +87,11 @@ const IdentifiedReport = ({ data }) => {
             </Card>
 
             <Card className="report-item licenses-obligation">
-              {licenses ? <LicensesObligations data={licenses} /> : <p className="text-center mb-0 mt-0">Loading obligations info...</p>}
+              {obligations ? (
+                <LicensesObligations data={obligations} />
+              ) : (
+                <p className="text-center mb-0 mt-0">Loading obligations info...</p>
+              )}
             </Card>
           </section>
         </>
