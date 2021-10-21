@@ -7,9 +7,10 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { utilDb } from './utils_db';
 import { License } from '../../api/types';
+import { licenseHelper } from '../helpers/LicenseHelper';
+
 
 const query = new Querys();
-
 
 export class LicenseDb extends Db {
   constructor(path: string) {
@@ -18,21 +19,15 @@ export class LicenseDb extends Db {
 
   // CREATE LICENSE
   public bulkCreate(db: any, license: Partial<License>) {
+    const spdxid = licenseHelper.licenseNameToSPDXID(license.spdxid);
     return new Promise<any>((resolve, reject) => {
       try {
         license.fulltext = 'AUTOMATIC IMPORT';
         license.url = 'AUTOMATIC IMPORT';
-        db.run(
-          query.SQL_CREATE_LICENSE,
-          license.spdxid,
-          license.spdxid,
-          license.fulltext,
-          license.url,
-          function (this: any) {
-            license.id = this.lastID;
-            resolve(license);
-          }
-        );
+        db.run(query.SQL_CREATE_LICENSE, spdxid, spdxid, license.fulltext, license.url, function (this: any) {
+          license.id = this.lastID;
+          resolve(license);
+        });
       } catch (error) {
         reject(new Error('The license was not created'));
       }
@@ -40,8 +35,8 @@ export class LicenseDb extends Db {
   }
 
   // CREATE LICENSE
-  public create(license: License) {
-    return new Promise<License>(async (resolve, reject) => {
+  public create(license: Partial<License>) {
+    return new Promise <License>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(async function () {
@@ -51,7 +46,7 @@ export class LicenseDb extends Db {
             db.close();
             if (err || this.lastID === 0) reject(new Error('The license was not created or already exist'));
             license.id = this.lastID;
-            resolve(license);
+            resolve(<License> license);
           });
         });
       } catch (error) {

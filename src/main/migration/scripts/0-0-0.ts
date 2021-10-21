@@ -1,6 +1,6 @@
 import { app } from 'electron';
 import fs from 'fs';
-import packageJson from '../../../package.json'
+import packageJson from '../../../package.json';
 
 export function wsCfgUpdate(wsPath: string) {
   const cfgData = fs.readFileSync(`${wsPath}/defaultCfg.json`, 'utf8');

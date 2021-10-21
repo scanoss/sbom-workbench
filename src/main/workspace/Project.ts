@@ -71,10 +71,12 @@ export class Project extends EventEmitter {
   public upgrade(): void {
     if (this.metadata.getVersion() === '11.4.9') {
       this.metadata.setAppVersion('0.8.0');
-      this.save();
+      this.metadata.save();
     }
     const pMigration = new ProjectMigration(this.metadata.getVersion(), this.metadata.getMyPath());
-    pMigration.up();
+    const newVersion: string = pMigration.up();   
+    this.metadata.setAppVersion(newVersion);
+    this.metadata.save();
   }
 
   public async open(): Promise<boolean> {
@@ -89,6 +91,7 @@ export class Project extends EventEmitter {
     this.filesSummary = a.filesSummary;
     this.scans_db = new ScanDb(this.metadata.getMyPath());
     await this.scans_db.init();
+    this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
 
     // const projectCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/projectCfg.json`, 'utf8');
     // const projectCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/../defaultCfg.json`, 'utf8');
