@@ -5,6 +5,7 @@ import DetectedReport from './pages/DetectedReport';
 import IdentifiedReport from './pages/IdentifiedReport';
 import { reportService } from '../../../../../api/report-service';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
+import obligationsService from '../../../../../api/obligations-service';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -55,9 +56,8 @@ const Reports = () => {
 
   const init = async () => {
     const  summary = await reportService.getSummary();
-   
     const detected = await reportService.detected();
-    const identified = await reportService.idetified();  
+    const identified = await reportService.idetified();
     setDetectedData({ ...detected, summary });
     setIdentifiedData({ ...identified, summary });
   };

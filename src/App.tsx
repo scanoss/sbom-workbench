@@ -25,13 +25,14 @@ export default class App {
         <MuiThemeProvider theme={theme}>
           <AppProvider>
             <DialogProvider>
+              <Route exact path="/" component={Workspace} /> {/* Redirect not working with new browser windows */}
               <Route path="/workspace" component={Workspace} />
               <WorkbenchProvider>
                 <Route path="/workbench" component={Workbench} />
-              </WorkbenchProvider>              
+              </WorkbenchProvider>
               <Route path="/about" exact component={About} />
 
-              <Redirect from="/" to="/workspace" />
+              {/* <Redirect from="/" to="/workspace" /> */}
             </DialogProvider>
           </AppProvider>
         </MuiThemeProvider>

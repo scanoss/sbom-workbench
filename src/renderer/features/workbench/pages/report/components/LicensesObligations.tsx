@@ -43,11 +43,17 @@ export default function MatchesForLicense({ data }) {
                 <TableCell component="th" scope="row">
                   {row?.label}
                 </TableCell>
-                <TableCell>{row?.copyleft === true ? <CheckIcon style={{ fill: '#4ADE80' }} /> : <ClearIcon style={{ fill: '#F87171' }} />}</TableCell>
+                <TableCell>
+                  {row.copyleft === true ? (
+                    <CheckIcon style={{ fill: '#4ADE80' }} />
+                  ) : (
+                    <ClearIcon style={{ fill: '#F87171' }} />
+                  )}
+                </TableCell>
                 <TableCell className="tableCellForLicensePill">
                   <div className="container-licenses-pills">
-                    {row?.incompatibles.map((license) => (
-                      <div key={license?.index} className="tinyPillLicenseContainer">
+                    {row.incompatibles?.map((license) => (
+                      <div key={license.index} className="tinyPillLicenseContainer">
                         <span className="tinyPillLicenseLabel">{license}</span>
                       </div>
                     ))}
