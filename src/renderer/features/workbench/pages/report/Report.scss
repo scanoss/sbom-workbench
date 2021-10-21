@@ -151,6 +151,10 @@
       word-break: break-all;
     }
 
+    .MuiTableContainer-root{
+      max-height: 500px;
+    }
+
       .tableRowLicense {
         .MuiTableCell-root {
           padding: 8px 16px;
