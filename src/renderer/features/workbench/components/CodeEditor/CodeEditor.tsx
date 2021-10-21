@@ -20,7 +20,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
   let start = 0;
   let end = LINES_MAX;
 
-  //highlighFlag is true when I should highlight the code. False otherwise.
+  //highlighFlag is true when code should be highlighted. False otherwise.
   const highlightFlag = !file.some((e) => e.length >= CHAR_MAX_IN_LINE);
 
   if (highlightFlag) {
@@ -79,7 +79,10 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
       ) : (
         <>
           <div className="codeEditorClass">
-            <div className="myClass">{code}</div>
+            <div className="myClass">
+              {' '}
+              <pre>{code}</pre>
+            </div>
           </div>
         </>
       )}
