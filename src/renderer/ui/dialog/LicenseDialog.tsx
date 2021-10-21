@@ -5,10 +5,13 @@ import React, { useContext, useEffect, useState } from 'react';
 import { License } from '../../../api/types';
 import { licenseService } from '../../../api/license-service';
 import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
-import { ResponseStatus } from '../../../main/Response';
+
 
 // TO DO
 import { DialogContext } from '../../context/DialogProvider';
+import { licenseHelper } from '../../../main/helpers/LicenseHelper';
+
+
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -56,8 +59,8 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
   };
 
   const isValid = () => {
-    const { url, name, spdxid, fulltext } = form;
-    return url && name && spdxid && url && fulltext;
+    const { name, fulltext } = form;
+    return name && fulltext;
   };
 
   return (
@@ -76,26 +79,11 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">Name</label>
             <Paper className="dialog-form-field-control">
-              <InputBase
-                name="name"
-                fullWidth
-                value={form?.name}
-                onChange={(e) => inputHandler(e)}
-                required
-              />
+              <InputBase name="name" fullWidth value={form?.name} onChange={(e) => inputHandler(e)}  />
             </Paper>
-          </div>
-          <div className="dialog-form-field">
-            <label className="dialog-form-field-label">SPDX ID</label>
-            <Paper className="dialog-form-field-control">
-              <InputBase
-                name="spdxid"
-                fullWidth
-                value={form?.spdxid}
-                onChange={(e) => inputHandler(e)}
-                required
-              />
-            </Paper>
+            <p className="dialog-form-field-hint">
+              SpdxID: {form?.name ? licenseHelper.licenseNameToSPDXID(form.name) : '-'}
+            </p>
           </div>
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">Full text</label>
@@ -110,15 +98,11 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
             </Paper>
           </div>
           <div className="dialog-form-field">
-            <label className="dialog-form-field-label">URL</label>
+            <label className="dialog-form-field-label">
+              URL <span className="optional">- Optional</span>
+            </label>
             <Paper className="dialog-form-field-control">
-              <InputBase
-                name="url"
-                fullWidth
-                value={form?.url}
-                onChange={(e) => inputHandler(e)}
-                required
-              />
+              <InputBase name="url" fullWidth value={form?.url} onChange={(e) => inputHandler(e)} />
             </Paper>
           </div>
         </div>

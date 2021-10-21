@@ -28,7 +28,7 @@ export default class App {
               <Route path="/workspace" component={Workspace} />
               <WorkbenchProvider>
                 <Route path="/workbench" component={Workbench} />
-              </WorkbenchProvider>
+              </WorkbenchProvider>              
               <Route path="/about" exact component={About} />
 
               <Redirect from="/" to="/workspace" />
