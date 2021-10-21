@@ -1,12 +1,17 @@
-.myClass {
-
-  background-color: lightslategray ;
+.code-viewer.nohighlight {
+  background-color: rgb(46, 52, 64);
+  color: #eeeeee;
   overflow: scroll;
 
-}
+  span {
+    display: inline;
+  }
 
-
-.codeEditorClass {
-  display: flex;
-  max-height: 450px;
+  code .linenumber {
+    display: inline-block;
+    min-width: 3.25em;
+    padding-right: 1em;
+    text-align: right;
+    user-select: none;
+  }
 }

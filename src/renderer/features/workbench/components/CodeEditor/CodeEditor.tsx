@@ -20,21 +20,19 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
   let start = 0;
   let end = LINES_MAX;
 
-  //highlighFlag is true when code should be highlighted. False otherwise.
+  // highlighFlag is true when code should be highlighted. False otherwise.
   const highlightFlag = !file.some((e) => e.length >= CHAR_MAX_IN_LINE);
 
-  if (highlightFlag) {
-    if (highlight && highlight !== 'all') {
-      const [rangeStart, rangeEnd] = highlight.split('-');
-      lines = range(parseInt(rangeStart, 10), parseInt(rangeEnd, 10));
-      if (file.length > LINES_MAX) {
-        start = Math.max(parseInt(rangeStart, 10) - LINES_OFFSET, 1);
-        end = parseInt(rangeEnd, 10) + LINES_OFFSET;
-      }
+  if (highlightFlag && highlight && highlight !== 'all') {
+    const [rangeStart, rangeEnd] = highlight.split('-');
+    lines = range(parseInt(rangeStart, 10), parseInt(rangeEnd, 10));
+    if (file.length > LINES_MAX) {
+      start = Math.max(parseInt(rangeStart, 10) - LINES_OFFSET, 1);
+      end = parseInt(rangeEnd, 10) + LINES_OFFSET;
     }
   }
 
-  code = file.slice(start, end).join('\n');
+  code = file.slice(start, end);
 
   const truncatedStart = start - 1;
   const truncatedEnd = file.length - end;
@@ -74,16 +72,23 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
             return {};
           }}
         >
-          {code}
+          {code.join('\n')}
         </SyntaxHighlighter>
       ) : (
         <>
-          <div className="codeEditorClass">
-            <div className="myClass">
-              {' '}
-              <pre>{code}</pre>
-            </div>
-          </div>
+          <pre className="code-viewer nohighlight">
+            <header className="text-center mt-2 mb-2">
+              Warning that file length is too long and highlighting has been disabled for this match.
+            </header>
+            <code>
+              {code.map((line, index) => (
+                <div className="line" key={index}>
+                  <span className="linenumber">{index + 1}</span>
+                  <span>{line}</span>
+                </div>
+              ))}
+            </code>
+          </pre>
         </>
       )}
     </>
