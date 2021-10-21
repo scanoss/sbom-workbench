@@ -19,10 +19,10 @@ export default function MatchesForLicense({ data }) {
   return (
     <>
       <TableContainer >
-        <Table className={classes.table} >
+        <Table stickyHeader className={classes.table} >
           <TableHead>
             <TableRow>
-              <TableCell className="" align="left">
+              <TableCell  className="" align="left">
                 Component
               </TableCell>
               <TableCell>Vendor</TableCell>
