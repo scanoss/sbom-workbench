@@ -91,7 +91,7 @@ export class Querys {
   SQL_GET_INVENTORY_BY_PURL = 'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.spdxid,i.purl,i.version,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE purl=?;';
 
   // GET INVENTORY BY ID
-  SQL_GET_INVENTORY_BY_ID = 'SELECT id,compid,usage,notes,url,spdxid,purl,version FROM inventories WHERE id=?;';
+  SQL_GET_INVENTORY_BY_ID = 'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.spdxid,i.purl,version,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE i.id=?;';
 
   SQL_SCAN_SELECT_FILE_RESULTS = "SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype!='none' order by file_path;";
 
