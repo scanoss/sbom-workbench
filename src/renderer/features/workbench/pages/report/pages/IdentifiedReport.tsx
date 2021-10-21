@@ -26,9 +26,7 @@ const IdentifiedReport = ({ data }) => {
   const isEmpty = state.progress === 0;
 
   const init = async () => {
-    console.log(data);
     const licenses = data.licenses.map((license) => license.label);
-    console.log(licenses);
     const obligations = await obligationsService.getObligations(licenses);
     setObligations(obligations);
   };
