@@ -33,6 +33,7 @@ class ObligationsService extends BaseService {
     return Object.keys(obligations).map((key) => ({
       label: key,
       ...obligations[key][0],
+      copyleft: obligations[key][0].copyleft === "yes",
       incompatibles: obligations[key][0].incompatible_with ? obligations[key][0].incompatible_with?.split(',') : [],
     }))[0];
   }
