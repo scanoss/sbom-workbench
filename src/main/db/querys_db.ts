@@ -20,7 +20,7 @@ export class Querys {
     'CREATE TABLE IF NOT EXISTS license_component_version (id integer primary key asc, cvid integer not null, licid integer not null, unique(cvid,licid));';
 
   COMPDB_LICENSES_TABLE =
-    "CREATE TABLE IF NOT EXISTS licenses (id integer primary key asc, spdxid text default '', name text not null, fulltext text default '', url text default '', unique(spdxid));";
+    "CREATE TABLE IF NOT EXISTS licenses (id integer primary key asc, spdxid text default '', name text not null, fulltext text default '', url text default '',official INTEGER DEFAULT 0 ,UNIQUE(spdxid));";
 
   SQL_DB_TABLES =
     this.SQL_CREATE_TABLE_RESULTS +
@@ -65,7 +65,7 @@ export class Querys {
 
   /** SQL COMPONENTS TABLES INSERT* */
   // SQL INSERT INTO LICENSES
-  SQL_CREATE_LICENSE = 'INSERT OR IGNORE INTO licenses (spdxid,name,fulltext,url) VALUES(?,?,?,?);';
+  SQL_CREATE_LICENSE = 'INSERT OR IGNORE INTO licenses (spdxid,name,fulltext,url,official) VALUES(?,?,?,?,?);';
 
   // SQL INSERT INTO  COMPONENT VERSIONS
   COMPDB_SQL_COMP_VERSION_INSERT =
@@ -177,9 +177,9 @@ export class Querys {
 
   SQL_GET_FILE_BY_PATH = 'SELECT file_path AS path,identified,ignored FROM results WHERE results.file_path=?;';
 
-  SQL_GET_SPDX_COMP_DATA =  `SELECT DISTINCT c.purl,c.version,c.url,c.name,i.spdxid AS concludedLicense,i.notes ,l.spdxid AS declareLicense
-    FROM components c INNER JOIN inventories i ON c.purl=i.purl 
-    INNER JOIN license_view l ON c.id=l.cvid AND c.version=i.version GROUP BY i.version;`;
+  SQL_GET_SPDX_COMP_DATA = `SELECT DISTINCT c.purl,c.version,c.url,c.name,i.spdxid AS concludedLicense,i.notes ,lic.spdxid AS declareLicense,l.fulltext,l.official
+  FROM components c INNER JOIN inventories i ON c.purl=i.purl 
+  INNER JOIN license_view lic ON c.id=lic.cvid AND c.version=i.version INNER JOIN licenses l ON l.spdxid=i.spdxid;`;
 
   SQL_GET_CSV_DATA = `SELECT DISTINCT i.id AS inventoryId,r.id AS resultID,i.usage,i.notes,i.spdxid AS identified_license,r.license AS detected_license,i.purl,i.version,r.file_path AS path,cv.name AS identified_component,r.component AS detected_component
   FROM inventories i 

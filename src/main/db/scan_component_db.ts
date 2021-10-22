@@ -17,6 +17,8 @@ import { Db } from './db';
 import { Component, ComponentGroup } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
 
+
+
 export interface ComponentParams {
   source?: ComponentSource;
 }
@@ -82,8 +84,7 @@ export class ComponentDb extends Db {
       transformation.purl = data[i].purl;
       transformation.url = data[i].comp_url;
       transformation.version = data[i].version;
-      if(data[i].filesCount)
-      transformation.filesCount=data[i].filesCount;
+      if (data[i].filesCount) transformation.filesCount = data[i].filesCount;
 
       if (data[i].license_id) {
         preLicense.id = data[i].license_id;
@@ -329,6 +330,7 @@ export class ComponentDb extends Db {
   // COMPONENT NEW
   private componentNewImportFromResults(db: any, data: any) {
     return new Promise<number>((resolve) => {
+      db.serialize(function() {
       db.run(
         query.COMPDB_SQL_COMP_VERSION_INSERT,
         data.component,
@@ -343,8 +345,11 @@ export class ComponentDb extends Db {
         data.purl,
         data.version,
         (err: any, comp: any) => {
+          if (err) console.log(err);         
           resolve(comp.id);
-        });
+        }
+      );
+    });
   });
 }
 
@@ -382,12 +387,12 @@ export class ComponentDb extends Db {
       return await new Promise<any>(async (resolve, reject) => {
         db.all(query.SQL_GET_UNIQUE_COMPONENT, (err: any, data: any) => {
           db.close();
-          if (!err) resolve(data);
-          else resolve([]);
+          if (err) reject(err);
+            resolve(data);
         });
       });
     } catch (error) {
-      console.log(error);
+      console.log(error);     
     }
   }
 
@@ -542,7 +547,8 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(`SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name, l.spdxid
+        db.all(
+          `SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name, l.spdxid
         FROM component_versions c
         INNER JOIN inventories i ON c.purl=i.purl AND c.version=i.version
         INNER JOIN licenses l ON l.spdxid=i.spdxid ORDER BY i.spdxid;`,
