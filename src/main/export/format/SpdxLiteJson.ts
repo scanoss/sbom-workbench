@@ -6,8 +6,8 @@ const pathLib = require('path');
 const crypto = require('crypto');
 
 export enum LicenseType {
-  OFFICIAL = 0,
-  CUSTOM = 1,
+  OFFICIAL = 1,
+  CUSTOM = 0,
 }
 
 export class SpdxLiteJson extends Format {
