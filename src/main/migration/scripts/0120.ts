@@ -17,7 +17,7 @@ export function dbMigration(projectPath: string) {
       db.run('CREATE TABLE old_licenses AS select * from licenses;');
       db.run('DROP TABLE licenses');
       db.run(
-        `CREATE TABLE  licenses (id integer primary key asc, spdxid text default '', name text not null, fulltext text default '', url text default '',official INTEGER DEFAULT 0, UNIQUE(spdxid));`
+        `CREATE TABLE  licenses (id integer primary key asc, spdxid text default '', name text not null, fulltext text default '', url text default '',official INTEGER DEFAULT 1, UNIQUE(spdxid));`
       );
       db.run(
         'INSERT INTO licenses (id,spdxid,url,name,fulltext) SELECT id,spdxid,url,name,fulltext FROM old_licenses;'

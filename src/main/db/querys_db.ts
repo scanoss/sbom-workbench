@@ -20,7 +20,7 @@ export class Querys {
     'CREATE TABLE IF NOT EXISTS license_component_version (id integer primary key asc, cvid integer not null, licid integer not null, unique(cvid,licid));';
 
   COMPDB_LICENSES_TABLE =
-    "CREATE TABLE IF NOT EXISTS licenses (id integer primary key asc, spdxid text default '', name text not null, fulltext text default '', url text default '',official INTEGER DEFAULT 0 ,UNIQUE(spdxid));";
+    "CREATE TABLE IF NOT EXISTS licenses (id integer primary key asc, spdxid text default '', name text not null, fulltext text default '', url text default '',official INTEGER DEFAULT 1 ,UNIQUE(spdxid));";
 
   SQL_DB_TABLES =
     this.SQL_CREATE_TABLE_RESULTS +
