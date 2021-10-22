@@ -1,8 +1,14 @@
+import { Buffer } from 'buffer';
 import { utilDb } from '../../db/utils_db';
 import { Format } from '../Format';
 
 const pathLib = require('path');
 const crypto = require('crypto');
+
+export enum LicenseType {
+  OFFICIAL = 0,
+  CUSTOM = 1,
+}
 
 export class SpdxLiteJson extends Format {
   constructor() {
@@ -24,6 +30,8 @@ export class SpdxLiteJson extends Format {
       pkg.PackageDownloadLocation = data[i].url;
       pkg.ConcludedLicense = data[i].concludedLicense;
       pkg.DeclaredLicense = data[i].declareLicense;
+      if (data[i].official === LicenseType.CUSTOM) pkg.ExtractedText = this.fulltextToBase64(data[i].fulltext);
+
       spdx.Packages.push(pkg);
     }
 
@@ -48,5 +56,10 @@ export class SpdxLiteJson extends Format {
       Packages: [] as any,
     };
     return spdx;
+  }
+
+  private fulltextToBase64(fulltext: string) {
+    const buf = Buffer.from(fulltext);
+    return buf.toString('base64');
   }
 }

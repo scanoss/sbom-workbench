@@ -24,7 +24,7 @@ export class LicenseDb extends Db {
       try {
         license.fulltext = 'AUTOMATIC IMPORT';
         license.url = 'AUTOMATIC IMPORT';
-        db.run(query.SQL_CREATE_LICENSE, spdxid, spdxid, license.fulltext, license.url, function (this: any) {
+        db.run(query.SQL_CREATE_LICENSE, spdxid, spdxid, license.fulltext, license.url, 1, function (this: any) {
           license.id = this.lastID;
           resolve(license);
         });
@@ -41,7 +41,7 @@ export class LicenseDb extends Db {
         const db = await this.openDb();
         db.serialize(async function () {
           db.run('begin transaction');
-          db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url);
+          db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 1);
           db.run('commit', function (this: any, err: any) {
             db.close();
             if (err || this.lastID === 0) reject(new Error('The license was not created or already exist'));

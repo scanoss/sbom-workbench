@@ -17,9 +17,11 @@ export function dbMigration(projectPath: string) {
       db.run('CREATE TABLE old_licenses AS select * from licenses;');
       db.run('DROP TABLE licenses');
       db.run(
-        `CREATE TABLE  licenses (id integer primary key asc, spdxid text default '', name text not null, fulltext text default '', url text default '', UNIQUE(spdxid));`
+        `CREATE TABLE  licenses (id integer primary key asc, spdxid text default '', name text not null, fulltext text default '', url text default '',official INTEGER DEFAULT 0, UNIQUE(spdxid));`
       );
-      db.run('INSERT INTO licenses SELECT * from old_licenses;');
+      db.run(
+        'INSERT INTO licenses (id,spdxid,url,name,fulltext) SELECT id,spdxid,url,name,fulltext FROM old_licenses;'
+      );
       db.run('DROP TABLE old_licenses;');
       db.run('CREATE TABLE old_inventories AS select * from inventories;');
       db.run('ALTER TABLE inventories RENAME COLUMN license_name TO spdxid;');
