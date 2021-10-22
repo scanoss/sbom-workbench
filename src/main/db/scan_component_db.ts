@@ -128,7 +128,7 @@ export class ComponentDb extends Db {
           db.all(sqlGetComp, async (err: any, data: any) => {
             db.close();
             if (err) resolve([]);
-            else {            
+            else {
               const comp = self.processComponent(data);
               const summary: any = await self.allSummaries();
               for (let i = 0; i < comp.length; i += 1) {
@@ -293,15 +293,15 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        const results = await this.getUnique();       
+        const results = await this.getUnique();
         db.serialize(async function () {
           db.run('begin transaction');
           for (const result of results) {
-            if (result.license !== null) {           
+            if (result.license !== null) {
               license.spdxid = result.license;
               attachLicComp.license_id = await self.license.getLicenseIdFilter(
                 license
-              );     
+              );
               if (attachLicComp.license_id === 0) {
                 license = await self.license.bulkCreate(db, license);
                 attachLicComp.license_id = license.id;
@@ -310,7 +310,7 @@ export class ComponentDb extends Db {
             attachLicComp.compid = await self.componentNewImportFromResults(
               db,
               result
-            );           
+            );
             if (result.license !== 'NULL')
               await self.license.bulkAttachLicensebyId(db, attachLicComp);
           }
@@ -328,7 +328,7 @@ export class ComponentDb extends Db {
 
   // COMPONENT NEW
   private componentNewImportFromResults(db: any, data: any) {
-    return new Promise<number>((resolve) => {       
+    return new Promise<number>((resolve) => {
       db.run(
         query.COMPDB_SQL_COMP_VERSION_INSERT,
         data.component,
@@ -337,14 +337,14 @@ export class ComponentDb extends Db {
         data.url,
         data.purl,
         'engine',
-      );       
+      );
       db.get(
         `SELECT id FROM component_versions WHERE purl=? AND version=?;`,
         data.purl,
         data.version,
-        (err: any, comp: any) => {  
+        (err: any, comp: any) => {
           resolve(comp.id);
-        });   
+        });
   });
 }
 
@@ -471,7 +471,7 @@ export class ComponentDb extends Db {
         const data = await this.getAll(component);
         if (data) {
           const [comp] = await this.groupComponentsByPurl(data);
-          comp.summary = await this.summaryByPurl(comp);          
+          comp.summary = await this.summaryByPurl(comp);
           resolve(comp);
         } else resolve([]);
       } catch (error) {
@@ -484,8 +484,8 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const data = await this.getAll({}, params);
-        if (data) {       
-          const comp = await this.groupComponentsByPurl(data);         
+        if (data) {
+          const comp = await this.groupComponentsByPurl(data);
           resolve(comp);
         } else resolve([]);
       } catch (error) {
@@ -500,7 +500,7 @@ export class ComponentDb extends Db {
       for (const component of data) {
         if (!aux.hasOwnProperty(component.purl)) aux[component.purl] = [];
         aux[component.purl].push(component);
-      }    
+      }
       const result = await this.mergeComponentByPurl(aux);
       return result;
     } catch (err) {
@@ -542,7 +542,7 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(`SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name
+        db.all(`SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name, l.spdxid
         FROM component_versions c
         INNER JOIN inventories i ON c.purl=i.purl AND c.version=i.version
         INNER JOIN licenses l ON l.spdxid=i.spdxid ORDER BY i.spdxid;`,

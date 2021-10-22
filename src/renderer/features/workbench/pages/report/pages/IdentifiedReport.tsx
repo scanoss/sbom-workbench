@@ -9,6 +9,8 @@ import LicensesTable from '../components/LicensesTable';
 import MatchesForLicense from '../components/MatchesForLicense';
 import { setHistoryCrumb } from '../../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../../store';
+import LicensesObligations from '../components/LicensesObligations';
+import obligationsService from '../../../../../../api/obligations-service';
 
 const { shell } = require('electron');
 
@@ -17,16 +19,24 @@ Chart.register(...registerables);
 const IdentifiedReport = ({ data }) => {
   const history = useHistory();
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const [obligations, setObligations] = useState(null);
 
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
 
   const isEmpty = state.progress === 0;
+
+  const init = async () => {
+    const licenses = data.licenses.map((license) => license.label);
+    const obligations = await obligationsService.getObligations(licenses);
+    setObligations(obligations);
+  };
 
   const onLicenseSelected = (license: string) => {
     const matchedLicense = data.licenses.find((item) => item?.label === license);
     setMatchedLicenseSelected(matchedLicense);
   };
 
+  useEffect(init, []);
   useEffect(() => dispatch(setHistoryCrumb({ report: 'identified' })), []);
 
   return (
@@ -71,6 +81,14 @@ const IdentifiedReport = ({ data }) => {
                 <MatchesForLicense data={matchedLicenseSelected || data.licenses?.[0]} />
               ) : (
                 <p className="report-empty">No matches found</p>
+              )}
+            </Card>
+
+            <Card className="report-item licenses-obligation">
+              {obligations ? (
+                <LicensesObligations data={obligations} />
+              ) : (
+                <p className="text-center mb-0 mt-0">Loading obligations info...</p>
               )}
             </Card>
           </section>
