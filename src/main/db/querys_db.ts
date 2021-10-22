@@ -82,7 +82,7 @@ export class Querys {
 
   /** *** SQL SCAN GET * **** */
   SQL_SCAN_SELECT_INVENTORIES_FROM_PATH =
-    'SELECT i.id,i.usage,i.compid,i.notes,i.url,i.spxid,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid INNER JOIN results r ON r.id=fi.resultid WHERE r.file_path=?;';
+    'SELECT i.id,i.usage,i.compid,i.notes,i.url,i.spdxid,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid INNER JOIN results r ON r.id=fi.resultid WHERE r.file_path=?;';
 
   SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION =
     'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.spdxid,i.purl,i.version,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE i.purl=? AND i.version=?;';
