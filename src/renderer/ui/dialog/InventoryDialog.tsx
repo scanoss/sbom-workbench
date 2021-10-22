@@ -187,7 +187,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     const lic = data
       .find((item) => item?.name === form?.component)
       ?.versions.find((item) => item.version === form.version)
-      ?.licenses.map((item) => ({ spdix: item.spdix, name: item.name, type: 'Matched' }));
+      ?.licenses.map((item) => ({ spdxid: item.spdxid, name: item.name, type: 'Matched' }));
 
     if (lic) {
       setLicenses([...lic, ...licensesAll]);
