@@ -28,6 +28,7 @@
 @import 'renderer/features/workbench/pages/detected/pages/ComponentDetail/ComponentDetail';
 @import 'renderer/features/workbench/pages/identified/pages/InventoryDetail/InventoryDetail.scss';
 @import 'renderer/features/workbench/components/AppBar/AppBar';
+@import 'renderer/features/workbench/components/CodeEditor/CodeEditor';
 @import 'renderer/features/workbench/components/FileTree/FileTree';
 @import 'renderer/features/workbench/components/ComponentCard/ComponentCard';
 @import 'renderer/features/workbench/components/RecognizedCard/RecognizedCard';
@@ -41,6 +42,8 @@
 @import 'renderer/features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 @import 'renderer/features/workbench/components/ComponentInfo/ComponentInfo.scss';
 @import 'renderer/features/workbench/components/NoMatchFound/NoMatchFound.scss';
+
+
 
 /* fonts */
 // @TODO: install fonts as dependencies

@@ -4,6 +4,7 @@ import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { range } from '../../../../../utils/utils';
 
 const LINES_MAX = 1000;
+const CHAR_MAX_IN_LINE = 5000;
 const LINES_OFFSET = 50;
 
 interface CodeEditorProps {
@@ -19,7 +20,10 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
   let start = 0;
   let end = LINES_MAX;
 
-  if (highlight && highlight !== 'all') {
+  // highlighFlag is true when code should be highlighted. False otherwise.
+  const highlightFlag = !file.some((e) => e.length >= CHAR_MAX_IN_LINE);
+
+  if (highlightFlag && highlight && highlight !== 'all') {
     const [rangeStart, rangeEnd] = highlight.split('-');
     lines = range(parseInt(rangeStart, 10), parseInt(rangeEnd, 10));
     if (file.length > LINES_MAX) {
@@ -28,7 +32,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
     }
   }
 
-  code = file.slice(start, end).join('\n');
+  code = file.slice(start, end);
 
   const truncatedStart = start - 1;
   const truncatedEnd = file.length - end;
@@ -50,25 +54,43 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
 
   return (
     <>
-      <SyntaxHighlighter
-        className={`
-          code-viewer
-          ${truncatedStart > 0 ? 'truncatedStart' : ''}
-          ${truncatedEnd > 0 ? 'truncatedEnd' : ''}`}
-        wrapLines
-        style={nord}
-        language="javascript"
-        startingLineNumber={start + 1}
-        showLineNumbers
-        lineProps={(line) => {
-          if (lines && lines.includes(line)) {
-            return { class: 'line-highlighted' };
-          }
-          return {};
-        }}
-      >
-        {code}
-      </SyntaxHighlighter>
+      {highlightFlag ? (
+        <SyntaxHighlighter
+          className={`
+            code-viewer
+            ${truncatedStart > 0 ? 'truncatedStart' : ''}
+            ${truncatedEnd > 0 ? 'truncatedEnd' : ''}`}
+          wrapLines
+          style={nord}
+          language="javascript"
+          startingLineNumber={start + 1}
+          showLineNumbers
+          lineProps={(line) => {
+            if (lines && lines.includes(line)) {
+              return { class: 'line-highlighted' };
+            }
+            return {};
+          }}
+        >
+          {code.join('\n')}
+        </SyntaxHighlighter>
+      ) : (
+        <>
+          <pre className="code-viewer nohighlight">
+            <header className="text-center mt-2 mb-2">
+              Warning that file length is too long and highlighting has been disabled for this match.
+            </header>
+            <code>
+              {code.map((line, index) => (
+                <div className="line" key={index}>
+                  <span className="linenumber">{index + 1}</span>
+                  <span>{line}</span>
+                </div>
+              ))}
+            </code>
+          </pre>
+        </>
+      )}
     </>
   );
 };
