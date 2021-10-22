@@ -23,7 +23,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
   // highlighFlag is true when code should be highlighted. False otherwise.
   const highlightFlag = !file.some((e) => e.length >= CHAR_MAX_IN_LINE);
 
-  if (highlightFlag && highlight && highlight !== 'all') {
+  if (highlight && highlight !== 'all') {
     const [rangeStart, rangeEnd] = highlight.split('-');
     lines = range(parseInt(rangeStart, 10), parseInt(rangeEnd, 10));
     if (file.length > LINES_MAX) {
@@ -77,12 +77,12 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
       ) : (
         <>
           <pre className="code-viewer nohighlight">
-            <header className="text-center mt-2 mb-2">
-              Warning that file length is too long and highlighting has been disabled for this match.
+            <header className="">
+              File length is too long,<br></br>highlighting has been disabled.
             </header>
             <code>
               {code.map((line, index) => (
-                <div className="line" key={index}>
+                <div className={`line ${lines && lines.includes(index + 1) ? 'line-highlighted' : ''}`} key={index}>
                   <span className="linenumber">{index + 1}</span>
                   <span>{line}</span>
                 </div>

@@ -3,6 +3,15 @@
   color: #eeeeee;
   overflow: scroll;
 
+  header {
+    text-align: center;
+    width: 70%;
+    padding: 5px 0 10px;
+    margin: 10px auto;
+    color: #e7c735;
+    border-bottom: 1px solid #eeeeee;
+  }
+
   span {
     display: inline;
   }
