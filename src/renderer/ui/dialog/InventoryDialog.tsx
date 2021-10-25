@@ -112,6 +112,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     );
     if (response && response.action === ResponseStatus.OK) {
       const { name, version, licenses, purl, url } = response.data;
+      setLicenses([...licenses, { spdxid: licenses[0].spdxid, name: licenses[0].name, type: 'Cataloged' }]);
       setComponents([...components, response.data.name]);
       setForm({
         ...form,
@@ -125,10 +126,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const openComponentDialog = async () => {
-    const response = await dialogCtrl.openComponentDialog();
+    const response = await dialogCtrl.openComponentDialog(); 
     if (response && response.action === ResponseStatus.OK) {
       const { name, version, licenses, purl, url } = response.data;
       setComponents([...components, response.data.name]);
+      setLicenses([...licenses, { spdxid: licenses[0].spdxid, name: licenses[0].name, type: 'Cataloged' }]);
       setForm({
         ...form,
         component: name,
