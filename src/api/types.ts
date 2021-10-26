@@ -3,6 +3,7 @@ export enum ScanState {
   READY_TO_SCAN = 'READY_TO_SCAN',
   SCANNING = 'SCANNING',
   SCANNED = 'SCANNED',
+  RESCAN = 'RESCAN',
 }
 
 export enum ProjectState {

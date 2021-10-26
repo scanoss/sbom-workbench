@@ -16,7 +16,6 @@ import { Metadata } from './Metadata';
 import { userSetting } from '../UserSetting';
 import { ProjectMigration } from '../migration/ProjectMigration';
 
-
 const path = require('path');
 
 export class Project extends EventEmitter {
@@ -74,7 +73,7 @@ export class Project extends EventEmitter {
       this.metadata.save();
     }
     const pMigration = new ProjectMigration(this.metadata.getVersion(), this.metadata.getMyPath());
-    const newVersion: string = pMigration.up();   
+    const newVersion: string = pMigration.up();
     this.metadata.setAppVersion(newVersion);
     this.metadata.save();
   }
@@ -116,14 +115,14 @@ export class Project extends EventEmitter {
     this.logical_tree = null;
     this.scans_db = null;
     this.filesToScan = null;
-   // this.config = null;
+    // this.config = null;
   }
 
   public save(): void {
     this.metadata.save();
     fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this));
     // fs.writeFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, JSON.stringify(this.config, null, 2));
-    log.info(`%c[ PROJECT ]: Project ${this.metadata.getName()} saved`,'color:green');
+    log.info(`%c[ PROJECT ]: Project ${this.metadata.getName()} saved`, 'color:green');
   }
 
   public async startScanner() {
@@ -145,7 +144,10 @@ export class Project extends EventEmitter {
     this.indexScan(this.metadata.getScanRoot(), this.logical_tree, this.banned_list);
     const summary = { total: 0, include: 0, filter: 0, files: {} };
     this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
-    log.info(`%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,'color: green');
+    log.info(
+      `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
+      'color: green'
+    );
     this.filesToScan = summary.files;
     this.filesNotScanned = {};
     this.metadata.setScannerState(ScanState.READY_TO_SCAN);
@@ -171,9 +173,11 @@ export class Project extends EventEmitter {
   }
 
   cleanProject() {
-    if (fs.existsSync(`${this.metadata.getMyPath()}/results.json`)) fs.unlinkSync(`${this.metadata.getMyPath()}/results.json`);
+    if (fs.existsSync(`${this.metadata.getMyPath()}/results.json`))
+      fs.unlinkSync(`${this.metadata.getMyPath()}/results.json`);
     if (fs.existsSync(`${this.metadata.getMyPath()}/scan_db`)) fs.unlinkSync(`${this.metadata.getMyPath()}/scan_db`);
-    if (fs.existsSync(`${this.metadata.getMyPath()}/tree.json`)) fs.unlinkSync(`${this.metadata.getMyPath()}/tree.json`);
+    if (fs.existsSync(`${this.metadata.getMyPath()}/tree.json`))
+      fs.unlinkSync(`${this.metadata.getMyPath()}/tree.json`);
   }
 
   initializeScanner() {
@@ -205,8 +209,17 @@ export class Project extends EventEmitter {
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath, filesNotScanned) => {
+
+
+      const count = await this.scans_db.results.count();
+      if (count > 0) {
+        await this.scans_db.results.updateDirty();
+      }
       await this.scans_db.results.insertFromFile(resPath);
       await this.scans_db.components.importUniqueFromFile();
+      await this.scans_db.results.deleteDirty();
+      const notValidComp = await this.scans_db.components.getNotValid();
+      // await this.scans_db.
       this.metadata.setScannerState(ScanState.SCANNED);
       this.metadata.save();
       await this.close();
@@ -345,13 +358,13 @@ export class Project extends EventEmitter {
     let nodeFound: any = {};
     for (let i = 0; i < res.length - 1; i += 1) {
       const path = res[i];
-       nodeFound = nodes.find((node) => {
-        return (node.type === 'folder' && node.label === path);
+      nodeFound = nodes.find((node) => {
+        return node.type === 'folder' && node.label === path;
       });
       nodes = nodeFound.children;
     }
-     nodeFound = nodes.find((node) => {
-      return (node.type === 'file' && node.label === res[res.length - 1]);
+    nodeFound = nodes.find((node) => {
+      return node.type === 'file' && node.label === res[res.length - 1];
     });
     if (nodeFound) return nodeFound;
     return {};
@@ -409,7 +422,7 @@ export class Project extends EventEmitter {
   scanMode(filePath: string) {
     // eslint-disable-next-line prettier/prettier
     const skipExtentions = new Set ([".exe", ".zip", ".tar", ".tgz", ".gz", ".rar", ".jar", ".war", ".ear", ".class", ".pyc", ".o", ".a", ".so", ".obj", ".dll", ".lib", ".out", ".app", ".doc", ".docx", ".xls", ".xlsx", ".ppt" ]);
-    const skipStartWith = ["{","[","<?xml","<html","<ac3d","<!doc"];
+    const skipStartWith = ['{', '[', '<?xml', '<html', '<ac3d', '<!doc'];
     const MIN_FILE_SIZE = 256;
 
     // Filter by extension
@@ -445,7 +458,7 @@ export class Project extends EventEmitter {
     if (jsonScan.type === 'file') {
       this.filesIndexed += 1;
       if (this.filesIndexed % 100 === 0)
-          this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+        this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
           stage: `indexing`,
           processed: this.filesIndexed,
         });
@@ -462,16 +475,42 @@ export class Project extends EventEmitter {
       } else {
         jsonScan.action = 'filter';
       }
-
-
     }
   }
 
-
-  public getToken(){
-    const txt = fs.readFileSync(`${this.metadata.getMyPath()}/projectCfg.json`,'utf8');
+  public getToken() {
+    const txt = fs.readFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, 'utf8');
     const cfg = JSON.parse(txt);
     return cfg.TOKEN;
+  }
+
+  public async reScan(){
+    console.log("RESCAN");
+    this.state = ProjectState.OPENED;
+    const myPath = this.metadata.getMyPath();
+    this.project_name = this.metadata.getName(); // To keep compatibility
+    this.banned_list = new Filtering.BannedList('NoFilter');
+    this.banned_list.load(`${myPath}/filter.json`);
+    this.scans_db = new ScanDb(myPath);
+    await this.scans_db.init();
+    await this.scans_db.licenses.importFromJSON(licenses);
+    this.build_tree();
+    this.indexScan(this.metadata.getScanRoot(), this.logical_tree, this.banned_list);
+    const summary = { total: 0, include: 0, filter: 0, files: {} };
+    this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
+    log.info(
+      `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
+      'color: green'
+    );
+    this.filesToScan = summary.files;
+    this.filesNotScanned = {};
+    this.metadata.setScannerState(ScanState.READY_TO_SCAN);
+    this.metadata.setFileCounter(summary.include);
+    this.initializeScanner();
+    // this.scanner.setId('rescan');
+    this.scanner.cleanWorkDirectory();
+    this.save();
+    this.startScan();
   }
 }
 
@@ -495,12 +534,11 @@ function summarizeTree(root: any, tree: any, summary: any) {
   }
   if (tree.type === 'folder') {
     if (tree.action === 'filter') {
-
       tree.className = 'filter-item';
     } else
-    for (j = 0; j < tree.children.length; j += 1) {
-      summary = summarizeTree(root, tree.children[j], summary);
-    }
+      for (j = 0; j < tree.children.length; j += 1) {
+        summary = summarizeTree(root, tree.children[j], summary);
+      }
     return summary;
   }
 }

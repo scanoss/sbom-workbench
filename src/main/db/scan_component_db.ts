@@ -563,4 +563,43 @@ export class ComponentDb extends Db {
       }
     });
   }
+
+  public getNotValid() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.all(
+          `SELECT cv.id FROM component_versions cv WHERE NOT EXISTS (SELECT DISTINCT r.purl,r.version FROM results r WHERE r.version!='' AND r.dirty=0 AND r.version=cv.version AND r.purl=cv.purl);`,
+          (err: any, data: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(data);
+          }
+        );
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  public deleteByID( componentIds []:number) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        
+        const db = await this.openDb();
+        db.all(
+          ``,
+          (err: any, data: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(data);
+          }
+        );
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  
 }

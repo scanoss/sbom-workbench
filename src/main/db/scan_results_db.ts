@@ -13,7 +13,6 @@ import { Db } from './db';
 import { utilDb } from './utils_db';
 import { ComponentDb } from './scan_component_db';
 
-
 const query = new Querys();
 
 export class ResultsDb extends Db {
@@ -48,6 +47,59 @@ export class ResultsDb extends Db {
         });
       } catch (error) {
         resolve(false);
+      }
+    });
+  }
+
+  async count() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.get('SELECT COUNT(*)as count FROM results;', function (err: any, result: any) {
+          if (err) throw err;
+          db.close();
+          resolve(result.count);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async updateDirty() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          db.run('UPDATE results SET dirty=1 WHERE id IN (SELECT id FROM results);');
+          db.run('commit', (err: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async deleteDirty() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          db.run('DELETE results WHERE dirty=1);');
+          db.run('commit', (err: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        reject(error);
       }
     });
   }
@@ -217,5 +269,4 @@ export class ResultsDb extends Db {
       }
     });
   }
-
 }

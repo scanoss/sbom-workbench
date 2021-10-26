@@ -11,12 +11,9 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import DeleteIcon from '@material-ui/icons/Delete';
+import ReplayIcon from '@material-ui/icons/Replay';
 import RestoreIcon from '@material-ui/icons/Restore';
-
-import { makeStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
-
-import { ResponseStatus } from '../../../main/Response';
 import { AppContext } from '../../../../context/AppProvider';
 import { IProject, ScanState } from '../../../../../api/types';
 import { workspaceService } from '../../../../../api/workspace-service';
@@ -82,6 +79,18 @@ const Workspace = () => {
     });
     if (action === DIALOG_ACTIONS.OK) {
       await workspaceService.deleteProject(path);
+      init();
+    }
+  };
+
+  const onRescan = async (path, e) => {
+    e.stopPropagation();
+    const { action } = await dialogCtrl.openConfirmDialog('Are you sure you want to rescan this project?', {
+      label: 'OK',
+      role: 'accept',
+    });
+    if (action === DIALOG_ACTIONS.OK) {
+      await workspaceService.rescanProject(path);
       init();
     }
   };
@@ -178,6 +187,16 @@ const Workspace = () => {
                                 <DeleteIcon fontSize="small" />
                               </IconButton>
                             </Tooltip>
+                            <Tooltip title="Rescan">
+                              <IconButton
+                                aria-label="rescan"
+                                className="btn-rescan"
+                                onClick={(event) => onRescan(row.work_root, event)}
+                              >
+                                <ReplayIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
                           </div>
                         </TableCell>
                       </TableRow>

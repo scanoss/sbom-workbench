@@ -77,6 +77,12 @@ class Workspace extends EventEmitter {
     return true;
   }
 
+  public async rescanProjectByPath(pPath: string) {
+    const p = this.getProjectByPath(pPath);
+    p.reScan();
+    return true;
+  }
+
   public getProjectByPath(pPath: string): Project {
     for (let i = 0; i < this.projectList.length; i += 1)
       if (this.projectList[i].getMyPath() === pPath) return this.projectList[i];

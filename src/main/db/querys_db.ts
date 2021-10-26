@@ -2,7 +2,7 @@ export class Querys {
   /** SQL CREATE SCAN TABLES * */
 
   SQL_CREATE_TABLE_RESULTS =
-    'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,file_path text ,fileid integer, vendor text, component text, version text, latest_version text, cpe text, license text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,identified integer,ignored integer,file_url text,source text);';
+    'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,file_path text ,fileid integer, vendor text, component text, version text, latest_version text, cpe text, license text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,identified integer,ignored integer,file_url text,source text,dirty INTEGER default 0);';
 
   SQL_CREATE_TABLE_FILE_INVENTORIES =
     'CREATE TABLE IF NOT EXISTS file_inventories (id integer primary key asc, resultid integer not null, inventoryid integer not null, FOREIGN KEY (inventoryid) REFERENCES inventories(id) ON DELETE CASCADE);';
@@ -193,7 +193,7 @@ export class Querys {
   SQL_GET_SUMMARY_BY_PURL =
     'SELECT SUM(identified) AS identified,SUM(pending) AS pending,SUM(ignored) AS ignored FROM summary WHERE purl=? GROUP BY purl;';
 
-  SQL_GET_UNIQUE_COMPONENT = `SELECT DISTINCT purl,version,license,component,url FROM results WHERE version!=''`;
+  SQL_GET_UNIQUE_COMPONENT = `SELECT DISTINCT purl,version,license,component,url FROM results WHERE version!='' AND dirty=0;`;
 
   SQL_DELETE_INVENTORY_BY_ID = 'DELETE FROM inventories WHERE id=?;';
 

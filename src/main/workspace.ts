@@ -36,3 +36,13 @@ ipcMain.handle(IpcEvents.UTILS_GET_PROJECT_DTO, async (event) => {
     return Response.fail({ message: e.message });
   }
 });
+
+ipcMain.handle(IpcEvents.WORKSPACE_RESCAN_PROJECT, async (event, projectPath: string) => {
+  try {
+    await workspace.rescanProjectByPath(projectPath);
+    return Response.ok();
+  } catch (error: any) {
+    console.error(error);
+    return Response.fail({ message: error.message });
+  }
+});
