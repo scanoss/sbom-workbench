@@ -91,7 +91,7 @@ export class ResultsDb extends Db {
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
-          db.run('DELETE results WHERE dirty=1);');
+          db.run('DELETE FROM results WHERE dirty=1 ;');
           db.run('commit', (err: any) => {
             db.close();
             if (err) throw err;

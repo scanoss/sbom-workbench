@@ -209,16 +209,16 @@ export class Project extends EventEmitter {
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath, filesNotScanned) => {
-
-
       const count = await this.scans_db.results.count();
       if (count > 0) {
         await this.scans_db.results.updateDirty();
       }
       await this.scans_db.results.insertFromFile(resPath);
       await this.scans_db.components.importUniqueFromFile();
+      const notValidComp: number[] = await this.scans_db.components.getNotValid();
+      if (notValidComp.length > 0) await this.scans_db.components.deleteByID(notValidComp);
+
       await this.scans_db.results.deleteDirty();
-      const notValidComp = await this.scans_db.components.getNotValid();
       // await this.scans_db.
       this.metadata.setScannerState(ScanState.SCANNED);
       this.metadata.save();
@@ -484,8 +484,8 @@ export class Project extends EventEmitter {
     return cfg.TOKEN;
   }
 
-  public async reScan(){
-    console.log("RESCAN");
+  public async reScan() {
+    console.log('RESCAN');
     this.state = ProjectState.OPENED;
     const myPath = this.metadata.getMyPath();
     this.project_name = this.metadata.getName(); // To keep compatibility

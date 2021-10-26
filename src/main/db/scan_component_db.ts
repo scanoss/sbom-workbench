@@ -565,15 +565,16 @@ export class ComponentDb extends Db {
   }
 
   public getNotValid() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise <number[]> (async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.all(
-          `SELECT cv.id FROM component_versions cv WHERE NOT EXISTS (SELECT DISTINCT r.purl,r.version FROM results r WHERE r.version!='' AND r.dirty=0 AND r.version=cv.version AND r.purl=cv.purl);`,
+          `SELECT cv.id FROM component_versions cv WHERE NOT EXISTS (SELECT DISTINCT r.purl,r.version FROM results r WHERE r.version!='' AND r.dirty=0 AND r.version=cv.version AND r.purl=cv.purl AND cv.source='engine');`,
           (err: any, data: any) => {
             db.close();
-            if (err) throw err;
-            resolve(data);
+            if (err) throw err;  
+            const ids:number[] = data.map((item:Record<string,number>) => item.id );         
+            resolve(ids);
           }
         );
       } catch (error) {
@@ -582,17 +583,17 @@ export class ComponentDb extends Db {
     });
   }
 
-  public deleteByID( componentIds []:number) {
+  public deleteByID( componentIds: number[]) {
     return new Promise(async (resolve, reject) => {
       try {
-        
         const db = await this.openDb();
-        db.all(
-          ``,
-          (err: any, data: any) => {
+        let deleteCompByIdQuery = "DELETE FROM component_versions WHERE id in ";
+        deleteCompByIdQuery += `(${componentIds.toString()});`;      
+        db.all(deleteCompByIdQuery,
+          (err: any) => {
             db.close();
             if (err) throw err;
-            resolve(data);
+            resolve(true);
           }
         );
       } catch (error) {
