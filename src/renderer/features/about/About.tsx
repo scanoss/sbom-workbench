@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-globals */
-import { Button } from '@material-ui/core';
 import React from 'react';
 import icon from '../../../../assets/icon.png';
 import LicensesText from './LicensesText';
@@ -30,9 +29,9 @@ const About = () => {
             <p style={{ fontSize: '0.9rem', marginBottom: 0 }}>
               SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.
             </p>
-            <p
-              style={{ fontSize: '0.75rem', margin: 0 }}
-              className="text-right">VERSION: {app.getVersion()}</p>
+            <p style={{ fontSize: '0.75rem', margin: 0 }} className="text-right">
+              VERSION: {app.getVersion()}
+            </p>
           </div>
         </div>
       </header>
