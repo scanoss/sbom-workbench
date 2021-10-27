@@ -54,7 +54,7 @@ export class ComponentDb extends Db {
   }
 
   getAll(data: any, params?: ComponentParams) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise <Component>(async (resolve, reject) => {
       try {
         let component: any;
         if (data.purl && data.version)        
@@ -65,9 +65,9 @@ export class ComponentDb extends Db {
           component = await this.allComp(params);
         }
         if (component !== undefined) resolve(component);
-        else resolve({});
+        else throw new Error("Unable to get components");
       } catch (error) {
-        reject(new Error('unable to open db'));
+        reject(error);
       }
     });
   }
@@ -513,7 +513,7 @@ export class ComponentDb extends Db {
     }
   }
 
-  private mergeComponentByPurl(data: Record<string, any>) {
+  private mergeComponentByPurl(data: Record<string, any>) {   
     return new Promise<any[]>(async (resolve) => {
       const result: any[] = [];
       for (const [key, value] of Object.entries(data)) {
@@ -534,6 +534,7 @@ export class ComponentDb extends Db {
           version.files = iterator.filesCount;
           version.licenses = [];
           version.licenses = iterator.licenses;
+          version.cvid=iterator.compid;
           aux.versions.push(version);
         }
         result.push(aux);
@@ -550,7 +551,7 @@ export class ComponentDb extends Db {
         db.all(
           `SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name, l.spdxid
         FROM component_versions c
-        INNER JOIN inventories i ON c.id=i.compid
+        INNER JOIN inventories i ON c.id=i.cvid
         INNER JOIN licenses l ON l.spdxid=i.spdxid ORDER BY i.spdxid;`,
           (err: any, data: any) => {
             db.close();

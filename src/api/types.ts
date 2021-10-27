@@ -28,7 +28,7 @@ export interface IWorkspaceCfg {
 
 export interface Inventory {
   id?: number;
-  compid: number;
+  cvid: number;
   component: Component;
   purl: string;
   version: string;

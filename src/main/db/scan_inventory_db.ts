@@ -10,13 +10,15 @@
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { ComponentDb } from './scan_component_db';
-import { Inventory } from '../../api/types';
+import { Inventory , Component } from '../../api/types';
 import { ResultsDb } from './scan_results_db';
+
+
 
 const query = new Querys();
 
 export class InventoryDb extends Db {
-  component: any;
+  component: ComponentDb;
 
   results: ResultsDb;
 
@@ -178,13 +180,11 @@ export class InventoryDb extends Db {
         let inventories: any;
         if (inventory.id) {
           inventories = await this.getById(inventory);
-          const comp = await this.component.getAll(inventories);
+          const comp = await this.component.get(inventories.compid);
           const files = await this.getInventoryFiles(inventories);
           inventories.component = comp;
           inventories.files = files;
-          // Remove purl and version from inventory
-          delete inventories.purl;
-          delete inventories.version;
+
           resolve(inventories);
         } else {
           resolve([]);
@@ -209,7 +209,7 @@ export class InventoryDb extends Db {
         } else inventories = await this.getAllInventories();
         if (inventory !== undefined) {
           for (let i = 0; i < inventories.length; i += 1) {
-            const comp = await this.component.getAll(inventories[i]);
+            const comp = await this.component.get(inventories[i].cvid);
             inventories[i].component = comp;
           }
           resolve(inventories);
@@ -255,13 +255,11 @@ export class InventoryDb extends Db {
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
         db.get(
-          `SELECT id FROM inventories WHERE purl=? AND notes=? AND version=? AND usage=? AND spdxid=? AND compid=?;`,
-          inventory.purl,
+          `SELECT id FROM inventories WHERE  notes=? AND usage=? AND spdxid=? AND cvid=?;`,
           inventory.notes ? inventory.notes : 'n/a',
-          inventory.version,
           inventory.usage,
           inventory.spdxid,
-          inventory.compid,
+          inventory.cvid,
           async function (err: any, inv: any) {
             if (err) throw Error('Unable to get existing inventory');
             resolve(inv);
@@ -278,16 +276,17 @@ export class InventoryDb extends Db {
     const self = this;
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
-        const { compid } = await this.component.getAll({ purl: inventory.purl, version: inventory.version });
-        inventory.compid = compid;
+        const { compid } = await this.component.getAll({
+          purl: inventory.purl,
+          version: inventory.version,
+        });
+        inventory.cvid = compid;
         const inv = await this.isInventory(inventory);
         if (!inv) {
           const db = await this.openDb();
           db.run(
             query.SQL_SCAN_INVENTORY_INSERT,
-            inventory.compid,
-            inventory.version,
-            inventory.purl,
+            inventory.cvid,
             inventory.usage ? inventory.usage : 'n/a',
             inventory.notes ? inventory.notes : 'n/a',
             inventory.url ? inventory.url : 'n/a',
@@ -299,7 +298,7 @@ export class InventoryDb extends Db {
           );
         } else inventory.id = inv.id;
         await self.attachFileInventory(inventory);
-        const comp = await self.component.getAll(inventory);
+        const comp: Component = (await self.component.get( { compid: inventory.cvid })) as Component;
         inventory.component = comp;
         resolve(inventory);
       } catch (e) {
@@ -334,11 +333,10 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         let success: any;
-        if (inventory.id !== undefined) {
-          success = await this.updateById(inventory);
-        } else {
-          success = await this.updateByPurl(inventory);
-        }
+        if (inventory.id !== undefined) success = await this.updateById(inventory);
+        // } else {
+        //   success = await this.updateByPurl(inventory);
+        // }
         if (success) resolve(success);
         else resolve(false);
       } catch (error) {
@@ -347,31 +345,31 @@ export class InventoryDb extends Db {
     });
   }
 
-  private updateByPurl(inventory: Inventory) {
-    return new Promise(async (resolve) => {
-      try {
-        const db = await this.openDb();
-        db.run(
-          query.SQL_UPDATE_INVENTORY_BY_PURL_VERSION,
-          inventory.compid ? inventory.compid : 0,
-          inventory.version,
-          inventory.purl,
-          inventory.usage ? inventory.usage : 'n/a',
-          inventory.notes ? inventory.notes : 'n/a',
-          inventory.url ? inventory.url : 'n/a',
-          inventory.license_name ? inventory.license_name : 'n/a',
-          inventory.purl,
-          inventory.version,
-          async function (this: any, err: any) {
-            if (err) resolve(false);
-            resolve(true);
-          }
-        );
-      } catch (error) {
-        resolve(false);
-      }
-    });
-  }
+  // private updateByPurl(inventory: Inventory) {
+  //   return new Promise(async (resolve) => {
+  //     try {
+  //       const db = await this.openDb();
+  //       db.run(
+  //         query.SQL_UPDATE_INVENTORY_BY_PURL_VERSION,
+  //         inventory.compid ? inventory.compid : 0,
+  //         inventory.version,
+  //         inventory.purl,
+  //         inventory.usage ? inventory.usage : 'n/a',
+  //         inventory.notes ? inventory.notes : 'n/a',
+  //         inventory.url ? inventory.url : 'n/a',
+  //         inventory.license_name ? inventory.license_name : 'n/a',
+  //         inventory.purl,
+  //         inventory.version,
+  //         async function (this: any, err: any) {
+  //           if (err) resolve(false);
+  //           resolve(true);
+  //         }
+  //       );
+  //     } catch (error) {
+  //       resolve(false);
+  //     }
+  //   });
+  // }
 
   private updateById(inventory: Partial<Inventory>) {
     return new Promise(async (resolve) => {
@@ -379,9 +377,7 @@ export class InventoryDb extends Db {
         const db = await this.openDb();
         db.run(
           query.SQL_UPDATE_INVENTORY_BY_ID,
-          inventory.compid ? inventory.compid : 0,
-          inventory.version,
-          inventory.purl,
+          inventory.cvid,
           inventory.usage ? inventory.usage : 'n/a',
           inventory.notes ? inventory.notes : 'n/a',
           inventory.url ? inventory.url : 'n/a',
@@ -400,7 +396,7 @@ export class InventoryDb extends Db {
   }
 
   // GET ALL THE INVENTORIES ATTACHED TO A COMPONENT
-  getFromComponent() {
+  public async getFromComponent() {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
@@ -441,22 +437,22 @@ export class InventoryDb extends Db {
   }
 
   // GET ALL THE INVENTORIES ATTACHED TO A FILE
-  getAllAttachedToAFile(inventory: Inventory) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(function () {
-          db.all(query.SQL_SELECT_ALL_INVENTORIES_FROM_FILE, `${inventory.files[0]}`, (err: any, data: any) => {
-            db.close();
-            if (err) resolve([]);
-            else resolve(data);
-          });
-        });
-      } catch (error) {
-        reject(new Error('[]'));
-      }
-    });
-  }
+  // getAllAttachedToAFile(inventory: Inventory) {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       const db = await this.openDb();
+  //       db.serialize(function () {
+  //         db.all(query.SQL_SELECT_ALL_INVENTORIES_FROM_FILE, `${inventory.files[0]}`, (err: any, data: any) => {
+  //           db.close();
+  //           if (err) resolve([]);
+  //           else resolve(data);
+  //         });
+  //       });
+  //     } catch (error) {
+  //       reject(new Error('[]'));
+  //     }
+  //   });
+  // }
 
   // GET FILES ATTACHED TO AN INVENTORY BY INVENTORY ID
   getInventoryFiles(inventory: Partial<Inventory>) {
