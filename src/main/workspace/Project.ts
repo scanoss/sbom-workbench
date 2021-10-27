@@ -91,19 +91,6 @@ export class Project extends EventEmitter {
     this.scans_db = new ScanDb(this.metadata.getMyPath());
     await this.scans_db.init();
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
-
-    // const projectCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/projectCfg.json`, 'utf8');
-    // const projectCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/../defaultCfg.json`, 'utf8');
-    // this.config = JSON.parse(projectCfg) as IProjectCfg;
-
-    // if(fs.existsSync(`${this.metadata.getMyPath()}/projectCfg.json`)){
-    //   const pCfg = await fs.promises.readFile(`${this.metadata.getMyPath()}/projectCfg.json`, 'utf8');
-    //   const pObjCfg = JSON.parse(pCfg) as IProjectCfg;
-    //   this.config = (...pObjCfg, ...usertSetting.getAll()) as IProjectCfg;
-    // } else {
-    //   this.config = appSetting.getAll();
-    // }
-
     return true;
   }
 
@@ -115,23 +102,46 @@ export class Project extends EventEmitter {
     this.logical_tree = null;
     this.scans_db = null;
     this.filesToScan = null;
-    // this.config = null;
   }
 
   public save(): void {
     this.metadata.save();
     fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this));
-    // fs.writeFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, JSON.stringify(this.config, null, 2));
     log.info(`%c[ PROJECT ]: Project ${this.metadata.getName()} saved`, 'color:green');
   }
 
   public async startScanner() {
+    this.metadata.setScannerState(ScanState.SCANNING);
+    this.startScan();
+  }
+
+  public async reScan() {
+    this.metadata.setScannerState(ScanState.RESCANNING);
+    this.startScan();
+  }
+
+  public async resumeScanner() {
+    const scanState: ScanState = this.metadata.getScannerState();
+    if (scanState !== ScanState.SCANNING && scanState !== ScanState.RESCANNING)
+      throw new Error('Cannot resume project');
+
+    await this.open();
+    this.initializeScanner();
+    log.info(`%c[ PROJECT ]: Resuming scanner, pending ${Object.keys(this.filesToScan).length} files`, 'color: green');
+    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: scanState,
+      processed: (100 * this.processedFiles) / this.filesSummary.include,
+    });
+    this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
+    return true;
+  }
+
+
+  private async startScan(): Promise<void> {
     log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`;
     this.state = ProjectState.OPENED;
     const myPath = this.metadata.getMyPath();
-    this.project_name = this.metadata.getName(); // To keep compatibility
     this.banned_list = new Filtering.BannedList('NoFilter');
-    this.cleanProject();
     if (!fs.existsSync(`${myPath}/filter.json`))
       fs.writeFileSync(`${myPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
     this.banned_list.load(`${myPath}/filter.json`);
@@ -150,59 +160,18 @@ export class Project extends EventEmitter {
     );
     this.filesToScan = summary.files;
     this.filesNotScanned = {};
-    this.metadata.setScannerState(ScanState.SCANNING);
+    this.processedFiles = 0;
     this.metadata.setFileCounter(summary.include);
     this.initializeScanner();
     this.scanner.cleanWorkDirectory();
     this.save();
-    this.startScan();
-  }
-
-  public async resumeScanner() {
-    this.state = ProjectState.OPENED;
-    if (this.metadata.getState() !== ScanState.SCANNING) return false;
-    await this.open();
-    this.initializeScanner();
-    log.info(`%c[ PROJECT ]: Resuming scanner, pending ${Object.keys(this.filesToScan).length} files`, 'color: green');
+    log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, 'color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'scanning',
+      stage: this.metadata.getScannerState(),
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
-    this.startScan();
-    return true;
+    this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
   }
-
-
-  public async reScan() {
-    console.log('RESCAN');
-    this.state = ProjectState.OPENED;
-    const myPath = this.metadata.getMyPath();
-    this.project_name = this.metadata.getName(); // To keep compatibility
-    this.banned_list = new Filtering.BannedList('NoFilter');
-    this.banned_list.load(`${myPath}/filter.json`);
-    this.scans_db = new ScanDb(myPath);
-    await this.scans_db.init();
-    await this.scans_db.licenses.importFromJSON(licenses);
-    this.build_tree();
-    this.indexScan(this.metadata.getScanRoot(), this.logical_tree, this.banned_list);
-    const summary = { total: 0, include: 0, filter: 0, files: {} };
-    this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
-    log.info(
-      `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
-      'color: green'
-    );
-    this.filesToScan = summary.files;
-    this.filesNotScanned = {};
-    this.processedFiles = 0;
-    this.metadata.setScannerState(ScanState.RESCANNING);
-    this.metadata.setFileCounter(summary.include);
-    this.initializeScanner();
-    // this.scanner.setId('rescan');
-    this.scanner.cleanWorkDirectory();
-    this.save();
-    this.startScan();
-  }
-
 
   cleanProject() {
     if (fs.existsSync(`${this.metadata.getMyPath()}/results.json`))
@@ -219,10 +188,7 @@ export class Project extends EventEmitter {
     scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
     this.scanner = new Scanner(scannerCfg);
     this.scanner.setWorkDirectory(this.metadata.getMyPath());
-    this.setScannerListeners();
-  }
 
-  setScannerListeners() {
     this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (response) => {
       this.processedFiles += response.getNumberOfFilesScanned();
       const filesScanned = response.getFilesScanned();
@@ -270,17 +236,9 @@ export class Project extends EventEmitter {
       await this.close();
       this.sendToUI(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
+
   }
 
-  startScan() {
-    log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, 'color: green');
-    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: 'scanning',
-      processed: (100 * this.processedFiles) / this.filesSummary.include,
-    });
-    // eslint-disable-next-line prettier/prettier
-    this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
-  }
 
   sendToUI(eventName, data: any) {
     if (this.msgToUI) this.msgToUI.send(eventName, data);

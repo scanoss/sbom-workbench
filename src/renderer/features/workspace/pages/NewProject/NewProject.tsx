@@ -31,7 +31,7 @@ const NewProject = () => {
 
       if (action === 'resume') controller.resume(path);
       if (action === 'rescan') controller.rescan(path);
-      else controller.scan(path);
+      if (action === 'scan') controller.scan(path);
     } catch (e) {
       console.log(e);
     }

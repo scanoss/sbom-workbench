@@ -62,6 +62,20 @@ ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
   await p.resumeScanner();
 });
 
+
+ipcMain.handle(IpcEvents.PROJECT_RESCAN, async (event, projectPath: string) => {
+  try {
+    const p = workspace.getProjectByPath(projectPath);
+    p.setMailbox(event.sender);
+    await p.reScan();
+    return Response.ok();
+  } catch (error: any) {
+    console.error(error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+
 ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
   const projectName = workspace.getOpenedProjects()[0].project_name;
   return { status: 'ok', message: 'Project name retrieve succesfully', data: projectName };

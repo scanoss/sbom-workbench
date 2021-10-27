@@ -12,7 +12,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ReplayIcon from '@material-ui/icons/Replay';
-import RestoreIcon from '@material-ui/icons/Restore';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import SearchIcon from '@material-ui/icons/Search';
 import { AppContext } from '../../../../context/AppProvider';
 import { IProject, ScanState } from '../../../../../api/types';
@@ -152,7 +152,7 @@ const Workspace = () => {
                 </TableHead>
                 <TableBody>
                   {filterProjects.length !== 0 ? (
-                    filterProjects.map((row) => (
+                    filterProjects.map((row: IProject) => (
                       <TableRow
                         className={isProjectFinished(row) ? 'scanning-complete' : 'scanning-not-complete'}
                         hover
@@ -169,13 +169,25 @@ const Workspace = () => {
                         <TableCell className="row-actions">
                           <div className="btn-actions">
                             {!isProjectFinished(row) ? (
-                              <Tooltip title="Resume scan">
+                              <Tooltip title={row.scannerState === ScanState.SCANNING ? 'Resume scan' : 'Resume Re-Scan'}>
                                 <IconButton
                                   aria-label="restore"
                                   className="btn-restore"
                                   onClick={(event) => onRestoreHandler(row.work_root, event)}
                                 >
-                                  <RestoreIcon fontSize="small" />
+                                  <PlayArrowIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            ) : null}
+
+                            {isProjectFinished(row) ? (
+                              <Tooltip title="Rescan">
+                                <IconButton
+                                  aria-label="rescan"
+                                  className="btn-rescan"
+                                  onClick={(event) => onRescan(row.work_root, event)}
+                                >
+                                  <ReplayIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
                             ) : null}
@@ -190,17 +202,6 @@ const Workspace = () => {
                               </IconButton>
                             </Tooltip>
 
-                            {isProjectFinished(row) ? (
-                              <Tooltip title="Rescan">
-                                <IconButton
-                                  aria-label="rescan"
-                                  className="btn-rescan"
-                                  onClick={(event) => onRescan(row.work_root, event)}
-                                >
-                                  <ReplayIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            ) : null}
                           </div>
                         </TableCell>
                       </TableRow>

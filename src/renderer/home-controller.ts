@@ -13,7 +13,7 @@ export const resume = async (path: string) => {
 };
 
 export const rescan = async (path: string) => {
-  await workspaceService.rescanProject(path);
+  await projectService.rescan(path);
 };
 
 export const open = async (path: string) => {

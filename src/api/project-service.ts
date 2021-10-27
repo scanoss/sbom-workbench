@@ -25,6 +25,11 @@ class ProjectService extends BaseService {
     return response;
   }
 
+  public async rescan(path: string): Promise<void> {
+    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_RESCAN, path);
+    return this.response(response);
+  }
+
   public async load(path: string): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.PROJECT_OPEN_SCAN, path);
     return response;

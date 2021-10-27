@@ -19,14 +19,6 @@ class WorkspaceService extends BaseService {
     const response = await ipcRenderer.invoke(IpcEvents.UTILS_GET_PROJECT_DTO);
     return this.response(response);
   }
-
-  public async rescanProject(args): Promise<void> {
-    const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_RESCAN_PROJECT, args);
-    return this.response(response);
-  }
-
 }
-
-
 
 export const workspaceService = new WorkspaceService();
