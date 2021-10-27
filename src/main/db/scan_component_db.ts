@@ -57,8 +57,8 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         let component: any;
-        if (data.purl && data.version)
-          component = await this.getbyPurlVersion(data);
+        if (data.purl && data.version)        
+          component = await this.getbyPurlVersion(data);        
         else if (data.purl) {
           component = await this.getByPurl(data);
         } else {
@@ -550,7 +550,7 @@ export class ComponentDb extends Db {
         db.all(
           `SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name, l.spdxid
         FROM component_versions c
-        INNER JOIN inventories i ON c.purl=i.purl AND c.version=i.version
+        INNER JOIN inventories i ON c.id=i.compid
         INNER JOIN licenses l ON l.spdxid=i.spdxid ORDER BY i.spdxid;`,
           (err: any, data: any) => {
             db.close();

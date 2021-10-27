@@ -255,12 +255,13 @@ export class InventoryDb extends Db {
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
         db.get(
-          `SELECT id FROM inventories WHERE purl=? AND notes=? AND version=? AND usage=? AND spdxid=?;`,
+          `SELECT id FROM inventories WHERE purl=? AND notes=? AND version=? AND usage=? AND spdxid=? AND compid=?;`,
           inventory.purl,
           inventory.notes ? inventory.notes : 'n/a',
           inventory.version,
           inventory.usage,
           inventory.spdxid,
+          inventory.compid,
           async function (err: any, inv: any) {
             if (err) throw Error('Unable to get existing inventory');
             resolve(inv);
@@ -274,16 +275,17 @@ export class InventoryDb extends Db {
 
   // NEW INVENTORY
   async create(inventory: Partial<Inventory>) {
-   
     const self = this;
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
+        const { compid } = await this.component.getAll({ purl: inventory.purl, version: inventory.version });
+        inventory.compid = compid;
         const inv = await this.isInventory(inventory);
         if (!inv) {
           const db = await this.openDb();
           db.run(
             query.SQL_SCAN_INVENTORY_INSERT,
-            inventory.compid ? inventory.compid : 0,
+            inventory.compid,
             inventory.version,
             inventory.purl,
             inventory.usage ? inventory.usage : 'n/a',
