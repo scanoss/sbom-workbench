@@ -8,16 +8,16 @@ export class Querys {
     'CREATE TABLE IF NOT EXISTS file_inventories (id integer primary key asc, resultid integer not null, inventoryid integer not null, FOREIGN KEY (inventoryid) REFERENCES inventories(id) ON DELETE CASCADE);';
 
   SQL_CREATE_TABLE_INVENTORY =
-    'CREATE TABLE IF NOT EXISTS inventories (id integer primary key,version text not null ,compid integer not null,purl text, usage text, notes text, url text, spdxid text);';
+    'CREATE TABLE IF NOT EXISTS inventories (id INTEGER PRIMARY KEY ,cvid INTEGER NOT NULL, usage TEXT, notes TEXT, url TEXT, spdxid TEXT, FOREIGN KEY (cvid) REFERENCES component_versions(id) ON  DELETE CASCADE );';
 
   SQL_CREATE_TABLE_STATUS =
     'CREATE TABLE IF NOT EXISTS status (files integer, scanned integer default 0, status text, project integer, user text, message text, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, type text, size text);';
 
   COMPDB_SQL_CREATE_TABLE_COMPVERS =
-    'CREATE TABLE IF NOT EXISTS component_versions (id integer primary key asc, name text, version text not null, description text, url text, purl text,source text, UNIQUE(version,purl));';
+    'CREATE TABLE IF NOT EXISTS component_versions (id INTEGER PRIMARY KEY , name text,  version TEXT NOT NULL , description text, url text, purl TEXT ,source text, UNIQUE(purl,version));';
 
   COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS =
-    'CREATE TABLE IF NOT EXISTS license_component_version (id integer primary key asc, cvid integer not null, licid integer not null, unique(cvid,licid));';
+    'CREATE TABLE IF NOT EXISTS license_component_version (id INTEGER PRIMARY KEY ASC, cvid INTEGER NOT NULL, licid INTEGER NOT NULL , UNIQUE(cvid,licid), FOREIGN KEY (cvid) references component_versions(id) ON DELETE CASCADE, FOREIGN KEY (licid) references licenses(id)ON DELETE CASCADE);';
 
   COMPDB_LICENSES_TABLE =
     "CREATE TABLE IF NOT EXISTS licenses (id integer primary key asc, spdxid text default '', name text not null, fulltext text default '', url text default '',official INTEGER DEFAULT 1 ,UNIQUE(spdxid));";
@@ -39,7 +39,7 @@ export class Querys {
 
   // SQL NEW INVENTORY
   SQL_SCAN_INVENTORY_INSERT =
-    'INSERT INTO inventories (compid,version ,purl ,usage, notes, url, spdxid) values (?,?,?,?,?,?,?);';
+    'INSERT INTO inventories (cvid,usage, notes, url, spdxid) values (?,?,?,?,?);';
 
   // SQL INSERT FILE INVENTORIES
   SQL_INSERT_FILE_INVENTORIES = 'INSERT into file_inventories (resultid,inventoryid) values (?,?);';
@@ -49,14 +49,14 @@ export class Querys {
 
   //  UPDATE INVENTORY BY ID
   SQL_UPDATE_INVENTORY_BY_ID =
-    'UPDATE inventories SET compid=?,version=?,purl=?,usage=?, notes=?, url=?, spdxid=?  where id=?;';
+    'UPDATE inventories SET cvid=?,usage=?, notes=?, url=?, spdxid=? WHERE id=?;';
 
-  SQL_SELECT_INVENTORY_COMPONENTS = `SELECT  i.id,i.usage,i.purl,i.notes,i.url,i.spdxid,i.version,cv.name
-  FROM inventories i INNER JOIN component_versions cv ON cv.version=i.version AND cv.purl=i.purl;`;
+  SQL_SELECT_INVENTORY_COMPONENTS = `SELECT  i.id,i.usage,cv.purl,i.notes,i.url,i.spdxid,cv.version,cv.name
+  FROM inventories i INNER JOIN component_versions cv ON cv.id=i.cvid;`;
 
   //  UPDATE INVENTORY BY PURL/VERSION
-  SQL_UPDATE_INVENTORY_BY_PURL_VERSION =
-    'UPDATE inventories SET compid=?,version=?,purl=?,usage=?, notes=?, url=?, spdxid=? where purl=? and version=?;';
+  // SQL_UPDATE_INVENTORY_BY_PURL_VERSION =
+  //   'UPDATE inventories i SET i.cvid=?,i.usage=?, i.notes=?, i.url=?, i.spdxid=?  INNER JOIN component_versions cv WHERE purl=? and version=?;';
 
   SQL_COMPDB_COMP_VERSION_UPDATE =
     'UPDATE component_versions  SET name=?,version=?, description=?, url=?,purl=? where id=?;';
@@ -82,25 +82,21 @@ export class Querys {
 
   /** *** SQL SCAN GET * **** */
   SQL_SCAN_SELECT_INVENTORIES_FROM_PATH =
-    'SELECT i.id,i.usage,i.compid,i.notes,i.url,i.spdxid,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid INNER JOIN results r ON r.id=fi.resultid WHERE r.file_path=?;';
+    'SELECT i.id,i.usage,i.cvid,i.notes,i.url,i.spdxid FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid INNER JOIN results r ON r.id=fi.resultid WHERE r.file_path=?;';
 
-  SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION =
-    'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.spdxid,i.purl,i.version,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE i.purl=? AND i.version=?;';
-
-  // GET INVENTORY BY ID
-  SQL_GET_INVENTORY_BY_PURL = 'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.spdxid,i.purl,i.version,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE purl=?;';
+  SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION = `SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN component_versions cv ON i.cvid=cv.id INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE cv.purl=? AND cv.version=?;`;
 
   // GET INVENTORY BY ID
-  SQL_GET_INVENTORY_BY_ID = 'SELECT i.id,i.compid,i.usage,i.notes,i.url,i.spdxid,i.purl,version,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE i.id=?;';
+  SQL_GET_INVENTORY_BY_PURL = 'SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid INNER JOIN component_versions cv ON cv.id=i.cvid WHERE cv.purl=?;';
+
+  // GET INVENTORY BY ID
+  SQL_GET_INVENTORY_BY_ID = 'SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE i.id=?;';
 
   SQL_SCAN_SELECT_FILE_RESULTS = "SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype!='none' order by file_path;";
 
   SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH =
     'SELECT DISTINCT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? ORDER BY file_path;';
-
-  // GET ALL THE INVENTORIES ATTACHED TO A COMPONENT
-  SQL_SELECT_ALL_INVENTORIES_ATTACHED_TO_COMPONENT =
-    'SELECT i.id,i.usage,i.purl,i.notes,i.url,i.spdxid from inventories i, component_versions cv where i.purl=cv.purl and i.version=cv.version and cv.purl=? and cv.version=?;';
+ 
 
   // GET ALL THE INVENTORIES ATTACHED TO A FILE BY PATH
   SQL_SELECT_ALL_INVENTORIES_FROM_FILE =
@@ -151,7 +147,7 @@ export class Querys {
   COMPDB_SQL_GET_LICENSE_ID_FROM_SPDX_NAME = 'SELECT id FROM licenses WHERE licenses.name=? or licenses.spdxid=?;';
 
   // GET ALL THE INVENTORIES
-  SQL_GET_ALL_INVENTORIES = `SELECT i.id,i.compid,i.usage,i.notes,i.url,i.spdxid,i.purl,i.version,l.name AS license_name FROM inventories i
+  SQL_GET_ALL_INVENTORIES = `SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i
   INNER JOIN licenses l ON i.spdxid=l.spdxid;`;
 
   SQL_SELECT_FILES_FROM_PURL_VERSION = `
@@ -177,14 +173,16 @@ export class Querys {
 
   SQL_GET_FILE_BY_PATH = 'SELECT file_path AS path,identified,ignored FROM results WHERE results.file_path=?;';
 
-  SQL_GET_SPDX_COMP_DATA = `SELECT DISTINCT c.purl,c.version,c.url,c.name,i.spdxid AS concludedLicense,i.notes ,lic.spdxid AS declareLicense,l.fulltext,l.official
-  FROM components c INNER JOIN inventories i ON c.purl=i.purl 
-  INNER JOIN license_view lic ON c.id=lic.cvid AND c.version=i.version INNER JOIN licenses l ON l.spdxid=i.spdxid;`;
+  SQL_GET_SPDX_COMP_DATA = `SELECT DISTINCT c.purl,c.version,c.url,c.name,i.spdxid AS concludedLicense,i.notes,l.spdxid AS declareLicense,lic.fulltext,lic.official
+  FROM inventories  i 
+  INNER JOIN license_view l ON l.cvid=i.cvid 
+  INNER JOIN component_versions c ON c.id=i.cvid 
+  INNER JOIN licenses lic ON lic.spdxid=i.spdxid;`;
 
-  SQL_GET_CSV_DATA = `SELECT DISTINCT i.id AS inventoryId,r.id AS resultID,i.usage,i.notes,i.spdxid AS identified_license,r.license AS detected_license,i.purl,i.version,r.file_path AS path,cv.name AS identified_component,r.component AS detected_component
+  SQL_GET_CSV_DATA = `SELECT DISTINCT i.id AS inventoryId,r.id AS resultID,i.usage,i.notes,i.spdxid AS identified_license,r.license AS detected_license,cv.purl,cv.version,r.file_path AS path,cv.name AS identified_component,r.component AS detected_component
   FROM inventories i 
   INNER JOIN file_inventories fi ON fi.inventoryid=i.id 
-  LEFT JOIN results r ON r.id=fi.resultid INNER JOIN component_versions cv ON cv.purl=i.purl AND cv.version = i.version;`;
+  LEFT JOIN results r ON r.id=fi.resultid INNER JOIN component_versions cv ON cv.id=i.cvid;`;
 
   SQL_GET_ALL_SUMMARIES = 'SELECT compid,ignored,pending,identified FROM summary;';
 
