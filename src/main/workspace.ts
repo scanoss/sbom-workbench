@@ -39,7 +39,10 @@ ipcMain.handle(IpcEvents.UTILS_GET_PROJECT_DTO, async (event) => {
 
 ipcMain.handle(IpcEvents.WORKSPACE_RESCAN_PROJECT, async (event, projectPath: string) => {
   try {
-    await workspace.rescanProjectByPath(projectPath);
+    const p = workspace.getProjectByPath(projectPath);
+    p.setMailbox(event.sender);
+    await p.reScan();
+    //await workspace.rescanProjectByPath(projectPath);
     return Response.ok();
   } catch (error: any) {
     console.error(error);
