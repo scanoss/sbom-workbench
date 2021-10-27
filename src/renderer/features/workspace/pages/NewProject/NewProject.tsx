@@ -30,6 +30,7 @@ const NewProject = () => {
       setProjectName(path.split('/')[path.split('/').length - 1]);
 
       if (action === 'resume') controller.resume(path);
+      if (action === 'rescan') controller.rescan(path);
       else controller.scan(path);
     } catch (e) {
       console.log(e);

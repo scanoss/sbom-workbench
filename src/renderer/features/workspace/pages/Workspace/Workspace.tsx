@@ -90,7 +90,8 @@ const Workspace = () => {
       role: 'accept',
     });
     if (action === DIALOG_ACTIONS.OK) {
-      await workspaceService.rescanProject(path);
+      setScanPath({ path, action: 'rescan' });
+      history.push('/workspace/new');
       init();
     }
   };
@@ -107,7 +108,8 @@ const Workspace = () => {
   }, []);
 
   const isProjectFinished = (project: IProject): boolean => {
-    return project.scannerState === ScanState.SCANNED || !project.scannerState;
+    console.log(project.scannerState);
+    return project.scannerState === ScanState.FINISHED || !project.scannerState;
   };
 
   return (
@@ -187,16 +189,18 @@ const Workspace = () => {
                                 <DeleteIcon fontSize="small" />
                               </IconButton>
                             </Tooltip>
-                            <Tooltip title="Rescan">
-                              <IconButton
-                                aria-label="rescan"
-                                className="btn-rescan"
-                                onClick={(event) => onRescan(row.work_root, event)}
-                              >
-                                <ReplayIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
 
+                            {isProjectFinished(row) ? (
+                              <Tooltip title="Rescan">
+                                <IconButton
+                                  aria-label="rescan"
+                                  className="btn-rescan"
+                                  onClick={(event) => onRescan(row.work_root, event)}
+                                >
+                                  <ReplayIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            ) : null}
                           </div>
                         </TableCell>
                       </TableRow>

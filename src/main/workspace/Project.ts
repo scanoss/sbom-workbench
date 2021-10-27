@@ -150,7 +150,7 @@ export class Project extends EventEmitter {
     );
     this.filesToScan = summary.files;
     this.filesNotScanned = {};
-    this.metadata.setScannerState(ScanState.READY_TO_SCAN);
+    this.metadata.setScannerState(ScanState.SCANNING);
     this.metadata.setFileCounter(summary.include);
     this.initializeScanner();
     this.scanner.cleanWorkDirectory();
@@ -171,6 +171,38 @@ export class Project extends EventEmitter {
     this.startScan();
     return true;
   }
+
+
+  public async reScan() {
+    console.log('RESCAN');
+    this.state = ProjectState.OPENED;
+    const myPath = this.metadata.getMyPath();
+    this.project_name = this.metadata.getName(); // To keep compatibility
+    this.banned_list = new Filtering.BannedList('NoFilter');
+    this.banned_list.load(`${myPath}/filter.json`);
+    this.scans_db = new ScanDb(myPath);
+    await this.scans_db.init();
+    await this.scans_db.licenses.importFromJSON(licenses);
+    this.build_tree();
+    this.indexScan(this.metadata.getScanRoot(), this.logical_tree, this.banned_list);
+    const summary = { total: 0, include: 0, filter: 0, files: {} };
+    this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
+    log.info(
+      `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
+      'color: green'
+    );
+    this.filesToScan = summary.files;
+    this.filesNotScanned = {};
+    this.processedFiles = 0;
+    this.metadata.setScannerState(ScanState.RESCANNING);
+    this.metadata.setFileCounter(summary.include);
+    this.initializeScanner();
+    // this.scanner.setId('rescan');
+    this.scanner.cleanWorkDirectory();
+    this.save();
+    this.startScan();
+  }
+
 
   cleanProject() {
     if (fs.existsSync(`${this.metadata.getMyPath()}/results.json`))
@@ -197,7 +229,7 @@ export class Project extends EventEmitter {
       // eslint-disable-next-line no-restricted-syntax
       for (const file of filesScanned) delete this.filesToScan[`${this.metadata.getScanRoot()}${file}`];
       this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-        stage: 'scanning',
+        stage: this.metadata.getScannerState(),
         processed: (100 * this.processedFiles) / this.filesSummary.include,
       });
     });
@@ -220,7 +252,7 @@ export class Project extends EventEmitter {
 
       await this.scans_db.results.deleteDirty();
       // await this.scans_db.
-      this.metadata.setScannerState(ScanState.SCANNED);
+      this.metadata.setScannerState(ScanState.FINISHED);
       this.metadata.save();
       await this.close();
       this.sendToUI(IpcEvents.SCANNER_FINISH_SCAN, {
@@ -246,8 +278,6 @@ export class Project extends EventEmitter {
       stage: 'scanning',
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
-    this.metadata.setScannerState(ScanState.SCANNING);
-    this.metadata.save();
     // eslint-disable-next-line prettier/prettier
     this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
   }
@@ -484,36 +514,7 @@ export class Project extends EventEmitter {
     return cfg.TOKEN;
   }
 
-  public async reScan() {
-    console.log('RESCAN');
-    this.state = ProjectState.OPENED;
-    const myPath = this.metadata.getMyPath();
-    this.project_name = this.metadata.getName(); // To keep compatibility
-    this.banned_list = new Filtering.BannedList('NoFilter');
-    this.banned_list.load(`${myPath}/filter.json`);
-    this.scans_db = new ScanDb(myPath);
-    await this.scans_db.init();
-    await this.scans_db.licenses.importFromJSON(licenses);
-    this.build_tree();
-    this.indexScan(this.metadata.getScanRoot(), this.logical_tree, this.banned_list);
-    const summary = { total: 0, include: 0, filter: 0, files: {} };
-    this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
-    log.info(
-      `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
-      'color: green'
-    );
-    this.filesToScan = summary.files;
-    this.filesNotScanned = {};
-    this.metadata.setScannerState(ScanState.READY_TO_SCAN);
-    this.metadata.setFileCounter(summary.include);
-    this.initializeScanner();
-    // this.scanner.setId('rescan');
-    this.scanner.cleanWorkDirectory();
-    this.save();
-    this.startScan();
-  }
 }
-
 /* AUXILIARY FUNCTIONS */
 
 function summarizeTree(root: any, tree: any, summary: any) {

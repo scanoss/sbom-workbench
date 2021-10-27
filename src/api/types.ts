@@ -2,8 +2,9 @@ export enum ScanState {
   CREATED = 'CREATED',
   READY_TO_SCAN = 'READY_TO_SCAN',
   SCANNING = 'SCANNING',
-  SCANNED = 'SCANNED',
+  FINISHED = 'FINISHED',
   RESCAN = 'RESCAN',
+  RESCANNING = 'RESCANNING',
 }
 
 export enum ProjectState {
