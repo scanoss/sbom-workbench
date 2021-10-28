@@ -418,15 +418,13 @@ export class InventoryDb extends Db {
   }
 
   async delete(inventory: Partial<Inventory>) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<boolean>(async (resolve, reject) => {
       try {
-        // GET ALL DATA FROM INVENTORY ID
-        const inv: any = await this.get(inventory);
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
-          db.run(query.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION, inv.id);
-          db.run(query.SQL_DELETE_INVENTORY_BY_ID, inv.id);
+          db.run(query.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION, inventory.id);
+          db.run(query.SQL_DELETE_INVENTORY_BY_ID, inventory.id);
           db.run('commit', () => {
             db.close();
             return resolve(true);

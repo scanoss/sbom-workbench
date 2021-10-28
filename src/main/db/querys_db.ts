@@ -193,7 +193,7 @@ export class Querys {
 
   SQL_GET_UNIQUE_COMPONENT = `SELECT DISTINCT purl,version,license,component,url FROM results WHERE version!='' AND dirty=0;`;
 
-  SQL_DELETE_INVENTORY_BY_ID = 'DELETE FROM inventories WHERE id in ';
+  SQL_DELETE_INVENTORY_BY_ID = 'DELETE FROM inventories WHERE id =?';
 
   SQL_SET_RESULTS_TO_PENDING_BY_PATH_PURL_VERSION = 'UPDATE results SET ignored=0,identified=0 WHERE results.id = ?;';
 
