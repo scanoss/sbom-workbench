@@ -80,15 +80,15 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   const ignoreFile = async (files: number[]): Promise<boolean> => {
-    const { status, data } = await resultService.ignored(files);
+    const success = await resultService.ignored(files);
     update();
-    return true;
+    return success;
   };
 
   const restoreFile = async (files: number[]): Promise<boolean> => {
-    const { status, data } = await resultService.unignored(files);
+    const success = await resultService.unignored(files);
     update();
-    return true;
+    return success;
   };
 
   const update = async () => {
