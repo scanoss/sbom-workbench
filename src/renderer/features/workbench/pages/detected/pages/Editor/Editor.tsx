@@ -86,8 +86,8 @@ export const Editor = () => {
   };
 
   const getInventories = async () => {
-    const { data } = await inventoryService.getAll({ files: [file] });
-    setInventories(data);
+    const inv = await inventoryService.getAll({ files: [file] });
+    setInventories(inv);
   };
 
   const getResults = async () => {
@@ -157,8 +157,8 @@ export const Editor = () => {
   };
 
   const onDetachPressed = async (inventory) => {
-    const { data } = await inventoryService.get({ id: inventory.id });
-    const fileResult = data?.files.find((item) => item.path === file);
+    const inv = await inventoryService.get({ id: inventory.id });
+    const fileResult = inv.files.find((item) => item.path === file);
     if (fileResult) {
       await detachFile([fileResult.id]);
       getInventories();

@@ -132,9 +132,9 @@ export const ComponentDetail = () => {
 
   const getInventories = async () => {
     const query = version ? { purl: component.purl, version } : { purl: component.purl };
-    const response = await inventoryService.getAll(query);
-    console.log('INVENTORIES BY COMP', response);
-    setInventories(response.message || []);
+    const inv = await inventoryService.getAll(query);
+    console.log('INVENTORIES BY COMP', inv);
+    setInventories(inv || []);
   };
 
   const onAction = async (file: any, action: MATCH_CARD_ACTIONS) => {
