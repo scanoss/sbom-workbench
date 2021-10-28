@@ -25,7 +25,6 @@ import { componentService } from '../../../api/component-service';
 import { licenseService } from '../../../api/license-service';
 import { DialogContext } from '../../context/DialogProvider';
 import { ResponseStatus } from '../../../main/Response';
-import { licenseHelper } from '../../../main/helpers/LicenseHelper';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -77,7 +76,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const setDefaults = () => setForm(inventory);
 
-  const fetchData = async () => {
+  const init = async () => {
     if (open) {
       const componentsResponse = await componentService.getAllComponentGroup();
       const licensesResponse = await licenseService.getAll();
@@ -94,11 +93,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }
   };
 
-  const openLicenseDialog = async () => {
-    const response = await dialogCtrl.openLicenseCreate();
+  const openComponentDialog = async () => {
+    const response = await dialogCtrl.openComponentDialog();
     if (response && response.action === ResponseStatus.OK) {
-      setLicenses([...licenses, { spdxid: response.data.spdxid, name: response.data.name, type: 'Cataloged' }]);
-      setForm({ ...form, spdxid: response.data.spdxid });
+      addCustomComponent(response.data);
     }
   };
 
@@ -111,34 +109,32 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       'Add Version'
     );
     if (response && response.action === ResponseStatus.OK) {
-      const { name, version, licenses, purl, url } = response.data;
-      setLicenses([...licenses, { spdxid: licenses[0].spdxid, name: licenses[0].name, type: 'Cataloged' }]);
-      setComponents([...components, response.data.name]);
-      setForm({
-        ...form,
-        component: name,
-        version,
-        spdxid: licenses[0].spdxid,
-        purl,
-        url: url || '',
-      });
+      addCustomComponent(response.data);
     }
   };
 
-  const openComponentDialog = async () => {
-    const response = await dialogCtrl.openComponentDialog(); 
+  const addCustomComponent = (component) => {
+    const { name, version, licenses, purl, url } = component;
+    setComponents([...components, component]);
+    setLicenses([
+      ...licenses,
+      { spdxid: component.licenses[0].spdxid, name: component.licenses[0].name, type: 'Cataloged' },
+    ]);
+    setForm({
+      ...form,
+      component: name,
+      version,
+      spdxid: licenses[0].spdxid,
+      purl,
+      url: url || '',
+    });
+  };
+
+  const openLicenseDialog = async () => {
+    const response = await dialogCtrl.openLicenseCreate();
     if (response && response.action === ResponseStatus.OK) {
-      const { name, version, licenses, purl, url } = response.data;
-      setComponents([...components, response.data.name]);
-      setLicenses([...licenses, { spdxid: licenses[0].spdxid, name: licenses[0].name, type: 'Cataloged' }]);
-      setForm({
-        ...form,
-        component: name,
-        version,
-        spdxid: licenses[0].spdxid,
-        purl,
-        url: url || '',
-      });
+      setLicenses([...licenses, { spdxid: response.data.spdxid, name: response.data.name, type: 'Cataloged' }]);
+      setForm({ ...form, spdxid: response.data.spdxid });
     }
   };
 
@@ -157,7 +153,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const isValid = () => {
-    const { version, component, url, purl, spdxid, usage } = form;
+    const { version, component, purl, spdxid, usage } = form;
     return spdxid && version && component && purl && usage;
   };
 
@@ -168,13 +164,15 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   useEffect(setDefaults, [inventory]);
-  useEffect(() => fetchData(), [open]);
-
   useEffect(() => {
+    init();
+  }, [open]);
+
+  /* useEffect(() => {
     if (licenses && licenses.length > 0 && !form.spdxid) {
       setForm({ ...form, spdxid: inventory.spdxid });
     }
-  }, [licenses]);
+  }, [licenses]); */
 
   useEffect(() => {
     const component = data.find((item) => item.purl === form.purl);
@@ -185,7 +183,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   }, [form.purl, data]);
 
   useEffect(() => {
-    console.log(data);
     const lic = data
       .find((item) => item?.name === form?.component)
       ?.versions.find((item) => item.version === form.version)
