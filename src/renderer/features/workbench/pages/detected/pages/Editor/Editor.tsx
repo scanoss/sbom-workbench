@@ -91,8 +91,8 @@ export const Editor = () => {
   };
 
   const getResults = async () => {
-    const { data } = await resultService.get(file);
-    setMatchInfo(mapFiles(data));
+    const results = await resultService.get(file);
+    setMatchInfo(mapFiles(results));
   };
 
   const create = async (defaultInventory, selFiles) => {
@@ -131,7 +131,7 @@ export const Editor = () => {
         await resultService.createFiltered(file); // idtype=forceinclude
       } else await resultService.updateNoMatchToFile(file);
 
-      const { data } = await resultService.getNoMatch(file);
+      const data = await resultService.getNoMatch(file);
 
       // FIXME: until getNode works ok
       if (!data) return;
