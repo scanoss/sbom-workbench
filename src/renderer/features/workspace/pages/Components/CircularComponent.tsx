@@ -1,5 +1,4 @@
 import { Box, CircularProgress, IconButton, Typography, makeStyles, Button } from '@material-ui/core';
-import { grey } from '@material-ui/core/colors';
 import React, { useEffect, useState } from 'react';
 
 import PauseIcon from '@material-ui/icons/Pause';
@@ -92,7 +91,6 @@ const CircularComponent = ({ stage, progress, pauseScan }: CircularComponentProp
           size="340px"
           thickness={3}
           className={classes.circularProgress}
-          disableShrink
           {...{ value: progress }}
         />
       </div>

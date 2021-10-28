@@ -19,7 +19,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import AddIcon from '@material-ui/icons/Add';
 import React, { useEffect, useState, useContext } from 'react';
 import { Autocomplete } from '@material-ui/lab';
-import { Inventory } from '../../../api/types';
+import { ComponentGroup, Inventory } from '../../../api/types';
 import { InventoryForm } from '../../context/types';
 import { componentService } from '../../../api/component-service';
 import { licenseService } from '../../../api/license-service';
@@ -115,11 +115,28 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const addCustomComponent = (component) => {
     const { name, version, licenses, purl, url } = component;
-    setComponents([...components, component]);
+
+    const existingCom = components.filter((item) => item.purl !== purl);
+    if (!existingCom) {
+      componentService
+        .getComponentGroup({ purl })
+        .then((response) => {
+          // FIXME: unify data and components
+          setComponents([...components, response.data]);
+          setData([...data, response.data]);
+
+          return true;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+
     setLicenses([
       ...licenses,
       { spdxid: component.licenses[0].spdxid, name: component.licenses[0].name, type: 'Cataloged' },
     ]);
+
     setForm({
       ...form,
       component: name,

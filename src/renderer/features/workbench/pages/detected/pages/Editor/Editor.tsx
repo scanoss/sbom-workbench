@@ -244,7 +244,7 @@ export const Editor = () => {
                               component: inventory.component.name,
                               version: inventory.component.version,
                               usage: inventory.usage,
-                              license: inventory.license_name,
+                              license: inventory.spdxid,
                               url: inventory.component.url,
                               purl: inventory.component.purl,
                             }}
