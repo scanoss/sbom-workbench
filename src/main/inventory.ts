@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron';
-import { Inventory } from '../api/types';
+import { stringify } from 'querystring';
+import { Inventory, Component, Files } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { workspace } from './workspace/Workspace';
 
@@ -14,11 +15,18 @@ ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (event, invget: Partial<Invent
   }
 });
 
-ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, invget: Partial<Inventory>) => {
-  let inv: any;
+ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, inv: Partial<Inventory>) => {
   try {
-    inv = await workspace.getOpenedProjects()[0].scans_db.inventories.get(invget);
-    return { status: 'ok', message: 'Inventory retrieve successfully', data: inv };
+    const inventory = (await workspace
+      .getOpenedProjects()[0]
+      .scans_db.inventories.getById(inv.id)) as Partial<Inventory>;
+    const comp: Component = (await workspace
+      .getOpenedProjects()[0]
+      .scans_db.components.get(inventory.cvid)) as Component;
+    inventory.component = comp as Component;
+    const files: any = await workspace.getOpenedProjects()[0].scans_db.inventories.getInventoryFiles(inventory);
+    inventory.files = files;
+    return { status: 'ok', message: 'Inventory retrieve successfully', data: inventory };
   } catch (e) {
     console.log('Catch an error: ', e);
     return { status: 'fail' };
@@ -49,7 +57,13 @@ ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (event, arg: Partial<Inven
 
 ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, arg: Partial<Inventory>) => {
   try {
+    await workspace.getOpenedProjects()[0].scans_db.results.restore(arg.files);
     const success = await workspace.getOpenedProjects()[0].scans_db.inventories.detachFileInventory(arg);
+    const emptyInv: any = await workspace.getOpenedProjects()[0].scans_db.inventories.emptyInventory();
+    if (emptyInv) {
+      const result = emptyInv.map((item: Record<string, number>) => item.id);
+      await workspace.getOpenedProjects()[0].scans_db.inventories.deleteAllEmpty(result);
+    }
     return { status: 'ok', message: 'File detached to inventory successfully', success };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);

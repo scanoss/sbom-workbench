@@ -103,7 +103,7 @@ export class Querys {
     'SELECT i.id,i.usage,i.notes,i.purl,i.version,i.spdxid,i.url FROM inventories i, file_inventories fi WHERE i.id=fi.inventoryid and fi.resultid=?;';
 
   SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID =
-    'SELECT DISTINCT r.id,r.file_path as path,r.identified as identified,r.ignored as ignored,i.purl,i.version FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN results r ON r.id=fi.resultid WHERE i.id=?';
+    'SELECT DISTINCT r.id,r.file_path as path,r.identified as identified,r.ignored as ignored FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN results r ON r.id=fi.resultid WHERE i.id=?';
 
   // SQL_GET_COMPONENTS TABLE
   SQL_GET_COMPONENT = 'SELECT id,name,version,description,url,purl from component_versions where purl like ?';
@@ -193,7 +193,7 @@ export class Querys {
 
   SQL_GET_UNIQUE_COMPONENT = `SELECT DISTINCT purl,version,license,component,url FROM results WHERE version!='' AND dirty=0;`;
 
-  SQL_DELETE_INVENTORY_BY_ID = 'DELETE FROM inventories WHERE id=?;';
+  SQL_DELETE_INVENTORY_BY_ID = 'DELETE FROM inventories WHERE id in ';
 
   SQL_SET_RESULTS_TO_PENDING_BY_PATH_PURL_VERSION = 'UPDATE results SET ignored=0,identified=0 WHERE results.id = ?;';
 

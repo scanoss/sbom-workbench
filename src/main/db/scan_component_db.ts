@@ -37,12 +37,12 @@ export class ComponentDb extends Db {
     this.license = new LicenseDb(path);
   }
 
-  get(component: Partial<Component>) {
+  get(component:number) {
     return new Promise(async (resolve, reject) => {
       try {
         let comp: any;
-        if (component.compid) {
-          comp = await this.getById(component.compid);
+        if (component) {
+          comp = await this.getById(component);
           const summary = await this.summaryByPurlVersion(comp);
           comp.summary = summary;
           resolve(comp);
@@ -224,7 +224,7 @@ export class ComponentDb extends Db {
                 license_id: component.license_id,
                 compid: this.lastID,
               });
-              const newComp = await self.get({ compid: this.lastID });
+              const newComp = await self.get(this.lastID);
               resolve(newComp);
             }
           );
@@ -315,14 +315,14 @@ export class ComponentDb extends Db {
             if (result.license !== 'NULL')
               await self.license.bulkAttachLicensebyId(db, attachLicComp);
           }
-          db.run('commit', () => {
+          db.run('commit', (err:any) => {
             db.close();
+            if (err) throw err;
             resolve(true);
           });
         });
-      } catch (error) {
-        console.log(error);
-        resolve(false);
+      } catch (error) {        
+        reject(error);
       }
     });
   }
