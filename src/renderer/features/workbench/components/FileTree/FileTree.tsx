@@ -10,7 +10,6 @@ export const FileTree = () => {
 
   const { tree } = state;
 
-  const [checked, setChecked] = useState<string[]>([]);
   const [expanded, setExpanded] = useState<string[]>([tree && tree[0] ? tree[0].value : '']);
 
   const onSelectFile = ({ children, value }: OnCheckNode) => {
@@ -24,11 +23,9 @@ export const FileTree = () => {
       {tree ? (
         <CheckboxTree
           nodes={tree || []}
-          checked={checked}
           expanded={expanded}
           onClick={(targetNode) => onSelectFile(targetNode)}
           expandOnClick
-          onCheck={(checkedItems) => setChecked(checkedItems)}
           onExpand={(expandedItems) => setExpanded(expandedItems)}
         />
       ) : (

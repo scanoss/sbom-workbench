@@ -15,11 +15,7 @@ const style = {
   },
 };
 
-export interface InventoryListProps {
-  // inventories: Inventory[];
-}
-
-export const InventoryList = (props: InventoryListProps) => {
+export const InventoryList = () => {
   const history = useHistory();
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
 
@@ -31,16 +27,18 @@ export const InventoryList = (props: InventoryListProps) => {
 
   const getInventories = async () => {
     const query = { purl: state.component.purl };
-    const response = await inventoryService.getAll(query);
-    console.log('INVENTORIES', response);
-    setInventories(response.message || []);
+    const inv = await inventoryService.getAll(query);
+    console.log('INVENTORIES', inv);
+    setInventories(inv || []);
   };
 
   const onInventorySelected = async (inventory: Inventory) => {
     history.push(`/workbench/identified/inventory/${inventory.id}`);
   };
 
-  useEffect(onInit, []);
+  useEffect(() => {
+    onInit();
+  }, []);
 
   const Loader = () => (
     <div className="loader">

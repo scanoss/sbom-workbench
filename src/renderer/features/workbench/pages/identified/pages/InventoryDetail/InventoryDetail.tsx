@@ -18,7 +18,7 @@ import { DIALOG_ACTIONS } from '../../../../../../context/types';
 
 export const InventoryDetail = () => {
   const history = useHistory();
-  const { id } = useParams();
+  const { id } = useParams<any>();
 
   const { detachFile, deleteInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
@@ -27,13 +27,14 @@ export const InventoryDetail = () => {
   const [files, setFiles] = useState<string[]>([]);
 
   const getInventory = async () => {
-    const response = await inventoryService.get({ id });
-    if (response.status === 'fail') {
+    try {
+      const inv = await inventoryService.get({ id });
+      setInventory(inv);
+      setFiles(mapFiles(inv.files));
+    } catch (error) {
+      console.error(error);
       history.goBack();
-      return;
     }
-    setInventory(response.data);
-    setFiles(mapFiles(response.data?.files));
   };
 
   const onRemoveClicked = async () => {
