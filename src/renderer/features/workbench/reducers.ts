@@ -8,6 +8,7 @@ import {
   SET_FILE,
   SET_PROGRESS,
   SET_HISTORY,
+  UPDATE_FILETREE,
 } from './actions';
 import { ComponentGroup } from '../../../api/types';
 
@@ -59,6 +60,13 @@ export default function reducer(state: State = initialState, action): State {
       return {
         ...state,
         loaded: false,
+      };
+    }
+    case UPDATE_FILETREE: {
+      const { node } = action;
+      return {
+        ...state,
+        tree: node, // TODO: update node tree
       };
     }
     case SET_PROGRESS: {
