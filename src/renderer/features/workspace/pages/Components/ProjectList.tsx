@@ -38,7 +38,7 @@ const format = (date) => {
 };
 
 const isProjectFinished = (project: IProject): boolean => {
-  return project.scannerState === ScanState.FINISHED || !project.scannerState;
+  return project.scannerState === ScanState.FINISHED || project.scannerState == 'SCANNED';
 };
 
 interface ProjectListProps {
