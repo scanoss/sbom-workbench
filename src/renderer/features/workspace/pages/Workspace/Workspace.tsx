@@ -108,8 +108,8 @@ const Workspace = () => {
   }, []);
 
   const isProjectFinished = (project: IProject): boolean => {
-    console.log(project.scannerState);
-    return project.scannerState === ScanState.FINISHED || !project.scannerState;
+    if (project.scannerState === ScanState.FINISHED || project.scannerState == 'SCANNED') return true;
+    return false;
   };
 
   return (

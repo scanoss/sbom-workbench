@@ -2,7 +2,7 @@ import sqlite3 from 'sqlite3';
 import fs from 'fs';
 import log from 'electron-log';
 
-export function dbMigration(projectPath: string) {
+export function dbMigration0120(projectPath: string) {
   log.info('%c[MIGRATION] IN PROGRESS...', 'color: green');
   const db: any = new sqlite3.Database(`${projectPath}/scan_db`, sqlite3.OPEN_READWRITE, (err: any) => {
     if (err) {

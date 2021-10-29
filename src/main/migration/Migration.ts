@@ -12,13 +12,17 @@ export abstract class Migration {
     const scripts = this.getScripts();
     const myVersion: string = this.getVersion();
     const oldestCompatibleVersion: string = Object.keys(scripts)[0];
+    let latestVersion = myVersion;
     if (this.compareVersions(myVersion, oldestCompatibleVersion) === -1)
-      // myVersion < oldCom....
-      throw new Error(`Cannot upgrade version ${myVersion}`);
+      throw new Error(`Cannot upgrade version ${myVersion}`); // myVersion < oldCom....
+
     Object.entries(scripts).forEach(([scriptsVersion, values]) => {
-      if (this.compareVersions(myVersion, scriptsVersion) === -1) values.forEach((script) => script(this.getPath()));
+      if (this.compareVersions(myVersion, scriptsVersion) <= 0) {
+        values.forEach((script) => script(this.getPath()));
+        latestVersion = scriptsVersion;
+      }
     }, this);
-    const latestVersion = app.isPackaged === true ? app.getVersion() : packageJson.version;
+
     return latestVersion;
   }
 
