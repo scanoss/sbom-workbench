@@ -19,9 +19,9 @@ ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, component: Component) =
   try {
     const newComp = await workspace.getOpenedProjects()[0].scans_db.components.create(component);;
     return Response.ok({ message: 'Component created successfully', data: newComp });
-  } catch (error) {
+  } catch (error: any) {
     console.log('Catch an error: ', error);
-    return Response.fail({ message: error.message });v
+    return Response.fail({ message: error.message });
   }
 });
 
