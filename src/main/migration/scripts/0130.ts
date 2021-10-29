@@ -13,13 +13,15 @@ export function dbMigration0130(projectPath: string) {
     db.serialize(function () {
       db.run('PRAGMA journal_mode = WAL;');
       db.run('PRAGMA synchronous = OFF');
-      db.run('PRAGMA foreign_keys = ON;');
+      db.run('PRAGMA foreign_keys = OFF;');
       db.run('begin transaction');
 
       db.run('CREATE TABLE inventories_old AS select * from inventories;');
       db.run('DROP TABLE inventories;');
 
-      db.run('CREATE TABLE IF NOT EXISTS inventories (id INTEGER PRIMARY KEY ,cvid INTEGER NOT NULL, usage TEXT, notes TEXT, url TEXT, spdxid TEXT, FOREIGN KEY (cvid) REFERENCES component_versions(id) ON  DELETE CASCADE );');
+      db.run(
+        'CREATE TABLE IF NOT EXISTS inventories (id INTEGER PRIMARY KEY ,cvid INTEGER NOT NULL, usage TEXT, notes TEXT, url TEXT, spdxid TEXT, FOREIGN KEY (cvid) REFERENCES component_versions(id) ON  DELETE CASCADE );'
+      );
 
       db.run(`  INSERT INTO inventories (id, cvid , usage,notes,url,spdxid)
       SELECT iold.id , cv.id as cvid, iold.usage, iold.notes, iold.url, iold.spdxid

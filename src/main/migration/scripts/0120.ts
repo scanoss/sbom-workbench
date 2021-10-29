@@ -12,7 +12,7 @@ export function dbMigration0120(projectPath: string) {
     db.serialize(function () {
       db.run('PRAGMA journal_mode = WAL;');
       db.run('PRAGMA synchronous = OFF');
-      db.run('PRAGMA foreign_keys = ON;');
+      db.run('PRAGMA foreign_keys = OFF;');
       db.run('begin transaction');
       db.run('CREATE TABLE old_licenses AS select * from licenses;');
       db.run('DROP TABLE licenses');

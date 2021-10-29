@@ -23,6 +23,37 @@ export class ResultsDb extends Db {
     this.component = new ComponentDb(path);
   }
 
+
+
+  
+  insertFromFileReScan(resultPath: string) {
+    return new Promise(async (resolve) => {
+      try {
+        const self = this;
+        const result: Record<any, any> = await utilDb.readFile(resultPath);
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          let data: any;
+          for (const [key, value] of Object.entries(result)) {
+            for (let i = 0; i < value.length; i += 1) {
+              const filePath = key;
+              data = value[i];
+              self.insertResultBulkReScan(db, data, filePath);
+            }
+          }
+            db.run('commit', () => {
+              db.close();
+              resolve(true);
+            });
+          });
+      } catch (error) {
+        console.log(error);
+        resolve(false);
+      }
+    });
+  }
+
   // INSERT RESULTS FROM FILE
   insertFromFile(resultPath: string) {
     return new Promise(async (resolve) => {
@@ -40,12 +71,13 @@ export class ResultsDb extends Db {
               self.insertResultBulk(db, data, filePath);
             }
           }
-          db.run('commit', () => {
-            db.close();
-            resolve(true);
+            db.run('commit', () => {
+              db.close();
+              resolve(true);
+            });
           });
-        });
       } catch (error) {
+        console.log(error);
         resolve(false);
       }
     });
@@ -66,13 +98,13 @@ export class ResultsDb extends Db {
     });
   }
 
-  async updateDirty() {
+  async updateDirty(value: number) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
-          db.run('UPDATE results SET dirty=1 WHERE id IN (SELECT id FROM results);');
+          db.run(`UPDATE results SET dirty=${value} WHERE id IN (SELECT id FROM results);`);
           db.run('commit', (err: any) => {
             db.close();
             if (err) throw err;
@@ -168,6 +200,82 @@ export class ResultsDb extends Db {
       'engine'
     );
   }
+
+
+
+  private insertResultBulkReScan(db: any, data: any, filePath: string) {
+    const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : null;
+
+
+    const sQuery = `SELECT id FROM results WHERE md5_file= '${data.file_hash? data.file_hash: null}' AND vendor = '${
+      data.vendor?data.vendor:null
+    }' AND component = '${data.component ? data.component :null }' AND version = '${data.version?data.version:null}' AND latest_version = '${
+      data.latest ? data.latest: null
+    }' AND license = '${licenseName?licenseName:null}' AND url = '${data.url?data.url:null}' AND lines = '${data.lines?data.lines:null}' AND oss_lines = '${
+      data.oss_lines? data.oss_lines : null
+    }' AND matched = '${data.matched? data.matched:null}' AND filename = '${data.file?data.file:null}' AND idtype = '${data.id}' AND md5_comp = '${
+      data.url_hash? data.url_hash:null
+    }' AND purl = '${data.purl ? data.purl[0] : ''}' AND file_path = '${filePath}'  AND file_url ='${
+      data.file_url?data.file_url:null
+    }' AND source='engine';`;
+
+
+    const test = `SELECT id FROM results WHERE md5_file= '${data.file_hash?data.file_hash:null}' AND vendor = '${data.vendor?data.vendor:null}'`;
+
+    console.log(sQuery);
+ 
+      db.get(sQuery, function (err: any, result: any) {
+        console.log(result);
+        console.log(err);
+      });
+  
+
+    //   `SELECT id FROM results WHERE md5_file=${data.file_hash} AND vendor = ${data.vendor} AND component = ${data.component} AND version = ${data.version} AND latest_version = ${data.latest} AND license = ${licenseName} AND url = ${ data.url} AND lines = ${data.lines} AND oss_lines = ${ data.oss_lines} AND matched = ${ data.matched} AND filename = ${data.file} AND idtype = ${data.id} AND md5_comp = ${data.url_hash} AND purl = ${data.purl ? data.purl[0] : ' '} AND file_path = ${filePath} AND file_url =${data.file_url} AND source='engine';`,
+    //   data.file_hash,
+    //   data.vendor,
+    //   data.component,
+    //   data.version,
+    //   data.latest,
+    //   licenseName,
+    //   data.url,
+    //   data.lines,
+    //   data.oss_lines,
+    //   data.matched,
+    //   data.file,
+    //   data.id,
+    //   data.url_hash,
+    //   data.purl ? data.purl[0] : ' ',
+    //   filePath,
+    //   data.file_url,
+    //   function (err:any, result:any) {
+    //     console.log(result);
+    //   }
+    // );
+
+    // db.run(
+    //   query.SQL_INSERT_RESULTS,
+    //   data.file_hash,
+    //   data.vendor,
+    //   data.component,
+    //   data.version,
+    //   data.latest,
+    //   licenseName,
+    //   data.url,
+    //   data.lines,
+    //   data.oss_lines,
+    //   data.matched,
+    //   data.file,
+    //   data.id,
+    //   data.url_hash,
+    //   data.purl ? data.purl[0] : ' ',
+    //   filePath,
+    //   0,
+    //   0,
+    //   data.file_url,
+    //   'engine'
+    // );
+  }
+
 
   // CONVERT ARRAY TO RESULTS FORMAT
   convertToResultsFormat(input: any) {
