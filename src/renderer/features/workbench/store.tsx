@@ -37,7 +37,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       const { name, fileTree, scanRoot } = await workbenchController.loadScan(path);
       dispatch(loadScanSuccess(name, fileTree, []));
       setScanBasePath(scanRoot);
-      update();
+      update(false);
       return true;
     } catch (error) {
       console.error(error);
@@ -91,7 +91,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     return success;
   };
 
-  const update = async () => {
+  const update = async (full = true) => {
     if (component) {
       const comp = await workbenchController.getComponent(component.purl);
       if (comp) dispatch(setComponent(comp));
@@ -103,8 +103,10 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     const summary = await reportService.getSummary();
     dispatch(setProgress(summary));
 
-    // const { fileTree } = await workbenchController.getFileTree();
-    // dispatch(updateTree(fileTree));
+    if (full) {
+      const fileTree = await workbenchController.getFileTree();
+      dispatch(updateTree(fileTree));
+    }
   };
 
   const value = React.useMemo(

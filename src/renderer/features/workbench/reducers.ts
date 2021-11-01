@@ -17,7 +17,7 @@ export interface State {
   loaded: boolean;
   progress: number;
   summary: any;
-  tree: any[];
+  tree: any;
   file: string | null;
   components: ComponentGroup[];
   component: ComponentGroup;
@@ -25,7 +25,7 @@ export interface State {
   history: {
     report: 'detected' | 'identified';
     section: number;
-  }
+  };
 }
 
 export const initialState: State = {
