@@ -5,7 +5,7 @@ import { AppContext } from '../../context/AppProvider';
 import { Inventory } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
-import { loadScanSuccess, setComponent, setComponents, setProgress } from './actions';
+import { loadScanSuccess, setComponent, setComponents, setProgress, updateTree } from './actions';
 import { resultService } from '../../../api/results-service';
 import { reportService } from '../../../api/report-service';
 
@@ -37,7 +37,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       const { name, fileTree, scanRoot } = await workbenchController.loadScan(path);
       dispatch(loadScanSuccess(name, fileTree, []));
       setScanBasePath(scanRoot);
-      update();
+      update(false);
       return true;
     } catch (error) {
       console.error(error);
@@ -46,45 +46,52 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   const createInventory = async (inventory: Inventory): Promise<Inventory> => {
-    const { status, data } = await inventoryService.create(inventory);
+    const response = await inventoryService.create(inventory);
     update();
-    return data;
+    return response;
   };
 
-  const ignoreFile = async (files: number[]): Promise<boolean> => {
-    const { status, data } = await resultService.ignored(files);
-    update();
-    return true;
-  }
-
-  const restoreFile = async (files: number[]): Promise<boolean> => {
-    const { status, data } = await resultService.unignored(files);
-    update();
-    return true;
-  }
-
   const attachFile = async (inventoryId: number, files: number[]): Promise<boolean> => {
-    const { status, data } = await inventoryService.attach({
-      id: inventoryId,
-      files
-    });
-    update();
-    return true;
-  }
+    try {
+      await inventoryService.attach({ id: inventoryId, files });
+      update();
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
 
   const detachFile = async (files: number[]): Promise<boolean> => {
-    const { status, data } = await inventoryService.detach({files});
+    await inventoryService.detach({ files });
     update();
     return true;
   };
 
   const deleteInventory = async (id: number): Promise<boolean> => {
-    const { status } = await inventoryService.delete({ id });
-    update();
-    return status != 'fail';
+    try {
+      await inventoryService.delete({ id });
+      update();
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   };
 
-  const update = async () => {
+  const ignoreFile = async (files: number[]): Promise<boolean> => {
+    const success = await resultService.ignored(files);
+    update();
+    return success;
+  };
+
+  const restoreFile = async (files: number[]): Promise<boolean> => {
+    const success = await resultService.unignored(files);
+    update();
+    return success;
+  };
+
+  const update = async (full = true) => {
     if (component) {
       const comp = await workbenchController.getComponent(component.purl);
       if (comp) dispatch(setComponent(comp));
@@ -95,6 +102,11 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
     const summary = await reportService.getSummary();
     dispatch(setProgress(summary));
+
+    if (full) {
+      const fileTree = await workbenchController.getFileTree();
+      dispatch(updateTree(fileTree));
+    }
   };
 
   const value = React.useMemo(
@@ -115,5 +127,3 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   return <WorkbenchContext.Provider value={value}>{children}</WorkbenchContext.Provider>;
 };
-
-export default WorkbenchProvider;

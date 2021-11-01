@@ -5,7 +5,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { AppContext, IAppContext } from '../../../../context/AppProvider';
 import * as controller from '../../../../home-controller';
 import { IpcEvents } from '../../../../../ipc-events';
-import { DialogContext } from '../../../../context/DialogProvider';
+import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
 import { projectService } from '../../../../../api/project-service';
 import CircularComponent from '../Components/CircularComponent';
 
@@ -18,7 +18,7 @@ const NewProject = () => {
   const [projectName, setProjectName] = useState<string>();
   const [progress, setProgress] = useState<number>(0);
   const [stage, setStage] = useState<string>('');
-  const dialogCtrl = useContext<any>(DialogContext); // ??
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const init = async () => {
     ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
@@ -33,7 +33,7 @@ const NewProject = () => {
       if (action === 'rescan') controller.rescan(path);
       if (action === 'scan') controller.scan(path);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -43,10 +43,9 @@ const NewProject = () => {
     ipcRenderer.removeListener(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
   };
 
-
   const onShowScan = (path) => {
     setScanPath({ path, action: 'none' });
-    history.push('/workbench/report');
+    history.replace('/workbench/report');
   };
 
   const handlerScannerStatus = (_event, args) => {

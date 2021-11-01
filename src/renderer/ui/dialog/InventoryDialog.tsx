@@ -19,7 +19,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import AddIcon from '@material-ui/icons/Add';
 import React, { useEffect, useState, useContext } from 'react';
 import { Autocomplete } from '@material-ui/lab';
-import { Inventory } from '../../../api/types';
+import { ComponentGroup, Inventory } from '../../../api/types';
 import { InventoryForm } from '../../context/types';
 import { componentService } from '../../../api/component-service';
 import { licenseService } from '../../../api/license-service';
@@ -68,29 +68,25 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const { open, inventory, onClose, onCancel } = props;
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
-  const [data, setData] = useState<any[]>([]);
-  const [components, setComponents] = useState<any[]>();
-  const [versions, setVersions] = useState<any[]>();
-  const [licenses, setLicenses] = useState<any[]>();
+  const [components, setComponents] = useState<ComponentGroup[]>([]);
+  const [versions, setVersions] = useState<any[]>([]);
+  const [licenses, setLicenses] = useState<any[]>([]);
   const [licensesAll, setLicensesAll] = useState<any[]>();
 
   const setDefaults = () => setForm(inventory);
 
   const init = async () => {
-    if (open) {
-      const componentsResponse = await componentService.getAllComponentGroup();
-      const licensesResponse = await licenseService.getAll();
+    const componentsResponse = await componentService.getAllComponentGroup();
+    const licensesResponse = await licenseService.getAll();
 
-      setData(componentsResponse.data);
-      setComponents(componentsResponse.data);
-      const catalogue = licensesResponse.data.map((item) => ({
-        spdxid: item.spdxid,
-        name: item.name,
-        type: 'Cataloged',
-      }));
-      setLicensesAll(catalogue);
-      setLicenses(catalogue);
-    }
+    setComponents(componentsResponse.data);
+    const catalogue = licensesResponse.data.map((item) => ({
+      spdxid: item.spdxid,
+      name: item.name,
+      type: 'Cataloged',
+    }));
+    setLicensesAll(catalogue);
+    setLicenses(catalogue);
   };
 
   const openComponentDialog = async () => {
@@ -113,13 +109,20 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }
   };
 
-  const addCustomComponent = (component) => {
+  const addCustomComponent = async (component) => {
     const { name, version, licenses, purl, url } = component;
-    setComponents([...components, component]);
+
+    const found = components.some((item) => item.purl === purl);
+    if (!found) {
+      const { data } = await componentService.getComponentGroup({ purl });
+      setComponents([...components, data]);
+    }
+
     setLicenses([
       ...licenses,
       { spdxid: component.licenses[0].spdxid, name: component.licenses[0].name, type: 'Cataloged' },
     ]);
+
     setForm({
       ...form,
       component: name,
@@ -163,9 +166,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     onClose(inventory);
   };
 
-  useEffect(setDefaults, [inventory]);
+  // useEffect(setDefaults, [inventory]);
   useEffect(() => {
-    init();
+    if (open) {
+      setDefaults();
+      init();
+    }
   }, [open]);
 
   /* useEffect(() => {
@@ -174,16 +180,18 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }
   }, [licenses]); */
 
-  useEffect(() => {
-    const component = data.find((item) => item.purl === form.purl);
-    if (component) {
-      setVersions(component?.versions.map((item) => item.version));
-      setForm({ ...form, url: component.url || '', component: component.name, purl: component.purl });
-    }
-  }, [form.purl, data]);
+  // cascade effects to populate autocompletes
 
   useEffect(() => {
-    const lic = data
+    const component = components.find((item) => item.purl === form.purl);
+    if (component) {
+      setVersions(component.versions.map((item) => item.version));
+      setForm({ ...form, url: component.url || '', component: component.name, purl: component.purl });
+    }
+  }, [form.purl]);
+
+  useEffect(() => {
+    const lic = components
       .find((item) => item?.name === form?.component)
       ?.versions.find((item) => item.version === form.version)
       ?.licenses.map((item) => ({ spdxid: item.spdxid, name: item.name, type: 'Matched' }));

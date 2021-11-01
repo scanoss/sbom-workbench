@@ -82,6 +82,7 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
       <DialogActions className={classes.actions}>
         {!hideDeleteButton && <Button onClick={handleCancel}>Cancel</Button>}
         <Button
+          autoFocus
           className={button?.role === 'delete' && classes.deleteButton}
           color="secondary"
           variant="contained"

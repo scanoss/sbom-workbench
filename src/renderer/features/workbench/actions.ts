@@ -2,6 +2,7 @@ import { ComponentGroup } from '../../../api/types';
 
 export const LOAD_SCAN_SUCCESS = 'APP/WORKBENCH/LOAD_SCAN_SUCCESS';
 export const LOAD_SCAN_FAIL = 'APP/WORKBENCH/LOAD_SCAN_FAIL';
+export const UPDATE_FILETREE = 'APP/WORKBENCH/UPDATE_FILETREE';
 export const SET_PROGRESS = 'APP/WORKBENCH/SET_PROGRESS';
 export const SET_COMPONENTS = 'APP/WORKBENCH/SET_COMPONENTS';
 export const SET_COMPONENT = 'APP/WORKBENCH/SET_COMPONENT';
@@ -16,6 +17,11 @@ export const loadScanSuccess = (name, tree, components: ComponentGroup[]) => ({
   name,
   tree,
   components,
+});
+
+export const updateTree = (node: any) => ({
+  type: UPDATE_FILETREE,
+  node,
 });
 
 export const setProgress = (summary: any) => ({

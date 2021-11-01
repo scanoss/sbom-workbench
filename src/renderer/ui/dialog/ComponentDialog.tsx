@@ -92,9 +92,9 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     try {
       const response = await componentService.create(form);
       onClose({ action: DIALOG_ACTIONS.OK, data: response });
-    } catch (error) {
+    } catch (error: any) {
       console.log('error', error);
-      await dialogCtrl.openConfirmDialog(error.message, { label: 'acept', role: 'acept' }, true);
+      await dialogCtrl.openConfirmDialog(error.message, { label: 'Accept', role: 'accept' }, true);
     }
   };
 

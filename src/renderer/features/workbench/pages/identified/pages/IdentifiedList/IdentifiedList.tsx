@@ -1,4 +1,4 @@
-import { makeStyles, Paper, IconButton, InputBase, Button, ButtonGroup } from '@material-ui/core';
+import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
@@ -67,8 +67,8 @@ export const IdentifiedList = () => {
   };
 
   const init = async () => {
-    const { data } = await inventoryService.getFromComponent();
-    setInventoryList(data);
+    const inventories = await inventoryService.getFromComponent();
+    setInventoryList(inventories);
   };
 
   const handleScroll = (e) => {

@@ -86,13 +86,13 @@ export const Editor = () => {
   };
 
   const getInventories = async () => {
-    const { data } = await inventoryService.getAll({ files: [file] });
-    setInventories(data);
+    const inv = await inventoryService.getAll({ files: [file] });
+    setInventories(inv);
   };
 
   const getResults = async () => {
-    const { data } = await resultService.get(file);
-    setMatchInfo(mapFiles(data));
+    const results = await resultService.get(file);
+    setMatchInfo(mapFiles(results));
   };
 
   const create = async (defaultInventory, selFiles) => {
@@ -131,7 +131,7 @@ export const Editor = () => {
         await resultService.createFiltered(file); // idtype=forceinclude
       } else await resultService.updateNoMatchToFile(file);
 
-      const { data } = await resultService.getNoMatch(file);
+      const data = await resultService.getNoMatch(file);
 
       // FIXME: until getNode works ok
       if (!data) return;
@@ -157,8 +157,8 @@ export const Editor = () => {
   };
 
   const onDetachPressed = async (inventory) => {
-    const { data } = await inventoryService.get({ id: inventory.id });
-    const fileResult = data?.files.find((item) => item.path === file);
+    const inv = await inventoryService.get({ id: inventory.id });
+    const fileResult = inv.files.find((item) => item.path === file);
     if (fileResult) {
       await detachFile([fileResult.id]);
       getInventories();
@@ -244,7 +244,7 @@ export const Editor = () => {
                               component: inventory.component.name,
                               version: inventory.component.version,
                               usage: inventory.usage,
-                              license: inventory.license_name,
+                              license: inventory.spdxid,
                               url: inventory.component.url,
                               purl: inventory.component.purl,
                             }}

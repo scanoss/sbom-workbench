@@ -1,5 +1,5 @@
 import { IpcEvents } from '../ipc-events';
-import { Project } from './types';
+import { IProject } from './types';
 import { BaseService } from './base-service';
 
 const { ipcRenderer } = require('electron');
@@ -20,7 +20,7 @@ class ProjectService extends BaseService {
     return response;
   }
 
-  public async create(project: Project): Promise<any> {
+  public async create(project: IProject): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.PROJECT_CREATE_SCAN, project);
     return response;
   }
@@ -51,6 +51,10 @@ class ProjectService extends BaseService {
     return this.response(response);
   }
 
+  public async getTree(): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_READ_TREE);
+    return this.response(response);
+  }
 }
 
 export const projectService = new ProjectService();
