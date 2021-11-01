@@ -30,6 +30,8 @@ export function dbMigration0130(projectPath: string) {
 
       db.run('DROP TABLE inventories_old;');
 
+      db.run('ALTER TABLE ADD dirty INTEGER DEFAULT 0');
+
       db.run('commit', () => {
         db.close();
       });
