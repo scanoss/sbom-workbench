@@ -23,9 +23,6 @@ export class ResultsDb extends Db {
     this.component = new ComponentDb(path);
   }
 
-
-
-  
   insertFromFileReScan(resultPath: string) {
     return new Promise(async (resolve) => {
       try {
@@ -42,11 +39,11 @@ export class ResultsDb extends Db {
               self.insertResultBulkReScan(db, data, filePath);
             }
           }
-            db.run('commit', () => {
-              db.close();
-              resolve(true);
-            });
+          db.run('commit', () => {
+            db.close();
+            resolve(true);
           });
+        });
       } catch (error) {
         console.log(error);
         resolve(false);
@@ -71,11 +68,11 @@ export class ResultsDb extends Db {
               self.insertResultBulk(db, data, filePath);
             }
           }
-            db.run('commit', () => {
-              db.close();
-              resolve(true);
-            });
+          db.run('commit', () => {
+            db.close();
+            resolve(true);
           });
+        });
       } catch (error) {
         console.log(error);
         resolve(false);
@@ -201,81 +198,33 @@ export class ResultsDb extends Db {
     );
   }
 
-
-
-  private insertResultBulkReScan(db: any, data: any, filePath: string) {
-    const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : null;
-
-
-    const sQuery = `SELECT id FROM results WHERE md5_file= '${data.file_hash? data.file_hash: null}' AND vendor = '${
-      data.vendor?data.vendor:null
-    }' AND component = '${data.component ? data.component :null }' AND version = '${data.version?data.version:null}' AND latest_version = '${
-      data.latest ? data.latest: null
-    }' AND license = '${licenseName?licenseName:null}' AND url = '${data.url?data.url:null}' AND lines = '${data.lines?data.lines:null}' AND oss_lines = '${
-      data.oss_lines? data.oss_lines : null
-    }' AND matched = '${data.matched? data.matched:null}' AND filename = '${data.file?data.file:null}' AND idtype = '${data.id}' AND md5_comp = '${
-      data.url_hash? data.url_hash:null
-    }' AND purl = '${data.purl ? data.purl[0] : ''}' AND file_path = '${filePath}'  AND file_url ='${
-      data.file_url?data.file_url:null
-    }' AND source='engine';`;
-
-
-    const test = `SELECT id FROM results WHERE md5_file= '${data.file_hash?data.file_hash:null}' AND vendor = '${data.vendor?data.vendor:null}'`;
-
-    console.log(sQuery);
- 
+  private async insertResultBulkReScan(db: any, data: any, filePath: string) {
+    const self = this;
+    const sQuery = `SELECT id FROM results WHERE md5_file ${
+      data.file_hash ? `='${data.file_hash}'` : 'IS NULL'
+    } AND vendor ${data.vendor ? `='${data.vendor}'` : 'IS NULL'} AND component ${
+      data.component ? `='${data.component}'` : 'IS NULL'
+    } AND version ${data.version ? `='${data.version}'` : 'IS NULL'} AND latest_version ${
+      data.latest ? `='${data.latest}'` : 'IS NULL'
+    } AND license ${data.licenses && data.licenses[0] ? `='${data.licenses[0].name}'` : 'IS NULL'} AND url ${
+      data.url ? `='${data.url}'` : 'IS NULL'
+    } AND lines ${data.lines ? `='${data.lines}'` : 'IS NULL'} AND oss_lines ${
+      data.oss_lines ? `='${data.oss_lines}'` : 'IS NULL'
+    } AND matched ${data.matched ? `='${data.matched}'` : 'IS NULL'} AND filename ${
+      data.file ? `='${data.file}'` : 'IS NULL'
+    } AND idtype = '${data.id}' AND md5_comp ${data.url_hash ? `='${data.url_hash}'` : 'IS NULL'} AND purl = '${
+      data.purl ? data.purl[0] : ' '
+    }' AND file_path = '${filePath}'  AND file_url ${
+      data.file_url ? `='${data.file_url}'` : 'IS NULL'
+    } AND source='engine';`;
+    db.serialize(function () {
       db.get(sQuery, function (err: any, result: any) {
-        console.log(result);
-        console.log(err);
+        if (result !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
+        else self.insertResultBulk(db, data, filePath);
+        if (err) console.log(err);
       });
-  
-
-    //   `SELECT id FROM results WHERE md5_file=${data.file_hash} AND vendor = ${data.vendor} AND component = ${data.component} AND version = ${data.version} AND latest_version = ${data.latest} AND license = ${licenseName} AND url = ${ data.url} AND lines = ${data.lines} AND oss_lines = ${ data.oss_lines} AND matched = ${ data.matched} AND filename = ${data.file} AND idtype = ${data.id} AND md5_comp = ${data.url_hash} AND purl = ${data.purl ? data.purl[0] : ' '} AND file_path = ${filePath} AND file_url =${data.file_url} AND source='engine';`,
-    //   data.file_hash,
-    //   data.vendor,
-    //   data.component,
-    //   data.version,
-    //   data.latest,
-    //   licenseName,
-    //   data.url,
-    //   data.lines,
-    //   data.oss_lines,
-    //   data.matched,
-    //   data.file,
-    //   data.id,
-    //   data.url_hash,
-    //   data.purl ? data.purl[0] : ' ',
-    //   filePath,
-    //   data.file_url,
-    //   function (err:any, result:any) {
-    //     console.log(result);
-    //   }
-    // );
-
-    // db.run(
-    //   query.SQL_INSERT_RESULTS,
-    //   data.file_hash,
-    //   data.vendor,
-    //   data.component,
-    //   data.version,
-    //   data.latest,
-    //   licenseName,
-    //   data.url,
-    //   data.lines,
-    //   data.oss_lines,
-    //   data.matched,
-    //   data.file,
-    //   data.id,
-    //   data.url_hash,
-    //   data.purl ? data.purl[0] : ' ',
-    //   filePath,
-    //   0,
-    //   0,
-    //   data.file_url,
-    //   'engine'
-    // );
+    });
   }
-
 
   // CONVERT ARRAY TO RESULTS FORMAT
   convertToResultsFormat(input: any) {
@@ -377,4 +326,17 @@ export class ResultsDb extends Db {
       }
     });
   }
+
+  public async getDirty() {
+    const db = await this.openDb();
+    return new Promise<number[]>(async (resolve) => {
+      db.all('SELECT id FROM results WHERE dirty=1;', (err: any, data: any) => {
+        db.close();
+        if (err) throw err;
+        if (data === undefined) resolve([]);
+         resolve(data.map((item: any) => item.id));
+      });
+    });
+  }
+
 }

@@ -452,4 +452,20 @@ export class InventoryDb extends Db {
       }
     });
   }
+
+  public async deleteDirtyFileInventories(id: number[]) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const deleteQuery = `DELETE FROM file_inventories WHERE resultid IN (${id.toString()});`;
+        const db = await this.openDb();
+        db.all(deleteQuery, (err: any) => {
+          db.close();
+          if (err) throw new Error('unable to delete files');
+          else resolve(true);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }

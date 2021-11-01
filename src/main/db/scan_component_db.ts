@@ -570,7 +570,11 @@ export class ComponentDb extends Db {
       try {
         const db = await this.openDb();
         db.all(
-          `SELECT cv.id FROM component_versions cv WHERE NOT EXISTS (SELECT DISTINCT r.purl,r.version FROM results r WHERE r.version!='' AND r.dirty=0 AND r.version=cv.version AND r.purl=cv.purl AND cv.source='engine');`,
+          `SELECT DISTINCT cv.id FROM (
+            SELECT notValid.purl,notValid.version FROM results notValid WHERE NOT EXISTS 
+            (SELECT valid.purl,valid.version FROM results valid WHERE valid.dirty=0 AND notValid.purl=valid.purl AND notValid.version=valid.version)
+             ) AS possibleNotValid
+             INNER JOIN component_versions cv ON cv.purl=possibleNotValid.purl AND cv.version=possibleNotValid.version;`,
           (err: any, data: any) => {
             db.close();
             if (err) throw err;  

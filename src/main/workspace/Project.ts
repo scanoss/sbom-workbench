@@ -207,61 +207,25 @@ export class Project extends EventEmitter {
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath, filesNotScanned) => {
-
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
-        console.log("reescanning");
-       await this.scans_db.results.insertFromFileReScan(resPath); 
-        // ETAPA 1
-        // pongo TODOS  los resultados originales en 1      
-         // await this.scans_db.results.updateDirty(1);  
+        log.info(`%c[ SCANNER ]: RESCANFINISHED `, 'color: green');
 
-        // Armar un SELECT 
-        // INSERTAMOS LOS RESULTADOS QUE NO ESTEN EN LA TABLA RESULT CON DIRTY EN 0 (LOS NUEVOS)
-        
-        // LOS RESULTADOS EXISTENTES (LOS VIEJOS) SE ACTUALIZA CON DIRTY A 0
-        // (QUEDAN EN 1 LOS FILES NO VALIDOS)
-        
+        await this.scans_db.results.updateDirty(1);
+        await this.scans_db.results.insertFromFileReScan(resPath);
 
-        /* ETAPA 2
-          - TOMAMOS LOS ID DE LOS RESULTADOS EN LOS QUE DIRTY ESTEN EN 1 
-          - LOS ELIMINAMOS DE LA TABLA FILE_INVENTORIES
-
-          (Reutilizar funcion que se utiliza cuando queda un inventario vacio)
-        */
-
-
-          // ETAPA 3
-          // Recordar: Un purl y version = componente(vienen del engine)
-        /*
-         - TOMAR LOS POSIBLES CANDIDATOS DE COMPONENTES A SER ELIMINADOS (SELECCIONAR LOS COMPONENTES DE LA TABLA RESULTS EN LOS QUE DIRTY SEA 1) PORQUE PUEDE ESTAR SIENDO UTILIZADO POR UN RESULTADO QUE ESTE DIRTY EN 0
-
-
-        Query = SELECT DISTINCT purl version WHERE dirty=1 AND NOT IN (SELECT DISTINCT purl version WHERE dirty=0)
-
-
-         - ELIMINAR DE LA TABLA DE COMPONENTES AQUELLOS QUE ESTEN CON DIRTY EN 1 Y NO ESTEN SIENDO UTILIZADOS POR UN RESULTADO QUE ESTE EN DIRTY EN 0
-          
-         */
-
-         /* ETAPA 4 -> Eliminar de la tabla results aquellos que tengan dirty en 1 */
-       // await this.scans_db.results.deleteDirty();
-         
-
-
-
-        await this.scans_db.components.importUniqueFromFile(); // Desde el nuevo result json 
-
-
+        const dirtyResults = await this.scans_db.results.getDirty();
+        if (dirtyResults.length > 0) {
+          await this.scans_db.inventories.deleteDirtyFileInventories(dirtyResults);
+        }
+        await this.scans_db.components.importUniqueFromFile();
         const notValidComp: number[] = await this.scans_db.components.getNotValid();
         if (notValidComp.length > 0) await this.scans_db.components.deleteByID(notValidComp);
-
         await this.scans_db.results.deleteDirty();
       } else {
-        await this.scans_db.results.insertFromFile(resPath); // insert of scan
+        await this.scans_db.results.insertFromFile(resPath);
         await this.scans_db.components.importUniqueFromFile();
       }
 
-      // await this.scans_db.
       this.metadata.setScannerState(ScanState.FINISHED);
       this.metadata.save();
       await this.close();
