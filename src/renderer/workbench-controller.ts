@@ -9,7 +9,7 @@ import { ComponentSource } from '../main/db/scan_component_db';
 export interface ScanResult {
   name: string;
   scanRoot: string;
-  fileTree: any[];
+  fileTree: any;
 }
 
 class WorkbenchController {
@@ -65,8 +65,13 @@ class WorkbenchController {
     return data;
   }
 
+  public async getFileTree() {
+    const tree = await projectService.getTree();
+    return tree;
+  }
+
   private async generateScanResult(data): Promise<ScanResult> {
-    const tree = [data.logical_tree];
+    const tree = data.logical_tree;
     const path = data.scan_root;
 
     // TODO: get from scan result
