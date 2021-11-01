@@ -217,10 +217,18 @@ export class Project extends EventEmitter {
         if (dirtyResults.length > 0) {
           await this.scans_db.inventories.deleteDirtyFileInventories(dirtyResults);
         }
-        await this.scans_db.components.importUniqueFromFile();
         const notValidComp: number[] = await this.scans_db.components.getNotValid();
+
         if (notValidComp.length > 0) await this.scans_db.components.deleteByID(notValidComp);
         await this.scans_db.results.deleteDirty();
+        await this.scans_db.components.importUniqueFromFile();
+
+        const emptyInv: any = await this.scans_db.inventories.emptyInventory();
+        if (emptyInv) {
+          const result = emptyInv.map((item: Record<string, number>) => item.id);
+          await this.scans_db.inventories.deleteAllEmpty(result);
+        }
+
       } else {
         await this.scans_db.results.insertFromFile(resPath);
         await this.scans_db.components.importUniqueFromFile();

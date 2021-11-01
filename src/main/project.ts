@@ -67,6 +67,7 @@ ipcMain.handle(IpcEvents.PROJECT_RESCAN, async (event, projectPath: string) => {
   try {
     const p = workspace.getProjectByPath(projectPath);
     p.setMailbox(event.sender);
+    await p.upgrade();
     await p.reScan();
     return Response.ok();
   } catch (error: any) {
