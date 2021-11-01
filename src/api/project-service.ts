@@ -46,6 +46,10 @@ class ProjectService extends BaseService {
     return this.response(response);
   }
 
+  public async getTree(): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_READ_TREE);
+    return this.response(response);
+  }
 }
 
 export const projectService = new ProjectService();

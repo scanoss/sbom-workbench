@@ -84,3 +84,13 @@ ipcMain.handle(IpcEvents.GET_TOKEN, (event) => {
     return Response.fail({ message: e.message });
   }
 });
+
+
+ipcMain.handle(IpcEvents.PROJECT_READ_TREE, (event) => {
+  try {
+    const tree = workspace.getOpenedProjects()[0].getLogicalTree();
+    return Response.ok({ message: 'Tree read successfully', data: tree });
+  } catch (e: any) {
+    return Response.fail({ message: e.message });
+  }
+});
