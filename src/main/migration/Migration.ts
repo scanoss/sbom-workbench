@@ -8,7 +8,7 @@ export abstract class Migration {
     this.version = version;
   }
 
-  public up(): string {
+  public async up(): Promise<string> {
     const scripts = this.getScripts();
     const myVersion: string = this.getVersion();
     const oldestCompatibleVersion: string = Object.keys(scripts)[0];
@@ -16,17 +16,21 @@ export abstract class Migration {
     if (this.compareVersions(myVersion, oldestCompatibleVersion) === -1)
       throw new Error(`Cannot upgrade version ${myVersion}`); // myVersion < oldCom....
 
-    Object.entries(scripts).forEach(([scriptsVersion, values]) => {
-      if (this.compareVersions(myVersion, scriptsVersion) <= 0) {
-        values.forEach((script) => script(this.getPath()));
+    for (let scriptsVersion in scripts) {
+      const values = scripts[scriptsVersion];
+      if (this.compareVersions(myVersion, scriptsVersion) < 0) {
+        for (let i = 0; i < values.length; i += 1) {
+          // eslint-disable-next-line no-await-in-loop
+          await values[i](this.getPath());
+        }
         latestVersion = scriptsVersion;
       }
-    }, this);
+    }
 
     return latestVersion;
   }
 
-  public abstract getScripts(): Record<string, Array<(path: string) => void>>;
+  public abstract getScripts(): Record<string, Array<(path: string) => Promise<boolean>>>;
 
   public abstract getPath(): string;
 
