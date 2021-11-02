@@ -8,7 +8,6 @@ export function dbMigration0130(projectPath: string) {
   return new Promise((resolve, reject) => {
     log.info('%c[MIGRATION] IN PROGRESS...', 'color: green');
     const db: any = new sqlite3.Database(`${projectPath}/scan_db`, sqlite3.OPEN_READWRITE, (err: any) => {
-      console.log("abrida db en 0130");
       db.serialize(function () {
         db.run('PRAGMA journal_mode = WAL;');
         db.run('PRAGMA synchronous = OFF');
@@ -33,7 +32,6 @@ export function dbMigration0130(projectPath: string) {
 
         db.run('commit', () => {
           db.close();
-          console.log("cerrada db en 0130");
           log.info('%c[MIGRATION] FINISHED', 'color: green');
           resolve(true);
         });

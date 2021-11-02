@@ -5,7 +5,6 @@ import log from 'electron-log';
 export function dbMigration0120(projectPath: string) {
   log.info('%c[MIGRATION] IN PROGRESS...', 'color: green');
   return new Promise((resolve, reject) => {
-    console.log("abrida db en 0120");
   const db: any = new sqlite3.Database(`${projectPath}/scan_db`, sqlite3.OPEN_READWRITE, (err: any) => {
     db.serialize(function () {
       db.run('PRAGMA journal_mode = WAL;');
@@ -29,7 +28,6 @@ export function dbMigration0120(projectPath: string) {
       db.run('DROP TABLE old_inventories;');
       db.run('commit', () => {
         db.close();
-        console.log("cerrada db en 0120");
         log.info('%c[MIGRATION] FINISHED', 'color: green');
         resolve(true);
       });
