@@ -7,11 +7,14 @@
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
+import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { ComponentDb } from './scan_component_db';
 import { Inventory, Component, Files } from '../../api/types';
 import { ResultsDb } from './scan_results_db';
+
+
 
 const query = new Querys();
 
@@ -38,6 +41,7 @@ export class InventoryDb extends Db {
           });
         }
       } catch (error) {
+        log.error(error);
         resolve(undefined);
       }
     });
@@ -60,6 +64,7 @@ export class InventoryDb extends Db {
           );
         }
       } catch (error) {
+        log.error(error);
         resolve(undefined);
       }
     });
@@ -75,6 +80,7 @@ export class InventoryDb extends Db {
           else resolve(inv);
         });
       } catch (error) {
+        log.error(error);
         reject(new Error('The inventory does not exists'));
       }
     });
@@ -92,12 +98,14 @@ export class InventoryDb extends Db {
             for (const id of inventory.files) {
               db.run(query.SQL_INSERT_FILE_INVENTORIES, id, inventory.id);
             }
-          db.run('commit', () => {
+          db.run('commit', (err: any) => {
+            log.error(err);
             db.close();
             resolve(true);
           });
         });
       } catch (error) {
+        log.error(error);
         reject(new Error('Unable to attach inventory'));
       }
     });
@@ -120,6 +128,7 @@ export class InventoryDb extends Db {
           });
         });
       } catch (error) {
+        log.error(error);
         reject(new Error('Unable to detach inventory'));
       }
     });
@@ -138,6 +147,7 @@ export class InventoryDb extends Db {
           });
         });
       } catch (error) {
+        log.error(error);
         reject(new Error('Empty inventory error'));
       }
     });
@@ -157,6 +167,7 @@ export class InventoryDb extends Db {
           });
         });
       } catch (error) {
+        log.error(error);
         return reject(new Error('detach files were not successfully'));
       }
     });
@@ -178,6 +189,7 @@ export class InventoryDb extends Db {
           resolve([]);
         }
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -203,6 +215,7 @@ export class InventoryDb extends Db {
           resolve(inventories);
         } else resolve([]);
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -218,6 +231,7 @@ export class InventoryDb extends Db {
           else resolve(inv);
         });
       } catch (error) {
+        log.error(error);
         reject(new Error('The inventory does not exists'));
       }
     });
@@ -233,6 +247,7 @@ export class InventoryDb extends Db {
           else resolve(inv);
         });
       } catch (error) {
+        log.error(error);
         reject(new Error('The inventory does not exists'));
       }
     });
@@ -253,8 +268,9 @@ export class InventoryDb extends Db {
             resolve(inv);
           }
         );
-      } catch (e) {
-        reject(e);
+      } catch (error) {
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -281,7 +297,7 @@ export class InventoryDb extends Db {
             inventory.spdxid ? inventory.spdxid : 'n/a',
             async function (this: any, err: any) {
               inventory.id = this.lastID;
-              if (err) reject(new Error(err));
+              if (err) throw Error('Unable to create inventory');
             }
           );
         } else inventory.id = inv.id;
@@ -289,8 +305,9 @@ export class InventoryDb extends Db {
         const comp: Component = (await self.component.get(inventory.cvid)) as Component;
         inventory.component = comp;
         resolve(inventory);
-      } catch (e) {
-        reject(e);
+      } catch (error) {
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -305,13 +322,15 @@ export class InventoryDb extends Db {
           const sqlUpdateIdentified = query.SQL_FILES_UPDATE_IDENTIFIED + resultsid;
           db.run('begin transaction');
           db.run(sqlUpdateIdentified);
-          db.run('commit', () => {
+          db.run('commit', (err:any) => {
+            if(err) throw Error('Unable to update identified files');
             db.close();
             return resolve(true);
           });
         });
       } catch (error) {
-        reject(new Error('Unable to open db'));
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -325,6 +344,7 @@ export class InventoryDb extends Db {
         if (success) resolve(success);
         else resolve(false);
       } catch (error) {
+        log.error(error);
         reject(new Error('Inventory was not updated'));
       }
     });
@@ -349,6 +369,7 @@ export class InventoryDb extends Db {
           }
         );
       } catch (error) {
+        log.error(error);
         resolve(false);
       }
     });
@@ -371,7 +392,8 @@ export class InventoryDb extends Db {
           });
         });
       } catch (error) {
-        reject(new Error('[]'));
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -412,6 +434,7 @@ export class InventoryDb extends Db {
           );
         });
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -425,13 +448,15 @@ export class InventoryDb extends Db {
           db.run('begin transaction');
           db.run(query.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION, inventory.id);
           db.run(query.SQL_DELETE_INVENTORY_BY_ID, inventory.id);
-          db.run('commit', () => {
+          db.run('commit', (err: any) => {
+            if (err) throw err;
             db.close();
             return resolve(true);
           });
         });
       } catch (error) {
-        return reject(new Error('files were not successfully detached'));
+        log.error(error);
+        return reject(error);
       }
     });
   }
@@ -443,11 +468,12 @@ export class InventoryDb extends Db {
         db.serialize(function () {
           db.all(query.SQL_GET_RESULTS_SUMMARY, (err: any, data: any) => {
             db.close();
-            if (err) throw new Error('summary were not successfully retrieved');
+            if (err) throw err;
             else resolve(data);
           });
         });
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });

@@ -11,12 +11,11 @@
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
-
+import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { Component, ComponentGroup } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
-
 
 
 export interface ComponentParams {
@@ -48,6 +47,7 @@ export class ComponentDb extends Db {
           resolve(comp);
         } else resolve([]);
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -67,6 +67,7 @@ export class ComponentDb extends Db {
         if (component !== undefined) resolve(component);
         else throw new Error("Unable to get components");
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -128,7 +129,7 @@ export class ComponentDb extends Db {
         db.serialize(function () {
           db.all(sqlGetComp, async (err: any, data: any) => {
             db.close();
-            if (err) resolve([]);
+            if (err) throw err;
             else {
               const comp = self.processComponent(data);
               const summary: any = await self.allSummaries();
@@ -139,8 +140,8 @@ export class ComponentDb extends Db {
             }
           });
         });
-      } catch (error) {
-        console.log(error);
+      } catch (error) {       
+        log.error(error);
         reject(error);
       }
     });
@@ -158,13 +159,14 @@ export class ComponentDb extends Db {
           data.purl,
           async (err: any, component: any) => {
             db.close();
-            if (err) resolve(undefined);
+            if (err) throw err;
             // Attach licenses to a component
             const comp = self.processComponent(component);
             resolve(comp);
           }
         );
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -182,7 +184,7 @@ export class ComponentDb extends Db {
           data.version,
           async (err: any, component: any) => {
             db.close();
-            if (err) resolve(undefined);
+            if (err) throw err;
             // Attach license to a component
             self.processComponent(component);
             const licenses = await self.getAllLicensesFromComponentId(
@@ -195,6 +197,7 @@ export class ComponentDb extends Db {
           }
         );
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -217,7 +220,7 @@ export class ComponentDb extends Db {
             'manual',
             async function (this: any, err: any) {
               db.close();
-              if (err) reject(new Error('Unable to create component'));
+              if (err) throw err;
               if (this.lastID === 0)
                 reject(new Error('Component already exists'));
               await self.license.licenseAttach({
@@ -230,6 +233,7 @@ export class ComponentDb extends Db {
           );
         });
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -247,7 +251,7 @@ export class ComponentDb extends Db {
             `${id}`,
             async function (err: any, data: any) {
               db.close();
-              if (err) resolve(undefined);
+              if (err) throw err;
               else {
                 const licenses = await self.getAllLicensesFromComponentId(
                   data.compid
@@ -259,7 +263,8 @@ export class ComponentDb extends Db {
           );
         });
       } catch (error) {
-        reject(new Error('[]'));
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -275,13 +280,14 @@ export class ComponentDb extends Db {
             `${id}`,
             (err: any, data: any) => {
               db.close();
-              if (err) resolve('[]');
+              if (err) throw err;
               else resolve(data);
             }
           );
         });
       } catch (error) {
-        reject(new Error('[]'));
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -315,14 +321,15 @@ export class ComponentDb extends Db {
             if (result.license !== 'NULL')
               await self.license.bulkAttachLicensebyId(db, attachLicComp);
           }
-          db.run('commit', (err:any) => {
-            db.close();
+          db.run('commit', (err: any) => {
             if (err) throw err;
+            db.close();          
             resolve(true);
           });
         });
-      } catch (error) {        
-        reject(error);
+      } catch (error) {
+        log.error(error);
+        resolve(false);
       }
     });
   }
@@ -330,28 +337,28 @@ export class ComponentDb extends Db {
   // COMPONENT NEW
   private componentNewImportFromResults(db: any, data: any) {
     return new Promise<number>((resolve) => {
-      db.serialize(function() {
-      db.run(
-        query.COMPDB_SQL_COMP_VERSION_INSERT,
-        data.component,
-        data.version,
-        'AUTOMATIC IMPORT',
-        data.url,
-        data.purl,
-        'engine',
-      );
-      db.get(
-        `SELECT id FROM component_versions WHERE purl=? AND version=?;`,
-        data.purl,
-        data.version,
-        (err: any, comp: any) => {
-          if (err) console.log(err);         
-          resolve(comp.id);
-        }
-      );
+      db.serialize(function () {
+        db.run(
+          query.COMPDB_SQL_COMP_VERSION_INSERT,
+          data.component,
+          data.version,
+          'AUTOMATIC IMPORT',
+          data.url,
+          data.purl,
+          'engine'
+        );
+        db.get(
+          `SELECT id FROM component_versions WHERE purl=? AND version=?;`,
+          data.purl,
+          data.version,
+          (err: any, comp: any) => {
+            if (err) log.error(err);
+            resolve(comp.id);
+          }
+        );
+      });
     });
-  });
-}
+  }
 
   update(component: Component) {
     return new Promise(async (resolve, reject) => {
@@ -368,7 +375,7 @@ export class ComponentDb extends Db {
             component.description,
             component.compid,
             (err: any) => {
-              if (err) resolve(false);
+              if (err) throw err;
             }
           );
           db.close();
@@ -376,24 +383,26 @@ export class ComponentDb extends Db {
           resolve(true);
         });
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
   }
 
   private async getUnique() {
-    try {
-      const db = await this.openDb();
-      return await new Promise<any>(async (resolve, reject) => {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
         db.all(query.SQL_GET_UNIQUE_COMPONENT, (err: any, data: any) => {
           db.close();
-          if (err) reject(err);
-            resolve(data);
+          if (err) throw err;
+          resolve(data);
         });
-      });
-    } catch (error) {
-      console.log(error);     
-    }
+      } catch (error: any) {
+        log.error(error);
+        reject(error);
+      }
+    });
   }
 
   private allSummaries() {
@@ -403,13 +412,14 @@ export class ComponentDb extends Db {
         const db = await this.openDb();
         db.all(query.SQL_GET_ALL_SUMMARIES, (err: any, data: any) => {
           db.close();
-          if (err) resolve({});
+          if (err) throw err;
           else {
             const summary = self.groupSummaryByCompid(data);
             resolve(summary);
           }
         });
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -436,11 +446,12 @@ export class ComponentDb extends Db {
           data.version,
           (err: any, summary: any) => {
             db.close();
-            if (err) resolve({});
+            if (err) throw err;
             else resolve(summary);
           }
         );
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -465,6 +476,7 @@ export class ComponentDb extends Db {
           }
         );
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -480,6 +492,7 @@ export class ComponentDb extends Db {
           resolve(comp);
         } else resolve([]);
       } catch (error) {
+        log.error(error);
         reject(new Error('Unable to get components grouped by purl'));
       }
     });
@@ -487,13 +500,13 @@ export class ComponentDb extends Db {
 
   async getAllComponentGroup(params: ComponentParams) {
     return new Promise(async (resolve, reject) => {
-      try {
+      try {     
         const data = await this.getAll({}, params);
-        if (data) {
-          const comp = await this.groupComponentsByPurl(data);
+        if (data) {        
+          const comp = await this.groupComponentsByPurl(data);          
           resolve(comp);
         } else resolve([]);
-      } catch (error) {
+      } catch (error) {        
         reject(new Error('Unable to get all component group'));
       }
     });
@@ -508,7 +521,8 @@ export class ComponentDb extends Db {
       }
       const result = await this.mergeComponentByPurl(aux);
       return result;
-    } catch (err) {
+    } catch (err) {     
+      log.error(err);
       return 'Unable to group components';
     }
   }
@@ -560,6 +574,7 @@ export class ComponentDb extends Db {
           }
         );
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });

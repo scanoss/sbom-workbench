@@ -124,7 +124,7 @@ export const ComponentDetail = () => {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<number>(state.history.section || 0);
 
-  const getFiles = async () => {
+  const getFiles = async () => {   
     const response = await componentService.getFiles({ purl: component.purl, version });
     console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));

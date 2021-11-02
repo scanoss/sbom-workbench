@@ -1,8 +1,9 @@
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable prettier/prettier */
 /* eslint-disable func-names */
+import log from 'electron-log';
 import sqlite3 from 'sqlite3';
-import fs from 'fs';
+
 
 import { Querys } from './querys_db';
 
@@ -50,6 +51,7 @@ export class Db {
         sqlite3.OPEN_READWRITE,
         (err: any) => {
           if (err) {
+            log.error(err);
             reject(err);
           }
           db.run('PRAGMA journal_mode = WAL;');
@@ -68,6 +70,7 @@ export class Db {
         sqlite3.OPEN_READWRITE,
         (err: any) => {
           if (err) {
+            log.error(err);
             reject(err);
           }
           db.run('PRAGMA journal_mode = WAL;');
@@ -108,7 +111,7 @@ export class Db {
           });         
         });
       } catch (error) {
-        console.log(error);
+        log.error(error);
       }
     });
   }
