@@ -60,6 +60,11 @@ ipcMain.handle(IpcEvents.RESULTS_ADD_FILTERED_FILE, async (event, filePath: stri
 
 ipcMain.handle(IpcEvents.RESULTS_FORCE_ATTACH, async (event, filePath: string) => {
   try {
+    const p: Project = workspace.getOpenedProjects()[0];
+    const node = p.getNodeFromPath(filePath);
+    node.action = 'scan';
+    node.className = 'match-info-result';
+    p.save();
     const result = await workspace.getOpenedProjects()[0].scans_db.results.updateResult(filePath);
     return Response.ok({
       message: 'Results updated succesfully',

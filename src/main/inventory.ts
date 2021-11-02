@@ -49,7 +49,20 @@ ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (event, arg: Partial<Inven
 
 ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, arg: Partial<Inventory>) => {
   try {
-    const success = await workspace.getOpenedProjects()[0].scans_db.inventories.detachFileInventory(arg);
+    const project = workspace.getOpenedProjects()[0];
+    const result = await project.scans_db.results.getNotOriginal(arg.files);
+    if (result !== undefined) {
+      const node = project.getNodeFromPath(result.file_path);
+      if (result.source === 'filtered') {
+        node.action = 'filter';
+        node.className = 'filter-item';
+      } else {
+        node.action = 'scan';
+        node.className = 'no-match';
+      }
+      project.save();
+    }
+    const success = await project.scans_db.inventories.detachFileInventory(arg);
     return { status: 'ok', message: 'File detached to inventory successfully', success };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
