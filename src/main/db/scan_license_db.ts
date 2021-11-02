@@ -3,11 +3,11 @@
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
+import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { utilDb } from './utils_db';
 import { License } from '../../api/types';
-import { licenseHelper } from '../helpers/LicenseHelper';
 
 
 const query = new Querys();
@@ -31,10 +31,12 @@ export class LicenseDb extends Db {
           license.url,
           1,
           function (this: any) {
-          license.id = this.lastID;
-          resolve(license);
-        });
+            license.id = this.lastID;
+            resolve(license);
+          }
+        );
       } catch (error) {
+        log.error(error);
         reject(new Error('The license was not created'));
       }
     });
@@ -42,7 +44,7 @@ export class LicenseDb extends Db {
 
   // CREATE LICENSE
   public create(license: Partial<License>) {
-    return new Promise <License>(async (resolve, reject) => {
+    return new Promise<License>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(async function () {
@@ -50,13 +52,14 @@ export class LicenseDb extends Db {
           db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 0);
           db.run('commit', function (this: any, err: any) {
             db.close();
-            if (err || this.lastID === 0) reject(new Error('The license was not created or already exist'));
+            if (err || this.lastID === 0) throw new Error('The license was not created or already exist');
             license.id = this.lastID;
-            resolve(<License> license);
+            resolve(<License>license);
           });
         });
       } catch (error) {
-        reject(new Error('The license was not created'));
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -69,12 +72,13 @@ export class LicenseDb extends Db {
         const json: Record<any, any> = await utilDb.readFile(path);
         for (const [key, license] of Object.entries(json)) {
           db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, (err: any) => {
-            if (err) reject(new Error('Unable to insert licenses'));
+            if (err) throw err;
           });
         }
         db.close();
         resolve(true);
       } catch (error) {
+        log.error(error);
         reject(new Error('unable to insert licenses'));
       }
     });
@@ -89,11 +93,14 @@ export class LicenseDb extends Db {
           for (const [key, license] of Object.entries(json)) {
             db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 1);
           }
-          db.run('commit');
-          db.close();
+          db.run('commit', (err: any) => {
+            if (err) throw err;
+            db.close();
+            resolve(true);
+          });
         });
-        resolve(true);
       } catch (error) {
+        log.error(error);
         reject(new Error('Unable to insert licenses'));
       }
     });
@@ -108,12 +115,13 @@ export class LicenseDb extends Db {
         db.serialize(function () {
           db.get(sqlGet, (err: any, license: any) => {
             db.close();
-            if (err || license === undefined) reject(new Error('Unable to get license by id'));
+            if (err || license === undefined) throw new Error('Unable to get license by id');
             resolve(license);
           });
         });
       } catch (error) {
-        reject(new Error('unable to open db'));
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -134,12 +142,13 @@ export class LicenseDb extends Db {
         db.serialize(function () {
           db.all(query.SQL_SELECT_ALL_LICENSES, (err: any, license: any) => {
             db.close();
-            if (err) reject(new Error('Unable to get all licenses'));
+            if (err) throw new Error('Unable to get all licenses');
             resolve(license);
           });
         });
       } catch (error) {
-        reject(new Error('unable to open db'));
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -166,7 +175,8 @@ export class LicenseDb extends Db {
           );
         });
       } catch (error) {
-        reject(new Error(undefined));
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -205,7 +215,8 @@ export class LicenseDb extends Db {
           if (success) resolve(true);
         }
       } catch (error) {
-        reject(new Error('License not attached'));
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -232,7 +243,8 @@ export class LicenseDb extends Db {
           resolve(true);
         });
       } catch (err) {
-        reject(new Error('License was not attached'));
+        log.error(err);
+        reject(err);
       }
     });
   }
@@ -250,7 +262,8 @@ export class LicenseDb extends Db {
           resolve(true);
         });
       } catch (err) {
-        reject(new Error('License was not attached'));
+        log.error(err);
+        reject(err);
       }
     });
   }
@@ -262,13 +275,14 @@ export class LicenseDb extends Db {
         const db = await this.openDb();
         const stmt = db.prepare(query.SQL_ATTACH_LICENSE_PURL_SPDXID);
         stmt.run(data.purl, data.version, data.license_spdxid, (err: any) => {
-          if (err) reject(new Error('License was not attached'));
+          if (err) throw new Error('License was not attached');
           db.close();
           stmt.finalize();
           resolve(true);
         });
       } catch (err) {
-        reject(new Error('License was not attached'));
+        log.error(err);
+        reject(err);
       }
     });
   }
@@ -281,13 +295,14 @@ export class LicenseDb extends Db {
         const stmt = db.prepare(query.SQL_CREATE_LICENSE);
         stmt.run(license.spdxid, license.name, license.fulltext, license.url, function (this: any, err: any) {
           db.close();
-          if (err || this.lastID === 0) reject(new Error('The license was not created or already exist'));
+          if (err || this.lastID === 0) throw new Error('The license was not created or already exist');
           license.id = this.lastID;
           stmt.finalize();
           resolve(license);
         });
       } catch (error) {
-        reject(new Error('The license was not created'));
+        log.error(error);
+        reject(error);
       }
     });
   }

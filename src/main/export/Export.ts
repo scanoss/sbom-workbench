@@ -1,11 +1,8 @@
 /* eslint-disable no-async-promise-executor */
 
 import { Format } from './Format';
-
 import { Spdxv20 } from './format/Spdxv20';
-
 import { SpdxLite } from './format/SpdxLite';
-
 import { Csv } from './format/Csv';
 import { Raw } from './format/Raw';
 import { Wfp } from './format/Wfp';
