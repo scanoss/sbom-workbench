@@ -8,7 +8,7 @@
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
-
+import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { Component, Files } from '../../api/types';
@@ -37,22 +37,24 @@ export class FilesDb extends Db {
 
         if (result !== undefined) resolve(result);
       } catch (error) {
+        log.error(error);
         reject(new Error('Unable to retrieve file'));
       }
     });
   }
 
   // GET ALL FILES FOR A COMPONENT
-  async getFilesComponent(data: Partial<Component>) {
+  async getFilesComponent(data: Partial<Component>) {  
     return new Promise(async (resolve, reject) => {
       let result;
       try {
         if (data.purl && data.version)
           result = await this.getByPurlVersion(data);
-        else result = await this.getByPurl(data);     
+        else result = await this.getByPurl(data);    
         resolve(result);
-      } catch (error) {
-        console.log(error);
+      } catch (error) {         
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -85,11 +87,12 @@ export class FilesDb extends Db {
                   file[i].inventory = index[file[i].inventoryid];
               }
               resolve(file);
-            } else resolve([]);
+            } else throw err;
           }
         );
       } catch (error) {
-        console.log(error);
+        log.error(error);
+        reject(error);      
       }
     });
   }
@@ -114,10 +117,11 @@ export class FilesDb extends Db {
                   file[i].inventory = index[file[i].inventoryid];
               }
             resolve(file);
-          } else resolve([]);
+          } else throw err;
         });
-      } catch (error) {
-        console.log(error);
+      } catch (error) {  
+        log.error(error);
+        reject(error);
       }
     });
   }
@@ -131,12 +135,14 @@ export class FilesDb extends Db {
         db.serialize(function () {
           db.run('begin transaction');
           db.run(ignoredFilesSQL);
-          db.run('commit', () => {
+          db.run('commit', (err:any) => {
+           if(err) throw err;
             db.close();
             resolve(true);
           });
         });
       } catch (error) {
+        log.error(error);
         reject(new Error('Ignore files were not successfully retrieved'));
       }
     });
@@ -157,12 +163,13 @@ export class FilesDb extends Db {
                 data.pending = 0;
               }
               db.close();
-              if (err) resolve(undefined);
+              if (err) throw err;
               else resolve(data);
             }
           );
         });
       } catch (error) {
+        log.error(error);
         reject(new Error('File were not successfully retrieved'));
       }
     });

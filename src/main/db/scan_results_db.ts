@@ -7,12 +7,11 @@
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-syntax */
-
+import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { utilDb } from './utils_db';
 import { ComponentDb } from './scan_component_db';
-
 
 const query = new Querys();
 
@@ -41,12 +40,14 @@ export class ResultsDb extends Db {
               self.insertResultBulk(db, data, filePath);
             }
           }
-          db.run('commit', () => {
+          db.run('commit', (err: any) => {
+            if (err) throw err;
             db.close();
             resolve(true);
           });
         });
       } catch (error) {
+        log.error(error);
         resolve(false);
       }
     });
@@ -86,6 +87,7 @@ export class ResultsDb extends Db {
           );
         });
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -150,13 +152,18 @@ export class ResultsDb extends Db {
 
   // GET RESULT
   async getNoMatch(path: string) {
-    const db = await this.openDb();
-    return new Promise<any>(async (resolve) => {
-      db.get(query.SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH, path, (err: any, data: any) => {
-        db.close();
-        if (err) resolve([]);
-        else resolve(data);
-      });
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.get(query.SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH, path, (err: any, data: any) => {
+          db.close();
+          if (err) throw err;
+          else resolve(data);
+        });
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
     });
   }
 
@@ -172,6 +179,7 @@ export class ResultsDb extends Db {
         }
         resolve(results);
       } catch (error) {
+        log.error(error);
         reject(new Error('Unable to retrieve results'));
       }
     });
@@ -189,6 +197,7 @@ export class ResultsDb extends Db {
           });
         });
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });
@@ -207,15 +216,16 @@ export class ResultsDb extends Db {
           db.run(sqlRestoreIdentified);
           db.run(sqlRestoreNoMatch);
           db.run(sqlRestoreFiltered);
-          db.run('commit', () => {
+          db.run('commit', (err: any) => {
+            if (err) throw err;
             db.close();
             resolve(true);
           });
         });
       } catch (error) {
+        log.error(error);
         reject(new Error('Unignore files were not successfully retrieved'));
       }
     });
   }
-
 }
