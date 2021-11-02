@@ -68,7 +68,6 @@ export class Project extends EventEmitter {
   }
 
   public async upgrade() {
-    console.log('upgrading project');
     if (this.metadata.getVersion() === '11.4.9') {
       this.metadata.setAppVersion('0.8.0');
       this.metadata.save();
@@ -77,7 +76,6 @@ export class Project extends EventEmitter {
     const newVersion: string = await pMigration.up();
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
     this.metadata.setAppVersion(newVersion);
-    console.log(newVersion);
     this.metadata.save();
   }
 
