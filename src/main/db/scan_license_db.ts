@@ -224,7 +224,10 @@ export class LicenseDb extends Db {
   public bulkAttachLicensebyId(db: any, data: any) {
     return new Promise(async (resolve, reject) => {
       db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
-        if (err) reject(new Error('License was not attached'));
+        if (err) {
+          console.log(err);
+          reject(new Error('License was not attached'))
+        }
         resolve(true);
       });
     });

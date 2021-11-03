@@ -36,12 +36,12 @@ export class ComponentDb extends Db {
     this.license = new LicenseDb(path);
   }
 
-  get(component: Partial<Component>) {
+  get(component:number) {
     return new Promise(async (resolve, reject) => {
       try {
         let comp: any;
-        if (component.compid) {
-          comp = await this.getById(component.compid);
+        if (component) {
+          comp = await this.getById(component);
           const summary = await this.summaryByPurlVersion(comp);
           comp.summary = summary;
           resolve(comp);
@@ -54,18 +54,18 @@ export class ComponentDb extends Db {
   }
 
   getAll(data: any, params?: ComponentParams) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise <Component>(async (resolve, reject) => {
       try {
         let component: any;
-        if (data.purl && data.version)
-          component = await this.getbyPurlVersion(data);
+        if (data.purl && data.version)        
+          component = await this.getbyPurlVersion(data);        
         else if (data.purl) {
           component = await this.getByPurl(data);
         } else {
           component = await this.allComp(params);
         }
         if (component !== undefined) resolve(component);
-        else resolve({});
+        else throw new Error("Unable to get components");
       } catch (error) {
         log.error(error);
         reject(error);
@@ -227,7 +227,7 @@ export class ComponentDb extends Db {
                 license_id: component.license_id,
                 compid: this.lastID,
               });
-              const newComp = await self.get({ compid: this.lastID });
+              const newComp = await self.get(this.lastID);
               resolve(newComp);
             }
           );
@@ -323,7 +323,7 @@ export class ComponentDb extends Db {
           }
           db.run('commit', (err: any) => {
             if (err) throw err;
-            db.close();
+            db.close();          
             resolve(true);
           });
         });
@@ -527,7 +527,7 @@ export class ComponentDb extends Db {
     }
   }
 
-  private mergeComponentByPurl(data: Record<string, any>) {
+  private mergeComponentByPurl(data: Record<string, any>) {   
     return new Promise<any[]>(async (resolve) => {
       const result: any[] = [];
       for (const [key, value] of Object.entries(data)) {
@@ -548,6 +548,7 @@ export class ComponentDb extends Db {
           version.files = iterator.filesCount;
           version.licenses = [];
           version.licenses = iterator.licenses;
+          version.cvid=iterator.compid;
           aux.versions.push(version);
         }
         result.push(aux);
@@ -564,7 +565,7 @@ export class ComponentDb extends Db {
         db.all(
           `SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name, l.spdxid
         FROM component_versions c
-        INNER JOIN inventories i ON c.purl=i.purl AND c.version=i.version
+        INNER JOIN inventories i ON c.id=i.cvid
         INNER JOIN licenses l ON l.spdxid=i.spdxid ORDER BY i.spdxid;`,
           (err: any, data: any) => {
             db.close();
@@ -578,4 +579,48 @@ export class ComponentDb extends Db {
       }
     });
   }
+
+  public getNotValid() {
+    return new Promise <number[]> (async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.all(
+          `SELECT DISTINCT cv.id FROM (
+            SELECT notValid.purl,notValid.version FROM results notValid WHERE NOT EXISTS 
+            (SELECT valid.purl,valid.version FROM results valid WHERE valid.dirty=0 AND notValid.purl=valid.purl AND notValid.version=valid.version)
+             ) AS possibleNotValid
+             INNER JOIN component_versions cv ON cv.purl=possibleNotValid.purl AND cv.version=possibleNotValid.version;`,
+          (err: any, data: any) => {
+            db.close();
+            if (err) throw err;  
+            const ids:number[] = data.map((item:Record<string,number>) => item.id );         
+            resolve(ids);
+          }
+        );
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  public deleteByID( componentIds: number[]) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        let deleteCompByIdQuery = "DELETE FROM component_versions WHERE id in ";
+        deleteCompByIdQuery += `(${componentIds.toString()});`;      
+        db.all(deleteCompByIdQuery,
+          (err: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          }
+        );
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  
 }

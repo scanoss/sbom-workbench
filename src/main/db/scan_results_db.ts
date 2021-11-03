@@ -23,6 +23,34 @@ export class ResultsDb extends Db {
     this.component = new ComponentDb(path);
   }
 
+  insertFromFileReScan(resultPath: string) {
+    return new Promise(async (resolve) => {
+      try {
+        const self = this;
+        const result: Record<any, any> = await utilDb.readFile(resultPath);
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          let data: any;
+          for (const [key, value] of Object.entries(result)) {
+            for (let i = 0; i < value.length; i += 1) {
+              const filePath = key;
+              data = value[i];
+              self.insertResultBulkReScan(db, data, filePath);
+            }
+          }
+          db.run('commit', () => {
+            db.close();
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        console.log(error);
+        resolve(false);
+      }
+    });
+  }
+
   // INSERT RESULTS FROM FILE
   insertFromFile(resultPath: string) {
     return new Promise(async (resolve) => {
@@ -49,6 +77,59 @@ export class ResultsDb extends Db {
       } catch (error) {
         log.error(error);
         resolve(false);
+      }
+    });
+  }
+
+  async count() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.get('SELECT COUNT(*)as count FROM results;', function (err: any, result: any) {
+          if (err) throw err;
+          db.close();
+          resolve(result.count);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async updateDirty(value: number) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          db.run(`UPDATE results SET dirty=${value} WHERE id IN (SELECT id FROM results);`);
+          db.run('commit', (err: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async deleteDirty() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          db.run('DELETE FROM results WHERE dirty=1 ;');
+          db.run('commit', (err: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        reject(error);
       }
     });
   }
@@ -117,6 +198,34 @@ export class ResultsDb extends Db {
       data.file_url,
       'engine'
     );
+  }
+
+  private async insertResultBulkReScan(db: any, data: any, filePath: string) {
+    const self = this;
+    const sQuery = `SELECT id FROM results WHERE md5_file ${
+      data.file_hash ? `='${data.file_hash}'` : 'IS NULL'
+    } AND vendor ${data.vendor ? `='${data.vendor}'` : 'IS NULL'} AND component ${
+      data.component ? `='${data.component}'` : 'IS NULL'
+    } AND version ${data.version ? `='${data.version}'` : 'IS NULL'} AND latest_version ${
+      data.latest ? `='${data.latest}'` : 'IS NULL'
+    } AND license ${data.licenses && data.licenses[0] ? `='${data.licenses[0].name}'` : 'IS NULL'} AND url ${
+      data.url ? `='${data.url}'` : 'IS NULL'
+    } AND lines ${data.lines ? `='${data.lines}'` : 'IS NULL'} AND oss_lines ${
+      data.oss_lines ? `='${data.oss_lines}'` : 'IS NULL'
+    } AND matched ${data.matched ? `='${data.matched}'` : 'IS NULL'} AND filename ${
+      data.file ? `='${data.file}'` : 'IS NULL'
+    } AND idtype = '${data.id}' AND md5_comp ${data.url_hash ? `='${data.url_hash}'` : 'IS NULL'} AND purl = '${
+      data.purl ? data.purl[0] : ' '
+    }' AND file_path = '${filePath}'  AND file_url ${
+      data.file_url ? `='${data.file_url}'` : 'IS NULL'
+    } AND source='engine';`;
+    db.serialize(function () {
+      db.get(sQuery, function (err: any, result: any) {
+        if (result !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
+        else self.insertResultBulk(db, data, filePath);
+        if (err) console.log(err);
+      });
+    });
   }
 
   // CONVERT ARRAY TO RESULTS FORMAT
@@ -228,6 +337,19 @@ export class ResultsDb extends Db {
       }
     });
   }
+
+  public async getDirty() {
+    const db = await this.openDb();
+    return new Promise<number[]>(async (resolve) => {
+      db.all('SELECT id FROM results WHERE dirty=1;', (err: any, data: any) => {
+        db.close();
+        if (err) throw err;
+        if (data === undefined) resolve([]);
+         resolve(data.map((item: any) => item.id));
+      });
+    });
+  }
+
 
   public async getNotOriginal(ids: number[]) {
     return new Promise<any>(async (resolve, reject) => {

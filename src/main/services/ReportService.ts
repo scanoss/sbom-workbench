@@ -5,7 +5,7 @@ class ReportService {
     try {
       let tempSummary: any = {};
       tempSummary = await workspace.getOpenedProjects()[0].scans_db.inventories.getCurrentSummary();
-      const projectSummary = workspace.getOpenedProjects()[0].filesSummary;
+      const projectSummary = await workspace.getOpenedProjects()[0].filesSummary;
       const summary = {
         totalFiles: 0,
         includedFiles: 0,

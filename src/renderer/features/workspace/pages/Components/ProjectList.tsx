@@ -13,7 +13,10 @@ import {
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import RestoreIcon from '@material-ui/icons/Restore';
+import ReplayIcon from '@material-ui/icons/Replay';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import { IProject, ScanState } from '../../../../../api/types';
+
 
 const filter = (items, query) => {
   if (!items) return null;
@@ -35,7 +38,7 @@ const format = (date) => {
 };
 
 const isProjectFinished = (project: IProject): boolean => {
-  return project.scannerState === ScanState.SCANNED || !project.scannerState;
+  return project.scannerState === ScanState.FINISHED || project.scannerState == 'SCANNED';
 };
 
 interface ProjectListProps {
@@ -44,6 +47,7 @@ interface ProjectListProps {
   onProjectClick: (project: IProject) => void;
   onProjectDelete: (project: IProject) => void;
   onProjectRestore: (project: IProject) => void;
+  onProjectRescan: (project: IProject) => void;
   onProjectCreate: () => void;
 }
 
@@ -90,7 +94,22 @@ const ProjectList = (props: ProjectListProps) => {
                                 props.onProjectRestore(project);
                               }}
                             >
-                              <RestoreIcon fontSize="small" />
+                              <PlayArrowIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        ) : null}
+
+                        {isProjectFinished(project) ? (
+                          <Tooltip title="Rescan">
+                            <IconButton
+                              aria-label="rescan"
+                              className="btn-rescan"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                props.onProjectRescan(project);
+                              }}
+                            >
+                              <ReplayIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                         ) : null}

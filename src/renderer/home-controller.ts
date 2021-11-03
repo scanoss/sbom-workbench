@@ -1,4 +1,5 @@
 import { projectService } from '../api/project-service';
+import { workspaceService } from '../api/workspace-service';
 import { IpcEvents } from '../ipc-events';
 
 const { ipcRenderer } = require('electron');
@@ -9,9 +10,11 @@ export const scan = (path: string) => {
 
 export const resume = async (path: string) => {
   const response = await projectService.resume(path);
-
 };
 
+export const rescan = async (path: string) => {
+  await projectService.rescan(path);
+};
 
 export const open = async (path: string) => {
    const response = await projectService.load(path);

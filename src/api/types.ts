@@ -2,7 +2,8 @@ export enum ScanState {
   CREATED = 'CREATED',
   READY_TO_SCAN = 'READY_TO_SCAN',
   SCANNING = 'SCANNING',
-  SCANNED = 'SCANNED',
+  RESCANNING = 'RESCANNING',
+  FINISHED = 'FINISHED',
 }
 
 export enum ProjectState {
@@ -26,7 +27,7 @@ export interface IWorkspaceCfg {
 
 export interface Inventory {
   id?: number;
-  compid: number;
+  cvid: number;
   component: Component;
   purl: string;
   version: string;

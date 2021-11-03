@@ -2,17 +2,14 @@ import sqlite3 from 'sqlite3';
 import fs from 'fs';
 import log from 'electron-log';
 
-export function dbMigration(projectPath: string) {
+export function dbMigration0120(projectPath: string) {
   log.info('%c[MIGRATION] IN PROGRESS...', 'color: green');
+  return new Promise((resolve, reject) => {
   const db: any = new sqlite3.Database(`${projectPath}/scan_db`, sqlite3.OPEN_READWRITE, (err: any) => {
-    if (err) {
-      log.error(err);
-      throw new Error('Unable to migrate db database');
-    }
     db.serialize(function () {
       db.run('PRAGMA journal_mode = WAL;');
       db.run('PRAGMA synchronous = OFF');
-      db.run('PRAGMA foreign_keys = ON;');
+      db.run('PRAGMA foreign_keys = OFF;');
       db.run('begin transaction');
       db.run('CREATE TABLE old_licenses AS select * from licenses;');
       db.run('DROP TABLE licenses');
@@ -31,9 +28,13 @@ export function dbMigration(projectPath: string) {
       db.run('DROP TABLE old_inventories;');
       db.run('commit', () => {
         db.close();
+        log.info('%c[MIGRATION] FINISHED', 'color: green');
+        resolve(true);
       });
     });
   });
 
-  log.info('%c[MIGRATION] FINISHED', 'color: green');
+
+
+  });
 }

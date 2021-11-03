@@ -7,9 +7,8 @@ import AddIcon from '@material-ui/icons/Add';
 import Paper from '@material-ui/core/Paper';
 
 import SearchIcon from '@material-ui/icons/Search';
-
 import { AppContext } from '../../../../context/AppProvider';
-import { IProject, ScanState } from '../../../../../api/types';
+import { IProject } from '../../../../../api/types';
 import { workspaceService } from '../../../../../api/workspace-service';
 import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
 import { DIALOG_ACTIONS } from '../../../../context/types';
@@ -51,6 +50,18 @@ const Workspace = () => {
     });
     if (action === DIALOG_ACTIONS.OK) {
       await workspaceService.deleteProject(project.work_root);
+      init();
+    }
+  };
+
+  const onRescanHandler = async (project: IProject) => {
+    const { action } = await dialogCtrl.openConfirmDialog('Are you sure you want to rescan this project?', {
+      label: 'OK',
+      role: 'accept',
+    });
+    if (action === DIALOG_ACTIONS.OK) {
+      setScanPath({ path: project.work_root, action: 'rescan' });
+      history.push('/workspace/new');
       init();
     }
   };
@@ -98,6 +109,7 @@ const Workspace = () => {
             onProjectClick={onShowScanHandler}
             onProjectDelete={onTrashHandler}
             onProjectRestore={onRestoreHandler}
+            onProjectRescan={onRescanHandler}
             onProjectCreate={onNewProjectHandler}
           />
         </main>
