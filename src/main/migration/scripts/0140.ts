@@ -3,8 +3,7 @@ import fs from 'fs';
 import log from 'electron-log';
 import { Metadata } from '../../workspace/Metadata';
 
-export function dbMigration0130(projectPath: string) {
-
+export function dbMigration0140(projectPath: string) {
   return new Promise((resolve, reject) => {
     log.info('%c[MIGRATION] IN PROGRESS...', 'color: green');
     const db: any = new sqlite3.Database(`${projectPath}/scan_db`, sqlite3.OPEN_READWRITE, (err: any) => {
@@ -36,16 +35,11 @@ export function dbMigration0130(projectPath: string) {
           resolve(true);
         });
       });
+    });
   });
-
-      });
-
-
-
-
 }
 
-export function mt0130(projectPath: string) {
+export function mt0140(projectPath: string) {
   const mtFile = fs.readFileSync(`${projectPath}/metadata.json`, 'utf8');
   const mt = JSON.parse(mtFile);
   if (mt.scannerState === 'SCANNED') mt.scannerState = 'FINISHED';
