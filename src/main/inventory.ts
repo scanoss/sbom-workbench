@@ -50,6 +50,19 @@ ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (event, arg: Partial<Inven
 ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, inv: Partial<Inventory>) => {
   try {
     const success: boolean = await logicInventoryService.detach(inv);
+    const project = workspace.getOpenedProjects()[0];
+    const result = await project.scans_db.results.getNotOriginal(arg.files);
+    if (result !== undefined) {
+      const node = project.getNodeFromPath(result.file_path);
+      if (result.source === 'filtered') {
+        node.action = 'filter';
+        node.className = 'filter-item';
+      } else {
+        node.action = 'scan';
+        node.className = 'no-match';
+      }
+      project.save();
+    }
     return { status: 'ok', message: 'File detached to inventory successfully', success };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);

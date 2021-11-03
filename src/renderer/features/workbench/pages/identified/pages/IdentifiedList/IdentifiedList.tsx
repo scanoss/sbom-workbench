@@ -1,5 +1,5 @@
-import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
+import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
@@ -8,8 +8,7 @@ import { inventoryService } from '../../../../../../../api/inventory-service';
 import { setComponent } from '../../../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import RecognizedCard from '../../../../components/RecognizedCard/RecognizedCard';
-
-const LIMIT = 80;
+import usePagination from '../../../../../../hooks/usePagination';
 
 const filter = (items, query) => {
   if (!items) {
@@ -47,9 +46,7 @@ const useStyles = makeStyles((theme) => ({
 export const IdentifiedList = () => {
   const history = useHistory();
   const classes = useStyles();
-
-  const [page, setPage] = useState(1);
-  const ITEMS = page * LIMIT;
+  const { limit, onScroll } = usePagination();
 
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
@@ -71,17 +68,6 @@ export const IdentifiedList = () => {
     setInventoryList(inventories);
   };
 
-  const handleScroll = (e) => {
-    const isBottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 50;
-    if (isBottom) {
-      paginate();
-    }
-  };
-
-  const paginate = () => {
-    setPage(page + 1);
-  };
-
   const cleanup = () => {};
 
   useEffect(() => {
@@ -91,7 +77,7 @@ export const IdentifiedList = () => {
 
   return (
     <>
-      <section className="app-page" onScroll={handleScroll}>
+      <section className="app-page" onScroll={onScroll}>
         <header className="app-header">
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">
@@ -109,7 +95,7 @@ export const IdentifiedList = () => {
         <main className="app-content">
           {filterItems && filterItems.length > 0 ? (
             <section className="component-list">
-              {filterItems.slice(0, ITEMS).map((inventory) => (
+              {filterItems.slice(0, limit).map((inventory) => (
                 <RecognizedCard
                   key={inventory.component}
                   inventory={inventory}
@@ -129,10 +115,10 @@ export const IdentifiedList = () => {
             </p>
           )}
 
-          {filterItems?.length > ITEMS && (
+          {filterItems?.length > limit && (
             <Alert className="my-5" severity="info">
               <strong>
-                Showing {ITEMS} of {filterItems.length} components
+                Showing {limit} of {filterItems.length} components
               </strong>
             </Alert>
           )}

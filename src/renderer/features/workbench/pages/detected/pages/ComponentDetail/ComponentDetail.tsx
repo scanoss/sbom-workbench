@@ -27,6 +27,7 @@ import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import { mapFiles } from '../../../../../../../utils/scan-util';
 import { setHistoryCrumb, setVersion } from '../../../../actions';
+import usePagination from '../../../../../../hooks/usePagination';
 
 // inner components
 const VersionSelector = ({ versions, version, onSelect, component }) => {
@@ -124,7 +125,7 @@ export const ComponentDetail = () => {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<number>(state.history.section || 0);
 
-  const getFiles = async () => {   
+  const getFiles = async () => {
     const response = await componentService.getFiles({ purl: component.purl, version });
     console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));

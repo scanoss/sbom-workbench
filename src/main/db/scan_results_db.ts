@@ -350,4 +350,20 @@ export class ResultsDb extends Db {
     });
   }
 
+
+  public async getNotOriginal(ids: number[]) {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        const queryGetNotOriginal = `SELECT * FROM results WHERE id in (${ids.toString()}) AND source!='engine';`;
+        db.get(queryGetNotOriginal, (err: any, data: any) => {
+          db.close();
+          if (err) throw new Error('Unable to get result by id');
+          else resolve(data);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }
