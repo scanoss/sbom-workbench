@@ -36,7 +36,7 @@ ipcMain.handle(IpcEvents.RESULTS_GET_NO_MATCH, async (event, filePath: string) =
       data: result,
     };
   return {
-    status: 'error',
+    status: 'fail',
     message: 'Files were not successfully retrieved',
   };
 });
@@ -62,6 +62,7 @@ ipcMain.handle(IpcEvents.RESULTS_FORCE_ATTACH, async (event, filePath: string) =
   try {
     const p: Project = workspace.getOpenedProjects()[0];
     const node = p.getNodeFromPath(filePath);
+    console.log(node);
     node.action = 'scan';
     node.className = 'match-info-result';
     p.save();
