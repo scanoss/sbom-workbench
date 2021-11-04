@@ -20,7 +20,7 @@ ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (event, invget: Partial<Invent
 });
 
 ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, inv: Partial<Inventory>) => {
-  try {
+  try {  
     const inventory: Inventory = await logicInventoryService.get(inv);
     return { status: 'ok', message: 'Inventory retrieve successfully', data: inventory };
   } catch (e) {
