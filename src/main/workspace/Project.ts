@@ -254,6 +254,35 @@ export class Project extends EventEmitter {
     });
   }
 
+  public refreshTree(filesToUpdate) {
+    console.log(filesToUpdate);
+    console.log(JSON.stringify(this.logical_tree, null, 2));
+    // eslint-disable-next-line no-restricted-syntax
+    for(const [key, value] of Object.entries(filesToUpdate)) {
+      this.updateStatusOfFile(key.split('/').splice(1), 0, this.logical_tree, value);
+    }
+    this.logical_tree.status = this.getFolderStatus(this.logical_tree);
+    console.log(JSON.stringify(this.logical_tree, null, 2));
+    //this.msgToUI(IpcEvents.COMPONENT_ATTACH_LICENSE, this.logical_tree);
+  }
+
+  private updateStatusOfFile(arrPaths, deep, current, status) {
+      if (deep >= arrPaths.length ) {
+          current.status = status;
+          return;
+      }
+      const next = current.children.find(child => child.label === arrPaths[deep]);
+      this.updateStatusOfFile(arrPaths, deep + 1, next, status);
+      next.status = this.getFolderStatus(next);
+  }
+
+  private getFolderStatus(node: any) {
+      if(node.type !== 'folder') return node.status;
+      if (node.children.some(child => child.status === 'pending')) return 'pending';
+      if (node.children.every(child => child.status === 'ignored')) return 'ignored';
+    return 'identified';
+  }
+
   sendToUI(eventName, data: any) {
     if (this.msgToUI) this.msgToUI.send(eventName, data);
   }
@@ -635,10 +664,11 @@ function dirTree(root: string, filename: string) {
       label: path.basename(filename),
       inventories: [],
       components: [],
-      children: undefined,
+      children: [],
       include: true,
       action: 'filter',
       showCheckbox: false,
+      status: 'pending',
     };
 
     info.children = fs
@@ -659,9 +689,11 @@ function dirTree(root: string, filename: string) {
       label: path.basename(filename),
       inventories: [],
       components: [],
+      children: [],
       include: true,
       action: 'filter',
       showCheckbox: false,
+      status: 'pending',
     };
   }
   return info;

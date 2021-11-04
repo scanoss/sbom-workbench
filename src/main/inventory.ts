@@ -1,7 +1,9 @@
 import { ipcMain } from 'electron';
+import { refresh } from 'electron-debug';
 import { Inventory } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { logicInventoryService } from './services/LogicInventoryService';
+import { logicResultService } from './services/LogicResultService';
 import { workspace } from './workspace/Workspace';
 
 
@@ -20,7 +22,7 @@ ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (event, invget: Partial<Invent
 });
 
 ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, inv: Partial<Inventory>) => {
-  try {  
+  try {
     const inventory: Inventory = await logicInventoryService.get(inv);
     return { status: 'ok', message: 'Inventory retrieve successfully', data: inventory };
   } catch (e) {
@@ -32,8 +34,12 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, inv: Partial<Inventory>) =
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   let inv: any;
   try {
-    inv = await workspace.getOpenedProjects()[0].scans_db.inventories.create(arg);
+    const p = await workspace.getOpenedProjects()[0];
+    inv = await p.scans_db.inventories.create(arg);
     arg.id = inv.id;
+    console.log("PEDIMOS A LA DB LOS ESTADOS DE LOS ARCHIVOS QIUE SE CAMBIARON");
+    logicResultService.getResultsByids(arg.files).then((data) => p.refreshTree(data));
+    console.log("ENVIANDO CONFIRMACION A LA UI QUE LOS ARCHIVOS EN LA DB SE CAMBIARON");
     return { status: 'ok', message: 'Inventory created', data: inv };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
@@ -43,7 +49,8 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
 
 ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (event, arg: Partial<Inventory>) => {
   try {
-    const success = await workspace.getOpenedProjects()[0].scans_db.inventories.attachFileInventory(arg);
+    const p = workspace.getOpenedProjects()[0];
+    const success = await p.scans_db.inventories.attachFileInventory(arg);
     return { status: 'ok', message: 'File attached to inventory successfully', success };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
