@@ -4,37 +4,44 @@ import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
 import { FileType } from '../api/types';
 import { workspace } from './workspace/Workspace';
-import { isPseudoBinary } from './workspace/isPseudoBinary';
 
 const path = require('path');
 
-const allowExtension = new Set ([".json", ".htm", ".html", ".xml"]);
+function isAllowed(filePath: string) {
+  const skip = new Set(['.exe', '.zip', '.tar', '.tgz', '.gz', '.7z', '.rar', '.jar', '.war', '.ear', '.class', '.pyc',
+    '.o', '.a', '.so', '.obj', '.dll', '.lib', '.out', '.app', '.bin', '.lst', '.dat']);
+
+  // Filter by extension
+  const ext = path.extname(filePath);
+  if (skip.has(ext)) {
+    return false;
+  }
+
+  // if binary
+  if (isBinaryFileSync(filePath)) {
+    return false;
+  }
+
+  return true;
+}
 
 ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
-  const fileContent = { content: '' };
+  const fileContent = { content: null };
   try {
-    // TODO: remove when isPsuedoBinary is fixed
-    const ext = path.extname(filePath);
-    let isBin = false;
-    if (allowExtension.has(ext)) {
-      isBin = false;
-    } else {
-      isBin = isPseudoBinary(filePath);
-    }
-
-    if (isBin) {
+    if (!isAllowed(filePath)) {
       fileContent.content = FileType.BINARY;
     } else {
       const file = fs.readFileSync(filePath).toString();
       fileContent.content = file;
     }
+
     return {
       status: 'ok',
       message: 'File content retrieved',
       data: fileContent,
     };
   } catch (e) {
-    console.log('Catch an error: ', e);
+    console.log('Error on file get content: ', e);
     return { status: 'fail' };
   }
 });
