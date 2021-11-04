@@ -85,11 +85,14 @@ export class ResultsDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.get('SELECT COUNT(*)as count FROM results;', function (err: any, result: any) {
-          if (err) throw err;
-          db.close();
-          resolve(result.count);
-        });
+        db.get(
+          'SELECT COUNT(*)as count FROM results;',
+          function (err: any, result: any) {
+            if (err) throw err;
+            db.close();
+            resolve(result.count);
+          }
+        );
       } catch (error) {
         reject(error);
       }
@@ -102,7 +105,9 @@ export class ResultsDb extends Db {
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
-          db.run(`UPDATE results SET dirty=${value} WHERE id IN (SELECT id FROM results);`);
+          db.run(
+            `UPDATE results SET dirty=${value} WHERE id IN (SELECT id FROM results);`
+          );
           db.run('commit', (err: any) => {
             db.close();
             if (err) throw err;
@@ -175,7 +180,8 @@ export class ResultsDb extends Db {
   }
 
   private insertResultBulk(db: any, data: any, filePath: string) {
-    const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : null;
+    const licenseName =
+      data.licenses && data.licenses[0] ? data.licenses[0].name : null;
     db.run(
       query.SQL_INSERT_RESULTS,
       data.file_hash,
@@ -204,24 +210,37 @@ export class ResultsDb extends Db {
     const self = this;
     const sQuery = `SELECT id FROM results WHERE md5_file ${
       data.file_hash ? `='${data.file_hash}'` : 'IS NULL'
-    } AND vendor ${data.vendor ? `='${data.vendor}'` : 'IS NULL'} AND component ${
+    } AND vendor ${
+      data.vendor ? `='${data.vendor}'` : 'IS NULL'
+    } AND component ${
       data.component ? `='${data.component}'` : 'IS NULL'
-    } AND version ${data.version ? `='${data.version}'` : 'IS NULL'} AND latest_version ${
+    } AND version ${
+      data.version ? `='${data.version}'` : 'IS NULL'
+    } AND latest_version ${
       data.latest ? `='${data.latest}'` : 'IS NULL'
-    } AND license ${data.licenses && data.licenses[0] ? `='${data.licenses[0].name}'` : 'IS NULL'} AND url ${
-      data.url ? `='${data.url}'` : 'IS NULL'
-    } AND lines ${data.lines ? `='${data.lines}'` : 'IS NULL'} AND oss_lines ${
+    } AND license ${
+      data.licenses && data.licenses[0]
+        ? `='${data.licenses[0].name}'`
+        : 'IS NULL'
+    } AND url ${data.url ? `='${data.url}'` : 'IS NULL'} AND lines ${
+      data.lines ? `='${data.lines}'` : 'IS NULL'
+    } AND oss_lines ${
       data.oss_lines ? `='${data.oss_lines}'` : 'IS NULL'
-    } AND matched ${data.matched ? `='${data.matched}'` : 'IS NULL'} AND filename ${
-      data.file ? `='${data.file}'` : 'IS NULL'
-    } AND idtype = '${data.id}' AND md5_comp ${data.url_hash ? `='${data.url_hash}'` : 'IS NULL'} AND purl = '${
+    } AND matched ${
+      data.matched ? `='${data.matched}'` : 'IS NULL'
+    } AND filename ${data.file ? `='${data.file}'` : 'IS NULL'} AND idtype = '${
+      data.id
+    }' AND md5_comp ${
+      data.url_hash ? `='${data.url_hash}'` : 'IS NULL'
+    } AND purl = '${
       data.purl ? data.purl[0] : ' '
     }' AND file_path = '${filePath}'  AND file_url ${
       data.file_url ? `='${data.file_url}'` : 'IS NULL'
     } AND source='engine';`;
     db.serialize(function () {
       db.get(sQuery, function (err: any, result: any) {
-        if (result !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
+        if (result !== undefined)
+          db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
         else self.insertResultBulk(db, data, filePath);
         if (err) console.log(err);
       });
@@ -251,11 +270,15 @@ export class ResultsDb extends Db {
   private async getResult(path: string) {
     const db = await this.openDb();
     return new Promise<any>(async (resolve) => {
-      db.all(query.SQL_SCAN_SELECT_FILE_RESULTS, path, (err: any, data: any) => {
-        db.close();
-        if (err) resolve([]);
-        else resolve(data);
-      });
+      db.all(
+        query.SQL_SCAN_SELECT_FILE_RESULTS,
+        path,
+        (err: any, data: any) => {
+          db.close();
+          if (err) resolve([]);
+          else resolve(data);
+        }
+      );
     });
   }
 
@@ -264,11 +287,15 @@ export class ResultsDb extends Db {
     return new Promise<any>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.get(query.SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH, path, (err: any, data: any) => {
-          db.close();
-          if (err) throw err;
-          else resolve(data);
-        });
+        db.get(
+          query.SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH,
+          path,
+          (err: any, data: any) => {
+            db.close();
+            if (err) throw err;
+            else resolve(data);
+          }
+        );
       } catch (error) {
         log.error(error);
         reject(error);
@@ -299,11 +326,16 @@ export class ResultsDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.run(query.SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH, 'nomatch', path, function (this: any, err: any) {
-            if (err) throw err;
-            db.close();
-            resolve(true);
-          });
+          db.run(
+            query.SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH,
+            'nomatch',
+            path,
+            function (this: any, err: any) {
+              if (err) throw err;
+              db.close();
+              resolve(true);
+            }
+          );
         });
       } catch (error) {
         log.error(error);
@@ -318,9 +350,11 @@ export class ResultsDb extends Db {
         const db = await this.openDb();
         db.serialize(() => {
           const resultsid = `(${files.toString()});`;
-          const sqlRestoreIdentified = query.SQL_RESTORE_IDENTIFIED_FILE_SNIPPET + resultsid;
+          const sqlRestoreIdentified =
+            query.SQL_RESTORE_IDENTIFIED_FILE_SNIPPET + resultsid;
           const sqlRestoreNoMatch = query.SQL_RESTORE_NOMATCH_FILE + resultsid;
-          const sqlRestoreFiltered = query.SQL_RESTORE_FILTERED_FILE + resultsid;
+          const sqlRestoreFiltered =
+            query.SQL_RESTORE_FILTERED_FILE + resultsid;
           db.run('begin transaction');
           db.run(sqlRestoreIdentified);
           db.run(sqlRestoreNoMatch);
@@ -345,11 +379,10 @@ export class ResultsDb extends Db {
         db.close();
         if (err) throw err;
         if (data === undefined) resolve([]);
-         resolve(data.map((item: any) => item.id));
+        resolve(data.map((item: any) => item.id));
       });
     });
   }
-
 
   public async getNotOriginal(ids: number[]) {
     return new Promise<any>(async (resolve, reject) => {
@@ -363,6 +396,29 @@ export class ResultsDb extends Db {
         });
       } catch (error) {
         reject(error);
+      }
+    });
+  }
+
+  public async getSummaryByids(ids: number[]) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(() => {
+          const sqlQuerySummary = query.SQL_GET_SUMMARY_BY_RESULT_ID.replace(
+            '#values',
+            `(${ids.toString()})`
+          );
+          console.log(sqlQuerySummary);
+          db.all(sqlQuerySummary, (err: any, data: any) => {
+            db.close();
+            if (err) throw err;
+            else resolve(data);
+          });
+        });
+      } catch (error) {
+        log.error(error);
+        reject(new Error('Unable to retrieve results'));
       }
     });
   }
