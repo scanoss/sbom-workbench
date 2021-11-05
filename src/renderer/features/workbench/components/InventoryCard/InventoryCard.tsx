@@ -28,7 +28,7 @@ const InventoryCard = ({ inventory, onSelect }: InventoryCardProps) => {
                 </div>
                 <div>
                   <Label label="VERSION" textColor="gray" />
-                  <Typography component="p">{inventory.version}</Typography>
+                  <Typography component="p">{inventory.component.version}</Typography>
                 </div>
                 <div>
                   <Label label="LICENSE" textColor="gray" />
