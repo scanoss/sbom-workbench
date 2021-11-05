@@ -40,7 +40,7 @@ export class SpdxLiteJson extends Format {
     hashSum.update(fileBuffer);
     const hex = hashSum.digest('hex');
 
-    spdx.SPDXID = spdx.SPDXID.replace('###', hex);
+    spdx.SPDXIdentifier = spdx.SPDXIdentifier.replace('###', hex);
 
     return JSON.stringify(spdx, undefined, 4);
   }
@@ -49,7 +49,7 @@ export class SpdxLiteJson extends Format {
     const spdx = {
       spdxVersion: 'SPDX-2.2',
       dataLicense: 'CC0-1.0',
-      SPDXID: 'SCANOSS-SPDX-###',
+      SPDXIdentifier: 'SCANOSS-SPDX-###',
       DocumentName: 'SCANOSS-SBOM',
       creator: 'Tool: SCANOSS Audit Workbench',
       created: '',
