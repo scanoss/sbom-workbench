@@ -589,7 +589,8 @@ export class ComponentDb extends Db {
             SELECT notValid.purl,notValid.version FROM results notValid WHERE NOT EXISTS 
             (SELECT valid.purl,valid.version FROM results valid WHERE valid.dirty=0 AND notValid.purl=valid.purl AND notValid.version=valid.version)
              ) AS possibleNotValid
-             INNER JOIN component_versions cv ON cv.purl=possibleNotValid.purl AND cv.version=possibleNotValid.version;`,
+             INNER JOIN component_versions cv ON cv.purl=possibleNotValid.purl AND cv.version=possibleNotValid.version
+             WHERE cv.id NOT IN (SELECT cvid FROM inventories);`,
           (err: any, data: any) => {
             db.close();
             if (err) throw err;  
@@ -620,6 +621,24 @@ export class ComponentDb extends Db {
         reject(error);
       }
     });
+  }
+
+  public async updateOrphanToManual(){
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();       
+        db.run(`UPDATE component_versions  SET source='manual' WHERE  id IN ( SELECT i.cvid FROM inventories i INNER JOIN component_versions cv ON cv.id=i.cvid WHERE (cv.purl,cv.version) NOT IN (SELECT r.purl,r.version FROM results r));`,
+          (err: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          }
+        );
+      } catch (error) {
+        reject(error);
+      }
+    });
+
   }
 
   
