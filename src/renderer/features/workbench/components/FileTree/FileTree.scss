@@ -28,6 +28,12 @@
     }
   }
 
+  .rct-node-clickable {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .exclude-item {
     font-weight: 600;
     color: #968d8d8a;
