@@ -10,6 +10,14 @@
     color: #3F3F46;
   }
 
+  .rct-text {
+    position: relative;
+  }
+  .rct-collapse {
+    position: absolute;
+    left: -20px;
+  }
+
   .match-info-result {
     font-weight: 600;
     color: #27272A;
@@ -23,12 +31,30 @@
     font-weight: 400;
     color: #968d8d8a;
 
-    .rct-node-icon {
-      color: #968d8d8a;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+  }
+
+  .rct-bare-label {
+    margin-left: 8px;
+  }
+
+  .react-checkbox-tree > ol {
+    padding-left: 25px;
+  }
+
+  .match-info-result {
+    margin: 9px 0px;
+  }
+
+  .rct-node-icon {
+    color: #968d8d8a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+  }
+
+  .rct-node-icon *{
+    width: auto;
   }
 
   .rct-node-clickable {

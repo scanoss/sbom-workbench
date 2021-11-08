@@ -42,21 +42,9 @@ export const FileTree = () => {
           icons={{
             expandClose: <KeyboardArrowRightIcon />,
             expandOpen: <KeyboardArrowDownIcon />,
-            parentClose: (
-              <SvgIcon component="object">
-                <img src={parentClose} alt="" />
-              </SvgIcon>
-            ),
-            parentOpen: (
-              <SvgIcon component="object">
-                  <img src={parentOpen} alt="" />
-              </SvgIcon>
-            ),
-            leaf: (
-              <SvgIcon component="object">
-                <img src={fileLogo} alt="" />
-              </SvgIcon>
-            ),
+            parentClose: <img src={parentClose} alt="" />,
+            parentOpen: <img src={parentOpen} alt="" />,
+            leaf: <img src={fileLogo} alt="" />,
           }}
         />
       ) : (
