@@ -4,9 +4,10 @@ import { useHistory } from 'react-router-dom';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import FolderOpenOutlined from '@material-ui/icons/FolderOpenOutlined';
 import SvgIcon from '@material-ui/core/SvgIcon';
-import InsertDriveFileOutlined from '@material-ui/icons/InsertDriveFileOutlined';
+import fileLogo from '../../../../../../assets/imgs/file.svg';
+import parentClose from '../../../../../../assets/imgs/folder.svg';
+import parentOpen from '../../../../../../assets/imgs/folder-open.svg';
 
 export const FileTree = () => {
   const history = useHistory();
@@ -43,11 +44,19 @@ export const FileTree = () => {
             expandOpen: <KeyboardArrowDownIcon />,
             parentClose: (
               <SvgIcon component="object">
-                <img src={'./imgs/file.svg'} alt="" />
+                <img src={parentClose} alt="" />
               </SvgIcon>
             ),
-            parentOpen: <FolderOpenOutlined />,
-            leaf: <InsertDriveFileOutlined />,
+            parentOpen: (
+              <SvgIcon component="object">
+                  <img src={parentOpen} alt="" />
+              </SvgIcon>
+            ),
+            leaf: (
+              <SvgIcon component="object">
+                <img src={fileLogo} alt="" />
+              </SvgIcon>
+            ),
           }}
         />
       ) : (

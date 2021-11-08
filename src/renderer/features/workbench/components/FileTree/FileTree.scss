@@ -25,6 +25,9 @@
 
     .rct-node-icon {
       color: #968d8d8a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   }
 
@@ -33,6 +36,7 @@
     justify-content: center;
     align-items: center;
   }
+
 
   .exclude-item {
     font-weight: 600;
