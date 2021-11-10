@@ -31,8 +31,8 @@ ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE, async (event, comp: Component
   return { status: 'ok', message: 'test' };
 });
 
-ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (event, component: Component) => {
-  const data = await workspace.getOpenedProjects()[0].scans_db.files.getFilesComponent(component);
+ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (event, component: Component, params) => {
+  const data = await workspace.getOpenedProjects()[0].scans_db.files.getFilesComponent(component, params);
   return { status: 'ok', message: 'test', data };
 });
 
