@@ -4,10 +4,9 @@ import { useHistory } from 'react-router-dom';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import SvgIcon from '@material-ui/core/SvgIcon';
-import fileLogo from '../../../../../../assets/imgs/file.svg';
-import parentClose from '../../../../../../assets/imgs/folder.svg';
-import parentOpen from '../../../../../../assets/imgs/folder-open.svg';
+import FolderOpenIcon from '../FolderOpenIcon/FolderOpenIcon';
+import FolderIcon from '../FolderIcon/FolderIcon';
+import FileIcon from '../FileIcon/FileIcon';
 
 export const FileTree = () => {
   const history = useHistory();
@@ -42,9 +41,9 @@ export const FileTree = () => {
           icons={{
             expandClose: <KeyboardArrowRightIcon />,
             expandOpen: <KeyboardArrowDownIcon />,
-            parentClose: <img src={parentClose} alt="" />,
-            parentOpen: <img src={parentOpen} alt="" />,
-            leaf: <img src={fileLogo} alt="" />,
+            parentClose: <FolderIcon width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" />,
+            parentOpen: <FolderOpenIcon width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg" />,
+            leaf: <FileIcon width="14" height="18" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg"/>,
           }}
         />
       ) : (
