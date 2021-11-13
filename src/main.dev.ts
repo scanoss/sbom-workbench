@@ -39,6 +39,8 @@ import { userSetting } from './main/UserSetting';
 
 import { WorkspaceMigration } from './main/migration/WorkspaceMigration';
 
+import buildTree from './main/workspace/Tree/index';
+
 const basepath = require('path');
 
 export default class AppUpdater {
@@ -144,7 +146,7 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.whenReady().then(mainLogic).then(createWindow).catch(console.log);
+app.whenReady().then(mainLogic).catch(console.log);// .then(createWindow).catch(console.log);
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
@@ -160,16 +162,19 @@ export interface IInitScan {
 }
 
 async function mainLogic() {
-  const root = `${os.homedir()}/scanoss-workspace`;
 
-  // This lines will be removed in future versions
-  if (fs.existsSync(`${root}/defaultCfg.json`)) {
-    wsCfgUpdate(root);
-  }
+  const tree: Node = buildTree('/home/ubuntu/Projects/SCANOSS/delete_me/scan');
+  console.log(tree, "ARBOLITO" );
+  // const root = `${os.homedir()}/scanoss-workspace`;
 
-  await workspace.read(root);
-  await userSetting.read(root);
-  new WorkspaceMigration(userSetting.get().VERSION, root).up();
+  // // This lines will be removed in future versions
+  // if (fs.existsSync(`${root}/defaultCfg.json`)) {
+  //   wsCfgUpdate(root);
+  // }
+
+  // await workspace.read(root);
+  // await userSetting.read(root);
+  // new WorkspaceMigration(userSetting.get().VERSION, root).up();
 }
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {

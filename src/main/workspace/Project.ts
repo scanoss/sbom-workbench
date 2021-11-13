@@ -230,7 +230,7 @@ export class Project extends EventEmitter {
         if (emptyInv) {
           const result = emptyInv.map((item: Record<string, number>) => item.id);
           await this.scans_db.inventories.deleteAllEmpty(result);
-        } 
+        }
       } else {
         await this.scans_db.results.insertFromFile(resPath);
         await this.scans_db.components.importUniqueFromFile();
@@ -332,6 +332,7 @@ export class Project extends EventEmitter {
     let files: string[];
     files = inv.files;
     for (i = 0; i < inv.files.length; i += 1) {
+      // this.logical_tree.insertInventory();
       insertInventory(this.logical_tree, files[i], inv);
     }
   }
@@ -643,6 +644,7 @@ function dirTree(root: string, filename: string) {
       showCheckbox: false,
     };
 
+    console.log("parent", filename);
     info.children = fs
       .readdirSync(filename, { withFileTypes: true }) // Returns a list of files and folders
       .sort(dirFirstFileAfter)
@@ -650,6 +652,7 @@ function dirTree(root: string, filename: string) {
       .map((dirent) => dirent.name) // Converts Dirent objects to paths
       .map((child: string) => {
         // Apply the recursion function in the whole array
+        console.log("child:", child);
         return dirTree(root, `${filename}/${child}`);
       });
   } else {
