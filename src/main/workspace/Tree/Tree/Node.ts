@@ -32,7 +32,7 @@ export default abstract class Node {
 
   public abstract updateStatus(path: string, status: string): boolean;
 
-  public abstract addComponent(component: any, path: string): void;
+  public abstract addComponent(component: any, path: string): boolean;
 
   public abstract getComponent(): any[];
   // public abstract addChild(node :Node): void;

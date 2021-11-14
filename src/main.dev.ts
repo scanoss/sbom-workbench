@@ -41,6 +41,7 @@ import { WorkspaceMigration } from './main/migration/WorkspaceMigration';
 
 import { Tree } from './main/workspace/Tree/Tree/Tree';
 
+
 const basepath = require('path');
 
 export default class AppUpdater {
@@ -162,12 +163,15 @@ export interface IInitScan {
 }
 
 async function mainLogic() {
-  const tree = new Tree('/home/agustin/scanoss_dt_last').buildTree();
-  console.log(JSON.stringify(tree, null, 2));
+  const tree = new Tree('/home/agustin/scanner.c').buildTree();
+
 
   const results = readFileSync('/home/agustin/scanoss-workspace/scanner.c/result.json', 'utf8');
 
   const res = JSON.parse(results);
+  
+
+
   Object.entries(res).forEach(([key, value]: [string, any]) => {   
     for (let i = 0; i < value.length; i += 1) {
       if (value[i].purl !== undefined) {
@@ -175,8 +179,9 @@ async function mainLogic() {
       }
     }
   });
+ 
 
-    console.log(JSON.stringify(tree,null,2), 'ARBOLITO');
+     console.log(JSON.stringify(tree,null,2), 'ARBOLITO');
 
   // const root = `${os.homedir()}/scanoss-workspace`;
 

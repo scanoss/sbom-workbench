@@ -7,10 +7,12 @@ export default class File extends Node {
     return true;
   }
 
-  public addComponent(component: string, path: string): void {
+  public addComponent(component: string, path: string): boolean {
     if (this.getPath() === path) {
         this.components.push(component);
+        return true;
     }
+    return false;
   }
 
   public getComponent(): any[] {
