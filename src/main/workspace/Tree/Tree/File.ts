@@ -15,12 +15,23 @@ export default class File extends Node {
   }
 
   public updateClassName(path: string, className: string): boolean {
-
     return true;
   }
 
   public getNode(path: string): Node {
     if (path === this.getPath()) return this;
     return null;
+  }
+
+  public addComponent(component: string, path: string): boolean {
+    if (this.getPath() === path) {
+        this.components.push(component);
+        return true;
+    }
+    return false;
+  }
+
+  public getComponent(): any[] {
+    return this.components;
   }
 }

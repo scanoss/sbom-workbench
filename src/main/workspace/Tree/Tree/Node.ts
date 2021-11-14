@@ -11,6 +11,8 @@ export default abstract class Node {
 
   private label: string;
 
+  protected components: any[] = [];
+
   private include: boolean;
 
   private action: string;
@@ -45,7 +47,9 @@ export default abstract class Node {
 
   public abstract updateClassName(path: string, status: string): boolean;
 
-  public abstract getNode(path: string): Node;
+  public abstract addComponent(component: any, path: string): boolean;
 
-  // public abstract addChild(node :Node): void;
+  public abstract getComponent(): any[];
+
+  public abstract getNode(path: string): Node;
 }

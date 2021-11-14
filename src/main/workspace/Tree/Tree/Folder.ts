@@ -1,3 +1,4 @@
+import { ChildFriendly } from '@material-ui/icons';
 import Node from './Node';
 
 export default class Folder extends Node {
@@ -46,5 +47,26 @@ export default class Folder extends Node {
       if (node !== null) return node;
     }
     return null;
+  }
+
+  public addComponent(component: string, path: string): boolean {
+    if (!path.includes(this.getPath())) return false;
+
+    this.children.forEach((child) => {
+      if (child.addComponent(component, path)) {
+        child.getComponent().forEach((item) => {
+          const isContained = this.components.some((el) => el.purl === item.purl && el.version === item.version);
+          if (isContained === false) {
+            this.components.push(item);
+          }
+        });
+      }
+    });
+
+    return true;
+  }
+
+  public getComponent(): any[] {
+    return this.components;
   }
 }
