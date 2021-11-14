@@ -116,7 +116,7 @@ export class FilesDb extends Db {
           params = [data.purl,data.version];
         }else{
           SQLquery = query.SQL_SELECT_FILES_FROM_PURL_VERSION_PATH;
-          params = [data.purl,data.version,path];
+          params = [data.purl,data.version,`${path}%`];
         } 
         const db = await this.openDb();      
         db.all(SQLquery,...params,async function (err: any, file: any){

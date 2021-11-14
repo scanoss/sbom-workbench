@@ -161,7 +161,7 @@ export class Querys {
     SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, fi.inventoryid
     FROM results r
     LEFT JOIN file_inventories fi ON r.id=fi.resultid
-    WHERE r.purl=? AND r.version=? AND r.file_path like ?%`;
+    WHERE r.purl=? AND r.version=? AND r.file_path like ?`;
 
   SQL_SELECT_FILES_FROM_PURL = `SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r
    LEFT JOIN file_inventories fi ON r.id=fi.resultid

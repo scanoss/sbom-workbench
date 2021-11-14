@@ -23,12 +23,12 @@ export interface State {
   mainComponents: ComponentGroup[];
   components: ComponentGroup[];
   component: ComponentGroup;
-  version: string;
   history: {
     report: 'detected' | 'identified';
     section: number;
   };
   filter: {
+    version: string;
     path: string;
   }
 }
@@ -43,12 +43,12 @@ export const initialState: State = {
   mainComponents: null,
   components: null,
   component: null,
-  version: null,
   history: {
     report: 'detected',
     section: null,
   },
   filter: {
+    version: null,
     path: null,
   }
 };
@@ -104,18 +104,24 @@ export default function reducer(state: State = initialState, action): State {
       return {
         ...state,
         component,
-        version: null,
         history: {
           ...state.history,
           section: null,
         },
+        filter: {
+          ...state.filter,
+          version: null,
+        }
       };
     }
     case SET_VERSION: {
       const { version } = action;
       return {
         ...state,
-        version,
+        filter: {
+          ...state.filter,
+          version,
+        }
       }
     }
     case SET_FILE: {
@@ -142,7 +148,7 @@ export default function reducer(state: State = initialState, action): State {
         components: node ? filter(state.mainComponents, node.components) : state.mainComponents,
         filter: {
           ...state.filter,
-          path: node ? node.path : null,
+          path: node ? node.value : null,
         },
       };
     }
@@ -156,7 +162,6 @@ export default function reducer(state: State = initialState, action): State {
 const filter = (components, node) => {
   const keys = new Map<string, Map<string, any>>(
     node.map(el => [ `${el.purl[0]}-${el.version}`, true])
-    //node.map(el => [ `${el.purl[0]}`])
   );
 
   return components.filter(el => {
