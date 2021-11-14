@@ -19,6 +19,7 @@ module.exports = {
     '@typescript-eslint/naming-convention': ['warn'],
     'react/jsx-props-no-spreading': 'off',
     'jsx-a11y/label-has-associated-control': 'off',
+    'no-restricted-syntax': ['off'],
   },
   parserOptions: {
     ecmaVersion: 2020,

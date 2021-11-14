@@ -1,6 +1,6 @@
-import Node from './Tree/Node';
-import File from './Tree/File';
-import Folder from './Tree/Folder';
+import Node from './Node';
+import File from './File';
+import Folder from './Folder';
 
 const fs = require('fs');
 const path = require('path');
@@ -26,4 +26,14 @@ export default function buildTree(dir: string, root: Folder): Node {
     } else root.addChild(new File(dirEntry.name));
   }
   return root;
+}
+
+export class Tree {
+  public root: Folder;
+
+  constructor(dir: string) {
+  }
+
+
+
 }
