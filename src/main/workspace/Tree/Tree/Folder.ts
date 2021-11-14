@@ -15,4 +15,10 @@ export default class Folder extends Node {
   public getChildren(): Node[] {
     return this.children;
   }
+
+  public addComponent(component: string, path: string): void {
+    this.children.forEach((child) => {
+      child.addComponent(component, path);
+    });
+  }
 }

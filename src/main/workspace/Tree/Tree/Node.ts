@@ -23,7 +23,14 @@ export default abstract class Node {
     return this.label;
   }
 
+  public getPath():string{
+    return this.value;
+  }
+
   public abstract updateStatus(path: string, status: string): boolean;
+
+  public abstract addComponent(component: any, path: string): void;
+
   // public abstract addChild(node :Node): void;
 }
 

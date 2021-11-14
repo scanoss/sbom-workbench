@@ -10,7 +10,7 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import fs from 'fs';
+import fs, { readFileSync } from 'fs';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
@@ -148,7 +148,7 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.whenReady().then(mainLogic).catch(console.log);// .then(createWindow).catch(console.log);
+app.whenReady().then(mainLogic).catch(console.log); // .then(createWindow).catch(console.log);
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
@@ -164,12 +164,26 @@ export interface IInitScan {
 }
 
 async function mainLogic() {
+  
 
-  const tree = new Tree('/home/ubuntu/Projects/SCANOSS/scanner.c').buildTree();
+  const tree = new Tree('/home/agustin/scanner.c').buildTree();
   console.log(JSON.stringify(tree, null, 2));
 
+  const results = readFileSync('/home/agustin/scanoss-workspace/scanner.c/result.json', 'utf8');
 
+  const res = JSON.parse(results);
+  Object.entries(res).forEach(([key, value]: [string, any]) => { 
+    for (let i = 0; i < value.length; i += 1) {
+     
+      if(value[i].purl !== undefined) {
 
+        tree.addComponent({ purl: value[i].purl[0], version: value[i].version }, key);
+      }
+  
+    }
+  });
+
+  console.log(tree, 'ARBOLITO');
 
   // const root = `${os.homedir()}/scanoss-workspace`;
 
