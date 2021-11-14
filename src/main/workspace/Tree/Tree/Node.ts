@@ -1,32 +1,51 @@
 const pathLib = require('path');
 
 export default abstract class Node {
-  // private type: string;
-  // private className: string;
-  private value: string;  // Relative path to the folder or file
-  private label: string;
-  // private inventories: any;
-  // private components: any;
-  // private include: any;
-  // private action: string;
-  // private showCheckbox: string;
+  protected type: string;
 
-  // value: filename.replace(root, ''),
-  // label: path.basename(filename),
+  protected className: string;
+
+  protected status: string;
+
+  protected value: string;  // Relative path to the folder or file
+
+  private label: string;
+
+  private include: boolean;
+
+  private action: string;
+
+  private showCheckbox: string;
+
+
 
   constructor(path: string, label: string) {
     this.value = path;
     this.label = label;
+    this.include = true;
+    this.className = 'no-match';
+    this.action = 'filter';
+    this.showCheckbox = 'false';
+    this.status = 'pending';
   }
 
   public getName(): string {
     return this.label;
   }
 
+  public getStatus(): string {
+    return this.status;
+  }
+
+  public getPath(): string {
+    return this.value;
+  }
+
   public abstract updateStatus(path: string, status: string): boolean;
+
+  public abstract updateClassName(path: string, status: string): boolean;
+
+  public abstract getNode(path: string): Node;
+
   // public abstract addChild(node :Node): void;
 }
-
-
-
-

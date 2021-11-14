@@ -15,6 +15,7 @@ import { defaultBannedList } from './filtering/defaultFilter';
 import { Metadata } from './Metadata';
 import { userSetting } from '../UserSetting';
 import { ProjectMigration } from '../migration/ProjectMigration';
+import { Tree } from './Tree/Tree/Tree';
 
 const path = require('path');
 

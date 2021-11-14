@@ -1,6 +1,7 @@
 import Node from './Node';
 import File from './File';
 import Folder from './Folder';
+import { EventEmitter } from 'events';
 
 const fs = require('fs');
 const pathLib = require('path');
@@ -47,6 +48,4 @@ export class Tree {
     if (a.isDirectory() && !b.isDirectory()) return -1;
     return 0;
   }
-
-
 }

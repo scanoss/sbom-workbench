@@ -163,10 +163,23 @@ export interface IInitScan {
   scanId?: string;
 }
 
+const { performance } = require('perf_hooks');
 async function mainLogic() {
 
-  const tree = new Tree('/home/ubuntu/Projects/SCANOSS/scanner.c').buildTree();
-  console.log(JSON.stringify(tree, null, 2));
+  let startTime = performance.now();
+  const tree = new Tree('/home/ubuntu/Projects/delete_me/toScan').buildTree();
+  let endTime = performance.now();
+  console.log(`Tree built in ${endTime - startTime} ms`);
+
+
+  startTime = performance.now();
+  tree.updateStatus('/fodler1', 'TESTING');
+  console.log(JSON.stringify(tree,undefined,2));
+
+  console.log( tree.getNode('scanoss-dt/babel.config.js'), "NODO" );
+  endTime = performance.now();
+  console.log(`Updated file in ${endTime - startTime} ms`);
+  //console.log(JSON.stringify(tree, null, 2));
 
 
 
