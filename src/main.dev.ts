@@ -39,8 +39,9 @@ import { userSetting } from './main/UserSetting';
 
 import { WorkspaceMigration } from './main/migration/WorkspaceMigration';
 
-import buildTree from './main/workspace/Tree/index';
-import Folder from './main/workspace/Tree/Tree/Folder';
+
+
+import { Tree } from './main/workspace/Tree/Tree/Tree';
 
 const basepath = require('path');
 
@@ -164,8 +165,9 @@ export interface IInitScan {
 
 async function mainLogic() {
 
-  const tree: any = buildTree('/home/ubuntu/Projects/SCANOSS/delete_me/scan', new Folder('scan'));
-  console.log(tree, "ARBOLITO");
+  const tree = new Tree('/home/ubuntu/Projects/SCANOSS/scanner.c').buildTree();
+  console.log(JSON.stringify(tree, null, 2));
+
 
 
 
