@@ -1,18 +1,19 @@
 import Node from './Node';
 
 export default class File extends Node {
-  private component: string[] = [];
+ // private component: string[] = [];
 
   public updateStatus(path: string, status: string): boolean {
     return true;
   }
-  
+
   public addComponent(component: string, path: string): void {
-    console.log(this.getName());
-  
-    if (this.getName() === path) {
- 
-      this.component.push(component);
+    if (this.getPath() === path) {
+        this.components.push(component);
     }
+  }
+
+  public getComponent(): any[] {
+    return this.components;
   }
 }

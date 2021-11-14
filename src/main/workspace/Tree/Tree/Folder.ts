@@ -19,6 +19,24 @@ export default class Folder extends Node {
   public addComponent(component: string, path: string): void {
     this.children.forEach((child) => {
       child.addComponent(component, path);
+
     });
+  
+    this.children.forEach((element) => {
+      element.getComponent().forEach((item) => {
+        const isContained = this.components.some((el) => el.purl === item.purl && el.version === item.version);      
+        if (isContained === false) {
+          this.components.push(item);
+        }
+      });
+    });
+    
   }
+
+  public getComponent(): any[] {
+    return this.components;
+  }
+
+  
+
 }

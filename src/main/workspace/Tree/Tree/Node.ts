@@ -3,8 +3,11 @@ const pathLib = require('path');
 export default abstract class Node {
   // private type: string;
   // private className: string;
-  private value: string;  // Relative path to the folder or file
+  private value: string; // Relative path to the folder or file
+
   private label: string;
+
+  protected components: any[] = [];
   // private inventories: any;
   // private components: any;
   // private include: any;
@@ -23,7 +26,7 @@ export default abstract class Node {
     return this.label;
   }
 
-  public getPath():string{
+  public getPath(): string {
     return this.value;
   }
 
@@ -31,6 +34,7 @@ export default abstract class Node {
 
   public abstract addComponent(component: any, path: string): void;
 
+  public abstract getComponent(): any[];
   // public abstract addChild(node :Node): void;
 }
 
