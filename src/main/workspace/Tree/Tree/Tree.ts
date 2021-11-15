@@ -48,4 +48,16 @@ export class Tree {
     if (a.isDirectory() && !b.isDirectory()) return -1;
     return 0;
   }
+
+  public addComponents(results: any): void {  
+    Object.entries(results).forEach(([key, value]: [string, any]) => {
+      for (let i = 0; i < value.length; i += 1) {
+        if (value[i].purl !== undefined) {    
+          this.rootFolder.addComponent({ purl: value[i].purl[0], version: value[i].version }, key);
+        }
+      }
+    });   
+  }
+
+
 }

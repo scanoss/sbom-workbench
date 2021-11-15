@@ -28,7 +28,9 @@ export class Project extends EventEmitter {
 
   banned_list: Filtering.BannedList;
 
-  logical_tree: any;
+  logical_tree: Tree;
+
+  tree: Tree;
 
   results: any;
 
@@ -202,6 +204,7 @@ export class Project extends EventEmitter {
     });
 
     this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response, filesNotScanned) => {
+      this.tree.addComponents(response.getServerResponse());
       this.attachComponent(response.getServerResponse());
       Object.assign(this.filesNotScanned, filesNotScanned);
       this.save();
@@ -221,7 +224,7 @@ export class Project extends EventEmitter {
         const notValidComp: number[] = await this.scans_db.components.getNotValid();
 
         if (notValidComp.length > 0) {
-           await this.scans_db.components.deleteByID(notValidComp);
+          await this.scans_db.components.deleteByID(notValidComp);
         }
         await this.scans_db.results.deleteDirty();
         await this.scans_db.components.updateOrphanToManual();
@@ -320,6 +323,8 @@ export class Project extends EventEmitter {
 
   build_tree() {
     const scanPath = this.metadata.getScanRoot();
+    this.tree = new Tree(scanPath);
+    this.tree.buildTree();
     this.logical_tree = dirTree(scanPath, scanPath);
     this.emit('treeBuilt', this.logical_tree);
   }
@@ -645,7 +650,7 @@ function dirTree(root: string, filename: string) {
       showCheckbox: false,
     };
 
-    console.log("parent", filename);
+    console.log('parent', filename);
     info.children = fs
       .readdirSync(filename, { withFileTypes: true }) // Returns a list of files and folders
       .sort(dirFirstFileAfter)
@@ -653,7 +658,7 @@ function dirTree(root: string, filename: string) {
       .map((dirent) => dirent.name) // Converts Dirent objects to paths
       .map((child: string) => {
         // Apply the recursion function in the whole array
-        console.log("child:", child);
+        console.log('child:', child);
         return dirTree(root, `${filename}/${child}`);
       });
   } else {

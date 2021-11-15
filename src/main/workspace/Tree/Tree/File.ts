@@ -23,10 +23,11 @@ export default class File extends Node {
     return null;
   }
 
-  public addComponent(component: string, path: string): boolean {
+  public addComponent(component: any, path: string): boolean {
     if (this.getPath() === path) {
-        this.components.push(component);
-        return true;
+      this.components.push(component);
+      this.className = 'match-info-results status-pending';
+      return true;
     }
     return false;
   }

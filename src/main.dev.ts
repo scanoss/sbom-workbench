@@ -147,7 +147,7 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.whenReady().then(mainLogic).catch(console.log); // .then(createWindow).catch(console.log);
+app.whenReady().then(mainLogic).catch(console.log).then(createWindow).catch(console.log);
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
@@ -162,28 +162,28 @@ export interface IInitScan {
   scanId?: string;
 }
 
-const { performance } = require('perf_hooks');
 async function mainLogic() {
-  const tree = new Tree('/home/agustin/scanner.c').buildTree();
+ 
+  // const tree = new Tree('/home/agustin/scanner.c').buildTree();
 
 
-  let startTime = performance.now();
-  const tree = new Tree('/home/ubuntu/Projects/delete_me/toScan').buildTree();
-  let endTime = performance.now();
-  console.log(`Tree built in ${endTime - startTime} ms`);
+ // let startTime = performance.now();
+  // const tree = new Tree('/home/ubuntu/Projects/delete_me/toScan').buildTree();
+  // let endTime = performance.now();
+ // console.log(`Tree built in ${endTime - startTime} ms`);
 
 
-  startTime = performance.now();
-  tree.updateStatus('/fodler1', 'TESTING');
-  console.log(JSON.stringify(tree,undefined,2));
+ // startTime = performance.now();
+  // tree.updateStatus('/fodler1', 'TESTING');
+  // console.log(JSON.stringify(tree,undefined,2));
 
-  console.log( tree.getNode('scanoss-dt/babel.config.js'), "NODO" );
-  endTime = performance.now();
-  console.log(`Updated file in ${endTime - startTime} ms`);
-  //console.log(JSON.stringify(tree, null, 2));
-  //const results = readFileSync('/home/agustin/scanoss-workspace/scanner.c/result.json', 'utf8');
+  // console.log( tree.getNode('scanoss-dt/babel.config.js'), "NODO" );
+ // endTime = performance.now();
+  // console.log(`Updated file in ${endTime - startTime} ms`);
+  // console.log(JSON.stringify(tree, null, 2));
+  // const results = readFileSync('/home/agustin/scanoss-workspace/scanner.c/result.json', 'utf8');
 
-  //const res = JSON.parse(results);
+ //  const res = JSON.parse(results);
 
 
 
@@ -196,18 +196,18 @@ async function mainLogic() {
   // });
 
 
-     //console.log(JSON.stringify(tree,null,2), 'ARBOLITO');
+     // console.log(JSON.stringify(tree,null,2), 'ARBOLITO');
 
-  // const root = `${os.homedir()}/scanoss-workspace`;
+  const root = `${os.homedir()}/scanoss-workspace`;
 
-  // // This lines will be removed in future versions
-  // if (fs.existsSync(`${root}/defaultCfg.json`)) {
-  //   wsCfgUpdate(root);
-  // }
+  // This lines will be removed in future versions
+  if (fs.existsSync(`${root}/defaultCfg.json`)) {
+    wsCfgUpdate(root);
+  }
 
-  // await workspace.read(root);
-  // await userSetting.read(root);
-  // new WorkspaceMigration(userSetting.get().VERSION, root).up();
+  await workspace.read(root);
+  await userSetting.read(root);
+  new WorkspaceMigration(userSetting.get().VERSION, root).up();
 }
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
