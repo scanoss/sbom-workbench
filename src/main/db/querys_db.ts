@@ -38,8 +38,7 @@ export class Querys {
   SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH = `UPDATE results SET source=?,idtype='file' WHERE file_path=?`;
 
   // SQL NEW INVENTORY
-  SQL_SCAN_INVENTORY_INSERT =
-    'INSERT INTO inventories (cvid,usage, notes, url, spdxid) values (?,?,?,?,?);';
+  SQL_SCAN_INVENTORY_INSERT = 'INSERT INTO inventories (cvid,usage, notes, url, spdxid) values (?,?,?,?,?);';
 
   // SQL INSERT FILE INVENTORIES
   SQL_INSERT_FILE_INVENTORIES = 'INSERT into file_inventories (resultid,inventoryid) values (?,?);';
@@ -48,8 +47,7 @@ export class Querys {
   SQL_DELETE_FILE_INVENTORIES = 'DELETE FROM file_inventories WHERE resultid IN ';
 
   //  UPDATE INVENTORY BY ID
-  SQL_UPDATE_INVENTORY_BY_ID =
-    'UPDATE inventories SET cvid=?,usage=?, notes=?, url=?, spdxid=? WHERE id=?;';
+  SQL_UPDATE_INVENTORY_BY_ID = 'UPDATE inventories SET cvid=?,usage=?, notes=?, url=?, spdxid=? WHERE id=?;';
 
   SQL_SELECT_INVENTORY_COMPONENTS = `SELECT  i.id,i.usage,cv.purl,i.notes,i.url,i.spdxid,cv.version,cv.name
   FROM inventories i INNER JOIN component_versions cv ON cv.id=i.cvid;`;
@@ -68,8 +66,9 @@ export class Querys {
   SQL_CREATE_LICENSE = 'INSERT OR IGNORE INTO licenses (spdxid,name,fulltext,url,official) VALUES(?,?,?,?,?);';
 
   // SQL INSERT INTO  COMPONENT VERSIONS
-  COMPDB_SQL_COMP_VERSION_INSERT =
-    'INSERT OR IGNORE INTO component_versions  (name,version, description, url,purl,source) VALUES (?,?,?,?,?,?);';
+
+  COMPDB_SQL_COMP_VERSION_INSERT = `INSERT INTO component_versions (name,version, description, url,purl,source) VALUES (?,?,?,?,?,?) ON CONFLICT(version,purl) DO UPDATE 
+    SET source = 'engine';`;
 
   // ATTACH A COMPONENT TO A LICENSE
   SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID = 'INSERT or IGNORE INTO license_component_version (cvid,licid) values (?,?)';
@@ -87,16 +86,18 @@ export class Querys {
   SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION = `SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN component_versions cv ON i.cvid=cv.id INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE cv.purl=? AND cv.version=?;`;
 
   // GET INVENTORY BY ID
-  SQL_GET_INVENTORY_BY_PURL = 'SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid INNER JOIN component_versions cv ON cv.id=i.cvid WHERE cv.purl=?;';
+  SQL_GET_INVENTORY_BY_PURL =
+    'SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid INNER JOIN component_versions cv ON cv.id=i.cvid WHERE cv.purl=?;';
 
   // GET INVENTORY BY ID
-  SQL_GET_INVENTORY_BY_ID = 'SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE i.id=?;';
+  SQL_GET_INVENTORY_BY_ID =
+    'SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE i.id=?;';
 
-  SQL_SCAN_SELECT_FILE_RESULTS = "SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype!='none' order by file_path;";
+  SQL_SCAN_SELECT_FILE_RESULTS =
+    "SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype!='none' order by file_path;";
 
   SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH =
     'SELECT DISTINCT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? ORDER BY file_path;';
- 
 
   // GET ALL THE INVENTORIES ATTACHED TO A FILE BY PATH
   SQL_SELECT_ALL_INVENTORIES_FROM_FILE =
