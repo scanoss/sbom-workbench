@@ -20,6 +20,7 @@ export default class Folder extends Node {
 
   public updateStatus(path: string, status: string): boolean {
     if (!path.includes(this.getPath())) return false;
+    if (path === this.getPath()) return false;
 
     for (const child of this.children) {
       if (child.updateStatus(path, status)) break;
@@ -30,8 +31,11 @@ export default class Folder extends Node {
     if (this.children.every((child) => child.getStatus() === 'ignored')) newFolderState = 'ignored';
 
     this.status = newFolderState;
+    this.setStatusOnClassnameAs(newFolderState);
+
     return true;
   }
+
 
   public updateClassName(path: string, status: string): boolean {
     throw new Error('Method not implemented.');

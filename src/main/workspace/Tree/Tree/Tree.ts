@@ -1,7 +1,6 @@
 import Node from './Node';
 import File from './File';
 import Folder from './Folder';
-import { EventEmitter } from 'events';
 
 const fs = require('fs');
 const pathLib = require('path');

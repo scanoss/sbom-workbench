@@ -164,8 +164,6 @@ export interface IInitScan {
 
 const { performance } = require('perf_hooks');
 async function mainLogic() {
-  const tree = new Tree('/home/agustin/scanner.c').buildTree();
-
 
   let startTime = performance.now();
   const tree = new Tree('/home/ubuntu/Projects/delete_me/toScan').buildTree();
@@ -174,27 +172,13 @@ async function mainLogic() {
 
 
   startTime = performance.now();
-  tree.updateStatus('/fodler1', 'TESTING');
+  tree.updateStatus('/fodler1/file1.py', 'identified');
+  tree.updateStatus('/fodler1/file2.py', 'ignored');
   console.log(JSON.stringify(tree,undefined,2));
 
   console.log( tree.getNode('scanoss-dt/babel.config.js'), "NODO" );
   endTime = performance.now();
   console.log(`Updated file in ${endTime - startTime} ms`);
-  //console.log(JSON.stringify(tree, null, 2));
-  //const results = readFileSync('/home/agustin/scanoss-workspace/scanner.c/result.json', 'utf8');
-
-  //const res = JSON.parse(results);
-
-
-
-  // Object.entries(res).forEach(([key, value]: [string, any]) => {
-  //   for (let i = 0; i < value.length; i += 1) {
-  //     if (value[i].purl !== undefined) {
-  //       tree.addComponent({ purl: value[i].purl[0], version: value[i].version }, key);
-  //     }
-  //   }
-  // });
-
 
      //console.log(JSON.stringify(tree,null,2), 'ARBOLITO');
 
