@@ -29,8 +29,11 @@ export interface State {
   };
   filter: {
     version: string;
-    path: string;
-  }
+    node?: {
+      type: 'folder' | 'file';
+      path: string;
+    };
+  };
 }
 
 export const initialState: State = {
@@ -49,8 +52,8 @@ export const initialState: State = {
   },
   filter: {
     version: null,
-    path: null,
-  }
+    node: null,
+  },
 };
 
 export default function reducer(state: State = initialState, action): State {
@@ -111,7 +114,7 @@ export default function reducer(state: State = initialState, action): State {
         filter: {
           ...state.filter,
           version: null,
-        }
+        },
       };
     }
     case SET_VERSION: {
@@ -121,8 +124,8 @@ export default function reducer(state: State = initialState, action): State {
         filter: {
           ...state.filter,
           version,
-        }
-      }
+        },
+      };
     }
     case SET_FILE: {
       const { file } = action;
@@ -148,7 +151,12 @@ export default function reducer(state: State = initialState, action): State {
         components: node ? filter(state.mainComponents, node.components) : state.mainComponents,
         filter: {
           ...state.filter,
-          path: node ? node.value : null,
+          node: node
+            ? {
+                type: 'folder',
+                path: node.value,
+              }
+            : null,
         },
       };
     }
@@ -160,12 +168,9 @@ export default function reducer(state: State = initialState, action): State {
 }
 
 const filter = (components, node) => {
-  const keys = new Map<string, Map<string, any>>(
-    node.map(el => [ `${el.purl[0]}-${el.version}`, true])
-  );
+  const keys = new Map<string, Map<string, any>>(node.map((el) => [`${el.purl[0]}-${el.version}`, true]));
 
-  return components.filter(el => {
-    console.log(el)
-    return el.versions.some(v => keys.has(`${el.purl}-${v.version}`))
+  return components.filter((el) => {
+    return el.versions.some((v) => keys.has(`${el.purl}-${v.version}`));
   });
-}
+};

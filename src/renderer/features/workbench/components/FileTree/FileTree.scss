@@ -2,8 +2,24 @@
   color: #3F3F46;
   font-weight: 400;
 
+  .react-checkbox-tree {
+    width: 100%;
+  }
+
   .rct-node {
     margin: 5px 0;
+
+    $bg: #dbe7ff;
+
+    .selected {
+      border-radius: 2px;
+      background-color: $bg
+    }
+
+    .rct-bare-label *:focus {
+      background: $bg;
+    }
+
   }
 
   .rct-node-icon {

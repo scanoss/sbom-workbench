@@ -66,14 +66,14 @@ const AppMenu = () => {
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/identified" activeClassName="active" tabIndex={-1}>
+      <NavLink onClick={reset} to="/workbench/identified" activeClassName="active" tabIndex={-1}>
         <Tooltip title="Identified components">
           <Button color="inherit">
             <CheckCircleOutlineOutlinedIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/report" activeClassName="active" tabIndex={-1}>
+      <NavLink onClick={reset} to="/workbench/report" activeClassName="active" tabIndex={-1}>
         <Tooltip title="Reports">
           <Button color="inherit">
             <InsertChartOutlinedTwoToneIcon />
