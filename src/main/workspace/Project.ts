@@ -88,7 +88,7 @@ export class Project extends EventEmitter {
     this.state = ProjectState.OPENED;
     log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`;
     const project = await fs.promises.readFile(`${this.metadata.getMyPath()}/tree.json`, 'utf8');
-    
+
     const a = JSON.parse(project);
     this.filesToScan = a.filesToScan;
     this.filesNotScanned = a.filesNotScanned;
@@ -159,9 +159,9 @@ export class Project extends EventEmitter {
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
     this.build_tree();
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
-    this.indexScan(this.metadata.getScanRoot(), this.logical_tree, this.banned_list);
+    this.indexScan(this.metadata.getScanRoot(), this.tree.getRootFolder(), this.banned_list);
     const summary = { total: 0, include: 0, filter: 0, files: {} };
-    this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
+    this.filesSummary = summarizeTree(this.metadata.getScanRoot(),this.tree.getRootFolder(), summary);
     log.info(
       `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
       'color: green'
@@ -335,7 +335,7 @@ export class Project extends EventEmitter {
   }
 
   getLogicalTree() {
-    return this.logical_tree;
+    return this.tree.getRootFolder();
   }
 
   attachInventory(inv: Inventory) {
@@ -344,7 +344,7 @@ export class Project extends EventEmitter {
     files = inv.files;
     for (i = 0; i < inv.files.length; i += 1) {
       // this.logical_tree.insertInventory();
-      insertInventory(this.logical_tree, files[i], inv);
+      insertInventory(this.tree.getRootFolder(), files[i], inv);
     }
   }
 
@@ -352,7 +352,7 @@ export class Project extends EventEmitter {
     for (const [key, value] of Object.entries(comp)) {
       for (let i = 0; i < value.length; i += 1) {
         // console.log(key+''+value[i].purl);
-        if (value[i].purl !== undefined) insertComponent(this.logical_tree, key, value[i]);
+        if (value[i].purl !== undefined) insertComponent(this.tree.getRootFolder(), key, value[i]);
       }
     }
   }
@@ -426,12 +426,12 @@ export class Project extends EventEmitter {
   }
 
   exclude_file(pathToExclude: string, recursive: boolean) {
-    const a = getLeaf(this.logical_tree, pathToExclude);
+    const a = getLeaf(this.tree.getRootFolder(), pathToExclude);
     setUseFile(a, false, recursive);
   }
 
   include_file(pathToInclude: string, recursive: boolean) {
-    const a = getLeaf(this.logical_tree, pathToInclude);
+    const a = getLeaf(this.tree.getRootFolder(), pathToInclude);
     setUseFile(a, true, recursive);
   }
 
@@ -611,7 +611,7 @@ function insertComponent(tree: any, mypath: string, comp: Component): any {
     let j: number;
     if (!arbol.components.some((e) => e.purl === component.purl && e.version === component.version)) {
       arbol.components.push(component);
-      arbol.className = 'match-info-result';
+      arbol.className = 'match-info-result status-pending';
     }
     childCount = arbol.children.length;
     for (j = 0; j < childCount; j += 1) {
@@ -628,7 +628,7 @@ function insertComponent(tree: any, mypath: string, comp: Component): any {
   }
 
   arbol.components.push(component);
-  arbol.className = 'match-info-result';
+  arbol.className = 'match-info-result status-pending';
 }
 
 function dirFirstFileAfter(a, b) {
@@ -644,7 +644,7 @@ function dirTree(root: string, filename: string) {
   if (stats.isDirectory()) {
     info = {
       type: 'folder',
-      className: 'no-match',
+      className: 'no-match status-pending',
       value: filename.replace(root, ''),
       label: path.basename(filename),
       inventories: [],
@@ -669,7 +669,7 @@ function dirTree(root: string, filename: string) {
   } else {
     info = {
       type: 'file',
-      className: 'no-match',
+      className: 'no-match status-pending',
       inv_count: 0,
       value: filename.replace(root, ''),
       label: path.basename(filename),

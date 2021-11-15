@@ -23,7 +23,7 @@ export default abstract class Node {
     this.value = path;
     this.label = label;
     this.include = true;
-    this.className = 'no-match status-pending';
+    this.className = 'no-match';
     this.showCheckbox = false;
     this.action = 'filter';  // filter or scan
     this.status = 'pending'; // pending, identified, ignored

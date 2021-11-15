@@ -73,4 +73,5 @@ export class Tree {
   public getRootFolder(): Folder {
     return this.rootFolder;
   }
+
 }
