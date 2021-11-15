@@ -38,13 +38,16 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
     inv = await p.scans_db.inventories.create(arg);
     arg.id = inv.id;
 
-    const path = await p.scans_db.results.getSummaryByids(arg.files);    
-   const node = p.getNode(path[0].path);
-   console.log("NODE",node);
+    const path = await p.scans_db.results.getSummaryByids(arg.files);
 
-  
-    logicResultService.getResultsByids(arg.files).then((data) => p.refreshTree(data));
-    
+    logicResultService.getResultsByids(arg.files).then(async (filesToUpdate) => {
+      for(const [key, value] of Object.entries(filesToUpdate)) {
+        p.getTree().getRootFolder().updateStatus(key, 'identified');
+      }
+      await p.save();
+      // Todo agregar avisar al UI cuando termina de actualizar
+    });
+
     return { status: 'ok', message: 'Inventory created', data: inv };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
@@ -54,7 +57,7 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
 
 ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (event, arg: Partial<Inventory>) => {
   try {
-    const p = workspace.getOpenedProjects()[0]; 
+    const p = workspace.getOpenedProjects()[0];
     const success = await p.scans_db.inventories.attachFileInventory(arg);
     return { status: 'ok', message: 'File attached to inventory successfully', success };
   } catch (e) {

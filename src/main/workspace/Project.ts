@@ -363,8 +363,8 @@ export class Project extends EventEmitter {
     this.emit('treeBuilt', this.logical_tree);
   }
 
-  getLogicalTree() {
-    return this.tree.getRootFolder();
+  getTree() {
+    return this.tree;
   }
 
   attachInventory(inv: Inventory) {

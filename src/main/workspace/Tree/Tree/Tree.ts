@@ -16,7 +16,7 @@ export class Tree {
     const pathParts = path.split(pathLib.sep);
     this.rootName = pathParts[pathParts.length - 1];
     this.rootPath = path;
-    this.rootFolder = new Folder(pathLib.sep, this.rootName);
+    this.rootFolder = new Folder('', this.rootName);
   }
 
   public buildTree(): Node {
