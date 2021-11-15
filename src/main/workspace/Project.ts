@@ -528,6 +528,11 @@ export class Project extends EventEmitter {
     const cfg = JSON.parse(txt);
     return cfg.TOKEN;
   }
+
+  public getNode(path: string) {
+    return this.tree.getNode(path);
+  }
+
 }
 /* AUXILIARY FUNCTIONS */
 
