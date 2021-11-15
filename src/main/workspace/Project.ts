@@ -17,6 +17,8 @@ import { userSetting } from '../UserSetting';
 import { ProjectMigration } from '../migration/ProjectMigration';
 import { Tree } from './Tree/Tree/Tree';
 
+import Folder from './Tree/Tree/Folder';
+
 const path = require('path');
 
 export class Project extends EventEmitter {
@@ -86,8 +88,8 @@ export class Project extends EventEmitter {
     this.state = ProjectState.OPENED;
     log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`;
     const project = await fs.promises.readFile(`${this.metadata.getMyPath()}/tree.json`, 'utf8');
+    
     const a = JSON.parse(project);
-    this.logical_tree = a.logical_tree;
     this.filesToScan = a.filesToScan;
     this.filesNotScanned = a.filesNotScanned;
     this.processedFiles = a.processedFiles;
@@ -95,6 +97,8 @@ export class Project extends EventEmitter {
     this.scans_db = new ScanDb(this.metadata.getMyPath());
     await this.scans_db.init();
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
+    this.tree = new Tree(this.metadata.getMyPath());
+    this.tree.loadTree(a.tree.rootFolder);
     return true;
   }
 
@@ -104,6 +108,7 @@ export class Project extends EventEmitter {
     this.state = ProjectState.CLOSED;
     this.scanner = null;
     this.logical_tree = null;
+    this.tree = null;
     this.scans_db = null;
     this.filesToScan = null;
   }

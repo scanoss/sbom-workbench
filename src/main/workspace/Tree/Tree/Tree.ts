@@ -48,15 +48,29 @@ export class Tree {
     return 0;
   }
 
-  public addComponents(results: any): void {  
+  public addComponents(results: any): void {
     Object.entries(results).forEach(([key, value]: [string, any]) => {
       for (let i = 0; i < value.length; i += 1) {
-        if (value[i].purl !== undefined) {    
+        if (value[i].purl !== undefined) {
           this.rootFolder.addComponent({ purl: value[i].purl[0], version: value[i].version }, key);
         }
       }
-    });   
+    });
   }
 
+  public loadTree(data: any): void {
+    this.rootFolder = this.deserialize(data) as Folder;
+  }
 
+  private deserialize(data: any): Node {
+    if (data.type === 'file') {
+      return Object.assign(Object.create(File.prototype), data);
+    }
+    const children = data.children.map((child: any) => this.deserialize(child));
+    return Object.assign(Object.create(Folder.prototype), { ...data, children });
+  }
+
+  public getRootFolder(): Folder {
+    return this.rootFolder;
+  }
 }

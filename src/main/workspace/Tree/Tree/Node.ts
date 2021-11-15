@@ -17,14 +17,14 @@ export default abstract class Node {
 
   private action: string;
 
-  private showCheckbox: string;
+  private showCheckbox: boolean;
 
   constructor(path: string, label: string) {
     this.value = path;
     this.label = label;
     this.include = true;
     this.className = 'no-match status-pending';
-    this.showCheckbox = 'false';
+    this.showCheckbox = false;
     this.action = 'filter';  // filter or scan
     this.status = 'pending'; // pending, identified, ignored
   }
