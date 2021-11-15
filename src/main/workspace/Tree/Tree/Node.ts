@@ -19,16 +19,14 @@ export default abstract class Node {
 
   private showCheckbox: string;
 
-
-
   constructor(path: string, label: string) {
     this.value = path;
     this.label = label;
     this.include = true;
-    this.className = 'no-match';
-    this.action = 'filter';
+    this.className = 'no-match status-pending';
     this.showCheckbox = 'false';
-    this.status = 'pending';
+    this.action = 'filter';  // filter or scan
+    this.status = 'pending'; // pending, identified, ignored
   }
 
   public getName(): string {
@@ -41,6 +39,12 @@ export default abstract class Node {
 
   public getPath(): string {
     return this.value;
+  }
+
+  public setStatusOnClassnameAs(className: string): void {
+    const re = new RegExp('.status-.*');
+    this.className = this.className.replace(re, '');
+    this.className += ` status-${className}`;
   }
 
   public abstract updateStatus(path: string, status: string): boolean;
