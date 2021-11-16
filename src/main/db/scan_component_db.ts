@@ -20,6 +20,7 @@ import { LicenseDb } from './scan_license_db';
 
 export interface ComponentParams {
   source?: ComponentSource;
+  path?: string;
 }
 
 export enum ComponentSource {
@@ -121,10 +122,14 @@ export class ComponentDb extends Db {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
-        const sqlGetComp =
-          params?.source === ComponentSource.ENGINE
-            ? query.SQL_GET_ALL_DETECTED_COMPONENTS
-            : query.SQL_GET_ALL_COMPONENTS;
+        let sqlGetComp ='';
+        if(params.source === ComponentSource.ENGINE) {
+          sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS
+        }else if(params.path) {
+          sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS.replace('#', `${params.path}%`);
+        }else{
+         sqlGetComp =  query.SQL_GET_ALL_COMPONENTS;
+        }      
         const db = await this.openDb();
         db.serialize(function () {
           db.all(sqlGetComp, async (err: any, data: any) => {
@@ -503,7 +508,8 @@ export class ComponentDb extends Db {
       try {     
         const data = await this.getAll({}, params);
         if (data) {        
-          const comp = await this.groupComponentsByPurl(data);          
+          const comp = await this.groupComponentsByPurl(data);       
+         
           resolve(comp);
         } else resolve([]);
       } catch (error) {        
