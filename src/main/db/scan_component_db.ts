@@ -16,7 +16,6 @@ import { Db } from './db';
 import { Component, ComponentGroup } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
 
-
 export interface ComponentParams {
   source?: ComponentSource;
   path?: string;
