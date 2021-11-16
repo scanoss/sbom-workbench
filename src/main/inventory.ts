@@ -38,15 +38,17 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
     inv = await p.scans_db.inventories.create(arg);
     arg.id = inv.id;
 
-    const path = await p.scans_db.results.getSummaryByids(arg.files);
-
-    logicResultService.getResultsByids(arg.files).then(async (filesToUpdate) => {
-      for(const [key, value] of Object.entries(filesToUpdate)) {
-        p.getTree().getRootFolder().updateStatus(key, 'identified');
-      }
-      await p.save();
-      // Todo agregar avisar al UI cuando termina de actualizar
-    });
+    logicResultService
+      .getResultsByids(arg.files)
+      .then((filesToUpdate) => {
+        const paths = Object.keys(filesToUpdate)
+        p.updateTree(paths as Array<string>, 'identified');
+        return true;
+      })
+      .catch((e) => {
+        console.log(e);
+        throw e;
+      });
 
     return { status: 'ok', message: 'Inventory created', data: inv };
   } catch (e) {
@@ -70,19 +72,37 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, inv: Partial<Inven
   try {
     const project = workspace.getOpenedProjects()[0];
     const result = await project.scans_db.results.getNotOriginal(inv.files);
-    if (result !== undefined) {
-      const node = project.getNodeFromPath(result.file_path);
-      if (result.source === 'filtered') {
-        node.action = 'filter';
-        node.className = 'filter-item';
-      } else {
-        node.action = 'scan';
-        node.className = 'no-match';
-      }
-      project.save();
-    }
+
+    // if (result !== undefined) {
+    //   const node = project.getNodeFromPath(result.file_path);
+    //   if (result.source === 'filtered') {
+    //     node.action = 'filter';
+    //     node.className = 'filter-item';
+    //   } else {
+    //     node.action = 'scan';
+    //     node.className = 'no-match';
+    //   }
+    //   project.save();
+    // }
+
 
     const success: boolean = await logicInventoryService.detach(inv);
+
+
+    logicResultService
+    .getResultsByids(inv.files)
+    .then((filesToUpdate) => {
+      const paths = Object.keys(filesToUpdate)
+      project.updateTree(paths as Array<string>, 'pending');
+      return true;
+    })
+    .catch((e) => {
+      console.log(e);
+      throw e;
+    });
+
+    project.save();
+
     return { status: 'ok', message: 'File detached to inventory successfully', success };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);

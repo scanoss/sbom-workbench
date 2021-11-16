@@ -363,8 +363,17 @@ export class Project extends EventEmitter {
     this.emit('treeBuilt', this.logical_tree);
   }
 
-  getTree() {
+  public getTree(): Tree {
     return this.tree;
+  }
+
+  public updateTree(paths: Array<string>, status: string) {
+    for (const filePath of paths) {
+      this.getTree().getRootFolder().updateStatus(filePath, status);
+    }
+    this.save();
+    this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
+    // Todo agregar avisar al UI cuando termina de actualizar
   }
 
   attachInventory(inv: Inventory) {
