@@ -20,11 +20,38 @@
       background: $bg;
     }
 
+    &.status-pending .rct-node-icon::before  {
+      background: var(--color-status-pending);
+    }
+
+    &.status-identified .rct-node-icon::before  {
+      background: var(--color-status-identified);
+    }
+
+    &.status-ignored .rct-node-icon::before  {
+      background: var(--color-status-ignored);
+    }
+
   }
 
   .rct-node-icon {
     color: #3F3F46;
+    position: relative;
+
+    &::before {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      left: 16px;
+      bottom: 2px;
+      background: transparent;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
   }
+
+
 
   .match-info-result {
     font-weight: 600;
