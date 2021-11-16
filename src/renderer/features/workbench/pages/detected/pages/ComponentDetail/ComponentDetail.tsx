@@ -329,6 +329,10 @@ export const ComponentDetail = () => {
                 component={component}
               />
             </div>
+
+            <div className="view">
+
+            </div>
           </div>
 
           <section className="subheader">

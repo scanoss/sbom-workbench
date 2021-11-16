@@ -1,6 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react';
 import CheckboxTree, { OnCheckNode } from 'react-checkbox-tree';
 import { useHistory } from 'react-router-dom';
+import { componentService } from '../../../../../api/component-service';
+import { ComponentSource } from '../../../../../main/db/scan_component_db';
 import { setFolder } from '../../actions';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 

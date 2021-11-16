@@ -67,7 +67,7 @@ export class Querys {
 
   // SQL INSERT INTO  COMPONENT VERSIONS
 
-  COMPDB_SQL_COMP_VERSION_INSERT = `INSERT INTO component_versions (name,version, description, url,purl,source) VALUES (?,?,?,?,?,?) ON CONFLICT(version,purl) DO UPDATE 
+  COMPDB_SQL_COMP_VERSION_INSERT = `INSERT INTO component_versions (name,version, description, url,purl,source) VALUES (?,?,?,?,?,?) ON CONFLICT(version,purl) DO UPDATE
     SET source = 'engine';`;
 
   // ATTACH A COMPONENT TO A LICENSE
@@ -121,11 +121,11 @@ export class Querys {
     'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.purl=? and cv.version=?;';
 
   SQL_GET_COMPONENT_BY_PURL_ENGINE = `SELECT counter.filesCount,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id
-    FROM 
-    (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp 
+    FROM
+    (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp
     LEFT JOIN license_view lic ON comp.id=lic.cvid
      WHERE comp.source=(SELECT source FROM components WHERE purl=? limit 1)
-     AND comp.purl=?) AS comp 
+     AND comp.purl=?) AS comp
      LEFT JOIN (SELECT DISTINCT r.purl, r.version, COUNT (*) AS filesCount FROM results  r WHERE r.source='engine' AND r.version!='' GROUP BY  r.purl,r.version ) as counter
      ON counter.purl=comp.purl AND counter.version=comp.version;`;
 
@@ -140,8 +140,8 @@ export class Querys {
 
     // GET ALL COMPONENTES BY PATH
     SQL_GET_ALL_DETECTED_COMPONENTS_BY_PATH = `SELECT filesVersion.filesCount,matched.comp_url,matched.compid,matched.comp_name,matched.license_url,matched.license_name,matched.license_spdxid,matched.purl,matched.version,matched.license_id,filesVersion.file_path FROM (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE source="engine") AS matched
-    INNER JOIN (SELECT DISTINCT r.purl, r.version,r.file_path,COUNT (*) AS filesCount FROM results  r WHERE r.source='engine' AND r.version!='' GROUP BY  r.purl,r.version ) AS filesVersion
-    ON filesVersion.version=matched.version AND filesVersion.purl=matched.purl  AND filesVersion.file_path LIKE '#';`;
+    INNER JOIN (SELECT DISTINCT r.purl, r.version,r.file_path,COUNT (*) AS filesCount FROM results  r WHERE r.source='engine' AND r.version!='' AND r.file_path LIKE '#' GROUP BY  r.purl,r.version ) AS filesVersion
+    ON filesVersion.version=matched.version AND filesVersion.purl=matched.purl;`;
 
   // GET ALL LICENSES
   SQL_SELECT_LICENSE = 'SELECT id, spdxid, name, url FROM licenses WHERE ';
@@ -190,14 +190,14 @@ export class Querys {
   SQL_GET_FILE_BY_PATH = 'SELECT file_path AS path,identified,ignored FROM results WHERE results.file_path=?;';
 
   SQL_GET_SPDX_COMP_DATA = `SELECT DISTINCT c.purl,c.version,c.url,c.name,i.spdxid AS concludedLicense,i.notes,l.spdxid AS declareLicense,lic.fulltext,lic.official
-  FROM inventories  i 
-  INNER JOIN license_view l ON l.cvid=i.cvid 
-  INNER JOIN component_versions c ON c.id=i.cvid 
+  FROM inventories  i
+  INNER JOIN license_view l ON l.cvid=i.cvid
+  INNER JOIN component_versions c ON c.id=i.cvid
   INNER JOIN licenses lic ON lic.spdxid=i.spdxid;`;
 
   SQL_GET_CSV_DATA = `SELECT DISTINCT i.id AS inventoryId,r.id AS resultID,i.usage,i.notes,i.spdxid AS identified_license,r.license AS detected_license,cv.purl,cv.version,r.file_path AS path,cv.name AS identified_component,r.component AS detected_component
-  FROM inventories i 
-  INNER JOIN file_inventories fi ON fi.inventoryid=i.id 
+  FROM inventories i
+  INNER JOIN file_inventories fi ON fi.inventoryid=i.id
   LEFT JOIN results r ON r.id=fi.resultid INNER JOIN component_versions cv ON cv.id=i.cvid;`;
 
   SQL_GET_ALL_SUMMARIES = 'SELECT compid,ignored,pending,identified FROM summary;';

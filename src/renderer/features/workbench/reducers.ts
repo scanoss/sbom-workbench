@@ -12,6 +12,7 @@ import {
   SET_FOLDER,
 } from './actions';
 import { ComponentGroup } from '../../../api/types';
+import { componentService } from '../../../api/component-service';
 
 export interface State {
   name: string;
