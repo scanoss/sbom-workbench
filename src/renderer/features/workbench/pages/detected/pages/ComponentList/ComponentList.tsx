@@ -8,6 +8,7 @@ import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import { setComponent } from '../../../../actions';
 import usePagination from '../../../../../../hooks/usePagination';
+import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 
 const filter = (items, query) => {
   if (!items) {
@@ -76,6 +77,8 @@ export const ComponentList = () => {
               inputProps={{ 'aria-label': 'search' }}
             />
           </Paper>
+
+          {state.filter.node && <Breadcrumb />}
         </header>
 
         <main className="app-content">
