@@ -210,7 +210,7 @@ export class Project extends EventEmitter {
 
     this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response, filesNotScanned) => {
       this.tree.addComponents(response.getServerResponse());
-      this.attachComponent(response.getServerResponse());
+      //this.attachComponent(response.getServerResponse());
       Object.assign(this.filesNotScanned, filesNotScanned);
       this.save();
     });

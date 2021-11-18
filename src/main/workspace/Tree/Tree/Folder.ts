@@ -56,18 +56,11 @@ export default class Folder extends Node {
   public addComponent(component: any, path: string): boolean {
     if (!path.includes(this.getPath())) return false;
 
-    this.children.forEach((child) => {
-      if (child.addComponent(component, path)) {
-        child.getComponent().forEach((item) => {
-          const isContained = this.components.some((el) => el.purl === item.purl && el.version === item.version);
-          if (isContained === false) {            
-            this.components.push(item);
-            this.className = 'match-info-results status-pending';
-          }
-        });
-      }
-    });
+    const existComponent = this.components.some((el) => el.purl === component.purl && el.version === component.version);
+    if (!existComponent) this.components.push(component);
 
+    for (const child of this.children)
+      if (child.addComponent(component, path)) break;
     return true;
   }
 
