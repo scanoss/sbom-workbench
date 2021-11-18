@@ -168,7 +168,7 @@ export class Project extends EventEmitter {
     log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, 'color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: this.metadata.getScannerState(),
-      processed: (100 * this.processedFiles) / this.filesSummary.include,
+      processed: 0,
     });
     this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
   }
@@ -230,7 +230,7 @@ export class Project extends EventEmitter {
         if (emptyInv) {
           const result = emptyInv.map((item: Record<string, number>) => item.id);
           await this.scans_db.inventories.deleteAllEmpty(result);
-        } 
+        }
       } else {
         await this.scans_db.results.insertFromFile(resPath);
         await this.scans_db.components.importUniqueFromFile();

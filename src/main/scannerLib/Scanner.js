@@ -72,6 +72,8 @@ export class Scanner extends EventEmitter {
 
     this.#setWinnowerListeners();
     this.#setDispatcherListeners();
+
+    if (this.#workDirectory === undefined) this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
   }
 
   #setWinnowerListeners() {
@@ -231,15 +233,15 @@ export class Scanner extends EventEmitter {
   async scanList(files, scanRoot = '') {
     this.#init();
 
+    this.filesToScan = files;
+    this.#scanRoot = scanRoot;
+    this.#createOutputFiles();
+
     if (!Object.entries(files).length) {
       await this.#finishScan();
       return;
     }
 
-    this.filesToScan = files;
-    this.#scanRoot = scanRoot;
-    if (this.#workDirectory === undefined) await this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
-    this.#createOutputFiles();
     this.#winnower.startWinnowing(this.filesToScan, scanRoot);
   }
 
