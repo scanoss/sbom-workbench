@@ -6,6 +6,12 @@
   .app-page {
     height: 100%;
   }
+
+  .app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+  }
 }
 
 .component-list {
