@@ -9,7 +9,6 @@ import { Db } from './db';
 import { utilDb } from './utils_db';
 import { License } from '../../api/types';
 
-
 const query = new Querys();
 
 export class LicenseDb extends Db {
@@ -19,22 +18,16 @@ export class LicenseDb extends Db {
 
   // CREATE LICENSE
   public bulkCreate(db: any, license: Partial<License>) {
-    return new Promise<any>((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
         license.fulltext = 'AUTOMATIC IMPORT';
         license.url = 'AUTOMATIC IMPORT';
-        db.run(
-          query.SQL_CREATE_LICENSE,
-          license.spdxid,
-          license.spdxid,
-          license.fulltext,
-          license.url,
-          1,
-          function (this: any) {
-            license.id = this.lastID;
-            resolve(license);
-          }
-        );
+        db.serialize(async function () {
+          db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.spdxid, license.fulltext, license.url, 1);
+          db.get(`${query.SQL_SELECT_LICENSE}spdxid=?;`, license.spdxid, (err: any, data: any) => {
+            resolve(data.id);
+          });
+        });
       } catch (error) {
         log.error(error);
         reject(new Error('The license was not created'));
@@ -115,7 +108,7 @@ export class LicenseDb extends Db {
         db.serialize(function () {
           db.get(sqlGet, (err: any, license: any) => {
             db.close();
-            if (err || license === undefined) throw new Error('Unable to get license by id');
+            if (err || license === undefined) throw new Error('Unable to get license ');
             resolve(license);
           });
         });
@@ -224,10 +217,7 @@ export class LicenseDb extends Db {
   public bulkAttachLicensebyId(db: any, data: any) {
     return new Promise(async (resolve, reject) => {
       db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
-        if (err) {
-          console.log(err);
-          reject(new Error('License was not attached'))
-        }
+        if (err) log.error(err);
         resolve(true);
       });
     });

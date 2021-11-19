@@ -296,7 +296,7 @@ export class ComponentDb extends Db {
   importUniqueFromFile() {
     const self = this;
     const attachLicComp: any = {};
-    let license: any = {};
+    const license: any = {};
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -309,9 +309,8 @@ export class ComponentDb extends Db {
               attachLicComp.license_id = await self.license.getLicenseIdFilter(
                 license
               );
-              if (attachLicComp.license_id === 0) {
-                license = await self.license.bulkCreate(db, license);
-                attachLicComp.license_id = license.id;
+              if (attachLicComp.license_id === 0) {               
+                attachLicComp.license_id  = await self.license.bulkCreate(db, license);              
               }
             }
             attachLicComp.compid = await self.componentNewImportFromResults(
