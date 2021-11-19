@@ -32,6 +32,9 @@
       background: var(--color-status-ignored);
     }
 
+    &.filter-item .rct-node-icon::before  {
+      background: transparent !important;
+    }
   }
 
   .rct-node-icon {
@@ -51,10 +54,8 @@
     }
   }
 
-
-
   .match-info-result {
-    font-weight: 600;
+    font-weight: 500;
     color: #27272A;
 
     .rct-node-icon {
@@ -63,8 +64,11 @@
   }
 
   .filter-item {
-    font-weight: 400;
     color: #968d8d8a;
+
+    .rct-title {
+      font-weight: 400 !important;
+    }
 
     .rct-node-icon {
       color: #968d8d8a;
