@@ -169,7 +169,7 @@ export default function reducer(state: State = initialState, action): State {
 }
 
 const filter = (components, node) => {
-  const keys = new Map<string, Map<string, any>>(node.map((el) => [`${el.purl[0]}-${el.version}`, true]));
+  const keys = new Map<string, Map<string, any>>(node.map((el) => [`${el.purl}-${el.version}`, true]));
 
   return components.filter((el) => {
     return el.versions.some((v) => keys.has(`${el.purl}-${v.version}`));

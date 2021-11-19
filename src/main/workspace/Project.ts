@@ -359,7 +359,7 @@ export class Project extends EventEmitter {
     const scanPath = this.metadata.getScanRoot();
     this.tree = new Tree(scanPath);
     this.tree.buildTree();
-    this.logical_tree = dirTree(scanPath, scanPath);
+    //this.logical_tree = dirTree(scanPath, scanPath);
     this.emit('treeBuilt', this.logical_tree);
   }
 
