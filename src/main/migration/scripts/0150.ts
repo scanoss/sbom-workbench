@@ -1,6 +1,8 @@
 import fs from 'fs';
+import log from 'electron-log';
 
 export function treeMigration(projectPath: string) {
+    log.info('%c[MIGRATION] IN PROGRESS...', 'color: green');
   const tree = JSON.parse(fs.readFileSync(`${projectPath}/tree.json`, 'utf8'));
 
   const metadata = JSON.parse(fs.readFileSync(`${projectPath}/metadata.json`, 'utf8'));
