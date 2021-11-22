@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import { nord } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { vs2015 } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { range } from '../../../../../utils/utils';
 
 const LINES_MAX = 1000;
@@ -61,7 +61,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
             ${truncatedStart > 0 ? 'truncatedStart' : ''}
             ${truncatedEnd > 0 ? 'truncatedEnd' : ''}`}
           wrapLines
-          style={nord}
+          style={vs2015}
           language="javascript"
           startingLineNumber={start + 1}
           showLineNumbers
