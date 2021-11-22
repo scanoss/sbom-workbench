@@ -4,10 +4,19 @@
 
   .react-checkbox-tree {
     width: 100%;
+    font-size: 14px;
+
+    > ol {
+      overflow-x: hidden;
+    }
+
+    .rct-collapse {
+      padding-right: 0;
+  }
   }
 
   .rct-node {
-    margin: 5px 0;
+    margin: 2px 0;
 
     $bg: #dbe7ff;
 
@@ -16,19 +25,28 @@
       background-color: $bg
     }
 
-    .rct-bare-label *:focus {
-      background: $bg;
+    .rct-bare-label {
+      width: 100%;
+
+      *:focus {
+        background: $bg;
+      }
     }
 
-    &.status-pending .rct-node-icon::before  {
+    .rct-node-clickable {
+      display: flex;
+      width: 100%;
+    }
+
+    &.status-pending > span .rct-node-icon::before  {
       background: var(--color-status-pending);
     }
 
-    &.status-identified .rct-node-icon::before  {
+    &.status-identified > span .rct-node-icon::before  {
       background: var(--color-status-identified);
     }
 
-    &.status-ignored .rct-node-icon::before  {
+    &.status-ignored > span .rct-node-icon::before  {
       background: var(--color-status-ignored);
     }
 
@@ -48,8 +66,8 @@
       left: 16px;
       bottom: 2px;
       background: transparent;
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
     }
   }

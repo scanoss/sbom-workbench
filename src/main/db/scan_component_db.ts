@@ -122,7 +122,7 @@ export class ComponentDb extends Db {
       try {
         let sqlGetComp = '';
         if(params?.path && params?.source) {
-          sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS_BY_PATH.replace('#', `${params.path}%`);
+          sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS_BY_PATH.replace('#', `${params.path}/%`);
         }
         else if(params?.source === ComponentSource.ENGINE) {
           sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS

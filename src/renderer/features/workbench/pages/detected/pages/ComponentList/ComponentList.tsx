@@ -66,6 +66,7 @@ export const ComponentList = () => {
     <div id="ComponentList">
       <section className="app-page" onScroll={onScroll}>
         <header className="app-header">
+          <Breadcrumb />
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">
               <SearchIcon />
@@ -77,8 +78,6 @@ export const ComponentList = () => {
               inputProps={{ 'aria-label': 'search' }}
             />
           </Paper>
-
-          {state.filter.node && <Breadcrumb />}
         </header>
 
         <main className="app-content">

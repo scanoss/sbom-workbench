@@ -12,6 +12,7 @@ import AppBar from './components/AppBar/AppBar';
 import Detected from './pages/detected/Detected';
 import Identified from './pages/identified/Identified';
 import Reports from './pages/report/Report';
+import Breadcrumb from './components/Breadcrumb/Breadcrumb';
 
 const Workbench = () => {
   const { path } = useRouteMatch();

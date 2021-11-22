@@ -44,15 +44,15 @@ export class FilesDb extends Db {
   }
 
   // GET ALL FILES FOR A COMPONENT
- public async getFilesComponent(data: Partial<Component>, params: any){  
-    return new Promise(async (resolve, reject) => {      
-      let result;   
-      try {     
+ public async getFilesComponent(data: Partial<Component>, params: any){
+    return new Promise(async (resolve, reject) => {
+      let result;
+      try {
         if (data.purl && data.version)
           result = await this.getByPurlVersion(data,params? params.path:null);
-        else result = await this.getByPurl(data, params? params.path:null);    
+        else result = await this.getByPurl(data, params? params.path:null);
         resolve(result);
-      } catch (error) {         
+      } catch (error) {
         log.error(error);
         reject(error);
       }
@@ -62,19 +62,19 @@ export class FilesDb extends Db {
   private async getByPurl(data: Partial<Component>, path: string) {
     return new Promise(async (resolve, reject) => {
       const self = this;
-      try {      
+      try {
         let SQLquery:String = '';
-        let params = [];       
+        let params = [];
         if(!path){
           SQLquery = query.SQL_SELECT_FILES_FROM_PURL;
           params = [data.purl];
         }
-        else {        
+        else {
           SQLquery = query.SQL_SELECT_FILES_FROM_PURL_PATH;
-          params = [data.purl,`${path}%`];
-        }           
+          params = [data.purl,`${path}/%`];
+        }
         const db = await this.openDb();
-        db.all(SQLquery, ...params,         
+        db.all(SQLquery, ...params,
           async function (err: any, file: any) {
             db.close();
             if (!err) {
@@ -100,7 +100,7 @@ export class FilesDb extends Db {
         );
       } catch (error) {
         log.error(error);
-        reject(error);      
+        reject(error);
       }
     });
   }
@@ -116,9 +116,9 @@ export class FilesDb extends Db {
           params = [data.purl,data.version];
         }else{
           SQLquery = query.SQL_SELECT_FILES_FROM_PURL_VERSION_PATH;
-          params = [data.purl,data.version,`${path}%`];
-        } 
-        const db = await this.openDb();      
+          params = [data.purl,data.version,`${path}/%`];
+        }
+        const db = await this.openDb();
         db.all(SQLquery,...params,async function (err: any, file: any){
           db.close();
           if (!err) {
@@ -136,7 +136,7 @@ export class FilesDb extends Db {
             resolve(file);
           } else throw err;
         });
-      } catch (error) {  
+      } catch (error) {
         log.error(error);
         reject(error);
       }
@@ -148,7 +148,7 @@ export class FilesDb extends Db {
       try {
         const db = await this.openDb();
         const ignoredFilesSQL = `${
-        query.SQL_UPDATE_IGNORED_FILES}(${files.toString()});`;       
+        query.SQL_UPDATE_IGNORED_FILES}(${files.toString()});`;
         db.serialize(function () {
           db.run('begin transaction');
           db.run(ignoredFilesSQL);

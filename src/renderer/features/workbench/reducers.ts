@@ -149,13 +149,13 @@ export default function reducer(state: State = initialState, action): State {
       const { node } = action;
       return {
         ...state,
-        components: node ? filter(state.mainComponents, node.components) : state.mainComponents,
+        // components: node ? filter(state.mainComponents, node.components) : state.mainComponents,
         filter: {
           ...state.filter,
           node: node
             ? {
                 type: 'folder',
-                path: node.value,
+                path: node.path,
               }
             : null,
         },

@@ -9,7 +9,7 @@ import { IWorkbenchContext, WorkbenchContext } from '../../store';
 export const FileTree = () => {
   const history = useHistory();
 
-  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, setNode } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const { tree, filter, file } = state;
 
@@ -23,10 +23,19 @@ export const FileTree = () => {
     const fileTreeNode = getNode(node);
 
     if (!children) {
-      dispatch(setFolder(null));
+      // dispatch(setFolder(null));
+      setNode(null);
       history.push(`/workbench/detected/file?path=${encodeURIComponent(value)}`);
     } else {
-      dispatch(setFolder(fileTreeNode || null));
+      // dispatch(setFolder(fileTreeNode || null));
+      setNode(
+        fileTreeNode
+          ? {
+              type: 'folder',
+              path: fileTreeNode.value || null,
+            }
+          : null
+      );
       history.push(`/workbench/detected`);
     }
 
