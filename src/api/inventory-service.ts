@@ -27,6 +27,7 @@ class InventoryService extends BaseService {
 
   public async detach(inventory: Partial<Inventory>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_DETACH_FILE, inventory);
+    console.log("SARASASASASAS");
     return this.response(response);
   }
 

@@ -30,8 +30,10 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, inv: Partial<Inventory>) =
 
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   let inv: any;
+
   try {
     const p = await workspace.getOpenedProjects()[0];
+    console.log(p.getTree().getNode('/Makefile'));
     inv = await p.scans_db.inventories.create(arg);
     arg.id = inv.id;
 
@@ -46,6 +48,7 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
         }
 
         p.updateTree();
+        console.log(p.getTree().getNode('/Makefile'));
         return true;
       })
       .catch((e) => {
@@ -74,16 +77,14 @@ ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (event, arg: Partial<Inven
 ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, inv: Partial<Inventory>) => {
   try {
     const project = workspace.getOpenedProjects()[0];
-    const result = await project.scans_db.results.getNotOriginal(inv.files);
-    console.log("DETACH INVENTORY");
+    //const result = await project.scans_db.results.getNotOriginal(inv.files);
+
     logicResultService
       .getResultsByids(inv.files)
       .then((filesToUpdate) => {
         const paths = Object.keys(filesToUpdate);
         project.getTree().restoreStatus(paths as Array<string>);
         project.updateTree();
-       
-
         return true;
       })
       .catch((e) => {
@@ -104,7 +105,23 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, inv: Partial<Inven
 
 ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (event, arg: Partial<Inventory>) => {
   try {
-    const success = await workspace.getOpenedProjects()[0].scans_db.inventories.delete(arg);
+    const p =  workspace.getOpenedProjects()[0];
+    const success = await p.scans_db.inventories.delete(arg);
+
+    console.log(arg);
+    logicResultService
+    .getResultsByids(arg)
+    .then((filesToUpdate) => {
+      const paths = Object.keys(filesToUpdate);
+      p.getTree().restoreStatus(paths as Array<string>);
+      p.updateTree();
+      return true;
+    })
+    .catch((e) => {
+      console.log(e);
+      throw e;
+    });
+
     if (success) return { status: 'ok', message: 'Inventory deleted successfully', success };
     return { status: 'error', message: 'Inventory was not deleted successfully', success };
   } catch (e) {

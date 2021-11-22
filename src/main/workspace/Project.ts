@@ -220,6 +220,9 @@ export class Project extends EventEmitter {
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath, filesNotScanned) => {
+
+      console.log(this.getTree().getNode('/Makefile'));
+
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
         log.info(`%c[ SCANNER ]: RESCANFINISHED `, 'color: green');
 
@@ -556,7 +559,7 @@ function summarizeTree(root: any, tree: any, summary: any) {
     summary.total += 1;
     if (tree.action === 'filter') {
       summary.filter += 1;
-      //tree.className = 'filter-item';
+      tree.className = 'filter-item';
     } else if (tree.include === true) {
       summary.include += 1;
       summary.files[`${root}${tree.value}`] = tree.scanMode;
@@ -568,7 +571,7 @@ function summarizeTree(root: any, tree: any, summary: any) {
   }
   if (tree.type === 'folder') {
     if (tree.action === 'filter') {
-      //tree.className = 'filter-item';
+      tree.className = 'filter-item';
     } else
       for (j = 0; j < tree.children.length; j += 1) {
         summary = summarizeTree(root, tree.children[j], summary);

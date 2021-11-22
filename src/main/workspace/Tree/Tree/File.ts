@@ -50,7 +50,7 @@ export default class File extends Node {
     console.log('ORIGINAL',this.original);
     console.log('action',this.action);
 
-    if (this.action === NodeStatus.FILTERED) {
+    if (this.action === '') {
       console.log("filtered");
       this.status = NodeStatus.FILTERED;
       this.setStatusOnClassnameAs(this.status);
