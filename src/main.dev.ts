@@ -185,9 +185,12 @@ async function mainLogic() {
     wsCfgUpdate(root);
   }
 
+
   await workspace.read(root);
   await userSetting.read(root);
   new WorkspaceMigration(userSetting.get().VERSION, root).up();
+
+
 }
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {

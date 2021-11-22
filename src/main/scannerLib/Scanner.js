@@ -14,15 +14,13 @@ import { ScannerEvents } from './ScannerEvents';
 import { ScannerCfg } from './ScannerCfg';
 import { DispatchableItem } from './Dispatcher/DispatchableItem';
 
-const sortPaths = require ('sort-paths');
-
+const sortPaths = require('sort-paths');
 
 // TO DO:
 // - Split ScannerEvents into ExternalEvents and InternalEvents
 // - Implement a static atribute to keep track of the scannerId
 
 export class Scanner extends EventEmitter {
-
   #scannerCfg;
 
   #workDirectory;
@@ -72,6 +70,8 @@ export class Scanner extends EventEmitter {
 
     this.#setWinnowerListeners();
     this.#setDispatcherListeners();
+
+    if (this.#workDirectory === undefined) this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
   }
 
   #setWinnowerListeners() {
@@ -193,8 +193,12 @@ export class Scanner extends EventEmitter {
     const resultSorted = {};
     // eslint-disable-next-line no-restricted-syntax
     for (const key of sortedPaths) resultSorted[key] = results[key];
-    await fs.promises.writeFile(this.#resultFilePath, JSON.stringify(resultSorted, null,2));
-    this.#reportLog(`[ SCANNER ]: Scan finished (Scanned: ${this.#processedFiles}, Not Scanned: ${Object.keys(this.filesNotScanned).length})`);
+    await fs.promises.writeFile(this.#resultFilePath, JSON.stringify(resultSorted, null, 2));
+    this.#reportLog(
+      `[ SCANNER ]: Scan finished (Scanned: ${this.#processedFiles}, Not Scanned: ${
+        Object.keys(this.filesNotScanned).length
+      })`
+    );
     this.#reportLog(`[ SCANNER ]: Results on: ${this.#resultFilePath}`);
     this.#isRunning = false;
     this.emit(ScannerEvents.SCAN_DONE, this.#resultFilePath, this.filesNotScanned);
@@ -206,8 +210,10 @@ export class Scanner extends EventEmitter {
 
   #errorHandler(error, origin) {
     this.stop();
-    if (origin === ScannerEvents.MODULE_DISPATCHER) {}
-    if (origin === ScannerEvents.MODULE_WINNOWER) {}
+    if (origin === ScannerEvents.MODULE_DISPATCHER) {
+    }
+    if (origin === ScannerEvents.MODULE_WINNOWER) {
+    }
 
     this.#reportLog(`[ SCANNER ]: Error reason ${error}`);
 
@@ -231,15 +237,15 @@ export class Scanner extends EventEmitter {
   async scanList(files, scanRoot = '') {
     this.#init();
 
+    this.filesToScan = files;
+    this.#scanRoot = scanRoot;
+    this.#createOutputFiles();
+
     if (!Object.entries(files).length) {
       await this.#finishScan();
       return;
     }
 
-    this.filesToScan = files;
-    this.#scanRoot = scanRoot;
-    if (this.#workDirectory === undefined) await this.setWorkDirectory(`${os.tmpdir()}/scanner-${this.getScannerId()}`);
-    this.#createOutputFiles();
     this.#winnower.startWinnowing(this.filesToScan, scanRoot);
   }
 
@@ -271,6 +277,5 @@ export class Scanner extends EventEmitter {
   isRunning() {
     return this.#isRunning;
   }
-
 
 }

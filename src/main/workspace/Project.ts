@@ -180,7 +180,7 @@ export class Project extends EventEmitter {
     log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, 'color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: this.metadata.getScannerState(),
-      processed: (100 * this.processedFiles) / this.filesSummary.include,
+      processed: 0,
     });
     this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
   }
