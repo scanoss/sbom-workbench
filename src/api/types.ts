@@ -131,3 +131,9 @@ export enum FormatVersion {
   WFP = 'WFP',
   SPDXLITEJSON = 'SPDXLITEJSON',
 }
+
+export type IParams = Record<PropertyKey, any> & {
+  // non-generic interface properties go here
+  sort?: string;
+  order?: string;
+}

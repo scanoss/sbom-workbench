@@ -9,6 +9,8 @@ export const SET_COMPONENT = 'APP/WORKBENCH/SET_COMPONENT';
 export const SET_VERSION = 'APP/WORKBENCH/SET_VERSION';
 export const SET_FILE = 'APP/WORKBENCH/SET_FILE';
 export const SET_HISTORY = 'APP/WORKBENCH/SET_HISTORY';
+export const SET_FOLDER = 'APP/WORKBENCH/SET_FILTER_FOLDER';
+
 
 export const RESET = 'APP/WORKBENCH/RESET';
 
@@ -52,6 +54,11 @@ export const setFile = (file: string) => ({
 export const setHistoryCrumb = (crumb) => ({
   type: SET_HISTORY,
   crumb,
+});
+
+export const setFolder = (node) => ({
+  type: SET_FOLDER,
+  node,
 });
 
 export const reset = () => ({

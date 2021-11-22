@@ -30,7 +30,7 @@ export function isPseudoBinary(filePath: string): boolean {
     return true;
   }
 
-  //if start with pattern
+  // if start with pattern
   const file = getFirstLine(filePath);
   for (const skip of skipStartWith) {
     if (file.startsWith(skip)) {

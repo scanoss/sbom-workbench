@@ -27,7 +27,7 @@ import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import { mapFiles } from '../../../../../../../utils/scan-util';
 import { setHistoryCrumb, setVersion } from '../../../../actions';
-import usePagination from '../../../../../../hooks/usePagination';
+import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 
 // inner components
 const VersionSelector = ({ versions, version, onSelect, component }) => {
@@ -109,7 +109,8 @@ export const ComponentDetail = () => {
   ) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { name, component, version } = state;
+  const { name, component, filter } = state;
+  const { version } = filter;
 
   const anchorRef = useRef<HTMLDivElement>(null);
 
@@ -126,7 +127,8 @@ export const ComponentDetail = () => {
   const [tab, setTab] = useState<number>(state.history.section || 0);
 
   const getFiles = async () => {
-    const response = await componentService.getFiles({ purl: component.purl, version });
+    console.log(version);
+    const response = await componentService.getFiles({ purl: component.purl, version }, filter.node?.path ? { path: filter.node.path } : null);
     console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));
   };
@@ -285,6 +287,7 @@ export const ComponentDetail = () => {
   }, [files]);
 
   useEffect(() => {
+    console.log('version changed');
     setFilterFiles({
       pending: [],
       identified: [],
@@ -292,7 +295,7 @@ export const ComponentDetail = () => {
     });
     getFiles();
     getInventories();
-  }, [version]);
+  }, [state.filter.version]);
 
   useEffect(() => {
     dispatch(setHistoryCrumb({ section: tab }));
@@ -326,6 +329,8 @@ export const ComponentDetail = () => {
                 component={component}
               />
             </div>
+
+            {filter.node && <Breadcrumb />}
           </div>
 
           <section className="subheader">

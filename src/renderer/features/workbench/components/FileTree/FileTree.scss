@@ -2,8 +2,39 @@
   color: #3F3F46;
   font-weight: 400;
 
+  .react-checkbox-tree {
+    width: 100%;
+  }
+
   .rct-node {
     margin: 5px 0;
+
+    $bg: #dbe7ff;
+
+    .selected {
+      border-radius: 2px;
+      background-color: $bg
+    }
+
+    .rct-bare-label *:focus {
+      background: $bg;
+    }
+
+    &.status-pending .rct-node-icon::before  {
+      background: var(--color-status-pending);
+    }
+
+    &.status-identified .rct-node-icon::before  {
+      background: var(--color-status-identified);
+    }
+
+    &.status-ignored .rct-node-icon::before  {
+      background: var(--color-status-ignored);
+    }
+
+    &.filter-item .rct-node-icon::before  {
+      background: transparent !important;
+    }
   }
 
   .MuiSvgIcon-root {
@@ -12,25 +43,42 @@
   }
 
   .rct-node-icon {
-    color: #27272A;
-  }
-
-  .rct-text {
+    color: #3F3F46;
     position: relative;
-  }
-  .rct-collapse {
-    position: absolute;
-    left: -20px;
+
+    .rct-text { // ADD
+      position: relative;
+    }
+
+    .rct-collapse {
+      position: absolute;
+      left: -20px;
+    }
+
+    &::before {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      left: 16px;
+      bottom: 2px;
+      background: transparent;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
   }
 
   .match-info-result {
-    font-weight: 600;
+    font-weight: 500;
     color: #27272A;
   }
 
   .filter-item {
-    font-weight: 400;
     color: #968d8d8a;
+
+    .rct-title {
+      font-weight: 400 !important;
+    }
 
     .rct-node-icon {
       color: #968d8d8a;

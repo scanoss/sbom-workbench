@@ -44,13 +44,13 @@ export class FilesDb extends Db {
   }
 
   // GET ALL FILES FOR A COMPONENT
-  async getFilesComponent(data: Partial<Component>) {  
-    return new Promise(async (resolve, reject) => {
-      let result;
-      try {
+ public async getFilesComponent(data: Partial<Component>, params: any){  
+    return new Promise(async (resolve, reject) => {      
+      let result;   
+      try {     
         if (data.purl && data.version)
-          result = await this.getByPurlVersion(data);
-        else result = await this.getByPurl(data);    
+          result = await this.getByPurlVersion(data,params? params.path:null);
+        else result = await this.getByPurl(data, params? params.path:null);    
         resolve(result);
       } catch (error) {         
         log.error(error);
@@ -59,14 +59,22 @@ export class FilesDb extends Db {
     });
   }
 
-  private async getByPurl(data: Partial<Component>) {
+  private async getByPurl(data: Partial<Component>, path: string) {
     return new Promise(async (resolve, reject) => {
       const self = this;
-      try {
+      try {      
+        let SQLquery:String = '';
+        let params = [];       
+        if(!path){
+          SQLquery = query.SQL_SELECT_FILES_FROM_PURL;
+          params = [data.purl];
+        }
+        else {        
+          SQLquery = query.SQL_SELECT_FILES_FROM_PURL_PATH;
+          params = [data.purl,`${path}%`];
+        }           
         const db = await this.openDb();
-        db.all(
-          query.SQL_SELECT_FILES_FROM_PURL,
-          data.purl,
+        db.all(SQLquery, ...params,         
           async function (err: any, file: any) {
             db.close();
             if (!err) {
@@ -97,12 +105,21 @@ export class FilesDb extends Db {
     });
   }
 
-  private async getByPurlVersion(data: Partial<Component>) {
+  private async getByPurlVersion(data: Partial<Component>, path: string ) {
     return new Promise(async (resolve, reject) => {
       const self = this;
       try {
-        const db = await this.openDb();
-        db.all(query.SQL_SELECT_FILES_FROM_PURL_VERSION,data.purl,data.version,async function (err: any, file: any){
+        let SQLquery:String = '';
+        let params = [];
+        if(!path){
+          SQLquery = query.SQL_SELECT_FILES_FROM_PURL_VERSION;
+          params = [data.purl,data.version];
+        }else{
+          SQLquery = query.SQL_SELECT_FILES_FROM_PURL_VERSION_PATH;
+          params = [data.purl,data.version,`${path}%`];
+        } 
+        const db = await this.openDb();      
+        db.all(SQLquery,...params,async function (err: any, file: any){
           db.close();
           if (!err) {
             const comp = await self.component.getAll({ purl: data.purl,version: data.version });

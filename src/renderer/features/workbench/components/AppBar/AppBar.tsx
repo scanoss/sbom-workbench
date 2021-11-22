@@ -26,7 +26,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import { reset } from '../../actions';
+import { reset, setFolder } from '../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
 import { ExportFormat } from '../../../../../api/export-service';
 import { projectService } from '../../../../../api/project-service';
@@ -52,24 +52,28 @@ const Navigation = () => {
 
 const AppMenu = () => {
   const history = useHistory();
+  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+
+
+  const reset = () => dispatch(setFolder(null));
 
   return (
     <section id="AppMenu">
-      <NavLink to="/workbench/detected" activeClassName="active" tabIndex={-1}>
+      <NavLink onClick={reset} to="/workbench/detected" activeClassName="active" tabIndex={-1}>
         <Tooltip title="Detected components">
           <Button color="inherit">
             <GavelIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/identified" activeClassName="active" tabIndex={-1}>
+      <NavLink onClick={reset} to="/workbench/identified" activeClassName="active" tabIndex={-1}>
         <Tooltip title="Identified components">
           <Button color="inherit">
             <CheckCircleOutlineOutlinedIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/report" activeClassName="active" tabIndex={-1}>
+      <NavLink onClick={reset} to="/workbench/report" activeClassName="active" tabIndex={-1}>
         <Tooltip title="Reports">
           <Button color="inherit">
             <InsertChartOutlinedTwoToneIcon />

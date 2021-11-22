@@ -13,7 +13,7 @@ ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (_event, arg: any) => {
   const r = await p.getResults();
 
   const response = {
-    logical_tree: p.getLogicalTree(),
+    logical_tree: p.getTree().getRootFolder(),
     work_root: p.getMyPath(),
     results: r,
     scan_root: p.getScanRoot(),
@@ -103,7 +103,7 @@ ipcMain.handle(IpcEvents.GET_TOKEN, (event) => {
 
 ipcMain.handle(IpcEvents.PROJECT_READ_TREE, (event) => {
   try {
-    const tree = workspace.getOpenedProjects()[0].getLogicalTree();
+    const tree = workspace.getOpenedProjects()[0].getTree().getRootFolder();
     return Response.ok({ message: 'Tree read successfully', data: tree });
   } catch (e: any) {
     return Response.fail({ message: e.message });
