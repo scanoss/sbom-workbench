@@ -7,7 +7,7 @@
   }
 
   .rct-node {
-    margin: 5px 0;
+    margin: 2px 0;
 
     $bg: #dbe7ff;
 
@@ -16,8 +16,17 @@
       background-color: $bg
     }
 
-    .rct-bare-label *:focus {
-      background: $bg;
+    .rct-bare-label {
+      width: 100%;
+
+      *:focus {
+        background: $bg;
+      }
+    }
+
+    .rct-node-clickable {
+      display: flex;
+      width: 100%;
     }
 
     &.status-pending .rct-node-icon::before  {

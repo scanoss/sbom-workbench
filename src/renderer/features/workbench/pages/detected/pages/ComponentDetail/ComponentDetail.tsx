@@ -287,7 +287,6 @@ export const ComponentDetail = () => {
   }, [files]);
 
   useEffect(() => {
-    console.log('version changed');
     setFilterFiles({
       pending: [],
       identified: [],
@@ -295,7 +294,7 @@ export const ComponentDetail = () => {
     });
     getFiles();
     getInventories();
-  }, [state.filter.version]);
+  }, [state.filter.version, state.filter.node]);
 
   useEffect(() => {
     dispatch(setHistoryCrumb({ section: tab }));
