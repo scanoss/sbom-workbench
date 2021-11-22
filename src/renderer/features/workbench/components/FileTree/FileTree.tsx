@@ -42,7 +42,7 @@ export const FileTree = () => {
             expandClose: <KeyboardArrowRightIcon />,
             expandOpen: <KeyboardArrowDownIcon />,
             parentClose: <FolderIcon width="18" height="18" viewBox="0 0 18 18" />,
-            parentOpen: <FolderOpenIcon width="19" height="18" viewBox="0 0 19 18" />,
+            parentOpen: <FolderOpenIcon width="18" height="18" viewBox="0 0 18 18" />,
             leaf: <FileIcon width="14" height="18" viewBox="0 0 14 18" />,
           }}
         />

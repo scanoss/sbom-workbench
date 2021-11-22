@@ -12,7 +12,7 @@
   }
 
   .rct-node-icon {
-    color: #3F3F46;
+    color: #27272A;
   }
 
   .rct-text {
@@ -26,16 +26,15 @@
   .match-info-result {
     font-weight: 600;
     color: #27272A;
-
-    .rct-node-icon {
-      color: #27272A;
-    }
   }
 
   .filter-item {
     font-weight: 400;
     color: #968d8d8a;
 
+    .rct-node-icon {
+      color: #968d8d8a;
+    }
   }
 
   .react-checkbox-tree > ol {
@@ -43,7 +42,6 @@
   }
 
   .rct-node-icon {
-    color: #968d8d8a;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -61,10 +59,10 @@
   .exclude-item {
     font-weight: 600;
     color: #968d8d8a;
-    text-decoration:line-through;
+    text-decoration: line-through;
 
     .rct-node-icon {
-      color: #968d8d8a;
+      color: #968d8d8a !important;
     }
   }
 
