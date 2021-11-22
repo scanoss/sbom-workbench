@@ -48,15 +48,21 @@ export class Tree {
     return 0;
   }
 
-  public addComponents(results: any): void {
+
+  public attachResults(results: any): void {
     Object.entries(results).forEach(([key, value]: [string, any]) => {
       for (let i = 0; i < value.length; i += 1) {
         if (value[i].purl !== undefined) {
-          this.rootFolder.addComponent({ purl: value[i].purl[0], version: value[i].version }, key);
+          this.rootFolder.attachResults({ purl: value[i].purl[0], version: value[i].version }, key);
         }
       }
     });
   }
+
+  public restoreStatus(paths: Array<string>) {
+    for (const path of paths) this.rootFolder.restoreStatus(path);
+  }
+
 
   public loadTree(data: any): void {
     this.rootFolder = this.deserialize(data) as Folder;

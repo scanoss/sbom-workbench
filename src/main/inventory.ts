@@ -4,11 +4,8 @@ import { Inventory } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { logicInventoryService } from './services/LogicInventoryService';
 import { logicResultService } from './services/LogicResultService';
+import { NodeStatus } from './workspace/Tree/Tree/Node';
 import { workspace } from './workspace/Workspace';
-
-
-
-
 
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (event, invget: Partial<Inventory>) => {
   let inv: any;
@@ -41,8 +38,9 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
     logicResultService
       .getResultsByids(arg.files)
       .then((filesToUpdate) => {
-        const paths = Object.keys(filesToUpdate)
-        p.updateTree(paths as Array<string>, 'identified');
+        const paths = Object.keys(filesToUpdate);
+        console.log("LLAMANDO DESDE EL INVENTORY SERVICES. PATH A ESCANEAR: ", paths)
+        p.updateTree(paths as Array<string>, NodeStatus.IDENTIFIED);
         return true;
       })
       .catch((e) => {
@@ -73,6 +71,15 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, inv: Partial<Inven
     const project = workspace.getOpenedProjects()[0];
     const result = await project.scans_db.results.getNotOriginal(inv.files);
 
+
+    // Primero tengo que preguntar cual era el estado anterior, lo puedo sacar de los campos original y
+
+
+      //p.getTree().getRootFolder().restoreStatus()
+
+
+
+
     // if (result !== undefined) {
     //   const node = project.getNodeFromPath(result.file_path);
     //   if (result.source === 'filtered') {
@@ -92,8 +99,8 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, inv: Partial<Inven
     logicResultService
     .getResultsByids(inv.files)
     .then((filesToUpdate) => {
-      const paths = Object.keys(filesToUpdate)
-      project.updateTree(paths as Array<string>, 'pending');
+      const paths = Object.keys(filesToUpdate);
+      project.getTree().restoreStatus(paths as Array<string>);
       return true;
     })
     .catch((e) => {

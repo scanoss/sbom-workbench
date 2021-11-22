@@ -18,6 +18,7 @@ import { ProjectMigration } from '../migration/ProjectMigration';
 import { Tree } from './Tree/Tree/Tree';
 
 import Folder from './Tree/Tree/Folder';
+import Node, { NodeStatus } from './Tree/Tree/Node';
 
 const path = require('path');
 
@@ -157,8 +158,11 @@ export class Project extends EventEmitter {
     await this.scans_db.init();
     await this.scans_db.licenses.importFromJSON(licenses);
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
-    this.build_tree();
+    this.build_tree();  // Estamos OK
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
+
+    // Tenemos que agregar el campo status y original field
+    // Aca tenemos que setear el original en filteres solo si es filtrado.
     this.indexScan(this.metadata.getScanRoot(), this.tree.getRootFolder(), this.banned_list);
     const summary = { total: 0, include: 0, filter: 0, files: {} };
     this.filesSummary = summarizeTree(this.metadata.getScanRoot(),this.tree.getRootFolder(), summary);
@@ -209,7 +213,7 @@ export class Project extends EventEmitter {
     });
 
     this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response, filesNotScanned) => {
-      this.tree.addComponents(response.getServerResponse());
+      this.tree.attachResults(response.getServerResponse());
       //this.attachComponent(response.getServerResponse());
       Object.assign(this.filesNotScanned, filesNotScanned);
       this.save();
@@ -367,9 +371,9 @@ export class Project extends EventEmitter {
     return this.tree;
   }
 
-  public updateTree(paths: Array<string>, status: string) {
+  public updateTree(paths: Array<string>, status: NodeStatus) {
     for (const filePath of paths) {
-      this.getTree().getRootFolder().updateStatus(filePath, status);
+      this.getTree().getRootFolder().setStatus(filePath, status);
     }
     this.save();
     this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
@@ -507,7 +511,7 @@ export class Project extends EventEmitter {
     return 'FULL_SCAN';
   }
 
-  indexScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
+  indexScan(scanRoot: string, jsonScan: Node, bannedList: Filtering.BannedList) {
     let i = 0;
     if (jsonScan.type === 'file') {
       this.filesIndexed += 1;

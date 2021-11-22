@@ -1,11 +1,23 @@
+import { match } from "assert";
+
 const pathLib = require('path');
+
+export enum NodeStatus {
+  FILTERED = "FILTERED",
+  NOMATCH = "NO-MATCH",
+  MATCH = "MATCH",
+  PENDING = "PENDING",
+  IDENTIFIED = "IDENTIFIED",
+  IGNORED = "IGNORED",
+};
+
 
 export default abstract class Node {
   protected type: string;
 
   protected className: string;
 
-  protected status: string;
+  protected status: NodeStatus;
 
   protected value: string;  // Relative path to the folder or file
 
@@ -15,26 +27,32 @@ export default abstract class Node {
 
   private include: boolean;
 
-  private action: string;
+  protected action: string;
 
   private showCheckbox: boolean;
+
+  protected original: NodeStatus;
 
   constructor(path: string, label: string) {
     this.value = path;
     this.label = label;
-    this.include = true;
+
+
+    this.status = NodeStatus.FILTERED;
+    this.original = NodeStatus.NOMATCH;
+
+    //Those parameters are used by the UI.
     this.className = 'no-match';
     this.showCheckbox = false;
-    this.action = 'filter';  // filter or scan
-    this.status = 'pending'; // pending, identified, ignored
+    //Those parameters are used by the UI.
+
+
+    this.action = 'filter';
+    this.include = true;
   }
 
   public getName(): string {
     return this.label;
-  }
-
-  public getStatus(): string {
-    return this.status;
   }
 
   public getPath(): string {
@@ -44,14 +62,26 @@ export default abstract class Node {
   public setStatusOnClassnameAs(className: string): void {
     const re = new RegExp('.status-.*');
     this.className = this.className.replace(re, '');
-    this.className += ` status-${className}`;
+    this.className += ` status-${className.toLowerCase()}`;
   }
 
-  public abstract updateStatus(path: string, status: string): boolean;
 
-  public abstract updateClassName(path: string, status: string): boolean;
 
-  public abstract addComponent(component: any, path: string): boolean;
+  public abstract setStatus(path: string, status: NodeStatus): boolean;
+
+  public abstract getStatus(path: string): NodeStatus;
+
+  public abstract setOriginal(path: string, status: NodeStatus): boolean;
+
+  public abstract getOriginal(path: string): NodeStatus;
+
+  // public abstract updateStatus(path: string, status: string): boolean;
+
+  // public abstract updateClassName(path: string, status: string): boolean;
+
+  public abstract restoreStatus(path: string);
+
+  public abstract attachResults(component: any, path: string): boolean;
 
   public abstract getComponent(): any[];
 
