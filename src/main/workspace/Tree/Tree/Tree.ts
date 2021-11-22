@@ -1,4 +1,4 @@
-import Node from './Node';
+import Node, { NodeStatus } from './Node';
 import File from './File';
 import Folder from './Folder';
 

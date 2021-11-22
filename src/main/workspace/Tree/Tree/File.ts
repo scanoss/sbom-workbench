@@ -32,8 +32,8 @@ export default class File extends Node {
   public attachResults(component: any, path: string): boolean {
     if (this.getPath() === path) {
       this.components.push(component);
-      this.className = 'match-info-results status-pending';
 
+      this.className = 'match-info-results status-pending';
       this.original = NodeStatus.MATCH;
       this.status = NodeStatus.PENDING;
 

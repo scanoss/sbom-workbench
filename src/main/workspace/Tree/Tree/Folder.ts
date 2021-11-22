@@ -56,10 +56,10 @@ export default class Folder extends Node {
   public setStatus(path: string, status: NodeStatus): boolean {
     if (path === this.getPath()) return false; // We don't want to set the status on a folder
     if (!path.includes(this.getPath())) return false;
-
+    // /home/ubuntu/inc/scanner.c
     for (const child of this.children) if (child.setStatus(path, status)) break;
 
-    console.log("LLAMANDO DESDE NODO: ", this.getPath());
+
     this.status = this.statusLogic();
     this.setStatusOnClassnameAs(this.status);
 
@@ -94,6 +94,10 @@ export default class Folder extends Node {
 
     this.original = NodeStatus.MATCH;
     this.status = this.statusLogic();
+
+    // Que tenemos que hacer?
+    // Actualizar el className del folder (de mi mismo) en funcion del estado de los hijos
+    this.setStatusOnClassnameAs(this.status);
 
     return true;
   }

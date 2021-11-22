@@ -1,5 +1,3 @@
-import { match } from "assert";
-
 const pathLib = require('path');
 
 export enum NodeStatus {
@@ -38,7 +36,7 @@ export default abstract class Node {
     this.label = label;
 
 
-    this.status = NodeStatus.FILTERED;
+    this.status = NodeStatus.NOMATCH;
     this.original = NodeStatus.NOMATCH;
 
     //Those parameters are used by the UI.
@@ -47,7 +45,6 @@ export default abstract class Node {
     //Those parameters are used by the UI.
 
 
-    this.action = 'filter';
     this.include = true;
   }
 
@@ -60,9 +57,22 @@ export default abstract class Node {
   }
 
   public setStatusOnClassnameAs(className: string): void {
+
     const re = new RegExp('.status-.*');
     this.className = this.className.replace(re, '');
-    this.className += ` status-${className.toLowerCase()}`;
+
+    if(className === NodeStatus.IDENTIFIED || className === NodeStatus.IGNORED || className === NodeStatus.PENDING) {
+      this.className = ` status-${className.toLowerCase()}`;
+    }
+
+    if(className === NodeStatus.FILTERED) {
+      this.className = 'filter-item';
+    }
+
+    if(className === NodeStatus.NOMATCH) {
+      this.className = 'no-match';
+    }
+
   }
 
 

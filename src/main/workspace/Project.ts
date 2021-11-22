@@ -412,7 +412,7 @@ export class Project extends EventEmitter {
     res = mypath.split('/');
     if (res[0] === '') res.shift();
     if (res[res.length - 1] === '') res.pop();
-    let nodes = this.logical_tree.children;
+    let nodes = this.getTree().getRootFolder().children;
     let nodeFound: any = {};
     for (let i = 0; i < res.length - 1; i += 1) {
       const path = res[i];
@@ -525,6 +525,8 @@ export class Project extends EventEmitter {
         jsonScan.scanMode = this.scanMode(scanRoot + jsonScan.value);
       } else {
         jsonScan.action = 'filter';
+        jsonScan.status = NodeStatus.FILTERED;
+        jsonScan.className = 'filter-item';
       }
     } else if (jsonScan.type === 'folder') {
       if (bannedList.evaluate(scanRoot + jsonScan.value)) {
@@ -532,6 +534,8 @@ export class Project extends EventEmitter {
         for (i = 0; i < jsonScan.children.length; i += 1) this.indexScan(scanRoot, jsonScan.children[i], bannedList);
       } else {
         jsonScan.action = 'filter';
+        jsonScan.status = NodeStatus.FILTERED;
+        jsonScan.className = 'filter-item';
       }
     }
   }
@@ -555,7 +559,7 @@ function summarizeTree(root: any, tree: any, summary: any) {
     summary.total += 1;
     if (tree.action === 'filter') {
       summary.filter += 1;
-      tree.className = 'filter-item';
+      //tree.className = 'filter-item';
     } else if (tree.include === true) {
       summary.include += 1;
       summary.files[`${root}${tree.value}`] = tree.scanMode;
@@ -567,7 +571,7 @@ function summarizeTree(root: any, tree: any, summary: any) {
   }
   if (tree.type === 'folder') {
     if (tree.action === 'filter') {
-      tree.className = 'filter-item';
+      //tree.className = 'filter-item';
     } else
       for (j = 0; j < tree.children.length; j += 1) {
         summary = summarizeTree(root, tree.children[j], summary);

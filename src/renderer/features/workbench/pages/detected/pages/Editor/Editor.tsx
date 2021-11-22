@@ -127,6 +127,7 @@ export const Editor = () => {
     });
     if (response) {
       const node = await projectService.getNodeFromPath(file);
+      console.log("IMPRIMIENDO UNA POTATO", node);
       if (node.action === 'filter') {
         await resultService.createFiltered(file); // idtype=forceinclude
       } else await resultService.updateNoMatchToFile(file);
