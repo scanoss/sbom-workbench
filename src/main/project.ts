@@ -84,7 +84,8 @@ ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
 
 ipcMain.handle(IpcEvents.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
   try {
-    const node = workspace.getOpenedProjects()[0].getNodeFromPath(path);
+    const p = workspace.getOpenedProjects()[0];
+    const node = p.getTree().getNode(path);
     return Response.ok({ message: 'Node from path retrieve succesfully', data: node });
   } catch (e: any) {
     return Response.fail({ message: e.message });
