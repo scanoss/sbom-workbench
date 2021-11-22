@@ -220,9 +220,6 @@ export class Project extends EventEmitter {
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath, filesNotScanned) => {
-
-      console.log(this.getTree().getNode('/Makefile'));
-
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
         log.info(`%c[ SCANNER ]: RESCANFINISHED `, 'color: green');
 

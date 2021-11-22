@@ -9,12 +9,10 @@ import { workspace } from './workspace/Workspace';
 ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
   const p = workspace.getOpenedProjects()[0];
   const data = await p.scans_db.files.ignored(arg);
-  console.log(arg, 'ARG en ignored');
 
   logicResultService
     .getResultsByids(arg)
     .then((filesToUpdate) => {
-      console.log(filesToUpdate, 'filesToUpdate');
       const paths = Object.keys(filesToUpdate);
       for (const filePath of paths) {
         p.getTree().getRootFolder().setStatus(filePath, NodeStatus.IGNORED);
