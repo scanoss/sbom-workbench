@@ -371,10 +371,7 @@ export class Project extends EventEmitter {
     return this.tree;
   }
 
-  public updateTree(paths: Array<string>, status: NodeStatus) {
-    for (const filePath of paths) {
-      this.getTree().getRootFolder().setStatus(filePath, status);
-    }
+  public updateTree() {
     this.save();
     this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
     // Todo agregar avisar al UI cuando termina de actualizar

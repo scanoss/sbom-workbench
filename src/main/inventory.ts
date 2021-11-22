@@ -39,8 +39,13 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
       .getResultsByids(arg.files)
       .then((filesToUpdate) => {
         const paths = Object.keys(filesToUpdate);
-        console.log("LLAMANDO DESDE EL INVENTORY SERVICES. PATH A ESCANEAR: ", paths)
-        p.updateTree(paths as Array<string>, NodeStatus.IDENTIFIED);
+        console.log('LLAMANDO DESDE EL INVENTORY SERVICES. PATH A ESCANEAR: ', paths);
+
+        for (const filePath of paths) {
+          p.getTree().getRootFolder().setStatus(filePath, NodeStatus.IDENTIFIED);
+        }
+
+        p.updateTree();
         return true;
       })
       .catch((e) => {
@@ -70,45 +75,25 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, inv: Partial<Inven
   try {
     const project = workspace.getOpenedProjects()[0];
     const result = await project.scans_db.results.getNotOriginal(inv.files);
+    console.log("DETACH INVENTORY");
+    logicResultService
+      .getResultsByids(inv.files)
+      .then((filesToUpdate) => {
+        const paths = Object.keys(filesToUpdate);
+        project.getTree().restoreStatus(paths as Array<string>);
+        project.updateTree();
+       
 
+        return true;
+      })
+      .catch((e) => {
+        console.log(e);
+        throw e;
+      });
 
-    // Primero tengo que preguntar cual era el estado anterior, lo puedo sacar de los campos original y
-
-
-      //p.getTree().getRootFolder().restoreStatus()
-
-
-
-
-    // if (result !== undefined) {
-    //   const node = project.getNodeFromPath(result.file_path);
-    //   if (result.source === 'filtered') {
-    //     node.action = 'filter';
-    //     node.className = 'filter-item';
-    //   } else {
-    //     node.action = 'scan';
-    //     node.className = 'no-match';
-    //   }
-    //   project.save();
-    // }
 
 
     const success: boolean = await logicInventoryService.detach(inv);
-
-
-    logicResultService
-    .getResultsByids(inv.files)
-    .then((filesToUpdate) => {
-      const paths = Object.keys(filesToUpdate);
-      project.getTree().restoreStatus(paths as Array<string>);
-      return true;
-    })
-    .catch((e) => {
-      console.log(e);
-      throw e;
-    });
-
-    project.save();
 
     return { status: 'ok', message: 'File detached to inventory successfully', success };
   } catch (e) {

@@ -43,22 +43,30 @@ export default class File extends Node {
   }
 
   public restoreStatus(path: string) {
-    if(this.getPath() === path) {
 
-      // ver la logica con el original y el action.
-      if (this.action === NodeStatus.FILTERED) {
-        this.status = NodeStatus.FILTERED;
-        return;
-      }
 
-      if (this.original === NodeStatus.NOMATCH) {
-        this.status = NodeStatus.NOMATCH;
-        return;
-      }
+    if (this.getPath() !== path) return;
 
-      if (this.original === NodeStatus.MATCH) {
-        this.status = NodeStatus.PENDING;
-      }
+    console.log('ORIGINAL',this.original);
+    console.log('action',this.action);
+
+    if (this.action === NodeStatus.FILTERED) {
+      console.log("filtered");
+      this.status = NodeStatus.FILTERED;
+      this.setStatusOnClassnameAs(this.status);
+      return;
+    }
+
+    if (this.original === NodeStatus.NOMATCH) {
+      console.log("nomatch");
+      this.status = NodeStatus.NOMATCH;
+      this.setStatusOnClassnameAs(this.status);
+      return;
+    }
+
+    if (this.original === NodeStatus.MATCH) {
+      this.status = NodeStatus.PENDING;
+      this.setStatusOnClassnameAs(this.status);
     }
   }
 

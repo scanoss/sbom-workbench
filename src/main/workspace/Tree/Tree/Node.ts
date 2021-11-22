@@ -58,6 +58,9 @@ export default abstract class Node {
 
   public setStatusOnClassnameAs(className: string): void {
 
+    
+    console.log("CLASSNAME", className);
+
     const re = new RegExp('.status-.*');
     this.className = this.className.replace(re, '');
 
@@ -66,6 +69,7 @@ export default abstract class Node {
     }
 
     if(className === NodeStatus.FILTERED) {
+      console.log('setStatusOnClassnameAs', className);
       this.className = 'filter-item';
     }
 

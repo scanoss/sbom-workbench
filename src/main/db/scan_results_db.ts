@@ -401,6 +401,7 @@ export class ResultsDb extends Db {
   }
 
   public async getSummaryByids(ids: number[]) {
+    console.log(ids);
     return new Promise<Array<any>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
