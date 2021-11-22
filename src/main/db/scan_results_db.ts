@@ -400,5 +400,22 @@ export class ResultsDb extends Db {
     });
   }
 
- 
+  public async getSummaryByids(ids: number[]) {
+    return new Promise<Array<any>>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(() => {
+          const sqlQuerySummary = query.SQL_GET_SUMMARY_BY_RESULT_ID.replace('#values', `(${ids.toString()})`);
+          db.all(sqlQuerySummary, (err: any, data: any) => {
+            db.close();
+            if (err) throw err;
+            else resolve(data);
+          });
+        });
+      } catch (error) {
+        log.error(error);
+        reject(new Error('Unable to retrieve results'));
+      }
+    });
+  }
 }

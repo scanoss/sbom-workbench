@@ -8,6 +8,7 @@ import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import { setComponent } from '../../../../actions';
 import usePagination from '../../../../../../hooks/usePagination';
+import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 
 const filter = (items, query) => {
   if (!items) {
@@ -65,6 +66,7 @@ export const ComponentList = () => {
     <div id="ComponentList">
       <section className="app-page" onScroll={onScroll}>
         <header className="app-header">
+          <Breadcrumb />
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">
               <SearchIcon />

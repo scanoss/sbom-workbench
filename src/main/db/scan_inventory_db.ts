@@ -418,7 +418,7 @@ export class InventoryDb extends Db {
   }
 
   // GET FILES ATTACHED TO AN INVENTORY BY INVENTORY ID
-  getInventoryFiles(inventory: Partial<Inventory>) {
+  public getInventoryFiles(inventory: Partial<Inventory>) {
     return new Promise<Files>(async (resolve, reject) => {
       try {
         const db = await this.openDb();

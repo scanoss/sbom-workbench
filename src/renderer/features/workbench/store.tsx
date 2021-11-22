@@ -5,12 +5,14 @@ import { AppContext } from '../../context/AppProvider';
 import { Inventory } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
-import { loadScanSuccess, setComponent, setComponents, setProgress, updateTree } from './actions';
+import { loadScanSuccess, setComponent, setComponents, setFolder, setProgress, updateTree } from './actions';
 import { resultService } from '../../../api/results-service';
 import { reportService } from '../../../api/report-service';
+import { componentService } from '../../../api/component-service';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
+  setNode: (node: any) => void;
   createInventory: (inventory: Inventory) => Promise<Inventory>;
   ignoreFile: (files: number[]) => Promise<boolean>;
   restoreFile: (files: number[]) => Promise<boolean>;
@@ -36,6 +38,8 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       console.log(`loading scan: ${path}`);
       const { name, fileTree, scanRoot } = await workbenchController.loadScan(path);
       dispatch(loadScanSuccess(name, fileTree, []));
+      console.log(fileTree);
+
       setScanBasePath(scanRoot);
       update(false);
       return true;
@@ -44,6 +48,17 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       return false;
     }
   };
+
+  const setNode = async (node: any) => {
+    dispatch(setFolder(node)); // TODO: SET NODE
+
+    const comp = await workbenchController.getComponents({
+      ...(node && { path: node.path }),
+    });
+
+    if (comp) dispatch(setComponents(comp));
+
+  }
 
   const createInventory = async (inventory: Inventory): Promise<Inventory> => {
     const response = await inventoryService.create(inventory);
@@ -114,6 +129,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       state,
       dispatch,
 
+      setNode,
       loadScan,
       createInventory,
       ignoreFile,

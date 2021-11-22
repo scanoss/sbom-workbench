@@ -8,6 +8,21 @@
   display: flex;
   align-items: center;
 
+
+  &.status- {
+    &pending {
+      border-left: 8px solid $pending-orange;
+    }
+
+    &identified {
+      border-left: 8px solid $indentified-green;
+    }
+
+    &ignored {
+      border-left: 8px solid $ignored-gray;
+    }
+  }
+
   @media screen and (max-width: $md) {
     width: 100%;
     margin-top: 20px;
@@ -64,17 +79,4 @@
 }
 
 
-.status- {
-  &pending {
-    border-left: 10px solid $pending-orange;
-  }
-
-  &identified {
-    border-left: 10px solid $indentified-green;
-  }
-
-  &ignored {
-    border-left: 10px solid $ignored-gray;
-  }
-}
 

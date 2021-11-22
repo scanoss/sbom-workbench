@@ -1,15 +1,17 @@
 header.app-header {
-  .subheader, .header {
+  .header, .subheader {
     display: flex;
     width: 100%;
     justify-content: space-between;
-    align-items: center;
   }
 
   .header {
     align-items: flex-start;
   }
 
+  .subheader {
+    align-items: flex-end;
+  }
 
 }
 
@@ -59,9 +61,8 @@ header.app-header {
   .filter-container {
     display: flex;
     align-items: center;
-    margin-bottom: 25px;
     line-height: 26px;
-
+    // margin-top: -5px;
 
     .header-title {
       margin-bottom: 0;

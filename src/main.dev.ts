@@ -10,7 +10,7 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import fs from 'fs';
+import fs, { readFileSync } from 'fs';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
@@ -38,6 +38,9 @@ import { Project } from './main/workspace/Project';
 import { userSetting } from './main/UserSetting';
 
 import { WorkspaceMigration } from './main/migration/WorkspaceMigration';
+
+import { Tree } from './main/workspace/Tree/Tree/Tree';
+
 
 const basepath = require('path');
 
@@ -144,7 +147,7 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.whenReady().then(mainLogic).then(createWindow).catch(console.log);
+app.whenReady().then(mainLogic).catch(console.log).then(createWindow).catch(console.log);
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
@@ -160,6 +163,21 @@ export interface IInitScan {
 }
 
 async function mainLogic() {
+
+ 
+  //  const tree = new Tree('/home/agustin/scanner.c').buildTree();
+
+
+  // startTime = performance.now();
+  // tree.updateStatus('/fodler1/file1.py', 'identified');
+  // tree.updateStatus('/fodler1/file2.py', 'ignored');
+  // console.log(JSON.stringify(tree,undefined,2));
+
+  // console.log( tree.getNode('scanoss-dt/babel.config.js'), "NODO" );
+  // endTime = performance.now();
+  // console.log(`Updated file in ${endTime - startTime} ms`);
+
+
   const root = `${os.homedir()}/scanoss-workspace`;
 
   // This lines will be removed in future versions

@@ -2,16 +2,78 @@
   color: #3F3F46;
   font-weight: 400;
 
+  .react-checkbox-tree {
+    width: 100%;
+    font-size: 14px;
+
+    > ol {
+      overflow-x: hidden;
+    }
+
+    .rct-collapse {
+      padding-right: 0;
+  }
+  }
+
   .rct-node {
-    margin: 5px 0;
+    margin: 2px 0;
+
+    $bg: #dbe7ff;
+
+    .selected {
+      border-radius: 2px;
+      background-color: $bg
+    }
+
+    .rct-bare-label {
+      width: 100%;
+
+      *:focus {
+        background: $bg;
+      }
+    }
+
+    .rct-node-clickable {
+      display: flex;
+      width: 100%;
+    }
+
+    &.status-pending > span .rct-node-icon::before  {
+      background: var(--color-status-pending);
+    }
+
+    &.status-identified > span .rct-node-icon::before  {
+      background: var(--color-status-identified);
+    }
+
+    &.status-ignored > span .rct-node-icon::before  {
+      background: var(--color-status-ignored);
+    }
+
+    &.filter-item .rct-node-icon::before  {
+      background: transparent !important;
+    }
   }
 
   .rct-node-icon {
     color: #3F3F46;
+    position: relative;
+
+    &::before {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      left: 16px;
+      bottom: 2px;
+      background: transparent;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
   }
 
   .match-info-result {
-    font-weight: 600;
+    font-weight: 500;
     color: #27272A;
 
     .rct-node-icon {
@@ -20,8 +82,11 @@
   }
 
   .filter-item {
-    font-weight: 400;
     color: #968d8d8a;
+
+    .rct-title {
+      font-weight: 400 !important;
+    }
 
     .rct-node-icon {
       color: #968d8d8a;

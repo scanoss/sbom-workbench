@@ -10,16 +10,15 @@
 /* eslint-disable @typescript-eslint/no-useless-constructor */
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable no-restricted-syntax */
 import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { Component, ComponentGroup } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
 
-
 export interface ComponentParams {
   source?: ComponentSource;
+  path?: string;
 }
 
 export enum ComponentSource {
@@ -57,8 +56,8 @@ export class ComponentDb extends Db {
     return new Promise <Component>(async (resolve, reject) => {
       try {
         let component: any;
-        if (data.purl && data.version)        
-          component = await this.getbyPurlVersion(data);        
+        if (data.purl && data.version)
+          component = await this.getbyPurlVersion(data);
         else if (data.purl) {
           component = await this.getByPurl(data);
         } else {
@@ -121,10 +120,15 @@ export class ComponentDb extends Db {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
-        const sqlGetComp =
-          params?.source === ComponentSource.ENGINE
-            ? query.SQL_GET_ALL_DETECTED_COMPONENTS
-            : query.SQL_GET_ALL_COMPONENTS;
+        let sqlGetComp = '';
+        if(params?.path && params?.source) {
+          sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS_BY_PATH.replace('#', `${params.path}/%`);
+        }
+        else if(params?.source === ComponentSource.ENGINE) {
+          sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS
+        } else{
+         sqlGetComp =  query.SQL_GET_ALL_COMPONENTS;
+        }
         const db = await this.openDb();
         db.serialize(function () {
           db.all(sqlGetComp, async (err: any, data: any) => {
@@ -140,7 +144,7 @@ export class ComponentDb extends Db {
             }
           });
         });
-      } catch (error) {       
+      } catch (error) {
         log.error(error);
         reject(error);
       }
@@ -322,7 +326,7 @@ export class ComponentDb extends Db {
           }
           db.run('commit', (err: any) => {
             if (err) throw err;
-            db.close();          
+            db.close();
             resolve(true);
           });
         });
@@ -497,15 +501,16 @@ export class ComponentDb extends Db {
     });
   }
 
-  async getAllComponentGroup(params: ComponentParams) {    
+  async getAllComponentGroup(params: ComponentParams) {
     return new Promise(async (resolve, reject) => {
-      try {     
+      try {
         const data = await this.getAll({}, params);
-        if (data) {        
-          const comp = await this.groupComponentsByPurl(data);          
+        if (data) {
+          const comp = await this.groupComponentsByPurl(data);
+
           resolve(comp);
         } else resolve([]);
-      } catch (error) {        
+      } catch (error) {
         reject(new Error('Unable to get all component group'));
       }
     });
@@ -520,13 +525,13 @@ export class ComponentDb extends Db {
       }
       const result = await this.mergeComponentByPurl(aux);
       return result;
-    } catch (err) {     
+    } catch (err) {
       log.error(err);
       return 'Unable to group components';
     }
   }
 
-  private mergeComponentByPurl(data: Record<string, any>) {   
+  private mergeComponentByPurl(data: Record<string, any>) {
     return new Promise<any[]>(async (resolve) => {
       const result: any[] = [];
       for (const [key, value] of Object.entries(data)) {
@@ -585,15 +590,15 @@ export class ComponentDb extends Db {
         const db = await this.openDb();
         db.all(
           `SELECT DISTINCT cv.id FROM (
-            SELECT notValid.purl,notValid.version FROM results notValid WHERE NOT EXISTS 
+            SELECT notValid.purl,notValid.version FROM results notValid WHERE NOT EXISTS
             (SELECT valid.purl,valid.version FROM results valid WHERE valid.dirty=0 AND notValid.purl=valid.purl AND notValid.version=valid.version)
              ) AS possibleNotValid
              INNER JOIN component_versions cv ON cv.purl=possibleNotValid.purl AND cv.version=possibleNotValid.version
              WHERE cv.id NOT IN (SELECT cvid FROM inventories);`,
           (err: any, data: any) => {
             db.close();
-            if (err) throw err;  
-            const ids:number[] = data.map((item:Record<string,number>) => item.id );         
+            if (err) throw err;
+            const ids:number[] = data.map((item:Record<string,number>) => item.id );
             resolve(ids);
           }
         );
@@ -608,7 +613,7 @@ export class ComponentDb extends Db {
       try {
         const db = await this.openDb();
         let deleteCompByIdQuery = "DELETE FROM component_versions WHERE id in ";
-        deleteCompByIdQuery += `(${componentIds.toString()});`;      
+        deleteCompByIdQuery += `(${componentIds.toString()});`;
         db.all(deleteCompByIdQuery,
           (err: any) => {
             db.close();
@@ -625,7 +630,7 @@ export class ComponentDb extends Db {
   public async updateOrphanToManual(){
     return new Promise(async (resolve, reject) => {
       try {
-        const db = await this.openDb();       
+        const db = await this.openDb();
         db.run(`UPDATE component_versions  SET source='manual' WHERE  id IN ( SELECT i.cvid FROM inventories i INNER JOIN component_versions cv ON cv.id=i.cvid WHERE (cv.purl,cv.version) NOT IN (SELECT r.purl,r.version FROM results r));`,
           (err: any) => {
             db.close();
@@ -640,5 +645,5 @@ export class ComponentDb extends Db {
 
   }
 
-  
+
 }

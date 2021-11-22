@@ -9,6 +9,7 @@ import { setComponent } from '../../../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import RecognizedCard from '../../../../components/RecognizedCard/RecognizedCard';
 import usePagination from '../../../../../../hooks/usePagination';
+import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 
 const filter = (items, query) => {
   if (!items) {
@@ -79,6 +80,7 @@ export const IdentifiedList = () => {
     <>
       <section className="app-page" onScroll={onScroll}>
         <header className="app-header">
+          <Breadcrumb />
           <Paper component="form" className={classes.root}>
             <IconButton className={classes.iconButton} aria-label="menu">
               <SearchIcon />

@@ -15,6 +15,10 @@ import { defaultBannedList } from './filtering/defaultFilter';
 import { Metadata } from './Metadata';
 import { userSetting } from '../UserSetting';
 import { ProjectMigration } from '../migration/ProjectMigration';
+import { Tree } from './Tree/Tree/Tree';
+
+import Folder from './Tree/Tree/Folder';
+import Node, { NodeStatus } from './Tree/Tree/Node';
 
 const path = require('path');
 
@@ -27,7 +31,9 @@ export class Project extends EventEmitter {
 
   banned_list: Filtering.BannedList;
 
-  logical_tree: any;
+  logical_tree: Tree;
+
+  tree: Tree;
 
   results: any;
 
@@ -83,8 +89,8 @@ export class Project extends EventEmitter {
     this.state = ProjectState.OPENED;
     log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`;
     const project = await fs.promises.readFile(`${this.metadata.getMyPath()}/tree.json`, 'utf8');
+
     const a = JSON.parse(project);
-    this.logical_tree = a.logical_tree;
     this.filesToScan = a.filesToScan;
     this.filesNotScanned = a.filesNotScanned;
     this.processedFiles = a.processedFiles;
@@ -92,6 +98,8 @@ export class Project extends EventEmitter {
     this.scans_db = new ScanDb(this.metadata.getMyPath());
     await this.scans_db.init();
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
+    this.tree = new Tree(this.metadata.getMyPath());
+    this.tree.loadTree(a.tree.rootFolder);
     return true;
   }
 
@@ -101,6 +109,7 @@ export class Project extends EventEmitter {
     this.state = ProjectState.CLOSED;
     this.scanner = null;
     this.logical_tree = null;
+    this.tree = null;
     this.scans_db = null;
     this.filesToScan = null;
   }
@@ -149,11 +158,14 @@ export class Project extends EventEmitter {
     await this.scans_db.init();
     await this.scans_db.licenses.importFromJSON(licenses);
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
-    this.build_tree();
+    this.build_tree();  // Estamos OK
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
-    this.indexScan(this.metadata.getScanRoot(), this.logical_tree, this.banned_list);
+
+    // Tenemos que agregar el campo status y original field
+    // Aca tenemos que setear el original en filteres solo si es filtrado.
+    this.indexScan(this.metadata.getScanRoot(), this.tree.getRootFolder(), this.banned_list);
     const summary = { total: 0, include: 0, filter: 0, files: {} };
-    this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.logical_tree, summary);
+    this.filesSummary = summarizeTree(this.metadata.getScanRoot(),this.tree.getRootFolder(), summary);
     log.info(
       `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
       'color: green'
@@ -201,7 +213,8 @@ export class Project extends EventEmitter {
     });
 
     this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response, filesNotScanned) => {
-      this.attachComponent(response.getServerResponse());
+      this.tree.attachResults(response.getServerResponse());
+      //this.attachComponent(response.getServerResponse());
       Object.assign(this.filesNotScanned, filesNotScanned);
       this.save();
     });
@@ -220,7 +233,7 @@ export class Project extends EventEmitter {
         const notValidComp: number[] = await this.scans_db.components.getNotValid();
 
         if (notValidComp.length > 0) {
-           await this.scans_db.components.deleteByID(notValidComp);
+          await this.scans_db.components.deleteByID(notValidComp);
         }
         await this.scans_db.results.deleteDirty();
         await this.scans_db.components.updateOrphanToManual();
@@ -254,6 +267,35 @@ export class Project extends EventEmitter {
       await this.close();
       this.sendToUI(IpcEvents.SCANNER_ERROR_STATUS, error);
     });
+  }
+
+  public refreshTree(filesToUpdate) {
+    console.log(filesToUpdate);
+    console.log(JSON.stringify(this.logical_tree, null, 2));
+    // eslint-disable-next-line no-restricted-syntax
+    for(const [key, value] of Object.entries(filesToUpdate)) {
+      this.updateStatusOfFile(key.split('/').splice(1), 0, this.logical_tree, value);
+    }
+    this.logical_tree.status = this.getFolderStatus(this.logical_tree);
+    console.log(JSON.stringify(this.logical_tree, null, 2));
+    //this.msgToUI(IpcEvents.COMPONENT_ATTACH_LICENSE, this.logical_tree);
+  }
+
+  private updateStatusOfFile(arrPaths, deep, current, status) {
+      if (deep >= arrPaths.length ) {
+          current.status = status;
+          return;
+      }
+      const next = current.children.find(child => child.label === arrPaths[deep]);
+      this.updateStatusOfFile(arrPaths, deep + 1, next, status);
+      next.status = this.getFolderStatus(next);
+  }
+
+  private getFolderStatus(node: any) {
+      if(node.type !== 'folder') return node.status;
+      if (node.children.some(child => child.status === 'pending')) return 'pending';
+      if (node.children.every(child => child.status === 'ignored')) return 'ignored';
+    return 'identified';
   }
 
   sendToUI(eventName, data: any) {
@@ -319,12 +361,20 @@ export class Project extends EventEmitter {
 
   build_tree() {
     const scanPath = this.metadata.getScanRoot();
-    this.logical_tree = dirTree(scanPath, scanPath);
+    this.tree = new Tree(scanPath);
+    this.tree.buildTree();
+    //this.logical_tree = dirTree(scanPath, scanPath);
     this.emit('treeBuilt', this.logical_tree);
   }
 
-  getLogicalTree() {
-    return this.logical_tree;
+  public getTree(): Tree {
+    return this.tree;
+  }
+
+  public updateTree() {
+    this.save();
+    this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
+    // Todo agregar avisar al UI cuando termina de actualizar
   }
 
   attachInventory(inv: Inventory) {
@@ -332,7 +382,8 @@ export class Project extends EventEmitter {
     let files: string[];
     files = inv.files;
     for (i = 0; i < inv.files.length; i += 1) {
-      insertInventory(this.logical_tree, files[i], inv);
+      // this.logical_tree.insertInventory();
+      insertInventory(this.tree.getRootFolder(), files[i], inv);
     }
   }
 
@@ -340,7 +391,7 @@ export class Project extends EventEmitter {
     for (const [key, value] of Object.entries(comp)) {
       for (let i = 0; i < value.length; i += 1) {
         // console.log(key+''+value[i].purl);
-        if (value[i].purl !== undefined) insertComponent(this.logical_tree, key, value[i]);
+        if (value[i].purl !== undefined) insertComponent(this.tree.getRootFolder(), key, value[i]);
       }
     }
   }
@@ -358,7 +409,7 @@ export class Project extends EventEmitter {
     res = mypath.split('/');
     if (res[0] === '') res.shift();
     if (res[res.length - 1] === '') res.pop();
-    let nodes = this.logical_tree.children;
+    let nodes = this.getTree().getRootFolder().children;
     let nodeFound: any = {};
     for (let i = 0; i < res.length - 1; i += 1) {
       const path = res[i];
@@ -414,12 +465,12 @@ export class Project extends EventEmitter {
   }
 
   exclude_file(pathToExclude: string, recursive: boolean) {
-    const a = getLeaf(this.logical_tree, pathToExclude);
+    const a = getLeaf(this.tree.getRootFolder(), pathToExclude);
     setUseFile(a, false, recursive);
   }
 
   include_file(pathToInclude: string, recursive: boolean) {
-    const a = getLeaf(this.logical_tree, pathToInclude);
+    const a = getLeaf(this.tree.getRootFolder(), pathToInclude);
     setUseFile(a, true, recursive);
   }
 
@@ -457,7 +508,7 @@ export class Project extends EventEmitter {
     return 'FULL_SCAN';
   }
 
-  indexScan(scanRoot: string, jsonScan: any, bannedList: Filtering.BannedList) {
+  indexScan(scanRoot: string, jsonScan: Node, bannedList: Filtering.BannedList) {
     let i = 0;
     if (jsonScan.type === 'file') {
       this.filesIndexed += 1;
@@ -471,6 +522,8 @@ export class Project extends EventEmitter {
         jsonScan.scanMode = this.scanMode(scanRoot + jsonScan.value);
       } else {
         jsonScan.action = 'filter';
+        jsonScan.status = NodeStatus.FILTERED;
+        jsonScan.className = 'filter-item';
       }
     } else if (jsonScan.type === 'folder') {
       if (bannedList.evaluate(scanRoot + jsonScan.value)) {
@@ -478,6 +531,8 @@ export class Project extends EventEmitter {
         for (i = 0; i < jsonScan.children.length; i += 1) this.indexScan(scanRoot, jsonScan.children[i], bannedList);
       } else {
         jsonScan.action = 'filter';
+        jsonScan.status = NodeStatus.FILTERED;
+        jsonScan.className = 'filter-item';
       }
     }
   }
@@ -487,6 +542,11 @@ export class Project extends EventEmitter {
     const cfg = JSON.parse(txt);
     return cfg.TOKEN;
   }
+
+  public getNode(path: string) {
+    return this.tree.getNode(path);
+  }
+
 }
 /* AUXILIARY FUNCTIONS */
 
@@ -599,7 +659,7 @@ function insertComponent(tree: any, mypath: string, comp: Component): any {
     let j: number;
     if (!arbol.components.some((e) => e.purl === component.purl && e.version === component.version)) {
       arbol.components.push(component);
-      arbol.className = 'match-info-result';
+      arbol.className = 'match-info-result status-pending';
     }
     childCount = arbol.children.length;
     for (j = 0; j < childCount; j += 1) {
@@ -616,7 +676,7 @@ function insertComponent(tree: any, mypath: string, comp: Component): any {
   }
 
   arbol.components.push(component);
-  arbol.className = 'match-info-result';
+  arbol.className = 'match-info-result status-pending';
 }
 
 function dirFirstFileAfter(a, b) {
@@ -632,17 +692,19 @@ function dirTree(root: string, filename: string) {
   if (stats.isDirectory()) {
     info = {
       type: 'folder',
-      className: 'no-match',
+      className: 'no-match status-pending',
       value: filename.replace(root, ''),
       label: path.basename(filename),
       inventories: [],
       components: [],
-      children: undefined,
+      children: [],
       include: true,
       action: 'filter',
       showCheckbox: false,
+      status: 'pending',
     };
 
+    console.log('parent', filename);
     info.children = fs
       .readdirSync(filename, { withFileTypes: true }) // Returns a list of files and folders
       .sort(dirFirstFileAfter)
@@ -650,20 +712,23 @@ function dirTree(root: string, filename: string) {
       .map((dirent) => dirent.name) // Converts Dirent objects to paths
       .map((child: string) => {
         // Apply the recursion function in the whole array
+        console.log('child:', child);
         return dirTree(root, `${filename}/${child}`);
       });
   } else {
     info = {
       type: 'file',
-      className: 'no-match',
+      className: 'no-match status-pending',
       inv_count: 0,
       value: filename.replace(root, ''),
       label: path.basename(filename),
       inventories: [],
       components: [],
+      children: [],
       include: true,
       action: 'filter',
       showCheckbox: false,
+      status: 'pending',
     };
   }
   return info;

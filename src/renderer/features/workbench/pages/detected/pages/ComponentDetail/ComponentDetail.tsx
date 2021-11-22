@@ -27,7 +27,7 @@ import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import { mapFiles } from '../../../../../../../utils/scan-util';
 import { setHistoryCrumb, setVersion } from '../../../../actions';
-import usePagination from '../../../../../../hooks/usePagination';
+import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 
 // inner components
 const VersionSelector = ({ versions, version, onSelect, component }) => {
@@ -109,7 +109,8 @@ export const ComponentDetail = () => {
   ) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { name, component, version } = state;
+  const { name, component, filter } = state;
+  const { version } = filter;
 
   const anchorRef = useRef<HTMLDivElement>(null);
 
@@ -126,7 +127,7 @@ export const ComponentDetail = () => {
   const [tab, setTab] = useState<number>(state.history.section || 0);
 
   const getFiles = async () => {
-    const response = await componentService.getFiles({ purl: component.purl, version });
+    const response = await componentService.getFiles({ purl: component.purl, version }, filter.node?.path ? { path: filter.node.path } : null);
     console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));
   };
@@ -292,7 +293,7 @@ export const ComponentDetail = () => {
     });
     getFiles();
     getInventories();
-  }, [version]);
+  }, [state.filter.version, state.filter.node]);
 
   useEffect(() => {
     dispatch(setHistoryCrumb({ section: tab }));
@@ -316,6 +317,7 @@ export const ComponentDetail = () => {
       <section id="ComponentDetail" className="app-page">
         <header className="app-header">
           <div className="header">
+            <Breadcrumb />
             <div className="filter-container">
               <ComponentInfo component={component} />
               <ChevronRightOutlinedIcon fontSize="small" />
@@ -340,6 +342,7 @@ export const ComponentDetail = () => {
             {tab === 0 && (
               <>
                 <ButtonGroup
+                  size="small"
                   disabled={filterFiles.pending.length === 0}
                   ref={anchorRef}
                   variant="contained"
@@ -374,6 +377,7 @@ export const ComponentDetail = () => {
             )}
             {tab === 1 && (
               <Button
+                size="small"
                 disabled={filterFiles.identified.length === 0}
                 variant="contained"
                 color="secondary"
@@ -384,6 +388,7 @@ export const ComponentDetail = () => {
             )}
             {tab === 2 && (
               <Button
+                size="small"
                 disabled={filterFiles.ignored.length === 0}
                 variant="contained"
                 color="secondary"

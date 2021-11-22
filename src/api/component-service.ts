@@ -1,6 +1,6 @@
 import { IpcEvents } from '../ipc-events';
 import { ComponentParams } from '../main/db/scan_component_db';
-import { Component, License,ComponentGroup, NewComponentDTO } from './types';
+import { Component, License,ComponentGroup, NewComponentDTO, IParams } from './types';
 import { BaseService } from './base-service';
 
 const { ipcRenderer } = require('electron');
@@ -36,8 +36,8 @@ class ComponentService extends BaseService {
     return response;
   }
 
-  public async getFiles(component: Partial<Component>): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_FILES, component);
+  public async getFiles(component: Partial<Component>, params: IParams = null): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_FILES, component, params);
     return response;
   }
 
