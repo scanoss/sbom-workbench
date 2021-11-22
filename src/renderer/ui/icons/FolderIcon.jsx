@@ -1,6 +1,5 @@
 import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
-import parentOpen from '../../../../../../assets/imgs/folder-open.svg';
 
 const FolderOpen = (props) => {
   return (

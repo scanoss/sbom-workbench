@@ -7,7 +7,7 @@
   }
 
   .rct-node {
-    margin: 5px 0;
+    margin: 2px 0;
 
     $bg: #dbe7ff;
 
@@ -42,25 +42,25 @@
     height: 0.75em;
   }
 
+
+  .rct-collapse {
+    display: flex;
+    padding: 0;
+    min-width: 18px;
+  }
+
   .rct-node-icon {
-    color: #3F3F46;
+    color: #65656f;
     position: relative;
 
-    .rct-text { // ADD
-      position: relative;
-    }
 
-    .rct-collapse {
-      position: absolute;
-      left: -20px;
-    }
 
     &::before {
       content: '';
       display: inline-block;
       position: absolute;
       left: 16px;
-      bottom: 2px;
+      bottom: -1px;
       background: transparent;
       width: 8px;
       height: 8px;
@@ -83,10 +83,6 @@
     .rct-node-icon {
       color: #968d8d8a;
     }
-  }
-
-  .react-checkbox-tree > ol {
-    padding-left: 25px;
   }
 
   .rct-node-icon {

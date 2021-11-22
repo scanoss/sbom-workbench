@@ -2,14 +2,12 @@ import React, { useContext, useState, useEffect } from 'react';
 import CheckboxTree, { OnCheckNode } from 'react-checkbox-tree';
 import { useHistory } from 'react-router-dom';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import { componentService } from '../../../../../api/component-service';
-import { ComponentSource } from '../../../../../main/db/scan_component_db';
+import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import { setFolder } from '../../actions';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
-import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
-import FolderOpenIcon from '../FolderOpenIcon/FolderOpenIcon';
-import FolderIcon from '../FolderIcon/FolderIcon';
-import FileIcon from '../FileIcon/FileIcon';
+import FolderOpenIcon from '../../../../ui/icons/FolderOpenIcon';
+import FolderIcon from '../../../../ui/icons/FolderIcon';
+import FileIcon from '../../../../ui/icons/FileIcon';
 
 export const FileTree = () => {
   const history = useHistory();
@@ -20,9 +18,7 @@ export const FileTree = () => {
 
   const [aTree, setAtree] = useState([]);
 
-  const [expanded, setExpanded] = useState<string[]>([
-    aTree && aTree[0] ? aTree[0].value : '',
-  ]);
+  const [expanded, setExpanded] = useState<string[]>([aTree && aTree[0] ? aTree[0].value : '']);
 
   const onSelectFile = async (node: OnCheckNode) => {
     const { children, value } = node;
