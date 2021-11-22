@@ -106,6 +106,7 @@ export default class Folder extends Node {
     if (!path.includes(this.getPath())) return;
     for (const child of this.children) if (child.restoreStatus(path)) break;
     this.status = this.getStatus(path);
+    this.setStatusOnClassnameAs(this.status);
   }
 
 

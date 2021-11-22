@@ -1,14 +1,13 @@
 const pathLib = require('path');
 
 export enum NodeStatus {
-  FILTERED = "FILTERED",
-  NOMATCH = "NO-MATCH",
-  MATCH = "MATCH",
-  PENDING = "PENDING",
-  IDENTIFIED = "IDENTIFIED",
-  IGNORED = "IGNORED",
-};
-
+  FILTERED = 'FILTERED',
+  NOMATCH = 'NO-MATCH',
+  MATCH = 'MATCH',
+  PENDING = 'PENDING',
+  IDENTIFIED = 'IDENTIFIED',
+  IGNORED = 'IGNORED',
+}
 
 export default abstract class Node {
   protected type: string;
@@ -17,7 +16,7 @@ export default abstract class Node {
 
   protected status: NodeStatus;
 
-  protected value: string;  // Relative path to the folder or file
+  protected value: string; // Relative path to the folder or file
 
   private label: string;
 
@@ -35,7 +34,6 @@ export default abstract class Node {
     this.value = path;
     this.label = label;
 
-
     this.status = NodeStatus.NOMATCH;
     this.original = NodeStatus.NOMATCH;
 
@@ -43,7 +41,6 @@ export default abstract class Node {
     this.className = 'no-match';
     this.showCheckbox = false;
     //Those parameters are used by the UI.
-
 
     this.include = true;
   }
@@ -57,29 +54,21 @@ export default abstract class Node {
   }
 
   public setStatusOnClassnameAs(className: string): void {
-
-    
-    console.log("CLASSNAME", className);
-
     const re = new RegExp('.status-.*');
     this.className = this.className.replace(re, '');
 
-    if(className === NodeStatus.IDENTIFIED || className === NodeStatus.IGNORED || className === NodeStatus.PENDING) {
+    if (className === NodeStatus.IDENTIFIED || className === NodeStatus.IGNORED || className === NodeStatus.PENDING) {
       this.className = ` status-${className.toLowerCase()}`;
     }
 
-    if(className === NodeStatus.FILTERED) {
-      console.log('setStatusOnClassnameAs', className);
+    if (className === NodeStatus.FILTERED) {
       this.className = 'filter-item';
     }
 
-    if(className === NodeStatus.NOMATCH) {
+    if (className === NodeStatus.NOMATCH) {
       this.className = 'no-match';
     }
-
   }
-
-
 
   public abstract setStatus(path: string, status: NodeStatus): boolean;
 

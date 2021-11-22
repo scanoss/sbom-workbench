@@ -1,5 +1,4 @@
 import { ipcMain } from 'electron';
-import { refresh } from 'electron-debug';
 import { Inventory } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { logicInventoryService } from './services/LogicInventoryService';
@@ -33,7 +32,6 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
 
   try {
     const p = await workspace.getOpenedProjects()[0];
-    console.log(p.getTree().getNode('/Makefile'));
     inv = await p.scans_db.inventories.create(arg);
     arg.id = inv.id;
 
@@ -41,14 +39,11 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
       .getResultsByids(arg.files)
       .then((filesToUpdate) => {
         const paths = Object.keys(filesToUpdate);
-        console.log('LLAMANDO DESDE EL INVENTORY SERVICES. PATH A ESCANEAR: ', paths);
-
         for (const filePath of paths) {
           p.getTree().getRootFolder().setStatus(filePath, NodeStatus.IDENTIFIED);
         }
 
         p.updateTree();
-        console.log(p.getTree().getNode('/Makefile'));
         return true;
       })
       .catch((e) => {
@@ -77,8 +72,6 @@ ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (event, arg: Partial<Inven
 ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, inv: Partial<Inventory>) => {
   try {
     const project = workspace.getOpenedProjects()[0];
-    //const result = await project.scans_db.results.getNotOriginal(inv.files);
-
     logicResultService
       .getResultsByids(inv.files)
       .then((filesToUpdate) => {
@@ -105,19 +98,16 @@ ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (event, arg: Partial<Inventory>
   try {
     const p = workspace.getOpenedProjects()[0];
 
-    const files = p.scans_db.inventories.getInventoryFiles(arg).then((filesToUpdate) => {
-      console.log(filesToUpdate);
-      const paths = [];
-
+    p.scans_db.inventories
+      .getInventoryFiles(arg)
+      .then((filesToUpdate) => {
+        const paths = [];
         filesToUpdate.forEach((element) => {
-        paths.push (element.path);
-      });
-
-      console.log(paths);
-
-      p.getTree().restoreStatus(paths as Array<string>);
-      p.updateTree();
-      return paths;
+          paths.push(element.path);
+        });
+        p.getTree().restoreStatus(paths as Array<string>);
+        p.updateTree();
+        return paths;
       })
       .catch((e) => {
         throw e;

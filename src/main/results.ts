@@ -83,13 +83,8 @@ ipcMain.handle(IpcEvents.RESULTS_GET_NO_MATCH, async (event, filePath: string) =
 
 ipcMain.handle(IpcEvents.RESULTS_ADD_FILTERED_FILE, async (event, filePath: string) => {
   try {
-    console.log('Add filtered file: ', filePath);
     const p: Project = workspace.getOpenedProjects()[0];
-    //const node = p.getNodeFromPath(filePath);
-    //node.action = 'scan';
-    //node.className = 'match-info-result';
     const result = await p.scans_db.results.insertFiltered(filePath);
-    //p.save();
     return Response.ok({
       message: 'Results succesfully retrieved',
       data: result,
@@ -101,14 +96,8 @@ ipcMain.handle(IpcEvents.RESULTS_ADD_FILTERED_FILE, async (event, filePath: stri
 
 ipcMain.handle(IpcEvents.RESULTS_FORCE_ATTACH, async (event, filePath: string) => {
   try {
-    console.log('Force attach file: ', filePath);
     const p: Project = workspace.getOpenedProjects()[0];
-    const node = p.getNodeFromPath(filePath);
-    console.log(node);
-    //node.action = 'scan';
-    //node.className = 'match-info-result';
-    //p.save();
-    const result = await workspace.getOpenedProjects()[0].scans_db.results.updateResult(filePath);
+    const result = await p.scans_db.results.updateResult(filePath);
     return Response.ok({
       message: 'Results updated succesfully',
       data: result,
