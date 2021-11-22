@@ -52,10 +52,9 @@ const Navigation = () => {
 
 const AppMenu = () => {
   const history = useHistory();
-  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, setNode } = useContext(WorkbenchContext) as IWorkbenchContext;
 
-
-  const reset = () => dispatch(setFolder(null));
+  const reset = () => setNode(null);
 
   return (
     <section id="AppMenu">

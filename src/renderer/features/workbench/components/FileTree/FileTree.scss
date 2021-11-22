@@ -4,6 +4,15 @@
 
   .react-checkbox-tree {
     width: 100%;
+    font-size: 14px;
+
+    > ol {
+      overflow-x: hidden;
+    }
+
+    .rct-collapse {
+      padding-right: 0;
+  }
   }
 
   .rct-node {
@@ -57,8 +66,8 @@
       left: 16px;
       bottom: 2px;
       background: transparent;
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
     }
   }

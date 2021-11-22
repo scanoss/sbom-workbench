@@ -318,6 +318,7 @@ export const ComponentDetail = () => {
       <section id="ComponentDetail" className="app-page">
         <header className="app-header">
           <div className="header">
+            <Breadcrumb />
             <div className="filter-container">
               <ComponentInfo component={component} />
               <ChevronRightOutlinedIcon fontSize="small" />
@@ -328,8 +329,6 @@ export const ComponentDetail = () => {
                 component={component}
               />
             </div>
-
-            {filter.node && <Breadcrumb />}
           </div>
 
           <section className="subheader">
@@ -344,6 +343,7 @@ export const ComponentDetail = () => {
             {tab === 0 && (
               <>
                 <ButtonGroup
+                  size="small"
                   disabled={filterFiles.pending.length === 0}
                   ref={anchorRef}
                   variant="contained"
@@ -378,6 +378,7 @@ export const ComponentDetail = () => {
             )}
             {tab === 1 && (
               <Button
+                size="small"
                 disabled={filterFiles.identified.length === 0}
                 variant="contained"
                 color="secondary"
@@ -388,6 +389,7 @@ export const ComponentDetail = () => {
             )}
             {tab === 2 && (
               <Button
+                size="small"
                 disabled={filterFiles.ignored.length === 0}
                 variant="contained"
                 color="secondary"

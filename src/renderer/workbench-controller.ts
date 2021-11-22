@@ -4,7 +4,7 @@ import { componentService } from '../api/component-service';
 import { ComponentGroup } from '../api/types';
 import { sortComponents, transform } from '../utils/scan-util';
 import { IpcEvents } from '../ipc-events';
-import { ComponentSource } from '../main/db/scan_component_db';
+import { ComponentParams, ComponentSource } from '../main/db/scan_component_db';
 
 export interface ScanResult {
   name: string;
@@ -53,9 +53,8 @@ class WorkbenchController {
     return response.text();
   }
 
-  public async getComponents(): Promise<ComponentGroup[]> {
-    const { data } = await componentService.getAllComponentGroup({ source: ComponentSource.ENGINE });
-    console.log(data);
+  public async getComponents(params: ComponentParams = null): Promise<ComponentGroup[]> {
+    const { data } = await componentService.getAllComponentGroup({ ...params, source: ComponentSource.ENGINE });
     sortComponents(data);
     return data;
   }
