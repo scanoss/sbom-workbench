@@ -510,9 +510,8 @@ export class ComponentDb extends Db {
       try {
         const data = await this.getAll({}, params);      
         if (data) {
-          const comp:any = await this.groupComponentsByPurl(data);
-        console.log("COMPONENT",comp);
-          if(params.path!==undefined){          
+          const comp:any = await this.groupComponentsByPurl(data);       
+          if(params?.path!==undefined){                   
               for (let i=0 ; i<comp.length; i+=1){
               const summary =  await this.getSummaryByPath(params.path,comp[i].purl);        
               comp[i].summary = summary;
