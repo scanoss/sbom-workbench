@@ -127,7 +127,6 @@ export const ComponentDetail = () => {
   const [tab, setTab] = useState<number>(state.history.section || 0);
 
   const getFiles = async () => {
-    console.log(version);
     const response = await componentService.getFiles({ purl: component.purl, version }, filter.node?.path ? { path: filter.node.path } : null);
     console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));
