@@ -30,6 +30,8 @@ const query = new Querys();
 export class ComponentDb extends Db {
   license: LicenseDb;
 
+
+
   constructor(path: string) {
     super(path);
     this.license = new LicenseDb(path);
@@ -504,10 +506,15 @@ export class ComponentDb extends Db {
   async getAllComponentGroup(params: ComponentParams) {
     return new Promise(async (resolve, reject) => {
       try {
-        const data = await this.getAll({}, params);
+        const data = await this.getAll({}, params);      
         if (data) {
-          const comp = await this.groupComponentsByPurl(data);
-
+          const comp:any = await this.groupComponentsByPurl(data);       
+          if(params?.path!==undefined){                   
+              for (let i=0 ; i<comp.length; i+=1){
+              const summary =  await this.getSummaryByPath(params.path,comp[i].purl);        
+              comp[i].summary = summary;
+              }          
+          }           
           resolve(comp);
         } else resolve([]);
       } catch (error) {
@@ -644,6 +651,28 @@ export class ComponentDb extends Db {
     });
 
   }
+
+
+  public getSummaryByPath(path: string, purl :string) {
+    return new Promise<Array<any>>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(() => {
+          let SQLquery = `SELECT SUM(r.identified) AS identified,SUM(r.ignored) AS ignored ,SUM((CASE WHEN  r.identified=0 AND r.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r WHERE r.file_path LIKE # AND r.purl=?;`;
+          SQLquery =  SQLquery.replace('#',`'${path}/%'`);        
+          db.get(SQLquery, purl, (err: any, data: any) => {
+            db.close();
+            if (err) throw err;
+            else resolve(data);
+          });
+        });
+      } catch (error) {
+        log.error(error);
+        reject(new Error('Unable to retrieve summary by path'));
+      }
+    });
+  }
+  
 
 
 }
