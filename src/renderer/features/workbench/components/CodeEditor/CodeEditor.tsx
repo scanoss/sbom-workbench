@@ -62,7 +62,6 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
             ${truncatedEnd > 0 ? 'truncatedEnd' : ''}`}
           wrapLines
           style={vs2015}
-          language="javascript"
           startingLineNumber={start + 1}
           showLineNumbers
           lineProps={(line) => {
