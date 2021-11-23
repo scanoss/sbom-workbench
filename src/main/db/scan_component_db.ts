@@ -54,14 +54,15 @@ export class ComponentDb extends Db {
     });
   }
 
-  getAll(data: any, params?: ComponentParams) {
+  getAll(data: any, params?: ComponentParams) {    
     return new Promise <Component>(async (resolve, reject) => {
       try {
         let component: any;
         if (data.purl && data.version)
           component = await this.getbyPurlVersion(data);
         else if (data.purl) {
-          component = await this.getByPurl(data);
+          console.log(params);
+          component = await this.getByPurl(data,params);
         } else {
           component = await this.allComp(params);
         }
@@ -153,14 +154,19 @@ export class ComponentDb extends Db {
     });
   }
 
-  // GET COMPONENENT ID FROM PURL
-  private getByPurl(data: any) {
+  
+  private getByPurl(data: any, params: ComponentParams) {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
+        let SQLQuery='';
+        if(params?.path)
+          SQLQuery = query.SQL_GET_COMPONENT_BY_PURL_ENGINE_PATH.replace('#', `'${params.path}/%'`);
+        else
+          SQLQuery =  query.SQL_GET_COMPONENT_BY_PURL_ENGINE;       
         const db = await this.openDb();
         db.all(
-          query.SQL_GET_COMPONENT_BY_PURL_ENGINE,
+          SQLQuery,
           data.purl,
           data.purl,
           async (err: any, component: any) => {
@@ -487,13 +493,29 @@ export class ComponentDb extends Db {
     });
   }
 
-  async getComponentGroup(component: Partial<ComponentGroup>) {
+  async getComponentGroup(component: Partial<ComponentGroup>,params: ComponentParams) {
     return new Promise(async (resolve, reject) => {
       try {
-        const data = await this.getAll(component);
+        const data = await this.getAll(component, params);
         if (data) {
           const [comp] = await this.groupComponentsByPurl(data);
           comp.summary = await this.summaryByPurl(comp);
+          if(params?.path){         
+            const aux = await this.getSummaryByPath(params.path,[comp.purl]);  
+            const  summary = aux.reduce((acc, curr) => {
+              if(!acc.hasOwnProperty(curr.purl)){
+                acc[curr.purl] = {
+                  identified: curr.identified,
+                  ignored: curr.ignored,
+                  pending: curr.pending,
+                }                 
+              }
+              return acc;
+            },{}); 
+            comp.summary = summary[comp.purl];
+          }
+          
+        
           resolve(comp);
         } else resolve([]);
       } catch (error) {
@@ -504,6 +526,7 @@ export class ComponentDb extends Db {
   }
 
   async getAllComponentGroup(params: ComponentParams) {
+ 
     return new Promise(async (resolve, reject) => {
       try {
         const data = await this.getAll({}, params);      
