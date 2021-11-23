@@ -15,6 +15,7 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { Component, ComponentGroup } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
+import { componentHelper } from '../helpers/ComponentHelper';
 
 export interface ComponentParams {
   source?: ComponentSource;
@@ -60,8 +61,7 @@ export class ComponentDb extends Db {
         let component: any;
         if (data.purl && data.version)
           component = await this.getbyPurlVersion(data);
-        else if (data.purl) {
-          console.log(params);
+        else if (data.purl) {          
           component = await this.getByPurl(data,params);
         } else {
           component = await this.allComp(params);
@@ -500,18 +500,9 @@ export class ComponentDb extends Db {
         if (data) {
           const [comp] = await this.groupComponentsByPurl(data);
           comp.summary = await this.summaryByPurl(comp);
-          if(params?.path){         
+          if(params?.path){             
             const aux = await this.getSummaryByPath(params.path,[comp.purl]);  
-            const  summary = aux.reduce((acc, curr) => {
-              if(!acc.hasOwnProperty(curr.purl)){
-                acc[curr.purl] = {
-                  identified: curr.identified,
-                  ignored: curr.ignored,
-                  pending: curr.pending,
-                }                 
-              }
-              return acc;
-            },{}); 
+           const summary = componentHelper.summaryByPurl(aux);  
             comp.summary = summary[comp.purl];
           }
           
@@ -531,7 +522,7 @@ export class ComponentDb extends Db {
       try {
         const data = await this.getAll({}, params);
         if (data) {
-          const comp:any = await this.groupComponentsByPurl(data);           
+          const comp:any = await this.groupComponentsByPurl(data);   //        
           // if path is defined
           if(params?.path!==undefined){       
             const purls =  comp.reduce((acc, curr) => {
@@ -539,16 +530,7 @@ export class ComponentDb extends Db {
               return acc;
             },[]);
             const aux = await this.getSummaryByPath(params.path,purls);         
-            const summary = aux.reduce((acc, curr) => {
-              if(!acc.hasOwnProperty(curr.purl)){
-                acc[curr.purl] = {
-                  identified: curr.identified,
-                  ignored: curr.ignored,
-                  pending: curr.pending,
-                }                 
-              }
-              return acc;
-            },{});                    
+            const summary = componentHelper.summaryByPurl(aux);          
               for (let i=0 ; i<comp.length; i+=1){
                 comp[i].summary = summary[comp[i].purl]; 
               

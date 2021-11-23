@@ -48,7 +48,7 @@ ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET_ALL, async (event, params: Componen
 ipcMain.handle(
   IpcEvents.COMPONENT_GROUP_GET,
   async (event, component: Partial<ComponentGroup>, params: ComponentParams) => {
-    const data = await workspace.getOpenedProjects()[0].scans_db.components.getComponentGroup(component);
+    const data = await workspace.getOpenedProjects()[0].scans_db.components.getComponentGroup(component, params);
     return {
       status: 'ok',
       message: 'Component group retrieve successfully',
