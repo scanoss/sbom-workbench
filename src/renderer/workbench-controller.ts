@@ -59,8 +59,8 @@ class WorkbenchController {
     return data;
   }
 
-  public async getComponent(purl: string): Promise<ComponentGroup> {
-    const { data } = await componentService.getComponentGroup({ purl });
+  public async getComponent(purl: string, params: ComponentParams = null): Promise<ComponentGroup> {
+    const { data } = await componentService.getComponentGroup({ purl }, { ...params, source: ComponentSource.ENGINE });
     return data;
   }
 

@@ -17,7 +17,7 @@ ipcMain.handle(IpcEvents.COMPONENT_GET, async (event, component: Component) => {
 
 ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, component: Component) => {
   try {
-    const newComp = await workspace.getOpenedProjects()[0].scans_db.components.create(component);;
+    const newComp = await workspace.getOpenedProjects()[0].scans_db.components.create(component);
     return Response.ok({ message: 'Component created successfully', data: newComp });
   } catch (error: any) {
     console.log('Catch an error: ', error);
@@ -45,11 +45,14 @@ ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET_ALL, async (event, params: Componen
   };
 });
 
-ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET, async (_event, component: Partial<ComponentGroup>) => {
-  const data = await workspace.getOpenedProjects()[0].scans_db.components.getComponentGroup(component);
-  return {
-    status: 'ok',
-    message: 'Component group retrieve successfully',
-    data,
-  };
-});
+ipcMain.handle(
+  IpcEvents.COMPONENT_GROUP_GET,
+  async (event, component: Partial<ComponentGroup>, params: ComponentParams) => {
+    const data = await workspace.getOpenedProjects()[0].scans_db.components.getComponentGroup(component, params);
+    return {
+      status: 'ok',
+      message: 'Component group retrieve successfully',
+      data,
+    };
+  }
+);

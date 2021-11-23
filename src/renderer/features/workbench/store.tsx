@@ -57,8 +57,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     });
 
     if (comp) dispatch(setComponents(comp));
-
-  }
+  };
 
   const createInventory = async (inventory: Inventory): Promise<Inventory> => {
     const response = await inventoryService.create(inventory);
@@ -107,12 +106,14 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   const update = async (full = true) => {
+    const params = state.filter.node?.type === 'folder' ? { path: state.filter.node.path } : null;
+
     if (component) {
-      const comp = await workbenchController.getComponent(component.purl);
+      const comp = await workbenchController.getComponent(component.purl, params);
       if (comp) dispatch(setComponent(comp));
     }
 
-    const components = await workbenchController.getComponents();
+    const components = await workbenchController.getComponents(params);
     dispatch(setComponents(components));
 
     const summary = await reportService.getSummary();
