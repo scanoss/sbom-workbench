@@ -508,11 +508,28 @@ export class ComponentDb extends Db {
       try {
         const data = await this.getAll({}, params);      
         if (data) {
-          const comp:any = await this.groupComponentsByPurl(data);       
-          if(params?.path!==undefined){                   
+          const comp:any = await this.groupComponentsByPurl(data);     
+          
+          // if path is defined
+          if(params?.path!==undefined){       
+            const purls =  comp.reduce((acc, curr) => {
+              acc.push(curr.purl);
+              return acc;
+            },[]);
+            const aux = await this.getSummaryByPath(params.path,purls);         
+            const summary = aux.reduce((acc, curr) => {
+              if(!acc.hasOwnProperty(curr.purl)){
+                acc[curr.purl] = {
+                  identified: curr.identified,
+                  ignored: curr.ignored,
+                  pending: curr.pending,
+                }                 
+              }
+              return acc;
+            },{});                    
               for (let i=0 ; i<comp.length; i+=1){
-              const summary =  await this.getSummaryByPath(params.path,comp[i].purl);        
-              comp[i].summary = summary;
+                comp[i].summary = summary[comp[i].purl]; 
+              
               }          
           }           
           resolve(comp);
@@ -653,14 +670,16 @@ export class ComponentDb extends Db {
   }
 
 
-  public getSummaryByPath(path: string, purl :string) {
+  public getSummaryByPath(path: string, purls: string[]) {
     return new Promise<Array<any>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
-          let SQLquery = `SELECT SUM(r.identified) AS identified,SUM(r.ignored) AS ignored ,SUM((CASE WHEN  r.identified=0 AND r.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r WHERE r.file_path LIKE # AND r.purl=?;`;
-          SQLquery =  SQLquery.replace('#',`'${path}/%'`);        
-          db.get(SQLquery, purl, (err: any, data: any) => {
+          let SQLquery = `SELECT r.purl,SUM(r.identified) AS identified,SUM(r.ignored) AS ignored ,SUM((CASE WHEN  r.identified=0 AND r.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r WHERE r.file_path LIKE # AND r.purl IN ? GROUP BY r.purl;`;
+          SQLquery =  SQLquery.replace('#',`'${path}/%'`);     
+          const aux = `'${  purls.join("','")  }'`;  
+          SQLquery = SQLquery.replace('?',`(${aux})`);          
+          db.all(SQLquery, (err: any, data: any) => {            
             db.close();
             if (err) throw err;
             else resolve(data);
