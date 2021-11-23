@@ -48,7 +48,6 @@ export class Tree {
     return 0;
   }
 
-
   public attachResults(results: any): void {
     Object.entries(results).forEach(([key, value]: [string, any]) => {
       for (let i = 0; i < value.length; i += 1) {
@@ -62,7 +61,6 @@ export class Tree {
   public restoreStatus(paths: Array<string>) {
     for (const path of paths) this.rootFolder.restoreStatus(path);
   }
-
 
   public loadTree(data: any): void {
     this.rootFolder = this.deserialize(data) as Folder;
@@ -81,7 +79,6 @@ export class Tree {
   }
 
   public getNode(path:string){
-   return this.rootFolder.getNode(path);
+    return this.rootFolder.getNode(path);
   }
-
 }

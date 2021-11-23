@@ -18,31 +18,9 @@ export default class Folder extends Node {
     return this.children;
   }
 
-  // public updateStatus(path: string, status: string): boolean {
-  //   if (!path.includes(this.getPath())) return false;
-  //   if (path === this.getPath()) return false;
-
-  //   for (const child of this.children) {
-  //     if (child.updateStatus(path, status)) break;
-  //   }
-
-  //   let newFolderState = 'identified';
-  //   if (this.children.some((child) => child.getStatus() === 'pending')) newFolderState = 'pending';
-  //   if (this.children.every((child) => child.getStatus() === 'ignored')) newFolderState = 'ignored';
-
-  //   this.status = newFolderState;
-  //   this.setStatusOnClassnameAs(newFolderState);
-
-  //   return true;
-  // }
-
   public getStatus(path: string): NodeStatus {
-
-    if (!path.includes(this.getPath())) return null;
-
-
+    if (!this.checkMyPath(path)) return null;
     return this.statusLogic();
-
   }
 
   private statusLogic(): NodeStatus {
@@ -54,15 +32,11 @@ export default class Folder extends Node {
   }
 
   public setStatus(path: string, status: NodeStatus): boolean {
-    if (path === this.getPath()) return false; // We don't want to set the status on a folder
-    if (!path.includes(this.getPath())) return false;
-    // /home/ubuntu/inc/scanner.c
+    if (path === this.getPath()) return false;
+    if (!this.checkMyPath(path)) return false;
     for (const child of this.children) if (child.setStatus(path, status)) break;
-
-
     this.status = this.statusLogic();
     this.setStatusOnClassnameAs(this.status);
-
     return true;
   }
 
@@ -71,10 +45,8 @@ export default class Folder extends Node {
   }
 
   public getNode(path: string): Node {
-    if (!path.includes(this.getPath())) return null;
-
+    if (!this.checkMyPath(path)) return null;
     if (path === this.getPath()) return this;
-
     for (const child of this.children) {
       const node = child.getNode(path);
       if (node !== null) return node;
@@ -83,22 +55,14 @@ export default class Folder extends Node {
   }
 
   public attachResults(component: any, path: string): boolean {
-    if (!path.includes(this.getPath())) return false;
-
+    if (!this.checkMyPath(path)) return false;
     // Avoid duplicate components
     const existComponent = this.components.some((el) => el.purl === component.purl && el.version === component.version);
     if (!existComponent) this.components.push(component);
-
-    for (const child of this.children)
-      if (child.attachResults(component, path)) break;
-
+    for (const child of this.children) if (child.attachResults(component, path)) break;
     this.original = NodeStatus.MATCH;
     this.status = this.statusLogic();
-
-    // Que tenemos que hacer?
-    // Actualizar el className del folder (de mi mismo) en funcion del estado de los hijos
     this.setStatusOnClassnameAs(this.status);
-
     return true;
   }
 
@@ -109,8 +73,20 @@ export default class Folder extends Node {
     this.setStatusOnClassnameAs(this.status);
   }
 
+  // Returns true only if my path is contained in the path (parameter)
+  private checkMyPath(path: string): boolean {
+    if (!path.includes(this.getPath())) return false;
+    // Only if first filter is passed.
+    const myPathExploded = this.getPath().split('/');
+    const pathExploded = path.split('/');
+    for(let i=0;i<myPathExploded.length;i+=1) {
+      if (myPathExploded[i] !== pathExploded[i]) return false;
+    }
+    return true;
+  }
 
   public getComponent(): any[] {
     return this.components;
   }
+
 }
