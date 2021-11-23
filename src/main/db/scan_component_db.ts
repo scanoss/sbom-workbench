@@ -321,8 +321,8 @@ export class ComponentDb extends Db {
               attachLicComp.license_id = await self.license.getLicenseIdFilter(
                 license
               );
-              if (attachLicComp.license_id === 0) {               
-                attachLicComp.license_id  = await self.license.bulkCreate(db, license);              
+              if (attachLicComp.license_id === 0) {
+                attachLicComp.license_id  = await self.license.bulkCreate(db, license);
               }
             }
             attachLicComp.compid = await self.componentNewImportFromResults(
@@ -529,10 +529,9 @@ export class ComponentDb extends Db {
  
     return new Promise(async (resolve, reject) => {
       try {
-        const data = await this.getAll({}, params);      
+        const data = await this.getAll({}, params);
         if (data) {
-          const comp:any = await this.groupComponentsByPurl(data);     
-          
+          const comp:any = await this.groupComponentsByPurl(data);           
           // if path is defined
           if(params?.path!==undefined){       
             const purls =  comp.reduce((acc, curr) => {
@@ -714,7 +713,7 @@ export class ComponentDb extends Db {
       }
     });
   }
-  
+
 
 
 }
