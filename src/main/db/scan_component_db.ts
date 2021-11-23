@@ -15,6 +15,7 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { Component, ComponentGroup } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
+import { componentHelper } from '../helpers/ComponentHelper';
 
 export interface ComponentParams {
   source?: ComponentSource;
@@ -54,14 +55,14 @@ export class ComponentDb extends Db {
     });
   }
 
-  getAll(data: any, params?: ComponentParams) {
+  getAll(data: any, params?: ComponentParams) {    
     return new Promise <Component>(async (resolve, reject) => {
       try {
         let component: any;
         if (data.purl && data.version)
           component = await this.getbyPurlVersion(data);
-        else if (data.purl) {
-          component = await this.getByPurl(data);
+        else if (data.purl) {          
+          component = await this.getByPurl(data,params);
         } else {
           component = await this.allComp(params);
         }
@@ -153,14 +154,19 @@ export class ComponentDb extends Db {
     });
   }
 
-  // GET COMPONENENT ID FROM PURL
-  private getByPurl(data: any) {
+  
+  private getByPurl(data: any, params: ComponentParams) {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
+        let SQLQuery='';
+        if(params?.path)
+          SQLQuery = query.SQL_GET_COMPONENT_BY_PURL_ENGINE_PATH.replace('#', `'${params.path}/%'`);
+        else
+          SQLQuery =  query.SQL_GET_COMPONENT_BY_PURL_ENGINE;       
         const db = await this.openDb();
         db.all(
-          query.SQL_GET_COMPONENT_BY_PURL_ENGINE,
+          SQLQuery,
           data.purl,
           data.purl,
           async (err: any, component: any) => {
@@ -315,8 +321,8 @@ export class ComponentDb extends Db {
               attachLicComp.license_id = await self.license.getLicenseIdFilter(
                 license
               );
-              if (attachLicComp.license_id === 0) {               
-                attachLicComp.license_id  = await self.license.bulkCreate(db, license);              
+              if (attachLicComp.license_id === 0) {
+                attachLicComp.license_id  = await self.license.bulkCreate(db, license);
               }
             }
             attachLicComp.compid = await self.componentNewImportFromResults(
@@ -487,13 +493,20 @@ export class ComponentDb extends Db {
     });
   }
 
-  async getComponentGroup(component: Partial<ComponentGroup>) {
+  async getComponentGroup(component: Partial<ComponentGroup>,params: ComponentParams) {
     return new Promise(async (resolve, reject) => {
       try {
-        const data = await this.getAll(component);
+        const data = await this.getAll(component, params);
         if (data) {
           const [comp] = await this.groupComponentsByPurl(data);
           comp.summary = await this.summaryByPurl(comp);
+          if(params?.path){             
+            const aux = await this.getSummaryByPath(params.path,[comp.purl]);  
+           const summary = componentHelper.summaryByPurl(aux);  
+            comp.summary = summary[comp.purl];
+          }
+          
+        
           resolve(comp);
         } else resolve([]);
       } catch (error) {
@@ -504,15 +517,23 @@ export class ComponentDb extends Db {
   }
 
   async getAllComponentGroup(params: ComponentParams) {
+ 
     return new Promise(async (resolve, reject) => {
       try {
-        const data = await this.getAll({}, params);      
+        const data = await this.getAll({}, params);
         if (data) {
-          const comp:any = await this.groupComponentsByPurl(data);       
-          if(params?.path!==undefined){                   
+          const comp:any = await this.groupComponentsByPurl(data);   //        
+          // if path is defined
+          if(params?.path!==undefined){       
+            const purls =  comp.reduce((acc, curr) => {
+              acc.push(curr.purl);
+              return acc;
+            },[]);
+            const aux = await this.getSummaryByPath(params.path,purls);         
+            const summary = componentHelper.summaryByPurl(aux);          
               for (let i=0 ; i<comp.length; i+=1){
-              const summary =  await this.getSummaryByPath(params.path,comp[i].purl);        
-              comp[i].summary = summary;
+                comp[i].summary = summary[comp[i].purl]; 
+              
               }          
           }           
           resolve(comp);
@@ -653,14 +674,16 @@ export class ComponentDb extends Db {
   }
 
 
-  public getSummaryByPath(path: string, purl :string) {
+  public getSummaryByPath(path: string, purls: string[]) {
     return new Promise<Array<any>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
-          let SQLquery = `SELECT SUM(r.identified) AS identified,SUM(r.ignored) AS ignored ,SUM((CASE WHEN  r.identified=0 AND r.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r WHERE r.file_path LIKE # AND r.purl=?;`;
-          SQLquery =  SQLquery.replace('#',`'${path}/%'`);        
-          db.get(SQLquery, purl, (err: any, data: any) => {
+          let SQLquery = `SELECT r.purl,SUM(r.identified) AS identified,SUM(r.ignored) AS ignored ,SUM((CASE WHEN  r.identified=0 AND r.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r WHERE r.file_path LIKE # AND r.purl IN ? GROUP BY r.purl;`;
+          SQLquery =  SQLquery.replace('#',`'${path}/%'`);     
+          const aux = `'${  purls.join("','")  }'`;  
+          SQLquery = SQLquery.replace('?',`(${aux})`);          
+          db.all(SQLquery, (err: any, data: any) => {            
             db.close();
             if (err) throw err;
             else resolve(data);
@@ -672,7 +695,7 @@ export class ComponentDb extends Db {
       }
     });
   }
-  
+
 
 
 }

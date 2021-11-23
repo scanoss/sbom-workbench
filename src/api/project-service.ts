@@ -35,7 +35,6 @@ class ProjectService extends BaseService {
     return response;
   }
 
-
   public async getProjectName(): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.UTILS_PROJECT_NAME);
     return response;
@@ -46,7 +45,7 @@ class ProjectService extends BaseService {
     return this.response(response);
   }
 
-  public async getToken(): Promise <any> {
+  public async getToken(): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.GET_TOKEN);
     return this.response(response);
   }

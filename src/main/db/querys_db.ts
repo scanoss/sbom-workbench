@@ -129,6 +129,15 @@ export class Querys {
      LEFT JOIN (SELECT DISTINCT r.purl, r.version, COUNT (*) AS filesCount FROM results  r WHERE r.source='engine' AND r.version!='' GROUP BY  r.purl,r.version ) as counter
      ON counter.purl=comp.purl AND counter.version=comp.version;`;
 
+  SQL_GET_COMPONENT_BY_PURL_ENGINE_PATH = `SELECT counter.file_path,counter.filesCount,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id
+FROM
+(SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp
+LEFT JOIN license_view lic ON comp.id=lic.cvid
+ WHERE comp.source=(SELECT source FROM components WHERE purl=? limit 1)
+ AND comp.purl=?) AS comp
+ INNER JOIN (SELECT DISTINCT r.file_path, r.purl, r.version, COUNT (*) AS filesCount FROM results  r WHERE r.source='engine' AND r.version!='' AND r.file_path LIKE # GROUP BY  r.purl,r.version ) as counter
+ ON counter.purl=comp.purl AND counter.version=comp.version;`;
+
   // GET ALL COMPONENTES
   SQL_GET_ALL_COMPONENTS =
     'SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid;';
@@ -138,8 +147,8 @@ export class Querys {
   LEFT JOIN (SELECT DISTINCT r.purl, r.version, COUNT (*) AS filesCount FROM results  r WHERE r.source='engine' AND r.version!='' GROUP BY  r.purl,r.version ) AS filesVersion
   ON filesVersion.version=matched.version AND filesVersion.purl=matched.purl;`;
 
-    // GET ALL COMPONENTES BY PATH
-    SQL_GET_ALL_DETECTED_COMPONENTS_BY_PATH = `SELECT filesVersion.filesCount,matched.comp_url,matched.compid,matched.comp_name,matched.license_url,matched.license_name,matched.license_spdxid,matched.purl,matched.version,matched.license_id,filesVersion.file_path FROM (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE source="engine") AS matched
+  // GET ALL COMPONENTES BY PATH
+  SQL_GET_ALL_DETECTED_COMPONENTS_BY_PATH = `SELECT filesVersion.filesCount,matched.comp_url,matched.compid,matched.comp_name,matched.license_url,matched.license_name,matched.license_spdxid,matched.purl,matched.version,matched.license_id,filesVersion.file_path FROM (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE source="engine") AS matched
     INNER JOIN (SELECT DISTINCT r.purl, r.version,r.file_path,COUNT (*) AS filesCount FROM results  r WHERE r.source='engine' AND r.version!='' AND r.file_path LIKE '#' GROUP BY  r.purl,r.version ) AS filesVersion
     ON filesVersion.version=matched.version AND filesVersion.purl=matched.purl;`;
 
@@ -162,7 +171,7 @@ export class Querys {
     LEFT JOIN file_inventories fi ON r.id=fi.resultid
     WHERE r.purl=? AND r.version=? GROUP BY r.file_path;`;
 
-    SQL_SELECT_FILES_FROM_PURL_VERSION_PATH = `
+  SQL_SELECT_FILES_FROM_PURL_VERSION_PATH = `
     SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, fi.inventoryid
     FROM results r
     LEFT JOIN file_inventories fi ON r.id=fi.resultid
@@ -173,7 +182,7 @@ export class Querys {
    WHERE r.purl=?
    GROUP BY r.file_path;`;
 
-   SQL_SELECT_FILES_FROM_PURL_PATH = `SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r
+  SQL_SELECT_FILES_FROM_PURL_PATH = `SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r
    LEFT JOIN file_inventories fi ON r.id=fi.resultid
    WHERE r.purl=? AND r.file_path like ?;`;
 
