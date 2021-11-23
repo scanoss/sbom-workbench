@@ -315,8 +315,8 @@ export class ComponentDb extends Db {
               attachLicComp.license_id = await self.license.getLicenseIdFilter(
                 license
               );
-              if (attachLicComp.license_id === 0) {               
-                attachLicComp.license_id  = await self.license.bulkCreate(db, license);              
+              if (attachLicComp.license_id === 0) {
+                attachLicComp.license_id  = await self.license.bulkCreate(db, license);
               }
             }
             attachLicComp.compid = await self.componentNewImportFromResults(
@@ -506,15 +506,15 @@ export class ComponentDb extends Db {
   async getAllComponentGroup(params: ComponentParams) {
     return new Promise(async (resolve, reject) => {
       try {
-        const data = await this.getAll({}, params);      
+        const data = await this.getAll({}, params);
         if (data) {
-          const comp:any = await this.groupComponentsByPurl(data);       
-          if(params?.path!==undefined){                   
+          const comp:any = await this.groupComponentsByPurl(data);
+          if(params?.path!==undefined){
               for (let i=0 ; i<comp.length; i+=1){
-              const summary =  await this.getSummaryByPath(params.path,comp[i].purl);        
+              const summary =  await this.getSummaryByPath(params.path,comp[i].purl);
               comp[i].summary = summary;
-              }          
-          }           
+              }
+          }
           resolve(comp);
         } else resolve([]);
       } catch (error) {
@@ -659,7 +659,7 @@ export class ComponentDb extends Db {
         const db = await this.openDb();
         db.serialize(() => {
           let SQLquery = `SELECT SUM(r.identified) AS identified,SUM(r.ignored) AS ignored ,SUM((CASE WHEN  r.identified=0 AND r.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r WHERE r.file_path LIKE # AND r.purl=?;`;
-          SQLquery =  SQLquery.replace('#',`'${path}/%'`);        
+          SQLquery =  SQLquery.replace('#',`'${path}/%'`);
           db.get(SQLquery, purl, (err: any, data: any) => {
             db.close();
             if (err) throw err;
@@ -672,7 +672,7 @@ export class ComponentDb extends Db {
       }
     });
   }
-  
+
 
 
 }
