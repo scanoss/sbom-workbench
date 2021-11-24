@@ -78,7 +78,7 @@ export class Tree {
     return this.rootFolder;
   }
 
-  public getNode(path:string){
+  public getNode(path: string) {
     return this.rootFolder.getNode(path);
   }
 
@@ -88,5 +88,3 @@ export class Tree {
     }
   }
 }
-
-
