@@ -19,6 +19,8 @@ import { Tree } from './Tree/Tree/Tree';
 
 import Folder from './Tree/Tree/Folder';
 import Node, { NodeStatus } from './Tree/Tree/Node';
+import { logicResultService } from '../services/LogicResultService';
+import { runInThisContext } from 'vm';
 
 const path = require('path');
 
@@ -158,11 +160,8 @@ export class Project extends EventEmitter {
     await this.scans_db.init();
     await this.scans_db.licenses.importFromJSON(licenses);
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
-    this.build_tree();  // Estamos OK
+    this.build_tree();
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
-
-    // Tenemos que agregar el campo status y original field
-    // Aca tenemos que setear el original en filteres solo si es filtrado.
     this.indexScan(this.metadata.getScanRoot(), this.tree.getRootFolder(), this.banned_list);
     const summary = { total: 0, include: 0, filter: 0, files: {} };
     this.filesSummary = summarizeTree(this.metadata.getScanRoot(),this.tree.getRootFolder(), summary);
@@ -214,7 +213,6 @@ export class Project extends EventEmitter {
 
     this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response, filesNotScanned) => {
       this.tree.attachResults(response.getServerResponse());
-      //this.attachComponent(response.getServerResponse());
       Object.assign(this.filesNotScanned, filesNotScanned);
       this.save();
     });
@@ -222,7 +220,7 @@ export class Project extends EventEmitter {
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath, filesNotScanned) => {
 
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
-        log.info(`%c[ SCANNER ]: RESCANFINISHED `, 'color: green');
+        log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
 
         await this.scans_db.results.updateDirty(1);
         await this.scans_db.results.insertFromFileReScan(resPath);
@@ -245,6 +243,10 @@ export class Project extends EventEmitter {
           const result = emptyInv.map((item: Record<string, number>) => item.id);
           await this.scans_db.inventories.deleteAllEmpty(result);
         }
+        const results = await logicResultService.getResultsRescan();
+        this.tree.sync(results);
+        this.save();
+
       } else {
         await this.scans_db.results.insertFromFile(resPath);
         await this.scans_db.components.importUniqueFromFile();
@@ -368,6 +370,7 @@ export class Project extends EventEmitter {
     this.emit('treeBuilt', this.logical_tree);
   }
 
+
   public getTree(): Tree {
     return this.tree;
   }
@@ -375,7 +378,7 @@ export class Project extends EventEmitter {
   public updateTree() {
     this.save();
     this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
-    // Todo agregar avisar al UI cuando termina de actualizar
+
   }
 
   attachInventory(inv: Inventory) {

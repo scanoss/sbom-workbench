@@ -78,7 +78,14 @@ export class Tree {
     return this.rootFolder;
   }
 
-  public getNode(path:string){
+  public getNode(path: string) {
     return this.rootFolder.getNode(path);
+  }
+
+  public sync(filesStatus: Array<Record<string, NodeStatus>>) {
+    for (const file of filesStatus) {
+      this.rootFolder.setStatus(file.path, file.status);
+      this.getNode(file.path).original = file.original;
+    }
   }
 }

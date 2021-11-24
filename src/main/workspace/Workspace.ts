@@ -176,7 +176,6 @@ class Workspace extends EventEmitter {
     const projectPaths = projectsDirEnt.map((dirent) => `${this.wsPath}/${dirent.name}`);
     return projectPaths;
   }
-
 }
 
 export const workspace = new Workspace();

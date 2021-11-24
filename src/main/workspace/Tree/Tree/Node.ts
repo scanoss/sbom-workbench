@@ -1,4 +1,3 @@
-const pathLib = require('path');
 
 export enum NodeStatus {
   FILTERED = 'FILTERED',
@@ -37,10 +36,10 @@ export default abstract class Node {
     this.status = NodeStatus.NOMATCH;
     this.original = NodeStatus.NOMATCH;
 
-    //Those parameters are used by the UI.
+    // Those parameters are used by the UI.
     this.className = 'no-match';
     this.showCheckbox = false;
-    //Those parameters are used by the UI.
+ 
 
     this.include = true;
   }
@@ -58,7 +57,7 @@ export default abstract class Node {
     this.className = this.className.replace(re, '');
 
     if (className === NodeStatus.IDENTIFIED || className === NodeStatus.IGNORED || className === NodeStatus.PENDING) {
-      this.className = ` status-${className.toLowerCase()}`;
+      this.className = ` status-${className.toLowerCase()}`;    
     }
 
     if (className === NodeStatus.FILTERED) {
@@ -77,10 +76,6 @@ export default abstract class Node {
   public abstract setOriginal(path: string, status: NodeStatus): boolean;
 
   public abstract getOriginal(path: string): NodeStatus;
-
-  // public abstract updateStatus(path: string, status: string): boolean;
-
-  // public abstract updateClassName(path: string, status: string): boolean;
 
   public abstract restoreStatus(path: string);
 
