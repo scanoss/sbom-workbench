@@ -245,6 +245,19 @@ export class Project extends EventEmitter {
           const result = emptyInv.map((item: Record<string, number>) => item.id);
           await this.scans_db.inventories.deleteAllEmpty(result);
         }
+
+        // Traer esto de la DB
+        /* [
+          {path: status},
+          {path: status},
+          .
+          .
+          .
+          {path: status},
+        ] */
+
+        this.tree.sync( [] ); // Aca va la magia
+
       } else {
         await this.scans_db.results.insertFromFile(resPath);
         await this.scans_db.components.importUniqueFromFile();
@@ -367,6 +380,7 @@ export class Project extends EventEmitter {
     //this.logical_tree = dirTree(scanPath, scanPath);
     this.emit('treeBuilt', this.logical_tree);
   }
+
 
   public getTree(): Tree {
     return this.tree;

@@ -81,4 +81,13 @@ export class Tree {
   public getNode(path:string){
     return this.rootFolder.getNode(path);
   }
+
+  public sync(filesStatus: Array<Record<string, NodeStatus>>) {
+    for (const file of filesStatus) {
+      this.rootFolder.setStatus(file.path, file.status);
+    }
+  }
 }
+
+// Lo abro directo -> Ejecuto la migrracion directo
+// Lo abro a travez de un rescan -> La migracion se ejecuta (el sync)
