@@ -19,6 +19,7 @@ import { Tree } from './Tree/Tree/Tree';
 
 import Folder from './Tree/Tree/Folder';
 import Node, { NodeStatus } from './Tree/Tree/Node';
+import { logicResultService } from '../services/LogicResultService';
 
 const path = require('path');
 
@@ -158,11 +159,8 @@ export class Project extends EventEmitter {
     await this.scans_db.init();
     await this.scans_db.licenses.importFromJSON(licenses);
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
-    this.build_tree();  // Estamos OK
+    this.build_tree(); 
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
-
-    // Tenemos que agregar el campo status y original field
-    // Aca tenemos que setear el original en filteres solo si es filtrado.
     this.indexScan(this.metadata.getScanRoot(), this.tree.getRootFolder(), this.banned_list);
     const summary = { total: 0, include: 0, filter: 0, files: {} };
     this.filesSummary = summarizeTree(this.metadata.getScanRoot(),this.tree.getRootFolder(), summary);
@@ -214,7 +212,6 @@ export class Project extends EventEmitter {
 
     this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response, filesNotScanned) => {
       this.tree.attachResults(response.getServerResponse());
-      //this.attachComponent(response.getServerResponse());
       Object.assign(this.filesNotScanned, filesNotScanned);
       this.save();
     });
@@ -255,8 +252,9 @@ export class Project extends EventEmitter {
           .
           {path: status},
         ] */
-
-        this.tree.sync( [] ); // Aca va la magia
+        const results = await logicResultService.getResultsRescan();   
+        this.tree.sync(results);
+       
 
       } else {
         await this.scans_db.results.insertFromFile(resPath);
@@ -389,7 +387,7 @@ export class Project extends EventEmitter {
   public updateTree() {
     this.save();
     this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
-    // Todo agregar avisar al UI cuando termina de actualizar
+   
   }
 
   attachInventory(inv: Inventory) {

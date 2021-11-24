@@ -277,7 +277,7 @@ export class ResultsDb extends Db {
   }
 
   // GET RESULTS
-  getAll(path: string) {
+  get(path: string) {
     let results: any;
     return new Promise(async (resolve, reject) => {
       try {
@@ -385,5 +385,19 @@ export class ResultsDb extends Db {
     });
   }
 
+  public async getResultsRescan(){
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.all(query.SQL_GET_RESULTS_RESCAN, (err: any, data: any) => {
+          db.close();
+          if (err) throw new Error('Unable to get result by id');
+          else resolve(data);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
   
 }

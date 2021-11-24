@@ -89,5 +89,4 @@ export class Tree {
   }
 }
 
-// Lo abro directo -> Ejecuto la migrracion directo
-// Lo abro a travez de un rescan -> La migracion se ejecuta (el sync)
+

@@ -8,7 +8,7 @@ export default class File extends Node {
 
   public setStatus(path: string, status: NodeStatus): boolean {
     if (this.getPath() === path) {
-      this.status = status;
+      this.status = status; 
       this.setStatusOnClassnameAs(status);
       return true;
     }
