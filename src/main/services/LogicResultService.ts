@@ -25,13 +25,16 @@ class LogicResultService {
     const results: Array<any> = await project.scans_db.results.getResultsRescan();
 
     results.forEach((result) => {
-      if (result.identified === 1) {
+      if (result.idtype === 'none') {
+        result[result.path] = NodeStatus.NOMATCH;
+        result.status = NodeStatus.NOMATCH;
+      } else if (result.identified === 1) {
         result[result.path] = NodeStatus.IDENTIFIED;
         result.status = NodeStatus.IDENTIFIED;
       } else if (result.ignored === 1) {
         result[result.path] = NodeStatus.IGNORED;
         result.status = NodeStatus.IGNORED;
-      } else {
+      } else if (result.pending === 1) {
         result[result.path] = NodeStatus.PENDING;
         result.status = NodeStatus.PENDING;
       }

@@ -20,6 +20,7 @@ import { Tree } from './Tree/Tree/Tree';
 import Folder from './Tree/Tree/Folder';
 import Node, { NodeStatus } from './Tree/Tree/Node';
 import { logicResultService } from '../services/LogicResultService';
+import { runInThisContext } from 'vm';
 
 const path = require('path');
 
@@ -253,8 +254,9 @@ export class Project extends EventEmitter {
           {path: status},
         ] */
         const results = await logicResultService.getResultsRescan();   
+        console.log(results);
         this.tree.sync(results);
-       
+        this.save();
 
       } else {
         await this.scans_db.results.insertFromFile(resPath);
