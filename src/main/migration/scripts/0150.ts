@@ -7,28 +7,20 @@ import { NodeStatus } from '../../workspace/Tree/Tree/Node';
 export async function treeMigration(projectPath: string) {
   log.info('%c[MIGRATION] IN PROGRESS...', 'color: green');
 
-  const tree = JSON.parse(fs.readFileSync(`${projectPath}/tree.json`, 'utf8'));
-
+  const project = JSON.parse(fs.readFileSync(`${projectPath}/tree.json`, 'utf8'));
+  const oldTree = project.logical_tree;
   const metadata = JSON.parse(fs.readFileSync(`${projectPath}/metadata.json`, 'utf8'));
 
-  const aux = tree.logical_tree;
-
-  tree.tree = {};
-  tree.tree.rootFolder = aux;
-
-  tree.tree.rootName = metadata.name;
-  tree.tree.rootpath = metadata.work_root;
-
   const newTree = new Tree(metadata.work_root);
-
-  newTree.loadTree(tree.tree.rootFolder);
+  newTree.loadTree(oldTree);
 
   const results: any = await getResults(projectPath);
-
   newTree.sync(results);
 
-  tree.tree.rootFolder = newTree.getRootFolder();
-  fs.writeFileSync(`${projectPath}/tree.json`, JSON.stringify(tree, null, 2), 'utf8');
+  project.tree = newTree;
+  delete project.logical_tree;
+
+  fs.writeFileSync(`${projectPath}/tree.json`, JSON.stringify(project, null, 2), 'utf8');
 }
 
 async function getResults(projectPath) {
@@ -44,18 +36,26 @@ async function getResults(projectPath) {
         `SELECT r.idtype,r.file_path as path,r.identified ,r.ignored ,(CASE WHEN  r.identified=0 AND r.ignored=0 THEN 1 ELSE 0 END) as pending FROM results r;`,
         (err: any, results: any) => {
           results.forEach((result) => {
-            if (result.idtype === 'none') {
+            if (result.idtype === 'none' && result.identified === 1) {
+              result[result.path] = NodeStatus.IDENTIFIED;
+              result.status = NodeStatus.IDENTIFIED;
+              result.original = NodeStatus.NOMATCH;
+            } else if (result.idtype === 'none') {
               result[result.path] = NodeStatus.NOMATCH;
               result.status = NodeStatus.NOMATCH;
+              result.original = NodeStatus.NOMATCH;
             } else if (result.identified === 1) {
               result[result.path] = NodeStatus.IDENTIFIED;
               result.status = NodeStatus.IDENTIFIED;
+              result.original = NodeStatus.MATCH;
             } else if (result.ignored === 1) {
               result[result.path] = NodeStatus.IGNORED;
               result.status = NodeStatus.IGNORED;
+              result.original = NodeStatus.MATCH;
             } else if (result.pending === 1) {
               result[result.path] = NodeStatus.PENDING;
               result.status = NodeStatus.PENDING;
+              result.original = NodeStatus.MATCH;
             }
           });
           resolve(results);

@@ -160,7 +160,7 @@ export class Project extends EventEmitter {
     await this.scans_db.init();
     await this.scans_db.licenses.importFromJSON(licenses);
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
-    this.build_tree(); 
+    this.build_tree();
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
     this.indexScan(this.metadata.getScanRoot(), this.tree.getRootFolder(), this.banned_list);
     const summary = { total: 0, include: 0, filter: 0, files: {} };
@@ -220,7 +220,7 @@ export class Project extends EventEmitter {
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath, filesNotScanned) => {
 
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
-        log.info(`%c[ SCANNER ]: RESCANFINISHED `, 'color: green');
+        log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
 
         await this.scans_db.results.updateDirty(1);
         await this.scans_db.results.insertFromFileReScan(resPath);
@@ -243,18 +243,7 @@ export class Project extends EventEmitter {
           const result = emptyInv.map((item: Record<string, number>) => item.id);
           await this.scans_db.inventories.deleteAllEmpty(result);
         }
-
-        // Traer esto de la DB
-        /* [
-          {path: status},
-          {path: status},
-          .
-          .
-          .
-          {path: status},
-        ] */
-        const results = await logicResultService.getResultsRescan();   
-        console.log(results);
+        const results = await logicResultService.getResultsRescan();
         this.tree.sync(results);
         this.save();
 
@@ -389,7 +378,7 @@ export class Project extends EventEmitter {
   public updateTree() {
     this.save();
     this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
-   
+
   }
 
   attachInventory(inv: Inventory) {

@@ -85,6 +85,7 @@ export class Tree {
   public sync(filesStatus: Array<Record<string, NodeStatus>>) {
     for (const file of filesStatus) {
       this.rootFolder.setStatus(file.path, file.status);
+      this.getNode(file.path).original = file.original;
     }
   }
 }
