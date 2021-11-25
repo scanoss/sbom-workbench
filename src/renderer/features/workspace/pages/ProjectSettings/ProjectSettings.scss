@@ -1,3 +1,28 @@
 #ProjectSettings {
 
+  .app-content {
+
+    .project-form-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      grid-gap: 1rem;
+
+      .input-container {
+
+        .input-label {
+          font-weight: bold;
+        }
+
+        .input-text {
+          margin-top: 20px;
+          padding: 8px;
+        }
+
+      }
+
+    }
+  }
+
 }
+

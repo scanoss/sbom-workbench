@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { IconButton } from '@material-ui/core';
+import { IconButton, InputBase, Paper } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router-dom';
 import { AppContext, IAppContext } from '../../../../context/AppProvider';
@@ -23,7 +23,52 @@ const ProjectSettings = () => {
           </div>
         </header>
         <main className="app-content">
-          <h5>Folder name</h5>
+          <div className="project-form-container">
+            <div className="input-container">
+                <label className="input-label">
+                  Project Name
+                </label>
+                <Paper className="input-text">
+                  <InputBase
+                    name="aa"
+                    onChange={(e) => console.log(e.target.value)}
+                  />
+                </Paper>
+            </div>
+            <div className="input-container">
+                <label className="input-label">
+                API Conections
+                </label>
+                <Paper className="input-text">
+                  <InputBase
+                    name="aa"
+                    onChange={(e) => console.log(e.target.value)}
+                  />
+                </Paper>
+            </div>
+            <div className="input-container">
+                <label className="input-label">
+                  License
+                </label>
+                <Paper className="input-text">
+                  <InputBase
+                    name="aa"
+                    onChange={(e) => console.log(e.target.value)}
+                  />
+                </Paper>
+            </div>
+            <div className="input-container">
+                <label className="input-label">
+                  Project Name
+                </label>
+                <Paper className="input-text">
+                  <InputBase
+                    name="aa"
+                    onChange={(e) => console.log(e.target.value)}
+                  />
+                </Paper>
+            </div>
+          </div>
         </main>
       </section>
     </>
