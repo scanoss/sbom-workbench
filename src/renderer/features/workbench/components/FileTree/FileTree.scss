@@ -7,7 +7,8 @@
     font-size: 14px;
 
     > ol {
-      overflow-x: hidden;
+      display: grid;
+      overflow-x: scroll;
     }
 
     .rct-collapse {
