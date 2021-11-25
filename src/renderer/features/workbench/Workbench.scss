@@ -21,8 +21,8 @@
 
   .file-tree-container {
     display: flex;
-    overflow-x: auto;
     padding-top: 20px;
+    overflow: hidden;
     width: 100%;
     height: 100%;
   }

@@ -21,7 +21,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
   let end = LINES_MAX;
 
   // highlighFlag is true when code should be highlighted. False otherwise.
-  const highlightFlag = !file.some((e) => e.length >= CHAR_MAX_IN_LINE);
+  const highlightFlag = !file.some((e) => e.length >= CHAR_MAX_IN_LINE) && file.length <= LINES_MAX;
 
   if (highlight && highlight !== 'all') {
     const [rangeStart, rangeEnd] = highlight.split('-');
