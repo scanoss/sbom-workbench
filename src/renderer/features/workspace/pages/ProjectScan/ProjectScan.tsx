@@ -11,7 +11,7 @@ import CircularComponent from '../Components/CircularComponent';
 
 const { ipcRenderer } = require('electron');
 
-const NewProject = () => {
+const ProjectScan = () => {
   const history = useHistory();
 
   const { scanPath, setScanPath } = useContext(AppContext) as IAppContext;
@@ -100,7 +100,7 @@ const NewProject = () => {
 
   return (
     <>
-      <section id="NewProject" className="app-page">
+      <section id="ProjectScan" className="app-page">
         <header className="app-header">
           <div>
             <h4 className="header-subtitle back">
@@ -124,4 +124,4 @@ const NewProject = () => {
   );
 };
 
-export default NewProject;
+export default ProjectScan;

@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { IpcEvents } from '../../ipc-events';
 import { dialogController } from '../dialog-controller';
 
-export interface IScan{
+export interface IScan {
   path: string;
   action: string;
 }
@@ -33,9 +33,11 @@ const AppProvider = ({ children }) => {
 
     if (projectPath) {
       setScanPath({ path: projectPath, action: 'scan' });
-      history.push('/workspace/new');
+      history.push('/workspace/new/settings');
     }
   };
+
+  // const handleOpenProject = () => history.push('/workspace/new');
 
   const setupAppMenuListeners = () => {
     ipcRenderer.on(IpcEvents.MENU_NEW_PROJECT, newProject);

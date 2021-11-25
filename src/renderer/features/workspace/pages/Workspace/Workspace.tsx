@@ -7,7 +7,7 @@ import AddIcon from '@material-ui/icons/Add';
 import Paper from '@material-ui/core/Paper';
 
 import SearchIcon from '@material-ui/icons/Search';
-import { AppContext } from '../../../../context/AppProvider';
+import { AppContext, IAppContext } from '../../../../context/AppProvider';
 import { IProject } from '../../../../../api/types';
 import { workspaceService } from '../../../../../api/workspace-service';
 import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
@@ -17,7 +17,7 @@ import ProjectList from '../Components/ProjectList';
 const Workspace = () => {
   const history = useHistory();
 
-  const { setScanPath, newProject } = useContext<any>(AppContext);
+  const { setScanPath, newProject } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const [projects, setProjects] = useState<any[] | null>(null);
@@ -61,14 +61,14 @@ const Workspace = () => {
     });
     if (action === DIALOG_ACTIONS.OK) {
       setScanPath({ path: project.work_root, action: 'rescan' });
-      history.push('/workspace/new');
+      history.push('/workspace/new/scan');
       init();
     }
   };
 
   const onRestoreHandler = async (project: IProject) => {
     setScanPath({ path: project.work_root, action: 'resume' });
-    history.push('/workspace/new');
+    history.push('/workspace/new/scan');
   };
 
   useEffect(() => {
