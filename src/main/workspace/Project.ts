@@ -21,6 +21,7 @@ import Folder from './Tree/Tree/Folder';
 import Node, { NodeStatus } from './Tree/Tree/Node';
 import { logicResultService } from '../services/LogicResultService';
 import { runInThisContext } from 'vm';
+import { reScanService } from '../services/rescanLogicService';
 
 const path = require('path');
 
@@ -217,38 +218,39 @@ export class Project extends EventEmitter {
       this.save();
     });
 
-    this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath, filesNotScanned) => {
+    this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
 
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
         log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
 
-        await this.scans_db.results.updateDirty(1);
-        await this.scans_db.results.insertFromFileReScan(resPath);
+        await reScanService.reScan(resultPath);
+        // await this.scans_db.results.updateDirty(1);
+        // await this.scans_db.results.insertFromFileReScan(resPath);
 
-        const dirtyResults = await this.scans_db.results.getDirty();
-        if (dirtyResults.length > 0) {
-          await this.scans_db.inventories.deleteDirtyFileInventories(dirtyResults);
-        }
-        const notValidComp: number[] = await this.scans_db.components.getNotValid();
+        // const dirtyResults = await this.scans_db.results.getDirty();
+        // if (dirtyResults.length > 0) {
+        //   await this.scans_db.inventories.deleteDirtyFileInventories(dirtyResults);
+        // }
+        // const notValidComp: number[] = await this.scans_db.components.getNotValid();
 
-        if (notValidComp.length > 0) {
-          await this.scans_db.components.deleteByID(notValidComp);
-        }
-        await this.scans_db.results.deleteDirty();
-        await this.scans_db.components.updateOrphanToManual();
-        await this.scans_db.components.importUniqueFromFile();
+        // if (notValidComp.length > 0) {
+        //   await this.scans_db.components.deleteByID(notValidComp);
+        // }
+        // await this.scans_db.results.deleteDirty();
+        // await this.scans_db.components.updateOrphanToManual();
+        // await this.scans_db.components.importUniqueFromFile();
 
-        const emptyInv: any = await this.scans_db.inventories.emptyInventory();
-        if (emptyInv) {
-          const result = emptyInv.map((item: Record<string, number>) => item.id);
-          await this.scans_db.inventories.deleteAllEmpty(result);
-        }
+        // const emptyInv: any = await this.scans_db.inventories.emptyInventory();
+        // if (emptyInv) {
+        //   const result = emptyInv.map((item: Record<string, number>) => item.id);
+        //   await this.scans_db.inventories.deleteAllEmpty(result);
+        // }
         const results = await logicResultService.getResultsRescan();
         this.tree.sync(results);
         this.save();
 
       } else {
-        await this.scans_db.results.insertFromFile(resPath);
+        await this.scans_db.results.insertFromFile(resultPath);
         await this.scans_db.components.importUniqueFromFile();
       }
 
