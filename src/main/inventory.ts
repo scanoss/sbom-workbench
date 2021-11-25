@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron';
 import { Inventory } from '../api/types';
 import { IpcEvents } from '../ipc-events';
+import { utilHelper } from './helpers/UtilHelper';
 import { logicInventoryService } from './services/LogicInventoryService';
 import { logicResultService } from './services/LogicResultService';
 import { NodeStatus } from './workspace/Tree/Tree/Node';
@@ -31,19 +32,19 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   let inv: any;
 
   try {
-    const p = await workspace.getOpenedProjects()[0];
-    inv = await p.scans_db.inventories.create(arg);
+    const project = workspace.getOpenedProjects()[0];
+    inv = await project.scans_db.inventories.create(arg);
     arg.id = inv.id;
 
     logicResultService
-      .getResultsByids(arg.files)
+      .getResultsByids(arg.files, project)
       .then((filesToUpdate) => {
         const paths = Object.keys(filesToUpdate);
         for (const filePath of paths) {
-          p.getTree().getRootFolder().setStatus(filePath, NodeStatus.IDENTIFIED);
+          project.getTree().getRootFolder().setStatus(filePath, NodeStatus.IDENTIFIED);
         }
 
-        p.updateTree();
+        project.updateTree();
         return true;
       })
       .catch((e) => {
@@ -73,7 +74,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, inv: Partial<Inven
   try {
     const project = workspace.getOpenedProjects()[0];
     logicResultService
-      .getResultsByids(inv.files)
+      .getResultsByids(inv.files, project)
       .then((filesToUpdate) => {
         const paths = Object.keys(filesToUpdate);
         project.getTree().restoreStatus(paths as Array<string>);
@@ -101,10 +102,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (event, arg: Partial<Inventory>
     p.scans_db.inventories
       .getInventoryFiles(arg)
       .then((filesToUpdate) => {
-        const paths = [];
-        filesToUpdate.forEach((element) => {
-          paths.push(element.path);
-        });
+        const paths: Array<string> = utilHelper.getArrayFromObjectValue(filesToUpdate, 'path');
         p.getTree().restoreStatus(paths as Array<string>);
         p.updateTree();
         return paths;

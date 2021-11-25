@@ -8,7 +8,7 @@ export default class File extends Node {
 
   public setStatus(path: string, status: NodeStatus): boolean {
     if (this.getPath() === path) {
-      this.status = status; 
+      this.status = status;
       this.setStatusOnClassnameAs(status);
       return true;
     }
@@ -43,7 +43,7 @@ export default class File extends Node {
   }
 
   public restoreStatus(path: string) {
-    if (this.getPath() !== path) return; 
+    if (this.getPath() !== path) return;
 
     if (this.action === 'filter') {
       this.status = NodeStatus.FILTERED;
@@ -65,5 +65,13 @@ export default class File extends Node {
 
   public getComponent(): any[] {
     return this.components;
+  }
+
+  public getFiltered(): Array<string> {
+    const result: Array<string> = [];
+    if (this.status === NodeStatus.FILTERED) {
+      result.push(this.getPath());
+    }
+    return result;
   }
 }

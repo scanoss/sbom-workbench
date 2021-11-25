@@ -408,4 +408,22 @@ export class ResultsDb extends Db {
       }
     });
   }
+
+  public async updateFiltered(path: Array<string>) {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        let SQLquery = `UPDATE results SET dirty=0 WHERE file_path IN ? AND identified=1 OR ignored=1;`;
+        const aux = `'${path.join("','")}'`;
+        SQLquery = SQLquery.replace('?', `(${aux})`);
+        db.run(SQLquery,(err: any) => {
+          if (err) throw err;
+          db.close();
+          resolve(true);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }
