@@ -45,6 +45,9 @@ export default class File extends Node {
   public restoreStatus(path: string) {
     if (this.getPath() !== path) return;
 
+    console.log(this.action);
+    console.log(this.original);
+
     if (this.action === 'filter') {
       this.status = NodeStatus.FILTERED;
       this.setStatusOnClassnameAs(this.status);
