@@ -6,5 +6,14 @@ class UtilHelper {
     });
     return result;
   }
+
+  public convertsArrayOfStringToString(path: Array<string>): string {
+    let out = '(';
+    for (const file of path) out += `"${file}",`;
+    out = out.slice(0, -1);
+    out += ')';
+    return out;
+  }
+
 }
 export const utilHelper = new UtilHelper();

@@ -1,3 +1,4 @@
+import { utilHelper } from '../helpers/UtilHelper';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 
 class ReScanService {
@@ -5,9 +6,10 @@ class ReScanService {
     try {
       await project.scans_db.results.updateDirty(1);
       await project.scans_db.results.insertFromFileReScan(resultPath);
-
-      if (filteredFiles.length > 0) await project.scans_db.results.updateFiltered(filteredFiles);
-
+      if (filteredFiles.length > 0) {
+        const filtered = utilHelper.convertsArrayOfStringToString(filteredFiles);
+        await project.scans_db.results.updateFiltered(filtered);
+      }
       const dirtyResults = await project.scans_db.results.getDirty();
       if (dirtyResults.length > 0) {
         await project.scans_db.inventories.deleteDirtyFileInventories(dirtyResults);
@@ -59,5 +61,7 @@ class ReScanService {
 
     return results;
   }
+
+
 }
 export const reScanService = new ReScanService();
