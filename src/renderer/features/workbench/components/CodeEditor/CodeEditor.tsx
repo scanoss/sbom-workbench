@@ -3,7 +3,7 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { vs2015 } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { range } from '../../../../../utils/utils';
 
-const LINES_MAX = 1000;
+const LINES_MAX = 2000;
 const CHAR_MAX_IN_LINE = 5000;
 const LINES_OFFSET = 50;
 
@@ -21,7 +21,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
   let end = LINES_MAX;
 
   // highlighFlag is true when code should be highlighted. False otherwise.
-  const highlightFlag = !file.some((e) => e.length >= CHAR_MAX_IN_LINE) && file.length <= LINES_MAX;
+  const highlightFlag = !file.some((e) => e.length >= CHAR_MAX_IN_LINE);
 
   if (highlight && highlight !== 'all') {
     const [rangeStart, rangeEnd] = highlight.split('-');
