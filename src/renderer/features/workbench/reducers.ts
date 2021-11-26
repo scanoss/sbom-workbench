@@ -11,8 +11,7 @@ import {
   UPDATE_FILETREE,
   SET_FOLDER,
 } from './actions';
-import { ComponentGroup } from '../../../api/types';
-import { componentService } from '../../../api/component-service';
+import { ComponentGroup, Node } from '../../../api/types';
 
 export interface State {
   name: string;
@@ -30,10 +29,7 @@ export interface State {
   };
   filter: {
     version: string;
-    node?: {
-      type: 'folder' | 'file';
-      path: string;
-    };
+    node?: Node;
   };
 }
 
@@ -128,13 +124,13 @@ export default function reducer(state: State = initialState, action): State {
         },
       };
     }
-    case SET_FILE: {
+    /* case SET_FILE: {
       const { file } = action;
       return {
         ...state,
         file,
       };
-    }
+    } */
     case SET_HISTORY: {
       const { crumb } = action;
       return {
@@ -142,6 +138,20 @@ export default function reducer(state: State = initialState, action): State {
         history: {
           ...state.history,
           ...crumb,
+        },
+      };
+    }
+    case SET_FILE: {
+      const { file } = action;
+
+      return {
+        ...state,
+        filter: {
+          ...state.filter,
+          node: {
+            type: 'file',
+            path: file,
+          },
         },
       };
     }

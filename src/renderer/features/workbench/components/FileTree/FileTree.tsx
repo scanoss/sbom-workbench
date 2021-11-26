@@ -23,11 +23,11 @@ export const FileTree = () => {
     const fileTreeNode = getNode(node);
 
     if (!children) {
-      // dispatch(setFolder(null));
-      setNode(null);
-      history.push(`/workbench/detected/file?path=${encodeURIComponent(value)}`);
+      setNode({
+        type: 'file',
+        path: value,
+      });
     } else {
-      // dispatch(setFolder(fileTreeNode || null));
       setNode(
         fileTreeNode
           ? {
@@ -36,7 +36,6 @@ export const FileTree = () => {
             }
           : null
       );
-      history.push(`/workbench/detected`);
     }
 
     setAtree([tree]);

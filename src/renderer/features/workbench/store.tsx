@@ -2,17 +2,18 @@
 import React, { useEffect, useState } from 'react';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
-import { Inventory } from '../../../api/types';
+import { Inventory, Node } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
-import { loadScanSuccess, setComponent, setComponents, setFolder, setProgress, updateTree } from './actions';
+import { loadScanSuccess, setComponent, setComponents, setFile, setFolder, setProgress, updateTree } from './actions';
 import { resultService } from '../../../api/results-service';
 import { reportService } from '../../../api/report-service';
 import { componentService } from '../../../api/component-service';
+import { useHistory } from 'react-router-dom';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
-  setNode: (node: any) => void;
+  setNode: (node: Node) => void;
   createInventory: (inventory: Inventory) => Promise<Inventory>;
   ignoreFile: (files: number[]) => Promise<boolean>;
   restoreFile: (files: number[]) => Promise<boolean>;
@@ -27,6 +28,8 @@ export interface IWorkbenchContext {
 export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(null);
 
 export const WorkbenchProvider: React.FC = ({ children }) => {
+  const history = useHistory();
+
   const { setScanBasePath } = React.useContext<any>(AppContext);
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const { loaded, tree, file, component } = state;
@@ -49,14 +52,19 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     }
   };
 
-  const setNode = async (node: any) => {
-    dispatch(setFolder(node)); // TODO: SET NODE
+  const setNode = async (node: Node) => {
+    if (node.type === 'folder') {
+      dispatch(setFolder(node));
 
-    const comp = await workbenchController.getComponents({
-      ...(node && { path: node.path }),
-    });
-
-    if (comp) dispatch(setComponents(comp));
+      const comp = await workbenchController.getComponents({
+        ...(node && { path: node.path }),
+      });
+      if (comp) dispatch(setComponents(comp));
+      history.push(`/workbench/detected`);
+    } else {
+      dispatch(setFile(node.path));
+      history.push(`/workbench/detected/file?path=${encodeURIComponent(node.path)}`);
+    }
   };
 
   const createInventory = async (inventory: Inventory): Promise<Inventory> => {

@@ -25,6 +25,11 @@ export interface IWorkspaceCfg {
   VERSION: string;
 }
 
+export interface Node {
+  type: 'folder' | 'file';
+  path: string;
+}
+
 export interface Inventory {
   id?: number;
   cvid: number;

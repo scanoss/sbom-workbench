@@ -20,6 +20,8 @@ const Breadcrumb = () => {
 
   const { state, dispatch, setNode } = useContext(WorkbenchContext) as IWorkbenchContext;
 
+  console.log(state.filter.node);
+
   const items = state.filter.node ? state.filter.node.path.substring(1).split('/') : [];
 
   const nodes = [

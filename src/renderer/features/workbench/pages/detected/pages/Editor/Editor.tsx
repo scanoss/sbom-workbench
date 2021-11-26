@@ -16,6 +16,7 @@ import { resultService } from '../../../../../../../api/results-service';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import { projectService } from '../../../../../../../api/project-service';
 import { InventoryForm } from '../../../../../../context/types';
+import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -230,6 +231,7 @@ export const Editor = () => {
     <>
       <section id="editor" className="app-page">
         <header className="app-header">
+          <Breadcrumb />
           <>
             <header className="match-info-header">
               {matchInfo && inventories ? (
