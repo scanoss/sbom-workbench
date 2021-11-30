@@ -1,8 +1,10 @@
 import { ipcMain } from 'electron';
-import { Inventory } from '../api/types';
+import { resultService } from '../api/results-service';
+import { IFolderInventory, Inventory, InventoryAction } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { logicInventoryService } from './services/LogicInventoryService';
 import { logicResultService } from './services/LogicResultService';
+import { logictTreeService } from './services/LogicTreeService';
 import { NodeStatus } from './workspace/Tree/Tree/Node';
 import { workspace } from './workspace/Workspace';
 
@@ -28,29 +30,17 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, inv: Partial<Inventory>) =
 });
 
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
-  let inv: any;
-
   try {
-    const p = await workspace.getOpenedProjects()[0];
-    inv = await p.scans_db.inventories.create(arg);
-    arg.id = inv.id;
-
-    logicResultService
-      .getResultsByids(arg.files)
-      .then((filesToUpdate) => {
-        const paths = Object.keys(filesToUpdate);
-        for (const filePath of paths) {
-          p.getTree().getRootFolder().setStatus(filePath, NodeStatus.IDENTIFIED);
-        }
-
-        p.updateTree();
-        return true;
-      })
-      .catch((e) => {
-        console.log(e);
-        throw e;
+    console.log("CREATE");
+    const p = workspace.getOpenedProjects()[0];
+    const inv = await p.scans_db.inventories.create(arg);  
+    logicResultService.getResultsFromIDs(arg.files).then((files:any) => {
+      const paths = getArrayFromObject(files,'path') as Array<string>;
+      paths.forEach(path => {
+        p.getTree().getRootFolder().setStatus(path, NodeStatus.IDENTIFIED);
       });
-
+      p.updateTree();
+    });
     return { status: 'ok', message: 'Inventory created', data: inv };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
@@ -60,6 +50,8 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
 
 ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (event, arg: Partial<Inventory>) => {
   try {
+    console.log("ATTACh");
+    console.log(arg);
     const p = workspace.getOpenedProjects()[0];
     const success = await p.scans_db.inventories.attachFileInventory(arg);
     return { status: 'ok', message: 'File attached to inventory successfully', success };
@@ -70,22 +62,12 @@ ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (event, arg: Partial<Inven
 });
 
 ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, inv: Partial<Inventory>) => {
-  try {
-    const project = workspace.getOpenedProjects()[0];
-    logicResultService
-      .getResultsByids(inv.files)
-      .then((filesToUpdate) => {
-        const paths = Object.keys(filesToUpdate);
-        project.getTree().restoreStatus(paths as Array<string>);
-        project.updateTree();
-        return true;
-      })
-      .catch((e) => {
-        console.log(e);
-        throw e;
-      });
-
-    const success: boolean = await logicInventoryService.detach(inv);
+  try {  
+   logicResultService.getResultsFromIDs(inv.files).then((files:any) => {
+    const paths = getArrayFromObject(files,'path') as Array<string>;
+    logictTreeService.retoreStatus(paths);
+   });   
+   const success: boolean = await logicInventoryService.detach(inv);
 
     return { status: 'ok', message: 'File detached to inventory successfully', success };
   } catch (e) {
@@ -97,24 +79,11 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (event, inv: Partial<Inven
 ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (event, arg: Partial<Inventory>) => {
   try {
     const p = workspace.getOpenedProjects()[0];
-
-    p.scans_db.inventories
-      .getInventoryFiles(arg)
-      .then((filesToUpdate) => {
-        const paths = [];
-        filesToUpdate.forEach((element) => {
-          paths.push(element.path);
-        });
-        p.getTree().restoreStatus(paths as Array<string>);
-        p.updateTree();
-        return paths;
-      })
-      .catch((e) => {
-        throw e;
-      });
-
+    p.scans_db.inventories.getInventoryFiles(arg).then((files:any) => {
+      const paths =  getArrayFromObject(files, 'path');
+      logictTreeService.retoreStatus(paths);
+    });
     const success = await p.scans_db.inventories.delete(arg);
-
     if (success) return { status: 'ok', message: 'Inventory deleted successfully', success };
     return { status: 'error', message: 'Inventory was not deleted successfully', success };
   } catch (e) {
@@ -133,3 +102,58 @@ ipcMain.handle(IpcEvents.INVENTORY_FROM_COMPONENT, async (event) => {
     return { status: 'fail' };
   }
 });
+
+ipcMain.handle(IpcEvents.INVENTORY_FOLDER, async (event, arg: IFolderInventory) => {
+  try {    
+    const project = workspace.getOpenedProjects()[0];
+    const files:any= await logicResultService.getFilesInFolder(arg.folder);
+   
+    let success= false;
+    if(arg.action === InventoryAction.RESTORE) { 
+
+      const restoreFiles = getArrayFromObject(files, 'id','identified');
+     logicResultService.getResultsFromIDs(restoreFiles).then((filesToUpdate:any) => {
+       // move getArratFromObject 
+      const paths = getArrayFromObject(filesToUpdate, 'path') as Array<string>;     
+      logictTreeService.retoreStatus(paths);         
+    });     
+      success = await logicInventoryService.detach({ files:restoreFiles } as Partial<Inventory>);
+
+    }else if(arg.overwrite){
+      if (arg.action === InventoryAction.IDENTIFY) {
+        const restoreFiles = getArrayFromObject(files, 'id','identified');
+        await logicInventoryService.detach({ files:restoreFiles } as Partial<Inventory>);
+      }
+       // const inv = await project.scans_db.inventories.create({});  
+        //success = await logicInventoryService.attach({ files:files } as Partial<Inventory>);
+      }else if(!arg.overwrite){
+        if (arg.action === InventoryAction.IDENTIFY){
+          const pendingFiles = getArrayFromObject(files, 'id','pending');
+
+
+        }
+        
+      }
+      
+    
+
+ 
+   return { status: 'ok', message: 'Inventories from component', data: success};
+
+  } catch (e) {
+    console.log('Catch an error on inventory: ', e);
+    return { status: 'fail' };
+  } 
+});
+
+function getArrayFromObject(results:any[],value:any,condition?:any){
+  const array = [];
+  results.forEach(result => {
+    if(condition){
+      if(result[condition])   array.push(result[value]);
+    }else
+     array.push(result[value]);
+});
+return array;
+
+}

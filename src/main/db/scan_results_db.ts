@@ -399,5 +399,21 @@ export class ResultsDb extends Db {
       }
     });
   }
+
+  public async getFilesInFolder(folder: string) {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        const SQLquery = query.SQL_GET_RESULTS_IN_FOLDER.replace('?', `/${folder}%`);
+        db.all(SQLquery, (err: any, data: any) => {
+          db.close();
+          if (err) throw new Error('[ DB ERROR ] : files in folder');
+          else resolve(data);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
   
 }
