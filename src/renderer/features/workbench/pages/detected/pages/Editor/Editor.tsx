@@ -33,13 +33,13 @@ export const Editor = () => {
   const history = useHistory();
   const query = useQuery();
 
-  const { state, dispatch, createInventory, ignoreFile, restoreFile, attachFile, detachFile } = useContext(
+  const { state, dispatch, createInventory, ignoreFile, restoreFile, detachFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { file } = state;
+  const file = state.filter.node?.type === 'file' ? state.filter.node.path : null;
 
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);
@@ -174,10 +174,12 @@ export const Editor = () => {
   useEffect(() => {
     const path = decodeURIComponent(query.get('path'));
 
-    dispatch(setFile(path));
+    // dispatch(setFile(path));
     const unlisten = history.listen((data) => {
       const path = decodeURIComponent(new URLSearchParams(data.search).get('path'));
-      dispatch(setFile(path));
+      // dispatch(setFile(path));
+      // TODO SET NODE
+
     });
     return () => {
       unlisten();
