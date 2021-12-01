@@ -1,15 +1,12 @@
 import React, { useContext, useState, useEffect } from 'react';
 import CheckboxTree, { OnCheckNode } from 'react-checkbox-tree';
 import { useHistory } from 'react-router-dom';
-import { componentService } from '../../../../../api/component-service';
-import { ComponentSource } from '../../../../../main/db/scan_component_db';
-import { setFolder } from '../../actions';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 
 export const FileTree = () => {
   const history = useHistory();
 
-  const { state, dispatch, setNode } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const { tree, filter, file } = state;
 
@@ -23,19 +20,15 @@ export const FileTree = () => {
     const fileTreeNode = getNode(node);
 
     if (!children) {
-      setNode({
-        type: 'file',
-        path: value,
+      history.push({
+        pathname: '/workbench/detected/file',
+        search: `?path=file|${encodeURIComponent(value)}`,
       });
     } else {
-      setNode(
-        fileTreeNode
-          ? {
-              type: 'folder',
-              path: fileTreeNode.value || null,
-            }
-          : null
-      );
+      history.push({
+        pathname: '/workbench/detected',
+        search: fileTreeNode ? `?path=folder|${encodeURIComponent(fileTreeNode.value)}` : null,
+      });
     }
 
     setAtree([tree]);

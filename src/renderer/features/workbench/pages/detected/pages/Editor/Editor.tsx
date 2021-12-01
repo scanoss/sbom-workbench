@@ -63,8 +63,6 @@ export const Editor = () => {
     }
   };
 
-  const destroy = () => dispatch(setFile(null));
-
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false });
@@ -172,22 +170,6 @@ export const Editor = () => {
   };
 
   useEffect(() => {
-    const path = decodeURIComponent(query.get('path'));
-
-    // dispatch(setFile(path));
-    const unlisten = history.listen((data) => {
-      const path = decodeURIComponent(new URLSearchParams(data.search).get('path'));
-      // dispatch(setFile(path));
-      // TODO SET NODE
-
-    });
-    return () => {
-      unlisten();
-      destroy();
-    };
-  }, []);
-
-  useEffect(() => {
     init();
   }, [file]);
 
@@ -236,7 +218,11 @@ export const Editor = () => {
           <Breadcrumb />
           <>
             <header className="match-info-header">
-              {matchInfo && inventories ? (
+              {(!matchInfo || !inventories) && (
+                <Skeleton variant="rect" width="50%" height={60} style={{ marginBottom: 18 }} />
+              )}
+
+              {matchInfo && inventories && (matchInfo.length > 0 || inventories.length > 0) && (
                 <section className="content">
                   <div className="match-info-default-container">
                     {inventories.length > 0
@@ -276,14 +262,12 @@ export const Editor = () => {
                         ))}
                   </div>
                 </section>
-              ) : (
-                <Skeleton variant="rect" width="50%" height={60} style={{ marginBottom: 34 }} />
               )}
 
               <div className="info-files">
                 <LabelCard label="Source File" file={file} status={null} />
                 {matchInfo && currentMatch && currentMatch.file && (
-                  <LabelCard label="Component File" status={null} file={currentMatch.file}/>
+                  <LabelCard label="Component File" status={null} file={currentMatch.file} />
                 )}
               </div>
             </header>

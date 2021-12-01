@@ -1,19 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
 import { Inventory, Node } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
-import { loadScanSuccess, setComponent, setComponents, setFile, setFolder, setProgress, updateTree } from './actions';
+import { loadScanSuccess, setComponent, setComponents, setProgress, updateTree, setCurrentNode } from './actions';
 import { resultService } from '../../../api/results-service';
 import { reportService } from '../../../api/report-service';
-import { componentService } from '../../../api/component-service';
-import { useHistory } from 'react-router-dom';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
-  setNode: (node: Node) => void;
   createInventory: (inventory: Inventory) => Promise<Inventory>;
   ignoreFile: (files: number[]) => Promise<boolean>;
   restoreFile: (files: number[]) => Promise<boolean>;
@@ -41,7 +39,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       console.log(`loading scan: ${path}`);
       const { name, fileTree, scanRoot } = await workbenchController.loadScan(path);
       dispatch(loadScanSuccess(name, fileTree, []));
-      console.log(fileTree);
 
       setScanBasePath(scanRoot);
       update(false);
@@ -49,21 +46,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     } catch (error) {
       console.error(error);
       return false;
-    }
-  };
-
-  const setNode = async (node: Node) => {
-    if (node.type === 'folder') {
-      dispatch(setFolder(node));
-
-      const comp = await workbenchController.getComponents({
-        ...(node && { path: node.path }),
-      });
-      if (comp) dispatch(setComponents(comp));
-      history.push(`/workbench/detected`);
-    } else {
-      dispatch(setFile(node.path));
-      history.push(`/workbench/detected/file?path=${encodeURIComponent(node.path)}`);
     }
   };
 
@@ -133,12 +115,42 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     }
   };
 
+  const setNode = async (node: Node) => {
+    dispatch(setCurrentNode(node));
+    if (!node || node.type === 'folder') {
+      const comp = await workbenchController.getComponents({
+        ...(node && { path: node.path }),
+      });
+      if (comp) dispatch(setComponents(comp));
+    }
+  };
+
+  // TODO: use custom navigation
+  useEffect(() => {
+    const unlisten = history.listen((data) => {
+      const param = new URLSearchParams(data.search).get('path');
+
+      if (!param) {
+        setNode(null);
+        return;
+      }
+
+      const [type, path]: any[] = decodeURIComponent(param).split('|');
+      if (path) {
+        setNode({ type, path });
+      }
+    });
+    return () => {
+      unlisten();
+      // destroy();
+    };
+  }, []);
+
   const value = React.useMemo(
     () => ({
       state,
       dispatch,
 
-      setNode,
       loadScan,
       createInventory,
       ignoreFile,

@@ -20,7 +20,7 @@ export const InventoryDetail = () => {
   const history = useHistory();
   const { id } = useParams<any>();
 
-  const { detachFile, deleteInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { setNode, detachFile, deleteInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const [inventory, setInventory] = useState<Inventory>();
@@ -51,7 +51,10 @@ export const InventoryDetail = () => {
   const onAction = (file: any, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push(`/workbench/detected/file?path=${encodeURIComponent(file.path)}`);
+        history.push({
+          pathname: '/workbench/detected',
+          search: `?path=foldfileer|${encodeURIComponent(file.path)}`,
+        });
         break;
       case MATCH_CARD_ACTIONS.ACTION_DETACH:
         detachFile([file.id]);
