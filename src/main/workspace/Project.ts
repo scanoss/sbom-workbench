@@ -378,7 +378,6 @@ export class Project extends EventEmitter {
   public updateTree() {    
     this.save();
     this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
-
   }
 
   attachInventory(inv: Inventory) {
