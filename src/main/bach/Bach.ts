@@ -1,5 +1,6 @@
 import { InventoryAction } from '../../api/types';
 import { logicResultService } from '../services/LogicResultService';
+import { Filter } from './Filter/Filter';
 
 export abstract class Bach {
   private filesInFolder: any;
@@ -26,9 +27,9 @@ export abstract class Bach {
     return files;
   }
 
-  public async getFilesToProcess(folder: string, value: any, condition?: any, condition2?: any): Promise<Array<any>> {
+  public async getFilesToProcess(folder: string, value: any, filter: Filter): Promise<Array<any>> {
     const aux = await this.getFilesInFolder(folder);
-    return this.getArrayFromObject(aux, value, condition, condition2);
+    return this.getArrayFromObject(aux, value, filter);
   }
 
   public async getResults(ids: Array<number>): Promise<Array<any>> {
@@ -36,19 +37,18 @@ export abstract class Bach {
     return results;
   }
 
-  public getArrayFromObject(results: any[], value: any, condition?: any, condition2?: any): Array<any> {
+  public getArrayFromObject(results: any[], value: any, filter: Filter): Array<any> {
     const array = [];
     results.forEach((result) => {
-      if (condition && condition2) {
-        if (result[condition]) array.push(result[value]);
-        if (result[condition2]) array.push(result[value]);
-      } else if (condition) {
-        if (result[condition]) array.push(result[value]);
-      } else {
+      if (filter.isValid(result)) {
         array.push(result[value]);
       }
     });
     return array;
+  }
+
+  public getOverWrite(): boolean {
+    return this.overWrite;
   }
 
   public abstract excecute();

@@ -31,10 +31,10 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (event, inv: Partial<Inventory>) =
 });
 
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
-  try {
-    console.log('CREATE');
+  try { 
+    console.log('Create inventory: ', arg);
     const p = workspace.getOpenedProjects()[0];
-    const inv = await p.scans_db.inventories.create(arg);
+    const inv = await logicInventoryService.create(arg);
     logicResultService
       .getResultsFromIDs(arg.files)
       .then((files: any) => {
@@ -57,8 +57,6 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
 
 ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (event, arg: Partial<Inventory>) => {
   try {
-    console.log('ATTACh');
-    console.log(arg);
     const p = workspace.getOpenedProjects()[0];
     const success = await p.scans_db.inventories.attachFileInventory(arg);
     return { status: 'ok', message: 'File attached to inventory successfully', success };
@@ -126,7 +124,7 @@ ipcMain.handle(IpcEvents.INVENTORY_FOLDER, async (event, arg: IFolderInventory) 
   try {
    
     const factory = new BachFactory();
-    const bachAction: Bach = factory.create(arg.action, arg.overwrite, arg.folder);
+    const bachAction: Bach = factory.create(arg.action, arg.overwrite, arg.folder, arg.data);
 
     const success = await bachAction.excecute();
 
@@ -170,7 +168,7 @@ ipcMain.handle(IpcEvents.INVENTORY_FOLDER, async (event, arg: IFolderInventory) 
     //         throw e;
     //       });
     //   }
-    //   // const inv = await project.scans_db.inventories.create({});
+    // const inv = await project.scans_db.inventories.create({});
     //   // success = await logicInventoryService.attach({ files:files } as Partial<Inventory>);
     // } else if (!arg.overwrite) {
     //   if (arg.action === InventoryAction.IDENTIFY) {
