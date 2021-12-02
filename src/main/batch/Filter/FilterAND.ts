@@ -1,4 +1,4 @@
-import { Filter } from "./Filter";
+import { Filter } from './Filter';
 
 export class FilterAND extends Filter {
   private Filter1: Filter;

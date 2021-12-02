@@ -71,6 +71,14 @@ class LogicResultService {
     }
   }
 
-
+  public async ignore(ids: number[]) {
+    try {
+      const project = workspace.getOpenedProjects()[0];
+      const success = await project.scans_db.files.ignored(ids);
+      return success;
+    } catch (e) {
+      return e;
+    }
+  }
 }
 export const logicResultService = new LogicResultService();

@@ -142,6 +142,7 @@ export enum InventoryAction {
   IGNORE = 'IGNORE',
   IDENTIFY = 'IDENTIFY',
   RESTORE = 'RESTORE',
+  ACCEPT = 'ACCEPT',
 }
 
 export interface IFolderInventory {
