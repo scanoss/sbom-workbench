@@ -1,8 +1,9 @@
 import { ipcMain } from 'electron';
-import { IFolderInventory, Inventory, InventoryAction } from '../api/types';
+import { IFolderInventory, Inventory } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { Batch } from './batch/Batch';
 import { BatchFactory } from './batch/BatchFactory';
+import { FilterTrue } from './batch/Filter/FilterTrue';
 import { utilHelper } from './helpers/UtilHelper';
 import { logicInventoryService } from './services/LogicInventoryService';
 import { logicResultService } from './services/LogicResultService';
@@ -38,8 +39,8 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (_event, arg: Inventory) => {
     logicResultService
       .getResultsFromIDs(arg.files)
       .then((files: any) => {
-        const paths = getArrayFromObject(files, 'path') as Array<string>;
-        paths.forEach((path) => {
+        const paths =  utilHelper.getArrayFromObjectFilter(files,'path',new FilterTrue()) as Array<string>;
+         paths.forEach((path) => {
           p.getTree().getRootFolder().setStatus(path, NodeStatus.IDENTIFIED);
         });
         p.updateTree();
@@ -71,7 +72,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (_event, inv: Partial<Inve
     logicResultService
       .getResultsFromIDs(inv.files)
       .then((files: any) => {
-        const paths = getArrayFromObject(files, 'path') as Array<string>;
+        const paths =  utilHelper.getArrayFromObjectFilter(files,'path',new FilterTrue()) as Array<string>;
         logictTreeService.retoreStatus(paths);
         return true;
       })
@@ -93,7 +94,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (_event, arg: Partial<Inventory
     p.scans_db.inventories
       .getInventoryFiles(arg)
       .then((files: any) => {
-        const paths = getArrayFromObject(files, 'path');
+        const paths =  utilHelper.getArrayFromObjectFilter(files,'path',new FilterTrue()) as Array<string>;
         logictTreeService.retoreStatus(paths);
         return true;
       })
@@ -133,12 +134,3 @@ ipcMain.handle(IpcEvents.INVENTORY_FOLDER, async (_event, arg: IFolderInventory)
   }
 });
 
-function getArrayFromObject(results: any[], value: any, condition?: any) {
-  const array = [];
-  results.forEach((result) => {
-    if (condition) {
-      if (result[condition]) array.push(result[value]);
-    } else array.push(result[value]);
-  });
-  return array;
-}

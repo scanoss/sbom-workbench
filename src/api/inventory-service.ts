@@ -42,11 +42,10 @@ class InventoryService extends BaseService {
 
   public async folder(args: IFolderInventory): Promise<any[]> {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_FOLDER, args);
-    console.log('response', response);
     return this.response(response);
   }
 }
 
 export const inventoryService = new InventoryService();
 
-document.invSer = inventoryService;
+
