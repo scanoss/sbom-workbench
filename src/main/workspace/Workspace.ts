@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
+import log from 'electron-log';
 import { Project } from './Project';
 import { IProject, ProjectState } from '../../api/types';
-import log from 'electron-log';
 
 class Workspace extends EventEmitter {
   private projectList: Array<Project>;

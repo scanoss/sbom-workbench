@@ -121,7 +121,7 @@ export class ResultsDb extends Db {
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
-          db.run('DELETE FROM results WHERE dirty=1 ;');
+          db.run(`DELETE FROM results WHERE dirty=1;`);
           db.run('commit', (err: any) => {
             db.close();
             if (err) throw err;
@@ -214,16 +214,25 @@ export class ResultsDb extends Db {
       data.oss_lines ? `='${data.oss_lines}'` : 'IS NULL'
     } AND matched ${data.matched ? `='${data.matched}'` : 'IS NULL'} AND filename ${
       data.file ? `='${data.file}'` : 'IS NULL'
-    } AND idtype = '${data.id}' AND md5_comp ${data.url_hash ? `='${data.url_hash}'` : 'IS NULL'} AND purl = '${
+    } AND md5_comp ${data.url_hash ? `='${data.url_hash}'` : 'IS NULL'} AND purl = '${
       data.purl ? data.purl[0] : ' '
-    }' AND file_path = '${filePath}'  AND file_url ${
-      data.file_url ? `='${data.file_url}'` : 'IS NULL'
-    } AND source='engine';`;
+    }' AND file_path = '${filePath}'  AND file_url ${data.file_url ? `='${data.file_url}'` : 'IS NULL'} AND idtype='${
+      data.id
+    }' ; `;
+
     db.serialize(function () {
       db.get(sQuery, function (err: any, result: any) {
-        if (result !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
-        else self.insertResultBulk(db, data, filePath);
-        if (err) console.log(err);
+        if (result === undefined) {
+          db.get(
+            `SELECT id FROM results WHERE file_path='${filePath}' AND source='nomatch' AND identified=1 OR ignored=1;`,
+            (err: any, resultNoMatch: any) => {
+              if (resultNoMatch !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', resultNoMatch.id);
+              else self.insertResultBulk(db, data, filePath);
+            }
+          );
+        } else {
+          db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
+        }
       });
     });
   }
@@ -341,7 +350,7 @@ export class ResultsDb extends Db {
   public async getDirty() {
     const db = await this.openDb();
     return new Promise<number[]>(async (resolve) => {
-      db.all('SELECT id FROM results WHERE dirty=1;', (err: any, data: any) => {
+      db.all(`SELECT id FROM results WHERE dirty=1;`, (err: any, data: any) => {
         db.close();
         if (err) throw err;
         if (data === undefined) resolve([]);
@@ -385,7 +394,7 @@ export class ResultsDb extends Db {
     });
   }
 
-  public async getResultsRescan(){
+  public async getResultsRescan() {
     return new Promise<any>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -399,5 +408,20 @@ export class ResultsDb extends Db {
       }
     });
   }
-  
+
+  public async updateFiltered(path: string) {  
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        const SQLquery = `UPDATE results SET dirty=0 WHERE file_path IN ${path} AND identified=1 OR ignored=1;`;     
+        db.run(SQLquery,(err: any) => {
+          if (err) throw err;
+          db.close();
+          resolve(true);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }
