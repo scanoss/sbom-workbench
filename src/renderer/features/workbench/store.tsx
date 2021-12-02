@@ -127,8 +127,12 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   // TODO: use custom navigation
   useEffect(() => {
+    if (!state.loaded) return null;
+
     const unlisten = history.listen((data) => {
       const param = new URLSearchParams(data.search).get('path');
+
+      if (!loaded) return;
 
       if (!param) {
         setNode(null);
@@ -144,7 +148,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       unlisten();
       // destroy();
     };
-  }, []);
+  }, [state.loaded]);
 
   const value = React.useMemo(
     () => ({
