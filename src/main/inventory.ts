@@ -3,6 +3,7 @@ import { IFolderInventory, Inventory, InventoryAction } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { Batch } from './batch/Batch';
 import { BatchFactory } from './batch/BatchFactory';
+import { utilHelper } from './helpers/UtilHelper';
 import { logicInventoryService } from './services/LogicInventoryService';
 import { logicResultService } from './services/LogicResultService';
 import { logictTreeService } from './services/LogicTreeService';
@@ -31,8 +32,7 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (_event, inv: Partial<Inventory>) 
 });
 
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (_event, arg: Inventory) => {
-  try {
-    console.log(arg);
+  try {   
     const p = workspace.getOpenedProjects()[0];
     const inv = await logicInventoryService.create(arg);
     logicResultService

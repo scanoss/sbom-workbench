@@ -84,4 +84,6 @@ export default abstract class Node {
   public abstract getComponent(): any[];
 
   public abstract getNode(path: string): Node;
+
+  public abstract getFiltered(): Array<string>;
 }

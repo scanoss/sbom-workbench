@@ -88,4 +88,8 @@ export class Tree {
       this.getNode(file.path).original = file.original;
     }
   }
+
+  public getFilteredFiles(): Array<string> {
+    return this.rootFolder.getFiltered();
+  }
 }

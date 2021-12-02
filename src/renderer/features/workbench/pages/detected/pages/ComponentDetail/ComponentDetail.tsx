@@ -104,7 +104,7 @@ const TabNavigation = ({ tab, version, component, filterFiles, onSelect }) => {
 export const ComponentDetail = () => {
   const history = useHistory();
 
-  const { state, dispatch, detachFile, createInventory, ignoreFile, restoreFile } = useContext(
+  const { state, dispatch, setNode, detachFile, createInventory, ignoreFile, restoreFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
@@ -142,7 +142,10 @@ export const ComponentDetail = () => {
   const onAction = async (file: any, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push(`/workbench/detected/file?path=${encodeURIComponent(file.path)}`);
+        history.push({
+          pathname: '/workbench/detected/file',
+          search: `?path=file|${encodeURIComponent(file.path)}`,
+        });
         break;
       case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
         await onIdentifyPressed(file);

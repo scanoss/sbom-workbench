@@ -34,13 +34,15 @@ const Breadcrumb = () => {
   ];
 
   const goToNode = (node: any) => {
-    history.push(`/workbench/detected`); // TODO: remove when refactor node currents is done
-    setNode(node.path ? node : null);
+    history.push({
+      pathname: '/workbench/detected',
+      search: node.path ? `?path=folder|${encodeURIComponent(node.path)}` : null,
+    });
   };
 
   return (
-    <div className="view d-flex align-center mb-3">
-      <AccountTreeOutlinedIcon fontSize="inherit" className="mr-1" />
+    <div className="view d-flex mb-3">
+      <AccountTreeOutlinedIcon fontSize="inherit" className="mr-1" style={{ marginTop: '4px' }} />
 
       <Breadcrumbs separator="›" aria-label="breadcrumb">
         {nodes.map((node, index) =>

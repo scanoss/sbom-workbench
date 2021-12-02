@@ -1,6 +1,5 @@
 import Node, { NodeStatus } from './Node';
 
-
 export default class Folder extends Node {
   private children: Node[];
 
@@ -79,7 +78,7 @@ export default class Folder extends Node {
     // Only if first filter is passed.
     const myPathExploded = this.getPath().split('/');
     const pathExploded = path.split('/');
-    for(let i=0;i<myPathExploded.length;i+=1) {
+    for (let i = 0; i < myPathExploded.length; i += 1) {
       if (myPathExploded[i] !== pathExploded[i]) return false;
     }
     return true;
@@ -89,4 +88,11 @@ export default class Folder extends Node {
     return this.components;
   }
 
+  public getFiltered(): Array<string> {
+    const result: Array<string> = [];
+    this.children.forEach(child => {
+      result.push(...child.getFiltered());
+    });
+    return result;
+  }
 }

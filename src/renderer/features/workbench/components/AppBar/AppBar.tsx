@@ -52,27 +52,24 @@ const Navigation = () => {
 
 const AppMenu = () => {
   const history = useHistory();
-  const { state, dispatch, setNode } = useContext(WorkbenchContext) as IWorkbenchContext;
-
-  const reset = () => setNode(null);
 
   return (
     <section id="AppMenu">
-      <NavLink onClick={reset} to="/workbench/detected" activeClassName="active" tabIndex={-1}>
+      <NavLink to="/workbench/detected" activeClassName="active" tabIndex={-1}>
         <Tooltip title="Detected components">
           <Button color="inherit">
             <GavelIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink onClick={reset} to="/workbench/identified" activeClassName="active" tabIndex={-1}>
+      <NavLink to="/workbench/identified" activeClassName="active" tabIndex={-1}>
         <Tooltip title="Identified components">
           <Button color="inherit">
             <CheckCircleOutlineOutlinedIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink onClick={reset} to="/workbench/report" activeClassName="active" tabIndex={-1}>
+      <NavLink to="/workbench/report" activeClassName="active" tabIndex={-1}>
         <Tooltip title="Reports">
           <Button color="inherit">
             <InsertChartOutlinedTwoToneIcon />

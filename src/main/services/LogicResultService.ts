@@ -2,9 +2,8 @@ import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { workspace } from '../workspace/Workspace';
 
 class LogicResultService {
-  public async getResultsByids(ids: number[]) {
+  public async getResultsByids(ids: number[], project: any) {
     try {
-      const project = workspace.getOpenedProjects()[0];
       const results: Array<any> = await project.scans_db.results.getSummaryByids(ids);
       const response = {};
       results.forEach((element: any) => {
