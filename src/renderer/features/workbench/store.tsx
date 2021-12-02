@@ -1,18 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
-import { Inventory } from '../../../api/types';
+import { Inventory, Node } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
-import { loadScanSuccess, setComponent, setComponents, setFolder, setProgress, updateTree } from './actions';
+import { loadScanSuccess, setComponent, setComponents, setProgress, updateTree, setCurrentNode } from './actions';
 import { resultService } from '../../../api/results-service';
 import { reportService } from '../../../api/report-service';
-import { componentService } from '../../../api/component-service';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
-  setNode: (node: any) => void;
   createInventory: (inventory: Inventory) => Promise<Inventory>;
   ignoreFile: (files: number[]) => Promise<boolean>;
   restoreFile: (files: number[]) => Promise<boolean>;
@@ -27,6 +26,8 @@ export interface IWorkbenchContext {
 export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(null);
 
 export const WorkbenchProvider: React.FC = ({ children }) => {
+  const history = useHistory();
+
   const { setScanBasePath } = React.useContext<any>(AppContext);
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const { loaded, tree, file, component } = state;
@@ -38,7 +39,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       console.log(`loading scan: ${path}`);
       const { name, fileTree, scanRoot } = await workbenchController.loadScan(path);
       dispatch(loadScanSuccess(name, fileTree, []));
-      console.log(fileTree);
 
       setScanBasePath(scanRoot);
       update(false);
@@ -47,16 +47,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       console.error(error);
       return false;
     }
-  };
-
-  const setNode = async (node: any) => {
-    dispatch(setFolder(node)); // TODO: SET NODE
-
-    const comp = await workbenchController.getComponents({
-      ...(node && { path: node.path }),
-    });
-
-    if (comp) dispatch(setComponents(comp));
   };
 
   const createInventory = async (inventory: Inventory): Promise<Inventory> => {
@@ -125,12 +115,46 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     }
   };
 
+  const setNode = async (node: Node) => {
+    dispatch(setCurrentNode(node));
+    if (!node || node.type === 'folder') {
+      const comp = await workbenchController.getComponents({
+        ...(node && { path: node.path }),
+      });
+      if (comp) dispatch(setComponents(comp));
+    }
+  };
+
+  // TODO: use custom navigation
+  useEffect(() => {
+    if (!state.loaded) return null;
+
+    const unlisten = history.listen((data) => {
+      const param = new URLSearchParams(data.search).get('path');
+
+      if (!loaded) return;
+
+      if (!param) {
+        setNode(null);
+        return;
+      }
+
+      const [type, path]: any[] = decodeURIComponent(param).split('|');
+      if (path) {
+        setNode({ type, path });
+      }
+    });
+    return () => {
+      unlisten();
+      // destroy();
+    };
+  }, [state.loaded]);
+
   const value = React.useMemo(
     () => ({
       state,
       dispatch,
 
-      setNode,
       loadScan,
       createInventory,
       ignoreFile,

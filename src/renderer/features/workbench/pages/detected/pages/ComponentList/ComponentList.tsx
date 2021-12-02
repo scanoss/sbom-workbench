@@ -50,7 +50,7 @@ export const ComponentList = () => {
   const { limit, onScroll } = usePagination();
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, setNode } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const { name, components } = state;
 
@@ -58,7 +58,11 @@ export const ComponentList = () => {
   const filterItems = filter(components, searchQuery);
 
   const onSelectComponent = (component) => {
-    history.push(`/workbench/detected/component`);
+    history.push({
+      pathname: '/workbench/detected/component',
+      search: history.location.search,
+    });
+
     dispatch(setComponent(component));
   };
 
