@@ -4,7 +4,8 @@ import * as fs from 'fs';
 import log from 'electron-log';
 import { Project } from './Project';
 import { IProject, ProjectState } from '../../api/types';
-
+import { licenses } from '../db/licenses';
+ 
 class Workspace extends EventEmitter {
   private projectList: Array<Project>;
 
@@ -176,6 +177,11 @@ class Workspace extends EventEmitter {
     const projectPaths = projectsDirEnt.map((dirent) => `${this.wsPath}/${dirent.name}`);
     return projectPaths;
   }
+
+  public getLicenses(){
+    return licenses;
+  }
+
 }
 
 export const workspace = new Workspace();
