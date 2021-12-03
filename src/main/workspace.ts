@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { workspace } from './workspace/Workspace';
 import { Response } from './Response';
-import { IProject } from '../api/types';
+import { IProject, License } from '../api/types';
 
 ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
   try {
@@ -31,6 +31,16 @@ ipcMain.handle(IpcEvents.UTILS_GET_PROJECT_DTO, async (event) => {
   try {
     const path: IProject = workspace.getOpenedProjects()[0].getDto();
     return Response.ok({ message: 'Project path succesfully retrieved', data: path });
+  } catch (e: any) {
+    console.log('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
+
+ipcMain.handle(IpcEvents.GET_LICENSES, async (event) => {
+  try {
+    const licenses: Array<License> = workspace.getLicenses();  
+    return Response.ok({ message: 'Project path succesfully retrieved', data: licenses });
   } catch (e: any) {
     console.log('Catch an error: ', e);
     return Response.fail({ message: e.message });
