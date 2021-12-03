@@ -429,7 +429,7 @@ export class ResultsDb extends Db {
     return new Promise<any>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        const SQLquery = `UPDATE results SET dirty=0 WHERE file_path IN ${path} AND identified=1 OR ignored=1;`;
+        const SQLquery = `UPDATE results SET dirty=0 WHERE file_path IN (${path}) AND identified=1 OR ignored=1;`;
         db.run(SQLquery, (err: any) => {
           if (err) throw err;
           db.close();

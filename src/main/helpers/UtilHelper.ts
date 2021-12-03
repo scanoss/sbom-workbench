@@ -1,22 +1,24 @@
 import { Filter } from '../batch/Filter/Filter';
 
 class UtilHelper {
-  public getArrayFromObjectValue(files, attribute: any): Array<string> {
-    const result: Array<string> = [];
-    files.forEach((element) => {
-      result.push(element[attribute]);
-    });
-    return result;
-  }
+  /**
+   * @brief data to be coverted to string  
+   * @returns string of values 
+   */
 
-  public convertsArrayOfStringToString(path: Array<string>): string {
-    let out = '(';
-    for (const file of path) out += `"${file}",`;
+  public convertsArrayOfStringToString(data: Array<string>): string {
+    let out = '';
+    for (const element of data) out += `"${element}",`;
     out = out.slice(0, -1);
-    out += ')';
     return out;
   }
 
+  /**
+   * @brief data to be filtered
+   * @param value to create resulting array 
+   * @param filter filter to be applied over the data 
+   * @returns array of values 
+   */
   public getArrayFromObjectFilter(results: any[], value: any, filter: Filter) {
     const array = [];
     results.forEach((result) => {
