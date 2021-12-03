@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import log from 'electron-log';
 import { Project } from './Project';
-import { IProject, ProjectState } from '../../api/types';
+import { IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../db/licenses';
  
 class Workspace extends EventEmitter {
@@ -178,7 +178,7 @@ class Workspace extends EventEmitter {
     return projectPaths;
   }
 
-  public getLicenses(){
+  public getLicenses(): Array<License> {
     return licenses;
   }
 
