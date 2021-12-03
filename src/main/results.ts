@@ -8,7 +8,7 @@ import { workspace } from './workspace/Workspace';
 
 ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
   const project = workspace.getOpenedProjects()[0];
-  const data = await project.scans_db.files.ignored(arg);
+  const data = await logicResultService.ignore(arg);
 
   logicResultService
     .getResultsByids(arg, project)

@@ -141,4 +141,18 @@ export type IParams = Record<PropertyKey, any> & {
   // non-generic interface properties go here
   sort?: string;
   order?: string;
+};
+
+export enum InventoryAction {
+  IGNORE = 'IGNORE',
+  IDENTIFY = 'IDENTIFY',
+  RESTORE = 'RESTORE',
+  ACCEPT = 'ACCEPT',
+}
+
+export interface IFolderInventory {
+  folder: string;
+  action: InventoryAction;
+  overwrite: boolean;
+  data?: Partial<Inventory>;
 }

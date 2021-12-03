@@ -409,12 +409,28 @@ export class ResultsDb extends Db {
     });
   }
 
-  public async updateFiltered(path: string) {  
+  public async getFilesInFolder(folder: string) {
     return new Promise<any>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        const SQLquery = `UPDATE results SET dirty=0 WHERE file_path IN ${path} AND identified=1 OR ignored=1;`;     
-        db.run(SQLquery,(err: any) => {
+        const SQLquery = query.SQL_GET_RESULTS_IN_FOLDER.replace('?', `/${folder}%`);
+        db.all(SQLquery, (err: any, data: any) => {
+          db.close();
+          if (err) throw new Error('[ DB ERROR ] : files in folder');
+          else resolve(data);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  public async updateFiltered(path: string) {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        const SQLquery = `UPDATE results SET dirty=0 WHERE file_path IN (${path}) AND identified=1 OR ignored=1;`;
+        db.run(SQLquery, (err: any) => {
           if (err) throw err;
           db.close();
           resolve(true);

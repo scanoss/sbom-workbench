@@ -1,5 +1,6 @@
 import { workspace } from '../workspace/Workspace';
 import { Inventory, Component } from '../../api/types';
+import { inventoryService } from '../../api/inventory-service';
 
 class LogicInventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
@@ -39,6 +40,12 @@ class LogicInventoryService {
     } catch (err: any) {
       return err;
     }
+  }
+
+  public async create(inv: Partial<Inventory>): Promise<Inventory> {
+    const project = workspace.getOpenedProjects()[0];
+    const inventory: Inventory = (await project.scans_db.inventories.create(inv)) as Inventory;
+    return inventory;
   }
 }
 
