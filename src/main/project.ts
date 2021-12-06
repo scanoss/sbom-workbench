@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
+import { ProjectFilterPath } from './workspace/filters/ProjectFilterPath';
 import { Project } from './workspace/Project';
 import { workspace } from './workspace/Workspace';
 
@@ -9,7 +10,9 @@ import { workspace } from './workspace/Workspace';
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (_event, arg: any) => {
   let created: any;
 
-  const p: Project = await workspace.openProjectByPath(arg);
+
+  // TO DO factory to create filters depending on arguments
+  const p: Project = await workspace.openProject(new ProjectFilterPath(arg));
   const r = await p.getResults();
 
   const response = {
@@ -57,7 +60,7 @@ ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
 
 ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
   const path = arg;
-  const p: Project = workspace.getProjectByPath(path);
+  const p: Project = workspace.getProject(new ProjectFilterPath(path));
   p.setMailbox(event.sender);
   await p.resumeScanner();
 });
@@ -65,7 +68,7 @@ ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
 
 ipcMain.handle(IpcEvents.PROJECT_RESCAN, async (event, projectPath: string) => {
   try {
-    const p = workspace.getProjectByPath(projectPath);
+    const p = workspace.getProject(new ProjectFilterPath(projectPath));
     p.setMailbox(event.sender);
     await p.upgrade();
     await p.reScan();

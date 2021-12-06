@@ -523,6 +523,8 @@ export class Project extends EventEmitter {
   public getNode(path: string) {
     return this.tree.getNode(path);
   }
+
+
 }
 /* AUXILIARY FUNCTIONS */
 
