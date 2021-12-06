@@ -83,20 +83,22 @@ export interface ItemInclude {
   action: boolean;
 }
 
-export interface IProject {
+export interface INewProject {
+  name: string;
+  scan_root: string;
+  default_license: string;
+  default_components?: string;
+}
+
+export interface IProject extends INewProject {
   appVersion: string;
   date: string;
-  name: string;
   work_root: string;
-  scan_root: string;
   scannerState: ScanState;
   files: number;
   api: string;
   token: string;
   uuid: string;
-
-  default_licenses?: string;
-  default_components?: string;
 }
 
 export interface Files {

@@ -1,6 +1,6 @@
 import { IpcEvents } from '../ipc-events';
 import { BaseService } from './base-service';
-import { IProject, License } from './types';
+import { INewProject, IProject, License } from './types';
 
 const { ipcRenderer } = require('electron');
 
@@ -22,6 +22,11 @@ class WorkspaceService extends BaseService {
 
   public async getLicenses(): Promise<Array<License>>{
     const response = await ipcRenderer.invoke(IpcEvents.GET_LICENSES);
+    return this.response(response);
+  }
+
+  public async createProject(project: INewProject): Promise<void> {
+    const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_CREATE_PROJECT, project);
     return this.response(response);
   }
 }

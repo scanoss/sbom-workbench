@@ -26,6 +26,8 @@ export class Metadata {
 
   private uuid: string;
 
+  private default_license: string;
+
   constructor(name: string) {
     this.name = name;
     this.appVersion = app.isPackaged === true ? app.getVersion() : packageJson.version;
@@ -47,6 +49,7 @@ export class Metadata {
     mt.setApi(fileMt.api);
     mt.setToken(fileMt.token);
     mt.setUuid(fileMt.uuid);
+    mt.setLicense(fileMt.default_license);
 
     return mt;
   }
@@ -104,6 +107,10 @@ export class Metadata {
     this.files = c;
   }
 
+  public setLicense(license: string) {
+    this.default_license = license;
+  }
+
   public getName() {
     return this.name;
   }
@@ -124,6 +131,10 @@ export class Metadata {
     return this.scannerState;
   }
 
+  public getLicense(): string {
+    return this.default_license;
+  }
+
   public getDto(): IProject {
     const Ip: IProject = {
       appVersion: this.appVersion,
@@ -136,6 +147,7 @@ export class Metadata {
       api: this.api,
       token: this.token,
       uuid: this.uuid,
+      default_license: this.default_license,
     };
     return Ip;
   }
