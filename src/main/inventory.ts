@@ -134,3 +134,5 @@ ipcMain.handle(IpcEvents.INVENTORY_FOLDER, async (_event, arg: IFolderInventory)
   }
 });
 
+
+
