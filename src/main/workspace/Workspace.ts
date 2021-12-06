@@ -3,9 +3,9 @@ import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import log from 'electron-log';
 import { Project } from './Project';
-import { IProject, License, ProjectState } from '../../api/types';
+import { INewProject, IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../db/licenses';
- 
+
 class Workspace extends EventEmitter {
   private projectList: Array<Project>;
 
@@ -182,6 +182,12 @@ class Workspace extends EventEmitter {
     return licenses;
   }
 
+  public async createProject(project: INewProject): Promise<Project> {
+    const p: Project = new Project(project.name);
+    await this.addProject(p);
+    p.setScanPath(project.scan_root);
+    return p;
+  }
 }
 
 export const workspace = new Workspace();
