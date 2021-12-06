@@ -3,6 +3,7 @@ import { IpcEvents } from '../ipc-events';
 import { workspace } from './workspace/Workspace';
 import { Response } from './Response';
 import { IProject, License } from '../api/types';
+import { ProjectFilterPath } from './workspace/filters/ProjectFilterPath';
 
 ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
   try {
@@ -19,7 +20,7 @@ ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
 
 ipcMain.handle(IpcEvents.WORKSPACE_DELETE_PROJECT, async (event, projectPath: string) => {
   try {
-    await workspace.removeProjectByPath(projectPath);
+    await workspace.removeProjectFilter(new ProjectFilterPath(projectPath));
     return Response.ok();
   } catch (error: any) {
     console.error(error);

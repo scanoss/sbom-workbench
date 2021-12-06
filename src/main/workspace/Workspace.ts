@@ -5,7 +5,8 @@ import log from 'electron-log';
 import { Project } from './Project';
 import { IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../db/licenses';
- 
+import { ProjectFilter } from './filters/ProjectFilter';
+
 class Workspace extends EventEmitter {
   private projectList: Array<Project>;
 
@@ -72,51 +73,23 @@ class Workspace extends EventEmitter {
     return false;
   }
 
-  public async removeProjectByPath(pPath: string) {
-    const p = this.getProjectByPath(pPath);
+  public async removeProjectFilter(filter: ProjectFilter) {
+    const p = this.getProject(filter);
     await this.removeProject(p);
     return true;
   }
 
-  public getProjectByPath(pPath: string): Project {
-    for (let i = 0; i < this.projectList.length; i += 1)
-      if (this.projectList[i].getMyPath() === pPath) return this.projectList[i];
-    return null;
+  public async closeProject(filter: ProjectFilter) {
+    const p: Project = this.getProject(filter);
+    await p.close();
   }
 
-  public getProjectByUuid(uuid: string) {
-    for (let i = 0; i < this.projectList.length; i += 1)
-      if (this.projectList[i].getUUID() === uuid) return this.projectList[i];
-    return null;
-  }
-
-  public closeProjectByUuid(uuid: string) {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const p of this.projectList) {
-      if (p.getUUID() === uuid) {
-        p.close();
-        break;
-      }
-    }
-  }
-
-  public async closeProjectByPath(path: string) {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const p of this.projectList) {
-      if (p.getMyPath() === path) {
-        // eslint-disable-next-line no-await-in-loop
-        await p.close();
-        break;
-      }
-    }
-  }
-
-  public async openProjectByPath(pPath: string) {
+  public async openProject(filter: ProjectFilter) {
     await this.closeAllProjects();
 
     // eslint-disable-next-line no-restricted-syntax
-    const p: Project = this.getProjectByPath(pPath);
-    log.info(`%c[ WORKSPACE ]: Opening project ${pPath}`, 'color: green');
+    const p: Project = this.getProject(filter);
+    log.info(`%c[ WORKSPACE ]: Opening project ${filter.getParam()}`, 'color: green');
     await p.upgrade();
     await p.open();
     return p;
@@ -182,6 +155,12 @@ class Workspace extends EventEmitter {
     return licenses;
   }
 
+  public getProject(filter: ProjectFilter) {
+    for (const project of this.projectList) {
+      if (filter.isValid(project)) return project;
+    }
+    return null;
+  }
 }
 
 export const workspace = new Workspace();
