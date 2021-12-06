@@ -28,6 +28,8 @@ ipcMain.handle(IpcEvents.WORKSPACE_DELETE_PROJECT, async (event, projectPath: st
   }
 });
 
+// This service creates a new project and launch automatically the scanner.
+// In future versions, the scanner will be launched by the user.
 ipcMain.handle(IpcEvents.WORKSPACE_CREATE_PROJECT, async (event, project: INewProject) => {
   try {
     const p = await workspace.createProject(project);
