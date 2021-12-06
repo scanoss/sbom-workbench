@@ -1,11 +1,22 @@
 import { projectService } from '../api/project-service';
+import { INewProject } from '../api/types';
 import { workspaceService } from '../api/workspace-service';
 import { IpcEvents } from '../ipc-events';
+import { workspace } from '../main/workspace/Workspace';
+import path from 'path';
 
 const { ipcRenderer } = require('electron');
 
-export const scan = (path: string) => {
-  ipcRenderer.send(IpcEvents.SCANNER_INIT_SCAN, { path });
+export const scan = (dir: string) => {
+
+  const pInfo: INewProject = {
+    name: path.basename(dir),
+    scan_root: dir,
+    default_license: null,
+  };
+
+  workspaceService.createProject(pInfo);
+
 };
 
 export const resume = async (path: string) => {

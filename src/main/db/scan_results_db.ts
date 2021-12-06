@@ -413,8 +413,11 @@ export class ResultsDb extends Db {
     return new Promise<any>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        // FIXME: check root folder by "/" (//%)
-        const SQLquery = query.SQL_GET_RESULTS_IN_FOLDER.replace('?', `${folder}/%`);
+        let SQLquery = '';
+        SQLquery =
+          folder === '/'
+            ? query.SQL_GET_RESULTS_IN_FOLDER.replace('?', `${folder}%`)
+            : (SQLquery = query.SQL_GET_RESULTS_IN_FOLDER.replace('?', `${folder}/%`));
         db.all(SQLquery, (err: any, data: any) => {
           db.close();
           if (err) throw new Error('[ DB ERROR ] : files in folder');
