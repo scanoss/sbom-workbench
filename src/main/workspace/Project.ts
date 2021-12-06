@@ -300,14 +300,14 @@ export class Project extends EventEmitter {
     this.metadata.setScanRoot(name);
   }
 
+  public setLicense(license: string) {
+    this.metadata.setLicense(license);
+  }
+
   public setMyPath(myPath: string) {
     this.metadata.setMyPath(myPath);
     this.metadata.save();
   }
-
-  // public setConfig(cfg: IProjectCfg){
-  //   this.config = cfg;
-  // }
 
   public getFilesNotScanned() {
     return this.filesNotScanned;
@@ -349,7 +349,7 @@ export class Project extends EventEmitter {
     return this.tree;
   }
 
-  public updateTree() {    
+  public updateTree() {
     this.save();
     this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
   }

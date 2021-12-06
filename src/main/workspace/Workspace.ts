@@ -156,7 +156,6 @@ class Workspace extends EventEmitter {
     await Promise.all(unlinkPromises);
 
     p.setMyPath(pDirectory);
-    // p.setConfig(await this.createProjectCfg());
     await p.save();
     this.projectList.push(p);
     return this.projectList.length - 1;
@@ -184,8 +183,10 @@ class Workspace extends EventEmitter {
 
   public async createProject(project: INewProject): Promise<Project> {
     const p: Project = new Project(project.name);
-    await this.addProject(p);
     p.setScanPath(project.scan_root);
+    console.log(project.default_license)
+    p.setLicense("myLicencia");
+    await this.addProject(p);
     return p;
   }
 }

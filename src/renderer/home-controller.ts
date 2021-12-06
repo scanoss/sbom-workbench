@@ -13,8 +13,6 @@ export const scan = (path: string) => {
   };
 
   workspaceService.createProject(pInfo);
-
-  //ipcRenderer.send(IpcEvents.SCANNER_INIT_SCAN, { path });
 };
 
 export const resume = async (path: string) => {
