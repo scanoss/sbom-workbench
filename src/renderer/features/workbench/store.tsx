@@ -19,6 +19,8 @@ export interface IWorkbenchContext {
   detachFile: (files: number[]) => Promise<boolean>;
   deleteInventory: (inventoryId: number) => Promise<boolean>;
 
+  update: (full?) => void;
+
   state: State;
   dispatch: any;
 }
@@ -162,6 +164,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       attachFile,
       detachFile,
       deleteInventory,
+      update,
     }),
     [state, dispatch, loadScan, createInventory, ignoreFile, restoreFile, attachFile, detachFile, deleteInventory]
   );

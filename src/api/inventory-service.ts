@@ -48,4 +48,3 @@ class InventoryService extends BaseService {
 
 export const inventoryService = new InventoryService();
 
-

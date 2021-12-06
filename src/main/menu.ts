@@ -39,7 +39,9 @@ export default class MenuBuilder {
   }
 
   setupDevelopmentEnvironment(): void {
-    this.mainWindow.webContents.on('context-menu', (_, props) => {
+    // FIXME: is not compatible con filetreee contextual menu
+
+    /* this.mainWindow.webContents.on('context-menu', (_, props) => {
       const { x, y } = props;
 
       Menu.buildFromTemplate([
@@ -50,7 +52,7 @@ export default class MenuBuilder {
           },
         },
       ]).popup({ window: this.mainWindow });
-    });
+    }); */
   }
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
