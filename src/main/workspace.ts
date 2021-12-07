@@ -61,3 +61,5 @@ ipcMain.handle(IpcEvents.GET_LICENSES, async (event) => {
     return Response.fail({ message: e.message });
   }
 });
+
+

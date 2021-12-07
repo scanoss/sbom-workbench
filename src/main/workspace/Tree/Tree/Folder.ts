@@ -17,16 +17,20 @@ export default class Folder extends Node {
     return this.children;
   }
 
-  public getStatus(path: string): NodeStatus {
+  public getStatusByPath(path: string): NodeStatus {
     if (!this.checkMyPath(path)) return null;
     return this.statusLogic();
   }
 
+  public getStatus(): NodeStatus {
+    return this.statusLogic();
+  }
+
   private statusLogic(): NodeStatus {
-    if (this.children.some((child) => child.status === NodeStatus.PENDING)) return NodeStatus.PENDING;
-    if (this.children.some((child) => child.status === NodeStatus.IDENTIFIED)) return NodeStatus.IDENTIFIED;
-    if (this.children.some((child) => child.status === NodeStatus.IGNORED)) return NodeStatus.IGNORED;
-    if (this.children.some((child) => child.status === NodeStatus.NOMATCH)) return NodeStatus.NOMATCH;
+    if (this.children.some((child) => child.getStatus() === NodeStatus.PENDING)) return NodeStatus.PENDING;
+    if (this.children.some((child) => child.getStatus() === NodeStatus.IDENTIFIED)) return NodeStatus.IDENTIFIED;
+    if (this.children.some((child) => child.getStatus() === NodeStatus.IGNORED)) return NodeStatus.IGNORED;
+    if (this.children.some((child) => child.getStatus() === NodeStatus.NOMATCH)) return NodeStatus.NOMATCH;
     return NodeStatus.FILTERED;
   }
 
@@ -68,7 +72,7 @@ export default class Folder extends Node {
   public restoreStatus(path: string): void {
     if (!path.includes(this.getPath())) return;
     for (const child of this.children) if (child.restoreStatus(path)) break;
-    this.status = this.getStatus(path);
+    this.status = this.getStatusByPath(path);
     this.setStatusOnClassnameAs(this.status);
   }
 
@@ -90,9 +94,13 @@ export default class Folder extends Node {
 
   public getFiltered(): Array<string> {
     const result: Array<string> = [];
-    this.children.forEach(child => {
+    this.children.forEach((child) => {
       result.push(...child.getFiltered());
     });
     return result;
+  }
+
+  public setOriginal(status: NodeStatus): void {
+    this.original = status;
   }
 }

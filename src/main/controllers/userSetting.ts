@@ -6,7 +6,7 @@ import { IWorkspaceCfg } from '../../api/types';
 import { userSetting } from '../UserSetting';
 
 ipcMain.handle(IpcEvents.USER_SETTING_SET, async (event, conf: Partial<IWorkspaceCfg>) => {
-  try {    
+  try {
     const defUrl: any = userSetting.getDefault().APIS[0];
     conf.APIS.splice(0, 0, defUrl);
     conf.DEFAULT_API_INDEX += 1;
