@@ -94,7 +94,7 @@ const TabNavigation = ({ tab, version, component, filterFiles, onSelect }) => {
           <Tab
             label={`Identified (${version ? `${filterFiles.identified.length}/` : ''}${component?.summary.identified})`}
           />
-          <Tab label={`Ignored (${version ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`} />
+          <Tab label={`Original (${version ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`} />
         </Tabs>
       </Paper>
     </div>
@@ -370,7 +370,7 @@ export const ComponentDetail = () => {
                             onIgnoreAllPressed();
                           }}
                         >
-                          Ignore All ({component?.summary.pending})
+                          Mark all as original ({component?.summary.pending})
                         </MenuItem>
                       </MenuList>
                     </ClickAwayListener>

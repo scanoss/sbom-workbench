@@ -45,7 +45,7 @@ const MatchCard = ({ label, status, onAction, type }: MatchCardProps) => {
                   <CheckIcon className="icon check" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Ignore match">
+              <Tooltip title="Mark as original">
                 <IconButton onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IGNORE)}>
                   <BanIcon className="icon ban" />
                 </IconButton>

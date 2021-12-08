@@ -42,38 +42,50 @@ export const FileTree = () => {
   };
 
   const onContextMenu = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: OnCheckNode | any) => {
-    const { children, value } = node;
-
-    console.log("NODE", node);
-
-    if (!children) return;
-
     const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED';
-    const showOverwrite = node.hasIdentified || node.hasIgnored;
+    const menu = !node.children
+      ? [
+          {
+            label: 'Identify file',
+            click: () => contextual.identifyAll(node),
+            enabled: !onlyRestore,
+          },
+          {
+            label: 'Mark file as original',
+            click: () => contextual.ignoreAll(node),
+            enabled: !onlyRestore && node.status !== 'FILTERED' && node.status !== 'NO-MATCH',
+          },
+          {
+            label: 'Restore file',
+            click: () => contextual.restoreAll(node),
+            enabled: onlyRestore,
+          },
+        ]
+      : [
+          {
+            label: 'Accept all',
+            click: () => contextual.acceptAll(node),
+            enabled: !onlyRestore,
+          },
+          { type: 'separator' },
+          {
+            label: 'Identify all files as...',
+            click: () => contextual.identifyAll(node),
+            enabled: !onlyRestore,
+          },
+          {
+            label: 'Mark all files as original',
+            click: () => contextual.ignoreAll(node),
+            enabled: !onlyRestore,
+          },
+          { type: 'separator' },
+          {
+            label: 'Restore all files',
+            click: () => contextual.restoreAll(node),
+          },
+        ];
 
-    Menu.buildFromTemplate([
-      {
-        label: 'Accept all',
-        click: () => contextual.acceptAll(value, showOverwrite),
-        enabled: !onlyRestore,
-      },
-      { type: 'separator' },
-      {
-        label: 'Identify all files as...',
-        click: () => contextual.identifyAll(value, showOverwrite),
-        enabled: !onlyRestore,
-      },
-      {
-        label: 'Mark all files as original',
-        click: () => contextual.ignoreAll(value, showOverwrite),
-        enabled: !onlyRestore,
-      },
-      { type: 'separator' },
-      {
-        label: 'Restore all files',
-        click: () => contextual.restoreAll(value),
-      }
-    ]).popup(remote.getCurrentWindow());
+    Menu.buildFromTemplate(menu).popup(remote.getCurrentWindow());
   };
 
   useEffect(() => {

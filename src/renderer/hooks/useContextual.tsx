@@ -8,6 +8,8 @@ const useContextual = () => {
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const { state, dispatch, executeBatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
+  const showOverwrite = (node: any) => node.hasIdentified || node.hasIgnored;
+
   const showOverwriteDialog = async (): Promise<DialogResponse> => {
     return dialogCtrl.openAlertDialog(
       'You have already identified files in this folder. Do you want to overwrite or keep them?',
@@ -18,41 +20,41 @@ const useContextual = () => {
     );
   };
 
-  const acceptAll = async (path: string, showOverwrite = false): Promise<boolean> => {
-    if (!showOverwrite) {
-      return executeBatch(path, InventoryAction.ACCEPT);
+  const acceptAll = async (node: any): Promise<boolean> => {
+    if (!showOverwrite(node)) {
+      return executeBatch(node.value, InventoryAction.ACCEPT);
     }
 
     const { action } = await showOverwriteDialog();
     if (action !== DIALOG_ACTIONS.CANCEL) {
-      return executeBatch(path, InventoryAction.ACCEPT, { overwrite: action === 'overwrite' });
+      return executeBatch(node.value, InventoryAction.ACCEPT, { overwrite: action === 'overwrite' });
     }
 
     return false;
   };
 
-  const identifyAll = async (path: string, showOverwrite = false): Promise<boolean> => {
+  const identifyAll = async (node: any): Promise<boolean> => {
     const inventory = await dialogCtrl.openInventory({ usage: 'file' });
-    const { action } = showOverwrite ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
+    const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
 
     if (inventory && action !== DIALOG_ACTIONS.CANCEL) {
-      return executeBatch(path, InventoryAction.IDENTIFY, { data: inventory });
+      return executeBatch(node.value, InventoryAction.IDENTIFY, { data: inventory });
     }
 
     return false;
   };
 
-  const ignoreAll = async (path: string, showOverwrite = false): Promise<boolean> => {
-    const { action } = showOverwrite ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
+  const ignoreAll = async (node: any): Promise<boolean> => {
+    const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
     if (action !== DIALOG_ACTIONS.CANCEL) {
-      return executeBatch(path, InventoryAction.IGNORE, { overwrite: action === 'overwrite' });
+      return executeBatch(node.value, InventoryAction.IGNORE, { overwrite: action === 'overwrite' });
     }
 
     return false;
   };
 
-  const restoreAll = async (path: string): Promise<boolean> => {
-    return executeBatch(path, InventoryAction.RESTORE);
+  const restoreAll = async (node: any): Promise<boolean> => {
+    return executeBatch(node.value, InventoryAction.RESTORE);
   };
 
   return {
