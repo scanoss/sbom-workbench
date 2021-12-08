@@ -1,5 +1,4 @@
-import { app } from 'electron';
-import packageJson from '../../package.json';
+
 
 export abstract class Migration {
   private version: string;
