@@ -158,6 +158,11 @@ class Workspace extends EventEmitter {
     const p: Project = new Project(project.name);
     p.setScanPath(project.scan_root);
     p.setLicense(project.default_license);
+    if (project.api) {
+      p.setApi(project.api);
+      p.setApiKey(project.api_key ? project.api_key : '');
+    }
+    if (project.token) p.setToken(project.token);
     await this.addProject(p);
     return p;
   }

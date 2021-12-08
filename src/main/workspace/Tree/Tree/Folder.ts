@@ -3,10 +3,25 @@ import Node, { NodeStatus } from './Node';
 export default class Folder extends Node {
   private children: Node[];
 
+  hasPending: boolean;
+
+  hasIgnored: boolean;
+
+  hasIdentified: boolean;
+
+  hasNoMatch: boolean;
+
+  hasFiltered: boolean;
+
   constructor(path: string, label: string) {
     super(path, label);
     this.children = [];
     this.type = 'folder';
+    this.hasPending = false;
+    this.hasIdentified = false;
+    this.hasIgnored = false;
+    this.hasNoMatch = false;
+    this.hasFiltered = false;
   }
 
   public addChild(node: Node): void {
@@ -17,24 +32,54 @@ export default class Folder extends Node {
     return this.children;
   }
 
-  public getStatus(path: string): NodeStatus {
+  public getStatusByPath(path: string): NodeStatus {
     if (!this.checkMyPath(path)) return null;
     return this.statusLogic();
   }
 
+  public getStatus(): NodeStatus {
+    return this.statusLogic();
+  }
+
   private statusLogic(): NodeStatus {
-    if (this.children.some((child) => child.status === NodeStatus.PENDING)) return NodeStatus.PENDING;
-    if (this.children.some((child) => child.status === NodeStatus.IDENTIFIED)) return NodeStatus.IDENTIFIED;
-    if (this.children.some((child) => child.status === NodeStatus.IGNORED)) return NodeStatus.IGNORED;
-    if (this.children.some((child) => child.status === NodeStatus.NOMATCH)) return NodeStatus.NOMATCH;
+    if (this.children.some((child) => child.getStatus() === NodeStatus.PENDING)) return NodeStatus.PENDING;
+    if (this.children.some((child) => child.getStatus() === NodeStatus.IDENTIFIED)) return NodeStatus.IDENTIFIED;
+    if (this.children.some((child) => child.getStatus() === NodeStatus.IGNORED)) return NodeStatus.IGNORED;
+    if (this.children.some((child) => child.getStatus() === NodeStatus.NOMATCH)) return NodeStatus.NOMATCH;
     return NodeStatus.FILTERED;
+  }
+
+  private getStatusClassName(): NodeStatus {
+    if (this.hasPending) return NodeStatus.PENDING;
+    if (this.hasIdentified) return NodeStatus.IDENTIFIED;
+    if (this.hasIgnored) return NodeStatus.IGNORED;
+    if (this.hasNoMatch) return NodeStatus.NOMATCH;
+    return NodeStatus.FILTERED;
+  }
+
+  private updateStatusFlags(): void {
+    this.hasPending = false;
+    this.hasIdentified = false;
+    this.hasIgnored = false;
+    this.hasNoMatch = false;
+    this.hasFiltered = false;
+
+    for (const child of this.children) {
+      if (child.status === NodeStatus.PENDING) this.hasPending = true;
+      else if (child.status === NodeStatus.IDENTIFIED) this.hasIdentified = true;
+      else if (child.status === NodeStatus.IGNORED) this.hasIgnored = true;
+      else if (child.status === NodeStatus.NOMATCH) this.hasNoMatch = true;
+      else if (child.status === NodeStatus.FILTERED) this.hasFiltered = true;
+      if (this.hasPending && this.hasIdentified && this.hasIgnored && this.hasNoMatch && this.hasFiltered) break;
+    }
   }
 
   public setStatus(path: string, status: NodeStatus): boolean {
     if (path === this.getPath()) return false;
     if (!this.checkMyPath(path)) return false;
     for (const child of this.children) if (child.setStatus(path, status)) break;
-    this.status = this.statusLogic();
+    this.updateStatusFlags();
+    this.status = this.getStatusClassName();
     this.setStatusOnClassnameAs(this.status);
     return true;
   }
@@ -60,7 +105,10 @@ export default class Folder extends Node {
     if (!existComponent) this.components.push(component);
     for (const child of this.children) if (child.attachResults(component, path)) break;
     this.original = NodeStatus.MATCH;
-    this.status = this.statusLogic();
+
+    this.updateStatusFlags();
+    this.status = this.getStatusClassName();
+
     this.setStatusOnClassnameAs(this.status);
     return true;
   }
@@ -68,7 +116,7 @@ export default class Folder extends Node {
   public restoreStatus(path: string): void {
     if (!path.includes(this.getPath())) return;
     for (const child of this.children) if (child.restoreStatus(path)) break;
-    this.status = this.getStatus(path);
+    this.status = this.getStatusByPath(path);
     this.setStatusOnClassnameAs(this.status);
   }
 
@@ -90,9 +138,13 @@ export default class Folder extends Node {
 
   public getFiltered(): Array<string> {
     const result: Array<string> = [];
-    this.children.forEach(child => {
+    this.children.forEach((child) => {
       result.push(...child.getFiltered());
     });
     return result;
+  }
+
+  public setOriginal(status: NodeStatus): void {
+    this.original = status;
   }
 }
