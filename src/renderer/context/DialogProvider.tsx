@@ -11,11 +11,13 @@ import { LicenseDialog } from '../ui/dialog/LicenseDialog';
 import { ComponentDialog } from '../ui/dialog/ComponentDialog';
 import { IpcEvents } from '../../ipc-events';
 import SettingsDialog from '../ui/dialog/SettingsDialog';
+import AlertDialog from '../ui/dialog/AlertDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
+  openAlertDialog: (message?: string, buttons?: any[]) => Promise<DialogResponse>;
   openLicenseCreate: () => Promise<DialogResponse>;
   openSettings: () => Promise<DialogResponse>;
   openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
@@ -95,6 +97,38 @@ export const DialogProvider: React.FC = ({ children }) => {
     });
   };
 
+  const [alertDialog, setAlertDialog] = useState<{
+    open: boolean;
+    message?: string;
+    buttons?: any[];
+    onClose?: (response: DialogResponse) => void;
+  }>({ open: false, buttons: [] });
+
+  const openAlertDialog = (
+    message = 'Are you sure?',
+    buttons: {
+      label: string;
+      role: 'accept' | 'cancel' | 'delete' | 'action';
+    }[] = [
+      {
+        label: 'OK',
+        role: 'accept',
+      },
+    ]
+  ): Promise<DialogResponse> => {
+    return new Promise<DialogResponse>((resolve) => {
+      setAlertDialog({
+        open: true,
+        message,
+        buttons,
+        onClose: (response) => {
+          setAlertDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(response);
+        },
+      });
+    });
+  };
+
   const [licenseDialog, setLicenseDialog] = useState<{
     open: boolean;
     onClose?: (response: DialogResponse) => void;
@@ -129,13 +163,12 @@ export const DialogProvider: React.FC = ({ children }) => {
     });
   };
 
-
   const [componentDialog, setComponentDialog] = useState<{
     open: boolean;
     component: Partial<NewComponentDTO>;
     label?: string;
     onClose?: (response: DialogResponse) => void;
-  }>({ open: false , component: {} });
+  }>({ open: false, component: {} });
 
   const openComponentDialog = (component: Partial<NewComponentDTO> = {}, label = 'Create Component') => {
     return new Promise<DialogResponse>((resolve) => {
@@ -172,6 +205,7 @@ export const DialogProvider: React.FC = ({ children }) => {
         openInventory,
         openInventorySelector,
         openConfirmDialog,
+        openAlertDialog,
         openLicenseCreate,
         openComponentDialog,
         openSettings,
@@ -217,6 +251,13 @@ export const DialogProvider: React.FC = ({ children }) => {
         open={settingsDialog.open}
         onCancel={() => settingsDialog.onClose && settingsDialog.onClose(null)}
         onClose={(response) => settingsDialog.onClose && settingsDialog.onClose(response)}
+      />
+
+      <AlertDialog
+        open={alertDialog.open}
+        message={alertDialog.message}
+        buttons={alertDialog.buttons}
+        onClose={(response) => alertDialog.onClose && alertDialog.onClose(response)}
       />
     </DialogContext.Provider>
   );

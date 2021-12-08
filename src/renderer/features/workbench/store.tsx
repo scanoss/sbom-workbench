@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
-import { Inventory, Node } from '../../../api/types';
+import { Inventory, InventoryAction, Node } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
 import { loadScanSuccess, setComponent, setComponents, setProgress, updateTree, setCurrentNode } from './actions';
@@ -18,8 +18,7 @@ export interface IWorkbenchContext {
   attachFile: (inventoryId: number, files: number[]) => Promise<boolean>;
   detachFile: (files: number[]) => Promise<boolean>;
   deleteInventory: (inventoryId: number) => Promise<boolean>;
-
-  update: (full?) => void;
+  executeBatch: (path: string, action: InventoryAction, data?: any) => Promise<boolean>;
 
   state: State;
   dispatch: any;
@@ -33,6 +32,8 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   const { setScanBasePath } = React.useContext<any>(AppContext);
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const { loaded, tree, file, component } = state;
+
+  let node = null;
 
   const loadScan = async (path: string) => {
     try {
@@ -97,6 +98,23 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     return success;
   };
 
+  const executeBatch = async (path: string, action: InventoryAction, data = null): Promise<boolean> => {
+    try {
+      await inventoryService.folder({
+        action,
+        folder: path,
+        overwrite: false,
+        ...data,
+      });
+      // update();
+      history.push(`/workbench`);
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  };
+
   const update = async (full = true) => {
     const params = state.filter.node?.type === 'folder' ? { path: state.filter.node.path } : null;
 
@@ -127,14 +145,16 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     }
   };
 
+  useEffect(() => {
+    node = state.filter.node;
+  }, [state.filter.node]);
+
   // TODO: use custom navigation
   useEffect(() => {
     if (!state.loaded) return null;
 
     const unlisten = history.listen((data) => {
       const param = new URLSearchParams(data.search).get('path');
-
-      if (!loaded) return;
 
       if (!param) {
         setNode(null);
@@ -156,7 +176,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     () => ({
       state,
       dispatch,
-
       loadScan,
       createInventory,
       ignoreFile,
@@ -164,9 +183,20 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       attachFile,
       detachFile,
       deleteInventory,
-      update,
+      executeBatch,
     }),
-    [state, dispatch, loadScan, createInventory, ignoreFile, restoreFile, attachFile, detachFile, deleteInventory]
+    [
+      state,
+      dispatch,
+      loadScan,
+      createInventory,
+      ignoreFile,
+      restoreFile,
+      attachFile,
+      detachFile,
+      deleteInventory,
+      executeBatch,
+    ]
   );
 
   return <WorkbenchContext.Provider value={value}>{children}</WorkbenchContext.Provider>;

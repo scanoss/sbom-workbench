@@ -7,7 +7,7 @@ export enum DIALOG_ACTIONS {
 }
 
 export interface DialogResponse {
-  action: DIALOG_ACTIONS;
+  action: DIALOG_ACTIONS | string;
   data?: any | null;
 }
 export interface InventorySelectorResponse {

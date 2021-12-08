@@ -44,25 +44,26 @@ export const FileTree = () => {
   const onContextMenu = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: OnCheckNode | any) => {
     const { children, value } = node;
 
-    const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED';
-
     if (!children) return;
+
+    const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED';
+    const showOverwrite = true;
 
     Menu.buildFromTemplate([
       {
         label: 'Accept all',
-        click: () => contextual.acceptAll(value),
+        click: () => contextual.acceptAll(value, showOverwrite),
         enabled: !onlyRestore,
       },
       { type: 'separator' },
       {
         label: 'Identify all files as...',
-        click: () => contextual.identifyAll(value),
+        click: () => contextual.identifyAll(value, showOverwrite),
         enabled: !onlyRestore,
       },
       {
         label: 'Mark all files as original',
-        click: () => contextual.ignoreAll(value),
+        click: () => contextual.ignoreAll(value, showOverwrite),
         enabled: !onlyRestore,
       },
       { type: 'separator' },
@@ -94,9 +95,9 @@ export const FileTree = () => {
 
   const preRender = (node: any) => {
     node.label = (
-      <span onContextMenu={(e) => onContextMenu(e, node)} data-value={node.value}>
+      <div onContextMenu={(e) => onContextMenu(e, node)} data-value={node.value}>
         {node.label}
-      </span>
+      </div>
     );
     if (node.children) {
       node.children.forEach((el) => preRender(el));
