@@ -1,12 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js';
 import { Button, Tooltip } from '@material-ui/core';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import { shell } from 'electron';
 import { ExportFormat } from '../../../../../../api/export-service';
 import { HashType } from '../../../../../../api/types';
-import { userSettingService } from '../../../../../../api/userSetting-service';
-
+import { projectService } from '../../../../../../api/project-service';
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
@@ -19,7 +18,7 @@ const LicensesChart = ({ data }) => {
   };
 
   const readToken = async () => {
-    const { TOKEN } = await userSettingService.get();
+    const TOKEN = await projectService.getToken();
     setToken(TOKEN || '');
   };
   useEffect(() => {

@@ -88,6 +88,9 @@ export interface INewProject {
   scan_root: string;
   default_license: string;
   default_components?: string;
+  api?: string;
+  token?: string;
+  api_key?: string;
 }
 
 export interface IProject extends INewProject {
@@ -95,9 +98,7 @@ export interface IProject extends INewProject {
   date: string;
   work_root: string;
   scannerState: ScanState;
-  files: number;
-  api: string;
-  token: string;
+  files: number; 
   uuid: string;
 }
 
