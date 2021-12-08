@@ -106,7 +106,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
         overwrite: false,
         ...data,
       });
-      // update();
+      update();
       history.push(`/workbench`);
       return true;
     } catch (e) {

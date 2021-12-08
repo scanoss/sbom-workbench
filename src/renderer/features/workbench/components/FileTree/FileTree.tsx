@@ -44,10 +44,12 @@ export const FileTree = () => {
   const onContextMenu = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: OnCheckNode | any) => {
     const { children, value } = node;
 
+    console.log("NODE", node);
+
     if (!children) return;
 
     const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED';
-    const showOverwrite = true;
+    const showOverwrite = node.hasIdentified || node.hasIgnored;
 
     Menu.buildFromTemplate([
       {
