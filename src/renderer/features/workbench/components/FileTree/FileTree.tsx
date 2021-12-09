@@ -1,18 +1,22 @@
 import React, { useContext, useState, useEffect } from 'react';
 import CheckboxTree, { OnCheckNode } from 'react-checkbox-tree';
 import { useHistory } from 'react-router-dom';
+import useContextual from '../../../../hooks/useContextual';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
+
+const electron = window.require('electron');
+const { remote } = electron;
+const { Menu, MenuItem } = remote;
 
 export const FileTree = () => {
   const history = useHistory();
+  const contextual = useContextual();
 
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
-
   const { tree, filter, file } = state;
 
-  const [aTree, setAtree] = useState([]);
-
-  const [expanded, setExpanded] = useState<string[]>([aTree && aTree[0] ? aTree[0].value : '']);
+  const [renderTree, setRenderTree] = useState([]);
+  const [expanded, setExpanded] = useState<string[]>([renderTree && renderTree[0] ? renderTree[0].value : '']);
 
   const onSelectFile = async (node: OnCheckNode) => {
     const { children, value } = node;
@@ -30,14 +34,58 @@ export const FileTree = () => {
         search: fileTreeNode ? `?path=folder|${encodeURIComponent(fileTreeNode.value)}` : null,
       });
     }
-
-    setAtree([tree]);
   };
 
   const getNode = (target) => {
     const node = target.parent.children?.find((el) => el.value === target.value);
-    if (node) node.label = <span data-value={node.value}>{node.label}</span>;
     return node;
+  };
+
+  const onContextMenu = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: OnCheckNode | any) => {
+    const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED';
+    const menu = !node.children
+      ? [
+          /* {
+            label: 'Identify file',
+            click: () => contextual.identifyAll(node),
+            enabled: !onlyRestore,
+          }, */
+          {
+            label: 'Mark file as original',
+            click: () => contextual.ignore(node),
+            enabled: !onlyRestore && node.status !== 'FILTERED' && node.status !== 'NO-MATCH',
+          },
+          {
+            label: 'Restore file',
+            click: () => contextual.restore(node),
+            enabled: onlyRestore,
+          },
+        ]
+      : [
+          {
+            label: 'Accept all',
+            click: () => contextual.acceptAll(node),
+            enabled: !onlyRestore,
+          },
+          { type: 'separator' },
+          {
+            label: 'Identify all files as...',
+            click: () => contextual.identifyAll(node),
+            enabled: !onlyRestore,
+          },
+          {
+            label: 'Mark all files as original',
+            click: () => contextual.ignoreAll(node),
+            enabled: !onlyRestore,
+          },
+          { type: 'separator' },
+          {
+            label: 'Restore all files',
+            click: () => contextual.restoreAll(node),
+          },
+        ];
+
+    Menu.buildFromTemplate(menu).popup(remote.getCurrentWindow());
   };
 
   useEffect(() => {
@@ -50,19 +98,32 @@ export const FileTree = () => {
     const value = filter.node?.path || file;
     const node = document.querySelector(`[data-value="${value}"]`);
     node?.closest('.rct-text')?.classList.add('selected');
-  }, [filter.node, file, aTree]);
+  }, [filter.node, file, renderTree]);
 
   useEffect(() => {
     if (tree) {
-      setAtree([tree]);
+      const t = { ...tree };
+      setRenderTree([preRender(t)]);
     }
   }, [tree]);
+
+  const preRender = (node: any) => {
+    node.label = (
+      <div onContextMenu={(e) => onContextMenu(e, node)} data-value={node.value}>
+        {node.label}
+      </div>
+    );
+    if (node.children) {
+      node.children.forEach((el) => preRender(el));
+    }
+    return node;
+  };
 
   return (
     <>
       {tree ? (
         <CheckboxTree
-          nodes={aTree || []}
+          nodes={renderTree || []}
           expanded={expanded}
           onClick={(targetNode) => onSelectFile(targetNode)}
           onExpand={(expandedItems) => setExpanded(expandedItems)}

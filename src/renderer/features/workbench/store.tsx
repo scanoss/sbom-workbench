@@ -1,14 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import { ipcRenderer } from 'electron';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
-import { Inventory, Node } from '../../../api/types';
+import { Inventory, InventoryAction, Node } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
 import { loadScanSuccess, setComponent, setComponents, setProgress, updateTree, setCurrentNode } from './actions';
 import { resultService } from '../../../api/results-service';
 import { reportService } from '../../../api/report-service';
+import { IpcEvents } from '../../../ipc-events';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
@@ -18,6 +20,7 @@ export interface IWorkbenchContext {
   attachFile: (inventoryId: number, files: number[]) => Promise<boolean>;
   detachFile: (files: number[]) => Promise<boolean>;
   deleteInventory: (inventoryId: number) => Promise<boolean>;
+  executeBatch: (path: string, action: InventoryAction, data?: any) => Promise<boolean>;
 
   state: State;
   dispatch: any;
@@ -95,6 +98,23 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     return success;
   };
 
+  const executeBatch = async (path: string, action: InventoryAction, data = null): Promise<boolean> => {
+    try {
+      await inventoryService.folder({
+        action,
+        folder: path,
+        overwrite: false,
+        ...data,
+      });
+      update();
+      history.push(`/workbench`);
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  };
+
   const update = async (full = true) => {
     const params = state.filter.node?.type === 'folder' ? { path: state.filter.node.path } : null;
 
@@ -115,6 +135,12 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     }
   };
 
+  const onTreeRefreshed = (tree) => {
+    console.log(tree);
+    // const fileTree = await workbenchController.getFileTree();
+    // dispatch(updateTree(tree));
+  };
+
   const setNode = async (node: Node) => {
     dispatch(setCurrentNode(node));
     if (!node || node.type === 'folder') {
@@ -132,8 +158,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     const unlisten = history.listen((data) => {
       const param = new URLSearchParams(data.search).get('path');
 
-      if (!loaded) return;
-
       if (!param) {
         setNode(null);
         return;
@@ -150,11 +174,21 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     };
   }, [state.loaded]);
 
+  const setupListeners = () => {
+    ipcRenderer.on(IpcEvents.TREE_UPDATED, onTreeRefreshed);
+  };
+
+  const removeListeners = () => {
+    ipcRenderer.removeListener(IpcEvents.TREE_UPDATED, onTreeRefreshed);
+  };
+
+  useEffect(setupListeners, []);
+  useEffect(() => () => removeListeners(), []);
+
   const value = React.useMemo(
     () => ({
       state,
       dispatch,
-
       loadScan,
       createInventory,
       ignoreFile,
@@ -162,8 +196,20 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       attachFile,
       detachFile,
       deleteInventory,
+      executeBatch,
     }),
-    [state, dispatch, loadScan, createInventory, ignoreFile, restoreFile, attachFile, detachFile, deleteInventory]
+    [
+      state,
+      dispatch,
+      loadScan,
+      createInventory,
+      ignoreFile,
+      restoreFile,
+      attachFile,
+      detachFile,
+      deleteInventory,
+      executeBatch,
+    ]
   );
 
   return <WorkbenchContext.Provider value={value}>{children}</WorkbenchContext.Provider>;

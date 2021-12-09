@@ -23,15 +23,19 @@
 
     .selected {
       border-radius: 2px;
-      background-color: $bg
+      background-color: $bg !important
     }
 
     .rct-bare-label {
       width: 100%;
 
       *:focus {
-        background: $bg;
+        background: #eef3fdad;
       }
+    }
+
+    .rct-title {
+      width: 100%;
     }
 
     .rct-node-clickable {
