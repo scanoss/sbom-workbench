@@ -7,20 +7,21 @@ import { Editor } from './pages/Editor/Editor';
 const Detected = () => {
   const history = useHistory();
   const { path, url } = useRouteMatch();
- 
 
   return (
-    <Switch>
-      <Route exact path={path}>
-        <ComponentList />
-      </Route>
-      <Route path={`${path}/component`}>
-        <ComponentDetail />
-      </Route>
-      <Route path={`${path}/file`}>
-        <Editor />
-      </Route>
-    </Switch>
+    <>
+      <Switch>
+        <Route exact path={path}>
+          <ComponentList />
+        </Route>
+        <Route path={`${path}/component`}>
+          <ComponentDetail />
+        </Route>
+        <Route path={`${path}/file`}>
+          <Editor />
+        </Route>
+      </Switch>
+    </>
   );
 };
 

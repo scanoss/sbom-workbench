@@ -1,15 +1,16 @@
 import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
+import { userSetting } from './UserSetting';
+import { ProjectFilterPath } from './workspace/filters/ProjectFilterPath';
 import { Project } from './workspace/Project';
 import { workspace } from './workspace/Workspace';
-
-
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (_event, arg: any) => {
   let created: any;
 
-  const p: Project = await workspace.openProjectByPath(arg);
+  // TO DO factory to create filters depending on arguments
+  const p: Project = await workspace.openProject(new ProjectFilterPath(arg));
   const r = await p.getResults();
 
   const response = {
@@ -46,26 +47,24 @@ ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (event, arg: Project) => {
 ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
   const projectList = workspace.getOpenedProjects();
   let pPromises = [];
-  for(let p of projectList) pPromises.push(p.save());
+  for (let p of projectList) pPromises.push(p.save());
   await Promise.all(pPromises);
 
   pPromises = [];
-  for(let p of projectList) pPromises.push(p.close());
+  for (let p of projectList) pPromises.push(p.close());
   await Promise.all(pPromises);
-
 });
 
 ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
   const path = arg;
-  const p: Project = workspace.getProjectByPath(path);
+  const p: Project = workspace.getProject(new ProjectFilterPath(path));
   p.setMailbox(event.sender);
   await p.resumeScanner();
 });
 
-
 ipcMain.handle(IpcEvents.PROJECT_RESCAN, async (event, projectPath: string) => {
   try {
-    const p = workspace.getProjectByPath(projectPath);
+    const p = workspace.getProject(new ProjectFilterPath(projectPath));
     p.setMailbox(event.sender);
     await p.upgrade();
     await p.reScan();
@@ -75,7 +74,6 @@ ipcMain.handle(IpcEvents.PROJECT_RESCAN, async (event, projectPath: string) => {
     return Response.fail({ message: error.message });
   }
 });
-
 
 ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
   const projectName = workspace.getOpenedProjects()[0].project_name;
@@ -92,15 +90,18 @@ ipcMain.handle(IpcEvents.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
   }
 });
 
-ipcMain.handle(IpcEvents.GET_TOKEN, (event) => {
+ipcMain.handle(IpcEvents.GET_TOKEN, async (event) => {
   try {
-    const token = workspace.getOpenedProjects()[0].getToken();
+    let token = workspace.getOpenedProjects()[0].getToken();
+    if (!token || token === '') {
+      const { TOKEN } = userSetting.get();
+      token = TOKEN;
+    }
     return Response.ok({ message: 'Node from path retrieve succesfully', data: token });
   } catch (e: any) {
     return Response.fail({ message: e.message });
   }
 });
-
 
 ipcMain.handle(IpcEvents.PROJECT_READ_TREE, (event) => {
   try {

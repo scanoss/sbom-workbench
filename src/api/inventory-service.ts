@@ -1,6 +1,6 @@
 import { IpcEvents } from '../ipc-events';
 import { BaseService } from './base-service';
-import { Inventory } from './types';
+import { IFolderInventory, Inventory } from './types';
 
 const { ipcRenderer } = require('electron');
 
@@ -27,7 +27,6 @@ class InventoryService extends BaseService {
 
   public async detach(inventory: Partial<Inventory>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_DETACH_FILE, inventory);
-    console.log("SARASASASASAS");
     return this.response(response);
   }
 
@@ -40,6 +39,14 @@ class InventoryService extends BaseService {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_FROM_COMPONENT);
     return this.response(response);
   }
+
+  public async folder(args: IFolderInventory): Promise<any[]> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_FOLDER, args);
+    return this.response(response);
+  }
 }
 
 export const inventoryService = new InventoryService();
+
+
+document.inv =  inventoryService;

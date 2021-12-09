@@ -7,17 +7,17 @@ import { NodeStatus } from './workspace/Tree/Tree/Node';
 import { workspace } from './workspace/Workspace';
 
 ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
-  const p = workspace.getOpenedProjects()[0];
-  const data = await p.scans_db.files.ignored(arg);
+  const project = workspace.getOpenedProjects()[0];
+  const data = await logicResultService.ignore(arg);
 
   logicResultService
-    .getResultsByids(arg)
+    .getResultsByids(arg, project)
     .then((filesToUpdate) => {
       const paths = Object.keys(filesToUpdate);
       for (const filePath of paths) {
-        p.getTree().getRootFolder().setStatus(filePath, NodeStatus.IGNORED);
+        project.getTree().getRootFolder().setStatus(filePath, NodeStatus.IGNORED);
       }
-      p.updateTree();
+      project.updateTree();
 
       return true;
     })
@@ -31,18 +31,18 @@ ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
 });
 
 ipcMain.handle(IpcEvents.UNIGNORED_FILES, async (event, arg: number[]) => {
-  const p = workspace.getOpenedProjects()[0];
-  const data = await p.scans_db.results.restore(arg);
+  const project = workspace.getOpenedProjects()[0];
+  const data = await project.scans_db.results.restore(arg);
 
   logicResultService
-    .getResultsByids(arg)
+    .getResultsByids(arg, project)
     .then((filesToUpdate) => {
       const paths = Object.keys(filesToUpdate);
       for (const filePath of paths) {
-        p.getTree().getRootFolder().setStatus(filePath, NodeStatus.PENDING);
+        project.getTree().getRootFolder().setStatus(filePath, NodeStatus.PENDING);
       }
 
-      p.updateTree();
+      project.updateTree();
       return true;
     })
     .catch((e) => {

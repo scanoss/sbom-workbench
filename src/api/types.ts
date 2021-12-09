@@ -25,6 +25,11 @@ export interface IWorkspaceCfg {
   VERSION: string;
 }
 
+export interface Node {
+  type: 'folder' | 'file';
+  path: string;
+}
+
 export interface Inventory {
   id?: number;
   cvid: number;
@@ -78,20 +83,23 @@ export interface ItemInclude {
   action: boolean;
 }
 
-export interface IProject {
+export interface INewProject {
+  name: string;
+  scan_root: string;
+  default_license: string;
+  default_components?: string;
+  api?: string;
+  token?: string;
+  api_key?: string;
+}
+
+export interface IProject extends INewProject {
   appVersion: string;
   date: string;
-  name: string;
   work_root: string;
-  scan_root: string;
   scannerState: ScanState;
-  files: number;
-  api: string;
-  token: string;
+  files: number; 
   uuid: string;
-
-  default_licenses?: string;
-  default_components?: string;
 }
 
 export interface Files {
@@ -136,4 +144,18 @@ export type IParams = Record<PropertyKey, any> & {
   // non-generic interface properties go here
   sort?: string;
   order?: string;
+};
+
+export enum InventoryAction {
+  IGNORE = 'IGNORE',
+  IDENTIFY = 'IDENTIFY',
+  RESTORE = 'RESTORE',
+  ACCEPT = 'ACCEPT',
+}
+
+export interface IFolderInventory {
+  folder: string;
+  action: InventoryAction;
+  overwrite: boolean;
+  data?: Partial<Inventory>;
 }

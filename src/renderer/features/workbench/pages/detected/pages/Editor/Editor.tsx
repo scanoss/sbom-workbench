@@ -16,6 +16,7 @@ import { resultService } from '../../../../../../../api/results-service';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import { projectService } from '../../../../../../../api/project-service';
 import { InventoryForm } from '../../../../../../context/types';
+import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -32,13 +33,13 @@ export const Editor = () => {
   const history = useHistory();
   const query = useQuery();
 
-  const { state, dispatch, createInventory, ignoreFile, restoreFile, attachFile, detachFile } = useContext(
+  const { state, dispatch, createInventory, ignoreFile, restoreFile, detachFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { file } = state;
+  const file = state.filter.node?.type === 'file' ? state.filter.node.path : null;
 
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);
@@ -61,8 +62,6 @@ export const Editor = () => {
       loadLocalFile(file);
     }
   };
-
-  const destroy = () => dispatch(setFile(null));
 
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
@@ -171,20 +170,6 @@ export const Editor = () => {
   };
 
   useEffect(() => {
-    const path = decodeURIComponent(query.get('path'));
-
-    dispatch(setFile(path));
-    const unlisten = history.listen((data) => {
-      const path = decodeURIComponent(new URLSearchParams(data.search).get('path'));
-      dispatch(setFile(path));
-    });
-    return () => {
-      unlisten();
-      destroy();
-    };
-  }, []);
-
-  useEffect(() => {
     init();
   }, [file]);
 
@@ -230,9 +215,14 @@ export const Editor = () => {
     <>
       <section id="editor" className="app-page">
         <header className="app-header">
+          <Breadcrumb />
           <>
             <header className="match-info-header">
-              {matchInfo && inventories ? (
+              {(!matchInfo || !inventories) && (
+                <Skeleton variant="rect" width="50%" height={60} style={{ marginBottom: 18 }} />
+              )}
+
+              {matchInfo && inventories && (matchInfo.length > 0 || inventories.length > 0) && (
                 <section className="content">
                   <div className="match-info-default-container">
                     {inventories.length > 0
@@ -272,14 +262,12 @@ export const Editor = () => {
                         ))}
                   </div>
                 </section>
-              ) : (
-                <Skeleton variant="rect" width="50%" height={60} style={{ marginBottom: 34 }} />
               )}
 
               <div className="info-files">
                 <LabelCard label="Source File" file={file} status={null} />
                 {matchInfo && currentMatch && currentMatch.file && (
-                  <LabelCard label="Component File" status={null} file={currentMatch.file}/>
+                  <LabelCard label="Component File" status={null} file={currentMatch.file} />
                 )}
               </div>
             </header>

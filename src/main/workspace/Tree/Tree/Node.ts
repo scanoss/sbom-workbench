@@ -71,11 +71,9 @@ export default abstract class Node {
 
   public abstract setStatus(path: string, status: NodeStatus): boolean;
 
-  public abstract getStatus(path: string): NodeStatus;
+  public abstract getStatusByPath(path: string): NodeStatus;
 
-  public abstract setOriginal(path: string, status: NodeStatus): boolean;
-
-  public abstract getOriginal(path: string): NodeStatus;
+  public abstract setOriginal(status: NodeStatus): void;
 
   public abstract restoreStatus(path: string);
 
@@ -84,4 +82,10 @@ export default abstract class Node {
   public abstract getComponent(): any[];
 
   public abstract getNode(path: string): Node;
+
+  public abstract getFiltered(): Array<string>;
+
+  public abstract getStatus(): NodeStatus;
+
+  
 }

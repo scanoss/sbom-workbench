@@ -3,7 +3,7 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { vs2015 } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { range } from '../../../../../utils/utils';
 
-const LINES_MAX = 1000;
+const LINES_MAX = 2000;
 const CHAR_MAX_IN_LINE = 5000;
 const LINES_OFFSET = 50;
 

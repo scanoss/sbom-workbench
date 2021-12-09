@@ -16,11 +16,8 @@ import { Metadata } from './Metadata';
 import { userSetting } from '../UserSetting';
 import { ProjectMigration } from '../migration/ProjectMigration';
 import { Tree } from './Tree/Tree/Tree';
-
-import Folder from './Tree/Tree/Folder';
 import Node, { NodeStatus } from './Tree/Tree/Node';
-import { logicResultService } from '../services/LogicResultService';
-import { runInThisContext } from 'vm';
+import { reScanService } from '../services/RescanLogicService';
 
 const path = require('path');
 
@@ -164,7 +161,7 @@ export class Project extends EventEmitter {
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
     this.indexScan(this.metadata.getScanRoot(), this.tree.getRootFolder(), this.banned_list);
     const summary = { total: 0, include: 0, filter: 0, files: {} };
-    this.filesSummary = summarizeTree(this.metadata.getScanRoot(),this.tree.getRootFolder(), summary);
+    this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.tree.getRootFolder(), summary);
     log.info(
       `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
       'color: green'
@@ -195,8 +192,14 @@ export class Project extends EventEmitter {
   initializeScanner() {
     const scannerCfg: ScannerCfg = new ScannerCfg();
     const { DEFAULT_API_INDEX, APIS } = userSetting.get();
-    scannerCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
-    scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
+
+    if (this.metadata.getApi()) {
+      scannerCfg.API_URL = this.metadata.getApi();
+    } else {
+      scannerCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
+      scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
+    }
+
     this.scanner = new Scanner(scannerCfg);
     this.scanner.setWorkDirectory(this.metadata.getMyPath());
 
@@ -217,38 +220,16 @@ export class Project extends EventEmitter {
       this.save();
     });
 
-    this.scanner.on(ScannerEvents.SCAN_DONE, async (resPath, filesNotScanned) => {
-
+    this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
         log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
 
-        await this.scans_db.results.updateDirty(1);
-        await this.scans_db.results.insertFromFileReScan(resPath);
-
-        const dirtyResults = await this.scans_db.results.getDirty();
-        if (dirtyResults.length > 0) {
-          await this.scans_db.inventories.deleteDirtyFileInventories(dirtyResults);
-        }
-        const notValidComp: number[] = await this.scans_db.components.getNotValid();
-
-        if (notValidComp.length > 0) {
-          await this.scans_db.components.deleteByID(notValidComp);
-        }
-        await this.scans_db.results.deleteDirty();
-        await this.scans_db.components.updateOrphanToManual();
-        await this.scans_db.components.importUniqueFromFile();
-
-        const emptyInv: any = await this.scans_db.inventories.emptyInventory();
-        if (emptyInv) {
-          const result = emptyInv.map((item: Record<string, number>) => item.id);
-          await this.scans_db.inventories.deleteAllEmpty(result);
-        }
-        const results = await logicResultService.getResultsRescan();
+        await reScanService.reScan(resultPath, this, this.tree.getFilteredFiles());
+        const results = await reScanService.getNewResults(this);
         this.tree.sync(results);
         this.save();
-
       } else {
-        await this.scans_db.results.insertFromFile(resPath);
+        await this.scans_db.results.insertFromFile(resultPath);
         await this.scans_db.components.importUniqueFromFile();
       }
 
@@ -276,28 +257,28 @@ export class Project extends EventEmitter {
     console.log(filesToUpdate);
     console.log(JSON.stringify(this.logical_tree, null, 2));
     // eslint-disable-next-line no-restricted-syntax
-    for(const [key, value] of Object.entries(filesToUpdate)) {
+    for (const [key, value] of Object.entries(filesToUpdate)) {
       this.updateStatusOfFile(key.split('/').splice(1), 0, this.logical_tree, value);
     }
     this.logical_tree.status = this.getFolderStatus(this.logical_tree);
     console.log(JSON.stringify(this.logical_tree, null, 2));
-    //this.msgToUI(IpcEvents.COMPONENT_ATTACH_LICENSE, this.logical_tree);
+    // this.msgToUI(IpcEvents.COMPONENT_ATTACH_LICENSE, this.logical_tree);
   }
 
   private updateStatusOfFile(arrPaths, deep, current, status) {
-      if (deep >= arrPaths.length ) {
-          current.status = status;
-          return;
-      }
-      const next = current.children.find(child => child.label === arrPaths[deep]);
-      this.updateStatusOfFile(arrPaths, deep + 1, next, status);
-      next.status = this.getFolderStatus(next);
+    if (deep >= arrPaths.length) {
+      current.status = status;
+      return;
+    }
+    const next = current.children.find((child) => child.label === arrPaths[deep]);
+    this.updateStatusOfFile(arrPaths, deep + 1, next, status);
+    next.status = this.getFolderStatus(next);
   }
 
   private getFolderStatus(node: any) {
-      if(node.type !== 'folder') return node.status;
-      if (node.children.some(child => child.status === 'pending')) return 'pending';
-      if (node.children.every(child => child.status === 'ignored')) return 'ignored';
+    if (node.type !== 'folder') return node.status;
+    if (node.children.some((child) => child.status === 'pending')) return 'pending';
+    if (node.children.every((child) => child.status === 'ignored')) return 'ignored';
     return 'identified';
   }
 
@@ -325,14 +306,14 @@ export class Project extends EventEmitter {
     this.metadata.setScanRoot(name);
   }
 
+  public setLicense(license: string) {
+    this.metadata.setLicense(license);
+  }
+
   public setMyPath(myPath: string) {
     this.metadata.setMyPath(myPath);
     this.metadata.save();
   }
-
-  // public setConfig(cfg: IProjectCfg){
-  //   this.config = cfg;
-  // }
 
   public getFilesNotScanned() {
     return this.filesNotScanned;
@@ -354,8 +335,20 @@ export class Project extends EventEmitter {
     return this.metadata.getDto();
   }
 
-  getScanRoot(): string {
+  public getScanRoot(): string {
     return this.metadata.getScanRoot();
+  }
+
+  public setApi(api: string) {
+    this.metadata.setApi(api);
+  }
+
+  public setToken(token: string) {
+    this.metadata.setToken(token);
+  }
+
+  public setApiKey(apiKey: string) {
+    this.metadata.setApiKey(apiKey);
   }
 
   public async getResults() {
@@ -366,10 +359,9 @@ export class Project extends EventEmitter {
     const scanPath = this.metadata.getScanRoot();
     this.tree = new Tree(scanPath);
     this.tree.buildTree();
-    //this.logical_tree = dirTree(scanPath, scanPath);
+    // this.logical_tree = dirTree(scanPath, scanPath);
     this.emit('treeBuilt', this.logical_tree);
   }
-
 
   public getTree(): Tree {
     return this.tree;
@@ -378,7 +370,6 @@ export class Project extends EventEmitter {
   public updateTree() {
     this.save();
     this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
-
   }
 
   attachInventory(inv: Inventory) {
@@ -542,15 +533,12 @@ export class Project extends EventEmitter {
   }
 
   public getToken() {
-    const txt = fs.readFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, 'utf8');
-    const cfg = JSON.parse(txt);
-    return cfg.TOKEN;
+    return this.metadata.getToken();
   }
 
   public getNode(path: string) {
     return this.tree.getNode(path);
   }
-
 }
 /* AUXILIARY FUNCTIONS */
 

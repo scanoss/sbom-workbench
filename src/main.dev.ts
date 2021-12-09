@@ -164,20 +164,6 @@ export interface IInitScan {
 
 async function mainLogic() {
 
- 
-  //  const tree = new Tree('/home/agustin/scanner.c').buildTree();
-
-
-  // startTime = performance.now();
-  // tree.updateStatus('/fodler1/file1.py', 'identified');
-  // tree.updateStatus('/fodler1/file2.py', 'ignored');
-  // console.log(JSON.stringify(tree,undefined,2));
-
-  // console.log( tree.getNode('scanoss-dt/babel.config.js'), "NODO" );
-  // endTime = performance.now();
-  // console.log(`Updated file in ${endTime - startTime} ms`);
-
-
   const root = `${os.homedir()}/scanoss-workspace`;
 
   // This lines will be removed in future versions
@@ -194,13 +180,13 @@ async function mainLogic() {
 }
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
-  const { path } = arg;
-  const projectName = basepath.basename(path);
-  const p: Project = new Project(projectName);
-  // p.setConfig();
-  // p.setFilters();
-  await workspace.addProject(p);
-  p.setScanPath(path);
-  p.setMailbox(event.sender);
-  await p.startScanner();
+  // const { path } = arg;
+  // const projectName = basepath.basename(path);
+  // const p: Project = new Project(projectName);
+  // // p.setConfig();
+  // // p.setFilters();
+  // await workspace.addProject(p);
+  // p.setScanPath(path);
+  // p.setMailbox(event.sender);
+  // await p.startScanner();
 });

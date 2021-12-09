@@ -7,7 +7,8 @@
     font-size: 14px;
 
     > ol {
-      overflow-x: hidden;
+      display: grid;
+      overflow-x: scroll;
     }
 
     .rct-collapse {
@@ -63,11 +64,11 @@
       content: '';
       display: inline-block;
       position: absolute;
-      left: 16px;
-      bottom: 2px;
+      left: 15px;
+      bottom: 1px;
       background: transparent;
-      width: 6px;
-      height: 6px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
     }
   }

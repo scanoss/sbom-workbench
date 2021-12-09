@@ -2,9 +2,8 @@ import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { workspace } from '../workspace/Workspace';
 
 class LogicResultService {
-  public async getResultsByids(ids: number[]) {
+  public async getResultsByids(ids: number[], project: any) {
     try {
-      const project = workspace.getOpenedProjects()[0];
       const results: Array<any> = await project.scans_db.results.getSummaryByids(ids);
       const response = {};
       results.forEach((element: any) => {
@@ -49,6 +48,36 @@ class LogicResultService {
     });
 
     return results;
+  }
+
+  public async getFilesInFolder(folder: string) {
+    try {
+      const project = workspace.getOpenedProjects()[0];
+      const results: Array<any> = await project.scans_db.results.getFilesInFolder(folder);
+      return results;
+    } catch (e) {
+      return e;
+    }
+  }
+
+  public async getResultsFromIDs(ids: number[]) {
+    try {
+      const project = workspace.getOpenedProjects()[0];
+      const results: Array<any> = await project.scans_db.results.getSummaryByids(ids);
+      return results;
+    } catch (e) {
+      return e;
+    }
+  }
+
+  public async ignore(ids: number[]) {
+    try {
+      const project = workspace.getOpenedProjects()[0];
+      const success = await project.scans_db.files.ignored(ids);
+      return success;
+    } catch (e) {
+      return e;
+    }
   }
 }
 export const logicResultService = new LogicResultService();
