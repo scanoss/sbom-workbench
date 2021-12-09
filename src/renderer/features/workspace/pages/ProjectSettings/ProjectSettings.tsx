@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
     '&:hover': {
       backgroundColor: theme.palette.primary.light,
     },
-  }
+  },
 }));
 
 const ProjectSettings = () => {
@@ -101,11 +101,9 @@ const ProjectSettings = () => {
     sbom: null,
   });
 
+  const [projectNameError, setProjectNameError] = useState(false);
 
-  const [projectExist, setProjectExist] = useState(false);
-
-
-  const projectsTest = [
+  const projectTest = [
     {
       id: 1,
       name: 'Project 1',
@@ -117,59 +115,38 @@ const ProjectSettings = () => {
     {
       id: 1,
       name: 'Project 3',
-    }
-  ]
-
-  useEffect(() => {
-
-  let found = projectsTest.find((project) => project.name === projectSettings.name);
-
-  if (found) {
-    setProjectExist(!projectExist);
-    console.log('existe pai');
-  }
-
-  }, [projectSettings.name]);
+    },
+  ];
 
   useEffect(() => {
     init();
   }, []);
 
 
-
   // ver poner nombre por deflt
-
-  // validacion de nombre logica
 
   // control de errores
 
   const init = async () => {
-    const { path } = scanPath;
-
-    let projectName = path.split(pathUtil.sep)[path.split(pathUtil.sep).length - 1];
-
-    setProjectSettings({
-      ...projectSettings,
-      name: projectName,
-    });
-
-    // -----------Autocomplete licencias ------------
-
     let data = await workspaceService.getLicenses();
     setLicenses(data);
 
-    // -----------Select APIs ------------
     let apiUrlKey = await userSettingService.get();
     setApis(apiUrlKey.APIS);
-
-
 
     const projects = await workspaceService.getAllProjects();
     setProjects(projects);
 
+    const { path } = scanPath;
+
+    let projectName = path.split(pathUtil.sep)[
+      path.split(pathUtil.sep).length - 1
+    ];
+
     setProjectSettings({
       ...projectSettings,
       scan_root: path,
+      name: projectName,
     });
 
     console.log(data);
@@ -177,23 +154,27 @@ const ProjectSettings = () => {
     console.log(apis);
   };
 
-  const submit = async () => {
-    if (projectSettings.name === '') {
-      alert('Project name is required');
-      return;
+  useEffect(() => {
+    let found = projectTest.find(
+      (project) => project.name === projectSettings.name
+    );
+
+    if (found || projectSettings.name === '') {
+      setProjectNameError(!projectNameError);
     } else {
-      // setGlobalState(projectSettings);
-      // history.push('/scan');
-      console.log(apiSelected);
-      console.log(projectSettings);
+      setProjectNameError(false);
     }
+  }, [projectSettings.name]);
+
+  const submit = async () => {
+    // setGlobalState(projectSettings);
+    // history.push('/scan');
   };
 
   const handleClose = (e) => {
     e.preventDefault();
     submit();
   };
-
 
   return (
     <>
@@ -215,9 +196,9 @@ const ProjectSettings = () => {
               <div className="project-license-container">
                 <div className="input-container">
                   <label className="input-label">Project Name</label>
-                  <Paper className="input-text-container project-name-container">
+                  <Paper className={`input-text-container project-name-container ${projectNameError ? 'error' : ''}`}>
                     <InputBase
-                      className="input-text project-name-input"
+                      className='project-name-input'
                       name="aa"
                       fullWidth
                       value={projectSettings.name}
@@ -232,11 +213,9 @@ const ProjectSettings = () => {
                 </div>
                 <div className="input-container input-container-license ">
                   <div className="input-label-add-container">
-                    <label className="input-label">License
-                    {' '}
-                    <span className="optional">- Optional</span>
+                    <label className="input-label">
+                      License <span className="optional">- Optional</span>
                     </label>
-
                   </div>
                   <Paper className="input-text-container license-input-container">
                     <SearchIcon className="icon" />
@@ -297,7 +276,12 @@ const ProjectSettings = () => {
                       {apis.map((api) => (
                         <MenuItem value={api} key={api.key}>
                           <span>API URL: {api.URL}</span>
-                          {api.API_KEY && <span className='api-key'> - API KEY: {api.API_KEY}</span>}
+                          {api.API_KEY && (
+                            <span className="api-key">
+                              {' '}
+                              - API KEY: {api.API_KEY}
+                            </span>
+                          )}
                         </MenuItem>
                       ))}
                     </Select>
@@ -329,7 +313,10 @@ const ProjectSettings = () => {
               </div>
             </div>
             <div className="button-container">
-              <Button disabled={projectExist} type="submit"  className={classes.button}>
+              <Button
+                type="submit"
+                className={classes.button}
+              >
                 Continue
                 <ArrowForwardIcon />
               </Button>
