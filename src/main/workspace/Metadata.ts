@@ -22,6 +22,8 @@ export class Metadata {
 
   private api: string;
 
+  private apiKey: string;
+
   private token: string;
 
   private uuid: string;
@@ -50,6 +52,7 @@ export class Metadata {
     mt.setToken(fileMt.token);
     mt.setUuid(fileMt.uuid);
     mt.setLicense(fileMt.default_license);
+    mt.setApiKey(fileMt.apiKey);
 
     return mt;
   }
@@ -135,6 +138,22 @@ export class Metadata {
     return this.default_license;
   }
 
+  public setApiKey(apiKey: string) {
+    this.apiKey = apiKey;
+  }
+
+  public getApiKey(): string {
+    return this.apiKey;
+  }
+
+  public getApi(): string {
+    return this.api;
+  }
+
+  public getToken(): string {
+    return this.token;
+  }
+
   public getDto(): IProject {
     const Ip: IProject = {
       appVersion: this.appVersion,
@@ -148,6 +167,7 @@ export class Metadata {
       token: this.token,
       uuid: this.uuid,
       default_license: this.default_license,
+      api_key: this.apiKey,
     };
     return Ip;
   }

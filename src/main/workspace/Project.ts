@@ -192,8 +192,14 @@ export class Project extends EventEmitter {
   initializeScanner() {
     const scannerCfg: ScannerCfg = new ScannerCfg();
     const { DEFAULT_API_INDEX, APIS } = userSetting.get();
-    scannerCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
-    scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
+
+    if (this.metadata.getApi()) {
+      scannerCfg.API_URL = this.metadata.getApi();
+    } else {
+      scannerCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
+      scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
+    }
+
     this.scanner = new Scanner(scannerCfg);
     this.scanner.setWorkDirectory(this.metadata.getMyPath());
 
@@ -256,7 +262,7 @@ export class Project extends EventEmitter {
     }
     this.logical_tree.status = this.getFolderStatus(this.logical_tree);
     console.log(JSON.stringify(this.logical_tree, null, 2));
-    //this.msgToUI(IpcEvents.COMPONENT_ATTACH_LICENSE, this.logical_tree);
+    // this.msgToUI(IpcEvents.COMPONENT_ATTACH_LICENSE, this.logical_tree);
   }
 
   private updateStatusOfFile(arrPaths, deep, current, status) {
@@ -329,8 +335,20 @@ export class Project extends EventEmitter {
     return this.metadata.getDto();
   }
 
-  getScanRoot(): string {
+  public getScanRoot(): string {
     return this.metadata.getScanRoot();
+  }
+
+  public setApi(api: string) {
+    this.metadata.setApi(api);
+  }
+
+  public setToken(token: string) {
+    this.metadata.setToken(token);
+  }
+
+  public setApiKey(apiKey: string) {
+    this.metadata.setApiKey(apiKey);
   }
 
   public async getResults() {
@@ -341,7 +359,7 @@ export class Project extends EventEmitter {
     const scanPath = this.metadata.getScanRoot();
     this.tree = new Tree(scanPath);
     this.tree.buildTree();
-    //this.logical_tree = dirTree(scanPath, scanPath);
+    // this.logical_tree = dirTree(scanPath, scanPath);
     this.emit('treeBuilt', this.logical_tree);
   }
 
@@ -515,16 +533,12 @@ export class Project extends EventEmitter {
   }
 
   public getToken() {
-    const txt = fs.readFileSync(`${this.metadata.getMyPath()}/projectCfg.json`, 'utf8');
-    const cfg = JSON.parse(txt);
-    return cfg.TOKEN;
+    return this.metadata.getToken();
   }
 
   public getNode(path: string) {
     return this.tree.getNode(path);
   }
-
-
 }
 /* AUXILIARY FUNCTIONS */
 

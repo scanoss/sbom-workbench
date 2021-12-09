@@ -15,7 +15,7 @@ export default class File extends Node {
     return false;
   }
 
-  public getStatus(path: string): NodeStatus {
+  public getStatusByPath(path: string): NodeStatus {
     if (path === this.getPath()) return this.status;
     return null;
   }
@@ -72,5 +72,13 @@ export default class File extends Node {
       result.push(this.getPath());
     }
     return result;
+  }
+
+  public setOriginal(status: NodeStatus): void {
+    this.original = status;
+  }
+
+  public getStatus(): NodeStatus {
+    return this.status;
   }
 }
