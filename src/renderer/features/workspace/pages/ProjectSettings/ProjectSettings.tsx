@@ -101,20 +101,35 @@ const ProjectSettings = () => {
     sbom: null,
   });
 
-  const [formValidated, setFormValidated] = useState(true);
 
   const [projectExist, setProjectExist] = useState(false);
 
 
-  // useEffect(() => {
-  //
-  // let found = projects.find((project) => project.name === projectSettings.name);
+  const projectsTest = [
+    {
+      id: 1,
+      name: 'Project 1',
+    },
+    {
+      id: 1,
+      name: 'Project 2',
+    },
+    {
+      id: 1,
+      name: 'Project 3',
+    }
+  ]
 
-  // if (found) {
-  //   setProjectExist(!projectExist);
-  // }
+  useEffect(() => {
 
-  // }, [projectSettings.name]);
+  let found = projectsTest.find((project) => project.name === projectSettings.name);
+
+  if (found) {
+    setProjectExist(!projectExist);
+    console.log('existe pai');
+  }
+
+  }, [projectSettings.name]);
 
   useEffect(() => {
     init();
@@ -143,12 +158,11 @@ const ProjectSettings = () => {
     let data = await workspaceService.getLicenses();
     setLicenses(data);
 
-    // ----------------------------------------------
-
     // -----------Select APIs ------------
     let apiUrlKey = await userSettingService.get();
     setApis(apiUrlKey.APIS);
-    // ----------------------------------------------
+
+
 
     const projects = await workspaceService.getAllProjects();
     setProjects(projects);
@@ -180,19 +194,6 @@ const ProjectSettings = () => {
     submit();
   };
 
-  // el nombre project name por default es el root del proyecto
-  // ver file separator para el nombre carpeta
-  // sacar de scan section el nombre de la carpeta
-  //----------------------------------------------------
-  // remover las funciones de settings
-  // agus me devuelve array de urls y posicion del api seteado
-  // {
-  //   'project_name': 'dadaad',
-  //   'license': 'dasdada',
-  //   'api-url': 'dadasda',
-  //   'api-key': 'dasdadad',
-  //   'sbom:' 'token',
-  // }
 
   return (
     <>
@@ -328,7 +329,7 @@ const ProjectSettings = () => {
               </div>
             </div>
             <div className="button-container">
-              <Button disabled={formValidated} type="submit"  className={classes.button}>
+              <Button disabled={projectExist} type="submit"  className={classes.button}>
                 Continue
                 <ArrowForwardIcon />
               </Button>
