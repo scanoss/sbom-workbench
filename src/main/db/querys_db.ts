@@ -41,7 +41,10 @@ export class Querys {
   SQL_SCAN_INVENTORY_INSERT = 'INSERT INTO inventories (cvid,usage, notes, url, spdxid) values (?,?,?,?,?);';
 
   // SQL INSERT FILE INVENTORIES
-  SQL_INSERT_FILE_INVENTORIES = 'INSERT into file_inventories (resultid,inventoryid) values (?,?);';
+  SQL_INSERT_FILE_INVENTORIES = 'INSERT into file_inventories (resultid,inventoryid) VALUES (?,?);';
+
+   // SQL INSERT FILE INVENTORIES
+   SQL_INSERT_FILE_INVENTORIES_BATCH= 'INSERT into file_inventories (resultid,inventoryid) VALUES ?;';
 
   // SQL DELETE FILE INVENTORY
   SQL_DELETE_FILE_INVENTORIES = 'DELETE FROM file_inventories WHERE resultid IN ';
