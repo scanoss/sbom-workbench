@@ -1,9 +1,12 @@
 #ProjectSettings {
   .app-content {
+    height: 100vh;
+
     .project-form-container {
       display: grid;
       grid-template-columns: repeat(2, 50%);
       overflow-x: hidden;
+
       .project-license-container {
         padding-right: 50px;
         .input-container {
@@ -59,28 +62,39 @@
               color: gray;
             }
           }
+
+          .error-message {
+            color: red;
+          }
         }
       }
 
       .api-conections-container {
+        margin-left: auto;
+        .api-subcontainer {
+          display: flex;
+          flex-direction: column;
+          width: 600px;
+          .api-conections-label-container {
+            margin-bottom: 24px;
 
-        .api-conections-label-container {
-          margin-bottom: 24px;
+            .api-conections-label {
+              font-size: 20px;
+            }
+          }
 
-          .api-conections-label {
-            font-size: 20px;
+          .knowledgebase-api-container {
+            margin-bottom: 24px;
           }
         }
 
-        .knowledgebase-api-container {
-          margin-bottom: 24px;
-        }
       }
     }
   }
 
   .label-input-container {
-    margin-bottom: 24px;
+
+
     .label-icon {
       margin-bottom: 12px;
     }
@@ -109,4 +123,3 @@
     border-bottom: 2px solid red;
   }
 }
-

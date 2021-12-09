@@ -1,6 +1,7 @@
 import { ipcRenderer } from 'electron';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { INewProject } from '../../api/types';
 import { IpcEvents } from '../../ipc-events';
 import { dialogController } from '../dialog-controller';
 
@@ -14,7 +15,8 @@ export interface IAppContext {
   setScanPath: (file: IScan) => void;
   scanBasePath?: string;
   setScanBasePath: (file: string) => void;
-
+  setSettingsNewProject: (project: INewProject) => void;
+  settingsNewProject?: INewProject;
   newProject: () => void;
 }
 
@@ -25,6 +27,7 @@ const AppProvider = ({ children }) => {
 
   const [scanBasePath, setScanBasePath] = useState<string>();
   const [scanPath, setScanPath] = useState<IScan>();
+  const [settingsNewProject, setSettingsNewProject] = useState<INewProject>();
 
   const newProject = () => {
     const projectPath = dialogController.showOpenDialog({
@@ -51,7 +54,7 @@ const AppProvider = ({ children }) => {
   useEffect(() => () => removeAppMenuListeners(), []);
 
   return (
-    <AppContext.Provider value={{ scanPath, setScanPath, scanBasePath, setScanBasePath, newProject }}>
+    <AppContext.Provider value={{ scanPath, setScanPath, scanBasePath, setScanBasePath, newProject, setSettingsNewProject, settingsNewProject }}>
       {children}
     </AppContext.Provider>
   );

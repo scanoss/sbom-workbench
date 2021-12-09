@@ -76,7 +76,8 @@ const ProjectSettings = () => {
   const classes = useStyles();
   const history = useHistory();
 
-  const { scanPath } = useContext<IAppContext>(AppContext);
+  const { scanPath, setSettingsNewProject } =
+    useContext<IAppContext>(AppContext);
   // const [selectedApi, setSelectedApi] = useState(null);
   const [licenses, setLicenses] = useState(null);
   const [apis, setApis] = useState([]);
@@ -101,31 +102,12 @@ const ProjectSettings = () => {
     sbom: null,
   });
 
-  const [projectNameError, setProjectNameError] = useState(false);
-
-  const projectTest = [
-    {
-      id: 1,
-      name: 'Project 1',
-    },
-    {
-      id: 1,
-      name: 'Project 2',
-    },
-    {
-      id: 1,
-      name: 'Project 3',
-    },
-  ];
+  const [projectNameEmpty, setprojectNameEmpty] = useState(false);
+  const [projectNameExists, setprojectNameExists] = useState(false);
 
   useEffect(() => {
     init();
   }, []);
-
-
-  // ver poner nombre por deflt
-
-  // control de errores
 
   const init = async () => {
     let data = await workspaceService.getLicenses();
@@ -155,20 +137,28 @@ const ProjectSettings = () => {
   };
 
   useEffect(() => {
-    let found = projectTest.find(
+    let found = projects.find(
       (project) => project.name === projectSettings.name
     );
 
-    if (found || projectSettings.name === '') {
-      setProjectNameError(!projectNameError);
+    if (found) {
+      setprojectNameExists(true);
     } else {
-      setProjectNameError(false);
+      setprojectNameExists(false);
     }
-  }, [projectSettings.name]);
+
+    if (projectSettings.name === '') {
+      setprojectNameEmpty(true);
+    } else {
+      setprojectNameEmpty(false);
+    }
+  }, [projectSettings.name, projects]);
 
   const submit = async () => {
     // setGlobalState(projectSettings);
     // history.push('/scan');
+    setSettingsNewProject(projectSettings);
+    history.push('/workspace/new/scan');
   };
 
   const handleClose = (e) => {
@@ -190,64 +180,72 @@ const ProjectSettings = () => {
             <h1 className="mt-0 mb-0">{scanPath.path}</h1>
           </div>
         </header>
-        <main className="app-content">
-          <form onSubmit={(e) => handleClose(e)}>
-            <div className="project-form-container">
-              <div className="project-license-container">
-                <div className="input-container">
-                  <label className="input-label">Project Name</label>
-                  <Paper className={`input-text-container project-name-container ${projectNameError ? 'error' : ''}`}>
-                    <InputBase
-                      className='project-name-input'
-                      name="aa"
-                      fullWidth
-                      value={projectSettings.name}
-                      onChange={(e) =>
-                        setProjectSettings({
-                          ...projectSettings,
-                          name: e.target.value,
-                        })
-                      }
-                    />
-                  </Paper>
-                </div>
-                <div className="input-container input-container-license ">
-                  <div className="input-label-add-container">
-                    <label className="input-label">
-                      License <span className="optional">- Optional</span>
-                    </label>
-                  </div>
-                  <Paper className="input-text-container license-input-container">
-                    <SearchIcon className="icon" />
-                    <Autocomplete
-                      onChange={(e, value) =>
-                        setProjectSettings({
-                          ...projectSettings,
-                          default_license: value?.spdxid,
-                        })
-                      }
-                      fullWidth
-                      className={classes.search}
-                      placeholder="URL"
-                      selectOnFocus
-                      clearOnBlur
-                      handleHomeEndKeys
-                      options={licenses}
-                      getOptionLabel={(option: any) => option.name || ''}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          InputProps={{
-                            ...params.InputProps,
-                            disableUnderline: true,
-                          }}
-                        />
-                      )}
-                    />
-                  </Paper>
-                </div>
+        <form onSubmit={(e) => handleClose(e)} className="app-content">
+          <div className="project-form-container">
+            <div className="project-license-container">
+              <div className="input-container">
+                <label className="input-label">Project Name </label>
+                <span className="error-message">
+                  {projectNameExists ? 'The project name already exists' : ''}
+                  {projectNameEmpty ? 'The project name is empty' : ''}
+                </span>
+                <Paper
+                  className={`input-text-container project-name-container ${
+                    projectNameExists || projectNameEmpty ? 'error' : ''
+                  }`}
+                >
+                  <InputBase
+                    className="project-name-input"
+                    name="aa"
+                    fullWidth
+                    value={projectSettings.name}
+                    onChange={(e) =>
+                      setProjectSettings({
+                        ...projectSettings,
+                        name: e.target.value,
+                      })
+                    }
+                  />
+                </Paper>
               </div>
-              <div className="api-conections-container">
+              <div className="input-container input-container-license ">
+                <div className="input-label-add-container">
+                  <label className="input-label">
+                    License <span className="optional">- Optional</span>
+                  </label>
+                </div>
+                <Paper className="input-text-container license-input-container">
+                  <SearchIcon className="icon" />
+                  <Autocomplete
+                    onChange={(e, value) =>
+                      setProjectSettings({
+                        ...projectSettings,
+                        default_license: value?.spdxid,
+                      })
+                    }
+                    fullWidth
+                    className={classes.search}
+                    placeholder="URL"
+                    selectOnFocus
+                    clearOnBlur
+                    handleHomeEndKeys
+                    options={licenses}
+                    getOptionLabel={(option: any) => option.name || ''}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        InputProps={{
+                          ...params.InputProps,
+                          disableUnderline: true,
+                        }}
+                      />
+                    )}
+                  />
+                </Paper>
+              </div>
+            </div>
+            <div className="api-conections-container">
+              <div className="api-subcontainer">
                 <div className="api-conections-label-container">
                   <label className="api-conections-label">
                     <b>API Connections</b>
@@ -259,14 +257,13 @@ const ProjectSettings = () => {
                   </div>
                   <Paper className="input-text-container">
                     <Select
-                      onChange={(e, value) => {
+                      onChange={(e: any) => {
                         setProjectSettings({
                           ...projectSettings,
                           'api-url': e.target?.value.URL,
                           'api-key': e.target?.value.API_KEY,
                         });
                       }}
-                      fullWidth
                       defaultValue={0}
                       disableUnderline
                       className={classes.search}
@@ -294,10 +291,9 @@ const ProjectSettings = () => {
                       <span className="optional">- Optional</span>
                     </label>
                   </div>
-                  <Paper className="dialog-form-field-control">
+                  <Paper className="input-text-container">
                     <InputBase
                       name="url"
-                      fullWidth
                       placeholder="URL"
                       style={{ padding: '8px' }}
                       value={sbomLedgerToken}
@@ -312,17 +308,18 @@ const ProjectSettings = () => {
                 </div>
               </div>
             </div>
-            <div className="button-container">
-              <Button
-                type="submit"
-                className={classes.button}
-              >
-                Continue
-                <ArrowForwardIcon />
-              </Button>
-            </div>
-          </form>
-        </main>
+          </div>
+          <div className="button-container">
+            <Button
+              type="submit"
+              className={classes.button}
+              disabled={projectNameEmpty || projectNameExists}
+            >
+              Continue
+              <ArrowForwardIcon />
+            </Button>
+          </div>
+        </form>
       </section>
     </>
   );
