@@ -65,12 +65,23 @@ export default class Folder extends Node {
     this.hasFiltered = false;
 
     for (const child of this.children) {
-      if (child.status === NodeStatus.PENDING) this.hasPending = true;
-      else if (child.status === NodeStatus.IDENTIFIED) this.hasIdentified = true;
-      else if (child.status === NodeStatus.IGNORED) this.hasIgnored = true;
-      else if (child.status === NodeStatus.NOMATCH) this.hasNoMatch = true;
-      else if (child.status === NodeStatus.FILTERED) this.hasFiltered = true;
-      if (this.hasPending && this.hasIdentified && this.hasIgnored && this.hasNoMatch && this.hasFiltered) break;
+
+      if(child.type === "folder") {
+
+        this.hasPending = child.hasPending;
+        this.hasIdentified = child.hasIdentified;
+        this.hasIgnored = child.hasIgnored;
+        this.hasNoMatch = child.hasNoMatch;
+        this.hasFiltered = child.hasFiltered;
+
+      } else {
+        if (child.status === NodeStatus.PENDING) this.hasPending = true;
+        else if (child.status === NodeStatus.IDENTIFIED) this.hasIdentified = true;
+        else if (child.status === NodeStatus.IGNORED) this.hasIgnored = true;
+        else if (child.status === NodeStatus.NOMATCH) this.hasNoMatch = true;
+        else if (child.status === NodeStatus.FILTERED) this.hasFiltered = true;
+        if (this.hasPending && this.hasIdentified && this.hasIgnored && this.hasNoMatch && this.hasFiltered) break;
+      }
     }
   }
 
@@ -150,4 +161,16 @@ export default class Folder extends Node {
   public setOriginal(status: NodeStatus): void {
     this.original = status;
   }
+
+
+  // Used only for migration
+  public updateAllStatusFlags() {
+    for (const child of this.children)
+      if (child.type === "folder") child.updateAllStatusFlags();
+
+    this.updateStatusFlags();
+    this.status = this.getStatusClassName();
+    this.setStatusOnClassnameAs(this.status);
+  }
+
 }
