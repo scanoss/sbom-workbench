@@ -180,7 +180,8 @@ const ProjectSettings = () => {
             <h1 className="mt-0 mb-0">{scanPath.path}</h1>
           </div>
         </header>
-        <form onSubmit={(e) => handleClose(e)} className="app-content">
+        <div className='app-content'>
+        <form onSubmit={(e) => handleClose(e)}>
           <div className="project-form-container">
             <div className="project-license-container">
               <div className="input-container">
@@ -320,6 +321,7 @@ const ProjectSettings = () => {
             </Button>
           </div>
         </form>
+        </div>
       </section>
     </>
   );

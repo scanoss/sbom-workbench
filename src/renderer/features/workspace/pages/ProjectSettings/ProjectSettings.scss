@@ -1,6 +1,11 @@
 #ProjectSettings {
   .app-content {
-    height: 100vh;
+    form {
+      height: 80vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
 
     .project-form-container {
       display: grid;
@@ -87,7 +92,6 @@
             margin-bottom: 24px;
           }
         }
-
       }
     }
   }
