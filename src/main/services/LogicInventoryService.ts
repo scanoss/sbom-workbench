@@ -47,6 +47,20 @@ class LogicInventoryService {
     const inventory: Inventory = (await project.scans_db.inventories.create(inv)) as Inventory;
     return inventory;
   }
+
+  public async InventoryBatchCreate(inv: Array<Partial<Inventory>>): Promise<Array<Inventory>> {
+    const project = workspace.getOpenedProjects()[0];
+    const inventory: Array<Inventory> = (await project.scans_db.inventories.createBatch(inv)) as Array<Inventory>;
+    return inventory;
+  }
+
+  public async InventoryAttachFileBatch(files:any ): Promise<boolean> {
+    const project = workspace.getOpenedProjects()[0];
+    const success: boolean = await project.scans_db.inventories.attachFileInventoryBatch(files);
+    return success;
+
+  }
+
 }
 
 export const logicInventoryService = new LogicInventoryService();
