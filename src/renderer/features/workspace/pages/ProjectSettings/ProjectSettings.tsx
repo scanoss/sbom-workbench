@@ -91,16 +91,14 @@ const ProjectSettings = () => {
 
     // -----------Autocomplete licencias ------------
 
-    let data = await workspaceService.getAllProjects();
-    setLicenses(data);
+    // let data = await workspaceService.getLicense();
+    // setLicenses(data);
 
     // ----------------------------------------------
 
-
-
     // -----------Select APIs ------------
-    let apiUrlKey = await userSettingService.get();
-    setApis(apiUrlKey);
+    // let apiUrlKey = await userSettingService.get();
+    // setApis(apiUrlKey);
     // ----------------------------------------------
 
     setProjectSettings({
@@ -110,7 +108,7 @@ const ProjectSettings = () => {
   };
 
   const submit = async () => {
-    console.log(projectSettings);
+    // workspaceService.createProject(projectSettings);
   };
 
   const handleClose = (e) => {
@@ -177,8 +175,7 @@ const ProjectSettings = () => {
                       onChange={(e) =>
                         setProjectSettings({
                           ...projectSettings,
-                          'api-url': e.target.value,
-                          'api-key': e.target.value,
+                          'default_license': e.target.value,
                         })
                       }
                       fullWidth
@@ -224,6 +221,7 @@ const ProjectSettings = () => {
                         setProjectSettings({
                           ...projectSettings,
                           'api-url': e.target.value,
+
                         })
                       }
                       fullWidth
@@ -234,9 +232,9 @@ const ProjectSettings = () => {
                       style={{ padding: '8px' }}
                     >
                       <MenuItem value={0}>Use Default Settings</MenuItem>;
-                      {apis.map((api) => {
-                        <MenuItem value={10}>{api}</MenuItem>;
-                      })}
+                      {/* {apis.map((api) => {
+                        <MenuItem value={1}>{api}</MenuItem>;
+                      })} */}
                     </Select>
                   </Paper>
                 </div>
