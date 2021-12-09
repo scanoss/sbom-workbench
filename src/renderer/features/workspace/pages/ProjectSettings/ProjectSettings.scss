@@ -3,9 +3,9 @@
     .project-form-container {
       display: grid;
       grid-template-columns: repeat(2, 50%);
-      grid-gap: 1rem;
       overflow-x: hidden;
       .project-license-container {
+        padding-right: 50px;
         .input-container {
           &-license {
             margin-top: 3em;
@@ -54,18 +54,12 @@
       }
 
       .api-conections-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        .api-conections-container-form {
-          width: 800px;
 
-          .api-conections-label-container {
-            margin-bottom: 24px;
+        .api-conections-label-container {
+          margin-bottom: 24px;
 
-            .api-conections-label {
-              font-size: 20px;
-            }
+          .api-conections-label {
+            font-size: 20px;
           }
         }
 
@@ -75,11 +69,30 @@
       }
     }
   }
-}
 
-.label-input-container {
-  margin-bottom: 24px;
-  .label-icon {
-    margin-bottom: 12px;
+  .label-input-container {
+    margin-bottom: 24px;
+    .label-icon {
+      margin-bottom: 12px;
+    }
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin: 30px;
+    .btn {
+      padding: 12px 24px;
+      width: 177px;
+      height: 43px;
+      border-radius: 4px;
+    }
+
+    .btn-continue {
+      background-color: #6366f1;
+      color: #fff;
+      font-weight: 400;
+      font-size: 24px;
+    }
   }
 }
