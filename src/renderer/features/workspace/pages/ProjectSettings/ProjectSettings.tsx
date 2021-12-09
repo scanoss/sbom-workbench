@@ -26,6 +26,7 @@ import { userSettingService } from '../../../../../api/userSetting-service';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { licenseService } from '../../../../../api/license-service';
 import { workspaceService } from '../../../../../api/workspace-service';
+import { appendFile } from 'original-fs';
 
 const filter = createFilterOptions();
 
@@ -60,17 +61,22 @@ const ProjectSettings = () => {
   const { scanPath } = useContext<IAppContext>(AppContext);
   // const [selectedApi, setSelectedApi] = useState(null);
   const [licenses, setLicenses] = useState(null);
-  const [apis, setApis] = useState(null);
+  const [apis, setApis] = useState([]);
   const [sbomLedgerToken, setSbomLedgerToken] = useState(null);
   const [apiDialog, setApiDialog] = useState({
     open: false,
     data: null,
   });
+  const [apiSelected, setApiSelected] = useState({
+    URL: null,
+    API_KEY: null,
+    DESCRIPTION: '',
+  });
 
   const [projectSettings, setProjectSettings] = useState({
     name: '',
     scan_root: '',
-    default_license: null,
+    default_license: '',
     'api-key': null,
     'api-url': null,
     sbom: null,
@@ -91,24 +97,36 @@ const ProjectSettings = () => {
 
     // -----------Autocomplete licencias ------------
 
-    // let data = await workspaceService.getLicense();
-    // setLicenses(data);
+    let data = await workspaceService.getLicenses();
+    setLicenses(data);
 
     // ----------------------------------------------
 
     // -----------Select APIs ------------
-    // let apiUrlKey = await userSettingService.get();
-    // setApis(apiUrlKey);
+    let apiUrlKey = await userSettingService.get();
+    setApis(apiUrlKey.APIS);
     // ----------------------------------------------
 
     setProjectSettings({
       ...projectSettings,
       scan_root: path,
     });
+
+    console.log(data);
+    console.log(apiUrlKey);
+    console.log(apis);
   };
 
   const submit = async () => {
-    // workspaceService.createProject(projectSettings);
+    if (projectSettings.name === '') {
+      alert('Project name is required');
+      return;
+    } else {
+      // setGlobalState(projectSettings);
+      // workspaceService.createProject(projectSettings);
+      console.log(apiSelected);
+      console.log(projectSettings);
+    }
   };
 
   const handleClose = (e) => {
@@ -172,10 +190,10 @@ const ProjectSettings = () => {
                   <Paper className="input-text-container license-input-container">
                     <SearchIcon className="icon" />
                     <Autocomplete
-                      onChange={(e) =>
+                      onChange={(e, value) =>
                         setProjectSettings({
                           ...projectSettings,
-                          'default_license': e.target.value,
+                          default_license: value.spdxid,
                         })
                       }
                       fullWidth
@@ -185,13 +203,8 @@ const ProjectSettings = () => {
                       selectOnFocus
                       clearOnBlur
                       handleHomeEndKeys
-                      //put license in options
-                      options={['one', 'two', 'three']}
-                      renderOption={(option) => (
-                        <div>
-                          <span>{option}</span>
-                        </div>
-                      )}
+                      options={licenses}
+                      getOptionLabel={(option: any) => option.name || ''}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -217,24 +230,35 @@ const ProjectSettings = () => {
                   </div>
                   <Paper className="input-text-container">
                     <Select
-                      onChange={(e) =>
+                      onChange={(e, value) => {
                         setProjectSettings({
                           ...projectSettings,
-                          'api-url': e.target.value,
-
-                        })
-                      }
+                          'api-url': e.target.value.URL || null,
+                          'api-key': e.target.value.API_KEY || null,
+                        });
+                      }}
                       fullWidth
-                      disableUnderline
                       defaultValue={0}
+                      disableUnderline
                       className={classes.search}
                       placeholder="URL"
                       style={{ padding: '8px' }}
                     >
                       <MenuItem value={0}>Use Default Settings</MenuItem>;
-                      {/* {apis.map((api) => {
-                        <MenuItem value={1}>{api}</MenuItem>;
-                      })} */}
+                      {apis.map((api) => (
+                        <MenuItem value={api} key={api.key}>
+                          <li className="w-100 d-flex space-between align-center">
+                            <div className={classes.option}>
+                              <span>{api.URL}</span>
+                              {api.API_KEY && (
+                                <span className="middle">
+                                  API KEY: {api.API_KEY}
+                                </span>
+                              )}
+                            </div>
+                          </li>
+                        </MenuItem>
+                      ))}
                     </Select>
                   </Paper>
                 </div>
