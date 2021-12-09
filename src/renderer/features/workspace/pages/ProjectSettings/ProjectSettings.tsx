@@ -131,9 +131,6 @@ const ProjectSettings = () => {
       name: projectName,
     });
 
-    console.log(data);
-    console.log(apiUrlKey);
-    console.log(apis);
   };
 
   useEffect(() => {
@@ -155,8 +152,6 @@ const ProjectSettings = () => {
   }, [projectSettings.name, projects]);
 
   const submit = async () => {
-    // setGlobalState(projectSettings);
-    // history.push('/scan');
     setSettingsNewProject(projectSettings);
     history.push('/workspace/new/scan');
   };
