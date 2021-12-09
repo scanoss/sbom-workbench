@@ -45,19 +45,19 @@ export const FileTree = () => {
     const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED';
     const menu = !node.children
       ? [
-          {
+          /* {
             label: 'Identify file',
             click: () => contextual.identifyAll(node),
             enabled: !onlyRestore,
-          },
+          }, */
           {
             label: 'Mark file as original',
-            click: () => contextual.ignoreAll(node),
+            click: () => contextual.ignore(node),
             enabled: !onlyRestore && node.status !== 'FILTERED' && node.status !== 'NO-MATCH',
           },
           {
             label: 'Restore file',
-            click: () => contextual.restoreAll(node),
+            click: () => contextual.restore(node),
             enabled: onlyRestore,
           },
         ]

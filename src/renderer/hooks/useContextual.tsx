@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { resultService } from '../../api/results-service';
 import { InventoryAction } from '../../api/types';
 import { DialogContext, IDialogContext } from '../context/DialogProvider';
 import { DialogResponse, DIALOG_ACTIONS } from '../context/types';
@@ -6,7 +7,7 @@ import { WorkbenchContext, IWorkbenchContext } from '../features/workbench/store
 
 const useContextual = () => {
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
-  const { state, dispatch, executeBatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, executeBatch, restoreFile, ignoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const showOverwrite = (node: any) => node.hasIdentified || node.hasIgnored;
 
@@ -57,11 +58,23 @@ const useContextual = () => {
     return executeBatch(node.value, InventoryAction.RESTORE);
   };
 
+  const ignore = async (node: any): Promise<boolean> => {
+    const [result] = await resultService.get(node.value);
+    return ignoreFile([result.id]);
+  };
+
+  const restore = async (node: any): Promise<boolean> => {
+    const [result] = await resultService.get(node.value);
+    return restoreFile([result.id]);
+  };
+
   return {
     acceptAll,
     identifyAll,
     ignoreAll,
     restoreAll,
+    restore,
+    ignore,
   };
 };
 

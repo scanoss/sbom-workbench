@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import { ipcRenderer } from 'electron';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
 import { Inventory, InventoryAction, Node } from '../../../api/types';
@@ -9,6 +10,7 @@ import reducer, { initialState, State } from './reducers';
 import { loadScanSuccess, setComponent, setComponents, setProgress, updateTree, setCurrentNode } from './actions';
 import { resultService } from '../../../api/results-service';
 import { reportService } from '../../../api/report-service';
+import { IpcEvents } from '../../../ipc-events';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
@@ -32,8 +34,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   const { setScanBasePath } = React.useContext<any>(AppContext);
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const { loaded, tree, file, component } = state;
-
-  let node = null;
 
   const loadScan = async (path: string) => {
     try {
@@ -135,6 +135,12 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     }
   };
 
+  const onTreeRefreshed = (tree) => {
+    console.log(tree);
+    // const fileTree = await workbenchController.getFileTree();
+    // dispatch(updateTree(tree));
+  };
+
   const setNode = async (node: Node) => {
     dispatch(setCurrentNode(node));
     if (!node || node.type === 'folder') {
@@ -144,10 +150,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       if (comp) dispatch(setComponents(comp));
     }
   };
-
-  useEffect(() => {
-    node = state.filter.node;
-  }, [state.filter.node]);
 
   // TODO: use custom navigation
   useEffect(() => {
@@ -171,6 +173,17 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       // destroy();
     };
   }, [state.loaded]);
+
+  const setupListeners = () => {
+    ipcRenderer.on(IpcEvents.TREE_UPDATED, onTreeRefreshed);
+  };
+
+  const removeListeners = () => {
+    ipcRenderer.removeListener(IpcEvents.TREE_UPDATED, onTreeRefreshed);
+  };
+
+  useEffect(setupListeners, []);
+  useEffect(() => () => removeListeners(), []);
 
   const value = React.useMemo(
     () => ({

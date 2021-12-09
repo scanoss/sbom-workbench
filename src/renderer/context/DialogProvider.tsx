@@ -11,7 +11,7 @@ import { LicenseDialog } from '../ui/dialog/LicenseDialog';
 import { ComponentDialog } from '../ui/dialog/ComponentDialog';
 import { IpcEvents } from '../../ipc-events';
 import SettingsDialog from '../ui/dialog/SettingsDialog';
-import AlertDialog from '../ui/dialog/AlertDialog';
+import { AlertDialog } from '../ui/dialog/AlertDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
