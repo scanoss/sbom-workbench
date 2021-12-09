@@ -27,6 +27,7 @@ import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { licenseService } from '../../../../../api/license-service';
 import { workspaceService } from '../../../../../api/workspace-service';
 import { appendFile } from 'original-fs';
+const pathUtil = require('path');
 
 const filter = createFilterOptions();
 
@@ -53,26 +54,44 @@ const useStyles = makeStyles((theme) => ({
       color: '#6c6c6e',
     },
   },
+  button: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    margin: '30px',
+    borderRadius: '4px',
+    width: '177px',
+    height: '43px',
+    padding: '12px 24px',
+    backgroundColor: theme.palette.primary.main,
+    color: '#fff',
+    fontWeight: 400,
+    fontSize: '24px',
+    '&:hover': {
+      backgroundColor: theme.palette.primary.light,
+    },
+  }
 }));
 
 const ProjectSettings = () => {
   const classes = useStyles();
   const history = useHistory();
+
   const { scanPath } = useContext<IAppContext>(AppContext);
   // const [selectedApi, setSelectedApi] = useState(null);
   const [licenses, setLicenses] = useState(null);
   const [apis, setApis] = useState([]);
   const [sbomLedgerToken, setSbomLedgerToken] = useState(null);
-  const [apiDialog, setApiDialog] = useState({
-    open: false,
-    data: null,
-  });
+  // const [apiDialog, setApiDialog] = useState({
+  //   open: false,
+  //   data: null,
+  // });
   const [apiSelected, setApiSelected] = useState({
     URL: null,
     API_KEY: null,
     DESCRIPTION: '',
   });
 
+  const [projects, setProjects] = useState<any[] | null>([]);
   const [projectSettings, setProjectSettings] = useState({
     name: '',
     scan_root: '',
@@ -82,18 +101,42 @@ const ProjectSettings = () => {
     sbom: null,
   });
 
+  const [formValidated, setFormValidated] = useState(true);
+
+  const [projectExist, setProjectExist] = useState(false);
+
+
+  // useEffect(() => {
+  //
+  // let found = projects.find((project) => project.name === projectSettings.name);
+
+  // if (found) {
+  //   setProjectExist(!projectExist);
+  // }
+
+  // }, [projectSettings.name]);
+
   useEffect(() => {
     init();
   }, []);
 
-  // dos fetch license izq con lo de groh workspaceService Autocomplete
 
-  // derecha con import { userSettingService } from '../../../api/userSetting-service'; select
-  // primera opcion del select "use default settings" esta opcion deja en null api-key & api-url esta opcion por defecto
-  // las demas opciones son las del servicio.
+
+  // ver poner nombre por deflt
+
+  // validacion de nombre logica
+
+  // control de errores
 
   const init = async () => {
     const { path } = scanPath;
+
+    let projectName = path.split(pathUtil.sep)[path.split(pathUtil.sep).length - 1];
+
+    setProjectSettings({
+      ...projectSettings,
+      name: projectName,
+    });
 
     // -----------Autocomplete licencias ------------
 
@@ -106,6 +149,9 @@ const ProjectSettings = () => {
     let apiUrlKey = await userSettingService.get();
     setApis(apiUrlKey.APIS);
     // ----------------------------------------------
+
+    const projects = await workspaceService.getAllProjects();
+    setProjects(projects);
 
     setProjectSettings({
       ...projectSettings,
@@ -123,7 +169,7 @@ const ProjectSettings = () => {
       return;
     } else {
       // setGlobalState(projectSettings);
-      // workspaceService.createProject(projectSettings);
+      // history.push('/scan');
       console.log(apiSelected);
       console.log(projectSettings);
     }
@@ -173,6 +219,7 @@ const ProjectSettings = () => {
                       className="input-text project-name-input"
                       name="aa"
                       fullWidth
+                      value={projectSettings.name}
                       onChange={(e) =>
                         setProjectSettings({
                           ...projectSettings,
@@ -184,8 +231,11 @@ const ProjectSettings = () => {
                 </div>
                 <div className="input-container input-container-license ">
                   <div className="input-label-add-container">
-                    <label className="input-label">License</label>{' '}
-                    <span className="optional"> - Optional</span>
+                    <label className="input-label">License
+                    {' '}
+                    <span className="optional">- Optional</span>
+                    </label>
+
                   </div>
                   <Paper className="input-text-container license-input-container">
                     <SearchIcon className="icon" />
@@ -193,13 +243,12 @@ const ProjectSettings = () => {
                       onChange={(e, value) =>
                         setProjectSettings({
                           ...projectSettings,
-                          default_license: value.spdxid,
+                          default_license: value?.spdxid,
                         })
                       }
                       fullWidth
                       className={classes.search}
                       placeholder="URL"
-                      style={{ padding: '8px' }}
                       selectOnFocus
                       clearOnBlur
                       handleHomeEndKeys
@@ -233,8 +282,8 @@ const ProjectSettings = () => {
                       onChange={(e, value) => {
                         setProjectSettings({
                           ...projectSettings,
-                          'api-url': e.target.value.URL || null,
-                          'api-key': e.target.value.API_KEY || null,
+                          'api-url': e.target?.value.URL,
+                          'api-key': e.target?.value.API_KEY,
                         });
                       }}
                       fullWidth
@@ -242,21 +291,12 @@ const ProjectSettings = () => {
                       disableUnderline
                       className={classes.search}
                       placeholder="URL"
-                      style={{ padding: '8px' }}
                     >
                       <MenuItem value={0}>Use Default Settings</MenuItem>;
                       {apis.map((api) => (
                         <MenuItem value={api} key={api.key}>
-                          <li className="w-100 d-flex space-between align-center">
-                            <div className={classes.option}>
-                              <span>{api.URL}</span>
-                              {api.API_KEY && (
-                                <span className="middle">
-                                  API KEY: {api.API_KEY}
-                                </span>
-                              )}
-                            </div>
-                          </li>
+                          <span>API URL: {api.URL}</span>
+                          {api.API_KEY && <span className='api-key'> - API KEY: {api.API_KEY}</span>}
                         </MenuItem>
                       ))}
                     </Select>
@@ -288,7 +328,7 @@ const ProjectSettings = () => {
               </div>
             </div>
             <div className="button-container">
-              <Button type="submit" className="btn btn-continue">
+              <Button disabled={formValidated} type="submit"  className={classes.button}>
                 Continue
                 <ArrowForwardIcon />
               </Button>
