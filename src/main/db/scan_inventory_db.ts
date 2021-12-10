@@ -97,7 +97,7 @@ export class InventoryDb extends Db {
               db.run(query.SQL_INSERT_FILE_INVENTORIES, id, inventory.id);
             }
           db.run('commit', (err: any) => {
-            log.error(err);
+            if (err) throw err;
             db.close();
             resolve(true);
           });
