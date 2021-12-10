@@ -14,8 +14,6 @@ import { ComponentDb } from './scan_component_db';
 import { Inventory, Component, Files } from '../../api/types';
 import { ResultsDb } from './scan_results_db';
 
-
-
 const query = new Querys();
 
 export class InventoryDb extends Db {
@@ -99,7 +97,7 @@ export class InventoryDb extends Db {
               db.run(query.SQL_INSERT_FILE_INVENTORIES, id, inventory.id);
             }
           db.run('commit', (err: any) => {
-            log.error(err);
+            if (err) throw err;
             db.close();
             resolve(true);
           });
@@ -208,9 +206,13 @@ export class InventoryDb extends Db {
           inventories = await this.getByPurl(inventory);
         } else inventories = await this.getAllInventories();
         if (inventory !== undefined) {
+          const component: any = await this.component.getAll({});
+          const compObj = component.reduce((acc, comp) => {
+            acc[comp.compid] = comp;
+            return acc;
+          }, {});
           for (let i = 0; i < inventories.length; i += 1) {
-            const comp = await this.component.get(inventories[i].cvid);
-            inventories[i].component = comp;
+            inventories[i].component = compObj[inventories[i].cvid];
           }
           resolve(inventories);
         } else resolve([]);
@@ -322,8 +324,8 @@ export class InventoryDb extends Db {
           const sqlUpdateIdentified = query.SQL_FILES_UPDATE_IDENTIFIED + resultsid;
           db.run('begin transaction');
           db.run(sqlUpdateIdentified);
-          db.run('commit', (err:any) => {
-            if(err) throw Error('Unable to update identified files');
+          db.run('commit', (err: any) => {
+            if (err) throw Error('Unable to update identified files');
             db.close();
             return resolve(true);
           });
@@ -491,6 +493,59 @@ export class InventoryDb extends Db {
         });
       } catch (error) {
         reject(error);
+      }
+    });
+  }
+
+  async createBatch(inventories: Array<Partial<Inventory>>) {
+    const self = this;
+    return new Promise<Array<Inventory>>(async (resolve, reject) => {
+      try {
+        const inv: any = [];
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          for (let i = 0; i < inventories.length; i+=1) {
+            db.run(
+              query.SQL_SCAN_INVENTORY_INSERT,
+              inventories[i].cvid,
+              inventories[i].usage ? inventories[i].usage : 'n/a',
+              inventories[i].notes ? inventories[i].notes : 'n/a',
+              inventories[i].url ? inventories[i].url : 'n/a',
+              inventories[i].spdxid ? inventories[i].spdxid : 'n/a',
+              function (this: any, err: any) {
+                inventories[i].id = this.lastID;
+                inv.push(inventories[i]);
+              }
+            );
+          }
+          db.run('commit', (err: any) => {
+            if (err) throw err;
+            db.close();
+            resolve(inv);
+          });
+        });
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
+  async attachFileInventoryBatch(inventoryFiles: any) {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        await this.updateIdentified(inventoryFiles as Partial<Inventory>);
+        const db = await this.openDb();
+        const SQLQuery = query.SQL_INSERT_FILE_INVENTORIES_BATCH.replace('?', inventoryFiles.invFiles);
+        db.run(SQLQuery, (err: any) => {
+          db.close();
+          if (err) throw err;
+          resolve(true);
+        });
+      } catch (error) {
+        log.error(error);
+        reject(new Error('Unable to attach inventory'));
       }
     });
   }

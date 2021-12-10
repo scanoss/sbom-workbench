@@ -18,7 +18,7 @@ const Breadcrumb = () => {
   const history = useHistory();
   const classes = useStyles();
 
-  const { state, dispatch, setNode } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const items = state.filter.node ? state.filter.node.path.substring(1).split('/') : [];
 
@@ -47,7 +47,13 @@ const Breadcrumb = () => {
       <Breadcrumbs separator="›" aria-label="breadcrumb">
         {nodes.map((node, index) =>
           index < nodes.length - 1 ? (
-            <Link className={classes.itemLink} underline="hover" color="inherit" onClick={() => goToNode(node)}>
+            <Link
+              key={node.path}
+              className={classes.itemLink}
+              underline="hover"
+              color="inherit"
+              onClick={() => goToNode(node)}
+            >
               {node.name}
             </Link>
           ) : (

@@ -1,4 +1,5 @@
-import { Inventory } from '../../api/types';
+import { Component, Inventory } from '../../api/types';
+import { logicComponentService } from '../services/LogicComponentService';
 import { logicInventoryService } from '../services/LogicInventoryService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { Batch } from './Batch';
@@ -26,22 +27,34 @@ export class Accept extends Batch {
       const ids = this.getArrayFromObject(files, 'id', this.filter);
 
       this.updateTree(ids, NodeStatus.IDENTIFIED);
+      const components: any = await logicComponentService.getAll();
+      let inventories = this.getFilteredObject(files, this.filter) as Array<Partial<Inventory>>;
 
-      const inventories = this.getFilteredObject(files, this.filter) as Array<Partial<Inventory>>;
-      const newInv = await this.createInventory(inventories);
-      return newInv;
+      inventories = this.AddComponentIdToInventory(components, inventories);
+
+      const inv = await logicInventoryService.InventoryBatchCreate(inventories);
+      const filesToUpdate: any = this.mergeFilesInventoryId(inv);
+      filesToUpdate.files = ids;
+      const success = await logicInventoryService.InventoryAttachFileBatch(filesToUpdate);
+      if (success) {
+        return inventories;
+      }
+      throw new Error('inventory accept failed');
     } catch (e: any) {
       return e;
     }
   }
 
-  private async createInventory(inventories: Array<Partial<Inventory>>) {
-    const newInv: Array<Inventory> = [];
-    for (const inventory of inventories) {
-      // eslint-disable-next-line no-await-in-loop
-      newInv.push(await logicInventoryService.create(inventory));
-    }
-    return newInv;
+  private mergeFilesInventoryId(inventories: Array<Inventory>) {
+    let aux = '';
+    inventories.forEach((inventory) => {
+      inventory.files.forEach((file) => {
+        aux += `(${file},${inventory.id}),`;
+      });
+    });
+
+    const result = aux.substring(0, aux.length - 1);
+    return { invFiles: result };
   }
 
   private getFilteredObject(results: any[], filter: Filter): Array<any> {
@@ -69,12 +82,29 @@ export class Accept extends Batch {
             version: result.version,
             url: result.url,
             spdxid: result.spdxid,
+            cvid: 0,
           };
+
           array.push(aux);
         }
       }
     });
 
     return array;
+  }
+
+  private AddComponentIdToInventory(components: any, inventories: any) {
+    inventories.forEach((inventory) => {
+      const index = this.getComponentId(components, inventory.purl, inventory.version);
+      inventory.cvid = components[index].compid;
+    });
+    return inventories;
+  }
+
+  private getComponentId(components: any, purl: string, version: string): number {
+    return components.findIndex((c) => {
+      return c.purl === purl && c.version === version;
+    });
+    return null;
   }
 }

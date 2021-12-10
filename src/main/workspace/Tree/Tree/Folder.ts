@@ -65,12 +65,23 @@ export default class Folder extends Node {
     this.hasFiltered = false;
 
     for (const child of this.children) {
-      if (child.status === NodeStatus.PENDING) this.hasPending = true;
-      else if (child.status === NodeStatus.IDENTIFIED) this.hasIdentified = true;
-      else if (child.status === NodeStatus.IGNORED) this.hasIgnored = true;
-      else if (child.status === NodeStatus.NOMATCH) this.hasNoMatch = true;
-      else if (child.status === NodeStatus.FILTERED) this.hasFiltered = true;
-      if (this.hasPending && this.hasIdentified && this.hasIgnored && this.hasNoMatch && this.hasFiltered) break;
+
+      if(child.type === "folder") {
+
+        this.hasPending = child.hasPending || this.hasPending;
+        this.hasIdentified = child.hasIdentified || this.hasIdentified;
+        this.hasIgnored = child.hasIgnored || this.hasIgnored;
+        this.hasNoMatch = child.hasNoMatch || this.hasNoMatch;
+        this.hasFiltered = child.hasFiltered || this.hasFiltered;
+
+      } else {
+        if (child.status === NodeStatus.PENDING) this.hasPending = true;
+        if (child.status === NodeStatus.IDENTIFIED) this.hasIdentified = true;
+        if (child.status === NodeStatus.IGNORED) this.hasIgnored = true;
+        if (child.status === NodeStatus.NOMATCH) this.hasNoMatch = true;
+        if (child.status === NodeStatus.FILTERED) this.hasFiltered = true;
+        if (this.hasPending && this.hasIdentified && this.hasIgnored && this.hasNoMatch && this.hasFiltered) break;
+      }
     }
   }
 
@@ -116,7 +127,10 @@ export default class Folder extends Node {
   public restoreStatus(path: string): void {
     if (!path.includes(this.getPath())) return;
     for (const child of this.children) if (child.restoreStatus(path)) break;
-    this.status = this.getStatusByPath(path);
+
+    this.updateStatusFlags();
+    this.status = this.getStatusClassName();
+
     this.setStatusOnClassnameAs(this.status);
   }
 
@@ -146,5 +160,16 @@ export default class Folder extends Node {
 
   public setOriginal(status: NodeStatus): void {
     this.original = status;
+  }
+
+  // Used only for migration
+  public updateAllStatusFlags() {
+    for (const child of this.children)
+      if (child.type === "folder") {
+        child.updateAllStatusFlags();
+        this.updateStatusFlags();
+        this.status = this.getStatusClassName();
+        this.setStatusOnClassnameAs(this.status);
+      }
   }
 }

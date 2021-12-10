@@ -6,12 +6,13 @@ import { ProjectFilterPath } from './workspace/filters/ProjectFilterPath';
 import { Project } from './workspace/Project';
 import { workspace } from './workspace/Workspace';
 
-ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (_event, arg: any) => {
+ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
   let created: any;
 
   // TO DO factory to create filters depending on arguments
   const p: Project = await workspace.openProject(new ProjectFilterPath(arg));
   const r = await p.getResults();
+  p.setMailbox(event.sender);
 
   const response = {
     logical_tree: p.getTree().getRootFolder(),
