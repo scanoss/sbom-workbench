@@ -162,15 +162,14 @@ export default class Folder extends Node {
     this.original = status;
   }
 
-
   // Used only for migration
   public updateAllStatusFlags() {
     for (const child of this.children)
-      if (child.type === "folder") child.updateAllStatusFlags();
-
-    this.updateStatusFlags();
-    this.status = this.getStatusClassName();
-    this.setStatusOnClassnameAs(this.status);
+      if (child.type === "folder") {
+        child.updateAllStatusFlags();
+        this.updateStatusFlags();
+        this.status = this.getStatusClassName();
+        this.setStatusOnClassnameAs(this.status);
+      }
   }
-
 }

@@ -3,6 +3,20 @@ import sqlite3 from 'sqlite3';
 import log from 'electron-log';
 import { NodeStatus } from '../../workspace/Tree/Tree/Node';
 import { Tree } from '../../workspace/Tree/Tree/Tree';
+import { ChildCare } from '@material-ui/icons';
+
+
+function updateRecurTree(root) {
+
+  for(const child of root.children) {
+
+    if(child.type === 'folder') {
+      updateRecurTree(child);
+      child.updateStatusFlags();
+    }
+  }
+
+}
 
 export async function flagTreeFolderMigration(projectPath: string) {
   log.info('%c[MIGRATION] IN PROGRESS...', 'color: green');
@@ -11,8 +25,9 @@ export async function flagTreeFolderMigration(projectPath: string) {
   const newTree = new Tree(metadata.work_root);
   newTree.loadTree(project.tree.rootFolder);
 
-  newTree.getRootFolder().updateAllStatusFlags();
+  updateRecurTree(newTree.getRootFolder());
 
+  console.log(newTree.getRootFolder());
   // const results: any = await getResults(projectPath);
   // newTree.sync(results);
   project.tree = newTree;
