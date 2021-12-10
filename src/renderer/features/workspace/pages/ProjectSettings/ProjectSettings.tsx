@@ -59,15 +59,11 @@ const ProjectSettings = () => {
   const classes = useStyles();
   const history = useHistory();
 
-  const { scanPath, setSettingsNewProject } = useContext<IAppContext>(AppContext);
-  // const [selectedApi, setSelectedApi] = useState(null);
+  const { scanPath, setScanPath, setSettingsNewProject } = useContext<IAppContext>(AppContext);
   const [licenses, setLicenses] = useState(null);
   const [apis, setApis] = useState([]);
   const [sbomLedgerToken, setSbomLedgerToken] = useState(null);
-  // const [apiDialog, setApiDialog] = useState({
-  //   open: false,
-  //   data: null,
-  // });
+
   const [apiSelected, setApiSelected] = useState({
     URL: null,
     API_KEY: null,
@@ -115,6 +111,7 @@ const ProjectSettings = () => {
   useEffect(() => {
     const found = projects.find((project) => project.name.trim().toLowerCase() === projectSettings.name.trim().toLowerCase());
 
+    // eslint-disable-next-line no-control-regex
     const re = /^[^\s^\x00-\x1f\\?*:"";<>|\/.][^\x00-\x1f\\?*:"";<>|\/]*[^\s^\x00-\x1f\\?*:"";<>|\/.]+$/;
 
     if (found) {
@@ -123,7 +120,7 @@ const ProjectSettings = () => {
       setprojectNameExists(false);
     }
 
-    if (projectSettings.name.trim() != '' && re.test(projectSettings.name)) {
+    if (projectSettings.name.trim() !== '' && re.test(projectSettings.name)) {
       setprojectValidName(true);
     } else {
       setprojectValidName(false);
@@ -131,6 +128,7 @@ const ProjectSettings = () => {
   }, [projectSettings.name, projects]);
 
   const submit = async () => {
+    setScanPath({ ...scanPath, projectName: projectSettings.name });
     setSettingsNewProject(projectSettings);
     history.push('/workspace/new/scan');
   };

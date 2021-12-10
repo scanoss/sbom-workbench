@@ -107,7 +107,7 @@ const ProjectScan = () => {
               </IconButton>
               SCANNING
             </h4>
-            <h1>{settingsNewProject.name}</h1>
+            <h1>{scanPath.projectName}</h1>
           </div>
         </header>
         <main className="app-content">
