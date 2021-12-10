@@ -31,6 +31,7 @@ ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
   return { status: 'error', message: 'Files were not ignored', data };
 });
 
+// TO DO REMOVE UNUSED SERVICE
 ipcMain.handle(IpcEvents.UNIGNORED_FILES, async (event, arg: number[]) => {
   const project = workspace.getOpenedProjects()[0];
   const data = await project.scans_db.results.restore(arg);

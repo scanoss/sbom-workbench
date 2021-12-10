@@ -40,8 +40,8 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (_event, arg: Inventory) => {
     logicResultService
       .getResultsFromIDs(arg.files)
       .then((files: any) => {
-        const paths =  utilHelper.getArrayFromObjectFilter(files,'path',new FilterTrue()) as Array<string>;
-         paths.forEach((path) => {
+        const paths = utilHelper.getArrayFromObjectFilter(files, 'path', new FilterTrue()) as Array<string>;
+        paths.forEach((path) => {
           p.getTree().getRootFolder().setStatus(path, NodeStatus.IDENTIFIED);
         });
         p.updateTree();
@@ -73,7 +73,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (_event, inv: Partial<Inve
     logicResultService
       .getResultsFromIDs(inv.files)
       .then((files: any) => {
-        const paths =  utilHelper.getArrayFromObjectFilter(files,'path',new FilterTrue()) as Array<string>;
+        const paths = utilHelper.getArrayFromObjectFilter(files, 'path', new FilterTrue()) as Array<string>;
         logictTreeService.retoreStatus(paths);
         return true;
       })
@@ -95,7 +95,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (_event, arg: Partial<Inventory
     p.scans_db.inventories
       .getInventoryFiles(arg)
       .then((files: any) => {
-        const paths =  utilHelper.getArrayFromObjectFilter(files,'path',new FilterTrue()) as Array<string>;
+        const paths = utilHelper.getArrayFromObjectFilter(files, 'path', new FilterTrue()) as Array<string>;
         logictTreeService.retoreStatus(paths);
         return true;
       })
@@ -134,6 +134,3 @@ ipcMain.handle(IpcEvents.INVENTORY_FOLDER, async (_event, arg: IFolderInventory)
     return { status: 'fail' };
   }
 });
-
-
-
