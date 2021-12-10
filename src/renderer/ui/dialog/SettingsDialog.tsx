@@ -1,7 +1,18 @@
-import { Button, Dialog, DialogActions, IconButton, InputBase, makeStyles, Paper, Tooltip } from '@material-ui/core';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  IconButton,
+  InputBase,
+  makeStyles,
+  Paper,
+  Tooltip,
+} from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
-import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
+import Autocomplete, {
+  createFilterOptions,
+} from '@material-ui/lab/Autocomplete';
 import React, { useEffect, useState } from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
@@ -69,7 +80,14 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
   useEffect(setDefaults, [open]);
 
   return (
-    <Dialog id="NewEndpointDialog" maxWidth="xs" fullWidth className="dialog" open={open} onClose={onCancel}>
+    <Dialog
+      id="NewEndpointDialog"
+      maxWidth="xs"
+      fullWidth
+      className="dialog"
+      open={open}
+      onClose={onCancel}
+    >
       <form onSubmit={onSubmit}>
         <div className="dialog-content">
           <div className="dialog-form-field">
@@ -101,7 +119,12 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
         </div>
         <DialogActions>
           <Button onClick={onCancel}>Cancel</Button>
-          <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
+          <Button
+            type="submit"
+            variant="contained"
+            color="secondary"
+            disabled={!isValid()}
+          >
             Add
           </Button>
         </DialogActions>
@@ -129,7 +152,9 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
 
   const submit = async () => {
     const config: Partial<IWorkspaceCfg> = {
-      DEFAULT_API_INDEX: selectedApi ? apis.findIndex((api) => api === selectedApi) : -1,
+      DEFAULT_API_INDEX: selectedApi
+        ? apis.findIndex((api) => api === selectedApi)
+        : -1,
       APIS: apis,
       TOKEN: sbomLedgerToken || null,
     };
@@ -142,7 +167,8 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
     const { DEFAULT_API_INDEX, APIS, TOKEN } = config;
 
     const urlsDefault = APIS || [];
-    const selectedUrlDefault = APIS && APIS[DEFAULT_API_INDEX] ? APIS[DEFAULT_API_INDEX] : null;
+    const selectedUrlDefault =
+      APIS && APIS[DEFAULT_API_INDEX] ? APIS[DEFAULT_API_INDEX] : null;
 
     setSbomLedgerToken(TOKEN);
     setApis(urlsDefault);
@@ -221,7 +247,10 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
                 <label>Knowledgebase API</label>
-                <Tooltip title="Add new endpoint" onClick={onNewEndpointHandler}>
+                <Tooltip
+                  title="Add new endpoint"
+                  onClick={onNewEndpointHandler}
+                >
                   <IconButton color="inherit" size="small">
                     <AddIcon fontSize="inherit" />
                   </IconButton>
@@ -236,7 +265,9 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
                       const { value } = e.target;
-                      const isExisting = apis.some((option) => value === option.URL);
+                      const isExisting = apis.some(
+                        (option) => value === option.URL
+                      );
                       if (!isExisting) {
                         handleOnChange(e, { new: true, inputValue: value });
                       } else {
@@ -249,7 +280,9 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
 
                     const { inputValue } = params;
                     // Suggest the creation of a new value
-                    const isExisting = options.some((option) => inputValue === option.URL);
+                    const isExisting = options.some(
+                      (option) => inputValue === option.URL
+                    );
                     if (inputValue !== '' && !isExisting) {
                       filtered.push({
                         inputValue,
@@ -274,7 +307,9 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                       return option.inputValue;
                     }
                     // Regular option
-                    return `${option.URL} ${option.API_KEY ? `(${option.API_KEY})` : ''}`;
+                    return `${option.URL} ${
+                      option.API_KEY ? `(${option.API_KEY})` : ''
+                    }`;
                   }}
                   renderOption={(option, props) =>
                     option.new ? (
@@ -282,10 +317,17 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                         {option.URL}
                       </li>
                     ) : (
-                      <li {...props} className="w-100 d-flex space-between align-center">
+                      <li
+                        {...props}
+                        className="w-100 d-flex space-between align-center"
+                      >
                         <div className={classes.option}>
                           <span>{option.URL}</span>
-                          {option.API_KEY && <span className="middle">API KEY: {option.API_KEY}</span>}
+                          {option.API_KEY && (
+                            <span className="middle">
+                              API KEY: {option.API_KEY}
+                            </span>
+                          )}
                         </div>
                         <IconButton
                           size="small"
@@ -299,14 +341,22 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                     )
                   }
                   renderInput={(params) => (
-                    <TextField {...params} InputProps={{ ...params.InputProps, disableUnderline: true }} />
+                    <TextField
+                      {...params}
+                      InputProps={{
+                        ...params.InputProps,
+                        disableUnderline: true,
+                      }}
+                    />
                   )}
                 />
               </Paper>
               <p className="dialog-form-field-hint">
-                This value is optional for dedicated SCANOSS server instances. When this value is empty, scans will be
-                launched against our free of charge public service. If you are interested in a dedicated instance with
-                guaranteed availability and throughput please contact us at sales@scanoss.com.
+                This value is optional for dedicated SCANOSS server instances.
+                When this value is empty, scans will be launched against our
+                free of charge public service. If you are interested in a
+                dedicated instance with guaranteed availability and throughput
+                please contact us at sales@scanoss.com.
               </p>
             </div>
             <div className="dialog-form-field mt-7">
