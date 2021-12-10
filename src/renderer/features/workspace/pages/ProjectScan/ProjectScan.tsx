@@ -14,8 +14,7 @@ const { ipcRenderer } = require('electron');
 const ProjectScan = () => {
   const history = useHistory();
 
-  const { scanPath, setScanPath } = useContext(AppContext) as IAppContext;
-  const [projectName, setProjectName] = useState<string>();
+  const { scanPath, setScanPath, settingsNewProject } = useContext(AppContext) as IAppContext;
   const [progress, setProgress] = useState<number>(0);
   const [stage, setStage] = useState<string>('');
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
@@ -27,11 +26,10 @@ const ProjectScan = () => {
 
     try {
       const { path, action } = scanPath;
-      setProjectName(path.split('/')[path.split('/').length - 1]);
 
       if (action === 'resume') controller.resume(path);
       if (action === 'rescan') controller.rescan(path);
-      if (action === 'scan') controller.scan(path);
+      if (action === 'scan') controller.scan(settingsNewProject);
     } catch (e) {
       console.error(e);
     }
@@ -109,7 +107,7 @@ const ProjectScan = () => {
               </IconButton>
               SCANNING
             </h4>
-            <h1>{projectName}</h1>
+            <h1>{settingsNewProject.name}</h1>
           </div>
         </header>
         <main className="app-content">

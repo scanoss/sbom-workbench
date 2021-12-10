@@ -8,15 +8,16 @@
     }
 
     .project-form-container {
-      display: grid;
-      grid-template-columns: repeat(2, 50%);
-      overflow-x: hidden;
-
+      max-width: 600px;
+      min-width: 400px;
       .project-license-container {
-        padding-right: 50px;
+
+        transform: scale(0.9);
+        transform-origin: 0;
+
         .input-container {
           &-license {
-            margin-top: 4em;
+            margin-top: 3.5em;
           }
 
           .input-label-add-container {
@@ -29,18 +30,7 @@
           }
 
           .license-input-container {
-            max-width: 625px;
-          }
 
-          .input-label {
-            font-weight: bold;
-            font-size: 20px;
-
-            .optional {
-              color: gray;
-              font-weight: normal;
-              font-size: 16px;
-            }
           }
 
           .input-text-container {
@@ -49,6 +39,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
+
+            border-bottom: 2px solid transparent;
 
             .input-autocomplete {
               height: 40px;
@@ -75,13 +67,15 @@
       }
 
       .api-conections-container {
-        margin-left: auto;
+        margin-top: 5px;
         .api-subcontainer {
           display: flex;
           flex-direction: column;
-          width: 700px;
+
+          transform: scale(0.9);
+          transform-origin: 0;
+
           .api-conections-label-container {
-            margin-bottom: 24px;
 
             .api-conections-label {
               font-size: 20px;
@@ -89,7 +83,7 @@
           }
 
           .knowledgebase-api-container {
-            margin-bottom: 24px;
+
           }
         }
       }
@@ -105,11 +99,9 @@
   .button-container {
     display: flex;
     justify-content: flex-end;
-    margin: 30px;
+
     .btn {
       padding: 12px 24px;
-      width: 177px;
-      height: 43px;
       border-radius: 4px;
     }
 
@@ -121,7 +113,19 @@
     }
   }
 
+
   .error {
-    border-bottom: 2px solid red;
+    border-bottom: 2px solid red !important;
+  }
+
+  .input-label {
+    font-weight: 600;
+    font-size: 18px;
+
+    .optional {
+      color: gray;
+      font-weight: normal;
+      font-size: 16px;
+    }
   }
 }

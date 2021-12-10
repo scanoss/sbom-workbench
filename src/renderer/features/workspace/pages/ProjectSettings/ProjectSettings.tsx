@@ -15,18 +15,17 @@ import {
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SearchIcon from '@material-ui/icons/Search';
 import { useHistory } from 'react-router-dom';
-import { AppContext, IAppContext } from '../../../../context/AppProvider';
-import Autocomplete, {
-  createFilterOptions,
-} from '@material-ui/lab/Autocomplete';
-import { DialogResponse, DIALOG_ACTIONS } from '../../../../context/types';
+import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import DeleteIcon from '@material-ui/icons/Delete';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import { appendFile } from 'original-fs';
+import { AppContext, IAppContext } from '../../../../context/AppProvider';
+import { DialogResponse, DIALOG_ACTIONS } from '../../../../context/types';
 import { IWorkspaceCfg } from '../../../../../api/types';
 import { userSettingService } from '../../../../../api/userSetting-service';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { licenseService } from '../../../../../api/license-service';
 import { workspaceService } from '../../../../../api/workspace-service';
-import { appendFile } from 'original-fs';
+
 const pathUtil = require('path');
 
 const filter = createFilterOptions();
@@ -57,15 +56,14 @@ const useStyles = makeStyles((theme) => ({
   button: {
     display: 'flex',
     justifyContent: 'flex-end',
-    margin: '30px',
     borderRadius: '4px',
     width: '177px',
-    height: '43px',
+    height: '40px',
     padding: '12px 24px',
     backgroundColor: theme.palette.primary.main,
     color: '#fff',
     fontWeight: 400,
-    fontSize: '24px',
+    fontSize: '22px',
     '&:hover': {
       backgroundColor: theme.palette.primary.light,
     },
@@ -76,8 +74,7 @@ const ProjectSettings = () => {
   const classes = useStyles();
   const history = useHistory();
 
-  const { scanPath, setSettingsNewProject } =
-    useContext<IAppContext>(AppContext);
+  const { scanPath, setSettingsNewProject } = useContext<IAppContext>(AppContext);
   // const [selectedApi, setSelectedApi] = useState(null);
   const [licenses, setLicenses] = useState(null);
   const [apis, setApis] = useState([]);
@@ -110,10 +107,10 @@ const ProjectSettings = () => {
   }, []);
 
   const init = async () => {
-    let data = await workspaceService.getLicenses();
+    const data = await workspaceService.getLicenses();
     setLicenses(data);
 
-    let apiUrlKey = await userSettingService.get();
+    const apiUrlKey = await userSettingService.get();
     setApis(apiUrlKey.APIS);
 
     const projects = await workspaceService.getAllProjects();
@@ -121,22 +118,17 @@ const ProjectSettings = () => {
 
     const { path } = scanPath;
 
-    let projectName = path.split(pathUtil.sep)[
-      path.split(pathUtil.sep).length - 1
-    ];
+    const projectName = path.split(pathUtil.sep)[path.split(pathUtil.sep).length - 1];
 
     setProjectSettings({
       ...projectSettings,
       scan_root: path,
       name: projectName,
     });
-
   };
 
   useEffect(() => {
-    let found = projects.find(
-      (project) => project.name === projectSettings.name
-    );
+    const found = projects.find((project) => project.name === projectSettings.name);
 
     if (found) {
       setprojectNameExists(true);
@@ -175,147 +167,133 @@ const ProjectSettings = () => {
             <h1 className="mt-0 mb-0">{scanPath.path}</h1>
           </div>
         </header>
-        <div className='app-content'>
-        <form onSubmit={(e) => handleClose(e)}>
-          <div className="project-form-container">
-            <div className="project-license-container">
-              <div className="input-container">
-                <label className="input-label">Project Name </label>
-                <span className="error-message">
-                  {projectNameExists ? 'The project name already exists' : ''}
-                  {projectNameEmpty ? 'The project name is empty' : ''}
-                </span>
-                <Paper
-                  className={`input-text-container project-name-container ${
-                    projectNameExists || projectNameEmpty ? 'error' : ''
-                  }`}
-                >
-                  <InputBase
-                    className="project-name-input"
-                    name="aa"
-                    fullWidth
-                    value={projectSettings.name}
-                    onChange={(e) =>
-                      setProjectSettings({
-                        ...projectSettings,
-                        name: e.target.value,
-                      })
-                    }
-                  />
-                </Paper>
-              </div>
-              <div className="input-container input-container-license ">
-                <div className="input-label-add-container">
-                  <label className="input-label">
-                    License <span className="optional">- Optional</span>
-                  </label>
-                </div>
-                <Paper className="input-text-container license-input-container">
-                  <SearchIcon className="icon" />
-                  <Autocomplete
-                    onChange={(e, value) =>
-                      setProjectSettings({
-                        ...projectSettings,
-                        default_license: value?.spdxid,
-                      })
-                    }
-                    fullWidth
-                    className={classes.search}
-                    placeholder="URL"
-                    selectOnFocus
-                    clearOnBlur
-                    handleHomeEndKeys
-                    options={licenses}
-                    getOptionLabel={(option: any) => option.name || ''}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        InputProps={{
-                          ...params.InputProps,
-                          disableUnderline: true,
-                        }}
-                      />
-                    )}
-                  />
-                </Paper>
-              </div>
-            </div>
-            <div className="api-conections-container">
-              <div className="api-subcontainer">
-                <div className="api-conections-label-container">
-                  <label className="api-conections-label">
-                    <b>API Connections</b>
-                  </label>
-                </div>
-                <div className="label-input-container">
-                  <div className="label-icon">
-                    <label>Knowledgebase API</label>
-                  </div>
-                  <Paper className="input-text-container">
-                    <Select
-                      onChange={(e: any) => {
-                        setProjectSettings({
-                          ...projectSettings,
-                          'api-url': e.target?.value.URL,
-                          'api-key': e.target?.value.API_KEY,
-                        });
-                      }}
-                      defaultValue={0}
-                      disableUnderline
-                      className={classes.search}
-                      placeholder="URL"
-                    >
-                      <MenuItem value={0}>Use Default Settings</MenuItem>;
-                      {apis.map((api) => (
-                        <MenuItem value={api} key={api.key}>
-                          <span>API URL: {api.URL}</span>
-                          {api.API_KEY && (
-                            <span className="api-key">
-                              {' '}
-                              - API KEY: {api.API_KEY}
-                            </span>
-                          )}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </Paper>
-                </div>
-                <div className="label-input-container mt-7">
-                  <div className="label-icon">
-                    <label className="">
-                      SBOM Ledger Token{' '}
-                      <span className="optional">- Optional</span>
-                    </label>
-                  </div>
-                  <Paper className="input-text-container">
+        <div className="app-content">
+          <form onSubmit={(e) => handleClose(e)}>
+            <div className="project-form-container mt-4">
+              <div className="project-license-container">
+                <div className="input-container">
+                  <label className="input-label">Project Name</label>
+                  <span className="error-message">
+                    {projectNameExists ? 'The project name already exists' : ''}
+                    {projectNameEmpty ? 'The project name is empty' : ''}
+                  </span>
+                  <Paper
+                    className={`input-text-container project-name-container ${
+                      projectNameExists || projectNameEmpty ? 'error' : ''
+                    }`}
+                  >
                     <InputBase
-                      name="url"
-                      placeholder="URL"
-                      style={{ padding: '8px' }}
-                      value={sbomLedgerToken}
+                      className="project-name-input"
+                      name="aa"
+                      fullWidth
+                      value={projectSettings.name}
                       onChange={(e) =>
                         setProjectSettings({
                           ...projectSettings,
-                          sbom: e.target.value,
+                          name: e.target.value,
                         })
                       }
                     />
                   </Paper>
                 </div>
+                <div className="input-container input-container-license ">
+                  <div className="input-label-add-container">
+                    <label className="input-label">
+                      License <span className="optional">- Optional</span>
+                    </label>
+                  </div>
+                  <Paper className="input-text-container license-input-container">
+                    <SearchIcon className="icon" />
+                    <Autocomplete
+                      onChange={(e, value) =>
+                        setProjectSettings({
+                          ...projectSettings,
+                          default_license: value?.spdxid,
+                        })
+                      }
+                      fullWidth
+                      className={classes.search}
+                      placeholder="URL"
+                      selectOnFocus
+                      clearOnBlur
+                      handleHomeEndKeys
+                      options={licenses}
+                      getOptionLabel={(option: any) => option.name || ''}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          InputProps={{
+                            ...params.InputProps,
+                            disableUnderline: true,
+                          }}
+                        />
+                      )}
+                    />
+                  </Paper>
+                </div>
+              </div>
+              <div className="api-conections-container">
+                <div className="api-subcontainer">
+                  <div className="api-conections-label-container mb-3">
+                    <label className="input-label">API Connections</label>
+                  </div>
+                  <div className="label-input-container">
+                    <div className="label-icon">
+                      <label>Knowledgebase API</label>
+                    </div>
+                    <Paper className="input-text-container">
+                      <Select
+                        onChange={(e: any) => {
+                          setProjectSettings({
+                            ...projectSettings,
+                            'api-url': e.target?.value.URL,
+                            'api-key': e.target?.value.API_KEY,
+                          });
+                        }}
+                        defaultValue={0}
+                        disableUnderline
+                        className={classes.search}
+                      >
+                        <MenuItem value={0}>use default settings</MenuItem>;
+                        {apis.map((api) => (
+                          <MenuItem value={api} key={api.key}>
+                            <span>API URL: {api.URL}</span>
+                            {api.API_KEY && <span className="api-key"> - API KEY: {api.API_KEY}</span>}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Paper>
+                  </div>
+                  <div className="label-input-container mt-5">
+                    <div className="label-icon">
+                      <label className="">
+                        SBOM Ledger Token <span className="optional">- Optional</span>
+                      </label>
+                    </div>
+                    <Paper className="input-text-container">
+                      <InputBase
+                        name="token"
+                        style={{ padding: '8px' }}
+                        value={sbomLedgerToken}
+                        onChange={(e) =>
+                          setProjectSettings({
+                            ...projectSettings,
+                            sbom: e.target.value,
+                          })
+                        }
+                      />
+                    </Paper>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="button-container">
-            <Button
-              type="submit"
-              className={classes.button}
-              disabled={projectNameEmpty || projectNameExists}
-            >
-              Continue
-              <ArrowForwardIcon />
-            </Button>
-          </div>
-        </form>
+            <div className="button-container">
+              <Button type="submit" className={classes.button} disabled={projectNameEmpty || projectNameExists}>
+                Continue
+                <ArrowForwardIcon />
+              </Button>
+            </div>
+          </form>
         </div>
       </section>
     </>
