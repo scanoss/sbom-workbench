@@ -93,7 +93,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   const restoreFile = async (files: number[]): Promise<boolean> => {
-    const success = await resultService.unignored(files);
+    const success = await inventoryService.detach({ files });
     update();
     return success;
   };
