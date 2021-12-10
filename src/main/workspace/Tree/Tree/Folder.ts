@@ -68,18 +68,18 @@ export default class Folder extends Node {
 
       if(child.type === "folder") {
 
-        this.hasPending = child.hasPending;
-        this.hasIdentified = child.hasIdentified;
-        this.hasIgnored = child.hasIgnored;
-        this.hasNoMatch = child.hasNoMatch;
-        this.hasFiltered = child.hasFiltered;
+        this.hasPending = child.hasPending || this.hasPending;
+        this.hasIdentified = child.hasIdentified || this.hasIdentified;
+        this.hasIgnored = child.hasIgnored || this.hasIgnored;
+        this.hasNoMatch = child.hasNoMatch || this.hasNoMatch;
+        this.hasFiltered = child.hasFiltered || this.hasFiltered;
 
       } else {
         if (child.status === NodeStatus.PENDING) this.hasPending = true;
-        else if (child.status === NodeStatus.IDENTIFIED) this.hasIdentified = true;
-        else if (child.status === NodeStatus.IGNORED) this.hasIgnored = true;
-        else if (child.status === NodeStatus.NOMATCH) this.hasNoMatch = true;
-        else if (child.status === NodeStatus.FILTERED) this.hasFiltered = true;
+        if (child.status === NodeStatus.IDENTIFIED) this.hasIdentified = true;
+        if (child.status === NodeStatus.IGNORED) this.hasIgnored = true;
+        if (child.status === NodeStatus.NOMATCH) this.hasNoMatch = true;
+        if (child.status === NodeStatus.FILTERED) this.hasFiltered = true;
         if (this.hasPending && this.hasIdentified && this.hasIgnored && this.hasNoMatch && this.hasFiltered) break;
       }
     }
