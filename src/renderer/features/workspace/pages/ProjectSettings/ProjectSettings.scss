@@ -1,0 +1,131 @@
+#ProjectSettings {
+  .app-content {
+    form {
+      height: 80vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .project-form-container {
+      max-width: 600px;
+      min-width: 400px;
+      .project-license-container {
+
+        transform: scale(0.9);
+        transform-origin: 0;
+
+        .input-container {
+          &-license {
+            margin-top: 3.5em;
+          }
+
+          .input-label-add-container {
+            display: flex;
+            align-items: center;
+          }
+
+          .project-name-container {
+            max-width: 500px;
+          }
+
+          .license-input-container {
+
+          }
+
+          .input-text-container {
+            margin-top: 1rem;
+            padding-left: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            border-bottom: 2px solid transparent;
+
+            .input-autocomplete {
+              height: 40px;
+            }
+
+            .project-name-input {
+              font-size: 2rem;
+              font-weight: 700;
+            }
+
+            .icon {
+              margin-right: 0.75em;
+            }
+
+            .api-key {
+              color: gray;
+            }
+          }
+
+          .error-message {
+            color: red;
+          }
+        }
+      }
+
+      .api-conections-container {
+        margin-top: 5px;
+        .api-subcontainer {
+          display: flex;
+          flex-direction: column;
+
+          transform: scale(0.9);
+          transform-origin: 0;
+
+          .api-conections-label-container {
+
+            .api-conections-label {
+              font-size: 20px;
+            }
+          }
+
+          .knowledgebase-api-container {
+
+          }
+        }
+      }
+    }
+  }
+
+  .label-input-container {
+    .label-icon {
+      margin-bottom: 12px;
+    }
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 4px;
+    }
+
+    .btn-continue {
+      background-color: #6366f1;
+      color: #fff;
+      font-weight: 400;
+      font-size: 24px;
+    }
+  }
+
+
+  .error {
+    border-bottom: 2px solid red !important;
+  }
+
+  .input-label {
+    font-weight: 600;
+    font-size: 18px;
+
+    .optional {
+      color: gray;
+      font-weight: normal;
+      font-size: 16px;
+    }
+  }
+}

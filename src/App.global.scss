@@ -21,7 +21,9 @@
 
 /* components */
 @import 'renderer/features/workspace/pages/Workspace/Workspace';
-@import 'renderer/features/workspace/pages/NewProject/NewProject';
+@import 'renderer/features/workspace/pages/ProjectDrop/ProjectDrop';
+@import 'renderer/features/workspace/pages/ProjectScan/ProjectScan';
+@import 'renderer/features/workspace/pages/ProjectSettings/ProjectSettings';
 @import 'renderer/features/workbench/Workbench';
 @import 'renderer/features/workbench/pages/report/Report.scss';
 @import 'renderer/features/workbench/pages/detected/pages/Editor/Editor';
