@@ -33,9 +33,10 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (_event, inv: Partial<Inventory>) 
 });
 
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (_event, arg: Inventory) => {
-  try {   
+  try {
     const p = workspace.getOpenedProjects()[0];
     const inv = await logicInventoryService.create(arg);
+    p.sendToUI(IpcEvents.TREE_UPDATING, {});
     logicResultService
       .getResultsFromIDs(arg.files)
       .then((files: any) => {
