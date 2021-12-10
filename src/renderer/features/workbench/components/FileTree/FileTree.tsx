@@ -1,6 +1,8 @@
+import { ipcRenderer } from 'electron';
 import React, { useContext, useState, useEffect } from 'react';
 import CheckboxTree, { OnCheckNode } from 'react-checkbox-tree';
 import { useHistory } from 'react-router-dom';
+import { IpcEvents } from '../../../../../ipc-events';
 import useContextual from '../../../../hooks/useContextual';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 
