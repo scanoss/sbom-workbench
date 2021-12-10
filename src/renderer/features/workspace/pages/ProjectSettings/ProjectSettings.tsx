@@ -21,7 +21,7 @@ import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { appendFile } from 'original-fs';
 import { AppContext, IAppContext } from '../../../../context/AppProvider';
 import { DialogResponse, DIALOG_ACTIONS } from '../../../../context/types';
-import { IWorkspaceCfg } from '../../../../../api/types';
+import { INewProject, IWorkspaceCfg } from '../../../../../api/types';
 import { userSettingService } from '../../../../../api/userSetting-service';
 import { licenseService } from '../../../../../api/license-service';
 import { workspaceService } from '../../../../../api/workspace-service';
@@ -53,21 +53,6 @@ const useStyles = makeStyles((theme) => ({
       color: '#6c6c6e',
     },
   },
-  button: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    borderRadius: '4px',
-    width: '177px',
-    height: '40px',
-    padding: '12px 24px',
-    backgroundColor: theme.palette.primary.main,
-    color: '#fff',
-    fontWeight: 400,
-    fontSize: '22px',
-    '&:hover': {
-      backgroundColor: theme.palette.primary.light,
-    },
-  },
 }));
 
 const ProjectSettings = () => {
@@ -90,16 +75,16 @@ const ProjectSettings = () => {
   });
 
   const [projects, setProjects] = useState<any[] | null>([]);
-  const [projectSettings, setProjectSettings] = useState({
+  const [projectSettings, setProjectSettings] = useState<INewProject>({
     name: '',
     scan_root: '',
     default_license: '',
-    'api-key': null,
-    'api-url': null,
-    sbom: null,
+    api_key: null,
+    api: null,
+    token: null,
   });
 
-  const [projectNameEmpty, setprojectNameEmpty] = useState(false);
+  const [projectValidName, setprojectValidName] = useState(false);
   const [projectNameExists, setprojectNameExists] = useState(false);
 
   useEffect(() => {
@@ -128,7 +113,9 @@ const ProjectSettings = () => {
   };
 
   useEffect(() => {
-    const found = projects.find((project) => project.name === projectSettings.name);
+    const found = projects.find((project) => project.name.trim().toLowerCase() === projectSettings.name.trim().toLowerCase());
+
+    const re = /^[^\s^\x00-\x1f\\?*:"";<>|\/.][^\x00-\x1f\\?*:"";<>|\/]*[^\s^\x00-\x1f\\?*:"";<>|\/.]+$/;
 
     if (found) {
       setprojectNameExists(true);
@@ -136,10 +123,10 @@ const ProjectSettings = () => {
       setprojectNameExists(false);
     }
 
-    if (projectSettings.name === '') {
-      setprojectNameEmpty(true);
+    if (projectSettings.name.trim() != '' && re.test(projectSettings.name)) {
+      setprojectValidName(true);
     } else {
-      setprojectNameEmpty(false);
+      setprojectValidName(false);
     }
   }, [projectSettings.name, projects]);
 
@@ -174,12 +161,11 @@ const ProjectSettings = () => {
                 <div className="input-container">
                   <label className="input-label">Project Name</label>
                   <span className="error-message">
-                    {projectNameExists ? 'The project name already exists' : ''}
-                    {projectNameEmpty ? 'The project name is empty' : ''}
+                    {projectNameExists || !projectValidName  ? 'The project name is invalid' : ''}
                   </span>
                   <Paper
                     className={`input-text-container project-name-container ${
-                      projectNameExists || projectNameEmpty ? 'error' : ''
+                      projectNameExists || !projectValidName ? 'error' : ''
                     }`}
                   >
                     <InputBase
@@ -239,18 +225,19 @@ const ProjectSettings = () => {
                   </div>
                   <div className="label-input-container">
                     <div className="label-icon">
-                      <label>Knowledgebase API</label>
+                      <label className='input-label'>Knowledgebase API</label>
                     </div>
                     <Paper className="input-text-container">
                       <Select
                         onChange={(e: any) => {
                           setProjectSettings({
                             ...projectSettings,
-                            'api-url': e.target?.value.URL,
-                            'api-key': e.target?.value.API_KEY,
+                            api: e.target?.value.URL,
+                            api_key: e.target?.value.API_KEY,
                           });
                         }}
                         defaultValue={0}
+                        fullWidth
                         disableUnderline
                         className={classes.search}
                       >
@@ -258,7 +245,7 @@ const ProjectSettings = () => {
                         {apis.map((api) => (
                           <MenuItem value={api} key={api.key}>
                             <span>API URL: {api.URL}</span>
-                            {api.API_KEY && <span className="api-key"> - API KEY: {api.API_KEY}</span>}
+                            {api.API_KEY && <span className="api_key"> - API KEY: {api.API_KEY}</span>}
                           </MenuItem>
                         ))}
                       </Select>
@@ -266,7 +253,7 @@ const ProjectSettings = () => {
                   </div>
                   <div className="label-input-container mt-5">
                     <div className="label-icon">
-                      <label className="">
+                      <label className="input-label">
                         SBOM Ledger Token <span className="optional">- Optional</span>
                       </label>
                     </div>
@@ -275,10 +262,11 @@ const ProjectSettings = () => {
                         name="token"
                         style={{ padding: '8px' }}
                         value={sbomLedgerToken}
+                        fullWidth
                         onChange={(e) =>
                           setProjectSettings({
                             ...projectSettings,
-                            sbom: e.target.value,
+                            token: e.target.value.trim(),
                           })
                         }
                       />
@@ -288,10 +276,9 @@ const ProjectSettings = () => {
               </div>
             </div>
             <div className="button-container">
-              <Button type="submit" className={classes.button} disabled={projectNameEmpty || projectNameExists}>
-                Continue
-                <ArrowForwardIcon />
-              </Button>
+              <Button endIcon={<ArrowForwardIcon />} variant="contained" color="primary" type="submit" disabled={!projectValidName || projectNameExists}>
+              Continue
+            </Button>
             </div>
           </form>
         </div>
