@@ -10,6 +10,7 @@ ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
   const project = workspace.getOpenedProjects()[0];
   const data = await logicResultService.ignore(arg);
 
+  project.sendToUI(IpcEvents.TREE_UPDATING, {});
   logicResultService
     .getResultsByids(arg, project)
     .then((filesToUpdate) => {
@@ -34,6 +35,7 @@ ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
 ipcMain.handle(IpcEvents.UNIGNORED_FILES, async (event, arg: number[]) => {
   const project = workspace.getOpenedProjects()[0];
   const data = await project.scans_db.results.restore(arg);
+  project.sendToUI(IpcEvents.TREE_UPDATING, {});
   logicResultService
     .getResultsByids(arg, project)
     .then((filesToUpdate) => {

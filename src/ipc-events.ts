@@ -87,8 +87,8 @@ export enum IpcEvents {
   USER_SETTING_SET = 'USER_SETTING_SET',
   USER_SETTING_GET = 'USER_SETTING_GET',
 
+  TREE_UPDATING = 'UPDATING_TREE',
   TREE_UPDATED = 'TREE_UPDATED',
-
 }
 
 export const ipcMainEvents = [
