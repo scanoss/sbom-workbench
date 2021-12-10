@@ -10,14 +10,14 @@
     .project-form-container {
       max-width: 600px;
       min-width: 400px;
+
       .project-license-container {
-
-        transform: scale(0.9);
-        transform-origin: 0;
-
         .input-container {
+          transform: scale(0.9);
+          transform-origin: 0;
+
           &-license {
-            margin-top: 3.5em;
+            margin-top: 2em;
           }
 
           .input-label-add-container {
@@ -26,7 +26,7 @@
           }
 
           .project-name-container {
-            max-width: 500px;
+            max-width: 380px;
           }
 
           .license-input-container {
@@ -52,7 +52,7 @@
             }
 
             .icon {
-              margin-right: 0.75em;
+              margin-left: 4px;
             }
 
             .api-key {
@@ -62,6 +62,8 @@
 
           .error-message {
             color: red;
+            height: 30px;
+            margin-top: 6px;
           }
         }
       }
@@ -94,6 +96,9 @@
     .label-icon {
       margin-bottom: 12px;
     }
+    .MuiSvgIcon-root {
+      margin-right: 15px;
+    }
   }
 
   .button-container {
@@ -122,10 +127,19 @@
     font-weight: 600;
     font-size: 18px;
 
+    &.h3 {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
     .optional {
       color: gray;
       font-weight: normal;
       font-size: 16px;
     }
+  }
+
+  .item-default {
+    color: #a8a8a8 !important;
   }
 }

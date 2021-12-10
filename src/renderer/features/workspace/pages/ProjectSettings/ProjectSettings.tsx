@@ -16,14 +16,10 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SearchIcon from '@material-ui/icons/Search';
 import { useHistory } from 'react-router-dom';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
-import DeleteIcon from '@material-ui/icons/Delete';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import { appendFile } from 'original-fs';
 import { AppContext, IAppContext } from '../../../../context/AppProvider';
-import { DialogResponse, DIALOG_ACTIONS } from '../../../../context/types';
 import { INewProject, IWorkspaceCfg } from '../../../../../api/types';
 import { userSettingService } from '../../../../../api/userSetting-service';
-import { licenseService } from '../../../../../api/license-service';
 import { workspaceService } from '../../../../../api/workspace-service';
 
 const pathUtil = require('path');
@@ -37,7 +33,11 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   search: {
-    padding: '8px 15px',
+    padding: '8px 16px 8px 8px',
+    outline: 'none',
+  },
+  select: {
+    padding: '8px 16px',
     outline: 'none',
   },
   new: {
@@ -154,13 +154,10 @@ const ProjectSettings = () => {
         </header>
         <div className="app-content">
           <form onSubmit={(e) => handleClose(e)}>
-            <div className="project-form-container mt-4">
+            <div className="project-form-container mt-1">
               <div className="project-license-container">
                 <div className="input-container">
                   <label className="input-label">Project Name</label>
-                  <span className="error-message">
-                    {projectNameExists || !projectValidName  ? 'The project name is invalid' : ''}
-                  </span>
                   <Paper
                     className={`input-text-container project-name-container ${
                       projectNameExists || !projectValidName ? 'error' : ''
@@ -168,7 +165,7 @@ const ProjectSettings = () => {
                   >
                     <InputBase
                       className="project-name-input"
-                      name="aa"
+                      spellCheck={false}
                       fullWidth
                       value={projectSettings.name}
                       onChange={(e) =>
@@ -179,8 +176,11 @@ const ProjectSettings = () => {
                       }
                     />
                   </Paper>
+                  <div className="error-message">
+                    {projectNameExists || !projectValidName  ? 'The project name is invalid' : ''}
+                  </div>
                 </div>
-                <div className="input-container input-container-license ">
+                <div className="input-container input-container-license mb-3">
                   <div className="input-label-add-container">
                     <label className="input-label">
                       License <span className="optional">- Optional</span>
@@ -223,7 +223,7 @@ const ProjectSettings = () => {
                   </div>
                   <div className="label-input-container">
                     <div className="label-icon">
-                      <label className='input-label'>Knowledgebase API</label>
+                      <label className='input-label h3'>Knowledgebase API</label>
                     </div>
                     <Paper className="input-text-container">
                       <Select
@@ -237,9 +237,12 @@ const ProjectSettings = () => {
                         defaultValue={0}
                         fullWidth
                         disableUnderline
-                        className={classes.search}
+                        className={classes.select}
                       >
-                        <MenuItem value={0}>use default settings</MenuItem>;
+                        <MenuItem value={0}>
+                          <span className="item-default">Use default settings</span>
+                        </MenuItem>
+                        ;
                         {apis.map((api) => (
                           <MenuItem value={api} key={api.key}>
                             <span>API URL: {api.URL}</span>
@@ -251,14 +254,15 @@ const ProjectSettings = () => {
                   </div>
                   <div className="label-input-container mt-5">
                     <div className="label-icon">
-                      <label className="input-label">
+                      <label className="input-label h3">
                         SBOM Ledger Token <span className="optional">- Optional</span>
                       </label>
                     </div>
                     <Paper className="input-text-container">
                       <InputBase
                         name="token"
-                        style={{ padding: '8px' }}
+                        placeholder="Use default settings"
+                        style={{ padding: '8px', paddingLeft: '16px' }}
                         value={sbomLedgerToken}
                         fullWidth
                         onChange={(e) =>
