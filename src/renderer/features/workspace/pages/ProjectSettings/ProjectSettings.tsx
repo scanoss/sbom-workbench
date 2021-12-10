@@ -223,7 +223,7 @@ const ProjectSettings = () => {
                   </div>
                   <div className="label-input-container">
                     <div className="label-icon">
-                      <label className='input-label h3'>Knowledgebase API</label>
+                      <label className='input-label h3'>Knowledgebase API <span className="optional">- Optional</span></label>
                     </div>
                     <Paper className="input-text-container">
                       <Select
