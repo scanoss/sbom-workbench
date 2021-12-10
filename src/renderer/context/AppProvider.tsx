@@ -6,6 +6,7 @@ import { IpcEvents } from '../../ipc-events';
 import { dialogController } from '../dialog-controller';
 
 export interface IScan {
+  projectName?: string;
   path: string;
   action: string;
 }

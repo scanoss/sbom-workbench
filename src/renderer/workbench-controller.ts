@@ -6,6 +6,8 @@ import { sortComponents, transform } from '../utils/scan-util';
 import { IpcEvents } from '../ipc-events';
 import { ComponentParams, ComponentSource } from '../main/db/scan_component_db';
 
+const pathUtil = require('path');
+
 export interface ScanResult {
   name: string;
   scanRoot: string;
@@ -71,15 +73,10 @@ class WorkbenchController {
 
   private async generateScanResult(data): Promise<ScanResult> {
     const tree = data.logical_tree;
-    const path = data.scan_root;
+    const work = data.work_root;
 
     // TODO: get from scan result
-    let name = '';
-    try {
-      name = path.split('/')[path.split('/').length - 1];
-    } catch (e) {
-      console.log(e);
-    }
+    const name = work.split(pathUtil.sep)[work.split(pathUtil.sep).length - 1];
 
     return {
       name,

@@ -60,14 +60,14 @@ const Workspace = () => {
       role: 'accept',
     });
     if (action === DIALOG_ACTIONS.OK) {
-      setScanPath({ path: project.work_root, action: 'rescan' });
+      setScanPath({ path: project.work_root, action: 'rescan', projectName: project.name });
       history.push('/workspace/new/scan');
       init();
     }
   };
 
   const onRestoreHandler = async (project: IProject) => {
-    setScanPath({ path: project.work_root, action: 'resume' });
+    setScanPath({ path: project.work_root, action: 'resume', projectName: project.name });
     history.push('/workspace/new/scan');
   };
 

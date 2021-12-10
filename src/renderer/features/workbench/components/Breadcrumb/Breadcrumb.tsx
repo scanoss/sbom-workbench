@@ -23,7 +23,7 @@ const Breadcrumb = () => {
   const items = state.filter.node ? state.filter.node.path.substring(1).split('/') : [];
 
   const nodes = [
-    { name: state.name, type: 'folder', path: null },
+    { name: state.tree.label, type: 'folder', path: null },
     ...items.map((item, index) => {
       return {
         type: 'folder',
