@@ -192,9 +192,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   useEffect(() => {
     const lic = components
-      .find((item) => item?.name === form?.component)
+      .find((item) => item?.purl === form?.purl)
       ?.versions.find((item) => item.version === form.version)
-      ?.licenses.map((item) => ({ spdxid: item.spdxid, name: item.name, type: 'Matched' }));
+      ?.licenses.map((item) => ({
+        spdxid: item.spdxid,
+        name: item.name,
+        type: 'Matched',
+      }));
 
     if (lic) {
       setLicenses([...lic, ...licensesAll]);
