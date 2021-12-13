@@ -180,13 +180,4 @@ async function mainLogic() {
 }
 
 ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
-  // const { path } = arg;
-  // const projectName = basepath.basename(path);
-  // const p: Project = new Project(projectName);
-  // // p.setConfig();
-  // // p.setFilters();
-  // await workspace.addProject(p);
-  // p.setScanPath(path);
-  // p.setMailbox(event.sender);
-  // await p.startScanner();
 });
