@@ -36,12 +36,12 @@ const useContextual = () => {
 
   const identifyAll = async (node: any): Promise<boolean> => {
     const inventory = await dialogCtrl.openInventory({ usage: 'file' });
-    const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
-
-    if (inventory && action !== DIALOG_ACTIONS.CANCEL) {
-      return executeBatch(node.value, InventoryAction.IDENTIFY, { data: inventory });
+    if (inventory) {
+      const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
+      if (inventory && action !== DIALOG_ACTIONS.CANCEL) {
+        return executeBatch(node.value, InventoryAction.IDENTIFY, { data: inventory });
+      }
     }
-
     return false;
   };
 
