@@ -533,7 +533,7 @@ export class ComponentDb extends Db {
                 comp[i].summary = summary[comp[i].purl]; 
               
               }          
-          }                           
+          }                              
           resolve(comp);
         } else resolve([]);
       } catch (error) {

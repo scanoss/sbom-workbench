@@ -2,15 +2,14 @@
 import { Format } from '../Format';
 
 export class Raw extends Format {
-
-  constructor(){
+  constructor() {
     super();
     this.extension = '.json';
   }
 
- // @override   
+  // @override
   public async generate() {
-    const data = this.export.getRawData();
+    const data = await this.export.getRawData();
     const out = {};
     for (const [key, obj] of Object.entries(data)) {
       let vKey = key;
