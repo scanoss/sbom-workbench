@@ -316,7 +316,7 @@ export class ComponentDb extends Db {
         db.serialize(async function () {
           db.run('begin transaction');
           for (const result of results) {
-            if (result.license !== null) {
+            if (result.license) {
               license.spdxid = result.license;
               attachLicComp.license_id = await self.license.getLicenseIdFilter(
                 license
@@ -329,7 +329,7 @@ export class ComponentDb extends Db {
               db,
               result
             );
-            if (result.license !== 'NULL')
+            if (result.license)
               await self.license.bulkAttachLicensebyId(db, attachLicComp);
           }
           db.run('commit', (err: any) => {
@@ -496,7 +496,7 @@ export class ComponentDb extends Db {
   async getComponentGroup(component: Partial<ComponentGroup>,params: ComponentParams) {
     return new Promise(async (resolve, reject) => {
       try {
-        const data = await this.getAll(component, params);
+        const data = await this.getAll(component, params);       
         if (data) {
           const [comp] = await this.groupComponentsByPurl(data);
           comp.summary = await this.summaryByPurl(comp);
@@ -504,9 +504,7 @@ export class ComponentDb extends Db {
             const aux = await this.getSummaryByPath(params.path,[comp.purl]);  
            const summary = componentHelper.summaryByPurl(aux);  
             comp.summary = summary[comp.purl];
-          }
-          
-        
+          }       
           resolve(comp);
         } else resolve([]);
       } catch (error) {
@@ -520,7 +518,7 @@ export class ComponentDb extends Db {
  
     return new Promise(async (resolve, reject) => {
       try {
-        const data = await this.getAll({}, params);
+        const data = await this.getAll({}, params);       
         if (data) {
           const comp:any = await this.groupComponentsByPurl(data);   //        
           // if path is defined
@@ -535,7 +533,7 @@ export class ComponentDb extends Db {
                 comp[i].summary = summary[comp[i].purl]; 
               
               }          
-          }           
+          }                           
           resolve(comp);
         } else resolve([]);
       } catch (error) {
