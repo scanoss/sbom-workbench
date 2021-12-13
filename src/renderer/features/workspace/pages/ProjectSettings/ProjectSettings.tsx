@@ -177,7 +177,8 @@ const ProjectSettings = () => {
                     />
                   </Paper>
                   <div className="error-message">
-                    {projectNameExists || !projectValidName  ? 'The project name is invalid' : ''}
+                    {projectNameExists && 'The project name already exists'}
+                    {!projectValidName && 'The project name is invalid'}
                   </div>
                 </div>
                 <div className="input-container input-container-license mb-3">
