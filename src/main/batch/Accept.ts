@@ -35,6 +35,7 @@ export class Accept extends Batch {
       const inv = await logicInventoryService.InventoryBatchCreate(inventories);
       const filesToUpdate: any = this.mergeFilesInventoryId(inv);
       filesToUpdate.files = ids;
+    
       const success = await logicInventoryService.InventoryAttachFileBatch(filesToUpdate);
       if (success) {
         return inventories;
