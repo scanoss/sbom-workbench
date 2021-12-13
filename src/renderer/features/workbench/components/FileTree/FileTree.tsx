@@ -44,7 +44,7 @@ export const FileTree = () => {
   };
 
   const onContextMenu = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: OnCheckNode | any) => {
-    const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED';
+    const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED' || node.status === 'FILTERED';
     const menu = !node.children
       ? [
           /* {
@@ -84,6 +84,7 @@ export const FileTree = () => {
           {
             label: 'Restore all files',
             click: () => contextual.restoreAll(node),
+            enabled: node.hasIdentified || node.hasIgnored,
           },
         ];
 

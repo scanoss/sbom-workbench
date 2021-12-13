@@ -106,8 +106,12 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
         overwrite: false,
         ...data,
       });
-      update();
-      history.push(`/workbench`);
+
+      // update(); // WORKAROUND UNTIL STORE REFACTOR
+      history.push(!path ? `/workbench/detected` : `/workbench/detected?path=folder|${encodeURIComponent(path)}`);
+      const summary = await reportService.getSummary();
+      dispatch(setProgress(summary));
+
       return true;
     } catch (e) {
       console.error(e);
@@ -128,18 +132,9 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
     const summary = await reportService.getSummary();
     dispatch(setProgress(summary));
-
-    if (full) {
-      const fileTree = await workbenchController.getFileTree();
-      dispatch(updateTree(fileTree));
-    }
   };
 
-  const onTreeRefreshed = (tree) => {
-    console.log(tree);
-    // const fileTree = await workbenchController.getFileTree();
-    // dispatch(updateTree(tree));
-  };
+  const onTreeRefreshed = (_event, fileTree) => dispatch(updateTree(fileTree));
 
   const setNode = async (node: Node) => {
     dispatch(setCurrentNode(node));
@@ -157,7 +152,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
     const unlisten = history.listen((data) => {
       const param = new URLSearchParams(data.search).get('path');
-
       if (!param) {
         setNode(null);
         return;
@@ -170,7 +164,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     });
     return () => {
       unlisten();
-      // destroy();
     };
   }, [state.loaded]);
 
