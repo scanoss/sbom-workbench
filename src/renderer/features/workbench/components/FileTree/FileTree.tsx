@@ -60,7 +60,7 @@ export const FileTree = () => {
           {
             label: 'Restore file',
             click: () => contextual.restore(node),
-            enabled: onlyRestore,
+            enabled: node.status === 'IDENTIFIED' || node.status === 'IGNORED',
           },
         ]
       : [

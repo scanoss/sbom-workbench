@@ -36,11 +36,17 @@
 
     .rct-title {
       width: 100%;
+      position: absolute;
+
+      > div {
+        padding-left: 25px;
+      }
     }
 
     .rct-node-clickable {
       display: flex;
       width: 100%;
+      position: relative;
     }
 
     &.status-pending > span .rct-node-icon::before  {
