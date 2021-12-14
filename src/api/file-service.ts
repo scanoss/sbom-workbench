@@ -1,5 +1,4 @@
 import { IpcEvents } from '../ipc-events';
-import { File } from './types';
 
 const { ipcRenderer } = require('electron');
 

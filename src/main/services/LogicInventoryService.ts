@@ -1,8 +1,9 @@
+import log from 'electron-log';
 import { workspace } from '../workspace/Workspace';
 import { Inventory, Component } from '../../api/types';
-import { inventoryService } from '../../api/inventory-service';
 
 class LogicInventoryService {
+
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
     try {
       const project = workspace.getOpenedProjects()[0];
@@ -54,13 +55,40 @@ class LogicInventoryService {
     return inventory;
   }
 
-  public async InventoryAttachFileBatch(files:any ): Promise<boolean> {
+  public async InventoryAttachFileBatch(files: any): Promise<boolean> {
     const project = workspace.getOpenedProjects()[0];
     const success: boolean = await project.scans_db.inventories.attachFileInventoryBatch(files);
     return success;
-
   }
 
+  public async getAll(inventory: Partial<Inventory>): Promise<Array<Inventory>> {
+    try {
+      const project = workspace.getOpenedProjects()[0];
+      let inventories: any;
+      if (inventory.purl && inventory.version) {
+        inventories = await project.scans_db.inventories.getByPurlVersion(inventory);
+      } else if (inventory.files) {
+        inventories = await project.scans_db.inventories.getByResultId(inventory);
+      } else if (inventory.purl) {
+        inventories = await project.scans_db.inventories.getByPurl(inventory);
+      } else inventories = await project.scans_db.inventories.getAll();
+      if (inventory !== undefined) {
+        const component: any = await project.scans_db.components.allComp();
+        const compObj = component.reduce((acc, comp) => {
+          acc[comp.compid] = comp;
+          return acc;
+        }, {});
+        for (let i = 0; i < inventories.length; i += 1) {
+          inventories[i].component = compObj[inventories[i].cvid];
+        }
+        return inventories;
+      }
+      return [];
+    } catch (error: any) {
+      log.error(error);
+      return error;
+    }
+  }
 }
 
 export const logicInventoryService = new LogicInventoryService();

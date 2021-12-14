@@ -5,12 +5,12 @@ import { IFolderInventory, Inventory } from './types';
 const { ipcRenderer } = require('electron');
 
 class InventoryService extends BaseService {
-  public async getAll(args: Partial<Inventory>): Promise<any> {
+  public async getAll(args: Partial<Inventory>): Promise<any> {  
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_GET_ALL, args);
     return this.response(response);
   }
 
-  public async get(args: Partial<Inventory>): Promise<any> {
+  public async get(args: Partial<Inventory>): Promise<any> {   
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_GET, args);
     return this.response(response);
   }

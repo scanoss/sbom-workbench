@@ -14,7 +14,7 @@ import { workspace } from './workspace/Workspace';
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (_event, invget: Partial<Inventory>) => {
   let inv: any;
   try {
-    inv = await workspace.getOpenedProjects()[0].scans_db.inventories.getAll(invget);
+    inv = await logicInventoryService.getAll(invget);
     return { status: 'ok', message: inv, data: inv };
   } catch (e) {
     console.log('Catch an error: ', e);

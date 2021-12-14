@@ -27,7 +27,7 @@ export class InventoryDb extends Db {
     this.results = new ResultsDb(path);
   }
 
-  private getByResultId(inventory: Partial<Inventory>) {
+  public async getByResultId(inventory: Partial<Inventory>) {
     return new Promise(async (resolve) => {
       try {
         if (inventory.files) {
@@ -45,7 +45,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private getByPurlVersion(inventory: Partial<Inventory>) {
+  public async getByPurlVersion(inventory: Partial<Inventory>) {
     return new Promise(async (resolve) => {
       try {
         const db = await this.openDb();
@@ -68,7 +68,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private getAllInventories() {
+  public async getAll() {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -193,36 +193,6 @@ export class InventoryDb extends Db {
     });
   }
 
-  // GET ALL INVENTORIES BY PURL, VERSION OR FILES
-  getAll(inventory: Partial<Inventory>) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let inventories: any;
-        if (inventory.purl && inventory.version) {
-          inventories = await this.getByPurlVersion(inventory);
-        } else if (inventory.files) {
-          inventories = await this.getByResultId(inventory);
-        } else if (inventory.purl) {
-          inventories = await this.getByPurl(inventory);
-        } else inventories = await this.getAllInventories();
-        if (inventory !== undefined) {
-          const component: any = await this.component.getAll({});
-          const compObj = component.reduce((acc, comp) => {
-            acc[comp.compid] = comp;
-            return acc;
-          }, {});
-          for (let i = 0; i < inventories.length; i += 1) {
-            inventories[i].component = compObj[inventories[i].cvid];
-          }
-          resolve(inventories);
-        } else resolve([]);
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
   public getById(id: number) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -239,7 +209,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private getByPurl(inventory: Partial<Inventory>) {
+  public async getByPurl(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -497,8 +467,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  async createBatch(inventories: Array<Partial<Inventory>>) {
-    const self = this;
+  public async createBatch(inventories: Array<Partial<Inventory>>) { 
     return new Promise<Array<Inventory>>(async (resolve, reject) => {
       try {
         const inv: any = [];
