@@ -21,12 +21,15 @@ const useContextual = () => {
     );
   };
 
-  const acceptAll = async (node: any): Promise<boolean> => {
-    if (!showOverwrite(node)) {
-      return executeBatch(node.value, InventoryAction.ACCEPT);
-    }
+  const showConfirmDialog = async (): Promise<DialogResponse> => {
+    return dialogCtrl.openAlertDialog('This action will be executed on all files within this folder. Are you sure?', [
+      { label: 'Cancel', action: 'cancel', role: 'cancel' },
+      { label: 'YES', role: 'success' },
+    ]);
+  };
 
-    const { action } = await showOverwriteDialog();
+  const acceptAll = async (node: any): Promise<boolean> => {
+    const { action } = showOverwrite(node) ? await showOverwriteDialog() : await showConfirmDialog();
     if (action !== DIALOG_ACTIONS.CANCEL) {
       return executeBatch(node.value, InventoryAction.ACCEPT, { overwrite: action === 'overwrite' });
     }
@@ -46,7 +49,7 @@ const useContextual = () => {
   };
 
   const ignoreAll = async (node: any): Promise<boolean> => {
-    const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
+    const { action } = showOverwrite(node) ? await showOverwriteDialog() : await showConfirmDialog();
     if (action !== DIALOG_ACTIONS.CANCEL) {
       return executeBatch(node.value, InventoryAction.IGNORE, { overwrite: action === 'overwrite' });
     }
@@ -55,7 +58,12 @@ const useContextual = () => {
   };
 
   const restoreAll = async (node: any): Promise<boolean> => {
-    return executeBatch(node.value, InventoryAction.RESTORE);
+    const { action } = await showConfirmDialog();
+    if (action !== DIALOG_ACTIONS.CANCEL) {
+      return executeBatch(node.value, InventoryAction.RESTORE);
+    }
+
+    return false;
   };
 
   const ignore = async (node: any): Promise<boolean> => {
