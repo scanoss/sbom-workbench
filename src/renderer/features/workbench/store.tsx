@@ -121,7 +121,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const update = async (full = true) => {
     const params = state.filter.node?.type === 'folder' ? { path: state.filter.node.path } : null;
-
     if (component) {
       const comp = await workbenchController.getComponent(component.purl, params);
       if (comp) dispatch(setComponent(comp));
