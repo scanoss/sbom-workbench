@@ -30,9 +30,3 @@ yarn package
 This project was made using Electron React Boilerplate
 
 See [docs and guides here](https://electron-react-boilerplate.js.org/docs/installation)
-
-
-## License
-
-??
-
