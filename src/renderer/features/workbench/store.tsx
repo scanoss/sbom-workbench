@@ -107,11 +107,11 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
         ...data,
       });
 
-      // update(); // WORKAROUND UNTIL STORE REFACTOR
-      history.push(!path ? `/workbench/detected` : `/workbench/detected?path=folder|${encodeURIComponent(path)}`);
+      update(); // WORKAROUND UNTIL STORE REFACTOR
+      /* history.push(!path ? `/workbench/detected` : `/workbench/detected?path=folder|${encodeURIComponent(path)}`);
       const summary = await reportService.getSummary();
       dispatch(setProgress(summary));
-
+ */
       return true;
     } catch (e) {
       console.error(e);

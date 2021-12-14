@@ -20,7 +20,7 @@ export const InventoryDetail = () => {
   const history = useHistory();
   const { id } = useParams<any>();
 
-  const { setNode, detachFile, deleteInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, detachFile, deleteInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const [inventory, setInventory] = useState<Inventory>();

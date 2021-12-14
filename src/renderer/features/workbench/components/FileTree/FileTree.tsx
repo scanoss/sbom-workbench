@@ -1,18 +1,15 @@
-import { ipcRenderer } from 'electron';
 import React, { useContext, useState, useEffect } from 'react';
 import CheckboxTree, { OnCheckNode } from 'react-checkbox-tree';
 import { useHistory } from 'react-router-dom';
-import { IpcEvents } from '../../../../../ipc-events';
 import useContextual from '../../../../hooks/useContextual';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 
 const electron = window.require('electron');
 const { remote } = electron;
-const { Menu, MenuItem } = remote;
+const { Menu } = remote;
 
 export const FileTree = () => {
   const history = useHistory();
-  const contextual = useContextual();
 
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { tree, filter, file } = state;
@@ -43,7 +40,56 @@ export const FileTree = () => {
     return node;
   };
 
-  const onContextMenu = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: OnCheckNode | any) => {
+  useEffect(() => {
+    document.querySelectorAll('.rct-text.selected').forEach((el) => el.classList.remove('selected'));
+    if (!filter.node?.path && !file) {
+      document.querySelector('.react-checkbox-tree .rct-text')?.classList.add('selected');
+      return;
+    }
+
+    const value = filter.node?.path || file;
+    const node = document.querySelector(`[data-value="${value}"]`);
+    node?.closest('.rct-text')?.classList.add('selected');
+  }, [filter.node, file, renderTree]);
+
+  useEffect(() => {
+    if (tree) {
+      const t = { ...tree };
+      setRenderTree([preRender(t)]);
+    }
+  }, [tree]);
+
+  const preRender = (node: any) => {
+    node.label = <NodeItem node={node} label={node.label} />;
+    if (node.children) {
+      node.children.forEach((el) => preRender(el));
+    }
+    return node;
+  };
+
+  return (
+    <>
+      {tree ? (
+        <CheckboxTree
+          nodes={renderTree || []}
+          expanded={expanded}
+          onClick={(targetNode) => onSelectFile(targetNode)}
+          onExpand={(expandedItems) => setExpanded(expandedItems)}
+        />
+      ) : (
+        <div className="loader">
+          <span>Indexing...</span>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default FileTree;
+
+export const NodeItem = ({ node, label }) => {
+  const contextual = useContextual();
+  const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: OnCheckNode | any) => {
     const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED' || node.status === 'FILTERED';
     const menu = !node.children
       ? [
@@ -91,53 +137,9 @@ export const FileTree = () => {
     Menu.buildFromTemplate(menu).popup(remote.getCurrentWindow());
   };
 
-  useEffect(() => {
-    document.querySelectorAll('.rct-text.selected').forEach((el) => el.classList.remove('selected'));
-    if (!filter.node?.path && !file) {
-      document.querySelector('.react-checkbox-tree .rct-text')?.classList.add('selected');
-      return;
-    }
-
-    const value = filter.node?.path || file;
-    const node = document.querySelector(`[data-value="${value}"]`);
-    node?.closest('.rct-text')?.classList.add('selected');
-  }, [filter.node, file, renderTree]);
-
-  useEffect(() => {
-    if (tree) {
-      const t = { ...tree };
-      setRenderTree([preRender(t)]);
-    }
-  }, [tree]);
-
-  const preRender = (node: any) => {
-    node.label = (
-      <div onContextMenu={(e) => onContextMenu(e, node)} data-value={node.value}>
-        {node.label}
-      </div>
-    );
-    if (node.children) {
-      node.children.forEach((el) => preRender(el));
-    }
-    return node;
-  };
-
   return (
-    <>
-      {tree ? (
-        <CheckboxTree
-          nodes={renderTree || []}
-          expanded={expanded}
-          onClick={(targetNode) => onSelectFile(targetNode)}
-          onExpand={(expandedItems) => setExpanded(expandedItems)}
-        />
-      ) : (
-        <div className="loader">
-          <span>Indexing...</span>
-        </div>
-      )}
-    </>
+    <div onContextMenu={(e) => onContextMenu(e, node)} data-value={node.value}>
+     {label}
+    </div>
   );
 };
-
-export default FileTree;

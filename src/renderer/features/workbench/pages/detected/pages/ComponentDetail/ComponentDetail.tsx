@@ -196,7 +196,8 @@ export const ComponentDetail = () => {
 
     console.log(component?.versions[0].licenses);
 
-    create(inv, selFiles);
+    await create(inv, selFiles);
+    setTab(1);
   };
 
   const onIgnorePressed = async (file) => {
@@ -212,7 +213,6 @@ export const ComponentDetail = () => {
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.pending.map((file) => file.id);
       await ignoreFile(selFiles);
-      getFiles();
     }
   };
 
@@ -226,7 +226,6 @@ export const ComponentDetail = () => {
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.ignored.map((file) => file.id);
       await restoreFile(selFiles);
-      getFiles();
     }
   };
 
@@ -239,14 +238,11 @@ export const ComponentDetail = () => {
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.identified.map((file) => file.id);
       await detachFile(selFiles);
-      getFiles();
-      getInventories();
     }
   };
 
   const onDetachPressed = async (file) => {
     await detachFile([file.id]);
-    getInventories();
   };
 
   const onRestorePressed = async (file) => {
@@ -265,10 +261,6 @@ export const ComponentDetail = () => {
       ...inventory,
       files: selFiles,
     });
-
-    setInventories((previous) => [...previous, newInventory]);
-    getFiles();
-    setTab(1);
   };
 
   const handleCloseButtonGroup = (event: React.MouseEvent<Document, MouseEvent>) => {
@@ -297,6 +289,11 @@ export const ComponentDetail = () => {
     getFiles();
     getInventories();
   }, [state.filter.version, state.filter.node]);
+
+  useEffect(() => {
+    getFiles();
+    getInventories();
+  }, [state.summary]);
 
   useEffect(() => {
     dispatch(setHistoryCrumb({ section: tab }));

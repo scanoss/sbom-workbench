@@ -189,6 +189,11 @@ export const Editor = () => {
     }
   }, [currentMatch]);
 
+  useEffect(() => {
+    getInventories();
+    getResults();
+  }, [state.summary]);
+
   const onAction = (action: MATCH_INFO_CARD_ACTIONS, result: any = null) => {
     switch (action) {
       case MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY:
