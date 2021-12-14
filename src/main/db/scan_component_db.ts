@@ -499,6 +499,10 @@ export class ComponentDb extends Db {
         const data = await this.getAll(component, params);       
         if (data) {
           const [comp] = await this.groupComponentsByPurl(data);
+          if (!comp){
+            log.error('Comp not found',data);
+            resolve([]);
+          }
           comp.summary = await this.summaryByPurl(comp);
           if(params?.path){             
             const aux = await this.getSummaryByPath(params.path,[comp.purl]);  
