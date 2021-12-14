@@ -29,6 +29,7 @@ export class Accept extends Batch {
 
       this.updateTree(ids, NodeStatus.IDENTIFIED);
       const components: any = await logicComponentService.getAll({ source: ComponentSource.ENGINE });
+      if (ids.length === 0) return [];
       let inventories = this.getFilteredObject(files, this.filter) as Array<Partial<Inventory>>;
 
       inventories = this.AddComponentIdToInventory(components, inventories);
@@ -36,9 +37,10 @@ export class Accept extends Batch {
       const inv = await logicInventoryService.InventoryBatchCreate(inventories);
       const filesToUpdate: any = this.mergeFilesInventoryId(inv);
       filesToUpdate.files = ids;
-    
+
       const success = await logicInventoryService.InventoryAttachFileBatch(filesToUpdate);
       if (success) {
+        this.updateTree(ids, NodeStatus.IDENTIFIED);
         return inventories;
       }
       throw new Error('inventory accept failed');
