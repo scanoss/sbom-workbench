@@ -1,4 +1,6 @@
 # SCANOSS AUDIT WORKBENCH
+The SCANOSS Audit Workbench is a graphical user interface to scan and audit source code using SCANOSS API.
+
 
 ## Prerequisites
 - Node.js v14.x (Unfortunately sqlite3 not supports node.js v16+ so far. We strongly recommend handling your node versions using [nvm](https://github.com/nvm-sh/nvm))
@@ -30,9 +32,3 @@ yarn package
 This project was made using Electron React Boilerplate
 
 See [docs and guides here](https://electron-react-boilerplate.js.org/docs/installation)
-
-
-## License
-
-??
-
