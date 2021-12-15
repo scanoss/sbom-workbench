@@ -7,7 +7,7 @@ import { logicComponentService } from './services/LogicComponentService';
 import { workspace } from './workspace/Workspace';
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (event, component: Component) => {
-  const data = await workspace.getOpenedProjects()[0].scans_db.components.getAll(component);
+  const data = await logicComponentService.getAll(component);
   return { status: 'ok', message: 'Components retrieved successfully', data };
 });
 

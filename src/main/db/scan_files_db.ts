@@ -15,8 +15,6 @@ import { Component, Files } from '../../api/types';
 import { ComponentDb } from './scan_component_db';
 import { InventoryDb } from './scan_inventory_db';
 
-const { performance } = require('perf_hooks')
-
 const query = new Querys();
 
 export class FilesDb extends Db {
@@ -44,22 +42,6 @@ export class FilesDb extends Db {
       }
     });
   }
-
-  // GET ALL FILES FOR A COMPONENT
-//  public async getFilesComponent(data: Partial<Component>, params: any){
-//     return new Promise(async (resolve, reject) => {
-//       let result;
-//       try {
-//         if (data.purl && data.version)
-//           result = await this.getByPurlVersion(data,params? params.path:null);
-//         else result = await this.getByPurl(data, params? params.path:null);
-//         resolve(result);
-//       } catch (error) {
-//         log.error(error);
-//         reject(error);
-//       }
-//     });
-//   }
 
   public async getByPurl(data: Partial<Component>, path: string) {    
     return new Promise(async (resolve, reject) => {  

@@ -57,7 +57,8 @@ ipcMain.handle(IpcEvents.UNIGNORED_FILES, async (event, arg: number[]) => {
 });
 
 ipcMain.handle(IpcEvents.RESULTS_GET, async (event, arg: string) => {
-  const result = await workspace.getOpenedProjects()[0].scans_db.results.get(arg);
+  // const result = await workspace.getOpenedProjects()[0].scans_db.results.get(arg);
+  const result = await logicResultService.getFromPath(arg);
   if (result)
     return {
       status: 'ok',

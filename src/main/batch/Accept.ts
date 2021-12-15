@@ -1,7 +1,8 @@
-import { Component, Inventory } from '../../api/types';
+import { Inventory } from '../../api/types';
 import { ComponentSource } from '../db/scan_component_db';
 import { logicComponentService } from '../services/LogicComponentService';
 import { logicInventoryService } from '../services/LogicInventoryService';
+
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { Batch } from './Batch';
 import { Filter } from './Filter/Filter';

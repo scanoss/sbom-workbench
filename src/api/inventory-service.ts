@@ -16,11 +16,13 @@ class InventoryService extends BaseService {
   }
 
   public async create(inventory: Inventory): Promise<Inventory> {
+    console.log('Create inventory: ', inventory);
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_CREATE, inventory);
     return this.response(response);
   }
 
   public async attach(inventory: Partial<Inventory>): Promise<any> {
+    console.log('Attach inventory: ', inventory);
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_ATTACH_FILE, inventory);
     return this.response(response);
   }

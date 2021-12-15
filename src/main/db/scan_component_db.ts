@@ -13,9 +13,9 @@
 import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
-import { Component, ComponentGroup } from '../../api/types';
+import { Component } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
-import { componentHelper } from '../helpers/ComponentHelper';
+
 
 export interface ComponentParams {
   source?: ComponentSource;

@@ -32,7 +32,7 @@ class LogicComponentService {
         files = await project.scans_db.files.getByPurlVersion(data, params ? params.path : null);
       else files = await project.scans_db.files.getByPurl(data, params ? params.path : null);
 
-      const components: any = await project.scans_db.components.getAll({
+      const components: any = await this.getAll({
         purl: data.purl,
         version: data.version,
       });
