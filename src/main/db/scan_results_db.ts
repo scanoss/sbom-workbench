@@ -256,6 +256,8 @@ export class ResultsDb extends Db {
     });
   }
 
+
+
   // GET RESULT
   public async getFromPath(path: string) {
     const db = await this.openDb();

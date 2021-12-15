@@ -131,7 +131,7 @@ export const Editor = () => {
       } else await resultService.updateNoMatchToFile(file);
 
       const data = await resultService.getNoMatch(file);
-
+      console.log("NEW INVENTORY",data);
       // FIXME: until getNode works ok
       if (!data) return;
 

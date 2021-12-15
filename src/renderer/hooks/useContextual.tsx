@@ -73,7 +73,6 @@ const useContextual = () => {
 
   const restore = async (node: any): Promise<boolean> => {
     const [result] = await resultService.get(node.value);
-    console.log(result);
     return restoreFile([result.id]);
   };
 

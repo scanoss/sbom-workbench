@@ -1,7 +1,6 @@
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { workspace } from '../workspace/Workspace';
 
-
 class LogicResultService {
   public async getResultsByids(ids: number[], project: any) {
     try {
@@ -98,11 +97,8 @@ class LogicResultService {
       const components: any = await project.scans_db.components.allComp();
 
       results.forEach((result) => {
-        result.component = components.find(
-          (component: any) => result.version === component.version && result.purl === component.purl
-        );
+        result.component = components;
       });
-
       return results;
     } catch (error: any) {
       return error;

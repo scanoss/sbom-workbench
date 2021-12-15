@@ -55,25 +55,6 @@ export class ComponentDb extends Db {
     });
   }
 
-  getAll(data: any, params?: ComponentParams) {    
-    return new Promise <Component>(async (resolve, reject) => {
-      try {
-        let component: any;
-        if (data.purl && data.version)
-          component = await this.getbyPurlVersion(data);
-        else if (data.purl) {          
-          component = await this.getByPurl(data,params);
-        } else {
-          component = await this.allComp(params);
-        }
-        if (component !== undefined) resolve(component);
-        else throw new Error("Unable to get components");
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
 
   private processComponent(data: any) {
     const results: any = [];
