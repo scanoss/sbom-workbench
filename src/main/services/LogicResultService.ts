@@ -97,7 +97,11 @@ class LogicResultService {
       const components: any = await project.scans_db.components.allComp();
 
       results.forEach((result) => {
-        result.component = components;
+        if (result.version)
+          result.component = components.find(
+            (component) => component.purl === result.purl && component.version === result.version
+          );
+        else result.component = null;
       });
       return results;
     } catch (error: any) {

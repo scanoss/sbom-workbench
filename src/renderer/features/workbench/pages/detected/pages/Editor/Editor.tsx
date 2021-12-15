@@ -131,7 +131,7 @@ export const Editor = () => {
       } else await resultService.updateNoMatchToFile(file);
 
       const data = await resultService.getNoMatch(file);
-      console.log("NEW INVENTORY",data);
+    
       // FIXME: until getNode works ok
       if (!data) return;
 
@@ -248,17 +248,17 @@ export const Editor = () => {
                             onAction={(action) => onAction(action, inventory)}
                           />
                         ))
-                      : matchInfo.map((match, index) => (
+                      : matchInfo?.map((match, index) => (
                           <MatchInfoCard
                             key={match.id}
                             selected={currentMatch === match}
                             match={{
-                              component: match.component.name,
-                              version: match.component.version,
+                              component: match.component?.name,
+                              version: match.component?.version,
                               usage: match.type,
-                              license: match.component.licenses && match.component.licenses[0]?.name,
-                              url: match.component.url,
-                              purl: match.component.purl,
+                              license: match.component?.licenses && match.component?.licenses[0]?.name,
+                              url: match.component?.url,
+                              purl: match.component?.purl,
                             }}
                             status={match.status}
                             onSelect={() => setCurrentMatch(matchInfo[index])}
