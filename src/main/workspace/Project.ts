@@ -166,6 +166,7 @@ export class Project extends EventEmitter {
       `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
       'color: green'
     );
+    await this.scans_db.files.insertFiles(this.tree.getRootFolder().getFiles());
     this.filesToScan = summary.files;
     this.filesNotScanned = {};
     this.processedFiles = 0;
@@ -230,6 +231,7 @@ export class Project extends EventEmitter {
         this.save();
       } else {
         await this.scans_db.results.insertFromFile(resultPath);
+        await this.scans_db.files.attachFileToResults();
         await this.scans_db.components.importUniqueFromFile();
       }
 

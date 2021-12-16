@@ -493,7 +493,7 @@ export class ComponentDb extends Db {
     });
   }
 
-  async getComponentGroup(component: Partial<ComponentGroup>,params: ComponentParams) {
+  async getComponentGroup(component: Partial<ComponentGroup>,params: ComponentParams) {  
     return new Promise(async (resolve, reject) => {
       try {
         const data = await this.getAll(component, params);       

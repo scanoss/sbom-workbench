@@ -15,7 +15,7 @@ import { Component, Files } from '../../api/types';
 import { ComponentDb } from './scan_component_db';
 import { InventoryDb } from './scan_inventory_db';
 
-const { performance } = require('perf_hooks')
+const { performance } = require('perf_hooks');
 
 const query = new Querys();
 
@@ -46,13 +46,16 @@ export class FilesDb extends Db {
   }
 
   // GET ALL FILES FOR A COMPONENT
- public async getFilesComponent(data: Partial<Component>, params: any){
+  public async getFilesComponent(data: Partial<Component>, params: any) {
     return new Promise(async (resolve, reject) => {
       let result;
       try {
         if (data.purl && data.version)
-          result = await this.getByPurlVersion(data,params? params.path:null);
-        else result = await this.getByPurl(data, params? params.path:null);
+          result = await this.getByPurlVersion(
+            data,
+            params ? params.path : null
+          );
+        else result = await this.getByPurl(data, params ? params.path : null);            
         resolve(result);
       } catch (error) {
         log.error(error);
@@ -61,45 +64,42 @@ export class FilesDb extends Db {
     });
   }
 
-  private async getByPurl(data: Partial<Component>, path: string) {    
+  private async getByPurl(data: Partial<Component>, path: string) {
     return new Promise(async (resolve, reject) => {
       const self = this;
       try {
-        let SQLquery:String = '';
+        let SQLquery: String = '';
         let params = [];
-        if(!path){
+        if (!path) {
           SQLquery = query.SQL_SELECT_FILES_FROM_PURL;
           params = [data.purl];
-        }
-        else {
+        } else {
           SQLquery = query.SQL_SELECT_FILES_FROM_PURL_PATH;
-          params = [data.purl,`${path}/%`];
+          params = [data.purl, `${path}/%`];
         }
-        const db = await this.openDb(); 
-        db.all(SQLquery, ...params,
-          async function (err: any, file: any) {
-            db.close();
-            if (!err) {           
-              const components: any = await self.component.getAll({
-                purl: data.purl,
-                version: data.version,
-              });                     
-              const inventories: any = await self.inventory.getAll({});
-              const index = inventories.reduce((acc, inventory) => {
-                acc[inventory.id] = inventory;
-                return acc;
-              }, {});
-              for (let i = 0; i < file.length; i += 1) {
-                file[i].component = components.find(
-                  (component) => file[i].version === component.version
-                );
-                if (file[i].inventoryid)
-                  file[i].inventory = index[file[i].inventoryid];
-              }         
-              resolve(file);
-            } else throw err;
-          }
-        );
+        const db = await this.openDb();
+        db.all(SQLquery, ...params, async function (err: any, file: any) {
+          db.close();
+          if (!err) {
+            const components: any = await self.component.getAll({
+              purl: data.purl,
+              version: data.version,
+            });
+            const inventories: any = await self.inventory.getAll({});
+            const index = inventories.reduce((acc, inventory) => {
+              acc[inventory.id] = inventory;
+              return acc;
+            }, {});
+            for (let i = 0; i < file.length; i += 1) {
+              file[i].component = components.find(
+                (component) => file[i].version === component.version
+              );
+              if (file[i].inventoryid)
+                file[i].inventory = index[file[i].inventoryid];
+            }
+            resolve(file);
+          } else throw err;
+        });
       } catch (error) {
         log.error(error);
         reject(error);
@@ -107,34 +107,37 @@ export class FilesDb extends Db {
     });
   }
 
-  private async getByPurlVersion(data: Partial<Component>, path: string ) {
+  private async getByPurlVersion(data: Partial<Component>, path: string) {
     return new Promise(async (resolve, reject) => {
       const self = this;
       try {
-        let SQLquery:String = '';
+        let SQLquery: String = '';
         let params = [];
-        if(!path){
+        if (!path) {
           SQLquery = query.SQL_SELECT_FILES_FROM_PURL_VERSION;
-          params = [data.purl,data.version];
-        }else{
+          params = [data.purl, data.version];
+        } else {
           SQLquery = query.SQL_SELECT_FILES_FROM_PURL_VERSION_PATH;
-          params = [data.purl,data.version,`${path}/%`];
+          params = [data.purl, data.version, `${path}/%`];
         }
         const db = await this.openDb();
-        db.all(SQLquery,...params,async function (err: any, file: any){
+        db.all(SQLquery, ...params, async function (err: any, file: any) {
           db.close();
           if (!err) {
-            const comp = await self.component.getAll({ purl: data.purl,version: data.version });
+            const comp = await self.component.getAll({
+              purl: data.purl,
+              version: data.version,
+            });
             const inventories: any = await self.inventory.getAll({});
             const index = inventories.reduce((acc, inventory) => {
-                acc[inventory.id] = inventory;
-                return acc;
-              }, {});
+              acc[inventory.id] = inventory;
+              return acc;
+            }, {});
             for (let i = 0; i < file.length; i += 1) {
-                file[i].component = comp;
-                if (file[i].inventoryid)
-                  file[i].inventory = index[file[i].inventoryid];
-              }
+              file[i].component = comp;
+              if (file[i].inventoryid)
+                file[i].inventory = index[file[i].inventoryid];
+            }
             resolve(file);
           } else throw err;
         });
@@ -150,12 +153,13 @@ export class FilesDb extends Db {
       try {
         const db = await this.openDb();
         const ignoredFilesSQL = `${
-        query.SQL_UPDATE_IGNORED_FILES}(${files.toString()});`;
+          query.SQL_UPDATE_IGNORED_FILES
+        }(${files.toString()});`;
         db.serialize(function () {
           db.run('begin transaction');
           db.run(ignoredFilesSQL);
-          db.run('commit', (err:any) => {
-           if(err) throw err;
+          db.run('commit', (err: any) => {
+            if (err) throw err;
             db.close();
             resolve(true);
           });
@@ -193,4 +197,45 @@ export class FilesDb extends Db {
       }
     });
   }
+
+  public async insertFiles(files: Array<string>) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          files.forEach((file) => {
+            db.run('INSERT INTO FILES(path) VALUES(?)', file);
+          });
+          db.run('commit', (err: any) => {
+            if (err) throw err;
+            db.close();
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        log.error(error);
+        reject(new Error('ERROR INSERTING FILES'));
+      }
+    });
+  }
+
+public async attachFileToResults(){
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await this.openDb();
+    db.run("INSERT INTO filesResults (fileId,resultId) SELECT f.fileId,r.id FROM results r INNER JOIN files f WHERE f.path=r.file_path AND r.idtype!='none';", (err: any) => {
+      if (err) throw err;
+      db.close();
+      resolve(true);
+    });
+  }
+    catch (error) {
+      log.error(error);
+      reject(new Error('ERROR ATTACHING FILES TO RESULTS'));
+    }
+  });
+}
+      
+
 }

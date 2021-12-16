@@ -81,4 +81,8 @@ export default class File extends Node {
   public getStatus(): NodeStatus {
     return this.status;
   }
+
+  public getFiles(): Array<string> {
+    return [this.getPath()];
+  }
 }
