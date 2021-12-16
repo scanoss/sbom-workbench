@@ -18,7 +18,7 @@ export interface IDialogContext {
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
   openAlertDialog: (message?: string, buttons?: any[]) => Promise<DialogResponse>;
-  openLicenseCreate: () => Promise<DialogResponse>;
+  openLicenseCreate: (save?: boolean) => Promise<DialogResponse>;
   openSettings: () => Promise<DialogResponse>;
   openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
 }
@@ -132,9 +132,10 @@ export const DialogProvider: React.FC = ({ children }) => {
   const [licenseDialog, setLicenseDialog] = useState<{
     open: boolean;
     onClose?: (response: DialogResponse) => void;
+    save?: boolean;
   }>({ open: false });
 
-  const openLicenseCreate = () => {
+  const openLicenseCreate = (save = true) => {
     return new Promise<DialogResponse>((resolve) => {
       setLicenseDialog({
         open: true,
@@ -142,6 +143,7 @@ export const DialogProvider: React.FC = ({ children }) => {
           setLicenseDialog((dialog) => ({ ...dialog, open: false }));
           resolve(response);
         },
+        save: save,
       });
     });
   };
@@ -245,6 +247,7 @@ export const DialogProvider: React.FC = ({ children }) => {
         open={licenseDialog.open}
         onCancel={() => licenseDialog.onClose && licenseDialog.onClose(null)}
         onClose={(response) => licenseDialog.onClose && licenseDialog.onClose(response)}
+        save={licenseDialog.save}
       />
 
       <SettingsDialog

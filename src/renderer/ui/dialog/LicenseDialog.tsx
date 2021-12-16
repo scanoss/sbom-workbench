@@ -28,11 +28,12 @@ interface LicenseDialogProps {
   open: boolean;
   onClose: (response: DialogResponse) => void;
   onCancel: () => void;
+  save?: boolean;
 }
 
 export const LicenseDialog = (props: LicenseDialogProps) => {
   const classes = useStyles();
-  const { open, onClose, onCancel } = props;
+  const { open, onClose, onCancel, save } = props;
   const [form, setForm] = useState<Partial<License>>({});
   const dialogCtrl = useContext<any>(DialogContext);
 
@@ -47,7 +48,7 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
     e.preventDefault();
     try {
       const license: Partial<License> = form;
-      const response = await licenseService.create(license);
+      const response = save ? await licenseService.create(license) : {...license, spdxid: licenseHelper.licenseNameToSPDXID(form.name)};
       onClose({ action: DIALOG_ACTIONS.OK, data: response });
     } catch (error) {
       await dialogCtrl.openConfirmDialog(
@@ -62,6 +63,12 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
     const { name, fulltext } = form;
     return name && fulltext;
   };
+
+  useEffect(() => {
+    if (open) {
+      setForm({});
+    }
+  }, [open])
 
   return (
     <Dialog
