@@ -23,7 +23,7 @@ export class ResultsDb extends Db {
     this.component = new ComponentDb(path);
   }
 
-  insertFromFileReScan(resultPath: string) {
+  insertFromFileReScan(resultPath: string,files:any) {
     return new Promise(async (resolve) => {
       try {
         const self = this;
@@ -36,7 +36,7 @@ export class ResultsDb extends Db {
             for (let i = 0; i < value.length; i += 1) {
               const filePath = key;
               data = value[i];
-              self.insertResultBulkReScan(db, data, filePath);
+              if (data.id !== 'none') self.insertResultBulkReScan(db, data, files[filePath]);
             }
           }
           db.run('commit', () => {
@@ -174,7 +174,7 @@ export class ResultsDb extends Db {
     });
   }
 
-  private insertResultBulk(db: any, data: any, fileId: string) {
+  private insertResultBulk(db: any, data: any, fileId: number) {
     const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : null;
     db.run(
       query.SQL_INSERT_RESULTS,
@@ -198,7 +198,7 @@ export class ResultsDb extends Db {
     );
   }
 
-  private async insertResultBulkReScan(db: any, data: any, filePath: string) {
+  private async insertResultBulkReScan(db: any, data: any,fileId: number) {
     const self = this;
     const sQuery = `SELECT id FROM results WHERE md5_file ${
       data.file_hash ? `='${data.file_hash}'` : 'IS NULL'
@@ -214,25 +214,33 @@ export class ResultsDb extends Db {
       data.file ? `='${data.file}'` : 'IS NULL'
     } AND md5_comp ${data.url_hash ? `='${data.url_hash}'` : 'IS NULL'} AND purl = '${
       data.purl ? data.purl[0] : ' '
-    }' AND file_path = '${filePath}'  AND file_url ${data.file_url ? `='${data.file_url}'` : 'IS NULL'} AND idtype='${
+    }' AND fileId = ${fileId}  AND file_url ${data.file_url ? `='${data.file_url}'` : 'IS NULL'} AND idtype='${
       data.id
     }' ; `;
 
     db.serialize(function () {
       db.get(sQuery, function (err: any, result: any) {
-        if (result === undefined) {
-          db.get(
-            `SELECT id FROM results WHERE file_path='${filePath}' AND source='nomatch' AND identified=1 OR ignored=1;`,
-            (err: any, resultNoMatch: any) => {
-              if (resultNoMatch !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', resultNoMatch.id);
-              else self.insertResultBulk(db, data, filePath);
-            }
-          );
-        } else {
+        if (result !== undefined) {
           db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
+        }else{
+          self.insertResultBulk(db, data, fileId);
         }
+
       });
     });
+    //     if (result === undefined) {
+    //       db.get(
+    //         `SELECT id FROM results WHERE file_path='${filePath}' AND source='nomatch' AND identified=1 OR ignored=1;`,
+    //         (err: any, resultNoMatch: any) => {
+    //           if (resultNoMatch !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', resultNoMatch.id);
+    //           else self.insertResultBulk(db, data, filePath);
+    //         }
+    //       );
+    //     } else {
+    //       db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
+    //     }
+    //   });
+    // });
   }
 
   // CONVERT ARRAY TO RESULTS FORMAT

@@ -254,6 +254,70 @@ public async getIdFromPath(path: string){
     }
   });
 }
+
+public async setDirty(dirty: number,path?: string){
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await this.openDb();
+      let SQLquery: String = '';
+      if(path)
+      SQLquery = `UPDATE files SET dirty=${dirty} WHERE path IN (${path});`;
+      else
+      SQLquery = `UPDATE files SET dirty=${dirty};`;
+      db.run(SQLquery,(err: any) => {
+      if (err) throw err;
+      db.close();
+      resolve(true);
+    });
+  }
+    catch (error) {
+      log.error(error);
+      reject(new Error('ERROR SETTING FILES DIRTY'));
+    }
+  });
+}
+
+public async getDirty() {
+  const db = await this.openDb();
+  return new Promise<number[]>(async (resolve) => {
+    db.all(`SELECT fileId AS id FROM files WHERE dirty=1;`, (err: any, data: any) => {
+      db.close();
+      if (err) throw err;
+      if (data === undefined) resolve([]);
+      resolve(data.map((item: any) => item.id));
+    });
+  });
+}
+
+public async deleteDirty() {
+  const db = await this.openDb();
+  return new Promise<number[]>(async (resolve) => {
+    db.all(`DELETE FROM files WHERE dirty=1;`, (err: any, data: any) => {
+      db.close();
+      if (err) throw err;
+      if (data === undefined) resolve([]);
+      resolve(data.map((item: any) => item.id));
+    });
+  });
+}
+
+public async getClean(){
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await this.openDb();
+      db.all("SELECT * FROM files WHERE dirty=0", (err: any, files:any) => {
+      if (err) throw err;
+      db.close();
+      resolve(files);
+    });
+  }
+    catch (error) {
+      log.error(error);
+      reject(new Error('ERROR ATTACHING FILES TO RESULTS'));
+    }
+  });
+}
+
       
 
 }

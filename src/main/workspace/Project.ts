@@ -165,8 +165,7 @@ export class Project extends EventEmitter {
     log.info(
       `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
       'color: green'
-    );
-    await this.scans_db.files.insertFiles(this.tree.getRootFolder().getFiles());
+    );   
     this.filesToScan = summary.files;
     this.filesNotScanned = {};
     this.processedFiles = 0;
@@ -225,21 +224,25 @@ export class Project extends EventEmitter {
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
         log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
 
-        await reScanService.reScan(resultPath, this, this.tree.getFilteredFiles());
+        await reScanService.reScan(
+          this.tree.getRootFolder().getFiles(),
+          resultPath,
+          this,
+          this.tree.getFilteredFiles()
+        );
         const results = await reScanService.getNewResults(this);
         this.tree.sync(results);
         this.save();
       } else {
-        const files:any =  await this.scans_db.files.getFiles();
-        const aux =  files.reduce((previousValue, currentValue) => {      
+        await this.scans_db.files.insertFiles(this.tree.getRootFolder().getFiles());
+        const files: any = await this.scans_db.files.getFiles();
+        const aux = files.reduce((previousValue, currentValue) => {
           previousValue[currentValue.path] = currentValue.fileId;
           return previousValue;
-        },[]);
+        }, []);
 
-     
-        await this.scans_db.results.insertFromFile(resultPath,aux);
+        await this.scans_db.results.insertFromFile(resultPath, aux);
 
-       
         await this.scans_db.components.importUniqueFromFile();
       }
 

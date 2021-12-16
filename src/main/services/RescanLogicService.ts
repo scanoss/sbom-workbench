@@ -2,25 +2,49 @@ import { utilHelper } from '../helpers/UtilHelper';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 
 class ReScanService {
-  public async reScan(resultPath: string, project: any, filteredFiles: Array<string>): Promise<void> {
+  public async reScan(files : Array<string>,resultPath: string, project: any, filteredFiles: Array<string>): Promise<void> {
     try {
+
+      
+      const aux = utilHelper.convertsArrayOfStringToString(files);
+      
+
+      // UPDATING FILES
+      await project.scans_db.files.setDirty(1);
+      await project.scans_db.files.setDirty(0, aux);
+      
+
       await project.scans_db.results.updateDirty(1);
-      await project.scans_db.results.insertFromFileReScan(resultPath);
-      if (filteredFiles.length > 0) {
-        const filtered = utilHelper.convertsArrayOfStringToString(filteredFiles);
-        await project.scans_db.results.updateFiltered(filtered);
-      }
-      const dirtyResults = await project.scans_db.results.getDirty();
-      if (dirtyResults.length > 0) {
-        await project.scans_db.inventories.deleteDirtyFileInventories(dirtyResults);
+
+
+      const cleanFiles = await project.scans_db.files.getClean();
+      const filesToUpdate = cleanFiles.reduce((previousValue, currentValue) => {
+        previousValue[currentValue.path] = currentValue.fileId;
+        return previousValue;
+      }, []);
+      await project.scans_db.results.insertFromFileReScan(resultPath, filesToUpdate);
+ 
+      // if (filteredFiles.length > 0) {
+      //   const filtered = utilHelper.convertsArrayOfStringToString(filteredFiles);
+      //   await project.scans_db.results.updateFiltered(filtered);
+      // }
+
+      // const dirtyResults = await project.scans_db.results.getDirty();
+      const dirtyFiles = await project.scans_db.files.getDirty();
+      if (dirtyFiles.length > 0) {
+        await project.scans_db.inventories.deleteDirtyFileInventories(dirtyFiles);
       }
       const notValidComp: number[] = await project.scans_db.components.getNotValid();
+     
 
       if (notValidComp.length > 0) {
         await project.scans_db.components.deleteByID(notValidComp);
       }
+     
 
       await project.scans_db.results.deleteDirty();
+      await project.scans_db.files.deleteDirty();
+    
       await project.scans_db.components.updateOrphanToManual();
       await project.scans_db.components.importUniqueFromFile();
 

@@ -128,9 +128,12 @@ export const Editor = () => {
     });
     
     if (response) {
-     
-      const node = await projectService.getNodeFromPath(file);
       const data = await fileService.getIdFromPath(file);
+      if (!data) return;
+      await createInventory({
+        ...response,
+        files: [data.id],
+      });
     
 
       // TO DO REMOVE UNUSED
@@ -141,12 +144,6 @@ export const Editor = () => {
       // const data = await resultService.getNoMatch(file);
 
       // FIXME: until getNode works ok
-      if (!data) return;
-
-      await createInventory({
-        ...response,
-        files: [data.id],
-      });
 
       getInventories();
       getResults();
