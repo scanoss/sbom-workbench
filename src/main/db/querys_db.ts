@@ -2,7 +2,7 @@ export class Querys {
   /** SQL CREATE SCAN TABLES * */
 
   SQL_CREATE_TABLE_RESULTS =
-    'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,file_path text ,fileid integer, vendor text, component text, version text, latest_version text, cpe text, license text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,identified integer,ignored integer,file_url text,source text,dirty INTEGER default 0);';
+    'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,fileId integer, vendor text, component text, version text, latest_version text, cpe text, license text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,file_url text,source text,dirty INTEGER default 0, FOREIGN KEY (fileId) REFERENCES files(fileId));';
 
   SQL_CREATE_TABLE_FILE_INVENTORIES =
     'CREATE TABLE IF NOT EXISTS file_inventories (id integer primary key asc, fileId integer not null, inventoryid integer not null, FOREIGN KEY (inventoryid) REFERENCES inventories(id) ON DELETE CASCADE);';
@@ -25,8 +25,7 @@ export class Querys {
   FILES_TABLE =
     'CREATE TABLE IF NOT EXISTS files (fileId INTEGER PRIMARY KEY ASC,path TEXT,identified INTEGER DEFAULT 0, ignored INTEGER DEFAULT 0, dirty INTEGER DEFAULT 0);';
 
-  FILES_RESULTS_TABLE =
-    'CREATE TABLE IF NOT EXISTS filesResults (id INTEGER PRIMARY KEY ASC, fileId INTEGER NOT NULL, resultId INTEGER NOT NULL, FOREIGN KEY (resultId) REFERENCES results(id) ON DELETE CASCADE, FOREIGN KEY (fileId) REFERENCES files(fileId) ON DELETE CASCADE);';
+  
 
   SQL_DB_TABLES =
     this.SQL_CREATE_TABLE_RESULTS +
@@ -35,13 +34,13 @@ export class Querys {
     this.SQL_CREATE_TABLE_INVENTORY +
     this.COMPDB_SQL_CREATE_TABLE_COMPVERS +
     this.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS +
-    this.COMPDB_LICENSES_TABLE +
-    this.FILES_RESULTS_TABLE;
+    this.COMPDB_LICENSES_TABLE;
+  
 
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS
   SQL_INSERT_RESULTS =
-    'INSERT or IGNORE INTO results (md5_file,vendor,component,version,latest_version,license,url,lines,oss_lines,matched,filename,idtype,md5_comp,purl,file_path,identified,ignored,file_url,source) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+    'INSERT or IGNORE INTO results (md5_file,vendor,component,version,latest_version,license,url,lines,oss_lines,matched,filename,idtype,md5_comp,purl,fileId,file_url,source) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
   SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH = `UPDATE results SET source=?,idtype='file' WHERE file_path=?`;
 
@@ -112,7 +111,7 @@ export class Querys {
   //   "SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype!='none' order by file_path;";
 
   SQL_SCAN_SELECT_FILE_RESULTS =
-    ' SELECT f.fileId AS id, f.path AS file_path, r.url,r.lines, r.oss_lines, r.matched, r.filename as file, r.idtype as type, r.md5_file, r.md5_comp as url_hash,r.purl, r.version,r.latest_version as latest, f.identified, f.ignored, r.file_url FROM files f LEFT JOIN filesResults fr  ON fr.fileid=f.fileId LEFT JOIN results r  ON r.id=fr.resultId WHERE f.path=? ORDER BY r.file_path;';
+    ' SELECT f.fileId AS id,f.path AS file_path, r.url,r.lines, r.oss_lines, r.matched, r.filename as file, r.idtype as type, r.md5_file, r.md5_comp as url_hash,r.purl, r.version,r.latest_version as latest, f.identified, f.ignored, r.file_url FROM files f INNER JOIN results r  ON r.fileId=f.fileId WHERE f.path=? ORDER BY f.path;';
 
   SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH =
     'SELECT DISTINCT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? ORDER BY file_path;';
@@ -125,7 +124,7 @@ export class Querys {
   //   'SELECT DISTINCT r.id,r.file_path as path,r.identified as identified,r.ignored as ignored FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN results r ON r.id=fi.resultid WHERE i.id=?';
 
   SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID =
-    'SELECT DISTINCT f.fileId AS id,f.path,f.identified as identified,r.ignored as ignored FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN files f ON f.fileId=fi.fileId INNER JOIN filesResults fr ON fr.fileId=f.fileId INNER JOIN results r ON fr.resultId=r.id WHERE i.id=?;';
+    'SELECT DISTINCT f.fileId AS id,f.path,f.identified,f.ignored FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN files f ON f.fileId=fi.fileId  WHERE i.id=?;';
 
   // SQL_GET_COMPONENTS TABLE
   SQL_GET_COMPONENT = 'SELECT id,name,version,description,url,purl from component_versions where purl like ?';
@@ -193,7 +192,7 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   //   WHERE r.purl=? AND r.version=? GROUP BY r.file_path;`;
 
   SQL_SELECT_FILES_FROM_PURL_VERSION = `
-    SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid FROM results r INNER JOIN filesResults fr ON r.id=fr.resultId INNER JOIN files f ON fr.fileId=f.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? AND r.version=? GROUP BY f.path;`;
+    SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid FROM results r INNER JOIN files f ON r.fileId=f.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? AND r.version=? GROUP BY f.path;`;
 
   // SQL_SELECT_FILES_FROM_PURL_VERSION_PATH = `
   //   SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, fi.inventoryid
@@ -201,7 +200,7 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   //   LEFT JOIN file_inventories fi ON r.id=fi.resultid
   //   WHERE r.purl=? AND r.version=? AND r.file_path like ?`;
 
-  SQL_SELECT_FILES_FROM_PURL_VERSION_PATH = `SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid FROM results r INNER JOIN filesResults fr ON r.id=fr.resultId INNER JOIN files f ON fr.fileId=f.fileId LEFT JOIN file_inventories fi ON fi.fileId-f.fileId WHERE r.purl=? AND r.version=? AND f.path like ?`;
+  SQL_SELECT_FILES_FROM_PURL_VERSION_PATH = `SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid FROM results r INNER JOIN files f ON r.fileId=f.fileId LEFT JOIN file_inventories fi ON fi.fileId-f.fileId WHERE r.purl=? AND r.version=? AND f.path like ?`;
 
   // SQL_SELECT_FILES_FROM_PURL = `SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r
   //  LEFT JOIN file_inventories fi ON r.id=fi.resultid
@@ -209,14 +208,14 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   //  GROUP BY r.file_path;`;
 
   SQL_SELECT_FILES_FROM_PURL =
-    'SELECT f.fileId AS id,r.file_path AS path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r INNER JOIN filesResults fr ON fr.resultId=r.id INNER JOIN files f ON f.fileId=fr.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? GROUP BY r.file_path;';
+    'SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r INNER JOIN files f ON f.fileId=r.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? GROUP BY f.path;';
 
   // SQL_SELECT_FILES_FROM_PURL_PATH = `SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r
   //  LEFT JOIN file_inventories fi ON r.id=fi.resultid
   //  WHERE r.purl=? AND r.file_path like ?;`;
 
   SQL_SELECT_FILES_FROM_PURL_PATH =
-    'SELECT f.fileId AS id,r.file_path AS path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r INNER JOIN filesResults fr ON fr.resultId=r.id INNER JOIN files f ON f.fileId=fr.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? AND f.path LIKE ?;';
+    'SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r INNER JOIN files f ON f.fileId=r.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? AND f.path LIKE ?;';
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE files SET ignored=1,identified=0 WHERE fileId IN ';
 
@@ -257,9 +256,9 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION =
     'UPDATE results SET identified=0 WHERE id IN (SELECT resultid FROM file_inventories where inventoryid=?)';
 
-  SQL_GET_RESULTS_SUMMARY = `SELECT (SELECT COUNT(*) FROM results r WHERE r.identified = 1 AND md5_file!="") AS "identified", (SELECT COUNT(*) FROM results r WHERE r.ignored = 1 AND md5_file!="" ) AS "ignored", (SELECT COUNT(*) FROM results r WHERE (r.identified = 0 AND r.ignored = 0 AND md5_file!="" AND source="engine")) AS "pending", (SELECT COUNT(*) FROM results WHERE idtype !="none" AND md5_file!="" AND source="engine") AS "detected";`;
+  SQL_GET_RESULTS_SUMMARY = `SELECT (SELECT COUNT(*) FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE f.identified = 1) AS "identified", (SELECT COUNT(*) FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE f.ignored = 1) AS "ignored", (SELECT COUNT(*) FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE (f.identified = 0 AND f.ignored = 0)) AS "pending", (SELECT COUNT(*) FROM results WHERE idtype !="none" AND md5_file!="" AND source="engine") AS "detected";`;
 
-  SQL_GET_SUMMARY_BY_RESULT_ID = `SELECT r.file_path as path,r.identified ,r.ignored ,(CASE WHEN  r.identified=0 AND r.ignored=0 THEN 1 ELSE 0 END) as pending FROM results r WHERE r.id in #values GROUP BY r.file_path;`;
+  SQL_GET_SUMMARY_BY_RESULT_ID = `SELECT f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending FROM files f  WHERE fileId IN #values GROUP BY f.path;`;
 
   SQL_GET_RESULTS_RESCAN = `SELECT r.idtype,r.file_path as path,r.identified ,r.ignored ,(CASE WHEN  r.identified=0 AND r.ignored=0 THEN 1 ELSE 0 END) as pending, source AS original FROM results r;`;
 

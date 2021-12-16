@@ -230,8 +230,16 @@ export class Project extends EventEmitter {
         this.tree.sync(results);
         this.save();
       } else {
-        await this.scans_db.results.insertFromFile(resultPath);
-        await this.scans_db.files.attachFileToResults();
+        const files:any =  await this.scans_db.files.getFiles();
+        const aux =  files.reduce((previousValue, currentValue) => {      
+          previousValue[currentValue.path] = currentValue.fileId;
+          return previousValue;
+        },[]);
+
+     
+        await this.scans_db.results.insertFromFile(resultPath,aux);
+
+       
         await this.scans_db.components.importUniqueFromFile();
       }
 

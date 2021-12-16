@@ -46,7 +46,7 @@ export class FilesDb extends Db {
   }
 
   // GET ALL FILES FOR A COMPONENT
-  public async getFilesComponent(data: Partial<Component>, params: any) {
+  public async getFilesComponent(data: Partial<Component>, params: any) {  
     return new Promise(async (resolve, reject) => {
       let result;
       try {
@@ -96,7 +96,7 @@ export class FilesDb extends Db {
               );
               if (file[i].inventoryid)
                 file[i].inventory = index[file[i].inventoryid];
-            }
+            }            
             resolve(file);
           } else throw err;
         });
@@ -220,14 +220,15 @@ export class FilesDb extends Db {
     });
   }
 
-public async attachFileToResults(){
+
+public async getFiles(){
   return new Promise(async (resolve, reject) => {
     try {
       const db = await this.openDb();
-    db.run("INSERT INTO filesResults (fileId,resultId) SELECT f.fileId,r.id FROM results r INNER JOIN files f WHERE f.path=r.file_path AND r.idtype!='none';", (err: any) => {
+      db.all("SELECT * FROM files", (err: any, files:any) => {
       if (err) throw err;
       db.close();
-      resolve(true);
+      resolve(files);
     });
   }
     catch (error) {

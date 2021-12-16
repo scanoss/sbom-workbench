@@ -52,7 +52,7 @@ export class ResultsDb extends Db {
   }
 
   // INSERT RESULTS FROM FILE
-  insertFromFile(resultPath: string) {
+  insertFromFile(resultPath: string, files: any) {
     return new Promise(async (resolve) => {
       try {
         const self = this;
@@ -65,7 +65,7 @@ export class ResultsDb extends Db {
             for (let i = 0; i < value.length; i += 1) {
               const filePath = key;
               data = value[i];
-              self.insertResultBulk(db, data, filePath);
+              if (data.id !== 'none') self.insertResultBulk(db, data, files[filePath]);
             }
           }
           db.run('commit', (err: any) => {
@@ -174,7 +174,7 @@ export class ResultsDb extends Db {
     });
   }
 
-  private insertResultBulk(db: any, data: any, filePath: string) {
+  private insertResultBulk(db: any, data: any, fileId: string) {
     const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : null;
     db.run(
       query.SQL_INSERT_RESULTS,
@@ -192,9 +192,7 @@ export class ResultsDb extends Db {
       data.id,
       data.url_hash,
       data.purl ? data.purl[0] : ' ',
-      filePath,
-      0,
-      0,
+      fileId,
       data.file_url,
       'engine'
     );
@@ -375,7 +373,7 @@ export class ResultsDb extends Db {
     });
   }
 
-  public async getSummaryByids(ids: number[]) {
+  public async getSummaryByids(ids: number[]) {    
     return new Promise<Array<any>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();

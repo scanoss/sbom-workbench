@@ -98,7 +98,7 @@ export class Db {
           db.run(`
           CREATE VIEW IF NOT EXISTS summary AS SELECT cv.id AS compid,cv.purl,cv.version,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
           SUM(f.identified=0 AND f.ignored=0) AS pending
-          FROM files f INNER JOIN filesResults fr ON fr.fileId=f.fileId INNER JOIN results r ON r.id=fr.resultId 
+          FROM files f INNER JOIN Results r ON r.fileId=f.fileId  
           INNER JOIN component_versions cv ON cv.purl=r.purl
           AND cv.version=r.version
           GROUP BY r.purl, r.version 

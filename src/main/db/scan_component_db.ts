@@ -66,6 +66,7 @@ export class ComponentDb extends Db {
         } else {
           component = await this.allComp(params);
         }
+        
         if (component !== undefined) resolve(component);
         else throw new Error("Unable to get components");
       } catch (error) {
@@ -119,7 +120,7 @@ export class ComponentDb extends Db {
     a.licenses.push(preLicense);
   }
 
-  private allComp(params: ComponentParams) {
+  private allComp(params: ComponentParams) {   
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
@@ -163,7 +164,7 @@ export class ComponentDb extends Db {
         if(params?.path)
           SQLQuery = query.SQL_GET_COMPONENT_BY_PURL_ENGINE_PATH.replace('#', `'${params.path}/%'`);
         else
-          SQLQuery =  query.SQL_GET_COMPONENT_BY_PURL_ENGINE;       
+          SQLQuery =  query.SQL_GET_COMPONENT_BY_PURL_ENGINE;          
         const db = await this.openDb();
         db.all(
           SQLQuery,
@@ -493,10 +494,10 @@ export class ComponentDb extends Db {
     });
   }
 
-  async getComponentGroup(component: Partial<ComponentGroup>,params: ComponentParams) {  
+  async getComponentGroup(component: Partial<ComponentGroup>,params: ComponentParams) {     
     return new Promise(async (resolve, reject) => {
       try {
-        const data = await this.getAll(component, params);       
+        const data = await this.getAll(component, params);         
         if (data) {
           const [comp] = await this.groupComponentsByPurl(data);
           if (!comp){
@@ -681,7 +682,7 @@ export class ComponentDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(() => {
-          let SQLquery = `SELECT r.purl,SUM(r.identified) AS identified,SUM(r.ignored) AS ignored ,SUM((CASE WHEN  r.identified=0 AND r.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r WHERE r.file_path LIKE # AND r.purl IN ? GROUP BY r.purl;`;
+          let SQLquery = `SELECT r.purl,SUM(f.identified) AS identified,SUM(f.ignored) AS ignored ,SUM((CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r INNER JOIN files f ON f.fileId=r.fileId WHERE f.path LIKE # AND r.purl IN ? GROUP BY r.purl;`;
           SQLquery =  SQLquery.replace('#',`'${path}/%'`);     
           const aux = `'${  purls.join("','")  }'`;  
           SQLquery = SQLquery.replace('?',`(${aux})`);          
