@@ -57,7 +57,7 @@ export class Querys {
   SQL_INSERT_FILE_INVENTORIES_BATCH = 'INSERT into file_inventories (fileId,inventoryid) VALUES ?;';
 
   // SQL DELETE FILE INVENTORY
-  SQL_DELETE_FILE_INVENTORIES = 'DELETE FROM file_inventories WHERE resultid IN ';
+  SQL_DELETE_FILE_INVENTORIES = 'DELETE FROM file_inventories WHERE fileId IN ';
 
   //  UPDATE INVENTORY BY ID
   SQL_UPDATE_INVENTORY_BY_ID = 'UPDATE inventories SET cvid=?,usage=?, notes=?, url=?, spdxid=? WHERE id=?;';
@@ -96,7 +96,7 @@ export class Querys {
 
   /** *** SQL SCAN GET * **** */
   SQL_SCAN_SELECT_INVENTORIES_FROM_PATH =
-    'SELECT i.id,i.usage,i.cvid,i.notes,i.url,i.spdxid FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid INNER JOIN results r ON r.id=fi.resultid WHERE r.file_path=?;';
+    'SELECT i.id,i.usage,i.cvid,i.notes,i.url,i.spdxid FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid INNER JOIN files f ON f.fileId=fi.fileId WHERE f.path=?;';
 
   SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION = `SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN component_versions cv ON i.cvid=cv.id INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE cv.purl=? AND cv.version=?;`;
 
@@ -108,8 +108,11 @@ export class Querys {
   SQL_GET_INVENTORY_BY_ID =
     'SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE i.id=?;';
 
+  // SQL_SCAN_SELECT_FILE_RESULTS =
+  //   "SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype!='none' order by file_path;";
+
   SQL_SCAN_SELECT_FILE_RESULTS =
-    "SELECT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? AND idtype!='none' order by file_path;";
+    ' SELECT f.fileId AS id, f.path AS file_path, r.url,r.lines, r.oss_lines, r.matched, r.filename as file, r.idtype as type, r.md5_file, r.md5_comp as url_hash,r.purl, r.version,r.latest_version as latest, f.identified, f.ignored, r.file_url FROM files f LEFT JOIN filesResults fr  ON fr.fileid=f.fileId LEFT JOIN results r  ON r.id=fr.resultId WHERE f.path=? ORDER BY r.file_path;';
 
   SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH =
     'SELECT DISTINCT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? ORDER BY file_path;';
@@ -121,7 +124,7 @@ export class Querys {
   // SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID =
   //   'SELECT DISTINCT r.id,r.file_path as path,r.identified as identified,r.ignored as ignored FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN results r ON r.id=fi.resultid WHERE i.id=?';
 
-    SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID =
+  SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID =
     'SELECT DISTINCT f.fileId AS id,f.path,f.identified as identified,r.ignored as ignored FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN files f ON f.fileId=fi.fileId INNER JOIN filesResults fr ON fr.fileId=f.fileId INNER JOIN results r ON fr.resultId=r.id WHERE i.id=?;';
 
   // SQL_GET_COMPONENTS TABLE
@@ -189,7 +192,7 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   //   LEFT JOIN file_inventories fi ON r.id=fi.resultid
   //   WHERE r.purl=? AND r.version=? GROUP BY r.file_path;`;
 
-    SQL_SELECT_FILES_FROM_PURL_VERSION = `
+  SQL_SELECT_FILES_FROM_PURL_VERSION = `
     SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid FROM results r INNER JOIN filesResults fr ON r.id=fr.resultId INNER JOIN files f ON fr.fileId=f.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? AND r.version=? GROUP BY f.path;`;
 
   // SQL_SELECT_FILES_FROM_PURL_VERSION_PATH = `
@@ -198,7 +201,7 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   //   LEFT JOIN file_inventories fi ON r.id=fi.resultid
   //   WHERE r.purl=? AND r.version=? AND r.file_path like ?`;
 
-    SQL_SELECT_FILES_FROM_PURL_VERSION_PATH = `SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid FROM results r INNER JOIN filesResults fr ON r.id=fr.resultId INNER JOIN files f ON fr.fileId=f.fileId LEFT JOIN file_inventories fi ON fi.fileId-f.fileId WHERE r.purl=? AND r.version=? AND f.path like ?`;
+  SQL_SELECT_FILES_FROM_PURL_VERSION_PATH = `SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid FROM results r INNER JOIN filesResults fr ON r.id=fr.resultId INNER JOIN files f ON fr.fileId=f.fileId LEFT JOIN file_inventories fi ON fi.fileId-f.fileId WHERE r.purl=? AND r.version=? AND f.path like ?`;
 
   // SQL_SELECT_FILES_FROM_PURL = `SELECT r.id,r.file_path AS path,r.identified,r.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r
   //  LEFT JOIN file_inventories fi ON r.id=fi.resultid
@@ -212,11 +215,12 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   //  LEFT JOIN file_inventories fi ON r.id=fi.resultid
   //  WHERE r.purl=? AND r.file_path like ?;`;
 
-  SQL_SELECT_FILES_FROM_PURL_PATH = 'SELECT f.fileId AS id,r.file_path AS path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r INNER JOIN filesResults fr ON fr.resultId=r.id INNER JOIN files f ON f.fileId=fr.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? AND f.path LIKE ?;';
+  SQL_SELECT_FILES_FROM_PURL_PATH =
+    'SELECT f.fileId AS id,r.file_path AS path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r INNER JOIN filesResults fr ON fr.resultId=r.id INNER JOIN files f ON f.fileId=fr.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? AND f.path LIKE ?;';
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE files SET ignored=1,identified=0 WHERE fileId IN ';
 
-  SQL_RESTORE_IDENTIFIED_FILE_SNIPPET = `UPDATE results SET ignored=0,identified=0 WHERE id IN `;
+  SQL_RESTORE_IDENTIFIED_FILE_SNIPPET = `UPDATE files SET ignored=0,identified=0 WHERE fileId IN `;
 
   SQL_RESTORE_NOMATCH_FILE = `UPDATE results SET ignored=0,identified=0,idtype='none' WHERE source='nomatch' AND id IN `;
 

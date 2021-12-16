@@ -85,12 +85,13 @@ export const Editor = () => {
   };
 
   const getInventories = async () => {
-    const inv = await inventoryService.getAll({ files: [file] });
+    const inv = await inventoryService.getAll({ files: [file] });   
     setInventories(inv);
   };
 
   const getResults = async () => {
     const results = await resultService.get(file);
+    console.log("RESULTS",results);
     setMatchInfo(mapFiles(results));
   };
 
@@ -156,7 +157,10 @@ export const Editor = () => {
   };
 
   const onDetachPressed = async (inventory) => {
+    console.log("ACA");
+    console.log(inventory);
     const inv = await inventoryService.get({ id: inventory.id });
+    console.log("INV",inv);
     const fileResult = inv.files.find((item) => item.path === file);
     if (fileResult) {
       await detachFile([fileResult.id]);
