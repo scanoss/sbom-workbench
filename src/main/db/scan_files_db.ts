@@ -15,8 +15,6 @@ import { Component, Files } from '../../api/types';
 import { ComponentDb } from './scan_component_db';
 import { InventoryDb } from './scan_inventory_db';
 
-const { performance } = require('perf_hooks')
-
 const query = new Querys();
 
 export class FilesDb extends Db {
@@ -45,25 +43,8 @@ export class FilesDb extends Db {
     });
   }
 
-  // GET ALL FILES FOR A COMPONENT
- public async getFilesComponent(data: Partial<Component>, params: any){
-    return new Promise(async (resolve, reject) => {
-      let result;
-      try {
-        if (data.purl && data.version)
-          result = await this.getByPurlVersion(data,params? params.path:null);
-        else result = await this.getByPurl(data, params? params.path:null);
-        resolve(result);
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
-  private async getByPurl(data: Partial<Component>, path: string) {    
-    return new Promise(async (resolve, reject) => {
-      const self = this;
+  public async getByPurl(data: Partial<Component>, path: string) {    
+    return new Promise(async (resolve, reject) => {  
       try {
         let SQLquery:String = '';
         let params = [];
@@ -79,27 +60,9 @@ export class FilesDb extends Db {
         db.all(SQLquery, ...params,
           async function (err: any, file: any) {
             db.close();
-            if (!err) {           
-              const components: any = await self.component.getAll({
-                purl: data.purl,
-                version: data.version,
-              });                     
-              const inventories: any = await self.inventory.getAll({});
-              const index = inventories.reduce((acc, inventory) => {
-                acc[inventory.id] = inventory;
-                return acc;
-              }, {});
-              for (let i = 0; i < file.length; i += 1) {
-                file[i].component = components.find(
-                  (component) => file[i].version === component.version
-                );
-                if (file[i].inventoryid)
-                  file[i].inventory = index[file[i].inventoryid];
-              }         
-              resolve(file);
-            } else throw err;
-          }
-        );
+            if (err) throw err;   
+            resolve(file);
+          });             
       } catch (error) {
         log.error(error);
         reject(error);
@@ -107,9 +70,8 @@ export class FilesDb extends Db {
     });
   }
 
-  private async getByPurlVersion(data: Partial<Component>, path: string ) {
-    return new Promise(async (resolve, reject) => {
-      const self = this;
+  public async getByPurlVersion(data: Partial<Component>, path: string ) {
+    return new Promise(async (resolve, reject) => {    
       try {
         let SQLquery:String = '';
         let params = [];
@@ -123,21 +85,9 @@ export class FilesDb extends Db {
         const db = await this.openDb();
         db.all(SQLquery,...params,async function (err: any, file: any){
           db.close();
-          if (!err) {
-            const comp = await self.component.getAll({ purl: data.purl,version: data.version });
-            const inventories: any = await self.inventory.getAll({});
-            const index = inventories.reduce((acc, inventory) => {
-                acc[inventory.id] = inventory;
-                return acc;
-              }, {});
-            for (let i = 0; i < file.length; i += 1) {
-                file[i].component = comp;
-                if (file[i].inventoryid)
-                  file[i].inventory = index[file[i].inventoryid];
-              }
-            resolve(file);
-          } else throw err;
-        });
+          if (err) throw err;
+          resolve(file);
+         }); 
       } catch (error) {
         log.error(error);
         reject(error);
