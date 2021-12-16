@@ -23,7 +23,7 @@ export class ResultsDb extends Db {
     this.component = new ComponentDb(path);
   }
 
-  insertFromFileReScan(resultPath: string,files:any) {
+  insertFromFileReScan(resultPath: string, files: any) {
     return new Promise(async (resolve) => {
       try {
         const self = this;
@@ -198,7 +198,7 @@ export class ResultsDb extends Db {
     );
   }
 
-  private async insertResultBulkReScan(db: any, data: any,fileId: number) {
+  private async insertResultBulkReScan(db: any, data: any, fileId: number) {
     const self = this;
     const sQuery = `SELECT id FROM results WHERE md5_file ${
       data.file_hash ? `='${data.file_hash}'` : 'IS NULL'
@@ -222,10 +222,10 @@ export class ResultsDb extends Db {
       db.get(sQuery, function (err: any, result: any) {
         if (result !== undefined) {
           db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
-        }else{
+        } else {
+          console.log('FILE ID 2:', fileId);
           self.insertResultBulk(db, data, fileId);
         }
-
       });
     });
     //     if (result === undefined) {
@@ -381,7 +381,7 @@ export class ResultsDb extends Db {
     });
   }
 
-  public async getSummaryByids(ids: number[]) {    
+  public async getSummaryByids(ids: number[]) {
     return new Promise<Array<any>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();

@@ -222,8 +222,7 @@ export class Project extends EventEmitter {
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
-        log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
-
+        log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');        
         await reScanService.reScan(
           this.tree.getRootFolder().getFiles(),
           resultPath,
