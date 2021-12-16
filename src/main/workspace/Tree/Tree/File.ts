@@ -82,7 +82,16 @@ export default class File extends Node {
     return this.status;
   }
 
-  public getFiles(): Array<string> {
-    return [this.getPath()];
+  public getFiles(): Array<any> {
+    let type = '';
+    if (this.status === NodeStatus.PENDING) type = NodeStatus.MATCH;
+    if (this.status === NodeStatus.FILTERED) type = NodeStatus.FILTERED;
+    if (this.status === NodeStatus.NOMATCH) type = NodeStatus.NOMATCH;
+    return [
+      {
+        path: this.getPath(),
+        type,
+      },
+    ];
   }
 }

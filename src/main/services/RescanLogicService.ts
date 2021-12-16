@@ -2,14 +2,9 @@ import { utilHelper } from '../helpers/UtilHelper';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 
 class ReScanService {
-  public async reScan(
-    files: Array<string>,
-    resultPath: string,
-    project: any,
-    filteredFiles: Array<string>
-  ): Promise<void> {
+  public async reScan(files: Array<any>, resultPath: string, project: any): Promise<void> {
     try {
-      const aux = utilHelper.convertsArrayOfStringToString(files);
+      const aux = utilHelper.convertsArrayOfStringToString(files, 'path');
 
       // UPDATING FILES
       await project.scans_db.files.setDirty(1);
@@ -17,12 +12,12 @@ class ReScanService {
       const filesDb = await project.scans_db.files.getFiles();
 
       const newFilesDb = [];
-      files.forEach(f => {
-        const aux = filesDb.find(o => o.path === f);
+      files.forEach((f) => {
+        const aux = filesDb.find((o) => o.path === f.path);
         if (aux === undefined) newFilesDb.push(f);
       });
       if (filesDb.length > 0) {
-       await project.scans_db.files.insertFiles(newFilesDb);
+        await project.scans_db.files.insertFiles(newFilesDb);
       }
 
       await project.scans_db.results.updateDirty(1);
@@ -67,15 +62,21 @@ class ReScanService {
     }
   }
 
-  public async getNewResults(project: any): Promise<Array<any>> {
-    const results: Array<any> = await project.scans_db.results.getResultsRescan();
+  public async getNewResults(project: any): Promise<Array<any>> { 
+    const results: Array<any> = await project.scans_db.files.getFilesRescan();
     results.forEach((result) => {
-      if (result.idtype === 'none' && result.identified === 1) {
+      if (result.type === NodeStatus.NOMATCH && result.identified === 1) {
         result[result.path] = NodeStatus.IDENTIFIED;
         result.status = NodeStatus.IDENTIFIED;
-      } else if (result.idtype === 'none') {
+      } else if (result.type === NodeStatus.NOMATCH) {
         result[result.path] = NodeStatus.NOMATCH;
         result.status = NodeStatus.NOMATCH;
+      } else if (result.type === NodeStatus.FILTERED && result.identified === 1) {
+        result[result.path] = NodeStatus.FILTERED;
+        result.status = NodeStatus.IDENTIFIED;
+      } else if (result.type === NodeStatus.FILTERED) {
+        result[result.path] = NodeStatus.FILTERED;
+        result.status = NodeStatus.FILTERED;
       } else if (result.identified === 1) {
         result[result.path] = NodeStatus.IDENTIFIED;
         result.status = NodeStatus.IDENTIFIED;
@@ -87,9 +88,9 @@ class ReScanService {
         result.status = NodeStatus.PENDING;
       }
       // Set the original status of a file
-      if (result.original === 'nomatch') result.original = NodeStatus.NOMATCH;
-      else if (result.original === 'engine') result.original = NodeStatus.MATCH;
-      else if (result.original === 'filtered') result.original = NodeStatus.FILTERED;
+      if (result.original === NodeStatus.NOMATCH) result.original = NodeStatus.NOMATCH;
+      else if (result.original === NodeStatus.MATCH) result.original = NodeStatus.MATCH;
+      else if (result.original === NodeStatus.FILTERED) result.original = NodeStatus.FILTERED;
     });
 
     return results;

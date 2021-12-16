@@ -198,14 +198,14 @@ export class FilesDb extends Db {
     });
   }
 
-  public async insertFiles(files: Array<string>) {
+  public async insertFiles(data: Array<any>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
-          files.forEach((file) => {
-            db.run('INSERT INTO FILES(path) VALUES(?)', file);
+          data.forEach((d) => {
+            db.run('INSERT INTO FILES(path,type) VALUES(?,?)', d.path,d.type);
           });
           db.run('commit', (err: any) => {
             if (err) throw err;
@@ -306,6 +306,24 @@ public async getClean(){
     try {
       const db = await this.openDb();
       db.all("SELECT * FROM files WHERE dirty=0", (err: any, files:any) => {
+      if (err) throw err;
+      db.close();
+      resolve(files);
+    });
+  }
+    catch (error) {
+      log.error(error);
+      reject(new Error('ERROR ATTACHING FILES TO RESULTS'));
+    }
+  });
+}
+
+public async getFilesRescan(){
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await this.openDb();
+      db.all("SELECT f.path,f.identified ,f.ignored ,f.type,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending FROM files f;", (err: any, files:any) => {
       if (err) throw err;
       db.close();
       resolve(files);

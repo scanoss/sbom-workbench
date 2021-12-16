@@ -87,7 +87,7 @@ export default abstract class Node {
 
   public abstract getStatus(): NodeStatus;
 
-  public abstract getFiles(): Array<string> ;
+  public abstract getFiles(): Array<any> ;
 
   
 }

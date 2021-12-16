@@ -170,8 +170,8 @@ export default class Folder extends Node {
       }
   }
 
-  public getFiles(): Array<string> {
-    const files: Array<string> = [];
+  public getFiles(): Array<any> {
+    const files: Array<any> = [];
     this.children.forEach((child) => {
       files.push(...child.getFiles());
     });

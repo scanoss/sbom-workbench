@@ -220,27 +220,10 @@ export class ResultsDb extends Db {
 
     db.serialize(function () {
       db.get(sQuery, function (err: any, result: any) {
-        if (result !== undefined) {
-          db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
-        } else {
-          console.log('FILE ID 2:', fileId);
-          self.insertResultBulk(db, data, fileId);
-        }
+        if (result !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
+        else self.insertResultBulk(db, data, fileId);
       });
     });
-    //     if (result === undefined) {
-    //       db.get(
-    //         `SELECT id FROM results WHERE file_path='${filePath}' AND source='nomatch' AND identified=1 OR ignored=1;`,
-    //         (err: any, resultNoMatch: any) => {
-    //           if (resultNoMatch !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', resultNoMatch.id);
-    //           else self.insertResultBulk(db, data, filePath);
-    //         }
-    //       );
-    //     } else {
-    //       db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
-    //     }
-    //   });
-    // });
   }
 
   // CONVERT ARRAY TO RESULTS FORMAT
@@ -396,21 +379,6 @@ export class ResultsDb extends Db {
       } catch (error) {
         log.error(error);
         reject(new Error('Unable to retrieve results'));
-      }
-    });
-  }
-
-  public async getResultsRescan() {
-    return new Promise<any>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.all(query.SQL_GET_RESULTS_RESCAN, (err: any, data: any) => {
-          db.close();
-          if (err) throw new Error('Unable to get result by id');
-          else resolve(data);
-        });
-      } catch (error) {
-        reject(error);
       }
     });
   }
