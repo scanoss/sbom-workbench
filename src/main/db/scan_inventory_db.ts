@@ -279,7 +279,6 @@ export class InventoryDb extends Db {
 
   // NEW INVENTORY
   async create(inventory: Partial<Inventory>) {
-    console.log('inventory', inventory);
     const self = this;
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {

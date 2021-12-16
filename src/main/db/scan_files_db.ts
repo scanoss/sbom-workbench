@@ -237,6 +237,23 @@ public async getFiles(){
     }
   });
 }
+
+public async getIdFromPath(path: string){
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await this.openDb();
+      db.get("SELECT fileId AS id FROM files WHERE path=?;",path,(err: any, id:any) => {
+      if (err) throw err;
+      db.close();
+      resolve(id);
+    });
+  }
+    catch (error) {
+      log.error(error);
+      reject(new Error('ERROR ATTACHING FILES TO RESULTS'));
+    }
+  });
+}
       
 
 }

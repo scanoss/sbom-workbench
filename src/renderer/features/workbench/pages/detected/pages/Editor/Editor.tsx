@@ -17,6 +17,7 @@ import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import { projectService } from '../../../../../../../api/project-service';
 import { InventoryForm } from '../../../../../../context/types';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
+import { fileService } from '../../../../../../../api/file-service';
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -121,17 +122,23 @@ export const Editor = () => {
     create(inv, [result.id]);
   };
 
-  const onNoMatchIdentifyPressed = async () => {
+  const onNoMatchIdentifyPressed = async (result) => {
     const response = await dialogCtrl.openInventory({
       usage: 'file',
     });
+    
     if (response) {
+     
       const node = await projectService.getNodeFromPath(file);
-      if (node.action === 'filter') {
-        await resultService.createFiltered(file); // idtype=forceinclude
-      } else await resultService.updateNoMatchToFile(file);
+      const data = await fileService.getIdFromPath(file);
+    
 
-      const data = await resultService.getNoMatch(file);
+      // TO DO REMOVE UNUSED
+      // if (node.action === 'filter') {
+      //   await resultService.createFiltered(file); // idtype=forceinclude
+      // } else await resultService.updateNoMatchToFile(file);
+
+      // const data = await resultService.getNoMatch(file);
 
       // FIXME: until getNode works ok
       if (!data) return;

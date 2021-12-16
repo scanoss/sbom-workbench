@@ -262,5 +262,5 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
 
   SQL_GET_RESULTS_RESCAN = `SELECT r.idtype,r.file_path as path,r.identified ,r.ignored ,(CASE WHEN  r.identified=0 AND r.ignored=0 THEN 1 ELSE 0 END) as pending, source AS original FROM results r;`;
 
-  SQL_GET_RESULTS_IN_FOLDER = `SELECT id,identified,ignored,(CASE WHEN  identified=0 AND ignored=0 THEN 1 ELSE 0 END) AS pending,source,idtype AS usage,component,version,license AS spdxid,url,purl FROM results WHERE file_path LIKE '?';`;
+  SQL_GET_RESULTS_IN_FOLDER = `SELECT f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE f.path LIKE '?';`;
 }
