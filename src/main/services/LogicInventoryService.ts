@@ -1,8 +1,16 @@
 import log from 'electron-log';
 import { workspace } from '../workspace/Workspace';
 import { Inventory, Component } from '../../api/types';
-
-
+import { logicResultService } from './LogicResultService';
+import { FilterAND } from '../batch/Filter/FilterAND';
+import { FilterNOT } from '../batch/Filter/FilterNOT';
+import { GenericFilter } from '../batch/Filter/GenericFilter';
+import { utilHelper } from '../helpers/UtilHelper';
+// eslint-disable-next-line import/no-cycle
+import { logicComponentService } from './LogicComponentService';
+import { Filter } from '../batch/Filter/Filter';
+import { ComponentSource } from '../db/scan_component_db';
+import { inventoryHelper } from '../helpers/InventoryHelper';
 
 class LogicInventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
@@ -130,6 +138,57 @@ class LogicInventoryService {
     } catch (err: any) {
       return err;
     }
+  }
+
+  public async preLoadInventoriesAcceptAll(folder: string): Promise<Array<Partial<Inventory>>> {
+    try {
+      const filter = new FilterAND(new FilterNOT(new GenericFilter('usage', 'none')), new GenericFilter('pending', 1));
+      const files: any = await logicResultService.getFilesInFolder(folder);
+      const ids = utilHelper.getArrayFromObjectFilter(files, 'id', filter);
+      const components: any = await logicComponentService.getAll({ source: ComponentSource.ENGINE });
+      if (ids.length === 0) return [];
+      let inventories = this.getFilteredObject(files, filter) as Array<Partial<Inventory>>;
+
+      inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);
+      return inventories;
+    } catch (err: any) {
+      return err;
+    }
+  }
+
+  private getFilteredObject(results: any[], filter: Filter): Array<any> {
+    const array: any = [];
+    results.forEach((result) => {
+      if (filter.isValid(result)) {
+        const index = array.findIndex(
+          (o) =>
+            o.component === result.component &&
+            o.version === result.version &&
+            o.purl === result.purl &&
+            o.usage === result.usage &&
+            o.license === result.license &&
+            o.spdxid === result.spdxid
+        );
+
+        if (index >= 0) {
+          array[index].files.push(result.id);
+        } else {
+          const aux = {
+            component: result.component,
+            files: [result.id],
+            purl: result.purl,
+            usage: result.usage,
+            version: result.version,
+            url: result.url,
+            spdxid: result.spdxid,
+            cvid: 0,
+          };
+
+          array.push(aux);
+        }
+      }
+    });
+    return array;
   }
 }
 
