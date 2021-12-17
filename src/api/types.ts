@@ -159,7 +159,8 @@ export interface IFolderInventory {
   folder: string;
   action: InventoryAction;
   overwrite: boolean;
-  data?: Partial<Inventory>;
+  data?: Partial<Inventory> | Partial<Array<Inventory>>;
+  notes?: string;
 }
 
 export interface ComponentParams {
