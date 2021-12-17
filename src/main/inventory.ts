@@ -124,13 +124,24 @@ ipcMain.handle(IpcEvents.INVENTORY_FROM_COMPONENT, async (_event) => {
   }
 });
 
-ipcMain.handle(IpcEvents.INVENTORY_FOLDER, async (_event, arg: IFolderInventory) => {
+ipcMain.handle(IpcEvents.INVENTORY_FOLDER, async (_event, params: IFolderInventory) => {
   try {
     const factory = new BatchFactory();
-    const bachAction: Batch = factory.create(arg.action, arg.overwrite, arg.folder, arg.data);
+    const bachAction: Batch = factory.create(params);
     const success = await bachAction.execute();
     if (success) return { status: 'ok', message: 'Inventory folder successfully', success };
     return { status: 'fail', message: 'Inventory folder error' };
+  } catch (e) {
+    console.log('Catch an error on inventory: ', e);
+    return { status: 'fail' };
+  }
+});
+
+ipcMain.handle(IpcEvents.INVENTORY_ACCEPT_PRE_LOAD, async (_event, folder: string) => {
+  try {
+    const inventories: Array<Partial<Inventory>> = await logicInventoryService.preLoadInventoriesAcceptAll(folder);
+
+    return { status: 'ok', message: 'Inventory folder successfully', inventories };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
     return { status: 'fail' };
