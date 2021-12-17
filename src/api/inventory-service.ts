@@ -46,6 +46,15 @@ class InventoryService extends BaseService {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_FOLDER, args);
     return this.response(response);
   }
+
+  public async acceptAllPreLoadInventory(folder: string): Promise<Partial<Array<Inventory>>> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_ACCEPT_PRE_LOAD, folder);
+    console.log('acceptAllPreLoadInventory: ', response);
+    return this.response(response);
+  }
 }
 
 export const inventoryService = new InventoryService();
+
+
+document.inv = inventoryService;
