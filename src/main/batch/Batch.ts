@@ -1,3 +1,5 @@
+
+import { utilHelper } from '../helpers/UtilHelper';
 import { logicResultService } from '../services/LogicResultService';
 import { logictTreeService } from '../services/LogicTreeService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
@@ -30,7 +32,7 @@ export abstract class Batch {
   public async getFilesToProcess(folder: string, value: any, filter: Filter): Promise<Array<any>> {
     try {
       const aux = await this.getFilesInFolder(folder);
-      return this.getArrayFromObject(aux, value, filter);
+      return utilHelper.getArrayFromObjectFilter(aux, value, filter);
     } catch (e: any) {
       return e;
     }
@@ -41,16 +43,6 @@ export abstract class Batch {
     return results;
   }
 
-  public getArrayFromObject(results: any[], value: any, filter: Filter): Array<any> {
-    const array = [];
-    results.forEach((result) => {
-      if (filter.isValid(result)) {
-        array.push(result[value]);
-      }
-    });
-    return array;
-  }
-
   public getOverWrite(): boolean {
     return this.overWrite;
   }
@@ -58,7 +50,7 @@ export abstract class Batch {
   public async updateTree(ids: Array<number>, status: NodeStatus): Promise<boolean> {
     return this.getResults(ids)
       .then((results) => {
-        const paths = this.getArrayFromObject(results, 'path', new FilterTrue()) as Array<string>;
+        const paths = utilHelper.getArrayFromObjectFilter(results, 'path', new FilterTrue()) as Array<string>;
         logictTreeService.updateStatus(paths, status);
         return true;
       })

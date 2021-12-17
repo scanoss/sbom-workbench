@@ -1,4 +1,5 @@
 import { Inventory } from '../../api/types';
+import { utilHelper } from '../helpers/UtilHelper';
 import { logicInventoryService } from '../services/LogicInventoryService';
 import { logictTreeService } from '../services/LogicTreeService';
 import { workspace } from '../workspace/Workspace';
@@ -26,7 +27,7 @@ export class Restore extends Batch {
   private async restoreTree(ids: Array<number>): Promise<boolean> {
     return this.getResults(ids)
       .then((results) => {
-        const paths = this.getArrayFromObject(results, 'path', new FilterTrue()) as Array<string>;
+        const paths = utilHelper.getArrayFromObjectFilter(results, 'path', new FilterTrue()) as Array<string>;
         logictTreeService.retoreStatus(paths);
         return true;
       })
