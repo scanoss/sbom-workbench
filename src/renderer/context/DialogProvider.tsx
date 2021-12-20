@@ -12,6 +12,7 @@ import { ComponentDialog } from '../ui/dialog/ComponentDialog';
 import { IpcEvents } from '../../ipc-events';
 import SettingsDialog from '../ui/dialog/SettingsDialog';
 import { AlertDialog } from '../ui/dialog/AlertDialog';
+import { PreLoadInventoryDialog } from '../ui/dialog/PreLoadInventoryDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
@@ -21,6 +22,7 @@ export interface IDialogContext {
   openLicenseCreate: (save?: boolean) => Promise<DialogResponse>;
   openSettings: () => Promise<DialogResponse>;
   openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
+  openPreLoadInventoryDialog: (path: string) => Promise<boolean>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -186,6 +188,25 @@ export const DialogProvider: React.FC = ({ children }) => {
     });
   };
 
+  const [preLoadInventory, setPreLoadInventoryDialog] = useState<{
+    path: string;
+    open: boolean;
+    onClose?: (response: any) => void;
+  }>({ path: '', open: false });
+
+  const openPreLoadInventoryDialog = (path) => {
+    return new Promise<boolean>((resolve) => {
+      setPreLoadInventoryDialog({
+        path,
+        open: true,
+        onClose: (response) => {
+          setPreLoadInventoryDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(response);
+        },
+      });     
+    });
+  };
+
   const handleOpenSettings = () => {
     openSettings();
   };
@@ -211,6 +232,7 @@ export const DialogProvider: React.FC = ({ children }) => {
         openLicenseCreate,
         openComponentDialog,
         openSettings,
+        openPreLoadInventoryDialog,
       }}
     >
       {children}
@@ -261,6 +283,13 @@ export const DialogProvider: React.FC = ({ children }) => {
         message={alertDialog.message}
         buttons={alertDialog.buttons}
         onClose={(response) => alertDialog.onClose && alertDialog.onClose(response)}
+      />
+
+      <PreLoadInventoryDialog
+        path={preLoadInventory.path}
+        open={preLoadInventory.open}
+        onCancel={() => preLoadInventory.onClose && preLoadInventory.onClose(null)}
+        onClose={(response) => preLoadInventory.onClose && preLoadInventory.onClose(response)}
       />
     </DialogContext.Provider>
   );
