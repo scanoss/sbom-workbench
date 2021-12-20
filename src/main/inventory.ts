@@ -141,7 +141,7 @@ ipcMain.handle(IpcEvents.INVENTORY_ACCEPT_PRE_LOAD, async (_event, folder: strin
   try {
     const inventories: Array<Partial<Inventory>> = await logicInventoryService.preLoadInventoriesAcceptAll(folder);
 
-    return { status: 'ok', message: 'Inventory folder successfully', inventories };
+    return { status: 'ok', message: 'Inventory folder successfully', data: inventories };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
     return { status: 'fail' };

@@ -1,9 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { resultService } from '../../api/results-service';
-import { InventoryAction } from '../../api/types';
+import { Inventory, InventoryAction } from '../../api/types';
 import { DialogContext, IDialogContext } from '../context/DialogProvider';
 import { DialogResponse, DIALOG_ACTIONS } from '../context/types';
 import { WorkbenchContext, IWorkbenchContext } from '../features/workbench/store';
+import PreLoadInventoryDialog from '../ui/dialog/PreLoadInventoryDialog';
 
 const useContextual = () => {
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
@@ -28,10 +29,22 @@ const useContextual = () => {
     ]);
   };
 
+  const showPreLoadInventoryDialog = async (path: string): Promise<any> => {
+    const response = await dialogCtrl.openPreLoadInventoryDialog(path);
+    return response;
+  };
+
   const acceptAll = async (node: any): Promise<boolean> => {
-    const { action } = showOverwrite(node) ? await showOverwriteDialog() : await showConfirmDialog();
-    if (action !== DIALOG_ACTIONS.CANCEL) {
-      return executeBatch(node.value, InventoryAction.ACCEPT, { overwrite: action === 'overwrite' });
+    const response: any = await showPreLoadInventoryDialog(node.value || '/');
+    if (response) {
+      const { action } = showOverwrite(node) ? await showOverwriteDialog() : await showConfirmDialog();
+      if (action !== DIALOG_ACTIONS.CANCEL) {
+        return executeBatch(node.value, InventoryAction.ACCEPT, {
+          overwrite: action === 'overwrite',
+          data: response.inventories,
+          notes: response.notes,
+        });
+      }
     }
 
     return false;

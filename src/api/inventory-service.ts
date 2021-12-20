@@ -49,7 +49,6 @@ class InventoryService extends BaseService {
 
   public async acceptAllPreLoadInventory(folder: string): Promise<Partial<Array<Inventory>>> {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_ACCEPT_PRE_LOAD, folder);
-    console.log('acceptAllPreLoadInventory: ', response);
     return this.response(response);
   }
 }
