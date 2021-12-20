@@ -72,7 +72,9 @@ export const AlertDialog = (props: AlertDialogProps) => {
       <DialogActions className={classes.actions}>
         {buttons.map((button: any, index: number) =>
           button.role === 'cancel' ? (
-            <Button key={button.label} onClick={handleCancel}>{button.label}</Button>
+            <Button key={button.label} onClick={handleCancel} className={button.class}>
+              {button.label}
+            </Button>
           ) : button.role === 'action' ? (
             <Button
               key={button.label}

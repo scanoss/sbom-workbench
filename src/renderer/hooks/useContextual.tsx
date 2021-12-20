@@ -15,6 +15,7 @@ const useContextual = () => {
     return dialogCtrl.openAlertDialog(
       'You have already identified files in this folder. Do you want to overwrite or keep them?',
       [
+        { label: 'CANCEL', action: 'cancel', role: 'cancel', class: 'mr-auto' },
         { label: 'KEEP', action: 'keep', role: 'action' },
         { label: 'OVERWRITE', action: 'overwrite', role: 'action' },
       ]
@@ -24,7 +25,7 @@ const useContextual = () => {
   const showConfirmDialog = async (): Promise<DialogResponse> => {
     return dialogCtrl.openAlertDialog('This action will be executed on all files within this folder. Are you sure?', [
       { label: 'Cancel', action: 'cancel', role: 'cancel' },
-      { label: 'YES', role: 'success' },
+      { label: 'Yes', role: 'success' },
     ]);
   };
 
