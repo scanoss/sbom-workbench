@@ -145,7 +145,7 @@ const ProjectSettings = () => {
   const submit = async () => {
     setScanPath({ ...scanPath, projectName: projectSettings.name });
     setSettingsNewProject(projectSettings);
-    // history.push('/workspace/new/scan');
+    history.push('/workspace/new/scan');
     console.log(projectSettings);
   };
 
