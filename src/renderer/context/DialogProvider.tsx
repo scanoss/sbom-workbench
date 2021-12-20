@@ -285,6 +285,7 @@ export const DialogProvider: React.FC = ({ children }) => {
       <PreLoadInventoryDialog
         path={preLoadInventory.path}
         open={preLoadInventory.open}
+        onCancel={() => preLoadInventory.onClose && preLoadInventory.onClose(null)}
         onClose={(response) => preLoadInventory.onClose && preLoadInventory.onClose(response)}
       />
     </DialogContext.Provider>

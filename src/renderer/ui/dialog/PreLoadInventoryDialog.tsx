@@ -3,22 +3,17 @@ import {
   ListItem,
   Checkbox,
   ListItemText,
-  Avatar,
-  ListItemAvatar,
   DialogContent,
   List,
   makeStyles,
   ListItemIcon,
   Button,
+  TextareaAutosize,
+  Paper,
+  FormControlLabel,
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-
-import { DIALOG_ACTIONS, DialogResponse } from '../../context/types';
 import { inventoryService } from '../../../api/inventory-service';
-import { Inventory } from '../../../api/types';
-import { check } from 'prettier';
 
 // or
 
@@ -59,18 +54,22 @@ interface IPreLoadInventoryDialog {
   open: boolean;
   path: string;
   onClose: (response: any) => void;
+  onCancel: () => void;
 }
 
 export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
-  const { open, path, onClose } = props;
+  const { open, path, onClose, onCancel } = props;
 
   const [inventories, setInventories] = useState<any[]>([]);
 
   const [checked, setChecked] = useState<any[]>([]);
 
+  const [notes, setNotes] = useState<string>('');
+
   const handleToggle = (value: any) => () => {
     const currentIndex = checked.findIndex(
-      (x) => x.purl === value.purl && x.version === value.version && x.spdxid === value.spdxid && x.usage === value.usage
+      (x) =>
+        x.purl === value.purl && x.version === value.version && x.spdxid === value.spdxid && x.usage === value.usage
     );
     const newChecked = [...checked];
     if (currentIndex === -1) newChecked.push(value);
@@ -81,39 +80,64 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    onClose(checked);
+    onClose({ inventories: checked, notes });
+  };
+
+  const inputHandler = (e) => {
+    setNotes(e.target.value);
+  };
+
+  const selectAll = () => {
+    if (checked.length === inventories.length) {
+      setChecked([]);
+    } else setChecked(inventories);
+  };
+
+  const AllChecked = () => {
+    return checked.length === inventories.length;
   };
 
   const init = async () => {
     const inv = await inventoryService.acceptAllPreLoadInventory(path);
-    console.log("INVENTORIES RESPONSE", inv);
     setInventories(inv);
+    setChecked(inv);
+  };
+
+  const isValid = () => {
+    return checked.length > 0;
   };
 
   useEffect(() => {
-    if (open) {
-      init();
+    if (open) init();
+    else {
+      setInventories([]);
+      setChecked([]);
+      setNotes('');
     }
   }, [open]);
 
   return (
     <div>
-      <Dialog open={open} maxWidth="sm" scroll="body" fullWidth>
+      <Dialog open={open} maxWidth="sm" scroll="body" fullWidth onClose={onCancel}>
+        <span className="dialog-title">Accept all</span>
         <DialogContent>
           <div>
             <List>
+              <FormControlLabel control={<Checkbox checked={AllChecked()} onClick={() => selectAll()} />} label="All" />
               {inventories.map((value) => {
                 const labelId = `checkbox-list-label-${value.cvid}`;
-
                 return (
                   <ListItem key={value}>
-                    {/* <ListItemButton > */}
                     <ListItemIcon role={undefined} onClick={handleToggle(value)}>
                       <Checkbox
                         edge="start"
                         checked={
                           checked.findIndex(
-                            (x) => x.version === value.version && x.purl === value.purl && x.spdxid === value.spdxid && x.usage === value.usage
+                            (x) =>
+                              x.version === value.version &&
+                              x.purl === value.purl &&
+                              x.spdxid === value.spdxid &&
+                              x.usage === value.usage
                           ) !== -1
                         }
                         tabIndex={-1}
@@ -125,15 +149,26 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                       id={labelId}
                       primary={`Component: ${value.purl} Version: ${value.version} License:${value.spdxid}  `}
                     />
-                    {/* </ListItemButton> */}
                   </ListItem>
                 );
               })}
             </List>
           </div>
           <div>
+            <label className="dialog-form-field-label">
+              Notes <span className="optional">- Optional</span>
+            </label>
+            <Paper className="dialog-form-field-control">
+              <TextareaAutosize name="notes" value={notes || ''} cols={30} rows={8} onChange={(e) => inputHandler(e)} />
+            </Paper>
+          </div>
+          <div>
             <form onSubmit={onSubmit}>
-              <Button type="submit">Submit</Button>
+              <Button onClick={onCancel}>Cancel</Button>
+              <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
+                {' '}
+                Identify{' '}
+              </Button>
             </form>
           </div>
         </DialogContent>

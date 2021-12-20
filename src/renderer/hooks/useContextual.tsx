@@ -35,15 +35,14 @@ const useContextual = () => {
   };
 
   const acceptAll = async (node: any): Promise<boolean> => {
-    const inventories:Partial<Array<Inventory>> = await showPreLoadInventoryDialog(node.value || '/');
-    console.log('INVENTORIES', inventories);
-
-    if (inventories) {
+    const response: any = await showPreLoadInventoryDialog(node.value || '/');
+    if (response) {
       const { action } = showOverwrite(node) ? await showOverwriteDialog() : await showConfirmDialog();
       if (action !== DIALOG_ACTIONS.CANCEL) {
         return executeBatch(node.value, InventoryAction.ACCEPT, {
           overwrite: action === 'overwrite',
-          data: inventories,
+          data: response.inventories,
+          notes: response.notes,
         });
       }
     }
