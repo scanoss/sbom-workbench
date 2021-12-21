@@ -42,7 +42,8 @@ class LogicComponentService {
         return acc;
       }, {});
       for (let i = 0; i < files.length; i += 1) {
-        files[i].component = components.find((component) => files[i].version === component.version);
+        if (data.purl && data.version) files[i].comopnent = [components];
+        else files[i].component = components.find((component: any) => files[i].version === component.version);
         if (files[i].inventoryid) files[i].inventory = index[files[i].inventoryid];
       }
       return files;

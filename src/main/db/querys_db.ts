@@ -205,10 +205,11 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   INNER JOIN component_versions c ON c.id=i.cvid
   INNER JOIN licenses lic ON lic.spdxid=i.spdxid;`;
 
-  SQL_GET_CSV_DATA = `SELECT DISTINCT i.id AS inventoryId,r.id AS resultID,i.usage,i.notes,i.spdxid AS identified_license,r.license AS detected_license,cv.purl,cv.version,r.file_path AS path,cv.name AS identified_component,r.component AS detected_component
+  SQL_GET_CSV_DATA = `SELECT DISTINCT i.id AS inventoryId,f.fileId,i.usage,i.notes,i.spdxid AS identified_license,r.license AS detected_license,cv.purl,cv.version,f.path,cv.name AS identified_component,r.component AS detected_component
   FROM inventories i
   INNER JOIN file_inventories fi ON fi.inventoryid=i.id
-  LEFT JOIN results r ON r.id=fi.resultid INNER JOIN component_versions cv ON cv.id=i.cvid;`;
+  INNER JOIN files f ON fi.fileId=f.fileId
+  LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions cv ON cv.id=i.cvid;`;
 
   SQL_GET_ALL_SUMMARIES = 'SELECT compid,ignored,pending,identified FROM summary;';
 
