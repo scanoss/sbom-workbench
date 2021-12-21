@@ -11,7 +11,7 @@ import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { ComponentDb } from './scan_component_db';
-import { Inventory, Component, Files } from '../../api/types';
+import { Inventory, Files } from '../../api/types';
 import { ResultsDb } from './scan_results_db';
 
 const query = new Querys();
@@ -27,7 +27,7 @@ export class InventoryDb extends Db {
     this.results = new ResultsDb(path);
   }
 
-  private getByResultId(inventory: Partial<Inventory>) {
+  public async getByResultId(inventory: Partial<Inventory>) {
     return new Promise(async (resolve) => {
       try {
         if (inventory.files) {
@@ -45,7 +45,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private getByPurlVersion(inventory: Partial<Inventory>) {
+  public async getByPurlVersion(inventory: Partial<Inventory>) {
     return new Promise(async (resolve) => {
       try {
         const db = await this.openDb();
@@ -68,7 +68,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private getAllInventories() {
+  public async getAll() {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -85,11 +85,10 @@ export class InventoryDb extends Db {
   }
 
   // CREATE NEW FILE INVENTORY
-  async attachFileInventory(inventory: Partial<Inventory>) {
-    return new Promise(async (resolve, reject) => {
+  public async attachFileInventory(inventory: Partial<Inventory>) {
+    return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        await this.updateIdentified(inventory);
         db.serialize(function () {
           db.run('begin transaction');
           if (inventory.files)
@@ -193,36 +192,6 @@ export class InventoryDb extends Db {
     });
   }
 
-  // GET ALL INVENTORIES BY PURL, VERSION OR FILES
-  getAll(inventory: Partial<Inventory>) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let inventories: any;
-        if (inventory.purl && inventory.version) {
-          inventories = await this.getByPurlVersion(inventory);
-        } else if (inventory.files) {
-          inventories = await this.getByResultId(inventory);
-        } else if (inventory.purl) {
-          inventories = await this.getByPurl(inventory);
-        } else inventories = await this.getAllInventories();
-        if (inventory !== undefined) {
-          const component: any = await this.component.getAll({});
-          const compObj = component.reduce((acc, comp) => {
-            acc[comp.compid] = comp;
-            return acc;
-          }, {});
-          for (let i = 0; i < inventories.length; i += 1) {
-            inventories[i].component = compObj[inventories[i].cvid];
-          }
-          resolve(inventories);
-        } else resolve([]);
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
   public getById(id: number) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -239,7 +208,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private getByPurl(inventory: Partial<Inventory>) {
+  public async getByPurl(inventory: Partial<Inventory>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -255,7 +224,7 @@ export class InventoryDb extends Db {
     });
   }
 
-  private async isInventory(inventory: Partial<Inventory>) {
+  public async isInventory(inventory: Partial<Inventory>) {
     const db = await this.openDb();
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
@@ -277,59 +246,23 @@ export class InventoryDb extends Db {
     });
   }
 
-  // NEW INVENTORY
   async create(inventory: Partial<Inventory>) {
-    const self = this;
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
-        const { compid } = await this.component.getAll({
-          purl: inventory.purl,
-          version: inventory.version,
-        });
-        inventory.cvid = compid;
-        const inv = await this.isInventory(inventory);
-        if (!inv) {
-          const db = await this.openDb();
-          db.run(
-            query.SQL_SCAN_INVENTORY_INSERT,
-            inventory.cvid,
-            inventory.usage ? inventory.usage : 'n/a',
-            inventory.notes ? inventory.notes : 'n/a',
-            inventory.url ? inventory.url : 'n/a',
-            inventory.spdxid ? inventory.spdxid : 'n/a',
-            async function (this: any, err: any) {
-              inventory.id = this.lastID;
-              if (err) throw Error('Unable to create inventory');
-            }
-          );
-        } else inventory.id = inv.id;
-        await self.attachFileInventory(inventory);
-        const comp: Component = (await self.component.get(inventory.cvid)) as Component;
-        inventory.component = comp;
-        resolve(inventory);
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
-  // UPDATE IDENTIFIED FILES
-  updateIdentified(inventory: Partial<Inventory>) {
-    return new Promise(async (resolve, reject) => {
-      try {
         const db = await this.openDb();
-        db.serialize(function () {
-          const resultsid = `(${inventory.files.toString()});`;
-          const sqlUpdateIdentified = query.SQL_FILES_UPDATE_IDENTIFIED + resultsid;
-          db.run('begin transaction');
-          db.run(sqlUpdateIdentified);
-          db.run('commit', (err: any) => {
-            if (err) throw Error('Unable to update identified files');
-            db.close();
-            return resolve(true);
-          });
-        });
+        db.run(
+          query.SQL_SCAN_INVENTORY_INSERT,
+          inventory.cvid,
+          inventory.usage ? inventory.usage : 'n/a',
+          inventory.notes ? inventory.notes : 'n/a',
+          inventory.url ? inventory.url : 'n/a',
+          inventory.spdxid ? inventory.spdxid : 'n/a',
+          async function (this: any, err: any) {
+            inventory.id = this.lastID;
+            if (err) throw Error('Unable to create inventory');
+          }
+        );
+        resolve(inventory);
       } catch (error) {
         log.error(error);
         reject(error);
@@ -497,15 +430,14 @@ export class InventoryDb extends Db {
     });
   }
 
-  async createBatch(inventories: Array<Partial<Inventory>>) {
-    const self = this;
+  public async createBatch(inventories: Array<Partial<Inventory>>) {
     return new Promise<Array<Inventory>>(async (resolve, reject) => {
       try {
         const inv: any = [];
         const db = await this.openDb();
         db.serialize(function () {
           db.run('begin transaction');
-          for (let i = 0; i < inventories.length; i+=1) {
+          for (let i = 0; i < inventories.length; i += 1) {
             db.run(
               query.SQL_SCAN_INVENTORY_INSERT,
               inventories[i].cvid,
@@ -535,7 +467,6 @@ export class InventoryDb extends Db {
   async attachFileInventoryBatch(inventoryFiles: any) {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
-        await this.updateIdentified(inventoryFiles as Partial<Inventory>);
         const db = await this.openDb();
         const SQLQuery = query.SQL_INSERT_FILE_INVENTORIES_BATCH.replace('?', inventoryFiles.invFiles);
         db.run(SQLQuery, (err: any) => {

@@ -1,6 +1,8 @@
-import { Component, Inventory } from '../../api/types';
+import { Inventory } from '../../api/types';
+import { ComponentSource } from '../db/scan_component_db';
 import { logicComponentService } from '../services/LogicComponentService';
 import { logicInventoryService } from '../services/LogicInventoryService';
+
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { Batch } from './Batch';
 import { Filter } from './Filter/Filter';
@@ -26,9 +28,9 @@ export class Accept extends Batch {
 
       const ids = this.getArrayFromObject(files, 'id', this.filter);
 
+      this.updateTree(ids, NodeStatus.IDENTIFIED);
+      const components: any = await logicComponentService.getAll({ source: ComponentSource.ENGINE });
       if (ids.length === 0) return [];
-
-      const components: any = await logicComponentService.getAll();
       let inventories = this.getFilteredObject(files, this.filter) as Array<Partial<Inventory>>;
 
       inventories = this.AddComponentIdToInventory(components, inventories);

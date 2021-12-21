@@ -245,8 +245,10 @@ export class ResultsDb extends Db {
     });
   }
 
+
+
   // GET RESULT
-  private async getResult(path: string) {
+  public async getFromPath(path: string) {
     const db = await this.openDb();
     return new Promise<any>(async (resolve) => {
       db.all(query.SQL_SCAN_SELECT_FILE_RESULTS, path, (err: any, data: any) => {
@@ -270,24 +272,6 @@ export class ResultsDb extends Db {
       } catch (error) {
         log.error(error);
         reject(error);
-      }
-    });
-  }
-
-  // GET RESULTS
-  get(path: string) {
-    let results: any;
-    return new Promise(async (resolve, reject) => {
-      try {
-        results = await this.getResult(path);
-        for (let i = 0; i < results.length; i += 1) {
-          const comp = await this.component.getAll(results[i]);
-          results[i].component = comp;
-        }
-        resolve(results);
-      } catch (error) {
-        log.error(error);
-        reject(new Error('Unable to retrieve results'));
       }
     });
   }
@@ -414,6 +398,29 @@ export class ResultsDb extends Db {
           resolve(true);
         });
       } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  // UPDATE IDENTIFIED FILES
+  identified(ids: number[]) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          const resultsid = `(${ids.toString()});`;
+          const sqlUpdateIdentified = query.SQL_FILES_UPDATE_IDENTIFIED + resultsid;
+          db.run('begin transaction');
+          db.run(sqlUpdateIdentified);
+          db.run('commit', (err: any) => {
+            if (err) throw Error('Unable to update identified files');
+            db.close();
+            return resolve(true);
+          });
+        });
+      } catch (error) {
+        log.error(error);
         reject(error);
       }
     });

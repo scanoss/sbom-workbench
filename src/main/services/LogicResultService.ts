@@ -79,5 +79,34 @@ class LogicResultService {
       return e;
     }
   }
+
+  public async identified(ids: number[]) {
+    try {
+      const project = workspace.getOpenedProjects()[0];
+      const success = await project.scans_db.results.identified(ids);
+      return success;
+    } catch (e) {
+      return e;
+    }
+  }
+
+  public async getFromPath(path: string) {
+    try {
+      const project = workspace.getOpenedProjects()[0];
+      const results = await project.scans_db.results.getFromPath(path);
+      const components: any = await project.scans_db.components.allComp();
+
+      results.forEach((result) => {
+        if (result.version)
+          result.component = components.find(
+            (component) => component.purl === result.purl && component.version === result.version
+          );
+        else result.component = null;
+      });
+      return results;
+    } catch (error: any) {
+      return error;
+    }
+  }
 }
 export const logicResultService = new LogicResultService();

@@ -47,6 +47,14 @@
 @include loop('.pl-', 'padding-left');
 @include loop('.pr-', 'padding-right');
 
+.mr-auto {
+  margin-right: auto !important;
+}
+
+.ml-auto {
+  margin-left: auto !important;
+}
+
 // width and height
 .w-100 {
   width: 100% !important;
