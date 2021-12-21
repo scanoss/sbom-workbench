@@ -229,7 +229,6 @@ export class Project extends EventEmitter {
         this.save();
       } else {
         await this.scans_db.files.insertFiles(this.tree.getRootFolder().getFiles());
-
         const files: any = await this.scans_db.files.getFiles();
         const aux = files.reduce((previousValue, currentValue) => {
           previousValue[currentValue.path] = currentValue.fileId;

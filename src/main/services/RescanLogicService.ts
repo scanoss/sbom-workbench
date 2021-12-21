@@ -65,16 +65,16 @@ class ReScanService {
   public async getNewResults(project: any): Promise<Array<any>> { 
     const results: Array<any> = await project.scans_db.files.getFilesRescan();
     results.forEach((result) => {
-      if (result.type === NodeStatus.NOMATCH && result.identified === 1) {
+      if (result.original === NodeStatus.NOMATCH && result.identified === 1) {
         result[result.path] = NodeStatus.IDENTIFIED;
         result.status = NodeStatus.IDENTIFIED;
-      } else if (result.type === NodeStatus.NOMATCH) {
+      } else if (result.original === NodeStatus.NOMATCH) {
         result[result.path] = NodeStatus.NOMATCH;
         result.status = NodeStatus.NOMATCH;
-      } else if (result.type === NodeStatus.FILTERED && result.identified === 1) {
+      } else if (result.original === NodeStatus.FILTERED && result.identified === 1) {
         result[result.path] = NodeStatus.FILTERED;
         result.status = NodeStatus.IDENTIFIED;
-      } else if (result.type === NodeStatus.FILTERED) {
+      } else if (result.original === NodeStatus.FILTERED) {
         result[result.path] = NodeStatus.FILTERED;
         result.status = NodeStatus.FILTERED;
       } else if (result.identified === 1) {
@@ -92,8 +92,7 @@ class ReScanService {
       else if (result.original === NodeStatus.MATCH) result.original = NodeStatus.MATCH;
       else if (result.original === NodeStatus.FILTERED) result.original = NodeStatus.FILTERED;
     });
-
-    console.log('[ RESCAN DB ] New results: ', results);
+ 
 
     return results;
   }
