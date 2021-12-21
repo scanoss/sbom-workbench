@@ -126,7 +126,6 @@ export const Editor = () => {
     const response = await dialogCtrl.openInventory({
       usage: 'file',
     });
-    
     if (response) {
       const data = await fileService.getIdFromPath(file);
       if (!data) return;
@@ -134,17 +133,6 @@ export const Editor = () => {
         ...response,
         files: [data.id],
       });
-    
-
-      // TO DO REMOVE UNUSED
-      // if (node.action === 'filter') {
-      //   await resultService.createFiltered(file); // idtype=forceinclude
-      // } else await resultService.updateNoMatchToFile(file);
-
-      // const data = await resultService.getNoMatch(file);
-
-      // FIXME: until getNode works ok
-
       getInventories();
       getResults();
     }
@@ -161,10 +149,7 @@ export const Editor = () => {
   };
 
   const onDetachPressed = async (inventory) => {
-    console.log("ACA");
-    console.log(inventory);
     const inv = await inventoryService.get({ id: inventory.id });
-    console.log("INV",inv);
     const fileResult = inv.files.find((item) => item.path === file);
     if (fileResult) {
       await detachFile([fileResult.id]);
