@@ -67,6 +67,7 @@ export default class App {
           fontWeight: 600,
           textTransform: 'none',
         },
+        fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       },
     });
 
