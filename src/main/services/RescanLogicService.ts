@@ -93,6 +93,8 @@ class ReScanService {
       else if (result.original === NodeStatus.FILTERED) result.original = NodeStatus.FILTERED;
     });
 
+    console.log('[ RESCAN DB ] New results: ', results);
+
     return results;
   }
 }

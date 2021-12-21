@@ -289,7 +289,7 @@ public async getFilesRescan(){
   return new Promise(async (resolve, reject) => {
     try {
       const db = await this.openDb();
-      db.all("SELECT f.path,f.identified ,f.ignored ,f.type,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending FROM files f;", (err: any, files:any) => {
+      db.all("SELECT f.path,f.identified ,f.ignored ,f.type AS original,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending FROM files f;", (err: any, files:any) => {
       if (err) throw err;
       db.close();
       resolve(files);

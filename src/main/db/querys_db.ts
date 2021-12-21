@@ -197,7 +197,7 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
 
   SQL_SELECT_INVENTORIES_NOT_HAVING_FILES = ` SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories);`;
 
-  SQL_GET_FILE_BY_PATH = 'SELECT file_path AS path,identified,ignored FROM results WHERE results.file_path=?;';
+  SQL_GET_FILE_BY_PATH = 'SELECT fileId,path,identified,ignored FROM files WHERE path=?;';
 
   SQL_GET_SPDX_COMP_DATA = `SELECT DISTINCT c.purl,c.version,c.url,c.name,i.spdxid AS concludedLicense,i.notes,l.spdxid AS declareLicense,lic.fulltext,lic.official
   FROM inventories  i

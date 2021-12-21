@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { fileService } from '../../api/file-service';
 import { resultService } from '../../api/results-service';
 import { InventoryAction } from '../../api/types';
 import { DialogContext, IDialogContext } from '../context/DialogProvider';
@@ -73,8 +74,8 @@ const useContextual = () => {
   };
 
   const restore = async (node: any): Promise<boolean> => {
-    const [result] = await resultService.get(node.value);
-    return restoreFile([result.id]);
+    const file = await fileService.getIdFromPath(node.value);
+    return restoreFile([file.id]);
   };
 
   return {
