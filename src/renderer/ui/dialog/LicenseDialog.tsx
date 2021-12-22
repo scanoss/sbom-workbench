@@ -28,7 +28,7 @@ interface LicenseDialogProps {
   open: boolean;
   onClose: (response: DialogResponse) => void;
   onCancel: () => void;
-    save?: boolean;
+  save?: boolean;
 }
 
 export const LicenseDialog = (props: LicenseDialogProps) => {
