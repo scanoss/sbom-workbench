@@ -67,7 +67,6 @@ export const Editor = () => {
   // get extension of file
   const getExtension = (file: string) => {
     const ext = file.split('.').pop();
-    console.log(ext);
 
     const languages = {
       'sol': 'solidity',
