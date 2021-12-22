@@ -147,7 +147,7 @@ class LogicComponentService {
     }
     result.sort((a, b) => a.name.localeCompare(b.name));
     return result;
-  }
+  }  
 }
 
 export const logicComponentService = new LogicComponentService();

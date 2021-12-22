@@ -203,13 +203,17 @@ export class ResultsDb extends Db {
 
   private async insertResultBulkReScan(db: any, data: any, fileId: number) {
     const self = this;
-    const sQuery = `SELECT id FROM results WHERE md5_file ${
+    let licenses: string;
+    if (data.licenses.length >= 0) licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses);
+    else licenses = null;
+
+    const SQLquery = `SELECT id FROM results WHERE md5_file ${
       data.file_hash ? `='${data.file_hash}'` : 'IS NULL'
     } AND vendor ${data.vendor ? `='${data.vendor}'` : 'IS NULL'} AND component ${
       data.component ? `='${data.component}'` : 'IS NULL'
     } AND version ${data.version ? `='${data.version}'` : 'IS NULL'} AND latest_version ${
       data.latest ? `='${data.latest}'` : 'IS NULL'
-    } AND license ${data.licenses && data.licenses[0] ? `='${data.licenses[0].name}'` : 'IS NULL'} AND url ${
+    } AND license ${licenses ? `='${licenses}'` : 'IS NULL'} AND url ${
       data.url ? `='${data.url}'` : 'IS NULL'
     } AND lines ${data.lines ? `='${data.lines}'` : 'IS NULL'} AND oss_lines ${
       data.oss_lines ? `='${data.oss_lines}'` : 'IS NULL'
@@ -220,9 +224,8 @@ export class ResultsDb extends Db {
     }' AND fileId = ${fileId}  AND file_url ${data.file_url ? `='${data.file_url}'` : 'IS NULL'} AND idtype='${
       data.id
     }' ; `;
-
     db.serialize(function () {
-      db.get(sQuery, function (err: any, result: any) {
+      db.get(SQLquery, function (err: any, result: any) {
         if (result !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
         else self.insertResultBulk(db, data, fileId);
       });

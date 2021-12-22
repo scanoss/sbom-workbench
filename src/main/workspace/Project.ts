@@ -237,7 +237,7 @@ export class Project extends EventEmitter {
 
         await this.scans_db.results.insertFromFile(resultPath, aux);
 
-        await this.scans_db.components.importUniqueFromFile();
+        await this.scans_db.components.importFromResults();
       }
 
       this.metadata.setScannerState(ScanState.FINISHED);

@@ -285,7 +285,7 @@ export class ComponentDb extends Db {
   }
 
   // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
-  importUniqueFromFile() {
+  public async importFromResults() {
     const self = this;
     const attachLicComp: any = {};
     return new Promise(async (resolve, reject) => {
@@ -299,7 +299,7 @@ export class ComponentDb extends Db {
         const results = await this.getUnique();
         db.serialize(async function () {
           db.run('begin transaction');
-          for (const result of results) {
+          for (const result of results) {            
             attachLicComp.compid = await self.componentNewImportFromResults(
               db,
               result
