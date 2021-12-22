@@ -168,9 +168,6 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   // GET LICENSES
   SQL_SELECT_ALL_LICENSES = 'SELECT id, spdxid, name, url FROM licenses ORDER BY name ASC;';
 
-  // GET LICENSE ID BY NAME OR SPDXID
-  COMPDB_SQL_GET_LICENSE_ID_FROM_SPDX_NAME = 'SELECT id FROM licenses WHERE licenses.name=? or licenses.spdxid=?;';
-
   // GET ALL THE INVENTORIES
   SQL_GET_ALL_INVENTORIES = `SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i
   INNER JOIN licenses l ON i.spdxid=l.spdxid;`;

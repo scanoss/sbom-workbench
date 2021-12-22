@@ -303,12 +303,8 @@ export class ComponentDb extends Db {
           db.run('begin transaction');
           for (const result of results) {
             if (result.license) {
-              license.spdxid = result.license;
-              // attachLicComp.license_id = await self.license.getLicenseIdFilter(
-              //   license
-              // );
+              license.spdxid = result.license;              
               attachLicComp.license_id= licenses[license.spdxid];
-
               if (attachLicComp.license_id===undefined) {
                 attachLicComp.license_id  = await self.license.bulkCreate(db, license);
                 licenses = { ...licenses,[license.spdxid]:attachLicComp.license_id };
