@@ -17,6 +17,7 @@ import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import { projectService } from '../../../../../../../api/project-service';
 import { InventoryForm } from '../../../../../../context/types';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
+import { getExtension } from '../../../../../../../utils/utils';
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -65,38 +66,7 @@ export const Editor = () => {
 
 
 
-  // get extension of file
-  const getExtension = (file: string) => {
-    // languages objects
-    const languages = {
-      'sol': 'solidity',
-      'js': 'javascript',
-      'ts': 'typescript',
-      'py': 'python',
-      'rb': 'ruby',
-      'sh': 'bash',
-      'go': 'go',
-      'java': 'java',
-      'c': 'c',
-      'cpp': 'cpp',
-      'h': 'c',
-      'hpp': 'cpp',
-      'cs': 'csharp',
-      'css': 'css',
-      'html': 'html',
-      'xml': 'xml',
-      'json': 'json',
-      'md': 'markdown',
-      'yml': 'yaml',
-      'scss': 'scss',
-      'less': 'less',
-      'sass': 'sass',
-      'sql': 'sql',
-    }
-    // get extension
-    const ext = file.split('.').pop();
-    return languages[ext] || ext || '';
-  };
+
 
 
 
