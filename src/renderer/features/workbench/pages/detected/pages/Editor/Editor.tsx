@@ -63,6 +63,39 @@ export const Editor = () => {
     }
   };
 
+
+  // get extension of file
+  const getExtension = (file: string) => {
+    const ext = file.split('.').pop();
+    console.log(ext);
+
+    const languages = {
+      'sol': 'solidity',
+      'js': 'javascript',
+      'ts': 'typescript',
+      'py': 'python',
+      'rb': 'ruby',
+      'sh': 'bash',
+      'go': 'go',
+      'java': 'java',
+      'c': 'c',
+      'cpp': 'cpp',
+      'h': 'c',
+      'hpp': 'cpp',
+      'cs': 'csharp',
+      'css': 'css',
+      'html': 'html',
+      'xml': 'xml',
+      'json': 'json',
+      'md': 'markdown',
+      'yml': 'yaml',
+    }
+
+    return languages[ext] || ext || '';
+  };
+
+
+
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false });
@@ -283,7 +316,7 @@ export const Editor = () => {
           <main className="editors editors-full app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
-                <MemoCodeEditor content={localFileContent.content} highlight={currentMatch?.lines || null} />
+                <MemoCodeEditor language={getExtension(file)} content={localFileContent.content} highlight={currentMatch?.lines || null} />
               ) : null}
             </div>
           </main>
@@ -291,7 +324,7 @@ export const Editor = () => {
           <main className="editors app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
-                <MemoCodeEditor content={localFileContent.content} highlight={currentMatch?.lines || null} />
+                <MemoCodeEditor language={getExtension(file)} content={localFileContent.content} highlight={currentMatch?.lines || null} />
               ) : null}
             </div>
             {inventories?.length === 0 && matchInfo?.length === 0 ? (
@@ -301,7 +334,7 @@ export const Editor = () => {
             ) : (
               <div className="editor">
                 {currentMatch && remoteFileContent?.content ? (
-                  <MemoCodeEditor content={remoteFileContent.content} highlight={currentMatch?.oss_lines || null} />
+                  <MemoCodeEditor language={getExtension(file)} content={remoteFileContent.content} highlight={currentMatch?.oss_lines || null} />
                 ) : null}
               </div>
             )}
