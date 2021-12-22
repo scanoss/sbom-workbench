@@ -88,6 +88,10 @@ export const Editor = () => {
       'json': 'json',
       'md': 'markdown',
       'yml': 'yaml',
+      'scss': 'scss',
+      'less': 'less',
+      'sass': 'sass',
+      'sql': 'sql',
     }
 
     return languages[ext] || ext || '';
