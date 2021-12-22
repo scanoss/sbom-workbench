@@ -112,10 +112,10 @@ export const Editor = () => {
   const onIdentifyPressed = async (result) => {
     const inv: Partial<InventoryForm> = {
       component: result.component.name,
-      version: result.component.version,
+      version: result.version,
       url: result.component.url,
-      purl: result.component.purl,
-      spdxid: result.component.licenses ? result.component.licenses[0]?.spdxid : null,
+      purl: result.purl,
+      spdxid: result.license ? result.license[0] : null,
       usage: result.type,
     };
 

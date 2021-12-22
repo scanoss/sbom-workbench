@@ -139,7 +139,7 @@ const ProjectSettings = () => {
     } else {
       setprojectValidName(false);
     }
-    console.log(licenses)
+
   }, [projectSettings.name, projects]);
 
   const submit = async () => {

@@ -12,6 +12,7 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { utilDb } from './utils_db';
 import { ComponentDb } from './scan_component_db';
+import { licenseHelper } from '../helpers/LicenseHelper';
 
 const query = new Querys();
 
@@ -175,7 +176,9 @@ export class ResultsDb extends Db {
   }
 
   private insertResultBulk(db: any, data: any, fileId: number) {
-    const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : null;
+    let licenses: string;
+    if (data.licenses.length >= 0) licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses);
+    else licenses = null;
     db.run(
       query.SQL_INSERT_RESULTS,
       data.file_hash,
@@ -183,7 +186,7 @@ export class ResultsDb extends Db {
       data.component,
       data.version,
       data.latest,
-      licenseName,
+      licenses,
       data.url,
       data.lines,
       data.oss_lines,
@@ -244,8 +247,6 @@ export class ResultsDb extends Db {
       resolve(formattedData);
     });
   }
-
-
 
   // GET RESULT
   public async getFromPath(path: string) {
