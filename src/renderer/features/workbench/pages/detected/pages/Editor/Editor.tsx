@@ -64,10 +64,10 @@ export const Editor = () => {
   };
 
 
+
   // get extension of file
   const getExtension = (file: string) => {
-    const ext = file.split('.').pop();
-
+    // languages objects
     const languages = {
       'sol': 'solidity',
       'js': 'javascript',
@@ -93,7 +93,8 @@ export const Editor = () => {
       'sass': 'sass',
       'sql': 'sql',
     }
-
+    // get extension
+    const ext = file.split('.').pop();
     return languages[ext] || ext || '';
   };
 
