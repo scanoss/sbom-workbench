@@ -96,13 +96,13 @@ export class Db {
           );
 
           db.run(`
-            CREATE VIEW IF NOT EXISTS summary AS SELECT component_versions.id AS compid,component_versions.purl,component_versions.version,SUM(results.ignored ) AS ignored , SUM(results.identified) AS identified , 
-            SUM(identified=0 AND ignored=0) AS pending
-            FROM results 
-            INNER JOIN component_versions ON component_versions.purl=results.purl
-            AND component_versions.version=results.version
-            GROUP BY results.purl, results.version 
-            ORDER BY compid ASC;         
+          CREATE VIEW IF NOT EXISTS summary AS SELECT cv.id AS compid,cv.purl,cv.version,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
+          SUM(f.identified=0 AND f.ignored=0) AS pending
+          FROM files f INNER JOIN Results r ON r.fileId=f.fileId  
+          INNER JOIN component_versions cv ON cv.purl=r.purl
+          AND cv.version=r.version
+          GROUP BY r.purl, r.version 
+          ORDER BY cv.id ASC;          
           `)
           db.run('commit',(err)=>{
             db.close();

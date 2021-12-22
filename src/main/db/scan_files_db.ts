@@ -43,18 +43,37 @@ export class FilesDb extends Db {
     });
   }
 
+  // GET ALL FILES FOR A COMPONENT
+  public async getFilesComponent(data: Partial<Component>, params: any) {  
+    return new Promise(async (resolve, reject) => {
+      let result;
+      try {
+        if (data.purl && data.version)
+          result = await this.getByPurlVersion(
+            data,
+            params ? params.path : null
+          );
+        else result = await this.getByPurl(data, params ? params.path : null);            
+        resolve(result);
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
+
   public async getByPurl(data: Partial<Component>, path: string) {    
     return new Promise(async (resolve, reject) => {  
       try {
-        let SQLquery:String = '';
+        let SQLquery: String = '';
         let params = [];
-        if(!path){
+        if (!path) {
           SQLquery = query.SQL_SELECT_FILES_FROM_PURL;
           params = [data.purl];
-        }
-        else {
+        } else {
           SQLquery = query.SQL_SELECT_FILES_FROM_PURL_PATH;
-          params = [data.purl,`${path}/%`];
+          params = [data.purl, `${path}/%`];
         }
         const db = await this.openDb(); 
         db.all(SQLquery, ...params,
@@ -73,17 +92,17 @@ export class FilesDb extends Db {
   public async getByPurlVersion(data: Partial<Component>, path: string ) {
     return new Promise(async (resolve, reject) => {    
       try {
-        let SQLquery:String = '';
+        let SQLquery: String = '';
         let params = [];
-        if(!path){
+        if (!path) {
           SQLquery = query.SQL_SELECT_FILES_FROM_PURL_VERSION;
-          params = [data.purl,data.version];
-        }else{
+          params = [data.purl, data.version];
+        } else {
           SQLquery = query.SQL_SELECT_FILES_FROM_PURL_VERSION_PATH;
-          params = [data.purl,data.version,`${path}/%`];
+          params = [data.purl, data.version, `${path}/%`];
         }
         const db = await this.openDb();
-        db.all(SQLquery,...params,async function (err: any, file: any){
+        db.all(SQLquery, ...params, async function (err: any, file: any) {
           db.close();
           if (err) throw err;
           resolve(file);
@@ -100,12 +119,13 @@ export class FilesDb extends Db {
       try {
         const db = await this.openDb();
         const ignoredFilesSQL = `${
-        query.SQL_UPDATE_IGNORED_FILES}(${files.toString()});`;
+          query.SQL_UPDATE_IGNORED_FILES
+        }(${files.toString()});`;
         db.serialize(function () {
           db.run('begin transaction');
           db.run(ignoredFilesSQL);
-          db.run('commit', (err:any) => {
-           if(err) throw err;
+          db.run('commit', (err: any) => {
+            if (err) throw err;
             db.close();
             resolve(true);
           });
@@ -143,4 +163,145 @@ export class FilesDb extends Db {
       }
     });
   }
+
+  public async insertFiles(data: Array<any>) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          data.forEach((d) => {
+            db.run('INSERT INTO FILES(path,type) VALUES(?,?)', d.path,d.type);
+          });
+          db.run('commit', (err: any) => {
+            if (err) throw err;
+            db.close();
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        log.error(error);
+        reject(new Error('ERROR INSERTING FILES'));
+      }
+    });
+  }
+
+
+public async getFiles(){
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await this.openDb();
+      db.all("SELECT * FROM files", (err: any, files:any) => {
+      if (err) throw err;
+      db.close();
+      resolve(files);
+    });
+  }
+    catch (error) {
+      log.error(error);
+      reject(new Error('ERROR ATTACHING FILES TO RESULTS'));
+    }
+  });
+}
+
+public async getIdFromPath(path: string){
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await this.openDb();
+      db.get("SELECT fileId AS id FROM files WHERE path=?;",path,(err: any, id:any) => {
+      if (err) throw err;
+      db.close();
+      resolve(id);
+    });
+  }
+    catch (error) {
+      log.error(error);
+      reject(new Error('ERROR ATTACHING FILES TO RESULTS'));
+    }
+  });
+}
+
+public async setDirty(dirty: number,path?: string){
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await this.openDb();
+      let SQLquery: String = '';
+      if(path)
+      SQLquery = `UPDATE files SET dirty=${dirty} WHERE path IN (${path});`;
+      else
+      SQLquery = `UPDATE files SET dirty=${dirty};`;
+      db.run(SQLquery,(err: any) => {
+      if (err) throw err;
+      db.close();
+      resolve(true);
+    });
+  }
+    catch (error) {
+      log.error(error);
+      reject(new Error('ERROR SETTING FILES DIRTY'));
+    }
+  });
+}
+
+public async getDirty() {
+  const db = await this.openDb();
+  return new Promise<number[]>(async (resolve) => {
+    db.all(`SELECT fileId AS id FROM files WHERE dirty=1;`, (err: any, data: any) => {
+      db.close();
+      if (err) throw err;
+      if (data === undefined) resolve([]);
+      resolve(data.map((item: any) => item.id));
+    });
+  });
+}
+
+public async deleteDirty() {
+  const db = await this.openDb();
+  return new Promise<number[]>(async (resolve) => {
+    db.all(`DELETE FROM files WHERE dirty=1;`, (err: any, data: any) => {
+      db.close();
+      if (err) throw err;
+      if (data === undefined) resolve([]);
+      resolve(data.map((item: any) => item.id));
+    });
+  });
+}
+
+public async getClean(){
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await this.openDb();
+      db.all("SELECT * FROM files WHERE dirty=0", (err: any, files:any) => {
+      if (err) throw err;
+      db.close();
+      resolve(files);
+    });
+  }
+    catch (error) {
+      log.error(error);
+      reject(new Error('ERROR ATTACHING FILES TO RESULTS'));
+    }
+  });
+}
+
+public async getFilesRescan(){
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await this.openDb();
+      db.all("SELECT f.path,f.identified ,f.ignored ,f.type AS original,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending FROM files f;", (err: any, files:any) => {
+      if (err) throw err;
+      db.close();
+      resolve(files);
+    });
+  }
+    catch (error) {
+      log.error(error);
+      reject(new Error('ERROR ATTACHING FILES TO RESULTS'));
+    }
+  });
+}
+
+      
+
 }

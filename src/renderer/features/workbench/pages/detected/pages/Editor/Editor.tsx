@@ -17,6 +17,7 @@ import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import { projectService } from '../../../../../../../api/project-service';
 import { InventoryForm } from '../../../../../../context/types';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
+import { fileService } from '../../../../../../../api/file-service';
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -85,12 +86,13 @@ export const Editor = () => {
   };
 
   const getInventories = async () => {
-    const inv = await inventoryService.getAll({ files: [file] });
+    const inv = await inventoryService.getAll({ files: [file] });   
     setInventories(inv);
   };
 
   const getResults = async () => {
     const results = await resultService.get(file);
+    console.log("RESULTS",results);
     setMatchInfo(mapFiles(results));
   };
 
@@ -120,26 +122,17 @@ export const Editor = () => {
     create(inv, [result.id]);
   };
 
-  const onNoMatchIdentifyPressed = async () => {
+  const onNoMatchIdentifyPressed = async (result) => {
     const response = await dialogCtrl.openInventory({
       usage: 'file',
     });
     if (response) {
-      const node = await projectService.getNodeFromPath(file);
-      if (node.action === 'filter') {
-        await resultService.createFiltered(file); // idtype=forceinclude
-      } else await resultService.updateNoMatchToFile(file);
-
-      const data = await resultService.getNoMatch(file);
-    
-      // FIXME: until getNode works ok
+      const data = await fileService.getIdFromPath(file);
       if (!data) return;
-
       await createInventory({
         ...response,
         files: [data.id],
       });
-
       getInventories();
       getResults();
     }

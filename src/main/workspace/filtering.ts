@@ -44,19 +44,17 @@ class NameFilter extends AbstractFilter {
     if (this.condition === 'contains') {
       return !(path.indexOf(this.value) >= 0);
     }
-    if (this.condition === 'fullmatch') return (fpath.basename(path) !== this.value);
+    if (this.condition === 'fullmatch') return fpath.basename(path) !== this.value;
     if (this.condition === 'starts') {
-     let filename: string;
-     filename = fpath.basename(path);
-    return !filename.startsWith(this.value);
-
+      let filename: string;
+      filename = fpath.basename(path);
+      return !filename.startsWith(this.value);
     }
     if (this.condition === 'ends') {
       let filename: string;
       filename = fpath.basename(path);
-       return !filename.endsWith(this.value);
-
-     }
+      return !filename.endsWith(this.value);
+    }
 
     return true;
   }
@@ -113,17 +111,15 @@ class SizeFilter extends AbstractFilter {
     }
     if (this.condition === '<') {
       if (stat.size < parseInt(this.value, 10)) {
-        //  console.log("NO aceptado por que NO es menor");
         return false;
       }
       return true;
     }
     if (this.condition === '=') {
       if (stat.size === parseInt(this.value, 10)) {
-        //   console.log("NO aceptado por que  IGUAL");
         return false;
       }
-      //  console.log("Aceptado por que es NO  IGUAL");
+
       return true;
     }
 
@@ -179,25 +175,17 @@ export class BannedList {
   }
 
   evaluate(path: string): boolean {
-
     const pathStat = fs.lstatSync(path);
 
     let i: number;
     for (i = 0; i < this.filters.length; i += 1) {
-
       const evaluation = this.filters[i].evaluate(path);
 
-      if (  this.filters[i].scope === 'FOLDER' &&
-            pathStat.isDirectory() &&
-            !evaluation) return false;
+      if (this.filters[i].scope === 'FOLDER' && pathStat.isDirectory() && !evaluation) return false;
 
-      if (  this.filters[i].scope === 'FILE' &&
-            pathStat.isFile() &&
-            !evaluation) return false;
+      if (this.filters[i].scope === 'FILE' && pathStat.isFile() && !evaluation) return false;
 
-      if (  this.filters[i].scope === 'ALL' &&
-            !evaluation) return false;
-
+      if (this.filters[i].scope === 'ALL' && !evaluation) return false;
     }
     return true;
   }

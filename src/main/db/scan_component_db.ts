@@ -55,7 +55,6 @@ export class ComponentDb extends Db {
     });
   }
 
-
   private processComponent(data: any) {
     const results: any = [];
 
@@ -144,7 +143,7 @@ export class ComponentDb extends Db {
         if(params?.path)
           SQLQuery = query.SQL_GET_COMPONENT_BY_PURL_ENGINE_PATH.replace('#', `'${params.path}/%'`);
         else
-          SQLQuery =  query.SQL_GET_COMPONENT_BY_PURL_ENGINE;       
+          SQLQuery =  query.SQL_GET_COMPONENT_BY_PURL_ENGINE;          
         const db = await this.openDb();
         db.all(
           SQLQuery,
@@ -293,17 +292,23 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
+        let licenses: any = await self.license.getAll();
+        licenses = licenses.reduce((acc,act)=>{
+          
+          if(!acc[act.spdxid]) acc[act.spdxid]=act.id;
+          return acc;
+        },{});      
         const results = await this.getUnique();
         db.serialize(async function () {
           db.run('begin transaction');
           for (const result of results) {
             if (result.license) {
-              license.spdxid = result.license;
-              attachLicComp.license_id = await self.license.getLicenseIdFilter(
-                license
-              );
-              if (attachLicComp.license_id === 0) {
+              license.spdxid = result.license;              
+              attachLicComp.license_id= licenses[license.spdxid];
+              if (attachLicComp.license_id===undefined) {
                 attachLicComp.license_id  = await self.license.bulkCreate(db, license);
+                licenses = { ...licenses,[license.spdxid]:attachLicComp.license_id };
+
               }
             }
             attachLicComp.compid = await self.componentNewImportFromResults(
@@ -563,7 +568,7 @@ export class ComponentDb extends Db {
       try {
         const db = await this.openDb();
         db.serialize(() => {
-          let SQLquery = `SELECT r.purl,SUM(r.identified) AS identified,SUM(r.ignored) AS ignored ,SUM((CASE WHEN  r.identified=0 AND r.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r WHERE r.file_path LIKE # AND r.purl IN ? GROUP BY r.purl;`;
+          let SQLquery = `SELECT r.purl,SUM(f.identified) AS identified,SUM(f.ignored) AS ignored ,SUM((CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r INNER JOIN files f ON f.fileId=r.fileId WHERE f.path LIKE # AND r.purl IN ? GROUP BY r.purl;`;
           SQLquery =  SQLquery.replace('#',`'${path}/%'`);     
           const aux = `'${  purls.join("','")  }'`;  
           SQLquery = SQLquery.replace('?',`(${aux})`);          
