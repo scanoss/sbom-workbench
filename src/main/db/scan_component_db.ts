@@ -16,7 +16,6 @@ import { Db } from './db';
 import { Component } from '../../api/types';
 import { LicenseDb } from './scan_license_db';
 
-
 export interface ComponentParams {
   source?: ComponentSource;
   path?: string;
@@ -31,14 +30,12 @@ const query = new Querys();
 export class ComponentDb extends Db {
   license: LicenseDb;
 
-
-
   constructor(path: string) {
     super(path);
     this.license = new LicenseDb(path);
   }
 
-  get(component:number) {
+  get(component: number) {
     return new Promise(async (resolve, reject) => {
       try {
         let comp: any;
@@ -104,13 +101,15 @@ export class ComponentDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         let sqlGetComp = '';
-        if(params?.path && params?.source) {
-          sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS_BY_PATH.replace('#', `${params.path}/%`);
-        }
-        else if(params?.source === ComponentSource.ENGINE) {
-          sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS
-        } else{
-         sqlGetComp =  query.SQL_GET_ALL_COMPONENTS;
+        if (params?.path && params?.source) {
+          sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS_BY_PATH.replace(
+            '#',
+            `${params.path}/%`
+          );
+        } else if (params?.source === ComponentSource.ENGINE) {
+          sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS;
+        } else {
+          sqlGetComp = query.SQL_GET_ALL_COMPONENTS;
         }
         const db = await this.openDb();
         db.serialize(function () {
@@ -134,16 +133,17 @@ export class ComponentDb extends Db {
     });
   }
 
-  
   public async getByPurl(data: any, params: ComponentParams) {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
-        let SQLQuery='';
-        if(params?.path)
-          SQLQuery = query.SQL_GET_COMPONENT_BY_PURL_ENGINE_PATH.replace('#', `'${params.path}/%'`);
-        else
-          SQLQuery =  query.SQL_GET_COMPONENT_BY_PURL_ENGINE;          
+        let SQLQuery = '';
+        if (params?.path)
+          SQLQuery = query.SQL_GET_COMPONENT_BY_PURL_ENGINE_PATH.replace(
+            '#',
+            `'${params.path}/%'`
+          );
+        else SQLQuery = query.SQL_GET_COMPONENT_BY_PURL_ENGINE;
         const db = await this.openDb();
         db.all(
           SQLQuery,
@@ -284,77 +284,106 @@ export class ComponentDb extends Db {
     });
   }
 
-  // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
-  importUniqueFromFile() {
-    const self = this;
-    const attachLicComp: any = {};
-    const license: any = {};
+  public async getLicensesAttachedToComponentsFromResults() {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        let licenses: any = await self.license.getAll();
-        licenses = licenses.reduce((acc,act)=>{
-          
-          if(!acc[act.spdxid]) acc[act.spdxid]=act.id;
-          return acc;
-        },{});      
-        const results = await this.getUnique();
-        db.serialize(async function () {
-          db.run('begin transaction');
-          for (const result of results) {
-            if (result.license) {
-              license.spdxid = result.license;              
-              attachLicComp.license_id= licenses[license.spdxid];
-              if (attachLicComp.license_id===undefined) {
-                attachLicComp.license_id  = await self.license.bulkCreate(db, license);
-                licenses = { ...licenses,[license.spdxid]:attachLicComp.license_id };
-
-              }
-            }
-            attachLicComp.compid = await self.componentNewImportFromResults(
-              db,
-              result
-            );
-            if (result.license)
-              await self.license.bulkAttachLicensebyId(db, attachLicComp);
-          }
-          db.run('commit', (err: any) => {
-            if (err) throw err;
+        db.all(
+          `SELECT cv.id,r.license FROM component_versions cv INNER JOIN results r ON cv.purl=r.purl AND cv.version = r.version;`,
+          async (err: any, data: any) => {
             db.close();
-            resolve(true);
-          });
-        });
+            if (err) throw err;
+            data.forEach((item) => {
+              if (
+                item.license === ' ' ||
+                item.license === '' ||
+                item.license === null
+              )
+                item.license = null;
+              else item.license = item.license.split(',');
+            });
+            resolve(data);
+          }
+        );
       } catch (error) {
-        log.error(error);
-        resolve(false);
+        reject(error);
       }
     });
   }
 
-  // COMPONENT NEW
-  private componentNewImportFromResults(db: any, data: any) {
-    return new Promise<number>((resolve) => {
-      db.serialize(function () {
-        db.run(
-          query.COMPDB_SQL_COMP_VERSION_INSERT,
-          data.component,
-          data.version,
-          'AUTOMATIC IMPORT',
-          data.url,
-          data.purl,
-          'engine'
-        );
-        db.get(
-          `SELECT id FROM component_versions WHERE purl=? AND version=?;`,
-          data.purl,
-          data.version,
-          (err: any, comp: any) => {
-            if (err) log.error(err);
-            resolve(comp.id);
-          }
-        );
-      });
+  public async import(components: Array<Partial<Component>>) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          components.forEach((component) => {
+            db.run(
+              query.COMPDB_SQL_COMP_VERSION_INSERT,
+              component.name,
+              component.version,
+              'AUTOMATIC IMPORT',
+              component.url,
+              component.purl,
+              'engine'
+            );
+          });
+          db.run('commit', (err: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
+  }
+
+  //   if (result.license) {
+  //     for (let i = 0; i < result.license.length; i += 1) {
+  //       if (licenses[result.license[i]] !== undefined) {
+  //         attachLicComp.license_id = licenses[result.license[i]];
+  //       } else {
+  //         attachLicComp.license_id = await self.license.bulkCreate(db, {
+  //           spdxid: result.license[i],
+  //         });
+  //         licenses = {
+  //           ...licenses,
+  //           [result.license[i]]: attachLicComp.license_id,
+  //         };
+  //       }
+  //       await self.license.bulkAttachLicensebyId(db, attachLicComp);
+  //     }
+  //   }
+
+  // COMPONENT NEW
+  public async componentNewImportFromResults(db: any, data: any) {
+    return new Promise<boolean>((resolve) => {
+      db.run(
+        query.COMPDB_SQL_COMP_VERSION_INSERT,
+        data.component,
+        data.version,
+        'AUTOMATIC IMPORT',
+        data.url,
+        data.purl,
+        'engine',
+        (err: any) => {
+          log.error(err);
+          resolve(true);
+        }
+      );
+    });
+    //   db.get(
+    //     `SELECT id FROM component_versions WHERE purl=? AND version=?;`,
+    //     data.purl,
+    //     data.version,
+    //     (err: any, comp: any) => {
+    //       if (err) log.error(err);
+    //       resolve(comp.id);
+    //     }
+    //   );
+    // });
   }
 
   update(component: Component) {
@@ -386,13 +415,16 @@ export class ComponentDb extends Db {
     });
   }
 
-  private async getUnique() {
-    return new Promise<any>(async (resolve, reject) => {
+  public async getUniqueComponentsFromResults() {
+    return new Promise<Array<Partial<Component>>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.all(query.SQL_GET_UNIQUE_COMPONENT, (err: any, data: any) => {
           db.close();
           if (err) throw err;
+          data.forEach((result) => {
+            if (result.license) result.license = result.license.split(',');
+          });
           resolve(data);
         });
       } catch (error: any) {
@@ -502,7 +534,7 @@ export class ComponentDb extends Db {
   }
 
   public getNotValid() {
-    return new Promise <number[]> (async (resolve, reject) => {
+    return new Promise<number[]>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.all(
@@ -515,7 +547,9 @@ export class ComponentDb extends Db {
           (err: any, data: any) => {
             db.close();
             if (err) throw err;
-            const ids:number[] = data.map((item:Record<string,number>) => item.id );
+            const ids: number[] = data.map(
+              (item: Record<string, number>) => item.id
+            );
             resolve(ids);
           }
         );
@@ -525,30 +559,29 @@ export class ComponentDb extends Db {
     });
   }
 
-  public deleteByID( componentIds: number[]) {
+  public deleteByID(componentIds: number[]) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        let deleteCompByIdQuery = "DELETE FROM component_versions WHERE id in ";
+        let deleteCompByIdQuery = 'DELETE FROM component_versions WHERE id in ';
         deleteCompByIdQuery += `(${componentIds.toString()});`;
-        db.all(deleteCompByIdQuery,
-          (err: any) => {
-            db.close();
-            if (err) throw err;
-            resolve(true);
-          }
-        );
+        db.all(deleteCompByIdQuery, (err: any) => {
+          db.close();
+          if (err) throw err;
+          resolve(true);
+        });
       } catch (error) {
         reject(error);
       }
     });
   }
 
-  public async updateOrphanToManual(){
+  public async updateOrphanToManual() {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.run(`UPDATE component_versions  SET source='manual' WHERE  id IN ( SELECT i.cvid FROM inventories i INNER JOIN component_versions cv ON cv.id=i.cvid WHERE (cv.purl,cv.version) NOT IN (SELECT r.purl,r.version FROM results r));`,
+        db.run(
+          `UPDATE component_versions  SET source='manual' WHERE  id IN ( SELECT i.cvid FROM inventories i INNER JOIN component_versions cv ON cv.id=i.cvid WHERE (cv.purl,cv.version) NOT IN (SELECT r.purl,r.version FROM results r));`,
           (err: any) => {
             db.close();
             if (err) throw err;
@@ -559,9 +592,7 @@ export class ComponentDb extends Db {
         reject(error);
       }
     });
-
   }
-
 
   public getSummaryByPath(path: string, purls: string[]) {
     return new Promise<Array<any>>(async (resolve, reject) => {
@@ -569,10 +600,10 @@ export class ComponentDb extends Db {
         const db = await this.openDb();
         db.serialize(() => {
           let SQLquery = `SELECT r.purl,SUM(f.identified) AS identified,SUM(f.ignored) AS ignored ,SUM((CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r INNER JOIN files f ON f.fileId=r.fileId WHERE f.path LIKE # AND r.purl IN ? GROUP BY r.purl;`;
-          SQLquery =  SQLquery.replace('#',`'${path}/%'`);     
-          const aux = `'${  purls.join("','")  }'`;  
-          SQLquery = SQLquery.replace('?',`(${aux})`);          
-          db.all(SQLquery, (err: any, data: any) => {            
+          SQLquery = SQLquery.replace('#', `'${path}/%'`);
+          const aux = `'${purls.join("','")}'`;
+          SQLquery = SQLquery.replace('?', `(${aux})`);
+          db.all(SQLquery, (err: any, data: any) => {
             db.close();
             if (err) throw err;
             else resolve(data);
@@ -584,7 +615,4 @@ export class ComponentDb extends Db {
       }
     });
   }
-
-
-
 }

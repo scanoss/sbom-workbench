@@ -8,7 +8,7 @@ export const IdentifiedList = ({ files, inventories, onAction }) => {
 
   const fetchGroups = () => {
     const grupedFiles = files.reduce((acc, file) => {
-      const key = file.inventory.component.name;
+      const key = file.component.name;
       if (!acc.hasOwnProperty(key)) acc[key] = [];
       acc[key].push(file);
       return acc;

@@ -86,7 +86,7 @@ export class Metadata {
     this.scan_root = scanRoot;
   }
 
-  public setScannerState(s: ScanState) {
+  public setScannerState(s: ScanState) {  
     this.scannerState = s;
   }
 

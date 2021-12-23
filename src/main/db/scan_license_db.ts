@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable func-names */
 /* eslint-disable @typescript-eslint/no-useless-constructor */
 /* eslint-disable no-async-promise-executor */
@@ -141,6 +142,50 @@ export class LicenseDb extends Db {
         });
       } catch (error) {
         log.error(error);
+        reject(error);
+      }
+    });
+  }
+
+  public async bulkAttachComponentLicense(data: any) {
+    const self: any = this;
+    return new Promise(async (resolve, reject) => {
+      try {
+        let licenses: any = await this.getAll();
+        licenses = licenses.reduce((acc, act) => {
+          if (!acc[act.spdxid]) acc[act.spdxid] = act.id;
+          return acc;
+        }, {});
+
+        const db = await this.openDb();
+        db.serialize(async function () {
+          db.run('begin transaction');
+          for (const component of data) {
+            if (component.license) {
+              for (let i = 0; i < component.license.length; i += 1) {
+                let licenseId = null;
+                if (licenses[component.license[i]] !== undefined) {
+                  licenseId = licenses[component.license[i]];
+                } else {
+                  licenseId = await self.bulkCreate(db, {
+                    spdxid: component.license[i],
+                  });
+                  licenses = {
+                    ...licenses,
+                    [component.license[i]]: licenseId,
+                  };
+                }
+                await self.bulkAttachLicensebyId(db, { compid: component.id, license_id: licenseId });
+              }
+            }
+          }
+          db.run('commit', (err: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          });
+        });
+      } catch (error: any) {
         reject(error);
       }
     });

@@ -148,6 +148,19 @@ class LogicComponentService {
     result.sort((a, b) => a.name.localeCompare(b.name));
     return result;
   }
+
+  public async importComponents(project) {
+    // eslint-disable-next-line no-async-promise-executor
+    try {
+      const components: Array<Partial<Component>> = await project.scans_db.components.getUniqueComponentsFromResults();
+      await project.scans_db.components.import(components);
+      const componentLicenses = await project.scans_db.components.getLicensesAttachedToComponentsFromResults();
+      await project.scans_db.licenses.bulkAttachComponentLicense(componentLicenses);
+      return true;
+    } catch (error: any) {
+      return error;
+    }
+  }
 }
 
 export const logicComponentService = new LogicComponentService();
