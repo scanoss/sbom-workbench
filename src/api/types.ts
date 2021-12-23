@@ -98,7 +98,7 @@ export interface IProject extends INewProject {
   date: string;
   work_root: string;
   scannerState: ScanState;
-  files: number; 
+  files: number;
   uuid: string;
 }
 
