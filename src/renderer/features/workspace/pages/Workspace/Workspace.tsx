@@ -35,7 +35,7 @@ const Workspace = () => {
 
   const cleanup = () => {};
 
-  const onShowScanHandler = async (project) => {
+  const onShowScanHandler = async (project: IProject) => {
     if (project.appVersion >= Config.MIN_VERSION_SUPPORTED) { // TODO: data should be calculated from the backend
       setScanPath({ path: project.work_root, action: 'none' });
       history.push('/workbench');
@@ -50,7 +50,7 @@ const Workspace = () => {
 
       if (action !== DIALOG_ACTIONS.CANCEL) {
         await deleteProject(project);
-        setScanPath({ path: project.work_root, action: 'scan' });
+        setScanPath({ path: project.scan_root, action: 'scan' });
         history.push('/workspace/new/settings');
       }
     }
