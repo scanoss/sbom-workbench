@@ -77,9 +77,6 @@ export class Querys {
   COMPDB_SQL_COMP_VERSION_INSERT = `INSERT INTO component_versions (name,version, description, url,purl,source) VALUES (?,?,?,?,?,?) ON CONFLICT(version,purl) DO UPDATE
     SET source = 'engine';`;
 
-  SQL_INSERT_COMPONENTS_BULK = `INSERT OR IGNORE INTO component_versions (name,version, description, url,purl,source) VALUES # ON CONFLICT(version,purl) DO UPDATE
-  SET source = 'engine';`;
-
   // ATTACH A COMPONENT TO A LICENSE
   SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID = 'INSERT or IGNORE INTO license_component_version (cvid,licid) values (?,?)';
 
@@ -218,7 +215,7 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   SQL_GET_SUMMARY_BY_PURL =
     'SELECT SUM(identified) AS identified,SUM(pending) AS pending,SUM(ignored) AS ignored FROM summary WHERE purl=? GROUP BY purl;';
 
-  SQL_GET_UNIQUE_COMPONENT = `SELECT DISTINCT purl,version,license,component,url FROM results WHERE version!='' AND dirty=0;`;
+  SQL_GET_UNIQUE_COMPONENT = `SELECT DISTINCT purl,version,license,component AS name,url FROM results WHERE version!='' AND dirty=0;`;
 
   SQL_DELETE_INVENTORY_BY_ID = 'DELETE FROM inventories WHERE id =?';
 

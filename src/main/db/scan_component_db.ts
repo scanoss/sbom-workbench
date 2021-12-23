@@ -284,108 +284,106 @@ export class ComponentDb extends Db {
     });
   }
 
-  public async getLicensesAttachedToComponentsFromResults(){
-      return new Promise(async (resolve, reject) => {
+  public async getLicensesAttachedToComponentsFromResults() {
+    return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(`SELECT cv.id,r.license FROM component_versions cv INNER JOIN results r ON cv.purl=r.purl AND cv.version = r.version;`, async (err: any, data: any) => {
-          db.close();
-          if(err) throw err;
-          data.forEach(item => {
-            if(item.license===' ' || item.license==='' || item.license===null)
-            item.license=null;
-            else
-            item.license = item.license.split(',');
+        db.all(
+          `SELECT cv.id,r.license FROM component_versions cv INNER JOIN results r ON cv.purl=r.purl AND cv.version = r.version;`,
+          async (err: any, data: any) => {
+            db.close();
+            if (err) throw err;
+            data.forEach((item) => {
+              if (
+                item.license === ' ' ||
+                item.license === '' ||
+                item.license === null
+              )
+                item.license = null;
+              else item.license = item.license.split(',');
+            });
+            resolve(data);
+          }
+        );
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  public async import(components: Array<Partial<Component>>) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run('begin transaction');
+          components.forEach((component) => {
+            db.run(
+              query.COMPDB_SQL_COMP_VERSION_INSERT,
+              component.name,
+              component.version,
+              'AUTOMATIC IMPORT',
+              component.url,
+              component.purl,
+              'engine'
+            );
           });
-          resolve(data);
+          db.run('commit', (err: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          });
         });
       } catch (error) {
         reject(error);
       }
     });
-
   }
 
-  // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
-  public async import(components:string) {
-    return new Promise(async (resolve, reject) => {
-      try {
-
-    // const self = this;
-    // const attachLicComp: any = {};
-    const SQLquery = query.SQL_INSERT_COMPONENTS_BULK.replace('#', components);
-    const db = await this.openDb();  
-  
-        db.run(SQLquery,(err: any) => {
-          if(err) throw err;
-          db.close();
-          resolve(true);
-        });
-        
-        
-    
-
-  } catch (error) {
-   reject(error);
-  }
-    });
-}
-
-
-
-
-    
-        
-        
-          //   if (result.license) {
-          //     for (let i = 0; i < result.license.length; i += 1) {
-          //       if (licenses[result.license[i]] !== undefined) {
-          //         attachLicComp.license_id = licenses[result.license[i]];
-          //       } else {
-          //         attachLicComp.license_id = await self.license.bulkCreate(db, {
-          //           spdxid: result.license[i],
-          //         });
-          //         licenses = {
-          //           ...licenses,
-          //           [result.license[i]]: attachLicComp.license_id,
-          //         };
-          //       }               
-          //       await self.license.bulkAttachLicensebyId(db, attachLicComp);
-          //     }           
-          //   }           
-           
-       
-      
-  
+  //   if (result.license) {
+  //     for (let i = 0; i < result.license.length; i += 1) {
+  //       if (licenses[result.license[i]] !== undefined) {
+  //         attachLicComp.license_id = licenses[result.license[i]];
+  //       } else {
+  //         attachLicComp.license_id = await self.license.bulkCreate(db, {
+  //           spdxid: result.license[i],
+  //         });
+  //         licenses = {
+  //           ...licenses,
+  //           [result.license[i]]: attachLicComp.license_id,
+  //         };
+  //       }
+  //       await self.license.bulkAttachLicensebyId(db, attachLicComp);
+  //     }
+  //   }
 
   // COMPONENT NEW
   public async componentNewImportFromResults(db: any, data: any) {
     return new Promise<boolean>((resolve) => {
-      
-        db.run(
-          query.COMPDB_SQL_COMP_VERSION_INSERT,
-          data.component,
-          data.version,
-          'AUTOMATIC IMPORT',
-          data.url,
-          data.purl,
-          'engine',(err: any) => {
-            log.error(err);
-            resolve(true);
-          }
-        );
+      db.run(
+        query.COMPDB_SQL_COMP_VERSION_INSERT,
+        data.component,
+        data.version,
+        'AUTOMATIC IMPORT',
+        data.url,
+        data.purl,
+        'engine',
+        (err: any) => {
+          log.error(err);
+          resolve(true);
+        }
+      );
     });
-      //   db.get(
-      //     `SELECT id FROM component_versions WHERE purl=? AND version=?;`,
-      //     data.purl,
-      //     data.version,
-      //     (err: any, comp: any) => {
-      //       if (err) log.error(err);
-      //       resolve(comp.id);
-      //     }
-      //   );
-      // });
-    
+    //   db.get(
+    //     `SELECT id FROM component_versions WHERE purl=? AND version=?;`,
+    //     data.purl,
+    //     data.version,
+    //     (err: any, comp: any) => {
+    //       if (err) log.error(err);
+    //       resolve(comp.id);
+    //     }
+    //   );
+    // });
   }
 
   update(component: Component) {
@@ -418,7 +416,7 @@ export class ComponentDb extends Db {
   }
 
   public async getUniqueComponentsFromResults() {
-    return new Promise<any>(async (resolve, reject) => {
+    return new Promise<Array<Partial<Component>>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.all(query.SQL_GET_UNIQUE_COMPONENT, (err: any, data: any) => {
