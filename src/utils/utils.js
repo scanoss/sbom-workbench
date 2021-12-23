@@ -65,7 +65,7 @@ const languages = {
   hpp: 'cpp',
   cs: 'csharp',
   css: 'css',
-  html: 'html',
+  html: 'htmlbars',
   xml: 'xml',
   json: 'json',
   md: 'markdown',
@@ -74,12 +74,14 @@ const languages = {
   less: 'less',
   sass: 'sass',
   sql: 'sql',
+  txt: 'text',
 };
 
 // get extension of file
 const getExtension = (file) => {
   const ext = file.split('.').pop();
-  return languages[ext] || ext || '';
+  console.log(ext);
+  return languages[ext] || 'text';
 };
 
 export { range, getColor, colorsForLicense, getExtension, languages };
