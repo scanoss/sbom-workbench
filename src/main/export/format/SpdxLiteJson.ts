@@ -24,14 +24,23 @@ export class SpdxLiteJson extends Format {
     spdx.packages = [];
     for (let i = 0; i < data.length; i += 1) {
       const pkg: any = {};
-      pkg.PackageName = data[i].name;
-      pkg.PackageSPDXID = `${data[i].purl}@${data[i].version}`;
-      pkg.PackageVersion = data[i].version;
-      pkg.PackageDownloadLocation = data[i].url;
-      pkg.ConcludedLicense = data[i].concludedLicense;
-      pkg.DeclaredLicense = data[i].declareLicense;
+      pkg.name = data[i].name;
+     // pkg.SPDXID = `SPDXRef-${data[i].purl}@${data[i].version}`; 
+      pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${data[i].purl}@${data[i].version}`).digest('hex')}`; // md5 purl@version
+      pkg.versionInfo = data[i].version;
+      pkg.downloadLocation = data[i].url;
+      pkg.filesAnalyzed = false;
+      pkg.homePage = data[i].url;
+      pkg.licenseDeclared = data[i].declareLicense;
+      pkg.licenseConcluded = data[i].concludedLicense;
+      pkg.externalRefs = [
+        {
+          referenceCategory: 'PACKAGE MANAGER',
+          referenceLocator: data[i].purl,
+          referenceType: 'purl',
+        },
+      ];
       if (data[i].official === LicenseType.CUSTOM) pkg.ExtractedText = this.fulltextToBase64(data[i].fulltext);
-
       spdx.packages.push(pkg);
     }
 
@@ -51,9 +60,9 @@ export class SpdxLiteJson extends Format {
       dataLicense: 'CC0-1.0',
       SPDXID: 'SPDXRef-###',
       name: 'SCANOSS-SBOM',
-      creationInfo:{
+      creationInfo: {
         creators: ['Tool: SCANOSS Audit Workbench', `User: ${os.userInfo().username}`],
-      created: utilDb.getTimeStamp(),
+        created: utilDb.getTimeStamp(),
       },
       packages: [] as any,
     };

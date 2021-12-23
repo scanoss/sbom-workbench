@@ -1,4 +1,3 @@
-import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { workspace } from '../workspace/Workspace';
 
 class LogicResultService {

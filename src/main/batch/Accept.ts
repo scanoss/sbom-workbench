@@ -26,11 +26,18 @@ export class Accept extends Batch {
       }
       const files: any = await this.getFilesInFolder(this.getFolder());
 
+      files.forEach((file) => {
+        file.spdxid = file.spdxid.split(',');
+      });
+
       const ids = this.getArrayFromObject(files, 'id', this.filter);
 
       this.updateTree(ids, NodeStatus.IDENTIFIED);
-      const components: any = await logicComponentService.getAll({ source: ComponentSource.ENGINE });
+      const components: any = await logicComponentService.getAll({
+        source: ComponentSource.ENGINE,
+      });
       if (ids.length === 0) return [];
+
       let inventories = this.getFilteredObject(files, this.filter) as Array<Partial<Inventory>>;
 
       inventories = this.AddComponentIdToInventory(components, inventories);
@@ -73,7 +80,7 @@ export class Accept extends Batch {
             o.purl === result.purl &&
             o.usage === result.usage &&
             o.license === result.license &&
-            o.spdxid === result.spdxid
+            o.spdxid === result.spdxid[0]
         );
 
         if (index >= 0) {
@@ -86,7 +93,7 @@ export class Accept extends Batch {
             usage: result.usage,
             version: result.version,
             url: result.url,
-            spdxid: result.spdxid,
+            spdxid: result.spdxid[0],
             cvid: 0,
           };
 

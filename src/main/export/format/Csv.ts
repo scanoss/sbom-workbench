@@ -12,7 +12,7 @@ export class Csv extends Format {
     let csv = `inventory_ID,usage,notes,identified_license,detected_license,identified_component,detected_component,path,purl,version\r\n`;
     for (const inventory of data) {
       csv += `${inventory.inventoryId},${inventory.usage},${inventory.notes},${inventory.identified_license},${
-        inventory.detected_license ? inventory.detected_license : 'n/a'
+        inventory.detected_license ? inventory.detected_license.replace(/,/g, ' ') : 'n/a'
       },${inventory.identified_component},${inventory.detected_component ? inventory.detected_component : 'n/a'},"${
         inventory.path
       }","${inventory.purl}",${inventory.version}\r\n`;
