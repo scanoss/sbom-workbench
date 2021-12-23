@@ -1,3 +1,4 @@
+import * as os from 'os';
 import { Buffer } from 'buffer';
 import { utilDb } from '../../db/utils_db';
 import { Format } from '../Format';
@@ -20,8 +21,7 @@ export class SpdxLiteJson extends Format {
   public async generate() {
     const data = await this.export.getSpdxData();
     const spdx = SpdxLiteJson.template();
-    spdx.Packages = [];
-    spdx.created = utilDb.getTimeStamp();
+    spdx.packages = [];
     for (let i = 0; i < data.length; i += 1) {
       const pkg: any = {};
       pkg.PackageName = data[i].name;
@@ -32,7 +32,7 @@ export class SpdxLiteJson extends Format {
       pkg.DeclaredLicense = data[i].declareLicense;
       if (data[i].official === LicenseType.CUSTOM) pkg.ExtractedText = this.fulltextToBase64(data[i].fulltext);
 
-      spdx.Packages.push(pkg);
+      spdx.packages.push(pkg);
     }
 
     const fileBuffer = JSON.stringify(spdx);
@@ -40,7 +40,7 @@ export class SpdxLiteJson extends Format {
     hashSum.update(fileBuffer);
     const hex = hashSum.digest('hex');
 
-    spdx.SPDXIdentifier = spdx.SPDXIdentifier.replace('###', hex);
+    spdx.SPDXID = spdx.SPDXID.replace('###', hex);
 
     return JSON.stringify(spdx, undefined, 4);
   }
@@ -49,11 +49,13 @@ export class SpdxLiteJson extends Format {
     const spdx = {
       spdxVersion: 'SPDX-2.2',
       dataLicense: 'CC0-1.0',
-      SPDXIdentifier: 'SCANOSS-SPDX-###',
-      DocumentName: 'SCANOSS-SBOM',
-      creator: 'Tool: SCANOSS Audit Workbench',
-      created: '',
-      Packages: [] as any,
+      SPDXID: 'SPDXRef-###',
+      name: 'SCANOSS-SBOM',
+      creationInfo:{
+        creators: ['Tool: SCANOSS Audit Workbench', `User: ${os.userInfo().username}`],
+      created: utilDb.getTimeStamp(),
+      },
+      packages: [] as any,
     };
     return spdx;
   }

@@ -81,28 +81,6 @@ ipcMain.handle(IpcEvents.RESULTS_GET_NO_MATCH, async (event, filePath: string) =
   };
 });
 
-ipcMain.handle(IpcEvents.RESULTS_ADD_FILTERED_FILE, async (event, filePath: string) => {
-  try {
-    const p: Project = workspace.getOpenedProjects()[0];
-    const result = await p.scans_db.results.insertFiltered(filePath);
-    return Response.ok({
-      message: 'Results succesfully retrieved',
-      data: result,
-    });
-  } catch (e: any) {
-    return Response.fail({ message: e.message });
-  }
-});
 
-ipcMain.handle(IpcEvents.RESULTS_FORCE_ATTACH, async (event, filePath: string) => {
-  try {
-    const p: Project = workspace.getOpenedProjects()[0];
-    const result = await p.scans_db.results.updateResult(filePath);
-    return Response.ok({
-      message: 'Results updated succesfully',
-      data: result,
-    });
-  } catch (e: any) {
-    return Response.fail({ message: e.message });
-  }
-});
+
+

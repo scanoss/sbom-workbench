@@ -163,7 +163,6 @@ export interface IInitScan {
 }
 
 async function mainLogic() {
-
   const root = `${os.homedir()}/scanoss-workspace`;
 
   // This lines will be removed in future versions
