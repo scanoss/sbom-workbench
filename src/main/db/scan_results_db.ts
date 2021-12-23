@@ -224,63 +224,6 @@ export class ResultsDb extends Db {
     });
   }
 
-  // GET RESULT
-  async getNoMatch(path: string) {
-    return new Promise<any>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.get(query.SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH, path, (err: any, data: any) => {
-          db.close();
-          if (err) throw err;
-          else resolve(data);
-        });
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
-
-
-  public async restore(files: number[]) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(() => {
-          const resultsid = `(${files.toString()});`;
-          const sqlRestoreIdentified = query.SQL_RESTORE_IDENTIFIED_FILE_SNIPPET + resultsid;
-          // const sqlRestoreNoMatch = query.SQL_RESTORE_NOMATCH_FILE + resultsid;
-          // const sqlRestoreFiltered = query.SQL_RESTORE_FILTERED_FILE + resultsid;
-          db.run('begin transaction');
-          db.run(sqlRestoreIdentified);
-          // db.run(sqlRestoreNoMatch);
-          // db.run(sqlRestoreFiltered);
-          db.run('commit', (err: any) => {
-            if (err) throw err;
-            db.close();
-            resolve(true);
-          });
-        });
-      } catch (error) {
-        log.error(error);
-        reject(new Error('Unignore files were not successfully retrieved'));
-      }
-    });
-  }
-
-  public async getDirty() {
-    const db = await this.openDb();
-    return new Promise<number[]>(async (resolve) => {
-      db.all(`SELECT id FROM results WHERE dirty=1;`, (err: any, data: any) => {
-        db.close();
-        if (err) throw err;
-        if (data === undefined) resolve([]);
-        resolve(data.map((item: any) => item.id));
-      });
-    });
-  }
-
   public async getNotOriginal(ids: number[]) {
     return new Promise<any>(async (resolve, reject) => {
       try {

@@ -186,11 +186,7 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE files SET ignored=1,identified=0 WHERE fileId IN ';
 
-  SQL_RESTORE_IDENTIFIED_FILE_SNIPPET = `UPDATE files SET ignored=0,identified=0 WHERE fileId IN `;
-
-  SQL_RESTORE_NOMATCH_FILE = `UPDATE results SET ignored=0,identified=0,idtype='none' WHERE source='nomatch' AND id IN `;
-
-  SQL_RESTORE_FILTERED_FILE = `DELETE FROM results WHERE source='filtered' AND id IN`;
+  SQL_FILE_RESTORE = `UPDATE files SET ignored=0,identified=0 WHERE fileId IN `;
 
   SQL_SELECT_INVENTORIES_NOT_HAVING_FILES = ` SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories);`;
 

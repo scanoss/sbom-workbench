@@ -302,6 +302,24 @@ public async getFilesRescan(){
   });
 }
 
+public async restore(files: number[]) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();      
+          const filesIds = `(${files.toString()});`;
+          const sqlRestoreIdentified = query.SQL_FILE_RESTORE + filesIds;        
+          db.run(sqlRestoreIdentified, (err: any) => {
+            if (err) throw err;
+            db.close();
+            resolve(true);
+          });       
+      } catch (error) {
+        log.error(error);
+        reject(new Error('Unignore files were not successfully retrieved'));
+      }
+    });
+  }
+
       
 
 }

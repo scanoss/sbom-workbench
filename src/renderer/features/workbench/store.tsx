@@ -11,6 +11,7 @@ import { loadScanSuccess, setComponent, setComponents, setProgress, updateTree, 
 import { resultService } from '../../../api/results-service';
 import { reportService } from '../../../api/report-service';
 import { IpcEvents } from '../../../ipc-events';
+import { fileService } from '../../../api/file-service';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
@@ -87,7 +88,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   const ignoreFile = async (files: number[]): Promise<boolean> => {
-    const success = await resultService.ignored(files);
+    const success = await fileService.ignored(files);
     update();
     return success;
   };

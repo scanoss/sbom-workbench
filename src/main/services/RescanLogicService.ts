@@ -30,13 +30,6 @@ class ReScanService {
       }, []);
 
       await project.scans_db.results.insertFromFileReScan(resultPath, filesToUpdate);
-
-      // if (filteredFiles.length > 0) {
-      //   const filtered = utilHelper.convertsArrayOfStringToString(filteredFiles);
-      //   await project.scans_db.results.updateFiltered(filtered);
-      // }
-
-      // const dirtyResults = await project.scans_db.results.getDirty();
       const dirtyFiles = await project.scans_db.files.getDirty();
       if (dirtyFiles.length > 0) {
         await project.scans_db.inventories.deleteDirtyFileInventories(dirtyFiles);
@@ -49,11 +42,7 @@ class ReScanService {
 
       await project.scans_db.results.deleteDirty();
       await project.scans_db.files.deleteDirty();
-
       await project.scans_db.components.updateOrphanToManual();
-
-      // call logicComponentService.import
-     // await project.scans_db.components.importUniqueFromFile();
       await logicComponentService.importComponents(project);
 
       const emptyInv: any = await project.scans_db.inventories.emptyInventory();

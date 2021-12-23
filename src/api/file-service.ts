@@ -19,5 +19,10 @@ class FileService extends BaseService {
     const response = await ipcRenderer.invoke(IpcEvents.FILE_GET_ID_FROM_PATH, args);
     return this.response(response);
   }
+
+  public async ignored(files: number[]): Promise<boolean> {
+    const response = await ipcRenderer.invoke(IpcEvents.IGNORED_FILES, files);
+    return this.response(response);
+  }
 }
 export const fileService = new FileService();

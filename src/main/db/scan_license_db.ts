@@ -148,7 +148,6 @@ export class LicenseDb extends Db {
   }
 
   public async bulkAttachComponentLicense(data: any) {
-    const self: any = this;
     return new Promise(async (resolve, reject) => {
       try {
         let licenses: any = await this.getAll();
@@ -156,9 +155,8 @@ export class LicenseDb extends Db {
           if (!acc[act.spdxid]) acc[act.spdxid] = act.id;
           return acc;
         }, {});
-
         const db = await this.openDb();
-        db.serialize(async function () {
+        db.serialize(async () =>{
           db.run('begin transaction');
           for (const component of data) {
             if (component.license) {
@@ -167,7 +165,7 @@ export class LicenseDb extends Db {
                 if (licenses[component.license[i]] !== undefined) {
                   licenseId = licenses[component.license[i]];
                 } else {
-                  licenseId = await self.bulkCreate(db, {
+                  licenseId = await this.bulkCreate(db, {
                     spdxid: component.license[i],
                   });
                   licenses = {
@@ -175,7 +173,7 @@ export class LicenseDb extends Db {
                     [component.license[i]]: licenseId,
                   };
                 }
-                await self.bulkAttachLicensebyId(db, { compid: component.id, license_id: licenseId });
+                await this.bulkAttachLicensebyId(db, { compid: component.id, license_id: licenseId });
               }
             }
           }
