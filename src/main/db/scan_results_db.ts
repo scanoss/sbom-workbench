@@ -135,6 +135,45 @@ export class ResultsDb extends Db {
     });
   }
 
+  async insertFiltered(path: string) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run(
+            query.SQL_INSERT_RESULTS,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'file',
+            null,
+            null,
+            path,
+            0,
+            0,
+            null,
+            'filtered',
+            function (this: any, err: any) {
+              if (err) throw err;
+              db.close();
+              resolve(this.lastID);
+            }
+          );
+        });
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
 
   private insertResultBulk(db: any, data: any, fileId: number) {
     let licenses: string;  
@@ -241,7 +280,23 @@ export class ResultsDb extends Db {
     });
   }
 
-
+  async updateResult(path: string) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          db.run(query.SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH, 'nomatch', path, function (this: any, err: any) {
+            if (err) throw err;
+            db.close();
+            resolve(true);
+          });
+        });
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
 
   public async restore(files: number[]) {
     return new Promise(async (resolve, reject) => {

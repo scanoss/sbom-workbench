@@ -24,15 +24,15 @@ class ResultService extends BaseService {
     return this.response(response);
   }
 
-  // public async createFiltered(path: string): Promise<any> {
-  //   const response = await ipcRenderer.invoke(IpcEvents.RESULTS_ADD_FILTERED_FILE, path);
-  //   return this.response(response);
-  // }
+  public async createFiltered(path: string): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.RESULTS_ADD_FILTERED_FILE, path);
+    return this.response(response);
+  }
 
-  // public async updateNoMatchToFile(path: string): Promise<any> {
-  //   const response = await ipcRenderer.invoke(IpcEvents.RESULTS_FORCE_ATTACH, path);
-  //   return this.response(response);
-  // }
+  public async updateNoMatchToFile(path: string): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.RESULTS_FORCE_ATTACH, path);
+    return this.response(response);
+  }
 
 }
 
