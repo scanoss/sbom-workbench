@@ -65,15 +65,12 @@ export default class Folder extends Node {
     this.hasFiltered = false;
 
     for (const child of this.children) {
-
-      if(child.type === "folder") {
-
+      if (child.type === 'folder') {
         this.hasPending = child.hasPending || this.hasPending;
         this.hasIdentified = child.hasIdentified || this.hasIdentified;
         this.hasIgnored = child.hasIgnored || this.hasIgnored;
         this.hasNoMatch = child.hasNoMatch || this.hasNoMatch;
         this.hasFiltered = child.hasFiltered || this.hasFiltered;
-
       } else {
         if (child.status === NodeStatus.PENDING) this.hasPending = true;
         if (child.status === NodeStatus.IDENTIFIED) this.hasIdentified = true;
@@ -165,11 +162,19 @@ export default class Folder extends Node {
   // Used only for migration
   public updateAllStatusFlags() {
     for (const child of this.children)
-      if (child.type === "folder") {
+      if (child.type === 'folder') {
         child.updateAllStatusFlags();
         this.updateStatusFlags();
         this.status = this.getStatusClassName();
         this.setStatusOnClassnameAs(this.status);
       }
+  }
+
+  public getFiles(): Array<any> {
+    const files: Array<any> = [];
+    this.children.forEach((child) => {
+      files.push(...child.getFiles());
+    });
+    return files;
   }
 }

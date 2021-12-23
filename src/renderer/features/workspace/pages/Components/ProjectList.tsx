@@ -1,7 +1,9 @@
 import React from 'react';
 import {
+  Chip,
   IconButton,
   Link,
+  makeStyles,
   Paper,
   Table,
   TableBody,
@@ -12,11 +14,12 @@ import {
   Tooltip,
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
-import RestoreIcon from '@material-ui/icons/Restore';
 import ReplayIcon from '@material-ui/icons/Replay';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import { IProject, ScanState } from '../../../../../api/types';
+import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
 
+import { IProject, ScanState } from '../../../../../api/types';
+import * as Config from '../../../../../Config';
 
 const filter = (items, query) => {
   if (!items) return null;
@@ -37,9 +40,15 @@ const format = (date) => {
   });
 };
 
-const isProjectFinished = (project: IProject): boolean => {
-  return project.scannerState === ScanState.FINISHED || project.scannerState == 'SCANNED';
-};
+const useStyles = makeStyles((theme) => ({
+  md: {
+    maxWidth: 130,
+    textAlign: 'center',
+  },
+}));
+
+const isProjectFinished = (project: IProject): boolean => project.scannerState === ScanState.FINISHED;
+const isProjectDeprecated = (project: IProject): boolean => project.appVersion < Config.MIN_VERSION_SUPPORTED;
 
 interface ProjectListProps {
   projects: IProject[];
@@ -52,6 +61,8 @@ interface ProjectListProps {
 }
 
 const ProjectList = (props: ProjectListProps) => {
+  const classes = useStyles();
+
   const { projects, searchQuery } = props;
   const filterProjects = filter(projects, searchQuery);
 
@@ -72,19 +83,34 @@ const ProjectList = (props: ProjectListProps) => {
               {filterProjects.length !== 0 ? (
                 filterProjects.map((project) => (
                   <TableRow
-                    className={isProjectFinished(project) ? 'scanning-complete' : 'scanning-not-complete'}
+                    className={`
+                      ${isProjectFinished(project) ? 'scanning-complete' : 'scanning-not-complete'}
+                      ${isProjectDeprecated(project) ? 'project-deprecated' : ''}
+                      `}
                     hover
                     key={project.name}
-                    onClick={() => isProjectFinished(project) && props.onProjectClick(project)}
+                    onClick={() =>
+                      isProjectFinished(project) && props.onProjectClick(project)
+                    }
                   >
                     <TableCell component="th" scope="row">
-                      {project.name}
+                      <div className="project-name">
+                        {isProjectDeprecated(project) && (
+                          <Tooltip
+                            classes={{ tooltip: classes.md }}
+                            title="This project was scanned with a previous version that is no longer supported."
+                          >
+                            <WarningOutlinedIcon fontSize="inherit" className="icon mr-1" />
+                          </Tooltip>
+                        )}
+                        <span>{project.name}</span>
+                      </div>
                     </TableCell>
                     <TableCell>{format(project.date)}</TableCell>
                     <TableCell>{project.files}</TableCell>
                     <TableCell className="row-actions">
                       <div className="btn-actions">
-                        {!isProjectFinished(project) ? (
+                        {!isProjectFinished(project) && !isProjectDeprecated(project) && (
                           <Tooltip title="Resume scan">
                             <IconButton
                               aria-label="restore"
@@ -97,9 +123,9 @@ const ProjectList = (props: ProjectListProps) => {
                               <PlayArrowIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
-                        ) : null}
+                        )}
 
-                        {isProjectFinished(project) ? (
+                        {isProjectFinished(project) && !isProjectDeprecated(project) && (
                           <Tooltip title="Rescan">
                             <IconButton
                               aria-label="rescan"
@@ -112,7 +138,7 @@ const ProjectList = (props: ProjectListProps) => {
                               <ReplayIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
-                        ) : null}
+                        )}
 
                         <Tooltip title="Remove project">
                           <IconButton

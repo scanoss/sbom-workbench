@@ -5,6 +5,14 @@ class LicenseHelper {
 
     return SPDXID;
   }
+
+  public getStringOfLicenseNameFromArray(data: any) {
+    let licenses = '';
+    data.forEach((license: any) => {
+      if (!licenses.includes(license.name) && license.name !== '') licenses += `${license.name},`;
+    });
+    return licenses.slice(0, -1);
+  }
 }
 
 export const licenseHelper = new LicenseHelper();

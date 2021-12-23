@@ -8,8 +8,31 @@ import { workspace } from './workspace/Workspace';
 const path = require('path');
 
 function isAllowed(filePath: string) {
-  const skip = new Set(['.exe', '.zip', '.tar', '.tgz', '.gz', '.7z', '.rar', '.jar', '.war', '.ear', '.class', '.pyc',
-    '.o', '.a', '.so', '.obj', '.dll', '.lib', '.out', '.app', '.bin', '.lst', '.dat']);
+  const skip = new Set([
+    '.exe',
+    '.zip',
+    '.tar',
+    '.tgz',
+    '.gz',
+    '.7z',
+    '.rar',
+    '.jar',
+    '.war',
+    '.ear',
+    '.class',
+    '.pyc',
+    '.o',
+    '.a',
+    '.so',
+    '.obj',
+    '.dll',
+    '.lib',
+    '.out',
+    '.app',
+    '.bin',
+    '.lst',
+    '.dat',
+  ]);
 
   // Filter by extension
   const ext = path.extname(filePath);
@@ -49,10 +72,18 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
 ipcMain.handle(IpcEvents.FILE_GET, async (_event, arg: Partial<File>) => {
   let data;
   try {
-    data = await workspace.getOpenedProjects()[0].scans_db.files.get(arg);
-    if (data) return { status: 'ok', message: 'Get file', data };
+    data = await workspace.getOpenedProjects()[0].scans_db.files.get(arg); 
     return { status: 'ok', message: 'Get file', data };
   } catch (error) {
     return { status: 'error', message: 'Get file were not successfully retrieve', data };
+  }
+});
+
+ipcMain.handle(IpcEvents.FILE_GET_ID_FROM_PATH, async (_event, arg: string) => {
+  try {
+    const data = await workspace.getOpenedProjects()[0].scans_db.files.getIdFromPath(arg);
+    return { status: 'ok', message: 'Get id from file path', data };
+  } catch (error) {
+    return { status: 'error', message: 'Get file were not successfully retrieve' };
   }
 });

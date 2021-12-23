@@ -12,6 +12,7 @@ import { Querys } from './querys_db';
 import { Db } from './db';
 import { utilDb } from './utils_db';
 import { ComponentDb } from './scan_component_db';
+import { licenseHelper } from '../helpers/LicenseHelper';
 
 const query = new Querys();
 
@@ -23,7 +24,7 @@ export class ResultsDb extends Db {
     this.component = new ComponentDb(path);
   }
 
-  insertFromFileReScan(resultPath: string) {
+  insertFromFileReScan(resultPath: string, files: any) {
     return new Promise(async (resolve) => {
       try {
         const self = this;
@@ -36,7 +37,7 @@ export class ResultsDb extends Db {
             for (let i = 0; i < value.length; i += 1) {
               const filePath = key;
               data = value[i];
-              self.insertResultBulkReScan(db, data, filePath);
+              if (data.id !== 'none') self.insertResultBulkReScan(db, data, files[filePath]);
             }
           }
           db.run('commit', () => {
@@ -52,7 +53,7 @@ export class ResultsDb extends Db {
   }
 
   // INSERT RESULTS FROM FILE
-  insertFromFile(resultPath: string) {
+  insertFromFile(resultPath: string, files: any) {
     return new Promise(async (resolve) => {
       try {
         const self = this;
@@ -65,7 +66,7 @@ export class ResultsDb extends Db {
             for (let i = 0; i < value.length; i += 1) {
               const filePath = key;
               data = value[i];
-              self.insertResultBulk(db, data, filePath);
+              if (data.id !== 'none') self.insertResultBulk(db, data, files[filePath]);
             }
           }
           db.run('commit', (err: any) => {
@@ -174,8 +175,10 @@ export class ResultsDb extends Db {
     });
   }
 
-  private insertResultBulk(db: any, data: any, filePath: string) {
-    const licenseName = data.licenses && data.licenses[0] ? data.licenses[0].name : null;
+  private insertResultBulk(db: any, data: any, fileId: number) {
+    let licenses: string;  
+    if (data.licenses.length >= 0 && data.licenses) licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses);
+    else licenses = null;
     db.run(
       query.SQL_INSERT_RESULTS,
       data.file_hash,
@@ -183,7 +186,7 @@ export class ResultsDb extends Db {
       data.component,
       data.version,
       data.latest,
-      licenseName,
+      licenses,
       data.url,
       data.lines,
       data.oss_lines,
@@ -192,23 +195,25 @@ export class ResultsDb extends Db {
       data.id,
       data.url_hash,
       data.purl ? data.purl[0] : ' ',
-      filePath,
-      0,
-      0,
+      fileId,
       data.file_url,
       'engine'
     );
   }
 
-  private async insertResultBulkReScan(db: any, data: any, filePath: string) {
+  private async insertResultBulkReScan(db: any, data: any, fileId: number) {
     const self = this;
-    const sQuery = `SELECT id FROM results WHERE md5_file ${
+    let licenses: string;
+    if (data.licenses.length >= 0) licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses);
+    else licenses = null;
+
+    const SQLquery = `SELECT id FROM results WHERE md5_file ${
       data.file_hash ? `='${data.file_hash}'` : 'IS NULL'
     } AND vendor ${data.vendor ? `='${data.vendor}'` : 'IS NULL'} AND component ${
       data.component ? `='${data.component}'` : 'IS NULL'
     } AND version ${data.version ? `='${data.version}'` : 'IS NULL'} AND latest_version ${
       data.latest ? `='${data.latest}'` : 'IS NULL'
-    } AND license ${data.licenses && data.licenses[0] ? `='${data.licenses[0].name}'` : 'IS NULL'} AND url ${
+    } AND license ${licenses ? `='${licenses}'` : 'IS NULL'} AND url ${
       data.url ? `='${data.url}'` : 'IS NULL'
     } AND lines ${data.lines ? `='${data.lines}'` : 'IS NULL'} AND oss_lines ${
       data.oss_lines ? `='${data.oss_lines}'` : 'IS NULL'
@@ -216,23 +221,13 @@ export class ResultsDb extends Db {
       data.file ? `='${data.file}'` : 'IS NULL'
     } AND md5_comp ${data.url_hash ? `='${data.url_hash}'` : 'IS NULL'} AND purl = '${
       data.purl ? data.purl[0] : ' '
-    }' AND file_path = '${filePath}'  AND file_url ${data.file_url ? `='${data.file_url}'` : 'IS NULL'} AND idtype='${
+    }' AND fileId = ${fileId}  AND file_url ${data.file_url ? `='${data.file_url}'` : 'IS NULL'} AND idtype='${
       data.id
     }' ; `;
-
     db.serialize(function () {
-      db.get(sQuery, function (err: any, result: any) {
-        if (result === undefined) {
-          db.get(
-            `SELECT id FROM results WHERE file_path='${filePath}' AND source='nomatch' AND identified=1 OR ignored=1;`,
-            (err: any, resultNoMatch: any) => {
-              if (resultNoMatch !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', resultNoMatch.id);
-              else self.insertResultBulk(db, data, filePath);
-            }
-          );
-        } else {
-          db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
-        }
+      db.get(SQLquery, function (err: any, result: any) {
+        if (result !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
+        else self.insertResultBulk(db, data, fileId);
       });
     });
   }
@@ -257,7 +252,7 @@ export class ResultsDb extends Db {
   }
 
   // GET RESULT
-  private async getResult(path: string) {
+  public async getFromPath(path: string) {
     const db = await this.openDb();
     return new Promise<any>(async (resolve) => {
       db.all(query.SQL_SCAN_SELECT_FILE_RESULTS, path, (err: any, data: any) => {
@@ -281,24 +276,6 @@ export class ResultsDb extends Db {
       } catch (error) {
         log.error(error);
         reject(error);
-      }
-    });
-  }
-
-  // GET RESULTS
-  get(path: string) {
-    let results: any;
-    return new Promise(async (resolve, reject) => {
-      try {
-        results = await this.getResult(path);
-        for (let i = 0; i < results.length; i += 1) {
-          const comp = await this.component.getAll(results[i]);
-          results[i].component = comp;
-        }
-        resolve(results);
-      } catch (error) {
-        log.error(error);
-        reject(new Error('Unable to retrieve results'));
       }
     });
   }
@@ -328,12 +305,12 @@ export class ResultsDb extends Db {
         db.serialize(() => {
           const resultsid = `(${files.toString()});`;
           const sqlRestoreIdentified = query.SQL_RESTORE_IDENTIFIED_FILE_SNIPPET + resultsid;
-          const sqlRestoreNoMatch = query.SQL_RESTORE_NOMATCH_FILE + resultsid;
-          const sqlRestoreFiltered = query.SQL_RESTORE_FILTERED_FILE + resultsid;
+          // const sqlRestoreNoMatch = query.SQL_RESTORE_NOMATCH_FILE + resultsid;
+          // const sqlRestoreFiltered = query.SQL_RESTORE_FILTERED_FILE + resultsid;
           db.run('begin transaction');
           db.run(sqlRestoreIdentified);
-          db.run(sqlRestoreNoMatch);
-          db.run(sqlRestoreFiltered);
+          // db.run(sqlRestoreNoMatch);
+          // db.run(sqlRestoreFiltered);
           db.run('commit', (err: any) => {
             if (err) throw err;
             db.close();
@@ -394,21 +371,6 @@ export class ResultsDb extends Db {
     });
   }
 
-  public async getResultsRescan() {
-    return new Promise<any>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.all(query.SQL_GET_RESULTS_RESCAN, (err: any, data: any) => {
-          db.close();
-          if (err) throw new Error('Unable to get result by id');
-          else resolve(data);
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
   public async getFilesInFolder(folder: string) {
     return new Promise<any>(async (resolve, reject) => {
       try {
@@ -440,6 +402,29 @@ export class ResultsDb extends Db {
           resolve(true);
         });
       } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  // UPDATE IDENTIFIED FILES
+  identified(ids: number[]) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.serialize(function () {
+          const resultsid = `(${ids.toString()});`;
+          const sqlUpdateIdentified = query.SQL_FILES_UPDATE_IDENTIFIED + resultsid;
+          db.run('begin transaction');
+          db.run(sqlUpdateIdentified);
+          db.run('commit', (err: any) => {
+            if (err) throw Error('Unable to update identified files');
+            db.close();
+            return resolve(true);
+          });
+        });
+      } catch (error) {
+        log.error(error);
         reject(error);
       }
     });

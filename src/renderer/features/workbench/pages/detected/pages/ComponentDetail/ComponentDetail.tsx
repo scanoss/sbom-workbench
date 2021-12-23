@@ -127,6 +127,7 @@ export const ComponentDetail = () => {
   const [tab, setTab] = useState<number>(state.history.section || 0);
 
   const getFiles = async () => {
+    console.log("GET FILES");
     const response = await componentService.getFiles({ purl: component.purl, version }, filter.node?.path ? { path: filter.node.path } : null);
     console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));
@@ -169,17 +170,18 @@ export const ComponentDetail = () => {
     getFiles();
   };
 
-  const onIdentifyPressed = async (file) => {
+  const onIdentifyPressed = async (result) => {
+    // Result is file join result
     const inv: Partial<Inventory> = {
-      component: file.component.name,
-      url: file.component.url,
-      purl: file.component.purl,
-      version: file.component.version,
-      spdxid: file.component.licenses[0]?.spdxid,
-      usage: file.type,
+      component: result.component.name,
+      url: result.component.url,
+      purl: result.purl,
+      version: result.version,
+      spdxid: result.license ? result.license[0] : null,
+      usage: result.type,
     };
 
-    create(inv, [file.id]);
+    create(inv, [result.id]);
   };
 
   const onIdentifyAllPressed = async () => {

@@ -14,7 +14,7 @@ import { workspace } from './workspace/Workspace';
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (_event, invget: Partial<Inventory>) => {
   let inv: any;
   try {
-    inv = await workspace.getOpenedProjects()[0].scans_db.inventories.getAll(invget);
+    inv = await logicInventoryService.getAll(invget);
     return { status: 'ok', message: inv, data: inv };
   } catch (e) {
     console.log('Catch an error: ', e);
@@ -59,8 +59,10 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (_event, arg: Inventory) => {
 
 ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (_event, arg: Partial<Inventory>) => {
   try {
-    const p = workspace.getOpenedProjects()[0];
-    const success = await p.scans_db.inventories.attachFileInventory(arg);
+    
+    // const p = workspace.getOpenedProjects()[0];
+   // const success = await p.scans_db.inventories.attachFileInventory(arg);
+    const success  = await logicInventoryService.attach(arg);
     return { status: 'ok', message: 'File attached to inventory successfully', success };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);

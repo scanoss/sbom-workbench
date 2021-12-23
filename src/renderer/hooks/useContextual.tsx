@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { fileService } from '../../api/file-service';
 import { resultService } from '../../api/results-service';
 import { InventoryAction } from '../../api/types';
 import { DialogContext, IDialogContext } from '../context/DialogProvider';
@@ -15,6 +16,7 @@ const useContextual = () => {
     return dialogCtrl.openAlertDialog(
       'You have already identified files in this folder. Do you want to overwrite or keep them?',
       [
+        { label: 'CANCEL', action: 'cancel', role: 'cancel', class: 'mr-auto' },
         { label: 'KEEP', action: 'keep', role: 'action' },
         { label: 'OVERWRITE', action: 'overwrite', role: 'action' },
       ]
@@ -24,7 +26,7 @@ const useContextual = () => {
   const showConfirmDialog = async (): Promise<DialogResponse> => {
     return dialogCtrl.openAlertDialog('This action will be executed on all files within this folder. Are you sure?', [
       { label: 'Cancel', action: 'cancel', role: 'cancel' },
-      { label: 'YES', role: 'success' },
+      { label: 'Yes', role: 'success' },
     ]);
   };
 
@@ -72,9 +74,8 @@ const useContextual = () => {
   };
 
   const restore = async (node: any): Promise<boolean> => {
-    const [result] = await resultService.get(node.value);
-    console.log(result);
-    return restoreFile([result.id]);
+    const file = await fileService.getIdFromPath(node.value);
+    return restoreFile([file.id]);
   };
 
   return {

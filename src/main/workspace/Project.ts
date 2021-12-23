@@ -18,6 +18,8 @@ import { ProjectMigration } from '../migration/ProjectMigration';
 import { Tree } from './Tree/Tree/Tree';
 import Node, { NodeStatus } from './Tree/Tree/Node';
 import { reScanService } from '../services/RescanLogicService';
+import { logicComponentService } from '../services/LogicComponentService';
+import { ContactsOutlined } from '@material-ui/icons';
 
 const path = require('path');
 
@@ -223,14 +225,23 @@ export class Project extends EventEmitter {
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
         log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
-
-        await reScanService.reScan(resultPath, this, this.tree.getFilteredFiles());
+        await reScanService.reScan(this.tree.getRootFolder().getFiles(), resultPath, this);
         const results = await reScanService.getNewResults(this);
         this.tree.sync(results);
         this.save();
       } else {
-        await this.scans_db.results.insertFromFile(resultPath);
-        await this.scans_db.components.importUniqueFromFile();
+        await this.scans_db.files.insertFiles(this.tree.getRootFolder().getFiles());
+        const files: any = await this.scans_db.files.getFiles();
+        const aux = files.reduce((previousValue, currentValue) => {
+          previousValue[currentValue.path] = currentValue.fileId;
+          return previousValue;
+        }, []);
+
+        await this.scans_db.results.insertFromFile(resultPath, aux);
+
+      //  await this.scans_db.components.importFromResults();
+       await logicComponentService.importComponents(this);
+     
       }
 
       this.metadata.setScannerState(ScanState.FINISHED);

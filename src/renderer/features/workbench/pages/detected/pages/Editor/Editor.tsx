@@ -18,6 +18,7 @@ import { projectService } from '../../../../../../../api/project-service';
 import { InventoryForm } from '../../../../../../context/types';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import { getExtension } from '../../../../../../../utils/utils';
+import { fileService } from '../../../../../../../api/file-service';
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -92,12 +93,13 @@ export const Editor = () => {
   };
 
   const getInventories = async () => {
-    const inv = await inventoryService.getAll({ files: [file] });
+    const inv = await inventoryService.getAll({ files: [file] });   
     setInventories(inv);
   };
 
   const getResults = async () => {
     const results = await resultService.get(file);
+    console.log("RESULTS",results);
     setMatchInfo(mapFiles(results));
   };
 
@@ -117,36 +119,27 @@ export const Editor = () => {
   const onIdentifyPressed = async (result) => {
     const inv: Partial<InventoryForm> = {
       component: result.component.name,
-      version: result.component.version,
+      version: result.version,
       url: result.component.url,
-      purl: result.component.purl,
-      spdxid: result.component.licenses ? result.component.licenses[0]?.spdxid : null,
+      purl: result.purl,
+      spdxid: result.license ? result.license[0] : null,
       usage: result.type,
     };
 
     create(inv, [result.id]);
   };
 
-  const onNoMatchIdentifyPressed = async () => {
+  const onNoMatchIdentifyPressed = async (result) => {
     const response = await dialogCtrl.openInventory({
       usage: 'file',
     });
     if (response) {
-      const node = await projectService.getNodeFromPath(file);
-      if (node.action === 'filter') {
-        await resultService.createFiltered(file); // idtype=forceinclude
-      } else await resultService.updateNoMatchToFile(file);
-
-      const data = await resultService.getNoMatch(file);
-
-      // FIXME: until getNode works ok
+      const data = await fileService.getIdFromPath(file);
       if (!data) return;
-
       await createInventory({
         ...response,
         files: [data.id],
       });
-
       getInventories();
       getResults();
     }
@@ -255,17 +248,17 @@ export const Editor = () => {
                             onAction={(action) => onAction(action, inventory)}
                           />
                         ))
-                      : matchInfo.map((match, index) => (
+                      : matchInfo?.map((match, index) => (
                           <MatchInfoCard
                             key={match.id}
                             selected={currentMatch === match}
                             match={{
-                              component: match.component.name,
-                              version: match.component.version,
+                              component: match.component?.name,
+                              version: match.component?.version,
                               usage: match.type,
-                              license: match.component.licenses && match.component.licenses[0]?.name,
-                              url: match.component.url,
-                              purl: match.component.purl,
+                              license: match.component?.licenses && match.component?.licenses[0]?.name,
+                              url: match.component?.url,
+                              purl: match.component?.purl,
                             }}
                             status={match.status}
                             onSelect={() => setCurrentMatch(matchInfo[index])}

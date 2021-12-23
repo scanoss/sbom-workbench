@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable func-names */
 /* eslint-disable @typescript-eslint/no-useless-constructor */
 /* eslint-disable no-async-promise-executor */
@@ -146,49 +147,48 @@ export class LicenseDb extends Db {
     });
   }
 
-  // GET LICENSE ID FROM SPDXID OR LICENSE NAME
-  public async getLicenseIdFilter(license: License) {
-    return new Promise<number>(async (resolve, reject) => {
+  public async bulkAttachComponentLicense(data: any) {
+    const self: any = this;
+    return new Promise(async (resolve, reject) => {
       try {
+        let licenses: any = await this.getAll();
+        licenses = licenses.reduce((acc, act) => {
+          if (!acc[act.spdxid]) acc[act.spdxid] = act.id;
+          return acc;
+        }, {});
+
         const db = await this.openDb();
-        const filter = this.licenseNameSpdxidFilter(license);
-        if (filter.name == null && filter.spdxid == null) {
-          resolve(0);
-        }
-        db.serialize(function () {
-          db.get(
-            query.COMPDB_SQL_GET_LICENSE_ID_FROM_SPDX_NAME,
-            `${filter.name}`,
-            `${filter.spdxid}`,
-            (err: any, lic: any) => {
-              db.close();
-              if (err || lic === undefined) resolve(0);
-              else resolve(lic.id);
+        db.serialize(async function () {
+          db.run('begin transaction');
+          for (const component of data) {
+            if (component.license) {
+              for (let i = 0; i < component.license.length; i += 1) {
+                let licenseId = null;
+                if (licenses[component.license[i]] !== undefined) {
+                  licenseId = licenses[component.license[i]];
+                } else {
+                  licenseId = await self.bulkCreate(db, {
+                    spdxid: component.license[i],
+                  });
+                  licenses = {
+                    ...licenses,
+                    [component.license[i]]: licenseId,
+                  };
+                }
+                await self.bulkAttachLicensebyId(db, { compid: component.id, license_id: licenseId });
+              }
             }
-          );
+          }
+          db.run('commit', (err: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          });
         });
-      } catch (error) {
-        log.error(error);
+      } catch (error: any) {
         reject(error);
       }
     });
-  }
-
-  /** *LICENSE FILTER** */
-  // Filter to perform the query with license name or spdixid
-  private licenseNameSpdxidFilter(license: any) {
-    const filter = {
-      name: null,
-      spdxid: null,
-    };
-    if (license.name) {
-      filter.name = license.name;
-      filter.spdxid = null;
-    } else if (license.spdxid) {
-      filter.name = null;
-      filter.spdxid = license.spdxid;
-    }
-    return filter;
   }
 
   // ATTACH LICENSE TO A COMPONENT VERSION
