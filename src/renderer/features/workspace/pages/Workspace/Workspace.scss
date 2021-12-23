@@ -19,21 +19,27 @@
       .MuiTableHead-root {
         background-color: #F4F4F5;
         font-weight: 600;
+
       }
 
       .MuiTableRow-root {
         cursor: pointer;
 
-        &.scanning-not-complete {
+        &.scanning-not-complete, &.project-deprecated {
 
           cursor: default;
 
           .MuiTableCell-root{
             color: grey;
           }
-          //opacity: 0.5;
+        }
 
-          //pointer-events: none;
+        &.project-deprecated {
+          cursor: pointer;
+
+          .project-deprecated-tooltip {
+            max-width: 60px;
+          }
         }
 
         .btn-actions {
@@ -44,7 +50,15 @@
 
         &:hover .btn-actions {
           visibility: visible;
+        }
 
+        .project-name {
+          display: flex;
+          align-items: center;
+
+          .icon {
+            color: orange
+          }
         }
       }
 
