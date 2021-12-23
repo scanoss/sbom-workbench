@@ -12,6 +12,7 @@ import { IProject } from '../../../../../api/types';
 import { workspaceService } from '../../../../../api/workspace-service';
 import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
 import { DIALOG_ACTIONS } from '../../../../context/types';
+import * as Config from '../../../../../Config';
 import ProjectList from '../Components/ProjectList';
 
 const Workspace = () => {
@@ -34,9 +35,30 @@ const Workspace = () => {
 
   const cleanup = () => {};
 
-  const onShowScanHandler = (project) => {
-    setScanPath({ path: project.work_root, action: 'none' });
-    history.push('/workbench');
+  const onShowScanHandler = async (project) => {
+    if (project.appVersion >= Config.MIN_VERSION_SUPPORTED) { // TODO: data should be calculated from the backend
+      setScanPath({ path: project.work_root, action: 'none' });
+      history.push('/workbench');
+    } else {
+      const { action } = await dialogCtrl.openAlertDialog(
+        'This project was scanned with a previous version that is no longer supported. Would you like to delete it and scan it again?',
+        [
+          { label: 'Cancel', role: 'cancel' },
+          { label: 'Delete & Scan', action: 'delete', role: 'delete' },
+        ]
+      );
+
+      if (action !== DIALOG_ACTIONS.CANCEL) {
+        await deleteProject(project);
+        setScanPath({ path: project.work_root, action: 'scan' });
+        history.push('/workspace/new/settings');
+      }
+    }
+  };
+
+  const deleteProject = async (project: IProject) => {
+    await workspaceService.deleteProject(project.work_root);
+    init();
   };
 
   const onNewProjectHandler = () => {
@@ -49,7 +71,7 @@ const Workspace = () => {
       role: 'delete',
     });
     if (action === DIALOG_ACTIONS.OK) {
-      await workspaceService.deleteProject(project.work_root);
+      await deleteProject(project);
       init();
     }
   };
