@@ -77,6 +77,9 @@ export class Querys {
   COMPDB_SQL_COMP_VERSION_INSERT = `INSERT INTO component_versions (name,version, description, url,purl,source) VALUES (?,?,?,?,?,?) ON CONFLICT(version,purl) DO UPDATE
     SET source = 'engine';`;
 
+  SQL_INSERT_COMPONENTS_BULK = `INSERT OR IGNORE INTO component_versions (name,version, description, url,purl,source) VALUES # ON CONFLICT(version,purl) DO UPDATE
+  SET source = 'engine';`;
+
   // ATTACH A COMPONENT TO A LICENSE
   SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID = 'INSERT or IGNORE INTO license_component_version (cvid,licid) values (?,?)';
 

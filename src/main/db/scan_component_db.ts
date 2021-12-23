@@ -284,60 +284,84 @@ export class ComponentDb extends Db {
     });
   }
 
-  // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
-  public async importFromResults() {
-    const self = this;
-    const attachLicComp: any = {};
-    return new Promise(async (resolve, reject) => {
+  public async getLicensesAttachedToComponentsFromResults(){
+      return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        let licenses: any = await self.license.getAll();
-        licenses = licenses.reduce((acc, act) => {
-          if (!acc[act.spdxid]) acc[act.spdxid] = act.id;
-          return acc;
-        }, {});
-        const results = await this.getUnique();
-        db.serialize(async function () {
-          db.run('begin transaction');
-          for (const result of results) {            
-            attachLicComp.compid = await self.componentNewImportFromResults(
-              db,
-              result
-            );
-            if (result.license) {
-              for (let i = 0; i < result.license.length; i += 1) {
-                if (licenses[result.license[i]] !== undefined) {
-                  attachLicComp.license_id = licenses[result.license[i]];
-                } else {
-                  attachLicComp.license_id = await self.license.bulkCreate(db, {
-                    spdxid: result.license[i],
-                  });
-                  licenses = {
-                    ...licenses,
-                    [result.license[i]]: attachLicComp.license_id,
-                  };
-                }               
-                await self.license.bulkAttachLicensebyId(db, attachLicComp);
-              }           
-            }           
-          }
-          db.run('commit', (err: any) => {
-            if (err) throw err;
-            db.close();
-            resolve(true);
+        db.all(`SELECT cv.id,r.license FROM component_versions cv INNER JOIN results r ON cv.purl=r.purl AND cv.version = r.version;`, async (err: any, data: any) => {
+          db.close();
+          if(err) throw err;
+          data.forEach(item => {
+            if(item.license===' ' || item.license==='' || item.license===null)
+            item.license=null;
+            else
+            item.license = item.license.split(',');
           });
+          resolve(data);
         });
       } catch (error) {
-        log.error(error);
-        resolve(false);
+        reject(error);
       }
     });
+
   }
+
+  // IMPORT UNIQUE RESULTS TO COMP DB FROM JSON RESULTS
+  public async import(components:string) {
+    return new Promise(async (resolve, reject) => {
+      try {
+
+    // const self = this;
+    // const attachLicComp: any = {};
+    const SQLquery = query.SQL_INSERT_COMPONENTS_BULK.replace('#', components);
+    const db = await this.openDb();  
+  
+        db.run(SQLquery,(err: any) => {
+          if(err) throw err;
+          db.close();
+          resolve(true);
+        });
+        
+        
+    
+
+  } catch (error) {
+   reject(error);
+  }
+    });
+}
+
+
+
+
+    
+        
+        
+          //   if (result.license) {
+          //     for (let i = 0; i < result.license.length; i += 1) {
+          //       if (licenses[result.license[i]] !== undefined) {
+          //         attachLicComp.license_id = licenses[result.license[i]];
+          //       } else {
+          //         attachLicComp.license_id = await self.license.bulkCreate(db, {
+          //           spdxid: result.license[i],
+          //         });
+          //         licenses = {
+          //           ...licenses,
+          //           [result.license[i]]: attachLicComp.license_id,
+          //         };
+          //       }               
+          //       await self.license.bulkAttachLicensebyId(db, attachLicComp);
+          //     }           
+          //   }           
+           
+       
+      
+  
 
   // COMPONENT NEW
   public async componentNewImportFromResults(db: any, data: any) {
-    return new Promise<number>((resolve) => {
-      db.serialize(function () {
+    return new Promise<boolean>((resolve) => {
+      
         db.run(
           query.COMPDB_SQL_COMP_VERSION_INSERT,
           data.component,
@@ -345,19 +369,23 @@ export class ComponentDb extends Db {
           'AUTOMATIC IMPORT',
           data.url,
           data.purl,
-          'engine'
-        );
-        db.get(
-          `SELECT id FROM component_versions WHERE purl=? AND version=?;`,
-          data.purl,
-          data.version,
-          (err: any, comp: any) => {
-            if (err) log.error(err);
-            resolve(comp.id);
+          'engine',(err: any) => {
+            log.error(err);
+            resolve(true);
           }
         );
-      });
     });
+      //   db.get(
+      //     `SELECT id FROM component_versions WHERE purl=? AND version=?;`,
+      //     data.purl,
+      //     data.version,
+      //     (err: any, comp: any) => {
+      //       if (err) log.error(err);
+      //       resolve(comp.id);
+      //     }
+      //   );
+      // });
+    
   }
 
   update(component: Component) {
@@ -389,7 +417,7 @@ export class ComponentDb extends Db {
     });
   }
 
-  private async getUnique() {
+  public async getUniqueComponentsFromResults() {
     return new Promise<any>(async (resolve, reject) => {
       try {
         const db = await this.openDb();

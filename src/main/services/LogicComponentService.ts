@@ -147,7 +147,31 @@ class LogicComponentService {
     }
     result.sort((a, b) => a.name.localeCompare(b.name));
     return result;
-  }  
+  }
+
+  public async importComponents(project) {
+    // eslint-disable-next-line no-async-promise-executor
+    try {
+      // const project = workspace.getOpenedProjects()[0];
+      const components = await project.scans_db.components.getUniqueComponentsFromResults();
+      // INSERT INTO component_versions (name,version, description, url,purl,source)
+      let comps = '';
+      components.forEach((component) => {
+        comps += `('${component.component}','${component.version}','AUTOMATIC IMPORT','${component.url}','${component.purl}','engine'),`;
+      });
+      comps = comps.substring(0, comps.length - 1);
+
+      await project.scans_db.components.import(comps);
+
+      const componentLicenses = await project.scans_db.components.getLicensesAttachedToComponentsFromResults();
+
+      await project.scans_db.licenses.bulkAttachComponentLicense(componentLicenses);
+
+      return true;
+    } catch (error: any) {
+      return error;
+    }
+  }
 }
 
 export const logicComponentService = new LogicComponentService();

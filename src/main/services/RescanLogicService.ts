@@ -1,5 +1,6 @@
 import { utilHelper } from '../helpers/UtilHelper';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { logicComponentService } from './LogicComponentService';
 
 class ReScanService {
   public async reScan(files: Array<any>, resultPath: string, project: any): Promise<void> {
@@ -50,7 +51,10 @@ class ReScanService {
       await project.scans_db.files.deleteDirty();
 
       await project.scans_db.components.updateOrphanToManual();
-      await project.scans_db.components.importUniqueFromFile();
+
+      // call logicComponentService.import
+     // await project.scans_db.components.importUniqueFromFile();
+      await logicComponentService.importComponents(project);
 
       const emptyInv: any = await project.scans_db.inventories.emptyInventory();
       if (emptyInv) {

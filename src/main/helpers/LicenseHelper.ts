@@ -9,7 +9,7 @@ class LicenseHelper {
   public getStringOfLicenseNameFromArray(data: any) {
     let licenses = '';
     data.forEach((license: any) => {
-      if (!licenses.includes(license.name)) licenses += `${license.name},`;
+      if (!licenses.includes(license.name) && license.name !== '') licenses += `${license.name},`;
     });
     return licenses.slice(0, -1);
   }

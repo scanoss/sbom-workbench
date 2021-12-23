@@ -176,8 +176,8 @@ export class ResultsDb extends Db {
   }
 
   private insertResultBulk(db: any, data: any, fileId: number) {
-    let licenses: string;
-    if (data.licenses.length >= 0) licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses);
+    let licenses: string;  
+    if (data.licenses.length >= 0 && data.licenses) licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses);
     else licenses = null;
     db.run(
       query.SQL_INSERT_RESULTS,
