@@ -288,26 +288,26 @@ export class ResultsDb extends Db {
     });
   }
 
-  // UPDATE IDENTIFIED FILES
-  identified(ids: number[]) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(() => {
-          const resultsid = `(${ids.toString()});`;
-          const sqlUpdateIdentified = query.SQL_FILES_UPDATE_IDENTIFIED + resultsid;
-          db.run('begin transaction');
-          db.run(sqlUpdateIdentified);
-          db.run('commit', (err: any) => {
-            if (err) throw Error('Unable to update identified files');
-            db.close();
-            return resolve(true);
-          });
-        });
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
+  // // UPDATE IDENTIFIED FILES
+  // identified(ids: number[]) {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       const db = await this.openDb();
+  //       db.serialize(() => {
+  //         const resultsid = `(${ids.toString()});`;
+  //         const sqlUpdateIdentified = query.SQL_FILES_UPDATE_IDENTIFIED + resultsid;
+  //         db.run('begin transaction');
+  //         db.run(sqlUpdateIdentified);
+  //         db.run('commit', (err: any) => {
+  //           if (err) throw Error('Unable to update identified files');
+  //           db.close();
+  //           return resolve(true);
+  //         });
+  //       });
+  //     } catch (error) {
+  //       log.error(error);
+  //       reject(error);
+  //     }
+  //   });
+  // }
 }

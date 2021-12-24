@@ -48,16 +48,6 @@ class LogicResultService {
     }
   }
 
-  public async identified(ids: number[]) {
-    try {
-      const project = workspace.getOpenedProjects()[0];
-      const success = await project.scans_db.results.identified(ids);
-      return success;
-    } catch (e) {
-      return e;
-    }
-  }
-
   public async getFromPath(path: string) {
     try {
       const project = workspace.getOpenedProjects()[0];
