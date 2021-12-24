@@ -1,12 +1,5 @@
-/* eslint-disable no-prototype-builtins */
-/* eslint-disable consistent-return */
 /* eslint-disable @typescript-eslint/no-this-alias */
-/* eslint-disable func-names */
-/* eslint-disable no-await-in-loop */
-/* eslint-disable @typescript-eslint/no-useless-constructor */
-/* eslint-disable no-async-promise-executor */
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable no-restricted-syntax */
+
 import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
@@ -32,7 +25,7 @@ export class InventoryDb extends Db {
       try {
         if (inventory.files) {
           const db = await this.openDb();
-          db.all(query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH, inventory.files[0], (err: object, data: any) => {
+          db.all(query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH, inventory.files[0], (err: any, data: any) => {
             db.close();
             if (err) resolve([]);
             else resolve(data);
@@ -54,7 +47,7 @@ export class InventoryDb extends Db {
             query.SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION,
             inventory.purl,
             inventory.version,
-            (err: object, inv: any) => {
+            (err: any, inv: any) => {
               db.close();
               if (err) resolve(undefined);
               else resolve(inv);
@@ -72,7 +65,7 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(query.SQL_GET_ALL_INVENTORIES, (err: object, inv: any) => {
+        db.all(query.SQL_GET_ALL_INVENTORIES, (err: any, inv: any) => {
           db.close();
           if (err) resolve(undefined);
           else resolve(inv);
@@ -89,7 +82,7 @@ export class InventoryDb extends Db {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(function () {
+        db.serialize(() => {
           db.run('begin transaction');
           if (inventory.files)
             for (const id of inventory.files) {
@@ -113,7 +106,7 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(async function () {
+        db.serialize(() => {
           const resultsid = `(${inventory.files.toString()});`;
           const sqlDeleteFileInventory = query.SQL_DELETE_FILE_INVENTORIES + resultsid;
           db.run('begin transaction');
@@ -135,7 +128,7 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(function () {
+        db.serialize(() => {
           db.run('begin transaction');
           db.all(query.SQL_SELECT_INVENTORIES_NOT_HAVING_FILES, async (err: any, inventories: any) => {
             db.close();
@@ -154,18 +147,19 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(function () {
+        db.serialize(() => {
           db.run('begin transaction');
           const sqlDeleteEmptyInv = `DELETE FROM inventories WHERE id in (${id.toString()});`;
           db.run(sqlDeleteEmptyInv);
-          db.run('commit', () => {
+          db.run('commit', (err: any) => {
+            if (err) throw err;
             db.close();
             resolve(true);
           });
         });
       } catch (error) {
         log.error(error);
-        return reject(new Error('detach files were not successfully'));
+        reject(error);
       }
     });
   }
@@ -196,7 +190,7 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.get(query.SQL_GET_INVENTORY_BY_ID, id, (err: object, inv: any) => {
+        db.get(query.SQL_GET_INVENTORY_BY_ID, id, (err: any, inv: any) => {
           db.close();
           if (err) resolve(undefined);
           else resolve(inv);
@@ -212,7 +206,7 @@ export class InventoryDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all(query.SQL_GET_INVENTORY_BY_PURL, inventory.purl, (err: object, inv: any) => {
+        db.all(query.SQL_GET_INVENTORY_BY_PURL, inventory.purl, (err: any, inv: any) => {
           db.close();
           if (err) resolve(undefined);
           else resolve(inv);
@@ -336,7 +330,7 @@ export class InventoryDb extends Db {
   private groupByComponentName(data: any) {
     const aux = data.reduce((acc, value) => {
       const key = value.name;
-      if (!acc.hasOwnProperty(key)) acc[`${key}`] = [];
+      if (!acc[key]) acc[key] = [];
       acc[`${key}`].push(value);
       return acc;
     }, {});
@@ -386,12 +380,12 @@ export class InventoryDb extends Db {
           db.run('commit', (err: any) => {
             if (err) throw err;
             db.close();
-            return resolve(true);
+            resolve(true);
           });
         });
       } catch (error) {
         log.error(error);
-        return reject(error);
+        reject(error);
       }
     });
   }

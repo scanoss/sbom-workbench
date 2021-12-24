@@ -20,6 +20,9 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'jsx-a11y/label-has-associated-control': 'off',
     'no-restricted-syntax': ['off'],
+    'no-await-in-loop': ['off'],
+    'no-async-promise-executor': ['off'],
+   // 'no-func-names': ['on','as-needed'],
   },
   parserOptions: {
     ecmaVersion: 2020,

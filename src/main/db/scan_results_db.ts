@@ -1,12 +1,5 @@
-/* eslint-disable import/no-cycle */
-/* eslint-disable consistent-return */
-/* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-this-alias */
-/* eslint-disable func-names */
-/* eslint-disable @typescript-eslint/no-useless-constructor */
-/* eslint-disable no-async-promise-executor */
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable no-restricted-syntax */
+
 import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
@@ -30,7 +23,7 @@ export class ResultsDb extends Db {
         const self = this;
         const result: Record<any, any> = await utilDb.readFile(resultPath);
         const db = await this.openDb();
-        db.serialize(function () {
+        db.serialize(() => {
           db.run('begin transaction');
           let data: any;
           for (const [key, value] of Object.entries(result)) {
@@ -59,7 +52,7 @@ export class ResultsDb extends Db {
         const self = this;
         const result: Record<any, any> = await utilDb.readFile(resultPath);
         const db = await this.openDb();
-        db.serialize(function () {
+        db.serialize(() => {
           db.run('begin transaction');
           let data: any;
           for (const [key, value] of Object.entries(result)) {
@@ -101,7 +94,7 @@ export class ResultsDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(function () {
+        db.serialize(() => {
           db.run('begin transaction');
           db.run(`UPDATE results SET dirty=${value} WHERE id IN (SELECT id FROM results);`);
           db.run('commit', (err: any) => {
@@ -120,7 +113,7 @@ export class ResultsDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(function () {
+        db.serialize(() => {
           db.run('begin transaction');
           db.run(`DELETE FROM results WHERE dirty=1;`);
           db.run('commit', (err: any) => {
@@ -135,10 +128,10 @@ export class ResultsDb extends Db {
     });
   }
 
-
   private insertResultBulk(db: any, data: any, fileId: number) {
-    let licenses: string;  
-    if (data.licenses.length >= 0 && data.licenses) licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses);
+    let licenses: string;
+    if (data.licenses.length >= 0 && data.licenses)
+      licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses);
     else licenses = null;
     db.run(
       query.SQL_INSERT_RESULTS,
@@ -185,7 +178,7 @@ export class ResultsDb extends Db {
     }' AND fileId = ${fileId}  AND file_url ${data.file_url ? `='${data.file_url}'` : 'IS NULL'} AND idtype='${
       data.id
     }' ; `;
-    db.serialize(function () {
+    db.serialize(() => {
       db.get(SQLquery, function (err: any, result: any) {
         if (result !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
         else self.insertResultBulk(db, data, fileId);
@@ -300,7 +293,7 @@ export class ResultsDb extends Db {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(function () {
+        db.serialize(() => {
           const resultsid = `(${ids.toString()});`;
           const sqlUpdateIdentified = query.SQL_FILES_UPDATE_IDENTIFIED + resultsid;
           db.run('begin transaction');

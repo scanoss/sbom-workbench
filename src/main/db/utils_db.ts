@@ -1,5 +1,3 @@
-/* eslint-disable no-async-promise-executor */
-
 import fs from 'fs';
 
 class UtilsDb {
