@@ -8,16 +8,24 @@ import {
   makeStyles,
   ListItemIcon,
   Button,
-  TextareaAutosize,
   Paper,
   FormControlLabel,
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { inventoryService } from '../../../api/inventory-service';
+import componentDefault from '../../../../assets/imgs/component-default.svg';
+
+
 
 // or
 
+
 const useStyles = makeStyles((theme) => ({
+  size: {
+    '& .MuiDialog-paperWidthMd': {
+      width: '700px',
+    },
+  },
   dialog: {
     width: 800,
   },
@@ -48,6 +56,13 @@ const useStyles = makeStyles((theme) => ({
     borderTop: '1px solid #D4D4D8',
     backgroundColor: '#f4f4f5',
   },
+  checkbox: {
+    padding: '0px',
+  },
+  listItem: {
+    padding: '0px',
+    margin: '0px',
+  },
 }));
 
 interface IPreLoadInventoryDialog {
@@ -59,6 +74,7 @@ interface IPreLoadInventoryDialog {
 
 export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
   const { open, path, onClose, onCancel } = props;
+  const classes = useStyles();
 
   const [inventories, setInventories] = useState<any[]>([]);
 
@@ -118,18 +134,19 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
 
   return (
     <div>
-      <Dialog open={open} maxWidth="sm" scroll="body" fullWidth onClose={onCancel}>
+      <Dialog open={open} maxWidth="sm" scroll="body" fullWidth onClose={onCancel} className={`${classes.size} dialog`}>
         <span className="dialog-title">Accept all</span>
         <DialogContent>
           <div>
             <List>
-              <FormControlLabel control={<Checkbox checked={AllChecked()} onClick={() => selectAll()} />} label="All" />
+              <FormControlLabel control={<Checkbox className={classes.checkbox} checked={AllChecked()} onClick={() => selectAll()} />} label="All" />
               {inventories.map((value) => {
                 const labelId = `checkbox-list-label-${value.cvid}`;
                 return (
-                  <ListItem key={value}>
+                  <ListItem className={classes.listItem} key={value}>
                     <ListItemIcon role={undefined} onClick={handleToggle(value)}>
                       <Checkbox
+                        className={classes.checkbox}
                         edge="start"
                         checked={
                           checked.findIndex(
@@ -145,10 +162,18 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                         inputProps={{ 'aria-labelledby': labelId }}
                       />
                     </ListItemIcon>
-                    <ListItemText
-                      id={labelId}
-                      primary={`Component: ${value.purl} Version: ${value.version} License:${value.spdxid}  `}
-                    />
+                    <div className='checkbox-info'>
+                      <img alt="component logo" className="list-item-icon" src={componentDefault} />
+                      <p className='list-item-text'>{`${value.purl}`}</p>
+                      <div className='pills'>
+                        <div className='version-pill'>
+                          <p>{`${value.version}`}</p>
+                        </div>
+                        <div className='license-pill'>
+                          <p>{`${value.spdxid}`}</p>
+                        </div>
+                      </div>
+                    </div>
                   </ListItem>
                 );
               })}
@@ -158,9 +183,9 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
             <label className="dialog-form-field-label">
               Notes <span className="optional">- Optional</span>
             </label>
-            <Paper className="dialog-form-field-control">
-              <TextareaAutosize name="notes" value={notes || ''} cols={30} rows={8} onChange={(e) => inputHandler(e)} />
-            </Paper>
+            <div className="dialog-form-field-control">
+              <textarea name="notes" value={notes || ''} cols={30} rows={8} onChange={(e) => inputHandler(e)} />
+            </div>
           </div>
           <div>
             <form onSubmit={onSubmit}>

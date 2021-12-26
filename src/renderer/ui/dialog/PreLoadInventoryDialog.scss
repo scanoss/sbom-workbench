@@ -1,0 +1,59 @@
+@mixin pill {
+  border-radius: 4px;
+  font-size: 12px;
+  height: 25px;
+  max-width: 50px;
+  margin-left: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 5px;
+}
+
+textarea {
+  resize: none;
+}
+
+
+.list-item-icon {
+  width: 20px;
+  height: 18px;
+  margin-right: 6px;
+}
+
+
+.list-item-text {
+  font-size: 16px;
+  color: #3B82F6;
+}
+
+.check {
+  color: #3B82F6;
+}
+
+
+.pills {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+
+  .version-pill {
+    @include pill;
+    color: #2563EB;
+    background-color: #BFDBFE;
+  }
+
+  .license-pill {
+    @include pill;
+    background-color: #E4E4E7;
+    color: #52525B;
+  }
+}
+
+.checkbox-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
