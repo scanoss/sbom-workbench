@@ -1,4 +1,3 @@
-import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { workspace } from '../workspace/Workspace';
 
 class LogicResultService {
@@ -43,16 +42,6 @@ class LogicResultService {
     try {
       const project = workspace.getOpenedProjects()[0];
       const success = await project.scans_db.files.ignored(ids);
-      return success;
-    } catch (e) {
-      return e;
-    }
-  }
-
-  public async identified(ids: number[]) {
-    try {
-      const project = workspace.getOpenedProjects()[0];
-      const success = await project.scans_db.results.identified(ids);
       return success;
     } catch (e) {
       return e;

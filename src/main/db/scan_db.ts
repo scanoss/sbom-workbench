@@ -1,13 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable object-shorthand */
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable func-names */
-/* eslint-disable @typescript-eslint/no-this-alias */
-/* eslint-disable no-async-promise-executor */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-await-in-loop */
-
 import { Db } from './db';
 import { FilesDb } from './scan_files_db';
 import { InventoryDb } from './scan_inventory_db';
@@ -29,7 +19,7 @@ export class ScanDb extends Db {
   lastID: any;
 
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
-  constructor(path:string) {
+  constructor(path: string) {
     super(path);
     this.files = new FilesDb(path);
     this.inventories = new InventoryDb(path);
@@ -37,6 +27,4 @@ export class ScanDb extends Db {
     this.licenses = new LicenseDb(path);
     this.components = new ComponentDb(path);
   }
-
- 
 }

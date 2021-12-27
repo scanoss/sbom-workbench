@@ -25,8 +25,6 @@ export class Querys {
   FILES_TABLE =
     'CREATE TABLE IF NOT EXISTS files (fileId INTEGER PRIMARY KEY ASC,path TEXT,identified INTEGER DEFAULT 0, ignored INTEGER DEFAULT 0, dirty INTEGER DEFAULT 0, type TEXT);';
 
-  
-
   SQL_DB_TABLES =
     this.SQL_CREATE_TABLE_RESULTS +
     this.FILES_TABLE +
@@ -35,7 +33,6 @@ export class Querys {
     this.COMPDB_SQL_CREATE_TABLE_COMPVERS +
     this.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS +
     this.COMPDB_LICENSES_TABLE;
-  
 
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS
@@ -173,24 +170,19 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   INNER JOIN licenses l ON i.spdxid=l.spdxid;`;
 
   SQL_SELECT_FILES_FROM_PURL_VERSION = `
-    SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid FROM results r INNER JOIN files f ON r.fileId=f.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? AND r.version=? GROUP BY f.path;`;
+    SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.license FROM results r INNER JOIN files f ON r.fileId=f.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? AND r.version=? GROUP BY f.path;`;
 
-  SQL_SELECT_FILES_FROM_PURL_VERSION_PATH = `SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid FROM results r INNER JOIN files f ON r.fileId=f.fileId LEFT JOIN file_inventories fi ON fi.fileId-f.fileId WHERE r.purl=? AND r.version=? AND f.path like ?`; 
+  SQL_SELECT_FILES_FROM_PURL_VERSION_PATH = `SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid,r.license FROM results r INNER JOIN files f ON r.fileId=f.fileId LEFT JOIN file_inventories fi ON fi.fileId-f.fileId WHERE r.purl=? AND r.version=? AND f.path like ?`;
 
   SQL_SELECT_FILES_FROM_PURL =
     'SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r INNER JOIN files f ON f.fileId=r.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? GROUP BY f.path;';
-
 
   SQL_SELECT_FILES_FROM_PURL_PATH =
     'SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url, r.version, r.license,r.purl,fi.inventoryid FROM results r INNER JOIN files f ON f.fileId=r.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? AND f.path LIKE ?;';
 
   SQL_UPDATE_IGNORED_FILES = 'UPDATE files SET ignored=1,identified=0 WHERE fileId IN ';
 
-  SQL_RESTORE_IDENTIFIED_FILE_SNIPPET = `UPDATE files SET ignored=0,identified=0 WHERE fileId IN `;
-
-  SQL_RESTORE_NOMATCH_FILE = `UPDATE results SET ignored=0,identified=0,idtype='none' WHERE source='nomatch' AND id IN `;
-
-  SQL_RESTORE_FILTERED_FILE = `DELETE FROM results WHERE source='filtered' AND id IN`;
+  SQL_FILE_RESTORE = `UPDATE files SET ignored=0,identified=0 WHERE fileId IN `;
 
   SQL_SELECT_INVENTORIES_NOT_HAVING_FILES = ` SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories);`;
 

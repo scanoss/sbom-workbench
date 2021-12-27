@@ -1,7 +1,7 @@
 import log from 'electron-log';
 import { workspace } from '../workspace/Workspace';
 import { Inventory, Component } from '../../api/types';
-import { logicResultService } from './LogicResultService';
+
 
 
 class LogicInventoryService {
@@ -22,7 +22,7 @@ class LogicInventoryService {
   public async detach(inv: Partial<Inventory>): Promise<boolean> {
     try {
       const project = workspace.getOpenedProjects()[0];
-      await project.scans_db.results.restore(inv.files);
+      await project.scans_db.files.restore(inv.files);
       await project.scans_db.inventories.detachFileInventory(inv);
       const emptyInv: any = await project.scans_db.inventories.emptyInventory();
       if (emptyInv) {
@@ -85,7 +85,8 @@ class LogicInventoryService {
 
   public async InventoryAttachFileBatch(data: any): Promise<boolean> {
     const project = workspace.getOpenedProjects()[0];
-    await logicResultService.identified(data.files);
+    await project.scans_db.files.identified(data.files);
+    // await logicResultService.identified(data.files);
     const success: boolean = await project.scans_db.inventories.attachFileInventoryBatch(data);
     return success;
   }
@@ -122,7 +123,8 @@ class LogicInventoryService {
   public async attach(inv: Partial<Inventory>): Promise<boolean> {
     try {
       const project = workspace.getOpenedProjects()[0];
-      await logicResultService.identified(inv.files);
+    //  await logicResultService.identified(inv.files);
+      await project.scans_db.files.identified(inv.files);
       const success: boolean = await project.scans_db.inventories.attachFileInventory(inv);
       return success;
     } catch (err: any) {

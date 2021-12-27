@@ -1,9 +1,3 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable func-names */
-/* eslint-disable @typescript-eslint/no-useless-constructor */
-/* eslint-disable no-async-promise-executor */
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable no-restricted-syntax */
 import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
@@ -13,19 +7,19 @@ import { License } from '../../api/types';
 const query = new Querys();
 
 export class LicenseDb extends Db {
-  constructor(path: string) {
+  public constructor(path: string) {
     super(path);
   }
 
-  // CREATE LICENSE
   public bulkCreate(db: any, license: Partial<License>) {
-    return new Promise((resolve, reject) => {
+    return new Promise<number>((resolve, reject) => {
       try {
         license.fulltext = 'AUTOMATIC IMPORT';
         license.url = 'AUTOMATIC IMPORT';
         db.serialize(async function () {
           db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.spdxid, license.fulltext, license.url, 1);
           db.get(`${query.SQL_SELECT_LICENSE}spdxid=?;`, license.spdxid, (err: any, data: any) => {
+            if (err) throw err;
             resolve(data.id);
           });
         });
@@ -148,7 +142,6 @@ export class LicenseDb extends Db {
   }
 
   public async bulkAttachComponentLicense(data: any) {
-    const self: any = this;
     return new Promise(async (resolve, reject) => {
       try {
         let licenses: any = await this.getAll();
@@ -156,9 +149,8 @@ export class LicenseDb extends Db {
           if (!acc[act.spdxid]) acc[act.spdxid] = act.id;
           return acc;
         }, {});
-
         const db = await this.openDb();
-        db.serialize(async function () {
+        db.serialize(async () => {
           db.run('begin transaction');
           for (const component of data) {
             if (component.license) {
@@ -167,7 +159,7 @@ export class LicenseDb extends Db {
                 if (licenses[component.license[i]] !== undefined) {
                   licenseId = licenses[component.license[i]];
                 } else {
-                  licenseId = await self.bulkCreate(db, {
+                  licenseId = await this.bulkCreate(db, {
                     spdxid: component.license[i],
                   });
                   licenses = {
@@ -175,7 +167,7 @@ export class LicenseDb extends Db {
                     [component.license[i]]: licenseId,
                   };
                 }
-                await self.bulkAttachLicensebyId(db, { compid: component.id, license_id: licenseId });
+                await this.bulkAttachLicensebyId(db, { compid: component.id, license_id: licenseId });
               }
             }
           }
@@ -216,10 +208,14 @@ export class LicenseDb extends Db {
 
   public bulkAttachLicensebyId(db: any, data: any) {
     return new Promise(async (resolve, reject) => {
-      db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
-        if (err) log.error(err);
-        resolve(true);
-      });
+      try {
+        db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
+          if (err) log.error(err);
+          resolve(true);
+        });
+      } catch (error: any) {
+        reject(error);
+      }
     });
   }
 

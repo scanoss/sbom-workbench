@@ -4,6 +4,8 @@ import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
 import { FileType } from '../api/types';
 import { workspace } from './workspace/Workspace';
+import { logicResultService } from './services/LogicResultService';
+import { NodeStatus } from './workspace/Tree/Tree/Node';
 
 const path = require('path');
 
@@ -86,4 +88,28 @@ ipcMain.handle(IpcEvents.FILE_GET_ID_FROM_PATH, async (_event, arg: string) => {
   } catch (error) {
     return { status: 'error', message: 'Get file were not successfully retrieve' };
   }
+});
+
+ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
+  const project = workspace.getOpenedProjects()[0];
+  const data = await logicResultService.ignore(arg);
+
+  project.sendToUI(IpcEvents.TREE_UPDATING, {});
+  logicResultService
+    .getResultsByids(arg, project)
+    .then((filesToUpdate) => {
+      const paths = Object.keys(filesToUpdate);
+      for (const filePath of paths) {
+        project.getTree().getRootFolder().setStatus(filePath, NodeStatus.IGNORED);
+      }
+      project.updateTree();
+      return true;
+    })
+    .catch((e) => {
+      console.log(e);
+      throw e;
+    });
+
+  if (data) return { status: 'ok', message: 'Files succesfully ignored', data };
+  return { status: 'error', message: 'Files were not ignored', data };
 });
