@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import CheckboxTree, { OnCheckNode } from 'react-checkbox-tree';
+import { expandNodesToLevel } from 'react-checkbox-tree/src/js/utils';
 import { useHistory } from 'react-router-dom';
 import useContextual from '../../../../hooks/useContextual';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
@@ -60,7 +61,7 @@ export const FileTree = () => {
   }, [tree]);
 
   const preRender = (node: any) => {
-    node.label = <NodeItem node={node} label={node.label} />;
+    node.label = <NodeItem node={node} label={node.label} setExpanded={setExpanded}/>;
     if (node.children) {
       node.children.forEach((el) => preRender(el));
     }
@@ -87,8 +88,9 @@ export const FileTree = () => {
 
 export default FileTree;
 
-export const NodeItem = ({ node, label }) => {
+export const NodeItem = ({ node, label, setExpanded }) => {
   const contextual = useContextual();
+
   const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: OnCheckNode | any) => {
     const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED' || node.status === 'FILTERED';
     const menu = !node.children
@@ -135,6 +137,11 @@ export const NodeItem = ({ node, label }) => {
         ];
 
     Menu.buildFromTemplate(menu).popup(remote.getCurrentWindow());
+
+    const nodes = expandNodesToLevel([node], Infinity);
+    console.log("NODES", nodes);
+    setExpanded(nodes);
+
   };
 
   return (
