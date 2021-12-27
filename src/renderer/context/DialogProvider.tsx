@@ -22,7 +22,7 @@ export interface IDialogContext {
   openLicenseCreate: (save?: boolean) => Promise<DialogResponse>;
   openSettings: () => Promise<DialogResponse>;
   openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
-  openPreLoadInventoryDialog: (path: string) => Promise<boolean>;
+  openPreLoadInventoryDialog: (folder: string, overwrite: boolean) => Promise<boolean>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -189,21 +189,23 @@ export const DialogProvider: React.FC = ({ children }) => {
   };
 
   const [preLoadInventory, setPreLoadInventoryDialog] = useState<{
-    path: string;
+    folder: string;
     open: boolean;
+    overwrite: boolean;
     onClose?: (response: any) => void;
-  }>({ path: '', open: false });
+  }>({ folder: '', open: false, overwrite: false });
 
-  const openPreLoadInventoryDialog = (path) => {
+  const openPreLoadInventoryDialog = (folder: string, overwrite: boolean) => {
     return new Promise<boolean>((resolve) => {
       setPreLoadInventoryDialog({
-        path,
+        overwrite,
+        folder,
         open: true,
         onClose: (response) => {
           setPreLoadInventoryDialog((dialog) => ({ ...dialog, open: false }));
           resolve(response);
         },
-      });     
+      });
     });
   };
 
@@ -286,8 +288,9 @@ export const DialogProvider: React.FC = ({ children }) => {
       />
 
       <PreLoadInventoryDialog
-        path={preLoadInventory.path}
+        folder={preLoadInventory.folder}
         open={preLoadInventory.open}
+        overwrite={preLoadInventory.overwrite}
         onCancel={() => preLoadInventory.onClose && preLoadInventory.onClose(null)}
         onClose={(response) => preLoadInventory.onClose && preLoadInventory.onClose(response)}
       />
