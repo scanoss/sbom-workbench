@@ -13,7 +13,6 @@ export class Restore extends Batch {
     try {
       const filter = new FilterOR(new GenericFilter('identified', 1), new GenericFilter('ignored', 1));
       const ids: Array<number> = (await this.getFilesToProcess(this.getFolder(), 'id', filter)) as Array<number>;
-
       this.restoreTree(ids);
       const success = await logicInventoryService.detach({ files: ids } as Partial<Inventory>);
       if (success) return success;
