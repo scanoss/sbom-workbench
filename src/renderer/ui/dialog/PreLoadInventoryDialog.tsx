@@ -115,7 +115,8 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
   };
 
   const init = async () => {
-    const inv = await inventoryService.acceptAllPreLoadInventory(path);
+    // TO DO add overwrite property
+    const inv = await inventoryService.acceptAllPreLoadInventory({ folder: path });
     setInventories(inv);
     setChecked(inv);
   };
