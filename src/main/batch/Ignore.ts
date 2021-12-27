@@ -3,7 +3,6 @@ import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { Batch } from './Batch';
 import { Filter } from './Filter/Filter';
 import { FilterAND } from './Filter/FilterAND';
-import { FilterNOT } from './Filter/FilterNOT';
 import { GenericFilter } from './Filter/GenericFilter';
 import { Restore } from './Restore';
 
@@ -12,7 +11,7 @@ export class Ignore extends Batch {
 
   constructor(folder: string, overWrite: boolean) {
     super(folder, overWrite);
-    this.filter = new FilterAND(new FilterNOT(new GenericFilter('usage', 'none')), new GenericFilter('pending', 1));
+    this.filter = new FilterAND(new GenericFilter('type', 'MATCH'), new GenericFilter('pending', 1));
   }
 
   public async execute() {

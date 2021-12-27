@@ -17,7 +17,7 @@ export class Identified extends Batch {
   constructor(folder: string, params: boolean, inventory: Partial<Inventory>) {
     super(folder, params);
     this.inventory = inventory;
-    this.filter = new FilterAND(new FilterNOT(new GenericFilter('usage', 'none')), new GenericFilter('pending', 1));
+    this.filter = new FilterAND(new GenericFilter('type', 'MATCH'), new GenericFilter('pending', 1));
   }
 
   public async execute() {
