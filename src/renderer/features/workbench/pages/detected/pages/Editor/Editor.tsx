@@ -17,6 +17,7 @@ import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import { projectService } from '../../../../../../../api/project-service';
 import { InventoryForm } from '../../../../../../context/types';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
+import { getExtension } from '../../../../../../../utils/utils';
 import { fileService } from '../../../../../../../api/file-service';
 
 const MemoCodeEditor = React.memo(CodeEditor);
@@ -63,6 +64,12 @@ export const Editor = () => {
       loadLocalFile(file);
     }
   };
+
+
+
+
+
+
 
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
@@ -276,7 +283,7 @@ export const Editor = () => {
           <main className="editors editors-full app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
-                <MemoCodeEditor content={localFileContent.content} highlight={currentMatch?.lines || null} />
+                <MemoCodeEditor language={getExtension(file)} content={localFileContent.content} highlight={currentMatch?.lines || null} />
               ) : null}
             </div>
           </main>
@@ -284,7 +291,7 @@ export const Editor = () => {
           <main className="editors app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
-                <MemoCodeEditor content={localFileContent.content} highlight={currentMatch?.lines || null} />
+                <MemoCodeEditor language={getExtension(file)} content={localFileContent.content} highlight={currentMatch?.lines || null} />
               ) : null}
             </div>
             {inventories?.length === 0 && matchInfo?.length === 0 ? (
@@ -294,7 +301,7 @@ export const Editor = () => {
             ) : (
               <div className="editor">
                 {currentMatch && remoteFileContent?.content ? (
-                  <MemoCodeEditor content={remoteFileContent.content} highlight={currentMatch?.oss_lines || null} />
+                  <MemoCodeEditor language={getExtension(file)} content={remoteFileContent.content} highlight={currentMatch?.oss_lines || null} />
                 ) : null}
               </div>
             )}

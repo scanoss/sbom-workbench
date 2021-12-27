@@ -10,9 +10,10 @@ const LINES_OFFSET = 50;
 interface CodeEditorProps {
   content: string;
   highlight: string;
+  language: string;
 }
 
-const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
+const CodeEditor = ({ content, highlight, language }: CodeEditorProps) => {
   const file = content.split('\n');
 
   let lines = null;
@@ -60,6 +61,7 @@ const CodeEditor = ({ content, highlight }: CodeEditorProps) => {
             code-viewer
             ${truncatedStart > 0 ? 'truncatedStart' : ''}
             ${truncatedEnd > 0 ? 'truncatedEnd' : ''}`}
+          language={language}
           wrapLines
           style={vs2015}
           startingLineNumber={start + 1}

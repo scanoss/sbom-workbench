@@ -50,4 +50,38 @@ const getColor = (index) => {
   return getColor(index % colorsForLicense.length);
 };
 
-export { range, getColor, colorsForLicense };
+const languages = {
+  sol: 'solidity',
+  js: 'javascript',
+  ts: 'typescript',
+  py: 'python',
+  rb: 'ruby',
+  sh: 'bash',
+  go: 'go',
+  java: 'java',
+  c: 'c',
+  cpp: 'cpp',
+  h: 'c',
+  hpp: 'cpp',
+  cs: 'csharp',
+  css: 'css',
+  html: 'htmlbars',
+  xml: 'xml',
+  json: 'json',
+  md: 'markdown',
+  yml: 'yaml',
+  scss: 'scss',
+  less: 'less',
+  sass: 'sass',
+  sql: 'sql',
+  txt: 'text',
+};
+
+// get extension of file
+const getExtension = (file) => {
+  const ext = file.split('.').pop();
+  console.log(ext);
+  return languages[ext] || 'text';
+};
+
+export { range, getColor, colorsForLicense, getExtension, languages };
