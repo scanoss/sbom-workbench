@@ -1,6 +1,6 @@
 import log from 'electron-log';
-import { Inventory, Component } from '../../api/types';
 import { serviceProvider } from './ServiceProvider';
+import { Inventory, Component, IFolderInventory } from '../../api/types';
 import { logicResultService } from './LogicResultService';
 import { FilterAND } from '../batch/Filter/FilterAND';
 import { FilterNOT } from '../batch/Filter/FilterNOT';
@@ -11,6 +11,7 @@ import { logicComponentService } from './LogicComponentService';
 import { Filter } from '../batch/Filter/Filter';
 import { ComponentSource } from '../db/scan_component_db';
 import { inventoryHelper } from '../helpers/InventoryHelper';
+import { Restore } from '../batch/Restore';
 
 class LogicInventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
@@ -130,10 +131,13 @@ class LogicInventoryService {
     }
   }
 
-  public async preLoadInventoriesAcceptAll(folder: string): Promise<Array<Partial<Inventory>>> {
+  public async preLoadInventoriesAcceptAll(data :Partial<IFolderInventory>): Promise<Array<Partial<Inventory>>> {
     try {
+      if (data.overwrite) {
+        await new Restore(data.folder, data.overwrite).execute();
+      }
       const filter = new FilterAND(new FilterNOT(new GenericFilter('usage', 'none')), new GenericFilter('pending', 1));
-      const files: any = await logicResultService.getFilesInFolder(folder);
+      const files: any = await logicResultService.getFilesInFolder(data.folder);
       const ids = utilHelper.getArrayFromObjectFilter(files, 'id', filter);
       const components: any = await logicComponentService.getAll({ source: ComponentSource.ENGINE });
       if (ids.length === 0) return [];

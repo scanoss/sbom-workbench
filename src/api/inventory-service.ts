@@ -45,13 +45,12 @@ class InventoryService extends BaseService {
     return this.response(response);
   }
 
-  public async acceptAllPreLoadInventory(folder: string): Promise<Partial<Array<Inventory>>> {
-    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_ACCEPT_PRE_LOAD, folder);
+  public async acceptAllPreLoadInventory(data: Partial<IFolderInventory>): Promise<Partial<Array<Inventory>>> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_ACCEPT_PRE_LOAD, data);
     return this.response(response);
   }
 }
 
 export const inventoryService = new InventoryService();
-
 
 document.inv = inventoryService;
