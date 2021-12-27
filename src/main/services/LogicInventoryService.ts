@@ -11,7 +11,6 @@ import { logicComponentService } from './LogicComponentService';
 import { Filter } from '../batch/Filter/Filter';
 import { ComponentSource } from '../db/scan_component_db';
 import { inventoryHelper } from '../helpers/InventoryHelper';
-import { Restore } from '../batch/Restore';
 
 class LogicInventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
@@ -132,7 +131,7 @@ class LogicInventoryService {
   public async attach(inv: Partial<Inventory>): Promise<boolean> {
     try {
       const project = workspace.getOpenedProjects()[0];
-    //  await logicResultService.identified(inv.files);
+      //  await logicResultService.identified(inv.files);
       await project.scans_db.files.identified(inv.files);
       const success: boolean = await project.scans_db.inventories.attachFileInventory(inv);
       return success;
@@ -141,13 +140,16 @@ class LogicInventoryService {
     }
   }
 
-  public async preLoadInventoriesAcceptAll(data :Partial<IFolderInventory>): Promise<Array<Partial<Inventory>>> {
+  public async preLoadInventoriesAcceptAll(data: Partial<IFolderInventory>): Promise<Array<Partial<Inventory>>> {
+    let filter: Filter = null;
     try {
-      if (data.overwrite) {
-        await new Restore(data.folder, data.overwrite).execute();
-      }
-      const filter = new FilterAND(new FilterNOT(new GenericFilter('usage', 'none')), new GenericFilter('pending', 1));
+      if (data.overwrite) filter = new GenericFilter('type', 'MATCH');
+      else filter = new FilterAND( new GenericFilter('type', 'MATCH'), new GenericFilter('pending', 1));
+
       const files: any = await logicResultService.getFilesInFolder(data.folder);
+
+
+    
       const ids = utilHelper.getArrayFromObjectFilter(files, 'id', filter);
       const components: any = await logicComponentService.getAll({ source: ComponentSource.ENGINE });
       if (ids.length === 0) return [];
@@ -171,7 +173,7 @@ class LogicInventoryService {
             o.purl === result.purl &&
             o.usage === result.usage &&
             o.license === result.license &&
-            o.spdxid === result.spdxid
+            o.spdxid === result.spdxid.split(',')[0],
         );
 
         if (index >= 0) {
@@ -184,7 +186,7 @@ class LogicInventoryService {
             usage: result.usage,
             version: result.version,
             url: result.url,
-            spdxid: result.spdxid,
+            spdxid: result.spdxid.split(',')[0],
             cvid: 0,
           };
 
