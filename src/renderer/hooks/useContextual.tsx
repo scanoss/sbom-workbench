@@ -29,16 +29,17 @@ const useContextual = () => {
     ]);
   };
 
-  const showPreLoadInventoryDialog = async (path: string): Promise<any> => {
-    const response = await dialogCtrl.openPreLoadInventoryDialog(path);
+  const showPreLoadInventoryDialog = async (path: string, overwrite: boolean): Promise<any> => {
+    const response = await dialogCtrl.openPreLoadInventoryDialog(path, overwrite);
     return response;
   };
 
   const acceptAll = async (node: any): Promise<boolean> => {
-    const response: any = await showPreLoadInventoryDialog(node.value || '/');
-    if (response) {
-      const { action } = showOverwrite(node) ? await showOverwriteDialog() : await showConfirmDialog();
-      if (action !== DIALOG_ACTIONS.CANCEL) {
+    const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
+
+    if (action !== DIALOG_ACTIONS.CANCEL) {
+      const response: any = await showPreLoadInventoryDialog(node.value || '/', action === 'overwrite');
+      if (response) {
         return executeBatch(node.value, InventoryAction.ACCEPT, {
           overwrite: action === 'overwrite',
           data: response.inventories,

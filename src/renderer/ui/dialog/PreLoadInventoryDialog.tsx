@@ -68,13 +68,14 @@ const useStyles = makeStyles((theme) => ({
 
 interface IPreLoadInventoryDialog {
   open: boolean;
-  path: string;
+  folder: string;
+  overwrite: boolean;
   onClose: (response: any) => void;
   onCancel: () => void;
 }
 
 export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
-  const { open, path, onClose, onCancel } = props;
+  const { open, folder, overwrite, onClose, onCancel } = props;
   const classes = useStyles();
 
   const [inventories, setInventories] = useState<any[]>([]);
@@ -115,8 +116,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
   };
 
   const init = async () => {
-    // TO DO add overwrite property
-    const inv = await inventoryService.acceptAllPreLoadInventory({ folder: path });
+    const inv = await inventoryService.acceptAllPreLoadInventory({ folder, overwrite });
     setInventories(inv);
     setChecked(inv);
   };
