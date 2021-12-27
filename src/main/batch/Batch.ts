@@ -1,4 +1,3 @@
-
 import { logicResultService } from '../services/LogicResultService';
 import { logictTreeService } from '../services/LogicTreeService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
@@ -6,7 +5,6 @@ import { Filter } from './Filter/Filter';
 import { FilterTrue } from './Filter/FilterTrue';
 
 export abstract class Batch {
-
   private overWrite: boolean;
 
   private folder: string;
@@ -36,7 +34,7 @@ export abstract class Batch {
     } catch (e: any) {
       return e;
     }
-  } 
+  }
 
   public async getResults(ids: Array<number>): Promise<Array<any>> {
     const results: any = await logicResultService.getResultsFromIDs(ids);
@@ -53,7 +51,6 @@ export abstract class Batch {
     return array;
   }
 
- 
   public getOverWrite(): boolean {
     return this.overWrite;
   }
