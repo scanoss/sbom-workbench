@@ -1,20 +1,18 @@
 import log from 'electron-log';
-import { Component, ComponentGroup } from '../../api/types';
-import { ComponentParams } from '../db/scan_component_db';
+import { Component, ComponentGroup, ComponentParams, IDb } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
-import { workspace } from '../workspace/Workspace';
-import { logicInventoryService } from './LogicInventoryService';
+// import { workspace } from '../workspace/Workspace';
 
 class LogicComponentService {
-  public async getAll(data: any, params?: ComponentParams): Promise<Component> {
+  public async getAll(projectDb: IDb, data: any, params?: ComponentParams): Promise<Component> {
     try {
-      const project = workspace.getOpenedProjects()[0];
+      // const project = workspace.getOpenedProjects()[0];
       let component: any;
-      if (data.purl && data.version) component = await project.scans_db.components.getbyPurlVersion(data);
+      if (data.purl && data.version) component = await projectDb.components.getbyPurlVersion(data);
       else if (data.purl) {
-        component = await project.scans_db.components.getByPurl(data, params);
+        component = await projectDb.components.getByPurl(data, params);
       } else {
-        component = await project.scans_db.components.allComp(params);
+        component = await projectDb.components.allComp(params);
       }
       if (component !== undefined) return component;
       throw new Error('Component not found');
@@ -24,19 +22,18 @@ class LogicComponentService {
     }
   }
 
-  public async getComponentFiles(data: Partial<Component>, params: any): Promise<any> {
+  public async getComponentFiles(projectDb: IDb, data: Partial<Component>, params: any): Promise<any> {
     try {
-      const project = workspace.getOpenedProjects()[0];
+      // const project = workspace.getOpenedProjects()[0];
       let files: any;
-      if (data.purl && data.version)
-        files = await project.scans_db.files.getByPurlVersion(data, params ? params.path : null);
-      else files = await project.scans_db.files.getByPurl(data, params ? params.path : null);
+      if (data.purl && data.version) files = await projectDb.files.getByPurlVersion(data, params ? params.path : null);
+      else files = await projectDb.files.getByPurl(data, params ? params.path : null);
 
-      const components: any = await this.getAll({
+      const components: any = await this.getAll(projectDb, {
         purl: data.purl,
         version: data.version,
       });
-      const inventories: any = await logicInventoryService.getAll({});
+      const inventories: any = await projectDb.inventories.getAll();
       const index = inventories.reduce((acc, inventory) => {
         acc[inventory.id] = inventory;
         return acc;
@@ -54,10 +51,10 @@ class LogicComponentService {
     }
   }
 
-  public async getAllComponentGroup(params: ComponentParams) {
+  public async getAllComponentGroup(projectDb: IDb, params: ComponentParams) {
     try {
-      const project = workspace.getOpenedProjects()[0];
-      const data = await this.getAll({}, params);
+      // const project = workspace.getOpenedProjects()[0];
+      const data = await this.getAll(projectDb, {}, params);
       if (data) {
         const comp: any = await this.groupComponentsByPurl(data); //
         // if path is defined
@@ -66,7 +63,7 @@ class LogicComponentService {
             acc.push(curr.purl);
             return acc;
           }, []);
-          const aux = await project.scans_db.components.getSummaryByPath(params.path, purls);
+          const aux = await projectDb.components.getSummaryByPath(params.path, purls);
           const summary = componentHelper.summaryByPurl(aux);
           for (let i = 0; i < comp.length; i += 1) {
             comp[i].summary = summary[comp[i].purl];
@@ -80,20 +77,20 @@ class LogicComponentService {
     }
   }
 
-  public async getComponentGroup(component: Partial<ComponentGroup>, params: ComponentParams) {
+  public async getComponentGroup(projectDb: IDb, component: Partial<ComponentGroup>, params: ComponentParams) {
     try {
-      const project = workspace.getOpenedProjects()[0];
+      // const project = workspace.getOpenedProjects()[0];
 
-      const data = await this.getAll(component, params);
+      const data = await this.getAll(projectDb, component, params);
       if (data) {
         const [comp] = await this.groupComponentsByPurl(data);
         if (!comp) {
           // log.error('Comp not found',data);
           return [];
         }
-        comp.summary = await project.scans_db.components.summaryByPurl(comp);
+        comp.summary = await projectDb.components.summaryByPurl(comp);
         if (params?.path) {
-          const aux = await project.scans_db.components.getSummaryByPath(params.path, [comp.purl]);
+          const aux = await projectDb.components.getSummaryByPath(params.path, [comp.purl]);
           const summary = componentHelper.summaryByPurl(aux);
           comp.summary = summary[comp.purl];
         }
@@ -150,13 +147,13 @@ class LogicComponentService {
     return result;
   }
 
-  public async importComponents(project) {
+  public async importComponents(projectDb: IDb) {
     // eslint-disable-next-line no-async-promise-executor
     try {
-      const components: Array<Partial<Component>> = await project.scans_db.components.getUniqueComponentsFromResults();
-      await project.scans_db.components.import(components);
-      const componentLicenses = await project.scans_db.components.getLicensesAttachedToComponentsFromResults();
-      await project.scans_db.licenses.bulkAttachComponentLicense(componentLicenses);
+      const components: Array<Partial<Component>> = await projectDb.components.getUniqueComponentsFromResults();
+      await projectDb.components.import(components);
+      const componentLicenses = await projectDb.components.getLicensesAttachedToComponentsFromResults();
+      await projectDb.licenses.bulkAttachComponentLicense(componentLicenses);
       return true;
     } catch (error: any) {
       return error;

@@ -4,8 +4,9 @@ import { InventoryDb } from './scan_inventory_db';
 import { ResultsDb } from './scan_results_db';
 import { LicenseDb } from './scan_license_db';
 import { ComponentDb } from './scan_component_db';
+import { IDb } from '../../api/types';
 
-export class ScanDb extends Db {
+export class ScanDb extends Db implements IDb {
   components: ComponentDb;
 
   files: FilesDb;

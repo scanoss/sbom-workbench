@@ -142,7 +142,7 @@ export class LicenseDb extends Db {
   }
 
   public async bulkAttachComponentLicense(data: any) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         let licenses: any = await this.getAll();
         licenses = licenses.reduce((acc, act) => {
@@ -174,7 +174,7 @@ export class LicenseDb extends Db {
           db.run('commit', (err: any) => {
             db.close();
             if (err) throw err;
-            resolve(true);
+            resolve();
           });
         });
       } catch (error: any) {

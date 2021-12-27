@@ -1,13 +1,13 @@
 import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
-import { Component, Files } from '../../api/types';
+import { Component, Files, IFilesDb } from '../../api/types';
 import { ComponentDb } from './scan_component_db';
 import { InventoryDb } from './scan_inventory_db';
 
 const query = new Querys();
 
-export class FilesDb extends Db {
+export class FilesDb extends Db implements IFilesDb {
   component: ComponentDb;
 
   inventory: InventoryDb;
@@ -275,7 +275,7 @@ export class FilesDb extends Db {
   }
 
   public async restore(files: number[]) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         const filesIds = `(${files.toString()});`;
@@ -283,7 +283,7 @@ export class FilesDb extends Db {
         db.run(sqlRestoreIdentified, (err: any) => {
           if (err) throw err;
           db.close();
-          resolve(true);
+          resolve();
         });
       } catch (error) {
         log.error(error);
@@ -294,7 +294,7 @@ export class FilesDb extends Db {
 
   // UPDATE IDENTIFIED FILES
   identified(ids: number[]) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
@@ -305,7 +305,7 @@ export class FilesDb extends Db {
           db.run('commit', (err: any) => {
             if (err) throw Error('Unable to update identified files');
             db.close();
-            return resolve(true);
+            resolve();
           });
         });
       } catch (error) {

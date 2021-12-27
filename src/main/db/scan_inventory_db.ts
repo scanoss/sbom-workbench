@@ -4,12 +4,12 @@ import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Db } from './db';
 import { ComponentDb } from './scan_component_db';
-import { Inventory, Files } from '../../api/types';
+import { Inventory, Files, IInventoryDb } from '../../api/types';
 import { ResultsDb } from './scan_results_db';
 
 const query = new Querys();
 
-export class InventoryDb extends Db {
+export class InventoryDb extends Db implements IInventoryDb {
   component: ComponentDb;
 
   results: ResultsDb;
@@ -103,7 +103,7 @@ export class InventoryDb extends Db {
 
   // DETACH FILE INVENTORY
   public async detachFileInventory(inventory: Partial<Inventory>) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
@@ -114,7 +114,7 @@ export class InventoryDb extends Db {
           db.run('commit', (err: any) => {
             db.close();
             if (err) throw err;
-            resolve(true);
+            resolve();
           });
         });
       } catch (error) {
@@ -144,7 +144,7 @@ export class InventoryDb extends Db {
   }
 
   public async deleteAllEmpty(id: number[]) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
@@ -154,7 +154,7 @@ export class InventoryDb extends Db {
           db.run('commit', (err: any) => {
             if (err) throw err;
             db.close();
-            resolve(true);
+            resolve();
           });
         });
       } catch (error) {
@@ -187,7 +187,7 @@ export class InventoryDb extends Db {
   }
 
   public getById(id: number) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<Inventory>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.get(query.SQL_GET_INVENTORY_BY_ID, id, (err: any, inv: any) => {

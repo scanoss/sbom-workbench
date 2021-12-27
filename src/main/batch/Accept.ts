@@ -1,9 +1,8 @@
-import { Inventory } from '../../api/types';
-import { ComponentSource } from '../db/scan_component_db';
+import { ComponentSource, Inventory } from '../../api/types';
 import { logicComponentService } from '../services/LogicComponentService';
 import { logicInventoryService } from '../services/LogicInventoryService';
-
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
 import { Filter } from './Filter/Filter';
 import { FilterAND } from './Filter/FilterAND';
@@ -33,7 +32,9 @@ export class Accept extends Batch {
       const ids = this.getArrayFromObject(files, 'id', this.filter);
 
       this.updateTree(ids, NodeStatus.IDENTIFIED);
-      const components: any = await logicComponentService.getAll({
+
+      const project = workspace.getOpenedProjects()[0];
+      const components: any = await logicComponentService.getAll(project.scans_db, {
         source: ComponentSource.ENGINE,
       });
       if (ids.length === 0) return [];
@@ -42,11 +43,11 @@ export class Accept extends Batch {
 
       inventories = this.AddComponentIdToInventory(components, inventories);
 
-      const inv = await logicInventoryService.InventoryBatchCreate(inventories);
+      const inv = await logicInventoryService.InventoryBatchCreate(project.scans_db, inventories);
       const filesToUpdate: any = this.mergeFilesInventoryId(inv);
       filesToUpdate.files = ids;
 
-      const success = await logicInventoryService.InventoryAttachFileBatch(filesToUpdate);
+      const success = await logicInventoryService.InventoryAttachFileBatch(project.scans_db, filesToUpdate);
       if (success) {
         this.updateTree(ids, NodeStatus.IDENTIFIED);
         return inventories;

@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import fs from 'fs';
 import { isBinaryFileSync } from 'isbinaryfile';
 import log from 'electron-log';
-import { Component, Inventory, IProjectCfg, ProjectState, ScanState } from '../../api/types';
+import { Component, Inventory, IProject, IProjectCfg, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanDb } from '../db/scan_db';
 import { licenses } from '../db/licenses';
@@ -19,7 +19,7 @@ import { Tree } from './Tree/Tree/Tree';
 import Node, { NodeStatus } from './Tree/Tree/Node';
 import { reScanService } from '../services/RescanLogicService';
 import { logicComponentService } from '../services/LogicComponentService';
-import { ContactsOutlined } from '@material-ui/icons';
+
 
 const path = require('path');
 
@@ -226,6 +226,7 @@ export class Project extends EventEmitter {
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
         log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
         await reScanService.reScan(this.tree.getRootFolder().getFiles(), resultPath, this);
+        await logicComponentService.importComponents(this.scans_db);
         const results = await reScanService.getNewResults(this);
         this.tree.sync(results);
         this.save();
@@ -236,9 +237,8 @@ export class Project extends EventEmitter {
           previousValue[currentValue.path] = currentValue.fileId;
           return previousValue;
         }, []);
-
         await this.scans_db.results.insertFromFile(resultPath, aux);
-        await logicComponentService.importComponents(this);
+        await logicComponentService.importComponents(this.scans_db);
       }
 
       this.metadata.setScannerState(ScanState.FINISHED);

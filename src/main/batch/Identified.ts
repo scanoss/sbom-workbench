@@ -1,6 +1,7 @@
 import { Inventory } from '../../api/types';
 import { logicInventoryService } from '../services/LogicInventoryService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
 import { Filter } from './Filter/Filter';
 import { FilterAND } from './Filter/FilterAND';
@@ -30,7 +31,8 @@ export class Identified extends Batch {
       this.updateTree(ids, NodeStatus.IDENTIFIED);
 
       this.inventory.files = ids;
-      const success = await logicInventoryService.create(this.inventory);
+      const project  = workspace.getOpenedProjects()[0];
+      const success = await logicInventoryService.create(project.scans_db, this.inventory);
 
       if (success) return success;
 
