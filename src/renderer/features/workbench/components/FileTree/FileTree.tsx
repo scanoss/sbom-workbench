@@ -41,6 +41,15 @@ export const FileTree = () => {
     return node;
   };
 
+  const onExpand = (node: any) => {
+    const nodes = expandNodesToLevel([node], Infinity);
+    setExpanded([expanded, ...nodes]);
+  }
+
+  const onCollapse = (node: any) => {
+    const nodes = expandNodesToLevel([node], Infinity);
+  }
+
   useEffect(() => {
     document.querySelectorAll('.rct-text.selected').forEach((el) => el.classList.remove('selected'));
     if (!filter.node?.path && !file) {
@@ -61,7 +70,7 @@ export const FileTree = () => {
   }, [tree]);
 
   const preRender = (node: any) => {
-    node.label = <NodeItem node={node} label={node.label} setExpanded={setExpanded}/>;
+    node.label = <NodeItem node={node} label={node.label} onExpand={onExpand} onCollapse={onCollapse}/>;
     if (node.children) {
       node.children.forEach((el) => preRender(el));
     }
@@ -151,11 +160,6 @@ export const NodeItem = ({ node, label, onExpand, onCollapse }) => {
         ];
 
     Menu.buildFromTemplate(menu).popup(remote.getCurrentWindow());
-
-    const nodes = expandNodesToLevel([node], Infinity);
-    console.log("NODES", nodes);
-    setExpanded(nodes);
-
   };
 
   return (
