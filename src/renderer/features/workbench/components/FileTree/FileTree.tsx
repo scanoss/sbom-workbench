@@ -88,7 +88,7 @@ export const FileTree = () => {
 
 export default FileTree;
 
-export const NodeItem = ({ node, label, setExpanded }) => {
+export const NodeItem = ({ node, label, onExpand, onCollapse }) => {
   const contextual = useContextual();
 
   const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: OnCheckNode | any) => {
@@ -133,6 +133,20 @@ export const NodeItem = ({ node, label, setExpanded }) => {
             label: 'Restore all files',
             click: () => contextual.restoreAll(node),
             enabled: node.hasIdentified || node.hasIgnored,
+          },
+          {
+            label: 'Expand/Collapse',
+            submenu: [
+              {
+                label: 'Expand all',
+                click: () => onExpand(node.value),
+              },
+              {
+                label: 'Collapse all',
+                click: () => onCollapse(node.value),
+              }
+            ]
+
           },
         ];
 
