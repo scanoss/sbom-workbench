@@ -1,14 +1,14 @@
 import log from 'electron-log';
-import { workspace } from '../workspace/Workspace';
-import { Inventory, Component, IDb } from '../../api/types';
+import { Inventory, Component } from '../../api/types';
+import { serviceProvider } from './ServiceProvider';
 
 class LogicInventoryService {
-  public async get(projectDb: IDb, inv: Partial<Inventory>): Promise<Inventory> {
+  public async get(inv: Partial<Inventory>): Promise<Inventory> {
     try {
-      const inventory = (await projectDb.inventories.getById(inv.id)) as Inventory;
-      const comp: Component = (await projectDb.components.get(inventory.cvid)) as Component;
+      const inventory = (await serviceProvider.model.inventory.getById(inv.id)) as Inventory;
+      const comp: Component = (await serviceProvider.model.component.get(inventory.cvid)) as Component;
       inventory.component = comp as Component;
-      const files: any = await projectDb.inventories.getInventoryFiles(inventory);
+      const files: any = await serviceProvider.model.inventory.getInventoryFiles(inventory);
       inventory.files = files;
       return inventory;
     } catch (err: any) {
@@ -16,15 +16,14 @@ class LogicInventoryService {
     }
   }
 
-  public async detach(projectDb: IDb, inv: Partial<Inventory>): Promise<boolean> {
+  public async detach(inv: Partial<Inventory>): Promise<boolean> {
     try {
-      const project = workspace.getOpenedProjects()[0];
-      await projectDb.files.restore(inv.files);
-      await projectDb.inventories.detachFileInventory(inv);
-      const emptyInv: any = await projectDb.inventories.emptyInventory();
+      await serviceProvider.model.file.restore(inv.files);
+      await serviceProvider.model.inventory.detachFileInventory(inv);
+      const emptyInv: any = await serviceProvider.model.inventory.emptyInventory();
       if (emptyInv) {
         const result = emptyInv.map((item: Record<string, number>) => item.id);
-        await project.scans_db.inventories.deleteAllEmpty(result);
+        await serviceProvider.model.inventory.deleteAllEmpty(result);
       }
       return true;
     } catch (err: any) {
@@ -34,36 +33,36 @@ class LogicInventoryService {
 
   public async delete(inv: Partial<Inventory>): Promise<boolean> {
     try {
-      const success: boolean = await workspace.getOpenedProjects()[0].scans_db.inventories.delete(inv);
+      const success: boolean = await serviceProvider.model.inventory.delete(inv);
       return success;
     } catch (err: any) {
       return err;
     }
   }
 
-  private async isInventory(projectDb: IDb, inventory: Partial<Inventory>): Promise<Partial<Inventory>> {
+  private async isInventory(inventory: Partial<Inventory>): Promise<Partial<Inventory>> {
     try {
-      const inv: Partial<Inventory> = await projectDb.inventories.isInventory(inventory);
+      const inv: Partial<Inventory> = await serviceProvider.model.inventory.isInventory(inventory);
       return inv;
     } catch (err: any) {
       return err;
     }
   }
 
-  public async create(projectDb: IDb, inventory: Partial<Inventory>): Promise<Inventory> {
+  public async create(inventory: Partial<Inventory>): Promise<Inventory> {
     try {
-      const component: any = await projectDb.components.getbyPurlVersion({
+      const component: any = await serviceProvider.model.component.getbyPurlVersion({
         purl: inventory.purl,
         version: inventory.version,
       });
       inventory.cvid = component.compid;
-      const inv = await this.isInventory(projectDb, inventory);
+      const inv = await this.isInventory(inventory);
       if (!inv) {
         // eslint-disable-next-line no-param-reassign
-        inventory = (await projectDb.inventories.create(inventory)) as Inventory;
+        inventory = (await serviceProvider.model.inventory.create(inventory)) as Inventory;
       } else inventory.id = inv.id;
-      this.attach(projectDb, inventory);
-      const comp: Component = (await projectDb.components.get(inventory.cvid)) as Component;
+      this.attach(inventory);
+      const comp: Component = (await serviceProvider.model.component.get(inventory.cvid)) as Component;
       inventory.component = comp;
       return inventory as Inventory;
     } catch (error: any) {
@@ -72,29 +71,29 @@ class LogicInventoryService {
     }
   }
 
-  public async InventoryBatchCreate(projectDb: IDb, inv: Array<Partial<Inventory>>): Promise<Array<Inventory>> {
-    const inventory: Array<Inventory> = (await projectDb.inventories.createBatch(inv)) as Array<Inventory>;
+  public async InventoryBatchCreate(inv: Array<Partial<Inventory>>): Promise<Array<Inventory>> {
+    const inventory: Array<Inventory> = (await serviceProvider.model.inventory.createBatch(inv)) as Array<Inventory>;
     return inventory;
   }
 
-  public async InventoryAttachFileBatch(projectDb: IDb, data: any): Promise<boolean> {
-    await projectDb.files.identified(data.files); 
-    const success: boolean = await projectDb.inventories.attachFileInventoryBatch(data);
+  public async InventoryAttachFileBatch(data: any): Promise<boolean> {
+    await serviceProvider.model.file.identified(data.files);
+    const success: boolean = await serviceProvider.model.inventory.attachFileInventoryBatch(data);
     return success;
   }
 
-  public async getAll(projectDb: IDb, inventory: Partial<Inventory>): Promise<Array<Inventory>> {
+  public async getAll(inventory: Partial<Inventory>): Promise<Array<Inventory>> {
     try {
       let inventories: any;
       if (inventory.purl && inventory.version) {
-        inventories = await projectDb.inventories.getByPurlVersion(inventory);
+        inventories = await serviceProvider.model.inventory.getByPurlVersion(inventory);
       } else if (inventory.files) {
-        inventories = await projectDb.inventories.getByResultId(inventory);
+        inventories = await serviceProvider.model.inventory.getByResultId(inventory);
       } else if (inventory.purl) {
-        inventories = await projectDb.inventories.getByPurl(inventory);
-      } else inventories = await projectDb.inventories.getAll();
+        inventories = await serviceProvider.model.inventory.getByPurl(inventory);
+      } else inventories = await serviceProvider.model.inventory.getAll();
       if (inventory !== undefined) {
-        const component: any = await projectDb.components.allComp(null);
+        const component: any = await serviceProvider.model.component.allComp(null);
         const compObj = component.reduce((acc, comp) => {
           acc[comp.compid] = comp;
           return acc;
@@ -111,10 +110,10 @@ class LogicInventoryService {
     }
   }
 
-  public async attach(projectDb: IDb, inv: Partial<Inventory>): Promise<boolean> {
+  public async attach(inv: Partial<Inventory>): Promise<boolean> {
     try {
-      await projectDb.files.identified(inv.files);
-      const success: boolean = await projectDb.inventories.attachFileInventory(inv);
+      await serviceProvider.model.file.identified(inv.files);
+      const success: boolean = await serviceProvider.model.inventory.attachFileInventory(inv);
       return success;
     } catch (err: any) {
       return err;

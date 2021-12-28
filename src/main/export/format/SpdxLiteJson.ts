@@ -1,9 +1,8 @@
 import * as os from 'os';
 import { Buffer } from 'buffer';
-import { utilDb } from '../../db/utils_db';
+import { utilModel } from '../../db/UtilModel';
 import { Format } from '../Format';
 
-const pathLib = require('path');
 const crypto = require('crypto');
 
 export enum LicenseType {
@@ -25,7 +24,6 @@ export class SpdxLiteJson extends Format {
     for (let i = 0; i < data.length; i += 1) {
       const pkg: any = {};
       pkg.name = data[i].name;
-     // pkg.SPDXID = `SPDXRef-${data[i].purl}@${data[i].version}`; 
       pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${data[i].purl}@${data[i].version}`).digest('hex')}`; // md5 purl@version
       pkg.versionInfo = data[i].version;
       pkg.downloadLocation = data[i].url;
@@ -62,7 +60,7 @@ export class SpdxLiteJson extends Format {
       name: 'SCANOSS-SBOM',
       creationInfo: {
         creators: ['Tool: SCANOSS Audit Workbench', `User: ${os.userInfo().username}`],
-        created: utilDb.getTimeStamp(),
+        created: utilModel.getTimeStamp(),
       },
       packages: [] as any,
     };

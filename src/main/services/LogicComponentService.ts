@@ -1,18 +1,17 @@
 import log from 'electron-log';
-import { Component, ComponentGroup, ComponentParams, IDb } from '../../api/types';
+import { Component, ComponentGroup, ComponentParams } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
-// import { workspace } from '../workspace/Workspace';
+import { serviceProvider } from './ServiceProvider';
 
 class LogicComponentService {
-  public async getAll(projectDb: IDb, data: any, params?: ComponentParams): Promise<Component> {
+  public async getAll(data: any, params?: ComponentParams): Promise<Component> {
     try {
-      // const project = workspace.getOpenedProjects()[0];
       let component: any;
-      if (data.purl && data.version) component = await projectDb.components.getbyPurlVersion(data);
+      if (data.purl && data.version) component = await serviceProvider.model.component.getbyPurlVersion(data);
       else if (data.purl) {
-        component = await projectDb.components.getByPurl(data, params);
+        component = await serviceProvider.model.component.getByPurl(data, params);
       } else {
-        component = await projectDb.components.allComp(params);
+        component = await serviceProvider.model.component.allComp(params);
       }
       if (component !== undefined) return component;
       throw new Error('Component not found');
@@ -22,18 +21,19 @@ class LogicComponentService {
     }
   }
 
-  public async getComponentFiles(projectDb: IDb, data: Partial<Component>, params: any): Promise<any> {
+  public async getComponentFiles(data: Partial<Component>, params: any): Promise<any> {
     try {
       // const project = workspace.getOpenedProjects()[0];
       let files: any;
-      if (data.purl && data.version) files = await projectDb.files.getByPurlVersion(data, params ? params.path : null);
-      else files = await projectDb.files.getByPurl(data, params ? params.path : null);
+      if (data.purl && data.version)
+        files = await serviceProvider.model.file.getByPurlVersion(data, params ? params.path : null);
+      else files = await serviceProvider.model.file.getByPurl(data, params ? params.path : null);
 
-      const components: any = await this.getAll(projectDb, {
+      const components: any = await this.getAll({
         purl: data.purl,
         version: data.version,
       });
-      const inventories: any = await projectDb.inventories.getAll();
+      const inventories: any = await serviceProvider.model.inventory.getAll();
       const index = inventories.reduce((acc, inventory) => {
         acc[inventory.id] = inventory;
         return acc;
@@ -51,10 +51,9 @@ class LogicComponentService {
     }
   }
 
-  public async getAllComponentGroup(projectDb: IDb, params: ComponentParams) {
+  public async getAllComponentGroup(params: ComponentParams) {
     try {
-      // const project = workspace.getOpenedProjects()[0];
-      const data = await this.getAll(projectDb, {}, params);
+      const data = await this.getAll({}, params);
       if (data) {
         const comp: any = await this.groupComponentsByPurl(data); //
         // if path is defined
@@ -63,7 +62,7 @@ class LogicComponentService {
             acc.push(curr.purl);
             return acc;
           }, []);
-          const aux = await projectDb.components.getSummaryByPath(params.path, purls);
+          const aux = await serviceProvider.model.component.getSummaryByPath(params.path, purls);
           const summary = componentHelper.summaryByPurl(aux);
           for (let i = 0; i < comp.length; i += 1) {
             comp[i].summary = summary[comp[i].purl];
@@ -77,20 +76,17 @@ class LogicComponentService {
     }
   }
 
-  public async getComponentGroup(projectDb: IDb, component: Partial<ComponentGroup>, params: ComponentParams) {
+  public async getComponentGroup(component: Partial<ComponentGroup>, params: ComponentParams) {
     try {
-      // const project = workspace.getOpenedProjects()[0];
-
-      const data = await this.getAll(projectDb, component, params);
+      const data = await this.getAll(component, params);
       if (data) {
         const [comp] = await this.groupComponentsByPurl(data);
         if (!comp) {
-          // log.error('Comp not found',data);
           return [];
         }
-        comp.summary = await projectDb.components.summaryByPurl(comp);
+        comp.summary = await serviceProvider.model.component.summaryByPurl(comp);
         if (params?.path) {
-          const aux = await projectDb.components.getSummaryByPath(params.path, [comp.purl]);
+          const aux = await serviceProvider.model.component.getSummaryByPath(params.path, [comp.purl]);
           const summary = componentHelper.summaryByPurl(aux);
           comp.summary = summary[comp.purl];
         }
@@ -98,7 +94,7 @@ class LogicComponentService {
       }
       return [];
     } catch (error: any) {
-      // log.error(error);
+      log.error(error);
       return error;
     }
   }
@@ -113,7 +109,7 @@ class LogicComponentService {
       const result = await this.mergeComponentByPurl(aux);
       return result;
     } catch (err) {
-      // log.error(err);
+      log.error(err);
       return 'Unable to group components';
     }
   }
@@ -147,13 +143,13 @@ class LogicComponentService {
     return result;
   }
 
-  public async importComponents(projectDb: IDb) {
-    // eslint-disable-next-line no-async-promise-executor
+  public async importComponents() {
     try {
-      const components: Array<Partial<Component>> = await projectDb.components.getUniqueComponentsFromResults();
-      await projectDb.components.import(components);
-      const componentLicenses = await projectDb.components.getLicensesAttachedToComponentsFromResults();
-      await projectDb.licenses.bulkAttachComponentLicense(componentLicenses);
+      const components: Array<Partial<Component>> =
+        await serviceProvider.model.component.getUniqueComponentsFromResults();
+      await serviceProvider.model.component.import(components);
+      const componentLicenses = await serviceProvider.model.component.getLicensesAttachedToComponentsFromResults();
+      await serviceProvider.model.license.bulkAttachComponentLicense(componentLicenses);
       return true;
     } catch (error: any) {
       return error;

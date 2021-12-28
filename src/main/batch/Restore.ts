@@ -14,9 +14,7 @@ export class Restore extends Batch {
       const ids: Array<number> = (await this.getFilesToProcess(this.getFolder(), 'id', filter)) as Array<number>;
 
       this.restoreTree(ids);
-
-      const project = workspace.getOpenedProjects()[0];
-      const success = await logicInventoryService.detach(project.scans_db,{ files: ids } as Partial<Inventory>);
+      const success = await logicInventoryService.detach({ files: ids } as Partial<Inventory>);
       if (success) return success;
 
       throw new Error('[ INVENTORY FOLDER] error on restore files service');

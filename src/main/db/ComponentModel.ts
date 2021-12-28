@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import log from 'electron-log';
 import { Querys } from './querys_db';
-import { Db } from './db';
-import { Component, ComponentParams, ComponentSource, IComponentDb } from '../../api/types';
-import { LicenseDb } from './scan_license_db';
+import { Model } from './Model';
+import { Component, ComponentParams, ComponentSource } from '../../api/types';
+import { LicenseModel } from './LicenseModel';
 
 // export interface ComponentParams {
 //   source?: ComponentSource;
@@ -16,12 +16,12 @@ import { LicenseDb } from './scan_license_db';
 
 const query = new Querys();
 
-export class ComponentDb extends Db implements IComponentDb {
-  license: LicenseDb;
+export class ComponentModel extends Model {
+  license: LicenseModel;
 
   public constructor(path: string) {
     super(path);
-    this.license = new LicenseDb(path);
+    this.license = new LicenseModel(path);
   }
 
   get(component: number) {
@@ -475,7 +475,7 @@ export class ComponentDb extends Db implements IComponentDb {
   }
 
   public deleteByID(componentIds: number[]) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         let deleteCompByIdQuery = 'DELETE FROM component_versions WHERE id in ';
@@ -483,7 +483,7 @@ export class ComponentDb extends Db implements IComponentDb {
         db.all(deleteCompByIdQuery, (err: any) => {
           db.close();
           if (err) throw err;
-          resolve(true);
+          resolve();
         });
       } catch (error) {
         reject(error);
@@ -492,7 +492,7 @@ export class ComponentDb extends Db implements IComponentDb {
   }
 
   public async updateOrphanToManual() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.run(
@@ -500,7 +500,7 @@ export class ComponentDb extends Db implements IComponentDb {
           (err: any) => {
             db.close();
             if (err) throw err;
-            resolve(true);
+            resolve();
           }
         );
       } catch (error) {

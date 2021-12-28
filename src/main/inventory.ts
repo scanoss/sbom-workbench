@@ -14,8 +14,7 @@ import { workspace } from './workspace/Workspace';
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (_event, invget: Partial<Inventory>) => {
   let inv: any;
   try {
-    const project = workspace.getOpenedProjects()[0];
-    inv = await logicInventoryService.getAll(project.scans_db, invget);
+    inv = await logicInventoryService.getAll(invget);
     return { status: 'ok', message: inv, data: inv };
   } catch (e) {
     console.log('Catch an error: ', e);
@@ -24,9 +23,8 @@ ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (_event, invget: Partial<Inven
 });
 
 ipcMain.handle(IpcEvents.INVENTORY_GET, async (_event, inv: Partial<Inventory>) => {
-  try {
-    const project = workspace.getOpenedProjects()[0];
-    const inventory: Inventory = await logicInventoryService.get(project.scans_db, inv);
+  try {    
+    const inventory: Inventory = await logicInventoryService.get(inv);
     return { status: 'ok', message: 'Inventory retrieve successfully', data: inventory };
   } catch (e) {
     console.log('Catch an error: ', e);
@@ -37,7 +35,7 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (_event, inv: Partial<Inventory>) 
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (_event, arg: Inventory) => {
   try {
     const p = workspace.getOpenedProjects()[0];
-    const inv = await logicInventoryService.create(p.scans_db, arg);
+    const inv = await logicInventoryService.create(arg);
     p.sendToUI(IpcEvents.TREE_UPDATING, {});
     logicResultService
       .getResultsFromIDs(arg.files)
@@ -62,7 +60,7 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (_event, arg: Inventory) => {
 ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (_event, arg: Partial<Inventory>) => {
   try {
     const p = workspace.getOpenedProjects()[0];
-    const success = await logicInventoryService.attach(p.scans_db, arg);
+    const success = await logicInventoryService.attach(arg);
     return { status: 'ok', message: 'File attached to inventory successfully', success };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
@@ -83,7 +81,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (_event, inv: Partial<Inve
       .catch((e) => {
         throw e;
       });
-    const success: boolean = await logicInventoryService.detach(project.scans_db, inv);
+    const success: boolean = await logicInventoryService.detach(inv);
 
     return { status: 'ok', message: 'File detached to inventory successfully', success };
   } catch (e) {
@@ -95,7 +93,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (_event, inv: Partial<Inve
 ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (_event, arg: Partial<Inventory>) => {
   try {
     const p = workspace.getOpenedProjects()[0];
-    p.scans_db.inventories
+    p.store.inventory
       .getInventoryFiles(arg)
       .then((files: any) => {
         const paths = utilHelper.getArrayFromObjectFilter(files, 'path', new FilterTrue()) as Array<string>;
@@ -105,7 +103,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (_event, arg: Partial<Inventory
       .catch((e) => {
         throw e;
       });
-    const success = await p.scans_db.inventories.delete(arg);
+    const success = await p.store.inventory.delete(arg);
     if (success) return { status: 'ok', message: 'Inventory deleted successfully', success };
     return { status: 'error', message: 'Inventory was not deleted successfully', success };
   } catch (e) {
@@ -116,7 +114,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (_event, arg: Partial<Inventory
 
 ipcMain.handle(IpcEvents.INVENTORY_FROM_COMPONENT, async (_event) => {
   try {
-    const data = await workspace.getOpenedProjects()[0].scans_db.inventories.getFromComponent();
+    const data = await workspace.getOpenedProjects()[0].store.inventory.getFromComponent();
     if (data) return { status: 'ok', message: 'Inventories from component', data };
     return { status: 'error', message: 'Inventory from component was not successfully retrieve', data };
   } catch (e) {

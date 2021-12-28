@@ -61,11 +61,8 @@ export class Querys {
   SQL_COMPDB_COMP_VERSION_UPDATE =
     'UPDATE component_versions  SET name=?,version=?, description=?, url=?,purl=? where id=?;';
 
-  // SQL_FILES_UPDATE_IDENTIFIED = 'UPDATE results SET identified=1 WHERE id IN ';
-
   SQL_FILES_UPDATE_IDENTIFIED = 'UPDATE files SET identified=1 WHERE fileId IN ';
 
-  /** SQL COMPONENTS TABLES INSERT* */
   // SQL INSERT INTO LICENSES
   SQL_CREATE_LICENSE = 'INSERT OR IGNORE INTO licenses (spdxid,name,fulltext,url,official) VALUES(?,?,?,?,?);';
 
@@ -100,15 +97,9 @@ export class Querys {
   SQL_SCAN_SELECT_FILE_RESULTS =
     ' SELECT f.fileId AS id,f.path AS file_path, r.url,r.lines, r.oss_lines, r.matched, r.filename as file, r.idtype as type, r.md5_file, r.md5_comp as url_hash,r.purl, r.version,r.latest_version as latest, f.identified, f.ignored, r.file_url,r.license FROM files f INNER JOIN results r  ON r.fileId=f.fileId WHERE f.path=? ORDER BY f.path;';
 
-  SQL_SCAN_SELECT_FILE_RESULTS_NO_MATCH =
-    'SELECT DISTINCT id, file_path, url,lines, oss_lines, matched, filename as file, idtype as type, md5_file, md5_comp as url_hash,purl, version,latest_version as latest, identified, ignored, file_url FROM results WHERE file_path=? ORDER BY file_path;';
-
   // GET ALL THE INVENTORIES ATTACHED TO A FILE BY PATH
   SQL_SELECT_ALL_INVENTORIES_FROM_FILE =
     'SELECT i.id,i.usage,i.notes,i.purl,i.version,i.spdxid,i.url FROM inventories i, file_inventories fi WHERE i.id=fi.inventoryid and fi.resultid=?;';
-
-  // SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID =
-  //   'SELECT DISTINCT r.id,r.file_path as path,r.identified as identified,r.ignored as ignored FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN results r ON r.id=fi.resultid WHERE i.id=?';
 
   SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID =
     'SELECT DISTINCT f.fileId AS id,f.path,f.identified,f.ignored FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN files f ON f.fileId=fi.fileId  WHERE i.id=?;';
@@ -219,8 +210,6 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   SQL_GET_RESULTS_SUMMARY = `SELECT (SELECT COUNT(*) FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE f.identified = 1) AS "identified", (SELECT COUNT(*) FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE f.ignored = 1) AS "ignored", (SELECT COUNT(*) FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE (f.identified = 0 AND f.ignored = 0)) AS "pending", (SELECT COUNT(*) FROM results WHERE idtype !="none" AND md5_file!="" AND source="engine") AS "detected";`;
 
   SQL_GET_SUMMARY_BY_RESULT_ID = `SELECT f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending FROM files f  WHERE fileId IN #values GROUP BY f.path;`;
-
-  SQL_GET_RESULTS_RESCAN = `SELECT r.idtype,f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending, source AS original FROM files f INNER JOIN results r ON f.fileId=r.fileId;`;
 
   SQL_GET_RESULTS_IN_FOLDER = `SELECT f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE f.path LIKE '?';`;
 }

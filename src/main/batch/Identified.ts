@@ -31,8 +31,7 @@ export class Identified extends Batch {
       this.updateTree(ids, NodeStatus.IDENTIFIED);
 
       this.inventory.files = ids;
-      const project = workspace.getOpenedProjects()[0];
-      const success = await logicInventoryService.create(project.scans_db, this.inventory);
+      const success = await logicInventoryService.create(this.inventory);
 
       if (success) return success;
 

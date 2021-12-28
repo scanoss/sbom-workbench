@@ -1,24 +1,24 @@
 import log from 'electron-log';
 import { Querys } from './querys_db';
-import { Db } from './db';
-import { Component, Files, IFilesDb } from '../../api/types';
-import { ComponentDb } from './scan_component_db';
-import { InventoryDb } from './scan_inventory_db';
+import { Component, File } from '../../api/types';
+import { ComponentModel } from './ComponentModel';
+import { InventoryModel } from './InventoryModel';
+import { Model } from './Model';
 
 const query = new Querys();
 
-export class FilesDb extends Db implements IFilesDb {
-  component: ComponentDb;
+export class FileModel extends Model {
+  component: ComponentModel;
 
-  inventory: InventoryDb;
+  inventory: InventoryModel;
 
   constructor(path: string) {
     super(path);
-    this.component = new ComponentDb(path);
-    this.inventory = new InventoryDb(path);
+    this.component = new ComponentModel(path);
+    this.inventory = new InventoryModel(path);
   }
 
-  get(file: Partial<Files>) {
+  public async get(file: Partial<File>) {
     return new Promise(async (resolve, reject) => {
       try {
         let result: any;
@@ -103,7 +103,7 @@ export class FilesDb extends Db implements IFilesDb {
       try {
         const db = await this.openDb();
         const ignoredFilesSQL = `${query.SQL_UPDATE_IGNORED_FILES}(${files.toString()});`;
-        db.serialize(function () {
+        db.serialize(() => {
           db.run('begin transaction');
           db.run(ignoredFilesSQL);
           db.run('commit', (err: any) => {
@@ -143,10 +143,10 @@ export class FilesDb extends Db implements IFilesDb {
   }
 
   public async insertFiles(data: Array<any>) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(function () {
+        db.serialize(() => {
           db.run('begin transaction');
           data.forEach((d) => {
             db.run('INSERT INTO FILES(path,type) VALUES(?,?)', d.path, d.type);
@@ -154,7 +154,7 @@ export class FilesDb extends Db implements IFilesDb {
           db.run('commit', (err: any) => {
             if (err) throw err;
             db.close();
-            resolve(true);
+            resolve();
           });
         });
       } catch (error) {
@@ -164,18 +164,18 @@ export class FilesDb extends Db implements IFilesDb {
     });
   }
 
-  public async getFiles() {
-    return new Promise(async (resolve, reject) => {
+  public async getAll() {
+    return new Promise<Array<File>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.all('SELECT * FROM files', (err: any, files: any) => {
+        db.all('SELECT fileId,path,identified,ignored,dirty,type FROM files', (err: any, files: Array<File>) => {
           if (err) throw err;
           db.close();
           resolve(files);
         });
       } catch (error) {
         log.error(error);
-        reject(new Error('ERROR ATTACHING FILES TO RESULTS'));
+        reject(new Error('ERROR GETTING ALL FILES'));
       }
     });
   }
@@ -197,7 +197,7 @@ export class FilesDb extends Db implements IFilesDb {
   }
 
   public async setDirty(dirty: number, path?: string) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         let SQLquery = '';
@@ -206,7 +206,7 @@ export class FilesDb extends Db implements IFilesDb {
         db.run(SQLquery, (err: any) => {
           if (err) throw err;
           db.close();
-          resolve(true);
+          resolve();
         });
       } catch (error) {
         log.error(error);
@@ -228,19 +228,22 @@ export class FilesDb extends Db implements IFilesDb {
   }
 
   public async deleteDirty() {
-    const db = await this.openDb();
-    return new Promise<number[]>(async (resolve) => {
-      db.all(`DELETE FROM files WHERE dirty=1;`, (err: any, data: any) => {
-        db.close();
-        if (err) throw err;
-        if (data === undefined) resolve([]);
-        resolve(data.map((item: any) => item.id));
-      });
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.run(`DELETE FROM files WHERE dirty=1;`, (err: any) => {
+          db.close();
+          if (err) throw err;
+          resolve();
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
   public async getClean() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<Array<any>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.all('SELECT * FROM files WHERE dirty=0', (err: any, files: any) => {
@@ -256,7 +259,7 @@ export class FilesDb extends Db implements IFilesDb {
   }
 
   public async getFilesRescan() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<Array<any>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.all(

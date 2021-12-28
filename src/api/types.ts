@@ -1,3 +1,5 @@
+import { NodeStatus } from '../main/workspace/Tree/Tree/Node';
+
 export enum ScanState {
   CREATED = 'CREATED',
   READY_TO_SCAN = 'READY_TO_SCAN',
@@ -100,7 +102,6 @@ export interface IProject extends INewProject {
   scannerState: ScanState;
   files: number;
   uuid: string;
-  db: IDb;
 }
 
 export interface Files {
@@ -170,49 +171,18 @@ export enum ComponentSource {
   ENGINE = 'engine',
 }
 
-export interface IComponentDb {
-  get(id: number): Promise<Component>;
-  create(component: any): Promise<Component>;
-  getLicensesAttachedToComponentsFromResults(): Promise<Array<any>>;
-  getUniqueComponentsFromResults(): Promise<Array<Partial<Component>>>;
-  import(components: Array<Partial<Component>>): Promise<void>;
-  getbyPurlVersion(data: any);
-  getByPurl(data: any, params: ComponentParams);
-  allComp(params: ComponentParams | null);
-  getSummaryByPath(path: string, purls: string[]): Promise<Array<any>>;
-  summaryByPurl(data: any);
-}
-export interface ILicenseDb {
-  bulkAttachComponentLicense(data: any): Promise<void>;
+export interface File {
+  fileId: number;
+  path: string;
+  identified: number;
+  ignored: number;
+  dirty: number;
+  type: NodeStatus;
 }
 
-export interface IFilesDb {
-  getByPurlVersion(data: Partial<Component>, path: string);
-  getByPurl(data: Partial<Component>, path: string);
-  restore(files: number[]): Promise<void>;
-  identified(id: number[]): Promise<void>;
-}
 
-export interface IInventoryDb {
-  getAll();
-  getInventoryFiles(inventory: Partial<Inventory>): Promise<Files>;
-  getById(id: number): Promise<Inventory>;
-  emptyInventory();
-  detachFileInventory(inventory: Partial<Inventory>): Promise<void>;
-  deleteAllEmpty(id: number[]): Promise<void>;
-  isInventory(inventory): Promise<Partial<Inventory>>;
-  create(inventory: Partial<Inventory>): Promise<Partial<Inventory>>;
-  createBatch(inventories: Array<Partial<Inventory>>): Promise<Array<Inventory>>;
-  attachFileInventoryBatch(data: any): Promise<boolean>;
-  getByPurlVersion(inventory: Partial<Inventory>);
-  getByResultId(inventory: Partial<Inventory>);
-  getByPurl(inventory: Partial<Inventory>);
-  attachFileInventory(inventory: Partial<Inventory>): Promise<boolean>;
-}
 
-export interface IDb {
-  components: IComponentDb;
-  licenses: ILicenseDb;
-  inventories: IInventoryDb;
-  files: IFilesDb;
-}
+
+
+
+

@@ -4,7 +4,7 @@ class ReportService {
   public async getReportSummary() {
     try {
       let tempSummary: any = {};
-      tempSummary = await workspace.getOpenedProjects()[0].scans_db.inventories.getCurrentSummary();
+      tempSummary = await workspace.getOpenedProjects()[0].store.inventory.getCurrentSummary();
       const projectSummary = await workspace.getOpenedProjects()[0].filesSummary;
       const summary = {
         totalFiles: 0,
@@ -33,7 +33,7 @@ class ReportService {
   public async getReportIdentified() {
     try {
       let data: any = [];
-      data = await workspace.getOpenedProjects()[0].scans_db.components.getIdentifiedForReport();
+      data = await workspace.getOpenedProjects()[0].store.component.getIdentifiedForReport();
       const licenses = [];
       data.forEach((element) => {
         const aux: any = {};

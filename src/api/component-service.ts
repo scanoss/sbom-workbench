@@ -1,6 +1,5 @@
 import { IpcEvents } from '../ipc-events';
-import { ComponentParams } from '../main/db/scan_component_db';
-import { Component, License,ComponentGroup, NewComponentDTO, IParams } from './types';
+import { Component, License, ComponentGroup, NewComponentDTO, IParams, ComponentParams } from './types';
 import { BaseService } from './base-service';
 
 const { ipcRenderer } = require('electron');

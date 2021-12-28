@@ -3,9 +3,9 @@ import { EventEmitter } from 'events';
 import fs from 'fs';
 import { isBinaryFileSync } from 'isbinaryfile';
 import log from 'electron-log';
-import { Component, Inventory, IProject, IProjectCfg, ProjectState, ScanState } from '../../api/types';
+import { Component, File, Inventory, IProject, IProjectCfg, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
-import { ScanDb } from '../db/scan_db';
+import { ScanModel } from '../db/ScanModel';
 import { licenses } from '../db/licenses';
 import { Scanner } from '../scannerLib/Scanner';
 import { ScannerEvents } from '../scannerLib/ScannerEvents';
@@ -19,6 +19,7 @@ import { Tree } from './Tree/Tree/Tree';
 import Node, { NodeStatus } from './Tree/Tree/Node';
 import { reScanService } from '../services/RescanLogicService';
 import { logicComponentService } from '../services/LogicComponentService';
+import { serviceProvider } from '../services/ServiceProvider';
 
 
 const path = require('path');
@@ -38,7 +39,7 @@ export class Project extends EventEmitter {
 
   results: any;
 
-  scans_db!: ScanDb;
+  store!: ScanModel;
 
   scanner!: Scanner;
 
@@ -96,8 +97,11 @@ export class Project extends EventEmitter {
     this.filesNotScanned = a.filesNotScanned;
     this.processedFiles = a.processedFiles;
     this.filesSummary = a.filesSummary;
-    this.scans_db = new ScanDb(this.metadata.getMyPath());
-    await this.scans_db.init();
+    this.store = new ScanModel(this.metadata.getMyPath());
+    await this.store.init();
+
+    serviceProvider.setModel(this.store);
+
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
     this.tree = new Tree(this.metadata.getMyPath());
     this.tree.loadTree(a.tree.rootFolder);
@@ -111,7 +115,7 @@ export class Project extends EventEmitter {
     this.scanner = null;
     this.logical_tree = null;
     this.tree = null;
-    this.scans_db = null;
+    this.store = null;
     this.filesToScan = null;
   }
 
@@ -155,9 +159,10 @@ export class Project extends EventEmitter {
     if (!fs.existsSync(`${myPath}/filter.json`))
       fs.writeFileSync(`${myPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
     this.banned_list.load(`${myPath}/filter.json`);
-    this.scans_db = new ScanDb(myPath);
-    await this.scans_db.init();
-    await this.scans_db.licenses.importFromJSON(licenses);
+    this.store = new ScanModel(myPath);
+    await this.store.init();
+    await this.store.license.importFromJSON(licenses);
+    serviceProvider.setModel(this.store);
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
     this.build_tree();
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
@@ -225,20 +230,20 @@ export class Project extends EventEmitter {
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
         log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
-        await reScanService.reScan(this.tree.getRootFolder().getFiles(), resultPath, this);
-        await logicComponentService.importComponents(this.scans_db);
-        const results = await reScanService.getNewResults(this);
+        await reScanService.reScan(this.tree.getRootFolder().getFiles(), resultPath);
+        const results = await reScanService.getNewResults();
         this.tree.sync(results);
         this.save();
       } else {
-        await this.scans_db.files.insertFiles(this.tree.getRootFolder().getFiles());
-        const files: any = await this.scans_db.files.getFiles();
+        await this.store.file.insertFiles(this.tree.getRootFolder().getFiles());
+        const files: Array<File> = await this.store.file.getAll();
         const aux = files.reduce((previousValue, currentValue) => {
           previousValue[currentValue.path] = currentValue.fileId;
           return previousValue;
         }, []);
-        await this.scans_db.results.insertFromFile(resultPath, aux);
-        await logicComponentService.importComponents(this.scans_db);
+        await this.store.result.insertFromFile(resultPath, aux);
+        // await logicService.logicComponentService.importComponents()
+        await logicComponentService.importComponents();
       }
 
       this.metadata.setScannerState(ScanState.FINISHED);
