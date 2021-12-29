@@ -1,6 +1,6 @@
 import log from 'electron-log';
 import { serviceProvider } from './ServiceProvider';
-import { Inventory, Component, IFolderInventory } from '../../api/types';
+import { Inventory, Component, IFolderInventory, ComponentSource } from '../../api/types';
 import { logicResultService } from './LogicResultService';
 import { FilterAND } from '../batch/Filter/FilterAND';
 import { FilterNOT } from '../batch/Filter/FilterNOT';
@@ -9,7 +9,6 @@ import { utilHelper } from '../helpers/UtilHelper';
 // eslint-disable-next-line import/no-cycle
 import { logicComponentService } from './LogicComponentService';
 import { Filter } from '../batch/Filter/Filter';
-import { ComponentSource } from '../db/scan_component_db';
 import { inventoryHelper } from '../helpers/InventoryHelper';
 
 class LogicInventoryService {
