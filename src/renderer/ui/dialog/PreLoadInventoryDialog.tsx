@@ -72,7 +72,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
   const { open, folder, overwrite, onClose, onCancel } = props;
   const classes = useStyles();
 
-  const [inventories, setInventories] = useState<any[]>([]);
+  const [inventories, setInventories] = useState<any[]>(null);
 
   const [checked, setChecked] = useState<any[]>([]);
 
@@ -100,13 +100,13 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
   };
 
   const selectAll = () => {
-    if (checked.length === inventories.length) {
+    if (checked.length === inventories?.length) {
       setChecked([]);
     } else setChecked(inventories);
   };
 
   const AllChecked = () => {
-    return checked.length === inventories.length;
+    return checked.length === inventories?.length;
   };
 
   const init = async () => {
@@ -122,7 +122,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
   useEffect(() => {
     if (open) init();
     else {
-      setInventories([]);
+      setInventories(null);
       setChecked([]);
       setNotes('');
     }
@@ -138,14 +138,12 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
               <FormControlLabel control={<Checkbox checked={AllChecked()} onClick={() => selectAll()} />} label="All" />
               <hr className="divider" />
               <div className="scroll-list">
-                {
-                  inventories === null || inventories.length === 0 ? (
-                    <CircularProgress />
-                  ) : (
-                    inventories.map((value) => {
+                { inventories === null && <div className="d-flex"><CircularProgress size={20}/> </div> }
+                { inventories && inventories.length === 0 && <span>No componentes were detected</span>}
+                { inventories?.length > 0 && inventories.map((value) => {
                       const labelId = `checkbox-list-label-${value.cvid}`;
                       return (
-                        <ListItem className={classes.listItem} key={value}>
+                        <ListItem className={classes.listItem} key={value.cvid}>
                           <ListItemIcon className="list-item" role={undefined} onClick={handleToggle(value)}>
                             <Checkbox
                               edge="start"
@@ -200,7 +198,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                           </ListItemIcon>
                         </ListItem>
                       );
-                    }))
+                    })
                 }
               </div>
             </List>
