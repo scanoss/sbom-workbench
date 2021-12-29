@@ -92,4 +92,8 @@ export class Tree {
   public getFilteredFiles(): Array<string> {
     return this.rootFolder.getFiltered();
   }
+
+  public summarize(root: string, summary: any): any {
+    return this.rootFolder.summarize(root, summary);
+  }
 }
