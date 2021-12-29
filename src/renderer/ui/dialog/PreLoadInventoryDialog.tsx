@@ -61,9 +61,6 @@ const useStyles = makeStyles((theme) => ({
     margin: '24px 0px',
     height: '25px',
   },
-  icon: {
-    minWidth: '0px !important',
-  }
 }));
 
 interface IPreLoadInventoryDialog {
@@ -148,7 +145,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                 const labelId = `checkbox-list-label-${value.cvid}`;
                 return (
                   <ListItem className={classes.listItem} key={value}>
-                    <ListItemIcon className={classes.icon} role={undefined} onClick={handleToggle(value)}>
+                    <ListItemIcon className="list-item" role={undefined} onClick={handleToggle(value)}>
                       <Checkbox
                         edge="start"
                         checked={
@@ -163,9 +160,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                         tabIndex={-1}
                         disableRipple
                         inputProps={{ 'aria-labelledby': labelId }}
-                        className={classes.icon}
                       />
-                    </ListItemIcon>
                     <div className='checkbox-info'>
                       <div className='name-component'>
                       <svg width="25" height="22" viewBox="0 0 25 22" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -175,13 +170,14 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                       </div>
                       <div className='pills'>
                         <div className='version-pill'>
-                          <p>{`${value.version}`.slice(0, 10).trim()}</p>
+                          <p>{value.version.trim() === '' ? '-' : `${value.version}`.slice(0,10) }</p>
                         </div>
                         <div className='license-pill'>
-                          <p>{`${value.spdxid}`.slice(0, 10).trim()}</p>
+                          <p>{value.spdxid.trim() === '' ? '-' : `${value.spdxid}`.slice(0,10)}</p>
                         </div>
                       </div>
                     </div>
+                    </ListItemIcon>
                   </ListItem>
                 );
               })}
