@@ -32,7 +32,7 @@ textarea {
 
 
 .list-item-text {
-  font-size: 18px;
+  font-size: 16px;
   color: #3B82F6;
   margin-left: 6px;
 }
@@ -52,7 +52,7 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
-
+  flex-shrink: 0;
 
   .version-pill {
     @include pill;
@@ -79,6 +79,8 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    svg { width: 30px; }
   }
 }
 
