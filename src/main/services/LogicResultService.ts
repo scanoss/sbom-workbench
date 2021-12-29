@@ -21,7 +21,7 @@ class LogicResultService {
   public async getFilesInFolder(folder: string) {
     try {
       const project = workspace.getOpenedProjects()[0];
-      const results: Array<any> = await project.scans_db.results.getFilesInFolder(folder);
+      const results: Array<any> = await project.store.result.getFilesInFolder(folder);
       return results;
     } catch (e) {
       return e;
@@ -31,7 +31,7 @@ class LogicResultService {
   public async getResultsFromIDs(ids: number[]) {
     try {
       const project = workspace.getOpenedProjects()[0];
-      const results: Array<any> = await project.scans_db.results.getSummaryByids(ids);
+      const results: Array<any> = await project.store.result.getSummaryByids(ids);
       return results;
     } catch (e) {
       return e;
@@ -41,7 +41,7 @@ class LogicResultService {
   public async ignore(ids: number[]) {
     try {
       const project = workspace.getOpenedProjects()[0];
-      const success = await project.scans_db.files.ignored(ids);
+      const success = await project.store.file.ignored(ids);
       return success;
     } catch (e) {
       return e;
@@ -51,8 +51,8 @@ class LogicResultService {
   public async getFromPath(path: string) {
     try {
       const project = workspace.getOpenedProjects()[0];
-      const results = await project.scans_db.results.getFromPath(path);
-      const components: any = await project.scans_db.components.allComp();
+      const results = await project.store.result.getFromPath(path);
+      const components: any = await project.store.component.allComp();
       results.forEach((result) => {
         if (result.license) result.license = result.license.split(',');
         if (result.version)

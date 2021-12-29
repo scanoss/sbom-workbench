@@ -33,7 +33,7 @@ export default class File extends Node {
     if (this.getPath() === path) {
       this.components.push(component);
 
-      this.className = 'match-info-results status-pending';
+      this.setClassName('match-info-results status-pending');
       this.original = NodeStatus.MATCH;
       this.status = NodeStatus.PENDING;
 
@@ -44,7 +44,7 @@ export default class File extends Node {
 
   public restoreStatus(path: string) {
     if (this.getPath() !== path) return;
-    if (this.action === 'filter') {
+    if (this.getAction() === 'filter') {
       this.status = NodeStatus.FILTERED;
       this.setStatusOnClassnameAs(this.status);
       return;
@@ -93,5 +93,19 @@ export default class File extends Node {
         type,
       },
     ];
+  }
+
+  public summarize(root: string, summary: any): any {
+    summary.total += 1;
+    if (this.getAction() === 'filter') {
+      summary.filter += 1;
+      this.setClassName('filter-item');
+    } else if (this.getInclude() === true) {
+      summary.include += 1;
+      summary.files[`${root}${this.getPath()}`] = this.getScanMode();
+    } else {
+      this.setClassName('exclude-item');
+    }
+    return summary;
   }
 }

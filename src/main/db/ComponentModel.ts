@@ -1,31 +1,31 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import log from 'electron-log';
 import { Querys } from './querys_db';
-import { Db } from './db';
-import { Component } from '../../api/types';
-import { LicenseDb } from './scan_license_db';
+import { Model } from './Model';
+import { Component, ComponentParams, ComponentSource } from '../../api/types';
+import { LicenseModel } from './LicenseModel';
 
-export interface ComponentParams {
-  source?: ComponentSource;
-  path?: string;
-}
+// export interface ComponentParams {
+//   source?: ComponentSource;
+//   path?: string;
+// }
 
-export enum ComponentSource {
-  ENGINE = 'engine',
-}
+// export enum ComponentSource {
+//   ENGINE = 'engine',
+// }
 
 const query = new Querys();
 
-export class ComponentDb extends Db {
-  license: LicenseDb;
+export class ComponentModel extends Model {
+  license: LicenseModel;
 
   public constructor(path: string) {
     super(path);
-    this.license = new LicenseDb(path);
+    this.license = new LicenseModel(path);
   }
 
   get(component: number) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<Component>(async (resolve, reject) => {
       try {
         let comp: any;
         if (component) {
@@ -33,7 +33,7 @@ export class ComponentDb extends Db {
           const summary = await this.summaryByPurlVersion(comp);
           comp.summary = summary;
           resolve(comp);
-        } else resolve([]);
+        } else throw new Error('Component not found');
       } catch (error) {
         log.error(error);
         reject(error);
@@ -168,7 +168,7 @@ export class ComponentDb extends Db {
   // CREATE COMPONENT
   create(component: any) {
     const self = this;
-    return new Promise(async (resolve, reject) => {
+    return new Promise<Component>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
@@ -242,12 +242,12 @@ export class ComponentDb extends Db {
   }
 
   public async getLicensesAttachedToComponentsFromResults() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<Array<any>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.all(
           `SELECT cv.id,r.license FROM component_versions cv INNER JOIN results r ON cv.purl=r.purl AND cv.version = r.version;`,
-          async (err: any, data: any) => {
+          async (err: any, data: Array<any>) => {
             db.close();
             if (err) throw err;
             data.forEach((item) => {
@@ -264,7 +264,7 @@ export class ComponentDb extends Db {
   }
 
   public async import(components: Array<Partial<Component>>) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
@@ -283,7 +283,7 @@ export class ComponentDb extends Db {
           db.run('commit', (err: any) => {
             db.close();
             if (err) throw err;
-            resolve(true);
+            resolve();
           });
         });
       } catch (error) {
@@ -475,7 +475,7 @@ export class ComponentDb extends Db {
   }
 
   public deleteByID(componentIds: number[]) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         let deleteCompByIdQuery = 'DELETE FROM component_versions WHERE id in ';
@@ -483,7 +483,7 @@ export class ComponentDb extends Db {
         db.all(deleteCompByIdQuery, (err: any) => {
           db.close();
           if (err) throw err;
-          resolve(true);
+          resolve();
         });
       } catch (error) {
         reject(error);
@@ -492,7 +492,7 @@ export class ComponentDb extends Db {
   }
 
   public async updateOrphanToManual() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.run(
@@ -500,7 +500,7 @@ export class ComponentDb extends Db {
           (err: any) => {
             db.close();
             if (err) throw err;
-            resolve(true);
+            resolve();
           }
         );
       } catch (error) {

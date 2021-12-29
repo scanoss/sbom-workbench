@@ -2,26 +2,27 @@
 
 import log from 'electron-log';
 import { Querys } from './querys_db';
-import { Db } from './db';
-import { utilDb } from './utils_db';
-import { ComponentDb } from './scan_component_db';
+import { Model } from './Model';
+import { utilModel } from './UtilModel';
+import { ComponentModel } from './ComponentModel';
 import { licenseHelper } from '../helpers/LicenseHelper';
+
 
 const query = new Querys();
 
-export class ResultsDb extends Db {
-  component: ComponentDb;
+export class ResultModel extends Model {
+  component: ComponentModel;
 
   constructor(path: string) {
     super(path);
-    this.component = new ComponentDb(path);
+    this.component = new ComponentModel(path);
   }
 
   insertFromFileReScan(resultPath: string, files: any) {
-    return new Promise(async (resolve) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const self = this;
-        const result: Record<any, any> = await utilDb.readFile(resultPath);
+        const result: Record<any, any> = await utilModel.readFile(resultPath);
         const db = await this.openDb();
         db.serialize(() => {
           db.run('begin transaction');
@@ -35,12 +36,12 @@ export class ResultsDb extends Db {
           }
           db.run('commit', () => {
             db.close();
-            resolve(true);
+            resolve();
           });
         });
       } catch (error) {
         console.log(error);
-        resolve(false);
+        reject(error);
       }
     });
   }
@@ -50,7 +51,7 @@ export class ResultsDb extends Db {
     return new Promise(async (resolve) => {
       try {
         const self = this;
-        const result: Record<any, any> = await utilDb.readFile(resultPath);
+        const result: Record<any, any> = await utilModel.readFile(resultPath);
         const db = await this.openDb();
         db.serialize(() => {
           db.run('begin transaction');
@@ -91,7 +92,7 @@ export class ResultsDb extends Db {
   }
 
   async updateDirty(value: number) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
@@ -100,7 +101,7 @@ export class ResultsDb extends Db {
           db.run('commit', (err: any) => {
             db.close();
             if (err) throw err;
-            resolve(true);
+            resolve();
           });
         });
       } catch (error) {
@@ -110,7 +111,7 @@ export class ResultsDb extends Db {
   }
 
   async deleteDirty() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
@@ -119,7 +120,7 @@ export class ResultsDb extends Db {
           db.run('commit', (err: any) => {
             db.close();
             if (err) throw err;
-            resolve(true);
+            resolve();
           });
         });
       } catch (error) {

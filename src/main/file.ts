@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { ipcMain } from 'electron';
 import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
-import { FileType } from '../api/types';
+import { File, FileType } from '../api/types';
 import { workspace } from './workspace/Workspace';
 import { logicResultService } from './services/LogicResultService';
 import { NodeStatus } from './workspace/Tree/Tree/Node';
@@ -74,7 +74,7 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
 ipcMain.handle(IpcEvents.FILE_GET, async (_event, arg: Partial<File>) => {
   let data;
   try {
-    data = await workspace.getOpenedProjects()[0].scans_db.files.get(arg); 
+    data = await workspace.getOpenedProjects()[0].store.file.get(arg); 
     return { status: 'ok', message: 'Get file', data };
   } catch (error) {
     return { status: 'error', message: 'Get file were not successfully retrieve', data };
@@ -83,7 +83,7 @@ ipcMain.handle(IpcEvents.FILE_GET, async (_event, arg: Partial<File>) => {
 
 ipcMain.handle(IpcEvents.FILE_GET_ID_FROM_PATH, async (_event, arg: string) => {
   try {
-    const data = await workspace.getOpenedProjects()[0].scans_db.files.getIdFromPath(arg);
+    const data = await workspace.getOpenedProjects()[0].store.file.getIdFromPath(arg);
     return { status: 'ok', message: 'Get id from file path', data };
   } catch (error) {
     return { status: 'error', message: 'Get file were not successfully retrieve' };

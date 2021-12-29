@@ -3,9 +3,9 @@ import { EventEmitter } from 'events';
 import fs from 'fs';
 import { isBinaryFileSync } from 'isbinaryfile';
 import log from 'electron-log';
-import { Component, Inventory, IProjectCfg, ProjectState, ScanState } from '../../api/types';
+import { File, IProjectCfg, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
-import { ScanDb } from '../db/scan_db';
+import { ScanModel } from '../db/ScanModel';
 import { licenses } from '../db/licenses';
 import { Scanner } from '../scannerLib/Scanner';
 import { ScannerEvents } from '../scannerLib/ScannerEvents';
@@ -19,7 +19,8 @@ import { Tree } from './Tree/Tree/Tree';
 import Node, { NodeStatus } from './Tree/Tree/Node';
 import { reScanService } from '../services/RescanLogicService';
 import { logicComponentService } from '../services/LogicComponentService';
-import { ContactsOutlined } from '@material-ui/icons';
+import { serviceProvider } from '../services/ServiceProvider';
+
 
 const path = require('path');
 
@@ -38,7 +39,7 @@ export class Project extends EventEmitter {
 
   results: any;
 
-  scans_db!: ScanDb;
+  store!: ScanModel;
 
   scanner!: Scanner;
 
@@ -96,8 +97,11 @@ export class Project extends EventEmitter {
     this.filesNotScanned = a.filesNotScanned;
     this.processedFiles = a.processedFiles;
     this.filesSummary = a.filesSummary;
-    this.scans_db = new ScanDb(this.metadata.getMyPath());
-    await this.scans_db.init();
+    this.store = new ScanModel(this.metadata.getMyPath());
+    await this.store.init();
+
+    serviceProvider.setModel(this.store);
+
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
     this.tree = new Tree(this.metadata.getMyPath());
     this.tree.loadTree(a.tree.rootFolder);
@@ -111,7 +115,7 @@ export class Project extends EventEmitter {
     this.scanner = null;
     this.logical_tree = null;
     this.tree = null;
-    this.scans_db = null;
+    this.store = null;
     this.filesToScan = null;
   }
 
@@ -155,15 +159,16 @@ export class Project extends EventEmitter {
     if (!fs.existsSync(`${myPath}/filter.json`))
       fs.writeFileSync(`${myPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
     this.banned_list.load(`${myPath}/filter.json`);
-    this.scans_db = new ScanDb(myPath);
-    await this.scans_db.init();
-    await this.scans_db.licenses.importFromJSON(licenses);
+    this.store = new ScanModel(myPath);
+    await this.store.init();
+    await this.store.license.importFromJSON(licenses);
+    serviceProvider.setModel(this.store);
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
     this.build_tree();
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
     this.indexScan(this.metadata.getScanRoot(), this.tree.getRootFolder(), this.banned_list);
-    const summary = { total: 0, include: 0, filter: 0, files: {} };
-    this.filesSummary = summarizeTree(this.metadata.getScanRoot(), this.tree.getRootFolder(), summary);
+    const summary = { total: 0, include: 0, filter: 0, files: {} }; 
+    this.filesSummary = this.tree.summarize(this.metadata.getScanRoot(), summary); // summarizeTree(this.metadata.getScanRoot(), this.tree.getRootFolder(), summary);
     log.info(
       `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
       'color: green'
@@ -225,20 +230,20 @@ export class Project extends EventEmitter {
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
         log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
-        await reScanService.reScan(this.tree.getRootFolder().getFiles(), resultPath, this);
-        const results = await reScanService.getNewResults(this);
+        await reScanService.reScan(this.tree.getRootFolder().getFiles(), resultPath);
+        const results = await reScanService.getNewResults();
         this.tree.sync(results);
         this.save();
       } else {
-        await this.scans_db.files.insertFiles(this.tree.getRootFolder().getFiles());
-        const files: any = await this.scans_db.files.getFiles();
+        await this.store.file.insertFiles(this.tree.getRootFolder().getFiles());
+        const files: Array<File> = await this.store.file.getAll();
         const aux = files.reduce((previousValue, currentValue) => {
           previousValue[currentValue.path] = currentValue.fileId;
           return previousValue;
         }, []);
-
-        await this.scans_db.results.insertFromFile(resultPath, aux);
-        await logicComponentService.importComponents(this);
+        await this.store.result.insertFromFile(resultPath, aux);
+        // await logicService.logicComponentService.importComponents()
+        await logicComponentService.importComponents();
       }
 
       this.metadata.setScannerState(ScanState.FINISHED);
@@ -380,104 +385,16 @@ export class Project extends EventEmitter {
     this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
   }
 
-  attachInventory(inv: Inventory) {
-    let i: number;
-    let files: string[];
-    files = inv.files;
-    for (i = 0; i < inv.files.length; i += 1) {
-      // this.logical_tree.insertInventory();
-      insertInventory(this.tree.getRootFolder(), files[i], inv);
-    }
-  }
 
-  attachComponent(comp: any) {
-    for (const [key, value] of Object.entries(comp)) {
-      for (let i = 0; i < value.length; i += 1) {
-        // console.log(key+''+value[i].purl);
-        if (value[i].purl !== undefined) insertComponent(this.tree.getRootFolder(), key, value[i]);
-      }
-    }
-  }
+
+
 
   set_filter_file(pathToFilter: string): boolean {
     this.banned_list.load(pathToFilter);
     return true;
   }
 
-  getNodeFromPath(mypath: string) {
-    let res: string[];
-    // eslint-disable-next-line prefer-const
-    if (!mypath || !mypath.includes('/')) throw new Error(`Error on path: "${mypath}`);
-
-    res = mypath.split('/');
-    if (res[0] === '') res.shift();
-    if (res[res.length - 1] === '') res.pop();
-    let nodes = this.getTree().getRootFolder().children;
-    let nodeFound: any = {};
-    for (let i = 0; i < res.length - 1; i += 1) {
-      const path = res[i];
-      nodeFound = nodes.find((node) => {
-        return node.type === 'folder' && node.label === path;
-      });
-      nodes = nodeFound.children;
-    }
-    nodeFound = nodes.find((node) => {
-      return node.type === 'file' && node.label === res[res.length - 1];
-    });
-    if (nodeFound) return nodeFound;
-    return {};
-  }
-
-  get_proxy_leaf(leaf: any): any {
-    if (leaf.type === 'file') return leaf;
-
-    let j = 0;
-    const ret = {
-      type: 'folder',
-      label: leaf.label,
-      inv_count: leaf.inv_count,
-      include: leaf.include,
-      children: [],
-      action: leaf.action,
-    };
-    ret.children = [];
-    const children = [];
-    for (j = 0; leaf.children && j < leaf.children.length; j += 1) {
-      if (leaf.children[j].type === 'folder') {
-        const info = {
-          type: 'folder',
-          label: leaf.children[j].label,
-          inv_count: leaf.children[j].inv_count,
-          include: leaf.children[j].include,
-          action: leaf.children[j].action,
-        };
-        children.push(info);
-      } else if (leaf.children[j].type === 'file') {
-        const info = {
-          type: 'file',
-          label: leaf.children[j].label,
-          inventories: leaf.children[j].inventories,
-          include: leaf.children[j].include,
-          action: leaf.children[j].action,
-        };
-        children.push(info);
-      }
-    }
-    Object.assign(ret.children, children);
-    return ret;
-  }
-
-  exclude_file(pathToExclude: string, recursive: boolean) {
-    const a = getLeaf(this.tree.getRootFolder(), pathToExclude);
-    setUseFile(a, false, recursive);
-  }
-
-  include_file(pathToInclude: string, recursive: boolean) {
-    const a = getLeaf(this.tree.getRootFolder(), pathToInclude);
-    setUseFile(a, true, recursive);
-  }
-
-  scanMode(filePath: string) {
+  private scanMode(filePath: string) {
     // eslint-disable-next-line prettier/prettier
     const skipExtentions = new Set ([".exe", ".zip", ".tar", ".tgz", ".gz", ".rar", ".jar", ".war", ".ear", ".class", ".pyc", ".o", ".a", ".so", ".obj", ".dll", ".lib", ".out", ".app", ".doc", ".docx", ".xls", ".xlsx", ".ppt" ]);
     const skipStartWith = ['{', '[', '<?xml', '<html', '<ac3d', '<!doc'];
@@ -520,22 +437,22 @@ export class Project extends EventEmitter {
           stage: `indexing`,
           processed: this.filesIndexed,
         });
-      if (bannedList.evaluate(scanRoot + jsonScan.value)) {
-        jsonScan.action = 'scan';
-        jsonScan.scanMode = this.scanMode(scanRoot + jsonScan.value);
+      if (bannedList.evaluate(scanRoot + jsonScan.getValue())) {
+        jsonScan.setAction('scan');
+        jsonScan.setScanMode(this.scanMode(scanRoot + jsonScan.getValue()));
       } else {
-        jsonScan.action = 'filter';
+        jsonScan.setAction('filter');
         jsonScan.status = NodeStatus.FILTERED;
-        jsonScan.className = 'filter-item';
+        jsonScan.setClassName('filter-item');
       }
     } else if (jsonScan.type === 'folder') {
-      if (bannedList.evaluate(scanRoot + jsonScan.value)) {
+      if (bannedList.evaluate(scanRoot + jsonScan.getValue())) {
         jsonScan.action = 'scan';
         for (i = 0; i < jsonScan.children.length; i += 1) this.indexScan(scanRoot, jsonScan.children[i], bannedList);
       } else {
-        jsonScan.action = 'filter';
+        jsonScan.setAction('filter');
         jsonScan.status = NodeStatus.FILTERED;
-        jsonScan.className = 'filter-item';
+        jsonScan.setClassName('filter-item');
       }
     }
   }
@@ -547,189 +464,4 @@ export class Project extends EventEmitter {
   public getNode(path: string) {
     return this.tree.getNode(path);
   }
-}
-/* AUXILIARY FUNCTIONS */
-
-function summarizeTree(root: any, tree: any, summary: any) {
-  let j = 0;
-  if (tree.type === 'file') {
-    summary.total += 1;
-    if (tree.action === 'filter') {
-      summary.filter += 1;
-      tree.className = 'filter-item';
-    } else if (tree.include === true) {
-      summary.include += 1;
-      summary.files[`${root}${tree.value}`] = tree.scanMode;
-    } else {
-      tree.className = 'exclude-item';
-    }
-
-    return summary;
-  }
-  if (tree.type === 'folder') {
-    if (tree.action === 'filter') {
-      tree.className = 'filter-item';
-    } else
-      for (j = 0; j < tree.children.length; j += 1) {
-        summary = summarizeTree(root, tree.children[j], summary);
-      }
-    return summary;
-  }
-}
-
-function getLeaf(arbol: any, mypath: string): any {
-  let res: string[];
-  // eslint-disable-next-line prefer-const
-  res = mypath.split('/');
-  if (res[0] === '') res.shift();
-  if (res[res.length - 1] === '') res.pop();
-
-  if (arbol.label === res[0] && res.length === 1) {
-    return arbol;
-  }
-  const i = 0;
-  let j = 0;
-  if (arbol.type === 'folder') {
-    for (j = 0; j < arbol.children.length; j += 1) {
-      if (arbol.children[j].type === 'folder' && arbol.children[j].label === res[1]) {
-        const newpath = mypath.replace(`${res[0]}`, '');
-        return getLeaf(arbol.children[j], newpath);
-      }
-      if (arbol.children[j].type === 'file' && arbol.children[j].label === res[1]) {
-        return arbol.children[j];
-      }
-    }
-  }
-}
-
-function setUseFile(tree: any, action: boolean, recursive: boolean) {
-  if (tree.type === 'file') tree.include = action;
-  else {
-    let j = 0;
-    tree.include = action;
-    if (recursive)
-      for (j = 0; j < tree.children.length; j += 1) {
-        setUseFile(tree.children[j], action, recursive);
-      }
-  }
-}
-
-function insertInventory(root: string, tree: any, mypath: string, inv: Inventory): any {
-  let myPathFolders: string[];
-  // eslint-disable-next-line prefer-const
-  let arbol = tree;
-  mypath = mypath.replace('//', '/');
-  mypath = mypath.replace(root, '');
-  myPathFolders = mypath.split('/');
-  if (myPathFolders[0] === '') myPathFolders.shift();
-  let i: number;
-  i = 0;
-  let childCount = 0;
-  while (i < myPathFolders.length) {
-    let j: number;
-    if (!arbol.inventories.includes(inv.id)) arbol.inventories.push(inv.id);
-    childCount = arbol.children.length;
-    for (j = 0; j < arbol.children.length; j += 1) {
-      if (arbol.children[j].label === myPathFolders[i]) {
-        arbol = arbol.children[j];
-        i += 1;
-        break;
-      }
-    }
-    if (j >= childCount) {
-      console.log(`Can not insert inventory on ${mypath}`);
-      return;
-    }
-  }
-
-  arbol.inventories.push(inv.id);
-}
-function insertComponent(tree: any, mypath: string, comp: Component): any {
-  let myPathFolders: string[];
-  // eslint-disable-next-line prefer-const
-  let arbol = tree;
-  myPathFolders = mypath.split('/');
-  if (myPathFolders[0] === '') myPathFolders.shift();
-  let i: number;
-  i = 0;
-  let childCount;
-  const component = { purl: comp.purl, version: comp.version };
-
-  while (i < myPathFolders.length) {
-    let j: number;
-    if (!arbol.components.some((e) => e.purl === component.purl && e.version === component.version)) {
-      arbol.components.push(component);
-      arbol.className = 'match-info-result status-pending';
-    }
-    childCount = arbol.children.length;
-    for (j = 0; j < childCount; j += 1) {
-      if (arbol.children[j].label === myPathFolders[i]) {
-        arbol = arbol.children[j];
-        i += 1;
-        break;
-      }
-    }
-    if (j >= childCount) {
-      console.log(`Can not insert component ${component.purl} on ${mypath}`);
-      return;
-    }
-  }
-
-  arbol.components.push(component);
-  arbol.className = 'match-info-result status-pending';
-}
-
-function dirFirstFileAfter(a, b) {
-  if (!a.isDirectory() && b.isDirectory()) return 1;
-  if (a.isDirectory() && !b.isDirectory()) return -1;
-  return 0;
-}
-
-function dirTree(root: string, filename: string) {
-  const stats = fs.lstatSync(filename);
-  let info;
-
-  if (stats.isDirectory()) {
-    info = {
-      type: 'folder',
-      className: 'no-match status-pending',
-      value: filename.replace(root, ''),
-      label: path.basename(filename),
-      inventories: [],
-      components: [],
-      children: [],
-      include: true,
-      action: 'filter',
-      showCheckbox: false,
-      status: 'pending',
-    };
-
-    console.log('parent', filename);
-    info.children = fs
-      .readdirSync(filename, { withFileTypes: true }) // Returns a list of files and folders
-      .sort(dirFirstFileAfter)
-      .filter((dirent) => !dirent.isSymbolicLink())
-      .map((dirent) => dirent.name) // Converts Dirent objects to paths
-      .map((child: string) => {
-        // Apply the recursion function in the whole array
-        console.log('child:', child);
-        return dirTree(root, `${filename}/${child}`);
-      });
-  } else {
-    info = {
-      type: 'file',
-      className: 'no-match status-pending',
-      inv_count: 0,
-      value: filename.replace(root, ''),
-      label: path.basename(filename),
-      inventories: [],
-      components: [],
-      children: [],
-      include: true,
-      action: 'filter',
-      showCheckbox: false,
-      status: 'pending',
-    };
-  }
-  return info;
 }

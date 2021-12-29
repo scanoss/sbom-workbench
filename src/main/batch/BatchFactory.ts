@@ -14,8 +14,8 @@ export class BatchFactory {
         return new Identified(folder, overWrite, inventory);
       case InventoryAction.IGNORE:
         return new Ignore(folder, overWrite);
-        case InventoryAction.ACCEPT:
-          return new Accept(folder, overWrite);
+      case InventoryAction.ACCEPT:
+        return new Accept(folder, overWrite);
       default:
         return null;
     }

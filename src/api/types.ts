@@ -1,3 +1,5 @@
+import { NodeStatus } from '../main/workspace/Tree/Tree/Node';
+
 export enum ScanState {
   CREATED = 'CREATED',
   READY_TO_SCAN = 'READY_TO_SCAN',
@@ -159,3 +161,28 @@ export interface IFolderInventory {
   overwrite: boolean;
   data?: Partial<Inventory>;
 }
+
+export interface ComponentParams {
+  source?: ComponentSource;
+  path?: string;
+}
+
+export enum ComponentSource {
+  ENGINE = 'engine',
+}
+
+export interface File {
+  fileId: number;
+  path: string;
+  identified: number;
+  ignored: number;
+  dirty: number;
+  type: NodeStatus;
+}
+
+
+
+
+
+
+

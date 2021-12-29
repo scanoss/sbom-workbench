@@ -1,6 +1,7 @@
 import { Inventory } from '../../api/types';
 import { logicInventoryService } from '../services/LogicInventoryService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
 import { Filter } from './Filter/Filter';
 import { FilterAND } from './Filter/FilterAND';

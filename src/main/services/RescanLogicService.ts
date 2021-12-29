@@ -1,16 +1,17 @@
 import { utilHelper } from '../helpers/UtilHelper';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { logicComponentService } from './LogicComponentService';
+import { serviceProvider } from './ServiceProvider';
 
 class ReScanService {
-  public async reScan(files: Array<any>, resultPath: string, project: any): Promise<void> {
+  public async reScan(files: Array<any>, resultPath: string): Promise<void> {
     try {
       const aux = utilHelper.convertsArrayOfStringToString(files, 'path');
 
       // UPDATING FILES
-      await project.scans_db.files.setDirty(1);
-      await project.scans_db.files.setDirty(0, aux);
-      const filesDb = await project.scans_db.files.getFiles();
+      await serviceProvider.model.file.setDirty(1);
+      await serviceProvider.model.file.setDirty(0, aux);
+      const filesDb = await serviceProvider.model.file.getAll();
 
       const newFilesDb = [];
       files.forEach((f) => {
@@ -18,45 +19,45 @@ class ReScanService {
         if (aux === undefined) newFilesDb.push(f);
       });
       if (filesDb.length > 0) {
-        await project.scans_db.files.insertFiles(newFilesDb);
+        await serviceProvider.model.file.insertFiles(newFilesDb);
       }
 
-      await project.scans_db.results.updateDirty(1);
+      await serviceProvider.model.result.updateDirty(1);
 
-      const cleanFiles = await project.scans_db.files.getClean();
+      const cleanFiles = await serviceProvider.model.file.getClean();
       const filesToUpdate = cleanFiles.reduce((previousValue, currentValue) => {
         previousValue[currentValue.path] = currentValue.fileId;
         return previousValue;
       }, []);
 
-      await project.scans_db.results.insertFromFileReScan(resultPath, filesToUpdate);
-      const dirtyFiles = await project.scans_db.files.getDirty();
+      await serviceProvider.model.result.insertFromFileReScan(resultPath, filesToUpdate);
+      const dirtyFiles = await serviceProvider.model.file.getDirty();
       if (dirtyFiles.length > 0) {
-        await project.scans_db.inventories.deleteDirtyFileInventories(dirtyFiles);
+        await serviceProvider.model.inventory.deleteDirtyFileInventories(dirtyFiles);
       }
-      const notValidComp: number[] = await project.scans_db.components.getNotValid();
+      const notValidComp: number[] = await serviceProvider.model.component.getNotValid();
 
       if (notValidComp.length > 0) {
-        await project.scans_db.components.deleteByID(notValidComp);
+        await serviceProvider.model.component.deleteByID(notValidComp);
       }
 
-      await project.scans_db.results.deleteDirty();
-      await project.scans_db.files.deleteDirty();
-      await project.scans_db.components.updateOrphanToManual();
-      await logicComponentService.importComponents(project);
+      await serviceProvider.model.result.deleteDirty();
+      await serviceProvider.model.file.deleteDirty();
+      await serviceProvider.model.component.updateOrphanToManual();
+      await logicComponentService.importComponents();
 
-      const emptyInv: any = await project.scans_db.inventories.emptyInventory();
+      const emptyInv: any = await serviceProvider.model.inventory.emptyInventory();
       if (emptyInv) {
         const result = emptyInv.map((item: Record<string, number>) => item.id);
-        await project.scans_db.inventories.deleteAllEmpty(result);
+        await serviceProvider.model.inventory.deleteAllEmpty(result);
       }
     } catch (err: any) {
       throw new Error('[ RESCAN DB ] Unable to insert new results');
     }
   }
 
-  public async getNewResults(project: any): Promise<Array<any>> { 
-    const results: Array<any> = await project.scans_db.files.getFilesRescan();
+  public async getNewResults(): Promise<Array<any>> {
+    const results: Array<any> = await serviceProvider.model.file.getFilesRescan();
     results.forEach((result) => {
       if (result.original === NodeStatus.NOMATCH && result.identified === 1) {
         result[result.path] = NodeStatus.IDENTIFIED;
@@ -85,7 +86,6 @@ class ReScanService {
       else if (result.original === NodeStatus.MATCH) result.original = NodeStatus.MATCH;
       else if (result.original === NodeStatus.FILTERED) result.original = NodeStatus.FILTERED;
     });
- 
 
     return results;
   }

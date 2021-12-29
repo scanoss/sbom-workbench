@@ -1,10 +1,8 @@
-import { utilDb } from '../../db/utils_db';
+import { utilModel } from '../../db/UtilModel';
 import { Format } from '../Format';
 
 export class Spdxv20 extends Format {
-
-
-  constructor(){
+  constructor() {
     super();
     this.extension = '-SPDXV20.json';
   }
@@ -13,8 +11,8 @@ export class Spdxv20 extends Format {
   public async generate() {
     const data = await this.export.getSpdxData();
     const spdx = Spdxv20.template();
-    spdx.Packages=[];
-    spdx.creationInfo.created = utilDb.getTimeStamp();
+    spdx.Packages = [];
+    spdx.creationInfo.created = utilModel.getTimeStamp();
     for (let i = 0; i < data.length; i += 1) {
       const pkg: any = {};
       pkg.name = data[i].name;

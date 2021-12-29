@@ -1,6 +1,7 @@
 import { Inventory } from '../../api/types';
 import { logicInventoryService } from '../services/LogicInventoryService';
 import { logictTreeService } from '../services/LogicTreeService';
+import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
 import { FilterOR } from './Filter/FilterOR';
 import { FilterTrue } from './Filter/FilterTrue';
@@ -13,7 +14,6 @@ export class Restore extends Batch {
       const ids: Array<number> = (await this.getFilesToProcess(this.getFolder(), 'id', filter)) as Array<number>;
 
       this.restoreTree(ids);
-
       const success = await logicInventoryService.detach({ files: ids } as Partial<Inventory>);
       if (success) return success;
 

@@ -177,4 +177,20 @@ export default class Folder extends Node {
     });
     return files;
   }
+
+  public summarize(root: string, summary: any): any {
+    if (this.getAction() === 'filter') {
+      this.setClassName('filter-item');
+    } else {
+      this.children.forEach((child) => {
+        const aux = child.summarize(root, summary);
+        summary.total = aux.total;
+        summary.include = aux.include;
+        summary.filter = aux.filter;
+        summary.files = { ...summary.files, ...aux.files };
+      });
+    }
+
+    return summary;
+  }
 }

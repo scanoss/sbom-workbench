@@ -2,22 +2,22 @@
 
 import log from 'electron-log';
 import { Querys } from './querys_db';
-import { Db } from './db';
-import { ComponentDb } from './scan_component_db';
+import { Model } from './Model';
+import { ComponentModel } from './ComponentModel';
 import { Inventory, Files } from '../../api/types';
-import { ResultsDb } from './scan_results_db';
+import { ResultModel } from './ResultModel';
 
 const query = new Querys();
 
-export class InventoryDb extends Db {
-  component: ComponentDb;
+export class InventoryModel extends Model {
+  component: ComponentModel;
 
-  results: ResultsDb;
+  results: ResultModel; 
 
   constructor(path: string) {
     super(path);
-    this.component = new ComponentDb(path);
-    this.results = new ResultsDb(path);
+    this.component = new ComponentModel(path);
+    this.results = new ResultModel(path);
   }
 
   public async getByResultId(inventory: Partial<Inventory>) {
@@ -103,7 +103,7 @@ export class InventoryDb extends Db {
 
   // DETACH FILE INVENTORY
   public async detachFileInventory(inventory: Partial<Inventory>) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
@@ -114,7 +114,7 @@ export class InventoryDb extends Db {
           db.run('commit', (err: any) => {
             db.close();
             if (err) throw err;
-            resolve(true);
+            resolve();
           });
         });
       } catch (error) {
@@ -125,7 +125,7 @@ export class InventoryDb extends Db {
   }
 
   public async emptyInventory() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<Array<Partial<Inventory>>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
@@ -144,7 +144,7 @@ export class InventoryDb extends Db {
   }
 
   public async deleteAllEmpty(id: number[]) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
@@ -154,7 +154,7 @@ export class InventoryDb extends Db {
           db.run('commit', (err: any) => {
             if (err) throw err;
             db.close();
-            resolve(true);
+            resolve();
           });
         });
       } catch (error) {
@@ -187,7 +187,7 @@ export class InventoryDb extends Db {
   }
 
   public getById(id: number) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<Inventory>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.get(query.SQL_GET_INVENTORY_BY_ID, id, (err: any, inv: any) => {
@@ -373,7 +373,7 @@ export class InventoryDb extends Db {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(function () {
+        db.serialize(() => {
           db.run('begin transaction');
           db.run(query.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION, inventory.id);
           db.run(query.SQL_DELETE_INVENTORY_BY_ID, inventory.id);
@@ -409,14 +409,14 @@ export class InventoryDb extends Db {
   }
 
   public async deleteDirtyFileInventories(id: number[]) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const deleteQuery = `DELETE FROM file_inventories WHERE fileId IN (${id.toString()});`;
         const db = await this.openDb();
         db.all(deleteQuery, (err: any) => {
           db.close();
           if (err) throw new Error('unable to delete files');
-          else resolve(true);
+          else resolve();
         });
       } catch (error) {
         reject(error);

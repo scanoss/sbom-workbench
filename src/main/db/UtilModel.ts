@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-class UtilsDb {
+class UtilModel {
   // READ RESULTS FROM A FILE
   public async readFile(path: string) {
     return new Promise<any>((resolve, reject) => {
@@ -29,4 +29,4 @@ class UtilsDb {
 }
 
 
-export const utilDb = new UtilsDb();
+export const utilModel = new UtilModel();

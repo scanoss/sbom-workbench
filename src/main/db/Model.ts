@@ -3,13 +3,11 @@
 /* eslint-disable func-names */
 import log from 'electron-log';
 import sqlite3 from 'sqlite3';
-
-
 import { Querys } from './querys_db';
 
 const query = new Querys();
 
-export class Db {
+export class Model {
   dbPath: string;
 
   constructor(path: string) {
