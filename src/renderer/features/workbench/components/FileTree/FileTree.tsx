@@ -1,6 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react';
 import CheckboxTree, { OnCheckNode } from 'react-checkbox-tree';
+import { expandNodesToLevel } from 'react-checkbox-tree/src/js/utils';
 import { useHistory } from 'react-router-dom';
+import { expandNodesToMatch } from '../../../../../utils/utils';
 import useContextual from '../../../../hooks/useContextual';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 
@@ -16,6 +18,11 @@ export const FileTree = () => {
 
   const [renderTree, setRenderTree] = useState([]);
   const [expanded, setExpanded] = useState<string[]>([renderTree && renderTree[0] ? renderTree[0].value : '']);
+
+  const getNode = (target) => {
+    const node = target.parent.children?.find((el) => el.value === target.value);
+    return node;
+  };
 
   const onSelectFile = async (node: OnCheckNode) => {
     const { children, value } = node;
@@ -35,9 +42,14 @@ export const FileTree = () => {
     }
   };
 
-  const getNode = (target) => {
-    const node = target.parent.children?.find((el) => el.value === target.value);
-    return node;
+  const onExpandAll = (node: any, toMatch = false) => {
+    const nodes = !toMatch ? expandNodesToLevel([node], Infinity) : expandNodesToMatch(node, []);
+    setExpanded((expanded) => [...new Set([...expanded, ...nodes])]);
+  };
+
+  const onCollapseAll = (node: any) => {
+    const nodes = expandNodesToLevel([node], Infinity);
+    setExpanded((expanded) =>  expanded.filter((el) => !nodes.includes(el)));
   };
 
   useEffect(() => {
@@ -60,7 +72,7 @@ export const FileTree = () => {
   }, [tree]);
 
   const preRender = (node: any) => {
-    node.label = <NodeItem node={node} label={node.label} />;
+    node.label = <NodeItem node={node} label={node.label} onExpand={onExpandAll} onCollapse={onCollapseAll} />;
     if (node.children) {
       node.children.forEach((el) => preRender(el));
     }
@@ -74,7 +86,7 @@ export const FileTree = () => {
           nodes={renderTree || []}
           expanded={expanded}
           onClick={(targetNode) => onSelectFile(targetNode)}
-          onExpand={(expandedItems) => setExpanded(expandedItems)}
+          onExpand={(expandedItems) => setExpanded((state) => expandedItems)}
         />
       ) : (
         <div className="loader">
@@ -87,8 +99,9 @@ export const FileTree = () => {
 
 export default FileTree;
 
-export const NodeItem = ({ node, label }) => {
+export const NodeItem = ({ node, label, onExpand, onCollapse }) => {
   const contextual = useContextual();
+
   const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: OnCheckNode | any) => {
     const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED' || node.status === 'FILTERED';
     const menu = !node.children
@@ -126,11 +139,29 @@ export const NodeItem = ({ node, label }) => {
             click: () => contextual.ignoreAll(node),
             enabled: !onlyRestore,
           },
-          { type: 'separator' },
           {
             label: 'Restore all files',
             click: () => contextual.restoreAll(node),
             enabled: node.hasIdentified || node.hasIgnored,
+          },
+          { type: 'separator' },
+          {
+            label: 'Expand/Collapse',
+            submenu: [
+              {
+                label: 'Expand all',
+                click: () => onExpand(node),
+              },
+              {
+                label: 'Expand to matches',
+                click: () => onExpand(node, true),
+              },
+              {
+                label: 'Collapse all',
+                click: () => onCollapse(node),
+              }
+            ]
+
           },
         ];
 
@@ -138,8 +169,8 @@ export const NodeItem = ({ node, label }) => {
   };
 
   return (
-    <div onContextMenu={(e) => onContextMenu(e, node)} data-value={node.value}>
+    <span onContextMenu={(e) => onContextMenu(e, node)} data-value={node.value}>
      {label}
-    </div>
+    </span>
   );
 };
