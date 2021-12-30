@@ -10,7 +10,7 @@ function range(start, edge, step) {
   step = step || 1;
 
   // Create array of numbers, stopping before the edge
-  let arr = [];
+  const arr = [];
   for (arr; (edge - start) * step > 0; start += step) {
     arr.push(start);
   }
@@ -42,7 +42,6 @@ const colorsForLicense = [
 ];
 
 const getColor = (index) => {
-
   if (index < colorsForLicense.length) {
     return colorsForLicense[index];
   }
@@ -80,8 +79,19 @@ const languages = {
 // get extension of file
 const getExtension = (file) => {
   const ext = file.split('.').pop();
-  console.log(ext);
   return languages[ext] || 'text';
 };
 
-export { range, getColor, colorsForLicense, getExtension, languages };
+const expandNodesToMatch = (node, acc) => {
+  const { children, value, type, hasPending } = node;
+  if (type === 'folder' && hasPending) acc.push(value);
+
+  if (children) {
+    children.forEach((child) => {
+      expandNodesToMatch(child, acc);
+    });
+  }
+  return acc;
+};
+
+export { range, getColor, colorsForLicense, getExtension, languages, expandNodesToMatch };
