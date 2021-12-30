@@ -1,15 +1,10 @@
 import log from 'electron-log';
 import { serviceProvider } from './ServiceProvider';
 import { Inventory, Component, IFolderInventory, ComponentSource } from '../../api/types';
-import { logicResultService } from './LogicResultService';
-import { FilterAND } from '../batch/Filter/FilterAND';
-import { FilterNOT } from '../batch/Filter/FilterNOT';
-import { GenericFilter } from '../batch/Filter/GenericFilter';
-import { utilHelper } from '../helpers/UtilHelper';
-// eslint-disable-next-line import/no-cycle
 import { logicComponentService } from './LogicComponentService';
-import { Filter } from '../batch/Filter/Filter';
 import { inventoryHelper } from '../helpers/InventoryHelper';
+
+
 
 class LogicInventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
@@ -130,60 +125,50 @@ class LogicInventoryService {
   }
 
   public async preLoadInventoriesAcceptAll(data: Partial<IFolderInventory>): Promise<Array<Partial<Inventory>>> {
-    let filter: Filter = null;
     try {
-      if (data.overwrite) filter = new GenericFilter('type', 'MATCH');
-      else filter = new FilterAND( new GenericFilter('type', 'MATCH'), new GenericFilter('pending', 1));
-
-      const files: any = await logicResultService.getFilesInFolder(data.folder);
-
-
-
-      const ids = utilHelper.getArrayFromObjectFilter(files, 'id', filter);
+      const files: any = await this.getResultsPreLoadInventory(data);
       const components: any = await logicComponentService.getAll({ source: ComponentSource.ENGINE });
-      if (ids.length === 0) return [];
-      let inventories = this.getFilteredObject(files, filter) as Array<Partial<Inventory>>;
-
+      let inventories = this.getPreLoadInventory(files) as Array<Partial<Inventory>>;
       inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);
+
       return inventories;
     } catch (err: any) {
       return err;
     }
   }
 
-  private getFilteredObject(results: any[], filter: Filter): Array<any> {
-    const array: any = [];
-    results.forEach((result) => {
-      if (filter.isValid(result)) {
-        const index = array.findIndex(
-          (o) =>
-            o.component === result.component &&
-            o.version === result.version &&
-            o.purl === result.purl &&
-            o.usage === result.usage &&
-            o.license === result.license &&
-            o.spdxid === result.spdxid.split(',')[0],
-        );
+  private async getResultsPreLoadInventory(params: Partial<IFolderInventory>) {
+    try {
+      let data: any;
+      if (params.overwrite) data = await serviceProvider.model.result.getByFolder(params.folder);
+      else data = await serviceProvider.model.result.getByFolderPending(params.folder);
 
-        if (index >= 0) {
-          array[index].files.push(result.id);
-        } else {
-          const aux = {
-            component: result.component,
-            files: [result.id],
-            purl: result.purl,
-            usage: result.usage,
-            version: result.version,
-            url: result.url,
-            spdxid: result.spdxid.split(',')[0],
-            cvid: 0,
-          };
+      return data;
+    } catch (err: any) {
+      return err;
+    }
+  }
 
-          array.push(aux);
-        }
-      }
-    });
-    return array;
+  private getPreLoadInventory(results: any[]): Array<any> {
+    const aux: any = {};
+    const count = results.length;
+    for (let i = 0; i < count; i += 1) {
+      const key = `${results[i].component}${results[i].version}${results[i].purl}${results[i].spdxid}${results[i].usage}`;
+      if (!aux[key]) {
+        aux[key] = {
+          component: results[i].component,
+          files: [results[i].id],
+          purl: results[i].purl,
+          usage: results[i].usage,
+          version: results[i].version,
+          url: results[i].url,
+          spdxid: results[i].spdxid.split(',')[0],
+          cvid: 0,
+        };
+      } else aux[key].files.push(results[i].id);
+    }
+
+    return Object.values(aux);
   }
 }
 

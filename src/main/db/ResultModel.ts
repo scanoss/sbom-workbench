@@ -7,7 +7,6 @@ import { utilModel } from './UtilModel';
 import { ComponentModel } from './ComponentModel';
 import { licenseHelper } from '../helpers/LicenseHelper';
 
-
 const query = new Querys();
 
 export class ResultModel extends Model {
@@ -289,26 +288,41 @@ export class ResultModel extends Model {
     });
   }
 
-  // // UPDATE IDENTIFIED FILES
-  // identified(ids: number[]) {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       const db = await this.openDb();
-  //       db.serialize(() => {
-  //         const resultsid = `(${ids.toString()});`;
-  //         const sqlUpdateIdentified = query.SQL_FILES_UPDATE_IDENTIFIED + resultsid;
-  //         db.run('begin transaction');
-  //         db.run(sqlUpdateIdentified);
-  //         db.run('commit', (err: any) => {
-  //           if (err) throw Error('Unable to update identified files');
-  //           db.close();
-  //           return resolve(true);
-  //         });
-  //       });
-  //     } catch (error) {
-  //       log.error(error);
-  //       reject(error);
-  //     }
-  //   });
-  // }
+  public async getByFolder(folder: string) {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        let SQLquery =
+          'SELECT f.fileId AS id,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE f.path LIKE ?';
+        if (folder === '/') SQLquery = SQLquery.replace('?', `'${folder}%';`);
+        else SQLquery = SQLquery.replace('?', `'${folder}/%';`);
+        db.all(SQLquery, (err: any, data: any) => {
+          db.close();
+          if (err) throw new Error('[ DB ERROR ] : files in folder');
+          else resolve(data);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  public async getByFolderPending(folder: string) {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        let SQLquery =
+          'SELECT f.fileId AS id,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE f.path LIKE ? AND f.identified=0 AND f.ignored=0;';
+        if (folder === '/') SQLquery = SQLquery.replace('?', `'${folder}%'`);
+        else SQLquery = SQLquery.replace('?', `'${folder}/%'`);
+        db.all(SQLquery, (err: any, data: any) => {
+          db.close();
+          if (err) throw new Error('[ DB ERROR ] : files in folder');
+          else resolve(data);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }

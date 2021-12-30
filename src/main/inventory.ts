@@ -11,6 +11,8 @@ import { logictTreeService } from './services/LogicTreeService';
 import { NodeStatus } from './workspace/Tree/Tree/Node';
 import { workspace } from './workspace/Workspace';
 
+
+
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (_event, invget: Partial<Inventory>) => {
   let inv: any;
   try {
@@ -139,7 +141,6 @@ ipcMain.handle(IpcEvents.INVENTORY_FOLDER, async (_event, params: IFolderInvento
 ipcMain.handle(IpcEvents.INVENTORY_ACCEPT_PRE_LOAD, async (_event, data: Partial<IFolderInventory>) => {
   try {
     const inventories: Array<Partial<Inventory>> = await logicInventoryService.preLoadInventoriesAcceptAll(data);
-
     return { status: 'ok', message: 'Inventory folder successfully', data: inventories };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
