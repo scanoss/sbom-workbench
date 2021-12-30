@@ -13,7 +13,7 @@
     "electron-rebuild": "node -r ../.erb/scripts/BabelRegister.js ../.erb/scripts/ElectronRebuild.js",
     "postinstall": "yarn electron-rebuild"
   },
-  "license": "MIT",
+  "license": "GPL-2.0",
   "dependencies": {
     "sqlite3": "5.0.0"
   }
