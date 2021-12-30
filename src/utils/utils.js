@@ -83,8 +83,8 @@ const getExtension = (file) => {
 };
 
 const expandNodesToMatch = (node, acc) => {
-  const { children, value, type, hasPending } = node;
-  if (type === 'folder' && hasPending) acc.push(value);
+  const { children, value, type, hasPending, hasIgnored, hasIdentified } = node;
+  if (type === 'folder' && (hasPending || hasIgnored || hasIdentified)) acc.push(value);
 
   if (children) {
     children.forEach((child) => {
