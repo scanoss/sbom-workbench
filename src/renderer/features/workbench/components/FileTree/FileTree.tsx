@@ -169,8 +169,8 @@ export const NodeItem = ({ node, label, onExpand, onCollapse }) => {
   };
 
   return (
-    <div onContextMenu={(e) => onContextMenu(e, node)} data-value={node.value}>
+    <span onContextMenu={(e) => onContextMenu(e, node)} data-value={node.value}>
      {label}
-    </div>
+    </span>
   );
 };

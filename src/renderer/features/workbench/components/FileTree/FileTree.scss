@@ -39,8 +39,12 @@
       width: 100%;
       position: absolute;
 
-      > div {
+      > span {
         padding-left: 25px;
+        overflow: visible;
+        display: flex;
+        word-break: break-all;
+        white-space: nowrap;
       }
     }
 
