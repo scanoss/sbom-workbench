@@ -11,13 +11,11 @@ ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
 
   // TO DO factory to create filters depending on arguments
   const p: Project = await workspace.openProject(new ProjectFilterPath(arg));
-  const r = await p.getResults();
   p.setMailbox(event.sender);
 
   const response = {
     logical_tree: p.getTree().getRootFolder(),
     work_root: p.getMyPath(),
-    results: r,
     scan_root: p.getScanRoot(),
     uuid: p.getUUID(),
   };
