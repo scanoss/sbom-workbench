@@ -1,5 +1,4 @@
 import log from 'electron-log';
-import { emitKeypressEvents } from 'readline';
 import { Component, ComponentGroup, ComponentParams } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { serviceProvider } from './ServiceProvider';
@@ -24,7 +23,6 @@ class LogicComponentService {
 
   public async getComponentFiles(data: Partial<Component>, params: any): Promise<any> {
     try {
-      // const project = workspace.getOpenedProjects()[0];
       let files: any;
       if (data.purl && data.version)
         files = await serviceProvider.model.file.getByPurlVersion(data, params ? params.path : null);
@@ -57,7 +55,6 @@ class LogicComponentService {
       if (data) {
         const compPurl: any = this.groupComponentsByPurl(data);
         const comp: any = await this.mergeComponentByPurl(compPurl);
-        //
         // if path is defined
         if (params?.path !== undefined) {
           const purls = comp.reduce((acc, curr) => {
