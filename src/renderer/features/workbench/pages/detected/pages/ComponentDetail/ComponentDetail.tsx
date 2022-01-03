@@ -173,8 +173,8 @@ export const ComponentDetail = () => {
   const onIdentifyPressed = async (result) => {
     // Result is file join result
     const inv: Partial<Inventory> = {
-      component: result.component.name,
-      url: result.component.url,
+      component: result.componentName,
+      url: result.url,
       purl: result.purl,
       version: result.version,
       spdxid: result.license ? result.license[0] : null,

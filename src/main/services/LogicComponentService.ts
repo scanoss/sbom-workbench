@@ -29,19 +29,21 @@ class LogicComponentService {
         files = await serviceProvider.model.file.getByPurlVersion(data, params ? params.path : null);
       else files = await serviceProvider.model.file.getByPurl(data, params ? params.path : null);
 
-      const components: any = await this.getAll({
-        purl: data.purl,
-        version: data.version,
-      });
+      const components: any = await this.getAll({});
+      console.log(components);
+
       const inventories: any = await serviceProvider.model.inventory.getAll();
       const index = inventories.reduce((acc, inventory) => {
         acc[inventory.id] = inventory;
         return acc;
       }, {});
+
       for (let i = 0; i < files.length; i += 1) {
-        if (data.purl && data.version) files[i].component = [components];
-        else files[i].component = components.find((component: any) => files[i].version === component.version);
-        if (files[i].inventoryid) files[i].inventory = index[files[i].inventoryid];
+        if (files[i].inventoryid) {
+          files[i].inventory = index[files[i].inventoryid];
+          files[i].component = components.find((component: any) => files[i].inventory.cvid === component.compid);
+        }
+
         files[i].license = files[i].license.split(',');
       }
       return files;
