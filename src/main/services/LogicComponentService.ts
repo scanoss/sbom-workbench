@@ -28,10 +28,7 @@ class LogicComponentService {
       if (data.purl && data.version)
         files = await serviceProvider.model.file.getByPurlVersion(data, params ? params.path : null);
       else files = await serviceProvider.model.file.getByPurl(data, params ? params.path : null);
-
       const components: any = await this.getAll({});
-      console.log(components);
-
       const inventories: any = await serviceProvider.model.inventory.getAll();
       const index = inventories.reduce((acc, inventory) => {
         acc[inventory.id] = inventory;
