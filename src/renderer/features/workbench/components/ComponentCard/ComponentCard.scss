@@ -25,7 +25,6 @@
     }
 
     .component-card-info {
-
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -54,6 +53,14 @@
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
+      }
+
+      &.override {
+        p, h6 {
+          text-decoration: line-through;
+          opacity: .5;
+        }
+
       }
     }
 

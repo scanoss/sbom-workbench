@@ -118,6 +118,10 @@ export interface ComponentGroup {
   vendor: string;
   url: string;
   versions: any[];
+  identifyAs: {
+    name: string;
+    purl: string;
+  }[];
   summary?: {
     pending: number;
     ignored: number;
