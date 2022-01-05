@@ -1,7 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { EventEmitter } from 'events';
 import fs from 'fs';
-import { isBinaryFileSync } from 'isbinaryfile';
 import log from 'electron-log';
 import { File, IProjectCfg, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
@@ -16,13 +15,9 @@ import { Metadata } from './Metadata';
 import { userSetting } from '../UserSetting';
 import { ProjectMigration } from '../migration/ProjectMigration';
 import { Tree } from './Tree/Tree/Tree';
-import Node, { NodeStatus } from './Tree/Tree/Node';
 import { reScanService } from '../services/RescanLogicService';
 import { logicComponentService } from '../services/LogicComponentService';
 import { serviceProvider } from '../services/ServiceProvider';
-
-
-const path = require('path');
 
 export class Project extends EventEmitter {
   work_root: string;
@@ -166,9 +161,9 @@ export class Project extends EventEmitter {
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
     this.build_tree();
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
-    this.indexScan(this.metadata.getScanRoot(), this.tree.getRootFolder(), this.banned_list);
-    const summary = { total: 0, include: 0, filter: 0, files: {} }; 
-    this.filesSummary = this.tree.summarize(this.metadata.getScanRoot(), summary); // summarizeTree(this.metadata.getScanRoot(), this.tree.getRootFolder(), summary);
+    this.tree.applyFilters(this.metadata.getScanRoot(), this.tree.getRootFolder(), this.banned_list);
+    const summary = { total: 0, include: 0, filter: 0, files: {} };
+    this.filesSummary = this.tree.summarize(this.metadata.getScanRoot(), summary);
     log.info(
       `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
       'color: green'
@@ -275,7 +270,6 @@ export class Project extends EventEmitter {
     }
     this.logical_tree.status = this.getFolderStatus(this.logical_tree);
     console.log(JSON.stringify(this.logical_tree, null, 2));
-    // this.msgToUI(IpcEvents.COMPONENT_ATTACH_LICENSE, this.logical_tree);
   }
 
   private updateStatusOfFile(arrPaths, deep, current, status) {
@@ -371,8 +365,8 @@ export class Project extends EventEmitter {
   build_tree() {
     const scanPath = this.metadata.getScanRoot();
     this.tree = new Tree(scanPath);
+    this.tree.setMailbox(this.msgToUI);
     this.tree.buildTree();
-    // this.logical_tree = dirTree(scanPath, scanPath);
     this.emit('treeBuilt', this.logical_tree);
   }
 
@@ -385,80 +379,9 @@ export class Project extends EventEmitter {
     this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
   }
 
-
-
-
-
   set_filter_file(pathToFilter: string): boolean {
     this.banned_list.load(pathToFilter);
     return true;
-  }
-
-  private scanMode(filePath: string) {
-    // eslint-disable-next-line prettier/prettier
-    const skipExtentions = new Set ([".exe", ".zip", ".tar", ".tgz", ".gz", ".rar", ".jar", ".war", ".ear", ".class", ".pyc", ".o", ".a", ".so", ".obj", ".dll", ".lib", ".out", ".app", ".doc", ".docx", ".xls", ".xlsx", ".ppt" ]);
-    const skipStartWith = ['{', '[', '<?xml', '<html', '<ac3d', '<!doc'];
-    const MIN_FILE_SIZE = 256;
-
-    // Filter by extension
-    const ext = path.extname(filePath);
-    if (skipExtentions.has(ext)) {
-      return 'MD5_SCAN';
-    }
-
-    // Filter by min size
-    const fileSize = fs.statSync(filePath).size;
-    if (fileSize < MIN_FILE_SIZE) {
-      return 'MD5_SCAN';
-    }
-
-    // if start with pattern
-    const file = fs.readFileSync(filePath, 'utf8');
-    for (const skip of skipStartWith) {
-      if (file.startsWith(skip)) {
-        return 'MD5_SCAN';
-      }
-    }
-
-    // if binary
-    if (isBinaryFileSync(filePath)) {
-      return 'MD5_SCAN';
-    }
-
-    return 'FULL_SCAN';
-  }
-
-  indexScan(scanRoot: string, jsonScan: Node, bannedList: Filtering.BannedList) {
-    let i = 0;
-    if (jsonScan.type === 'file') {
-      this.filesIndexed += 1;
-      if (this.filesIndexed % 100 === 0)
-        this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-          stage: `indexing`,
-          processed: this.filesIndexed,
-        });
-      if (bannedList.evaluate(scanRoot + jsonScan.getValue())) {
-        jsonScan.setAction('scan');
-        jsonScan.setScanMode(this.scanMode(scanRoot + jsonScan.getValue()));
-      } else {
-        jsonScan.setAction('filter');
-        jsonScan.status = NodeStatus.FILTERED;
-        jsonScan.setClassName('filter-item');
-      }
-    } else if (jsonScan.type === 'folder') {
-      if (bannedList.evaluate(scanRoot + jsonScan.getValue())) {
-        jsonScan.action = 'scan';
-        for (i = 0; i < jsonScan.children.length; i += 1) this.indexScan(scanRoot, jsonScan.children[i], bannedList);
-      } else {
-        jsonScan.setAction('filter');
-        jsonScan.status = NodeStatus.FILTERED;
-        jsonScan.setClassName('filter-item');
-      }
-    }
-  }
-
-  public getToken() {
-    return this.metadata.getToken();
   }
 
   public getNode(path: string) {
