@@ -65,7 +65,7 @@ export default class Folder extends Node {
     this.hasFiltered = false;
 
     for (const child of this.children) {
-      if (child.type === 'folder') {
+      if (child.getType() === 'folder') {
         this.hasPending = child.hasPending || this.hasPending;
         this.hasIdentified = child.hasIdentified || this.hasIdentified;
         this.hasIgnored = child.hasIgnored || this.hasIgnored;
@@ -187,10 +187,18 @@ export default class Folder extends Node {
         summary.total = aux.total;
         summary.include = aux.include;
         summary.filter = aux.filter;
-        summary.files = { ...summary.files, ...aux.files };
+        summary.files = aux.files;
       });
     }
 
     return summary;
+  }
+
+  public getChildrenCount(): number {
+    return this.children.length;
+  }
+
+  public getChild(i: number): Node {
+    return this.children[i];
   }
 }

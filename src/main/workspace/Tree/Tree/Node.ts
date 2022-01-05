@@ -105,6 +105,17 @@ export default abstract class Node {
     return this.className;
   }
   
+  public getType(): string {
+    return this.type;
+  }
+
+  public setStatusFromFilter(status: NodeStatus): void {
+    this.status = status;
+  }
+
+  public abstract getChild(i: number): Node;
+
+  public abstract getChildrenCount(): number;
 
   public abstract setStatus(path: string, status: NodeStatus): boolean;
 

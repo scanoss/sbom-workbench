@@ -1,6 +1,11 @@
+import { isBinaryFileSync } from 'isbinaryfile';
 import Node, { NodeStatus } from './Node';
 import File from './File';
 import Folder from './Folder';
+import { IpcEvents } from '../../../../ipc-events';
+import * as Filtering from '../../filtering';
+
+
 
 const fs = require('fs');
 const pathLib = require('path');
@@ -12,11 +17,23 @@ export class Tree {
 
   private rootPath: string;
 
+  private msgToUI!: Electron.WebContents;
+
+  private filesIndexed = 0;
+
   constructor(path: string) {
     const pathParts = path.split(pathLib.sep);
     this.rootName = pathParts[pathParts.length - 1];
     this.rootPath = path;
     this.rootFolder = new Folder('', this.rootName);
+  }
+
+  setMailbox(mailbox: Electron.WebContents) {
+    this.msgToUI = mailbox;
+  }
+
+  sendToUI(eventName, data: any) {
+    if (this.msgToUI) this.msgToUI.send(eventName, data);
   }
 
   public buildTree(): Node {
@@ -95,5 +112,65 @@ export class Tree {
 
   public summarize(root: string, summary: any): any {
     return this.rootFolder.summarize(root, summary);
+  }
+
+  private scanMode(filePath: string) {
+    // eslint-disable-next-line prettier/prettier
+    const skipExtentions = new Set ([".exe", ".zip", ".tar", ".tgz", ".gz", ".rar", ".jar", ".war", ".ear", ".class", ".pyc", ".o", ".a", ".so", ".obj", ".dll", ".lib", ".out", ".app", ".doc", ".docx", ".xls", ".xlsx", ".ppt" ]);
+    const skipStartWith = ['{', '[', '<?xml', '<html', '<ac3d', '<!doc'];
+    const MIN_FILE_SIZE = 256;
+
+    // Filter by extension
+    const ext = pathLib.extname(filePath);
+    if (skipExtentions.has(ext)) {
+      return 'MD5_SCAN';
+    }
+    // Filter by min size
+    const fileSize = fs.statSync(filePath).size;
+    if (fileSize < MIN_FILE_SIZE) {
+      return 'MD5_SCAN';
+    }
+    // if start with pattern
+    const file = fs.readFileSync(filePath, 'utf8');
+    for (const skip of skipStartWith) {
+      if (file.startsWith(skip)) {
+        return 'MD5_SCAN';
+      }
+    }
+    // if binary
+    if (isBinaryFileSync(filePath)) {
+      return 'MD5_SCAN';
+    }
+
+    return 'FULL_SCAN';
+  }
+
+  public applyFilters(scanRoot: string, node: Node, bannedList: Filtering.BannedList) {
+    let i = 0;
+    if (node.getType() === 'file') {
+      this.filesIndexed += 1;
+      if (this.filesIndexed % 100 === 0)
+        this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+          stage: `indexing`,
+          processed: this.filesIndexed,
+        });
+      if (bannedList.evaluate(scanRoot + node.getValue())) {
+        node.setAction('scan');
+        node.setScanMode(this.scanMode(scanRoot + node.getValue()));
+      } else {
+        node.setAction('filter');
+        node.setStatusFromFilter(NodeStatus.FILTERED);
+        node.setClassName('filter-item');
+      }
+    } else if (node.getType() === 'folder') {
+      if (bannedList.evaluate(scanRoot + node.getValue())) {
+        node.setAction('scan');
+        for (i = 0; i < node.getChildrenCount(); i += 1) this.applyFilters(scanRoot, node.getChild(i), bannedList);
+      } else {
+        node.setAction('filter');
+        node.setStatusFromFilter( NodeStatus.FILTERED);
+        node.setClassName('filter-item');
+      }
+    }
   }
 }
