@@ -108,4 +108,12 @@ export default class File extends Node {
     }
     return summary;
   }
+
+  public getChildrenCount(): number {
+    return 0;
+  }
+
+  public getChild():Node{
+    return null;
+  }
 }
