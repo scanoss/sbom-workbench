@@ -123,6 +123,7 @@ class LogicComponentService {
         aux.name = iterator.name;
         aux.purl = iterator.purl;
         aux.url = iterator.url;
+        aux.vendor = iterator.vendor;
         const version: any = {};
         if (iterator.summary) {
           aux.summary.ignored += iterator.summary.ignored;

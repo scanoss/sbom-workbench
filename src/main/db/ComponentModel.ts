@@ -53,6 +53,7 @@ export class ComponentModel extends Model {
       transformation.purl = data[i].purl;
       transformation.url = data[i].comp_url;
       transformation.version = data[i].version;
+      transformation.vendor = data[i].vendor;
       if (data[i].filesCount) transformation.filesCount = data[i].filesCount;
 
       if (data[i].license_id) {
