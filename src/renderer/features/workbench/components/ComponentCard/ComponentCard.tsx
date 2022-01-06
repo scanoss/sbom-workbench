@@ -10,6 +10,7 @@ interface ComponentCardProps {
 
 const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
   const multiple: boolean = component.versions.length > 1;
+  console.log(component);
 
   return (
     <>
@@ -17,7 +18,7 @@ const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
         <ButtonBase onClick={() => onClick(component)}>
           <CardContent className="component-card-content">
             <figure>
-              <img alt="component logo" src={componentDefault} />
+              <img alt="component logo" height="64" src={`https://avatars.githubusercontent.com/${component.vendor}?s=100`}/>
             </figure>
             <div className="component-card-info">
               <p>{multiple ? `${component.versions.length} versions` : component.versions[0].version}</p>
