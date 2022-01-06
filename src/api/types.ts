@@ -118,7 +118,7 @@ export interface ComponentGroup {
   vendor: string;
   url: string;
   versions: any[];
-  identifyAs: {
+  identifiedAs: {
     name: string;
     purl: string;
   }[];

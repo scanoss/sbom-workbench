@@ -1,5 +1,5 @@
 import { makeStyles, Paper, IconButton, InputBase, Link } from '@material-ui/core';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
@@ -43,14 +43,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
 export const ComponentList = () => {
   const history = useHistory();
   const classes = useStyles();
 
-  const { limit, onScroll } = usePagination();
+  const { limit, onScroll } = usePagination(20);
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { state, dispatch, setNode } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const { name, components } = state;
 
