@@ -208,7 +208,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                 Notes <span className="optional">- Optional</span>
               </label>
               <Paper className="dialog-form-field-control">
-                <TextareaAutosize name="notes" cols={30} rows={8} />
+                <TextareaAutosize name="notes" cols={30} rows={6} />
               </Paper>
             </div>
             <div className="button-container">
