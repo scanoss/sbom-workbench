@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -6,9 +6,9 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
 import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
+
 
 const useStyles = makeStyles({
   table: {
@@ -21,6 +21,17 @@ const useStyles = makeStyles({
 
 export default function MatchesForLicense({ data }) {
   const classes = useStyles();
+
+  const init = () => {
+    const aux = data.reduce((acc, curr) => {
+      if (!acc[curr.label]) acc[curr.label] = curr;
+      return acc;
+    }, {});
+
+    return aux;
+  };
+
+  const licenseHash = init();
 
   return (
     <>
@@ -36,13 +47,13 @@ export default function MatchesForLicense({ data }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data?.map((row) => (
-              <TableRow className="tableRowLicense" key={row.label}>
+            {data?.map((license) => (
+              <TableRow className="tableRowLicense" key={license.label}>
                 <TableCell component="th" scope="row">
-                  {row?.label}
+                  {license?.label}
                 </TableCell>
                 <TableCell>
-                  {row.copyleft === true ? (
+                  {license.copyleft === true ? (
                     <CheckIcon style={{ fill: '#4ADE80' }} />
                   ) : (
                     <ClearIcon style={{ fill: '#F87171' }} />
@@ -50,11 +61,17 @@ export default function MatchesForLicense({ data }) {
                 </TableCell>
                 <TableCell className="tableCellForLicensePill">
                   <div className="container-licenses-pills">
-                    {row.incompatibles?.map((license) => (
-                      <div key={license.index} className="tinyPillLicenseContainer">
-                        <span className="tinyPillLicenseLabel">{license}</span>
-                      </div>
-                    ))}
+                    {license.incompatibles?.map((incompatibleLicense) =>
+                      licenseHash[incompatibleLicense] === undefined ? (
+                        <div key={incompatibleLicense.index} className="tinyPillLicenseContainer">
+                          <span className="tinyPillLicenseLabel">{incompatibleLicense}</span>
+                        </div>
+                      ) : (
+                        <div key={incompatibleLicense.index} className="tinyPillLicenseContainer incompatible">
+                          <span className="incompatible tinyPillLicenseLabel">{incompatibleLicense}</span>
+                        </div>
+                      )
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

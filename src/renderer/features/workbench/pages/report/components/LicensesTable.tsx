@@ -2,6 +2,8 @@ import React from 'react';
 import { getColor } from '../../../../../../utils/utils';
 
 const LicensesTable = ({ data, selectLicense, matchedLicenseSelected }) => {
+
+
   return (
     <div id="LicenseTable" className="license-list">
       {data.map((item, index) => {
