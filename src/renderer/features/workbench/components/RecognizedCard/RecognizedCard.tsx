@@ -8,13 +8,13 @@ interface RecognizedCardProps {
 }
 
 const RecognizedCard = ({ inventory, onClick }: RecognizedCardProps) => {
-  console.log(inventory);
+  console.log("INVENTORY",inventory);
   return (
     <>
       <Card id="RecognizedCard" className="component-card" elevation={1}>
         <ButtonBase onClick={() => onClick()}>
           <CardContent className="component-card-content">
-            <IconComponent name={inventory.component} size={64} />
+            <IconComponent name={inventory.vendor} size={64} />
             <div className="component-card-info">
               <p> {inventory.inventories.length} groups </p>
               <Tooltip title={inventory.component}>

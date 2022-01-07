@@ -11,8 +11,6 @@ import { logictTreeService } from './services/LogicTreeService';
 import { NodeStatus } from './workspace/Tree/Tree/Node';
 import { workspace } from './workspace/Workspace';
 
-
-
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (_event, invget: Partial<Inventory>) => {
   let inv: any;
   try {
@@ -25,7 +23,7 @@ ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (_event, invget: Partial<Inven
 });
 
 ipcMain.handle(IpcEvents.INVENTORY_GET, async (_event, inv: Partial<Inventory>) => {
-  try {    
+  try {
     const inventory: Inventory = await logicInventoryService.get(inv);
     return { status: 'ok', message: 'Inventory retrieve successfully', data: inventory };
   } catch (e) {
@@ -61,7 +59,6 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (_event, arg: Inventory) => {
 
 ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (_event, arg: Partial<Inventory>) => {
   try {
-    const p = workspace.getOpenedProjects()[0];
     const success = await logicInventoryService.attach(arg);
     return { status: 'ok', message: 'File attached to inventory successfully', success };
   } catch (e) {
@@ -72,7 +69,6 @@ ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (_event, arg: Partial<Inve
 
 ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (_event, inv: Partial<Inventory>) => {
   try {
-    const project = workspace.getOpenedProjects()[0];
     logicResultService
       .getResultsFromIDs(inv.files)
       .then((files: any) => {

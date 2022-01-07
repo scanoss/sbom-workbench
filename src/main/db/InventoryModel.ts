@@ -327,22 +327,22 @@ export class InventoryModel extends Model {
     });
   }
 
+  // FIX ME
   private groupByComponentName(data: any) {
-    const aux = data.reduce((acc, value) => {
+    const aux: Record<string, any> = data.reduce((acc, value) => {
       const key = value.name;
       if (!acc[key]) acc[key] = [];
       acc[`${key}`].push(value);
       return acc;
     }, {});
-
     const inventories = [];
     Object.entries(aux).forEach(([key, value]) => {
       const inv: any = {};
       inv.component = key;
+      inv.vendor = value[0].vendor;
       inv.inventories = value;
       inventories.push(inv);
     });
-
     return inventories;
   }
 
