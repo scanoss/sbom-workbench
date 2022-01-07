@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -8,7 +8,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
-
 
 const useStyles = makeStyles({
   table: {
@@ -21,6 +20,7 @@ const useStyles = makeStyles({
 
 export default function MatchesForLicense({ data }) {
   const classes = useStyles();
+  const [licenseHash, setLicenseHash] = useState({});
 
   const init = () => {
     const aux = data.reduce((acc, curr) => {
@@ -28,10 +28,10 @@ export default function MatchesForLicense({ data }) {
       return acc;
     }, {});
 
-    return aux;
+    setLicenseHash(aux);
   };
 
-  const licenseHash = init();
+  useEffect(init, []);
 
   return (
     <>
@@ -67,8 +67,8 @@ export default function MatchesForLicense({ data }) {
                           <span className="tinyPillLicenseLabel">{incompatibleLicense}</span>
                         </div>
                       ) : (
-                        <div key={incompatibleLicense.index} className="tinyPillLicenseContainer incompatible">
-                          <span className="incompatible tinyPillLicenseLabel">{incompatibleLicense}</span>
+                        <div key={incompatibleLicense.index} className="incompatible tinyPillLicenseContainer">
+                          <span className="incompatible">{incompatibleLicense}</span>
                         </div>
                       )
                     )}
