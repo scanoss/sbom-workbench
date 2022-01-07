@@ -37,17 +37,28 @@ const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
                     <ComponentInfo name={component.name} />
                   </div>
                   <div className="identified">
-                    <ComponentInfo name={component.identifiedAs.map((item) => item.name).join(' - ')} />
+                    <ComponentInfo name={identified[0]?.name} />
+                    {identified.length > 1 && (
+                      <Tooltip
+                        title={identified
+                          .slice(1)
+                          .map((item) => item.name)
+                          .join(' - ')}
+                      >
+                        <p className="more">{component.identifiedAs.length - 1} more</p>
+                      </Tooltip>
+                    )}
                   </div>
                 </>
               ) : (
                 <div>
                   <VersionInfo multiple={multiple} versions={component.versions} />
-                  <ComponentInfo
-                    name={`${component.name} ${
-                      identified.length > 0 ? ` - ${identified.map((item) => item.name).join(' - ')}` : ''
-                    }`}
-                  />
+                  <ComponentInfo name={component.name} />
+                  {identified.length > 0 && (
+                    <Tooltip title={identified.map((item) => item.name).join(' - ')}>
+                      <p className="more">{component.identifiedAs.length - 1} more</p>
+                    </Tooltip>
+                  )}
                 </div>
               )}
             </div>
@@ -70,7 +81,7 @@ const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
 };
 
 const ComponentInfo = ({ name }) =>
-  name.length > 15 ? (
+  name?.length > 15 ? (
     <Tooltip title={name}>
       <h6>{name}</h6>
     </Tooltip>
