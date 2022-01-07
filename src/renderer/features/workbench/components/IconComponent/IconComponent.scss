@@ -1,0 +1,17 @@
+#IconComponent {
+  figure {
+    text-align: center;
+    font-size: 12px;
+    margin: 5px auto;
+
+    img {
+      width: 100%;
+      height: 100%;
+      background-image: url('/assets/imgs/component-default.svg');
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+  }
+}
+
+

@@ -45,7 +45,7 @@ class ComponentService extends BaseService {
     return response;
   }
 
-  public async getComponentGroup(component: Partial<ComponentGroup>, params: ComponentParams): Promise<any> {
+  public async getComponentGroup(component: Partial<ComponentGroup>, params?: ComponentParams): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GROUP_GET, component, params);
     return response;
   }

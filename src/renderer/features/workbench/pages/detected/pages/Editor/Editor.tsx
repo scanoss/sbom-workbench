@@ -236,7 +236,7 @@ export const Editor = () => {
                             key={inventory.id}
                             selected={currentMatch === inventory}
                             match={{
-                              component: inventory.component.name,
+                              component: inventory.component.vendor,
                               version: inventory.component.version,
                               usage: inventory.usage,
                               license: inventory.spdxid,
@@ -253,7 +253,7 @@ export const Editor = () => {
                             key={match.id}
                             selected={currentMatch === match}
                             match={{
-                              component: match.component?.name,
+                              component: match.vendor,
                               version: match.component?.version,
                               usage: match.type,
                               license: match.component?.licenses && match.component?.licenses[0]?.name,

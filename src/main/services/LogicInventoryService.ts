@@ -5,7 +5,6 @@ import { logicComponentService } from './LogicComponentService';
 import { inventoryHelper } from '../helpers/InventoryHelper';
 
 
-
 class LogicInventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
     try {
@@ -169,7 +168,7 @@ class LogicInventoryService {
     }
 
     return Object.values(aux);
-  }
+  } 
 }
 
 export const logicInventoryService = new LogicInventoryService();

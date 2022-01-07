@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Tooltip, ButtonBase } from '@material-ui/core';
-import componentDefault from '../../../../../../assets/imgs/component-default.svg';
 import { ComponentGroup } from '../../../../../api/types';
+import IconComponent from '../IconComponent/IconComponent';
 
 interface ComponentCardProps {
   component: ComponentGroup;
@@ -26,9 +26,7 @@ const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
       >
         <ButtonBase onClick={() => onClick(component)}>
           <CardContent className="component-card-content">
-            <figure>
-              <img alt="component logo" src={componentDefault} />
-            </figure>
+            <IconComponent name={component.vendor} size={64} />
             <div className="component-card-info">
               {override ? (
                 <>
