@@ -23,7 +23,6 @@ class LogicComponentService {
 
   public async getComponentFiles(data: Partial<Component>, params: any): Promise<any> {
     try {
-      // const project = workspace.getOpenedProjects()[0];
       let files: any;
       if (data.purl && data.version)
         files = await serviceProvider.model.file.getByPurlVersion(data, params ? params.path : null);
@@ -54,7 +53,8 @@ class LogicComponentService {
     try {
       const data = await this.getAll({}, params);
       if (data) {
-        const comp: any = await this.groupComponentsByPurl(data); //
+        const compPurl: any = this.groupComponentsByPurl(data);
+        const comp: any = await this.mergeComponentByPurl(compPurl);
         // if path is defined
         if (params?.path !== undefined) {
           const purls = comp.reduce((acc, curr) => {
@@ -79,7 +79,8 @@ class LogicComponentService {
     try {
       const data = await this.getAll(component, params);
       if (data) {
-        const [comp] = await this.groupComponentsByPurl(data);
+        const compPurl: any = this.groupComponentsByPurl(data);
+        const [comp]: any = await this.mergeComponentByPurl(compPurl);
         if (!comp) {
           return [];
         }
@@ -98,28 +99,29 @@ class LogicComponentService {
     }
   }
 
-  private async groupComponentsByPurl(data: any) {
+  private groupComponentsByPurl(data: any) {
     try {
       const aux = {};
       for (const component of data) {
         if (!aux[component.purl]) aux[component.purl] = [];
         aux[component.purl].push(component);
       }
-      const result = await this.mergeComponentByPurl(aux);
-      return result;
+      return aux;
     } catch (err) {
       log.error(err);
       return 'Unable to group components';
     }
   }
 
-  private mergeComponentByPurl(data: Record<string, any>) {
+  private async mergeComponentByPurl(data: Record<string, any>) {
+    const overrideComponents = await this.getOverrideComponents();
     const result: any[] = [];
     for (const [key, value] of Object.entries(data)) {
       const aux: any = {};
       aux.summary = { ignored: 0, pending: 0, identified: 0 };
       aux.versions = [];
       for (const iterator of value) {
+        aux.identifiedAs = overrideComponents[iterator.purl] ? overrideComponents[iterator.purl] : [];
         aux.name = iterator.name;
         aux.purl = iterator.purl;
         aux.url = iterator.url;
@@ -152,6 +154,24 @@ class LogicComponentService {
       await serviceProvider.model.license.bulkAttachComponentLicense(componentLicenses);
       return true;
     } catch (error: any) {
+      return error;
+    }
+  }
+
+  private async getOverrideComponents() {
+    try {
+      const overrideComponents = await serviceProvider.model.component.getOverrideComponents();
+      let result: any = {};
+      if (overrideComponents.length > 0) {
+        result = overrideComponents.reduce((acc, curr) => {
+          if (!acc[curr.matchedPurl]) acc[curr.matchedPurl] = [];
+          acc[curr.matchedPurl].push({ purl: curr.overridePurl, name: curr.overrideName });
+          return acc;
+        }, {});
+      }
+      return result;
+    } catch (error) {
+      log.error(error);
       return error;
     }
   }

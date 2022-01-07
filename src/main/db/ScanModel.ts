@@ -18,7 +18,6 @@ export class ScanModel extends Model {
 
   lastID: any;
 
-  // eslint-disable-next-line @typescript-eslint/no-useless-constructor
   constructor(path: string) {
     super(path);
     this.file = new FileModel(path);

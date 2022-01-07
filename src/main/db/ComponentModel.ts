@@ -5,15 +5,6 @@ import { Model } from './Model';
 import { Component, ComponentParams, ComponentSource } from '../../api/types';
 import { LicenseModel } from './LicenseModel';
 
-// export interface ComponentParams {
-//   source?: ComponentSource;
-//   path?: string;
-// }
-
-// export enum ComponentSource {
-//   ENGINE = 'engine',
-// }
-
 const query = new Querys();
 
 export class ComponentModel extends Model {
@@ -525,6 +516,27 @@ export class ComponentModel extends Model {
             else resolve(data);
           });
         });
+      } catch (error) {
+        log.error(error);
+        reject(new Error('Unable to retrieve summary by path'));
+      }
+    });
+  }
+
+  public getOverrideComponents() {
+    return new Promise<Array<any>>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.all(
+          `SELECT DISTINCT cv.purl AS overridePurl,cv.name AS overrideName,r.component,i.id,r.purl AS matchedPurl FROM results r  
+          INNER JOIN files f ON r.fileId=f.fileId INNER JOIN file_inventories fi ON fi.fileId=f.fileId
+          INNER JOIN inventories i ON i.id=fi.inventoryid INNER JOIN component_versions  cv ON i.cvid=cv.id ORDER BY r.purl;`,
+          (err: any, data: any) => {
+            db.close();
+            if (err) throw err;
+            else resolve(data);
+          }
+        );
       } catch (error) {
         log.error(error);
         reject(new Error('Unable to retrieve summary by path'));
