@@ -29,7 +29,7 @@
     position: relative;
     width: calc(100% - 30px);
     height: 100%;
-    padding-left: 20px;
+    padding-left: 12px;
     justify-content: space-between;
     border-left: 10px solid transparent;
 
@@ -59,12 +59,6 @@
       display: flex;
       align-items: center;
 
-      .logo-match-info-card {
-        width: 35px;
-        height: 35px;
-        margin-right: 12px;
-      }
-
       .component-span {
         font-weight: bold;
         max-width: 40%;
@@ -72,6 +66,7 @@
         flex-shrink: .5;
         color: #3B82F6;
         margin-right: 12px;
+        margin-left: 6px;
         word-break: break-word;
 
       }

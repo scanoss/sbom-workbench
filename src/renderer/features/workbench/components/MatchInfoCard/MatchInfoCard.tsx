@@ -6,6 +6,7 @@ import DescriptionOutlined from '@material-ui/icons/DescriptionOutlined';
 import IconButton from '@material-ui/core/IconButton';
 import { Tooltip } from '@material-ui/core';
 import componentDefault from '../../../../../../assets/imgs/component-default.svg';
+import IconComponent from '../IconComponent/IconComponent';
 
 export enum MATCH_INFO_CARD_ACTIONS {
   ACTION_ENTER,
@@ -51,7 +52,8 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
         <div onClick={onSelect} style={selected ? { border: '#60A5FA 2px solid' } : {}} className="match-info-card">
           <div className={`match-info-card-content status-${status}`}>
             <div onMouseEnter={handlerOpen} onMouseLeave={() => setOver(false)} className="label-info-div">
-              <img alt="component logo" className="logo-match-info-card" src={componentDefault} />
+              {/* <img alt="component logo" className="logo-match-info-card" src={componentDefault} /> */}
+              <IconComponent name={match.component} size={32} />
               <span className="component-span">{match.component}</span>
               <span className="version-span">{match.version}</span>
               <div className="usage-div">

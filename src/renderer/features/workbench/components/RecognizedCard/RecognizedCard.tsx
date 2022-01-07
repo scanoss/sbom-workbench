@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, CardContent, Typography, Tooltip, ButtonBase } from '@material-ui/core';
-import componentDefault from '../../../../../../assets/imgs/component-default.svg';
-import { ComponentGroup } from '../../../../../api/types';
+import IconComponent from '../IconComponent/IconComponent';
 
 interface RecognizedCardProps {
   inventory: any;
@@ -9,15 +8,13 @@ interface RecognizedCardProps {
 }
 
 const RecognizedCard = ({ inventory, onClick }: RecognizedCardProps) => {
-
+  console.log(inventory);
   return (
     <>
       <Card id="RecognizedCard" className="component-card" elevation={1}>
         <ButtonBase onClick={() => onClick()}>
           <CardContent className="component-card-content">
-            <figure>
-              <img alt="component logo" src={componentDefault} />
-            </figure>
+            <IconComponent name={inventory.component} size={64} />
             <div className="component-card-info">
               <p> {inventory.inventories.length} groups </p>
               <Tooltip title={inventory.component}>

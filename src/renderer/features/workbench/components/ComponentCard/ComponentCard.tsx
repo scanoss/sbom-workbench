@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Tooltip, ButtonBase } from '@material-ui/core';
-import componentDefault from '../../../../../../assets/imgs/component-default.svg';
 import { ComponentGroup } from '../../../../../api/types';
+import IconComponent from '../IconComponent/IconComponent';
 
 interface ComponentCardProps {
   component: ComponentGroup;
@@ -10,16 +10,13 @@ interface ComponentCardProps {
 
 const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
   const multiple: boolean = component.versions.length > 1;
-  console.log(component);
 
   return (
     <>
       <Card className={`component-card ${multiple && 'multiple'}`} elevation={1}>
         <ButtonBase onClick={() => onClick(component)}>
           <CardContent className="component-card-content">
-            <figure>
-              <img alt="component logo" height="64" src={`https://avatars.githubusercontent.com/${component.vendor}?s=100`}/>
-            </figure>
+            <IconComponent name={component.vendor} size={64} />
             <div className="component-card-info">
               <p>{multiple ? `${component.versions.length} versions` : component.versions[0].version}</p>
               {component.name.length > 15 ? (
