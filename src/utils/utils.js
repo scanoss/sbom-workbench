@@ -94,4 +94,22 @@ const expandNodesToMatch = (node, acc) => {
   return acc;
 };
 
-export { range, getColor, colorsForLicense, getExtension, languages, expandNodesToMatch };
+const convertTreeToNode = (tree) => {
+  const nTree = mapNode(tree);
+  nTree.state = { expanded: true };
+  return [tree];
+};
+
+const mapNode = (node) => {
+  node.id = node.value;
+  node.name = node.label;
+
+  if (node.children) {
+    node.children.forEach((child) => {
+      mapNode(child);
+    });
+  }
+  return node;
+};
+
+export { range, getColor, colorsForLicense, getExtension, languages, expandNodesToMatch, convertTreeToNode };

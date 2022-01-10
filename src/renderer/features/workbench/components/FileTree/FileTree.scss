@@ -1,4 +1,5 @@
 .file-tree-container {
+
   color: #3F3F46;
   font-weight: 400;
 
@@ -136,5 +137,62 @@
     font-size: 12px;
     margin-bottom: 60px;
     color: var(--color-status-ignored);
+  }
+}
+
+
+// FILE TREE VIRT
+.file-tree-container {
+  $bg: #dbe7ff;
+
+  .ft-node {
+
+    &:hover {
+      background-color: #eef3fdad;
+    }
+
+    &.selected {
+      border-radius: 2px;
+      background-color: $bg !important
+    }
+
+    > span {
+      width: 100%;
+      display: flex;
+    }
+
+    > span::before {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      left: 15px;
+      bottom: 1px;
+      background: transparent;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    //  &.status-pending > span .rct-node-icon::before
+    &.status-pending > span::before  {
+      background: var(--color-status-pending);
+    }
+
+    &.status-identified > span::before  {
+      background: var(--color-status-identified);
+    }
+
+    &.status-ignored > span::before  {
+      background: var(--color-status-ignored);
+    }
+
+    .ft-node-title {
+      background: transparent;
+      border: transparent;
+      outline: none;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+    }
   }
 }
