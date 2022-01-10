@@ -22,24 +22,29 @@ export class SpdxLiteJson extends Format {
     const spdx = SpdxLiteJson.template();
     spdx.packages = [];
     for (let i = 0; i < data.length; i += 1) {
-      const pkg: any = {};
-      pkg.name = data[i].name;
-      pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${data[i].purl}@${data[i].version}`).digest('hex')}`; // md5 purl@version
-      pkg.versionInfo = data[i].version;
-      pkg.downloadLocation = data[i].url;
-      pkg.filesAnalyzed = false;
-      pkg.homePage = data[i].url;
-      pkg.licenseDeclared = data[i].declareLicense;
-      pkg.licenseConcluded = data[i].concludedLicense;
-      pkg.externalRefs = [
-        {
-          referenceCategory: 'PACKAGE MANAGER',
-          referenceLocator: data[i].purl,
-          referenceType: 'purl',
-        },
-      ];
-      if (data[i].official === LicenseType.CUSTOM) pkg.ExtractedText = this.fulltextToBase64(data[i].fulltext);
-      spdx.packages.push(pkg);
+      const aux = spdx.packages.find((p) => p.versionInfo === data[i].version);
+      if (aux !== undefined) {
+        aux.licenseDeclared = aux.licenseDeclared.concat(' AND ', data[i].declareLicense);
+      } else {
+        const pkg: any = {};
+        pkg.name = data[i].name;
+        pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${data[i].purl}@${data[i].version}`).digest('hex')}`; // md5 purl@version
+        pkg.versionInfo = data[i].version;
+        pkg.downloadLocation = data[i].url ? data[i].url : 'NOASSERSTION';
+        pkg.filesAnalyzed = false;
+        pkg.homePage = data[i].url;
+        pkg.licenseDeclared = data[i].declareLicense;
+        pkg.licenseConcluded = data[i].concludedLicense;
+        pkg.externalRefs = [
+          {
+            referenceCategory: 'PACKAGE MANAGER',
+            referenceLocator: data[i].purl,
+            referenceType: 'purl',
+          },
+        ];
+        if (data[i].official === LicenseType.CUSTOM) pkg.ExtractedText = this.fulltextToBase64(data[i].fulltext);
+        spdx.packages.push(pkg);
+      }
     }
 
     const fileBuffer = JSON.stringify(spdx);
