@@ -82,34 +82,47 @@ const getExtension = (file) => {
   return languages[ext] || 'text';
 };
 
-const expandNodesToMatch = (node, acc) => {
-  const { children, value, type, hasPending, hasIgnored, hasIdentified } = node;
-  if (type === 'folder' && (hasPending || hasIgnored || hasIdentified)) acc.push(value);
+const expandNodes = (node) => {
+  const { children } = node;
+  node.state = { expanded: true };
 
   if (children) {
     children.forEach((child) => {
-      expandNodesToMatch(child, acc);
-    });
-  }
-  return acc;
-};
-
-const convertTreeToNode = (tree) => {
-  const nTree = mapNode(tree);
-  nTree.state = { expanded: true };
-  return [tree];
-};
-
-const mapNode = (node) => {
-  node.id = node.value;
-  node.name = node.label;
-
-  if (node.children) {
-    node.children.forEach((child) => {
-      mapNode(child);
+      expandNodesToMatch(child);
     });
   }
   return node;
 };
 
-export { range, getColor, colorsForLicense, getExtension, languages, expandNodesToMatch, convertTreeToNode };
+const expandNodesToMatch = (node) => {
+  const { children, value, type, hasPending, hasIgnored, hasIdentified } = node;
+  if (type === 'folder' && (hasPending || hasIgnored || hasIdentified)) node.state = { expanded: true };
+
+  if (children) {
+    children.forEach((child) => {
+      expandNodesToMatch(child);
+    });
+  }
+  return node;
+};
+
+const convertTreeToNode = (tree, previous) => {
+  const nTree = mapNode(tree, previous[0]);
+  nTree.state = { expanded: true };
+  return [tree];
+};
+
+const mapNode = (node, prev) => {
+  node.id = node.value;
+  node.name = node.label;
+  node.state = prev.state;
+
+  if (node.children) {
+    node.children.forEach((child, index) => {
+      mapNode(child, prev.children[index]);
+    });
+  }
+  return node;
+};
+
+export { range, getColor, colorsForLicense, getExtension, languages, expandNodes, expandNodesToMatch, convertTreeToNode };

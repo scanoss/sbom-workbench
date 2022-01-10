@@ -145,6 +145,14 @@
 .file-tree-container {
   $bg: #dbe7ff;
 
+  .ReactVirtualized__Grid__innerScrollContainer {
+    overflow: visible !important;
+  }
+
+  .ReactVirtualized__List {
+    outline: none;
+  }
+
   .ft-node {
 
     &:hover {
@@ -161,38 +169,55 @@
       display: flex;
     }
 
-    > span::before {
-      content: '';
-      display: inline-block;
-      position: absolute;
-      left: 15px;
-      bottom: 1px;
-      background: transparent;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-    }
+
 
     //  &.status-pending > span .rct-node-icon::before
-    &.status-pending > span::before  {
+    &.status-pending > span .ft-node-icon::before  {
       background: var(--color-status-pending);
     }
 
-    &.status-identified > span::before  {
+    &.status-identified > span .ft-node-icon::before  {
       background: var(--color-status-identified);
     }
 
-    &.status-ignored > span::before  {
+    &.status-ignored > span .ft-node-icon::before  {
       background: var(--color-status-ignored);
     }
 
     .ft-node-title {
+      font-size: 14px;
+      margin-left: 5px;
       background: transparent;
       border: transparent;
       outline: none;
       cursor: pointer;
       width: 100%;
       text-align: left;
+      font-family: inherit;
+
+      &.file {
+        padding-left: 13px;
+      }
+
+      .ft-node-icon {
+        position: relative;
+        display: inline-block;
+        margin-right: 10px;
+        min-width: 15px;
+        font-size: 14px;
+
+        &::before {
+          content: '';
+          display: inline-block;
+          position: absolute;
+          left: 10px;
+          bottom: 1px;
+          background: transparent;
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+        }
+      }
     }
   }
 }

@@ -1,8 +1,9 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Tree, { renderers as Renderers, selectors } from 'react-virtualized-tree';
-import FolderOutlined from '@material-ui/icons/FolderOutlined';
-import { convertTreeToNode } from '../../../../../utils/utils';
+import { convertTreeToNode, expandNodes, expandNodesToMatch } from '../../../../../utils/utils';
 import useContextual from '../../../../hooks/useContextual';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 
@@ -14,17 +15,19 @@ const { Menu } = remote;
 
 const FileTreeNode = ({ node, onClick, onContextMenu }) => {
   return (
-    <button
-      className="ft-node-title"
-      type="button"
+    <span
+      className={`ft-node-title ${node.type}`}
       onClick={(e) => onClick(e, node)}
       onContextMenu={(e) => onContextMenu(e, node)}
     >
       <span className="ft-node-icon">
-        {node.state?.expanded ? <i className="far fa-folder" /> : <i className="far fa-folder-open" />}
+        {node.type === 'folder' &&
+          (node.state?.expanded ? <i className="fa fa-folder-open" /> : <i className="fa fa-folder" />)}
+
+        {node.type === 'file' && <i className="fa fa-file" />}
       </span>
       {node.name}
-    </button>
+    </span>
   );
 };
 
@@ -109,8 +112,8 @@ export const FileTreeVirt = () => {
               {
                 label: 'Collapse all',
                 click: () => onCollapseAll(node),
-              }
-            ]
+              },
+            ],
           },
         ];
 
@@ -118,8 +121,8 @@ export const FileTreeVirt = () => {
   };
 
   const onExpandAll = (node: any, toMatch = false) => {
-   /*  const nodes = !toMatch ? expandNodesToLevel([node], Infinity) : expandNodesToMatch(node, []);
-    setExpanded((expanded) => [...new Set([...expanded, ...nodes])]); */
+     const nodes = !toMatch ? expandNodes(node) : expandNodesToMatch(node);
+     setNodes([nodes]);
   };
 
   const onCollapseAll = (node: any) => {
@@ -129,7 +132,7 @@ export const FileTreeVirt = () => {
 
   useEffect(() => {
     if (tree) {
-      setNodes(convertTreeToNode(tree));
+      setNodes(convertTreeToNode(tree, nodes.length > 0 ? nodes : [tree]));
     }
   }, [tree]);
 
@@ -149,11 +152,7 @@ export const FileTreeVirt = () => {
               lastChild: 'mi mi-insert-drive-file',
             }}
           >
-           <FileTreeNode
-           node={node}
-           onClick={onSelectNode}
-           onContextMenu={onContextMenu}
-           />
+            <FileTreeNode node={node} onClick={onSelectNode} onContextMenu={onContextMenu} />
           </Expandable>
         </div>
       )}
