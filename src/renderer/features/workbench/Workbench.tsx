@@ -13,6 +13,7 @@ import Detected from './pages/detected/Detected';
 import Identified from './pages/identified/Identified';
 import Reports from './pages/report/Report';
 import Breadcrumb from './components/Breadcrumb/Breadcrumb';
+import FileTreeVirt from './components/FileTree/FileTreeVirt';
 
 const Workbench = () => {
   const { path } = useRouteMatch();
@@ -53,7 +54,8 @@ const Workbench = () => {
       >
         <aside className="panel explorer">
           <div className="file-tree-container">
-            <FileTree />
+            {/* <FileTree /> */}
+            <FileTreeVirt />
           </div>
         </aside>
         <main id="Workbench" className="match-info">

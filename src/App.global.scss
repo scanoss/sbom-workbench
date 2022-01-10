@@ -4,6 +4,8 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 @import "~react-checkbox-tree/lib/react-checkbox-tree.css";
+@import "~react-virtualized/styles.css";
+@import "~react-virtualized-tree/lib/main.css";
 
 /* fonts & vars */
 @import './theme/fonts.scss';
