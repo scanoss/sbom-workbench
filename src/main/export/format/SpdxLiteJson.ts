@@ -22,9 +22,13 @@ export class SpdxLiteJson extends Format {
     const spdx = SpdxLiteJson.template();
     spdx.packages = [];
     for (let i = 0; i < data.length; i += 1) {
-      const aux = spdx.packages.find((p) => p.versionInfo === data[i].version);
+      const aux = spdx.packages.find(
+        (p) => p.versionInfo === data[i].version && p.externalRefs[0].referenceLocator === data[i].purl
+      );
       if (aux !== undefined) {
-        aux.licenseDeclared = aux.licenseDeclared.concat(' AND ', data[i].declareLicense);
+        if (new RegExp(`\\b${data[i].declareLicense}\\b`).test(aux.licenseDeclared) === false) {     
+          aux.licenseDeclared = aux.licenseDeclared.concat(' AND ', data[i].declareLicense);
+        }
       } else {
         const pkg: any = {};
         pkg.name = data[i].name;
