@@ -249,7 +249,6 @@
     "node-fetch": "^2.6.1",
     "p-queue": "6.6.2",
     "react": "^17.0.1",
-    "react-checkbox-tree": "^1.7.1",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
     "react-split-pane": "^0.1.92",
