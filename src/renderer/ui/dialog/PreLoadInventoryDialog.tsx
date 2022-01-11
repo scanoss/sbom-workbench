@@ -111,15 +111,15 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
     const response = await inventoryService.acceptAllPreLoadInventory({ folder, overwrite });
 
     const inv = response.sort((a, b) => {
-      if (a.spdxid === '') return 1;
-      if (b.spdxid === '') return -1;
+      if (a.spdxid === null) return 1;
+      if (b.spdxid === null) return -1;
       if (a.purl > b.purl) return 1;
       if (a.purl < b.purl) return -1;
       return a.spdxid.localeCompare(b.spdxid);
     });
-    const validInv = response.filter((el) => el.spdxid !== '');
+    const validInv = response.filter((el) => el.spdxid);
     setInventories(inv);
-    setInventoryNoLicenseCount(inv.filter((x) => x.spdxid === '').length);
+    setInventoryNoLicenseCount(inv.filter((x) => !x.spdxid).length);
     setChecked(validInv);
     setValidInventories(validInv);
   };
@@ -164,9 +164,9 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                           <ListItemIcon className="list-item" onClick={handleToggle(value)}>
                             <Checkbox
                               edge="start"
-                              disabled={value.spdxid === ''}
+                              disabled={value.spdxid === null}
                               checked={
-                                value.spdxid === ''
+                                value.spdxid === null
                                   ? false
                                   : checked.findIndex(
                                       (x) =>
@@ -191,33 +191,31 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                                 >
                                   <path
                                     d="M18.3333 9.58203V4.30391C18.3333 3.60078 17.8973 2.97266 17.2364 2.72422L12.9239 1.10703C12.5442 0.961719 12.1223 0.961719 11.7379 1.10703L7.42544 2.72422C6.7645 2.97266 6.32856 3.60078 6.32856 4.30391V9.58203L1.43013 11.4242C0.769189 11.668 0.333252 12.3008 0.333252 13.0039V18.0008C0.333252 18.6383 0.694189 19.2242 1.26606 19.5101L5.88794 21.8211C6.36138 22.0602 6.92388 22.0602 7.39731 21.8211L12.3333 19.3555L17.2692 21.8211C17.7426 22.0602 18.3051 22.0602 18.7786 21.8211L23.4004 19.5101C23.9723 19.2242 24.3333 18.6383 24.3333 18.0008V13.0039C24.3333 12.3008 23.8973 11.6727 23.2364 11.4242L18.3333 9.58203ZM12.8958 11.2133V6.62422L17.2083 5.13828V9.71328L12.8958 11.2133ZM7.45825 3.91484L12.3333 2.08672L17.2083 3.91484V3.92422L12.3333 5.63984L7.45825 3.91953V3.91484ZM7.45825 5.13828L11.7708 6.62422V11.2133L7.45825 9.71328V5.13828ZM6.052 20.5789L1.5145 18.3102V13.9367L6.052 15.7789V20.5789ZM1.5145 12.6617V12.6523L6.64263 10.7305L11.7098 12.6289V12.6852L6.64263 14.743L1.5145 12.6617ZM7.23325 15.7789L11.7098 13.9602V18.343L7.23325 20.5836V15.7789ZM17.4333 20.5789L12.9567 18.343V13.9648L17.4333 15.7836V20.5789ZM23.152 18.3102L18.6145 20.5789V15.7789L23.152 13.9367V18.3102ZM23.152 12.6617L18.0239 14.743L12.9567 12.6852V12.6289L18.0239 10.7305L23.152 12.6523V12.6617Z"
-                                    fill={value.spdxid === '' ? '#7E7E7E' : '#3B82F6'}
+                                    fill={value.spdxid ? '#3B82F6' : '#7E7E7E'}
                                   />
                                 </svg>
 
-                                <p className={value.spdxid === '' ? 'list-item-text-no-license' : 'list-item-text'}>
+                                <p className={value.spdxid ? 'list-item-text' : 'list-item-text-no-license'}>
                                   {`${value.purl}`}
                                 </p>
                               </div>
                               <div className="pills">
-                                {value.spdxid === '' ? (
-                                  <div className="version-pill-no-license">
-                                    <p>{value.version.trim() === '' ? '-' : `${value.version}`.slice(0, 10)}</p>
-                                  </div>
-                                ) : (
-                                  <div className="version-pill">
-                                    <p>{value.version.trim() === '' ? '-' : `${value.version}`.slice(0, 10)}</p>
-                                  </div>
-                                )}
-                                {value.spdxid.length > 10 ? (
+                                <div className={value.spdxid ? 'version-pill' : 'version-pill-no-license'}>
+                                  <p>{value.version.trim() === '' ? '-' : `${value.version}`.slice(0, 10)}</p>
+                                </div>
+                                {value.spdxid?.length > 10 ? (
                                   <Tooltip title={value.spdxid}>
                                     <div className="license-pill">
-                                      <p>{value.spdxid.trim() === '' ? '-' : `${value.spdxid.slice(0, 10)}...`}</p>
+                                      <p>
+                                        {value.spdxid?.trim() === '' || !value.spdxid
+                                          ? '-'
+                                          : `${value.spdxid?.slice(0, 10)}...`}
+                                      </p>
                                     </div>
                                   </Tooltip>
                                 ) : (
                                   <div className="license-pill">
-                                    <p>{value.spdxid.trim() === '' ? '-' : `${value.spdxid}`}</p>
+                                    <p>{value.spdxid?.trim() === '' || !value.spdxid ? '-' : `${value.spdxid}`}</p>
                                   </div>
                                 )}
                               </div>
