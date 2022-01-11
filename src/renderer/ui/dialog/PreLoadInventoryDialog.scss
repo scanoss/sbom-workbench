@@ -16,11 +16,16 @@ textarea {
   font-size: 0.75rem;
 }
 
-.divider {
+.divider , .divider-no-license{
   border: 0.5px solid #D4D4D8;
   height: 0px;
+}
+
+.divider { 
   margin-bottom: 24px;
 }
+
+
 
 .list-item-icon {
   width: 20px;
@@ -29,7 +34,7 @@ textarea {
 }
 
 
-.list-item-text {
+.list-item-text , .list-item-text-no-license {
   font-size: 16px;
   color: #3B82F6;
   margin-left: 6px;
@@ -112,10 +117,7 @@ textarea {
   }
 
   .list-item-text-no-license {
-    font-size: 16px;
-    color: grey;
-    margin-left: 6px;
-  
+    color: grey;  
   }
 
   .svg-no-license{

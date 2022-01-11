@@ -83,7 +83,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
         x.version === value.version &&
         x.spdxid === value.spdxid &&
         x.usage === value.usage &&
-        value.spdxid !== ''
+        value.spdxid !== null
     );
     const newChecked = [...checked];
     if (currentIndex === -1) newChecked.push(value);
@@ -104,7 +104,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
   };
 
   const AllChecked = () => {
-    return checked.length === validInventories?.length;
+    return checked.length === validInventories?.length && validInventories.length > 0;
   };
 
   const init = async () => {
@@ -160,9 +160,14 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                     inventories.map((value, index) => {
                       const labelId = `checkbox-list-label-${value.cvid}`;
                       return (
-                        <ListItem className={classes.listItem} key={value.cvid + value.version + value.spdxid}>
+                        <ListItem
+                          disabled={value.spdxid === null}
+                          className={classes.listItem}
+                          key={value.cvid + value.version + value.spdxid}
+                        >
                           <ListItemIcon className="list-item" onClick={handleToggle(value)}>
                             <Checkbox
+                              onClick={handleToggle(value)}
                               edge="start"
                               disabled={value.spdxid === null}
                               checked={
@@ -232,10 +237,10 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                 <div />
               ) : (
                 <>
-                  <hr className="divider " />
+                  <hr className="divider-no-license" />
                   <div>
                     <p className="no-license-note">
-                      * {inventoryNoLicenseCount} components will not be identified due to they don&apos;t have licenses
+                      {inventoryNoLicenseCount} components will not be identified due to they don&apos;t have licenses
                       attached to them. Please identify them manually.
                     </p>
                   </div>
