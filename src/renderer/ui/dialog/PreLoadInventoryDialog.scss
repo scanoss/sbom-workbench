@@ -12,6 +12,10 @@ textarea {
   padding: 12px;
 }
 
+.no-license-note{
+  font-size: 0.75rem;
+}
+
 .divider {
   border: 0.5px solid #D4D4D8;
   height: 0px;
@@ -32,7 +36,7 @@ textarea {
 }
 
 .check {
-  color: #3B82F6;
+  color: #3B82F6;  
 }
 
 
@@ -61,6 +65,12 @@ textarea {
     color: #52525B;
     margin-left: 12px;
 }
+  .version-pill-no-license {
+    @include pill;
+    color: grey;
+    background-color: #E4E4E7;
+    width: max-content;
+  }
 }
 
 .checkbox-info {
@@ -100,4 +110,16 @@ textarea {
   button {
     margin-left: 16px;
   }
+
+  .list-item-text-no-license {
+    font-size: 16px;
+    color: grey;
+    margin-left: 6px;
+  
+  }
+
+  .svg-no-license{
+    fill: grey;
+  }
+
 }
