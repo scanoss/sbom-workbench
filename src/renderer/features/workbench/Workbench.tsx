@@ -1,9 +1,8 @@
 import { CircularProgress } from '@material-ui/core';
-import React, { useContext, useEffect, useState } from 'react';
-import { Link, Redirect, Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-router-dom';
+import React, { useContext, useEffect } from 'react';
+import { Redirect, Route, Switch, useLocation, useRouteMatch } from 'react-router-dom';
 import SplitPane from 'react-split-pane';
 
-import { FileTree } from './components/FileTree/FileTree';
 import { dialogController } from '../../dialog-controller';
 
 import { WorkbenchContext, IWorkbenchContext } from './store';
@@ -12,8 +11,7 @@ import AppBar from './components/AppBar/AppBar';
 import Detected from './pages/detected/Detected';
 import Identified from './pages/identified/Identified';
 import Reports from './pages/report/Report';
-import Breadcrumb from './components/Breadcrumb/Breadcrumb';
-import FileTreeVirt from './components/FileTree/FileTreeVirt';
+import FileTree from './components/FileTree/FileTree';
 
 const Workbench = () => {
   const { path } = useRouteMatch();
@@ -54,8 +52,7 @@ const Workbench = () => {
       >
         <aside className="panel explorer">
           <div className="file-tree-container">
-            {/* <FileTree /> */}
-            <FileTreeVirt />
+            <FileTree />
           </div>
         </aside>
         <main id="Workbench" className="match-info">
