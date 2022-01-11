@@ -38,6 +38,18 @@
       width: 11px;
       text-align: center;
       outline: none;
+
+      &.fa-folder:before {
+        content: "\f114";
+      }
+
+      &.fa-folder-open:before {
+        content: "\f115";
+      }
+
+      &.fa-file:before {
+        content: "\f15b";
+      }
     }
 
     //  &.status-pending > span .rct-node-icon::before
