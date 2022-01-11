@@ -31,6 +31,9 @@
     > span {
       width: 100%;
       display: flex;
+      overflow: visible;
+      word-break: break-all;
+      white-space: nowrap;
     }
 
     i.fa {
@@ -48,7 +51,7 @@
       }
 
       &.fa-file:before {
-        content: "\f15b";
+        content: "\f016";
       }
     }
 
@@ -77,13 +80,13 @@
       font-family: inherit;
 
       &.file {
-        padding-left: 13px;
+        padding-left: 11px;
       }
 
       .ft-node-icon {
         position: relative;
         display: inline-block;
-        margin-right: 10px;
+        margin-right: 8px;
         min-width: 15px;
         font-size: 14px;
 
