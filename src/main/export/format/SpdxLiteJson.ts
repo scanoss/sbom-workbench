@@ -33,8 +33,8 @@ export class SpdxLiteJson extends Format {
         pkg.downloadLocation = data[i].url ? data[i].url : 'NOASSERSTION';
         pkg.filesAnalyzed = false;
         pkg.homePage = data[i].url;
-        pkg.licenseDeclared = data[i].declareLicense;
-        pkg.licenseConcluded = data[i].concludedLicense;
+        pkg.licenseDeclared = data[i].declareLicense ? data[i].declareLicense : 'NOASSERSTION';
+        pkg.licenseConcluded = data[i].concludedLicense !== 'N/A' ? data[i].concludedLicense : 'NOASSERSTION';
         pkg.externalRefs = [
           {
             referenceCategory: 'PACKAGE MANAGER',

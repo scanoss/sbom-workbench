@@ -159,7 +159,7 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
 
   // GET ALL THE INVENTORIES
   SQL_GET_ALL_INVENTORIES = `SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i
-  INNER JOIN licenses l ON i.spdxid=l.spdxid;`;
+  LEFT JOIN licenses l ON i.spdxid=l.spdxid;`;
 
   SQL_SELECT_FILES_FROM_PURL_VERSION = `
     SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.license, r.component AS componentName, r.url FROM results r INNER JOIN files f ON r.fileId=f.fileId LEFT JOIN file_inventories fi ON fi.fileId=f.fileId WHERE r.purl=? AND r.version=? GROUP BY f.path;`;
@@ -182,9 +182,9 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
 
   SQL_GET_SPDX_COMP_DATA = `SELECT DISTINCT c.purl,c.version,c.url,c.name,i.spdxid AS concludedLicense,i.notes,l.spdxid AS declareLicense,lic.fulltext,lic.official
   FROM inventories  i
-  INNER JOIN license_view l ON l.cvid=i.cvid
+  LEFT JOIN license_view l ON l.cvid=i.cvid
   INNER JOIN component_versions c ON c.id=i.cvid
-  INNER JOIN licenses lic ON lic.spdxid=i.spdxid;`;
+  LEFT JOIN licenses lic ON lic.spdxid=i.spdxid;`;
 
   SQL_GET_CSV_DATA = `SELECT DISTINCT i.id AS inventoryId,f.fileId,i.usage,i.notes,i.spdxid AS identified_license,r.license AS detected_license,cv.purl,cv.version,f.path,cv.name AS identified_component,r.component AS detected_component
   FROM inventories i
