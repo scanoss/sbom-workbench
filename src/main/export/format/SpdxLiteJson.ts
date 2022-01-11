@@ -30,11 +30,11 @@ export class SpdxLiteJson extends Format {
         pkg.name = data[i].name;
         pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${data[i].purl}@${data[i].version}`).digest('hex')}`; // md5 purl@version
         pkg.versionInfo = data[i].version;
-        pkg.downloadLocation = data[i].url ? data[i].url : 'NOASSERSTION';
+        pkg.downloadLocation = data[i].url ? data[i].url : 'NOASSERTION';
         pkg.filesAnalyzed = false;
         pkg.homePage = data[i].url;
-        pkg.licenseDeclared = data[i].declareLicense ? data[i].declareLicense : 'NOASSERSTION';
-        pkg.licenseConcluded = data[i].concludedLicense !== 'N/A' ? data[i].concludedLicense : 'NOASSERSTION';
+        pkg.licenseDeclared = data[i].declareLicense ? data[i].declareLicense : 'NOASSERTION';
+        pkg.licenseConcluded = data[i].concludedLicense !== 'N/A' ? data[i].concludedLicense : 'NOASSERTION';
         pkg.externalRefs = [
           {
             referenceCategory: 'PACKAGE MANAGER',
