@@ -161,7 +161,7 @@ class LogicInventoryService {
           usage: results[i].usage,
           version: results[i].version,
           url: results[i].url,
-          spdxid: results[i].spdxid.split(',')[0],
+          spdxid: results[i]?.spdxid.split(',')[0] ? results[i].spdxid.split(',')[0] : 'N/A',
           cvid: 0,
         };
       } else aux[key].files.push(results[i].id);

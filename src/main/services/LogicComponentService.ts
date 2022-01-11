@@ -40,7 +40,7 @@ class LogicComponentService {
           files[i].component = components.find((component: any) => files[i].inventory.cvid === component.compid);
         }
 
-        files[i].license = files[i].license.split(',');
+        if (files[i].license) files[i].license = files[i].license.split(',');
       }
       return files;
     } catch (error: any) {
