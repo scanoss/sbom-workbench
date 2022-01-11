@@ -76,53 +76,9 @@ const languages = {
   txt: 'text',
 };
 
-// get extension of file
 const getExtension = (file) => {
   const ext = file.split('.').pop();
   return languages[ext] || 'text';
 };
 
-const expandNodes = (node) => {
-  const { children } = node;
-  node.state = { expanded: true };
-
-  if (children) {
-    children.forEach((child) => {
-      expandNodesToMatch(child);
-    });
-  }
-  return node;
-};
-
-const expandNodesToMatch = (node) => {
-  const { children, value, type, hasPending, hasIgnored, hasIdentified } = node;
-  if (type === 'folder' && (hasPending || hasIgnored || hasIdentified)) node.state = { expanded: true };
-
-  if (children) {
-    children.forEach((child) => {
-      expandNodesToMatch(child);
-    });
-  }
-  return node;
-};
-
-const convertTreeToNode = (tree, previous) => {
-  const nTree = mapNode(tree, previous[0]);
-  nTree.state = { expanded: true };
-  return [tree];
-};
-
-const mapNode = (node, prev) => {
-  node.id = node.value;
-  node.name = node.label;
-  node.state = prev.state;
-
-  if (node.children) {
-    node.children.forEach((child, index) => {
-      mapNode(child, prev.children[index]);
-    });
-  }
-  return node;
-};
-
-export { range, getColor, colorsForLicense, getExtension, languages, expandNodes, expandNodesToMatch, convertTreeToNode };
+export { range, getColor, colorsForLicense, getExtension, languages };

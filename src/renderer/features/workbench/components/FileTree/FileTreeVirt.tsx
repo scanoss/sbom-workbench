@@ -3,7 +3,7 @@
 import React, { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Tree, { renderers as Renderers, selectors } from 'react-virtualized-tree';
-import { convertTreeToNode, expandNodes, expandNodesToMatch } from '../../../../../utils/utils';
+import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '../../../../../utils/filetree-utils';
 import useContextual from '../../../../hooks/useContextual';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 
@@ -121,13 +121,13 @@ export const FileTreeVirt = () => {
   };
 
   const onExpandAll = (node: any, toMatch = false) => {
-     const nodes = !toMatch ? expandNodes(node) : expandNodesToMatch(node);
-     setNodes([nodes]);
+    const ns = !toMatch ? expandAll(nodes, node) : expandToMatches(nodes, node);
+    setNodes(ns);
   };
 
   const onCollapseAll = (node: any) => {
-    /* const nodes = expandNodesToLevel([node], Infinity);
-    setExpanded((expanded) =>  expanded.filter((el) => !nodes.includes(el))); */
+    const ns = collapseAll(nodes, node);
+    setNodes(ns);
   };
 
   useEffect(() => {
