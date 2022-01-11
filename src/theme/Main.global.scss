@@ -72,3 +72,17 @@ a {
     background-color: #A1A1AA
   }
 }
+
+.loader {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  span {
+    font-size: 12px;
+    margin-bottom: 60px;
+    color: var(--color-status-ignored);
+  }
+}

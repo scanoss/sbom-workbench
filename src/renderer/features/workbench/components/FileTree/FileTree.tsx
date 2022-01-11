@@ -1,33 +1,51 @@
-import React, { useContext, useState, useEffect } from 'react';
-import CheckboxTree, { OnCheckNode } from 'react-checkbox-tree';
-import { expandNodesToLevel } from 'react-checkbox-tree/src/js/utils';
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+import React, { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { expandNodesToMatch } from '../../../../../utils/utils';
+import Tree, { renderers as Renderers, selectors } from 'react-virtualized-tree';
+import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '../../../../../utils/filetree-utils';
 import useContextual from '../../../../hooks/useContextual';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
+
+const { Expandable } = Renderers;
 
 const electron = window.require('electron');
 const { remote } = electron;
 const { Menu } = remote;
 
+const FileTreeNode = ({ node, onClick, onContextMenu }) => {
+  return (
+    <span
+      className={`ft-node-title ${node.type}`}
+      onClick={(e) => onClick(e, node)}
+      onContextMenu={(e) => onContextMenu(e, node)}
+    >
+      <span className="ft-node-icon">
+        {node.type === 'folder' &&
+          (node.state?.expanded ? <i className="fa fa-folder-open" /> : <i className="fa fa-folder" />)}
+
+        {node.type === 'file' && <i className="fa fa-file" />}
+      </span>
+      {node.name}
+    </span>
+  );
+};
+
 export const FileTree = () => {
   const history = useHistory();
+  const contextual = useContextual();
 
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { tree, filter, file } = state;
 
-  const [renderTree, setRenderTree] = useState([]);
-  const [expanded, setExpanded] = useState<string[]>([renderTree && renderTree[0] ? renderTree[0].value : '']);
+  const [nodes, setNodes] = React.useState([]);
 
-  const getNode = (target) => {
-    const node = target.parent.children?.find((el) => el.value === target.value);
-    return node;
+  const handleChange = (nodes) => {
+    setNodes(nodes);
   };
 
-  const onSelectFile = async (node: OnCheckNode) => {
+  const onSelectNode = async (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
     const { children, value } = node;
-
-    const fileTreeNode = getNode(node);
 
     if (!children) {
       history.push({
@@ -37,80 +55,15 @@ export const FileTree = () => {
     } else {
       history.push({
         pathname: '/workbench/detected',
-        search: fileTreeNode ? `?path=folder|${encodeURIComponent(fileTreeNode.value)}` : null,
+        search: node.value ? `?path=folder|${encodeURIComponent(value)}` : null,
       });
     }
   };
 
-  const onExpandAll = (node: any, toMatch = false) => {
-    const nodes = !toMatch ? expandNodesToLevel([node], Infinity) : expandNodesToMatch(node, []);
-    setExpanded((expanded) => [...new Set([...expanded, ...nodes])]);
-  };
-
-  const onCollapseAll = (node: any) => {
-    const nodes = expandNodesToLevel([node], Infinity);
-    setExpanded((expanded) =>  expanded.filter((el) => !nodes.includes(el)));
-  };
-
-  useEffect(() => {
-    document.querySelectorAll('.rct-text.selected').forEach((el) => el.classList.remove('selected'));
-    if (!filter.node?.path && !file) {
-      document.querySelector('.react-checkbox-tree .rct-text')?.classList.add('selected');
-      return;
-    }
-
-    const value = filter.node?.path || file;
-    const node = document.querySelector(`[data-value="${value}"]`);
-    node?.closest('.rct-text')?.classList.add('selected');
-  }, [filter.node, file, renderTree]);
-
-  useEffect(() => {
-    if (tree) {
-      const t = { ...tree };
-      setRenderTree([preRender(t)]);
-    }
-  }, [tree]);
-
-  const preRender = (node: any) => {
-    node.label = <NodeItem node={node} label={node.label} onExpand={onExpandAll} onCollapse={onCollapseAll} />;
-    if (node.children) {
-      node.children.forEach((el) => preRender(el));
-    }
-    return node;
-  };
-
-  return (
-    <>
-      {tree ? (
-        <CheckboxTree
-          nodes={renderTree || []}
-          expanded={expanded}
-          onClick={(targetNode) => onSelectFile(targetNode)}
-          onExpand={(expandedItems) => setExpanded((state) => expandedItems)}
-        />
-      ) : (
-        <div className="loader">
-          <span>Indexing...</span>
-        </div>
-      )}
-    </>
-  );
-};
-
-export default FileTree;
-
-export const NodeItem = ({ node, label, onExpand, onCollapse }) => {
-  const contextual = useContextual();
-
-  const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: OnCheckNode | any) => {
+  const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
     const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED' || node.status === 'FILTERED';
     const menu = !node.children
       ? [
-          /* {
-            label: 'Identify file',
-            click: () => contextual.identifyAll(node),
-            enabled: !onlyRestore,
-          }, */
           {
             label: 'Mark file as original',
             click: () => contextual.ignore(node),
@@ -150,27 +103,64 @@ export const NodeItem = ({ node, label, onExpand, onCollapse }) => {
             submenu: [
               {
                 label: 'Expand all',
-                click: () => onExpand(node),
+                click: () => onExpandAll(node),
               },
               {
                 label: 'Expand to matches',
-                click: () => onExpand(node, true),
+                click: () => onExpandAll(node, true),
               },
               {
                 label: 'Collapse all',
-                click: () => onCollapse(node),
-              }
-            ]
-
+                click: () => onCollapseAll(node),
+              },
+            ],
           },
         ];
 
     Menu.buildFromTemplate(menu).popup(remote.getCurrentWindow());
   };
 
-  return (
-    <span onContextMenu={(e) => onContextMenu(e, node)} data-value={node.value}>
-     {label}
-    </span>
+  const onExpandAll = (node: any, toMatch = false) => {
+    const ns = !toMatch ? expandAll(nodes, node) : expandToMatches(nodes, node);
+    setNodes(ns);
+  };
+
+  const onCollapseAll = (node: any) => {
+    const ns = collapseAll(nodes, node);
+    setNodes(ns);
+  };
+
+  useEffect(() => {
+    if (tree) {
+      setNodes(convertTreeToNode(tree, nodes.length > 0 ? nodes : [tree]));
+    }
+  }, [tree]);
+
+  return tree ? (
+    <Tree nodes={nodes} onChange={handleChange}>
+      {({ style, node, ...rest }) => (
+        <div
+          style={{ ...style, ...{ paddingLeft: style.marginLeft, margin: 0 } }}
+          className={`ft-node ${node.className} ${node.id === filter.node?.path ? 'selected' : ''}`}
+        >
+          <Expandable
+            node={node}
+            {...rest}
+            iconsClassNameMap={{
+              expanded: 'fa fa-angle-down',
+              collapsed: 'fa fa-angle-right',
+            }}
+          >
+            <FileTreeNode node={node} onClick={onSelectNode} onContextMenu={onContextMenu} />
+          </Expandable>
+        </div>
+      )}
+    </Tree>
+  ) : (
+    <div className="loader">
+      <span>Indexing...</span>
+    </div>
   );
 };
+
+export default FileTree;
