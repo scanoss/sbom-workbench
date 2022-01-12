@@ -109,7 +109,6 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
 
   const init = async () => {
     const response = await inventoryService.acceptAllPreLoadInventory({ folder, overwrite });
-
     const inv = response.sort((a, b) => {
       if (a.spdxid === null) return 1;
       if (b.spdxid === null) return -1;
@@ -160,7 +159,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                     inventories.map((value, index) => {
                       const labelId = `checkbox-list-label-${value.cvid}`;
                       return (
-                        <ListItem
+                        <ListItem                       
                           onClick={value.spdxid ? handleToggle(value) : null}
                           disabled={!value.spdxid}
                           className={classes.listItem}
@@ -231,6 +230,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                 </div>
               </List>
             </div>
+
             <div>
               {inventoryNoLicenseCount <= 0 ? (
                 <div />

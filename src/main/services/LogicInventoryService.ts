@@ -152,7 +152,8 @@ class LogicInventoryService {
     const aux: any = {};
     const count = results.length;
     for (let i = 0; i < count; i += 1) {
-      const key = `${results[i].component}${results[i].version}${results[i].purl}${results[i].spdxid}${results[i].usage}`;
+      const spdx = results[i].spdxid?.split(',')[0] ? results[i].spdxid.split(',')[0] : '-';
+      const key = `${results[i].component.toLowerCase()}${results[i].version}${spdx}${results[i].usage}`;
       if (!aux[key]) {
         aux[key] = {
           component: results[i].component,
@@ -161,14 +162,14 @@ class LogicInventoryService {
           usage: results[i].usage,
           version: results[i].version,
           url: results[i].url,
-          spdxid: results[i]?.spdxid.split(',')[0] ? results[i].spdxid.split(',')[0] : null,
+          spdxid: spdx === '-' ? null : spdx,
           cvid: 0,
         };
       } else aux[key].files.push(results[i].id);
     }
 
     return Object.values(aux);
-  } 
+  }
 }
 
 export const logicInventoryService = new LogicInventoryService();
