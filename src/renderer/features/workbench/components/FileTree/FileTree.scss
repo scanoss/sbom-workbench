@@ -1,140 +1,108 @@
 .file-tree-container {
+  $bg: #dbe7ff;
   color: #3F3F46;
   font-weight: 400;
 
-  .react-checkbox-tree {
-    width: 100%;
-    font-size: 14px;
+  .ReactVirtualized__Grid__innerScrollContainer {
+    overflow: visible !important;
+  }
 
-    > ol {
-      display: grid;
-      overflow-x: scroll;
+  .ReactVirtualized__List {
+    outline: none;
+  }
+
+  .ft-node {
+    &:first-child {
+      padding-left: 8px !important;
     }
 
-    .rct-collapse {
-      padding-right: 0;
-  }
-  }
+    &.filter-item {
+      color: #968d8d8a;
+    }
 
-  .rct-node {
-    margin: 2px 0;
-    overflow: visible;
+    &:hover {
+      background-color: #eef3fdad;
+    }
 
-    $bg: #dbe7ff;
-
-    .selected {
-      border-radius: 2px;
+    &.selected {
       background-color: $bg !important
     }
 
-    .rct-bare-label {
+    > span {
       width: 100%;
-
-      *:focus {
-        background: #eef3fdad;
-      }
-    }
-
-    .rct-title {
-      width: 100%;
-      position: absolute;
-
-      > span {
-        padding-left: 25px;
-        overflow: visible;
-        display: flex;
-        word-break: break-all;
-        white-space: nowrap;
-      }
-    }
-
-    .rct-node-clickable {
       display: flex;
-      width: 100%;
-      position: relative;
+      overflow: visible;
+      word-break: break-all;
+      white-space: nowrap;
     }
 
-    &.status-pending > span .rct-node-icon::before  {
+    i.fa {
+      margin-top: 1px;
+      width: 11px;
+      text-align: center;
+      outline: none;
+
+      &.fa-folder:before {
+        content: "\f114";
+      }
+
+      &.fa-folder-open:before {
+        content: "\f115";
+      }
+
+      &.fa-file:before {
+        content: "\f016";
+      }
+    }
+
+    //  &.status-pending > span .rct-node-icon::before
+    &.status-pending > span .ft-node-icon::before  {
       background: var(--color-status-pending);
     }
 
-    &.status-identified > span .rct-node-icon::before  {
+    &.status-identified > span .ft-node-icon::before  {
       background: var(--color-status-identified);
     }
 
-    &.status-ignored > span .rct-node-icon::before  {
+    &.status-ignored > span .ft-node-icon::before  {
       background: var(--color-status-ignored);
     }
 
-    &.filter-item .rct-node-icon::before  {
-      background: transparent !important;
-    }
-  }
-
-  .rct-node-icon {
-    color: #3F3F46;
-    position: relative;
-
-    &::before {
-      content: '';
-      display: inline-block;
-      position: absolute;
-      left: 15px;
-      bottom: 1px;
+    .ft-node-title {
+      font-size: 14px;
+      margin-left: 5px;
       background: transparent;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
+      border: transparent;
+      outline: none;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+
+      &.file {
+        padding-left: 11px;
+      }
+
+      .ft-node-icon {
+        position: relative;
+        display: inline-block;
+        margin-right: 8px;
+        min-width: 15px;
+        font-size: 14px;
+
+        &::before {
+          content: '';
+          display: inline-block;
+          position: absolute;
+          left: 10px;
+          bottom: 1px;
+          background: transparent;
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+        }
+      }
     }
   }
 
-  .match-info-result {
-    font-weight: 500;
-    color: #27272A;
-
-    .rct-node-icon {
-      color: #27272A;
-    }
-  }
-
-  .filter-item {
-    color: #968d8d8a;
-
-    .rct-title {
-      font-weight: 400 !important;
-    }
-
-    .rct-node-icon {
-      color: #968d8d8a;
-    }
-  }
-
-  .exclude-item {
-    font-weight: 600;
-    color: #968d8d8a;
-    text-decoration:line-through;
-
-    .rct-node-icon {
-      color: #968d8d8a;
-    }
-  }
-
-  .no-match {
-    font-weight: 400;
-  }
-
-}
-
-.loader {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  span {
-    font-size: 12px;
-    margin-bottom: 60px;
-    color: var(--color-status-ignored);
-  }
 }

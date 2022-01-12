@@ -76,22 +76,9 @@ const languages = {
   txt: 'text',
 };
 
-// get extension of file
 const getExtension = (file) => {
   const ext = file.split('.').pop();
   return languages[ext] || 'text';
 };
 
-const expandNodesToMatch = (node, acc) => {
-  const { children, value, type, hasPending, hasIgnored, hasIdentified } = node;
-  if (type === 'folder' && (hasPending || hasIgnored || hasIdentified)) acc.push(value);
-
-  if (children) {
-    children.forEach((child) => {
-      expandNodesToMatch(child, acc);
-    });
-  }
-  return acc;
-};
-
-export { range, getColor, colorsForLicense, getExtension, languages, expandNodesToMatch };
+export { range, getColor, colorsForLicense, getExtension, languages };

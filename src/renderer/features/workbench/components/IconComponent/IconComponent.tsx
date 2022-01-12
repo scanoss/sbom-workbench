@@ -1,11 +1,10 @@
 import React from 'react';
 import componentDefault from '../../../../../../assets/imgs/component-default.svg';
 import { ENABLE_COMPONENT_LOGO } from '../../../../../Config';
-import style from './IconComponent.scss';
 
 const IconComponent = ({ name, size }) => {
   return (
-    <div id={style.IconComponent}>
+    <div id="IconComponent">
       <figure style={{ width: size, height: size }}>
         {ENABLE_COMPONENT_LOGO ? (
           <img
