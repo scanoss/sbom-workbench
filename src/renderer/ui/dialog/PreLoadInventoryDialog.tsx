@@ -161,15 +161,15 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                       const labelId = `checkbox-list-label-${value.cvid}`;
                       return (
                         <ListItem
-                          disabled={value.spdxid === null}
+                          onClick={value.spdxid ? handleToggle(value) : null}
+                          disabled={!value.spdxid}
                           className={classes.listItem}
                           key={value.cvid + value.version + value.spdxid}
                         >
-                          <ListItemIcon className="list-item" onClick={handleToggle(value)}>
+                          <ListItemIcon className="list-item">
                             <Checkbox
-                              onClick={handleToggle(value)}
                               edge="start"
-                              disabled={value.spdxid === null}
+                              disabled={!value.spdxid}
                               checked={
                                 value.spdxid === null
                                   ? false
@@ -182,7 +182,6 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                                     ) !== -1
                               }
                               tabIndex={-1}
-                              // disableRipple
                               inputProps={{ 'aria-labelledby': labelId }}
                             />
                             <div className="checkbox-info">
