@@ -8,6 +8,14 @@
   padding: 0px 8px;
 }
 
+.list-container{
+  border: transparent;
+  border-radius: 20px;
+  :focus{
+    outline: none;
+  }
+}
+
 textarea {
   padding: 12px;
 }
