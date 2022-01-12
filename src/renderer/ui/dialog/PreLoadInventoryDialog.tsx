@@ -204,7 +204,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                               </div>
                               <div className="pills">
                                 <div className={value.spdxid ? 'version-pill' : 'version-pill-no-license'}>
-                                  <p>{value.version.trim() === '' ? '-' : `${value.version}`.slice(0, 10)}</p>
+                                  <p>{value.version.trim() === '' ? '-' : `${value.version}`.slice(0, 12)}</p>
                                 </div>
                                 {value.spdxid?.length > 10 ? (
                                   <Tooltip title={value.spdxid}>
