@@ -3,7 +3,7 @@ import { workspace } from '../workspace/Workspace';
 class LogicResultService {
   public async getResultsByids(ids: number[], project: any) {
     try {
-      const results: Array<any> = await project.scans_db.results.getSummaryByids(ids);
+      const results: Array<any> = await project.store.results.getSummaryByids(ids);
       const response = {};
       results.forEach((element: any) => {
         if (response[element.path] === undefined) {

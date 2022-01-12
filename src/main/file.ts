@@ -6,6 +6,8 @@ import { File, FileType } from '../api/types';
 import { workspace } from './workspace/Workspace';
 import { logicResultService } from './services/LogicResultService';
 import { NodeStatus } from './workspace/Tree/Tree/Node';
+import { utilHelper } from './helpers/UtilHelper';
+import { FilterTrue } from './batch/Filter/FilterTrue';
 
 const path = require('path');
 
@@ -96,9 +98,9 @@ ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
 
   project.sendToUI(IpcEvents.TREE_UPDATING, {});
   logicResultService
-    .getResultsByids(arg, project)
-    .then((filesToUpdate) => {
-      const paths = Object.keys(filesToUpdate);
+    .getResultsFromIDs(arg)
+    .then((filesToUpdate: any) => {
+      const paths = utilHelper.getArrayFromObjectFilter(filesToUpdate, 'path', new FilterTrue()) as Array<string>;  
       for (const filePath of paths) {
         project.getTree().getRootFolder().setStatus(filePath, NodeStatus.IGNORED);
       }
