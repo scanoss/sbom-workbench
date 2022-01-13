@@ -387,4 +387,8 @@ export class Project extends EventEmitter {
   public getNode(path: string) {
     return this.tree.getNode(path);
   }
+
+  public getToken(){
+    return this.metadata.getToken();
+  }
 }
