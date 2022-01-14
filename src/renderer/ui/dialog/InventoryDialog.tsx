@@ -60,26 +60,45 @@ interface InventoryDialogProps {
   inventory: Partial<InventoryForm>;
   onClose: (inventory: Inventory) => void;
   onCancel: () => void;
+  recentUsedComponents: ComponentGroup[];
 }
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
   const dialogCtrl = useContext<any>(DialogContext);
-
-  const { open, inventory, onClose, onCancel } = props;
+  const { open, inventory, onClose, onCancel, recentUsedComponents } = props;
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
-  const [components, setComponents] = useState<ComponentGroup[]>([]);
+  const [components, setComponents] = useState<any[]>([]);
   const [versions, setVersions] = useState<any[]>([]);
   const [licenses, setLicenses] = useState<any[]>([]);
   const [licensesAll, setLicensesAll] = useState<any[]>();
+ 
 
   const setDefaults = () => setForm(inventory);
 
   const init = async () => {
+    console.log('INIT',recentUsedComponents);
     const componentsResponse = await componentService.getAllComponentGroup();
     const licensesResponse = await licenseService.getAll();
+    const compCatalogue = componentsResponse.data.map((component) => ({
+      name: component.name,
+      purl: component.purl,
+      versions: component.versions,
+      type: 'Catalogued',
+    }));
 
-    setComponents(componentsResponse.data);
+    if (recentUsedComponents && recentUsedComponents.length > 0) {
+      const recentUsed = recentUsedComponents.map((component) => ({
+        name: component.name,
+        purl: component.purl,
+        versions: component.versions,
+        type: 'Recents',
+      }));
+      setComponents([...recentUsed, ...compCatalogue]);
+    } else {
+      setComponents(componentsResponse.data);
+    }
+
     const catalogue = licensesResponse.data.map((item) => ({
       spdxid: item.spdxid,
       name: item.name,
@@ -162,25 +181,16 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    const inventory: any = form;
-    onClose(inventory);
+    const newInventory: any = form;
+    onClose(newInventory);
   };
-
-  // useEffect(setDefaults, [inventory]);
+ 
   useEffect(() => {
     if (open) {
       setDefaults();
       init();
     }
   }, [open]);
-
-  /* useEffect(() => {
-    if (licenses && licenses.length > 0 && !form.spdxid) {
-      setForm({ ...form, spdxid: inventory.spdxid });
-    }
-  }, [licenses]); */
-
-  // cascade effects to populate autocompletes
 
   useEffect(() => {
     const component = components.find((item) => item.purl === form.purl);
@@ -239,6 +249,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 <Autocomplete
                   fullWidth
                   options={components || []}
+                  groupBy={(option) => option?.type}
                   value={{ name: form?.component, purl: form?.purl }}
                   getOptionSelected={(option, value) => option.purl === value.purl}
                   getOptionLabel={(option) => option.name}

@@ -65,12 +65,6 @@ export const Editor = () => {
     }
   };
 
-
-
-
-
-
-
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false });
@@ -93,18 +87,18 @@ export const Editor = () => {
   };
 
   const getInventories = async () => {
-    const inv = await inventoryService.getAll({ files: [file] });   
+    const inv = await inventoryService.getAll({ files: [file] });
     setInventories(inv);
   };
 
   const getResults = async () => {
     const results = await resultService.get(file);
-    console.log("RESULTS",results);
+    console.log('RESULTS', results);
     setMatchInfo(mapFiles(results));
   };
 
   const create = async (defaultInventory, selFiles) => {
-    const inventory = await dialogCtrl.openInventory(defaultInventory);
+    const inventory = await dialogCtrl.openInventory(defaultInventory, state.recentUsedComponents);
     if (!inventory) return;
 
     const newInventory = await createInventory({
@@ -130,9 +124,12 @@ export const Editor = () => {
   };
 
   const onNoMatchIdentifyPressed = async (result) => {
-    const response = await dialogCtrl.openInventory({
-      usage: 'file',
-    });
+    const response = await dialogCtrl.openInventory(
+      {
+        usage: 'file',
+      },
+      state.recentUsedComponents
+    );
     if (response) {
       const data = await fileService.getIdFromPath(file);
       if (!data) return;
@@ -283,7 +280,11 @@ export const Editor = () => {
           <main className="editors editors-full app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
-                <MemoCodeEditor language={getExtension(file)} content={localFileContent.content} highlight={currentMatch?.lines || null} />
+                <MemoCodeEditor
+                  language={getExtension(file)}
+                  content={localFileContent.content}
+                  highlight={currentMatch?.lines || null}
+                />
               ) : null}
             </div>
           </main>
@@ -291,7 +292,11 @@ export const Editor = () => {
           <main className="editors app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
-                <MemoCodeEditor language={getExtension(file)} content={localFileContent.content} highlight={currentMatch?.lines || null} />
+                <MemoCodeEditor
+                  language={getExtension(file)}
+                  content={localFileContent.content}
+                  highlight={currentMatch?.lines || null}
+                />
               ) : null}
             </div>
             {inventories?.length === 0 && matchInfo?.length === 0 ? (
@@ -301,7 +306,11 @@ export const Editor = () => {
             ) : (
               <div className="editor">
                 {currentMatch && remoteFileContent?.content ? (
-                  <MemoCodeEditor language={getExtension(file)} content={remoteFileContent.content} highlight={currentMatch?.oss_lines || null} />
+                  <MemoCodeEditor
+                    language={getExtension(file)}
+                    content={remoteFileContent.content}
+                    highlight={currentMatch?.oss_lines || null}
+                  />
                 ) : null}
               </div>
             )}
