@@ -11,8 +11,11 @@ import {
   UPDATE_FILETREE,
   SET_FOLDER,
   SET_NODE,
+  SET_RECENT_USED_COMPONENTS,
 } from './actions';
-import { ComponentGroup, Node } from '../../../api/types';
+import { Component, ComponentGroup, Node } from '../../../api/types';
+
+const MAX_RECENT_USED_COMPONENTS = 3;
 
 export interface State {
   name: string;
@@ -22,6 +25,7 @@ export interface State {
   tree: any;
   file: string | null;
   mainComponents: ComponentGroup[];
+  recentUsedComponents: ComponentGroup[];
   components: ComponentGroup[];
   component: ComponentGroup;
   history: {
@@ -43,6 +47,7 @@ export const initialState: State = {
   tree: null,
   file: null,
   mainComponents: null,
+  recentUsedComponents: null,
   components: null,
   component: null,
   history: {
@@ -177,6 +182,26 @@ export default function reducer(state: State = initialState, action): State {
         },
       };
     }
+    case SET_RECENT_USED_COMPONENTS: {
+      const { component } = action;
+      if (state.recentUsedComponents) {
+        if (!state.recentUsedComponents.some((el) => el.purl === component.purl)) {
+          state.recentUsedComponents.splice(0, 0, component);
+        } else {
+          const index = state.recentUsedComponents.findIndex((el) => el.purl === component.purl);
+          state.recentUsedComponents.splice(0, 0, component);
+          state.recentUsedComponents.splice(index, 1);
+        }
+      } else state.recentUsedComponents = [component];
+
+      if (state.recentUsedComponents && state.recentUsedComponents.length >= MAX_RECENT_USED_COMPONENTS)
+        state.recentUsedComponents.splice(3, 1);
+
+      return {
+        ...state,
+      };
+    }
+
     case RESET:
       return { ...initialState };
     default:

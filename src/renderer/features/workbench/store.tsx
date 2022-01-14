@@ -4,10 +4,18 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
-import { Inventory, InventoryAction, Node } from '../../../api/types';
+import { Component, ComponentGroup, Inventory, InventoryAction, Node } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
-import { loadScanSuccess, setComponent, setComponents, setProgress, updateTree, setCurrentNode } from './actions';
+import {
+  loadScanSuccess,
+  setComponent,
+  setComponents,
+  setProgress,
+  updateTree,
+  setCurrentNode,
+  setRecentUsedComponents,
+} from './actions';
 import { resultService } from '../../../api/results-service';
 import { reportService } from '../../../api/report-service';
 import { IpcEvents } from '../../../ipc-events';
@@ -34,7 +42,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const { setScanBasePath } = React.useContext<any>(AppContext);
   const [state, dispatch] = React.useReducer(reducer, initialState);
-  const { loaded, tree, file, component } = state;
+  const { loaded, tree, file, component, recentUsedComponents } = state;
 
   const loadScan = async (path: string) => {
     try {
@@ -55,6 +63,8 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const createInventory = async (inventory: Inventory): Promise<Inventory> => {
     const response = await inventoryService.create(inventory);
+    const comp = state.components.find((c) => c.purl === inventory.purl);
+    if (comp) dispatch(setRecentUsedComponents(comp as ComponentGroup));
     update();
     return response;
   };

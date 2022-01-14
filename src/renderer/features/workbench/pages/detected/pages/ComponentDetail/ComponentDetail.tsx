@@ -256,7 +256,7 @@ export const ComponentDetail = () => {
   };
 
   const create = async (defaultInventory, selFiles) => {
-    const inventory = await dialogCtrl.openInventory(defaultInventory);
+    const inventory = await dialogCtrl.openInventory(defaultInventory, state.recentUsedComponents);
     if (!inventory) return;
 
     const newInventory = await createInventory({

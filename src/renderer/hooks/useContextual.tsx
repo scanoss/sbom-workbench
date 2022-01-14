@@ -1,11 +1,11 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { fileService } from '../../api/file-service';
 import { resultService } from '../../api/results-service';
-import { Inventory, InventoryAction } from '../../api/types';
+import { InventoryAction } from '../../api/types';
 import { DialogContext, IDialogContext } from '../context/DialogProvider';
 import { DialogResponse, DIALOG_ACTIONS } from '../context/types';
 import { WorkbenchContext, IWorkbenchContext } from '../features/workbench/store';
-import PreLoadInventoryDialog from '../ui/dialog/PreLoadInventoryDialog';
+
 
 const useContextual = () => {
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
@@ -54,7 +54,7 @@ const useContextual = () => {
   };
 
   const identifyAll = async (node: any): Promise<boolean> => {
-    const inventory = await dialogCtrl.openInventory({ usage: 'file' });
+    const inventory = await dialogCtrl.openInventory({ usage: 'file' }, state.recentUsedComponents);
     if (inventory) {
       const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
       if (inventory && action !== DIALOG_ACTIONS.CANCEL) {

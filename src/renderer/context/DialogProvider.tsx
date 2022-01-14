@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { ipcRenderer } from 'electron';
 import { InventoryDialog } from '../ui/dialog/InventoryDialog';
-import { Component, Inventory, IWorkspaceCfg, License, NewComponentDTO } from '../../api/types';
+import { ComponentGroup, Inventory, NewComponentDTO } from '../../api/types';
 import { InventorySelectorDialog } from '../features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
-import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse } from './types';
+import { DialogResponse, InventoryForm, InventorySelectorResponse } from './types';
 import { ConfirmDialog } from '../ui/dialog/ConfirmDialog';
 import { LicenseDialog } from '../ui/dialog/LicenseDialog';
 import { ComponentDialog } from '../ui/dialog/ComponentDialog';
@@ -15,7 +15,10 @@ import { AlertDialog } from '../ui/dialog/AlertDialog';
 import { PreLoadInventoryDialog } from '../ui/dialog/PreLoadInventoryDialog';
 
 export interface IDialogContext {
-  openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
+  openInventory: (
+    inventory: Partial<InventoryForm>,
+    recentUsedComponents: ComponentGroup[]
+  ) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
   openAlertDialog: (message?: string, buttons?: any[]) => Promise<DialogResponse>;
@@ -31,13 +34,18 @@ export const DialogProvider: React.FC = ({ children }) => {
   const [inventoryDialog, setInventoryDialog] = useState<{
     open: boolean;
     inventory: Partial<InventoryForm>;
+    recentUsedComponents: ComponentGroup[];
     onClose?: (inventory) => void;
-  }>({ open: false, inventory: {} });
+  }>({ open: false, inventory: {}, recentUsedComponents: [] });
 
-  const openInventory = (inventory: Partial<InventoryForm>): Promise<Inventory | null> => {
+  const openInventory = (
+    inventory: Partial<InventoryForm>,
+    recentUsedComponents: ComponentGroup[]
+  ): Promise<Inventory | null> => {
     return new Promise<Inventory>((resolve) => {
       setInventoryDialog({
         inventory,
+        recentUsedComponents,
         open: true,
         onClose: (inv) => {
           setInventoryDialog((dialog) => ({ ...dialog, open: false }));
@@ -145,7 +153,7 @@ export const DialogProvider: React.FC = ({ children }) => {
           setLicenseDialog((dialog) => ({ ...dialog, open: false }));
           resolve(response);
         },
-        save: save,
+        save,
       });
     });
   };
@@ -243,6 +251,7 @@ export const DialogProvider: React.FC = ({ children }) => {
         inventory={inventoryDialog.inventory}
         onCancel={() => inventoryDialog.onClose && inventoryDialog.onClose(null)}
         onClose={(inventory) => inventoryDialog.onClose && inventoryDialog.onClose(inventory)}
+        recentUsedComponents={inventoryDialog.recentUsedComponents}
       />
 
       <InventorySelectorDialog
