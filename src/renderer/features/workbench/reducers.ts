@@ -13,7 +13,7 @@ import {
   SET_NODE,
   SET_RECENT_USED_COMPONENTS,
 } from './actions';
-import { Component, ComponentGroup, Node } from '../../../api/types';
+import { ComponentGroup, Node } from '../../../api/types';
 
 const MAX_RECENT_USED_COMPONENTS = 3;
 
@@ -189,13 +189,15 @@ export default function reducer(state: State = initialState, action): State {
           state.recentUsedComponents.splice(0, 0, component);
         } else {
           const index = state.recentUsedComponents.findIndex((el) => el.purl === component.purl);
-          state.recentUsedComponents.splice(0, 0, component);
+
           state.recentUsedComponents.splice(index, 1);
+          state.recentUsedComponents.splice(0, 0, component);
         }
       } else state.recentUsedComponents = [component];
 
-      if (state.recentUsedComponents && state.recentUsedComponents.length >= MAX_RECENT_USED_COMPONENTS)
+      if (state.recentUsedComponents?.length >= MAX_RECENT_USED_COMPONENTS) {
         state.recentUsedComponents.splice(3, 1);
+      }
 
       return {
         ...state,
