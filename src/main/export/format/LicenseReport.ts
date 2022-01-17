@@ -67,7 +67,7 @@ export class LicenseReport extends Format {
     
     <style>
         .table td,
-        .table th {
+        .table thead th {
             padding: 0rem;
             vertical-align: middle;
             border-top: 1px solid #dee2e6;
