@@ -90,7 +90,7 @@ export class LicenseReport extends Format {
                     <table style="width: 60%; height:100px;" class="table">
                         <thead>
                             <tr>
-                                <th style="width: 30px;" scope="col">Ref-color</th>
+                                <th style="width: 30px;" scope="col">Ref-colour</th>
                                 <th scope="col" style="padding-left: 10%; text">License Name</th>
                                 <th scope="col" style="padding-left: 5%;">Component Count</th>
                             </tr>
