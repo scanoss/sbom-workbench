@@ -6,6 +6,7 @@ import { SpdxLite } from './format/SpdxLite';
 import { Csv } from './format/Csv';
 import { Raw } from './format/Raw';
 import { Wfp } from './format/Wfp';
+import { LicenseReport } from './format/LicenseReport';
 import { FormatVersion } from '../../api/types';
 import { SpdxLiteJson } from './format/SpdxLiteJson';
 
@@ -48,6 +49,9 @@ export class Export {
         break;
       case FormatVersion.SPDXLITEJSON:
         Export.format = new SpdxLiteJson();
+        break;
+      case FormatVersion.LICENSEREPORT:
+        Export.format = new LicenseReport();
         break;
       default:
     
