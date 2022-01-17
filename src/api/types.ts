@@ -144,6 +144,7 @@ export enum FormatVersion {
   RAW = 'RAW',
   WFP = 'WFP',
   SPDXLITEJSON = 'SPDXLITEJSON',
+  HTMLSUMMARY = 'HTMLSUMMARY',
 }
 
 export type IParams = Record<PropertyKey, any> & {

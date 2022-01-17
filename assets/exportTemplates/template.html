@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Report</title>
+</head>
+
+<style>
+    body {
+        background-color: #f5f5f5a1;
+    }
+
+    header {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+    h1 {
+        margin-top: 1%;
+        margin-bottom: 1%;
+        text-align: center;
+    }
+
+    h3 {
+        margin-top: 1%;
+        text-align: center;
+    }
+
+    .identification-progress-title {
+        margin-top: 5%
+    }
+
+    .divider {
+        border-bottom: 1px solid #b5b5b5ab;
+        text-align: center;
+        width: 90%;
+    }
+
+    .main-container {
+        width: 100%;
+        height: 800px;
+        margin-top: 1%;
+    }
+
+    .progress-bar-container {
+        margin-top: 1%;
+        width: 100%;
+        height: 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 3%;
+    }
+
+
+    .main-content-info-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 700px;
+        padding-bottom: 4%;
+        padding-top: 7%;
+    }
+
+    .main-container-left {
+        display: flex;
+        flex-direction: column;
+        width: 45%;
+        height: 700px;
+    }
+
+    .main-container-right {
+        display: flex;
+        flex-direction: column;
+        width: 55%;
+        height: 700px;
+        border-left: 1px solid #e7e6e6ab;
+    }
+
+    .license-table-container {
+        width: 100%;
+        height: 700px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        padding-left: 4%;
+        padding-right: 7%;
+    }
+
+    .pie-chart-container {
+        width: 100%;
+        height: 330px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding-top: 5px;
+        padding-bottom: 5px;
+
+    }
+
+    .table td,
+    .table th {
+        padding: 0.15rem;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    th {
+        font-size: 13px;
+    }
+
+    tr {
+        font-size: 11px;
+    }
+
+    .colour-ref-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgb(105 101 101 / 5%);
+    }
+
+    #myChart {
+        width: 235px;
+    }
+
+    .button-solid {
+        border: none;
+        background-color: rgb(105 101 101 / 5%);
+        color: rgb(104, 180, 250);
+        font-weight: bold;
+    }
+
+    #drop-down-license-detail-btn{
+    	display:block;
+    	 border: none;
+    	 width:100%;
+    	 background-color: rgb(226 226 226);
+    }
+
+    .button-solid:focus ,#drop-down-license-detail-btn:focus{
+        border: none;
+        outline: none;
+    }
+
+    .show {
+        display: table-cell;
+        border-top: 0;
+    }
+
+    td.show {
+        border-top: 1px solid white;
+        padding: 0;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    .component-row {
+        width: 100%;
+    }
+
+    .license-ref-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        align-items: center;
+        flex-flow: nowrap;
+        width: 100%;
+    }
+
+    .colour-ref-license-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 15px;
+    }
+
+    .license-label {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 80%;
+        font-size: 12px;
+    }
+
+    .label {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        width: 100%;
+        color: rgb(0 0 0 / 51%);
+    }
+
+    .license-name {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        width: 100%;
+        flex-flow: wrap;
+    }
+
+    p {
+        margin-top: 0;
+        margin-bottom: 0;
+        text-align: left;
+    }
+
+    .colour-ref-license {
+        width: 100%;
+        height: 15px;
+        border-radius: 3px;
+    }
+
+    .component-license-detail {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        background-color: rgb(236 232 232);
+    }
+
+    .comp-detail-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 33.3%;
+    }
+
+    .comp-label {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding-left: 15%;
+        width: 100%;
+        font-size: 12px;
+        color: #777777;
+    }
+
+    .comp-info {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 100%;
+        padding-left: 15%;
+        font-size: 12px;
+    }
+
+    #progress-bar {
+        width: 400px;
+        height: 40px;
+        padding-left: 3.5px;
+    }
+
+    .progress-bar-child-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+        width: 50%;
+    }
+
+    .progress {
+        font-size: 25px;
+        display: block;
+        height: auto;
+        color: #22C55E;
+        background-color: #f5f5f5a1;
+    }
+
+    .progress-bar-info {
+        display: flex;
+        flex-flow: row;
+        flex-direction: row;
+        align-items: space-between;
+        width: 50%;
+        height: 20px;
+    }
+
+    .progress-bar-info-identified,
+    .progress-bar-info-pending {
+        display: flex;
+        width: 50%;
+        height: 20px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .identified,
+    .pending {
+        width: 30px;
+        height: 10px;
+    }
+
+    .pending {
+        background-color: #e9701b;
+    }
+
+    .identified {
+        background-color: #73c75f;
+    }
+
+    #identify-progress,
+    #pending-progress {
+        font-size: 13px;
+        padding-left: 3px;
+    }
+
+    .table th.license-head-column {
+        text-align: left;
+        padding-left: 10%;
+    }
+
+    .drop-down-license-detail-container{
+     border-bottom: 1.5px solid #82828291;
+    }
+
+    .drop-down-license-detail-container button{
+    display:flex;
+    justify-content:center;
+    width:100%;
+    }
+
+    .show-license-detail{
+        display: block;
+    }
+
+
+    
+</style>
+
+<body>
+    <header>
+        <h1>Identification Report</h1>
+        <div class="divider"></div>
+    </header>
+    <div class="main-container">
+
+        <div class="progress-bar-container">
+            <h3 class="identification-progress-title">Original v OSS</h3>
+            <div class="progress-bar-child-container">
+                <div>
+                    <span class="progress"></span>
+                </div>
+                <canvas id="progress-bar"></canvas>
+            </div>
+
+            <div class="progress-bar-info">
+                <div class="progress-bar-info-identified">
+                    <div class="identified" identified></div>
+                    <p id="identify-progress"></p>
+                </div>
+
+                <div class="progress-bar-info-pending">
+                    <div class="pending" pending></div>
+                    <p id="pending-progress"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content-info-container">
+            <div class="main-container-left">
+                <div>
+                    <h3>License Reference</h3>
+                    <div class="pie-chart-container">
+                        <div>
+                            <canvas id="myChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div>
+                    <h3 class="identified-license-detail-title">Identified License Detail</h3>
+                    <div class="drop-down-license-detail-container">
+                        <button id="drop-down-license-detail-btn" > Identified License Detail &#8711;</button>
+                    </div>
+                    <div class="drop-down-license-detail hide">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-license-detail-table">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="main-container-right">
+                <h3>Identified License Report</h3>
+                <div class="license-table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="license-head-column" scope="col">License</th>
+                                <th scope="col">Component Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="body-license-table">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="./report.js"></script>
+
+</body>
+
+</html>
