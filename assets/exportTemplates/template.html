@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Report</title>
+</head>
+
+<style>
+    header {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+
+    h1 {
+        margin-top: 1%;
+        margin-bottom: 1%;
+        text-align: center;
+    }
+
+    h3 {
+        margin-top: 1%;
+        text-align: center;
+    }
+
+    .identification-progress-title {
+        margin-top: 2%
+    }
+
+    .divider {
+        border-bottom: 1px solid #e7e6e6ab;
+        text-align: center;
+        width: 90%;
+    }
+
+    .main-container {
+        width: 100%;
+        height: 800px;
+        margin-top: 1%;
+
+    }
+
+    .progress-bar-container {
+        margin-top: 1%;
+        width: 100%;
+        height: 100px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        
+    }
+
+
+    .main-content-info-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 700px;
+
+    }
+
+    .main-container-left {
+        display: flex;
+        flex-direction: column;
+        width: 45%;
+        height: 700px;
+
+    }
+
+    .main-container-right {
+        display: flex;
+        flex-direction: column;
+        width: 55%;
+        height: 700px;
+        border-left: 1px solid #e7e6e6ab;
+
+
+    }
+
+    .license-table-container {
+        width: 100%;
+        height: 700px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        padding-left: 7%;
+        padding-right: 7%;
+        padding-top: 1%;
+
+
+
+    }
+
+
+    .pie-chart-container {
+        width: 100%;
+        height: 330px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding-top: 5px;
+        padding-bottom: 5px;
+
+    }
+
+    .licence-component-info-container {
+        height: 530px;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        border-top: 1px solid #e7e6e6ab;
+
+    }
+
+    .table td,
+    .table th {
+        padding: 0.15rem;
+        text-align: center;
+    }
+
+    .table thead th {
+        vertical-align: middle;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    th {
+        font-size: 13px;
+    }
+
+    tr {
+        font-size: 11px;
+    }
+
+
+    .colour-ref-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgb(105 101 101 / 5%);
+    }
+
+    #myChart {
+        width: 235px;
+
+    }
+</style>
+
+<body>
+    <header>
+        <h1>Identified Report</h1>
+        <div class="divider"></div>
+    </header>
+    <div class="main-container">
+        <!-- <h3 class="identification-progress-title">Identification Progress</h3> -->
+        <!-- <div class="progress-bar-container">
+            <h1>ACA VA LA BARRA DE PROGRESO</h1>
+        </div> -->
+
+        <div class="main-content-info-container">
+            <div class="main-container-left">
+                <div>
+                    <h3>Licenses</h3>
+                    <div class="pie-chart-container">
+                        <div>
+                            <canvas id="myChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="licence-component-info-container"></div>
+            </div>
+
+            <div class="main-container-right">
+                <h3>Identified License Report</h3>
+                <div class="license-table-container">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Colour-reference</th>
+                                <th scope="col">License Name</th>
+                                <th scope="col">Component Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="body-license-table">                          
+                        </tbody>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="./report.js"></script>
+
+</body>
+
+</html>
