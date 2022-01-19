@@ -2,13 +2,11 @@
 import { EventEmitter } from 'events';
 import fs from 'fs';
 import log from 'electron-log';
+import { Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
 import { File, IProjectCfg, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanModel } from '../db/ScanModel';
 import { licenses } from '../db/licenses';
-import { Scanner } from '../scannerLib/Scanner';
-import { ScannerEvents } from '../scannerLib/ScannerEvents';
-import { ScannerCfg } from '../scannerLib/ScannerCfg';
 import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
 import { Metadata } from './Metadata';
@@ -116,7 +114,15 @@ export class Project extends EventEmitter {
 
   public save(): void {
     this.metadata.save();
-    fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(this));
+    const self = this;
+    const a = {
+      filesToScan: self.filesToScan,
+      filesNotScanned: self.filesNotScanned,
+      processedFiles: self.processedFiles,
+      filesSummary: self.filesSummary,
+      tree: self.tree,
+    }
+    fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(a));
     log.info(`%c[ PROJECT ]: Project ${this.metadata.getName()} saved`, 'color:green');
   }
 
@@ -142,7 +148,11 @@ export class Project extends EventEmitter {
       stage: scanState,
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
-    this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
+
+
+    const scanIn = this.adapterToScannerInput(this.filesToScan);
+    this.scanner.scan(scanIn);
+    //this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
     return true;
   }
 
@@ -180,7 +190,37 @@ export class Project extends EventEmitter {
       stage: this.metadata.getScannerState(),
       processed: 0,
     });
-    this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
+
+    const scanIn = this.adapterToScannerInput(summary.files);
+    this.scanner.scan(scanIn);
+
+  }
+
+  private adapterToScannerInput(filesToScan: Record<string,string>): Array<ScannerInput> {
+
+
+
+    const fullScan: ScannerInput = {
+      fileList: [],
+      folderRoot: this.metadata.getScanRoot(),
+      winnowingMode: WinnowingMode.FULL_WINNOWING,
+    };
+
+    const quickScan: ScannerInput = {
+      fileList: [],
+      folderRoot: this.metadata.getScanRoot(),
+      winnowingMode: WinnowingMode.WINNOWING_ONLY_MD5,
+    };
+
+    for (const filePath of Object.keys(filesToScan)) {
+      if (filesToScan[filePath] === 'MD5_SCAN') {
+        quickScan.fileList.push(filePath);
+      } else {
+        fullScan.fileList.push(filePath);
+      }
+    }
+
+    return [fullScan, quickScan];
   }
 
   cleanProject() {
@@ -201,6 +241,10 @@ export class Project extends EventEmitter {
       scannerCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
       scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
     }
+
+    scannerCfg.CONCURRENCY_LIMIT = 20;
+    scannerCfg.DISPATCHER_QUEUE_SIZE_MAX_LIMIT = 500;
+    scannerCfg.DISPATCHER_QUEUE_SIZE_MIN_LIMIT = 450;
 
     this.scanner = new Scanner(scannerCfg);
     this.scanner.setWorkDirectory(this.metadata.getMyPath());

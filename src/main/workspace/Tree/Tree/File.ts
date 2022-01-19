@@ -102,6 +102,7 @@ export default class File extends Node {
       this.setClassName('filter-item');
     } else if (this.getInclude() === true) {
       summary.include += 1;
+      // TODO: Change summary files to pass directly to scanner
       summary.files[`${root}${this.getPath()}`] = this.getScanMode();
     } else {
       this.setClassName('exclude-item');
