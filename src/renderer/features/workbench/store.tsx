@@ -49,7 +49,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       if (loaded) return true; // && state.path != path
 
       console.log(`loading scan: ${path}`);
-      const { name, fileTree, scanRoot } = await workbenchController.loadScan(path);
+      const { name, fileTree, scanRoot } = await workbenchController.loadScan(path);      
       dispatch(loadScanSuccess(name, fileTree, []));
 
       setScanBasePath(scanRoot);

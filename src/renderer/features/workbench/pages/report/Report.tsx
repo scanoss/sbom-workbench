@@ -1,11 +1,10 @@
 import { ButtonGroup, Button, Tooltip, createStyles, makeStyles } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
-import { NavLink, Redirect, Route, Switch, useRouteMatch } from 'react-router-dom';
+import { NavLink, Redirect, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import DetectedReport from './pages/DetectedReport';
 import IdentifiedReport from './pages/IdentifiedReport';
 import { reportService } from '../../../../../api/report-service';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
-import obligationsService from '../../../../../api/obligations-service';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -46,23 +45,34 @@ const Nav = () => {
 };
 
 const Reports = () => {
+  const historyState = useHistory();
   const { path } = useRouteMatch();
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
-
-  const { history } = state;
 
   const [detectedData, setDetectedData] = useState(null);
   const [identifiedData, setIdentifiedData] = useState(null);
 
-  const init = async () => {
-    const  summary = await reportService.getSummary();
-    const detected = await reportService.detected();
-    const identified = await reportService.idetified();
-    setDetectedData({ ...detected, summary });
-    setIdentifiedData({ ...identified, summary });
+  const { history } = state;
+
+  const getEndpoint = () => {
+    historyState.push(`${path}/detected`);
+    if (state.tree.hasIdentified || state.tree.hasIgnored) {
+      historyState.push(`${path}/identified`);
+      history.report = 'identified';
+    }
   };
 
-  useEffect(init, []);
+  useEffect(() => {
+    const init = async () => {
+      const summary = await reportService.getSummary();
+      const detected = await reportService.detected();
+      const identified = await reportService.idetified();
+      setDetectedData({ ...detected, summary });
+      setIdentifiedData({ ...identified, summary });
+      getEndpoint();
+    };
+    init();
+  }, []);
 
   return (
     <>
