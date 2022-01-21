@@ -19,7 +19,12 @@ export const FileList = ({ files, filter, onAction }: FileListProps) => {
         {filteredFiles.length > 0
           ? filteredFiles.slice(0, MAX_FILES).map((file, index) => (
               <article className="item" key={index}>
-                <MatchCard onAction={(action) => onAction(file, action)} label={file.path} status={file.status} />
+                <MatchCard
+                  onAction={(action) => onAction(file, action)}
+                  label={file.path}
+                  status={file.status}
+                  type={file.type}
+                />
               </article>
             ))
           : null}

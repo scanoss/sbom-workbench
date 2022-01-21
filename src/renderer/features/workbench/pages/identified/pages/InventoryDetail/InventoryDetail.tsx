@@ -52,8 +52,8 @@ export const InventoryDetail = () => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
         history.push({
-          pathname: '/workbench/detected',
-          search: `?path=foldfileer|${encodeURIComponent(file.path)}`,
+          pathname: `/workbench/detected/file`,
+          search: `?path=file|${encodeURIComponent(file.path)}`,
         });
         break;
       case MATCH_CARD_ACTIONS.ACTION_DETACH:
