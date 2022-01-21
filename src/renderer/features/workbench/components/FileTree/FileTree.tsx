@@ -46,7 +46,6 @@ export const FileTree = () => {
 
   const onSelectNode = async (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
     const { children, value } = node;
-
     if (!children) {
       history.push({
         pathname: '/workbench/detected/file',
