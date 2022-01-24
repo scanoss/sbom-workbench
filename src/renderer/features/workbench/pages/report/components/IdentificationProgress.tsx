@@ -22,6 +22,7 @@ const LicensesChart = ({ data }) => {
     setToken(TOKEN || '');
   };
   useEffect(() => {
+  
     const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
     const pending = 100 - percentage;
     setPercentage(percentage);
@@ -87,7 +88,7 @@ const LicensesChart = ({ data }) => {
             position: 'custom',
             callbacks: {
               title() {
-                return `Pending files\n${data?.pendingFiles}`;
+                return `Pending files ${data?.pendingFiles}\n Identified Files${data?.identifiedFiles}`;
               },
               label() {
                 return ``;

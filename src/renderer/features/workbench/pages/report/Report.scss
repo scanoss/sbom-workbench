@@ -106,21 +106,25 @@
 
       .identification-canvas-container {
         margin-top: 22px;
-        height: 38px;
+        height: 55px;
         width: 100%;
         display: flex;
         justify-content: space-between;
 
 
-        .label {
+        .label , .label-original{
           float: left;
           margin-left: auto;
           margin-right: auto;
           text-align: center;
           color: #22C55E;
-          margin-top: -6px;
+          margin-top: 4px;
           font-size: 34px;
           font-weight: 700;
+        }
+
+        .label-original {
+          color: #A1A1AA;
         }
 
         .label-not-found {
@@ -132,6 +136,10 @@
 
         .progress-bar {
           width: 90%;
+        }
+
+        .progress-bar-oss-original {
+          width: 75%;
         }
       }
     }
