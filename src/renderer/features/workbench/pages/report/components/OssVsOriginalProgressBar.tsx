@@ -11,9 +11,10 @@ const OssVsOriginalProgressBar = ({ data }) => {
     setMatchedFiles(data.totalFiles);
     const ossFiles = Math.floor((data.identifiedFiles * 100) / data.totalFiles);
     setOssFiles(ossFiles);
-    const originalFiles = data.totalFiles - ossFiles;
+    const originalFiles = Math.floor((data.totalFiles - data.identifiedFiles) * 100 / data.totalFiles);
     setoriginalFiles(originalFiles);
 
+    console.log(data.identifiedFiles);
     const tooltipPlugin = Chart.registry.getPlugin('tooltip');
     tooltipPlugin.positioners.custom = function (elements, eventPosition) {
       return {
@@ -73,7 +74,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
             position: 'custom',
             callbacks: {
               title() {
-                return `OSS Files ${ossFiles}\nOriginal Files ${originalFiles}\nTotal Files ${data?.totalFiles}`;
+                return `OSS Files ${data.identifiedFiles}\nOriginal Files ${data.totalFiles - data.identifiedFiles}`;
               },
               label() {
                 return ``;
