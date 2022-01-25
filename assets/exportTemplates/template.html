@@ -284,7 +284,7 @@
         width: 50%;
     }
 
-    .progress {
+    .oss-percentage , .original-percentage{
         font-size: 25px;
         display: block;
         height: auto;
@@ -302,7 +302,7 @@
     }
 
     .progress-bar-info-identified,
-    .progress-bar-info-pending {
+    .progress-bar-info-pending, .total-files-container {
         display: flex;
         width: 50%;
         height: 20px;
@@ -316,16 +316,16 @@
         height: 10px;
     }
 
-    .pending {
-        background-color: #e9701b;
+    .pending  {
+        background-color: #A1A1AA;
     }
 
     .identified {
         background-color: #73c75f;
     }
 
-    #identify-progress,
-    #pending-progress {
+    #oss,
+    #original, #total-files {
         font-size: 13px;
         padding-left: 3px;
     }
@@ -349,6 +349,11 @@
         display: block;
     }
 
+    .original-percentage{
+        color:#A1A1AA;
+        margin-left: 3px;
+    }
+ 
 
     
 </style>
@@ -361,23 +366,31 @@
     <div class="main-container">
 
         <div class="progress-bar-container">
-            <h3 class="identification-progress-title">Original v OSS</h3>
+            <h3 class="identification-progress-title">Original vs OSS</h3>
             <div class="progress-bar-child-container">
                 <div>
-                    <span class="progress"></span>
+                    <span class="oss-percentage"></span>
                 </div>
                 <canvas id="progress-bar"></canvas>
+                <div>
+                    <span class="original-percentage"></span>
+                </div>
             </div>
 
             <div class="progress-bar-info">
+
+                <div class="total-files-container">                  
+                    <p id="total-files"></p>
+                </div>
+
                 <div class="progress-bar-info-identified">
                     <div class="identified" identified></div>
-                    <p id="identify-progress"></p>
+                    <p id="oss"></p>
                 </div>
 
                 <div class="progress-bar-info-pending">
                     <div class="pending" pending></div>
-                    <p id="pending-progress"></p>
+                    <p id="original"></p>
                 </div>
             </div>
         </div>

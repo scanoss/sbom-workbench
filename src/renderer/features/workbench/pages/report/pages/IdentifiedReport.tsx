@@ -11,6 +11,8 @@ import { setHistoryCrumb } from '../../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../../store';
 import LicensesObligations from '../components/LicensesObligations';
 import obligationsService from '../../../../../../api/obligations-service';
+import OssVsOriginalProgressBar from '../components/OssVsOriginalProgressBar';
+
 
 const { shell } = require('electron');
 
@@ -59,6 +61,10 @@ const IdentifiedReport = ({ data }) => {
             <Card className="report-item identification-progress">
               <div className="report-title">Identification Progress</div>
               <IdentificationProgress data={data.summary} />
+            </Card>
+            <Card className="report-item identification-progress">
+              <div className="report-title">OSS vs Original</div>
+              <OssVsOriginalProgressBar data={data.summary} />
             </Card>
             <Card className="report-item licenses">
               <div className="report-title">Licenses</div>

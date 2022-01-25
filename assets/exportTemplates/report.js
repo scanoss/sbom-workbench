@@ -7,8 +7,14 @@ const auxSummaryData = '#SUMMARY';
 const auxData = Array.from(JSON.parse(identifiedData));
 const summaryData = JSON.parse(auxSummaryData);
 
-const original = summaryData.scannedFiles - summaryData.identifiedFiles;
+
 const percentage = Math.floor((original + summaryData.identifiedFiles * 100) / summaryData.scannedFiles);
+
+const ossFilesPercentage = Math.floor((summaryData.identifiedFiles * 100) / summaryData.totalFiles);
+
+const originalFilesPercentage = Math.floor(
+  ((summaryData.totalFiles - summaryData.identifiedFiles) * 100) / summaryData.totalFiles
+);
 
 const labels = [];
 const values = [];
@@ -262,12 +268,18 @@ function pieChart() {
 pieChart();
 
 function progressBar() {
-  const identfiedText = document.querySelector('#identify-progress');
-  identfiedText.innerText = `${summaryData.identifiedFiles} OSS Files`;
-  const pendingText = document.querySelector('#pending-progress');
-  pendingText.innerText = `${summaryData.pendingFiles} Original Files`;
+  const oss = document.querySelector('#oss');
+  oss.innerText = `${summaryData.identifiedFiles} OSS Files`;
 
-  document.querySelector('.progress').innerHTML = `${percentage}%`;
+  const original = document.querySelector('#original');
+  original.innerText = `${summaryData.totalFiles - summaryData.identifiedFiles} Original Files`;
+
+  const totalFiles = document.querySelector('#total-files');
+  totalFiles.innerText = `Total files : ${summaryData.totalFiles}`;
+
+  document.querySelector('.oss-percentage').innerHTML = `${ossFilesPercentage}%`;
+  document.querySelector('.original-percentage').innerHTML = `${originalFilesPercentage}%`;
+
   const chart = new Chart(document.getElementById('progress-bar'), {
     type: 'bar',
     data: {
@@ -275,16 +287,16 @@ function progressBar() {
       datasets: [
         {
           label: '',
-          data: [percentage],
+          data: [ossFilesPercentage],
           borderWidth: 0,
           backgroundColor: ['#22C55E'],
           barThickness: 34,
         },
         {
           label: 'Identified',
-          data: [original],
+          data: [originalFilesPercentage],
           borderWidth: 0,
-          backgroundColor: ['#F97316'],
+          backgroundColor: ['#A1A1AA'],
           barThickness: 34,
         },
       ],
