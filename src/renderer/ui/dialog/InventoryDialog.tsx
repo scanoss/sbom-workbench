@@ -72,7 +72,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const [versions, setVersions] = useState<any[]>([]);
   const [licenses, setLicenses] = useState<any[]>([]);
   const [licensesAll, setLicensesAll] = useState<any[]>();
- 
+
 
   const setDefaults = () => setForm(inventory);
 
@@ -184,7 +184,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     const newInventory: any = form;
     onClose(newInventory);
   };
- 
+
   useEffect(() => {
     if (open) {
       setDefaults();
@@ -331,6 +331,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   }
                   getOptionSelected={(option) => option.spdxid === form.spdxid}
                   getOptionLabel={(option) => option.name || option}
+                  filterOptions={(options, params) => {
+                    return options.filter(
+                      (option) =>
+                        option.name.toLowerCase().includes(params.inputValue.toLowerCase()) ||
+                        option.spdxid.toLowerCase().includes(params.inputValue.toLowerCase())
+                    );
+                  }}
                   disableClearable
                   renderInput={(params) => (
                     <TextField
