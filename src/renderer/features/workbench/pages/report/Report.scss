@@ -68,7 +68,10 @@
       grid-column: 1/3;
     }
 
-    .report-item {
+
+
+
+    .report-item, .report-item-long {
       padding: 16px;
 
       .report-title {
@@ -86,9 +89,25 @@
       }
     }
 
-    .report-item.licenses {
+    .report-item-long {
+      height: 370px;
+    }
+
+    .report-item.long-license-list , .report-item.licenses {
       display: flex;
       flex-direction: column;
+    }
+
+
+
+    .report-item.long-license-list {
+      display: grid;
+      grid-template-rows: auto 90%;
+
+      height: 370px;
+    }
+
+    .report-item.licenses {
 
       .report-empty {
         font-size: 16px;
@@ -160,7 +179,7 @@
     }
 
     .MuiTableContainer-root{
-      max-height: 500px;
+      max-height: 95%;
     }
 
       .tableRowLicense {
@@ -185,16 +204,16 @@
               margin-right: 10px;
 
               .tinyPillLicenseLabel{
-                color: #3F3F46;               
+                color: #3F3F46;
                 font-size: 11px;
                 font-weight: 700;
               }
             }
            .incompatible {
-              background-color: #EF4444;   
-              color: white;  
+              background-color: #EF4444;
+              color: white;
               font-size: 11px;
-              font-weight: 700;                      
+              font-weight: 700;
             }
           }
         }
@@ -208,18 +227,26 @@
   justify-self: center;
 }
 
-#report-second {
+.report-second,.license-long-list-container {
   display: grid;
   grid-template-columns: 50% 50%;
   justify-content: space-between;
   align-items: center;
 }
 
+.license-long-list-container {
+  align-items: center;
+}
+
+#LicenseTable.license-short-list, #LicenseTable.license-list  {
+  overflow-y: scroll;
+  padding: 0 20px;
+}
 
 #LicenseTable.license-list {
   overflow-y: scroll;
-  max-height: 200px;
-  padding: 0 20px;
+  max-height: 100%;
+
 
   .license-list-item {
     display: flex;

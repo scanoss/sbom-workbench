@@ -27,10 +27,10 @@ const DetectedReport = ({ data }) => {
   return (
     <>
       <section className="report-layout detected">
-        <Card className="report-item licenses">
+        <Card className={data.licenses.length < 4 ? 'report-item licenses' : 'report-item long-license-list'}>
           <div className="report-title">Licenses</div>
           {data.licenses.length > 0 ? (
-            <div id="report-second">
+            <div className={data.licenses.length < 4 ? 'report-second' : 'license-long-list-container'}>
               <LicensesChart data={data.licenses} />
               <LicensesTable
                 matchedLicenseSelected={matchedLicenseSelected || data.licenses?.[0]}
