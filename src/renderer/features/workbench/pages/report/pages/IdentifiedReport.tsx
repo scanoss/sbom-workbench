@@ -13,9 +13,9 @@ import LicensesObligations from '../components/LicensesObligations';
 import obligationsService from '../../../../../../api/obligations-service';
 import OssVsOriginalProgressBar from '../components/OssVsOriginalProgressBar';
 
-const { shell } = require('electron');
-
 Chart.register(...registerables);
+
+const MAX_LICENSES = 4;
 
 const IdentifiedReport = ({ data }) => {
   const history = useHistory();
@@ -65,10 +65,10 @@ const IdentifiedReport = ({ data }) => {
               <div className="report-title">OSS vs Original</div>
               <OssVsOriginalProgressBar data={data.summary} />
             </Card>
-            <Card className={data.licenses.length < 4 ? 'report-item licenses' : 'report-item long-license-list'}>
+            <Card className={data.licenses.length <= MAX_LICENSES ? 'report-item licenses' : 'report-item long-license-list'}>
               <div className="report-title">Licenses</div>
               {data.licenses.length > 0 ? (
-                <div className={data.licenses.length < 4 ? 'report-second' : 'license-long-list-container'}>
+                <div className={data.licenses.length <= MAX_LICENSES ? 'report-second' : 'license-long-list-container'}>
                   <LicensesChart data={data.licenses} />
                   <LicensesTable
                     matchedLicenseSelected={matchedLicenseSelected || data.licenses?.[0]}
@@ -82,7 +82,7 @@ const IdentifiedReport = ({ data }) => {
             </Card>
             <Card
               className={
-                data.licenses.length < 4 ? 'report-item matches-for-license' : 'report-item-long matches-for-licenses'
+                data.licenses.length <= MAX_LICENSES ? 'report-item matches-for-license' : 'report-item-long matches-for-licenses'
               }
             >
               <div className="report-title">Matches for license</div>
