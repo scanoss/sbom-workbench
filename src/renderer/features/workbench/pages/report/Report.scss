@@ -68,7 +68,10 @@
       grid-column: 1/3;
     }
 
-    .report-item {
+   
+    
+
+    .report-item, .report-item-long {
       padding: 16px;
 
       .report-title {
@@ -86,9 +89,22 @@
       }
     }
 
-    .report-item.licenses {
+    .report-item-long{
+      height: 500px;
+    }
+
+    .report-item.long-license-list , .report-item.licenses {
       display: flex;
       flex-direction: column;
+    }
+
+
+
+    .report-item.long-license-list {  
+      height: 500px;
+    }
+
+    .report-item.licenses {    
 
       .report-empty {
         font-size: 16px;
@@ -208,18 +224,27 @@
   justify-self: center;
 }
 
-#report-second {
+.report-second,.license-long-list-container {
   display: grid;
   grid-template-columns: 50% 50%;
   justify-content: space-between;
   align-items: center;
 }
 
+.license-long-list-container {  
+  align-items: flex-start;
+  padding-top: 15px;
+}
+
+#LicenseTable.license-short-list, #LicenseTable.license-list  {
+  overflow-y: scroll;
+  padding: 0 20px;
+}
 
 #LicenseTable.license-list {
   overflow-y: scroll;
-  max-height: 200px;
-  padding: 0 20px;
+  max-height: 450px;
+
 
   .license-list-item {
     display: flex;
