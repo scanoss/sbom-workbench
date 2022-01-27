@@ -1,26 +1,25 @@
-import { Button, Chip } from '@material-ui/core';
+import { Chip } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import { Inventory } from '../../../../../../../api/types';
 import { FileList } from './components/FileList';
-import { ComponentInfo } from '../../../../components/ComponentInfo/ComponentInfo';
 import { inventoryService } from '../../../../../../../api/inventory-service';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import Label from '../../../../components/Label/Label';
 import { mapFiles } from '../../../../../../../utils/scan-util';
 import { AppContext, IAppContext } from '../../../../../../context/AppProvider';
 import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
-import { DIALOG_ACTIONS } from '../../../../../../context/types';
+import { DIALOG_ACTIONS, InventoryForm } from '../../../../../../context/types';
 
 export const InventoryDetail = () => {
   const history = useHistory();
   const { id } = useParams<any>();
 
-  const { state, detachFile, deleteInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, detachFile, deleteInventory, updateInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const [inventory, setInventory] = useState<Inventory>();
@@ -35,6 +34,23 @@ export const InventoryDetail = () => {
       console.error(error);
       history.goBack();
     }
+  };
+
+  const onEditClicked = async () => {
+
+    const inventoryForm: Partial<InventoryForm> = {
+      ...inventory,
+      id: inventory.id,
+      component: inventory.component.name,
+      purl: inventory.component.purl,
+      version: inventory.component.version,
+    };
+
+    const nInv = await dialogCtrl.openInventory(inventoryForm, state.recentUsedComponents);
+    if (!nInv) return;
+
+    const inv = await updateInventory(nInv);
+    setInventory(inv);
   };
 
   const onRemoveClicked = async () => {
@@ -74,9 +90,14 @@ export const InventoryDetail = () => {
       <section className="app-page">
         <header className="app-header">
           <div className="identified-info-card">
-            <IconButton className="btn-delete" onClick={onRemoveClicked}>
-              <DeleteOutlineOutlinedIcon />
-            </IconButton>
+            <div className="actions">
+              <IconButton className="btn-delete" onClick={onEditClicked}>
+                <EditOutlinedIcon />
+              </IconButton>
+              <IconButton className="btn-delete" onClick={onRemoveClicked}>
+                <DeleteOutlineOutlinedIcon />
+              </IconButton>
+            </div>
 
             <Chip className="identified" variant="outlined" label="Identified Group" />
 

@@ -24,11 +24,12 @@ import { fileService } from '../../../api/file-service';
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
   createInventory: (inventory: Inventory) => Promise<Inventory>;
+  updateInventory: (inventory: Inventory) => Promise<Inventory>;
+  deleteInventory: (inventoryId: number) => Promise<boolean>;
   ignoreFile: (files: number[]) => Promise<boolean>;
   restoreFile: (files: number[]) => Promise<boolean>;
   attachFile: (inventoryId: number, files: number[]) => Promise<boolean>;
   detachFile: (files: number[]) => Promise<boolean>;
-  deleteInventory: (inventoryId: number) => Promise<boolean>;
   executeBatch: (path: string, action: InventoryAction, data?: any) => Promise<boolean>;
 
   state: State;
@@ -49,7 +50,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       if (loaded) return true; // && state.path != path
 
       console.log(`loading scan: ${path}`);
-      const { name, fileTree, scanRoot } = await workbenchController.loadScan(path);      
+      const { name, fileTree, scanRoot } = await workbenchController.loadScan(path);
       dispatch(loadScanSuccess(name, fileTree, []));
 
       setScanBasePath(scanRoot);
@@ -65,6 +66,12 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     const response = await inventoryService.create(inventory);
     const comp = state.components.find((c) => c.purl === inventory.purl);
     if (comp) dispatch(setRecentUsedComponents(comp as ComponentGroup));
+    update();
+    return response;
+  };
+
+  const updateInventory = async (inventory: Inventory): Promise<Inventory> => {
+    const response = await inventoryService.update(inventory);
     update();
     return response;
   };
@@ -194,6 +201,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       dispatch,
       loadScan,
       createInventory,
+      updateInventory,
       ignoreFile,
       restoreFile,
       attachFile,
@@ -206,6 +214,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       dispatch,
       loadScan,
       createInventory,
+      updateInventory,
       ignoreFile,
       restoreFile,
       attachFile,

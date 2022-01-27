@@ -196,8 +196,6 @@ export const ComponentDetail = () => {
       usage: 'file',
     };
 
-    console.log(component?.versions[0].licenses);
-
     await create(inv, selFiles);
     setTab(1);
   };

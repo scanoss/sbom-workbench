@@ -77,7 +77,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const setDefaults = () => setForm(inventory);
 
   const init = async () => {
-    console.log('INIT',recentUsedComponents);
     const componentsResponse = await componentService.getAllComponentGroup();
     const licensesResponse = await licenseService.getAll();
     const compCatalogue = componentsResponse.data.map((component) => ({
@@ -230,7 +229,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       open={open}
       onClose={onCancel}
     >
-      <span className="dialog-title">Identify Component</span>
+      <span className="dialog-title">{!form.id ? 'Identify Component' : 'Edit Identification'}</span>
 
       <form onSubmit={onSubmit}>
         <div className="dialog-content">
