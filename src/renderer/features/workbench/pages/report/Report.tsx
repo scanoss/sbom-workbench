@@ -54,11 +54,9 @@ const Reports = () => {
 
   const { history } = state;
 
-  const getEndpoint = () => {
-    historyState.push(`${path}/detected`);
+  const setTab = () => {
     if (state.tree.hasIdentified || state.tree.hasIgnored) {
       historyState.push(`${path}/identified`);
-      history.report = 'identified';
     }
   };
 
@@ -69,7 +67,7 @@ const Reports = () => {
       const identified = await reportService.idetified();
       setDetectedData({ ...detected, summary });
       setIdentifiedData({ ...identified, summary });
-      getEndpoint();
+      setTab();
     };
     init();
   }, []);
@@ -88,7 +86,7 @@ const Reports = () => {
             <Route exact path={`${path}/identified`}>
               {identifiedData && <IdentifiedReport data={identifiedData} />}
             </Route>
-            <Redirect from={path} to={`${path}/${history.report}`} />
+            <Redirect from={path} to={`${path}/detected`} />
           </Switch>
         </main>
       </section>

@@ -7,7 +7,6 @@ import LicensesChart from '../components/LicensesChart';
 import IdentificationProgress from '../components/IdentificationProgress';
 import LicensesTable from '../components/LicensesTable';
 import MatchesForLicense from '../components/MatchesForLicense';
-import { setHistoryCrumb } from '../../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../../store';
 import LicensesObligations from '../components/LicensesObligations';
 import obligationsService from '../../../../../../api/obligations-service';
@@ -38,7 +37,6 @@ const IdentifiedReport = ({ data }) => {
   };
 
   useEffect(init, []);
-  useEffect(() => dispatch(setHistoryCrumb({ report: 'identified' })), []);
 
   return (
     <>
