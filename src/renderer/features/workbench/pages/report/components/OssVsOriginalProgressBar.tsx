@@ -112,7 +112,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
       </div>
       <div className="total-files-container">
         <span className="total-files-label">
-          <strong>{data.totalFiles}</strong> Total Files
+          <strong>{data.totalFiles}</strong> total files
         </span>
       </div>
     </div>
