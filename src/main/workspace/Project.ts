@@ -198,29 +198,36 @@ export class Project extends EventEmitter {
 
   private adapterToScannerInput(filesToScan: Record<string,string>): Array<ScannerInput> {
 
+    const fullScanList: Array<string> = [];
+    const quickScanList: Array<string> = [];
 
-
-    const fullScan: ScannerInput = {
-      fileList: [],
-      folderRoot: this.metadata.getScanRoot(),
-      winnowingMode: WinnowingMode.FULL_WINNOWING,
-    };
-
-    const quickScan: ScannerInput = {
-      fileList: [],
-      folderRoot: this.metadata.getScanRoot(),
-      winnowingMode: WinnowingMode.WINNOWING_ONLY_MD5,
-    };
 
     for (const filePath of Object.keys(filesToScan)) {
       if (filesToScan[filePath] === 'MD5_SCAN') {
-        quickScan.fileList.push(filePath);
+        quickScanList.push(filePath);
       } else {
-        fullScan.fileList.push(filePath);
+        fullScanList.push(filePath);
       }
     }
 
-    return [fullScan, quickScan];
+    const result: Array<ScannerInput> = [];
+
+    if (fullScanList.length > 0) {
+      result.push({
+        fileList: fullScanList,
+        folderRoot: this.metadata.getScanRoot(),
+        winnowingMode: WinnowingMode.FULL_WINNOWING,
+      });
+    }
+
+    if (quickScanList.length > 0) {
+      result.push({
+        fileList: quickScanList,
+        folderRoot: this.metadata.getScanRoot(),
+        winnowingMode: WinnowingMode.WINNOWING_ONLY_MD5,
+      });
+    }
+    return result;
   }
 
   cleanProject() {
