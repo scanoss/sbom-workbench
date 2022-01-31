@@ -329,8 +329,14 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       ? { spdxid: form.spdxid, name: licenses.find((item) => item.spdxid === form.spdxid)?.name }
                       : ''
                   }
-                  getOptionSelected={(option) => option.spdxid === form.spdxid}
-                  getOptionLabel={(option) => option.name || option}
+                  getOptionSelected={(option: any) => option.spdxid === form.spdxid}
+                  getOptionLabel={(option: any) => option.name || option}
+                  renderOption={(option: any) => (
+                    <div className={classes.option}>
+                      <span>{option.name}</span>
+                      <span className="middle">{option.spdxid}</span>
+                    </div>
+                  )}
                   filterOptions={(options, params) => {
                     return options.filter(
                       (option) =>
