@@ -125,7 +125,7 @@ const LicensesChart = ({ data }) => {
       </div>
       <div className="total-files-container">
         <span className="total-files-label">
-          <strong>{data.totalFiles}</strong> total files
+          <strong>{data.detectedFiles}</strong> total files
         </span>
       </div>
       <div className={token ? 'notarize-container' : 'hide'}>
