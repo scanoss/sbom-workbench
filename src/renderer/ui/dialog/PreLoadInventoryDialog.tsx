@@ -228,8 +228,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                 <hr className="divider-no-license" />
                 <div>
                   <p className="no-license-note">
-                    {inventoryNoLicenseCount} components will not be identified due to they don&apos;t have licenses
-                    attached to them. Please identify them manually.
+                    {inventoryNoLicenseCount} component(s) will not be identified as they do not have a license declared with the component. Please manually identify these.
                   </p>
                 </div>
               </>
