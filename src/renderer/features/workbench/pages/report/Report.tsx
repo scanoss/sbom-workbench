@@ -68,7 +68,6 @@ const Reports = () => {
       setDetectedData({ ...detected, summary });
       setIdentifiedData({ ...identified, summary });
       setTab();
-      console.log("IDENTIFIED",summary);
     };
     init();
   }, []);
