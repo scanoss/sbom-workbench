@@ -152,14 +152,15 @@
         font-weight: bold;
     }
 
-    #drop-down-license-detail-btn{
-    	display:block;
-    	 border: none;
-    	 width:100%;
-    	 background-color: rgb(226 226 226);
+    #drop-down-license-detail-btn {
+        display: block;
+        border: none;
+        width: 100%;
+        background-color: rgb(226 226 226);
     }
 
-    .button-solid:focus ,#drop-down-license-detail-btn:focus{
+    .button-solid:focus,
+    #drop-down-license-detail-btn:focus {
         border: none;
         outline: none;
     }
@@ -284,7 +285,8 @@
         width: 50%;
     }
 
-    .oss-percentage , .original-percentage{
+    .oss-percentage,
+    .original-percentage {
         font-size: 25px;
         display: block;
         height: auto;
@@ -302,7 +304,8 @@
     }
 
     .progress-bar-info-identified,
-    .progress-bar-info-pending, .total-files-container {
+    .progress-bar-info-pending,
+    .total-files-container {
         display: flex;
         width: 50%;
         height: 20px;
@@ -316,7 +319,7 @@
         height: 10px;
     }
 
-    .pending  {
+    .pending {
         background-color: #A1A1AA;
     }
 
@@ -325,7 +328,8 @@
     }
 
     #oss,
-    #original, #total-files {
+    #original,
+    #total-files {
         font-size: 13px;
         padding-left: 3px;
     }
@@ -335,27 +339,24 @@
         padding-left: 10%;
     }
 
-    .drop-down-license-detail-container{
-     border-bottom: 1.5px solid #82828291;
+    .drop-down-license-detail-container {
+        border-bottom: 1.5px solid #82828291;
     }
 
-    .drop-down-license-detail-container button{
-    display:flex;
-    justify-content:center;
-    width:100%;
+    .drop-down-license-detail-container button {
+        display: flex;
+        justify-content: center;
+        width: 100%;
     }
 
-    .show-license-detail{
+    .show-license-detail {
         display: block;
     }
 
-    .original-percentage{
-        color:#A1A1AA;
+    .original-percentage {
+        color: #A1A1AA;
         margin-left: 3px;
     }
- 
-
-    
 </style>
 
 <body>
@@ -379,7 +380,7 @@
 
             <div class="progress-bar-info">
 
-                <div class="total-files-container">                  
+                <div class="total-files-container">
                     <p id="total-files"></p>
                 </div>
 
@@ -410,7 +411,7 @@
                 <div>
                     <h3 class="identified-license-detail-title">Identified License Detail</h3>
                     <div class="drop-down-license-detail-container">
-                        <button id="drop-down-license-detail-btn" > Identified License Detail &#8711;</button>
+                        <button id="drop-down-license-detail-btn"> Identified License Detail &#8711;</button>
                     </div>
                     <div class="drop-down-license-detail hide">
                         <table class="table">
@@ -448,199 +449,201 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const identifiedData = '#DATA';
-const auxSummaryData = '#SUMMARY';
-const auxData = Array.from(JSON.parse(identifiedData));
-const summaryData = JSON.parse(auxSummaryData);
+        const auxSummaryData = '#SUMMARY';
+        const auxData = Array.from(JSON.parse(identifiedData));
+        const summaryData = JSON.parse(auxSummaryData);
 
 
-const percentage = Math.floor((original + summaryData.identifiedFiles * 100) / summaryData.scannedFiles);
 
-const ossFilesPercentage = Math.floor((summaryData.identifiedFiles * 100) / summaryData.scannedFiles);
+        const percentage = Math.floor((original + summaryData.identifiedFiles * 100) / summaryData.scannedFiles);
 
-const originalFilesPercentage = Math.floor(
-  ((summaryData.scannedFiles - summaryData.identifiedFiles) * 100) / summaryData.scannedFiles
-);
-
-const labels = [];
-const values = [];
-const rowDataTable = {};
-
-function rowData() {
-  auxData.forEach((d) => {
-    if (rowDataTable[d.label] === undefined) {
-      rowDataTable[d.label] = {
-        components: {},
-        componentCount: 0,
-      };
-    }
-
-    d.components.forEach((component) => {
-      if (rowDataTable[d.label].components[component.name] === undefined) {
-        rowDataTable[d.label].components[component.name] = {
-          versions: [],
-          vendor: component.vendor,
-          purl: component.purl,
-        };
-      }
-      rowDataTable[d.label].components[component.name].versions.push(component.version);
-      rowDataTable[d.label].components[component.name].versions.sort();
-    });
-    rowDataTable[d.label].componentCount = Object.keys(rowDataTable[d.label].components).length;  
-  });   
-}
-
-rowData();
-
-Object.entries(rowDataTable).forEach(([key, value]) => {
-  labels.push(key);
-  values.push(value.componentCount);
-});
+        const ossFilesPercentage = Math.round(((summaryData.identifiedFiles + summaryData.pendingFiles) * 100) / summaryData.scannedFiles);
 
 
-const color = [
-  '#E8B34B',
-  '#E22C2C',
-  '#5754D0',
-  '#9F69C0',
-  '#FE7F10',
-  '#E56399',
-  '#E637BF',
-  '#474647',
-  '#153243',
-  '#2DE1C2',
-  '#F05365',
-  '#A2D729',
-  '#3C91E6',
-  '#FA824C',
-  '#C94277',
-  '#E56B6F',
-  '#F71735',
-  '#011627',
-  '#724E91',
-  '#7D451B',
-  '#9BE564',
-];
+        const originalFilesPercentage = Math.round(
+            ((summaryData.scannedFiles - (summaryData.identifiedFiles + summaryData.pendingFiles)) * 100) / summaryData.scannedFiles
+        );
 
-function insertLicenseRow() {
-  const bodyLicenseTable = document.querySelector('#body-license-table');
-  let counter = 0;
-  Object.keys(rowDataTable).forEach((key) => {
-    const tr = document.createElement('tr');
-    const tdColor = document.createElement('td');
-    const licenseRefContainer = document.createElement('div');
-    licenseRefContainer.classList.add('license-ref-container');
-    const colourRefLicenseContainer = document.createElement('div');
-    colourRefLicenseContainer.classList.add('colour-ref-license-container');
-    const colourRefLicense = document.createElement('div');
-    colourRefLicense.classList.add('colour-ref-license');
-    colourRefLicense.style.backgroundColor = color[counter % auxData.length];
-    colourRefLicenseContainer.appendChild(colourRefLicense);
-    const licenseLabel = document.createElement('div');
-    licenseLabel.classList.add('license-label');
-    const licenseName = document.createElement('div');
-    licenseName.classList.add('license-name');
-    const licenseNameP = document.createElement('p');
-    licenseNameP.innerText = key;
-    licenseName.appendChild(licenseNameP);
-    licenseLabel.appendChild(licenseName);
 
-    licenseRefContainer.appendChild(colourRefLicenseContainer);
-    licenseRefContainer.appendChild(licenseLabel);
+        const labels = [];
+        const values = [];
+        const rowDataTable = {};
 
-    tdColor.appendChild(licenseRefContainer);
-    tr.appendChild(tdColor);
+        function rowData() {
+            auxData.forEach((d) => {
+                if (rowDataTable[d.label] === undefined) {
+                    rowDataTable[d.label] = {
+                        components: {},
+                        componentCount: 0,
+                    };
+                }
 
-    // count components
-    const tdCount = document.createElement('td');
-    tdCount.classList.add('width-license-count');
+                d.components.forEach((component) => {
+                    if (rowDataTable[d.label].components[component.name] === undefined) {
+                        rowDataTable[d.label].components[component.name] = {
+                            versions: [],
+                            vendor: component.vendor,
+                            purl: component.purl,
+                        };
+                    }
+                    rowDataTable[d.label].components[component.name].versions.push(component.version);
+                    rowDataTable[d.label].components[component.name].versions.sort();
+                });
+                rowDataTable[d.label].componentCount = Object.keys(rowDataTable[d.label].components).length;
+            });
+        }
 
-    console.log("KEY LENGHT",key.length);
-    const textCount = document.createTextNode(`${rowDataTable[key].componentCount}`); 
-    tdCount.appendChild(textCount);
-    tr.appendChild(tdCount);
+        rowData();
 
-    bodyLicenseTable.appendChild(tr);
+        Object.entries(rowDataTable).forEach(([key, value]) => {
+            labels.push(key);
+            values.push(value.componentCount);
+        });
 
-    counter += 1;
-  });
-}
 
-insertLicenseRow();
+        const color = [
+            '#E8B34B',
+            '#E22C2C',
+            '#5754D0',
+            '#9F69C0',
+            '#FE7F10',
+            '#E56399',
+            '#E637BF',
+            '#474647',
+            '#153243',
+            '#2DE1C2',
+            '#F05365',
+            '#A2D729',
+            '#3C91E6',
+            '#FA824C',
+            '#C94277',
+            '#E56B6F',
+            '#F71735',
+            '#011627',
+            '#724E91',
+            '#7D451B',
+            '#9BE564',
+        ];
 
-function dropDown(id) {
-  const nodes = document.getElementsByClassName(id);
-  for (let i = 0; i < nodes.length; i += 1) {
-    if (nodes[i].classList.contains('hide')) {
-      nodes[i].classList.remove('hide');
-      nodes[i].classList.add('show');
-    } else {
-      nodes[i].classList.remove('show');
-      nodes[i].classList.add('hide');
-    }
-  }
-}
+        function insertLicenseRow() {
+            const bodyLicenseTable = document.querySelector('#body-license-table');
+            let counter = 0;
+            Object.keys(rowDataTable).forEach((key) => {
+                const tr = document.createElement('tr');
+                const tdColor = document.createElement('td');
+                const licenseRefContainer = document.createElement('div');
+                licenseRefContainer.classList.add('license-ref-container');
+                const colourRefLicenseContainer = document.createElement('div');
+                colourRefLicenseContainer.classList.add('colour-ref-license-container');
+                const colourRefLicense = document.createElement('div');
+                colourRefLicense.classList.add('colour-ref-license');
+                colourRefLicense.style.backgroundColor = color[counter % auxData.length];
+                colourRefLicenseContainer.appendChild(colourRefLicense);
+                const licenseLabel = document.createElement('div');
+                licenseLabel.classList.add('license-label');
+                const licenseName = document.createElement('div');
+                licenseName.classList.add('license-name');
+                const licenseNameP = document.createElement('p');
+                licenseNameP.innerText = key;
+                licenseName.appendChild(licenseNameP);
+                licenseLabel.appendChild(licenseName);
 
-function addButtonListener() {
-  const btn = document.querySelectorAll('.button-solid');
+                licenseRefContainer.appendChild(colourRefLicenseContainer);
+                licenseRefContainer.appendChild(licenseLabel);
 
-  btn.forEach((button) => {
-    button.addEventListener('click', (event) => {
-      dropDown(event.target.id);
-    });
-  });
-}
+                tdColor.appendChild(licenseRefContainer);
+                tr.appendChild(tdColor);
 
-function insertLicenseDetailRow() {
-  const bodyLicenseTable = document.querySelector('#body-license-detail-table');
+                // count components
+                const tdCount = document.createElement('td');
+                tdCount.classList.add('width-license-count');
 
-  let counter = 0;
-  Object.keys(rowDataTable).forEach((key) => {
-    const tr = document.createElement('tr');
-    const tdColor = document.createElement('td');
-    const licenseRefContainer = document.createElement('div');
-    licenseRefContainer.classList.add('license-ref-container');
-    const colourRefLicenseContainer = document.createElement('div');
-    colourRefLicenseContainer.classList.add('colour-ref-license-container');
-    const colourRefLicense = document.createElement('div');
-    colourRefLicense.classList.add('colour-ref-license');
-    colourRefLicense.style.backgroundColor = color[counter % auxData.length];
-    colourRefLicenseContainer.appendChild(colourRefLicense);
-    const licenseLabel = document.createElement('div');
-    licenseLabel.classList.add('license-label');
-    const label = document.createElement('div');
-    label.classList.add('label');
-    const labelP = document.createElement('p');
-    labelP.innerText = 'License';
-    label.appendChild(labelP);
-    licenseLabel.appendChild(label);
-    const licenseName = document.createElement('div');
-    licenseName.classList.add('license-name');
-    const licenseNameP = document.createElement('p');
-    licenseNameP.innerText = key;
-    licenseName.appendChild(licenseNameP);
-    licenseLabel.appendChild(licenseName);
+                const textCount = document.createTextNode(`${rowDataTable[key].componentCount}`);
+                tdCount.appendChild(textCount);
+                tr.appendChild(tdCount);
 
-    licenseRefContainer.appendChild(colourRefLicenseContainer);
-    licenseRefContainer.appendChild(licenseLabel);
+                bodyLicenseTable.appendChild(tr);
 
-    tdColor.appendChild(licenseRefContainer);
-    tr.appendChild(tdColor);
+                counter += 1;
+            });
+        }
 
-    // count components
-    const tdCount = document.createElement('td');
-    tdCount.classList.add('width-license-count');
-    const btn = `<button class="button-solid" id="${counter}">${rowDataTable[key].componentCount} component found &#8711;</button>`;
+        insertLicenseRow();
 
-    tdCount.innerHTML = btn;
-    tr.appendChild(tdCount);
-    bodyLicenseTable.appendChild(tr);
-    let rows = '';
-    for (const [compName, value] of Object.entries(rowDataTable[key].components)) {
-      const version =
-        value.versions.length > 1
-          ? `${value.versions.toString().replace(/,/g, ' , ')} &#10;&#13; (${value.versions.length} versions)`
-          : value.versions.toString();
-      rows += `<tr class="component-row">
+        function dropDown(id) {
+            const nodes = document.getElementsByClassName(id);
+            for (let i = 0; i < nodes.length; i += 1) {
+                if (nodes[i].classList.contains('hide')) {
+                    nodes[i].classList.remove('hide');
+                    nodes[i].classList.add('show');
+                } else {
+                    nodes[i].classList.remove('show');
+                    nodes[i].classList.add('hide');
+                }
+            }
+        }
+
+        function addButtonListener() {
+            const btn = document.querySelectorAll('.button-solid');
+
+            btn.forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    dropDown(event.target.id);
+                });
+            });
+        }
+
+        function insertLicenseDetailRow() {
+            const bodyLicenseTable = document.querySelector('#body-license-detail-table');
+
+            let counter = 0;
+            Object.keys(rowDataTable).forEach((key) => {
+                const tr = document.createElement('tr');
+                const tdColor = document.createElement('td');
+                const licenseRefContainer = document.createElement('div');
+                licenseRefContainer.classList.add('license-ref-container');
+                const colourRefLicenseContainer = document.createElement('div');
+                colourRefLicenseContainer.classList.add('colour-ref-license-container');
+                const colourRefLicense = document.createElement('div');
+                colourRefLicense.classList.add('colour-ref-license');
+                colourRefLicense.style.backgroundColor = color[counter % auxData.length];
+                colourRefLicenseContainer.appendChild(colourRefLicense);
+                const licenseLabel = document.createElement('div');
+                licenseLabel.classList.add('license-label');
+                const label = document.createElement('div');
+                label.classList.add('label');
+                const labelP = document.createElement('p');
+                labelP.innerText = 'License';
+                label.appendChild(labelP);
+                licenseLabel.appendChild(label);
+                const licenseName = document.createElement('div');
+                licenseName.classList.add('license-name');
+                const licenseNameP = document.createElement('p');
+                licenseNameP.innerText = key;
+                licenseName.appendChild(licenseNameP);
+                licenseLabel.appendChild(licenseName);
+
+                licenseRefContainer.appendChild(colourRefLicenseContainer);
+                licenseRefContainer.appendChild(licenseLabel);
+
+                tdColor.appendChild(licenseRefContainer);
+                tr.appendChild(tdColor);
+
+                // count components
+                const tdCount = document.createElement('td');
+                tdCount.classList.add('width-license-count');
+                const btn = `<button class="button-solid" id="${counter}">${rowDataTable[key].componentCount} component found &#8711;</button>`;
+
+                tdCount.innerHTML = btn;
+                tr.appendChild(tdCount);
+                bodyLicenseTable.appendChild(tr);
+                let rows = '';
+                for (const [compName, value] of Object.entries(rowDataTable[key].components)) {
+                    const version =
+                        value.versions.length > 1
+                            ? `${value.versions.toString().replace(/,/g, ' , ')} &#10;&#13; (${value.versions.length} versions)`
+                            : value.versions.toString();
+                    rows += `<tr class="component-row">
                     <td colspan="2" class="${counter} hide">
                       <div class="component-license-detail">
                         <div class="comp-detail-container">
@@ -671,144 +674,135 @@ function insertLicenseDetailRow() {
                      
                     </td>
                 </tr>`;
-    }
+                }
 
-    bodyLicenseTable.innerHTML += rows;
+                bodyLicenseTable.innerHTML += rows;
 
-    counter += 1;
-  });
-  addButtonListener();
-}
-insertLicenseDetailRow();
+                counter += 1;
+            });
+            addButtonListener();
+        }
+        insertLicenseDetailRow();
 
-function pieChart() {
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: 'My First dataset',
-        backgroundColor: color,
-        borderColor: 'rgb(255, 255, 255)',
-        data: values,
-      },
-    ],
-  };
-  const config = {
-    type: 'pie',
-    data,
-    options: {
-      elements: {
-        arc: {
-          borderWidth: 1,
-        },
-      },
-      plugins: {
-        legend: {
-          display: false,
-        },
-      },
-    },
-  };
-  const myChart = new Chart(document.getElementById('myChart'), config);
-}
+        function pieChart() {
+            const data = {
+                labels,
+                datasets: [
+                    {
+                        label: 'My First dataset',
+                        backgroundColor: color,
+                        borderColor: 'rgb(255, 255, 255)',
+                        data: values,
+                    },
+                ],
+            };
+            const config = {
+                type: 'pie',
+                data,
+                options: {
+                    elements: {
+                        arc: {
+                            borderWidth: 1,
+                        },
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                    },
+                },
+            };
+            const myChart = new Chart(document.getElementById('myChart'), config);
+        }
 
-pieChart();
+        pieChart();
 
-function progressBar() {
-  const oss = document.querySelector('#oss');
-  oss.innerText = `${summaryData.identifiedFiles} OSS Files`;
+        function progressBar() {
+            const oss = document.querySelector('#oss');
+            oss.innerText = `${summaryData.identifiedFiles + summaryData.pendingFiles} OSS Files`;
 
-  const original = document.querySelector('#original');
-  original.innerText = `${summaryData.scannedFiles - summaryData.identifiedFiles} Original Files`;
+            const original = document.querySelector('#original');
+            original.innerText = `${summaryData.scannedFiles - (summaryData.identifiedFiles + summaryData.pendingFiles)} Original Files`;
 
-  const totalFiles = document.querySelector('#total-files');
-  totalFiles.innerText = `Total files : ${summaryData.scannedFiles}`;
+            const totalFiles = document.querySelector('#total-files');
+            totalFiles.innerText = `Total files : ${summaryData.scannedFiles}`;
 
-  document.querySelector('.oss-percentage').innerHTML = `${ossFilesPercentage}%`;
-  document.querySelector('.original-percentage').innerHTML = `${originalFilesPercentage}%`;
+            document.querySelector('.oss-percentage').innerHTML = `${ossFilesPercentage}%`;
+            document.querySelector('.original-percentage').innerHTML = `${originalFilesPercentage}%`;
 
-  const chart = new Chart(document.getElementById('progress-bar'), {
-    type: 'bar',
-    data: {
-      labels: [`${percentage}%`],
-      datasets: [
-        {
-          label: '',
-          data: [ossFilesPercentage],
-          borderWidth: 0,
-          backgroundColor: ['#22C55E'],
-          barThickness: 34,
-        },
-        {
-          label: 'Identified',
-          data: [originalFilesPercentage],
-          borderWidth: 0,
-          backgroundColor: ['#A1A1AA'],
-          barThickness: 34,
-        },
-      ],
-    },
-    options: {
-      maintainAspectRatio: false,
-      indexAxis: 'y',
-      scales: {
-        y: {
-          stacked: true,
-          beginAtZero: true,
-          grid: {
-            display: false,
-            drawBorder: false,
-          },
-          display: false,
-        },
-        x: {
-          stacked: true,
-          beginAtZero: true,
-          grid: {
-            display: false,
-            drawBorder: false,
-          },
-          ticks: {
-            display: false,
-          },
-        },
-      },
-      plugins: {
-        tooltip: {
-          position: 'custom',
-          callbacks: {
-            title() {
-              return `Pending files\n${summaryData?.pendingFiles}`;
-            },
-            label() {
-              return ``;
-            },
-          },
-          displayColors: false,
-        },
-        legend: {
-          display: false,
-          labels: {
-            boxWidth: 0,
-          },
-        },
-      },
-    },
-  });
-}
+            const chart = new Chart(document.getElementById('progress-bar'), {
+                type: 'bar',
+                data: {
+                    labels: [`${percentage}%`],
+                    datasets: [
+                        {
+                            label: '',
+                            data: [ossFilesPercentage],
+                            borderWidth: 0,
+                            backgroundColor: ['#22C55E'],
+                            barThickness: 34,
+                        },
+                        {
+                            label: 'Identified',
+                            data: [originalFilesPercentage],
+                            borderWidth: 0,
+                            backgroundColor: ['#A1A1AA'],
+                            barThickness: 34,
+                        },
+                    ],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            grid: {
+                                display: false,
+                                drawBorder: false,
+                            },
+                            display: false,
+                        },
+                        x: {
+                            stacked: true,
+                            beginAtZero: true,
+                            grid: {
+                                display: false,
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                display: false,
+                            },
+                        },
+                    },
+                    plugins: {
+                        tooltip: {
+                            enabled: false
+                        },
+                        legend: {
+                            display: false,
+                            labels: {
+                                boxWidth: 0,
+                            },
+                        },
+                    },
+                },
+            });
+        }
 
-progressBar();
+        progressBar();
 
-document.getElementById('drop-down-license-detail-btn').addEventListener('click', () => {
-  const aux = document.querySelector('.drop-down-license-detail');
-  if (aux.classList.contains('hide')) {
-    aux.classList.remove('hide');
-    aux.classList.add('show-license-detail');
-  } else {
-    aux.classList.remove('show-license-detail');
-    aux.classList.add('hide');
-  }
-});
+        document.getElementById('drop-down-license-detail-btn').addEventListener('click', () => {
+            const aux = document.querySelector('.drop-down-license-detail');
+            if (aux.classList.contains('hide')) {
+                aux.classList.remove('hide');
+                aux.classList.add('show-license-detail');
+            } else {
+                aux.classList.remove('show-license-detail');
+                aux.classList.add('hide');
+            }
+        });
 
     </script>
 

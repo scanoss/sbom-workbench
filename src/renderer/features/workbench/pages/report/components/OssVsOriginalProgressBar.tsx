@@ -8,11 +8,13 @@ const OssVsOriginalProgressBar = ({ data }) => {
   const [originalFiles, setoriginalFiles] = useState<number>(0);
 
   useEffect(() => {
-    setMatchedFiles(data.totalFiles);
-    const ossFiles = Math.floor((data.identifiedFiles * 100) / data.scannedFiles);
+    setMatchedFiles(data.totalFiles);  
+    const ossFiles = Math.round(((data.identifiedFiles + data.pendingFiles) * 100) / data.scannedFiles); 
     setOssFiles(ossFiles);
-    const originalFiles = Math.floor((data.scannedFiles - data.identifiedFiles) * 100 / data.scannedFiles);
-    setoriginalFiles(originalFiles);
+    const originalFiles = Math.round(
+      ((data.scannedFiles - (data.identifiedFiles + data.pendingFiles)) * 100) / data.scannedFiles
+    );
+      setoriginalFiles(originalFiles);
 
     const tooltipPlugin = Chart.registry.getPlugin('tooltip');
     tooltipPlugin.positioners.custom = function (elements, eventPosition) {
@@ -73,7 +75,9 @@ const OssVsOriginalProgressBar = ({ data }) => {
             position: 'custom',
             callbacks: {
               title() {
-                return `OSS Files ${data.identifiedFiles}\nOriginal Files ${data.scannedFiles - data.identifiedFiles}`;
+                return `OSS Files ${data.identifiedFiles + data.pendingFiles}\nOriginal Files ${
+                  data.scannedFiles - (data.identifiedFiles + data.pendingFiles)
+                }`;
               },
               label() {
                 return ``;
