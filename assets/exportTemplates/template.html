@@ -537,7 +537,7 @@
                 colourRefLicenseContainer.classList.add('colour-ref-license-container');
                 const colourRefLicense = document.createElement('div');
                 colourRefLicense.classList.add('colour-ref-license');
-                colourRefLicense.style.backgroundColor = color[counter % auxData.length];
+                colourRefLicense.style.backgroundColor = color[counter % color.length];
                 colourRefLicenseContainer.appendChild(colourRefLicense);
                 const licenseLabel = document.createElement('div');
                 licenseLabel.classList.add('license-label');
@@ -606,7 +606,7 @@
                 colourRefLicenseContainer.classList.add('colour-ref-license-container');
                 const colourRefLicense = document.createElement('div');
                 colourRefLicense.classList.add('colour-ref-license');
-                colourRefLicense.style.backgroundColor = color[counter % auxData.length];
+                colourRefLicense.style.backgroundColor = color[counter % color.length];
                 colourRefLicenseContainer.appendChild(colourRefLicense);
                 const licenseLabel = document.createElement('div');
                 licenseLabel.classList.add('license-label');
