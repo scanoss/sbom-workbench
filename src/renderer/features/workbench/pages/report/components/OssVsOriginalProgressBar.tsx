@@ -9,7 +9,6 @@ const OssVsOriginalProgressBar = ({ data }) => {
   useEffect(() => {
     setMatchedFiles(data.totalFiles);
     const ossFiles = Math.round((data.identifiedFiles * 100) / data.scannedFiles);
-    const originalFiles = Math.round((data.ignoredFiles * 100) / data.scannedFiles);
     const pendingFiles = Math.round((data.pendingFiles * 100) / data.scannedFiles);
 
     const canvas = document.getElementById('OssOriginalProgress') as HTMLCanvasElement;
@@ -30,21 +29,21 @@ const OssVsOriginalProgressBar = ({ data }) => {
         datasets: [
           {
             label: 'OSS',
-            data: [ossFiles],
+            data: [data.identifiedFiles],
             borderWidth: 0,
             backgroundColor: ['#22C55E'],
             barThickness: 34,
           },
           {
             label: 'Pending',
-            data: [pendingFiles],
+            data: [data.pendingFiles],
             borderWidth: 0,
             backgroundColor: ['#F97316'],
             barThickness: 34,
           },
           {
             label: 'Original',
-            data: [originalFiles],
+            data: [data.ignoredFiles],
             borderWidth: 0,
             backgroundColor: ['#A1A1AA'],
             barThickness: 34,
