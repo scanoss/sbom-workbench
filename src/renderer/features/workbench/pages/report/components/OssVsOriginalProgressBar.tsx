@@ -6,12 +6,8 @@ const OssVsOriginalProgressBar = ({ data }) => {
   const [matchedFiles, setMatchedFiles] = useState<number>(0);
 
   useEffect(() => {
-    setMatchedFiles(data.totalFiles);
-    const ossFiles = Math.round((data.identifiedFiles * 100) / data.scannedFiles);
-    const pendingFiles = Math.round((data.pendingFiles * 100) / data.scannedFiles);
+    setMatchedFiles(data.totalFiles); 
     const originalFiles = data.scannedFiles - (data.identifiedFiles + data.pendingFiles);
-    const canvas = document.getElementById('OssOriginalProgress') as HTMLCanvasElement;
-    const ctx = canvas.getContext('2d');
 
     const tooltipPlugin = Chart.registry.getPlugin('tooltip');
     tooltipPlugin.positioners.custom = function (elements, eventPosition) {
@@ -21,7 +17,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
       };
     };
 
-    const chart = new Chart(ctx, {
+    const chart = new Chart(chartRef.current, {
       type: 'bar',
       data: {
         labels: [``],
@@ -63,6 +59,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
             display: false,
           },
           x: {
+            max:data.scannedFiles,
             stacked: true,
             beginAtZero: true,
             grid: {
@@ -79,6 +76,8 @@ const OssVsOriginalProgressBar = ({ data }) => {
         {
           id: 'line',
           afterDraw: (chart) => {
+            const ossFiles = (data.identifiedFiles * 100) / data.scannedFiles ;
+            const pendingFiles = (data.pendingFiles * 100) / data.scannedFiles;
             const percentage = ossFiles + pendingFiles;
             const meta = chart.getDatasetMeta(1); // Gets datasats[1]
             if (!meta.hidden) {
@@ -89,7 +88,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
                 chart.ctx.strokeStyle = 'black';
                 chart.ctx.lineTo(x, 90);
                 chart.ctx.stroke();
-                chart.ctx.fillText(`${percentage}%`, percentage < 95 ? x + 10 : x - 35, 85);
+                chart.ctx.fillText(`${Math.floor(percentage)}%`, percentage < 95 ? x + 10 : x - 35, 85);
                 chart.ctx.save();
               });
             }

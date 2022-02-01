@@ -404,9 +404,6 @@
         const auxSummaryData = '#SUMMARY';
         const auxData = Array.from(JSON.parse(identifiedData));
         const summaryData = JSON.parse(auxSummaryData);
-        const ossFilesPercentage = Math.round(((summaryData.identifiedFiles) * 100) / summaryData.scannedFiles);
-        const originalFilesPercentage = Math.round((summaryData.ignoredFiles * 100) / summaryData.scannedFiles);
-        const pendingFilesPercentage = Math.round((summaryData.pendingFiles * 100) / summaryData.scannedFiles);
         const originalFiles = summaryData.scannedFiles - (summaryData.identifiedFiles + summaryData.pendingFiles);
 
         const labels = [];
@@ -694,6 +691,10 @@
                     ],
                 },
                 options: {
+                    plugins: {
+                        tooltip: { enabled: false },
+
+                    },
                     maintainAspectRatio: false,
                     indexAxis: 'y',
                     scales: {
@@ -707,6 +708,7 @@
                             display: false,
                         },
                         x: {
+                            max: summaryData.scannedFiles,
                             stacked: true,
                             beginAtZero: true,
                             grid: {
@@ -717,13 +719,15 @@
                                 display: false,
                             },
                         },
-                    },                              
+                    },
                 },
                 plugins: [
                     {
                         id: 'line',
                         afterDraw: (chart) => {
-                            const percentage = ossFilesPercentage + pendingFilesPercentage;
+                            const ossFiles = ((summaryData.identifiedFiles * 100) / summaryData.scannedFiles);
+                            const pendingFiles = ((summaryData.pendingFiles * 100) / summaryData.scannedFiles);
+                            const percentage = ossFiles + pendingFiles;
                             const meta = chart.getDatasetMeta(1); // Gets datasats[1]
                             if (!meta.hidden) {
                                 meta.data.forEach((element) => {
@@ -733,7 +737,7 @@
                                     chart.ctx.strokeStyle = 'black';
                                     chart.ctx.lineTo(x, 90);
                                     chart.ctx.stroke();
-                                    chart.ctx.fillText(`${percentage}%`, percentage < 95 ? x + 10 : x - 35, 85);
+                                    chart.ctx.fillText(`${Math.floor(percentage)}%`, percentage < 95 ? x + 10 : x - 35, 85);
                                     chart.ctx.save();
                                 });
                             }
