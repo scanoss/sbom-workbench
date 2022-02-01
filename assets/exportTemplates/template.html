@@ -52,12 +52,12 @@
 
     .progress-bar-container {
         margin-top: 1%;
-        width: 100%;        
+        width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        margin-bottom: 5%; 
+        margin-bottom: 5%;
     }
 
     .main-content-info-container {
@@ -269,8 +269,8 @@
         font-size: 12px;
     }
 
-    #progress-bar {     
-        height: 95px;     
+    #progress-bar {
+        height: 95px;
         padding-left: 3.5px;
     }
 
@@ -345,7 +345,7 @@
                 <p id="total-files"></p>
             </div>
 
-        <div class="divider"> </div>
+            <div class="divider"> </div>
         </div>
 
         <div class="main-content-info-container">
@@ -407,7 +407,7 @@
         const ossFilesPercentage = Math.round(((summaryData.identifiedFiles) * 100) / summaryData.scannedFiles);
         const originalFilesPercentage = Math.round((summaryData.ignoredFiles * 100) / summaryData.scannedFiles);
         const pendingFilesPercentage = Math.round((summaryData.pendingFiles * 100) / summaryData.scannedFiles);
-
+        const originalFiles = summaryData.scannedFiles - (summaryData.identifiedFiles + summaryData.pendingFiles);
 
         const labels = [];
         const values = [];
@@ -685,8 +685,8 @@
                             barThickness: 34,
                         },
                         {
-                            label: `Original: ${summaryData.ignoredFiles}`,
-                            data: [summaryData.ignoredFiles],
+                            label: `Original: ${originalFiles}`,
+                            data: [originalFiles],
                             borderWidth: 0,
                             backgroundColor: ['#A1A1AA'],
                             barThickness: 34,
@@ -717,7 +717,7 @@
                                 display: false,
                             },
                         },
-                    },
+                    },                              
                 },
                 plugins: [
                     {
