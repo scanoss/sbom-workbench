@@ -5,7 +5,6 @@ const OssVsOriginalProgressBar = ({ data }) => {
   const chartRef = React.createRef<any>();
   const [matchedFiles, setMatchedFiles] = useState<number>(0);
 
-  // FIXME: Refactor on useEffect of bar chart
   useEffect(() => {
     setMatchedFiles(data.totalFiles);
     const ossFiles = Math.round((data.identifiedFiles * 100) / data.scannedFiles);
@@ -109,7 +108,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
           <span className="label-not-found">No matches found</span>
         ) : (
           <>
-            <div className="progress-bar">
+            <div className="oss-original-bar">
               <canvas id="OssOriginalProgress" ref={chartRef} />
             </div>
           </>

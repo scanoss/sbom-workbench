@@ -35,7 +35,7 @@
     }
 
     .identification-progress-title {
-        margin-top: 5%
+        margin-top: 1.2%
     }
 
     .divider {
@@ -671,21 +671,21 @@
                     labels: [``],
                     datasets: [
                         {
-                            label: 'OSS',
+                            label: `OSS: ${summaryData.identifiedFiles}`,
                             data: [summaryData.identifiedFiles],
                             borderWidth: 0,
                             backgroundColor: ['#22C55E'],
                             barThickness: 34,
                         },
                         {
-                            label: 'Pending',
+                            label: `Pending: ${summaryData.pendingFiles}`,
                             data: [summaryData.pendingFiles],
                             borderWidth: 0,
                             backgroundColor: ['#F97316'],
                             barThickness: 34,
                         },
                         {
-                            label: 'Original',
+                            label: `Original: ${summaryData.ignoredFiles}`,
                             data: [summaryData.ignoredFiles],
                             borderWidth: 0,
                             backgroundColor: ['#A1A1AA'],
