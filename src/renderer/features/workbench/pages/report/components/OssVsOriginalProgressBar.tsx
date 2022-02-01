@@ -3,7 +3,7 @@ import { Chart } from 'chart.js';
 
 const OssVsOriginalProgressBar = ({ data }) => {
   const chartRef = React.createRef<any>();
-  const [matchedFiles, setMatchedFiles] = useState<number>(0); 
+  const [matchedFiles, setMatchedFiles] = useState<number>(0);
 
   // FIXME: Refactor on useEffect of bar chart
   useEffect(() => {
@@ -11,7 +11,6 @@ const OssVsOriginalProgressBar = ({ data }) => {
     const ossFiles = Math.round((data.identifiedFiles * 100) / data.scannedFiles);
     const originalFiles = Math.round((data.ignoredFiles * 100) / data.scannedFiles);
     const pendingFiles = Math.round((data.pendingFiles * 100) / data.scannedFiles);
-
 
     const canvas = document.getElementById('OssOriginalProgress') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
@@ -83,14 +82,19 @@ const OssVsOriginalProgressBar = ({ data }) => {
           id: 'line',
           afterDraw: (chart) => {
             const percentage = ossFiles + pendingFiles;
-            const x = (percentage * chart.width) / 100;
-            chart.ctx.beginPath();
-            chart.ctx.moveTo(x, 30);
-            chart.ctx.strokeStyle = 'black';
-            chart.ctx.lineTo(x, 90);
-            chart.ctx.stroke();
-            chart.ctx.fillText(`${percentage}%`, percentage < 95 ? x + 10 : x - 35, 85);
-            chart.ctx.save();
+            const meta = chart.getDatasetMeta(1); // Gets datasats[1]
+            if (!meta.hidden) {
+              meta.data.forEach((element) => {
+                const { x }: any = element.tooltipPosition();
+                chart.ctx.beginPath();
+                chart.ctx.moveTo(x, 30);
+                chart.ctx.strokeStyle = 'black';
+                chart.ctx.lineTo(x, 90);
+                chart.ctx.stroke();
+                chart.ctx.fillText(`${percentage}%`, percentage < 95 ? x + 10 : x - 35, 85);
+                chart.ctx.save();
+              });
+            }
           },
         },
       ],
