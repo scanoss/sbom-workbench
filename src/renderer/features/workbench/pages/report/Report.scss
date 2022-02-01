@@ -118,12 +118,12 @@
 
     }
 
-    #IdentificationProgress {
+    #IdentificationProgress, #OssProgress {
       display: flex;
       justify-content: center;
       flex-direction: column;
 
-      .identification-canvas-container {
+      .identification-canvas-container  {
         margin-top: 22px;
         height: 55px;
         width: 100%;
@@ -131,7 +131,7 @@
         justify-content: space-between;
 
 
-        .label , .label-original{
+        .label {
           float: left;
           margin-left: auto;
           margin-right: auto;
@@ -155,11 +155,7 @@
 
         .progress-bar {
           width: 90%;
-        }
-
-        .progress-bar-oss-original {
-          width: 75%;
-        }
+        }      
       }
     }
 
@@ -408,3 +404,16 @@
 .hide {
   display:none;
 }
+
+#OssProgress .label{
+  color: #5d5d5d !important;
+}
+
+#OssProgress{
+  height: 115px;
+}
+
+#OssOriginalProgress{
+  height: 95px;
+}
+

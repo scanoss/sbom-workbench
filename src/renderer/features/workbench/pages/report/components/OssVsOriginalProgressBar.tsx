@@ -3,18 +3,18 @@ import { Chart } from 'chart.js';
 
 const OssVsOriginalProgressBar = ({ data }) => {
   const chartRef = React.createRef<any>();
-  const [matchedFiles, setMatchedFiles] = useState<number>(0);
-  const [ossFiles, setOssFiles] = useState<number>(0);
-  const [originalFiles, setoriginalFiles] = useState<number>(0);
+  const [matchedFiles, setMatchedFiles] = useState<number>(0); 
 
+  // FIXME: Refactor on useEffect of bar chart
   useEffect(() => {
-    setMatchedFiles(data.totalFiles);  
-    const ossFiles = Math.round(((data.identifiedFiles + data.pendingFiles) * 100) / data.scannedFiles); 
-    setOssFiles(ossFiles);
-    const originalFiles = Math.round(
-      ((data.scannedFiles - (data.identifiedFiles + data.pendingFiles)) * 100) / data.scannedFiles
-    );
-      setoriginalFiles(originalFiles);
+    setMatchedFiles(data.totalFiles);
+    const ossFiles = Math.round((data.identifiedFiles * 100) / data.scannedFiles);
+    const originalFiles = Math.round((data.ignoredFiles * 100) / data.scannedFiles);
+    const pendingFiles = Math.round((data.pendingFiles * 100) / data.scannedFiles);
+
+
+    const canvas = document.getElementById('OssOriginalProgress') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
 
     const tooltipPlugin = Chart.registry.getPlugin('tooltip');
     tooltipPlugin.positioners.custom = function (elements, eventPosition) {
@@ -24,16 +24,23 @@ const OssVsOriginalProgressBar = ({ data }) => {
       };
     };
 
-    const chart = new Chart(chartRef.current, {
+    const chart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: [`${data.totalFiles}%`],
+        labels: [``],
         datasets: [
           {
             label: 'OSS',
             data: [ossFiles],
             borderWidth: 0,
             backgroundColor: ['#22C55E'],
+            barThickness: 34,
+          },
+          {
+            label: 'Pending',
+            data: [pendingFiles],
+            borderWidth: 0,
+            backgroundColor: ['#F97316'],
             barThickness: 34,
           },
           {
@@ -70,46 +77,38 @@ const OssVsOriginalProgressBar = ({ data }) => {
             },
           },
         },
-        plugins: {
-          tooltip: {
-            position: 'custom',
-            callbacks: {
-              title() {
-                return `OSS Files ${data.identifiedFiles + data.pendingFiles}\nOriginal Files ${
-                  data.scannedFiles - (data.identifiedFiles + data.pendingFiles)
-                }`;
-              },
-              label() {
-                return ``;
-              },
-            },
-            displayColors: false,
-          },
-          legend: {
-            display: false,
-            labels: {
-              boxWidth: 0,
-            },
+      },
+      plugins: [
+        {
+          id: 'line',
+          afterDraw: (chart) => {
+            const percentage = ossFiles + pendingFiles;
+            const x = (percentage * chart.width) / 100;
+            chart.ctx.beginPath();
+            chart.ctx.moveTo(x, 30);
+            chart.ctx.strokeStyle = 'black';
+            chart.ctx.lineTo(x, 90);
+            chart.ctx.stroke();
+            chart.ctx.fillText(`${percentage}%`, percentage < 95 ? x + 10 : x - 35, 85);
+            chart.ctx.save();
           },
         },
-      },
+      ],
     });
 
     return () => chart.destroy();
   }, []);
 
   return (
-    <div id="IdentificationProgress">
-      <div className="identification-canvas-container">
+    <div id="OssProgress">
+      <div className="oss-canvas-container">
         {Number.isNaN(matchedFiles) ? (
           <span className="label-not-found">No matches found</span>
         ) : (
           <>
-            <span className="label">{ossFiles}%</span>
-            <div className="progress-bar-oss-original ">
-              <canvas ref={chartRef} />
+            <div className="progress-bar">
+              <canvas id="OssOriginalProgress" ref={chartRef} />
             </div>
-            <span className="label-original">{originalFiles}%</span>
           </>
         )}
       </div>
