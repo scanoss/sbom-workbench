@@ -12,7 +12,7 @@ const query = new Querys();
 export class InventoryModel extends Model {
   component: ComponentModel;
 
-  results: ResultModel; 
+  results: ResultModel;
 
   constructor(path: string) {
     super(path);
@@ -264,42 +264,26 @@ export class InventoryModel extends Model {
     });
   }
 
-  // UPDATE INVENTORY
-  update(inventory: Inventory) {
+  update(inventory: Inventory): Promise<Inventory> {
     return new Promise(async (resolve, reject) => {
+      const db = await this.openDb();
       try {
-        let success: any;
-        if (inventory.id !== undefined) success = await this.updateById(inventory);
-        if (success) resolve(success);
-        else resolve(false);
-      } catch (error) {
-        log.error(error);
-        reject(new Error('Inventory was not updated'));
-      }
-    });
-  }
-
-  private updateById(inventory: Partial<Inventory>) {
-    return new Promise(async (resolve) => {
-      try {
-        const db = await this.openDb();
         db.run(
-          query.SQL_UPDATE_INVENTORY_BY_ID,
+          query.SQL_UPDATE_INVENTORY,
           inventory.cvid,
-          inventory.usage ? inventory.usage : 'n/a',
-          inventory.notes ? inventory.notes : 'n/a',
-          inventory.url ? inventory.url : 'n/a',
-          inventory.license_name ? inventory.license_name : 'n/a',
+          inventory.usage,
+          inventory.notes,
+          inventory.url ? inventory.url : '',
+          inventory.spdxid,
           inventory.id,
-          async function (err: any) {
-            db.close();
-            if (err) resolve(false);
-            resolve(true);
+          (err: any) => {
+            if (err) throw Error('Unable to update inventory');
+            resolve(inventory);
           }
         );
       } catch (error) {
         log.error(error);
-        resolve(false);
+        reject(error);
       }
     });
   }
