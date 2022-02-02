@@ -12,7 +12,7 @@ const query = new Querys();
 export class InventoryModel extends Model {
   component: ComponentModel;
 
-  results: ResultModel; 
+  results: ResultModel;
 
   constructor(path: string) {
     super(path);
@@ -394,12 +394,10 @@ export class InventoryModel extends Model {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(function () {
-          db.all(query.SQL_GET_RESULTS_SUMMARY, (err: any, data: any) => {
-            db.close();
-            if (err) throw err;
-            else resolve(data);
-          });
+        db.get(query.SQL_GET_RESULTS_SUMMARY, (err: any, data: any) => {
+          db.close();
+          if (err) throw err;
+          else resolve(data);
         });
       } catch (error) {
         log.error(error);

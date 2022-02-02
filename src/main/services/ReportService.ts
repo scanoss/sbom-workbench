@@ -39,15 +39,17 @@ class ReportService {
         identifiedFiles: 0,
         ignoredFiles: 0,
         detectedFiles: 0,
+        noMatchFiles: 0,
       };
-      summary.totalFiles = projectSummary.total;
+      summary.totalFiles = tempSummary.totalFiles;
       summary.includedFiles = projectSummary.include;
       summary.filteredFiles = projectSummary.filter;
-      summary.scannedFiles = tempSummary[0].identified + tempSummary[0].ignored + tempSummary[0].pending;
-      summary.pendingFiles = tempSummary[0].pending;
-      summary.identifiedFiles = tempSummary[0].identified;
-      summary.ignoredFiles = tempSummary[0].ignored;
-      summary.detectedFiles = tempSummary[0].detected;
+      summary.scannedFiles = tempSummary.scannedFiles;
+      summary.pendingFiles = tempSummary.pending;
+      summary.identifiedFiles = tempSummary.identified;
+      summary.ignoredFiles = tempSummary.original;
+      summary.detectedFiles = tempSummary.match;
+      summary.noMatchFiles = tempSummary.noMatch;
       return summary;
     } catch (error) {
       return error;
