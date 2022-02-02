@@ -1,5 +1,5 @@
 import { makeStyles, Paper, IconButton, InputBase, Link } from '@material-ui/core';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
@@ -42,7 +42,6 @@ const useStyles = makeStyles((theme) => ({
     padding: 10,
   },
 }));
-
 
 export const ComponentList = () => {
   const history = useHistory();

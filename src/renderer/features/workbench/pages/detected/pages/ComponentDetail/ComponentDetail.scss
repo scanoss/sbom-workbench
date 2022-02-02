@@ -1,5 +1,5 @@
 header.app-header {
-  .header, .subheader {
+  .header, .tab-navigation {
     display: flex;
     width: 100%;
     justify-content: space-between;
@@ -9,8 +9,13 @@ header.app-header {
     align-items: flex-start;
   }
 
-  .subheader {
+  .tab-navigation {
     align-items: flex-end;
+  }
+
+  .search-box {
+    width: $search-box-width;
+    margin-bottom: 16px;
   }
 
 }
