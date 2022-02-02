@@ -22,7 +22,7 @@ const LicensesChart = ({ data }) => {
     setToken(TOKEN || '');
   };
   useEffect(() => {
-    const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);    
+    const percentage = Math.floor(((data?.detectedIdentifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);    
     setPercentage(percentage);
 
     readToken();
@@ -34,7 +34,7 @@ const LicensesChart = ({ data }) => {
         datasets: [
           {
             label: 'Identified',
-            data: [data.identifiedFiles + data.ignoredFiles],
+            data: [data.detectedIdentifiedFiles + data.ignoredFiles],
             borderWidth: 0,
             backgroundColor: ['#22C55E'],
             barThickness: 34,

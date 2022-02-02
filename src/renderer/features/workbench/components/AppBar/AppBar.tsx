@@ -102,7 +102,7 @@ const AppProgress = ({ summary, progress }) => {
               </div>
 
               <div className="mr-3">
-                <Typography className="has-status-bullet identified">{summary?.identifiedFiles}</Typography>
+                <Typography className="has-status-bullet identified">{summary?.detectedIdentifiedFiles}</Typography>
                 <p className="m-0">IDENTIFIED</p>
               </div>
 

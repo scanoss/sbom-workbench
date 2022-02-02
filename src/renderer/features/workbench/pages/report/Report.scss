@@ -140,6 +140,7 @@
           margin-top: 4px;
           font-size: 34px;
           font-weight: 700;
+          margin-right: 2px;        
         }
 
         .label-original {
@@ -405,15 +406,16 @@
   display:none;
 }
 
-#OssProgress .label{
-  color: #5d5d5d !important;
-}
-
 #OssProgress{
   height: 115px;
 }
 
 #OssOriginalProgress{
   height: 95px;
+}
+
+#Report .report-layout #OssProgress .identification-canvas-container .label {
+  margin-top: 17px;
+  color: #5d5d5d ;
 }
 

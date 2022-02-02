@@ -91,7 +91,7 @@ export default function reducer(state: State = initialState, action): State {
       const progress =
         summary?.detectedFiles === 0
           ? 100
-          : ((summary?.identifiedFiles + summary?.ignoredFiles) * 100) / summary?.detectedFiles;
+          : ((summary?.detectedIdentifiedFiles + summary?.ignoredFiles) * 100) / summary?.detectedFiles;
       return {
         ...state,
         summary,

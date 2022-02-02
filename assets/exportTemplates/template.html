@@ -282,13 +282,13 @@
         width: 65%;
     }
 
-    .oss-percentage,
-    .original-percentage {
+    #oss-percentage{
         font-size: 25px;
         display: block;
-        height: auto;
-        color: #22C55E;
+        height: auto;       
         background-color: #f5f5f5a1;
+        padding-top: 28px;
+        font-size: 35px;
     }
 
     .identified,
@@ -321,6 +321,13 @@
         color: #A1A1AA;
         margin-left: 3px;
     }
+
+    .percentage-container{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+    }
 </style>
 
 <body>
@@ -333,8 +340,8 @@
         <div class="progress-bar-container">
             <h3 class="identification-progress-title">Original vs OSS</h3>
             <div class="progress-bar-child-container">
-                <div>
-                    <span class="oss-percentage"></span>
+                <div class="percentage-container">
+                    <span id="oss-percentage"></span>
                 </div>
                 <canvas id="progress-bar"></canvas>
                 <div>
@@ -405,6 +412,9 @@
         const auxData = Array.from(JSON.parse(identifiedData));
         const summaryData = JSON.parse(auxSummaryData);
         const originalFiles = summaryData.scannedFiles - (summaryData.identifiedFiles + summaryData.pendingFiles);
+        const ossFiles = (summaryData.identifiedFiles * 100) / summaryData.scannedFiles;
+        const pendingFiles = (summaryData.pendingFiles * 100) / summaryData.scannedFiles;
+        const percentage = ossFiles + pendingFiles;
 
         const labels = [];
         const values = [];
@@ -659,8 +669,10 @@
         pieChart();
 
         function progressBar() {
+            const spanPercentage = document.querySelector('#oss-percentage');
+            spanPercentage.innerHTML=`${Math.floor(percentage)}%`;
             const totalFiles = document.querySelector('#total-files');
-            totalFiles.innerText = `Total files : ${summaryData.scannedFiles}`;
+            totalFiles.innerText = `Total files: ${summaryData.scannedFiles}`;
 
             const chart = new Chart(document.getElementById('progress-bar'), {
                 type: 'bar',
@@ -724,10 +736,7 @@
                 plugins: [
                     {
                         id: 'line',
-                        afterDraw: (chart) => {
-                            const ossFiles = ((summaryData.identifiedFiles * 100) / summaryData.scannedFiles);
-                            const pendingFiles = ((summaryData.pendingFiles * 100) / summaryData.scannedFiles);
-                            const percentage = ossFiles + pendingFiles;
+                        afterDraw: (chart) => {                           
                             const meta = chart.getDatasetMeta(1); // Gets datasats[1]
                             if (!meta.hidden) {
                                 meta.data.forEach((element) => {
@@ -736,8 +745,7 @@
                                     chart.ctx.moveTo(x, 30);
                                     chart.ctx.strokeStyle = 'black';
                                     chart.ctx.lineTo(x, 90);
-                                    chart.ctx.stroke();
-                                    chart.ctx.fillText(`${Math.floor(percentage)}%`, percentage < 95 ? x + 10 : x - 35, 85);
+                                    chart.ctx.stroke();                                   
                                     chart.ctx.save();
                                 });
                             }

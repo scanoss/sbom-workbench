@@ -40,6 +40,7 @@ class ReportService {
         ignoredFiles: 0,
         detectedFiles: 0,
         noMatchFiles: 0,
+        detectedIdentifiedFiles: 0,
       };
       summary.totalFiles = tempSummary.totalFiles;
       summary.includedFiles = projectSummary.include;
@@ -50,6 +51,7 @@ class ReportService {
       summary.ignoredFiles = tempSummary.original;
       summary.detectedFiles = tempSummary.match;
       summary.noMatchFiles = tempSummary.noMatch;
+      summary.detectedIdentifiedFiles = tempSummary.detectedIdentifiedFiles;
       return summary;
     } catch (error) {
       return error;

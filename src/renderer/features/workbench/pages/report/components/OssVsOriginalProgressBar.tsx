@@ -76,7 +76,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
               meta.data.forEach((element) => {
                 const { x }: any = element.tooltipPosition();
                 chart.ctx.beginPath();
-                chart.ctx.moveTo(x, 30);
+                chart.ctx.moveTo(x, 20);
                 chart.ctx.strokeStyle = 'black';
                 chart.ctx.lineTo(x, 90);
                 chart.ctx.stroke();
