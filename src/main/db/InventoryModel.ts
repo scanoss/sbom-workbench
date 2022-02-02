@@ -229,6 +229,7 @@ export class InventoryModel extends Model {
           inventory.spdxid,
           inventory.cvid,
           async function (err: any, inv: any) {
+            db.close();
             if (err) throw Error('Unable to get existing inventory');
             resolve(inv);
           }
@@ -256,6 +257,7 @@ export class InventoryModel extends Model {
             if (err) throw Error('Unable to create inventory');
           }
         );
+        db.close();
         resolve(inventory);
       } catch (error) {
         log.error(error);
@@ -277,6 +279,7 @@ export class InventoryModel extends Model {
           inventory.spdxid,
           inventory.id,
           (err: any) => {
+            db.close();
             if (err) throw Error('Unable to update inventory');
             resolve(inventory);
           }

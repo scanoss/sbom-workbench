@@ -301,6 +301,7 @@ export class LicenseModel extends Model {
       try {
         const db = await this.openDb();
         db.get(`${query.SQL_SELECT_LICENSE}spdxid='${spdxid}';`, (err: any, license: any) => {
+          db.close();
           if (err) throw err;
           resolve(license);
         });
