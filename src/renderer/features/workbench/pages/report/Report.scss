@@ -139,7 +139,7 @@
           color: #22C55E;
           margin-top: 4px;
           font-size: 34px;
-          font-weight: 700;
+          font-weight: 700;             
         }
 
         .label-original {
@@ -300,6 +300,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      width: 35%;
 
       .label-match {
         color: #6366F1;
@@ -320,6 +321,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      width: 35%;
       .label-nomatch {
         color: #A5B4FC;
         padding: 0px;
@@ -405,15 +407,24 @@
   display:none;
 }
 
-#OssProgress .label{
-  color: #5d5d5d !important;
-}
-
 #OssProgress{
-  height: 115px;
+  height: 105px;
 }
 
 #OssOriginalProgress{
   height: 95px;
 }
 
+#Report .report-layout #OssProgress .identification-canvas-container .label {
+  margin-top: 27px;
+  color: #5d5d5d ;
+}
+
+#Report .report-layout #OssProgress .identification-canvas-container{
+  height: 70px;
+  margin-top: 5px;
+}
+
+#OssProgress .total-files-container{ 
+  margin-top: 10px;
+} 

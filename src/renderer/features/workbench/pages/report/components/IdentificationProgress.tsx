@@ -22,35 +22,26 @@ const LicensesChart = ({ data }) => {
     setToken(TOKEN || '');
   };
   useEffect(() => {
-    const percentage = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
-    const pending = 100 - percentage;
+    const percentage = Math.floor(((data?.detectedIdentifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);    
     setPercentage(percentage);
 
     readToken();
 
-    const tooltipPlugin = Chart.registry.getPlugin('tooltip');
-    tooltipPlugin.positioners.custom = function (elements, eventPosition) {
-      return {
-        x: eventPosition.x,
-        y: eventPosition.y,
-      };
-    };
-
     const chart = new Chart(chartRef.current, {
       type: 'bar',
       data: {
-        labels: [`${percentage}%`],
+        labels: [``],
         datasets: [
           {
-            label: '',
-            data: [percentage],
+            label: 'Identified',
+            data: [data.detectedIdentifiedFiles + data.ignoredFiles],
             borderWidth: 0,
             backgroundColor: ['#22C55E'],
             barThickness: 34,
           },
           {
-            label: 'Identified',
-            data: [pending],
+            label: 'Pending',
+            data: [data.pendingFiles],
             borderWidth: 0,
             backgroundColor: ['#F97316'],
             barThickness: 34,
@@ -71,6 +62,7 @@ const LicensesChart = ({ data }) => {
             display: false,
           },
           x: {
+            max: data.detectedFiles,
             stacked: true,
             beginAtZero: true,
             grid: {
@@ -83,20 +75,6 @@ const LicensesChart = ({ data }) => {
           },
         },
         plugins: {
-          tooltip: {
-            position: 'custom',
-            callbacks: {
-              title() {
-                return `Pending Files ${data?.pendingFiles}\nIdentified & Original Files ${
-                  data?.identifiedFiles + data.ignoredFiles
-                }`;
-              },
-              label() {
-                return ``;
-              },
-            },
-            displayColors: false,
-          },
           legend: {
             display: false,
             labels: {
@@ -126,7 +104,7 @@ const LicensesChart = ({ data }) => {
       </div>
       <div className="total-files-container">
         <span className="total-files-label">
-          <strong>{data.detectedFiles}</strong> total files
+          <strong>{data.detectedFiles}</strong> detected files
         </span>
       </div>
       <div className={token ? 'notarize-container' : 'hide'}>

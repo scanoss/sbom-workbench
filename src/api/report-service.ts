@@ -14,12 +14,13 @@ class ReportService extends BaseService {
     return this.response(response);
   }
 
-  public async getInventoryProgress(args: string | null = null): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.REPORT_INVENTORY_PROGRESS, args);
-    return response;
-  }
+  // TODO:Remove service
+  // public async getInventoryProgress(args: string | null = null): Promise<any> {
+  //   const response = await ipcRenderer.invoke(IpcEvents.REPORT_INVENTORY_PROGRESS, args);
+  //   return response;
+  // }
 
-  public async idetified(): Promise<any> {
+  public async identified(): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.REPORT_IDENTIFIED);
     return this.response(response);
   }

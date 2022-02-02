@@ -208,7 +208,18 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION =
     'UPDATE files SET identified=0 WHERE fileId IN (SELECT fileId FROM file_inventories WHERE inventoryid=?)';
 
-  SQL_GET_RESULTS_SUMMARY = `SELECT (SELECT COUNT(*) FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE f.identified = 1) AS "identified", (SELECT COUNT(*) FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE f.ignored = 1) AS "ignored", (SELECT COUNT(*) FROM files f INNER JOIN results r ON f.fileId=r.fileId WHERE (f.identified = 0 AND f.ignored = 0)) AS "pending", (SELECT COUNT(*) FROM results WHERE idtype !="none" AND md5_file!="" AND source="engine") AS "detected";`;
+  SQL_GET_RESULTS_SUMMARY = `
+  SELECT filesIdentified.identified,filesPending.pending,filesOriginal.original,filesNoMatch.noMatch,filesFiltered.filtered,filesMatch.match,totalFiles.totalFiles, scannedFiles.scannedFiles,detectedIdentifiedFiles.detectedIdentifiedFiles FROM (
+  (SELECT COUNT(*) AS identified FROM files f WHERE f.identified=1) AS filesIdentified,
+  (SELECT COUNT(*) AS pending FROM files f WHERE f.identified=0 AND f.ignored=0 AND f.type="MATCH") AS filesPending,
+  (SELECT COUNT(*) AS original FROM files f WHERE f.ignored=1) AS filesOriginal,
+  (SELECT COUNT(*) AS noMatch FROM files f WHERE f.type='NO-MATCH') AS filesNoMatch,
+  (SELECT COUNT(*) AS filtered FROM files f WHERE f.type='FILTERED') AS filesFiltered,
+  (SELECT COUNT(*) AS match FROM files f WHERE f.type='MATCH') AS filesMatch,
+  (SELECT COUNT(*) AS totalFiles FROM files) AS totalFiles,
+  (SELECT COUNT(*) AS scannedFiles FROM files f WHERE f.type!="FILTERED" ) AS scannedFiles,
+  (SELECT COUNT(*) AS detectedIdentifiedFiles FROM files f WHERE f.type="MATCH" AND f.identified=1) AS detectedIdentifiedFiles
+   );`;
 
   SQL_GET_SUMMARY_BY_RESULT_ID = `SELECT f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending FROM files f  WHERE fileId IN #values GROUP BY f.path;`;
 

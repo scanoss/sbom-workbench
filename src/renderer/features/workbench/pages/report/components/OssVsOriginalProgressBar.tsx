@@ -4,18 +4,13 @@ import { Chart } from 'chart.js';
 const OssVsOriginalProgressBar = ({ data }) => {
   const chartRef = React.createRef<any>();
   const [matchedFiles, setMatchedFiles] = useState<number>(0);
+  const ossFiles = (data.identifiedFiles * 100) / data.scannedFiles;
+  const pendingFiles = (data.pendingFiles * 100) / data.scannedFiles;
+  const percentage = ossFiles + pendingFiles;
 
   useEffect(() => {
-    setMatchedFiles(data.totalFiles); 
+    setMatchedFiles(data.totalFiles);
     const originalFiles = data.scannedFiles - (data.identifiedFiles + data.pendingFiles);
-
-    const tooltipPlugin = Chart.registry.getPlugin('tooltip');
-    tooltipPlugin.positioners.custom = function (elements, eventPosition) {
-      return {
-        x: eventPosition.x,
-        y: eventPosition.y,
-      };
-    };
 
     const chart = new Chart(chartRef.current, {
       type: 'bar',
@@ -59,7 +54,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
             display: false,
           },
           x: {
-            max:data.scannedFiles,
+            max: data.scannedFiles,
             stacked: true,
             beginAtZero: true,
             grid: {
@@ -76,19 +71,15 @@ const OssVsOriginalProgressBar = ({ data }) => {
         {
           id: 'line',
           afterDraw: (chart) => {
-            const ossFiles = (data.identifiedFiles * 100) / data.scannedFiles ;
-            const pendingFiles = (data.pendingFiles * 100) / data.scannedFiles;
-            const percentage = ossFiles + pendingFiles;
-            const meta = chart.getDatasetMeta(1); // Gets datasats[1]
+            const meta = chart.getDatasetMeta(1); // Gets datasets[1]
             if (!meta.hidden) {
               meta.data.forEach((element) => {
                 const { x }: any = element.tooltipPosition();
                 chart.ctx.beginPath();
-                chart.ctx.moveTo(x, 30);
+                chart.ctx.moveTo(x, 20);
                 chart.ctx.strokeStyle = 'black';
                 chart.ctx.lineTo(x, 90);
                 chart.ctx.stroke();
-                chart.ctx.fillText(`${Math.floor(percentage)}%`, percentage < 95 ? x + 10 : x - 35, 85);
                 chart.ctx.save();
               });
             }
@@ -102,12 +93,13 @@ const OssVsOriginalProgressBar = ({ data }) => {
 
   return (
     <div id="OssProgress">
-      <div className="oss-canvas-container">
+      <div className="identification-canvas-container">
         {Number.isNaN(matchedFiles) ? (
           <span className="label-not-found">No matches found</span>
         ) : (
           <>
-            <div className="oss-original-bar">
+            <span className="label">{Math.floor(percentage)}%</span>
+            <div className="progress-bar">
               <canvas id="OssOriginalProgress" ref={chartRef} />
             </div>
           </>
@@ -115,7 +107,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
       </div>
       <div className="total-files-container">
         <span className="total-files-label">
-          <strong>{data.scannedFiles}</strong> total files
+          <strong>{data.scannedFiles}</strong> scanned files
         </span>
       </div>
     </div>
