@@ -52,8 +52,8 @@ export class Querys {
   // SQL DELETE FILE INVENTORY
   SQL_DELETE_FILE_INVENTORIES = 'DELETE FROM file_inventories WHERE fileId IN ';
 
-  //  UPDATE INVENTORY BY ID
-  SQL_UPDATE_INVENTORY_BY_ID = 'UPDATE inventories SET cvid=?,usage=?, notes=?, url=?, spdxid=? WHERE id=?;';
+  //  UPDATE INVENTORY 
+  SQL_UPDATE_INVENTORY = 'UPDATE inventories SET cvid=?, usage=?, notes=?, url=?, spdxid=? WHERE id=?;';
 
   SQL_SELECT_INVENTORY_COMPONENTS = `SELECT DISTINCT i.cvid,i.id,r.vendor,i.usage,cv.purl,i.notes,i.url,i.spdxid,cv.version,cv.name FROM inventories i 
   INNER JOIN component_versions cv ON cv.id=i.cvid 
@@ -215,4 +215,6 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   SQL_GET_RESULTS_RESCAN = `SELECT r.idtype,f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending, source AS original FROM files f INNER JOIN results r ON f.fileId=r.fileId;`;
 
   SQL_GET_RESULTS_IN_FOLDER = `SELECT f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f LEFT JOIN results r ON f.fileId=r.fileId WHERE f.path LIKE '?';`;
+
+  
 }

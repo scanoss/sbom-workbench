@@ -139,7 +139,15 @@ ipcMain.handle(IpcEvents.INVENTORY_ACCEPT_PRE_LOAD, async (_event, data: Partial
     const inventories: Array<Partial<Inventory>> = await logicInventoryService.preLoadInventoriesAcceptAll(data);
     return { status: 'ok', message: 'Inventory folder successfully', data: inventories };
   } catch (e) {
-    console.log('Catch an error on inventory: ', e);
+    return { status: 'fail' };
+  }
+});
+
+ipcMain.handle(IpcEvents.INVENTORY_UPDATE, async (_event, inventory: Inventory) => {
+  try {
+    const inv = await logicInventoryService.update(inventory);
+    return { status: 'ok', message: 'Inventory succesfully updated', data: inv };
+  } catch (e) {
     return { status: 'fail' };
   }
 });
