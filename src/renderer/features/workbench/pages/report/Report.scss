@@ -407,7 +407,7 @@
 }
 
 #OssProgress{
-  height: 115px;
+  height: 105px;
 }
 
 #OssOriginalProgress{
@@ -415,7 +415,16 @@
 }
 
 #Report .report-layout #OssProgress .identification-canvas-container .label {
-  margin-top: 17px;
+  margin-top: 27px;
   color: #5d5d5d ;
 }
 
+#Report .report-layout #OssProgress .identification-canvas-container{
+  height: 70px;
+  margin-top: 5px;
+}
+
+
+#OssProgress .total-files-container{ 
+  margin-top: 10px;
+} 
