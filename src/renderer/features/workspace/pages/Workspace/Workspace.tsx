@@ -14,6 +14,7 @@ import { DialogContext, IDialogContext } from '../../../../context/DialogProvide
 import { DIALOG_ACTIONS } from '../../../../context/types';
 import * as Config from '../../../../../Config';
 import ProjectList from '../Components/ProjectList';
+import SearchBox from '../../../../components/SearchBox/SearchBox';
 
 const Workspace = () => {
   const history = useHistory();
@@ -104,19 +105,9 @@ const Workspace = () => {
         <header className="app-header">
           <h1 className="header-title">Projects</h1>
           <section className="subheader">
-            <div>
+            <div className="search-box">
               {projects && projects.length > 0 && (
-                <Paper>
-                  <IconButton>
-                    <SearchIcon />
-                  </IconButton>
-                  <InputBase
-                    className="search-input"
-                    onKeyUp={(e: any) => setSearchQuery(e.target.value)}
-                    placeholder="Search..."
-                    inputProps={{ 'aria-label': 'search', maxLength: 20 }}
-                  />
-                </Paper>
+                <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
               )}
             </div>
             <Button startIcon={<AddIcon />} variant="contained" color="primary" onClick={onNewProjectHandler}>

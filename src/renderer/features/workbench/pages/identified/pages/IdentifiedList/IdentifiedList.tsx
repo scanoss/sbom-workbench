@@ -10,6 +10,7 @@ import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import RecognizedCard from '../../../../components/RecognizedCard/RecognizedCard';
 import usePagination from '../../../../../../hooks/usePagination';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
+import SearchBox from '../../../../../../components/SearchBox/SearchBox';
 
 const filter = (items, query) => {
   if (!items) {
@@ -78,20 +79,12 @@ export const IdentifiedList = () => {
 
   return (
     <>
-      <section className="app-page" onScroll={onScroll}>
+      <section id="IdentifiedList" className="app-page" onScroll={onScroll}>
         <header className="app-header">
           <Breadcrumb />
-          <Paper component="form" className={classes.root}>
-            <IconButton className={classes.iconButton} aria-label="menu">
-              <SearchIcon />
-            </IconButton>
-            <InputBase
-              className={classes.input}
-              onKeyUp={(e: any) => setSearchQuery(e.target.value)}
-              placeholder="Search"
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </Paper>
+          <div className="search-box">
+            <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
+          </div>
         </header>
 
         <main className="app-content">

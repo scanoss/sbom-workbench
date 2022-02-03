@@ -1,5 +1,5 @@
 import { makeStyles, Paper, IconButton, InputBase, Link } from '@material-ui/core';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
@@ -9,6 +9,7 @@ import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import { setComponent } from '../../../../actions';
 import usePagination from '../../../../../../hooks/usePagination';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
+import SearchBox from '../../../../../../components/SearchBox/SearchBox';
 
 const filter = (items, query) => {
   if (!items) {
@@ -43,7 +44,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
 export const ComponentList = () => {
   const history = useHistory();
   const classes = useStyles();
@@ -72,17 +72,9 @@ export const ComponentList = () => {
       <section className="app-page" onScroll={onScroll}>
         <header className="app-header">
           <Breadcrumb />
-          <Paper component="form" className={classes.root}>
-            <IconButton className={classes.iconButton} aria-label="menu">
-              <SearchIcon />
-            </IconButton>
-            <InputBase
-              className={classes.input}
-              onKeyUp={(e: any) => setSearchQuery(e.target.value)}
-              placeholder="Search"
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </Paper>
+          <div className="search-box">
+            <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
+          </div>
         </header>
 
         <main className="app-content">

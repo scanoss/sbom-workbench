@@ -1,18 +1,5 @@
-import {
-  Button,
-  ButtonGroup,
-  ClickAwayListener,
-  Menu,
-  MenuItem,
-  MenuList,
-  Paper,
-  Popper,
-  Tab,
-  Tabs,
-} from '@material-ui/core';
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import { Inventory } from '../../../../../../../api/types';
@@ -28,91 +15,21 @@ import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import { mapFiles } from '../../../../../../../utils/scan-util';
 import { setHistoryCrumb, setVersion } from '../../../../actions';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
-
-// inner components
-const VersionSelector = ({ versions, version, onSelect, component }) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const totalFiles = component.summary.ignored + component.summary.pending + component.summary.identified;
-
-  const handleSelected = (version: string) => {
-    setAnchorEl(null);
-    onSelect(version);
-  };
-
-  return (
-    <>
-      <div>
-        {versions?.length > 1 ? (
-          <Button
-            className={`filter btn-version ${version ? 'selected' : ''}`}
-            aria-controls="menu"
-            aria-haspopup="true"
-            endIcon={<ArrowDropDownIcon />}
-            onClick={(event) => setAnchorEl(event.currentTarget)}
-          >
-            {version || 'version'}
-          </Button>
-        ) : (
-          versions[0].version
-        )}
-      </div>
-      <Menu id="VersionSelectorList" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-        <MenuItem key="all" onClick={() => handleSelected(null)}>
-          <div className="version-container">
-            <div className="version"> All versions</div>
-            <div className="files-counter">{totalFiles}</div>
-          </div>
-        </MenuItem>
-        {versions?.map(({ version, files }) => (
-          <MenuItem key={version} onClick={() => handleSelected(version)}>
-            <div className="version-container">
-              <div className="version"> {version}</div>
-              <div className="files-counter">{files}</div>
-            </div>
-          </MenuItem>
-        ))}
-      </Menu>
-    </>
-  );
-};
-
-const TabNavigation = ({ tab, version, component, filterFiles, onSelect }) => {
-  return (
-    <div className="tabs d-flex">
-      <Paper square>
-        <Tabs
-          selectionFollowsFocus
-          value={tab}
-          TabIndicatorProps={{ style: { display: 'none' } }}
-          onChange={(event, value) => onSelect(value)}
-        >
-          <Tab label={`Pending (${version ? `${filterFiles.pending.length}/` : ''}${component?.summary.pending})`} />
-          <Tab
-            label={`Identified (${version ? `${filterFiles.identified.length}/` : ''}${component?.summary.identified})`}
-          />
-          <Tab label={`Original (${version ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`} />
-        </Tabs>
-      </Paper>
-    </div>
-  );
-};
+import SearchBox from '../../../../../../components/SearchBox/SearchBox';
+import TabNavigation from './components/TabNavigation/TabNavigation';
+import ActionButton from './components/ActionButton/ActionButton';
+import VersionSelector from './components/VersionSelector/VersionSelector';
 
 export const ComponentDetail = () => {
   const history = useHistory();
 
-  const { state, dispatch, setNode, detachFile, createInventory, ignoreFile, restoreFile } = useContext(
+  const { state, dispatch, detachFile, createInventory, ignoreFile, restoreFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { name, component, filter } = state;
+  const { component, filter } = state;
   const { version } = filter;
-
-  const anchorRef = useRef<HTMLDivElement>(null);
 
   const [files, setFiles] = useState<any[]>([]);
   const [filterFiles, setFilterFiles] = useState<{ pending: any[]; identified: any[]; ignored: any[] }>({
@@ -122,21 +39,17 @@ export const ComponentDetail = () => {
   });
 
   const [inventories, setInventories] = useState<Inventory[]>([]);
-
-  const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<number>(state.history.section || 0);
+  const [searchQuery, setSearchQuery] = useState<string | null>(null);
 
   const getFiles = async () => {
-    console.log("GET FILES");
     const response = await componentService.getFiles({ purl: component.purl, version }, filter.node?.path ? { path: filter.node.path } : null);
-    console.log('FILES BY COMP', response);
     setFiles(mapFiles(response.data));
   };
 
   const getInventories = async () => {
     const query = version ? { purl: component.purl, version } : { purl: component.purl };
     const inv = await inventoryService.getAll(query);
-    console.log('INVENTORIES BY COMP', inv);
     setInventories(inv || []);
   };
 
@@ -171,7 +84,7 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyPressed = async (result) => {
-    // Result is file join result
+    // result is "file join result"
     const inv: Partial<Inventory> = {
       component: result.componentName,
       url: result.url,
@@ -185,7 +98,7 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyAllPressed = async () => {
-    const selFiles = files.filter((file) => file.status === 'pending').map((file) => file.id);
+    const selFiles = filterFiles.pending.map((file) => file.id);
 
     const inv: Partial<Inventory> = {
       component: component?.name,
@@ -195,8 +108,6 @@ export const ComponentDetail = () => {
       purl: component?.purl,
       usage: 'file',
     };
-
-    console.log(component?.versions[0].licenses);
 
     await create(inv, selFiles);
     setTab(1);
@@ -265,14 +176,6 @@ export const ComponentDetail = () => {
     });
   };
 
-  const handleCloseButtonGroup = (event: React.MouseEvent<Document, MouseEvent>) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
-      return;
-    }
-
-    setOpen(false);
-  };
-
   useEffect(() => {
     if (!files) return;
     setFilterFiles({
@@ -293,6 +196,14 @@ export const ComponentDetail = () => {
   }, [state.filter.version, state.filter.node]);
 
   useEffect(() => {
+    setFilterFiles({
+      pending: files.filter((file) => file.path.toLowerCase().includes(searchQuery) && file.status === 'pending'),
+      identified: files.filter((file) => file.path.toLowerCase().includes(searchQuery) && file.status === 'identified'),
+      ignored: files.filter((file) => file.path.toLowerCase().includes(searchQuery) && file.status === 'ignored'),
+    });
+  }, [searchQuery, files]);
+
+  useEffect(() => {
     getFiles();
     getInventories();
   }, [state.summary]);
@@ -304,11 +215,30 @@ export const ComponentDetail = () => {
   const renderTab = () => {
     switch (tab) {
       case 0:
-        return <FileList files={filterFiles.pending} emptyMessage="No pending files" onAction={onAction} />;
+        return (
+          <FileList
+            files={filterFiles.pending}
+            emptyMessage={searchQuery ? `No pending files found with "${searchQuery}"` : 'No pending files'}
+            onAction={onAction}
+          />
+        );
       case 1:
-        return <IdentifiedList files={filterFiles.identified} inventories={inventories} onAction={onAction} />;
+        return (
+          <IdentifiedList
+            files={filterFiles.identified}
+            inventories={inventories}
+            emptyMessage={searchQuery ? `No identified files found with "${searchQuery}"` : 'No identified files'}
+            onAction={onAction}
+          />
+        );
       case 2:
-        return <FileList files={filterFiles.ignored} emptyMessage="No ignored files" onAction={onAction} />;
+        return (
+          <FileList
+            files={filterFiles.ignored}
+            emptyMessage={searchQuery ? `No original files found with "${searchQuery}"` : 'No original files'}
+            onAction={onAction}
+          />
+        );
       default:
         return 'no data';
     }
@@ -333,72 +263,29 @@ export const ComponentDetail = () => {
           </div>
 
           <section className="subheader">
-            <TabNavigation
-              tab={tab}
-              version={version}
-              component={component}
-              filterFiles={filterFiles}
-              onSelect={(tab) => setTab(tab)}
-            />
+            <div className="search-box">
+              <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
+            </div>
 
-            {tab === 0 && (
-              <>
-                <ButtonGroup
-                  size="small"
-                  disabled={filterFiles.pending.length === 0}
-                  ref={anchorRef}
-                  variant="contained"
-                  color="secondary"
-                  aria-label="split button"
-                >
-                  <Button variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
-                    Identify All ({filterFiles.pending.length})
-                  </Button>
-                  <Button color="secondary" size="small" onClick={() => setOpen((prevOpen) => !prevOpen)}>
-                    <ArrowDropDownIcon />
-                  </Button>
-                </ButtonGroup>
-                <Popper open={open} anchorEl={anchorRef.current} transition disablePortal>
-                  <Paper>
-                    <ClickAwayListener onClickAway={handleCloseButtonGroup}>
-                      <MenuList id="split-button-menu">
-                        <MenuItem
-                          key="test"
-                          onClick={() => {
-                            setOpen(false);
-                            onIgnoreAllPressed();
-                          }}
-                        >
-                          Mark all as original ({component?.summary.pending})
-                        </MenuItem>
-                      </MenuList>
-                    </ClickAwayListener>
-                  </Paper>
-                </Popper>
-              </>
-            )}
-            {tab === 1 && (
-              <Button
-                size="small"
-                disabled={filterFiles.identified.length === 0}
-                variant="contained"
-                color="secondary"
-                onClick={onDetachAllPressed}
-              >
-                Restore All ({filterFiles.identified.length})
-              </Button>
-            )}
-            {tab === 2 && (
-              <Button
-                size="small"
-                disabled={filterFiles.ignored.length === 0}
-                variant="contained"
-                color="secondary"
-                onClick={onRestoreAllPressed}
-              >
-                Restore All ({filterFiles.ignored.length})
-              </Button>
-            )}
+            <div className="tab-navigation">
+              <TabNavigation
+                tab={tab}
+                version={version}
+                query={searchQuery}
+                component={component}
+                filterFiles={filterFiles}
+                onSelect={(tab) => setTab(tab)}
+              />
+
+              <ActionButton
+                tab={tab}
+                files={filterFiles}
+                onIdentifyAllPressed={onIdentifyAllPressed}
+                onIgnoreAllPressed={onIgnoreAllPressed}
+                onRestoreAllPressed={onRestoreAllPressed}
+                onDetachAllPressed={onDetachAllPressed}
+              />
+            </div>
           </section>
         </header>
 
