@@ -21,11 +21,11 @@ const TabNavigation = ({ tab, version, query, component, filterFiles, onSelect }
           TabIndicatorProps={{ style: { display: 'none' } }}
           onChange={(event, value) => onSelect(value)}
         >
-          <Tab label={`Pending (${version || query ? `${filterFiles.pending.length}/` : ''}${component?.summary.pending})`} />
+          <Tab label={`Pending (${version || (query && filterFiles.pending.length !== component?.summary.pending) ?`${filterFiles.pending.length}/` : ''}${component?.summary.pending})`} />
           <Tab
-            label={`Identified (${version || query ? `${filterFiles.identified.length}/` : ''}${component?.summary.identified})`}
+            label={`Identified (${version || (query && filterFiles.identified.length !== component?.summary.identified) ? `${filterFiles.identified.length}/` : ''}${component?.summary.identified})`}
           />
-          <Tab label={`Original (${version || query ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`} />
+          <Tab label={`Original (${version || (query && filterFiles.ignored.length !== component?.summary.ignored) ? `${filterFiles.ignored.length}/` : ''}${component?.summary.ignored})`} />
         </Tabs>
       </Paper>
     </div>
