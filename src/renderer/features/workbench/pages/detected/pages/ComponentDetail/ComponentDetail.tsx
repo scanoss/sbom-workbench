@@ -98,7 +98,7 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyAllPressed = async () => {
-    const selFiles = files.filter((file) => file.status === 'pending').map((file) => file.id);
+    const selFiles = filterFiles.pending.map((file) => file.id);
 
     const inv: Partial<Inventory> = {
       component: component?.name,
@@ -201,7 +201,7 @@ export const ComponentDetail = () => {
       identified: files.filter((file) => file.path.toLowerCase().includes(searchQuery) && file.status === 'identified'),
       ignored: files.filter((file) => file.path.toLowerCase().includes(searchQuery) && file.status === 'ignored'),
     });
-  }, [searchQuery]);
+  }, [searchQuery, files]);
 
   useEffect(() => {
     getFiles();
