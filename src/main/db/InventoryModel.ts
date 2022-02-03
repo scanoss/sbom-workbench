@@ -222,18 +222,13 @@ export class InventoryModel extends Model {
     const db = await this.openDb();
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
-        db.get(
-          `SELECT id FROM inventories WHERE  notes=? AND usage=? AND spdxid=? AND cvid=?;`,
-          inventory.notes ? inventory.notes : null,
-          inventory.usage,
-          inventory.spdxid,
-          inventory.cvid,
-          async function (err: any, inv: any) {
-            db.close();
-            if (err) throw Error('Unable to get existing inventory');
-            resolve(inv);
-          }
-        );
+        let SQLquery = `SELECT id FROM inventories WHERE  notes# AND usage=? AND spdxid=? AND cvid=?;`;
+        SQLquery = SQLquery.replace('#', inventory.notes ? `=${inventory.notes}` : ' IS NULL');
+        db.get(SQLquery, inventory.usage, inventory.spdxid, inventory.cvid, (err: any, inv: any) => {
+          db.close();
+          if (err) throw Error('Unable to get existing inventory');
+          resolve(inv);
+        });
       } catch (error) {
         log.error(error);
         reject(error);
