@@ -1,5 +1,4 @@
-
-
+/* eslint-disable guard-for-in */
 export abstract class Migration {
   private version: string;
 
@@ -15,7 +14,7 @@ export abstract class Migration {
     if (this.compareVersions(myVersion, oldestCompatibleVersion) === -1)
       throw new Error(`Cannot upgrade version ${myVersion}`); // myVersion < oldCom....
 
-    for (let scriptsVersion in scripts) {
+    for (const scriptsVersion in scripts) {
       const values = scripts[scriptsVersion];
       if (this.compareVersions(myVersion, scriptsVersion) < 0) {
         for (let i = 0; i < values.length; i += 1) {
@@ -29,7 +28,7 @@ export abstract class Migration {
     return latestVersion;
   }
 
-  public abstract getScripts(): Record<string, Array<(path: string) => Promise<boolean>>>;
+  public abstract getScripts(): Record<string, Array<(path: string) => Promise<any>>>;
 
   public abstract getPath(): string;
 

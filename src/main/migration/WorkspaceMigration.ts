@@ -1,5 +1,4 @@
 import { Migration } from './Migration';
-import * as script0 from './scripts/0-0-0';
 
 export class WorkspaceMigration extends Migration {
   private scripts: Record<string, Array<(data: string) => void>>;
@@ -14,7 +13,7 @@ export class WorkspaceMigration extends Migration {
     };
   }
 
-  public getScripts() {
+  public getScripts(): Record<string, Array<(data: string) => any>>  {
     return this.scripts;
   }
 
