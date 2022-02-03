@@ -9,7 +9,6 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
   },
   input: {
-    marginLeft: theme.spacing(1),
     flex: 1,
   },
   iconButton: {
@@ -47,6 +46,6 @@ const SearchBox = ({ placeholder, responseDelay, onChange }: SearchBoxProps) => 
   );
 };
 
-SearchBox.defaultProps = { placeholder: 'Search', responseDelay: 300 };
+SearchBox.defaultProps = { placeholder: 'Search...', responseDelay: 300 };
 
 export default SearchBox;
