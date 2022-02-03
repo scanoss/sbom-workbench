@@ -215,11 +215,30 @@ export const ComponentDetail = () => {
   const renderTab = () => {
     switch (tab) {
       case 0:
-        return <FileList files={filterFiles.pending} emptyMessage="No pending files" onAction={onAction} />;
+        return (
+          <FileList
+            files={filterFiles.pending}
+            emptyMessage={searchQuery ? `No pending files found with "${searchQuery}"` : 'No pending files'}
+            onAction={onAction}
+          />
+        );
       case 1:
-        return <IdentifiedList files={filterFiles.identified} inventories={inventories} onAction={onAction} />;
+        return (
+          <IdentifiedList
+            files={filterFiles.identified}
+            inventories={inventories}
+            emptyMessage={searchQuery ? `No identified files found with "${searchQuery}"` : 'No identified files'}
+            onAction={onAction}
+          />
+        );
       case 2:
-        return <FileList files={filterFiles.ignored} emptyMessage="No ignored files" onAction={onAction} />;
+        return (
+          <FileList
+            files={filterFiles.ignored}
+            emptyMessage={searchQuery ? `No original files found with "${searchQuery}"` : 'No original files'}
+            onAction={onAction}
+          />
+        );
       default:
         return 'no data';
     }
