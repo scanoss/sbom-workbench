@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Chip,
   IconButton,
   Link,
   makeStyles,
@@ -89,9 +88,7 @@ const ProjectList = (props: ProjectListProps) => {
                       `}
                     hover
                     key={project.name}
-                    onClick={() =>
-                      isProjectFinished(project) && props.onProjectClick(project)
-                    }
+                    onClick={() => isProjectFinished(project) && props.onProjectClick(project)}
                   >
                     <TableCell component="th" scope="row">
                       <div className="project-name">

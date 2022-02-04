@@ -31,7 +31,7 @@ const FileTreeNode = ({ node, onClick, onContextMenu }) => {
   );
 };
 
-export const FileTree = () => {
+const FileTree = () => {
   const history = useHistory();
   const contextual = useContextual();
 
@@ -137,7 +137,7 @@ export const FileTree = () => {
 
   return tree ? (
     <Tree nodes={nodes} onChange={handleChange}>
-      {({ style, node, ...rest }) => (
+      {({ style, node, ...rest }: any) => (
         <div
           style={{ ...style, ...{ paddingLeft: style.marginLeft, margin: 0 } }}
           className={`ft-node ${node.className} ${node.id === filter.node?.path ? 'selected' : ''}`}

@@ -13,11 +13,11 @@ const { ipcRenderer } = require('electron');
 
 const ProjectScan = () => {
   const history = useHistory();
-
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const { scanPath, setScanPath, settingsNewProject } = useContext(AppContext) as IAppContext;
+
   const [progress, setProgress] = useState<number>(0);
   const [stage, setStage] = useState<string>('');
-  const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const init = async () => {
     ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);

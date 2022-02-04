@@ -29,17 +29,12 @@
             max-width: 380px;
           }
 
-          .license-input-container {
-
-          }
-
           .input-text-container {
             margin-top: 1rem;
             padding-left: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-
             border-bottom: 2px solid transparent;
 
             .input-autocomplete {
@@ -83,10 +78,6 @@
               font-size: 20px;
             }
           }
-
-          .knowledgebase-api-container {
-
-          }
         }
       }
     }
@@ -117,7 +108,6 @@
       font-size: 24px;
     }
   }
-
 
   .error {
     border-bottom: 2px solid red !important;
