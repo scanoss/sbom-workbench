@@ -52,8 +52,6 @@ const Reports = () => {
   const [detectedData, setDetectedData] = useState(null);
   const [identifiedData, setIdentifiedData] = useState(null);
 
-  const { history } = state;
-
   const setTab = () => {
     if (state.tree.hasIdentified || state.tree.hasIgnored) {
       historyState.push(`${path}/identified`);

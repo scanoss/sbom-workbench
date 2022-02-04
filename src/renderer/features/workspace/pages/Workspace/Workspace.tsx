@@ -1,12 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-
-import { Button, IconButton, InputBase } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
-
-import Paper from '@material-ui/core/Paper';
-
-import SearchIcon from '@material-ui/icons/Search';
 import { AppContext, IAppContext } from '../../../../context/AppProvider';
 import { IProject } from '../../../../../api/types';
 import { workspaceService } from '../../../../../api/workspace-service';
@@ -37,7 +32,7 @@ const Workspace = () => {
   const cleanup = () => {};
 
   const onShowScanHandler = async (project: IProject) => {
-    if (project.appVersion >= Config.MIN_VERSION_SUPPORTED) { // TODO: data should be calculated from the backend
+    if (project.appVersion >= Config.MIN_VERSION_SUPPORTED) {
       setScanPath({ path: project.work_root, action: 'none' });
       history.push('/workbench');
     } else {
