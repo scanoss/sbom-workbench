@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { Component, License, ComponentGroup, ComponentParams, IProject } from '../api/types';
+import { Component, License, ComponentGroup, IWorkbenchFilter, IProject } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
 import { logicComponentService } from './services/LogicComponentService';
@@ -36,7 +36,7 @@ ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (_event, component: Componen
   return { status: 'ok', message: 'test', data };
 });
 
-ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET_ALL, async (_event, params: ComponentParams) => {
+ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET_ALL, async (_event, params: IWorkbenchFilter) => {
   const data = await logicComponentService.getAllComponentGroup(params);
   return {
     status: 'ok',
@@ -47,7 +47,7 @@ ipcMain.handle(IpcEvents.COMPONENT_GROUP_GET_ALL, async (_event, params: Compone
 
 ipcMain.handle(
   IpcEvents.COMPONENT_GROUP_GET,
-  async (_event, component: Partial<ComponentGroup>, params: ComponentParams) => {
+  async (_event, component: Partial<ComponentGroup>, params: IWorkbenchFilter) => {
     const data = await logicComponentService.getComponentGroup(component, params);
     return {
       status: 'ok',

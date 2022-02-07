@@ -1,10 +1,10 @@
 import log from 'electron-log';
-import { Component, ComponentGroup, ComponentParams } from '../../api/types';
+import { Component, ComponentGroup, IWorkbenchFilter } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { serviceProvider } from './ServiceProvider';
 
 class LogicComponentService {
-  public async getAll(data: any, params?: ComponentParams): Promise<Component> {
+  public async getAll(data: any, params?: IWorkbenchFilter): Promise<Component> {
     try {
       let component: any;
       if (data.purl && data.version) component = await serviceProvider.model.component.getbyPurlVersion(data);
@@ -49,7 +49,7 @@ class LogicComponentService {
     }
   }
 
-  public async getAllComponentGroup(params: ComponentParams) {
+  public async getAllComponentGroup(params: IWorkbenchFilter) {
     try {
       const data = await this.getAll({}, params);
       if (data) {
@@ -75,7 +75,7 @@ class LogicComponentService {
     }
   }
 
-  public async getComponentGroup(component: Partial<ComponentGroup>, params: ComponentParams) {
+  public async getComponentGroup(component: Partial<ComponentGroup>, params: IWorkbenchFilter) {
     try {
       const data = await this.getAll(component, params);
       if (data) {

@@ -2,7 +2,7 @@
 import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Model } from './Model';
-import { Component, ComponentParams, ComponentSource } from '../../api/types';
+import { Component, IWorkbenchFilter, ComponentSource } from '../../api/types';
 import { LicenseModel } from './LicenseModel';
 
 const query = new Querys();
@@ -77,7 +77,7 @@ export class ComponentModel extends Model {
     a.licenses.unshift(preLicense);
   }
 
-  public async allComp(params?: ComponentParams) {
+  public async allComp(params?: IWorkbenchFilter) {
     // const self = this;
     return new Promise(async (resolve, reject) => {
       try {
@@ -111,7 +111,7 @@ export class ComponentModel extends Model {
     });
   }
 
-  public async getByPurl(data: any, params: ComponentParams) {
+  public async getByPurl(data: any, params: IWorkbenchFilter) {
     // const self = this;
     return new Promise(async (resolve, reject) => {
       try {
