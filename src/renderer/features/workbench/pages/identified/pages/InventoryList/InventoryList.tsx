@@ -27,9 +27,7 @@ export const InventoryList = () => {
 
   const getInventories = async () => {
     const query = { purl: state.component.purl };
-    console.log('query', query);
     const inv = await inventoryService.getAll(query);
-    console.log('INVENTORIES', inv);
     setInventories(inv || []);
   };
 

@@ -18,7 +18,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function MatchesForLicense({ data }) {
+const LicensesObligations = ({ data }) => {
   const classes = useStyles();
   const [licenseHash, setLicenseHash] = useState({});
 
@@ -61,9 +61,9 @@ export default function MatchesForLicense({ data }) {
                 </TableCell>
                 <TableCell className="tableCellForLicensePill">
                   <div className="container-licenses-pills">
-                    {license.incompatibles?.map((incompatibleLicense) =>
+                    {license.incompatibles?.map((incompatibleLicense, index) =>
                       licenseHash[incompatibleLicense] === undefined ? (
-                        <div key={incompatibleLicense.index} className="tinyPillLicenseContainer">
+                        <div key={index} className="tinyPillLicenseContainer">
                           <span className="tinyPillLicenseLabel">{incompatibleLicense}</span>
                         </div>
                       ) : (
@@ -81,4 +81,6 @@ export default function MatchesForLicense({ data }) {
       </TableContainer>
     </>
   );
-}
+};
+
+export default LicensesObligations;

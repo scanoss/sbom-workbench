@@ -40,7 +40,7 @@ const SearchBox = ({ placeholder, responseDelay, onChange }: SearchBoxProps) => 
         className={classes.input}
         onKeyUp={(e: any) => setQuery(e.target.value)}
         placeholder={placeholder}
-        inputProps={{ 'aria-label': placeholder, spellcheck: 'false' }}
+        inputProps={{ 'aria-label': placeholder, spellCheck: 'false' }}
       />
     </Paper>
   );

@@ -93,7 +93,6 @@ export const Editor = () => {
 
   const getResults = async () => {
     const results = await resultService.get(file);
-    console.log('RESULTS', results);
     setMatchInfo(mapFiles(results));
   };
 

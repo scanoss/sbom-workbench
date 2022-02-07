@@ -76,7 +76,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const setDefaults = () => setForm(inventory);
 
   const init = async () => {
-    console.log('INIT',recentUsedComponents);
     const componentsResponse = await componentService.getAllComponentGroup();
     const licensesResponse = await licenseService.getAll();
     const compCatalogue = componentsResponse.data.map((component) => ({
@@ -329,7 +328,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       : ''
                   }
                   getOptionSelected={(option: any) => option.spdxid === form.spdxid}
-                  getOptionLabel={(option: any) => option.name || option}
+                  getOptionLabel={(option: any) => option.name || option.spdxid}
                   renderOption={(option: any) => (
                     <div className={classes.option}>
                       <span>{option.name}</span>

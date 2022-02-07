@@ -8,7 +8,6 @@ interface RecognizedCardProps {
 }
 
 const RecognizedCard = ({ inventory, onClick }: RecognizedCardProps) => {
-  console.log("INVENTORY",inventory);
   return (
     <>
       <Card id="RecognizedCard" className="component-card" elevation={1}>
