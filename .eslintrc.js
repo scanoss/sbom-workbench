@@ -22,7 +22,8 @@ module.exports = {
     'no-restricted-syntax': ['off'],
     'no-await-in-loop': ['off'],
     'no-async-promise-executor': ['off'],
-   // 'no-func-names': ['on','as-needed'],
+    // 'no-func-names': ['on','as-needed'],
+    'react/no-array-index-key': ['warn'],
   },
   parserOptions: {
     ecmaVersion: 2020,

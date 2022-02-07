@@ -6,7 +6,6 @@ const MatchesChart = ({ data }) => {
   const [percentage, setPercentage] = useState<number>(0);
 
   useEffect(() => {
-    console.log(data);
     const percentage = Math.floor((data?.detectedFiles * 100) / data?.scannedFiles);
     const noMatches = 100 - percentage;
     setPercentage(percentage);
