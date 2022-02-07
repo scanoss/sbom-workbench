@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
-import { Component, ComponentGroup, Inventory, InventoryAction, Node } from '../../../api/types';
+import { ComponentGroup, Inventory, InventoryAction, Node } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
 import {
@@ -14,9 +14,8 @@ import {
   setProgress,
   updateTree,
   setCurrentNode,
-  setRecentUsedComponents,
+  setRecentUsedComponent,
 } from './actions';
-import { resultService } from '../../../api/results-service';
 import { reportService } from '../../../api/report-service';
 import { IpcEvents } from '../../../ipc-events';
 import { fileService } from '../../../api/file-service';
@@ -42,18 +41,18 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const { setScanBasePath } = React.useContext<any>(AppContext);
   const [state, dispatch] = React.useReducer(reducer, initialState);
-  const { loaded, tree, file, component, recentUsedComponents } = state;
+  const { loaded, component } = state;
 
   const loadScan = async (path: string) => {
     try {
       if (loaded) return true; // && state.path != path
 
-      console.log(`loading scan: ${path}`);
-      const { name, fileTree, scanRoot } = await workbenchController.loadScan(path);      
+      console.log(`STORE: loading scan: ${path}`);
+      const { name, fileTree, scanRoot } = await workbenchController.loadScan(path);
       dispatch(loadScanSuccess(name, fileTree, []));
 
       setScanBasePath(scanRoot);
-      update(false);
+      update();
       return true;
     } catch (error) {
       console.error(error);
@@ -64,7 +63,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   const createInventory = async (inventory: Inventory): Promise<Inventory> => {
     const response = await inventoryService.create(inventory);
     const comp = state.components.find((c) => c.purl === inventory.purl);
-    if (comp) dispatch(setRecentUsedComponents(comp as ComponentGroup));
+    if (comp) dispatch(setRecentUsedComponent(comp));
     update();
     return response;
   };
@@ -118,11 +117,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
         ...data,
       });
 
-      update(); // WORKAROUND UNTIL STORE REFACTOR
-      /* history.push(!path ? `/workbench/detected` : `/workbench/detected?path=folder|${encodeURIComponent(path)}`);
-      const summary = await reportService.getSummary();
-      dispatch(setProgress(summary));
- */
+      update();
       return true;
     } catch (e) {
       console.error(e);
@@ -130,7 +125,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     }
   };
 
-  const update = async (full = true) => {
+  const update = async () => {
     const params = state.filter.node?.type === 'folder' ? { path: state.filter.node.path } : null;
     if (component) {
       const comp = await workbenchController.getComponent(component.purl, params);

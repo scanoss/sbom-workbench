@@ -11,7 +11,7 @@ import {
   UPDATE_FILETREE,
   SET_FOLDER,
   SET_NODE,
-  SET_RECENT_USED_COMPONENTS,
+  SET_RECENT_USED_COMPONENT,
 } from './actions';
 import { ComponentGroup, Node } from '../../../api/types';
 
@@ -29,7 +29,6 @@ export interface State {
   components: ComponentGroup[];
   component: ComponentGroup;
   history: {
-    report: 'detected' | 'identified';
     section: number;
   };
   filter: {
@@ -51,7 +50,6 @@ export const initialState: State = {
   components: null,
   component: null,
   history: {
-    report: 'detected',
     section: null,
   },
   filter: {
@@ -83,7 +81,7 @@ export default function reducer(state: State = initialState, action): State {
       const { node } = action;
       return {
         ...state,
-        tree: node, // TODO: update node tree
+        tree: node,
       };
     }
     case SET_PROGRESS: {
@@ -170,7 +168,6 @@ export default function reducer(state: State = initialState, action): State {
       const { node } = action;
       return {
         ...state,
-        // components: node ? filter(state.mainComponents, node.components) : state.mainComponents,
         filter: {
           ...state.filter,
           node: node
@@ -182,7 +179,7 @@ export default function reducer(state: State = initialState, action): State {
         },
       };
     }
-    case SET_RECENT_USED_COMPONENTS: {
+    case SET_RECENT_USED_COMPONENT: {
       const { component } = action;
       if (state.recentUsedComponents) {
         if (!state.recentUsedComponents.some((el) => el.purl === component.purl)) {
@@ -196,7 +193,7 @@ export default function reducer(state: State = initialState, action): State {
       } else state.recentUsedComponents = [component];
 
       if (state.recentUsedComponents?.length >= MAX_RECENT_USED_COMPONENTS) {
-        state.recentUsedComponents.splice(3, 1);
+        state.recentUsedComponents.splice(MAX_RECENT_USED_COMPONENTS, 1);
       }
 
       return {
@@ -210,11 +207,3 @@ export default function reducer(state: State = initialState, action): State {
       return state;
   }
 }
-
-const filter = (components, node) => {
-  const keys = new Map<string, Map<string, any>>(node.map((el) => [`${el.purl}-${el.version}`, true]));
-
-  return components.filter((el) => {
-    return el.versions.some((v) => keys.has(`${el.purl}-${v.version}`));
-  });
-};

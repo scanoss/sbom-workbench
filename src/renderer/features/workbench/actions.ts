@@ -1,4 +1,4 @@
-import { Component, ComponentGroup, Node } from '../../../api/types';
+import { ComponentGroup, Node } from '../../../api/types';
 
 export const LOAD_SCAN_SUCCESS = 'APP/WORKBENCH/LOAD_SCAN_SUCCESS';
 export const LOAD_SCAN_FAIL = 'APP/WORKBENCH/LOAD_SCAN_FAIL';
@@ -11,7 +11,7 @@ export const SET_FILE = 'APP/WORKBENCH/SET_FILE';
 export const SET_HISTORY = 'APP/WORKBENCH/SET_HISTORY';
 export const SET_FOLDER = 'APP/WORKBENCH/SET_FILTER_FOLDER';
 export const SET_NODE = 'APP/WORKBENCH/SET_NODE';
-export const SET_RECENT_USED_COMPONENTS = 'APP/WORKBENCH/SET_RECENT_USED_COMPONENTS';
+export const SET_RECENT_USED_COMPONENT = 'APP/WORKBENCH/SET_RECENT_USED_COMPONENT';
 export const RESET = 'APP/WORKBENCH/RESET';
 
 export const loadScanSuccess = (name, tree, components: ComponentGroup[]) => ({
@@ -56,11 +56,11 @@ export const setCurrentNode = (node: Node) => ({
   node,
 });
 
-export const reset = () => ({
-  type: RESET,
+export const setRecentUsedComponent = (component: ComponentGroup) => ({
+  type: SET_RECENT_USED_COMPONENT,
+  component,
 });
 
-export const setRecentUsedComponents = (component: ComponentGroup) => ({
-  type: SET_RECENT_USED_COMPONENTS,
-  component,
+export const reset = () => ({
+  type: RESET,
 });
