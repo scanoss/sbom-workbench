@@ -2,8 +2,8 @@ import { ipcRenderer } from 'electron';
 import { IDependencyResponse } from 'scanoss';
 import { projectService } from '../api/project-service';
 import { componentService } from '../api/component-service';
-import { ComponentGroup, ComponentParams, ComponentSource } from '../api/types';
-import { sortComponents } from '../utils/scan-util';
+import { ComponentGroup, IWorkbenchFilter, ComponentSource } from '../api/types';
+import { sortComponents, transform } from '../utils/scan-util';
 import { IpcEvents } from '../ipc-events';
 
 const pathUtil = require('path');
@@ -56,13 +56,13 @@ class WorkbenchController {
     return response.text();
   }
 
-  public async getComponents(params: ComponentParams = null): Promise<ComponentGroup[]> {
+  public async getComponents(params: IWorkbenchFilter = null): Promise<ComponentGroup[]> {
     const { data } = await componentService.getAllComponentGroup({ ...params, source: ComponentSource.ENGINE });
     sortComponents(data);
     return data;
   }
 
-  public async getComponent(purl: string, params: ComponentParams = null): Promise<ComponentGroup> {
+  public async getComponent(purl: string, params: IWorkbenchFilter = null): Promise<ComponentGroup> {
     const { data } = await componentService.getComponentGroup({ purl }, { ...params, source: ComponentSource.ENGINE });
     return data;
   }
@@ -78,7 +78,6 @@ class WorkbenchController {
     const { dependencies } = data;
     const imported = data.source === 'IMPORTED';
 
-    console.log(data);
     // TODO: get from scan result
     const name = work.split(pathUtil.sep)[work.split(pathUtil.sep).length - 1];
 
