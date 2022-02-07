@@ -64,8 +64,7 @@ class LogicInventoryService {
         inventory = (await serviceProvider.model.inventory.create(inventory)) as Inventory;
       } else inventory.id = inv.id;
       this.attach(inventory);
-      const comp: Component = (await serviceProvider.model.component.get(inventory.cvid)) as Component;
-      inventory.component = comp;
+      inventory.component = component as Component;
       return inventory as Inventory;
     } catch (error: any) {
       log.error(error);
