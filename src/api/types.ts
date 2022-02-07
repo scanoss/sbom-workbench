@@ -168,9 +168,23 @@ export interface IFolderInventory {
   notes?: string;
 }
 
-export interface ComponentParams {
+export interface IWorkbenchFilter {
   source?: ComponentSource;
   path?: string;
+  usage?: FileUsageType;
+  status?: FileStatusType;
+  purl?: string;
+}
+
+export enum FileStatusType {
+  PENDING,
+  ORIGINAL,
+  IDENTIFIED,
+}
+
+export enum FileUsageType {
+  SNIPPET = 'snippet',
+  FILE = 'file',
 }
 
 export enum ComponentSource {
