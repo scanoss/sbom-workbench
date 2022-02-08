@@ -11,7 +11,7 @@ export class QueryBuilderUsage extends QueryBuilder {
 
 
   public getSQL(): string {
-    return `f.usage=?`;
+    return `r.idtype=?`;
   }
 
   public getFilters(): any[]{

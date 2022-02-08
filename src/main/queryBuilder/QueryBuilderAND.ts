@@ -2,6 +2,7 @@
 import { IWorkbenchFilter } from '../../api/types';
 import { QueryBuilder } from './QueryBuilder';
 import { QueryBuilderPath } from './QueryBuilderPath';
+import { QueryBuilderPurl } from './QueryBuilderPurl';
 import { QueryBuilderSource } from './QueryBuilderSource';
 import { QueryBuilderStatus } from './QueryBuilderStatus';
 import { QueryBuilderUsage } from './QueryBuilderUsage';
@@ -47,7 +48,7 @@ export class QueryBuilderAND extends QueryBuilder {
       this.builders.push(new QueryBuilderUsage(params.usage));
     }
     if (params.purl) {
-      this.builders.push(new QueryBuilderPath(params.purl));
+      this.builders.push(new QueryBuilderPurl(params.purl));
     }
   }
 }

@@ -1,5 +1,12 @@
 import log from 'electron-log';
-import { Component, ComponentGroup, IWorkbenchFilter } from '../../api/types';
+import {
+  Component,
+  ComponentGroup,
+  ComponentSource,
+  FileStatusType,
+  FileUsageType,
+  IWorkbenchFilter,
+} from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { QueryBuilderAND } from '../queryBuilder/QueryBuilderAND';
 import { serviceProvider } from './ServiceProvider';
@@ -52,23 +59,21 @@ class LogicComponentService {
 
   public async getAllComponentGroup(params: IWorkbenchFilter) {
     try {
-
       let comp: any;
       let summary: any;
       if (params) {
         const queryBuilder: QueryBuilderAND = new QueryBuilderAND(); // Add builder creator
         queryBuilder.create(params);
-        comp = await serviceProvider.model.component.getAll(queryBuilder); 
+        comp = await serviceProvider.model.component.getAll(queryBuilder);
         summary = await serviceProvider.model.component.summary(queryBuilder);
       } else {
-        comp = await serviceProvider.model.component.getAll(); 
+        comp = await serviceProvider.model.component.getAll();
         summary = await serviceProvider.model.component.summary();
       }
 
       const data = componentHelper.addSummary(comp, summary);
 
-
-     //  const data = await this.getAll({}, params);
+      //  const data = await this.getAll({}, params);
       if (data) {
         const compPurl: any = this.groupComponentsByPurl(data);
         const comp: any = await this.mergeComponentByPurl(compPurl);
