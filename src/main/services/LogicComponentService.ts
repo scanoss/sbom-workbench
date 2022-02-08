@@ -1,6 +1,7 @@
 import log from 'electron-log';
 import { Component, ComponentGroup, IWorkbenchFilter } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
+import { QueryBuilderAND } from '../queryBuilder/QueryBuilderAND';
 import { serviceProvider } from './ServiceProvider';
 
 class LogicComponentService {
@@ -51,22 +52,38 @@ class LogicComponentService {
 
   public async getAllComponentGroup(params: IWorkbenchFilter) {
     try {
-      const data = await this.getAll({}, params);
+
+      let comp: any;
+      let summary: any;
+      if (params) {
+        const queryBuilder: QueryBuilderAND = new QueryBuilderAND(); // Add builder creator
+        queryBuilder.create(params);
+        comp = await serviceProvider.model.component.getAll(queryBuilder); 
+        summary = await serviceProvider.model.component.summary(queryBuilder);
+      } else {
+        comp = await serviceProvider.model.component.getAll(); 
+        summary = await serviceProvider.model.component.summary();
+      }
+
+      const data = componentHelper.addSummary(comp, summary);
+
+
+     //  const data = await this.getAll({}, params);
       if (data) {
         const compPurl: any = this.groupComponentsByPurl(data);
         const comp: any = await this.mergeComponentByPurl(compPurl);
         // if path is defined
-        if (params?.path !== undefined) {
-          const purls = comp.reduce((acc, curr) => {
-            acc.push(curr.purl);
-            return acc;
-          }, []);
-          const aux = await serviceProvider.model.component.getSummaryByPath(params.path, purls);
-          const summary = componentHelper.summaryByPurl(aux);
-          for (let i = 0; i < comp.length; i += 1) {
-            comp[i].summary = summary[comp[i].purl];
-          }
-        }
+        // if (params?.path !== undefined) {
+        //   const purls = comp.reduce((acc, curr) => {
+        //     acc.push(curr.purl);
+        //     return acc;
+        //   }, []);
+        //   const aux = await serviceProvider.model.component.getSummaryByPath(params.path, purls);
+        //   const summary = componentHelper.summaryByPurl(aux);
+        //   for (let i = 0; i < comp.length; i += 1) {
+        //     comp[i].summary = summary[comp[i].purl];
+        //   }
+        // }
         return comp;
       }
       return [];
@@ -137,6 +154,7 @@ class LogicComponentService {
         version.licenses = [];
         version.licenses = iterator.licenses;
         version.cvid = iterator.compid;
+        version.summary = iterator.summary;
         aux.versions.push(version);
       }
       result.push(aux);
