@@ -34,7 +34,7 @@ export class QueryBuilderAND extends QueryBuilder {
     this.builders.push(builder);
   }
 
-  public create(params: IWorkbenchFilter) {
+  public create(params: Record<string, any>) {
     if (params.path) {
       this.builders.push(new QueryBuilderPath(params.path));
     }

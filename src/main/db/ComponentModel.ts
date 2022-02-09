@@ -503,28 +503,6 @@ export class ComponentModel extends Model {
     });
   }
 
-  public getSummaryByPath(path: string, purls: string[]) {
-    return new Promise<Array<any>>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(() => {
-          let SQLquery = `SELECT r.purl,SUM(f.identified) AS identified,SUM(f.ignored) AS ignored ,SUM((CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r INNER JOIN files f ON f.fileId=r.fileId WHERE f.path LIKE # AND r.purl IN ? GROUP BY r.purl;`;
-          SQLquery = SQLquery.replace('#', `'${path}/%'`);
-          const aux = `'${purls.join("','")}'`;
-          SQLquery = SQLquery.replace('?', `(${aux})`);
-          db.all(SQLquery, (err: any, data: any) => {
-            db.close();
-            if (err) throw err;
-            else resolve(data);
-          });
-        });
-      } catch (error) {
-        log.error(error);
-        reject(new Error('Unable to retrieve summary by path'));
-      }
-    });
-  }
-
   public getOverrideComponents() {
     return new Promise<Array<any>>(async (resolve, reject) => {
       try {

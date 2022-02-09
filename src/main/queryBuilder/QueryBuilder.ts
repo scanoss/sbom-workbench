@@ -1,3 +1,4 @@
+
 export abstract class QueryBuilder {
   public abstract getSQL(): string;
 
