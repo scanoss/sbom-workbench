@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../../store';
 import { FileList } from './FileList';
 
-export const IdentifiedList = ({ files, inventories, emptyMessage, onAction }) => {
+export const IdentifiedList = ({ files, emptyMessage, onAction }) => {
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
   const [groups, setGroups] = useState({});
 

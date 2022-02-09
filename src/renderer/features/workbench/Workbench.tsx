@@ -11,6 +11,7 @@ import Identified from './pages/identified/Identified';
 import Reports from './pages/report/Report';
 import FileTree from './components/FileTree/FileTree';
 import { reset } from './actions';
+import FilterBox from './components/FilterBox/FilterBox';
 
 const Workbench = () => {
   const { path } = useRouteMatch();
@@ -51,9 +52,8 @@ const Workbench = () => {
         pane1Style={report ? { display: 'none' } : {}}
       >
         <aside className="panel explorer">
-          <div className="file-tree-container">
-            <FileTree />
-          </div>
+          <FilterBox />
+          <FileTree />
         </aside>
         <main id="Workbench" className="match-info">
           {loaded ? (

@@ -180,9 +180,9 @@ export interface IWorkbenchFilter {
 }
 
 export enum FileStatusType {
-  PENDING,
-  ORIGINAL,
-  IDENTIFIED,
+  PENDING = 'pending',
+  ORIGINAL = 'original',
+  IDENTIFIED = 'identified',
 }
 
 export enum FileUsageType {
