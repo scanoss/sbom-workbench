@@ -1,8 +1,8 @@
 import log from 'electron-log';
 import { serviceProvider } from './ServiceProvider';
 import { Inventory, Component, IFolderInventory, ComponentSource } from '../../api/types';
-import { logicComponentService } from './LogicComponentService';
 import { inventoryHelper } from '../helpers/InventoryHelper';
+import { QueryBuilderAND } from '../queryBuilder/QueryBuilderAND';
 
 class LogicInventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
@@ -94,7 +94,7 @@ class LogicInventoryService {
         inventories = await serviceProvider.model.inventory.getByPurl(inventory);
       } else inventories = await serviceProvider.model.inventory.getAll();
       if (inventory !== undefined) {
-        const component: any = await serviceProvider.model.component.allComp(null);
+        const component: any = await serviceProvider.model.component.getAll();
         const compObj = component.reduce((acc, comp) => {
           acc[comp.compid] = comp;
           return acc;
@@ -124,7 +124,9 @@ class LogicInventoryService {
   public async preLoadInventoriesAcceptAll(data: Partial<IFolderInventory>): Promise<Array<Partial<Inventory>>> {
     try {
       const files: any = await this.getResultsPreLoadInventory(data);
-      const components: any = await logicComponentService.getAll({ source: ComponentSource.ENGINE });
+      const queryBuilder = new QueryBuilderAND();
+      queryBuilder.create({ source: ComponentSource.ENGINE });
+      const components: any = await serviceProvider.model.component.getAll(queryBuilder);
       let inventories = this.getPreLoadInventory(files) as Array<Partial<Inventory>>;
       inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);
 
