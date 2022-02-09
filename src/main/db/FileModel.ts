@@ -4,6 +4,7 @@ import { Component, File } from '../../api/types';
 import { ComponentModel } from './ComponentModel';
 import { InventoryModel } from './InventoryModel';
 import { Model } from './Model';
+import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 
 const query = new Querys();
 
@@ -33,60 +34,20 @@ export class FileModel extends Model {
     });
   }
 
-  // GET ALL FILES FOR A COMPONENT
-  public async getFilesComponent(data: Partial<Component>, params: any) {
+  public getAllComponentFiles(builder?: QueryBuilder) {
     return new Promise(async (resolve, reject) => {
-      let result;
       try {
-        if (data.purl && data.version) result = await this.getByPurlVersion(data, params ? params.path : null);
-        else result = await this.getByPurl(data, params ? params.path : null);
-        resolve(result);
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
+        let SQLquery = `SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.license, r.component AS componentName, r.url 
+        FROM results r INNER JOIN files f ON r.fileId=f.fileId INNER JOIN component_versions comp ON
+        comp.purl = r.purl AND comp.version = r.version
+       LEFT JOIN file_inventories fi ON fi.fileId=f.fileId #FILTER ;`;
 
-  public async getByPurl(data: Partial<Component>, path: string) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let SQLquery = '';
-        let params = [];
-        if (!path) {
-          SQLquery = query.SQL_SELECT_FILES_FROM_PURL;
-          params = [data.purl];
-        } else {
-          SQLquery = query.SQL_SELECT_FILES_FROM_PURL_PATH;
-          params = [data.purl, `${path}/%`];
-        }
-        const db = await this.openDb();
-        db.all(SQLquery, ...params, async function (err: any, file: any) {
-          db.close();
-          if (err) throw err;
-          resolve(file);
-        });
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
+        const filter = builder ? `WHERE ${builder.getSQL().toString()}` : '';
+        const params = builder ? builder.getFilters() : [];
+        SQLquery = SQLquery.replace('#FILTER', filter);
 
-  public async getByPurlVersion(data: Partial<Component>, path: string) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let SQLquery = '';
-        let params = [];
-        if (!path) {
-          SQLquery = query.SQL_SELECT_FILES_FROM_PURL_VERSION;
-          params = [data.purl, data.version];
-        } else {
-          SQLquery = query.SQL_SELECT_FILES_FROM_PURL_VERSION_PATH;
-          params = [data.purl, data.version, `${path}/%`];
-        }
         const db = await this.openDb();
-        db.all(SQLquery, ...params, async function (err: any, file: any) {
+        db.all(SQLquery, ...params, (err: any, file: any) => { 
           db.close();
           if (err) throw err;
           resolve(file);

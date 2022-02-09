@@ -52,7 +52,7 @@ class LogicResultService {
     try {
       const project = workspace.getOpenedProjects()[0];
       const results = await project.store.result.getFromPath(path);
-      const components: any = await project.store.component.allComp();
+      const components: any = await project.store.component.getAll();
       results.forEach((result) => {
         if (result.license) result.license = result.license.split(',');
         if (result.version)
