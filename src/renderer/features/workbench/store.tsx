@@ -172,7 +172,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   useEffect(() => {
-    update();
+    if (state.loaded) update();
   }, [state.filter]);
 
   // TODO: use custom navigation
