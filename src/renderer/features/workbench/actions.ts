@@ -1,4 +1,4 @@
-import { ComponentGroup, Node } from '../../../api/types';
+import { ComponentGroup, IWorkbenchFilter, Node } from '../../../api/types';
 
 export const LOAD_SCAN_SUCCESS = 'APP/WORKBENCH/LOAD_SCAN_SUCCESS';
 export const LOAD_SCAN_FAIL = 'APP/WORKBENCH/LOAD_SCAN_FAIL';
@@ -7,10 +7,9 @@ export const SET_PROGRESS = 'APP/WORKBENCH/SET_PROGRESS';
 export const SET_COMPONENTS = 'APP/WORKBENCH/SET_COMPONENTS';
 export const SET_COMPONENT = 'APP/WORKBENCH/SET_COMPONENT';
 export const SET_VERSION = 'APP/WORKBENCH/SET_VERSION';
-export const SET_FILE = 'APP/WORKBENCH/SET_FILE';
 export const SET_HISTORY = 'APP/WORKBENCH/SET_HISTORY';
-export const SET_FOLDER = 'APP/WORKBENCH/SET_FILTER_FOLDER';
 export const SET_NODE = 'APP/WORKBENCH/SET_NODE';
+export const SET_FILTER = 'APP/WORKBENCH/SET_FILTER';
 export const SET_RECENT_USED_COMPONENT = 'APP/WORKBENCH/SET_RECENT_USED_COMPONENT';
 export const RESET = 'APP/WORKBENCH/RESET';
 
@@ -54,6 +53,12 @@ export const setHistoryCrumb = (crumb) => ({
 export const setCurrentNode = (node: Node) => ({
   type: SET_NODE,
   node,
+});
+
+export const setFilter = (filter: IWorkbenchFilter, override = false) => ({
+  type: SET_FILTER,
+  filter,
+  override,
 });
 
 export const setRecentUsedComponent = (component: ComponentGroup) => ({
