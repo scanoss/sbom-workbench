@@ -1,45 +1,28 @@
 import log from 'electron-log';
 import { Component, ComponentGroup, IWorkbenchFilter } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
+import { QueryBuilderAND } from '../queryBuilder/QueryBuilderAND';
 import { serviceProvider } from './ServiceProvider';
 
 class LogicComponentService {
-  public async getAll(data: any, params?: IWorkbenchFilter): Promise<Component> {
+  
+  public async getComponentFiles(data: Partial<Component>, filter: IWorkbenchFilter): Promise<any> {
     try {
-      let component: any;
-      if (data.purl && data.version) component = await serviceProvider.model.component.getbyPurlVersion(data);
-      else if (data.purl) {
-        component = await serviceProvider.model.component.getByPurl(data, params);
-      } else {
-        component = await serviceProvider.model.component.allComp(params);
-      }
-      if (component !== undefined) return component;
-      throw new Error('Component not found');
-    } catch (error: any) {
-      log.error(error);
-      return error;
-    }
-  }
-
-  public async getComponentFiles(data: Partial<Component>, params: any): Promise<any> {
-    try {
-      let files: any;
-      if (data.purl && data.version)
-        files = await serviceProvider.model.file.getByPurlVersion(data, params ? params.path : null);
-      else files = await serviceProvider.model.file.getByPurl(data, params ? params.path : null);
-      const components: any = await this.getAll({});
+      const params = { purl: data.purl, ...filter } as IWorkbenchFilter;
+      const queryBuilder = new QueryBuilderAND();
+      queryBuilder.create(params);
+      const files: any = await serviceProvider.model.file.getAllComponentFiles(queryBuilder);
+      const components = await serviceProvider.model.component.getAll();
       const inventories: any = await serviceProvider.model.inventory.getAll();
       const index = inventories.reduce((acc, inventory) => {
         acc[inventory.id] = inventory;
         return acc;
       }, {});
-
       for (let i = 0; i < files.length; i += 1) {
         if (files[i].inventoryid) {
           files[i].inventory = index[files[i].inventoryid];
           files[i].component = components.find((component: any) => files[i].inventory.cvid === component.compid);
         }
-
         if (files[i].license) files[i].license = files[i].license.split(',');
       }
       return files;
@@ -49,24 +32,23 @@ class LogicComponentService {
     }
   }
 
-  public async getAllComponentGroup(params: IWorkbenchFilter) {
+  public async getAll(params: IWorkbenchFilter) {
     try {
-      const data = await this.getAll({}, params);
+      let comp: any;
+      let summary: any;
+      if (params) {
+        const queryBuilder: QueryBuilderAND = new QueryBuilderAND(); // Add builder creator
+        queryBuilder.create(params);
+        comp = await serviceProvider.model.component.getAll(queryBuilder);
+        summary = await serviceProvider.model.component.summary(queryBuilder);
+      } else {
+        comp = await serviceProvider.model.component.getAll();
+        summary = await serviceProvider.model.component.summary();
+      }
+      const data = componentHelper.addSummary(comp, summary);
       if (data) {
         const compPurl: any = this.groupComponentsByPurl(data);
-        const comp: any = await this.mergeComponentByPurl(compPurl);
-        // if path is defined
-        if (params?.path !== undefined) {
-          const purls = comp.reduce((acc, curr) => {
-            acc.push(curr.purl);
-            return acc;
-          }, []);
-          const aux = await serviceProvider.model.component.getSummaryByPath(params.path, purls);
-          const summary = componentHelper.summaryByPurl(aux);
-          for (let i = 0; i < comp.length; i += 1) {
-            comp[i].summary = summary[comp[i].purl];
-          }
-        }
+        comp = await this.mergeComponentByPurl(compPurl);
         return comp;
       }
       return [];
@@ -75,24 +57,10 @@ class LogicComponentService {
     }
   }
 
-  public async getComponentGroup(component: Partial<ComponentGroup>, params: IWorkbenchFilter) {
+  public async get(component: Partial<ComponentGroup>, params: IWorkbenchFilter) {
     try {
-      const data = await this.getAll(component, params);
-      if (data) {
-        const compPurl: any = this.groupComponentsByPurl(data);
-        const [comp]: any = await this.mergeComponentByPurl(compPurl);
-        if (!comp) {
-          return [];
-        }
-        comp.summary = await serviceProvider.model.component.summaryByPurl(comp);
-        if (params?.path) {
-          const aux = await serviceProvider.model.component.getSummaryByPath(params.path, [comp.purl]);
-          const summary = componentHelper.summaryByPurl(aux);
-          comp.summary = summary[comp.purl];
-        }
-        return comp;
-      }
-      return [];
+      const response = await this.getAll({ purl: component.purl, ...params });
+      return response[0] || null;
     } catch (error: any) {
       log.error(error);
       return error;
@@ -133,10 +101,11 @@ class LogicComponentService {
           aux.summary.identified += iterator.summary.identified;
         }
         version.version = iterator.version;
-        version.files = iterator.filesCount;
+        version.files = iterator.summary.ignored + iterator.summary.pending + iterator.summary.identified;
         version.licenses = [];
         version.licenses = iterator.licenses;
         version.cvid = iterator.compid;
+        version.summary = iterator.summary;
         aux.versions.push(version);
       }
       result.push(aux);

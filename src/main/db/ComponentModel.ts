@@ -4,6 +4,8 @@ import { Querys } from './querys_db';
 import { Model } from './Model';
 import { Component, IWorkbenchFilter, ComponentSource } from '../../api/types';
 import { LicenseModel } from './LicenseModel';
+import { QueryBuilder } from '../queryBuilder/QueryBuilder';
+
 
 const query = new Querys();
 
@@ -501,28 +503,6 @@ export class ComponentModel extends Model {
     });
   }
 
-  public getSummaryByPath(path: string, purls: string[]) {
-    return new Promise<Array<any>>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(() => {
-          let SQLquery = `SELECT r.purl,SUM(f.identified) AS identified,SUM(f.ignored) AS ignored ,SUM((CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r INNER JOIN files f ON f.fileId=r.fileId WHERE f.path LIKE # AND r.purl IN ? GROUP BY r.purl;`;
-          SQLquery = SQLquery.replace('#', `'${path}/%'`);
-          const aux = `'${purls.join("','")}'`;
-          SQLquery = SQLquery.replace('?', `(${aux})`);
-          db.all(SQLquery, (err: any, data: any) => {
-            db.close();
-            if (err) throw err;
-            else resolve(data);
-          });
-        });
-      } catch (error) {
-        log.error(error);
-        reject(new Error('Unable to retrieve summary by path'));
-      }
-    });
-  }
-
   public getOverrideComponents() {
     return new Promise<Array<any>>(async (resolve, reject) => {
       try {
@@ -540,6 +520,63 @@ export class ComponentModel extends Model {
       } catch (error) {
         log.error(error);
         reject(new Error('Unable to retrieve summary by path'));
+      }
+    });
+  }
+
+  public getAll(builder?: QueryBuilder) {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        let SQLquery = `SELECT comp.vendor,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id
+        FROM
+        (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id,r.vendor FROM components AS comp 
+        LEFT JOIN results r ON r.purl=comp.purl AND r.version = comp.version LEFT JOIN files f ON f.fileId=r.fileId
+        LEFT JOIN license_view lic ON comp.id=lic.cvid
+        #FILTER) AS comp;`;
+        const filter = builder ? `WHERE ${builder.getSQL().toString()}` : '';
+        const params = builder ? builder.getFilters() : [];
+        SQLquery = SQLquery.replace('#FILTER', filter);
+        const db = await this.openDb();
+        db.all(SQLquery, ...params, async (err: any, data: any) => {
+          db.close();
+          if (err) throw err;
+          else {
+            const comp = this.processComponent(data);
+            resolve(comp);
+          }
+        });
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
+  public summary(builder?: QueryBuilder) {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        let SQLquery = `SELECT comp.id,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
+        SUM(f.identified=0 AND f.ignored=0) AS pending FROM files f INNER JOIN results r ON f.fileId=r.fileId
+        INNER JOIN component_versions comp ON r.purl=comp.purl AND r.version=comp.version #FILTER
+        GROUP BY r.purl, r.version ;`;
+
+        const filter = builder ? `WHERE ${builder.getSQL().toString()}` : '';
+        const params = builder ? builder.getFilters() : [];
+
+
+        SQLquery = SQLquery.replace('#FILTER', filter);
+
+        const db = await this.openDb();
+        db.all(SQLquery, ...params, async (err: any, data: any) => {
+          db.close();
+          if (err) throw err;
+          else {
+            resolve(data);
+          }
+        });
+      } catch (error) {
+        log.error(error);
+        reject(error);
       }
     });
   }
