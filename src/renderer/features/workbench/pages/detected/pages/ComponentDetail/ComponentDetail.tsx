@@ -28,8 +28,7 @@ export const ComponentDetail = () => {
   ) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { component, filter } = state;
-  const { version } = filter;
+  const { component, version, filter } = state;
 
   const [files, setFiles] = useState<any[]>([]);
   const [filterFiles, setFilterFiles] = useState<{ pending: any[]; identified: any[]; ignored: any[] }>({
@@ -43,13 +42,13 @@ export const ComponentDetail = () => {
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
 
   const getFiles = async () => {
-    const response = await componentService.getFiles({ purl: component.purl, version }, filter.node?.path ? { path: filter.node.path } : null);
+    const response = await componentService.getFiles({ purl: component.purl, version }, filter);
     setFiles(mapFiles(response.data));
   };
 
   const getInventories = async () => {
     const query = version ? { purl: component.purl, version } : { purl: component.purl };
-    const inv = await inventoryService.getAll(query);
+    const inv = await inventoryService.getAll(query); // TODO: set global filter
     setInventories(inv || []);
   };
 
@@ -193,7 +192,7 @@ export const ComponentDetail = () => {
     });
     getFiles();
     getInventories();
-  }, [state.filter.version, state.filter.node]);
+  }, [state.version, state.node]);
 
   useEffect(() => {
     setFilterFiles({

@@ -35,7 +35,7 @@ class ComponentService extends BaseService {
     return response;
   }
 
-  public async getFiles(component: Partial<Component>, params: IParams = null): Promise<any> {
+  public async getFiles(component: Partial<Component>, params: IWorkbenchFilter = null): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_FILES, component, params);
     return response;
   }

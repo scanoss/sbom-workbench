@@ -5,15 +5,14 @@ import {
   SET_COMPONENTS,
   SET_COMPONENT,
   SET_VERSION,
-  SET_FILE,
   SET_PROGRESS,
   SET_HISTORY,
   UPDATE_FILETREE,
-  SET_FOLDER,
   SET_NODE,
   SET_RECENT_USED_COMPONENT,
+  SET_FILTER,
 } from './actions';
-import { ComponentGroup, Node } from '../../../api/types';
+import { ComponentGroup, IWorkbenchFilter, Node } from '../../../api/types';
 
 const MAX_RECENT_USED_COMPONENTS = 3;
 
@@ -31,11 +30,9 @@ export interface State {
   history: {
     section: number;
   };
-  filter: {
-    version: string;
-    node?: Node;
-    folder?: string;
-  };
+  node: Node;
+  version: string;
+  filter: IWorkbenchFilter;
 }
 
 export const initialState: State = {
@@ -52,10 +49,9 @@ export const initialState: State = {
   history: {
     section: null,
   },
-  filter: {
-    version: null,
-    node: null,
-  },
+  node: null,
+  version: null,
+  filter: {},
 };
 
 export default function reducer(state: State = initialState, action): State {
@@ -113,20 +109,14 @@ export default function reducer(state: State = initialState, action): State {
           ...state.history,
           section: null,
         },
-        filter: {
-          ...state.filter,
-          version: null,
-        },
+        version: null,
       };
     }
     case SET_VERSION: {
       const { version } = action;
       return {
         ...state,
-        filter: {
-          ...state.filter,
-          version,
-        },
+        version,
       };
     }
     case SET_HISTORY: {
@@ -143,40 +133,11 @@ export default function reducer(state: State = initialState, action): State {
       const { node } = action;
       return {
         ...state,
-        filter: {
+        node,
+        filter: clean({
           ...state.filter,
-          node,
-          folder: node?.type === 'folder' ? node.path : null,
-        },
-      };
-    }
-    case SET_FILE: {
-      const { file } = action;
-
-      return {
-        ...state,
-        filter: {
-          ...state.filter,
-          node: {
-            type: 'file',
-            path: file,
-          },
-        },
-      };
-    }
-    case SET_FOLDER: {
-      const { node } = action;
-      return {
-        ...state,
-        filter: {
-          ...state.filter,
-          node: node
-            ? {
-                type: 'folder',
-                path: node.path,
-              }
-            : null,
-        },
+          path: node?.type === 'folder' ? node.path : null,
+        }),
       };
     }
     case SET_RECENT_USED_COMPONENT: {
@@ -200,10 +161,18 @@ export default function reducer(state: State = initialState, action): State {
         ...state,
       };
     }
-
+    case SET_FILTER: {
+      const { filter, override } = action;
+      return {
+        ...state,
+        filter: clean(override ? filter : { ...state.filter, ...filter }),
+      };
+    }
     case RESET:
       return { ...initialState };
     default:
       return state;
   }
 }
+
+const clean = (obj) => Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != null));

@@ -41,7 +41,7 @@ export const Editor = () => {
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const file = state.filter.node?.type === 'file' ? state.filter.node.path : null;
+  const file = state.node?.type === 'file' ? state.node.path : null;
 
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);

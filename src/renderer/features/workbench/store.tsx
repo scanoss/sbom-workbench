@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
-import { ComponentGroup, Inventory, InventoryAction, Node } from '../../../api/types';
+import { ComponentGroup, Inventory, InventoryAction, IWorkbenchFilter, Node } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
 import {
@@ -126,7 +126,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   const update = async () => {
-    const params = state.filter.node?.type === 'folder' ? { path: state.filter.node.path } : null;
+    const params: IWorkbenchFilter = state.filter;
     if (component) {
       const comp = await workbenchController.getComponent(component.purl, params);
       if (comp) dispatch(setComponent(comp));
