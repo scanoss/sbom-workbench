@@ -2,7 +2,7 @@
 import { EventEmitter } from 'events';
 import fs from 'fs';
 import log from 'electron-log';
-import { Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
+import { Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode, Dependency } from 'scanoss';
 import { File, IProjectCfg, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanModel } from '../db/ScanModel';
@@ -152,7 +152,6 @@ export class Project extends EventEmitter {
 
     const scanIn = this.adapterToScannerInput(this.filesToScan);
     this.scanner.scan(scanIn);
-    //this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
     return true;
   }
 
@@ -185,15 +184,23 @@ export class Project extends EventEmitter {
     this.initializeScanner();
     this.scanner.cleanWorkDirectory();
     this.save();
+
+    log.info(`%c[ SCANNER ]: Start scanning dependencies`, 'color: green');
+    const allFiles = [];
+    const rootPath=this.metadata.getScanRoot();
+    this.tree.getRootFolder().getFiles().forEach((f: File) => {
+        allFiles.push(rootPath + f.path);
+    });
+    const dependencies = await new Dependency().scan(allFiles).catch((e) => console.error(e));
+    fs.promises.writeFile(`${myPath}/dependencies.json`, JSON.stringify(dependencies, null, 2));
+
     log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, 'color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: this.metadata.getScannerState(),
       processed: 0,
     });
-
     const scanIn = this.adapterToScannerInput(summary.files);
     this.scanner.scan(scanIn);
-
   }
 
   private adapterToScannerInput(filesToScan: Record<string,string>): Array<ScannerInput> {
@@ -441,5 +448,14 @@ export class Project extends EventEmitter {
 
   public getToken(){
     return this.metadata.getToken();
+  }
+
+  public async getDependencies() {
+    try {
+      return await fs.promises.readFile(`${this.metadata.getMyPath()}/dependencies.json`, 'utf8');
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 }
