@@ -38,7 +38,7 @@ const FileTree = () => {
   const contextual = useContextual();
 
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const { tree, filter, file } = state;
+  const { tree, file } = state;
 
   const [nodes, setNodes] = React.useState([]);
 
@@ -137,29 +137,34 @@ const FileTree = () => {
     }
   }, [tree]);
 
-  return tree ? (
-    <Tree nodes={nodes} onChange={handleChange}>
-      {({ style, node, ...rest }: any) => (
-        <div
-          style={{ ...style, ...{ paddingLeft: style.marginLeft, margin: 0 } }}
-          className={`ft-node ${node.className} ${node.id === filter.node?.path ? 'selected' : ''} ${node.isDependencyFile ? 'is-dependency-file' : ''}`}
-        >
-          <Expandable
-            node={node}
-            {...rest}
-            iconsClassNameMap={{
-              expanded: 'fa fa-angle-down',
-              collapsed: 'fa fa-angle-right',
-            }}
-          >
-            <FileTreeNode node={node} onClick={onSelectNode} onContextMenu={onContextMenu} />
-          </Expandable>
+
+  return (
+    <div className="file-tree-container">
+      {tree ? (
+        <Tree nodes={nodes} onChange={handleChange}>
+          {({ style, node, ...rest }: any) => (
+            <div
+              style={{ ...style, ...{ paddingLeft: style.marginLeft, margin: 0 } }}
+              className={`ft-node ${node.className} ${node.id === state.node?.path ? 'selected' : ''} ${node.isDependencyFile ? 'is-dependency-file' : ''}`}
+            >
+              <Expandable
+                node={node}
+                {...rest}
+                iconsClassNameMap={{
+                  expanded: 'fa fa-angle-down',
+                  collapsed: 'fa fa-angle-right',
+                }}
+              >
+                <FileTreeNode node={node} onClick={onSelectNode} onContextMenu={onContextMenu} />
+              </Expandable>
+            </div>
+          )}
+        </Tree>
+      ) : (
+        <div className="loader">
+          <span>Indexing...</span>
         </div>
       )}
-    </Tree>
-  ) : (
-    <div className="loader">
-      <span>Indexing...</span>
     </div>
   );
 };
