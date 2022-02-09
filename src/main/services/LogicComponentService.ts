@@ -5,23 +5,7 @@ import { QueryBuilderAND } from '../queryBuilder/QueryBuilderAND';
 import { serviceProvider } from './ServiceProvider';
 
 class LogicComponentService {
-  // public async getAll(data: any, params?: IWorkbenchFilter): Promise<Component> {
-  //   try {
-  //     let component: any;
-  //     if (data.purl && data.version) component = await serviceProvider.model.component.getbyPurlVersion(data);
-  //     else if (data.purl) {
-  //       component = await serviceProvider.model.component.getByPurl(data, params);
-  //     } else {
-  //       component = await serviceProvider.model.component.allComp(params);
-  //     }
-  //     if (component !== undefined) return component;
-  //     throw new Error('Component not found');
-  //   } catch (error: any) {
-  //     log.error(error);
-  //     return error;
-  //   }
-  // }
-
+  
   public async getComponentFiles(data: Partial<Component>, filter: IWorkbenchFilter): Promise<any> {
     try {
       const params = { purl: data.purl, ...filter } as IWorkbenchFilter;
