@@ -9,7 +9,6 @@ import { componentService } from '../../../../../../../api/component-service';
 
 import { IdentifiedList } from '../ComponentList/components/IdentifiedList';
 import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
-import { inventoryService } from '../../../../../../../api/inventory-service';
 import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import { mapFiles } from '../../../../../../../utils/scan-util';
@@ -37,19 +36,12 @@ export const ComponentDetail = () => {
     ignored: [],
   });
 
-  const [inventories, setInventories] = useState<Inventory[]>([]);
   const [tab, setTab] = useState<number>(state.history.section || 0);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
 
   const getFiles = async () => {
     const response = await componentService.getFiles({ purl: component.purl, version }, filter);
     setFiles(mapFiles(response.data));
-  };
-
-  const getInventories = async () => {
-    const query = version ? { purl: component.purl, version } : { purl: component.purl };
-    const inv = await inventoryService.getAll(query); // TODO: set global filter
-    setInventories(inv || []);
   };
 
   const onAction = async (file: any, action: MATCH_CARD_ACTIONS) => {
@@ -191,7 +183,6 @@ export const ComponentDetail = () => {
       ignored: [],
     });
     getFiles();
-    getInventories();
   }, [state.version, state.node]);
 
   useEffect(() => {
@@ -204,7 +195,6 @@ export const ComponentDetail = () => {
 
   useEffect(() => {
     getFiles();
-    getInventories();
   }, [state.summary]);
 
   useEffect(() => {
@@ -225,7 +215,6 @@ export const ComponentDetail = () => {
         return (
           <IdentifiedList
             files={filterFiles.identified}
-            inventories={inventories}
             emptyMessage={searchQuery ? `No identified files found with "${searchQuery}"` : 'No identified files'}
             onAction={onAction}
           />

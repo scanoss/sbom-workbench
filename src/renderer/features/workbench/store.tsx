@@ -19,6 +19,7 @@ import {
 import { reportService } from '../../../api/report-service';
 import { IpcEvents } from '../../../ipc-events';
 import { fileService } from '../../../api/file-service';
+import { Filter } from '@material-ui/icons';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
@@ -128,7 +129,19 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   const update = async () => {
     const params: IWorkbenchFilter = state.filter;
     if (component) {
-      const comp = await workbenchController.getComponent(component.purl, params);
+      let comp = await workbenchController.getComponent(component.purl, params);
+      if (!comp) {
+        // TODO: remove this block after backend changes. Do it for her!
+        comp = {
+          ...component,
+          versions: null,
+          summary: {
+            pending: 0,
+            identified: 0,
+            ignored: 0,
+          },
+        };
+      }
       if (comp) dispatch(setComponent(comp));
     }
 
@@ -143,13 +156,17 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const setNode = async (node: Node) => {
     dispatch(setCurrentNode(node));
-    if (!node || node.type === 'folder') {
+    /* if (!node || node.type === 'folder') {
       const comp = await workbenchController.getComponents({
         ...(node && { path: node.path }),
       });
       if (comp) dispatch(setComponents(comp));
-    }
+    } */
   };
+
+  useEffect(() => {
+    update();
+  }, [state.filter]);
 
   // TODO: use custom navigation
   useEffect(() => {

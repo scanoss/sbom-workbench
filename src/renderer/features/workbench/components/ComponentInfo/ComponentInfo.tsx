@@ -9,11 +9,11 @@ export const ComponentInfo = ({ component }: { component: any }) => {
   const group = !!component.versions;
 
   const version = group
-    ? component.versions.length === 1
+    ? component.versions?.length === 1
       ? component.versions[0].version
       : `${component.versions.length} versions`
     : component.version;
-  const license = group ? component.versions[0].licenses[0]?.name : component.licenses[0];
+  const license = (component.licenses || component.versions) ? group ? component.versions[0].licenses[0]?.name : component.licenses[0] : '-';
 
   return (
     <div className="component-info">
