@@ -1,5 +1,3 @@
-
-import { IWorkbenchFilter } from '../../api/types';
 import { QueryBuilder } from './QueryBuilder';
 import { QueryBuilderPath } from './QueryBuilderPath';
 import { QueryBuilderPurl } from './QueryBuilderPurl';
