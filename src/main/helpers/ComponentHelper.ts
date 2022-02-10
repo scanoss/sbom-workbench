@@ -1,18 +1,21 @@
 class ComponentHelper {
-  public addSummary(components: any, summary: any) {
+  public addSummaryByPurl(components: any, summary: any) {
     const sum = summary.reduce((acc, curr) => {
-      if (!acc[curr.id]) {
-        acc[curr.id] = {
-          identified: curr.identified,
-          ignored: curr.ignored,
-          pending: curr.pending,
+      if (!acc[curr.purl])
+        acc[curr.purl] = { identified: curr.identified, pending: curr.pending, ignored: curr.ignored };
+      else
+        acc[curr.purl] = {
+          identified: acc[curr.purl].identified + curr.identified,
+          pending: acc[curr.purl].pending + curr.pending,
+          ignored: acc[curr.purl].ignored + curr.ignored,
         };
-      }
       return acc;
     }, {});
+
     components.forEach((comp) => {
-      if (sum[comp.compid]) {
-        comp.summary = sum[comp.compid];
+      if (sum[comp.purl]) {
+        comp.summary = sum[comp.purl];
+        comp.totalFiles = comp.summary.ignored + comp.summary.pending + comp.summary.identified;
       }
     });
     return components;
@@ -61,6 +64,25 @@ class ComponentHelper {
     preLicense.name = b.license_name;
     preLicense.spdxid = b.license_spdxid;
     a.licenses.push(preLicense);
+  }
+
+  public addSummary(components: any, summary: any) {
+    const sum = summary.reduce((acc, curr) => {
+      if (!acc[curr.id]) {
+        acc[curr.id] = {
+          identified: curr.identified,
+          ignored: curr.ignored,
+          pending: curr.pending,
+        };
+      }
+      return acc;
+    }, {});
+    components.forEach((comp) => {
+      if (sum[comp.compid]) {
+        comp.summary = sum[comp.compid];
+      }
+    });
+    return components;
   }
 }
 

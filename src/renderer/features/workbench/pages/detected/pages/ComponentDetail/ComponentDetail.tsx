@@ -40,7 +40,7 @@ export const ComponentDetail = () => {
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
 
   const getFiles = async () => {
-    const response = await componentService.getFiles({ purl: component.purl, version }, filter);
+    const response = await componentService.getFiles({ purl: component.purl, version }, { ...filter, status: null });
     setFiles(mapFiles(response.data));
   };
 
