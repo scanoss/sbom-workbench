@@ -5,7 +5,6 @@ import { QueryBuilderAND } from '../queryBuilder/QueryBuilderAND';
 import { serviceProvider } from './ServiceProvider';
 
 class LogicComponentService {
-  
   public async getComponentFiles(data: Partial<Component>, filter: IWorkbenchFilter): Promise<any> {
     try {
       const params = { purl: data.purl, ...filter } as IWorkbenchFilter;
@@ -53,6 +52,7 @@ class LogicComponentService {
       }
       return [];
     } catch (error: any) {
+      log.error(error);
       return error;
     }
   }
@@ -88,6 +88,7 @@ class LogicComponentService {
       const aux: any = {};
       aux.summary = { ignored: 0, pending: 0, identified: 0 };
       aux.versions = [];
+      aux.totalFiles = 0;
       for (const iterator of value) {
         aux.identifiedAs = overrideComponents[iterator.purl] ? overrideComponents[iterator.purl] : [];
         aux.name = iterator.name;
@@ -99,13 +100,14 @@ class LogicComponentService {
           aux.summary.ignored += iterator.summary.ignored;
           aux.summary.pending += iterator.summary.pending;
           aux.summary.identified += iterator.summary.identified;
+          aux.totalFiles += iterator.summary.ignored + iterator.summary.pending + iterator.summary.identified;
+          version.summary = iterator.summary;
+          version.files = iterator.summary.ignored  + iterator.summary?.pending + iterator.summary.identified;
         }
         version.version = iterator.version;
-        version.files = iterator.summary.ignored + iterator.summary.pending + iterator.summary.identified;
         version.licenses = [];
         version.licenses = iterator.licenses;
         version.cvid = iterator.compid;
-        version.summary = iterator.summary;
         aux.versions.push(version);
       }
       result.push(aux);

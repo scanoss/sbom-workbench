@@ -37,7 +37,7 @@ export class FileModel extends Model {
   public getAllComponentFiles(builder?: QueryBuilder) {
     return new Promise(async (resolve, reject) => {
       try {
-        let SQLquery = `SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.license, r.component AS componentName, r.url 
+        let SQLquery = `SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.license, r.component AS componentName, r.url,comp.purl,comp.version 
         FROM results r INNER JOIN files f ON r.fileId=f.fileId INNER JOIN component_versions comp ON
         comp.purl = r.purl AND comp.version = r.version
        LEFT JOIN file_inventories fi ON fi.fileId=f.fileId #FILTER ;`;

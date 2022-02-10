@@ -119,38 +119,6 @@ export class Querys {
   SQL_GET_COMPONENT_BY_PURL_VERSION =
     'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version,r.purl FROM component_versions cv LEFT JOIN results r ON cv.purl=r.purl AND cv.version=r.version WHERE cv.purl=? and cv.version=?;';
 
-  SQL_GET_COMPONENT_BY_PURL_ENGINE = `SELECT counter.vendor,counter.filesCount,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id
-    FROM
-    (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp
-    LEFT JOIN license_view lic ON comp.id=lic.cvid
-     WHERE comp.source=(SELECT source FROM components WHERE purl=? limit 1)
-     AND comp.purl=?) AS comp
-     LEFT JOIN (SELECT DISTINCT r.vendor,r.purl, r.version, COUNT (*) AS filesCount FROM results  r WHERE r.source='engine' AND r.version!='' GROUP BY  r.purl,r.version ) as counter
-     ON counter.purl=comp.purl AND counter.version=comp.version;`;
-
-  SQL_GET_COMPONENT_BY_PURL_ENGINE_PATH = `SELECT counter.vendor,counter.file_path,counter.filesCount,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id
-FROM
-(SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp
-LEFT JOIN license_view lic ON comp.id=lic.cvid
- WHERE comp.source=(SELECT source FROM components WHERE purl=? limit 1)
- AND comp.purl=?) AS comp
- INNER JOIN (SELECT DISTINCT r.vendor,f.path AS file_path, r.purl, r.version, COUNT (*) AS filesCount FROM results  r INNER JOIN files f ON r.fileId=f.fileId WHERE f.path LIKE # GROUP BY  r.purl,r.version ) as counter
- ON counter.purl=comp.purl AND counter.version=comp.version;`;
-
-  // GET ALL COMPONENTES
-  SQL_GET_ALL_COMPONENTS =
-    'SELECT DISTINCT r.vendor,comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid LEFT JOIN results r ON r.purl=comp.purl AND r.version=comp.version;';
-
-  // GET ALL COMPONENTES
-  SQL_GET_ALL_DETECTED_COMPONENTS = `SELECT filesVersion.vendor,filesVersion.filesCount,matched.comp_url,matched.compid,matched.comp_name,matched.license_url,matched.license_name,matched.license_spdxid,matched.purl,matched.version,matched.license_id  FROM (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE source="engine") AS matched
-  LEFT JOIN (SELECT DISTINCT r.purl, r.version,r.vendor, COUNT (*) AS filesCount FROM results  r WHERE r.source='engine' AND r.version!='' GROUP BY  r.purl,r.version ) AS filesVersion
-  ON filesVersion.version=matched.version AND filesVersion.purl=matched.purl;`;
-
-  // GET ALL COMPONENTES BY PATH
-  SQL_GET_ALL_DETECTED_COMPONENTS_BY_PATH = `SELECT filesVersion.vendor,filesVersion.filesCount,matched.comp_url,matched.compid,matched.comp_name,matched.license_url,matched.license_name,matched.license_spdxid,matched.purl,matched.version,matched.license_id,filesVersion.file_path FROM (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE source="engine") AS matched
-    INNER JOIN (SELECT DISTINCT r.vendor,r.purl, r.version,f.path AS file_path,COUNT (*) AS filesCount FROM results r INNER JOIN files f ON f.fileId=r.fileId WHERE f.path LIKE '#' GROUP BY  r.purl,r.version ) AS filesVersion
-    ON filesVersion.version=matched.version AND filesVersion.purl=matched.purl;`;
-
   // GET ALL LICENSES
   SQL_SELECT_LICENSE = 'SELECT id, spdxid, name, url FROM licenses WHERE ';
 
@@ -180,8 +148,6 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   INNER JOIN file_inventories fi ON fi.inventoryid=i.id
   INNER JOIN files f ON fi.fileId=f.fileId
   LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions cv ON cv.id=i.cvid;`;
-
-  SQL_GET_ALL_SUMMARIES = 'SELECT compid,ignored,pending,identified FROM summary;';
 
   SQL_GET_SUMMARY_BY_PURL_VERSION = 'SELECT identified,pending,ignored FROM summary WHERE purl=? AND version=?;';
 
@@ -215,4 +181,20 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   SQL_GET_RESULTS_RESCAN = `SELECT r.idtype,f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending, source AS original FROM files f INNER JOIN results r ON f.fileId=r.fileId;`;
 
   SQL_GET_RESULTS_IN_FOLDER = `SELECT f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f LEFT JOIN results r ON f.fileId=r.fileId WHERE f.path LIKE '?';`;
+
+  SQL_COMPONENTS_SUMMARY = `SELECT comp.id,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
+  SUM(f.identified=0 AND f.ignored=0) AS pending FROM files f LEFT JOIN results r ON f.fileId=r.fileId
+  INNER JOIN component_versions comp ON r.purl=comp.purl AND r.version=comp.version #FILTER
+  GROUP BY r.purl, r.version;`;
+
+  SQL_GET_ALL_COMPONENTS = `SELECT comp.vendor,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id
+  FROM
+  (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id,r.vendor FROM components AS comp 
+  LEFT JOIN results r ON r.purl=comp.purl AND r.version = comp.version LEFT JOIN files f ON f.fileId=r.fileId
+  LEFT JOIN license_view lic ON comp.id=lic.cvid
+  #FILTER) AS comp;`;
+
+  SQL_GET_OVERRIDE_COMPONENTS = `SELECT DISTINCT cv.purl AS overridePurl,cv.name AS overrideName,r.component,i.id,r.purl AS matchedPurl FROM results r  
+  INNER JOIN files f ON r.fileId=f.fileId INNER JOIN file_inventories fi ON fi.fileId=f.fileId
+  INNER JOIN inventories i ON i.id=fi.inventoryid INNER JOIN component_versions  cv ON i.cvid=cv.id ORDER BY r.purl;`;
 }
