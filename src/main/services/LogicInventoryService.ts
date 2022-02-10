@@ -2,7 +2,7 @@ import log from 'electron-log';
 import { serviceProvider } from './ServiceProvider';
 import { Inventory, Component, IFolderInventory, ComponentSource } from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
-import { QueryBuilderAND } from '../queryBuilder/QueryBuilderAND';
+import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 
 class LogicInventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
@@ -85,7 +85,7 @@ class LogicInventoryService {
   }
 
   public async getAll(inventory: Partial<Inventory>): Promise<Array<Inventory>> {
-    try { 
+    try {
       let inventories: any;
       if (inventory.purl && inventory.version) {
         inventories = await serviceProvider.model.inventory.getByPurlVersion(inventory);
@@ -125,8 +125,7 @@ class LogicInventoryService {
   public async preLoadInventoriesAcceptAll(data: Partial<IFolderInventory>): Promise<Array<Partial<Inventory>>> {
     try {
       const files: any = await this.getResultsPreLoadInventory(data);
-      const queryBuilder = new QueryBuilderAND();
-      queryBuilder.create({ source: ComponentSource.ENGINE });
+      const queryBuilder = QueryBuilderCreator.create({ source: ComponentSource.ENGINE });
       const components: any = await serviceProvider.model.component.getAll(queryBuilder);
       let inventories = this.getPreLoadInventory(files) as Array<Partial<Inventory>>;
       inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);

@@ -1,15 +1,15 @@
 import log from 'electron-log';
 import { Component, ComponentGroup, IWorkbenchFilter } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
-import { QueryBuilderAND } from '../queryBuilder/QueryBuilderAND';
+import { QueryBuilder } from '../queryBuilder/QueryBuilder';
+import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 import { serviceProvider } from './ServiceProvider';
 
 class LogicComponentService {
   public async getComponentFiles(data: Partial<Component>, filter: IWorkbenchFilter): Promise<any> {
     try {
-      const params = { purl: data.purl, ...filter } as IWorkbenchFilter;
-      const queryBuilder = new QueryBuilderAND();
-      queryBuilder.create(params);
+      const params = { purl: data.purl, ...filter };
+      const queryBuilder = QueryBuilderCreator.create(params);
       const files: any = await serviceProvider.model.file.getAllComponentFiles(queryBuilder);
       const components = await serviceProvider.model.component.getAll();
       const inventories: any = await serviceProvider.model.inventory.getAll();
@@ -33,15 +33,8 @@ class LogicComponentService {
 
   public async getAll(params: IWorkbenchFilter) {
     try {
-      let queryBuilder: QueryBuilderAND = null;
-      let queryBuilderSummary: QueryBuilderAND = null;
-      if (params) {
-        queryBuilder = new QueryBuilderAND(); // TODO:Add builder creator
-        queryBuilder.create(params);
-        queryBuilderSummary = new QueryBuilderAND();
-        queryBuilderSummary.create({ ...params, status: null }); // Keep summary independent from summary
-      }
-
+      const queryBuilder: QueryBuilder = QueryBuilderCreator.create(params);
+      const queryBuilderSummary: QueryBuilder = QueryBuilderCreator.create({ ...params, status: null }); // Keep summary independent from summary
       let comp = await serviceProvider.model.component.getAll(queryBuilder);
       const summary = await serviceProvider.model.component.summary(queryBuilderSummary);
       comp = componentHelper.addSummary(comp, summary);

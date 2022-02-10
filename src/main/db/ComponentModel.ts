@@ -34,8 +34,6 @@ export class ComponentModel extends Model {
     });
   }
 
-  
-
   // GET COMPONENENT ID FROM PURL
   public async getbyPurlVersion(data: any) {
     // const self = this;
