@@ -1,7 +1,6 @@
 import log from 'electron-log';
 import { Querys } from './querys_db';
-import { Component, File } from '../../api/types';
-import { ComponentModel } from './ComponentModel';
+import { File } from '../../api/types';
 import { InventoryModel } from './InventoryModel';
 import { Model } from './Model';
 import { QueryBuilder } from '../queryBuilder/QueryBuilder';
@@ -9,13 +8,10 @@ import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 const query = new Querys();
 
 export class FileModel extends Model {
-  component: ComponentModel;
-
   inventory: InventoryModel;
 
   constructor(path: string) {
     super(path);
-    this.component = new ComponentModel(path);
     this.inventory = new InventoryModel(path);
   }
 
