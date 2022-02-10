@@ -2,7 +2,7 @@
 import { EventEmitter } from 'events';
 import fs from 'fs';
 import log from 'electron-log';
-import { Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode, Dependency } from 'scanoss';
+import { Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode, Dependency, IDependencyResponse } from 'scanoss';
 import { File, IProjectCfg, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanModel } from '../db/ScanModel';
@@ -450,9 +450,9 @@ export class Project extends EventEmitter {
     return this.metadata.getToken();
   }
 
-  public async getDependencies() {
+  public async getDependencies(): Promise<IDependencyResponse> {
     try {
-      return await fs.promises.readFile(`${this.metadata.getMyPath()}/dependencies.json`, 'utf8');
+      return JSON.parse(await fs.promises.readFile(`${this.metadata.getMyPath()}/dependencies.json`, 'utf8'));
     } catch (e) {
       console.error(e);
       return null;
