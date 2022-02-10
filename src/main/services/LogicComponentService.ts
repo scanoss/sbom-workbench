@@ -33,24 +33,22 @@ class LogicComponentService {
 
   public async getAll(params: IWorkbenchFilter) {
     try {
-      let comp: any;
-      let summary: any;
+      let queryBuilder: QueryBuilderAND = null;
+      let queryBuilderSummary: QueryBuilderAND = null;
       if (params) {
-        const queryBuilder: QueryBuilderAND = new QueryBuilderAND(); // Add builder creator
+        queryBuilder = new QueryBuilderAND(); // TODO:Add builder creator
         queryBuilder.create(params);
-        comp = await serviceProvider.model.component.getAll(queryBuilder);
-        summary = await serviceProvider.model.component.summary(queryBuilder);
-      } else {
-        comp = await serviceProvider.model.component.getAll();
-        summary = await serviceProvider.model.component.summary();
+        queryBuilderSummary = new QueryBuilderAND();
+        queryBuilderSummary.create({ ...params, status: null }); // Keep summary independent from summary
       }
-      const data = componentHelper.addSummary(comp, summary);
-      if (data) {
-        const compPurl: any = this.groupComponentsByPurl(data);
-        comp = await this.mergeComponentByPurl(compPurl);
-        return comp;
-      }
-      return [];
+
+      let comp = await serviceProvider.model.component.getAll(queryBuilder);
+      const summary = await serviceProvider.model.component.summary(queryBuilderSummary);
+      comp = componentHelper.addSummary(comp, summary);
+      const compPurl: any = this.groupComponentsByPurl(comp);
+      comp = await this.mergeComponentByPurl(compPurl);
+      comp = componentHelper.addSummaryByPurl(comp, summary);
+      return comp;
     } catch (error: any) {
       log.error(error);
       return error;
@@ -102,7 +100,7 @@ class LogicComponentService {
           aux.summary.identified += iterator.summary.identified;
           aux.totalFiles += iterator.summary.ignored + iterator.summary.pending + iterator.summary.identified;
           version.summary = iterator.summary;
-          version.files = iterator.summary.ignored  + iterator.summary?.pending + iterator.summary.identified;
+          version.files = iterator.summary.ignored + iterator.summary?.pending + iterator.summary.identified;
         }
         version.version = iterator.version;
         version.licenses = [];

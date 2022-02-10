@@ -182,7 +182,7 @@ export class Querys {
 
   SQL_GET_RESULTS_IN_FOLDER = `SELECT f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f LEFT JOIN results r ON f.fileId=r.fileId WHERE f.path LIKE '?';`;
 
-  SQL_COMPONENTS_SUMMARY = `SELECT comp.id,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
+  SQL_COMPONENTS_SUMMARY = `SELECT comp.purl,comp.id,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
   SUM(f.identified=0 AND f.ignored=0) AS pending FROM files f LEFT JOIN results r ON f.fileId=r.fileId
   INNER JOIN component_versions comp ON r.purl=comp.purl AND r.version=comp.version #FILTER
   GROUP BY r.purl, r.version;`;
