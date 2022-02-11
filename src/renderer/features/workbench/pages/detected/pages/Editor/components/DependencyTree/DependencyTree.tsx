@@ -20,7 +20,7 @@ const DependencyTree = ({ dependencies }) => {
                 <ListItemIcon>
                   <IconComponent name={dependency.purl.replace(/pkg:.*\//, '')} size={24} />
                 </ListItemIcon>
-                <ListItemText primary={dependency.purl} />
+                <ListItemText primary={decodeURIComponent(dependency.purl)} />
                 <small>{dependency.version || '-'}</small>
               </ListItem>
               <Divider component="li" variant="middle" />
