@@ -2,12 +2,14 @@ import React from 'react';
 import { Divider, List, ListItem, ListItemIcon, ListItemText, Typography } from '@material-ui/core';
 import IconComponent from '../../../../../../components/IconComponent/IconComponent';
 
-const DependenciesTree = ({ dependencies }) => {
+const DependencyTree = ({ dependencies }) => {
   return (
-    <div className="dependencies-tree">
-      <div className="dependencies-tree-header">
+    <div id="DependencyTree" className="dependencies-tree">
+      <div className="dependencies-tree-header mt-1 mb-2">
         <div className="dependencies-tree-header-title">
-          <Typography variant="h6">Dependencies</Typography>
+          <Typography variant="subtitle2">
+            <b>{dependencies.length}</b> {dependencies.length > 1 ? 'dependencies' : 'dependency'} found
+          </Typography>
         </div>
       </div>
       <div className="dependencies-tree-content">
@@ -18,7 +20,8 @@ const DependenciesTree = ({ dependencies }) => {
                 <ListItemIcon>
                   <IconComponent name={dependency.component} size={24} />
                 </ListItemIcon>
-                <ListItemText primary={dependency.purl} secondary={dependency.version} />
+                <ListItemText primary={dependency.purl} />
+                <small>{dependency.version || '-'}</small>
               </ListItem>
               <Divider component="li" variant="middle" />
             </>
@@ -29,4 +32,4 @@ const DependenciesTree = ({ dependencies }) => {
   );
 };
 
-export default DependenciesTree;
+export default DependencyTree;

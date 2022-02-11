@@ -19,7 +19,7 @@ import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import { getExtension } from '../../../../../../../utils/utils';
 import { fileService } from '../../../../../../../api/file-service';
 import CodeViewSelector from './components/CodeViewSelector/CodeViewSelector';
-import DependenciesTree from './components/DependenciesTree/DependenciesTree';
+import DependencyTree from './components/DependencyTree/DependencyTree';
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -63,7 +63,9 @@ export const Editor = () => {
     getResults();
 
     if (file) {
-      setDependencies(state.dependencies?.files.find((d) => d.file.endsWith(file))?.dependencies);
+      const dep = state.dependencies?.files.find((d) => d.file.endsWith(file))?.dependencies;
+      setView(dep ? 'graph' : 'code');
+      setDependencies(dep);
       loadLocalFile(file);
     }
   };
@@ -305,7 +307,7 @@ export const Editor = () => {
                       highlight={currentMatch?.lines || null}
                     />
                   ) : (
-                    <DependenciesTree dependencies={dependencies} />
+                    <DependencyTree dependencies={dependencies} />
                   )}
                 </>
               ) : null}

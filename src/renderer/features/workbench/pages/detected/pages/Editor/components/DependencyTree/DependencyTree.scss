@@ -1,0 +1,26 @@
+#DependencyTree {
+  height: calc(100% - 30px);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  margin-bottom: 50px;
+
+  .dependencies-tree-content {
+    max-height: 100%;
+    background: white;
+    overflow: auto;
+  }
+
+  .MuiListItemIcon-root {
+    min-width: 0;
+    margin-right: 12px;
+  }
+
+  .MuiListItem-root {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .MuiListItemText-primary {
+    font-size: 14px;
+  }
+}
