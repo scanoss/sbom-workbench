@@ -18,7 +18,7 @@ const DependencyTree = ({ dependencies }) => {
             <>
               <ListItem key={dependency.purl}>
                 <ListItemIcon>
-                  <IconComponent name={dependency.component} size={24} />
+                  <IconComponent name={dependency.purl.replace(/pkg:.*\//, '')} size={24} />
                 </ListItemIcon>
                 <ListItemText primary={dependency.purl} />
                 <small>{dependency.version || '-'}</small>
