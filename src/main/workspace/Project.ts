@@ -469,11 +469,16 @@ export class Project extends EventEmitter {
       .forEach((f: File) => {
         allFiles.push(rootPath + f.path);
       });
-    const dependencies: IDependencyResponse = await new Dependency().scan(allFiles);
-    dependencies.files.forEach((f) => {
-      f.file = f.file.replace(rootPath, '');
-    });
-    fs.promises.writeFile(`${this.metadata.getMyPath()}/dependencies.json`, JSON.stringify(dependencies, null, 2));
-    this.tree.addDependencies(dependencies);
+
+    try {
+      const dependencies: IDependencyResponse = await new Dependency().scan(allFiles)
+      dependencies.files.forEach((f) => {
+        f.file = f.file.replace(rootPath, '');
+      });
+      fs.promises.writeFile(`${this.metadata.getMyPath()}/dependencies.json`, JSON.stringify(dependencies, null, 2));
+      this.tree.addDependencies(dependencies);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
