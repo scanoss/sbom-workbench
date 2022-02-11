@@ -1,6 +1,8 @@
 import { IpcEvents } from '../../ipc-events';
-import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
+import Node, { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { workspace } from '../workspace/Workspace';
+import { serviceProvider } from './ServiceProvider';
 
 class LogicTreeService {
   public retoreStatus(files: Array<string>) {
@@ -20,7 +22,7 @@ class LogicTreeService {
     try {
       const project = workspace.getOpenedProjects()[0];
       project.sendToUI(IpcEvents.TREE_UPDATING, {});
-      paths.forEach(path => {
+      paths.forEach((path) => {
         project.getTree().getRootFolder().setStatus(path, status);
       });
       project.updateTree();
@@ -28,6 +30,19 @@ class LogicTreeService {
       console.log(e);
       throw e;
     }
+  }
+
+  public async filterTree(params: any) {
+    const project = workspace.getOpenedProjects()[0];
+    const queryBuilder = QueryBuilderCreator.create(params);
+    const files: any = await serviceProvider.model.file.getAllComponentFiles(queryBuilder);
+    const aux = files.map((file: any) => {
+      return file.path;    
+    });
+    const tree =  project.getTree().getRootFolder().getCopy();
+  
+    tree.filter(aux);
+    project.filterTree(tree);
   }
 }
 

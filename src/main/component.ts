@@ -3,6 +3,7 @@ import { Component, License, ComponentGroup, IWorkbenchFilter, IProject } from '
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
 import { logicComponentService } from './services/LogicComponentService';
+import { logictTreeService } from './services/LogicTreeService';
 import { workspace } from './workspace/Workspace';
 
 
@@ -30,6 +31,7 @@ ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (_event, component: Componen
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (_event, params: IWorkbenchFilter) => {
   const data = await logicComponentService.getAll(params);
+  await logictTreeService.filterTree(params);
   return {
     status: 'ok',
     message: 'Components group retrieve successfully',

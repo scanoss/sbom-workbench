@@ -114,7 +114,18 @@ export default class File extends Node {
     return 0;
   }
 
-  public getChild():Node{
+  public getChild(): Node {
     return null;
+  }
+
+  public filter(paths: Array<string>): void {
+   if(!paths.includes(this.getPath())) {
+      this.status = NodeStatus.NOMATCH;
+      this.setStatusOnClassnameAs(this.status);
+    }
+  }
+
+  public getCopy(): Node {  
+    return Object.assign(Object.create(File.prototype), this);
   }
 }

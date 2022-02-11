@@ -52,6 +52,10 @@ export default abstract class Node {
     return this.value;
   }
 
+  public getLabel(): string {
+    return this.label;
+  }
+
   public setStatusOnClassnameAs(className: string): void {
     const re = new RegExp('.status-.*');
     this.className = this.className.replace(re, '');
@@ -138,4 +142,8 @@ export default abstract class Node {
   public abstract getFiles(): Array<any>;
 
   public abstract summarize(root: string, summary: any): any;
+
+  public abstract filter(paths:Array<string>):void;
+
+  public abstract getCopy():Node;
 }

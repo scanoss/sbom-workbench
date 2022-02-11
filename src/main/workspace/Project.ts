@@ -430,6 +430,10 @@ export class Project extends EventEmitter {
     this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
   }
 
+  public filterTree(tree: any) {
+    this.sendToUI(IpcEvents.TREE_UPDATED, tree);
+  }
+
   set_filter_file(pathToFilter: string): boolean {
     this.banned_list.load(pathToFilter);
     return true;
