@@ -138,4 +138,6 @@ export default abstract class Node {
   public abstract getFiles(): Array<any>;
 
   public abstract summarize(root: string, summary: any): any;
+
+  public abstract addDependency(path: string): void;
 }
