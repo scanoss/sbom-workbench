@@ -201,4 +201,11 @@ export default class Folder extends Node {
   public getChild(i: number): Node {
     return this.children[i];
   }
+
+  public addDependency(path: string): void {
+    if (!this.checkMyPath(path)) return;
+    for (const child of this.children) {
+      child.addDependency(path);
+    }
+  }
 }
