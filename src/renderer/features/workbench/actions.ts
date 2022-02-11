@@ -1,3 +1,4 @@
+import { IDependencyResponse } from 'scanoss';
 import { ComponentGroup, Node } from '../../../api/types';
 
 export const LOAD_SCAN_SUCCESS = 'APP/WORKBENCH/LOAD_SCAN_SUCCESS';
@@ -14,10 +15,11 @@ export const SET_NODE = 'APP/WORKBENCH/SET_NODE';
 export const SET_RECENT_USED_COMPONENT = 'APP/WORKBENCH/SET_RECENT_USED_COMPONENT';
 export const RESET = 'APP/WORKBENCH/RESET';
 
-export const loadScanSuccess = (name, tree, components: ComponentGroup[]) => ({
+export const loadScanSuccess = (name, tree, components: ComponentGroup[], dependencies: IDependencyResponse) => ({
   type: LOAD_SCAN_SUCCESS,
   name,
   tree,
+  dependencies,
   components,
 });
 

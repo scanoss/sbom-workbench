@@ -5,8 +5,6 @@ import Folder from './Folder';
 import { IpcEvents } from '../../../../ipc-events';
 import * as Filtering from '../../filtering';
 
-
-
 const fs = require('fs');
 const pathLib = require('path');
 
@@ -168,9 +166,15 @@ export class Tree {
         for (i = 0; i < node.getChildrenCount(); i += 1) this.applyFilters(scanRoot, node.getChild(i), bannedList);
       } else {
         node.setAction('filter');
-        node.setStatusFromFilter( NodeStatus.FILTERED);
+        node.setStatusFromFilter(NodeStatus.FILTERED);
         node.setClassName('filter-item');
       }
     }
+  }
+
+  public addDependencies(dependencies: any): void {
+    dependencies.files.forEach((dependency) => {
+      this.getRootFolder().addDependency(dependency.file);
+    });
   }
 }

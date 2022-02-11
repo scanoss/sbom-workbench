@@ -24,7 +24,9 @@ const FileTreeNode = ({ node, onClick, onContextMenu }) => {
         {node.type === 'folder' &&
           (node.state?.expanded ? <i className="fa fa-folder-open" /> : <i className="fa fa-folder" />)}
 
-        {node.type === 'file' && <i className="fa fa-file" />}
+        {node.type === 'file' && !node.isDependencyFile && <i className="fa fa-file" />}
+
+        {node.type === 'file' && node.isDependencyFile && <i className="fa fa-dependency-file" />}
       </span>
       {node.name}
     </span>
@@ -140,7 +142,7 @@ const FileTree = () => {
       {({ style, node, ...rest }: any) => (
         <div
           style={{ ...style, ...{ paddingLeft: style.marginLeft, margin: 0 } }}
-          className={`ft-node ${node.className} ${node.id === filter.node?.path ? 'selected' : ''}`}
+          className={`ft-node ${node.className} ${node.id === filter.node?.path ? 'selected' : ''} ${node.isDependencyFile ? 'is-dependency-file' : ''}`}
         >
           <Expandable
             node={node}

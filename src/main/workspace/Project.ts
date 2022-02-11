@@ -2,7 +2,15 @@
 import { EventEmitter } from 'events';
 import fs from 'fs';
 import log from 'electron-log';
-import { Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
+import {
+  Scanner,
+  ScannerCfg,
+  ScannerEvents,
+  ScannerInput,
+  WinnowingMode,
+  Dependency,
+  IDependencyResponse,
+} from 'scanoss';
 import { File, IProjectCfg, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanModel } from '../db/ScanModel';
@@ -121,7 +129,7 @@ export class Project extends EventEmitter {
       processedFiles: self.processedFiles,
       filesSummary: self.filesSummary,
       tree: self.tree,
-    }
+    };
     fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(a));
     log.info(`%c[ PROJECT ]: Project ${this.metadata.getName()} saved`, 'color:green');
   }
@@ -142,6 +150,8 @@ export class Project extends EventEmitter {
       throw new Error('Cannot resume project');
 
     await this.open();
+    log.info(`%c[ SCANNER ]: Start scanning dependencies`, 'color: green');
+    await this.scanDependencies();
     this.initializeScanner();
     log.info(`%c[ PROJECT ]: Resuming scanner, pending ${Object.keys(this.filesToScan).length} files`, 'color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
@@ -149,10 +159,8 @@ export class Project extends EventEmitter {
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
 
-
     const scanIn = this.adapterToScannerInput(this.filesToScan);
     this.scanner.scan(scanIn);
-    //this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
     return true;
   }
 
@@ -185,22 +193,22 @@ export class Project extends EventEmitter {
     this.initializeScanner();
     this.scanner.cleanWorkDirectory();
     this.save();
+
+    log.info(`%c[ SCANNER ]: Start scanning dependencies`, 'color: green');
+    await this.scanDependencies();
+
     log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, 'color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: this.metadata.getScannerState(),
       processed: 0,
     });
-
     const scanIn = this.adapterToScannerInput(summary.files);
     this.scanner.scan(scanIn);
-
   }
 
-  private adapterToScannerInput(filesToScan: Record<string,string>): Array<ScannerInput> {
-
+  private adapterToScannerInput(filesToScan: Record<string, string>): Array<ScannerInput> {
     const fullScanList: Array<string> = [];
     const quickScanList: Array<string> = [];
-
 
     for (const filePath of Object.keys(filesToScan)) {
       if (filesToScan[filePath] === 'MD5_SCAN') {
@@ -439,7 +447,38 @@ export class Project extends EventEmitter {
     return this.tree.getNode(path);
   }
 
-  public getToken(){
+  public getToken() {
     return this.metadata.getToken();
+  }
+
+  public async getDependencies(): Promise<IDependencyResponse> {
+    try {
+      return JSON.parse(await fs.promises.readFile(`${this.metadata.getMyPath()}/dependencies.json`, 'utf8'));
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  private async scanDependencies(): Promise<void> {
+    const allFiles = [];
+    const rootPath = this.metadata.getScanRoot();
+    this.tree
+      .getRootFolder()
+      .getFiles()
+      .forEach((f: File) => {
+        allFiles.push(rootPath + f.path);
+      });
+
+    try {
+      const dependencies: IDependencyResponse = await new Dependency().scan(allFiles)
+      dependencies.files.forEach((f) => {
+        f.file = f.file.replace(rootPath, '');
+      });
+      fs.promises.writeFile(`${this.metadata.getMyPath()}/dependencies.json`, JSON.stringify(dependencies, null, 2));
+      this.tree.addDependencies(dependencies);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }

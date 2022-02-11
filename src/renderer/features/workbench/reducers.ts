@@ -1,3 +1,4 @@
+import { IDependencyResponse } from 'scanoss';
 import {
   LOAD_SCAN_FAIL,
   LOAD_SCAN_SUCCESS,
@@ -23,6 +24,7 @@ export interface State {
   progress: number;
   summary: any;
   tree: any;
+  dependencies: IDependencyResponse;
   file: string | null;
   mainComponents: ComponentGroup[];
   recentUsedComponents: ComponentGroup[];
@@ -44,6 +46,7 @@ export const initialState: State = {
   progress: 0,
   summary: null,
   tree: null,
+  dependencies: null,
   file: null,
   mainComponents: null,
   recentUsedComponents: null,
@@ -61,12 +64,13 @@ export const initialState: State = {
 export default function reducer(state: State = initialState, action): State {
   switch (action.type) {
     case LOAD_SCAN_SUCCESS: {
-      const { name, tree, components } = action;
+      const { name, tree, components, dependencies } = action;
       return {
         ...state,
         name,
         loaded: true,
         tree,
+        dependencies,
         mainComponents: components,
         components,
       };

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
+import { IDependency } from 'scanoss';
 import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
 import { workbenchController } from '../../../../../../workbench-controller';
@@ -11,14 +12,14 @@ import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/M
 import { mapFiles } from '../../../../../../../utils/scan-util';
 import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import { inventoryService } from '../../../../../../../api/inventory-service';
-import { setFile } from '../../../../actions';
 import { resultService } from '../../../../../../../api/results-service';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
-import { projectService } from '../../../../../../../api/project-service';
 import { InventoryForm } from '../../../../../../context/types';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import { getExtension } from '../../../../../../../utils/utils';
 import { fileService } from '../../../../../../../api/file-service';
+import CodeViewSelector from './components/CodeViewSelector/CodeViewSelector';
+import DependencyTree from './components/DependencyTree/DependencyTree';
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -33,7 +34,6 @@ export interface FileContent {
 
 export const Editor = () => {
   const history = useHistory();
-  const query = useQuery();
 
   const { state, dispatch, createInventory, ignoreFile, restoreFile, detachFile } = useContext(
     WorkbenchContext
@@ -49,6 +49,8 @@ export const Editor = () => {
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
   const [fullFile, setFullFile] = useState<boolean>(null);
+  const [dependencies, setDependencies] = useState<IDependency[]>(null);
+  const [view, setView] = useState<'code' | 'graph'>('code');
 
   const init = () => {
     setMatchInfo(null);
@@ -61,9 +63,14 @@ export const Editor = () => {
     getResults();
 
     if (file) {
+      const dep = state.dependencies?.files.find((d) => d.file.endsWith(file))?.dependencies;
+      setView(dep ? 'graph' : 'code');
+      setDependencies(dep);
       loadLocalFile(file);
     }
   };
+
+  useEffect(() => console.log(dependencies), [dependencies]);
 
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
@@ -291,11 +298,18 @@ export const Editor = () => {
           <main className="editors app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
-                <MemoCodeEditor
-                  language={getExtension(file)}
-                  content={localFileContent.content}
-                  highlight={currentMatch?.lines || null}
-                />
+                <>
+                  {dependencies && <CodeViewSelector active={view} setView={setView} />}
+                  {view === 'code' ? (
+                    <MemoCodeEditor
+                      language={getExtension(file)}
+                      content={localFileContent.content}
+                      highlight={currentMatch?.lines || null}
+                    />
+                  ) : (
+                    <DependencyTree dependencies={dependencies} />
+                  )}
+                </>
               ) : null}
             </div>
             {inventories?.length === 0 && matchInfo?.length === 0 ? (

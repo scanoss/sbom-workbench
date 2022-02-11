@@ -16,8 +16,12 @@
       padding-left: 8px !important;
     }
 
-    &.filter-item {
+    &.filter-item:not(.is-dependency-file) {
       color: #968d8d8a;
+    }
+
+    &.is-dependency-file {
+
     }
 
     &:hover {
@@ -53,6 +57,13 @@
       &.fa-file:before {
         content: "\f016";
       }
+
+      &.fa-dependency-file:before {
+        content: "\f1b3";
+        margin-left: -2px;
+        opacity: 0.9;
+      }
+
     }
 
     //  &.status-pending > span .rct-node-icon::before
