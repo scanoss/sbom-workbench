@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../../store';
 import { FileList } from './FileList';
 
-export const IdentifiedList = ({ files, inventories, onAction }) => {
+export const IdentifiedList = ({ files, inventories, emptyMessage, onAction }) => {
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
   const [groups, setGroups] = useState({});
 
@@ -34,7 +34,7 @@ export const IdentifiedList = ({ files, inventories, onAction }) => {
         </section>
       ))}
 
-      {Object.keys(groups).length === 0 && <p>No identified files</p>}
+      {Object.keys(groups).length === 0 && <p>{emptyMessage}</p>}
     </div>
   );
 };

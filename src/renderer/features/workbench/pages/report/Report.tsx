@@ -5,6 +5,8 @@ import DetectedReport from './pages/DetectedReport';
 import IdentifiedReport from './pages/IdentifiedReport';
 import { reportService } from '../../../../../api/report-service';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
+import { componentService } from '../../../../../api/component-service';
+import { getSuggestedQuery } from '@testing-library/react';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -22,24 +24,22 @@ const Nav = () => {
 
   return (
     <section className="nav">
-      <ButtonGroup variant="contained" disableElevation>
-        <NavLink to={`${path}/detected`} activeClassName="active" tabIndex={-1}>
-          <Tooltip
-            title="Potential Bill of Materials based on automatic detection"
-            classes={{ tooltip: classes.tooltip }}
-          >
-            <Button size="large">Detected</Button>
-          </Tooltip>
-        </NavLink>
-        <NavLink to={`${path}/identified`} activeClassName="active" tabIndex={-1}>
-          <Tooltip
-            title="Actual Bill of Materials based on confirmed identifications"
-            classes={{ tooltip: classes.tooltip }}
-          >
-            <Button size="large">Identified</Button>
-          </Tooltip>
-        </NavLink>
-      </ButtonGroup>
+      <NavLink to={`${path}/detected`} activeClassName="active" tabIndex={-1}>
+        <Tooltip
+          title="Potential Bill of Materials based on automatic detection"
+          classes={{ tooltip: classes.tooltip }}
+        >
+          <Button size="large">Detected</Button>
+        </Tooltip>
+      </NavLink>
+      <NavLink to={`${path}/identified`} activeClassName="active" tabIndex={-1}>
+        <Tooltip
+          title="Actual Bill of Materials based on confirmed identifications"
+          classes={{ tooltip: classes.tooltip }}
+        >
+          <Button size="large">Identified</Button>
+        </Tooltip>
+      </NavLink>
     </section>
   );
 };
@@ -52,13 +52,9 @@ const Reports = () => {
   const [detectedData, setDetectedData] = useState(null);
   const [identifiedData, setIdentifiedData] = useState(null);
 
-  const { history } = state;
-
-  const getEndpoint = () => {
-    historyState.push(`${path}/detected`);
+  const setTab = () => {
     if (state.tree.hasIdentified || state.tree.hasIgnored) {
       historyState.push(`${path}/identified`);
-      history.report = 'identified';
     }
   };
 
@@ -66,10 +62,10 @@ const Reports = () => {
     const init = async () => {
       const summary = await reportService.getSummary();
       const detected = await reportService.detected();
-      const identified = await reportService.idetified();
+      const identified = await reportService.identified();
       setDetectedData({ ...detected, summary });
       setIdentifiedData({ ...identified, summary });
-      getEndpoint();
+      setTab();
     };
     init();
   }, []);
@@ -88,7 +84,7 @@ const Reports = () => {
             <Route exact path={`${path}/identified`}>
               {identifiedData && <IdentifiedReport data={identifiedData} />}
             </Route>
-            <Redirect from={path} to={`${path}/${history.report}`} />
+            <Redirect from={path} to={`${path}/detected`} />
           </Switch>
         </main>
       </section>

@@ -4,6 +4,16 @@
   .app-header {
     margin-top: 20px;
 
+    .subheader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .search-box {
+        width: $search-box-width;
+      }
+    }
+
     .search-input {
       width: 400px ;
     }
@@ -84,5 +94,4 @@
       }
     }
   }
-
 }

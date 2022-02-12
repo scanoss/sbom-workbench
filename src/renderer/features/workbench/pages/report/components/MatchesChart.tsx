@@ -6,7 +6,7 @@ const MatchesChart = ({ data }) => {
   const [percentage, setPercentage] = useState<number>(0);
 
   useEffect(() => {
-    const percentage = Math.floor(((data?.detectedFiles) * 100) / data?.includedFiles);
+    const percentage = Math.floor((data?.detectedFiles * 100) / data?.scannedFiles);
     const noMatches = 100 - percentage;
     setPercentage(percentage);
 
@@ -64,7 +64,7 @@ const MatchesChart = ({ data }) => {
                 return ``;
               },
               title() {
-                return `${data?.detectedFiles} of ${data?.includedFiles} files scanned`;
+                return `${data?.detectedFiles} of ${data?.scannedFiles} files scanned`;
               },
             },
             displayColors: false,
@@ -84,28 +84,28 @@ const MatchesChart = ({ data }) => {
 
   return (
     <div id="MatchesChart">
-      {
-        Number.isNaN(percentage) ? (
-          <p className="report-empty">No matches found</p>
-        ) : (
-          <>
+      {Number.isNaN(percentage) ? (
+        <p className="report-empty">No matches found</p>
+      ) : (
+        <>
           <div className="matches-canvas-container">
-          <div className="label-match-container">
-            <span className="label-match">{percentage}%</span>
-            <span className="label-match-sublabel">Match</span>
-          </div>
-          <canvas ref={chartRef} />
-          <div className="label-nomatch-container">
-            <span className="label-nomatch">{100 - percentage}%</span>
-            <span className="label-nomatch-sublabel">No Match</span>
-          </div>
+            <div className="label-match-container">
+              <span className="label-match">{percentage}%</span>
+              <span className="label-match-sublabel">Match</span>
+            </div>
+            <canvas ref={chartRef} />
+            <div className="label-nomatch-container">
+              <span className="label-nomatch">{100 - percentage}%</span>
+              <span className="label-nomatch-sublabel">No Match</span>
+            </div>
           </div>
           <div className="total-files-container">
-        <span className="total-files-label">Scanned Files: {data?.includedFiles}</span>
-      </div>
-          </>
-        )
-      }
+            <span className="total-files-label">
+              <strong> {data.scannedFiles}</strong> scanned files
+            </span>
+          </div>
+        </>
+      )}
     </div>
   );
 };

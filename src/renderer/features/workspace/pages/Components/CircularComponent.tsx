@@ -1,6 +1,5 @@
-import { Box, CircularProgress, IconButton, Typography, makeStyles, Button } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
-
+import React from 'react';
+import { CircularProgress, makeStyles, Button } from '@material-ui/core';
 import PauseIcon from '@material-ui/icons/Pause';
 
 interface CircularComponentProps {
@@ -72,9 +71,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CircularComponent = ({ stage, progress, pauseScan }: CircularComponentProps) => {
-  const variant = stage === 'preparing' || stage === 'indexing' ? 'indeterminate' : 'determinate';
-
   const classes = useStyles();
+  const variant = stage === 'preparing' || stage === 'indexing' ? 'indeterminate' : 'determinate';
 
   return (
     <div className={classes.parentBox}>

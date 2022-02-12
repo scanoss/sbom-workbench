@@ -4,35 +4,31 @@ import { Chart } from 'chart.js';
 const OssVsOriginalProgressBar = ({ data }) => {
   const chartRef = React.createRef<any>();
   const [matchedFiles, setMatchedFiles] = useState<number>(0);
-  const [ossFiles, setOssFiles] = useState<number>(0);
-  const [originalFiles, setoriginalFiles] = useState<number>(0);
+  const ossFiles = (data.identifiedFiles * 100) / data.scannedFiles;
+  const pendingFiles = (data.pendingFiles * 100) / data.scannedFiles;
+  const percentage = ossFiles + pendingFiles;
 
   useEffect(() => {
     setMatchedFiles(data.totalFiles);
-    const ossFiles = Math.floor((data.identifiedFiles * 100) / data.totalFiles);
-    setOssFiles(ossFiles);
-    const originalFiles = Math.floor((data.totalFiles - data.identifiedFiles) * 100 / data.totalFiles);
-    setoriginalFiles(originalFiles);
-
-    console.log(data.identifiedFiles);
-    const tooltipPlugin = Chart.registry.getPlugin('tooltip');
-    tooltipPlugin.positioners.custom = function (elements, eventPosition) {
-      return {
-        x: eventPosition.x,
-        y: eventPosition.y,
-      };
-    };
+    const originalFiles = data.scannedFiles - (data.identifiedFiles + data.pendingFiles);
 
     const chart = new Chart(chartRef.current, {
       type: 'bar',
       data: {
-        labels: [`${data.totalFiles}%`],
+        labels: [``],
         datasets: [
           {
             label: 'OSS',
-            data: [ossFiles],
+            data: [data.identifiedFiles],
             borderWidth: 0,
             backgroundColor: ['#22C55E'],
+            barThickness: 34,
+          },
+          {
+            label: 'Pending',
+            data: [data.pendingFiles],
+            borderWidth: 0,
+            backgroundColor: ['#F97316'],
             barThickness: 34,
           },
           {
@@ -58,6 +54,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
             display: false,
           },
           x: {
+            max: data.scannedFiles,
             stacked: true,
             beginAtZero: true,
             grid: {
@@ -69,50 +66,48 @@ const OssVsOriginalProgressBar = ({ data }) => {
             },
           },
         },
-        plugins: {
-          tooltip: {
-            position: 'custom',
-            callbacks: {
-              title() {
-                return `OSS Files ${data.identifiedFiles}\nOriginal Files ${data.totalFiles - data.identifiedFiles}`;
-              },
-              label() {
-                return ``;
-              },
-            },
-            displayColors: false,
-          },
-          legend: {
-            display: false,
-            labels: {
-              boxWidth: 0,
-            },
+      },
+      plugins: [
+        {
+          id: 'line',
+          afterDraw: (chart) => {
+            const meta = chart.getDatasetMeta(1); // Gets datasets[1]
+            if (!meta.hidden) {
+              meta.data.forEach((element) => {
+                const { x }: any = element.tooltipPosition();
+                chart.ctx.beginPath();
+                chart.ctx.moveTo(x, 20);
+                chart.ctx.strokeStyle = 'black';
+                chart.ctx.lineTo(x, 90);
+                chart.ctx.stroke();
+                chart.ctx.save();
+              });
+            }
           },
         },
-      },
+      ],
     });
 
     return () => chart.destroy();
   }, []);
 
   return (
-    <div id="IdentificationProgress">
+    <div id="OssProgress">
       <div className="identification-canvas-container">
         {Number.isNaN(matchedFiles) ? (
           <span className="label-not-found">No matches found</span>
         ) : (
           <>
-            <span className="label">{ossFiles}%</span>
-            <div className="progress-bar-oss-original ">
-              <canvas ref={chartRef} />
+            <span className="label">{Math.floor(percentage)}%</span>
+            <div className="progress-bar">
+              <canvas id="OssOriginalProgress" ref={chartRef} />
             </div>
-            <span className="label-original">{originalFiles}%</span>
           </>
         )}
       </div>
       <div className="total-files-container">
         <span className="total-files-label">
-          <strong>{data.totalFiles}</strong> Total Files
+          <strong>{data.scannedFiles}</strong> scanned files
         </span>
       </div>
     </div>

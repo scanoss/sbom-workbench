@@ -1,18 +1,10 @@
-:root {
-  /* TODO: armar theme cuando llegue UI */
-  --background-color-primary: #e4e4e7;
-  --text-color-primary: #505050;
-}
-
 
 .explorer {
   color: var(--text-color-primary);
   height: 100%;
   width: 100%;
-
   display: flex;
   flex-direction: column;
-
   background-color: white;
 
   header {
@@ -35,10 +27,4 @@
 .match-info {
   height: 100%;
   background-color: var(--background-color-primary);
-}
-
-.btn-export {
-  position: absolute !important;
-  bottom: 16px ;
-  right: 16px;
 }

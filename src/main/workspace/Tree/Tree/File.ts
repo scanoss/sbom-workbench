@@ -1,9 +1,12 @@
 import Node, { NodeStatus } from './Node';
 
 export default class File extends Node {
+  private isDependencyFile: boolean;
+
   constructor(name: string, path: string) {
     super(name, path);
     this.type = 'file';
+    this.isDependencyFile = false;
   }
 
   public setStatus(path: string, status: NodeStatus): boolean {
@@ -114,7 +117,11 @@ export default class File extends Node {
     return 0;
   }
 
-  public getChild():Node{
+  public getChild(): Node {
     return null;
+  }
+
+  public addDependency(path: string): void {
+    if (this.getPath() === path) this.isDependencyFile = true;
   }
 }

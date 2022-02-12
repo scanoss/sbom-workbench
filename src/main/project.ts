@@ -17,6 +17,7 @@ ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
     logical_tree: p.getTree().getRootFolder(),
     work_root: p.getMyPath(),
     scan_root: p.getScanRoot(),
+    dependencies: await p.getDependencies(),
     uuid: p.getUUID(),
   };
 

@@ -35,7 +35,7 @@
     }
 
     .identification-progress-title {
-        margin-top: 5%
+        margin-top: 1.2%
     }
 
     .divider {
@@ -53,14 +53,12 @@
     .progress-bar-container {
         margin-top: 1%;
         width: 100%;
-        height: 100px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding-bottom: 3%;
+        margin-bottom: 2%;
     }
-
 
     .main-content-info-container {
         display: flex;
@@ -152,14 +150,15 @@
         font-weight: bold;
     }
 
-    #drop-down-license-detail-btn{
-    	display:block;
-    	 border: none;
-    	 width:100%;
-    	 background-color: rgb(226 226 226);
+    #drop-down-license-detail-btn {
+        display: block;
+        border: none;
+        width: 100%;
+        background-color: rgb(226 226 226);
     }
 
-    .button-solid:focus ,#drop-down-license-detail-btn:focus{
+    .button-solid:focus,
+    #drop-down-license-detail-btn:focus {
         border: none;
         outline: none;
     }
@@ -271,8 +270,7 @@
     }
 
     #progress-bar {
-        width: 400px;
-        height: 40px;
+        height: 95px;
         padding-left: 3.5px;
     }
 
@@ -281,53 +279,23 @@
         justify-content: center;
         align-items: center;
         flex-direction: row;
-        width: 50%;
+        width: 65%;
     }
 
-    .oss-percentage , .original-percentage{
+    #oss-percentage{
         font-size: 25px;
         display: block;
-        height: auto;
-        color: #22C55E;
+        height: auto;       
         background-color: #f5f5f5a1;
-    }
-
-    .progress-bar-info {
-        display: flex;
-        flex-flow: row;
-        flex-direction: row;
-        align-items: space-between;
-        width: 50%;
-        height: 20px;
-    }
-
-    .progress-bar-info-identified,
-    .progress-bar-info-pending, .total-files-container {
-        display: flex;
-        width: 50%;
-        height: 20px;
-        align-items: center;
-        justify-content: center;
+        padding-top: 28px;
+        font-size: 35px;
     }
 
     .identified,
-    .pending {
+    .pending,
+    .original {
         width: 30px;
         height: 10px;
-    }
-
-    .pending  {
-        background-color: #A1A1AA;
-    }
-
-    .identified {
-        background-color: #73c75f;
-    }
-
-    #oss,
-    #original, #total-files {
-        font-size: 13px;
-        padding-left: 3px;
     }
 
     .table th.license-head-column {
@@ -335,27 +303,31 @@
         padding-left: 10%;
     }
 
-    .drop-down-license-detail-container{
-     border-bottom: 1.5px solid #82828291;
+    .drop-down-license-detail-container {
+        border-bottom: 1.5px solid #82828291;
     }
 
-    .drop-down-license-detail-container button{
-    display:flex;
-    justify-content:center;
-    width:100%;
+    .drop-down-license-detail-container button {
+        display: flex;
+        justify-content: center;
+        width: 100%;
     }
 
-    .show-license-detail{
+    .show-license-detail {
         display: block;
     }
 
-    .original-percentage{
-        color:#A1A1AA;
+    .original-percentage {
+        color: #A1A1AA;
         margin-left: 3px;
     }
- 
 
-    
+    .percentage-container{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+    }
 </style>
 
 <body>
@@ -368,31 +340,19 @@
         <div class="progress-bar-container">
             <h3 class="identification-progress-title">Original vs OSS</h3>
             <div class="progress-bar-child-container">
-                <div>
-                    <span class="oss-percentage"></span>
+                <div class="percentage-container">
+                    <span id="oss-percentage"></span>
                 </div>
                 <canvas id="progress-bar"></canvas>
                 <div>
                     <span class="original-percentage"></span>
                 </div>
             </div>
-
-            <div class="progress-bar-info">
-
-                <div class="total-files-container">                  
-                    <p id="total-files"></p>
-                </div>
-
-                <div class="progress-bar-info-identified">
-                    <div class="identified" identified></div>
-                    <p id="oss"></p>
-                </div>
-
-                <div class="progress-bar-info-pending">
-                    <div class="pending" pending></div>
-                    <p id="original"></p>
-                </div>
+            <div>
+                <p id="total-files"></p>
             </div>
+
+            <div class="divider"> </div>
         </div>
 
         <div class="main-content-info-container">
@@ -410,7 +370,7 @@
                 <div>
                     <h3 class="identified-license-detail-title">Identified License Detail</h3>
                     <div class="drop-down-license-detail-container">
-                        <button id="drop-down-license-detail-btn" > Identified License Detail &#8711;</button>
+                        <button id="drop-down-license-detail-btn"> Identified License Detail &#8711;</button>
                     </div>
                     <div class="drop-down-license-detail hide">
                         <table class="table">
@@ -446,7 +406,369 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="text/javascript" src="./report.js"></script>
+    <script>
+        const identifiedData = '#DATA';
+        const auxSummaryData = '#SUMMARY';
+        const auxData = Array.from(JSON.parse(identifiedData));
+        const summaryData = JSON.parse(auxSummaryData);
+        const originalFiles = summaryData.scannedFiles - (summaryData.identifiedFiles + summaryData.pendingFiles);
+        const ossFiles = (summaryData.identifiedFiles * 100) / summaryData.scannedFiles;
+        const pendingFiles = (summaryData.pendingFiles * 100) / summaryData.scannedFiles;
+        const percentage = ossFiles + pendingFiles;
+
+        const labels = [];
+        const values = [];
+        const rowDataTable = {};
+
+        function rowData() {
+            auxData.forEach((d) => {
+                if (rowDataTable[d.label] === undefined) {
+                    rowDataTable[d.label] = {
+                        components: {},
+                        componentCount: 0,
+                    };
+                }
+
+                d.components.forEach((component) => {
+                    if (rowDataTable[d.label].components[component.name] === undefined) {
+                        rowDataTable[d.label].components[component.name] = {
+                            versions: [],
+                            vendor: component.vendor,
+                            purl: component.purl,
+                        };
+                    }
+                    rowDataTable[d.label].components[component.name].versions.push(component.version);
+                    rowDataTable[d.label].components[component.name].versions.sort();
+                });
+                rowDataTable[d.label].componentCount = Object.keys(rowDataTable[d.label].components).length;
+            });
+        }
+
+        rowData();
+
+        Object.entries(rowDataTable).forEach(([key, value]) => {
+            labels.push(key);
+            values.push(value.componentCount);
+        });
+
+
+        const color = [
+            '#E8B34B',
+            '#E22C2C',
+            '#5754D0',
+            '#9F69C0',
+            '#FE7F10',
+            '#E56399',
+            '#E637BF',
+            '#474647',
+            '#153243',
+            '#2DE1C2',
+            '#F05365',
+            '#A2D729',
+            '#3C91E6',
+            '#FA824C',
+            '#C94277',
+            '#E56B6F',
+            '#F71735',
+            '#011627',
+            '#724E91',
+            '#7D451B',
+            '#9BE564',
+        ];
+
+        function insertLicenseRow() {
+            const bodyLicenseTable = document.querySelector('#body-license-table');
+            let counter = 0;
+            Object.keys(rowDataTable).forEach((key) => {
+                const tr = document.createElement('tr');
+                const tdColor = document.createElement('td');
+                const licenseRefContainer = document.createElement('div');
+                licenseRefContainer.classList.add('license-ref-container');
+                const colourRefLicenseContainer = document.createElement('div');
+                colourRefLicenseContainer.classList.add('colour-ref-license-container');
+                const colourRefLicense = document.createElement('div');
+                colourRefLicense.classList.add('colour-ref-license');
+                colourRefLicense.style.backgroundColor = color[counter % color.length];
+                colourRefLicenseContainer.appendChild(colourRefLicense);
+                const licenseLabel = document.createElement('div');
+                licenseLabel.classList.add('license-label');
+                const licenseName = document.createElement('div');
+                licenseName.classList.add('license-name');
+                const licenseNameP = document.createElement('p');
+                licenseNameP.innerText = key;
+                licenseName.appendChild(licenseNameP);
+                licenseLabel.appendChild(licenseName);
+
+                licenseRefContainer.appendChild(colourRefLicenseContainer);
+                licenseRefContainer.appendChild(licenseLabel);
+
+                tdColor.appendChild(licenseRefContainer);
+                tr.appendChild(tdColor);
+
+                // count components
+                const tdCount = document.createElement('td');
+                tdCount.classList.add('width-license-count');
+
+                const textCount = document.createTextNode(`${rowDataTable[key].componentCount}`);
+                tdCount.appendChild(textCount);
+                tr.appendChild(tdCount);
+
+                bodyLicenseTable.appendChild(tr);
+
+                counter += 1;
+            });
+        }
+
+        insertLicenseRow();
+
+        function dropDown(id) {
+            const nodes = document.getElementsByClassName(id);
+            for (let i = 0; i < nodes.length; i += 1) {
+                if (nodes[i].classList.contains('hide')) {
+                    nodes[i].classList.remove('hide');
+                    nodes[i].classList.add('show');
+                } else {
+                    nodes[i].classList.remove('show');
+                    nodes[i].classList.add('hide');
+                }
+            }
+        }
+
+        function addButtonListener() {
+            const btn = document.querySelectorAll('.button-solid');
+
+            btn.forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    dropDown(event.target.id);
+                });
+            });
+        }
+
+        function insertLicenseDetailRow() {
+            const bodyLicenseTable = document.querySelector('#body-license-detail-table');
+
+            let counter = 0;
+            Object.keys(rowDataTable).forEach((key) => {
+                const tr = document.createElement('tr');
+                const tdColor = document.createElement('td');
+                const licenseRefContainer = document.createElement('div');
+                licenseRefContainer.classList.add('license-ref-container');
+                const colourRefLicenseContainer = document.createElement('div');
+                colourRefLicenseContainer.classList.add('colour-ref-license-container');
+                const colourRefLicense = document.createElement('div');
+                colourRefLicense.classList.add('colour-ref-license');
+                colourRefLicense.style.backgroundColor = color[counter % color.length];
+                colourRefLicenseContainer.appendChild(colourRefLicense);
+                const licenseLabel = document.createElement('div');
+                licenseLabel.classList.add('license-label');
+                const label = document.createElement('div');
+                label.classList.add('label');
+                const labelP = document.createElement('p');
+                labelP.innerText = 'License';
+                label.appendChild(labelP);
+                licenseLabel.appendChild(label);
+                const licenseName = document.createElement('div');
+                licenseName.classList.add('license-name');
+                const licenseNameP = document.createElement('p');
+                licenseNameP.innerText = key;
+                licenseName.appendChild(licenseNameP);
+                licenseLabel.appendChild(licenseName);
+
+                licenseRefContainer.appendChild(colourRefLicenseContainer);
+                licenseRefContainer.appendChild(licenseLabel);
+
+                tdColor.appendChild(licenseRefContainer);
+                tr.appendChild(tdColor);
+
+                // count components
+                const tdCount = document.createElement('td');
+                tdCount.classList.add('width-license-count');
+                const btn = `<button class="button-solid" id="${counter}">${rowDataTable[key].componentCount} component found &#8711;</button>`;
+
+                tdCount.innerHTML = btn;
+                tr.appendChild(tdCount);
+                bodyLicenseTable.appendChild(tr);
+                let rows = '';
+                for (const [compName, value] of Object.entries(rowDataTable[key].components)) {
+                    const version =
+                        value.versions.length > 1
+                            ? `${value.versions.toString().replace(/,/g, ' , ')} &#10;&#13; (${value.versions.length} versions)`
+                            : value.versions.toString();
+                    rows += `<tr class="component-row">
+                    <td colspan="2" class="${counter} hide">
+                      <div class="component-license-detail">
+                        <div class="comp-detail-container">
+                          <div class="comp-label">
+                            <p>Component</p>
+                          </div>  
+                        <div class="comp-info">
+                            <p>${compName}</p>
+                          </div>
+                        </div>
+                         <div class="comp-detail-container"> 
+                         <div class="comp-label">
+                          <p>Purl</p>
+                         </div>  
+                         <div class="comp-info">
+                          <p>${value.purl}</p>
+                        </div>
+                        </div>
+                        <div class="comp-detail-container">
+                          <div class="comp-label">
+                            <p>Versions</p>
+                          </div>  
+                          <div class="comp-info">
+                            <p>${version}</p>    
+                          </div>
+                        </div>          
+                        </div>
+                     
+                    </td>
+                </tr>`;
+                }
+
+                bodyLicenseTable.innerHTML += rows;
+
+                counter += 1;
+            });
+            addButtonListener();
+        }
+        insertLicenseDetailRow();
+
+        function pieChart() {
+            const data = {
+                labels,
+                datasets: [
+                    {
+                        label: 'My First dataset',
+                        backgroundColor: color,
+                        borderColor: 'rgb(255, 255, 255)',
+                        data: values,
+                    },
+                ],
+            };
+            const config = {
+                type: 'pie',
+                data,
+                options: {
+                    elements: {
+                        arc: {
+                            borderWidth: 1,
+                        },
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                    },
+                },
+            };
+            const myChart = new Chart(document.getElementById('myChart'), config);
+        }
+
+        pieChart();
+
+        function progressBar() {
+            const spanPercentage = document.querySelector('#oss-percentage');
+            spanPercentage.innerHTML=`${Math.floor(percentage)}%`;
+            const totalFiles = document.querySelector('#total-files');
+            totalFiles.innerText = `Total files: ${summaryData.scannedFiles}`;
+
+            const chart = new Chart(document.getElementById('progress-bar'), {
+                type: 'bar',
+                data: {
+                    labels: [``],
+                    datasets: [
+                        {
+                            label: `OSS: ${summaryData.identifiedFiles}`,
+                            data: [summaryData.identifiedFiles],
+                            borderWidth: 0,
+                            backgroundColor: ['#22C55E'],
+                            barThickness: 34,
+                        },
+                        {
+                            label: `Pending: ${summaryData.pendingFiles}`,
+                            data: [summaryData.pendingFiles],
+                            borderWidth: 0,
+                            backgroundColor: ['#F97316'],
+                            barThickness: 34,
+                        },
+                        {
+                            label: `Original: ${originalFiles}`,
+                            data: [originalFiles],
+                            borderWidth: 0,
+                            backgroundColor: ['#A1A1AA'],
+                            barThickness: 34,
+                        },
+                    ],
+                },
+                options: {
+                    plugins: {
+                        tooltip: { enabled: false },
+
+                    },
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            grid: {
+                                display: false,
+                                drawBorder: false,
+                            },
+                            display: false,
+                        },
+                        x: {
+                            max: summaryData.scannedFiles,
+                            stacked: true,
+                            beginAtZero: true,
+                            grid: {
+                                display: false,
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                display: false,
+                            },
+                        },
+                    },
+                },
+                plugins: [
+                    {
+                        id: 'line',
+                        afterDraw: (chart) => {                           
+                            const meta = chart.getDatasetMeta(1); // Gets datasats[1]
+                            if (!meta.hidden) {
+                                meta.data.forEach((element) => {
+                                    const { x } = element.tooltipPosition();
+                                    chart.ctx.beginPath();
+                                    chart.ctx.moveTo(x, 30);
+                                    chart.ctx.strokeStyle = 'black';
+                                    chart.ctx.lineTo(x, 90);
+                                    chart.ctx.stroke();                                   
+                                    chart.ctx.save();
+                                });
+                            }
+                        },
+                    },
+                ],
+            });
+        }
+
+        progressBar();
+
+        document.getElementById('drop-down-license-detail-btn').addEventListener('click', () => {
+            const aux = document.querySelector('.drop-down-license-detail');
+            if (aux.classList.contains('hide')) {
+                aux.classList.remove('hide');
+                aux.classList.add('show-license-detail');
+            } else {
+                aux.classList.remove('show-license-detail');
+                aux.classList.add('hide');
+            }
+        });
+
+    </script>
 
 </body>
 

@@ -9015,6 +9015,11 @@ package-json@^6.3.0:
     registry-url "^5.0.0"
     semver "^6.2.0"
 
+packageurl-js@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/packageurl-js/-/packageurl-js-0.0.5.tgz#a48c9e5ca6855cd23660257ad2b0199593b3373a"
+  integrity sha512-BISQVKLiu7EsWF5Qhx8OvX6K5vOfFcYuQBggFfrF2dHu+/Z2snuabilb0EyLvHZH0XXqbEz20pqFRonTt8z6QA==
+
 pako@~1.0.2:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.11.tgz#6c9599d340d54dfd3946380252a35705a6b992bf"
@@ -10521,10 +10526,10 @@ saxes@^5.0.1:
   dependencies:
     xmlchars "^2.2.0"
 
-scanoss@^0.2.10:
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/scanoss/-/scanoss-0.2.10.tgz#7bf141dc9a01c6695e2191e45446e24de262c88e"
-  integrity sha512-QHK4RtihA2uY9ZCocNa5oHXGOVVZDDY1qobFAF0BRx33vrGmoRF1/FFpLHqWXVPmxliJFECVLyNipZOpI+Y9Mg==
+scanoss@^0.2.14:
+  version "0.2.14"
+  resolved "https://registry.yarnpkg.com/scanoss/-/scanoss-0.2.14.tgz#64956d9c2e8a3154d9158d7a0faeb43a58ee17d0"
+  integrity sha512-L6WzZuQow5d38OULFkkQtYmHdg8t60+8FaIVarCFFkM9906hv0FI20iY2TQrCn6X/v1AlG8Lc3tj2mu7Pvx4yA==
   dependencies:
     abort-controller "^3.0.0"
     cli-progress "^3.9.1"
@@ -10534,6 +10539,7 @@ scanoss@^0.2.10:
     isbinaryfile "^4.0.8"
     node-fetch "2.6.1"
     p-queue "6.6.2"
+    packageurl-js "^0.0.5"
     sort-paths "^1.1.1"
 
 scheduler@^0.19.1:

@@ -1,27 +1,30 @@
-header.app-header {
-  .header, .subheader {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .header {
-    align-items: flex-start;
-  }
-
-  .subheader {
-    align-items: flex-end;
-  }
-
-}
-
 #ComponentDetail {
+  header.app-header {
+    .header, .tab-navigation {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .header {
+      align-items: flex-start;
+    }
+
+    .tab-navigation {
+      align-items: flex-end;
+    }
+
+    .search-box {
+      width: $search-box-width;
+      margin-bottom: 16px;
+    }
+  }
+
   .app-content {
     min-height: calc(100% - 300px);
   }
 
   .tabs {
-
     .MuiPaper-root {
       border-radius: 4px;
     }
@@ -85,7 +88,6 @@ header.app-header {
         // color: var(--color-component);
         color:  black;
       }
-
     }
   }
 
@@ -165,7 +167,6 @@ header.app-header {
     .files-counter {
       color:#949496;
     }
-
   }
 }
 

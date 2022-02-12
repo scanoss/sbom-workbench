@@ -1,5 +1,6 @@
 :root {
   --color-primary: #6366F1;
+  --text-color-primary: #505050;
 
   --color-status-pending: #F97316;
   --color-status-ignored: #71717A;
@@ -18,8 +19,6 @@
 }
 
 
-// sass variables
-
 // Colors
 $pending-orange: #f97316;
 $indentified-green: #22c55e;
@@ -30,3 +29,5 @@ $blue-scanoss: #3B82F6;
 // Screen sizes
 $default-width: 1280px;
 $md: 780px;
+
+$search-box-width: 480px;

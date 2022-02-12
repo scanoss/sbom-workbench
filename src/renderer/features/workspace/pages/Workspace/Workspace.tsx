@@ -1,12 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-
-import { Button, IconButton, InputBase } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
-
-import Paper from '@material-ui/core/Paper';
-
-import SearchIcon from '@material-ui/icons/Search';
 import { AppContext, IAppContext } from '../../../../context/AppProvider';
 import { IProject } from '../../../../../api/types';
 import { workspaceService } from '../../../../../api/workspace-service';
@@ -14,6 +9,7 @@ import { DialogContext, IDialogContext } from '../../../../context/DialogProvide
 import { DIALOG_ACTIONS } from '../../../../context/types';
 import * as Config from '../../../../../Config';
 import ProjectList from '../Components/ProjectList';
+import SearchBox from '../../../../components/SearchBox/SearchBox';
 
 const Workspace = () => {
   const history = useHistory();
@@ -36,7 +32,7 @@ const Workspace = () => {
   const cleanup = () => {};
 
   const onShowScanHandler = async (project: IProject) => {
-    if (project.appVersion >= Config.MIN_VERSION_SUPPORTED) { // TODO: data should be calculated from the backend
+    if (project.appVersion >= Config.MIN_VERSION_SUPPORTED) {
       setScanPath({ path: project.work_root, action: 'none' });
       history.push('/workbench');
     } else {
@@ -104,19 +100,9 @@ const Workspace = () => {
         <header className="app-header">
           <h1 className="header-title">Projects</h1>
           <section className="subheader">
-            <div>
+            <div className="search-box">
               {projects && projects.length > 0 && (
-                <Paper>
-                  <IconButton>
-                    <SearchIcon />
-                  </IconButton>
-                  <InputBase
-                    className="search-input"
-                    onKeyUp={(e: any) => setSearchQuery(e.target.value)}
-                    placeholder="Search..."
-                    inputProps={{ 'aria-label': 'search', maxLength: 20 }}
-                  />
-                </Paper>
+                <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
               )}
             </div>
             <Button startIcon={<AddIcon />} variant="contained" color="primary" onClick={onNewProjectHandler}>

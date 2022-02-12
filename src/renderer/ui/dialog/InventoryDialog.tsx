@@ -73,7 +73,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const [licenses, setLicenses] = useState<any[]>([]);
   const [licensesAll, setLicensesAll] = useState<any[]>();
 
-
   const setDefaults = () => setForm(inventory);
 
   const init = async () => {
@@ -101,7 +100,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     const catalogue = licensesResponse.data.map((item) => ({
       spdxid: item.spdxid,
       name: item.name,
-      type: 'Cataloged',
+      type: 'Catalogued',
     }));
     setLicensesAll(catalogue);
     setLicenses(catalogue);
@@ -138,7 +137,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
     setLicenses([
       ...licenses,
-      { spdxid: component.licenses[0].spdxid, name: component.licenses[0].name, type: 'Cataloged' },
+      { spdxid: component.licenses[0].spdxid, name: component.licenses[0].name, type: 'Catalogued' },
     ]);
 
     setForm({
@@ -154,7 +153,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const openLicenseDialog = async () => {
     const response = await dialogCtrl.openLicenseCreate();
     if (response && response.action === ResponseStatus.OK) {
-      setLicenses([...licenses, { spdxid: response.data.spdxid, name: response.data.name, type: 'Cataloged' }]);
+      setLicenses([...licenses, { spdxid: response.data.spdxid, name: response.data.name, type: 'Catalogued' }]);
       setForm({ ...form, spdxid: response.data.spdxid });
     }
   };
@@ -328,8 +327,14 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       ? { spdxid: form.spdxid, name: licenses.find((item) => item.spdxid === form.spdxid)?.name }
                       : ''
                   }
-                  getOptionSelected={(option) => option.spdxid === form.spdxid}
-                  getOptionLabel={(option) => option.name || option}
+                  getOptionSelected={(option: any) => option.spdxid === form.spdxid}
+                  getOptionLabel={(option: any) => option.name || option.spdxid}
+                  renderOption={(option: any) => (
+                    <div className={classes.option}>
+                      <span>{option.name}</span>
+                      <span className="middle">{option.spdxid}</span>
+                    </div>
+                  )}
                   filterOptions={(options, params) => {
                     return options.filter(
                       (option) =>

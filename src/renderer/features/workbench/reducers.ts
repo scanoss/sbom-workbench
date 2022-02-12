@@ -1,3 +1,4 @@
+import { IDependencyResponse } from 'scanoss';
 import {
   LOAD_SCAN_FAIL,
   LOAD_SCAN_SUCCESS,
@@ -11,7 +12,7 @@ import {
   UPDATE_FILETREE,
   SET_FOLDER,
   SET_NODE,
-  SET_RECENT_USED_COMPONENTS,
+  SET_RECENT_USED_COMPONENT,
 } from './actions';
 import { ComponentGroup, Node } from '../../../api/types';
 
@@ -23,13 +24,13 @@ export interface State {
   progress: number;
   summary: any;
   tree: any;
+  dependencies: IDependencyResponse;
   file: string | null;
   mainComponents: ComponentGroup[];
   recentUsedComponents: ComponentGroup[];
   components: ComponentGroup[];
   component: ComponentGroup;
   history: {
-    report: 'detected' | 'identified';
     section: number;
   };
   filter: {
@@ -45,13 +46,13 @@ export const initialState: State = {
   progress: 0,
   summary: null,
   tree: null,
+  dependencies: null,
   file: null,
   mainComponents: null,
   recentUsedComponents: null,
   components: null,
   component: null,
   history: {
-    report: 'detected',
     section: null,
   },
   filter: {
@@ -63,12 +64,13 @@ export const initialState: State = {
 export default function reducer(state: State = initialState, action): State {
   switch (action.type) {
     case LOAD_SCAN_SUCCESS: {
-      const { name, tree, components } = action;
+      const { name, tree, components, dependencies } = action;
       return {
         ...state,
         name,
         loaded: true,
         tree,
+        dependencies,
         mainComponents: components,
         components,
       };
@@ -83,7 +85,7 @@ export default function reducer(state: State = initialState, action): State {
       const { node } = action;
       return {
         ...state,
-        tree: node, // TODO: update node tree
+        tree: node,
       };
     }
     case SET_PROGRESS: {
@@ -91,7 +93,7 @@ export default function reducer(state: State = initialState, action): State {
       const progress =
         summary?.detectedFiles === 0
           ? 100
-          : ((summary?.identifiedFiles + summary?.ignoredFiles) * 100) / summary?.detectedFiles;
+          : ((summary?.detectedIdentifiedFiles + summary?.ignoredFiles) * 100) / summary?.detectedFiles;
       return {
         ...state,
         summary,
@@ -170,7 +172,6 @@ export default function reducer(state: State = initialState, action): State {
       const { node } = action;
       return {
         ...state,
-        // components: node ? filter(state.mainComponents, node.components) : state.mainComponents,
         filter: {
           ...state.filter,
           node: node
@@ -182,7 +183,7 @@ export default function reducer(state: State = initialState, action): State {
         },
       };
     }
-    case SET_RECENT_USED_COMPONENTS: {
+    case SET_RECENT_USED_COMPONENT: {
       const { component } = action;
       if (state.recentUsedComponents) {
         if (!state.recentUsedComponents.some((el) => el.purl === component.purl)) {
@@ -196,7 +197,7 @@ export default function reducer(state: State = initialState, action): State {
       } else state.recentUsedComponents = [component];
 
       if (state.recentUsedComponents?.length >= MAX_RECENT_USED_COMPONENTS) {
-        state.recentUsedComponents.splice(3, 1);
+        state.recentUsedComponents.splice(MAX_RECENT_USED_COMPONENTS, 1);
       }
 
       return {
@@ -210,11 +211,3 @@ export default function reducer(state: State = initialState, action): State {
       return state;
   }
 }
-
-const filter = (components, node) => {
-  const keys = new Map<string, Map<string, any>>(node.map((el) => [`${el.purl}-${el.version}`, true]));
-
-  return components.filter((el) => {
-    return el.versions.some((v) => keys.has(`${el.purl}-${v.version}`));
-  });
-};

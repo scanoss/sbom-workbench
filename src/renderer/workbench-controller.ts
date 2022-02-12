@@ -1,10 +1,10 @@
 import { ipcRenderer } from 'electron';
+import { IDependencyResponse } from 'scanoss';
 import { projectService } from '../api/project-service';
 import { componentService } from '../api/component-service';
 import { ComponentGroup, ComponentParams, ComponentSource } from '../api/types';
-import { sortComponents, transform } from '../utils/scan-util';
+import { sortComponents } from '../utils/scan-util';
 import { IpcEvents } from '../ipc-events';
-
 
 const pathUtil = require('path');
 
@@ -12,6 +12,7 @@ export interface ScanResult {
   name: string;
   scanRoot: string;
   fileTree: any;
+  dependencies: IDependencyResponse;
 }
 
 class WorkbenchController {
@@ -35,7 +36,6 @@ class WorkbenchController {
    * @memberof WorkbenchController
    */
   public async fetchLocalFile(path: string): Promise<string> {
-    console.log(path)
     const { data } = await ipcRenderer.invoke(IpcEvents.FILE_GET_CONTENT, path);
     return data.content;
   }
@@ -74,6 +74,7 @@ class WorkbenchController {
   private async generateScanResult(data): Promise<ScanResult> {
     const tree = data.logical_tree;
     const work = data.work_root;
+    const { dependencies } = data;
 
     // TODO: get from scan result
     const name = work.split(pathUtil.sep)[work.split(pathUtil.sep).length - 1];
@@ -82,6 +83,7 @@ class WorkbenchController {
       name,
       scanRoot: data.scan_root,
       fileTree: tree,
+      dependencies,
     };
   }
 }

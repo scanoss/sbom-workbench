@@ -1,4 +1,4 @@
-#ComponentList {
+#ComponentList, #IdentifiedList {
   display: grid;
   grid-template-rows: auto 1fr;
   height: 100%;
@@ -8,15 +8,20 @@
   }
 
   .app-header {
+    .search-box {
+      width: $search-box-width
+    }
 
+  }
+
+  .component-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 200px);
+    grid-row-gap: 1.5em;
+    grid-column-gap: 1.5em;
+    overflow-y: scroll;
+    padding-bottom: 10px;
   }
 }
 
-.component-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 200px);
-  grid-row-gap: 1.5em;
-  grid-column-gap: 1.5em;
-  overflow-y: scroll;
-  padding-bottom: 10px;
-}
+
