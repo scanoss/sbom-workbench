@@ -20,7 +20,7 @@ class ReportService extends BaseService {
   //   return response;
   // }
 
-  public async identified(): Promise<any> {
+  public async idetified(): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.REPORT_IDENTIFIED);
     return this.response(response);
   }

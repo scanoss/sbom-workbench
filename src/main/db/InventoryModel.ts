@@ -222,17 +222,13 @@ export class InventoryModel extends Model {
     const db = await this.openDb();
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
-        db.get(
-          `SELECT id FROM inventories WHERE  notes=? AND usage=? AND spdxid=? AND cvid=?;`,
-          inventory.notes ? inventory.notes : 'n/a',
-          inventory.usage,
-          inventory.spdxid,
-          inventory.cvid,
-          async function (err: any, inv: any) {
-            if (err) throw Error('Unable to get existing inventory');
-            resolve(inv);
-          }
-        );
+        let SQLquery = `SELECT id FROM inventories WHERE  notes# AND usage=? AND spdxid=? AND cvid=?;`;
+        SQLquery = SQLquery.replace('#', inventory.notes ? `='${inventory.notes}'` : ' IS NULL');
+        db.get(SQLquery, inventory.usage, inventory.spdxid, inventory.cvid, (err: any, inv: any) => {
+          db.close();
+          if (err) throw Error('Unable to get existing inventory');
+          resolve(inv);
+        });
       } catch (error) {
         log.error(error);
         reject(error);
@@ -247,15 +243,16 @@ export class InventoryModel extends Model {
         db.run(
           query.SQL_SCAN_INVENTORY_INSERT,
           inventory.cvid,
-          inventory.usage ? inventory.usage : 'n/a',
-          inventory.notes ? inventory.notes : 'n/a',
-          inventory.url ? inventory.url : 'n/a',
-          inventory.spdxid ? inventory.spdxid : 'n/a',
+          inventory.usage ? inventory.usage : null,
+          inventory.notes ? inventory.notes : null,
+          inventory.url ? inventory.url : null,
+          inventory.spdxid ? inventory.spdxid : null,
           async function (this: any, err: any) {
             inventory.id = this.lastID;
             if (err) throw Error('Unable to create inventory');
           }
         );
+        db.close();
         resolve(inventory);
       } catch (error) {
         log.error(error);
@@ -264,42 +261,27 @@ export class InventoryModel extends Model {
     });
   }
 
-  // UPDATE INVENTORY
-  update(inventory: Inventory) {
+  update(inventory: Inventory): Promise<Inventory> {
     return new Promise(async (resolve, reject) => {
+      const db = await this.openDb();
       try {
-        let success: any;
-        if (inventory.id !== undefined) success = await this.updateById(inventory);
-        if (success) resolve(success);
-        else resolve(false);
-      } catch (error) {
-        log.error(error);
-        reject(new Error('Inventory was not updated'));
-      }
-    });
-  }
-
-  private updateById(inventory: Partial<Inventory>) {
-    return new Promise(async (resolve) => {
-      try {
-        const db = await this.openDb();
         db.run(
-          query.SQL_UPDATE_INVENTORY_BY_ID,
+          query.SQL_UPDATE_INVENTORY,
           inventory.cvid,
-          inventory.usage ? inventory.usage : 'n/a',
-          inventory.notes ? inventory.notes : 'n/a',
-          inventory.url ? inventory.url : 'n/a',
-          inventory.license_name ? inventory.license_name : 'n/a',
+          inventory.usage,
+          inventory.notes ? inventory.notes : null,
+          inventory.url ? inventory.url : null,
+          inventory.spdxid,
           inventory.id,
-          async function (err: any) {
+          (err: any) => {
             db.close();
-            if (err) resolve(false);
-            resolve(true);
+            if (err) throw Error('Unable to update inventory');
+            resolve(inventory);
           }
         );
       } catch (error) {
         log.error(error);
-        resolve(false);
+        reject(error);
       }
     });
   }
@@ -434,7 +416,7 @@ export class InventoryModel extends Model {
               query.SQL_SCAN_INVENTORY_INSERT,
               inventories[i].cvid,
               inventories[i].usage ? inventories[i].usage : 'n/a',
-              inventories[i].notes ? inventories[i].notes : 'n/a',
+              inventories[i].notes ? inventories[i].notes : null,
               inventories[i].url ? inventories[i].url : 'n/a',
               inventories[i].spdxid ? inventories[i].spdxid : 'n/a',
               function (this: any, err: any) {

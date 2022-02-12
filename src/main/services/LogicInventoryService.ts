@@ -4,7 +4,6 @@ import { Inventory, Component, IFolderInventory, ComponentSource } from '../../a
 import { logicComponentService } from './LogicComponentService';
 import { inventoryHelper } from '../helpers/InventoryHelper';
 
-
 class LogicInventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
     try {
@@ -65,8 +64,7 @@ class LogicInventoryService {
         inventory = (await serviceProvider.model.inventory.create(inventory)) as Inventory;
       } else inventory.id = inv.id;
       this.attach(inventory);
-      const comp: Component = (await serviceProvider.model.component.get(inventory.cvid)) as Component;
-      inventory.component = comp;
+      inventory.component = component as Component;
       return inventory as Inventory;
     } catch (error: any) {
       log.error(error);
@@ -169,6 +167,26 @@ class LogicInventoryService {
     }
 
     return Object.values(aux);
+  }
+
+  public async update(inv: Inventory): Promise<Inventory> {
+    try {
+      // Validate new inventory
+      let inventory: Inventory = (await serviceProvider.model.inventory.get(inv)) as Inventory;
+      const component: Component = (await serviceProvider.model.component.getbyPurlVersion({
+        purl: inv.purl,
+        version: inv.version,
+      })) as Component;
+      const license = await serviceProvider.model.license.getBySpdxId(inventory.spdxid);
+      if (inventory && component && license) {
+        inv.cvid = component.compid;
+        inventory = await serviceProvider.model.inventory.update(inv);
+        inventory = (await serviceProvider.model.inventory.get(inv)) as Inventory;
+      } else throw new Error('Inventory not found');
+      return inventory;
+    } catch (err: any) {
+      return err;
+    }
   }
 }
 

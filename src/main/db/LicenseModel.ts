@@ -295,4 +295,20 @@ export class LicenseModel extends Model {
       }
     });
   }
+
+  public async getBySpdxId(spdxid: string) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.get(`${query.SQL_SELECT_LICENSE}spdxid='${spdxid}';`, (err: any, license: any) => {
+          db.close();
+          if (err) throw err;
+          resolve(license);
+        });
+      } catch (err) {
+        log.error(err);
+        reject(err);
+      }
+    });
+  }
 }

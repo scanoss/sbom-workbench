@@ -16,7 +16,7 @@ export interface InventorySelectorResponse {
 }
 
 export interface InventoryForm {
-  id?: string;
+  id?: number;
   component: string;
   version: string;
   spdxid: string;
