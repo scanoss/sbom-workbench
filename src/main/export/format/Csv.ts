@@ -2,8 +2,7 @@
 import { Format } from '../Format';
 
 export class Csv extends Format {
-
-  constructor(){
+  constructor() {
     super();
     this.extension = '.csv';
   }
@@ -11,11 +10,13 @@ export class Csv extends Format {
   private csvCreate(data: any) {
     let csv = `inventory_ID,usage,notes,identified_license,detected_license,identified_component,detected_component,path,purl,version\r\n`;
     for (const inventory of data) {
-      csv += `${inventory.inventoryId},${inventory.usage},${inventory.notes},${inventory.identified_license},${
-        inventory.detected_license ? inventory.detected_license.replace(/,/g, ' ') : 'n/a'
-      },${inventory.identified_component},${inventory.detected_component ? inventory.detected_component : 'n/a'},"${
-        inventory.path
-      }","${inventory.purl}",${inventory.version}\r\n`;
+      csv += `${inventory.inventoryId},${inventory.usage},${inventory.notes ? inventory.notes : ''},${
+        inventory.identified_license
+      },${inventory.detected_license ? inventory.detected_license.replace(/,/g, ' ') : 'n/a'},${
+        inventory.identified_component
+      },${inventory.detected_component ? inventory.detected_component : 'n/a'},"${inventory.path}","${
+        inventory.purl
+      }",${inventory.version}\r\n`;
     }
     return csv;
   }
