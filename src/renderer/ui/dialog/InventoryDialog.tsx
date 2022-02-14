@@ -78,23 +78,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const init = async () => {
     const componentsResponse = await componentService.getAllComponentGroup();
     const licensesResponse = await licenseService.getAll();
-    const compCatalogue = componentsResponse.data.map((component) => ({
-      name: component.name,
-      purl: component.purl,
-      versions: component.versions,
-      type: 'Catalogued',
-    }));
+    const compCatalogue = componentsResponse.data.map((component) => ({ ...component, type: 'Catalogued' }));
 
     if (recentUsedComponents && recentUsedComponents.length > 0) {
-      const recentUsed = recentUsedComponents.map((component) => ({
-        name: component.name,
-        purl: component.purl,
-        versions: component.versions,
-        type: 'Recents',
-      }));
+      const recentUsed = recentUsedComponents.map((component) => ({ ...component, type: 'Recents' }));
       setComponents([...recentUsed, ...compCatalogue]);
     } else {
-      setComponents(componentsResponse.data);
+      setComponents(componentsResponse.data.map((component) => ({ ...component, type: 'Catalogued' })));
     }
 
     const catalogue = licensesResponse.data.map((item) => ({
