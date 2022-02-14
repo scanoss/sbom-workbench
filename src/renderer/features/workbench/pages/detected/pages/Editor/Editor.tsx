@@ -312,7 +312,7 @@ export const Editor = () => {
             </div>
             {inventories?.length === 0 && matchInfo?.length === 0 ? (
               <div className="editor">
-                <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} />
+                <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} showLabel={!dependencies} />
               </div>
             ) : (
               <div className="editor">
