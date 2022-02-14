@@ -70,8 +70,6 @@ export const Editor = () => {
     }
   };
 
-  useEffect(() => console.log(dependencies), [dependencies]);
-
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false });
