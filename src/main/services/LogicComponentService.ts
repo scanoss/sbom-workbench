@@ -142,6 +142,7 @@ class LogicComponentService {
       result.push(aux);
     }
     result.sort((a, b) => a.name.localeCompare(b.name));
+    result.forEach((comp) => comp.versions.sort((a, b) => b.version.localeCompare(a.version)));
     return result;
   }
 
