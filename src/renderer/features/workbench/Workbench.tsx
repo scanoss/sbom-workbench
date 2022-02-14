@@ -10,12 +10,13 @@ import Detected from './pages/detected/Detected';
 import Identified from './pages/identified/Identified';
 import Reports from './pages/report/Report';
 import FileTree from './components/FileTree/FileTree';
+import { reset } from './actions';
 
 const Workbench = () => {
   const { path } = useRouteMatch();
   const { pathname } = useLocation();
 
-  const { state, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { dispatch, state, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanPath } = useContext(AppContext) as IAppContext;
   const { loaded } = state;
 
@@ -29,7 +30,10 @@ const Workbench = () => {
     }
   };
 
-  const onDestroy = () => {};
+  const onDestroy = () => {
+    console.log('Closing workbench...');
+    dispatch(reset());
+  };
 
   useEffect(() => {
     onInit();

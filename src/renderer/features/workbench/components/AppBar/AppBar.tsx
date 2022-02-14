@@ -32,7 +32,6 @@ import { ExportFormat } from '../../../../../api/export-service';
 import { projectService } from '../../../../../api/project-service';
 import { dialogController } from '../../../../dialog-controller';
 import { FormatVersion, IProject } from '../../../../../api/types';
-import { workspace } from '../../../../../main/workspace/Workspace';
 import { workspaceService } from '../../../../../api/workspace-service';
 
 const Navigation = () => {
@@ -219,7 +218,7 @@ const Export = ({ state }) => {
       >
         <MenuItem disabled={state.progress === 0} onClick={() => onExport(FormatVersion.CSV)}>
           CSV
-        </MenuItem> 
+        </MenuItem>
         <MenuItem disabled={state.progress === 0} onClick={() => onExport(FormatVersion.SPDXLITEJSON)}>
           SPDX Lite
         </MenuItem>
@@ -240,7 +239,6 @@ const AppBar = ({ exp }) => {
   const report = pathname.startsWith('/workbench/report');
 
   const onBackPressed = () => {
-    dispatch(reset());
     history.push('/workspace');
   };
 
