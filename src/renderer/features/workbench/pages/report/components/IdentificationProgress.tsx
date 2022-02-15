@@ -62,7 +62,7 @@ const LicensesChart = ({ data }) => {
             display: false,
           },
           x: {
-            max: data.detectedFiles,
+            max: data.detectedFiles === 0 ? 1 : data.detectedFiles,
             stacked: true,
             beginAtZero: true,
             grid: {
