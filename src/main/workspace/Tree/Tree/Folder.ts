@@ -203,27 +203,20 @@ export default class Folder extends Node {
   }
 
   public filter(paths: Array<string>): void {
-    this.children.forEach((child) => {
-      child.filter(paths);
-    });
-    this.updateStatusFlags();
-    this.status = this.getStatusClassName();
+    if (this.getStatusClassName() !== NodeStatus.FILTERED) {
+      this.children.forEach((child) => {
+        child.filter(paths);
+      });
 
-    this.setStatusOnClassnameAs(this.status);
+      this.updateStatusFlags();
+      this.status = this.getStatusClassName();
+      this.setStatusOnClassnameAs(this.status);
+    }
   }
 
   public getCopy(): Node {
-    const copy = new Folder(this.getPath(), this.getLabel());
+    const copy = Object.assign(Object.create(Folder.prototype), this);
     copy.children = this.children.map((child) => child.getCopy());
-    copy.original = this.original;
-    copy.status = this.status;
-    copy.components = this.components;
-    copy.type = this.type;
-    copy.hasPending = this.hasPending;
-    copy.hasIdentified = this.hasIdentified;
-    copy.hasIgnored = this.hasIgnored;
-    copy.hasNoMatch = this.hasNoMatch;
-    copy.hasFiltered = this.hasFiltered;
     return copy;
   }
 }

@@ -119,7 +119,7 @@ export default class File extends Node {
   }
 
   public filter(paths: Array<string>): void {
-   if(!paths.includes(this.getPath())) {
+   if (!paths.includes(this.getPath()) && this.getAction() !== 'filter') {
       this.status = NodeStatus.NOMATCH;
       this.setStatusOnClassnameAs(this.status);
     }

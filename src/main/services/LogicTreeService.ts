@@ -1,3 +1,4 @@
+import { ComponentSource, IWorkbenchFilter } from '../../api/types';
 import { IpcEvents } from '../../ipc-events';
 import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 import Node, { NodeStatus } from '../workspace/Tree/Tree/Node';
@@ -32,16 +33,20 @@ class LogicTreeService {
     }
   }
 
-  public async filterTree(params: any) {
+  public async filterTree(params: IWorkbenchFilter) {
     const project = workspace.getOpenedProjects()[0];
-    const queryBuilder = QueryBuilderCreator.create(params);
-    const files: any = await serviceProvider.model.file.getAllComponentFiles(queryBuilder);
-    const aux = files.map((file: any) => {
-      return file.path;    
-    });
-    const tree =  project.getTree().getRootFolder().getCopy();
-  
-    tree.filter(aux);
+    let tree = null;
+    if (params.source === ComponentSource.ENGINE && Object.keys(params).length === 1) {
+      tree = project.getTree().getRootFolder();
+    } else {
+      const queryBuilder = QueryBuilderCreator.create({ ...params, path: null });
+      const files: any = await serviceProvider.model.file.getAllComponentFiles(queryBuilder);
+      const aux = files.map((file: any) => {
+        return file.path;
+      });
+      tree = project.getTree().getRootFolder().getCopy();
+      tree.filter(aux);
+    }
     project.filterTree(tree);
   }
 }

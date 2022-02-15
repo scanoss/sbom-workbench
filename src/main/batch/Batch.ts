@@ -31,6 +31,7 @@ export abstract class Batch {
 
   public async getFilesToProcess(folder: string, value: any, filter: Filter): Promise<Array<any>> {
     try {  
+      console.log('[ BATCH ] getFilesToProcess', folder);
       const aux = await this.getFilesInFolder(folder);
       return utilHelper.getArrayFromObjectFilter(aux, value, filter);
     } catch (e: any) {

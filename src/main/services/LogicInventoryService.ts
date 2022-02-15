@@ -124,25 +124,24 @@ class LogicInventoryService {
 
   public async preLoadInventoriesAcceptAll(data: Partial<IFolderInventory>): Promise<Array<Partial<Inventory>>> {
     try {
-      const files: any = await this.getResultsPreLoadInventory(data);
-      const queryBuilder = QueryBuilderCreator.create({ source: ComponentSource.ENGINE });
+      let queryBuilder = null;
+      if (data.overwrite)
+        queryBuilder = QueryBuilderCreator.create({
+          source: ComponentSource.ENGINE,
+          path: data.folder,
+        });
+      else
+        queryBuilder = QueryBuilderCreator.create({
+          source: ComponentSource.ENGINE,
+          path: data.folder,
+          status: 'PENDING',
+        });
+      const files: any = await serviceProvider.model.result.getResultsPreLoadInventory(queryBuilder);
       const components: any = await serviceProvider.model.component.getAll(queryBuilder);
       let inventories = this.getPreLoadInventory(files) as Array<Partial<Inventory>>;
       inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);
 
       return inventories;
-    } catch (err: any) {
-      return err;
-    }
-  }
-
-  private async getResultsPreLoadInventory(params: Partial<IFolderInventory>) {
-    try {
-      let data: any;
-      if (params.overwrite) data = await serviceProvider.model.result.getByFolder(params.folder);
-      else data = await serviceProvider.model.result.getByFolderPending(params.folder);
-
-      return data;
     } catch (err: any) {
       return err;
     }
