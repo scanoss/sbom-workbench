@@ -1,5 +1,5 @@
-
 import { utilHelper } from '../helpers/UtilHelper';
+import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 import { logicResultService } from '../services/LogicResultService';
 import { logictTreeService } from '../services/LogicTreeService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
@@ -20,20 +20,20 @@ export abstract class Batch {
     return this.folder;
   }
 
-  public async getFilesInFolder(folder: string): Promise<Array<any>> {
+  public async getFilesInFolder(builder: QueryBuilder): Promise<Array<any>> {
     try {
-      const files: any = await logicResultService.getFilesInFolder(folder);
+      const files: any = await logicResultService.getFilesInFolder(builder);
       return files;
     } catch (e: any) {
       throw new Error(e);
     }
   }
 
-  public async getFilesToProcess(folder: string, value: any, filter: Filter): Promise<Array<any>> {
-    try {  
-      console.log('[ BATCH ] getFilesToProcess', folder);
-      const aux = await this.getFilesInFolder(folder);
-      return utilHelper.getArrayFromObjectFilter(aux, value, filter);
+  public async getFilesToProcess(builder: QueryBuilder, value: any, filter?: Filter): Promise<Array<any>> {
+    try {
+      const aux = await this.getFilesInFolder(builder);
+      if (filter) return utilHelper.getArrayFromObjectFilter(aux, value, filter);
+      return utilHelper.getArrayFromObject(aux, value);
     } catch (e: any) {
       return e;
     }

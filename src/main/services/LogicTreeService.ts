@@ -36,7 +36,7 @@ class LogicTreeService {
   public async filterTree(params: IWorkbenchFilter) {
     const project = workspace.getOpenedProjects()[0];
     let tree = null;
-    if (params.source === ComponentSource.ENGINE && Object.keys(params).length === 1) {
+    if (!params || (params.source === ComponentSource.ENGINE && Object.keys(params).length === 1)) {
       tree = project.getTree().getRootFolder();
     } else {
       const queryBuilder = QueryBuilderCreator.create({ ...params, path: null });

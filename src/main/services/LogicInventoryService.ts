@@ -1,6 +1,6 @@
 import log from 'electron-log';
 import { serviceProvider } from './ServiceProvider';
-import { Inventory, Component, IFolderInventory, ComponentSource } from '../../api/types';
+import { Inventory, Component, IFolderInventory, ComponentSource, FileUsageType } from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
 import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 
@@ -124,6 +124,7 @@ class LogicInventoryService {
 
   public async preLoadInventoriesAcceptAll(data: Partial<IFolderInventory>): Promise<Array<Partial<Inventory>>> {
     try {
+      // TODO:TAKES GLOBAL FILTERS TO CREATE QUERYBUILDER
       let queryBuilder = null;
       if (data.overwrite)
         queryBuilder = QueryBuilderCreator.create({
@@ -135,6 +136,7 @@ class LogicInventoryService {
           source: ComponentSource.ENGINE,
           path: data.folder,
           status: 'PENDING',
+          usage: FileUsageType.SNIPPET, // REMOVE: ONLY FOR TESTING
         });
       const files: any = await serviceProvider.model.result.getResultsPreLoadInventory(queryBuilder);
       const components: any = await serviceProvider.model.component.getAll(queryBuilder);

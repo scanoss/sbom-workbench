@@ -413,8 +413,8 @@ export class ComponentModel extends Model {
     return new Promise<any>(async (resolve, reject) => {
       try {
         let SQLquery = query.SQL_COMPONENTS_SUMMARY;
-        const filter = builder ? `WHERE ${builder.getSQL().toString()}` : '';
-        const params = builder ? builder.getFilters() : [];
+        const filter = builder?.getSQL() ? `WHERE ${builder.getSQL().toString()}` : '';
+        const params = builder?.getFilters() ? builder.getFilters() : [];
         SQLquery = SQLquery.replace('#FILTER', filter);
         const db = await this.openDb();
         db.all(SQLquery, ...params, async (err: any, data: any) => {

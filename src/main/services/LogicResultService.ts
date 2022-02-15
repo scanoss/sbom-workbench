@@ -1,3 +1,5 @@
+import { IWorkbenchFilter } from '../../api/types';
+import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 import { workspace } from '../workspace/Workspace';
 
 class LogicResultService {
@@ -18,10 +20,10 @@ class LogicResultService {
     }
   }
 
-  public async getFilesInFolder(folder: string) {
+  public async getFilesInFolder(builder: QueryBuilder) {
     try {
       const project = workspace.getOpenedProjects()[0];
-      const results: Array<any> = await project.store.result.getFilesInFolder(folder);
+      const results: Array<any> = await project.store.result.getAll(builder);
       return results;
     } catch (e) {
       return e;
