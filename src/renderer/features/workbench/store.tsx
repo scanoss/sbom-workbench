@@ -130,7 +130,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   const update = async () => {
     const params: IWorkbenchFilter = state.filter;
     if (component) {
-      let comp = await workbenchController.getComponent(component.purl, params);
+      let comp = await workbenchController.getComponent(component.purl);
       if (!comp) {
         // TODO: remove this block after backend changes. Do it for her!
         comp = {
@@ -146,7 +146,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       if (comp) dispatch(setComponent(comp));
     }
 
-    const components = await workbenchController.getComponents(params);
+    const components = await workbenchController.getComponents();
     dispatch(setComponents(components));
 
     const summary = await reportService.getSummary();
@@ -165,10 +165,10 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     } */
   };
 
-  useEffect(() => {
+  useEffect(async () => {
     if (state.loaded) {
+      await projectService.setFilter(state.filter);
       update();
-      projectService.setFilter(state.filter);
     }
   }, [state.filter]);
 
