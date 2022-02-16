@@ -1,6 +1,14 @@
 import log from 'electron-log';
 import { serviceProvider } from './ServiceProvider';
-import { Inventory, Component, IFolderInventory, ComponentSource, FileUsageType } from '../../api/types';
+import {
+  Inventory,
+  Component,
+  IFolderInventory,
+  ComponentSource,
+  FileUsageType,
+  IWorkbenchFilter,
+  FileStatusType,
+} from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
 import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 
@@ -122,27 +130,18 @@ class LogicInventoryService {
     }
   }
 
-  public async preLoadInventoriesAcceptAll(data: Partial<IFolderInventory>): Promise<Array<Partial<Inventory>>> {
+  public async preLoadInventoriesAcceptAll(
+    data: Partial<IFolderInventory>,
+    filter: IWorkbenchFilter
+  ): Promise<Array<Partial<Inventory>>> {
     try {
-      // TODO:TAKES GLOBAL FILTERS TO CREATE QUERYBUILDER
       let queryBuilder = null;
-      if (data.overwrite)
-        queryBuilder = QueryBuilderCreator.create({
-          source: ComponentSource.ENGINE,
-          path: data.folder,
-        });
-      else
-        queryBuilder = QueryBuilderCreator.create({
-          source: ComponentSource.ENGINE,
-          path: data.folder,
-          status: 'PENDING',
-          usage: FileUsageType.SNIPPET, // REMOVE: ONLY FOR TESTING
-        });
+      if (data.overwrite) queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder });
+      else queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder, status: FileStatusType.PENDING });
       const files: any = await serviceProvider.model.result.getResultsPreLoadInventory(queryBuilder);
       const components: any = await serviceProvider.model.component.getAll(queryBuilder);
       let inventories = this.getPreLoadInventory(files) as Array<Partial<Inventory>>;
       inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);
-
       return inventories;
     } catch (err: any) {
       return err;

@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron';
+import { IWorkbenchFilter } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
 import { userSetting } from './UserSetting';
@@ -46,11 +47,11 @@ ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (event, arg: Project) => {
 ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
   const projectList = workspace.getOpenedProjects();
   let pPromises = [];
-  for (let p of projectList) pPromises.push(p.save());
+  for (const p of projectList) pPromises.push(p.save());
   await Promise.all(pPromises);
 
   pPromises = [];
-  for (let p of projectList) pPromises.push(p.close());
+  for (const p of projectList) pPromises.push(p.close());
   await Promise.all(pPromises);
 });
 
@@ -106,6 +107,16 @@ ipcMain.handle(IpcEvents.PROJECT_READ_TREE, (event) => {
   try {
     const tree = workspace.getOpenedProjects()[0].getTree().getRootFolder();
     return Response.ok({ message: 'Tree read successfully', data: tree });
+  } catch (e: any) {
+    return Response.fail({ message: e.message });
+  }
+});
+
+ipcMain.handle(IpcEvents.PROJECT_SET_FILTER, async (event, filter: IWorkbenchFilter) => {
+  try {
+    const p = workspace.getOpenedProjects()[0];
+    await p.setFilter(filter);
+    return Response.ok({ message: 'Filter setted succesfully', data: true });
   } catch (e: any) {
     return Response.fail({ message: e.message });
   }

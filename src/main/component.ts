@@ -6,8 +6,6 @@ import { logicComponentService } from './services/LogicComponentService';
 import { logictTreeService } from './services/LogicTreeService';
 import { workspace } from './workspace/Workspace';
 
-
-
 ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, component: Component) => {
   try {
     const newComp = await workspace.getOpenedProjects()[0].store.component.create(component);
@@ -25,13 +23,14 @@ ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE, async (_event, comp: Componen
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (_event, component: Component, params) => {
-  const data = await logicComponentService.getComponentFiles(component, params);
+  const filter = workspace.getOpenedProjects()[0].getFilter();
+  const data = await logicComponentService.getComponentFiles(component, { ...filter, ...params });
   return { status: 'ok', message: 'test', data };
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (_event, params: IWorkbenchFilter) => {
-  const data = await logicComponentService.getAll(params);
-  await logictTreeService.filterTree(params);
+  const filter = workspace.getOpenedProjects()[0].getFilter();
+  const data = await logicComponentService.getAll({ ...filter, ...params });
   return {
     status: 'ok',
     message: 'Components group retrieve successfully',

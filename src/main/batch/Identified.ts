@@ -1,8 +1,9 @@
-import { FileStatusType, FileUsageType, Inventory } from '../../api/types';
+import { ComponentSource, FileStatusType, FileUsageType, Inventory } from '../../api/types';
 import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 import { logicInventoryService } from '../services/LogicInventoryService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
 import { Restore } from './Restore';
 
@@ -14,12 +15,12 @@ export class Identified extends Batch {
   constructor(folder: string, params: boolean, inventory: Partial<Inventory>) {
     super(folder, params);
     this.inventory = inventory;
-   // this params should come from the global filters
+    const filter = workspace.getOpenedProjects()[0].getFilter();
     this.queryBuilder = QueryBuilderCreator.create({
+      ...filter,
       path: this.getFolder(),
-      source: 'engine',
       status: FileStatusType.PENDING,
-      usage: FileUsageType.SNIPPET, // REMOVE: ONLY FOR TESTING
+      source: ComponentSource.ENGINE,
     });
   }
 

@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
+import { Filter } from '@material-ui/icons';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
 import { ComponentGroup, Inventory, InventoryAction, IWorkbenchFilter, Node } from '../../../api/types';
@@ -19,7 +20,7 @@ import {
 import { reportService } from '../../../api/report-service';
 import { IpcEvents } from '../../../ipc-events';
 import { fileService } from '../../../api/file-service';
-import { Filter } from '@material-ui/icons';
+import { projectService } from '../../../api/project-service';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
@@ -165,7 +166,10 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   useEffect(() => {
-    if (state.loaded) update();
+    if (state.loaded) {
+      update();
+      projectService.setFilter(state.filter);
+    }
   }, [state.filter]);
 
   // TODO: use custom navigation

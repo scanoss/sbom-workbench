@@ -272,7 +272,8 @@ export class ResultModel extends Model {
   public getResultsPreLoadInventory(builder: QueryBuilder) {
     return new Promise<any>(async (resolve, reject) => {
       try {
-        let SQLquery = 'SELECT f.fileId AS id,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f INNER JOIN results r ON f.fileId=r.fileId LEFT JOIN component_versions comp ON comp.purl=r.purl AND comp.version=r.version #FILTER';
+        let SQLquery =
+          'SELECT f.fileId AS id,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f INNER JOIN results r ON f.fileId=r.fileId LEFT JOIN component_versions comp ON comp.purl=r.purl AND comp.version=r.version #FILTER';
         const filter = builder ? `WHERE ${builder.getSQL().toString()}` : '';
         const params = builder ? builder.getFilters() : [];
         SQLquery = SQLquery.replace('#FILTER', filter);
@@ -289,18 +290,17 @@ export class ResultModel extends Model {
         reject(error);
       }
     });
-  }  
+  }
 
   public async getAll(builder: QueryBuilder) {
     return new Promise<any>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         let SQLquery = `SELECT f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f LEFT JOIN results r ON f.fileId=r.fileId LEFT JOIN component_versions comp ON comp.purl=r.purl AND comp.version=r.version #FILTER;`;
-        const filter = builder ? `WHERE ${builder.getSQL().toString()}` : '';
-        const params = builder ? builder.getFilters() : [];
+        const filter = builder?.getSQL() ? `WHERE ${builder.getSQL().toString()}` : '';
+        const params = builder?.getFilters() ? builder.getFilters() : [];
         SQLquery = SQLquery.replace('#FILTER', filter);
-        
-        db.all(SQLquery, ...params,(err: any, data: any) => {
+        db.all(SQLquery, ...params, (err: any, data: any) => {
           db.close();
           if (err) throw new Error('[ DB ERROR ] : files in folder');
           else resolve(data);

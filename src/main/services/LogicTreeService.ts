@@ -32,23 +32,6 @@ class LogicTreeService {
       throw e;
     }
   }
-
-  public async filterTree(params: IWorkbenchFilter) {
-    const project = workspace.getOpenedProjects()[0];
-    let tree = null;
-    if (!params || (params.source === ComponentSource.ENGINE && Object.keys(params).length === 1)) {
-      tree = project.getTree().getRootFolder();
-    } else {
-      const queryBuilder = QueryBuilderCreator.create({ ...params, path: null });
-      const files: any = await serviceProvider.model.file.getAllComponentFiles(queryBuilder);
-      const aux = files.map((file: any) => {
-        return file.path;
-      });
-      tree = project.getTree().getRootFolder().getCopy();
-      tree.filter(aux);
-    }
-    project.filterTree(tree);
-  }
 }
 
 export const logictTreeService = new LogicTreeService();

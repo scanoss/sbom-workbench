@@ -1,8 +1,9 @@
-import { FileStatusType } from '../../api/types';
+import { ComponentSource, FileStatusType } from '../../api/types';
 import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 import { logicResultService } from '../services/LogicResultService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
 import { Restore } from './Restore';
 
@@ -11,10 +12,12 @@ export class Ignore extends Batch {
 
   constructor(folder: string, overWrite: boolean) {
     super(folder, overWrite);
-     this.queryBuilder = QueryBuilderCreator.create({
+    const filter = workspace.getOpenedProjects()[0].getFilter();
+    this.queryBuilder = QueryBuilderCreator.create({
+      ...filter,
       path: this.getFolder(),
-      source: 'engine',
       status: FileStatusType.PENDING,
+      source: ComponentSource.ENGINE,
     });
   }
 
