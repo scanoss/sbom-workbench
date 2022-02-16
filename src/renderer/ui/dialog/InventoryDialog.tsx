@@ -94,6 +94,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }));
     setLicensesAll(catalogue);
     setLicenses(catalogue);
+
+    setDefaults();
   };
 
   const openComponentDialog = async () => {
@@ -175,7 +177,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   useEffect(() => {
     if (open) {
-      setDefaults();
       init();
     }
   }, [open]);
