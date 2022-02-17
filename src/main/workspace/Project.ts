@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import fs from 'fs';
 import log from 'electron-log';
 import { Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
-import { File, IProjectCfg, ProjectState, ScanState } from '../../api/types';
+import { ComponentSource, File, IProjectCfg, IWorkbenchFilter, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanModel } from '../db/ScanModel';
 import { licenses } from '../db/licenses';
@@ -16,6 +16,7 @@ import { Tree } from './Tree/Tree/Tree';
 import { reScanService } from '../services/RescanLogicService';
 import { logicComponentService } from '../services/LogicComponentService';
 import { serviceProvider } from '../services/ServiceProvider';
+import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 
 export class Project extends EventEmitter {
   work_root: string;
@@ -54,10 +55,13 @@ export class Project extends EventEmitter {
 
   config: IProjectCfg;
 
+  filter: IWorkbenchFilter;
+
   constructor(name: string) {
     super();
     this.metadata = new Metadata(name);
     this.state = ProjectState.CLOSED;
+    this.filter = null;
   }
 
   public static async readFromPath(pathToProject: string): Promise<Project> {
@@ -121,7 +125,7 @@ export class Project extends EventEmitter {
       processedFiles: self.processedFiles,
       filesSummary: self.filesSummary,
       tree: self.tree,
-    }
+    };
     fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(a));
     log.info(`%c[ PROJECT ]: Project ${this.metadata.getName()} saved`, 'color:green');
   }
@@ -149,10 +153,9 @@ export class Project extends EventEmitter {
       processed: (100 * this.processedFiles) / this.filesSummary.include,
     });
 
-
     const scanIn = this.adapterToScannerInput(this.filesToScan);
     this.scanner.scan(scanIn);
-    //this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
+    // this.scanner.scanList(this.filesToScan, this.metadata.getScanRoot());
     return true;
   }
 
@@ -193,14 +196,11 @@ export class Project extends EventEmitter {
 
     const scanIn = this.adapterToScannerInput(summary.files);
     this.scanner.scan(scanIn);
-
   }
 
-  private adapterToScannerInput(filesToScan: Record<string,string>): Array<ScannerInput> {
-
+  private adapterToScannerInput(filesToScan: Record<string, string>): Array<ScannerInput> {
     const fullScanList: Array<string> = [];
     const quickScanList: Array<string> = [];
-
 
     for (const filePath of Object.keys(filesToScan)) {
       if (filesToScan[filePath] === 'MD5_SCAN') {
@@ -427,7 +427,23 @@ export class Project extends EventEmitter {
 
   public updateTree() {
     this.save();
-    this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
+    this.notifyTree();
+  }
+
+  public async notifyTree() {
+    let tree = null;
+    if (!this.filter || (this.filter.source === ComponentSource.ENGINE && Object.keys(this.filter).length === 1)) {
+      tree = this.getTree().getRootFolder();
+    } else {
+      const queryBuilder = QueryBuilderCreator.create({ ...this.filter, path: null });
+      let files: any = await serviceProvider.model.file.getAllComponentFiles(queryBuilder);
+      files = files.map((file: any) => {
+        return file.path;
+      });
+      tree = this.getTree().getRootFolder().getCopy();
+      tree.filter(files);
+    }
+    this.sendToUI(IpcEvents.TREE_UPDATED, tree);
   }
 
   set_filter_file(pathToFilter: string): boolean {
@@ -439,7 +455,22 @@ export class Project extends EventEmitter {
     return this.tree.getNode(path);
   }
 
-  public getToken(){
+  public getToken() {
     return this.metadata.getToken();
+  }
+
+  public async setFilter(filter: IWorkbenchFilter) {
+    try {
+      this.filter = filter;
+      this.notifyTree();
+      return true;
+    } catch (e) {
+      log.error(e);
+      return e;
+    }
+  }
+
+  public getFilter(): IWorkbenchFilter {
+    return this.filter;
   }
 }

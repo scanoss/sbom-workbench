@@ -8,9 +8,10 @@ class UtilHelper {
 
   public convertsArrayOfStringToString(data: Array<any>, param?: any): string {
     let out = '';
-    if (param) for (const element of data) {
-      out += `"${element[param]}",`;
-    }
+    if (param)
+      for (const element of data) {
+        out += `"${element[param]}",`;
+      }
     else for (const element of data) out += `${element},`;
     out = out.slice(0, -1);
     return out;
@@ -28,6 +29,14 @@ class UtilHelper {
       if (filter.isValid(result)) {
         array.push(result[value]);
       }
+    });
+    return array;
+  }
+
+  public getArrayFromObject(results: any[], value: any) {
+    const array = [];
+    results.forEach((result) => {
+      array.push(result[value]);
     });
     return array;
   }
