@@ -202,16 +202,17 @@ export default class Folder extends Node {
     return this.children[i];
   }
 
-  public filter(paths: Array<string>): void {
+  public filter(paths: Array<string>): boolean {
+    this.setFilteredMatch(false);
     if (this.getStatusClassName() !== NodeStatus.FILTERED) {
       this.children.forEach((child) => {
-        child.filter(paths);
+        if (child.filter(paths) === true) this.setFilteredMatch(true);
       });
-
       this.updateStatusFlags();
       this.status = this.getStatusClassName();
       this.setStatusOnClassnameAs(this.status);
     }
+    return this.getFilteredMatch();
   }
 
   public getCopy(): Node {
