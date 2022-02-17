@@ -11,7 +11,7 @@ import {
   Dependency,
   IDependencyResponse,
 } from 'scanoss';
-import { File, IProjectCfg, ProjectState, ScanState } from '../../api/types';
+import { ComponentSource, File, IProjectCfg, IWorkbenchFilter, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanModel } from '../db/ScanModel';
 import { licenses } from '../db/licenses';
@@ -24,6 +24,7 @@ import { Tree } from './Tree/Tree/Tree';
 import { reScanService } from '../services/RescanLogicService';
 import { logicComponentService } from '../services/LogicComponentService';
 import { serviceProvider } from '../services/ServiceProvider';
+import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 
 export class Project extends EventEmitter {
   work_root: string;
@@ -62,10 +63,13 @@ export class Project extends EventEmitter {
 
   config: IProjectCfg;
 
+  filter: IWorkbenchFilter;
+
   constructor(name: string) {
     super();
     this.metadata = new Metadata(name);
     this.state = ProjectState.CLOSED;
+    this.filter = null;
   }
 
   public static async readFromPath(pathToProject: string): Promise<Project> {
@@ -436,7 +440,23 @@ export class Project extends EventEmitter {
 
   public updateTree() {
     this.save();
-    this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
+    this.notifyTree();
+  }
+
+  public async notifyTree() {
+    let tree = null;
+    if (!this.filter || (this.filter.source === ComponentSource.ENGINE && Object.keys(this.filter).length === 1)) {
+      tree = this.getTree().getRootFolder();
+    } else {
+      const queryBuilder = QueryBuilderCreator.create({ ...this.filter, path: null });
+      let files: any = await serviceProvider.model.file.getAllComponentFiles(queryBuilder);
+      files = files.map((file: any) => {
+        return file.path;
+      });
+      tree = this.getTree().getRootFolder().getCopy();
+      tree.filter(files);
+    }
+    this.sendToUI(IpcEvents.TREE_UPDATED, tree);
   }
 
   set_filter_file(pathToFilter: string): boolean {
@@ -481,5 +501,20 @@ export class Project extends EventEmitter {
     } catch (e) {
       log.error(e);
     }
+  }
+
+  public async setFilter(filter: IWorkbenchFilter) {
+    try {
+      this.filter = filter;
+      this.notifyTree();
+      return true;
+    } catch (e) {
+      log.error(e);
+      return e;
+    }
+  }
+
+  public getFilter(): IWorkbenchFilter {
+    return this.filter;
   }
 }

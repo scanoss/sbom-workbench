@@ -208,4 +208,23 @@ export default class Folder extends Node {
       child.addDependency(path);
     }
   }
+
+  public filter(paths: Array<string>): boolean {
+    this.setFilteredMatch(false);
+    if (this.getStatusClassName() !== NodeStatus.FILTERED) {
+      this.children.forEach((child) => {
+        if (child.filter(paths) === true) this.setFilteredMatch(true);
+      });
+      this.updateStatusFlags();
+      this.status = this.getStatusClassName();
+      this.setStatusOnClassnameAs(this.status);
+    }
+    return this.getFilteredMatch();
+  }
+
+  public getCopy(): Node {
+    const copy = Object.assign(Object.create(Folder.prototype), this);
+    copy.children = this.children.map((child) => child.getCopy());
+    return copy;
+  }
 }

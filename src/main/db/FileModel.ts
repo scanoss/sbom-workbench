@@ -38,10 +38,9 @@ export class FileModel extends Model {
         comp.purl = r.purl AND comp.version = r.version
        LEFT JOIN file_inventories fi ON fi.fileId=f.fileId #FILTER ;`;
 
-        const filter = builder ? `WHERE ${builder.getSQL().toString()}` : '';
-        const params = builder ? builder.getFilters() : [];
+        const filter = builder?.getSQL() ? `WHERE ${builder.getSQL().toString()}` : '';
+        const params = builder?.getFilters() ? builder.getFilters() : [];
         SQLquery = SQLquery.replace('#FILTER', filter);
-
         const db = await this.openDb();
         db.all(SQLquery, ...params, (err: any, file: any) => { 
           db.close();

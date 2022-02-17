@@ -30,6 +30,8 @@ export default abstract class Node {
 
   private scanMode: string;
 
+  private isFilteredMatch: boolean;
+
   constructor(path: string, label: string) {
     this.value = path;
     this.label = label;
@@ -50,6 +52,10 @@ export default abstract class Node {
 
   public getPath(): string {
     return this.value;
+  }
+
+  public getLabel(): string {
+    return this.label;
   }
 
   public setStatusOnClassnameAs(className: string): void {
@@ -104,13 +110,21 @@ export default abstract class Node {
   public getClassName(): string {
     return this.className;
   }
-  
+
   public getType(): string {
     return this.type;
   }
 
   public setStatusFromFilter(status: NodeStatus): void {
     this.status = status;
+  }
+
+  public setFilteredMatch(isFilteredMatch: boolean): void {
+    this.isFilteredMatch = isFilteredMatch;
+  }
+
+  public getFilteredMatch(): boolean {
+    return this.isFilteredMatch;
   }
 
   public abstract getChild(i: number): Node;
@@ -140,4 +154,8 @@ export default abstract class Node {
   public abstract summarize(root: string, summary: any): any;
 
   public abstract addDependency(path: string): void;
+
+  public abstract filter(paths: Array<string>): boolean;
+
+  public abstract getCopy(): Node;
 }

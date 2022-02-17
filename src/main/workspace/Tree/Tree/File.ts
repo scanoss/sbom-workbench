@@ -124,4 +124,19 @@ export default class File extends Node {
   public addDependency(path: string): void {
     if (this.getPath() === path) this.isDependencyFile = true;
   }
+
+  public filter(paths: Array<string>): boolean {
+    if (!paths.includes(this.getPath()) && this.getAction() !== 'filter') {
+      this.status = NodeStatus.NOMATCH;
+      this.setStatusOnClassnameAs(this.status);
+      this.setFilteredMatch(false);
+      return false;
+    }
+    this.setFilteredMatch(true);
+    return true;
+  }
+
+  public getCopy(): Node {
+    return Object.assign(Object.create(File.prototype), this);
+  }
 }

@@ -1,17 +1,24 @@
+import { ComponentSource, FileStatusType } from '../../api/types';
+import { QueryBuilder } from '../queryBuilder/QueryBuilder';
+import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 import { logicResultService } from '../services/LogicResultService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
-import { Filter } from './Filter/Filter';
-import { FilterAND } from './Filter/FilterAND';
-import { GenericFilter } from './Filter/GenericFilter';
 import { Restore } from './Restore';
 
 export class Ignore extends Batch {
-  private filter: Filter;
+  private queryBuilder: QueryBuilder;
 
   constructor(folder: string, overWrite: boolean) {
     super(folder, overWrite);
-    this.filter = new FilterAND(new GenericFilter('type', 'MATCH'), new GenericFilter('pending', 1));
+    const filter = workspace.getOpenedProjects()[0].getFilter();
+    this.queryBuilder = QueryBuilderCreator.create({
+      ...filter,
+      path: this.getFolder(),
+      status: FileStatusType.PENDING,
+      source: ComponentSource.ENGINE,
+    });
   }
 
   public async execute() {
@@ -19,11 +26,8 @@ export class Ignore extends Batch {
       if (this.getOverWrite()) {
         await new Restore(this.getFolder(), this.getOverWrite()).execute();
       }
-
-      const ids = (await this.getFilesToProcess(this.getFolder(), 'id', this.filter)) as Array<number>;
-
+      const ids = (await this.getFilesToProcess(this.queryBuilder, 'id')) as Array<number>;
       this.updateTree(ids, NodeStatus.IGNORED);
-
       const success = await logicResultService.ignore(ids);
       if (success) return success;
 
