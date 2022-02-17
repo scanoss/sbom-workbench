@@ -1,6 +1,9 @@
+import { ComponentSource, IWorkbenchFilter } from '../../api/types';
 import { IpcEvents } from '../../ipc-events';
-import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
+import Node, { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { workspace } from '../workspace/Workspace';
+import { serviceProvider } from './ServiceProvider';
 
 class LogicTreeService {
   public retoreStatus(files: Array<string>) {
@@ -20,7 +23,7 @@ class LogicTreeService {
     try {
       const project = workspace.getOpenedProjects()[0];
       project.sendToUI(IpcEvents.TREE_UPDATING, {});
-      paths.forEach(path => {
+      paths.forEach((path) => {
         project.getTree().getRootFolder().setStatus(path, status);
       });
       project.updateTree();

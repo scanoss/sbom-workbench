@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
+import { Filter } from '@material-ui/icons';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
 import { ComponentGroup, Inventory, InventoryAction, IWorkbenchFilter, Node } from '../../../api/types';
@@ -19,7 +20,7 @@ import {
 import { reportService } from '../../../api/report-service';
 import { IpcEvents } from '../../../ipc-events';
 import { fileService } from '../../../api/file-service';
-import { Filter } from '@material-ui/icons';
+import { projectService } from '../../../api/project-service';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
@@ -136,7 +137,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   const update = async () => {
     const params: IWorkbenchFilter = state.filter;
     if (component) {
-      let comp = await workbenchController.getComponent(component.purl, params);
+      let comp = await workbenchController.getComponent(component.purl);
       if (!comp) {
         // TODO: remove this block after backend changes. Do it for her!
         comp = {
@@ -152,7 +153,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       if (comp) dispatch(setComponent(comp));
     }
 
-    const components = await workbenchController.getComponents(params);
+    const components = await workbenchController.getComponents();
     dispatch(setComponents(components));
 
     const summary = await reportService.getSummary();
@@ -171,8 +172,11 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     } */
   };
 
-  useEffect(() => {
-    if (state.loaded) update();
+  useEffect(async () => {
+    if (state.loaded) {
+      await projectService.setFilter(state.filter);
+      update();
+    }
   }, [state.filter]);
 
   // TODO: use custom navigation
