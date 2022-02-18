@@ -147,7 +147,7 @@ const FileTree = () => {
               style={{ ...style, ...{ paddingLeft: style.marginLeft, margin: 0 } }}
               className={`ft-node ${node.className} ${node.id === state.node?.path ? 'selected' : ''} ${node.isDependencyFile ? 'is-dependency-file' : ''}`}
             >
-              <Expandable
+               <Expandable
                 node={node}
                 {...rest}
                 iconsClassNameMap={{

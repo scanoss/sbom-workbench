@@ -30,7 +30,7 @@ export class FileModel extends Model {
     });
   }
 
-  public getAllComponentFiles(builder?: QueryBuilder) {
+  public getAllComponentFiles(builder?: QueryBuilder): Promise<any[]> {
     return new Promise(async (resolve, reject) => {
       try {
         let SQLquery = `SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.license, r.component AS componentName, r.url,comp.purl,comp.version 

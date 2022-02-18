@@ -2,16 +2,16 @@
 import { EventEmitter } from 'events';
 import fs from 'fs';
 import log from 'electron-log';
+import { Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
 import {
-  Scanner,
-  ScannerCfg,
-  ScannerEvents,
-  ScannerInput,
-  WinnowingMode,
-  Dependency,
-  IDependencyResponse,
-} from 'scanoss';
-import { ComponentSource, File, IProjectCfg, IWorkbenchFilter, ProjectState, ScanState } from '../../api/types';
+  ComponentSource,
+  File,
+  FileTreeViewMode,
+  IProjectCfg,
+  IWorkbenchFilter,
+  ProjectState,
+  ScanState,
+} from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanModel } from '../db/ScanModel';
 import { licenses } from '../db/licenses';
@@ -25,6 +25,8 @@ import { reScanService } from '../services/RescanLogicService';
 import { logicComponentService } from '../services/LogicComponentService';
 import { serviceProvider } from '../services/ServiceProvider';
 import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
+import Node from './Tree/Tree/Node';
+import Folder from './Tree/Tree/Folder';
 
 export class Project extends EventEmitter {
   work_root: string;
@@ -65,11 +67,14 @@ export class Project extends EventEmitter {
 
   filter: IWorkbenchFilter;
 
+  fileTreeViewMode: FileTreeViewMode;
+
   constructor(name: string) {
     super();
     this.metadata = new Metadata(name);
     this.state = ProjectState.CLOSED;
     this.filter = null;
+    this.fileTreeViewMode = FileTreeViewMode.DEFAULT;
   }
 
   public static async readFromPath(pathToProject: string): Promise<Project> {
@@ -444,17 +449,29 @@ export class Project extends EventEmitter {
   }
 
   public async notifyTree() {
-    let tree = null;
+    let tree: any = null;
     if (!this.filter || (this.filter.source === ComponentSource.ENGINE && Object.keys(this.filter).length === 1)) {
       tree = this.getTree().getRootFolder();
     } else {
-      const queryBuilder = QueryBuilderCreator.create({ ...this.filter, path: null });
-      let files: any = await serviceProvider.model.file.getAllComponentFiles(queryBuilder);
-      files = files.map((file: any) => {
-        return file.path;
+      const queryBuilder = QueryBuilderCreator.create({
+        ...this.filter,
+        path: null,
       });
-      tree = this.getTree().getRootFolder().getCopy();
-      tree.filter(files);
+      let files: any = await serviceProvider.model.file.getAllComponentFiles(queryBuilder);
+      files = files.reduce((acc: any, curr: any) => {
+        if (!acc[curr.path]) acc[curr.path] = curr.id;
+        return acc;
+      }, {});
+      tree = this.getTree().getRootFolder().getClone();
+      if (this.fileTreeViewMode === FileTreeViewMode.DEFAULT) {
+        tree.filter(files);
+      } else {
+        tree = this.getTree().getRootFolder().getClonePath(files);
+        if (!tree) {
+          tree = this.getTree().getRootFolder().getClone();
+          tree.children = [];
+        }
+      }
     }
     this.sendToUI(IpcEvents.TREE_UPDATED, tree);
   }
@@ -516,5 +533,10 @@ export class Project extends EventEmitter {
 
   public getFilter(): IWorkbenchFilter {
     return this.filter;
+  }
+
+  public setFileTreeViewMode(mode: FileTreeViewMode) {
+    this.fileTreeViewMode = mode;
+    this.notifyTree();
   }
 }

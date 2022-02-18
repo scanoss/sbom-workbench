@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { IWorkbenchFilter } from '../api/types';
+import { FileTreeViewMode, IWorkbenchFilter } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
 import { userSetting } from './UserSetting';
@@ -118,6 +118,16 @@ ipcMain.handle(IpcEvents.PROJECT_SET_FILTER, async (event, filter: IWorkbenchFil
   try {
     const p = workspace.getOpenedProjects()[0];
     await p.setFilter(filter);
+    return Response.ok({ message: 'Filter setted succesfully', data: true });
+  } catch (e: any) {
+    return Response.fail({ message: e.message });
+  }
+});
+
+ipcMain.handle(IpcEvents.PROJECT_SET_FILE_TREE_VIEW_MODE, async (event, mode: FileTreeViewMode) => {
+  try {
+    const p = workspace.getOpenedProjects()[0];
+    p.setFileTreeViewMode(mode);
     return Response.ok({ message: 'Filter setted succesfully', data: true });
   } catch (e: any) {
     return Response.fail({ message: e.message });

@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from '@material-ui/core';
-import { FileStatusType, FileUsageType } from '../../../../../api/types';
+import { FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, FormGroup, Checkbox } from '@material-ui/core';
+import { FileStatusType, FileTreeViewMode, FileUsageType } from '../../../../../api/types';
 import { WorkbenchContext } from '../../store';
 import { setFilter } from '../../actions';
-
+import { projectService } from '../../../../../api/project-service';
 
 const FilterBox = () => {
   const { dispatch, state } = useContext(WorkbenchContext);
@@ -13,6 +13,10 @@ const FilterBox = () => {
     dispatch(setFilter({ [filter]: value !== 'all' ? value : null }));
   };
 
+  const setFileTreeViewMode = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) await projectService.setFileTreeViewMode(FileTreeViewMode.PRUNE);
+    else await projectService.setFileTreeViewMode(FileTreeViewMode.DEFAULT);
+  };
   return (
     <div id="FilterBox" className="filter-box-container">
       <form className="ml-2 mt-2 mb-1">
@@ -61,6 +65,10 @@ const FilterBox = () => {
             />
           </RadioGroup>
         </FormControl>
+        <FormLabel component="legend">File Tree View Mode</FormLabel>
+        <FormGroup>
+          <FormControlLabel control={<Checkbox onChange={setFileTreeViewMode} />} label="File Tree View" />
+        </FormGroup>
       </form>
     </div>
   );
