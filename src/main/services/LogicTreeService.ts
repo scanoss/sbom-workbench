@@ -1,9 +1,6 @@
-import { ComponentSource, IWorkbenchFilter } from '../../api/types';
 import { IpcEvents } from '../../ipc-events';
-import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
-import Node, { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { workspace } from '../workspace/Workspace';
-import { serviceProvider } from './ServiceProvider';
 
 class LogicTreeService {
   public retoreStatus(files: Array<string>) {

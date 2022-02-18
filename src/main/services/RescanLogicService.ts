@@ -11,7 +11,7 @@ class ReScanService {
       // UPDATING FILES
       await serviceProvider.model.file.setDirty(1);
       await serviceProvider.model.file.setDirty(0, aux);
-      const filesDb = await serviceProvider.model.file.getAll();
+      const filesDb = await serviceProvider.model.file.getAll(null);
 
       const newFilesDb = [];
       files.forEach((f) => {

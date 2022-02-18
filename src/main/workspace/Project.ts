@@ -25,7 +25,7 @@ import { reScanService } from '../services/RescanLogicService';
 import { logicComponentService } from '../services/LogicComponentService';
 import { serviceProvider } from '../services/ServiceProvider';
 import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
-import Node from './Tree/Tree/Node';
+import { NodeStatus } from './Tree/Tree/Node';
 import Folder from './Tree/Tree/Folder';
 
 export class Project extends EventEmitter {
@@ -109,9 +109,7 @@ export class Project extends EventEmitter {
     this.filesSummary = a.filesSummary;
     this.store = new ScanModel(this.metadata.getMyPath());
     await this.store.init();
-
     serviceProvider.setModel(this.store);
-
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
     this.tree = new Tree(this.metadata.getMyPath());
     this.tree.loadTree(a.tree.rootFolder);
@@ -295,9 +293,9 @@ export class Project extends EventEmitter {
         this.save();
       } else {
         await this.store.file.insertFiles(this.tree.getRootFolder().getFiles());
-        const files: Array<File> = await this.store.file.getAll();
+        const files: Array<any> = await this.store.file.getAll(null);
         const aux = files.reduce((previousValue, currentValue) => {
-          previousValue[currentValue.path] = currentValue.fileId;
+          previousValue[currentValue.path] = currentValue.id;
           return previousValue;
         }, []);
         await this.store.result.insertFromFile(resultPath, aux);
@@ -447,26 +445,28 @@ export class Project extends EventEmitter {
     let tree: any = null;
     if (!this.filter || (this.filter.source === ComponentSource.ENGINE && Object.keys(this.filter).length === 1)) {
       tree = this.getTree().getRootFolder();
-    } else {
-      const queryBuilder = QueryBuilderCreator.create({
-        ...this.filter,
-        path: null,
-      });
-      let files: any = await serviceProvider.model.file.getAllComponentFiles(queryBuilder);
-      files = files.reduce((acc: any, curr: any) => {
-        if (!acc[curr.path]) acc[curr.path] = curr.id;
-        return acc;
-      }, {});
+      this.sendToUI(IpcEvents.TREE_UPDATED, tree);
+      return;
+    }
+    let files: any = await serviceProvider.model.file.getAll(
+      QueryBuilderCreator.create({ ...this.filter, path: null })
+    );
+    files = files.reduce((acc: any, curr: any) => {
+      if (!acc[curr.path]) acc[curr.path] = curr.id;
+      return acc;
+    }, {});
+    if (this.fileTreeViewMode === FileTreeViewMode.DEFAULT) {
       tree = this.getTree().getRootFolder().getClone();
-      if (this.fileTreeViewMode === FileTreeViewMode.DEFAULT) {
-        tree.filter(files);
-      } else {
-        tree = this.getTree().getRootFolder().getClonePath(files);
-        if (!tree) {
-          tree = this.getTree().getRootFolder().getClone();
-          tree.children = [];
-        }
-      }
+      tree.filter(files);
+      this.sendToUI(IpcEvents.TREE_UPDATED, tree);
+      return;
+    }
+    tree = this.getTree().getRootFolder().getClonePath(files);
+    if (!tree) {
+      tree = new Folder('', this.getProjectName());
+      tree.setAction('filter');
+      tree.setStatusFromFilter(NodeStatus.FILTERED);
+      tree.setClassName('filter-item');
     }
     this.sendToUI(IpcEvents.TREE_UPDATED, tree);
   }
