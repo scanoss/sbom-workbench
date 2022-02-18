@@ -209,7 +209,7 @@ export default class Folder extends Node {
     }
   }
 
-  public filter(paths: Array<string>): boolean {
+  public filter(paths: Record<string, number>): boolean {
     this.setFilteredMatch(false);
     if (this.getStatusClassName() !== NodeStatus.FILTERED) {
       this.children.forEach((child) => {
@@ -222,9 +222,20 @@ export default class Folder extends Node {
     return this.getFilteredMatch();
   }
 
-  public getCopy(): Node {
+  public getClone(): Node {
     const copy = Object.assign(Object.create(Folder.prototype), this);
-    copy.children = this.children.map((child) => child.getCopy());
+    copy.children = this.children.map((child) => child.getClone());
+    return copy;
+  }
+
+  public getClonePath(paths: Record<string, number>): Node {
+    const childrenClone = this.children.map((child) => child.getClonePath(paths)).filter((child) => child !== null);
+    if (childrenClone.length === 0) return null;
+    const copy = Object.assign(Object.create(Folder.prototype), this);
+    copy.children = childrenClone;
+    copy.updateStatusFlags();
+    copy.status = copy.getStatusClassName();
+    copy.setStatusOnClassnameAs(copy.status);
     return copy;
   }
 }

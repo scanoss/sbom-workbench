@@ -46,13 +46,13 @@ export const convertTreeToNode = (tree, previous) => {
 const mapNode = (node, prev) => {
   node.id = node.value;
   node.name = node.label;
-  node.state = prev.state;
-
+  node.state = prev?.state;
   if (node.children) {
     node.children.forEach((child, index) => {
-      mapNode(child, prev.children[index]);
+      mapNode(child, prev && prev.children ? prev.children[index] : null);
     });
   }
+
   return node;
 };
 
