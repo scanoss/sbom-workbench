@@ -1,3 +1,5 @@
+import { QueryBuilder } from '../../../queryBuilder/QueryBuilder';
+
 export enum NodeStatus {
   FILTERED = 'FILTERED',
   NOMATCH = 'NO-MATCH',
@@ -153,7 +155,9 @@ export default abstract class Node {
 
   public abstract summarize(root: string, summary: any): any;
 
-  public abstract filter(paths: Array<string>): boolean;
+  public abstract filter(paths: Record<string, number>): boolean;
 
-  public abstract getCopy(): Node;
+  public abstract getClone(): Node;
+
+  public abstract getClonePath(paths: Record<string, number>): Node;
 }
