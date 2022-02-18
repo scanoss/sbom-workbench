@@ -10,7 +10,7 @@ class LogicComponentService {
     try {
       const params = { purl: data.purl, ...filter };
       const queryBuilder = QueryBuilderCreator.create(params);
-      const files: any = await serviceProvider.model.file.getAllComponentFiles(queryBuilder);
+      const files: any = await serviceProvider.model.file.getAll(queryBuilder);
       const components = await serviceProvider.model.component.getAll();
       const inventories: any = await serviceProvider.model.inventory.getAll();
       const index = inventories.reduce((acc, inventory) => {

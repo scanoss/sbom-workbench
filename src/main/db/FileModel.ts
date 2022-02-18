@@ -30,11 +30,11 @@ export class FileModel extends Model {
     });
   }
 
-  public getAllComponentFiles(builder?: QueryBuilder): Promise<any[]> {
+  public getAll(builder?: QueryBuilder): Promise<any[]> {
     return new Promise(async (resolve, reject) => {
       try {
-        let SQLquery = `SELECT f.fileId AS id,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.license, r.component AS componentName, r.url,comp.purl,comp.version 
-        FROM results r INNER JOIN files f ON r.fileId=f.fileId INNER JOIN component_versions comp ON
+        let SQLquery = `SELECT f.fileId AS id,f.type,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.license, r.component AS componentName, r.url,comp.purl,comp.version 
+        FROM files f LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions comp ON
         comp.purl = r.purl AND comp.version = r.version
        LEFT JOIN file_inventories fi ON fi.fileId=f.fileId #FILTER ;`;
 
@@ -116,22 +116,6 @@ export class FileModel extends Model {
       } catch (error) {
         log.error(error);
         reject(new Error('ERROR INSERTING FILES'));
-      }
-    });
-  }
-
-  public async getAll() {
-    return new Promise<Array<File>>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.all('SELECT fileId,path,identified,ignored,dirty,type FROM files', (err: any, files: Array<File>) => {
-          if (err) throw err;
-          db.close();
-          resolve(files);
-        });
-      } catch (error) {
-        log.error(error);
-        reject(new Error('ERROR GETTING ALL FILES'));
       }
     });
   }
