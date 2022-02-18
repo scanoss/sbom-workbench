@@ -118,8 +118,8 @@ export default class File extends Node {
     return null;
   }
 
-  public filter(paths: Array<string>): boolean {
-    if (!paths.includes(this.getPath()) && this.getAction() !== 'filter') {
+  public filter(paths: Record<string, number>): boolean {
+    if (!paths[this.getPath()] && this.getAction() !== 'filter') {
       this.status = NodeStatus.NOMATCH;
       this.setStatusOnClassnameAs(this.status);
       this.setFilteredMatch(false);
@@ -129,7 +129,15 @@ export default class File extends Node {
     return true;
   }
 
-  public getCopy(): Node {
+  public getClone(): Node {
     return Object.assign(Object.create(File.prototype), this);
+  }
+
+  public getClonePath(paths: Record<string, number>): Node {
+    if (paths[this.getPath()]) {
+      const copy = Object.assign(Object.create(File.prototype), this);
+      return copy;
+    }
+    return null;
   }
 }

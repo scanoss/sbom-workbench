@@ -200,9 +200,7 @@ export interface File {
   type: NodeStatus;
 }
 
-
-
-
-
-
-
+export enum FileTreeViewMode {
+  DEFAULT,
+  PRUNE,
+}
