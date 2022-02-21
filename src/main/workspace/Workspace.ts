@@ -7,7 +7,6 @@ import { INewProject, IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../db/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
 
-
 class Workspace extends EventEmitter {
   private projectList: Array<Project>;
 
@@ -173,6 +172,10 @@ class Workspace extends EventEmitter {
       if (filter.isValid(project)) return project;
     }
     return null;
+  }
+
+  public addNewProject(p: Project) {
+    if (p) this.projectList.push(p);
   }
 }
 

@@ -24,6 +24,7 @@ import { Tree } from './Tree/Tree/Tree';
 import { reScanService } from '../services/RescanLogicService';
 import { logicComponentService } from '../services/LogicComponentService';
 import { serviceProvider } from '../services/ServiceProvider';
+import { projectHelper } from '../helpers/ProjectHelper';
 
 export class Project extends EventEmitter {
   work_root: string;
@@ -471,7 +472,7 @@ export class Project extends EventEmitter {
       });
 
     try {
-      const dependencies: IDependencyResponse = await new Dependency().scan(allFiles)
+      const dependencies: IDependencyResponse = await new Dependency().scan(allFiles);
       dependencies.files.forEach((f) => {
         f.file = f.file.replace(rootPath, '');
       });
@@ -480,5 +481,23 @@ export class Project extends EventEmitter {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  public static isValidProjectZip(zippedProjectPath: string): string {
+    const zip = projectHelper.readZip(zippedProjectPath);
+    const zipEntries = zip.getEntries();
+    if (!projectHelper.isValidZip(zipEntries)) throw new Error('The zip file is not valid');
+    const projectName = projectHelper.getProjectNameFromZip(zipEntries);
+    return projectName;
+  }
+
+  public static async unzipProject(zippedProjectPath: string, workRoot: string): Promise<void> {
+    const zip = projectHelper.readZip(zippedProjectPath);
+    const zipEntries = zip.getEntries();
+    const projectName = projectHelper.getProjectNameFromZip(zipEntries);
+    zip.extractAllTo(workRoot, true);
+    const projectMetadata = await Metadata.readFromPath(`${workRoot}/${projectName}`);
+    projectMetadata.setScanRoot(null);
+    projectMetadata.save();
   }
 }

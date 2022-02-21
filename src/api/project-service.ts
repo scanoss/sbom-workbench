@@ -58,4 +58,4 @@ class ProjectService extends BaseService {
 
 export const projectService = new ProjectService();
 
-document.ps = projectService;
+

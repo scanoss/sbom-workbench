@@ -29,6 +29,11 @@ class WorkspaceService extends BaseService {
     const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_CREATE_PROJECT, project);
     return this.response(response);
   }
+
+  public async importProject(projectZipPath: string): Promise<void> {
+    const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_IMPORT_PROJECT, projectZipPath);
+    return this.response(response);
+  }
 }
 
 export const workspaceService = new WorkspaceService();
