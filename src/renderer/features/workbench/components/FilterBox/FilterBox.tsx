@@ -63,6 +63,16 @@ const FilterBox = () => {
               control={<Radio size="small" />}
               label={FileStatusType.IDENTIFIED}
             />
+            <FormControlLabel
+              value={FileStatusType.NOMATCH}
+              control={<Radio size="small" />}
+              label={FileStatusType.NOMATCH}
+            />
+            <FormControlLabel
+              value={FileStatusType.FILTERED}
+              control={<Radio size="small" />}
+              label={FileStatusType.FILTERED}
+            />
           </RadioGroup>
         </FormControl>
         <FormLabel component="legend">File Tree View Mode</FormLabel>

@@ -136,7 +136,7 @@ class LogicInventoryService {
     try {
       let queryBuilder = null;
       if (data.overwrite) queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder });
-      else queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder, status: FileStatusType.PENDING });
+      else queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder });
       const files: any = await serviceProvider.model.result.getResultsPreLoadInventory(queryBuilder);
       const components: any = await serviceProvider.model.component.getAll(queryBuilder);
       let inventories = this.getPreLoadInventory(files) as Array<Partial<Inventory>>;
