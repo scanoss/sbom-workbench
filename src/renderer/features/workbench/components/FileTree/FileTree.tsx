@@ -28,7 +28,7 @@ const FileTreeNode = ({ node, onClick, onContextMenu }) => {
 
         {node.type === 'file' && node.isDependencyFile && <i className="fa fa-dependency-file" />}
       </span>
-      {node.name}
+      <span className='ft-node-label'>{node.name}</span>
     </span>
   );
 };
