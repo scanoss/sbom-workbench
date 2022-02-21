@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Card, CardContent, Tooltip, ButtonBase } from '@material-ui/core';
 import { ComponentGroup } from '../../../../../api/types';
 import IconComponent from '../IconComponent/IconComponent';
+import { WorkbenchContext } from '../../store';
 
 interface ComponentCardProps {
   component: ComponentGroup;
@@ -9,6 +10,8 @@ interface ComponentCardProps {
 }
 
 const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
+  const { state } = useContext(WorkbenchContext);
+
   const multiple: boolean = component.versions.length > 1;
   const identified = component.identifiedAs.filter((item) => item.purl !== component.purl);
   const keepOriginal: boolean = identified.length < component.identifiedAs.length;
@@ -60,7 +63,7 @@ const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
                 </div>
               )}
             </div>
-            <div className="component-card-files">
+            <div className={`component-card-files ${state.filter?.status || 'no-status-filter'}`}>
               {component.summary.identified !== 0 ? (
                 <span className="info-count has-status-bullet identified">{component.summary.identified}</span>
               ) : null}

@@ -67,7 +67,16 @@
       padding: 10px 0;
       display: flex;
 
+      &.no-status-filter .info-count {
+        opacity: 1;
+      }
+
+      &.pending .info-count.pending { opacity: 1; }
+      &.original .info-count.ignored { opacity: 1; }
+      &.identified .info-count.identified { opacity: 1; }
+
       .info-count {
+        opacity: .4;
         display: flex;
         align-items: center;
         margin-right: 10px;
