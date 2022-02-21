@@ -32,6 +32,10 @@
       background-color: $bg !important
     }
 
+    &.matched {
+      font-weight: 500;
+    }
+
     > span {
       width: 100%;
       display: flex;

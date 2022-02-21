@@ -75,9 +75,8 @@ const FilterBox = () => {
             />
           </RadioGroup>
         </FormControl>
-        <FormLabel component="legend">File Tree View Mode</FormLabel>
         <FormGroup>
-          <FormControlLabel control={<Checkbox onChange={setFileTreeViewMode} />} label="File Tree View" />
+          <FormControlLabel control={<Checkbox onChange={setFileTreeViewMode} />} label="Show only filter matches" />
         </FormGroup>
       </form>
     </div>
