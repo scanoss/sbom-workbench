@@ -143,7 +143,7 @@ const FileTree = () => {
           {({ style, node, ...rest }: any) => (
             <div
               style={{ ...style, ...{ paddingLeft: style.marginLeft, margin: 0 } }}
-              className={`ft-node ${node.className} ${node.id === state.node?.path ? 'selected' : ''}`}
+              className={`ft-node ${node.className} ${node.id === state.node?.path ? 'selected' : ''} ${node.isFilteredMatch ? 'matched' : ''}`}
             >
                <Expandable
                 node={node}

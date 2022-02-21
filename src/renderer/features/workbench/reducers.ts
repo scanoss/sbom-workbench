@@ -176,6 +176,6 @@ export default function reducer(state: State = initialState, action): State {
 }
 
 const clean = (obj) => {
-  const filter = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != null)) 
+  const filter = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != null));
   return Object.keys(filter).length === 0 ? null : filter;
 };
