@@ -32,8 +32,9 @@
       background-color: $bg !important
     }
 
-    &.matched {
-      font-weight: 500;
+    &.matched .ft-node-label {
+      background-color: #b7a5f8;
+      color: white;
     }
 
     > span {

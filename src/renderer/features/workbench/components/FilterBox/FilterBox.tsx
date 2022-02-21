@@ -49,11 +49,6 @@ const FilterBox = () => {
           >
             <FormControlLabel value="all" control={<Radio size="small" />} label="All" />
             <FormControlLabel
-              value={FileStatusType.ORIGINAL}
-              control={<Radio size="small" />}
-              label={FileStatusType.ORIGINAL}
-            />
-            <FormControlLabel
               value={FileStatusType.PENDING}
               control={<Radio size="small" />}
               label={FileStatusType.PENDING}
@@ -62,6 +57,11 @@ const FilterBox = () => {
               value={FileStatusType.IDENTIFIED}
               control={<Radio size="small" />}
               label={FileStatusType.IDENTIFIED}
+            />
+            <FormControlLabel
+              value={FileStatusType.ORIGINAL}
+              control={<Radio size="small" />}
+              label={FileStatusType.ORIGINAL}
             />
             <FormControlLabel
               value={FileStatusType.NOMATCH}
