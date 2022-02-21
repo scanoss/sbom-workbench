@@ -19,7 +19,6 @@ export class Identified extends Batch {
     this.queryBuilder = QueryBuilderCreator.create({
       ...filter,
       path: this.getFolder(),
-      status: FileStatusType.PENDING,
       source: ComponentSource.ENGINE,
     });
   }

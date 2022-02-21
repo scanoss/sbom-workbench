@@ -464,9 +464,6 @@ export class Project extends EventEmitter {
     tree = this.getTree().getRootFolder().getClonePath(files);
     if (!tree) {
       tree = new Folder('', this.getProjectName());
-      tree.setAction('filter');
-      tree.setStatusFromFilter(NodeStatus.FILTERED);
-      tree.setClassName('filter-item');
     }
     this.sendToUI(IpcEvents.TREE_UPDATED, tree);
   }
