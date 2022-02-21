@@ -19,6 +19,12 @@ import TabNavigation from './components/TabNavigation/TabNavigation';
 import ActionButton from './components/ActionButton/ActionButton';
 import VersionSelector from './components/VersionSelector/VersionSelector';
 
+const TABS = {
+  pending: '0',
+  identified: '1',
+  original: '2',
+};
+
 export const ComponentDetail = () => {
   const history = useHistory();
 
@@ -36,7 +42,7 @@ export const ComponentDetail = () => {
     ignored: [],
   });
 
-  const [tab, setTab] = useState<number>(state.history.section || 0);
+  const [tab, setTab] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
 
   const getFiles = async () => {
@@ -101,7 +107,6 @@ export const ComponentDetail = () => {
     };
 
     await create(inv, selFiles);
-    setTab(1);
   };
 
   const onIgnorePressed = async (file) => {
@@ -175,6 +180,13 @@ export const ComponentDetail = () => {
       ignored: files.filter((file) => file.status === 'ignored'),
     });
   }, [files]);
+
+  useEffect(() => {
+    const nTab = TABS[state.filter?.status] || state.history.section || tab || TABS.pending;
+    console.log('component detail', nTab, state.history.section);
+
+    setTab(parseInt(nTab, 10));
+  }, [state.filter]);
 
   useEffect(() => {
     setFilterFiles({
