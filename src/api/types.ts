@@ -183,6 +183,8 @@ export enum FileStatusType {
   PENDING = 'pending',
   ORIGINAL = 'original',
   IDENTIFIED = 'identified',
+  FILTERED = 'filtered',
+  NOMATCH = 'nomatch',
 }
 
 export enum FileUsageType {
