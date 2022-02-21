@@ -7,6 +7,7 @@ import { INewProject, IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../db/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
 
+
 class Workspace extends EventEmitter {
   private projectList: Array<Project>;
 
@@ -54,11 +55,11 @@ class Workspace extends EventEmitter {
     return openedProjects;
   }
 
-  public existProject(p: Project) {
+  public existProject(projectName: string): boolean {
     // eslint-disable-next-line no-restricted-syntax
     for (let i = 0; i < this.projectList.length; i += 1)
-      if (this.projectList[i].getProjectName() === p.getProjectName()) return i;
-    return -1;
+      if (this.projectList[i].getProjectName() === projectName) return true;
+    return false;
   }
 
   public async removeProject(p: Project) {
@@ -116,7 +117,7 @@ class Workspace extends EventEmitter {
   }
 
   public async addProject(p: Project) {
-    if (this.existProject(p) > -1) {
+    if (this.existProject(p.getProjectName())) {
       log.info(`%c[ WORKSPACE ]: Project already exist and will be replaced`, 'color: green');
       await this.removeProject(p);
     }
@@ -129,7 +130,7 @@ class Workspace extends EventEmitter {
     await Promise.all(unlinkPromises);
 
     p.setMyPath(pDirectory);
-    await p.save();
+    p.save();
     this.projectList.push(p);
     return this.projectList.length - 1;
   }
