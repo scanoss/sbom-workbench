@@ -125,6 +125,7 @@ export class Project extends EventEmitter {
     this.tree = null;
     this.store = null;
     this.filesToScan = null;
+    this.filter = null;
   }
 
   public save(): void {
