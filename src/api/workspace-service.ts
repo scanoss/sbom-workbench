@@ -20,7 +20,7 @@ class WorkspaceService extends BaseService {
     return this.response(response);
   }
 
-  public async getLicenses(): Promise<Array<License>>{
+  public async getLicenses(): Promise<Array<License>> {
     const response = await ipcRenderer.invoke(IpcEvents.GET_LICENSES);
     return this.response(response);
   }
@@ -30,10 +30,12 @@ class WorkspaceService extends BaseService {
     return this.response(response);
   }
 
-  public async importProject(projectZipPath: string): Promise<void> {
+  public async importProject(projectZipPath: string): Promise<IProject> {
     const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_IMPORT_PROJECT, projectZipPath);
     return this.response(response);
   }
 }
 
 export const workspaceService = new WorkspaceService();
+
+document.ws = workspaceService;

@@ -130,7 +130,7 @@ class Workspace extends EventEmitter {
 
     p.setMyPath(pDirectory);
     p.save();
-    this.projectList.push(p);
+    this.addNewProject(p);
     return this.projectList.length - 1;
   }
 
