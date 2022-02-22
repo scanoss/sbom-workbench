@@ -41,14 +41,26 @@ const AppProvider = ({ children }) => {
     }
   };
 
-  // const handleOpenProject = () => history.push('/workspace/new');
+  const importProject = () => {
+    const projectPath = dialogController.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'Zip files', extensions: ['zip'] }],
+    });
+
+    if (projectPath) {
+      // setScanPath({ path: projectPath, action: 'scan' });
+      // history.push('/workspace/new/settings');
+    }
+  };
 
   const setupAppMenuListeners = () => {
     ipcRenderer.on(IpcEvents.MENU_NEW_PROJECT, newProject);
+    ipcRenderer.on(IpcEvents.MENU_IMPORT_PROJECT, importProject);
   };
 
   const removeAppMenuListeners = () => {
     ipcRenderer.removeListener(IpcEvents.MENU_OPEN_SETTINGS, newProject);
+    ipcRenderer.on(IpcEvents.MENU_IMPORT_PROJECT, importProject);
   };
 
   useEffect(setupAppMenuListeners, []);
