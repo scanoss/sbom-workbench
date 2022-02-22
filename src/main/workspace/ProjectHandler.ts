@@ -65,7 +65,7 @@ class ProjectHandler {
 
   private getProjectNameFromZip(zipEntries: any): string {
     let projectName = null;
-    zipEntries.forEach((zipEntry) =>{
+    zipEntries.forEach((zipEntry) => {
       if (zipEntry.name === 'metadata.json') {
         const metadata = JSON.parse(zipEntry.getData().toString('utf8'));
         projectName = metadata.name;
@@ -89,6 +89,8 @@ class ProjectHandler {
     zip.extractAllTo(workspace.getMyPath(), true);
     const projectMetadata = await Metadata.readFromPath(workspace.getMyPath() + path.sep + projectName);
     projectMetadata.setScanRoot(null);
+    projectMetadata.setSource('IMPORTED');
+    projectMetadata.setMyPath(workspace.getMyPath() + path.sep + projectName);
     projectMetadata.save();
   }
 }
