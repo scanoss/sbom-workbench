@@ -75,9 +75,9 @@ ipcMain.handle(IpcEvents.WORKSPACE_IMPORT_PROJECT, async (_event, zippedProjectP
   }
 });
 
-ipcMain.handle(IpcEvents.WORKSPACE_EXPORT_PROJECT, async (event, pathToSave: string, projectPath: string) => {
+ipcMain.handle(IpcEvents.WORKSPACE_EXPORT_PROJECT, (event, pathToSave: string, projectPath: string) => {
   try {
-    await projectHandler.export(pathToSave, projectPath);
+    projectHandler.export(pathToSave, projectPath);
     return Response.ok({ message: 'Project exported succesfully', data: true });
   } catch (e: any) {
     log.error('Catch an error: ', e);

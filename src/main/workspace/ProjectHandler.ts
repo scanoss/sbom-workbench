@@ -1,5 +1,6 @@
 import path from 'path';
 import { app } from 'electron';
+import fs from 'fs';
 import { IProject, ScanState } from '../../api/types';
 import { MIN_VERSION_SUPPORTED } from '../../Config';
 import { SemVerCompareVersion } from '../helpers/SemVer';
@@ -13,10 +14,12 @@ const AdmZip = require('adm-zip');
 class ProjectHandler {
   private mandatoryFiles: Array<string> = ['metadata.json', 'result.json', 'scan_db', 'tree.json', 'winnowing.wfp'];
 
-  public async export(pathToSave: string, projectPath: string): Promise<void> {
+  public export(pathToSave: string, projectPath: string): void {
     const zip = new AdmZip();
-    await zip.addLocalFolderPromise(projectPath, { zipPath: path.basename(projectPath) });
-    zip.writeZip(path.join(path.dirname(pathToSave), path.basename(pathToSave)));
+    const stats = fs.statSync(projectPath);
+    zip.addLocalFolder(projectPath, path.basename(projectPath) + path.sep);
+    zip.addFile(path.basename(projectPath) + path.sep, Buffer.alloc(0), '', stats);
+    zip.writeZip(pathToSave);
   }
 
   public async import(zippedProjectPath: string): Promise<IProject> {
@@ -38,6 +41,7 @@ class ProjectHandler {
     const appVersion = app.isPackaged === true ? app.getVersion() : packageJson.version;
     const data = zipEntries.reduce(
       (acc, entry) => {
+        console.log(entry.toString());
         if (entry.isDirectory) acc.folderCount += 1;
         if (entry.name === 'metadata.json') {
           const metadata = JSON.parse(entry.getData().toString('utf8'));
