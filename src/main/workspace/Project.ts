@@ -443,7 +443,11 @@ export class Project extends EventEmitter {
 
   public async notifyTree() {
     let tree: any = null;
-    if (!this.filter || (this.filter.source === ComponentSource.ENGINE && Object.keys(this.filter).length === 1)) {
+    if (
+      !this.filter ||
+      (this.filter.source === ComponentSource.ENGINE && Object.keys(this.filter).length === 1) ||
+      (this.filter.path && Object.keys(this.filter).length === 1)
+    ) {
       tree = this.getTree().getRootFolder();
       this.sendToUI(IpcEvents.TREE_UPDATED, tree);
       return;
