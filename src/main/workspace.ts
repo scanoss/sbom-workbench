@@ -5,6 +5,8 @@ import { Response } from './Response';
 import { INewProject, IProject, License } from '../api/types';
 import { ProjectFilterPath } from './workspace/filters/ProjectFilterPath';
 import { Project } from './workspace/Project';
+import { log } from 'electron-log';
+import { fileURLToPath } from 'url';
 
 const AdmZip = require('adm-zip');
 
@@ -55,7 +57,7 @@ ipcMain.handle(IpcEvents.UTILS_GET_PROJECT_DTO, async (event) => {
   }
 });
 
-ipcMain.handle(IpcEvents.GET_LICENSES, async (event) => {
+ipcMain.handle(IpcEvents.GET_LICENSES, async (_event) => {
   try {
     const licenses: Array<License> = workspace.getLicenses();
     return Response.ok({ message: 'Project path succesfully retrieved', data: licenses });
@@ -65,16 +67,17 @@ ipcMain.handle(IpcEvents.GET_LICENSES, async (event) => {
   }
 });
 
-ipcMain.handle(IpcEvents.WORKSPACE_IMPORT_PROJECT, async (event, zippedProject: string) => {
+ipcMain.handle(IpcEvents.WORKSPACE_IMPORT_PROJECT, async (_event, zippedProjectPath: string) => {
   try {
-    const projectName = Project.isValidProjectZip(zippedProject);
+    const projectName = Project.isValidProjectZip(zippedProjectPath);
     if (workspace.existProject(projectName)) throw new Error('Project already exists');
-    await Project.unzipProject(zippedProject, `${workspace.getMyPath()}`);
-    const p = await Project.readFromPath(`${workspace.getMyPath()}/${projectName}`);
+    await Project.unzipProject(zippedProjectPath, `${workspace.getMyPath()}`);
+    const p = await Project.readFromPath(`${workspace.getMyPath()}/${projectName}`); // file node library bar
     workspace.addNewProject(p);
-    return Response.ok({ message: 'Project imported succesfully' , data: p });
+    const iProject = p.getDto();
+    return Response.ok({ message: 'Project imported succesfully', data: iProject });
   } catch (e: any) {
-    console.log('Catch an error: ', e);
+    log.error('Catch an error: ', e);
     return Response.fail({ message: e.message });
   }
 });

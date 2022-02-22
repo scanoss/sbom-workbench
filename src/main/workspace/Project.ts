@@ -26,6 +26,7 @@ import { logicComponentService } from '../services/LogicComponentService';
 import { serviceProvider } from '../services/ServiceProvider';
 import { projectHelper } from '../helpers/ProjectHelper';
 
+
 export class Project extends EventEmitter {
   work_root: string;
 
@@ -496,7 +497,7 @@ export class Project extends EventEmitter {
     const zipEntries = zip.getEntries();
     const projectName = projectHelper.getProjectNameFromZip(zipEntries);
     zip.extractAllTo(workRoot, true);
-    const projectMetadata = await Metadata.readFromPath(`${workRoot}/${projectName}`);
+    const projectMetadata = await Metadata.readFromPath(`${workRoot}/${projectName}`); // add file
     projectMetadata.setScanRoot(null);
     projectMetadata.save();
   }
