@@ -93,6 +93,7 @@ export interface INewProject {
   api?: string;
   token?: string;
   api_key?: string;
+  source: string;
 }
 
 export interface IProject extends INewProject {

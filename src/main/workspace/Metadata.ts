@@ -30,6 +30,8 @@ export class Metadata {
 
   private default_license: string;
 
+  private source: string;
+
   constructor(name: string) {
     this.name = name;
     this.appVersion = app.isPackaged === true ? app.getVersion() : packageJson.version;
@@ -38,23 +40,8 @@ export class Metadata {
   }
 
   public static async readFromPath(pathToProject: string): Promise<Metadata> {
-    const fileMt: Metadata = JSON.parse(await fs.promises.readFile(`${pathToProject}/metadata.json`, 'utf8'));
-    const mt = new Metadata('');
-
-    mt.setMyPath(pathToProject);
-    mt.setAppVersion(fileMt.appVersion);
-    mt.setDate(fileMt.date);
-    mt.setName(fileMt.name);
-    mt.setScanRoot(fileMt.scan_root);
-    mt.setScannerState(fileMt.scannerState);
-    mt.setFileCounter(fileMt.files);
-    mt.setApi(fileMt.api);
-    mt.setToken(fileMt.token);
-    mt.setUuid(fileMt.uuid);
-    mt.setLicense(fileMt.default_license);
-    mt.setApiKey(fileMt.apiKey);
-
-    return mt;
+    const data: Metadata = JSON.parse(await fs.promises.readFile(`${pathToProject}/metadata.json`, 'utf8'));
+    return Object.assign(Object.create(Metadata.prototype), data);
   }
 
   public save(): void {
@@ -86,7 +73,7 @@ export class Metadata {
     this.scan_root = scanRoot;
   }
 
-  public setScannerState(s: ScanState) {  
+  public setScannerState(s: ScanState) {
     this.scannerState = s;
   }
 
@@ -112,6 +99,14 @@ export class Metadata {
 
   public setLicense(license: string) {
     this.default_license = license;
+  }
+
+  public setSource(source: string) {
+    this.source = source;
+  }
+
+  public getSource(): string {
+    return this.source;
   }
 
   public getName() {
@@ -168,6 +163,7 @@ export class Metadata {
       uuid: this.uuid,
       default_license: this.default_license,
       api_key: this.apiKey,
+      source: this.source,
     };
     return Ip;
   }
