@@ -252,6 +252,7 @@ export class Project extends EventEmitter {
 
     if (this.metadata.getApi()) {
       scannerCfg.API_URL = this.metadata.getApi();
+      scannerCfg.API_KEY = this.metadata.getApiKey();
     } else {
       scannerCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
       scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
