@@ -1,14 +1,23 @@
 import path from 'path';
+import { app } from 'electron';
 import { IProject, ScanState } from '../../api/types';
 import { MIN_VERSION_SUPPORTED } from '../../Config';
+import { SemVerCompareVersion } from '../helpers/SemVer';
 import { Metadata } from './Metadata';
 import { Project } from './Project';
 import { workspace } from './Workspace';
+import packageJson from '../../package.json';
 
 const AdmZip = require('adm-zip');
 
 class ProjectHandler {
-  public export() {}
+  private mandatoryFiles: Array<string> = ['metadata.json', 'result.json', 'scan_db', 'tree.json', 'winnowing.wfp'];
+
+  public async export(pathToSave: string, projectPath: string): Promise<void> {
+    const zip = new AdmZip();
+    await zip.addLocalFolderPromise(projectPath, { zipPath: path.basename(projectPath) });
+    zip.writeZip(path.join(path.dirname(pathToSave), path.basename(pathToSave)));
+  }
 
   public async import(zippedProjectPath: string): Promise<IProject> {
     const projectName = this.isValidProjectZip(zippedProjectPath);
@@ -20,28 +29,31 @@ class ProjectHandler {
     return iProject;
   }
 
-  private mandatoryFiles: Array<string> = ['metadata.json', 'result.json', 'scan_db', 'tree.json', 'winnowing.wfp'];
-
   private readZip(zippedProject: string): any {
     const zip = new AdmZip(zippedProject);
     return zip;
   }
 
   public isValidZip(zipEntries: any): boolean {
+    const appVersion = app.isPackaged === true ? app.getVersion() : packageJson.version;
     const data = zipEntries.reduce(
       (acc, entry) => {
         if (entry.isDirectory) acc.folderCount += 1;
         if (entry.name === 'metadata.json') {
-          const metadata = entry.getData().toString('utf8');
-          if (metadata.AppVersion < MIN_VERSION_SUPPORTED) acc.isValidVersion = false;
-          if (acc.scannerState !== ScanState.FINISHED) acc.scannerState = false;
+          const metadata = JSON.parse(entry.getData().toString('utf8'));
+          if (
+            SemVerCompareVersion(MIN_VERSION_SUPPORTED, metadata.appVersion) > 0 ||
+            SemVerCompareVersion(appVersion, metadata.appVersion) < 0
+          )
+            acc.isValidVersion = false;
+          if (metadata.scannerState !== ScanState.FINISHED) acc.scannerState = false;
         }
         acc.files.add(entry.name);
         return acc;
       },
       { folderCount: 0, files: new Set<string>(), isValidVersion: true, isValidScannerState: true }
     );
-    if (data.folderCount === 1 && data.isValidVersion && data.isValidScannerState) {
+    if (data.isValidVersion && data.isValidScannerState) {
       // eslint-disable-next-line consistent-return
       this.mandatoryFiles.forEach((mandatoryFile) => {
         if (!data.files.has(mandatoryFile)) return false;
@@ -52,11 +64,13 @@ class ProjectHandler {
   }
 
   private getProjectNameFromZip(zipEntries: any): string {
-    const projectName = zipEntries
-      .filter((entry) => {
-        return entry.isDirectory;
-      })[0]
-      .entryName.split('/')[0];
+    let projectName = null;
+    zipEntries.forEach((zipEntry) =>{
+      if (zipEntry.name === 'metadata.json') {
+        const metadata = JSON.parse(zipEntry.getData().toString('utf8'));
+        projectName = metadata.name;
+      }
+    });
     return projectName;
   }
 

@@ -77,10 +77,8 @@ ipcMain.handle(IpcEvents.WORKSPACE_IMPORT_PROJECT, async (_event, zippedProjectP
 
 ipcMain.handle(IpcEvents.WORKSPACE_EXPORT_PROJECT, async (event, pathToSave: string, projectPath: string) => {
   try {
-    const p = workspace.getProject(new ProjectFilterPath(projectPath));
-    p.export(pathToSave);
-
-    return Response.ok({ message: 'Project path succesfully retrieved', data: licenses });
+    await projectHandler.export(pathToSave, projectPath);
+    return Response.ok({ message: 'Project exported succesfully', data: true });
   } catch (e: any) {
     log.error('Catch an error: ', e);
     return Response.fail({ message: e.message });
