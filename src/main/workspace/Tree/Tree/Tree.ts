@@ -5,7 +5,8 @@ import Folder from './Folder';
 import { IpcEvents } from '../../../../ipc-events';
 import * as Filtering from '../../filtering';
 
-
+import { TreeViewMode } from './TreeViewMode/TreeViewMode';
+import { TreeViewDefault } from './TreeViewMode/TreeViewDefault';
 
 const fs = require('fs');
 const pathLib = require('path');
@@ -21,11 +22,14 @@ export class Tree {
 
   private filesIndexed = 0;
 
+  private fileTreeViewMode: TreeViewMode;
+
   constructor(path: string) {
     const pathParts = path.split(pathLib.sep);
     this.rootName = pathParts[pathParts.length - 1];
     this.rootPath = path;
     this.rootFolder = new Folder('', this.rootName);
+    this.fileTreeViewMode = new TreeViewDefault();
   }
 
   setMailbox(mailbox: Electron.WebContents) {
@@ -168,11 +172,18 @@ export class Tree {
         for (i = 0; i < node.getChildrenCount(); i += 1) this.applyFilters(scanRoot, node.getChild(i), bannedList);
       } else {
         node.setAction('filter');
-        node.setStatusFromFilter( NodeStatus.FILTERED);
+        node.setStatusFromFilter(NodeStatus.FILTERED);
         node.setClassName('filter-item');
       }
     }
   }
 
+  public setTreeViewMode(mode: TreeViewMode) {
+    this.fileTreeViewMode = mode;
+  }
 
+  public async getTree(): Promise<Node> {
+    const tree = await this.fileTreeViewMode.getTree(this.getRootFolder());
+    return tree;
+  }
 }
