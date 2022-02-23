@@ -141,7 +141,8 @@ class Workspace extends EventEmitter {
   private async getAllProjectsPaths() {
     const workspaceStuff = await fs.promises.readdir(this.wsPath, { withFileTypes: true }).catch((e) => {
       log.info(`%c[ WORKSPACE ]: Cannot read the workspace directory ${this.wsPath}`, 'color: green');
-      console.log(e);
+      log.error(e);
+      throw e;
     });
     const projectsDirEnt = workspaceStuff.filter((dirent) => {
       return !dirent.isSymbolicLink() && !dirent.isFile();
