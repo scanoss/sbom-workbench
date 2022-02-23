@@ -10526,10 +10526,10 @@ saxes@^5.0.1:
   dependencies:
     xmlchars "^2.2.0"
 
-scanoss@^0.2.16:
-  version "0.2.16"
-  resolved "https://registry.yarnpkg.com/scanoss/-/scanoss-0.2.16.tgz#3dbe0f98dabdb94db2bbdfd5e191efe4f21bb0c5"
-  integrity sha512-eQxr1l01b4MSL5byIQkcqZkypdJbI5g0NkgMEncetfAVtbcAJkJ21nvVyyMfBS0dLDKZAmcSotsjS5+H0CdgRg==
+scanoss@^0.2.18:
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/scanoss/-/scanoss-0.2.18.tgz#d1f8862b7bce350c40ababae1ecf643a5181d448"
+  integrity sha512-7W0/6I3xpsFAUEv9+qb6DiAFHwKk3pqcn3u65/eY7viHHouPEeDumKLiqyMHw6LbV8NggcWTnBp5J8GiyVovHg==
   dependencies:
     abort-controller "^3.0.0"
     cli-progress "^3.9.1"
