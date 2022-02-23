@@ -1,0 +1,23 @@
+.notification#NotificationImport {
+  .MuiSnackbarContent-message, .MuiLinearProgress-root {
+    width: 100%;
+  }
+
+  .MuiSnackbarContent-message {
+    padding-bottom: 0;
+  }
+
+  .notification-message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    span {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #fff;
+    }
+  }
+}

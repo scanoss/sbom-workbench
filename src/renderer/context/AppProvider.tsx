@@ -1,9 +1,13 @@
+import { LinearProgress, Snackbar } from '@material-ui/core';
 import { ipcRenderer } from 'electron';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { projectService } from '../../api/project-service';
 import { INewProject } from '../../api/types';
+import { workspaceService } from '../../api/workspace-service';
 import { IpcEvents } from '../../ipc-events';
 import { dialogController } from '../dialog-controller';
+import { DialogContext, IDialogContext } from './DialogProvider';
 
 export interface IScan {
   projectName?: string;
@@ -25,6 +29,7 @@ export const AppContext = React.createContext<IAppContext | null>(null);
 
 const AppProvider = ({ children }) => {
   const history = useHistory();
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const [scanBasePath, setScanBasePath] = useState<string>();
   const [scanPath, setScanPath] = useState<IScan>();
@@ -41,15 +46,19 @@ const AppProvider = ({ children }) => {
     }
   };
 
-  const importProject = () => {
-    const projectPath = dialogController.showOpenDialog({
+  const importProject = async () => {
+    const path = dialogController.showOpenDialog({
       properties: ['openFile'],
       filters: [{ name: 'Zip files', extensions: ['zip'] }],
     });
 
-    if (projectPath) {
-      // setScanPath({ path: projectPath, action: 'scan' });
-      // history.push('/workspace/new/settings');
+    if (!path) return;
+    try {
+      dialogCtrl.openProgressDialog('IMPORTING PROJECT');
+      // const project = await workspaceService.importProject(path);
+    } catch(e) {
+      console.error(e);
+      dialogCtrl.openAlertDialog('Failed to import project');
     }
   };
 

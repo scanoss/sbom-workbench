@@ -13,6 +13,7 @@ import { IpcEvents } from '../../ipc-events';
 import SettingsDialog from '../ui/dialog/SettingsDialog';
 import { AlertDialog } from '../ui/dialog/AlertDialog';
 import { PreLoadInventoryDialog } from '../ui/dialog/PreLoadInventoryDialog';
+import { ProgressDialog } from '../ui/dialog/ProgressDialog';
 
 export interface IDialogContext {
   openInventory: (
@@ -26,6 +27,7 @@ export interface IDialogContext {
   openSettings: () => Promise<DialogResponse>;
   openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
   openPreLoadInventoryDialog: (folder: string, overwrite: boolean) => Promise<boolean>;
+  openProgressDialog: (message: string) => Promise<void>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -139,6 +141,20 @@ export const DialogProvider: React.FC = ({ children }) => {
     });
   };
 
+  const [progressDialog, setProgressDialog] = useState<{
+    open: boolean;
+    message?: string;
+  }>({ open: false });
+
+  const openProgressDialog = (message = 'Wait a moment please'): Promise<void> => {
+    return new Promise<void>((resolve) => {
+      setProgressDialog({
+        open: true,
+        message,
+      });
+    });
+  };
+
   const [licenseDialog, setLicenseDialog] = useState<{
     open: boolean;
     onClose?: (response: DialogResponse) => void;
@@ -243,6 +259,7 @@ export const DialogProvider: React.FC = ({ children }) => {
         openComponentDialog,
         openSettings,
         openPreLoadInventoryDialog,
+        openProgressDialog,
       }}
     >
       {children}
@@ -303,6 +320,8 @@ export const DialogProvider: React.FC = ({ children }) => {
         onCancel={() => preLoadInventory.onClose && preLoadInventory.onClose(null)}
         onClose={(response) => preLoadInventory.onClose && preLoadInventory.onClose(response)}
       />
+
+      <ProgressDialog open={progressDialog.open} message={progressDialog.message} />
     </DialogContext.Provider>
   );
 };
