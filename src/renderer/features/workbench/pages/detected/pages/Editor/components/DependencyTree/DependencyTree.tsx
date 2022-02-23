@@ -15,16 +15,18 @@ const DependencyTree = ({ dependencies }) => {
       <div className="dependencies-tree-content">
         <List style={{ width: '100%', backgroundColor: 'white' }}>
           {dependencies.map((dependency) => (
-            <>
-              <ListItem key={dependency.purl}>
+            <React.Fragment key={dependency.purl}>
+              <ListItem>
                 <ListItemIcon>
                   <IconComponent name={dependency.purl.replace(/pkg:.*\//, '')} size={24} />
                 </ListItemIcon>
                 <ListItemText primary={decodeURIComponent(dependency.purl)} />
-                <small>{dependency.version || '-'}</small>
+                <div className="ml-1">
+                  <small>{dependency.version || '-'}</small>
+                </div>
               </ListItem>
               <Divider component="li" variant="middle" />
-            </>
+            </React.Fragment>
           ))}
         </List>
       </div>
