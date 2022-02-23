@@ -23,8 +23,8 @@ export default class App {
     const app = (
       <HashRouter>
         <MuiThemeProvider theme={theme}>
-          <AppProvider>
-            <DialogProvider>
+          <DialogProvider>
+            <AppProvider>
               <Route exact path="/" component={Workspace} /> {/* Redirect not working with new browser windows */}
               <Route path="/workspace" component={Workspace} />
               <WorkbenchProvider>
@@ -33,8 +33,8 @@ export default class App {
               <Route path="/about" exact component={About} />
 
               {/* <Redirect from="/" to="/workspace" /> */}
-            </DialogProvider>
-          </AppProvider>
+            </AppProvider>
+          </DialogProvider>
         </MuiThemeProvider>
       </HashRouter>
     );
@@ -60,6 +60,9 @@ export default class App {
         secondary: {
           main: '#22C55E',
           contrastText: '#FFFFFF',
+        },
+        success: {
+          main: '#4caf50',
         },
       },
       typography: {

@@ -11,12 +11,13 @@ import {
   TableHead,
   TableRow,
   Tooltip,
+  Chip,
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ReplayIcon from '@material-ui/icons/Replay';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
-
+import GetAppOutlined from '@material-ui/icons/GetAppOutlined';
 import { IProject, ScanState } from '../../../../../api/types';
 import * as Config from '../../../../../Config';
 
@@ -48,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
 
 const isProjectFinished = (project: IProject): boolean => project.scannerState === ScanState.FINISHED;
 const isProjectDeprecated = (project: IProject): boolean => project.appVersion < Config.MIN_VERSION_SUPPORTED;
+const isProjectImported = (project: IProject): boolean => project.source === 'IMPORTED';
 
 interface ProjectListProps {
   projects: IProject[];
@@ -56,6 +58,7 @@ interface ProjectListProps {
   onProjectDelete: (project: IProject) => void;
   onProjectRestore: (project: IProject) => void;
   onProjectRescan: (project: IProject) => void;
+  onProjectExport: (project: IProject) => void;
   onProjectCreate: () => void;
 }
 
@@ -101,6 +104,11 @@ const ProjectList = (props: ProjectListProps) => {
                           </Tooltip>
                         )}
                         <span>{project.name}</span>
+                        {isProjectImported(project) && (
+                          <Tooltip classes={{ tooltip: classes.md }} title="This project was imported. You will not be able to see the original source code.">
+                            <Chip label="IMPORTED" size="small" variant="outlined" className="ml-1" />
+                          </Tooltip>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>{format(project.date)}</TableCell>
@@ -123,18 +131,33 @@ const ProjectList = (props: ProjectListProps) => {
                         )}
 
                         {isProjectFinished(project) && !isProjectDeprecated(project) && (
-                          <Tooltip title="Rescan">
-                            <IconButton
-                              aria-label="rescan"
-                              className="btn-rescan"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                props.onProjectRescan(project);
-                              }}
-                            >
-                              <ReplayIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
+                          <>
+                          <Tooltip title="Export project">
+                              <IconButton
+                                aria-label="export"
+                                className="btn-export"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  props.onProjectExport(project);
+                                }}
+                              >
+                                <GetAppOutlined fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
+                            <Tooltip title="Rescan">
+                              <IconButton
+                                aria-label="rescan"
+                                className="btn-rescan"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  props.onProjectRescan(project);
+                                }}
+                              >
+                                <ReplayIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </>
                         )}
 
                         <Tooltip title="Remove project">

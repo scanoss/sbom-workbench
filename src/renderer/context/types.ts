@@ -15,6 +15,12 @@ export interface InventorySelectorResponse {
   inventory?: Inventory | null;
 }
 
+export interface LoaderController {
+  present: () => void;
+  finish: ({ message }: { message?: string }) => void;
+  dismiss: ({ delay }?: { delay?: number }) => void;
+}
+
 export interface InventoryForm {
   id?: number;
   component: string;

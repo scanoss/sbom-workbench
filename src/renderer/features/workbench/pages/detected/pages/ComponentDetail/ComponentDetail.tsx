@@ -84,6 +84,8 @@ export const ComponentDetail = () => {
   };
 
   const onIdentifyPressed = async (result) => {
+
+    console.log('identify', result);
     // result is "file join result"
     const inv: Partial<Inventory> = {
       component: result.componentName,

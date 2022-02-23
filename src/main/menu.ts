@@ -68,6 +68,12 @@ export default class MenuBuilder {
           },
         },
         {
+          label: '&Import project',
+          click: () => {
+            this.mainWindow.webContents.send(IpcEvents.MENU_IMPORT_PROJECT);
+          },
+        },
+        {
           label: '&Settings',
           accelerator: 'Command+,',
           click: () => {
@@ -167,6 +173,12 @@ export default class MenuBuilder {
             accelerator: 'Ctrl+N',
             click: () => {
               this.mainWindow.webContents.send(IpcEvents.MENU_NEW_PROJECT);
+            },
+          },
+          {
+            label: '&Import project',
+            click: () => {
+              this.mainWindow.webContents.send(IpcEvents.MENU_IMPORT_PROJECT);
             },
           },
           {
