@@ -10,7 +10,6 @@ import Workspace from './renderer/features/workspace';
 import About from './renderer/features/about/About';
 
 import './App.global.scss';
-import NotificationCenter from './renderer/components/NotificationCenter/NotificationCenter';
 
 export default class App {
   /**
@@ -34,8 +33,6 @@ export default class App {
               <Route path="/about" exact component={About} />
 
               {/* <Redirect from="/" to="/workspace" /> */}
-
-              <NotificationCenter />
             </AppProvider>
           </DialogProvider>
         </MuiThemeProvider>
@@ -63,6 +60,9 @@ export default class App {
         secondary: {
           main: '#22C55E',
           contrastText: '#FFFFFF',
+        },
+        success: {
+          main: '#4caf50',
         },
       },
       typography: {

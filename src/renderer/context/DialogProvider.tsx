@@ -5,7 +5,7 @@ import { ipcRenderer } from 'electron';
 import { InventoryDialog } from '../ui/dialog/InventoryDialog';
 import { ComponentGroup, Inventory, NewComponentDTO } from '../../api/types';
 import { InventorySelectorDialog } from '../features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
-import { DialogResponse, InventoryForm, InventorySelectorResponse } from './types';
+import { DialogResponse, InventoryForm, InventorySelectorResponse, LoaderController } from './types';
 import { ConfirmDialog } from '../ui/dialog/ConfirmDialog';
 import { LicenseDialog } from '../ui/dialog/LicenseDialog';
 import { ComponentDialog } from '../ui/dialog/ComponentDialog';
@@ -27,7 +27,7 @@ export interface IDialogContext {
   openSettings: () => Promise<DialogResponse>;
   openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
   openPreLoadInventoryDialog: (folder: string, overwrite: boolean) => Promise<boolean>;
-  openProgressDialog: (message: string) => Promise<void>;
+  createProgressDialog: (message: string) => Promise<LoaderController>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -143,14 +143,20 @@ export const DialogProvider: React.FC = ({ children }) => {
 
   const [progressDialog, setProgressDialog] = useState<{
     open: boolean;
+    loader?: boolean;
     message?: string;
-  }>({ open: false });
+  }>({ open: false, loader: false });
 
-  const openProgressDialog = (message = 'Wait a moment please'): Promise<void> => {
-    return new Promise<void>((resolve) => {
+  const createProgressDialog = (message = 'Wait a moment please'): Promise<LoaderController> => {
+    return new Promise<LoaderController>((resolve) => {
       setProgressDialog({
-        open: true,
+        open: false,
         message,
+      });
+      resolve({
+        present: () => setProgressDialog((dialog) => ({ ...dialog, open: true, loader: true })),
+        finish: ({ message }) => setProgressDialog((dialog) => ({ ...dialog, message, loader: false })),
+        dismiss: (props) => setTimeout(() => setProgressDialog((dialog) => ({ ...dialog, open: false })), props?.delay || 0),
       });
     });
   };
@@ -259,7 +265,7 @@ export const DialogProvider: React.FC = ({ children }) => {
         openComponentDialog,
         openSettings,
         openPreLoadInventoryDialog,
-        openProgressDialog,
+        createProgressDialog,
       }}
     >
       {children}
@@ -321,7 +327,7 @@ export const DialogProvider: React.FC = ({ children }) => {
         onClose={(response) => preLoadInventory.onClose && preLoadInventory.onClose(response)}
       />
 
-      <ProgressDialog open={progressDialog.open} message={progressDialog.message} />
+      <ProgressDialog open={progressDialog.open} message={progressDialog.message} loader={progressDialog.loader} />
     </DialogContext.Provider>
   );
 };

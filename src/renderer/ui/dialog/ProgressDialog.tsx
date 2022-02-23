@@ -22,16 +22,17 @@ const useStyles = makeStyles((theme) => ({
 interface ProgressDialogProps {
   open: boolean;
   message: string;
+  loader: boolean;
 }
 
 export const ProgressDialog = (props: ProgressDialogProps) => {
   const classes = useStyles();
-  const { open, message } = props;
+  const { open, message, loader } = props;
 
   return (
     <Dialog id="ProgressDialog" className={`${classes.size} dialog`} maxWidth="md" open={open}>
       <DialogContent className={classes.content}>
-        <LinearProgress />
+        {loader ? <LinearProgress /> : <LinearProgress variant="determinate" color="secondary" value={100} />}
         <div className={classes.text}>{message}</div>
       </DialogContent>
     </Dialog>
