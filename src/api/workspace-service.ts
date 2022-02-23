@@ -20,13 +20,23 @@ class WorkspaceService extends BaseService {
     return this.response(response);
   }
 
-  public async getLicenses(): Promise<Array<License>>{
+  public async getLicenses(): Promise<Array<License>> {
     const response = await ipcRenderer.invoke(IpcEvents.GET_LICENSES);
     return this.response(response);
   }
 
   public async createProject(project: INewProject): Promise<void> {
     const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_CREATE_PROJECT, project);
+    return this.response(response);
+  }
+
+  public async importProject(projectZipPath: string): Promise<IProject> {
+    const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_IMPORT_PROJECT, projectZipPath);
+    return this.response(response);
+  }
+
+  public async exportProject(pathToSave: string, projectPath: string): Promise<void> {
+    const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_EXPORT_PROJECT, pathToSave, projectPath);
     return this.response(response);
   }
 }

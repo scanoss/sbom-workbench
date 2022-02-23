@@ -322,14 +322,14 @@ export class Project extends EventEmitter {
   }
 
   public refreshTree(filesToUpdate) {
-    console.log(filesToUpdate);
-    console.log(JSON.stringify(this.logical_tree, null, 2));
+    log.info(filesToUpdate);
+    log.info(JSON.stringify(this.logical_tree, null, 2));
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, value] of Object.entries(filesToUpdate)) {
       this.updateStatusOfFile(key.split('/').splice(1), 0, this.logical_tree, value);
     }
     this.logical_tree.status = this.getFolderStatus(this.logical_tree);
-    console.log(JSON.stringify(this.logical_tree, null, 2));
+    log.info(JSON.stringify(this.logical_tree, null, 2));
   }
 
   private updateStatusOfFile(arrPaths, deep, current, status) {
@@ -456,7 +456,7 @@ export class Project extends EventEmitter {
     try {
       return JSON.parse(await fs.promises.readFile(`${this.metadata.getMyPath()}/dependencies.json`, 'utf8'));
     } catch (e) {
-      console.error(e);
+      log.error(e);
       return null;
     }
   }
@@ -472,14 +472,14 @@ export class Project extends EventEmitter {
       });
 
     try {
-      const dependencies: IDependencyResponse = await new Dependency().scan(allFiles)
+      const dependencies: IDependencyResponse = await new Dependency().scan(allFiles);
       dependencies.files.forEach((f) => {
         f.file = f.file.replace(rootPath, '');
       });
       fs.promises.writeFile(`${this.metadata.getMyPath()}/dependencies.json`, JSON.stringify(dependencies, null, 2));
       this.tree.addDependencies(dependencies);
     } catch (e) {
-      console.error(e);
+      log.error(e);
     }
   }
 }

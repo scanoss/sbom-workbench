@@ -54,11 +54,11 @@ class Workspace extends EventEmitter {
     return openedProjects;
   }
 
-  public existProject(p: Project) {
+  public existProject(projectName: string): boolean {
     // eslint-disable-next-line no-restricted-syntax
     for (let i = 0; i < this.projectList.length; i += 1)
-      if (this.projectList[i].getProjectName() === p.getProjectName()) return i;
-    return -1;
+      if (this.projectList[i].getProjectName() === projectName) return true;
+    return false;
   }
 
   public async removeProject(p: Project) {
@@ -116,7 +116,7 @@ class Workspace extends EventEmitter {
   }
 
   public async addProject(p: Project) {
-    if (this.existProject(p) > -1) {
+    if (this.existProject(p.getProjectName())) {
       log.info(`%c[ WORKSPACE ]: Project already exist and will be replaced`, 'color: green');
       await this.removeProject(p);
     }
@@ -129,8 +129,8 @@ class Workspace extends EventEmitter {
     await Promise.all(unlinkPromises);
 
     p.setMyPath(pDirectory);
-    await p.save();
-    this.projectList.push(p);
+    p.save();
+    this.addNewProject(p);
     return this.projectList.length - 1;
   }
 
@@ -141,7 +141,8 @@ class Workspace extends EventEmitter {
   private async getAllProjectsPaths() {
     const workspaceStuff = await fs.promises.readdir(this.wsPath, { withFileTypes: true }).catch((e) => {
       log.info(`%c[ WORKSPACE ]: Cannot read the workspace directory ${this.wsPath}`, 'color: green');
-      console.log(e);
+      log.error(e);
+      throw e;
     });
     const projectsDirEnt = workspaceStuff.filter((dirent) => {
       return !dirent.isSymbolicLink() && !dirent.isFile();
@@ -172,6 +173,10 @@ class Workspace extends EventEmitter {
       if (filter.isValid(project)) return project;
     }
     return null;
+  }
+
+  public addNewProject(p: Project) {
+    if (p) this.projectList.push(p);
   }
 }
 
