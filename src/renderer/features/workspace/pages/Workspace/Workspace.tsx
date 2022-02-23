@@ -14,10 +14,8 @@ import SearchBox from '../../../../components/SearchBox/SearchBox';
 const Workspace = () => {
   const history = useHistory();
 
-  const { setScanPath, newProject } = useContext(AppContext) as IAppContext;
+  const { projects, setProjects, setScanPath, newProject, exportProject } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
-
-  const [projects, setProjects] = useState<any[] | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const init = async () => {
@@ -89,6 +87,10 @@ const Workspace = () => {
     history.push('/workspace/new/scan');
   };
 
+  const onExportHandler = async (project: IProject) => {
+    exportProject(project);
+  };
+
   useEffect(() => {
     init();
     return cleanup;
@@ -118,6 +120,7 @@ const Workspace = () => {
             onProjectDelete={onTrashHandler}
             onProjectRestore={onRestoreHandler}
             onProjectRescan={onRescanHandler}
+            onProjectExport={onExportHandler}
             onProjectCreate={onNewProjectHandler}
           />
         </main>
