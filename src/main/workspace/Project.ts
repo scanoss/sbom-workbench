@@ -3,15 +3,7 @@ import { EventEmitter } from 'events';
 import fs from 'fs';
 import log from 'electron-log';
 import { Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
-import {
-  ComponentSource,
-  File,
-  FileTreeViewMode,
-  IProjectCfg,
-  IWorkbenchFilter,
-  ProjectState,
-  ScanState,
-} from '../../api/types';
+import { FileTreeViewMode, IProjectCfg, IWorkbenchFilter, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanModel } from '../db/ScanModel';
 import { licenses } from '../db/licenses';
@@ -24,9 +16,7 @@ import { Tree } from './Tree/Tree/Tree';
 import { reScanService } from '../services/RescanLogicService';
 import { logicComponentService } from '../services/LogicComponentService';
 import { serviceProvider } from '../services/ServiceProvider';
-import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
-import { NodeStatus } from './Tree/Tree/Node';
-import Folder from './Tree/Tree/Folder';
+import { TreeViewModeCreator } from './Tree/Tree/TreeViewMode/TreeViewModeCreator';
 
 export class Project extends EventEmitter {
   work_root: string;
@@ -448,33 +438,7 @@ export class Project extends EventEmitter {
   }
 
   public async notifyTree() {
-    let tree: any = null;
-    if (
-      !this.filter ||
-      (this.filter.source === ComponentSource.ENGINE && Object.keys(this.filter).length === 1) ||
-      (this.filter.path && Object.keys(this.filter).length === 1)
-    ) {
-      tree = this.getTree().getRootFolder();
-      this.sendToUI(IpcEvents.TREE_UPDATED, tree);
-      return;
-    }
-    let files: any = await serviceProvider.model.file.getAll(
-      QueryBuilderCreator.create({ ...this.filter, path: null })
-    );
-    files = files.reduce((acc: any, curr: any) => {
-      if (!acc[curr.path]) acc[curr.path] = curr.id;
-      return acc;
-    }, {});
-    if (this.fileTreeViewMode === FileTreeViewMode.DEFAULT) {
-      tree = this.getTree().getRootFolder().getClone();
-      tree.filter(files);
-      this.sendToUI(IpcEvents.TREE_UPDATED, tree);
-      return;
-    }
-    tree = this.getTree().getRootFolder().getClonePath(files);
-    if (!tree) {
-      tree = new Folder('', this.getProjectName());
-    }
+    const tree = await this.tree.getTree();
     this.sendToUI(IpcEvents.TREE_UPDATED, tree);
   }
 
@@ -524,8 +488,11 @@ export class Project extends EventEmitter {
 
   public async setFilter(filter: IWorkbenchFilter) {
     try {
+      if (!(JSON.stringify({ ...filter, path: null }) === JSON.stringify({ ...this.filter, path: null }))) {
+        this.tree.setTreeViewMode(TreeViewModeCreator.create(filter, this.fileTreeViewMode));
+        this.notifyTree();
+      }
       this.filter = filter;
-      this.notifyTree();
       return true;
     } catch (e) {
       log.error(e);
@@ -538,6 +505,8 @@ export class Project extends EventEmitter {
   }
 
   public setFileTreeViewMode(mode: FileTreeViewMode) {
+    if (JSON.stringify(this.fileTreeViewMode) === JSON.stringify(mode)) return;
+    this.tree.setTreeViewMode(TreeViewModeCreator.create(this.filter, mode));
     this.fileTreeViewMode = mode;
     this.notifyTree();
   }
