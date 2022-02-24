@@ -22,8 +22,7 @@ const IdentifiedReport = ({ data }) => {
   const [obligations, setObligations] = useState(null);
 
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
-
-  const isEmpty = state.progress === 0;
+  const isEmpty = data.summary.identifiedFiles === 0 && data.summary.ignoredFiles === 0;
 
   const init = async () => {
     const licenses = data.licenses.map((license) => license.label);
