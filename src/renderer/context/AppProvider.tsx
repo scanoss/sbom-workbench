@@ -88,7 +88,7 @@ const AppProvider = ({ children }) => {
 
   const exportProject = async (project: IProject) => {
     const path = dialogController.showSaveDialog({
-      defaultPath: `${project.name}.zip`,
+      defaultPath: `${project.work_root}/${project.name}.zip`,
     });
 
     if (!path) return;
