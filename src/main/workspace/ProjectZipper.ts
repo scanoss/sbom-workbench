@@ -32,11 +32,27 @@ class ProjectZipper {
 
   private zipFolderCount = 0;
 
-  public export(pathToSave: string, projectPath: string): void {
+  public async export(pathToSave: string, projectPath: string): Promise<void> {
     const zip = new AdmZip();
-    const stats = fs.statSync(projectPath);
-    zip.addLocalFolder(projectPath, path.basename(projectPath) + path.sep);
-    zip.addFile(path.basename(projectPath) + path.sep, Buffer.alloc(0), '', stats);
+    // Create a folder in the zip.
+    zip.addFile(path.basename(projectPath) + path.sep, Buffer.alloc(0), '');
+
+    // Copy all files from project folder to the zip except metadata.json.
+    // Before zipping, the api and api key needs to be removed from metadata.
+    const dirContent = await fs.promises.readdir(projectPath);
+    for (const file of dirContent)
+      if (file !== 'metadata.json')
+        zip.addLocalFile(path.join(projectPath, file), path.basename(projectPath) + path.sep);
+
+    // Read metadata and delete de api and apiKey fields.
+    const txtMetadata = await fs.promises.readFile(path.join(projectPath, 'metadata.json'), 'utf8');
+    const metadata = JSON.parse(txtMetadata);
+    delete metadata.apiKey;
+    delete metadata.api;
+
+    // Add metadata.json to the zip
+    const metadataZipPath = path.join(path.basename(projectPath), 'metadata.json');
+    zip.addFile(metadataZipPath, JSON.stringify(metadata, null, 2), '');
     zip.writeZip(pathToSave);
   }
 
