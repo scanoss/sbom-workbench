@@ -19,6 +19,7 @@ ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
     scan_root: p.getScanRoot(),
     dependencies: await p.getDependencies(),
     uuid: p.getUUID(),
+    source: p.getDto().source,
   };
 
   return {

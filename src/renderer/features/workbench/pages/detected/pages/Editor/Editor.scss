@@ -140,6 +140,24 @@
       margin: 0;
     }
   }
+
+  #NoLocalFile {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+
+
+    p {
+      margin-top: 10px;
+      margin-bottom: 35px;
+      font-weight: 400;
+      text-align: center;
+      max-width: 300px;
+    }
+  }
 }
 
 

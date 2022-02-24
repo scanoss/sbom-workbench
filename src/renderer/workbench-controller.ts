@@ -10,6 +10,7 @@ const pathUtil = require('path');
 
 export interface ScanResult {
   name: string;
+  imported: boolean;
   scanRoot: string;
   fileTree: any;
   dependencies: IDependencyResponse;
@@ -75,12 +76,15 @@ class WorkbenchController {
     const tree = data.logical_tree;
     const work = data.work_root;
     const { dependencies } = data;
+    const imported = data.source === 'IMPORTED';
 
+    console.log(data);
     // TODO: get from scan result
     const name = work.split(pathUtil.sep)[work.split(pathUtil.sep).length - 1];
 
     return {
       name,
+      imported,
       scanRoot: data.scan_root,
       fileTree: tree,
       dependencies,

@@ -1,3 +1,4 @@
+import { ExecOptionsWithStringEncoding } from 'child_process';
 import { NodeStatus } from '../main/workspace/Tree/Tree/Node';
 
 export enum ScanState {
@@ -103,6 +104,7 @@ export interface IProject extends INewProject {
   scannerState: ScanState;
   files: number;
   uuid: string;
+  source: string;
 }
 
 export interface Files {
