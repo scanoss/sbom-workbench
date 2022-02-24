@@ -452,9 +452,11 @@ export class Project extends EventEmitter {
 
   public async setFilter(filter: IWorkbenchFilter) {
     try {
-      this.tree.setTreeViewMode(TreeViewModeCreator.create(filter, this.fileTreeViewMode));
+      if (!(JSON.stringify({ ...filter, path: null }) === JSON.stringify({ ...this.filter, path: null }))) {
+        this.tree.setTreeViewMode(TreeViewModeCreator.create(filter, this.fileTreeViewMode));
+        this.notifyTree();
+      }
       this.filter = filter;
-      this.notifyTree();
       return true;
     } catch (e) {
       log.error(e);
@@ -467,6 +469,7 @@ export class Project extends EventEmitter {
   }
 
   public setFileTreeViewMode(mode: FileTreeViewMode) {
+    if (JSON.stringify(this.fileTreeViewMode) === JSON.stringify(mode)) return;
     this.tree.setTreeViewMode(TreeViewModeCreator.create(this.filter, mode));
     this.fileTreeViewMode = mode;
     this.notifyTree();
