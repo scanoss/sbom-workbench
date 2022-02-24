@@ -20,12 +20,9 @@ import { getExtension } from '../../../../../../../utils/utils';
 import { fileService } from '../../../../../../../api/file-service';
 import CodeViewSelector from './components/CodeViewSelector/CodeViewSelector';
 import DependencyTree from './components/DependencyTree/DependencyTree';
+import NoLocalFile from './components/NoLocalFile/NoLocalFile';
 
 const MemoCodeEditor = React.memo(CodeEditor);
-
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
 
 export interface FileContent {
   content: string | null;
@@ -40,6 +37,8 @@ export const Editor = () => {
   ) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
+
+  const { imported } = state;
 
   const file = state.filter.node?.type === 'file' ? state.filter.node.path : null;
 
@@ -186,7 +185,7 @@ export const Editor = () => {
     if (currentMatch) {
       const full = currentMatch?.type === 'file';
       setFullFile(full);
-      if (!full) loadRemoteFile(currentMatch.md5_file);
+      if (!full || imported) loadRemoteFile(currentMatch.md5_file);
     }
   }, [currentMatch]);
 
@@ -283,10 +282,10 @@ export const Editor = () => {
         {fullFile ? (
           <main className="editors editors-full app-content">
             <div className="editor">
-              {matchInfo && localFileContent?.content ? (
+              {matchInfo && (localFileContent?.content || remoteFileContent?.content) ? (
                 <MemoCodeEditor
                   language={getExtension(file)}
-                  content={localFileContent.content}
+                  content={localFileContent.content || remoteFileContent.content}
                   highlight={currentMatch?.lines || null}
                 />
               ) : null}
@@ -308,7 +307,7 @@ export const Editor = () => {
                     <DependencyTree dependencies={dependencies} />
                   )}
                 </>
-              ) : null}
+              ) : imported ? <NoLocalFile /> : null}
             </div>
             {inventories?.length === 0 && matchInfo?.length === 0 ? (
               <div className="editor">

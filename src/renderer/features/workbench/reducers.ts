@@ -20,6 +20,7 @@ const MAX_RECENT_USED_COMPONENTS = 3;
 
 export interface State {
   name: string;
+  imported: boolean;
   loaded: boolean;
   progress: number;
   summary: any;
@@ -42,6 +43,7 @@ export interface State {
 
 export const initialState: State = {
   name: null,
+  imported: false,
   loaded: false,
   progress: 0,
   summary: null,
@@ -64,10 +66,11 @@ export const initialState: State = {
 export default function reducer(state: State = initialState, action): State {
   switch (action.type) {
     case LOAD_SCAN_SUCCESS: {
-      const { name, tree, components, dependencies } = action;
+      const { name, imported, tree, components, dependencies } = action;
       return {
         ...state,
         name,
+        imported,
         loaded: true,
         tree,
         dependencies,

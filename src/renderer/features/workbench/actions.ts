@@ -15,9 +15,10 @@ export const SET_NODE = 'APP/WORKBENCH/SET_NODE';
 export const SET_RECENT_USED_COMPONENT = 'APP/WORKBENCH/SET_RECENT_USED_COMPONENT';
 export const RESET = 'APP/WORKBENCH/RESET';
 
-export const loadScanSuccess = (name, tree, components: ComponentGroup[], dependencies: IDependencyResponse) => ({
+export const loadScanSuccess = (name, imported, tree, components: ComponentGroup[], dependencies: IDependencyResponse) => ({
   type: LOAD_SCAN_SUCCESS,
   name,
+  imported,
   tree,
   dependencies,
   components,
