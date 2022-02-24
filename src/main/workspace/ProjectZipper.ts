@@ -16,6 +16,8 @@ class ProjectZipper {
 
   private MAX_FOLDER_ZIP_COUNT = 1;
 
+  private MIN_FOLDER_ZIP_COUNT = 0;
+
   private projectName = null;
 
   private zipEntries: any;
@@ -77,6 +79,14 @@ class ProjectZipper {
   }
 
   private isValidZip(): boolean {
+    if (
+      this.zipFolderCount === this.MIN_FOLDER_ZIP_COUNT ||
+      !this.zipVersion ||
+      !this.projectName ||
+      !this.scannerState ||
+      this.zipEntries.length === 0
+    )
+      return false;
     if (
       this.zipFolderCount === this.MAX_FOLDER_ZIP_COUNT &&
       this.isValidZipVersion() &&
