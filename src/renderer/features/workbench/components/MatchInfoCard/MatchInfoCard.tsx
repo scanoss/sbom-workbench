@@ -20,6 +20,7 @@ export enum MATCH_INFO_CARD_ACTIONS {
 interface MatchInfoCardProps {
   match: {
     component: string;
+    vendor: string;
     version: string;
     usage: string;
     license: string;
@@ -39,8 +40,8 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
 
   const handlerOpen = (e) => {
     const refParent = document.querySelector('#editor .content');
-    const x = ref.current.getBoundingClientRect().left - refParent.getBoundingClientRect().left;
-    const y = ref.current.getBoundingClientRect().top - refParent.getBoundingClientRect().top + 62;
+    const x = ref?.current.getBoundingClientRect().left - refParent.getBoundingClientRect().left;
+    const y = ref?.current.getBoundingClientRect().top - refParent.getBoundingClientRect().top + 62;
 
     setPos({ x, y });
     setOver(true);
@@ -53,7 +54,7 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
           <div className={`match-info-card-content status-${status}`}>
             <div onMouseEnter={handlerOpen} onMouseLeave={() => setOver(false)} className="label-info-div">
               {/* <img alt="component logo" className="logo-match-info-card" src={componentDefault} /> */}
-              <IconComponent name={match.component} size={32} />
+              <IconComponent name={match.vendor} size={32} />
               <span className="component-span">{match.component}</span>
               <span className="version-span">{match.version}</span>
               <div className="usage-div">

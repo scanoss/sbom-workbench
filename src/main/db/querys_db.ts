@@ -52,7 +52,7 @@ export class Querys {
   // SQL DELETE FILE INVENTORY
   SQL_DELETE_FILE_INVENTORIES = 'DELETE FROM file_inventories WHERE fileId IN ';
 
-  //  UPDATE INVENTORY 
+  //  UPDATE INVENTORY
   SQL_UPDATE_INVENTORY = 'UPDATE inventories SET cvid=?, usage=?, notes=?, url=?, spdxid=? WHERE id=?;';
 
   SQL_SELECT_INVENTORY_COMPONENTS = `SELECT DISTINCT i.cvid,i.id,r.vendor,i.usage,cv.purl,i.notes,i.url,i.spdxid,cv.version,cv.name FROM inventories i 
@@ -138,8 +138,10 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
  ON counter.purl=comp.purl AND counter.version=comp.version;`;
 
   // GET ALL COMPONENTES
-  SQL_GET_ALL_COMPONENTS =
-    'SELECT DISTINCT r.vendor,comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid LEFT JOIN results r ON r.purl=comp.purl AND r.version=comp.version;';
+  SQL_GET_ALL_COMPONENTS = `SELECT DISTINCT r.vendor,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id FROM 
+  (SELECT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id
+  FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid) AS comp
+  LEFT JOIN results r ON r.purl=comp.purl;`;
 
   // GET ALL COMPONENTES
   SQL_GET_ALL_DETECTED_COMPONENTS = `SELECT filesVersion.vendor,filesVersion.filesCount,matched.comp_url,matched.compid,matched.comp_name,matched.license_url,matched.license_name,matched.license_spdxid,matched.purl,matched.version,matched.license_id  FROM (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp LEFT JOIN license_view lic ON comp.id=lic.cvid WHERE source="engine") AS matched
@@ -226,6 +228,4 @@ LEFT JOIN license_view lic ON comp.id=lic.cvid
   SQL_GET_RESULTS_RESCAN = `SELECT r.idtype,f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending, source AS original FROM files f INNER JOIN results r ON f.fileId=r.fileId;`;
 
   SQL_GET_RESULTS_IN_FOLDER = `SELECT f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f LEFT JOIN results r ON f.fileId=r.fileId WHERE f.path LIKE '?';`;
-
-  
 }
