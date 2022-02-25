@@ -121,16 +121,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const addCustomComponent = async (component) => {
     const { name, version, licenses, purl, url } = component;
 
-    const found = components.some((item) => item.purl === purl);
-    if (!found) {
-      const { data } = await componentService.getComponentGroup({ purl });
-      setComponents([...components, data]);
-    }
-
-    setLicenses([
-      ...licenses,
-      { spdxid: component.licenses[0].spdxid, name: component.licenses[0].name, type: 'Catalogued' },
-    ]);
+    const nComponents = components.filter((item) => item.purl !== purl);
+    const { data } = await componentService.getComponentGroup({ purl });
+    setComponents([...nComponents, data]);
+    setVersions([...versions, version]);
+    setLicenses(licenses);
 
     setForm({
       ...form,
