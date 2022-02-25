@@ -79,13 +79,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     const componentsResponse = await componentService.getAllComponentGroup();
     const licensesResponse = await licenseService.getAll();
     const compCatalogue = componentsResponse.data.map((component) => ({ ...component, type: 'Catalogued' }));
-
-    if (recentUsedComponents && recentUsedComponents.length > 0) {
-      const recentUsed = recentUsedComponents.map((component) => ({ ...component, type: 'Recents' }));
-      setComponents([...recentUsed, ...compCatalogue]);
-    } else {
-      setComponents(componentsResponse.data.map((component) => ({ ...component, type: 'Catalogued' })));
-    }
+    setGlobalComponents(compCatalogue);
 
     const catalogue = licensesResponse.data.map((item) => ({
       spdxid: item.spdxid,
@@ -114,18 +108,19 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       'Add Version'
     );
     if (response && response.action === ResponseStatus.OK) {
-      addCustomComponent(response.data);
+      addCustomComponentVersion(response.data);
     }
   };
 
   const addCustomComponent = async (component) => {
     const { name, version, licenses, purl, url } = component;
-
-    const nComponents = components.filter((item) => item.purl !== purl);
     const { data } = await componentService.getComponentGroup({ purl });
-    setComponents([...nComponents, data]);
-    setVersions([...versions, version]);
-    setLicenses(licenses);
+    setGlobalComponents([...components, data]);
+
+    setLicenses([
+      ...licenses,
+      { spdxid: component.licenses[0].spdxid, name: component.licenses[0].name, type: 'Catalogued' },
+    ]);
 
     setForm({
       ...form,
@@ -135,6 +130,41 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       purl,
       url: url || '',
     });
+  };
+
+  const addCustomComponentVersion = async (component) => {
+    const { name, version, licenses, purl, url } = component;
+
+    // FIXME: This is a hack to get the component, should be change when rafactor branch is merged.
+    const { data } = await componentService.getAllComponentGroup();
+    const nComponents = components.filter((item) => item.purl !== purl);
+    const comp = data.find((item) => item.purl === purl);
+
+    setGlobalComponents([...nComponents, comp]);
+    setVersions([version, ...versions]);
+    // setLicenses(licenses);
+
+    setForm({
+      ...form,
+      component: name,
+      version,
+      spdxid: licenses[0].spdxid,
+      purl,
+      url: url || '',
+    });
+  };
+
+  const setGlobalComponents = (components) => {
+    let recents = [];
+    const nComponents = components.filter((comp) => comp.type !== 'Recents');
+    if (recentUsedComponents && recentUsedComponents.length > 0) {
+      // const recentUsed = recentUsedComponents.map((component) => ({ ...component, type: 'Recents' }));
+      recents = nComponents
+        .filter((comp) => recentUsedComponents.find((item) => item.purl === comp.purl))
+        .map((component) => ({ ...component, type: 'Recents' }));
+    }
+
+    setComponents([...recents, ...nComponents]);
   };
 
   const openLicenseDialog = async () => {
@@ -175,6 +205,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       init();
     }
   }, [open]);
+
+
 
   useEffect(() => {
     const component = components.find((item) => item.purl === form.purl);
