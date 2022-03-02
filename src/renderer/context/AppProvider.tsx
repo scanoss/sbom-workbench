@@ -10,6 +10,8 @@ import { IpcEvents } from '../../ipc-events';
 import { dialogController } from '../dialog-controller';
 import { DialogContext, IDialogContext } from './DialogProvider';
 
+import * as os from 'os';
+
 export interface IScan {
   projectName?: string;
   path: string;
@@ -89,8 +91,9 @@ const AppProvider = ({ children }) => {
 
   const exportProject = async (project: IProject) => {
     const path = dialogController.showSaveDialog({
-      defaultPath: `${project.work_root}/${project.name}.zip`,
+      defaultPath: `${os.homedir()}/Downloads/${project.name}.zip`,
     });
+    
 
     if (!path) return;
     const dialog = await dialogCtrl.createProgressDialog('EXPORTING PROJECT');
