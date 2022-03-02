@@ -27,6 +27,7 @@ export interface IAppContext {
   settingsNewProject?: INewProject;
   newProject: () => void;
   exportProject: (project: IProject) => void;
+  importProject: () => void;
 }
 
 export const AppContext = React.createContext<IAppContext | null>(null);
@@ -141,6 +142,7 @@ const AppProvider = ({ children }) => {
         setSettingsNewProject,
         settingsNewProject,
         exportProject,
+        importProject,
       }}
     >
       {children}

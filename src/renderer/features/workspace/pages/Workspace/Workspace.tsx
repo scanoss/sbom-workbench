@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
 import { AppContext, IAppContext } from '../../../../context/AppProvider';
 import { IProject } from '../../../../../api/types';
 import { workspaceService } from '../../../../../api/workspace-service';
@@ -10,11 +8,12 @@ import { DIALOG_ACTIONS } from '../../../../context/types';
 import * as Config from '../../../../../Config';
 import ProjectList from '../Components/ProjectList';
 import SearchBox from '../../../../components/SearchBox/SearchBox';
+import AddProjectButton from '../Components/AddProjectButton/AddProjectButton';
 
 const Workspace = () => {
   const history = useHistory();
 
-  const { projects, setProjects, setScanPath, newProject, exportProject } = useContext(AppContext) as IAppContext;
+  const { projects, setProjects, setScanPath, newProject, exportProject, importProject } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -57,6 +56,10 @@ const Workspace = () => {
 
   const onNewProjectHandler = () => {
     newProject();
+  };
+
+  const onImportProjectHandler = () => {
+    importProject();
   };
 
   const onTrashHandler = async (project: IProject) => {
@@ -107,9 +110,7 @@ const Workspace = () => {
                 <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
               )}
             </div>
-            <Button startIcon={<AddIcon />} variant="contained" color="primary" onClick={onNewProjectHandler}>
-              New project
-            </Button>
+            <AddProjectButton onNewProject={onNewProjectHandler} onImportProject={onImportProjectHandler} />
           </section>
         </header>
         <main className="app-content">
@@ -122,6 +123,7 @@ const Workspace = () => {
             onProjectRescan={onRescanHandler}
             onProjectExport={onExportHandler}
             onProjectCreate={onNewProjectHandler}
+            onProjectImport={onImportProjectHandler}
           />
         </main>
       </section>
