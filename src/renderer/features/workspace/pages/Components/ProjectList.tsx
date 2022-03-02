@@ -60,6 +60,7 @@ interface ProjectListProps {
   onProjectRescan: (project: IProject) => void;
   onProjectExport: (project: IProject) => void;
   onProjectCreate: () => void;
+  onProjectImport: () => void;
 }
 
 const ProjectList = (props: ProjectListProps) => {
@@ -195,8 +196,8 @@ const ProjectList = (props: ProjectListProps) => {
           <div className="empty-list">
             <h3>No projects found</h3>
             <p>
-              You can start scanning by&nbsp;
-              <Link onClick={() => props.onProjectCreate()}>creating a new project</Link>.
+              You can start by&nbsp;
+              <Link onClick={() => props.onProjectCreate()}>scanning a new project</Link><br></br>or <Link onClick={() => props.onProjectImport()}>importing a project</Link>.
             </p>
           </div>
         </div>
