@@ -1,16 +1,15 @@
-import { LinearProgress, Snackbar } from '@material-ui/core';
-import { AnyNaptrRecord } from 'dns';
+import { Button, LinearProgress, Snackbar } from '@material-ui/core';
 import { ipcRenderer } from 'electron';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { projectService } from '../../api/project-service';
+import * as os from 'os';
 import { INewProject, IProject } from '../../api/types';
 import { workspaceService } from '../../api/workspace-service';
 import { IpcEvents } from '../../ipc-events';
 import { dialogController } from '../dialog-controller';
 import { DialogContext, IDialogContext } from './DialogProvider';
 
-import * as os from 'os';
+const { shell } = require('electron');
 
 export interface IScan {
   projectName?: string;
@@ -93,7 +92,6 @@ const AppProvider = ({ children }) => {
     const path = dialogController.showSaveDialog({
       defaultPath: `${os.homedir()}/Downloads/${project.name}.zip`,
     });
-    
 
     if (!path) return;
     const dialog = await dialogCtrl.createProgressDialog('EXPORTING PROJECT');
@@ -102,8 +100,42 @@ const AppProvider = ({ children }) => {
     try {
       await workspaceService.exportProject(path, project.work_root);
       setTimeout(async () => {
-        dialog.finish({ message: 'SUCCESSFUL EXPORT' });
-        dialog.dismiss({ delay: 1500 });
+        const timeout = setTimeout(() => dialog.dismiss(), 8000);
+        const dismiss = () => {
+          clearTimeout(timeout);
+          dialog.dismiss();
+        };
+        dialog.finish({
+          message: (
+            <footer className="d-flex space-between">
+              <span>SUCCESSFUL EXPORT</span>
+              <div>
+                <Button
+                  className="mr-3"
+                  size="small"
+                  variant="text"
+                  color="primary"
+                  style={{ padding: 0, lineHeight: 1, minWidth: 0 }}
+                  onClick={() => dismiss()}
+                >
+                  CLOSE
+                </Button>
+                <Button
+                  size="small"
+                  variant="text"
+                  color="primary"
+                  style={{ padding: 0, lineHeight: 1, minWidth: 0 }}
+                  onClick={() => {
+                    dismiss();
+                    shell.showItemInFolder(path);
+                  }}
+                >
+                  OPEN
+                </Button>
+              </div>
+            </footer>
+          ),
+        });
       }, 2000);
     } catch (err: any) {
       const errorMessage = `<strong>Exporting Error</strong>
