@@ -144,7 +144,7 @@ export const DialogProvider: React.FC = ({ children }) => {
   const [progressDialog, setProgressDialog] = useState<{
     open: boolean;
     loader?: boolean;
-    message?: string;
+    message?: React.ReactNode;
   }>({ open: false, loader: false });
 
   const createProgressDialog = (message = 'Wait a moment please'): Promise<LoaderController> => {

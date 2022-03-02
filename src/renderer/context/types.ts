@@ -17,7 +17,7 @@ export interface InventorySelectorResponse {
 
 export interface LoaderController {
   present: () => void;
-  finish: ({ message }: { message?: string }) => void;
+  finish: ({ message }: { message?: React.ReactNode }) => void;
   dismiss: ({ delay }?: { delay?: number }) => void;
 }
 
