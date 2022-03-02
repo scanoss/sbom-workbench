@@ -51,7 +51,7 @@ export class ComponentModel extends Model {
         preLicense.id = data[i].license_id;
         preLicense.name = data[i].license_name;
         preLicense.spdxid = data[i].license_spdxid;
-        transformation.licenses.push(preLicense);
+        transformation.licenses.unshift(preLicense);
       }
       results.push(transformation);
       let countMerged = 0;
@@ -74,7 +74,7 @@ export class ComponentModel extends Model {
     preLicense.id = b.license_id;
     preLicense.name = b.license_name;
     preLicense.spdxid = b.license_spdxid;
-    a.licenses.push(preLicense);
+    a.licenses.unshift(preLicense);
   }
 
   public async allComp(params?: ComponentParams) {

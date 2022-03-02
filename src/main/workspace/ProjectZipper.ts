@@ -60,7 +60,7 @@ class ProjectZipper {
     this.readZip(zippedProjectPath);
     if (!this.isValidZip()) throw new Error('The zip file is not valid');
     if (!this.projectName) throw new Error('The zip file is not valid');
-    if (workspace.existProject(this.projectName)) throw new Error('Project already exists');
+    if (workspace.existProject(this.projectName)) throw new Error(`${this.projectName} project already exists`);
     await this.unzipProject();
     const project = await Project.readFromPath(workspace.getMyPath() + path.sep + this.projectName);
     workspace.addNewProject(project);
