@@ -51,8 +51,7 @@ class ProjectZipper {
     delete metadata.api;
 
     // Add metadata.json to the zip
-    const metadataZipPath = path.join(path.basename(projectPath), 'metadata.json');
-    zip.addFile(metadataZipPath, JSON.stringify(metadata, null, 2), '');
+    zip.addFile(`${path.basename(projectPath)}/metadata.json`, JSON.stringify(metadata, null, 2), '');
     zip.writeZip(pathToSave);
   }
 
