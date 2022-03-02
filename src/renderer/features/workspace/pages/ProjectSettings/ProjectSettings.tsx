@@ -72,6 +72,7 @@ const ProjectSettings = () => {
     api_key: null,
     api: null,
     token: null,
+    source: null,
   });
 
   const [projectValidName, setprojectValidName] = useState(false);
@@ -226,7 +227,21 @@ const ProjectSettings = () => {
                       clearOnBlur
                       handleHomeEndKeys
                       options={licenses}
-                      getOptionLabel={(option: any) => option.name || ''}
+                      getOptionSelected={(option: any) => option.spdxid === projectSettings.default_license}
+                      getOptionLabel={(option: any) => option.name || option.spdxid}
+                      renderOption={(option: any) => (
+                        <div className={classes.option}>
+                          <span>{option.name}</span>
+                          <span className="middle">{option.spdxid}</span>
+                        </div>
+                      )}
+                      filterOptions={(options, params) => {
+                        return options.filter(
+                          (option) =>
+                            option.name.toLowerCase().includes(params.inputValue.toLowerCase()) ||
+                            option.spdxid.toLowerCase().includes(params.inputValue.toLowerCase())
+                        );
+                      }}
                       renderInput={(params) => (
                         <TextField
                           {...params}
