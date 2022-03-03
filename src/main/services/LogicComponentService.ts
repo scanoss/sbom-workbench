@@ -5,14 +5,19 @@ import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 import { serviceProvider } from './ServiceProvider';
 
+const { performance } = require('perf_hooks');
+
 class LogicComponentService {
   public async getComponentFiles(data: Partial<Component>, filter: IWorkbenchFilter): Promise<any> {
     try {
       const params = { purl: data.purl, ...filter };
       const queryBuilder = QueryBuilderCreator.create(params);
       const files: any = await serviceProvider.model.file.getAll(queryBuilder);
-      const components = await serviceProvider.model.component.getAll();
       const inventories: any = await serviceProvider.model.inventory.getAll();
+      const compid = inventories.map((inv) => inv.cvid);
+      const queryComp = QueryBuilderCreator.create({ compid });
+      const components = await serviceProvider.model.component.getAll(queryComp);
+
       const index = inventories.reduce((acc, inventory) => {
         acc[inventory.id] = inventory;
         return acc;
@@ -24,6 +29,7 @@ class LogicComponentService {
         }
         if (files[i].license) files[i].license = files[i].license.split(',');
       }
+
       return files;
     } catch (error: any) {
       log.error(error);

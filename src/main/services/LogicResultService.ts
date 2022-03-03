@@ -1,6 +1,8 @@
-import { IWorkbenchFilter } from '../../api/types';
 import { QueryBuilder } from '../queryBuilder/QueryBuilder';
+import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 import { workspace } from '../workspace/Workspace';
+
+const { performance } = require('perf_hooks');
 
 class LogicResultService {
   public async getResultsByids(ids: number[], project: any) {
@@ -52,9 +54,11 @@ class LogicResultService {
 
   public async getFromPath(path: string) {
     try {
+      const t0 = performance.now();
       const project = workspace.getOpenedProjects()[0];
       const results = await project.store.result.getFromPath(path);
-      const components: any = await project.store.component.getAll();
+      const queryBuilder = QueryBuilderCreator.create({ path });
+      const components: any = await project.store.component.getAll(queryBuilder);
       results.forEach((result) => {
         if (result.license) result.license = result.license.split(',');
         if (result.version)
@@ -63,6 +67,8 @@ class LogicResultService {
           );
         else result.component = null;
       });
+      const t1 = performance.now();
+      console.log(`Results ${t1 - t0} milliseconds.`);
       return results;
     } catch (error: any) {
       return error;
