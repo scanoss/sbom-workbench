@@ -1,6 +1,6 @@
 .match-card {
   background-color: #ffff;
-  min-height: 52px;
+  min-height: 42px;
   height: 100%;
   width: 55%;
   border-radius: 4px;
@@ -59,10 +59,10 @@
       align-items: center;
 
       span.type {
-        font-size: 20px;
+        font-size: 16px;
         font-weight: 700;
         color: $indentified-green;
-        margin-right: 16px;
+        margin-right: 8px;
         text-transform: capitalize;
       }
 
