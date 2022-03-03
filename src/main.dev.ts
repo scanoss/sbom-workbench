@@ -10,15 +10,18 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import fs, { readFileSync } from 'fs';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import path from 'path';
 import * as os from 'os';
-import { wsCfgUpdate } from './main/migration/scripts/0-0-0';
-
 import MenuBuilder from './main/menu';
+
+import { workspace } from './main/workspace/Workspace';
+import { userSetting } from './main/UserSetting';
+import { WorkspaceMigration } from './main/migration/WorkspaceMigration';
+
+// handlers
 import './main/inventory';
 import './main/component';
 import './main/project';
@@ -29,20 +32,7 @@ import './main/workspace';
 import './main/report';
 import './main/license';
 import './main/controllers/userSetting';
-
-import { IpcEvents } from './ipc-events';
-import { workspace } from './main/workspace/Workspace';
-
-import { Project } from './main/workspace/Project';
-
-import { userSetting } from './main/UserSetting';
-
-import { WorkspaceMigration } from './main/migration/WorkspaceMigration';
-
-import { Tree } from './main/workspace/Tree/Tree/Tree';
-
-
-const basepath = require('path');
+import { DEFAULT_WORKSPACE_NAME } from './Config';
 
 export default class AppUpdater {
   constructor() {
@@ -147,7 +137,11 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.whenReady().then(mainLogic).catch(console.log).then(createWindow).catch(console.log);
+app.whenReady()
+  .then(init)
+  .catch(console.log)
+  .then(createWindow)
+  .catch(console.log);
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
@@ -155,28 +149,9 @@ app.on('activate', () => {
   if (mainWindow === null) createWindow();
 });
 
-// TODO: move to isolate module (see menu.ts)
-
-export interface IInitScan {
-  path: string;
-  scanId?: string;
-}
-
-async function mainLogic() {
-  const root = `${os.homedir()}/scanoss-workspace`;
-
-  // This lines will be removed in future versions
-  if (fs.existsSync(`${root}/defaultCfg.json`)) {
-    wsCfgUpdate(root);
-  }
-
-
+async function init() {
+  const root = `${os.homedir()}/${DEFAULT_WORKSPACE_NAME}`;
   await workspace.read(root);
   await userSetting.read(root);
   new WorkspaceMigration(userSetting.get().VERSION, root).up();
-
-
 }
-
-ipcMain.on(IpcEvents.SCANNER_INIT_SCAN, async (event, arg: IInitScan) => {
-});
