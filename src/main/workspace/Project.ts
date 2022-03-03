@@ -2,7 +2,15 @@
 import { EventEmitter } from 'events';
 import fs from 'fs';
 import log from 'electron-log';
-import { Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
+import {
+  Dependency,
+  IDependencyResponse,
+  Scanner,
+  ScannerCfg,
+  ScannerEvents,
+  ScannerInput,
+  WinnowingMode,
+} from 'scanoss';
 import { FileTreeViewMode, IProjectCfg, IWorkbenchFilter, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanModel } from '../db/ScanModel';
