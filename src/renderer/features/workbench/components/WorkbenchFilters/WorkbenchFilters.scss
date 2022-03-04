@@ -1,5 +1,16 @@
 #WorkbenchFilters {
 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  header {
+    min-height: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .workbench-filters-group  {
 
     legend {

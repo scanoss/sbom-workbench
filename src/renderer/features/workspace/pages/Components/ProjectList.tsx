@@ -20,9 +20,6 @@ import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
 import GetAppOutlined from '@material-ui/icons/GetAppOutlined';
 import { IProject, ScanState } from '../../../../../api/types';
 import * as Config from '../../../../../Config';
-import { getAllByAltText } from '@testing-library/react';
-import { getComponents } from '../../../../../utils/scan-util';
-import { GroupWorkSharp } from '@material-ui/icons';
 
 const filter = (items, query) => {
   if (!items) return null;
