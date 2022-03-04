@@ -2,8 +2,6 @@ import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 import { workspace } from '../workspace/Workspace';
 
-const { performance } = require('perf_hooks');
-
 class LogicResultService {
   public async getResultsByids(ids: number[], project: any) {
     try {
@@ -15,7 +13,6 @@ class LogicResultService {
             element.identified === 1 ? 'identified' : element.ignored === 1 ? 'ignored' : 'pending';
         }
       });
-
       return response;
     } catch (e) {
       return e;
@@ -54,7 +51,6 @@ class LogicResultService {
 
   public async getFromPath(path: string) {
     try {
-      const t0 = performance.now();
       const project = workspace.getOpenedProjects()[0];
       const results = await project.store.result.getFromPath(path);
       const queryBuilder = QueryBuilderCreator.create({ path });
@@ -67,8 +63,6 @@ class LogicResultService {
           );
         else result.component = null;
       });
-      const t1 = performance.now();
-      console.log(`Results ${t1 - t0} milliseconds.`);
       return results;
     } catch (error: any) {
       return error;

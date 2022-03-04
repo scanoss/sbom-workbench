@@ -5,8 +5,6 @@ import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 import { serviceProvider } from './ServiceProvider';
 
-const { performance } = require('perf_hooks');
-
 class LogicComponentService {
   public async getComponentFiles(data: Partial<Component>, filter: IWorkbenchFilter): Promise<any> {
     try {
@@ -29,7 +27,6 @@ class LogicComponentService {
         }
         if (files[i].license) files[i].license = files[i].license.split(',');
       }
-
       return files;
     } catch (error: any) {
       log.error(error);
