@@ -3,15 +3,15 @@ import { EventEmitter } from 'events';
 import fs from 'fs';
 import log from 'electron-log';
 import {
+  Dependency,
+  IDependencyResponse,
   Scanner,
   ScannerCfg,
   ScannerEvents,
   ScannerInput,
   WinnowingMode,
-  Dependency,
-  IDependencyResponse,
 } from 'scanoss';
-import { File, IProjectCfg, ProjectState, ScanState } from '../../api/types';
+import { FileTreeViewMode, IProjectCfg, IWorkbenchFilter, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanModel } from '../db/ScanModel';
 import { licenses } from '../db/licenses';
@@ -24,6 +24,7 @@ import { Tree } from './Tree/Tree/Tree';
 import { reScanService } from '../services/RescanLogicService';
 import { logicComponentService } from '../services/LogicComponentService';
 import { serviceProvider } from '../services/ServiceProvider';
+import { TreeViewModeCreator } from './Tree/Tree/TreeViewMode/TreeViewModeCreator';
 
 export class Project extends EventEmitter {
   work_root: string;
@@ -62,10 +63,16 @@ export class Project extends EventEmitter {
 
   config: IProjectCfg;
 
+  filter: IWorkbenchFilter;
+
+  fileTreeViewMode: FileTreeViewMode;
+
   constructor(name: string) {
     super();
     this.metadata = new Metadata(name);
     this.state = ProjectState.CLOSED;
+    this.filter = null;
+    this.fileTreeViewMode = FileTreeViewMode.DEFAULT;
   }
 
   public static async readFromPath(pathToProject: string): Promise<Project> {
@@ -100,9 +107,7 @@ export class Project extends EventEmitter {
     this.filesSummary = a.filesSummary;
     this.store = new ScanModel(this.metadata.getMyPath());
     await this.store.init();
-
     serviceProvider.setModel(this.store);
-
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
     this.tree = new Tree(this.metadata.getMyPath());
     this.tree.loadTree(a.tree.rootFolder);
@@ -118,6 +123,7 @@ export class Project extends EventEmitter {
     this.tree = null;
     this.store = null;
     this.filesToScan = null;
+    this.filter = null;
   }
 
   public save(): void {
@@ -291,9 +297,9 @@ export class Project extends EventEmitter {
         this.save();
       } else {
         await this.store.file.insertFiles(this.tree.getRootFolder().getFiles());
-        const files: Array<File> = await this.store.file.getAll();
+        const files: Array<any> = await this.store.file.getAll(null);
         const aux = files.reduce((previousValue, currentValue) => {
-          previousValue[currentValue.path] = currentValue.fileId;
+          previousValue[currentValue.path] = currentValue.id;
           return previousValue;
         }, []);
         await this.store.result.insertFromFile(resultPath, aux);
@@ -436,7 +442,12 @@ export class Project extends EventEmitter {
 
   public updateTree() {
     this.save();
-    this.sendToUI(IpcEvents.TREE_UPDATED, this.tree.getRootFolder());
+    this.notifyTree();
+  }
+
+  public async notifyTree() {
+    const tree = await this.tree.getTree();
+    this.sendToUI(IpcEvents.TREE_UPDATED, tree);
   }
 
   set_filter_file(pathToFilter: string): boolean {
@@ -481,5 +492,30 @@ export class Project extends EventEmitter {
     } catch (e) {
       log.error(e);
     }
+  }
+
+  public async setFilter(filter: IWorkbenchFilter) {
+    try {
+      if (!(JSON.stringify({ ...filter, path: null }) === JSON.stringify({ ...this.filter, path: null }))) {
+        this.tree.setTreeViewMode(TreeViewModeCreator.create(filter, this.fileTreeViewMode));
+        this.notifyTree();
+      }
+      this.filter = filter;
+      return true;
+    } catch (e) {
+      log.error(e);
+      return e;
+    }
+  }
+
+  public getFilter(): IWorkbenchFilter {
+    return this.filter;
+  }
+
+  public setFileTreeViewMode(mode: FileTreeViewMode) {
+    if (JSON.stringify(this.fileTreeViewMode) === JSON.stringify(mode)) return;
+    this.tree.setTreeViewMode(TreeViewModeCreator.create(this.filter, mode));
+    this.fileTreeViewMode = mode;
+    this.notifyTree();
   }
 }

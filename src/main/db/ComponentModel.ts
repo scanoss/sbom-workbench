@@ -2,8 +2,10 @@
 import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Model } from './Model';
-import { Component, ComponentParams, ComponentSource } from '../../api/types';
+import { Component } from '../../api/types';
 import { LicenseModel } from './LicenseModel';
+import { QueryBuilder } from '../queryBuilder/QueryBuilder';
+import { componentHelper } from '../helpers/ComponentHelper';
 
 const query = new Querys();
 
@@ -32,107 +34,6 @@ export class ComponentModel extends Model {
     });
   }
 
-  private processComponent(data: any) {
-    const results: any = [];
-
-    for (let i = 0; i < data.length; i += 1) {
-      const transformation: any = {};
-      const preLicense: any = {};
-      transformation.compid = data[i].compid;
-      transformation.licenses = [];
-      transformation.name = data[i].comp_name;
-      transformation.purl = data[i].purl;
-      transformation.url = data[i].comp_url;
-      transformation.version = data[i].version;
-      transformation.vendor = data[i].vendor;
-      if (data[i].filesCount) transformation.filesCount = data[i].filesCount;
-
-      if (data[i].license_id) {
-        preLicense.id = data[i].license_id;
-        preLicense.name = data[i].license_name;
-        preLicense.spdxid = data[i].license_spdxid;
-        transformation.licenses.unshift(preLicense);
-      }
-      results.push(transformation);
-      let countMerged = 0;
-      for (let j = i + 1; j < data.length; j += 1) {
-        if (data[i].compid < data[j].compid) break;
-
-        if (data[i].compid === data[j].compid) {
-          this.mergeComponents(results[results.length - 1], data[j]);
-          countMerged += 1;
-        }
-      }
-      i += countMerged;
-    }
-    return results;
-  }
-
-  // merge component b into a
-  private mergeComponents(a: any, b: any) {
-    const preLicense: any = {};
-    preLicense.id = b.license_id;
-    preLicense.name = b.license_name;
-    preLicense.spdxid = b.license_spdxid;
-    a.licenses.unshift(preLicense);
-  }
-
-  public async allComp(params?: ComponentParams) {
-    // const self = this;
-    return new Promise(async (resolve, reject) => {
-      try {
-        let sqlGetComp = '';
-        if (params?.path && params?.source) {
-          sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS_BY_PATH.replace('#', `${params.path}/%`);
-        } else if (params?.source === ComponentSource.ENGINE) {
-          sqlGetComp = query.SQL_GET_ALL_DETECTED_COMPONENTS;
-        } else {
-          sqlGetComp = query.SQL_GET_ALL_COMPONENTS;
-        }
-        const db = await this.openDb();
-        db.serialize(() => {
-          db.all(sqlGetComp, async (err: any, data: any) => {
-            db.close();
-            if (err) throw err;
-            else {
-              const comp = this.processComponent(data);
-              const summary: any = await this.allSummaries();
-              for (let i = 0; i < comp.length; i += 1) {
-                comp[i].summary = summary[comp[i].compid];
-              }
-              resolve(comp);
-            }
-          });
-        });
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
-  public async getByPurl(data: any, params: ComponentParams) {
-    // const self = this;
-    return new Promise(async (resolve, reject) => {
-      try {
-        let SQLQuery = '';
-        if (params?.path) SQLQuery = query.SQL_GET_COMPONENT_BY_PURL_ENGINE_PATH.replace('#', `'${params.path}/%'`);
-        else SQLQuery = query.SQL_GET_COMPONENT_BY_PURL_ENGINE;
-        const db = await this.openDb();
-        db.all(SQLQuery, data.purl, data.purl, async (err: any, component: any) => {
-          db.close();
-          if (err) throw err;
-          // Attach licenses to a component
-          const comp = this.processComponent(component);
-          resolve(comp);
-        });
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
   // GET COMPONENENT ID FROM PURL
   public async getbyPurlVersion(data: any) {
     // const self = this;
@@ -143,7 +44,7 @@ export class ComponentModel extends Model {
           db.close();
           if (err) throw err;
           // Attach license to a component
-          this.processComponent(component);
+          componentHelper.processComponent(component);
           const licenses = await this.getAllLicensesFromComponentId(component.compid);
           component.licenses = licenses;
           const summary = await this.summaryByPurlVersion(component);
@@ -351,38 +252,6 @@ export class ComponentModel extends Model {
     });
   }
 
-  private allSummaries() {
-    // const self = this;
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.all(query.SQL_GET_ALL_SUMMARIES, (err: any, data: any) => {
-          db.close();
-          if (err) throw err;
-          else {
-            const summary = this.groupSummaryByCompid(data);
-            resolve(summary);
-          }
-        });
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
-  private groupSummaryByCompid(data: any) {
-    const aux = {};
-    for (const i of data) {
-      const key = i.compid;
-      const value = i;
-      if (!aux[key]) aux[`${key}`] = [];
-      // if (!aux.hasOwnProperty(i.compid)) aux[`${key}`];
-      aux[`${key}`] = value;
-    }
-    return aux;
-  }
-
   private summaryByPurlVersion(data: any) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -501,20 +370,14 @@ export class ComponentModel extends Model {
     });
   }
 
-  public getSummaryByPath(path: string, purls: string[]) {
+  public getOverrideComponents() {
     return new Promise<Array<any>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(() => {
-          let SQLquery = `SELECT r.purl,SUM(f.identified) AS identified,SUM(f.ignored) AS ignored ,SUM((CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END)) as pending FROM results r INNER JOIN files f ON f.fileId=r.fileId WHERE f.path LIKE # AND r.purl IN ? GROUP BY r.purl;`;
-          SQLquery = SQLquery.replace('#', `'${path}/%'`);
-          const aux = `'${purls.join("','")}'`;
-          SQLquery = SQLquery.replace('?', `(${aux})`);
-          db.all(SQLquery, (err: any, data: any) => {
-            db.close();
-            if (err) throw err;
-            else resolve(data);
-          });
+        db.all(query.SQL_GET_OVERRIDE_COMPONENTS, (err: any, data: any) => {
+          db.close();
+          if (err) throw err;
+          else resolve(data);
         });
       } catch (error) {
         log.error(error);
@@ -523,23 +386,47 @@ export class ComponentModel extends Model {
     });
   }
 
-  public getOverrideComponents() {
-    return new Promise<Array<any>>(async (resolve, reject) => {
+  public getAll(builder?: QueryBuilder) {
+    return new Promise<any>(async (resolve, reject) => {
       try {
+        let SQLquery = query.SQL_GET_ALL_COMPONENTS;
+        const filter = builder?.getSQL() ? `WHERE ${builder.getSQL().toString()}` : '';
+        const params = builder?.getFilters() ? builder.getFilters() : [];
+        SQLquery = SQLquery.replace('#FILTER', filter);
         const db = await this.openDb();
-        db.all(
-          `SELECT DISTINCT cv.purl AS overridePurl,cv.name AS overrideName,r.component,i.id,r.purl AS matchedPurl FROM results r  
-          INNER JOIN files f ON r.fileId=f.fileId INNER JOIN file_inventories fi ON fi.fileId=f.fileId
-          INNER JOIN inventories i ON i.id=fi.inventoryid INNER JOIN component_versions  cv ON i.cvid=cv.id ORDER BY r.purl;`,
-          (err: any, data: any) => {
-            db.close();
-            if (err) throw err;
-            else resolve(data);
+        db.all(SQLquery, ...params, async (err: any, data: any) => {
+          db.close();
+          if (err) throw err;
+          else {
+            const comp = componentHelper.processComponent(data);
+            resolve(comp);
           }
-        );
+        });
       } catch (error) {
         log.error(error);
-        reject(new Error('Unable to retrieve summary by path'));
+        reject(error);
+      }
+    });
+  }
+
+  public summary(builder?: QueryBuilder) {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        let SQLquery = query.SQL_COMPONENTS_SUMMARY;
+        const filter = builder?.getSQL() ? `WHERE ${builder.getSQL().toString()}` : '';
+        const params = builder?.getFilters() ? builder.getFilters() : [];
+        SQLquery = SQLquery.replace('#FILTER', filter);
+        const db = await this.openDb();
+        db.all(SQLquery, ...params, async (err: any, data: any) => {
+          db.close();
+          if (err) throw err;
+          else {
+            resolve(data);
+          }
+        });
+      } catch (error) {
+        log.error(error);
+        reject(error);
       }
     });
   }

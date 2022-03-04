@@ -1,5 +1,5 @@
 import { IpcEvents } from '../ipc-events';
-import { IProject } from './types';
+import { FileTreeViewMode, IProject, IWorkbenchFilter } from './types';
 import { BaseService } from './base-service';
 
 const { ipcRenderer } = require('electron');
@@ -54,8 +54,16 @@ class ProjectService extends BaseService {
     const response = await ipcRenderer.invoke(IpcEvents.PROJECT_READ_TREE);
     return this.response(response);
   }
+
+  public async setFilter(filter: IWorkbenchFilter): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_SET_FILTER, filter);
+    return this.response(response);
+  }
+
+  public async setFileTreeViewMode(mode: FileTreeViewMode): Promise<any> {
+    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_SET_FILE_TREE_VIEW_MODE, mode);
+    return this.response(response);
+  }
 }
 
 export const projectService = new ProjectService();
-
-

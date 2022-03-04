@@ -124,4 +124,27 @@ export default class File extends Node {
   public addDependency(path: string): void {
     if (this.getPath() === path) this.isDependencyFile = true;
   }
+
+  public filter(paths: Record<string, number>): boolean {
+    if (!paths[this.getPath()]) {
+      this.status = NodeStatus.NOMATCH;
+      this.setStatusOnClassnameAs(this.status);
+      this.setFilteredMatch(false);
+      return false;
+    }
+    this.setFilteredMatch(true);
+    return true;
+  }
+
+  public getClone(): Node {
+    return Object.assign(Object.create(File.prototype), this);
+  }
+
+  public getClonePath(paths: Record<string, number>): Node {
+    if (paths[this.getPath()]) {
+      const copy = Object.assign(Object.create(File.prototype), this);
+      return copy;
+    }
+    return null;
+  }
 }

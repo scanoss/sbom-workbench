@@ -20,10 +20,10 @@ const Breadcrumb = () => {
 
   const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
 
-  const items = state.filter.node ? state.filter.node.path.substring(1).split('/') : [];
+  const items = state.node ? state.node.path.substring(1).split('/') : [];
 
   const nodes = [
-    { name: state.tree.label, type: 'folder', path: null },
+    { name: state.tree?.label, type: 'folder', path: null },
     ...items.map((item, index) => {
       return {
         type: 'folder',

@@ -11,6 +11,8 @@ import Identified from './pages/identified/Identified';
 import Reports from './pages/report/Report';
 import FileTree from './components/FileTree/FileTree';
 import { reset } from './actions';
+import WorkbenchFilters from './components/WorkbenchFilters/WorkbenchFilters';
+import { ENABLE_WORKBENCH_FILTERS } from '../../../Config';
 
 const Workbench = () => {
   const { path } = useRouteMatch();
@@ -51,9 +53,8 @@ const Workbench = () => {
         pane1Style={report ? { display: 'none' } : {}}
       >
         <aside className="panel explorer">
-          <div className="file-tree-container">
-            <FileTree />
-          </div>
+          {ENABLE_WORKBENCH_FILTERS && <WorkbenchFilters />}
+          <FileTree />
         </aside>
         <main id="Workbench" className="match-info">
           {loaded ? (

@@ -1,0 +1,44 @@
+#WorkbenchFilters {
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  header {
+    min-height: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .workbench-filters-group  {
+
+    legend {
+      font-size: 14px;
+      color: #71717A;
+      margin-bottom: 8px;
+    }
+
+    .MuiRadio-root {
+      display: none;
+    }
+
+    .MuiFormControlLabel-label {
+      font-size: 14px;
+      margin: 4px 0;
+      padding: 1px 8px;
+
+      border: 1px solid #64748B;
+      font-weight: 400;
+      color: #64748B;
+      border-radius: 4px;
+      text-transform: capitalize;
+    }
+
+    .Mui-checked + .MuiFormControlLabel-label {
+        background: #E2E8F0;
+      }
+  }
+
+
+}

@@ -20,7 +20,7 @@ class LogicTreeService {
     try {
       const project = workspace.getOpenedProjects()[0];
       project.sendToUI(IpcEvents.TREE_UPDATING, {});
-      paths.forEach(path => {
+      paths.forEach((path) => {
         project.getTree().getRootFolder().setStatus(path, status);
       });
       project.updateTree();

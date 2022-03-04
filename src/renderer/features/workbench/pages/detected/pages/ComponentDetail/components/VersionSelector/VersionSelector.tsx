@@ -27,7 +27,7 @@ const VersionSelector = ({ versions, version, onSelect, component }) => {
             {version || 'version'}
           </Button>
         ) : (
-          versions[0].version
+          versions ? versions[0].version : '-'
         )}
       </div>
       <Menu id="VersionSelectorList" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>

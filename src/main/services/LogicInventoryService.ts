@@ -1,8 +1,16 @@
 import log from 'electron-log';
 import { serviceProvider } from './ServiceProvider';
-import { Inventory, Component, IFolderInventory, ComponentSource } from '../../api/types';
-import { logicComponentService } from './LogicComponentService';
+import {
+  Inventory,
+  Component,
+  IFolderInventory,
+  ComponentSource,
+  FileUsageType,
+  IWorkbenchFilter,
+  FileStatusType,
+} from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
+import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 
 class LogicInventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
@@ -94,7 +102,7 @@ class LogicInventoryService {
         inventories = await serviceProvider.model.inventory.getByPurl(inventory);
       } else inventories = await serviceProvider.model.inventory.getAll();
       if (inventory !== undefined) {
-        const component: any = await serviceProvider.model.component.allComp(null);
+        const component: any = await serviceProvider.model.component.getAll();
         const compObj = component.reduce((acc, comp) => {
           acc[comp.compid] = comp;
           return acc;
@@ -121,26 +129,19 @@ class LogicInventoryService {
     }
   }
 
-  public async preLoadInventoriesAcceptAll(data: Partial<IFolderInventory>): Promise<Array<Partial<Inventory>>> {
+  public async preLoadInventoriesAcceptAll(
+    data: Partial<IFolderInventory>,
+    filter: IWorkbenchFilter
+  ): Promise<Array<Partial<Inventory>>> {
     try {
-      const files: any = await this.getResultsPreLoadInventory(data);
-      const components: any = await logicComponentService.getAll({ source: ComponentSource.ENGINE });
+      let queryBuilder = null;
+      if (data.overwrite) queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder });
+      else queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder });
+      const files: any = await serviceProvider.model.result.getResultsPreLoadInventory(queryBuilder);
+      const components: any = await serviceProvider.model.component.getAll(queryBuilder);
       let inventories = this.getPreLoadInventory(files) as Array<Partial<Inventory>>;
       inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);
-
       return inventories;
-    } catch (err: any) {
-      return err;
-    }
-  }
-
-  private async getResultsPreLoadInventory(params: Partial<IFolderInventory>) {
-    try {
-      let data: any;
-      if (params.overwrite) data = await serviceProvider.model.result.getByFolder(params.folder);
-      else data = await serviceProvider.model.result.getByFolderPending(params.folder);
-
-      return data;
     } catch (err: any) {
       return err;
     }

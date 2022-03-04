@@ -41,13 +41,13 @@ const MatchCard = ({ label, status, onAction, type }: MatchCardProps) => {
             <>
               <span className="type">{type}</span>
               <Tooltip title="Identify">
-                <IconButton onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IDENTIFY)}>
-                  <CheckIcon className="icon check" />
+                <IconButton size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IDENTIFY)}>
+                  <CheckIcon className="icon check" fontSize="inherit" />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Mark as original">
-                <IconButton onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IGNORE)}>
-                  <BanIcon className="icon ban" />
+                <IconButton size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IGNORE)}>
+                  <BanIcon className="icon ban" fontSize="inherit" />
                 </IconButton>
               </Tooltip>
             </>
@@ -55,8 +55,8 @@ const MatchCard = ({ label, status, onAction, type }: MatchCardProps) => {
           {status === 'ignored' && isShow && (
             <>
               <Tooltip title="Restore">
-                <IconButton onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_RESTORE)}>
-                  <RestoreOutlined className="icon" />
+                <IconButton size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_RESTORE)}>
+                  <RestoreOutlined className="icon" fontSize="inherit" />
                 </IconButton>
               </Tooltip>
             </>
@@ -64,13 +64,13 @@ const MatchCard = ({ label, status, onAction, type }: MatchCardProps) => {
           {status === 'identified' && isShow && (
             <>
               <Tooltip title="Remove identification">
-                <IconButton onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_DETACH)}>
-                  <RestoreOutlined className="icon" />
+                <IconButton size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_DETACH)}>
+                  <RestoreOutlined className="icon" fontSize="inherit" />
                 </IconButton>
               </Tooltip>
               <Tooltip title="View identification">
-                <IconButton onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_DETAIL)}>
-                  <DescriptionOutlined />
+                <IconButton size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_DETAIL)}>
+                  <DescriptionOutlined fontSize="inherit" />
                 </IconButton>
               </Tooltip>
             </>

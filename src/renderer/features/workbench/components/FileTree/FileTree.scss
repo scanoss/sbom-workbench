@@ -32,6 +32,11 @@
       background-color: $bg !important
     }
 
+    &.matched .ft-node-label {
+      font-weight: 500;
+      color: #000;
+    }
+
     > span {
       width: 100%;
       display: flex;

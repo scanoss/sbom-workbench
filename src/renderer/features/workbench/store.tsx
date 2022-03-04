@@ -2,9 +2,10 @@
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
+import { Filter } from '@material-ui/icons';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
-import { ComponentGroup, Inventory, InventoryAction, Node } from '../../../api/types';
+import { ComponentGroup, Inventory, InventoryAction, IWorkbenchFilter, Node } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
 import {
@@ -19,6 +20,7 @@ import {
 import { reportService } from '../../../api/report-service';
 import { IpcEvents } from '../../../ipc-events';
 import { fileService } from '../../../api/file-service';
+import { projectService } from '../../../api/project-service';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;
@@ -133,13 +135,25 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   const update = async () => {
-    const params = state.filter.node?.type === 'folder' ? { path: state.filter.node.path } : null;
+    const params: IWorkbenchFilter = state.filter;
     if (component) {
-      const comp = await workbenchController.getComponent(component.purl, params);
+      let comp = await workbenchController.getComponent(component.purl);
+      if (!comp) {
+        // TODO: remove this block after backend changes. Do it for her!
+        comp = {
+          ...component,
+          versions: null,
+          summary: {
+            pending: 0,
+            identified: 0,
+            ignored: 0,
+          },
+        };
+      }
       if (comp) dispatch(setComponent(comp));
     }
 
-    const components = await workbenchController.getComponents(params);
+    const components = await workbenchController.getComponents();
     dispatch(setComponents(components));
 
     const summary = await reportService.getSummary();
@@ -150,13 +164,20 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const setNode = async (node: Node) => {
     dispatch(setCurrentNode(node));
-    if (!node || node.type === 'folder') {
+    /* if (!node || node.type === 'folder') {
       const comp = await workbenchController.getComponents({
         ...(node && { path: node.path }),
       });
       if (comp) dispatch(setComponents(comp));
-    }
+    } */
   };
+
+  useEffect(async () => {
+    if (state.loaded) {
+      await projectService.setFilter(state.filter);
+      update();
+    }
+  }, [state.filter]);
 
   // TODO: use custom navigation
   useEffect(() => {
