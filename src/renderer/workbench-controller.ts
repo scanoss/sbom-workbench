@@ -5,6 +5,7 @@ import { componentService } from '../api/component-service';
 import { ComponentGroup, ComponentParams, ComponentSource } from '../api/types';
 import { sortComponents } from '../utils/scan-util';
 import { IpcEvents } from '../ipc-events';
+import { API_URL } from '../Config';
 
 const pathUtil = require('path');
 
@@ -50,7 +51,7 @@ class WorkbenchController {
    */
   public async fetchRemoteFile(hash: string): Promise<string> {
     // TODO: move api url to API Config
-    const response = await fetch(`https://osskb.org/api/file_contents/${hash}`);
+    const response = await fetch(`${API_URL}/file_contents/${hash}`);
     if (!response.ok) throw new Error('File not found');
 
     return response.text();

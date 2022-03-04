@@ -4,6 +4,7 @@ import { IWorkspaceCfg } from '../api/types';
 import { wsUtils } from './workspace/WsUtils/WsUtils';
 
 import packageJson from '../package.json';
+import { API_URL } from '../Config';
 
 class UserSetting {
   private myPath: string;
@@ -15,7 +16,7 @@ class UserSetting {
   private defaultStore: IWorkspaceCfg = {
     TOKEN: '',
     DEFAULT_API_INDEX: 0,
-    APIS: [{ URL: 'https://osskb.org/api/scan/direct', API_KEY: '', DESCRIPTION: '' }],
+    APIS: [{ URL: `${API_URL}/scan/direct`, API_KEY: '', DESCRIPTION: '' }],
     SCAN_MODE: 'FULL_SCAN',
     VERSION: app.isPackaged === true ? app.getVersion() : packageJson.version,
   };

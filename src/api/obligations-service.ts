@@ -1,6 +1,5 @@
+import { API_URL } from '../Config';
 import { BaseService } from './base-service';
-
-const BASE_URL = 'https://osskb.org/api';
 
 class ObligationsService extends BaseService {
   private cache: Map<string, any> = new Map();
@@ -16,7 +15,7 @@ class ObligationsService extends BaseService {
         return this.cache.get(spdxId);
       }
 
-      const response = await fetch(`${BASE_URL}/license/obligations/${spdxId}`);
+      const response = await fetch(`${API_URL}/license/obligations/${spdxId}`);
       if (response.ok) {
         const obligations = this.mapper(await response.json());
         this.cache.set(spdxId, obligations);
