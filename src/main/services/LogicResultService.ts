@@ -1,5 +1,5 @@
-import { IWorkbenchFilter } from '../../api/types';
 import { QueryBuilder } from '../queryBuilder/QueryBuilder';
+import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 import { workspace } from '../workspace/Workspace';
 
 class LogicResultService {
@@ -13,7 +13,6 @@ class LogicResultService {
             element.identified === 1 ? 'identified' : element.ignored === 1 ? 'ignored' : 'pending';
         }
       });
-
       return response;
     } catch (e) {
       return e;
@@ -54,7 +53,8 @@ class LogicResultService {
     try {
       const project = workspace.getOpenedProjects()[0];
       const results = await project.store.result.getFromPath(path);
-      const components: any = await project.store.component.getAll();
+      const queryBuilder = QueryBuilderCreator.create({ path });
+      const components: any = await project.store.component.getAll(queryBuilder);
       results.forEach((result) => {
         if (result.license) result.license = result.license.split(',');
         if (result.version)

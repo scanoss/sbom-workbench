@@ -11,8 +11,11 @@ class LogicComponentService {
       const params = { purl: data.purl, ...filter };
       const queryBuilder = QueryBuilderCreator.create(params);
       const files: any = await serviceProvider.model.file.getAll(queryBuilder);
-      const components = await serviceProvider.model.component.getAll();
       const inventories: any = await serviceProvider.model.inventory.getAll();
+      const compid = inventories.map((inv) => inv.cvid);
+      const queryComp = QueryBuilderCreator.create({ compid });
+      const components = await serviceProvider.model.component.getAll(queryComp);
+
       const index = inventories.reduce((acc, inventory) => {
         acc[inventory.id] = inventory;
         return acc;
