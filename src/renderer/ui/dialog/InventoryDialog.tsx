@@ -19,7 +19,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import AddIcon from '@material-ui/icons/Add';
 import React, { useEffect, useState, useContext } from 'react';
 import { Autocomplete } from '@material-ui/lab';
-import { ComponentGroup, Inventory } from '../../../api/types';
+import { Inventory } from '../../../api/types';
 import { InventoryForm } from '../../context/types';
 import { componentService } from '../../../api/component-service';
 import { licenseService } from '../../../api/license-service';
@@ -60,7 +60,7 @@ interface InventoryDialogProps {
   inventory: Partial<InventoryForm>;
   onClose: (inventory: Inventory) => void;
   onCancel: () => void;
-  recentUsedComponents: ComponentGroup[];
+  recentUsedComponents: Array<string>;
 }
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
@@ -76,11 +76,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const setDefaults = () => setForm(inventory);
 
   const init = async () => {
-    const componentsResponse = await componentService.getAllComponentGroup();
+    const componentsResponse = await componentService.getAll();
     const licensesResponse = await licenseService.getAll();
-    const compCatalogue = componentsResponse.data.map((component) => ({ ...component, type: 'Catalogued' }));
+    const compCatalogue = componentsResponse.map((component) => ({ ...component, type: 'Catalogued' }));
     setGlobalComponents(compCatalogue);
-
     const catalogue = licensesResponse.data.map((item) => ({
       spdxid: item.spdxid,
       name: item.name,
@@ -114,8 +113,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const addCustomComponent = async (component) => {
     const { name, version, licenses, purl, url } = component;
-    const { data } = await componentService.getComponentGroup({ purl });
-    setGlobalComponents([...components, data]);
+    const comp = await componentService.get({ purl });
+    setGlobalComponents([...components, comp]);
 
     setLicenses([
       ...licenses,
@@ -134,12 +133,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const addCustomComponentVersion = async (component) => {
     const { name, version, licenses, purl, url } = component;
-
-    // FIXME: This is a hack to get the component, should be change when rafactor branch is merged.
-    const { data } = await componentService.getAllComponentGroup();
+    const comp = await componentService.get({ purl: component.purl });
     const nComponents = components.filter((item) => item.purl !== purl);
-    const comp = data.find((item) => item.purl === purl);
-
     setGlobalComponents([...nComponents, comp]);
     setVersions([version, ...versions]);
     // setLicenses(licenses);
@@ -158,12 +153,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     let recents = [];
     const nComponents = components.filter((comp) => comp.type !== 'Recents');
     if (recentUsedComponents && recentUsedComponents.length > 0) {
-      // const recentUsed = recentUsedComponents.map((component) => ({ ...component, type: 'Recents' }));
-      recents = nComponents
-        .filter((comp) => recentUsedComponents.find((item) => item.purl === comp.purl))
-        .map((component) => ({ ...component, type: 'Recents' }));
+      for (const component of recentUsedComponents) {
+        const recent = nComponents
+          .filter((item) => item.purl === component)
+          .map((comp) => ({ ...comp, type: 'Recents' }));
+        recents = [...recents, ...recent];
+      }
     }
-
     setComponents([...recents, ...nComponents]);
   };
 
@@ -205,8 +201,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       init();
     }
   }, [open]);
-
-
 
   useEffect(() => {
     const component = components.find((item) => item.purl === form.purl);

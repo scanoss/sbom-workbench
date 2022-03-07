@@ -58,14 +58,14 @@ class WorkbenchController {
   }
 
   public async getComponents(params: IWorkbenchFilter = null): Promise<ComponentGroup[]> {
-    const { data } = await componentService.getAllComponentGroup({ ...params, source: ComponentSource.ENGINE });
-    sortComponents(data);
-    return data;
+    const components = await componentService.getAll({ ...params, source: ComponentSource.ENGINE });
+    sortComponents(components);
+    return components;
   }
 
   public async getComponent(purl: string, params: IWorkbenchFilter = null): Promise<ComponentGroup> {
-    const { data } = await componentService.getComponentGroup({ purl }, { ...params, source: ComponentSource.ENGINE });
-    return data;
+    const comp = await componentService.get({ purl }, { ...params, source: ComponentSource.ENGINE });
+    return comp;
   }
 
   public async getFileTree() {

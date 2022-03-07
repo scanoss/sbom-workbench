@@ -27,7 +27,7 @@ export interface State {
   dependencies: IDependencyResponse;
   file: string | null;
   mainComponents: ComponentGroup[];
-  recentUsedComponents: ComponentGroup[];
+  recentUsedComponents: Array<string>;
   components: ComponentGroup[];
   component: ComponentGroup;
   history: {
@@ -148,24 +148,15 @@ export default function reducer(state: State = initialState, action): State {
       };
     }
     case SET_RECENT_USED_COMPONENT: {
-      const { component } = action;
+      const { purl } = action;
       if (state.recentUsedComponents) {
-        if (!state.recentUsedComponents.some((el) => el.purl === component.purl)) {
-          state.recentUsedComponents.splice(0, 0, component);
-        } else {
-          const index = state.recentUsedComponents.findIndex((el) => el.purl === component.purl);
-
-          state.recentUsedComponents.splice(index, 1);
-          state.recentUsedComponents.splice(0, 0, component);
-        }
-      } else state.recentUsedComponents = [component];
-
-      if (state.recentUsedComponents?.length >= MAX_RECENT_USED_COMPONENTS) {
-        state.recentUsedComponents.splice(MAX_RECENT_USED_COMPONENTS, 1);
-      }
-
+        state.recentUsedComponents = state.recentUsedComponents.filter((c) => c !== purl);
+        state.recentUsedComponents.unshift(purl);
+        if (state.recentUsedComponents.length > MAX_RECENT_USED_COMPONENTS) state.recentUsedComponents.pop();
+      } else state.recentUsedComponents = [purl];
       return {
         ...state,
+        recentUsedComponents: state.recentUsedComponents,
       };
     }
     case SET_FILTER: {

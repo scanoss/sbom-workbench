@@ -31,14 +31,14 @@ class ComponentService extends BaseService {
     return response;
   }
 
-  public async getAllComponentGroup(params?: IWorkbenchFilter): Promise<any> {
+  public async getAll(params?: IWorkbenchFilter): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_ALL, params);
-    return response;
+    return this.response(response);
   }
 
-  public async getComponentGroup(component: Partial<ComponentGroup>, params?: IWorkbenchFilter): Promise<any> {
+  public async get(component: Partial<ComponentGroup>, params?: IWorkbenchFilter): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET, component, params);
-    return response;
+    return this.response(response);
   }
 }
 
