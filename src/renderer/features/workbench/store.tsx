@@ -2,10 +2,9 @@
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
-import { Filter } from '@material-ui/icons';
 import { workbenchController } from '../../workbench-controller';
 import { AppContext } from '../../context/AppProvider';
-import { ComponentGroup, Inventory, InventoryAction, IWorkbenchFilter, Node } from '../../../api/types';
+import { Inventory, InventoryAction, IWorkbenchFilter, Node } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
 import reducer, { initialState, State } from './reducers';
 import {
@@ -64,9 +63,8 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   const createInventory = async (inventory: Inventory): Promise<Inventory> => {
-    const response = await inventoryService.create(inventory);
-    const comp = state.components.find((c) => c.purl === inventory.purl);
-    if (comp) dispatch(setRecentUsedComponent(comp));
+    const response = await inventoryService.create(inventory);   
+    if (inventory) dispatch(setRecentUsedComponent(inventory.purl));
     update();
     return response;
   };

@@ -29,23 +29,27 @@ ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (_event, component: Componen
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (_event, params: IWorkbenchFilter) => {
-  const filter = workspace.getOpenedProjects()[0].getFilter();
-  const data = await logicComponentService.getAll({ ...filter, ...params });
-  return {
-    status: 'ok',
-    message: 'Components group retrieve successfully',
-    data,
-  };
+  try {
+    const filter = workspace.getOpenedProjects()[0].getFilter();
+    const data = await logicComponentService.getAll({ ...filter, ...params });
+    return {
+      status: 'ok',
+      message: 'Components getAll retrieve successfully',
+      data,
+    };
+  } catch (e) {
+    return { status: 'fail' };
+  }
 });
 
 ipcMain.handle(
   IpcEvents.COMPONENT_GET,
   async (_event, component: Partial<ComponentGroup>, params: IWorkbenchFilter) => {
-    const data = await logicComponentService.get(component, params);
-    return {
-      status: 'ok',
-      message: 'Component group retrieve successfully',
-      data,
-    };
+    try {
+      const data = await logicComponentService.get(component, params);
+      return { status: 'ok', message: 'Component group retrieve successfully', data };
+    } catch (e) {
+      return { status: 'fail' };
+    }
   }
 );

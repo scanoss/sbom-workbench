@@ -60,8 +60,8 @@ export const IdentifiedList = () => {
 
   const onSelectComponent = async (grouped) => {
     const { purl } = grouped.inventories[0];
-    const { data } = await componentService.getComponentGroup({ purl });
-    dispatch(setComponent(data));
+    const comp = await componentService.get({ purl });
+    dispatch(setComponent(comp));
     history.push(`/workbench/identified/inventory`);
   };
 

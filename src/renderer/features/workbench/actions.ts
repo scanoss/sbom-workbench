@@ -64,9 +64,9 @@ export const setFilter = (filter: IWorkbenchFilter, override = false) => ({
   override,
 });
 
-export const setRecentUsedComponent = (component: ComponentGroup) => ({
+export const setRecentUsedComponent = (purl: string) => ({
   type: SET_RECENT_USED_COMPONENT,
-  component,
+  purl,
 });
 
 export const reset = () => ({
