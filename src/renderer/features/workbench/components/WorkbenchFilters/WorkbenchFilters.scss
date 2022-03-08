@@ -3,57 +3,80 @@
   flex-direction: column;
   justify-content: center;
 
+
   .workbench-filters-body {
     min-height: 130px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+
+    margin: 0 16px;
+  }
+
+  .MuiFormControlLabel-root {
+    --color: #6366f1;
+    --color-rgb: 99, 102, 241;
+
+    &.pending { --color: rgb(249, 115, 22); --color-rgb: 249, 115, 22; }
+    &.identified { --color: #22C55E; --color-rgb: 34, 197, 94; }
+    &.original { --color: #84CC16; --color-rgb: 132, 204, 22; }
+    &.nomatch { --color: #3F3F46; --color-rgb: 63, 63, 70; }
+    &.filtered { --color: #A1A1AA; --color-rgb: 161, 161, 170; }
   }
 
   &.collapsed {
     .workbench-filters-body {
       flex-direction: row;
+      justify-content: space-between;
     }
 
     .workbench-filters-group  {
       display: flex;
       flex-direction: row;
-      align-items: center;
-      margin-bottom: 0 !important;
+      align-items: flex-start;
+      margin-bottom: 8px;
 
-      &:first-child {
-        margin-right: 16px;
-      }
-
-      label {
-        &::before {
-          content: '\00a0';
-          width: 10px;
-          height: 10px;
-          background: red;
-          display: block;
-        }
+      .MuiFormLabel-root {
+        margin-bottom: 1px;
       }
 
       .MuiFormControlLabel-label {
-        display: none;
+        font-size: 0;
+        border: 0;
+        margin: 2px 0;
+        padding: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: rgba(var(--color-rgb), 0.3);
       }
 
+      .Mui-checked + .MuiFormControlLabel-label {
+        background-color: (var(--color));
+      }
+
+      .MuiFormControlLabel-root:last-child {
+        margin-right: 0;
+      }
     }
   }
 
   header {
-    min-height: 30px;
     display: flex;
-    justify-content: space-between;
+    justify-content: start;
     align-items: center;
+    font-size: 16px;
+    margin: 14px 16px 4px;
+    min-height: 24px;
+    padding: 0;
   }
 
   .workbench-filters-group  {
+    margin-bottom: 16px;
 
-    legend {
+    .MuiFormLabel-root {
+      margin-right: 8px;
       font-size: 14px;
-      color: #71717A;
       margin-bottom: 8px;
     }
 
@@ -66,15 +89,15 @@
       margin: 4px 0;
       padding: 1px 8px;
 
-      border: 1px solid #64748B;
+      border: 1px solid var(--color);
       font-weight: 400;
-      color: #64748B;
+      color: var(--color);
       border-radius: 4px;
       text-transform: capitalize;
     }
 
     .Mui-checked + .MuiFormControlLabel-label {
-      background: #E2E8F0;
+      background-color: rgba(var(--color-rgb), 0.2);
     }
 
   }

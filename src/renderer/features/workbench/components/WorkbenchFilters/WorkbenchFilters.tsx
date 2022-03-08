@@ -44,8 +44,8 @@ const WorkbenchFilters = () => {
   return (
     <>
       <Box id="WorkbenchFilters" boxShadow={1} className={`workbench-filters ${open ? 'no-collapsed' : 'collapsed'}`}>
-        <header className="workbench-filters-header d-flex">
-          <h4 className="ml-2 mb-0 mt-0">Filters</h4>
+        <header className="workbench-filters-header">
+          <h4 className="mr-1 mb-0 mt-0">Filters</h4>
           {isFilterActive(filter) &&
             <Tooltip title="Clean filters">
               <IconButton size="small" aria-label="clean" className="btn-clean" onClick={handleReset}>
@@ -54,9 +54,9 @@ const WorkbenchFilters = () => {
             </Tooltip>
           }
         </header>
-        <Collapse in={open} collapsedHeight={30}>
-          <form className="workbench-filters-body ml-3 mt-1">
-            <FormControl component="fieldset" className="workbench-filters-group usage mb-4">
+        <Collapse in={open} collapsedHeight={25}>
+          <form className="workbench-filters-body">
+            <FormControl component="fieldset" className="workbench-filters-group usage">
               <FormLabel component="span">Usage</FormLabel>
               <RadioGroup
                 aria-label="usage"
@@ -66,19 +66,23 @@ const WorkbenchFilters = () => {
                 className="flex-row ml-2"
               >
                 <FormControlLabel value="all" control={<Radio size="small" />} label="All" />
-                <FormControlLabel
-                  value={FileUsageType.FILE}
-                  control={<Radio size="small" />}
-                  label={FileUsageType.FILE}
-                />
-                <FormControlLabel
-                  value={FileUsageType.SNIPPET}
-                  control={<Radio size="small" />}
-                  label={FileUsageType.SNIPPET}
-                />
+                <Tooltip title={FileUsageType.FILE} disableHoverListener={open} placement="top" arrow>
+                  <FormControlLabel
+                    value={FileUsageType.FILE}
+                    control={<Radio size="small" />}
+                    label={FileUsageType.FILE}
+                  />
+                </Tooltip>
+                <Tooltip title={FileUsageType.SNIPPET} disableHoverListener={open} placement="top" arrow>
+                  <FormControlLabel
+                    value={FileUsageType.SNIPPET}
+                    control={<Radio size="small" />}
+                    label={FileUsageType.SNIPPET}
+                  />
+                </Tooltip>
               </RadioGroup>
             </FormControl>
-            <FormControl component="fieldset" className="workbench-filters-group status mb-1">
+            <FormControl component="fieldset" className="workbench-filters-group status">
               <FormLabel component="span">Status</FormLabel>
               <RadioGroup
                 aria-label="status"
@@ -89,22 +93,31 @@ const WorkbenchFilters = () => {
               >
                 <FormControlLabel value="all" control={<Radio size="small" />} label="All" />
                 <FormControlLabel
+                  className={FileStatusType.PENDING}
                   value={FileStatusType.PENDING}
                   control={<Radio size="small" />}
                   label={FileStatusType.PENDING}
                 />
                 <FormControlLabel
+                  className={FileStatusType.IDENTIFIED}
                   value={FileStatusType.IDENTIFIED}
                   control={<Radio size="small" />}
                   label={FileStatusType.IDENTIFIED}
                 />
                 <FormControlLabel
+                  className={FileStatusType.ORIGINAL}
                   value={FileStatusType.ORIGINAL}
                   control={<Radio size="small" />}
                   label={FileStatusType.ORIGINAL}
                 />
-                <FormControlLabel value={FileStatusType.NOMATCH} control={<Radio size="small" />} label="No Match" />
                 <FormControlLabel
+                  className={FileStatusType.NOMATCH}
+                  value={FileStatusType.NOMATCH}
+                  control={<Radio size="small" />}
+                  label="No Match"
+                />
+                <FormControlLabel
+                  className={FileStatusType.FILTERED}
                   value={FileStatusType.FILTERED}
                   control={<Radio size="small" />}
                   label={FileStatusType.FILTERED}
@@ -127,6 +140,7 @@ const WorkbenchFilters = () => {
             <KeyboardArrowDownOutlinedIcon fontSize="inherit" />
           )}
         </Button>
+
       </Box>
     </>
   );
