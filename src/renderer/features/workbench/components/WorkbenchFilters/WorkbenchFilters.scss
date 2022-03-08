@@ -1,8 +1,46 @@
 #WorkbenchFilters {
-
   display: flex;
   flex-direction: column;
   justify-content: center;
+
+  .workbench-filters-body {
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  &.collapsed {
+    .workbench-filters-body {
+      flex-direction: row;
+    }
+
+    .workbench-filters-group  {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-bottom: 0 !important;
+
+      &:first-child {
+        margin-right: 16px;
+      }
+
+      label {
+        &::before {
+          content: '\00a0';
+          width: 10px;
+          height: 10px;
+          background: red;
+          display: block;
+        }
+      }
+
+      .MuiFormControlLabel-label {
+        display: none;
+      }
+
+    }
+  }
 
   header {
     min-height: 30px;
@@ -36,8 +74,9 @@
     }
 
     .Mui-checked + .MuiFormControlLabel-label {
-        background: #E2E8F0;
-      }
+      background: #E2E8F0;
+    }
+
   }
 
 
