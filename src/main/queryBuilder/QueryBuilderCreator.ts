@@ -10,7 +10,6 @@ import { QueryBuilderUsage } from './QueryBuilderUsage';
 import { QueryBuilderVersion } from './QueryBuilderVersion';
 
 export class QueryBuilderCreator {
-
   public static create(params: Record<string, any>): QueryBuilder {
     let builder: QueryBuilderAND = null;
     if (params) {
