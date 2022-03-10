@@ -10,6 +10,8 @@ import { componentHelper } from '../helpers/ComponentHelper';
 const query = new Querys();
 
 export class ComponentModel extends Model {
+  public static readonly entityMapper = { path: 'f.path', purl: 'comp.purl', version: 'comp.version' };
+
   license: LicenseModel;
 
   public constructor(path: string) {
@@ -390,7 +392,9 @@ export class ComponentModel extends Model {
     return new Promise<any>(async (resolve, reject) => {
       try {
         let SQLquery = query.SQL_GET_ALL_COMPONENTS;
-        const filter = builder?.getSQL() ? `WHERE ${builder.getSQL().toString()}` : '';
+        const filter = builder?.getSQL(this.getEntityMapper())
+          ? `WHERE ${builder.getSQL(this.getEntityMapper()).toString()}`
+          : '';
         const params = builder?.getFilters() ? builder.getFilters() : [];
         SQLquery = SQLquery.replace('#FILTER', filter);
         const db = await this.openDb();
@@ -413,7 +417,9 @@ export class ComponentModel extends Model {
     return new Promise<any>(async (resolve, reject) => {
       try {
         let SQLquery = query.SQL_COMPONENTS_SUMMARY;
-        const filter = builder?.getSQL() ? `WHERE ${builder.getSQL().toString()}` : '';
+        const filter = builder?.getSQL(this.getEntityMapper())
+          ? `WHERE ${builder.getSQL(this.getEntityMapper()).toString()}`
+          : '';
         const params = builder?.getFilters() ? builder.getFilters() : [];
         SQLquery = SQLquery.replace('#FILTER', filter);
         const db = await this.openDb();
@@ -429,5 +435,9 @@ export class ComponentModel extends Model {
         reject(error);
       }
     });
+  }
+
+  public getEntityMapper(): Record<string, string> {
+    return ComponentModel.entityMapper;
   }
 }

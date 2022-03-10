@@ -8,8 +8,8 @@ export class QueryBuilderAND extends QueryBuilder {
     this.builders = [];
   }
 
-  public getSQL(): string {
-    const partialSQL = this.builders.map((e) => e.getSQL()).join(' AND ');
+  public getSQL(entityMapper: Record<string, string>): string {
+    const partialSQL = this.builders.map((e) => e.getSQL(entityMapper)).join(' AND ');
     return partialSQL;
   }
 

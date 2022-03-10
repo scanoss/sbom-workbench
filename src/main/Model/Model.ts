@@ -9,6 +9,8 @@ const query = new Querys();
 
 export class Model {
   dbPath: string;
+  
+  public static readonly entityMapper = null;
 
   constructor(path: string) {
     this.dbPath = `${path}/scan_db`;
@@ -113,4 +115,8 @@ export class Model {
       }
     });
   }
+
+  public getEntityMapper():Record<string,string>{
+    return Model.entityMapper;
+  } 
 }

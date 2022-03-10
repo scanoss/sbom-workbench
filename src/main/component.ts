@@ -1,9 +1,8 @@
 import { ipcMain } from 'electron';
-import { Component, License, ComponentGroup, IWorkbenchFilter, IProject } from '../api/types';
+import { Component, License, ComponentGroup, IWorkbenchFilter } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
 import { logicComponentService } from './services/LogicComponentService';
-import { logictTreeService } from './services/LogicTreeService';
 import { workspace } from './workspace/Workspace';
 
 ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, component: Component) => {

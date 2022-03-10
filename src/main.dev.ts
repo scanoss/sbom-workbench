@@ -31,6 +31,7 @@ import './main/formats';
 import './main/workspace';
 import './main/report';
 import './main/license';
+import './main/dependency';
 import './main/controllers/userSetting';
 import { DEFAULT_WORKSPACE_NAME } from './Config';
 

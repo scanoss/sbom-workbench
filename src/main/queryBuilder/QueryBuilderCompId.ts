@@ -1,7 +1,6 @@
 import { QueryBuilder } from './QueryBuilder';
 
 export class QueryBuilderCompId extends QueryBuilder {
-
   private value: any;
 
   constructor(value: any) {
@@ -9,11 +8,11 @@ export class QueryBuilderCompId extends QueryBuilder {
     this.value = value;
   }
 
-  public getSQL(): string {
+  public getSQL(entityMapper: Record<string, string>): string {
     return `comp.id IN (${this.value.toString()})`;
   }
 
-  public getFilters(): any[]{
+  public getFilters(): any[] {
     return null;
-  } 
+  }
 }

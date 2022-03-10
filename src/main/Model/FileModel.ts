@@ -8,6 +8,8 @@ import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 const query = new Querys();
 
 export class FileModel extends Model {
+  public static readonly entityMapper = { path: 'f.path', purl: 'comp.purl', version: 'comp.version' };
+
   inventory: InventoryModel;
 
   constructor(path: string) {
@@ -38,11 +40,13 @@ export class FileModel extends Model {
         comp.purl = r.purl AND comp.version = r.version
        LEFT JOIN file_inventories fi ON fi.fileId=f.fileId #FILTER ;`;
 
-        const filter = builder?.getSQL() ? `WHERE ${builder.getSQL().toString()}` : '';
+        const filter = builder?.getSQL(this.getEntityMapper())
+          ? `WHERE ${builder.getSQL(this.getEntityMapper()).toString()}`
+          : '';
         const params = builder?.getFilters() ? builder.getFilters() : [];
         SQLquery = SQLquery.replace('#FILTER', filter);
         const db = await this.openDb();
-        db.all(SQLquery, ...params, (err: any, file: any) => { 
+        db.all(SQLquery, ...params, (err: any, file: any) => {
           db.close();
           if (err) throw err;
           resolve(file);
@@ -256,5 +260,9 @@ export class FileModel extends Model {
         reject(error);
       }
     });
+  }
+
+  public getEntityMapper(): Record<string, string> {
+    return FileModel.entityMapper;
   }
 }
