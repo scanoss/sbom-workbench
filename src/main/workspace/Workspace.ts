@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import log from 'electron-log';
 import { Project } from './Project';
 import { INewProject, IProject, License, ProjectState } from '../../api/types';
-import { licenses } from '../db/licenses';
+import { licenses } from '../Model/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
 
 class Workspace extends EventEmitter {

@@ -28,5 +28,4 @@ class UtilModel {
   }
 }
 
-
 export const utilModel = new UtilModel();
