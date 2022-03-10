@@ -26,6 +26,7 @@ const WorkbenchFilters = () => {
   const { filter } = state;
 
   const [open, setOpen] = useState<boolean>(false);
+  const isFilterActive = (currentFilter: IWorkbenchFilter) => currentFilter?.status || currentFilter?.usage;
 
   const handleChange = (filter, value) => {
     dispatch(setFilter({ [filter]: value !== 'all' ? value : null }));
@@ -35,91 +36,101 @@ const WorkbenchFilters = () => {
     dispatch(setFilter({ status: null, usage: null }));
   };
 
-  const isFilterActive = (currentFilter: IWorkbenchFilter) => currentFilter?.status || currentFilter?.usage;
+  const handleClick = (filterValue, value) => {
+    if (filter && filter[filterValue] === value) {
+      dispatch(setFilter({ [filterValue]: null }));
+    }
+  };
 
   const setFileTreeViewMode = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) await projectService.setFileTreeViewMode(FileTreeViewMode.PRUNE);
     else await projectService.setFileTreeViewMode(FileTreeViewMode.DEFAULT);
   };
+
+  const FormControlElement = (props) => {
+    const { label } = props;
+    return (
+      <Tooltip title={label.charAt(0).toUpperCase() + label.slice(1)} disableHoverListener={open} placement="top" arrow>
+        <FormControlLabel {...props} control={<Radio size="small" />} />
+      </Tooltip>
+    );
+  };
+
   return (
     <>
-      <Box boxShadow={1} id="WorkbenchFilters" className="workbench-filters">
-        <header className="d-flex">
-          <h4 className="ml-2 mb-0 mt-0">Filters</h4>
-          {isFilterActive(filter) &&
+      <Box id="WorkbenchFilters" boxShadow={1} className={`workbench-filters ${open ? 'no-collapsed' : 'collapsed'}`}>
+        <header className="workbench-filters-header">
+          <h4 className="mr-1 mb-0 mt-0">Filters</h4>
+          {isFilterActive(filter) && (
             <Tooltip title="Clean filters">
               <IconButton size="small" aria-label="clean" className="btn-clean" onClick={handleReset}>
                 <DeleteIcon fontSize="inherit" />
               </IconButton>
             </Tooltip>
-          }
+          )}
         </header>
-        <Collapse in={open}>
-          <section className="workbench-filters-status ml-3 mt-1">
-            <form>
-              <FormControl component="fieldset" className="workbench-filters-group usage mb-4">
-                <FormLabel component="legend">Usage</FormLabel>
-                <RadioGroup
-                  aria-label="usage"
-                  name="usage"
-                  value={filter?.usage || 'all'}
-                  onChange={(event) => handleChange('usage', event.target.value)}
-                  className="flex-row ml-2"
-                >
-                  <FormControlLabel value="all" control={<Radio size="small" />} label="All" />
-                  <FormControlLabel
-                    value={FileUsageType.FILE}
-                    control={<Radio size="small" />}
-                    label={FileUsageType.FILE}
-                  />
-                  <FormControlLabel
-                    value={FileUsageType.SNIPPET}
-                    control={<Radio size="small" />}
-                    label={FileUsageType.SNIPPET}
-                  />
-                </RadioGroup>
-              </FormControl>
-              <FormControl component="fieldset" className="workbench-filters-group status mb-1">
-                <FormLabel component="legend">Match Status</FormLabel>
-                <RadioGroup
-                  aria-label="status"
-                  name="usage"
-                  value={filter?.status || 'all'}
-                  onChange={(event) => handleChange('status', event.target.value)}
-                  className="flex-row ml-2"
-                >
-                  <FormControlLabel value="all" control={<Radio size="small" />} label="All" />
-                  <FormControlLabel
-                    value={FileStatusType.PENDING}
-                    control={<Radio size="small" />}
-                    label={FileStatusType.PENDING}
-                  />
-                  <FormControlLabel
-                    value={FileStatusType.IDENTIFIED}
-                    control={<Radio size="small" />}
-                    label={FileStatusType.IDENTIFIED}
-                  />
-                  <FormControlLabel
-                    value={FileStatusType.ORIGINAL}
-                    control={<Radio size="small" />}
-                    label={FileStatusType.ORIGINAL}
-                  />
-                  <FormControlLabel value={FileStatusType.NOMATCH} control={<Radio size="small" />} label="No Match" />
-                  <FormControlLabel
-                    value={FileStatusType.FILTERED}
-                    control={<Radio size="small" />}
-                    label={FileStatusType.FILTERED}
-                  />
-                </RadioGroup>
-              </FormControl>
-              <FormGroup>
-                <FormControlLabel
-                  control={<Checkbox onChange={setFileTreeViewMode} />}
-                  label={<small>Show only filter matches</small>}
+        <Collapse in={open} collapsedHeight={25}>
+          <form className="workbench-filters-body">
+            <FormControl component="fieldset" className="workbench-filters-group usage">
+              <FormLabel component="span">Usage</FormLabel>
+              <RadioGroup
+                aria-label="usage"
+                name="usage"
+                value={filter?.usage || 'all'}
+                onChange={(event) => handleChange('usage', event.target.value)}
+                onClick={(event: any) => event.target.value && handleClick('usage', event.target.value)}
+                className="flex-row ml-2"
+              >
+                <FormControlElement value="all" label="All" />
+                <FormControlElement value={FileUsageType.FILE} label={FileUsageType.FILE} />
+                <FormControlElement value={FileUsageType.SNIPPET} label={FileUsageType.SNIPPET} />
+              </RadioGroup>
+            </FormControl>
+            <FormControl component="fieldset" className="workbench-filters-group status">
+              <FormLabel component="span">Status</FormLabel>
+              <RadioGroup
+                aria-label="status"
+                name="usage"
+                value={filter?.status || 'all'}
+                onChange={(event) => handleChange('status', event.target.value)}
+                onClick={(event: any) => event.target.value && handleClick('status', event.target.value)}
+                className="flex-row ml-2"
+              >
+                <FormControlElement value="all" label="All" />
+                <FormControlElement
+                  className={FileStatusType.PENDING}
+                  value={FileStatusType.PENDING}
+                  label={FileStatusType.PENDING}
                 />
-              </FormGroup>
-            </form>
-          </section>
+                <FormControlElement
+                  className={FileStatusType.IDENTIFIED}
+                  value={FileStatusType.IDENTIFIED}
+                  label={FileStatusType.IDENTIFIED}
+                />
+                <FormControlElement
+                  className={FileStatusType.ORIGINAL}
+                  value={FileStatusType.ORIGINAL}
+                  label={FileStatusType.ORIGINAL}
+                />
+                <FormControlElement
+                  className={FileStatusType.NOMATCH}
+                  value={FileStatusType.NOMATCH}
+                  label="No Match"
+                />
+                <FormControlElement
+                  className={FileStatusType.FILTERED}
+                  value={FileStatusType.FILTERED}
+                  label={FileStatusType.FILTERED}
+                />
+              </RadioGroup>
+            </FormControl>
+          </form>
+          <FormGroup>
+            <FormControlLabel
+              control={<Checkbox onChange={setFileTreeViewMode} />}
+              label={<small>Show only filter matches</small>}
+            />
+          </FormGroup>
         </Collapse>
 
         <Button size="small" onClick={() => setOpen(!open)}>
