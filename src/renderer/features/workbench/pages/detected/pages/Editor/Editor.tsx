@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 import { IDependency } from 'scanoss';
 import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
@@ -39,7 +39,6 @@ export const Editor = () => {
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const { imported } = state;
 
-  
   const file = state.node?.type === 'file' ? state.node.path : null;
 
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);

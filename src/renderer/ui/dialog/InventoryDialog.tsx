@@ -76,7 +76,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const setDefaults = () => setForm(inventory);
 
   const init = async () => {
-    const componentsResponse = await componentService.getAll();
+    const componentsResponse = await componentService.getAll({ path: null, usage: null, status: null });
     const licensesResponse = await licenseService.getAll();
     const compCatalogue = componentsResponse.map((component) => ({ ...component, type: 'Catalogued' }));
     setGlobalComponents(compCatalogue);

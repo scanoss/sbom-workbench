@@ -46,7 +46,8 @@ ipcMain.handle(
   IpcEvents.COMPONENT_GET,
   async (_event, component: Partial<ComponentGroup>, params: IWorkbenchFilter) => {
     try {
-      const data = await logicComponentService.get(component, params);
+      const filter = workspace.getOpenedProjects()[0].getFilter();
+      const data = await logicComponentService.get(component, { ...filter, ...params });
       return { status: 'ok', message: 'Component group retrieve successfully', data };
     } catch (e) {
       return { status: 'fail' };
