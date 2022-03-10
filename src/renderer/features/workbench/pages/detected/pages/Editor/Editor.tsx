@@ -62,7 +62,7 @@ export const Editor = () => {
     getResults();
 
     if (file) {
-      const dep = state.dependencies?.files.find((d) => d.file === file)?.dependencies;
+      const dep = state.dependencies?.filesList.find((d) => d.file === file)?.dependenciesList;
       setView(dep ? 'graph' : 'code');
       setDependencies(dep);
       loadLocalFile(file);

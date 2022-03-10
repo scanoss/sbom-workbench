@@ -9,7 +9,7 @@ export class QueryBuilderPurl extends QueryBuilder {
   }
 
   public getSQL(): string {
-    return `comp.purl=?`;
+    return `comp.purl = ?`;
   }
 
   public getFilters(): any[] {
