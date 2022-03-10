@@ -6,6 +6,7 @@ import { IpcEvents } from '../../../../ipc-events';
 import * as Filtering from '../../filtering';
 import { TreeViewMode } from './TreeViewMode/TreeViewMode';
 import { TreeViewDefault } from './TreeViewMode/TreeViewDefault';
+import { IDependencyResponse } from 'scanoss';
 
 const fs = require('fs');
 const pathLib = require('path');
@@ -177,8 +178,8 @@ export class Tree {
     }
   }
 
-  public addDependencies(dependencies: any): void {
-    dependencies.files.forEach((dependency) => {
+  public addDependencies(dependencies: IDependencyResponse): void {
+    dependencies.filesList.forEach((dependency) => {
       this.getRootFolder().addDependency(dependency.file);
     });
   }

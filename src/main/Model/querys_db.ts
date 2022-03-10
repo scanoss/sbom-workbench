@@ -25,6 +25,9 @@ export class Querys {
   FILES_TABLE =
     'CREATE TABLE IF NOT EXISTS files (fileId INTEGER PRIMARY KEY ASC,path TEXT,identified INTEGER DEFAULT 0, ignored INTEGER DEFAULT 0, dirty INTEGER DEFAULT 0, type TEXT);';
 
+  DEPENDENCY_TABLE =
+    'CREATE TABLE IF NOT EXISTS dependencies (dependencyId INTEGER PRIMARY KEY ASC,fileId INTEGER ,purl TEXT, version TEXT, scope TEXT DEFAULT NULL, rejectedAt DATETIME DEFAULT NULL,licenses TEXT,component TEXT,FOREIGN KEY(fileID) REFERENCES files(fileId) ON DELETE CASCADE);';
+
   SQL_DB_TABLES =
     this.SQL_CREATE_TABLE_RESULTS +
     this.FILES_TABLE +
@@ -32,7 +35,8 @@ export class Querys {
     this.SQL_CREATE_TABLE_INVENTORY +
     this.COMPDB_SQL_CREATE_TABLE_COMPVERS +
     this.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS +
-    this.COMPDB_LICENSES_TABLE;
+    this.COMPDB_LICENSES_TABLE +
+    this.DEPENDENCY_TABLE;
 
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS
@@ -196,4 +200,6 @@ export class Querys {
   SQL_GET_OVERRIDE_COMPONENTS = `SELECT DISTINCT cv.purl AS overridePurl,cv.name AS overrideName,r.component,i.id,r.purl AS matchedPurl FROM results r
   INNER JOIN files f ON r.fileId=f.fileId INNER JOIN file_inventories fi ON fi.fileId=f.fileId
   INNER JOIN inventories i ON i.id=fi.inventoryid INNER JOIN component_versions  cv ON i.cvid=cv.id ORDER BY r.purl;`;
+
+  SQL_DEPENDENCIES_INSERT = `INSERT INTO dependencies (fileId, purl, version, scope , licenses, component) VALUES (?,?,?,?,?,?);`;
 }

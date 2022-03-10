@@ -11,12 +11,18 @@ import packageJson from '../../package.json';
 
 const AdmZip = require('adm-zip');
 
-class ProjectZipper {
-  private mandatoryFiles: Array<string> = ['metadata.json', 'result.json', 'scan_db', 'tree.json', 'winnowing.wfp'];
+export class ProjectZipper {
+  public static readonly mandatoryFiles: Array<string> = [
+    'metadata.json',
+    'result.json',
+    'scan_db',
+    'tree.json',
+    'winnowing.wfp',
+  ];
 
-  private MAX_FOLDER_ZIP_COUNT = 1;
+  public static readonly MAX_FOLDER_ZIP_COUNT = 1;
 
-  private MIN_FOLDER_ZIP_COUNT = 0;
+  public static readonly MIN_FOLDER_ZIP_COUNT = 0;
 
   private projectName = null;
 
@@ -76,11 +82,6 @@ class ProjectZipper {
   }
 
   private extractProjectDataFromZip() {
-    this.zipFolderCount = 0;
-    this.projectName = null;
-    this.zipFiles = new Set<string>();
-    this.scannerState = null;
-    this.zipVersion = null;
     this.zipEntries.forEach((entry) => {
       if (entry.isDirectory) this.zipFolderCount += 1;
       if (entry.name === 'metadata.json') {
@@ -95,7 +96,7 @@ class ProjectZipper {
 
   private isValidZip(): boolean {
     if (
-      this.zipFolderCount === this.MIN_FOLDER_ZIP_COUNT ||
+      this.zipFolderCount === ProjectZipper.MIN_FOLDER_ZIP_COUNT ||
       !this.zipVersion ||
       !this.projectName ||
       !this.scannerState ||
@@ -103,12 +104,12 @@ class ProjectZipper {
     )
       return false;
     if (
-      this.zipFolderCount === this.MAX_FOLDER_ZIP_COUNT &&
+      this.zipFolderCount === ProjectZipper.MAX_FOLDER_ZIP_COUNT &&
       this.isValidZipVersion() &&
       this.scannerState === ScanState.FINISHED
     ) {
-      for (let i = 0; i < this.mandatoryFiles.length; i += 1) {
-        if (!this.zipFiles.has(this.mandatoryFiles[i])) return false;
+      for (let i = 0; i < ProjectZipper.mandatoryFiles.length; i += 1) {
+        if (!this.zipFiles.has(ProjectZipper.mandatoryFiles[i])) return false;
       }
       return true;
     }
@@ -136,4 +137,4 @@ class ProjectZipper {
   }
 }
 
-export const projectZipper = new ProjectZipper();
+

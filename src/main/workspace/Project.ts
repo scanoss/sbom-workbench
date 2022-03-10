@@ -3,18 +3,25 @@ import { EventEmitter } from 'events';
 import fs from 'fs';
 import log from 'electron-log';
 import {
-  Dependency,
   IDependencyResponse,
+  DependencyScanner,
   Scanner,
   ScannerCfg,
   ScannerEvents,
   ScannerInput,
   WinnowingMode,
 } from 'scanoss';
-import { FileTreeViewMode, IProjectCfg, IWorkbenchFilter, IWorkbenchFilterParams, ProjectState, ScanState } from '../../api/types';
+import {
+  FileTreeViewMode,
+  IProjectCfg,
+  IWorkbenchFilter,
+  IWorkbenchFilterParams,
+  ProjectState,
+  ScanState,
+} from '../../api/types';
 import * as Filtering from './filtering';
-import { ScanModel } from '../db/ScanModel';
-import { licenses } from '../db/licenses';
+import { ScanModel } from '../Model/ScanModel';
+import { licenses } from '../Model/licenses';
 import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
 import { Metadata } from './Metadata';
@@ -25,6 +32,8 @@ import { reScanService } from '../services/RescanLogicService';
 import { logicComponentService } from '../services/LogicComponentService';
 import { serviceProvider } from '../services/ServiceProvider';
 import { TreeViewModeCreator } from './Tree/Tree/TreeViewMode/TreeViewModeCreator';
+import { logicDependencyService } from '../services/LogicDependencyService';
+import { fileHelper } from '../helpers/FileHelper';
 
 export class Project extends EventEmitter {
   work_root: string;
@@ -200,8 +209,8 @@ export class Project extends EventEmitter {
     this.scanner.cleanWorkDirectory();
     this.save();
 
-    log.info(`%c[ SCANNER ]: Start scanning dependencies`, 'color: green');
-    await this.scanDependencies();
+    // log.info(`%c[ SCANNER ]: Start scanning dependencies`, 'color: green');
+    // await this.scanDependencies();
 
     log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, 'color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
@@ -297,14 +306,11 @@ export class Project extends EventEmitter {
         this.save();
       } else {
         await this.store.file.insertFiles(this.tree.getRootFolder().getFiles());
-        const files: Array<any> = await this.store.file.getAll(null);
-        const aux = files.reduce((previousValue, currentValue) => {
-          previousValue[currentValue.path] = currentValue.id;
-          return previousValue;
-        }, []);
-        await this.store.result.insertFromFile(resultPath, aux);
+        const files = await fileHelper.getPathFileId();
+        await this.store.result.insertFromFile(resultPath, files);
         // await logicService.logicComponentService.importComponents()
         await logicComponentService.importComponents();
+        await this.scanDependencies();
       }
 
       this.metadata.setScannerState(ScanState.FINISHED);
@@ -483,12 +489,14 @@ export class Project extends EventEmitter {
       });
 
     try {
-      const dependencies: IDependencyResponse = await new Dependency().scan(allFiles);
-      dependencies.files.forEach((f) => {
+      const dependencies = await new DependencyScanner().scan(allFiles);
+      dependencies.filesList.forEach((f) => {
         f.file = f.file.replace(rootPath, '');
       });
       fs.promises.writeFile(`${this.metadata.getMyPath()}/dependencies.json`, JSON.stringify(dependencies, null, 2));
       this.tree.addDependencies(dependencies);
+      this.save();
+      await logicDependencyService.insert(dependencies);
     } catch (e) {
       log.error(e);
     }

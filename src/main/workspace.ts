@@ -5,7 +5,7 @@ import { workspace } from './workspace/Workspace';
 import { Response } from './Response';
 import { INewProject, IProject, License } from '../api/types';
 import { ProjectFilterPath } from './workspace/filters/ProjectFilterPath';
-import { projectZipper } from './workspace/ProjectZipper';
+import { ProjectZipper } from './workspace/ProjectZipper';
 
 ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
   try {
@@ -66,7 +66,7 @@ ipcMain.handle(IpcEvents.GET_LICENSES, async (_event) => {
 
 ipcMain.handle(IpcEvents.WORKSPACE_IMPORT_PROJECT, async (_event, zippedProjectPath: string) => {
   try {
-    const Iproject = await projectZipper.import(zippedProjectPath);
+    const Iproject = await new ProjectZipper().import(zippedProjectPath);
     return Response.ok({ message: 'Project imported succesfully', data: Iproject });
   } catch (e: any) {
     log.error('Catch an error: ', e);
@@ -76,7 +76,7 @@ ipcMain.handle(IpcEvents.WORKSPACE_IMPORT_PROJECT, async (_event, zippedProjectP
 
 ipcMain.handle(IpcEvents.WORKSPACE_EXPORT_PROJECT, async (event, pathToSave: string, projectPath: string) => {
   try {
-    await projectZipper.export(pathToSave, projectPath);
+    await new ProjectZipper().export(pathToSave, projectPath);
     return Response.ok({ message: 'Project exported succesfully', data: true });
   } catch (e: any) {
     log.error('Catch an error: ', e);
