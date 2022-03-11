@@ -136,7 +136,7 @@ ipcMain.handle(IpcEvents.INVENTORY_FOLDER, async (_event, params: IFolderInvento
 
 ipcMain.handle(IpcEvents.INVENTORY_ACCEPT_PRE_LOAD, async (_event, data: Partial<IFolderInventory>) => {
   try {
-    const filter = workspace.getOpenedProjects()[0].getFilter();
+    const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
     const inventories: Array<Partial<Inventory>> = await logicInventoryService.preLoadInventoriesAcceptAll(
       data,
       filter

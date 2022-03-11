@@ -494,7 +494,7 @@ export class Project extends EventEmitter {
     }
   }
 
-  public async setFilter(filter: IWorkbenchFilter) {
+  public async setGlobalFilter(filter: IWorkbenchFilter) {
     try {
       if (!(JSON.stringify({ ...filter, path: null }) === JSON.stringify({ ...this.filter, path: null }))) {
         this.tree.setTreeViewMode(TreeViewModeCreator.create(filter, this.fileTreeViewMode));
@@ -508,7 +508,7 @@ export class Project extends EventEmitter {
     }
   }
 
-  public getFilter(): IWorkbenchFilter {
+  public getGlobalFilter(): IWorkbenchFilter {
     return this.filter;
   }
 

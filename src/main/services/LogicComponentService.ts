@@ -8,7 +8,7 @@ import { serviceProvider } from './ServiceProvider';
 class LogicComponentService {
   public async getComponentFiles(data: Partial<Component>, filter: IWorkbenchFilter): Promise<any> {
     try {
-      const params = { purl: data.purl, ...filter };
+      const params = { purl: data.purl, version: data.version, ...filter };
       const queryBuilder = QueryBuilderCreator.create(params);
       const files: any = await serviceProvider.model.file.getAll(queryBuilder);
       const inventories: any = await serviceProvider.model.inventory.getAll();

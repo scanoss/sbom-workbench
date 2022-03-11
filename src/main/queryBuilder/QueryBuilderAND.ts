@@ -1,3 +1,4 @@
+import { Folder } from '@material-ui/icons';
 import { QueryBuilder } from './QueryBuilder';
 
 export class QueryBuilderAND extends QueryBuilder {

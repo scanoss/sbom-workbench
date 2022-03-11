@@ -13,7 +13,7 @@ export class Restore extends Batch {
   public async execute() {
     try {
       const filter = new FilterOR(new GenericFilter('identified', 1), new GenericFilter('ignored', 1));
-      const queryBuilderFilter = workspace.getOpenedProjects()[0].getFilter();
+      const queryBuilderFilter = workspace.getOpenedProjects()[0].getGlobalFilter();
       const builder = QueryBuilderCreator.create({
         ...queryBuilderFilter,
         path: this.getFolder(),

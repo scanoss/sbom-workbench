@@ -117,7 +117,7 @@ ipcMain.handle(IpcEvents.PROJECT_READ_TREE, (event) => {
 ipcMain.handle(IpcEvents.PROJECT_SET_FILTER, async (event, filter: IWorkbenchFilter) => {
   try {
     const p = workspace.getOpenedProjects()[0];
-    await p.setFilter(filter);
+    await p.setGlobalFilter(filter);
     return Response.ok({ message: 'Filter setted succesfully', data: true });
   } catch (e: any) {
     return Response.fail({ message: e.message });

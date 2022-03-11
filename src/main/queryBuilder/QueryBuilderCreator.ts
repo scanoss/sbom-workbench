@@ -7,6 +7,7 @@ import { QueryBuilderPurl } from './QueryBuilderPurl';
 import { QueryBuilderSource } from './QueryBuilderSource';
 import { QueryBuilderStatus } from './QueryBuilderStatus';
 import { QueryBuilderUsage } from './QueryBuilderUsage';
+import { QueryBuilderVersion } from './QueryBuilderVersion';
 
 export class QueryBuilderCreator {
 
@@ -28,6 +29,9 @@ export class QueryBuilderCreator {
       }
       if (params.purl) {
         builder.add(new QueryBuilderPurl(params.purl));
+      }
+      if (params.version) {
+        builder.add(new QueryBuilderVersion(params.version));
       }
       if (params.compid) {
         const queryBuilderIN = new QueryBuilderIN();
