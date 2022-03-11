@@ -16,10 +16,7 @@ import { PreLoadInventoryDialog } from '../ui/dialog/PreLoadInventoryDialog';
 import { ProgressDialog } from '../ui/dialog/ProgressDialog';
 
 export interface IDialogContext {
-  openInventory: (
-    inventory: Partial<InventoryForm>,
-    recentUsedComponents: ComponentGroup[]
-  ) => Promise<Inventory | null>;
+  openInventory: (inventory: Partial<InventoryForm>, recentUsedComponents: string[]) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
   openAlertDialog: (message?: string, buttons?: any[]) => Promise<DialogResponse>;
@@ -36,13 +33,13 @@ export const DialogProvider: React.FC = ({ children }) => {
   const [inventoryDialog, setInventoryDialog] = useState<{
     open: boolean;
     inventory: Partial<InventoryForm>;
-    recentUsedComponents: ComponentGroup[];
+    recentUsedComponents: string[];
     onClose?: (inventory) => void;
   }>({ open: false, inventory: {}, recentUsedComponents: [] });
 
   const openInventory = (
     inventory: Partial<InventoryForm>,
-    recentUsedComponents: ComponentGroup[]
+    recentUsedComponents: string[]
   ): Promise<Inventory | null> => {
     return new Promise<Inventory>((resolve) => {
       setInventoryDialog({

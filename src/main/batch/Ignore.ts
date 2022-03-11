@@ -12,7 +12,7 @@ export class Ignore extends Batch {
 
   constructor(folder: string, overWrite: boolean) {
     super(folder, overWrite);
-    const filter = workspace.getOpenedProjects()[0].getFilter();
+    const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
     this.queryBuilder = QueryBuilderCreator.create({
       ...filter,
       path: this.getFolder(),

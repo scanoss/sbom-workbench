@@ -63,7 +63,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   };
 
   const createInventory = async (inventory: Inventory): Promise<Inventory> => {
-    const response = await inventoryService.create(inventory);   
+    const response = await inventoryService.create(inventory);
     if (inventory) dispatch(setRecentUsedComponent(inventory.purl));
     update();
     return response;
@@ -162,12 +162,6 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const setNode = async (node: Node) => {
     dispatch(setCurrentNode(node));
-    /* if (!node || node.type === 'folder') {
-      const comp = await workbenchController.getComponents({
-        ...(node && { path: node.path }),
-      });
-      if (comp) dispatch(setComponents(comp));
-    } */
   };
 
   useEffect(async () => {

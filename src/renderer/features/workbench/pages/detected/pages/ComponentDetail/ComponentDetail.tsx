@@ -46,6 +46,7 @@ export const ComponentDetail = () => {
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
 
   const getFiles = async () => {
+    console.log(version);
     const response = await componentService.getFiles({ purl: component.purl, version }, { status: null });
     setFiles(mapFiles(response.data));
   };
@@ -183,7 +184,6 @@ export const ComponentDetail = () => {
 
   useEffect(() => {
     const nTab = TABS[state.filter?.status] || state.history.section || tab || TABS.pending;
-    console.log('component detail', nTab, state.history.section);
 
     setTab(parseInt(nTab, 10));
   }, [state.filter]);

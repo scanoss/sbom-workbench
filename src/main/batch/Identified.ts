@@ -15,7 +15,7 @@ export class Identified extends Batch {
   constructor(folder: string, params: boolean, inventory: Partial<Inventory>) {
     super(folder, params);
     this.inventory = inventory;
-    const filter = workspace.getOpenedProjects()[0].getFilter();
+    const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
     this.queryBuilder = QueryBuilderCreator.create({
       ...filter,
       path: this.getFolder(),

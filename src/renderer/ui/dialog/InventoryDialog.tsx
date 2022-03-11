@@ -76,7 +76,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const setDefaults = () => setForm(inventory);
 
   const init = async () => {
-    const componentsResponse = await componentService.getAll();
+    const componentsResponse = await componentService.getAll({ unique: true });
     const licensesResponse = await licenseService.getAll();
     const compCatalogue = componentsResponse.map((component) => ({ ...component, type: 'Catalogued' }));
     setGlobalComponents(compCatalogue);
@@ -113,7 +113,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const addCustomComponent = async (component) => {
     const { name, version, licenses, purl, url } = component;
-    const comp = await componentService.get({ purl });
+    const comp = await componentService.get({ purl }, { unique: true });
     setGlobalComponents([...components, comp]);
 
     setLicenses([
@@ -133,7 +133,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const addCustomComponentVersion = async (component) => {
     const { name, version, licenses, purl, url } = component;
-    const comp = await componentService.get({ purl: component.purl });
+    const comp = await componentService.get({ purl: component.purl }, { unique: true });
     const nComponents = components.filter((item) => item.purl !== purl);
     setGlobalComponents([...nComponents, comp]);
     setVersions([version, ...versions]);

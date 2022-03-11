@@ -11,7 +11,7 @@ import {
   ScannerInput,
   WinnowingMode,
 } from 'scanoss';
-import { FileTreeViewMode, IProjectCfg, IWorkbenchFilter, ProjectState, ScanState } from '../../api/types';
+import { FileTreeViewMode, IProjectCfg, IWorkbenchFilter, IWorkbenchFilterParams, ProjectState, ScanState } from '../../api/types';
 import * as Filtering from './filtering';
 import { ScanModel } from '../db/ScanModel';
 import { licenses } from '../db/licenses';
@@ -494,7 +494,7 @@ export class Project extends EventEmitter {
     }
   }
 
-  public async setFilter(filter: IWorkbenchFilter) {
+  public async setGlobalFilter(filter: IWorkbenchFilter) {
     try {
       if (!(JSON.stringify({ ...filter, path: null }) === JSON.stringify({ ...this.filter, path: null }))) {
         this.tree.setTreeViewMode(TreeViewModeCreator.create(filter, this.fileTreeViewMode));
@@ -508,8 +508,13 @@ export class Project extends EventEmitter {
     }
   }
 
-  public getFilter(): IWorkbenchFilter {
+  public getGlobalFilter(): IWorkbenchFilter {
     return this.filter;
+  }
+
+  public getFilter(params: IWorkbenchFilterParams): IWorkbenchFilter {
+    if (params?.unique) return params.filter;
+    return { ...this.filter, ...params?.filter };
   }
 
   public setFileTreeViewMode(mode: FileTreeViewMode) {
