@@ -1,6 +1,6 @@
 import { QueryBuilder } from "./QueryBuilder";
 
-
+// TO DO: DO IT FOR HER
 export class QueryBuilderSource extends QueryBuilder {
   private value: string;
 
@@ -9,7 +9,7 @@ export class QueryBuilderSource extends QueryBuilder {
     this.value = value;
   }
 
-  public getSQL(): string {
+  public getSQL(entityMapper: Record<string, string>): string { 
     return `comp.source=?`;
   }
 

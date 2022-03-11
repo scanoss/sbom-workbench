@@ -1,9 +1,8 @@
 import { QueryBuilder } from './QueryBuilder';
 import { QueryBuilderAND } from './QueryBuilderAND';
 import { QueryBuilderCompId } from './QueryBuilderCompId';
+import { QueryBuilderCustom } from './QueryBuilderCustom';
 import { QueryBuilderIN } from './QueryBuilderIN';
-import { QueryBuilderPath } from './QueryBuilderPath';
-import { QueryBuilderPurl } from './QueryBuilderPurl';
 import { QueryBuilderSource } from './QueryBuilderSource';
 import { QueryBuilderStatus } from './QueryBuilderStatus';
 import { QueryBuilderUsage } from './QueryBuilderUsage';
@@ -15,7 +14,7 @@ export class QueryBuilderCreator {
     if (params) {
       builder = new QueryBuilderAND();
       if (params.path) {
-        builder.add(new QueryBuilderPath(params.path));
+        builder.add(new QueryBuilderCustom('path', 'LIKE', `${params.path}%`));
       }
       if (params.source) {
         builder.add(new QueryBuilderSource(params.source));
@@ -27,7 +26,7 @@ export class QueryBuilderCreator {
         builder.add(new QueryBuilderUsage(params.usage));
       }
       if (params.purl) {
-        builder.add(new QueryBuilderPurl(params.purl));
+        builder.add(new QueryBuilderCustom('purl', '=', params.purl));
       }
       if (params.version) {
         builder.add(new QueryBuilderVersion(params.version));
@@ -38,7 +37,6 @@ export class QueryBuilderCreator {
         return queryBuilderIN;
       }
     }
-
     return builder;
   }
 }

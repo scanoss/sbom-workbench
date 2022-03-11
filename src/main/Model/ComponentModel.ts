@@ -10,6 +10,8 @@ import { componentHelper } from '../helpers/ComponentHelper';
 const query = new Querys();
 
 export class ComponentModel extends Model {
+  public static readonly entityMapper = { path: 'f.path', purl: 'comp.purl', version: 'comp.version' };
+
   license: LicenseModel;
 
   public constructor(path: string) {
@@ -386,15 +388,12 @@ export class ComponentModel extends Model {
     });
   }
 
-  public getAll(builder?: QueryBuilder) {
+  public getAll(queryBuilder?: QueryBuilder) {
     return new Promise<any>(async (resolve, reject) => {
       try {
-        let SQLquery = query.SQL_GET_ALL_COMPONENTS;
-        const filter = builder?.getSQL() ? `WHERE ${builder.getSQL().toString()}` : '';
-        const params = builder?.getFilters() ? builder.getFilters() : [];
-        SQLquery = SQLquery.replace('#FILTER', filter);
+        const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_COMPONENTS, this.getEntityMapper());
         const db = await this.openDb();
-        db.all(SQLquery, ...params, async (err: any, data: any) => {
+        db.all(SQLquery.SQL, ...SQLquery.params, async (err: any, data: any) => {
           db.close();
           if (err) throw err;
           else {
@@ -409,15 +408,12 @@ export class ComponentModel extends Model {
     });
   }
 
-  public summary(builder?: QueryBuilder) {
+  public summary(queryBuilder?: QueryBuilder) {
     return new Promise<any>(async (resolve, reject) => {
       try {
-        let SQLquery = query.SQL_COMPONENTS_SUMMARY;
-        const filter = builder?.getSQL() ? `WHERE ${builder.getSQL().toString()}` : '';
-        const params = builder?.getFilters() ? builder.getFilters() : [];
-        SQLquery = SQLquery.replace('#FILTER', filter);
+        const SQLquery = this.getSQL(queryBuilder, query.SQL_COMPONENTS_SUMMARY, this.getEntityMapper());
         const db = await this.openDb();
-        db.all(SQLquery, ...params, async (err: any, data: any) => {
+        db.all(SQLquery.SQL, ...SQLquery.params, async (err: any, data: any) => {
           db.close();
           if (err) throw err;
           else {
@@ -429,5 +425,9 @@ export class ComponentModel extends Model {
         reject(error);
       }
     });
+  }
+
+  public getEntityMapper(): Record<string, string> {
+    return ComponentModel.entityMapper;
   }
 }
