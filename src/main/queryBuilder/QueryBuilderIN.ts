@@ -8,8 +8,8 @@ export class QueryBuilderIN extends QueryBuilder {
     this.builders = [];
   }
 
-  public getSQL(): string {
-    const partialSQL = this.builders.map((e) => e.getSQL());
+  public getSQL(entityMapper: Record<string, string>): string {
+    const partialSQL = this.builders.map((e) => e.getSQL(entityMapper));
     return partialSQL[0];
   }
 

@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import Label from '../Label/Label';
 import Title from '../Title/Title';
-import componentDefault from '../../../../../../assets/imgs/component-default.svg';
-import { Component, ComponentGroup } from '../../../../../api/types';
 
 export const ComponentInfo = ({ component }: { component: any }) => {
   const [over, setOver] = useState<boolean>(false);
