@@ -1,6 +1,5 @@
 export abstract class QueryBuilder {
-  public abstract getSQL(): string;
+  public abstract getSQL(entityMapper?: Record<string, string>): string;
 
   public abstract getFilters(): any[];
-  
 }
