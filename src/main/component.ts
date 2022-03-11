@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { Component, License, ComponentGroup, IWorkbenchFilter } from '../api/types';
+import { Component, License, ComponentGroup, IWorkbenchFilterParams } from '../api/types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from './Response';
 import { logicComponentService } from './services/LogicComponentService';
@@ -21,16 +21,16 @@ ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE, async (_event, comp: Componen
   return { status: 'ok', message: 'test' };
 });
 
-ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (_event, component: Component, params) => {
-  const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
-  const data = await logicComponentService.getComponentFiles(component, { ...filter, ...params });
+ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (_event, component: Component, params: IWorkbenchFilterParams) => {
+  const filter = workspace.getOpenedProjects()[0].getFilter(params);
+  const data = await logicComponentService.getComponentFiles(component, filter);
   return { status: 'ok', message: 'test', data };
 });
 
-ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (_event, params: IWorkbenchFilter) => {
+ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (_event, params: IWorkbenchFilterParams) => {
   try {
-    const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
-    const data = await logicComponentService.getAll({ ...filter, ...params });
+    const filter = workspace.getOpenedProjects()[0].getFilter(params);
+    const data = await logicComponentService.getAll(filter);
     return {
       status: 'ok',
       message: 'Components getAll retrieve successfully',
@@ -43,10 +43,10 @@ ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (_event, params: IWorkbenchFil
 
 ipcMain.handle(
   IpcEvents.COMPONENT_GET,
-  async (_event, component: Partial<ComponentGroup>, params: IWorkbenchFilter) => {
+  async (_event, component: Partial<ComponentGroup>, params: IWorkbenchFilterParams) => {
     try {
-      const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
-      const data = await logicComponentService.get(component, { ...filter, ...params });
+      const filter = workspace.getOpenedProjects()[0].getFilter(params);
+      const data = await logicComponentService.get(component, filter);
       return { status: 'ok', message: 'Component group retrieve successfully', data };
     } catch (e) {
       return { status: 'fail' };

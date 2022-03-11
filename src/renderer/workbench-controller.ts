@@ -2,7 +2,7 @@ import { ipcRenderer } from 'electron';
 import { IDependencyResponse } from 'scanoss';
 import { projectService } from '../api/project-service';
 import { componentService } from '../api/component-service';
-import { ComponentGroup, IWorkbenchFilter, ComponentSource } from '../api/types';
+import { ComponentGroup, IWorkbenchFilter, ComponentSource, IWorkbenchFilterParams } from '../api/types';
 import { sortComponents, transform } from '../utils/scan-util';
 import { IpcEvents } from '../ipc-events';
 import { API_URL } from '../Config';
@@ -57,14 +57,20 @@ class WorkbenchController {
     return response.text();
   }
 
-  public async getComponents(params: IWorkbenchFilter = null): Promise<ComponentGroup[]> {
-    const components = await componentService.getAll({ ...params, source: ComponentSource.ENGINE });
+  public async getComponents(params: IWorkbenchFilterParams = null): Promise<ComponentGroup[]> {
+    const components = await componentService.getAll({
+      ...params,
+      filter: { ...params?.filter, source: ComponentSource.ENGINE },
+    });
     sortComponents(components);
     return components;
   }
 
-  public async getComponent(purl: string, params: IWorkbenchFilter = null): Promise<ComponentGroup> {
-    const comp = await componentService.get({ purl }, { ...params, source: ComponentSource.ENGINE });
+  public async getComponent(purl: string, params: IWorkbenchFilterParams = null): Promise<ComponentGroup> {
+    const comp = await componentService.get(
+      { purl },
+      { ...params, filter: { ...params?.filter, source: ComponentSource.ENGINE } }
+    );
     return comp;
   }
 

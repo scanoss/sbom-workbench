@@ -1,5 +1,5 @@
 import { IpcEvents } from '../ipc-events';
-import { Component, License, ComponentGroup, NewComponentDTO, IParams, IWorkbenchFilter } from './types';
+import { Component, License, ComponentGroup, NewComponentDTO, IParams, IWorkbenchFilter, IWorkbenchFilterParams } from './types';
 import { BaseService } from './base-service';
 
 const { ipcRenderer } = require('electron');
@@ -31,12 +31,12 @@ class ComponentService extends BaseService {
     return response;
   }
 
-  public async getAll(params?: IWorkbenchFilter): Promise<any> {
+  public async getAll(params?: IWorkbenchFilterParams): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_ALL, params);
     return this.response(response);
   }
 
-  public async get(component: Partial<ComponentGroup>, params?: IWorkbenchFilter): Promise<any> {
+  public async get(component: Partial<ComponentGroup>, params?: IWorkbenchFilterParams): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET, component, params);
     return this.response(response);
   }

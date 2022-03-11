@@ -179,6 +179,11 @@ export interface IWorkbenchFilter {
   purl?: string;
 }
 
+export interface IWorkbenchFilterParams {
+  filter?: IWorkbenchFilter;
+  unique?: boolean;
+}
+
 export enum FileStatusType {
   PENDING = 'pending',
   ORIGINAL = 'original',
@@ -209,3 +214,5 @@ export enum FileTreeViewMode {
   DEFAULT,
   PRUNE,
 }
+
+
