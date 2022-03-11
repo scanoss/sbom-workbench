@@ -9,7 +9,8 @@ export class QueryBuilderStatus extends QueryBuilder {
     this.value = value;
   }
 
-  public getSQL(): string {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public getSQL(_queryAdapter: Record<string, string>): string {
     if (this.value === FileStatusType.IDENTIFIED) return 'f.identified=1';
     if (this.value === FileStatusType.ORIGINAL) return 'f.ignored=1';
     if (this.value === FileStatusType.NOMATCH) return `type='NO-MATCH' AND f.ignored=0 AND f.identified=0`;

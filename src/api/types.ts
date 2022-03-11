@@ -1,4 +1,3 @@
-import { ExecOptionsWithStringEncoding } from 'child_process';
 import { NodeStatus } from '../main/workspace/Tree/Tree/Node';
 
 export enum ScanState {
@@ -215,4 +214,13 @@ export enum FileTreeViewMode {
   PRUNE,
 }
 
-
+export interface DependencyDTO {
+  dependencyId: number;
+  fileId: number;
+  licenses: string[];
+  purl: string;
+  version: string;
+  scope: string;
+  component: string;
+  status: FileStatusType.IDENTIFIED | FileStatusType.ORIGINAL | FileStatusType.PENDING;
+}
