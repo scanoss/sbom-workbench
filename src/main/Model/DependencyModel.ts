@@ -1,4 +1,5 @@
 import log from 'electron-log';
+import { DependencyDTO } from '../../api/types';
 import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 import { Model } from './Model';
 import { Querys } from './querys_db';
@@ -6,7 +7,7 @@ import { Querys } from './querys_db';
 const query = new Querys();
 
 export class DependencyModel extends Model {
-  public static readonly entityMapper= { path: 'f.path', purl: 'd.purl', version: 'd.version' };
+  public static readonly entityMapper = { path: 'f.path', purl: 'd.purl', version: 'd.version' };
 
   public constructor(path: string) {
     super(path);
@@ -45,21 +46,17 @@ export class DependencyModel extends Model {
   }
 
   public async getAll(queryBuilder: QueryBuilder) {
-    return new Promise<any>(async (resolve, reject) => {
+    return new Promise<Array<DependencyDTO>>(async (resolve, reject) => {
       try {
-        let SQLquery = query.SQL_GET_ALL_DEPENDENCIES;
-        const filter = queryBuilder?.getSQL(this.getEntityMapper())
-          ? `WHERE ${queryBuilder.getSQL(this.getEntityMapper()).toString()}`
-          : '';
-        const params = queryBuilder?.getFilters() ? queryBuilder.getFilters() : [];
-        SQLquery = SQLquery.replace('#FILTER', filter);
+        const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_DEPENDENCIES, DependencyModel.entityMapper);
         const db = await this.openDb();
-        db.all(SQLquery, ...params, async (err: any, dep: any) => {
+        db.all(SQLquery.SQL, ...SQLquery.params, async (err: any, dep: any) => {
           db.close();
           if (err) throw err;
-          else {
-            resolve(dep);
-          }
+          dep.forEach((d) => {
+            d.licenses = d.licenses.split(',');
+          });
+          resolve(dep);
         });
       } catch (error) {
         log.error(error);

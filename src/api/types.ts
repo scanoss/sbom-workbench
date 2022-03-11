@@ -209,3 +209,14 @@ export enum FileTreeViewMode {
   DEFAULT,
   PRUNE,
 }
+
+export interface DependencyDTO{
+  dependencyId: number;
+  fileId: number;
+  licenses: string[];
+  purl: string;
+  version: string;
+  scope: string;
+  component: string;
+  status: FileStatusType.IDENTIFIED | FileStatusType.ORIGINAL | FileStatusType.PENDING;
+}

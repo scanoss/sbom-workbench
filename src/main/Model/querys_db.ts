@@ -1,3 +1,5 @@
+import { FileStatusType } from "../../api/types";
+
 export class Querys {
   /** SQL CREATE SCAN TABLES * */
 
@@ -203,8 +205,15 @@ export class Querys {
 
   SQL_DEPENDENCIES_INSERT = `INSERT INTO dependencies (fileId, purl, version, scope , licenses, component) VALUES (?,?,?,?,?,?);`;
 
-  SQL_GET_ALL_DEPENDENCIES = `SELECT d.purl,d.version,d.licenses,d.component, i.id AS inventoryId,cv.id AS compid,d.rejectedAt,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN 'identified' WHEN i.id IS NULL AND d.rejectedAt IS NOT NULL THEN 'rejected' ELSE "pending" END) AS status FROM dependencies d 
+  SQL_GET_ALL_DEPENDENCIES = `SELECT d.purl,d.version,d.licenses,d.component, i.id AS inventoryId,cv.id AS compid,d.rejectedAt,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN '${FileStatusType.IDENTIFIED}' WHEN i.id IS NULL AND d.rejectedAt IS NOT NULL THEN '${FileStatusType.ORIGINAL}' ELSE '${FileStatusType.PENDING}' END) AS status FROM dependencies d 
   INNER JOIN files f ON f.fileId =  d.fileId
   LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version 
   LEFT JOIN inventories i ON cv.id = i.cvid #FILTER;`;
+
+  SQL_GET_ALL_RESULTS = `SELECT f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f LEFT JOIN results r ON f.fileId=r.fileId LEFT JOIN component_versions comp ON comp.purl=r.purl AND comp.version=r.version #FILTER;`;
+
+  SQL_GET_ALL_FILES = `SELECT f.fileId AS id,f.type,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.license, r.component AS componentName, r.url,comp.purl,comp.version 
+  FROM files f LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions comp ON
+  comp.purl = r.purl AND comp.version = r.version
+ LEFT JOIN file_inventories fi ON fi.fileId=f.fileId #FILTER ;`;
 }

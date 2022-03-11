@@ -1,5 +1,5 @@
-import { QueryBuilder } from '@material-ui/icons';
 import { IDependencyResponse } from 'scanoss';
+import { DependencyDTO } from '../../api/types';
 import { dependencyHelper } from '../helpers/DependencyHelper';
 import { fileHelper } from '../helpers/FileHelper';
 import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
@@ -12,13 +12,9 @@ class LogicDependencyService {
     await serviceProvider.model.dependency.insert(files, filesDependencies);
   }
 
-  public async getAll(params: any) {
+  public async getAll(params: any): Promise<Array<DependencyDTO>> {
     const queryBuilder = QueryBuilderCreator.create(params);
     const dependencies = await serviceProvider.model.dependency.getAll(queryBuilder);
-    dependencies.forEach((dependency) => {
-      dependency.licenses = dependency.licenses.split(',');
-    });
-
     return dependencies;
   }
 }

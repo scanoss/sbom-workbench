@@ -388,17 +388,12 @@ export class ComponentModel extends Model {
     });
   }
 
-  public getAll(builder?: QueryBuilder) {
+  public getAll(queryBuilder?: QueryBuilder) {
     return new Promise<any>(async (resolve, reject) => {
       try {
-        let SQLquery = query.SQL_GET_ALL_COMPONENTS;
-        const filter = builder?.getSQL(this.getEntityMapper())
-          ? `WHERE ${builder.getSQL(this.getEntityMapper()).toString()}`
-          : '';
-        const params = builder?.getFilters() ? builder.getFilters() : [];
-        SQLquery = SQLquery.replace('#FILTER', filter);
+        const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_COMPONENTS, this.getEntityMapper());
         const db = await this.openDb();
-        db.all(SQLquery, ...params, async (err: any, data: any) => {
+        db.all(SQLquery.SQL, ...SQLquery.params, async (err: any, data: any) => {
           db.close();
           if (err) throw err;
           else {
@@ -413,17 +408,12 @@ export class ComponentModel extends Model {
     });
   }
 
-  public summary(builder?: QueryBuilder) {
+  public summary(queryBuilder?: QueryBuilder) {
     return new Promise<any>(async (resolve, reject) => {
       try {
-        let SQLquery = query.SQL_COMPONENTS_SUMMARY;
-        const filter = builder?.getSQL(this.getEntityMapper())
-          ? `WHERE ${builder.getSQL(this.getEntityMapper()).toString()}`
-          : '';
-        const params = builder?.getFilters() ? builder.getFilters() : [];
-        SQLquery = SQLquery.replace('#FILTER', filter);
+        const SQLquery = this.getSQL(queryBuilder, query.SQL_COMPONENTS_SUMMARY, this.getEntityMapper());
         const db = await this.openDb();
-        db.all(SQLquery, ...params, async (err: any, data: any) => {
+        db.all(SQLquery.SQL, ...SQLquery.params, async (err: any, data: any) => {
           db.close();
           if (err) throw err;
           else {
