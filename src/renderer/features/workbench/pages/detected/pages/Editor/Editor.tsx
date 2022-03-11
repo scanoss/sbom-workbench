@@ -51,7 +51,7 @@ export const Editor = () => {
   const [fullFile, setFullFile] = useState<boolean>(null);
   const [dependencies, setDependencies] = useState<IDependency[]>(null);
   const [view, setView] = useState<'code' | 'graph'>('code');
- 
+
   const init = () => {
     setMatchInfo(null);
     setInventories(null);
@@ -66,7 +66,7 @@ export const Editor = () => {
 
     if (file) {
       getDependencies(file);
-      const dep = state.dependencies?.filesList.find((d) => d.file === file)?.dependenciesList;
+      const dep = state.dependencies?.filesList?.find((d) => d.file === file)?.dependenciesList;
       setView(dep ? 'graph' : 'code');
       setDependencies(dep);
       loadLocalFile(file);
