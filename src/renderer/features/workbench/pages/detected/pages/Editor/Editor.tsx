@@ -21,6 +21,8 @@ import { fileService } from '../../../../../../../api/file-service';
 import CodeViewSelector from './components/CodeViewSelector/CodeViewSelector';
 import DependencyTree from './components/DependencyTree/DependencyTree';
 import NoLocalFile from './components/NoLocalFile/NoLocalFile';
+import { dependencyService } from '../../../../../../../api/dependency-service';
+
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -49,7 +51,7 @@ export const Editor = () => {
   const [fullFile, setFullFile] = useState<boolean>(null);
   const [dependencies, setDependencies] = useState<IDependency[]>(null);
   const [view, setView] = useState<'code' | 'graph'>('code');
-
+ 
   const init = () => {
     setMatchInfo(null);
     setInventories(null);
@@ -57,10 +59,13 @@ export const Editor = () => {
     setLocalFileContent({ content: null, error: false });
     setRemoteFileContent({ content: null, error: false });
 
+
     getInventories();
     getResults();
 
+
     if (file) {
+      getDependencies(file);
       const dep = state.dependencies?.filesList.find((d) => d.file === file)?.dependenciesList;
       setView(dep ? 'graph' : 'code');
       setDependencies(dep);
@@ -88,6 +93,11 @@ export const Editor = () => {
       setRemoteFileContent({ content: null, error: true });
     }
   };
+
+  const getDependencies = async (path: string): Promise<any> => {
+    const dep = await dependencyService.getAll({ path });
+    console.log (dep);
+  }
 
   const getInventories = async () => {
     const inv = await inventoryService.getAll({ files: [file] });
