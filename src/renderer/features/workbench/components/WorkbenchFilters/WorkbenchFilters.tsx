@@ -12,6 +12,8 @@ import {
   IconButton,
   Button,
   Tooltip,
+  Switch,
+  Divider,
 } from '@material-ui/core';
 import KeyboardArrowDownOutlinedIcon from '@material-ui/icons/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@material-ui/icons/KeyboardArrowUpOutlined';
@@ -69,7 +71,7 @@ const WorkbenchFilters = () => {
             </Tooltip>
           )}
         </header>
-        <Collapse in={open} collapsedHeight={25}>
+        <Collapse in={open} collapsedHeight={34}>
           <form className="workbench-filters-body">
             <FormControl component="fieldset" className="workbench-filters-group usage">
               <FormLabel component="span">Usage</FormLabel>
@@ -81,11 +83,14 @@ const WorkbenchFilters = () => {
                 onClick={(event: any) => event.target.value && handleClick('usage', event.target.value)}
                 className="flex-row ml-2"
               >
-                <FormControlElement value="all" label="All" />
+                <FormControlElement value="all" label="All" className="d-none" />
                 <FormControlElement value={FileUsageType.FILE} label={FileUsageType.FILE} />
                 <FormControlElement value={FileUsageType.SNIPPET} label={FileUsageType.SNIPPET} />
               </RadioGroup>
             </FormControl>
+
+            <Divider orientation="vertical" flexItem />
+
             <FormControl component="fieldset" className="workbench-filters-group status">
               <FormLabel component="span">Status</FormLabel>
               <RadioGroup
@@ -96,7 +101,7 @@ const WorkbenchFilters = () => {
                 onClick={(event: any) => event.target.value && handleClick('status', event.target.value)}
                 className="flex-row ml-2"
               >
-                <FormControlElement value="all" label="All" />
+                <FormControlElement value="all" label="All" className="d-none" />
                 <FormControlElement
                   className={FileStatusType.PENDING}
                   value={FileStatusType.PENDING}
@@ -120,17 +125,23 @@ const WorkbenchFilters = () => {
                 <FormControlElement
                   className={FileStatusType.FILTERED}
                   value={FileStatusType.FILTERED}
-                  label={FileStatusType.FILTERED}
+                  label="Ignored"
                 />
               </RadioGroup>
             </FormControl>
+
+            <Divider orientation="vertical" flexItem />
+
+            <FormGroup>
+              <Tooltip title="Show only filtered matches" disableHoverListener={open} placement="top" arrow>
+                <FormControlLabel
+                  className="tree-toggle-switch"
+                  control={<Switch onChange={setFileTreeViewMode} size="small" color="primary" />}
+                  label={open ? <small>Show only filtered matches</small> : ''}
+                />
+              </Tooltip>
+            </FormGroup>
           </form>
-          <FormGroup>
-            <FormControlLabel
-              control={<Checkbox onChange={setFileTreeViewMode} />}
-              label={<small>Show only filter matches</small>}
-            />
-          </FormGroup>
         </Collapse>
 
         <Button size="small" onClick={() => setOpen(!open)}>
