@@ -47,9 +47,9 @@ const Workbench = () => {
       <AppBar />
       <SplitPane
         split="vertical"
-        minSize={280}
+        minSize={320}
         maxSize={450}
-        defaultSize={300}
+        defaultSize={320}
         pane1Style={report ? { display: 'none' } : {}}
       >
         <aside className="panel explorer">

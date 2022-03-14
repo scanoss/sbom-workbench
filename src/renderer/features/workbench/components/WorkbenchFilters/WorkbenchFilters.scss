@@ -3,14 +3,12 @@
   flex-direction: column;
   justify-content: center;
 
-
   .workbench-filters-body {
-    min-height: 130px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 
-    margin: 0 16px;
+    margin: 16px 16px 0;
   }
 
   .MuiFormControlLabel-root {
@@ -28,19 +26,22 @@
     .workbench-filters-body {
       flex-direction: row;
       justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
     }
 
     .workbench-filters-group  {
       display: flex;
       flex-direction: row;
       align-items: flex-start;
-      margin-bottom: 8px;
+      margin-bottom: 0px;
 
       .MuiFormLabel-root {
         margin-bottom: 1px;
       }
 
       .MuiFormControlLabel-label {
+        position: relative;
         font-size: 0;
         border: 0;
         margin: 2px 0;
@@ -49,21 +50,42 @@
         height: 12px;
         border-radius: 50%;
         background-color: rgba(var(--color-rgb), 0.3);
+
+        &::before {
+          content: '';
+          display: block;
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          border: 1px solid transparent;
+        }
       }
 
       .Mui-checked + .MuiFormControlLabel-label {
         background-color: (var(--color));
       }
 
+      .Mui-checked + .MuiFormControlLabel-label::before {
+        border: 1px solid var(--color);
+      }
+
       .MuiFormControlLabel-root:last-child {
         margin-right: 0;
       }
+    }
+
+    .MuiFormControlLabel-root.tree-toggle-switch {
+      margin-top: -4px;
+      margin-right: 0px;
     }
   }
 
   header {
     display: flex;
-    justify-content: start;
+    justify-content: space-between;
     align-items: center;
     font-size: 16px;
     margin: 14px 16px 4px;
@@ -87,20 +109,27 @@
     .MuiFormControlLabel-label {
       font-size: 14px;
       margin: 4px 0;
-      padding: 1px 8px;
+      padding: 0px 8px;
 
       border: 1px solid var(--color);
       font-weight: 400;
       color: var(--color);
-      border-radius: 4px;
+      border-radius: 50px;
       text-transform: capitalize;
     }
 
     .Mui-checked + .MuiFormControlLabel-label {
       background-color: rgba(var(--color-rgb), 0.2);
     }
-
   }
 
+  .MuiFormControlLabel-root.tree-toggle-switch {
+    display: flex;
+    align-items: baseline;
+    margin-left: -2px;
 
+    small {
+      color: #71717A;
+    }
+  }
 }
