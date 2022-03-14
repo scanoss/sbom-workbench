@@ -10,7 +10,7 @@ export class Querys {
     'CREATE TABLE IF NOT EXISTS file_inventories (id integer primary key asc, fileId integer not null, inventoryid integer not null, FOREIGN KEY (inventoryid) REFERENCES inventories(id) ON DELETE CASCADE);';
 
   SQL_CREATE_TABLE_INVENTORY =
-    'CREATE TABLE IF NOT EXISTS inventories (id INTEGER PRIMARY KEY ,cvid INTEGER NOT NULL, usage TEXT, notes TEXT, url TEXT, spdxid TEXT, FOREIGN KEY (cvid) REFERENCES component_versions(id) ON  DELETE CASCADE );';
+    'CREATE TABLE IF NOT EXISTS inventories (id INTEGER PRIMARY KEY ,cvid INTEGER NOT NULL, usage TEXT, notes TEXT, url TEXT, spdxid TEXT,source TEXT DEFAULT "detected", FOREIGN KEY (cvid) REFERENCES component_versions(id) ON  DELETE CASCADE );';
 
   SQL_CREATE_TABLE_STATUS =
     'CREATE TABLE IF NOT EXISTS status (files integer, scanned integer default 0, status text, project integer, user text, message text, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, type text, size text);';
@@ -48,7 +48,7 @@ export class Querys {
   SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH = `UPDATE results SET source=?,idtype='file' WHERE file_path=?`;
 
   // SQL NEW INVENTORY
-  SQL_SCAN_INVENTORY_INSERT = 'INSERT INTO inventories (cvid,usage, notes, url, spdxid) values (?,?,?,?,?);';
+  SQL_SCAN_INVENTORY_INSERT = 'INSERT INTO inventories (cvid,usage, notes, url, spdxid, source) VALUES (?,?,?,?,?,?);';
 
   SQL_INSERT_FILE_INVENTORIES = 'INSERT into file_inventories (fileId,inventoryid) VALUES (?,?);';
 
@@ -62,7 +62,7 @@ export class Querys {
   SQL_UPDATE_INVENTORY = 'UPDATE inventories SET cvid=?, usage=?, notes=?, url=?, spdxid=? WHERE id=?;';
 
   SQL_SELECT_INVENTORY_COMPONENTS = `SELECT DISTINCT i.cvid,i.id,r.vendor,i.usage,cv.purl,i.notes,i.url,i.spdxid,cv.version,cv.name FROM inventories i
-  INNER JOIN component_versions cv ON cv.id=i.cvid
+  INNER JOIN component_versions cv ON cv.id=i.cvid AND i.source="detected"
   LEFT JOIN results r ON r.purl=cv.purl AND r.version=cv.version;`;
 
   SQL_COMPDB_COMP_VERSION_UPDATE =
@@ -153,7 +153,8 @@ export class Querys {
   FROM inventories i
   INNER JOIN file_inventories fi ON fi.inventoryid=i.id
   INNER JOIN files f ON fi.fileId=f.fileId
-  LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions cv ON cv.id=i.cvid;`;
+  LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions cv ON cv.id=i.cvid
+  WHERE i.source='detected';`;
 
   SQL_GET_SUMMARY_BY_PURL_VERSION = 'SELECT identified,pending,ignored FROM summary WHERE purl=? AND version=?;';
 
@@ -208,7 +209,7 @@ export class Querys {
   SQL_GET_ALL_DEPENDENCIES = `SELECT d.dependencyId,d.component AS componentName,d.purl,d.version,d.licenses,d.component, i.id AS inventory,cv.id AS compid,d.rejectedAt,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN '${FileStatusType.IDENTIFIED}' WHEN i.id IS NULL AND d.rejectedAt IS NOT NULL THEN '${FileStatusType.ORIGINAL}' ELSE '${FileStatusType.PENDING}' END) AS status FROM dependencies d 
   INNER JOIN files f ON f.fileId =  d.fileId
   LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version 
-  LEFT JOIN inventories i ON cv.id = i.cvid #FILTER;`;
+  LEFT JOIN inventories i ON cv.id = i.cvid AND i.source='declared' #FILTER;`;
 
   SQL_GET_ALL_RESULTS = `SELECT f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f LEFT JOIN results r ON f.fileId=r.fileId LEFT JOIN component_versions comp ON comp.purl=r.purl AND comp.version=r.version #FILTER;`;
 

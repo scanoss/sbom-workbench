@@ -63,7 +63,7 @@ class LogicDependencyService {
         await serviceProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
       }
       await serviceProvider.model.dependency.accept(dependency);
-      await serviceProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.license });
+      await serviceProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.license, source: 'declared' });
       const response = (await this.getAll({ id: params.id }))[0];
       return response;
     } catch (error: any) {
