@@ -1,4 +1,4 @@
-import { FileStatusType } from "../../api/types";
+import { FileStatusType } from '../../api/types';
 
 export class Querys {
   /** SQL CREATE SCAN TABLES * */
@@ -205,7 +205,7 @@ export class Querys {
 
   SQL_DEPENDENCIES_INSERT = `INSERT INTO dependencies (fileId, purl, version, scope , licenses, component) VALUES (?,?,?,?,?,?);`;
 
-  SQL_GET_ALL_DEPENDENCIES = `SELECT d.purl,d.version,d.licenses,d.component, i.id AS inventoryId,cv.id AS compid,d.rejectedAt,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN '${FileStatusType.IDENTIFIED}' WHEN i.id IS NULL AND d.rejectedAt IS NOT NULL THEN '${FileStatusType.ORIGINAL}' ELSE '${FileStatusType.PENDING}' END) AS status FROM dependencies d 
+  SQL_GET_ALL_DEPENDENCIES = `SELECT d.dependencyId,d.component AS componentName,d.purl,d.version,d.licenses,d.component, i.id AS inventory,cv.id AS compid,d.rejectedAt,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN '${FileStatusType.IDENTIFIED}' WHEN i.id IS NULL AND d.rejectedAt IS NOT NULL THEN '${FileStatusType.ORIGINAL}' ELSE '${FileStatusType.PENDING}' END) AS status FROM dependencies d 
   INNER JOIN files f ON f.fileId =  d.fileId
   LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version 
   LEFT JOIN inventories i ON cv.id = i.cvid #FILTER;`;

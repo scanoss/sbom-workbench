@@ -248,12 +248,12 @@ export class InventoryModel extends Model {
           inventory.url ? inventory.url : null,
           inventory.spdxid ? inventory.spdxid : null,
           async function (this: any, err: any) {
-            inventory.id = this.lastID;
             if (err) throw Error('Unable to create inventory');
+            inventory.id = this.lastID;
+            db.close();
+            resolve(inventory);
           }
         );
-        db.close();
-        resolve(inventory);
       } catch (error) {
         log.error(error);
         reject(error);

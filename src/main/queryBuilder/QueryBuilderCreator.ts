@@ -36,6 +36,9 @@ export class QueryBuilderCreator {
         queryBuilderIN.add(new QueryBuilderCompId(params.compid));
         return queryBuilderIN;
       }
+      if (params.id) {
+        builder.add(new QueryBuilderCustom('id', '=', params.id));
+      }
     }
     return builder;
   }
