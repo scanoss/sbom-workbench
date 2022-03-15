@@ -89,6 +89,7 @@ export enum IpcEvents {
   TREE_UPDATED = 'TREE_UPDATED',
 
   DEPENDENCY_GET_ALL = 'DEPENDENCY_GET_ALL',
+  DEPENDENCY_ACCEPT = 'DEPENDENCY_ACCEPT',
 }
 
 export const ipcMainEvents = [
@@ -166,4 +167,5 @@ export const ipcRendererEvents = [
   IpcEvents.USER_SETTING_GET,
 
   IpcEvents.DEPENDENCY_GET_ALL,
+  IpcEvents.DEPENDENCY_ACCEPT,
 ];

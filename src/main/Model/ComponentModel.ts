@@ -10,7 +10,12 @@ import { componentHelper } from '../helpers/ComponentHelper';
 const query = new Querys();
 
 export class ComponentModel extends Model {
-  public static readonly entityMapper = { path: 'f.path', purl: 'comp.purl', version: 'comp.version' };
+  public static readonly entityMapper = {
+    path: 'f.path',
+    purl: 'comp.purl',
+    version: 'comp.version',
+    source: 'comp.source',
+  };
 
   license: LicenseModel;
 

@@ -7,7 +7,7 @@ import { Querys } from './querys_db';
 const query = new Querys();
 
 export class DependencyModel extends Model {
-  public static readonly entityMapper = { path: 'f.path', purl: 'd.purl', version: 'd.version' };
+  public static readonly entityMapper = { path: 'f.path', purl: 'd.purl', version: 'd.version', id: 'd.dependencyId' };
 
   public constructor(path: string) {
     super(path);
@@ -46,7 +46,7 @@ export class DependencyModel extends Model {
   }
 
   public async getAll(queryBuilder: QueryBuilder) {
-    return new Promise<Array<DependencyDTO>>(async (resolve, reject) => {
+    return new Promise<Array<any>>(async (resolve, reject) => {
       try {
         const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_DEPENDENCIES, DependencyModel.entityMapper);
         const db = await this.openDb();
@@ -54,10 +54,54 @@ export class DependencyModel extends Model {
           db.close();
           if (err) throw err;
           dep.forEach((d) => {
-            d.licenses = d.licenses.split(',');
+            if (d.licenses) d.licenses = d.licenses.split(',');
+            else d.licenses = [];
           });
           resolve(dep);
         });
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
+  public insertLicense(dependency: any) {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.run(
+          'UPDATE dependencies SET licenses=? WHERE dependencyId=?',
+          dependency.licenses,
+          dependency.dependencyId,
+          async (err: any, dep: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          }
+        );
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
+  public accept(dependency: any) {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.run(
+          `UPDATE dependencies SET rejectedAt=? WHERE purl=? AND version=?;`,
+          null,
+          dependency.purl,
+          dependency.version,
+          async (err: any, dep: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          }
+        );
       } catch (error) {
         log.error(error);
         reject(error);

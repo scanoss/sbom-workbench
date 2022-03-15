@@ -222,7 +222,7 @@ export class InventoryModel extends Model {
     const db = await this.openDb();
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
-        let SQLquery = `SELECT id FROM inventories WHERE  notes# AND usage=? AND spdxid=? AND cvid=?;`;
+        let SQLquery = `SELECT id FROM inventories WHERE  notes# AND usage=? AND spdxid=? AND cvid=? AND source='detected';`;
         SQLquery = SQLquery.replace('#', inventory.notes ? `='${inventory.notes}'` : ' IS NULL');
         db.get(SQLquery, inventory.usage, inventory.spdxid, inventory.cvid, (err: any, inv: any) => {
           db.close();
@@ -236,7 +236,7 @@ export class InventoryModel extends Model {
     });
   }
 
-  async create(inventory: Partial<Inventory>) {
+  async create(inventory: any) {
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -247,13 +247,14 @@ export class InventoryModel extends Model {
           inventory.notes ? inventory.notes : null,
           inventory.url ? inventory.url : null,
           inventory.spdxid ? inventory.spdxid : null,
+          inventory.source ? inventory.source : 'detected',
           async function (this: any, err: any) {
-            inventory.id = this.lastID;
             if (err) throw Error('Unable to create inventory');
+            inventory.id = this.lastID;
+            db.close();
+            resolve(inventory);
           }
         );
-        db.close();
-        resolve(inventory);
       } catch (error) {
         log.error(error);
         reject(error);
