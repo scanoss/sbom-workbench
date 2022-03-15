@@ -8,7 +8,12 @@ import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 const query = new Querys();
 
 export class FileModel extends Model {
-  public static readonly entityMapper = { path: 'f.path', purl: 'comp.purl', version: 'comp.version' };
+  public static readonly entityMapper = {
+    path: 'f.path',
+    purl: 'comp.purl',
+    version: 'comp.version',
+    source: 'comp.source',
+  };
 
   inventory: InventoryModel;
 

@@ -221,6 +221,7 @@ export interface DependencyDTO {
   purl: string;
   version: string;
   scope: string;
-  component: string;
+  component: Component;
   status: FileStatusType.IDENTIFIED | FileStatusType.ORIGINAL | FileStatusType.PENDING;
+  inventory: Inventory;
 }
