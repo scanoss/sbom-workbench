@@ -3,10 +3,8 @@ import { QueryBuilderAND } from './QueryBuilderAND';
 import { QueryBuilderCompId } from './QueryBuilderCompId';
 import { QueryBuilderCustom } from './QueryBuilderCustom';
 import { QueryBuilderIN } from './QueryBuilderIN';
-import { QueryBuilderSource } from './QueryBuilderSource';
 import { QueryBuilderStatus } from './QueryBuilderStatus';
 import { QueryBuilderUsage } from './QueryBuilderUsage';
-import { QueryBuilderVersion } from './QueryBuilderVersion';
 
 export class QueryBuilderCreator {
   public static create(params: Record<string, any>): QueryBuilder {
@@ -17,7 +15,7 @@ export class QueryBuilderCreator {
         builder.add(new QueryBuilderCustom('path', 'LIKE', `${params.path}%`));
       }
       if (params.source) {
-        builder.add(new QueryBuilderSource(params.source));
+        builder.add(new QueryBuilderCustom('source', '=', `${params.source}`));
       }
       if (params.status) {
         builder.add(new QueryBuilderStatus(params.status));
@@ -29,7 +27,7 @@ export class QueryBuilderCreator {
         builder.add(new QueryBuilderCustom('purl', '=', params.purl));
       }
       if (params.version) {
-        builder.add(new QueryBuilderVersion(params.version));
+        builder.add(new QueryBuilderCustom('version', '=', params.version));
       }
       if (params.compid) {
         const queryBuilderIN = new QueryBuilderIN();
