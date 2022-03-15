@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { fileService } from '../../api/file-service';
-import { resultService } from '../../api/results-service';
+import { fileService } from '../../api/services/file.service';
+import { resultService } from '../../api/services/results.service';
 import { InventoryAction } from '../../api/types';
 import { DialogContext, IDialogContext } from '../context/DialogProvider';
 import { DialogResponse, DIALOG_ACTIONS } from '../context/types';

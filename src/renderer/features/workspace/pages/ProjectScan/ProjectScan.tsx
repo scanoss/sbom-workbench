@@ -6,7 +6,7 @@ import { AppContext, IAppContext } from '../../../../context/AppProvider';
 import * as controller from '../../../../controllers/home-controller';
 import { IpcEvents } from '../../../../../api/ipc-events';
 import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
-import { projectService } from '../../../../../api/project-service';
+import { projectService } from '../../../../../api/services/project.service';
 import CircularComponent from '../Components/CircularComponent';
 
 const { ipcRenderer } = require('electron');

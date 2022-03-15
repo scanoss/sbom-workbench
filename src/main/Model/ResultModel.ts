@@ -271,16 +271,12 @@ export class ResultModel extends Model {
     });
   }
 
-  public getResultsPreLoadInventory(builder: QueryBuilder) {
+  public getResultsPreLoadInventory(queryBuilder: QueryBuilder) {
     return new Promise<any>(async (resolve, reject) => {
       try {
-        let SQLquery =
-          'SELECT f.fileId AS id,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f INNER JOIN results r ON f.fileId=r.fileId LEFT JOIN component_versions comp ON comp.purl=r.purl AND comp.version=r.version #FILTER';
-        const filter = builder ? `WHERE ${builder.getSQL().toString()}` : '';
-        const params = builder ? builder.getFilters() : [];
-        SQLquery = SQLquery.replace('#FILTER', filter);
+        const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_RESULTS_PRELOADINVENTORY, this.getEntityMapper());
         const db = await this.openDb();
-        db.all(SQLquery, ...params, async (err: any, data: any) => {
+        db.all(SQLquery.SQL, ...SQLquery.params, async (err: any, data: any) => {
           db.close();
           if (err) throw err;
           else {

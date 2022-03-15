@@ -217,4 +217,7 @@ export class Querys {
   FROM files f LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions comp ON
   comp.purl = r.purl AND comp.version = r.version
  LEFT JOIN file_inventories fi ON fi.fileId=f.fileId #FILTER ;`;
+
+  SQL_GET_RESULTS_PRELOADINVENTORY =
+    'SELECT f.fileId AS id,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f INNER JOIN results r ON f.fileId=r.fileId LEFT JOIN component_versions comp ON comp.purl=r.purl AND comp.version=r.version #FILTER';
 }

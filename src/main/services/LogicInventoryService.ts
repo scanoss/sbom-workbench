@@ -12,6 +12,7 @@ import {
 import { inventoryHelper } from '../helpers/InventoryHelper';
 import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
 
+
 class LogicInventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
     try {

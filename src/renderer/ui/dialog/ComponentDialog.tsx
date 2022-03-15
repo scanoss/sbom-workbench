@@ -19,8 +19,8 @@ import { Autocomplete } from '@material-ui/lab';
 import { NewComponentDTO } from '../../../api/types';
 import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
 import { ResponseStatus } from '../../../api/Response';
-import { componentService } from '../../../api/component-service';
-import { licenseService } from '../../../api/license-service';
+import { componentService } from '../../../api/services/component.service';
+import { licenseService } from '../../../api/services/license.service';
 import { DialogContext } from '../../context/DialogProvider';
 
 const useStyles = makeStyles((theme) => ({

@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { List, AutoSizer } from 'react-virtualized';
-import { inventoryService } from '../../../api/inventory-service';
+import { inventoryService } from '../../../api/services/inventory.service';
 
 const useStyles = makeStyles((theme) => ({
   size: {

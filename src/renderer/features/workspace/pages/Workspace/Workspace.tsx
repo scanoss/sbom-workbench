@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { AppContext, IAppContext } from '../../../../context/AppProvider';
 import { IProject } from '../../../../../api/types';
-import { workspaceService } from '../../../../../api/workspace-service';
+import { workspaceService } from '../../../../../api/services/workspace.service';
 import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
 import { DIALOG_ACTIONS } from '../../../../context/types';
 import * as Config from '../../../../../shared/Config';

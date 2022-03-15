@@ -18,8 +18,8 @@ import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { Add } from '@material-ui/icons';
 import { AppContext, IAppContext } from '../../../../context/AppProvider';
 import { INewProject } from '../../../../../api/types';
-import { userSettingService } from '../../../../../api/userSetting-service';
-import { workspaceService } from '../../../../../api/workspace-service';
+import { userSettingService } from '../../../../../api/services/userSetting.service';
+import { workspaceService } from '../../../../../api/services/workspace.service';
 import { ResponseStatus } from '../../../../../api/Response';
 import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
 

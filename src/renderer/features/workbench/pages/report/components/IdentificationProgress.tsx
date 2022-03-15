@@ -3,9 +3,9 @@ import { Chart } from 'chart.js';
 import { Button, Tooltip } from '@material-ui/core';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import { shell } from 'electron';
-import { ExportFormat } from '../../../../../../api/export-service';
+import { ExportFormat } from '../../../../../../api/services/export.service';
 import { HashType } from '../../../../../../api/types';
-import { projectService } from '../../../../../../api/project-service';
+import { projectService } from '../../../../../../api/services/project.service';
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
