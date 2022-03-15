@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
-import { workbenchController } from '../../workbench-controller';
+import { workbenchController } from '../../controllers/workbench-controller';
 import { AppContext } from '../../context/AppProvider';
 import { Inventory, InventoryAction, IWorkbenchFilter, Node } from '../../../api/types';
 import { inventoryService } from '../../../api/inventory-service';
@@ -164,11 +164,15 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     dispatch(setCurrentNode(node));
   };
 
-  useEffect(async () => {
-    if (state.loaded) {
-      await projectService.setFilter(state.filter);
-      update();
-    }
+  useEffect(() => {
+    const setFilter = async () => {
+      if (state.loaded) {
+        await projectService.setFilter(state.filter);
+        update();
+      }
+    };
+
+    setFilter();
   }, [state.filter]);
 
   // TODO: use custom navigation

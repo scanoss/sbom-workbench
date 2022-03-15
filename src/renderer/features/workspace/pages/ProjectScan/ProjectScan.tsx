@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { IconButton } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { AppContext, IAppContext } from '../../../../context/AppProvider';
-import * as controller from '../../../../home-controller';
+import * as controller from '../../../../controllers/home-controller';
 import { IpcEvents } from '../../../../../ipc-events';
 import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
 import { projectService } from '../../../../../api/project-service';

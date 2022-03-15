@@ -91,7 +91,7 @@ const createWindow = async () => {
     },
   });
 
-  const mainURL = `file://${__dirname}/index.html`;
+  const mainURL = `file://${__dirname}/renderer/index.html`;
   mainWindow.loadURL(mainURL);
 
   // @TODO: Use 'ready-to-show' event

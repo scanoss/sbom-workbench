@@ -2,7 +2,6 @@ import { CircularProgress } from '@material-ui/core';
 import React, { useContext, useEffect } from 'react';
 import { Redirect, Route, Switch, useLocation, useRouteMatch } from 'react-router-dom';
 import SplitPane from 'react-split-pane';
-import { dialogController } from '../../dialog-controller';
 import { WorkbenchContext, IWorkbenchContext } from './store';
 import { AppContext, IAppContext } from '../../context/AppProvider';
 import AppBar from './components/AppBar/AppBar';
@@ -13,6 +12,7 @@ import FileTree from './components/FileTree/FileTree';
 import { reset } from './actions';
 import WorkbenchFilters from './components/WorkbenchFilters/WorkbenchFilters';
 import { ENABLE_WORKBENCH_FILTERS } from '../../../Config';
+import { dialogController } from '../../controllers/dialog-controller';
 
 const Workbench = () => {
   const { path } = useRouteMatch();

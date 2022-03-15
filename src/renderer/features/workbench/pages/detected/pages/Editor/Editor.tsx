@@ -4,7 +4,7 @@ import { Skeleton } from '@material-ui/lab';
 import { IDependency } from 'scanoss';
 import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
-import { workbenchController } from '../../../../../../workbench-controller';
+import { workbenchController } from '../../../../../../controllers/workbench-controller';
 import { AppContext, IAppContext } from '../../../../../../context/AppProvider';
 import { FileType, Inventory } from '../../../../../../../api/types';
 import LabelCard from '../../../../components/LabelCard/LabelCard';

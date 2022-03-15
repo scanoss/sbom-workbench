@@ -2,12 +2,12 @@ import React from 'react';
 import { render } from 'react-dom';
 import { HashRouter, Redirect, Route } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider, Theme } from '@material-ui/core/styles';
-import { WorkbenchProvider } from './renderer/features/workbench/store';
-import { DialogProvider } from './renderer/context/DialogProvider';
-import Workbench from './renderer/features/workbench/Workbench';
-import AppProvider from './renderer/context/AppProvider';
-import Workspace from './renderer/features/workspace';
-import About from './renderer/features/about/About';
+import { WorkbenchProvider } from './features/workbench/store';
+import { DialogProvider } from './context/DialogProvider';
+import Workbench from './features/workbench/Workbench';
+import AppProvider from './context/AppProvider';
+import Workspace from './features/workspace';
+import About from './features/about/About';
 
 import './App.global.scss';
 
