@@ -1,9 +1,9 @@
 import { utilHelper } from '../helpers/UtilHelper';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
-import { logicComponentService } from './LogicComponentService';
+import { componentService } from './ComponentService';
 import { serviceProvider } from './ServiceProvider';
 
-class ReScanService {
+class RescanService {
   public async reScan(files: Array<any>, resultPath: string): Promise<void> {
     try {
       const aux = utilHelper.convertsArrayOfStringToString(files, 'path');
@@ -44,7 +44,7 @@ class ReScanService {
       await serviceProvider.model.result.deleteDirty();
       await serviceProvider.model.file.deleteDirty();
       await serviceProvider.model.component.updateOrphanToManual();
-      await logicComponentService.importComponents();
+      await componentService.importComponents();
 
       const emptyInv: any = await serviceProvider.model.inventory.emptyInventory();
       if (emptyInv) {
@@ -90,4 +90,4 @@ class ReScanService {
     return results;
   }
 }
-export const reScanService = new ReScanService();
+export const rescanService = new RescanService();

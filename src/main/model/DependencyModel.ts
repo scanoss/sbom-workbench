@@ -1,6 +1,6 @@
 import log from 'electron-log';
 import { DependencyDTO } from '../../api/types';
-import { QueryBuilder } from '../queryBuilder/QueryBuilder';
+import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Model } from './Model';
 import { Querys } from './querys_db';
 

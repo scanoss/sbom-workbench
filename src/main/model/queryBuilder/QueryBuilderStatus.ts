@@ -1,4 +1,4 @@
-import { FileStatusType } from '../../api/types';
+import { FileStatusType } from '../../../api/types';
 import { QueryBuilder } from './QueryBuilder';
 
 export class QueryBuilderStatus extends QueryBuilder {

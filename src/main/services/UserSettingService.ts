@@ -6,7 +6,7 @@ import { wsUtils } from '../workspace/WsUtils/WsUtils';
 import packageJson from '../../package.json';
 import { API_URL } from '../../shared/Config';
 
-class UserSetting {
+class UserSettingService {
   private myPath: string;
 
   private name: string;
@@ -64,4 +64,4 @@ class UserSetting {
   }
 }
 
-export const userSetting = new UserSetting();
+export const userSettingService = new UserSettingService();

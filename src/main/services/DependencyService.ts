@@ -4,10 +4,10 @@ import { DependencyDTO } from '../../api/types';
 import { dependencyHelper } from '../helpers/DependencyHelper';
 import { fileHelper } from '../helpers/FileHelper';
 import { licenseHelper } from '../helpers/LicenseHelper';
-import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
+import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { serviceProvider } from './ServiceProvider';
 
-class LogicDependencyService {
+class DependencyService {
   public async insert(dependencies: IDependencyResponse): Promise<void> {
     const filesDependencies = dependencyHelper.dependecyModelAdapter(dependencies);
     const files = await fileHelper.getPathFileId();
@@ -73,4 +73,4 @@ class LogicDependencyService {
   }
 }
 
-export const logicDependencyService = new LogicDependencyService();
+export const dependencyService = new DependencyService();

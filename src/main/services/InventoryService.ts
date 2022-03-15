@@ -10,10 +10,10 @@ import {
   FileStatusType,
 } from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
-import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
+import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 
 
-class LogicInventoryService {
+class InventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
     try {
       const inventory = (await serviceProvider.model.inventory.getById(inv.id)) as Inventory;
@@ -192,4 +192,4 @@ class LogicInventoryService {
   }
 }
 
-export const logicInventoryService = new LogicInventoryService();
+export const inventoryService = new InventoryService();

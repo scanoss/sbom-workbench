@@ -3,7 +3,7 @@
 /* eslint-disable func-names */
 import log from 'electron-log';
 import sqlite3 from 'sqlite3';
-import { QueryBuilder } from '../queryBuilder/QueryBuilder';
+import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Querys } from './querys_db';
 
 const query = new Querys();

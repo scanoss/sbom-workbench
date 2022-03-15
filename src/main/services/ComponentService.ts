@@ -1,11 +1,11 @@
 import log from 'electron-log';
 import { Component, ComponentGroup, IWorkbenchFilter } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
-import { QueryBuilder } from '../queryBuilder/QueryBuilder';
-import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
+import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
+import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { serviceProvider } from './ServiceProvider';
 
-class LogicComponentService {
+class ComponentService {
   public async getComponentFiles(data: Partial<Component>, filter: IWorkbenchFilter): Promise<any> {
     try {
       const params = { purl: data.purl, version: data.version, ...filter };
@@ -143,4 +143,4 @@ class LogicComponentService {
   }
 }
 
-export const logicComponentService = new LogicComponentService();
+export const componentService = new ComponentService();

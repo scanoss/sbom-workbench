@@ -7,7 +7,7 @@ import { workspace } from '../../main/workspace/Workspace';
 import { NodeStatus } from '../../main/workspace/Tree/Tree/Node';
 import { utilHelper } from '../../main/helpers/UtilHelper';
 import { FilterTrue } from '../../main/batch/Filter/FilterTrue';
-import { logicResultService } from '../../main/services/LogicResultService';
+import { resultService } from '../../main/services/ResultService';
 
 const path = require('path');
 
@@ -94,10 +94,10 @@ ipcMain.handle(IpcEvents.FILE_GET_ID_FROM_PATH, async (_event, arg: string) => {
 
 ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
   const project = workspace.getOpenedProjects()[0];
-  const data = await logicResultService.ignore(arg);
+  const data = await resultService.ignore(arg);
 
   project.sendToUI(IpcEvents.TREE_UPDATING, {});
-  logicResultService
+  resultService
     .getResultsFromIDs(arg)
     .then((filesToUpdate: any) => {
       const paths = utilHelper.getArrayFromObjectFilter(filesToUpdate, 'path', new FilterTrue()) as Array<string>;

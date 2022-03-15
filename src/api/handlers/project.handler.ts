@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { FileTreeViewMode, IWorkbenchFilter } from '../types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from '../Response';
-import { userSetting } from '../../main/services/UserSetting';
+import { userSettingService } from '../../main/services/UserSettingService';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { Project } from '../../main/workspace/Project';
 import { workspace } from '../../main/workspace/Workspace';
@@ -85,7 +85,7 @@ ipcMain.handle(IpcEvents.GET_TOKEN, async (event) => {
   try {
     let token = workspace.getOpenedProjects()[0].getToken();
     if (!token || token === '') {
-      const { TOKEN } = userSetting.get();
+      const { TOKEN } = userSettingService.get();
       token = TOKEN;
     }
     return Response.ok({ message: 'Node from path retrieve succesfully', data: token });

@@ -4,7 +4,7 @@ import { Querys } from './querys_db';
 import { Model } from './Model';
 import { Component } from '../../api/types';
 import { LicenseModel } from './LicenseModel';
-import { QueryBuilder } from '../queryBuilder/QueryBuilder';
+import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { componentHelper } from '../helpers/ComponentHelper';
 
 const query = new Querys();

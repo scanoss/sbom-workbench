@@ -1,4 +1,4 @@
-import { ScanModel } from '../Model/ScanModel';
+import { ScanModel } from '../model/ScanModel';
 
 class ServiceProdiver {
   private _model: ScanModel;

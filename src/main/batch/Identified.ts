@@ -1,7 +1,7 @@
 import { ComponentSource, FileStatusType, FileUsageType, Inventory } from '../../api/types';
-import { QueryBuilder } from '../queryBuilder/QueryBuilder';
-import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
-import { logicInventoryService } from '../services/LogicInventoryService';
+import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
+import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
+import { inventoryService } from '../services/InventoryService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
@@ -34,7 +34,7 @@ export class Identified extends Batch {
       this.updateTree(ids, NodeStatus.IDENTIFIED);
 
       this.inventory.files = ids;
-      const success = await logicInventoryService.create(this.inventory);
+      const success = await inventoryService.create(this.inventory);
 
       if (success) return success;
 

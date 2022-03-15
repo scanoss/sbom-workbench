@@ -1,8 +1,8 @@
-import { QueryBuilder } from '../queryBuilder/QueryBuilder';
-import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
+import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
+import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { workspace } from '../workspace/Workspace';
 
-class LogicResultService {
+class ResultService {
   public async getResultsByids(ids: number[], project: any) {
     try {
       const results: Array<any> = await project.store.results.getSummaryByids(ids);
@@ -69,4 +69,4 @@ class LogicResultService {
     }
   }
 }
-export const logicResultService = new LogicResultService();
+export const resultService = new ResultService();

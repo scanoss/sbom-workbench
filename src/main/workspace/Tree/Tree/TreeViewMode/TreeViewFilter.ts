@@ -1,4 +1,4 @@
-import { QueryBuilderCreator } from '../../../../queryBuilder/QueryBuilderCreator';
+import { QueryBuilderCreator } from '../../../../model/queryBuilder/QueryBuilderCreator';
 import { serviceProvider } from '../../../../services/ServiceProvider';
 import Node from '../Node';
 import { TreeViewMode } from './TreeViewMode';

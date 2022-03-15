@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { Component, License, ComponentGroup, IWorkbenchFilterParams } from '../types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from '../Response';
-import { logicComponentService } from '../../main/services/LogicComponentService';
+import { componentService } from '../../main/services/ComponentService';
 import { workspace } from '../../main/workspace/Workspace';
 
 ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, component: Component) => {
@@ -23,14 +23,14 @@ ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE, async (_event, comp: Componen
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (_event, component: Component, params: IWorkbenchFilterParams) => {
   const filter = workspace.getOpenedProjects()[0].getFilter(params);
-  const data = await logicComponentService.getComponentFiles(component, filter);
+  const data = await componentService.getComponentFiles(component, filter);
   return { status: 'ok', message: 'test', data };
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (_event, params: IWorkbenchFilterParams) => {
   try {
     const filter = workspace.getOpenedProjects()[0].getFilter(params);
-    const data = await logicComponentService.getAll(filter);
+    const data = await componentService.getAll(filter);
     return {
       status: 'ok',
       message: 'Components getAll retrieve successfully',
@@ -46,7 +46,7 @@ ipcMain.handle(
   async (_event, component: Partial<ComponentGroup>, params: IWorkbenchFilterParams) => {
     try {
       const filter = workspace.getOpenedProjects()[0].getFilter(params);
-      const data = await logicComponentService.get(component, filter);
+      const data = await componentService.get(component, filter);
       return { status: 'ok', message: 'Component group retrieve successfully', data };
     } catch (e) {
       return { status: 'fail' };

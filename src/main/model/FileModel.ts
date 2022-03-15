@@ -3,7 +3,7 @@ import { Querys } from './querys_db';
 import { File } from '../../api/types';
 import { InventoryModel } from './InventoryModel';
 import { Model } from './Model';
-import { QueryBuilder } from '../queryBuilder/QueryBuilder';
+import { QueryBuilder } from './queryBuilder/QueryBuilder';
 
 const query = new Querys();
 

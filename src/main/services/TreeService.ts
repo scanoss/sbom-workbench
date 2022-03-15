@@ -2,7 +2,7 @@ import { IpcEvents } from '../../api/ipc-events';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { workspace } from '../workspace/Workspace';
 
-class LogicTreeService {
+class TreeService {
   public retoreStatus(files: Array<string>) {
     try {
       const project = workspace.getOpenedProjects()[0];
@@ -31,4 +31,4 @@ class LogicTreeService {
   }
 }
 
-export const logictTreeService = new LogicTreeService();
+export const treeService = new TreeService();

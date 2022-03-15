@@ -6,7 +6,7 @@ import { Model } from './Model';
 import { utilModel } from './UtilModel';
 import { ComponentModel } from './ComponentModel';
 import { licenseHelper } from '../helpers/LicenseHelper';
-import { QueryBuilder } from '../queryBuilder/QueryBuilder';
+import { QueryBuilder } from './queryBuilder/QueryBuilder';
 
 const query = new Querys();
 

@@ -18,7 +18,7 @@ import * as os from 'os';
 import MenuBuilder from './main/menu';
 
 import { workspace } from './main/workspace/Workspace';
-import { userSetting } from './main/services/UserSetting';
+import { userSettingService } from './main/services/UserSettingService';
 import { WorkspaceMigration } from './main/migration/WorkspaceMigration';
 import { DEFAULT_WORKSPACE_NAME } from './shared/Config';
 
@@ -153,6 +153,6 @@ app.on('activate', () => {
 async function init() {
   const root = `${os.homedir()}/${DEFAULT_WORKSPACE_NAME}`;
   await workspace.read(root);
-  await userSetting.read(root);
-  new WorkspaceMigration(userSetting.get().VERSION, root).up();
+  await userSettingService.read(root);
+  new WorkspaceMigration(userSettingService.get().VERSION, root).up();
 }
