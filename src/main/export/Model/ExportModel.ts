@@ -2,7 +2,7 @@ import sqlite3 from 'sqlite3';
 
 import fs from 'fs';
 
-import { Querys } from '../../Model/querys_db';
+import { Querys } from '../../model/querys_db';
 import { workspace } from '../../workspace/Workspace';
 
 export class ExportModel {

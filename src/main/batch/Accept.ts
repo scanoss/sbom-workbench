@@ -1,9 +1,7 @@
 import { Inventory } from '../../api/types';
-import { logicInventoryService } from '../services/LogicInventoryService';
+import { inventoryService } from '../services/InventoryService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
-import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
-
 import { Restore } from './Restore';
 
 export class Accept extends Batch {
@@ -28,10 +26,10 @@ export class Accept extends Batch {
           inventory.notes = this.note;
         });
       }
-      const inv = await logicInventoryService.InventoryBatchCreate(this.inventories);
+      const inv = await inventoryService.InventoryBatchCreate(this.inventories);
       const filesToUpdate: any = this.mergeFilesInventoryId(inv);
       filesToUpdate.files = ids;
-      const success = await logicInventoryService.InventoryAttachFileBatch(filesToUpdate);
+      const success = await inventoryService.InventoryAttachFileBatch(filesToUpdate);
       if (success) {
         this.updateTree(ids, NodeStatus.IDENTIFIED);
         return inv;

@@ -1,7 +1,7 @@
 import { ComponentSource, FileStatusType } from '../../api/types';
-import { QueryBuilder } from '../queryBuilder/QueryBuilder';
-import { QueryBuilderCreator } from '../queryBuilder/QueryBuilderCreator';
-import { logicResultService } from '../services/LogicResultService';
+import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
+import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
+import { resultService } from '../services/ResultService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
@@ -28,7 +28,7 @@ export class Ignore extends Batch {
       }
       const ids = (await this.getFilesToProcess(this.queryBuilder, 'id')) as Array<number>;
       this.updateTree(ids, NodeStatus.IGNORED);
-      const success = await logicResultService.ignore(ids);
+      const success = await resultService.ignore(ids);
       if (success) return success;
 
       throw new Error('[ INVENTORY FOLDER] error on ignore files service');

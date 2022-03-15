@@ -7,7 +7,7 @@ import MatchesChart from '../../../../report/components/MatchesChart';
 import VulnerabilitiesCard from '../../../../report/components/VulnerabilitiesCard';
 import LicensesChart from '../../../../report/components/LicensesChart';
 import LicensesTable from '../../../../report/components/LicensesTable';
-import { report } from '../../../../../api/report-service';
+import { report } from '../../../../../api/services/report.service';
 
 const ScanResults = ({ name }) => {
   const history = useHistory();
@@ -17,7 +17,7 @@ const ScanResults = ({ name }) => {
   const [displayed, setDisplayed] = useState<any>(localStorage.getItem(name) === 'true' || !localStorage.getItem(name));
 
   const init = async () => {
-    const a = await report.getSummary();  
+    const a = await report.getSummary();
     setProgress(a?.data?.summary);
     setLicenses(a?.data?.licenses);
     setVulnerabilites(a?.data?.vulnerabilities);

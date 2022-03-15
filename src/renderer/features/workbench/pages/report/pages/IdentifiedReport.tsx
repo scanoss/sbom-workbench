@@ -9,7 +9,7 @@ import LicensesTable from '../components/LicensesTable';
 import MatchesForLicense from '../components/MatchesForLicense';
 import { WorkbenchContext, IWorkbenchContext } from '../../../store';
 import LicensesObligations from '../components/LicensesObligations';
-import obligationsService from '../../../../../../api/obligations-service';
+import obligationsService from '../../../../../../api/services/obligations.service';
 import OssVsOriginalProgressBar from '../components/OssVsOriginalProgressBar';
 
 Chart.register(...registerables);

@@ -23,7 +23,7 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import { FileStatusType, FileTreeViewMode, FileUsageType } from '../../../../../api/types';
 import { WorkbenchContext } from '../../store';
 import { setFilter, resetFilter } from '../../actions';
-import { projectService } from '../../../../../api/project-service';
+import { projectService } from '../../../../../api/services/project.service';
 
 const useStyles = makeStyles((theme) => ({
   info: {
