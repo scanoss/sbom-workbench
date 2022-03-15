@@ -1,9 +1,9 @@
 import { ipcMain } from 'electron';
-import { License } from '../api/types';
+import { License } from '../types';
 import { IpcEvents } from '../ipc-events';
-import { licenseHelper } from './helpers/LicenseHelper';
-import { Response } from './Response';
-import { workspace } from './workspace/Workspace';
+import { licenseHelper } from '../../main/helpers/LicenseHelper';
+import { Response } from '../Response';
+import { workspace } from '../../main/workspace/Workspace';
 
 ipcMain.handle(IpcEvents.LICENSE_GET_ALL, async (event) => {
   try {

@@ -1,9 +1,9 @@
 import { ipcMain } from 'electron';
-import { Component, License, ComponentGroup, IWorkbenchFilterParams } from '../api/types';
+import { Component, License, ComponentGroup, IWorkbenchFilterParams } from '../types';
 import { IpcEvents } from '../ipc-events';
-import { Response } from './Response';
-import { logicComponentService } from './services/LogicComponentService';
-import { workspace } from './workspace/Workspace';
+import { Response } from '../Response';
+import { logicComponentService } from '../../main/services/LogicComponentService';
+import { workspace } from '../../main/workspace/Workspace';
 
 ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, component: Component) => {
   try {

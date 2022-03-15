@@ -1,9 +1,9 @@
 import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
-import { Response } from './Response';
-import { reportService } from './services/ReportService';
-import { Export } from './export/Export';
-import { FormatVersion } from '../api/types';
+import { Response } from '../Response';
+import { reportService } from '../../main/services/ReportService';
+import { Export } from '../../main/export/Export';
+import { FormatVersion } from '../types';
 
 const pathLib = require('path');
 

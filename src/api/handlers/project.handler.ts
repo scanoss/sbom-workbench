@@ -1,11 +1,11 @@
 import { ipcMain } from 'electron';
-import { FileTreeViewMode, IWorkbenchFilter } from '../api/types';
+import { FileTreeViewMode, IWorkbenchFilter } from '../types';
 import { IpcEvents } from '../ipc-events';
-import { Response } from './Response';
-import { userSetting } from './UserSetting';
-import { ProjectFilterPath } from './workspace/filters/ProjectFilterPath';
-import { Project } from './workspace/Project';
-import { workspace } from './workspace/Workspace';
+import { Response } from '../Response';
+import { userSetting } from '../../main/services/UserSetting';
+import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
+import { Project } from '../../main/workspace/Project';
+import { workspace } from '../../main/workspace/Workspace';
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
   let created: any;
@@ -34,17 +34,6 @@ function getUserHome() {
   // Return the value using process.env
   return process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 }
-
-ipcMain.handle(IpcEvents.PROJECT_CREATE_SCAN, async (event, arg: Project) => {
-  const { path } = arg;
-
-  const projectName = basepath.basename(path);
-  const p: Project = new Project(projectName);
-  await workspace.addProject(p);
-  p.setScanPath(path);
-  p.setMailbox(event.sender);
-  await p.startScanner();
-});
 
 ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
   const projectList = workspace.getOpenedProjects();

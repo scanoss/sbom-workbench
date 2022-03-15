@@ -1,6 +1,6 @@
 import { IpcEvents } from '../ipc-events';
-import { BaseService } from './base-service';
-import { IFolderInventory, Inventory } from './types';
+import { BaseService } from './base.service';
+import { IFolderInventory, Inventory } from '../types';
 
 const { ipcRenderer } = require('electron');
 

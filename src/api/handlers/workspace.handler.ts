@@ -1,11 +1,11 @@
 import { ipcMain } from 'electron';
 import log from 'electron-log';
 import { IpcEvents } from '../ipc-events';
-import { workspace } from './workspace/Workspace';
-import { Response } from './Response';
-import { INewProject, IProject, License } from '../api/types';
-import { ProjectFilterPath } from './workspace/filters/ProjectFilterPath';
-import { ProjectZipper } from './workspace/ProjectZipper';
+import { workspace } from '../../main/workspace/Workspace';
+import { Response } from '../Response';
+import { INewProject, IProject, License } from '../types';
+import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
+import { ProjectZipper } from '../../main/workspace/ProjectZipper';
 
 ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
   try {
@@ -33,7 +33,7 @@ ipcMain.handle(IpcEvents.WORKSPACE_DELETE_PROJECT, async (event, projectPath: st
 // This service creates a new project and launch automatically the scanner.
 // In future versions, the scanner will be launched by the user.
 ipcMain.handle(IpcEvents.WORKSPACE_CREATE_PROJECT, async (event, project: INewProject) => {
-  try {  
+  try {
     const p = await workspace.createProject(project);
     p.setMailbox(event.sender);
     p.startScanner();

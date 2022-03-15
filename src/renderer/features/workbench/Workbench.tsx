@@ -11,7 +11,7 @@ import Reports from './pages/report/Report';
 import FileTree from './components/FileTree/FileTree';
 import { reset } from './actions';
 import WorkbenchFilters from './components/WorkbenchFilters/WorkbenchFilters';
-import { ENABLE_WORKBENCH_FILTERS } from '../../../Config';
+import { ENABLE_WORKBENCH_FILTERS } from '../../../shared/Config';
 import { dialogController } from '../../controllers/dialog-controller';
 
 const Workbench = () => {

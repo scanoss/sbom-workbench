@@ -27,10 +27,10 @@ import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
-import { ExportFormat } from '../../../../../api/export-service';
+import { ExportFormat } from '../../../../../api/services/export.service';
 import { dialogController } from '../../../../controllers/dialog-controller';
 import { FormatVersion, IProject } from '../../../../../api/types';
-import { workspaceService } from '../../../../../api/workspace-service';
+import { workspaceService } from '../../../../../api/services/workspace.service';
 
 const Navigation = () => {
   const history = useHistory();

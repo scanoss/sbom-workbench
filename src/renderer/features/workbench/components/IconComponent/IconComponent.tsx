@@ -1,6 +1,6 @@
 import React from 'react';
 import componentDefault from '../../../../../../assets/imgs/component-default.svg';
-import { ENABLE_COMPONENT_LOGO } from '../../../../../Config';
+import { ENABLE_COMPONENT_LOGO } from '../../../../../shared/Config';
 
 const IconComponent = ({ name, size }) => {
   return (

@@ -1,6 +1,6 @@
 import { IpcEvents } from '../ipc-events';
-import { BaseService } from './base-service';
-import { INewProject, IProject, License } from './types';
+import { BaseService } from './base.service';
+import { INewProject, IProject, License } from '../types';
 
 const { ipcRenderer } = require('electron');
 

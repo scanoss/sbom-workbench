@@ -20,7 +20,7 @@ import { AppContext, IAppContext } from '../../../../context/AppProvider';
 import { INewProject } from '../../../../../api/types';
 import { userSettingService } from '../../../../../api/userSetting-service';
 import { workspaceService } from '../../../../../api/workspace-service';
-import { ResponseStatus } from '../../../../../main/Response';
+import { ResponseStatus } from '../../../../../api/Response';
 import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
 
 const pathUtil = require('path');

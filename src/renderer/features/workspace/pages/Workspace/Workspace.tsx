@@ -5,7 +5,7 @@ import { IProject } from '../../../../../api/types';
 import { workspaceService } from '../../../../../api/workspace-service';
 import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
 import { DIALOG_ACTIONS } from '../../../../context/types';
-import * as Config from '../../../../../Config';
+import * as Config from '../../../../../shared/Config';
 import ProjectList from '../Components/ProjectList';
 import SearchBox from '../../../../components/SearchBox/SearchBox';
 import AddProjectButton from '../Components/AddProjectButton/AddProjectButton';

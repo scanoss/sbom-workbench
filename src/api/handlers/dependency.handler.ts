@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
+import { logicDependencyService } from '../../main/services/LogicDependencyService';
 import { IpcEvents } from '../ipc-events';
-import { Response } from './Response';
-import { logicDependencyService } from './services/LogicDependencyService';
+import { Response } from '../Response';
 
 ipcMain.handle(IpcEvents.DEPENDENCY_GET_ALL, async (event, params: any) => {
   try {

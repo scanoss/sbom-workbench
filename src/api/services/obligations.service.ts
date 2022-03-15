@@ -1,5 +1,5 @@
-import { API_URL } from '../Config';
-import { BaseService } from './base-service';
+import { API_URL } from '../../shared/Config';
+import { BaseService } from './base.service';
 
 class ObligationsService extends BaseService {
   private cache: Map<string, any> = new Map();

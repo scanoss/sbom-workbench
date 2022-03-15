@@ -1,6 +1,6 @@
 import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions } from 'electron';
 import path from 'path';
-import { IpcEvents } from '../ipc-events';
+import { IpcEvents } from '../api/ipc-events';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;

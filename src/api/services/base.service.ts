@@ -1,4 +1,4 @@
-import { ResponseStatus } from '../main/Response';
+import { ResponseStatus } from '../Response';
 
 export class BaseService {
   public response(response) {

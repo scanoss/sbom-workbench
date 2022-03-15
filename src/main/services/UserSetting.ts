@@ -1,10 +1,10 @@
 import { app } from 'electron';
 import fs from 'fs';
-import { IWorkspaceCfg } from '../api/types';
-import { wsUtils } from './workspace/WsUtils/WsUtils';
+import { IWorkspaceCfg } from '../../api/types';
+import { wsUtils } from '../workspace/WsUtils/WsUtils';
 
-import packageJson from '../package.json';
-import { API_URL } from '../Config';
+import packageJson from '../../package.json';
+import { API_URL } from '../../shared/Config';
 
 class UserSetting {
   private myPath: string;

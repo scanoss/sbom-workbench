@@ -1,11 +1,17 @@
 import { IpcEvents } from '../ipc-events';
-import { Component, License, ComponentGroup, NewComponentDTO, IParams, IWorkbenchFilter, IWorkbenchFilterParams } from './types';
-import { BaseService } from './base-service';
+import {
+  Component,
+  License,
+  ComponentGroup,
+  NewComponentDTO,
+  IWorkbenchFilter,
+  IWorkbenchFilterParams,
+} from '../types';
+import { BaseService } from './base.service';
 
 const { ipcRenderer } = require('electron');
 
 class ComponentService extends BaseService {
-
   public async create(component: Partial<NewComponentDTO>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_CREATE, component);
     return this.response(response);

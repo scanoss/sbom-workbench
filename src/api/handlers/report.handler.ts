@@ -1,8 +1,7 @@
 import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
-import { Response } from './Response';
-import { reportService } from './services/ReportService';
-import { workspace } from './workspace/Workspace';
+import { Response } from '../Response';
+import { reportService } from '../../main/services/ReportService';
 
 ipcMain.handle(IpcEvents.REPORT_SUMMARY, async () => {
   try {

@@ -1,11 +1,11 @@
 import { ipcRenderer } from 'electron';
 import { IDependencyResponse } from 'scanoss';
-import { projectService } from '../../api/project-service';
-import { componentService } from '../../api/component-service';
+import { projectService } from '../../api/services/project.service';
+import { componentService } from '../../api/services/component.service';
 import { ComponentGroup, IWorkbenchFilter, ComponentSource, IWorkbenchFilterParams } from '../../api/types';
-import { sortComponents, transform } from '../../utils/scan-util';
-import { IpcEvents } from '../../ipc-events';
-import { API_URL } from '../../Config';
+import { sortComponents } from '../../shared/utils/scan-util';
+import { IpcEvents } from '../../api/ipc-events';
+import { API_URL } from '../../shared/Config';
 
 const pathUtil = require('path');
 

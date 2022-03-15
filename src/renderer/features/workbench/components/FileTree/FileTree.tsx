@@ -3,7 +3,7 @@
 import React, { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Tree, { renderers as Renderers, selectors } from 'react-virtualized-tree';
-import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '../../../../../utils/filetree-utils';
+import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '../../../../../shared/utils/filetree-utils';
 import useContextual from '../../../../hooks/useContextual';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 

@@ -2,12 +2,12 @@ import * as fs from 'fs';
 import { ipcMain } from 'electron';
 import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
-import { File, FileType } from '../api/types';
-import { workspace } from './workspace/Workspace';
-import { logicResultService } from './services/LogicResultService';
-import { NodeStatus } from './workspace/Tree/Tree/Node';
-import { utilHelper } from './helpers/UtilHelper';
-import { FilterTrue } from './batch/Filter/FilterTrue';
+import { File, FileType } from '../types';
+import { workspace } from '../../main/workspace/Workspace';
+import { NodeStatus } from '../../main/workspace/Tree/Tree/Node';
+import { utilHelper } from '../../main/helpers/UtilHelper';
+import { FilterTrue } from '../../main/batch/Filter/FilterTrue';
+import { logicResultService } from '../../main/services/LogicResultService';
 
 const path = require('path');
 
@@ -76,7 +76,7 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
 ipcMain.handle(IpcEvents.FILE_GET, async (_event, arg: Partial<File>) => {
   let data;
   try {
-    data = await workspace.getOpenedProjects()[0].store.file.get(arg); 
+    data = await workspace.getOpenedProjects()[0].store.file.get(arg);
     return { status: 'ok', message: 'Get file', data };
   } catch (error) {
     return { status: 'error', message: 'Get file were not successfully retrieve', data };
@@ -100,7 +100,7 @@ ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
   logicResultService
     .getResultsFromIDs(arg)
     .then((filesToUpdate: any) => {
-      const paths = utilHelper.getArrayFromObjectFilter(filesToUpdate, 'path', new FilterTrue()) as Array<string>;  
+      const paths = utilHelper.getArrayFromObjectFilter(filesToUpdate, 'path', new FilterTrue()) as Array<string>;
       for (const filePath of paths) {
         project.getTree().getRootFolder().setStatus(filePath, NodeStatus.IGNORED);
       }

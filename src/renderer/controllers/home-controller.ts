@@ -1,6 +1,6 @@
-import { projectService } from '../../api/project-service';
+import { projectService } from '../../api/services/project.service';
+import { workspaceService } from '../../api/services/workspace.service';
 import { INewProject } from '../../api/types';
-import { workspaceService } from '../../api/workspace-service';
 
 export const scan = (project: INewProject) => {
   workspaceService.createProject(project);

@@ -24,7 +24,7 @@ import { InventoryForm } from '../../context/types';
 import { componentService } from '../../../api/component-service';
 import { licenseService } from '../../../api/license-service';
 import { DialogContext } from '../../context/DialogProvider';
-import { ResponseStatus } from '../../../main/Response';
+import { ResponseStatus } from '../../../api/Response';
 
 const useStyles = makeStyles((theme) => ({
   size: {

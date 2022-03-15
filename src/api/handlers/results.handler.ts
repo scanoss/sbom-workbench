@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { IpcEvents } from '../ipc-events';
-import { logicResultService } from './services/LogicResultService';
+import { logicResultService } from '../../main/services/LogicResultService';
 
 ipcMain.handle(IpcEvents.RESULTS_GET, async (event, arg: string) => {
   const result = await logicResultService.getFromPath(arg);

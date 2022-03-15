@@ -1,4 +1,4 @@
-import { IpcEvents } from '../../ipc-events';
+import { IpcEvents } from '../../api/ipc-events';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { workspace } from '../workspace/Workspace';
 

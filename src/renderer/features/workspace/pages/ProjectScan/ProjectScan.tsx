@@ -4,7 +4,7 @@ import { IconButton } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { AppContext, IAppContext } from '../../../../context/AppProvider';
 import * as controller from '../../../../controllers/home-controller';
-import { IpcEvents } from '../../../../../ipc-events';
+import { IpcEvents } from '../../../../../api/ipc-events';
 import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
 import { projectService } from '../../../../../api/project-service';
 import CircularComponent from '../Components/CircularComponent';

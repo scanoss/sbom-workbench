@@ -5,7 +5,7 @@ import { ipcRenderer } from 'electron';
 import { workbenchController } from '../../controllers/workbench-controller';
 import { AppContext } from '../../context/AppProvider';
 import { Inventory, InventoryAction, IWorkbenchFilter, Node } from '../../../api/types';
-import { inventoryService } from '../../../api/inventory-service';
+import { inventoryService } from '../../../api/services/inventory.service';
 import reducer, { initialState, State } from './reducers';
 import {
   loadScanSuccess,
@@ -16,10 +16,10 @@ import {
   setCurrentNode,
   setRecentUsedComponent,
 } from './actions';
-import { reportService } from '../../../api/report-service';
-import { IpcEvents } from '../../../ipc-events';
-import { fileService } from '../../../api/file-service';
-import { projectService } from '../../../api/project-service';
+import { reportService } from '../../../api/services/report.service';
+import { IpcEvents } from '../../../api/ipc-events';
+import { fileService } from '../../../api/services/file.service';
+import { projectService } from '../../../api/services/project.service';
 
 export interface IWorkbenchContext {
   loadScan: (path: string) => Promise<boolean>;

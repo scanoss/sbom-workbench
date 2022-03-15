@@ -1,6 +1,6 @@
 import { IpcEvents } from '../ipc-events';
-import { BaseService } from './base-service';
-import { IWorkspaceCfg } from './types';
+import { IWorkspaceCfg } from '../types';
+import { BaseService } from './base.service';
 
 const { ipcRenderer } = require('electron');
 

@@ -22,10 +22,9 @@ import {
 import * as Filtering from './filtering';
 import { ScanModel } from '../Model/ScanModel';
 import { licenses } from '../Model/licenses';
-import { IpcEvents } from '../../ipc-events';
 import { defaultBannedList } from './filtering/defaultFilter';
 import { Metadata } from './Metadata';
-import { userSetting } from '../UserSetting';
+import { userSetting } from '../services/UserSetting';
 import { ProjectMigration } from '../migration/ProjectMigration';
 import { Tree } from './Tree/Tree/Tree';
 import { reScanService } from '../services/RescanLogicService';
@@ -34,6 +33,7 @@ import { serviceProvider } from '../services/ServiceProvider';
 import { TreeViewModeCreator } from './Tree/Tree/TreeViewMode/TreeViewModeCreator';
 import { logicDependencyService } from '../services/LogicDependencyService';
 import { fileHelper } from '../helpers/FileHelper';
+import { IpcEvents } from '../../api/ipc-events';
 
 export class Project extends EventEmitter {
   work_root: string;

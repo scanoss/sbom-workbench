@@ -7,10 +7,10 @@ import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined'
 import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import { Inventory } from '../../../../../../../api/types';
 import { FileList } from './components/FileList';
-import { inventoryService } from '../../../../../../../api/inventory-service';
+import { inventoryService } from '../../../../../../../api/services/inventory.service';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import Label from '../../../../components/Label/Label';
-import { mapFiles } from '../../../../../../../utils/scan-util';
+import { mapFiles } from '../../../../../../../shared/utils/scan-util';
 import { AppContext, IAppContext } from '../../../../../../context/AppProvider';
 import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
 import { DIALOG_ACTIONS, InventoryForm } from '../../../../../../context/types';

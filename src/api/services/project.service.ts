@@ -1,6 +1,6 @@
 import { IpcEvents } from '../ipc-events';
-import { FileTreeViewMode, IProject, IWorkbenchFilter } from './types';
-import { BaseService } from './base-service';
+import { FileTreeViewMode, IProject, IWorkbenchFilter } from '../types';
+import { BaseService } from './base.service';
 
 const { ipcRenderer } = require('electron');
 

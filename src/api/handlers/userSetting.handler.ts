@@ -1,9 +1,8 @@
 import { ipcMain } from 'electron';
-import { workspace } from '../workspace/Workspace';
 import { Response } from '../Response';
-import { IpcEvents } from '../../ipc-events';
-import { IWorkspaceCfg } from '../../api/types';
-import { userSetting } from '../UserSetting';
+import { IpcEvents } from '../ipc-events';
+import { IWorkspaceCfg } from '../types';
+import { userSetting } from '../../main/services/UserSetting';
 
 ipcMain.handle(IpcEvents.USER_SETTING_SET, async (event, conf: Partial<IWorkspaceCfg>) => {
   try {

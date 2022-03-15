@@ -1,15 +1,15 @@
 import { ipcMain } from 'electron';
-import { IFolderInventory, Inventory } from '../api/types';
+import { IFolderInventory, Inventory } from '../types';
 import { IpcEvents } from '../ipc-events';
-import { Batch } from './batch/Batch';
-import { BatchFactory } from './batch/BatchFactory';
-import { FilterTrue } from './batch/Filter/FilterTrue';
-import { utilHelper } from './helpers/UtilHelper';
-import { logicInventoryService } from './services/LogicInventoryService';
-import { logicResultService } from './services/LogicResultService';
-import { logictTreeService } from './services/LogicTreeService';
-import { NodeStatus } from './workspace/Tree/Tree/Node';
-import { workspace } from './workspace/Workspace';
+import { Batch } from '../../main/batch/Batch';
+import { BatchFactory } from '../../main/batch/BatchFactory';
+import { FilterTrue } from '../../main/batch/Filter/FilterTrue';
+import { utilHelper } from '../../main/helpers/UtilHelper';
+import { logicInventoryService } from '../../main/services/LogicInventoryService';
+import { logicResultService } from '../../main/services/LogicResultService';
+import { logictTreeService } from '../../main/services/LogicTreeService';
+import { NodeStatus } from '../../main/workspace/Tree/Tree/Node';
+import { workspace } from '../../main/workspace/Workspace';
 
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (_event, invget: Partial<Inventory>) => {
   let inv: any;
