@@ -21,10 +21,10 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Alert, Autocomplete } from '@material-ui/lab';
 import { Inventory } from '../../../api/types';
 import { InventoryForm } from '../../context/types';
-import { componentService } from '../../../api/component-service';
-import { licenseService } from '../../../api/license-service';
+import { componentService } from '../../../api/services/component.service';
+import { licenseService } from '../../../api/services/license.service';
 import { DialogContext } from '../../context/DialogProvider';
-import { ResponseStatus } from '../../../main/Response';
+import { ResponseStatus } from '../../../api/Response';
 
 const useStyles = makeStyles((theme) => ({
   size: {

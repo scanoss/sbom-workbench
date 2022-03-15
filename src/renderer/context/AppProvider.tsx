@@ -4,10 +4,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import * as os from 'os';
 import { INewProject, IProject } from '../../api/types';
-import { workspaceService } from '../../api/workspace-service';
-import { IpcEvents } from '../../ipc-events';
-import { dialogController } from '../dialog-controller';
+import { workspaceService } from '../../api/services/workspace.service';
+import { IpcEvents } from '../../api/ipc-events';
 import { DialogContext, IDialogContext } from './DialogProvider';
+import { dialogController } from '../controllers/dialog-controller';
 
 const { shell } = require('electron');
 

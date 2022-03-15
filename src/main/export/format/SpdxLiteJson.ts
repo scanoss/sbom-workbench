@@ -1,6 +1,6 @@
 import * as os from 'os';
 import { Buffer } from 'buffer';
-import { utilModel } from '../../Model/UtilModel';
+import { utilModel } from '../../model/UtilModel';
 import { Format } from '../Format';
 
 const crypto = require('crypto');

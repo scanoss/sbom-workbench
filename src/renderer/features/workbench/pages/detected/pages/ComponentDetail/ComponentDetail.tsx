@@ -5,13 +5,13 @@ import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import { Inventory } from '../../../../../../../api/types';
 import { FileList } from '../ComponentList/components/FileList';
 import { ComponentInfo } from '../../../../components/ComponentInfo/ComponentInfo';
-import { componentService } from '../../../../../../../api/component-service';
+import { componentService } from '../../../../../../../api/services/component.service';
 
 import { IdentifiedList } from '../ComponentList/components/IdentifiedList';
 import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
 import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
-import { mapFiles } from '../../../../../../../utils/scan-util';
+import { mapFiles } from '../../../../../../../shared/utils/scan-util';
 import { setHistoryCrumb, setVersion } from '../../../../actions';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';

@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { CircularProgress } from '@material-ui/core';
 import InventoryCard from '../../../../components/InventoryCard/InventoryCard';
 import { ComponentInfo } from '../../../../components/ComponentInfo/ComponentInfo';
-import { inventoryService } from '../../../../../../../api/inventory-service';
+import { inventoryService } from '../../../../../../../api/services/inventory.service';
 import { Inventory } from '../../../../../../../api/types';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 

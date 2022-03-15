@@ -9,7 +9,7 @@ import { DialogResponse, InventoryForm, InventorySelectorResponse, LoaderControl
 import { ConfirmDialog } from '../ui/dialog/ConfirmDialog';
 import { LicenseDialog } from '../ui/dialog/LicenseDialog';
 import { ComponentDialog } from '../ui/dialog/ComponentDialog';
-import { IpcEvents } from '../../ipc-events';
+import { IpcEvents } from '../../api/ipc-events';
 import SettingsDialog from '../ui/dialog/SettingsDialog';
 import { AlertDialog } from '../ui/dialog/AlertDialog';
 import { PreLoadInventoryDialog } from '../ui/dialog/PreLoadInventoryDialog';

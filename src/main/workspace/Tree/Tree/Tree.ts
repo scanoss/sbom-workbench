@@ -2,7 +2,7 @@ import { isBinaryFileSync } from 'isbinaryfile';
 import Node, { NodeStatus } from './Node';
 import File from './File';
 import Folder from './Folder';
-import { IpcEvents } from '../../../../ipc-events';
+import { IpcEvents } from '../../../../api/ipc-events';
 import * as Filtering from '../../filtering';
 import { TreeViewMode } from './TreeViewMode/TreeViewMode';
 import { TreeViewDefault } from './TreeViewMode/TreeViewDefault';

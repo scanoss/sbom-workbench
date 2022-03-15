@@ -1,5 +1,5 @@
 import React from 'react';
-import { getColor } from '../../../../../../utils/utils';
+import { getColor } from '../../../../../../shared/utils/utils';
 
 const LicensesTable = ({ data, selectLicense, matchedLicenseSelected }) => {
 

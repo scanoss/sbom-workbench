@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
 import { IWorkspaceCfg } from '../../../api/types';
-import { userSettingService } from '../../../api/userSetting-service';
+import { userSettingService } from '../../../api/services/userSetting.service';
 
 const filter = createFilterOptions();
 
