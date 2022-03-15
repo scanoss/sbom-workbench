@@ -3,10 +3,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, Redirect, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import DetectedReport from './pages/DetectedReport';
 import IdentifiedReport from './pages/IdentifiedReport';
-import { reportService } from '../../../../../api/report-service';
+import { reportService } from '../../../../../api/services/report.service';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
-import { componentService } from '../../../../../api/component-service';
-import { getSuggestedQuery } from '@testing-library/react';
 
 const useStyles = makeStyles(() =>
   createStyles({

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Chart } from 'chart.js';
-import { colorsForLicense } from '../../../../../../utils/utils';
+import { colorsForLicense } from '../../../../../../shared/utils/utils';
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();

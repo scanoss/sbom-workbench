@@ -3,13 +3,14 @@ import { Dialog, Paper, DialogActions, Button, makeStyles, InputBase, TextareaAu
 
 import React, { useContext, useEffect, useState } from 'react';
 import { License } from '../../../api/types';
-import { licenseService } from '../../../api/license-service';
+import { licenseService } from '../../../api/services/license.service';
 import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
 
 
 // TO DO
-import { DialogContext } from '../../context/DialogProvider';
+
 import { licenseHelper } from '../../../main/helpers/LicenseHelper';
+import { DialogContext } from '../../context/DialogProvider';
 
 
 

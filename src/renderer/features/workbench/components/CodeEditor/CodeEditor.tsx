@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { vs2015 } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { range } from '../../../../../utils/utils';
+import { range } from '../../../../../shared/utils/utils';
 
 const LINES_MAX = 2000;
 const CHAR_MAX_IN_LINE = 5000;

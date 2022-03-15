@@ -2,7 +2,7 @@ import path from 'path';
 import { app } from 'electron';
 import fs from 'fs';
 import { IProject, ScanState } from '../../api/types';
-import { MIN_VERSION_SUPPORTED } from '../../Config';
+import { MIN_VERSION_SUPPORTED } from '../../shared/Config';
 import { SemVerCompareVersion } from '../helpers/SemVer';
 import { Metadata } from './Metadata';
 import { Project } from './Project';
