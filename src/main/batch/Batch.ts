@@ -1,7 +1,7 @@
 import { utilHelper } from '../helpers/UtilHelper';
-import { QueryBuilder } from '../queryBuilder/QueryBuilder';
-import { logicResultService } from '../services/LogicResultService';
-import { logictTreeService } from '../services/LogicTreeService';
+import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
+import { resultService } from '../services/ResultService';
+import { treeService } from '../services/TreeService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { Filter } from './Filter/Filter';
 import { FilterTrue } from './Filter/FilterTrue';
@@ -22,7 +22,7 @@ export abstract class Batch {
 
   public async getFilesInFolder(builder: QueryBuilder): Promise<Array<any>> {
     try {
-      const files: any = await logicResultService.getFilesInFolder(builder);
+      const files: any = await resultService.getFilesInFolder(builder);
       return files;
     } catch (e: any) {
       throw new Error(e);
@@ -40,7 +40,7 @@ export abstract class Batch {
   }
 
   public async getResults(ids: Array<number>): Promise<Array<any>> {
-    const results: any = await logicResultService.getResultsFromIDs(ids);
+    const results: any = await resultService.getResultsFromIDs(ids);
     return results;
   }
 
@@ -52,7 +52,7 @@ export abstract class Batch {
     return this.getResults(ids)
       .then((results) => {
         const paths = utilHelper.getArrayFromObjectFilter(results, 'path', new FilterTrue()) as Array<string>;
-        logictTreeService.updateStatus(paths, status);
+        treeService.updateStatus(paths, status);
         return true;
       })
       .catch((error) => {

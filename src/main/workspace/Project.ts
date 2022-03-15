@@ -20,20 +20,23 @@ import {
   ScanState,
 } from '../../api/types';
 import * as Filtering from './filtering';
-import { ScanModel } from '../Model/ScanModel';
-import { licenses } from '../Model/licenses';
-import { IpcEvents } from '../../ipc-events';
+import { ScanModel } from '../model/ScanModel';
+import { licenses } from '../model/licenses';
 import { defaultBannedList } from './filtering/defaultFilter';
 import { Metadata } from './Metadata';
-import { userSetting } from '../UserSetting';
+import { userSettingService } from '../services/UserSettingService';
 import { ProjectMigration } from '../migration/ProjectMigration';
 import { Tree } from './Tree/Tree/Tree';
-import { reScanService } from '../services/RescanLogicService';
-import { logicComponentService } from '../services/LogicComponentService';
-import { serviceProvider } from '../services/ServiceProvider';
+import { rescanService } from '../services/RescanService';
+import { componentService } from '../services/ComponentService';
+import { modelProvider } from '../services/ModelProvider';
 import { TreeViewModeCreator } from './Tree/Tree/TreeViewMode/TreeViewModeCreator';
-import { logicDependencyService } from '../services/LogicDependencyService';
+import { dependencyService } from '../services/DependencyService';
 import { fileHelper } from '../helpers/FileHelper';
+import { IpcEvents } from '../../api/ipc-events';
+import { fileService } from '../services/FileService';
+import { resultService } from '../services/ResultService';
+import { licenseService } from '../services/LicenseService';
 
 export class Project extends EventEmitter {
   work_root: string;
@@ -114,9 +117,7 @@ export class Project extends EventEmitter {
     this.filesNotScanned = a.filesNotScanned;
     this.processedFiles = a.processedFiles;
     this.filesSummary = a.filesSummary;
-    this.store = new ScanModel(this.metadata.getMyPath());
-    await this.store.init();
-    serviceProvider.setModel(this.store);
+    await modelProvider.init(this.metadata.getMyPath());
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
     this.tree = new Tree(this.metadata.getMyPath());
     this.tree.loadTree(a.tree.rootFolder);
@@ -187,10 +188,8 @@ export class Project extends EventEmitter {
     if (!fs.existsSync(`${myPath}/filter.json`))
       fs.writeFileSync(`${myPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
     this.banned_list.load(`${myPath}/filter.json`);
-    this.store = new ScanModel(myPath);
-    await this.store.init();
-    await this.store.license.importFromJSON(licenses);
-    serviceProvider.setModel(this.store);
+    await modelProvider.init(this.metadata.getMyPath());
+    await licenseService.importFromJSON(licenses);
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
     this.build_tree();
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
@@ -208,9 +207,6 @@ export class Project extends EventEmitter {
     this.initializeScanner();
     this.scanner.cleanWorkDirectory();
     this.save();
-
-    // log.info(`%c[ SCANNER ]: Start scanning dependencies`, 'color: green');
-    // await this.scanDependencies();
 
     log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, 'color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
@@ -263,7 +259,7 @@ export class Project extends EventEmitter {
 
   initializeScanner() {
     const scannerCfg: ScannerCfg = new ScannerCfg();
-    const { DEFAULT_API_INDEX, APIS } = userSetting.get();
+    const { DEFAULT_API_INDEX, APIS } = userSettingService.get();
 
     if (this.metadata.getApi()) {
       scannerCfg.API_URL = this.metadata.getApi();
@@ -300,16 +296,17 @@ export class Project extends EventEmitter {
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
         log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
-        await reScanService.reScan(this.tree.getRootFolder().getFiles(), resultPath);
-        const results = await reScanService.getNewResults();
+        await rescanService.reScan(this.tree.getRootFolder().getFiles(), resultPath);
+        const results = await rescanService.getNewResults();
         this.tree.sync(results);
         this.save();
       } else {
-        await this.store.file.insertFiles(this.tree.getRootFolder().getFiles());
+        await fileService.insert(this.tree.getRootFolder().getFiles());
+        // await this.store.file.insertFiles(this.tree.getRootFolder().getFiles());
         const files = await fileHelper.getPathFileId();
-        await this.store.result.insertFromFile(resultPath, files);
-        // await logicService.logicComponentService.importComponents()
-        await logicComponentService.importComponents();
+        await resultService.insertFromFile(resultPath, files);
+        // await this.store.result.insertFromFile(resultPath, files);
+        await componentService.importComponents();
         await this.scanDependencies();
       }
 
@@ -496,7 +493,7 @@ export class Project extends EventEmitter {
       fs.promises.writeFile(`${this.metadata.getMyPath()}/dependencies.json`, JSON.stringify(dependencies, null, 2));
       this.tree.addDependencies(dependencies);
       this.save();
-      await logicDependencyService.insert(dependencies);
+      await dependencyService.insert(dependencies);
     } catch (e) {
       log.error(e);
     }

@@ -18,22 +18,22 @@ import * as os from 'os';
 import MenuBuilder from './main/menu';
 
 import { workspace } from './main/workspace/Workspace';
-import { userSetting } from './main/UserSetting';
+import { userSettingService } from './main/services/UserSettingService';
 import { WorkspaceMigration } from './main/migration/WorkspaceMigration';
+import { DEFAULT_WORKSPACE_NAME } from './shared/Config';
 
 // handlers
-import './main/inventory';
-import './main/component';
-import './main/project';
-import './main/results';
-import './main/file';
-import './main/formats';
-import './main/workspace';
-import './main/report';
-import './main/license';
-import './main/dependency';
-import './main/controllers/userSetting';
-import { DEFAULT_WORKSPACE_NAME } from './Config';
+import './api/handlers/inventory.handler';
+import './api/handlers/component.handler';
+import './api/handlers/project.handler';
+import './api/handlers/results.handler';
+import './api/handlers/file.hanlder';
+import './api/handlers/formats.handler';
+import './api/handlers/workspace.handler';
+import './api/handlers/report.handler';
+import './api/handlers/license.handler';
+import './api/handlers/dependency.handler';
+import './api/handlers/userSetting.handler';
 
 export default class AppUpdater {
   constructor() {
@@ -91,7 +91,7 @@ const createWindow = async () => {
     },
   });
 
-  const mainURL = `file://${__dirname}/index.html`;
+  const mainURL = `file://${__dirname}/renderer/index.html`;
   mainWindow.loadURL(mainURL);
 
   // @TODO: Use 'ready-to-show' event
@@ -153,6 +153,6 @@ app.on('activate', () => {
 async function init() {
   const root = `${os.homedir()}/${DEFAULT_WORKSPACE_NAME}`;
   await workspace.read(root);
-  await userSetting.read(root);
-  new WorkspaceMigration(userSetting.get().VERSION, root).up();
+  await userSettingService.read(root);
+  new WorkspaceMigration(userSettingService.get().VERSION, root).up();
 }

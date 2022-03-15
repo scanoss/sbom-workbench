@@ -21,18 +21,16 @@ import InsertChartOutlinedTwoToneIcon from '@material-ui/icons/InsertChartOutlin
 import GavelIcon from '@material-ui/icons/Gavel';
 // eslint-disable-next-line import/no-named-default
 import { default as MaterialAppBar } from '@material-ui/core/AppBar';
-import { NavLink, useHistory, useLocation, useRouteMatch } from 'react-router-dom';
+import { NavLink, useHistory, useLocation } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import { reset, setFolder } from '../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
-import { ExportFormat } from '../../../../../api/export-service';
-import { projectService } from '../../../../../api/project-service';
-import { dialogController } from '../../../../dialog-controller';
+import { ExportFormat } from '../../../../../api/services/export.service';
+import { dialogController } from '../../../../controllers/dialog-controller';
 import { FormatVersion, IProject } from '../../../../../api/types';
-import { workspaceService } from '../../../../../api/workspace-service';
+import { workspaceService } from '../../../../../api/services/workspace.service';
 
 const Navigation = () => {
   const history = useHistory();

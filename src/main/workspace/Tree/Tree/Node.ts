@@ -1,5 +1,3 @@
-import { QueryBuilder } from '../../../queryBuilder/QueryBuilder';
-
 export enum NodeStatus {
   FILTERED = 'FILTERED',
   NOMATCH = 'NO-MATCH',

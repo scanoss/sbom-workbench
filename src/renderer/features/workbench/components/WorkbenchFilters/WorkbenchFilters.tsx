@@ -21,7 +21,7 @@ import DeleteIcon from '@material-ui/icons/DeleteOutlined';
 import { FileStatusType, FileTreeViewMode, FileUsageType, IWorkbenchFilter } from '../../../../../api/types';
 import { WorkbenchContext } from '../../store';
 import { setFilter } from '../../actions';
-import { projectService } from '../../../../../api/project-service';
+import { projectService } from '../../../../../api/services/project.service';
 
 const WorkbenchFilters = () => {
   const { dispatch, state } = useContext(WorkbenchContext);

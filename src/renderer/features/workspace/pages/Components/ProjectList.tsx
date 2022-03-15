@@ -19,7 +19,7 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
 import GetAppOutlined from '@material-ui/icons/GetAppOutlined';
 import { IProject, ScanState } from '../../../../../api/types';
-import * as Config from '../../../../../Config';
+import * as Config from '../../../../../shared/Config';
 
 const filter = (items, query) => {
   if (!items) return null;
