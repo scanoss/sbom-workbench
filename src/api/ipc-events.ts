@@ -90,6 +90,7 @@ export enum IpcEvents {
 
   DEPENDENCY_GET_ALL = 'DEPENDENCY_GET_ALL',
   DEPENDENCY_ACCEPT = 'DEPENDENCY_ACCEPT',
+  DEPENDENCY_REJECT = 'DEPENDENCY_REJECT',
 }
 
 export const ipcMainEvents = [
@@ -168,4 +169,5 @@ export const ipcRendererEvents = [
 
   IpcEvents.DEPENDENCY_GET_ALL,
   IpcEvents.DEPENDENCY_ACCEPT,
+  IpcEvents.DEPENDENCY_REJECT,
 ];
