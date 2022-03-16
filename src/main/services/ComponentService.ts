@@ -3,18 +3,18 @@ import { Component, ComponentGroup, IWorkbenchFilter } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
-import { serviceProvider } from './ServiceProvider';
+import { modelProvider } from './ModelProvider';
 
 class ComponentService {
   public async getComponentFiles(data: Partial<Component>, filter: IWorkbenchFilter): Promise<any> {
     try {
       const params = { purl: data.purl, version: data.version, ...filter };
       const queryBuilder = QueryBuilderCreator.create(params);
-      const files: any = await serviceProvider.model.file.getAll(queryBuilder);
-      const inventories: any = await serviceProvider.model.inventory.getAll();
+      const files: any = await modelProvider.model.file.getAll(queryBuilder);
+      const inventories: any = await modelProvider.model.inventory.getAll();
       const compid = inventories.map((inv) => inv.cvid);
       const queryComp = QueryBuilderCreator.create({ compid });
-      const components = await serviceProvider.model.component.getAll(queryComp);
+      const components = await modelProvider.model.component.getAll(queryComp);
 
       const index = inventories.reduce((acc, inventory) => {
         acc[inventory.id] = inventory;
@@ -38,8 +38,8 @@ class ComponentService {
     try {
       const queryBuilder: QueryBuilder = QueryBuilderCreator.create(params);
       const queryBuilderSummary: QueryBuilder = QueryBuilderCreator.create({ ...params, status: null }); // Keep summary independent from summary
-      let comp = await serviceProvider.model.component.getAll(queryBuilder);
-      const summary = await serviceProvider.model.component.summary(queryBuilderSummary);
+      let comp = await modelProvider.model.component.getAll(queryBuilder);
+      const summary = await modelProvider.model.component.summary(queryBuilderSummary);
       comp = componentHelper.addSummary(comp, summary);
       const compPurl: any = this.groupComponentsByPurl(comp);
       comp = await this.mergeComponentByPurl(compPurl);
@@ -113,11 +113,10 @@ class ComponentService {
 
   public async importComponents() {
     try {
-      const components: Array<Partial<Component>> =
-        await serviceProvider.model.component.getUniqueComponentsFromResults();
-      await serviceProvider.model.component.import(components);
-      const componentLicenses = await serviceProvider.model.component.getLicensesAttachedToComponentsFromResults();
-      await serviceProvider.model.license.bulkAttachComponentLicense(componentLicenses);
+      const components: Array<Partial<Component>> = await modelProvider.model.component.getUniqueComponentsFromResults();
+      await modelProvider.model.component.import(components);
+      const componentLicenses = await modelProvider.model.component.getLicensesAttachedToComponentsFromResults();
+      await modelProvider.model.license.bulkAttachComponentLicense(componentLicenses);
       return true;
     } catch (error: any) {
       return error;
@@ -126,7 +125,7 @@ class ComponentService {
 
   private async getOverrideComponents() {
     try {
-      const overrideComponents = await serviceProvider.model.component.getOverrideComponents();
+      const overrideComponents = await modelProvider.model.component.getOverrideComponents();
       let result: any = {};
       if (overrideComponents.length > 0) {
         result = overrideComponents.reduce((acc, curr) => {

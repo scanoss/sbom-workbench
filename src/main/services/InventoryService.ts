@@ -1,25 +1,17 @@
 import log from 'electron-log';
-import { serviceProvider } from './ServiceProvider';
-import {
-  Inventory,
-  Component,
-  IFolderInventory,
-  ComponentSource,
-  FileUsageType,
-  IWorkbenchFilter,
-  FileStatusType,
-} from '../../api/types';
+import { modelProvider } from './ModelProvider';
+import { Inventory, Component, IFolderInventory, IWorkbenchFilter } from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 
 
-class InventoryService {
+class InventoryService  {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
     try {
-      const inventory = (await serviceProvider.model.inventory.getById(inv.id)) as Inventory;
-      const comp: Component = (await serviceProvider.model.component.get(inventory.cvid)) as Component;
+      const inventory = (await modelProvider.model.inventory.getById(inv.id)) as Inventory;
+      const comp: Component = (await modelProvider.model.component.get(inventory.cvid)) as Component;
       inventory.component = comp as Component;
-      const files: any = await serviceProvider.model.inventory.getInventoryFiles(inventory);
+      const files: any = await modelProvider.model.inventory.getInventoryFiles(inventory);
       inventory.files = files;
       return inventory;
     } catch (err: any) {
@@ -29,12 +21,12 @@ class InventoryService {
 
   public async detach(inv: Partial<Inventory>): Promise<boolean> {
     try {
-      await serviceProvider.model.file.restore(inv.files);
-      await serviceProvider.model.inventory.detachFileInventory(inv);
-      const emptyInv: any = await serviceProvider.model.inventory.emptyInventory();
+      await modelProvider.model.file.restore(inv.files);
+      await modelProvider.model.inventory.detachFileInventory(inv);
+      const emptyInv: any = await modelProvider.model.inventory.emptyInventory();
       if (emptyInv) {
         const result = emptyInv.map((item: Record<string, number>) => item.id);
-        await serviceProvider.model.inventory.deleteAllEmpty(result);
+        await modelProvider.model.inventory.deleteAllEmpty(result);
       }
       return true;
     } catch (err: any) {
@@ -44,7 +36,7 @@ class InventoryService {
 
   public async delete(inv: Partial<Inventory>): Promise<boolean> {
     try {
-      const success: boolean = await serviceProvider.model.inventory.delete(inv);
+      const success: boolean = await modelProvider.model.inventory.delete(inv);
       return success;
     } catch (err: any) {
       return err;
@@ -53,7 +45,7 @@ class InventoryService {
 
   private async isInventory(inventory: Partial<Inventory>): Promise<Partial<Inventory>> {
     try {
-      const inv: Partial<Inventory> = await serviceProvider.model.inventory.isInventory(inventory);
+      const inv: Partial<Inventory> = await modelProvider.model.inventory.isInventory(inventory);
       return inv;
     } catch (err: any) {
       return err;
@@ -62,7 +54,7 @@ class InventoryService {
 
   public async create(inventory: Partial<Inventory>): Promise<Inventory> {
     try {
-      const component: any = await serviceProvider.model.component.getbyPurlVersion({
+      const component: any = await modelProvider.model.component.getbyPurlVersion({
         purl: inventory.purl,
         version: inventory.version,
       });
@@ -70,7 +62,7 @@ class InventoryService {
       const inv = await this.isInventory(inventory);
       if (!inv) {
         // eslint-disable-next-line no-param-reassign
-        inventory = (await serviceProvider.model.inventory.create(inventory)) as Inventory;
+        inventory = (await modelProvider.model.inventory.create(inventory)) as Inventory;
       } else inventory.id = inv.id;
       this.attach(inventory);
       inventory.component = component as Component;
@@ -82,13 +74,13 @@ class InventoryService {
   }
 
   public async InventoryBatchCreate(inv: Array<Partial<Inventory>>): Promise<Array<Inventory>> {
-    const inventory: Array<Inventory> = (await serviceProvider.model.inventory.createBatch(inv)) as Array<Inventory>;
+    const inventory: Array<Inventory> = (await modelProvider.model.inventory.createBatch(inv)) as Array<Inventory>;
     return inventory;
   }
 
   public async InventoryAttachFileBatch(data: any): Promise<boolean> {
-    await serviceProvider.model.file.identified(data.files);
-    const success: boolean = await serviceProvider.model.inventory.attachFileInventoryBatch(data);
+    await modelProvider.model.file.identified(data.files);
+    const success: boolean = await modelProvider.model.inventory.attachFileInventoryBatch(data);
     return success;
   }
 
@@ -96,14 +88,14 @@ class InventoryService {
     try {
       let inventories: any;
       if (inventory.purl && inventory.version) {
-        inventories = await serviceProvider.model.inventory.getByPurlVersion(inventory);
+        inventories = await modelProvider.model.inventory.getByPurlVersion(inventory);
       } else if (inventory.files) {
-        inventories = await serviceProvider.model.inventory.getByResultId(inventory);
+        inventories = await modelProvider.model.inventory.getByResultId(inventory);
       } else if (inventory.purl) {
-        inventories = await serviceProvider.model.inventory.getByPurl(inventory);
-      } else inventories = await serviceProvider.model.inventory.getAll();
+        inventories = await modelProvider.model.inventory.getByPurl(inventory);
+      } else inventories = await modelProvider.model.inventory.getAll();
       if (inventory !== undefined) {
-        const component: any = await serviceProvider.model.component.getAll();
+        const component: any = await modelProvider.model.component.getAll();
         const compObj = component.reduce((acc, comp) => {
           acc[comp.compid] = comp;
           return acc;
@@ -122,8 +114,8 @@ class InventoryService {
 
   public async attach(inv: Partial<Inventory>): Promise<boolean> {
     try {
-      await serviceProvider.model.file.identified(inv.files);
-      const success: boolean = await serviceProvider.model.inventory.attachFileInventory(inv);
+      await modelProvider.model.file.identified(inv.files);
+      const success: boolean = await modelProvider.model.inventory.attachFileInventory(inv);
       return success;
     } catch (err: any) {
       return err;
@@ -138,8 +130,8 @@ class InventoryService {
       let queryBuilder = null;
       if (data.overwrite) queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder });
       else queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder });
-      const files: any = await serviceProvider.model.result.getResultsPreLoadInventory(queryBuilder);
-      const components: any = await serviceProvider.model.component.getAll(queryBuilder);
+      const files: any = await modelProvider.model.result.getResultsPreLoadInventory(queryBuilder);
+      const components: any = await modelProvider.model.component.getAll(queryBuilder);
       let inventories = this.getPreLoadInventory(files) as Array<Partial<Inventory>>;
       inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);
       return inventories;
@@ -174,16 +166,16 @@ class InventoryService {
   public async update(inv: Inventory): Promise<Inventory> {
     try {
       // Validate new inventory
-      let inventory: Inventory = (await serviceProvider.model.inventory.get(inv)) as Inventory;
-      const component: Component = (await serviceProvider.model.component.getbyPurlVersion({
+      let inventory: Inventory = (await modelProvider.model.inventory.get(inv)) as Inventory;
+      const component: Component = (await modelProvider.model.component.getbyPurlVersion({
         purl: inv.purl,
         version: inv.version,
       })) as Component;
-      const license = await serviceProvider.model.license.getBySpdxId(inventory.spdxid);
+      const license = await modelProvider.model.license.getBySpdxId(inventory.spdxid);
       if (inventory && component && license) {
         inv.cvid = component.compid;
-        inventory = await serviceProvider.model.inventory.update(inv);
-        inventory = (await serviceProvider.model.inventory.get(inv)) as Inventory;
+        inventory = await modelProvider.model.inventory.update(inv);
+        inventory = (await modelProvider.model.inventory.get(inv)) as Inventory;
       } else throw new Error('Inventory not found');
       return inventory;
     } catch (err: any) {

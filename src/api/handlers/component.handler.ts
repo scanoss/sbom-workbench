@@ -30,6 +30,7 @@ ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (_event, component: Componen
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (_event, params: IWorkbenchFilterParams) => {
   try {
     const filter = workspace.getOpenedProjects()[0].getFilter(params);
+    
     const data = await componentService.getAll(filter);
     return {
       status: 'ok',

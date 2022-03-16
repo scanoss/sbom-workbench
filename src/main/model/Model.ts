@@ -6,10 +6,11 @@ import sqlite3 from 'sqlite3';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Querys } from './querys_db';
 
+
 const query = new Querys();
 
 export class Model {
-  dbPath: string;
+  private dbPath: string; 
   
   public static readonly entityMapper = null;
 
@@ -45,24 +46,6 @@ export class Model {
     });
   }
 
-  public open(path :string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const db: any = new sqlite3.Database(
-        path,
-        sqlite3.OPEN_READWRITE,
-        (err: any) => {
-          if (err) {
-            log.error(err);
-            reject(err);
-          }
-          db.run('PRAGMA journal_mode = WAL;');
-          db.run('PRAGMA synchronous = OFF');
-          db.run('PRAGMA foreign_keys = ON;');
-          resolve(db);
-        }
-      );
-    });
-  }
 
   public openDb(): Promise<any> {
     return new Promise((resolve, reject) => {

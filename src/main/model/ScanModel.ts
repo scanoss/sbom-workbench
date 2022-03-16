@@ -1,4 +1,3 @@
-import { Model } from './Model';
 import { ComponentModel } from './ComponentModel';
 import { FileModel } from './FileModel';
 import { InventoryModel } from './InventoryModel';
@@ -6,7 +5,7 @@ import { LicenseModel } from './LicenseModel';
 import { ResultModel } from './ResultModel';
 import { DependencyModel } from './DependencyModel';
 
-export class ScanModel extends Model {
+export class ScanModel {
   component: ComponentModel;
 
   file: FileModel;
@@ -22,7 +21,6 @@ export class ScanModel extends Model {
   dependency: DependencyModel;
 
   constructor(path: string) {
-    super(path);
     this.file = new FileModel(path);
     this.inventory = new InventoryModel(path);
     this.result = new ResultModel(path);

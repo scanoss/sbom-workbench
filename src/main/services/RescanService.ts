@@ -1,7 +1,7 @@
 import { utilHelper } from '../helpers/UtilHelper';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { componentService } from './ComponentService';
-import { serviceProvider } from './ServiceProvider';
+import { modelProvider } from './ModelProvider';
 
 class RescanService {
   public async reScan(files: Array<any>, resultPath: string): Promise<void> {
@@ -9,9 +9,9 @@ class RescanService {
       const aux = utilHelper.convertsArrayOfStringToString(files, 'path');
 
       // UPDATING FILES
-      await serviceProvider.model.file.setDirty(1);
-      await serviceProvider.model.file.setDirty(0, aux);
-      const filesDb = await serviceProvider.model.file.getAll(null);
+      await modelProvider.model.file.setDirty(1);
+      await modelProvider.model.file.setDirty(0, aux);
+      const filesDb = await modelProvider.model.file.getAll(null);
 
       const newFilesDb = [];
       files.forEach((f) => {
@@ -19,37 +19,37 @@ class RescanService {
         if (aux === undefined) newFilesDb.push(f);
       });
       if (filesDb.length > 0) {
-        await serviceProvider.model.file.insertFiles(newFilesDb);
+        await modelProvider.model.file.insertFiles(newFilesDb);
       }
 
-      await serviceProvider.model.result.updateDirty(1);
+      await modelProvider.model.result.updateDirty(1);
 
-      const cleanFiles = await serviceProvider.model.file.getClean();
+      const cleanFiles = await modelProvider.model.file.getClean();
       const filesToUpdate = cleanFiles.reduce((previousValue, currentValue) => {
         previousValue[currentValue.path] = currentValue.fileId;
         return previousValue;
       }, []);
 
-      await serviceProvider.model.result.insertFromFileReScan(resultPath, filesToUpdate);
-      const dirtyFiles = await serviceProvider.model.file.getDirty();
+      await modelProvider.model.result.insertFromFileReScan(resultPath, filesToUpdate);
+      const dirtyFiles = await modelProvider.model.file.getDirty();
       if (dirtyFiles.length > 0) {
-        await serviceProvider.model.inventory.deleteDirtyFileInventories(dirtyFiles);
+        await modelProvider.model.inventory.deleteDirtyFileInventories(dirtyFiles);
       }
-      const notValidComp: number[] = await serviceProvider.model.component.getNotValid();
+      const notValidComp: number[] = await modelProvider.model.component.getNotValid();
 
       if (notValidComp.length > 0) {
-        await serviceProvider.model.component.deleteByID(notValidComp);
+        await modelProvider.model.component.deleteByID(notValidComp);
       }
 
-      await serviceProvider.model.result.deleteDirty();
-      await serviceProvider.model.file.deleteDirty();
-      await serviceProvider.model.component.updateOrphanToManual();
+      await modelProvider.model.result.deleteDirty();
+      await modelProvider.model.file.deleteDirty();
+      await modelProvider.model.component.updateOrphanToManual();
       await componentService.importComponents();
 
-      const emptyInv: any = await serviceProvider.model.inventory.emptyInventory();
+      const emptyInv: any = await modelProvider.model.inventory.emptyInventory();
       if (emptyInv) {
         const result = emptyInv.map((item: Record<string, number>) => item.id);
-        await serviceProvider.model.inventory.deleteAllEmpty(result);
+        await modelProvider.model.inventory.deleteAllEmpty(result);
       }
     } catch (err: any) {
       throw new Error('[ RESCAN DB ] Unable to insert new results');
@@ -57,7 +57,7 @@ class RescanService {
   }
 
   public async getNewResults(): Promise<Array<any>> {
-    const results: Array<any> = await serviceProvider.model.file.getFilesRescan();
+    const results: Array<any> = await modelProvider.model.file.getFilesRescan();
     results.forEach((result) => {
       if (result.original === NodeStatus.NOMATCH && result.identified === 1) {
         result[result.path] = NodeStatus.IDENTIFIED;

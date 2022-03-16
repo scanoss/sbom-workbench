@@ -1,6 +1,6 @@
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
-import { workspace } from '../workspace/Workspace';
+import { modelProvider } from './ModelProvider';
 
 class ResultService {
   public async getResultsByids(ids: number[], project: any) {
@@ -21,8 +21,7 @@ class ResultService {
 
   public async getFilesInFolder(builder: QueryBuilder) {
     try {
-      const project = workspace.getOpenedProjects()[0];
-      const results: Array<any> = await project.store.result.getAll(builder);
+      const results: Array<any> = await modelProvider.model.result.getAll(builder);
       return results;
     } catch (e) {
       return e;
@@ -31,8 +30,7 @@ class ResultService {
 
   public async getResultsFromIDs(ids: number[]) {
     try {
-      const project = workspace.getOpenedProjects()[0];
-      const results: Array<any> = await project.store.result.getSummaryByids(ids);
+      const results: Array<any> = await modelProvider.model.result.getSummaryByids(ids);
       return results;
     } catch (e) {
       return e;
@@ -41,8 +39,7 @@ class ResultService {
 
   public async ignore(ids: number[]) {
     try {
-      const project = workspace.getOpenedProjects()[0];
-      const success = await project.store.file.ignored(ids);
+      const success = await modelProvider.model.file.ignored(ids);
       return success;
     } catch (e) {
       return e;
@@ -51,10 +48,9 @@ class ResultService {
 
   public async getFromPath(path: string) {
     try {
-      const project = workspace.getOpenedProjects()[0];
-      const results = await project.store.result.getFromPath(path);
+      const results = await modelProvider.model.result.getFromPath(path);
       const queryBuilder = QueryBuilderCreator.create({ path });
-      const components: any = await project.store.component.getAll(queryBuilder);
+      const components: any = await modelProvider.model.component.getAll(queryBuilder);
       results.forEach((result) => {
         if (result.license) result.license = result.license.split(',');
         if (result.version)
@@ -67,6 +63,10 @@ class ResultService {
     } catch (error: any) {
       return error;
     }
+  }
+
+  public async insertFromFile(resultPath: string, files: any) {
+    await modelProvider.model.result.insertFromFile(resultPath, files);
   }
 }
 export const resultService = new ResultService();

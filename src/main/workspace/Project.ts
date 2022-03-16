@@ -29,11 +29,14 @@ import { ProjectMigration } from '../migration/ProjectMigration';
 import { Tree } from './Tree/Tree/Tree';
 import { rescanService } from '../services/RescanService';
 import { componentService } from '../services/ComponentService';
-import { serviceProvider } from '../services/ServiceProvider';
+import { modelProvider } from '../services/ModelProvider';
 import { TreeViewModeCreator } from './Tree/Tree/TreeViewMode/TreeViewModeCreator';
 import { dependencyService } from '../services/DependencyService';
 import { fileHelper } from '../helpers/FileHelper';
 import { IpcEvents } from '../../api/ipc-events';
+import { fileService } from '../services/FileService';
+import { resultService } from '../services/ResultService';
+import { licenseService } from '../services/LicenseService';
 
 export class Project extends EventEmitter {
   work_root: string;
@@ -114,9 +117,7 @@ export class Project extends EventEmitter {
     this.filesNotScanned = a.filesNotScanned;
     this.processedFiles = a.processedFiles;
     this.filesSummary = a.filesSummary;
-    this.store = new ScanModel(this.metadata.getMyPath());
-    await this.store.init();
-    serviceProvider.setModel(this.store);
+    await modelProvider.init(this.metadata.getMyPath());
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
     this.tree = new Tree(this.metadata.getMyPath());
     this.tree.loadTree(a.tree.rootFolder);
@@ -187,10 +188,8 @@ export class Project extends EventEmitter {
     if (!fs.existsSync(`${myPath}/filter.json`))
       fs.writeFileSync(`${myPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
     this.banned_list.load(`${myPath}/filter.json`);
-    this.store = new ScanModel(myPath);
-    await this.store.init();
-    await this.store.license.importFromJSON(licenses);
-    serviceProvider.setModel(this.store);
+    await modelProvider.init(this.metadata.getMyPath());
+    await licenseService.importFromJSON(licenses);
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
     this.build_tree();
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
@@ -302,9 +301,11 @@ export class Project extends EventEmitter {
         this.tree.sync(results);
         this.save();
       } else {
-        await this.store.file.insertFiles(this.tree.getRootFolder().getFiles());
+        await fileService.insert(this.tree.getRootFolder().getFiles());
+        // await this.store.file.insertFiles(this.tree.getRootFolder().getFiles());
         const files = await fileHelper.getPathFileId();
-        await this.store.result.insertFromFile(resultPath, files);
+        await resultService.insertFromFile(resultPath, files);
+        // await this.store.result.insertFromFile(resultPath, files);
         await componentService.importComponents();
         await this.scanDependencies();
       }
