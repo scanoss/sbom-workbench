@@ -1,7 +1,7 @@
 import { Model } from '../model/Model';
 import { ScanModel } from '../model/ScanModel';
 
-class ModelProdiver {
+class ModelProvider {
   private _model: ScanModel;
 
   private projectPath: string;
@@ -24,4 +24,4 @@ class ModelProdiver {
   }
 }
 
-export const modelProvider = new ModelProdiver();
+export const modelProvider = new ModelProvider();
