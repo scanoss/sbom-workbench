@@ -34,6 +34,7 @@ class ComponentHelper {
       transformation.url = data[i].comp_url;
       transformation.version = data[i].version;
       transformation.vendor = data[i].vendor;
+      transformation.source = data[i].source;
       if (data[i].filesCount) transformation.filesCount = data[i].filesCount;
 
       if (data[i].license_id) {
