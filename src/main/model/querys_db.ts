@@ -192,9 +192,9 @@ export class Querys {
   INNER JOIN component_versions comp ON r.purl=comp.purl AND r.version=comp.version #FILTER
   GROUP BY r.purl, r.version;`;
 
-  SQL_GET_ALL_COMPONENTS = `SELECT DISTINCT vendor.vendor,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id
+  SQL_GET_ALL_COMPONENTS = `SELECT DISTINCT vendor.vendor,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id,comp.source
   FROM
-  (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id FROM components AS comp
+  (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id, comp.source FROM components AS comp
   LEFT JOIN results r ON r.purl=comp.purl AND r.version = comp.version LEFT JOIN files f ON f.fileId=r.fileId
   LEFT JOIN license_view lic ON comp.id=lic.cvid
   #FILTER ) AS comp LEFT JOIN

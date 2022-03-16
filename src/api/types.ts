@@ -60,6 +60,7 @@ export interface Component {
     identified: number;
   };
   licenses: any[];
+  source: string;
 }
 
 export interface License {
