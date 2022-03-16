@@ -7,7 +7,6 @@ import { licenseHelper } from '../helpers/LicenseHelper';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { modelProvider } from './ModelProvider';
 
-
 class DependencyService {
   public async insert(dependencies: IDependencyResponse): Promise<void> {
     const filesDependencies = dependencyHelper.dependecyModelAdapter(dependencies);
@@ -63,10 +62,23 @@ class DependencyService {
       else {
         await modelProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
       }
-      await modelProvider.model.dependency.accept(dependency);
+      await modelProvider.model.dependency.update(dependency);
       await modelProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.license, source: 'declared' });
       const response = (await this.getAll({ id: params.id }))[0];
       return response;
+    } catch (error: any) {
+      log.error(error);
+      return error;
+    }
+  }
+
+  public async reject(dependencyId: number): Promise<boolean> {
+    try {
+      const dep = (await this.getAll({ id: dependencyId }))[0];
+      await modelProvider.model.inventory.delete(dep.inventory);
+      if (dep.component.source === 'manual') await modelProvider.model.component.deleteByID([dep.component.compid]);
+      await modelProvider.model.dependency.update(dep);
+      return true;
     } catch (error: any) {
       log.error(error);
       return error;
