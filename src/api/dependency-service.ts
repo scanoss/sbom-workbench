@@ -14,8 +14,10 @@ class DepencyService extends BaseService {
     const response = await ipcRenderer.invoke(IpcEvents.DEPENDENCY_ACCEPT, params);
     return this.response(response);
   }
+
+  public async reject(dependencyId: number): Promise<DependencyDTO> {
+    const response = await ipcRenderer.invoke(IpcEvents.DEPENDENCY_REJECT, dependencyId);
+    return this.response(response);
+  }
 }
-
 export const dependencyService = new DepencyService();
-
-document.dep = dependencyService;

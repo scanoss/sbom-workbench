@@ -122,7 +122,7 @@ export class Model {
   } 
 
   public getSQL(queryBuilder:QueryBuilder , SQLquery:string, entityMapper:Record<string,string>){
-    let SQL = SQLquery;
+    let SQL = SQLquery;    
     const filter = queryBuilder?.getSQL(entityMapper)
       ? `WHERE ${queryBuilder.getSQL(entityMapper).toString()}`
       : '';
