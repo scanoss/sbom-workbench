@@ -54,6 +54,10 @@ class Workspace extends EventEmitter {
     return openedProjects;
   }
 
+  public getOpenProject(): Project {
+    return this.getOpenedProjects()[0];
+  }
+
   public existProject(projectName: string): boolean {
     // eslint-disable-next-line no-restricted-syntax
     for (let i = 0; i < this.projectList.length; i += 1)

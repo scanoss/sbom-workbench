@@ -6,6 +6,11 @@ import { userSettingService } from '../../main/services/UserSettingService';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { Project } from '../../main/workspace/Project';
 import { workspace } from '../../main/workspace/Workspace';
+import { ReScan } from '../../main/scanner/ReScan';
+import { modelProvider } from '../../main/services/ModelProvider';
+import { licenseService } from '../../main/services/LicenseService';
+import { treeService } from '../../main/services/TreeService';
+import { ResumeScan } from '../../main/scanner/ResumeScan';
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
   let created: any;
@@ -36,6 +41,7 @@ function getUserHome() {
 }
 
 ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
+  
   const projectList = workspace.getOpenedProjects();
   let pPromises = [];
   for (const p of projectList) pPromises.push(p.save());
@@ -48,9 +54,17 @@ ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
 
 ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
   const path = arg;
+  await workspace.closeAllProjects();
   const p: Project = workspace.getProject(new ProjectFilterPath(path));
   p.setMailbox(event.sender);
-  await p.resumeScanner();
+  const tree = treeService.init(event.sender, p.getMyPath(), p.metadata.getScanRoot());
+  p.setTree(tree);
+  const scan = new ResumeScan(p, event.sender); 
+  await scan.scanStateValidation();
+  scan.init();
+  scan.cleanWorkDirectory();
+  scan.scan();
+  // await p.resumeScanner();
 });
 
 ipcMain.handle(IpcEvents.PROJECT_RESCAN, async (event, projectPath: string) => {
@@ -58,7 +72,14 @@ ipcMain.handle(IpcEvents.PROJECT_RESCAN, async (event, projectPath: string) => {
     const p = workspace.getProject(new ProjectFilterPath(projectPath));
     p.setMailbox(event.sender);
     await p.upgrade();
-    await p.reScan();
+    const tree = treeService.init(event.sender, p.getMyPath(), p.metadata.getScanRoot());
+    p.setTree(tree);
+    await modelProvider.init(p.getMyPath());
+    await licenseService.import();
+    const scan = new ReScan(p, event.sender);
+    scan.init();
+    scan.cleanWorkDirectory();
+    scan.scan();
     return Response.ok();
   } catch (error: any) {
     console.error(error);

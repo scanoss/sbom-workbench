@@ -111,7 +111,6 @@ export class Project extends EventEmitter {
     this.state = ProjectState.OPENED;
     log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`;
     const project = await fs.promises.readFile(`${this.metadata.getMyPath()}/tree.json`, 'utf8');
-
     const a = JSON.parse(project);
     this.filesToScan = a.filesToScan;
     this.filesNotScanned = a.filesNotScanned;
@@ -119,7 +118,7 @@ export class Project extends EventEmitter {
     this.filesSummary = a.filesSummary;
     await modelProvider.init(this.metadata.getMyPath());
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
-    this.tree = new Tree(this.metadata.getMyPath());
+    this.tree = new Tree(this.metadata.getMyPath(), this.msgToUI);
     this.tree.loadTree(a.tree.rootFolder);
     return true;
   }
@@ -151,13 +150,16 @@ export class Project extends EventEmitter {
   }
 
   public async startScanner() {
-    this.metadata.setScannerState(ScanState.SCANNING);
-    await this.startScan();
+    // this.metadata.setScannerState(ScanState.SCANNING);
+    log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`;
+    this.state = ProjectState.OPENED;
+
+  //  await this.startScan();
   }
 
   public async reScan() {
     this.metadata.setScannerState(ScanState.RESCANNING);
-    await this.startScan();
+    // await this.startScan();
   }
 
   public async resumeScanner() {
@@ -167,7 +169,7 @@ export class Project extends EventEmitter {
 
     await this.open();
     log.info(`%c[ SCANNER ]: Start scanning dependencies`, 'color: green');
-    await this.scanDependencies();
+   // await this.scanDependencies();
     this.initializeScanner();
     log.info(`%c[ PROJECT ]: Resuming scanner, pending ${Object.keys(this.filesToScan).length} files`, 'color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
@@ -179,43 +181,46 @@ export class Project extends EventEmitter {
     this.scanner.scan(scanIn);
     return true;
   }
-
+/*
   private async startScan(): Promise<void> {
     log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`;
     this.state = ProjectState.OPENED;
-    const myPath = this.metadata.getMyPath();
-    this.banned_list = new Filtering.BannedList('NoFilter');
-    if (!fs.existsSync(`${myPath}/filter.json`))
-      fs.writeFileSync(`${myPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
-    this.banned_list.load(`${myPath}/filter.json`);
-    await modelProvider.init(this.metadata.getMyPath());
-    await licenseService.importFromJSON(licenses);
-    log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
-    this.build_tree();
-    log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
-    this.tree.applyFilters(this.metadata.getScanRoot(), this.tree.getRootFolder(), this.banned_list);
-    const summary = { total: 0, include: 0, filter: 0, files: {} };
-    this.filesSummary = this.tree.summarize(this.metadata.getScanRoot(), summary);
-    log.info(
-      `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
-      'color: green'
-    );
-    this.filesToScan = summary.files;
-    this.filesNotScanned = {};
-    this.processedFiles = 0;
-    this.metadata.setFileCounter(summary.include);
-    this.initializeScanner();
-    this.scanner.cleanWorkDirectory();
-    this.save();
 
-    log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, 'color: green');
-    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: this.metadata.getScannerState(),
-      processed: 0,
-    });
-    const scanIn = this.adapterToScannerInput(summary.files);
-    this.scanner.scan(scanIn);
+    // const myPath = this.metadata.getMyPath();
+    // this.banned_list = new Filtering.BannedList('NoFilter');
+    // if (!fs.existsSync(`${myPath}/filter.json`))
+    //   fs.writeFileSync(`${myPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
+    // this.banned_list.load(`${myPath}/filter.json`);
+    // await modelProvider.init(this.metadata.getMyPath());
+    // await licenseService.importFromJSON(licenses);
+    // log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
+    // this.build_tree();
+    // log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
+    // this.tree.applyFilters(this.metadata.getScanRoot(), this.tree.getRootFolder(), this.banned_list);
+   // const summary = { total: 0, include: 0, filter: 0, files: {} };
+   // this.filesSummary = this.tree.summarize(this.metadata.getScanRoot(), summary);
+    // log.info(
+    //   `%c[ PROJECT ]: Total files: ${this.filesSummary.total} Filtered:${this.filesSummary.filter} Included:${this.filesSummary.include}`,
+    //   'color: green'
+    // );
+    // this.filesToScan = summary.files;
+    // this.filesNotScanned = {};
+    // this.processedFiles = 0;
+    // this.metadata.setFileCounter(summary.include);
+    // this.initializeScanner();
+    // this.scanner.cleanWorkDirectory();
+    // this.save();
+
+    // log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, 'color: green');
+    // this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+    //   stage: this.metadata.getScannerState(),
+    //   processed: 0,
+    // });
+    // const scanIn = this.adapterToScannerInput(summary.files);
+    // this.scanner.scan(scanIn);
   }
+*/
+  
 
   private adapterToScannerInput(filesToScan: Record<string, string>): Array<ScannerInput> {
     const fullScanList: Array<string> = [];
@@ -330,33 +335,33 @@ export class Project extends EventEmitter {
     });
   }
 
-  public refreshTree(filesToUpdate) {
-    log.info(filesToUpdate);
-    log.info(JSON.stringify(this.logical_tree, null, 2));
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [key, value] of Object.entries(filesToUpdate)) {
-      this.updateStatusOfFile(key.split('/').splice(1), 0, this.logical_tree, value);
-    }
-    this.logical_tree.status = this.getFolderStatus(this.logical_tree);
-    log.info(JSON.stringify(this.logical_tree, null, 2));
-  }
+  // public refreshTree(filesToUpdate) {
+  //   log.info(filesToUpdate);
+  //   log.info(JSON.stringify(this.logical_tree, null, 2));
+  //   // eslint-disable-next-line no-restricted-syntax
+  //   for (const [key, value] of Object.entries(filesToUpdate)) {
+  //     this.updateStatusOfFile(key.split('/').splice(1), 0, this.logical_tree, value);
+  //   }
+  //   this.logical_tree.status = this.getFolderStatus(this.logical_tree);
+  //   log.info(JSON.stringify(this.logical_tree, null, 2));
+  // }
 
-  private updateStatusOfFile(arrPaths, deep, current, status) {
-    if (deep >= arrPaths.length) {
-      current.status = status;
-      return;
-    }
-    const next = current.children.find((child) => child.label === arrPaths[deep]);
-    this.updateStatusOfFile(arrPaths, deep + 1, next, status);
-    next.status = this.getFolderStatus(next);
-  }
+  // private updateStatusOfFile(arrPaths, deep, current, status) {
+  //   if (deep >= arrPaths.length) {
+  //     current.status = status;
+  //     return;
+  //   }
+  //   const next = current.children.find((child) => child.label === arrPaths[deep]);
+  //   this.updateStatusOfFile(arrPaths, deep + 1, next, status);
+  //   next.status = this.getFolderStatus(next);
+  // }
 
-  private getFolderStatus(node: any) {
-    if (node.type !== 'folder') return node.status;
-    if (node.children.some((child) => child.status === 'pending')) return 'pending';
-    if (node.children.every((child) => child.status === 'ignored')) return 'ignored';
-    return 'identified';
-  }
+  // private getFolderStatus(node: any) {
+  //   if (node.type !== 'folder') return node.status;
+  //   if (node.children.some((child) => child.status === 'pending')) return 'pending';
+  //   if (node.children.every((child) => child.status === 'ignored')) return 'ignored';
+  //   return 'identified';
+  // }
 
   sendToUI(eventName, data: any) {
     if (this.msgToUI) this.msgToUI.send(eventName, data);
@@ -419,25 +424,34 @@ export class Project extends EventEmitter {
     this.metadata.setApi(api);
   }
 
+  public getApi() {
+    return this.metadata.getApi();
+  }
+
   public setToken(token: string) {
     this.metadata.setToken(token);
   }
 
+
   public setApiKey(apiKey: string) {
     this.metadata.setApiKey(apiKey);
+  }
+
+  public getApiKey(){
+    return this.metadata.getApiKey();
   }
 
   public async getResults() {
     return JSON.parse(await fs.promises.readFile(`${this.metadata.getMyPath()}/result.json`, 'utf8'));
   }
 
-  build_tree() {
-    const scanPath = this.metadata.getScanRoot();
-    this.tree = new Tree(scanPath);
-    this.tree.setMailbox(this.msgToUI);
-    this.tree.buildTree();
-    this.emit('treeBuilt', this.logical_tree);
-  }
+  // build_tree() {
+  //   const scanPath = this.metadata.getScanRoot();
+  //   this.tree = new Tree(scanPath);
+  //   this.tree.setMailbox(this.msgToUI);
+  //   this.tree.buildTree();
+  //   this.emit('treeBuilt', this.logical_tree);
+  // }
 
   public getTree(): Tree {
     return this.tree;
@@ -453,10 +467,6 @@ export class Project extends EventEmitter {
     this.sendToUI(IpcEvents.TREE_UPDATED, tree);
   }
 
-  set_filter_file(pathToFilter: string): boolean {
-    this.banned_list.load(pathToFilter);
-    return true;
-  }
 
   public getNode(path: string) {
     return this.tree.getNode(path);
@@ -527,5 +537,10 @@ export class Project extends EventEmitter {
     this.tree.setTreeViewMode(TreeViewModeCreator.create(this.filter, mode));
     this.fileTreeViewMode = mode;
     this.notifyTree();
+  }
+
+  public setTree(tree: Tree) {
+    this.tree = tree;
+    this.metadata.setFileCounter(tree.getSummarize().include);
   }
 }

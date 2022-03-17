@@ -1,7 +1,6 @@
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
 
-
 interface licenseEntry {
   label: string;
   components: any[];
@@ -26,34 +25,24 @@ interface inventoryProgress {
   acceptedComponents: number;
 }
 
-class ReportService  {
+class ReportService {
   public async getReportSummary() {
     try {
       let tempSummary: any = {};
       tempSummary = await modelProvider.model.inventory.getCurrentSummary();
-      const projectSummary = await workspace.getOpenedProjects()[0].filesSummary;
+      const projectSummary = await workspace.getOpenedProjects()[0].getTree().getSummarize(); // filesSummary;
       const summary = {
-        totalFiles: 0,
-        includedFiles: 0,
-        filteredFiles: 0,
-        scannedFiles: 0,
-        pendingFiles: 0,
-        identifiedFiles: 0,
-        ignoredFiles: 0,
-        detectedFiles: 0,
-        noMatchFiles: 0,
-        detectedIdentifiedFiles: 0,
+        totalFiles: tempSummary.totalFiles,
+        includedFiles: projectSummary.include,
+        filteredFiles: projectSummary.filter,
+        scannedFiles: tempSummary.scannedFiles,
+        pendingFiles: tempSummary.pending,
+        identifiedFiles: tempSummary.identified,
+        ignoredFiles: tempSummary.original,
+        detectedFiles: tempSummary.match,
+        noMatchFiles: tempSummary.noMatch,
+        detectedIdentifiedFiles: tempSummary.detectedIdentifiedFiles,
       };
-      summary.totalFiles = tempSummary.totalFiles;
-      summary.includedFiles = projectSummary.include;
-      summary.filteredFiles = projectSummary.filter;
-      summary.scannedFiles = tempSummary.scannedFiles;
-      summary.pendingFiles = tempSummary.pending;
-      summary.identifiedFiles = tempSummary.identified;
-      summary.ignoredFiles = tempSummary.original;
-      summary.detectedFiles = tempSummary.match;
-      summary.noMatchFiles = tempSummary.noMatch;
-      summary.detectedIdentifiedFiles = tempSummary.detectedIdentifiedFiles;
       return summary;
     } catch (error) {
       return error;
@@ -209,7 +198,6 @@ class ReportService  {
       // console.log(JSON.stringify({ licenses, crypto, summary }));
 
       return { licenses, crypto, vulnerabilities };
-      
     } catch (e) {
       console.log('Catch an error: ', e);
       return { status: 'fail' };
