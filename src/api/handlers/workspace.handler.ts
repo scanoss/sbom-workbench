@@ -6,12 +6,7 @@ import { Response } from '../Response';
 import { INewProject, IProject, License } from '../types';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
-import { licenseService } from '../../main/services/LicenseService';
-import { modelProvider } from '../../main/services/ModelProvider';
-import { Scan } from '../../main/scanner/scanHandler/Scan';
-import { projectService } from '../../main/services/ProjectService';
 import { ProjectScan } from '../../main/scanner/projectScanHandler/ProjectScan';
-
 
 ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
   try {

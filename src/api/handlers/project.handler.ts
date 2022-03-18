@@ -6,20 +6,12 @@ import { userSettingService } from '../../main/services/UserSettingService';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { Project } from '../../main/workspace/Project';
 import { workspace } from '../../main/workspace/Workspace';
-import { ReScan } from '../../main/scanner/scanHandler/ReScan';
-import { modelProvider } from '../../main/services/ModelProvider';
-import { licenseService } from '../../main/services/LicenseService';
-import { treeService } from '../../main/services/TreeService';
-import { ResumeScan } from '../../main/scanner/scanHandler/ResumeScan';
 import { ProjectReScan } from '../../main/scanner/projectScanHandler/ProjectReScan';
 import { ProjectResume } from '../../main/scanner/projectScanHandler/ProjectResume';
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
- 
-
   // TO DO factory to create filters depending on arguments
   const p: Project = await workspace.openProject(new ProjectFilterPath(arg));
-  // p.setMailbox(event.sender);
   p.getTree().setMailbox(event.sender);
   const response = {
     logical_tree: p.getTree().getRootFolder(),
