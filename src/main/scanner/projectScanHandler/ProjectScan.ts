@@ -4,7 +4,7 @@ import { licenseService } from '../../services/LicenseService';
 import { modelProvider } from '../../services/ModelProvider';
 import { treeService } from '../../services/TreeService';
 import { workspace } from '../../workspace/Workspace';
-import { Scan } from '../Scan';
+import { Scan } from '../scanHandler/Scan';
 import { ProjectScanHandler } from './ProjectScanHandler';
 
 export class ProjectScan extends ProjectScanHandler {

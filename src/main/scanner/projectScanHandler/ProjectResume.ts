@@ -1,7 +1,7 @@
 import { ProjectFilterPath } from '../../workspace/filters/ProjectFilterPath';
 import { Project } from '../../workspace/Project';
 import { workspace } from '../../workspace/Workspace';
-import { ResumeScan } from '../ResumeScan';
+import { ResumeScan } from '../scanHandler/ResumeScan';
 import { ProjectScanHandler } from './ProjectScanHandler';
 
 export class ProjectResume extends ProjectScanHandler {

@@ -8,7 +8,7 @@ import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPat
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
 import { licenseService } from '../../main/services/LicenseService';
 import { modelProvider } from '../../main/services/ModelProvider';
-import { Scan } from '../../main/scanner/Scan';
+import { Scan } from '../../main/scanner/scanHandler/Scan';
 import { projectService } from '../../main/services/ProjectService';
 import { ProjectScan } from '../../main/scanner/projectScanHandler/ProjectScan';
 

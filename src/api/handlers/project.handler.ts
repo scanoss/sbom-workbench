@@ -6,11 +6,11 @@ import { userSettingService } from '../../main/services/UserSettingService';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { Project } from '../../main/workspace/Project';
 import { workspace } from '../../main/workspace/Workspace';
-import { ReScan } from '../../main/scanner/ReScan';
+import { ReScan } from '../../main/scanner/scanHandler/ReScan';
 import { modelProvider } from '../../main/services/ModelProvider';
 import { licenseService } from '../../main/services/LicenseService';
 import { treeService } from '../../main/services/TreeService';
-import { ResumeScan } from '../../main/scanner/ResumeScan';
+import { ResumeScan } from '../../main/scanner/scanHandler/ResumeScan';
 import { ProjectReScan } from '../../main/scanner/projectScanHandler/ProjectReScan';
 import { ProjectResume } from '../../main/scanner/projectScanHandler/ProjectResume';
 

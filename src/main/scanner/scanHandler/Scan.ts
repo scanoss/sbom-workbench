@@ -1,16 +1,16 @@
 import log from 'electron-log';
 import { DependencyScanner, Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
 import fs from 'fs';
-import { IpcEvents } from '../../api/ipc-events';
-import { ScanState } from '../../api/types';
-import { fileHelper } from '../helpers/FileHelper';
-import { componentService } from '../services/ComponentService';
-import { dependencyService } from '../services/DependencyService';
-import { fileService } from '../services/FileService';
-import { resultService } from '../services/ResultService';
-import { userSettingService } from '../services/UserSettingService';
+import { IpcEvents } from '../../../api/ipc-events';
+import { ScanState } from '../../../api/types';
+import { fileHelper } from '../../helpers/FileHelper';
+import { componentService } from '../../services/ComponentService';
+import { dependencyService } from '../../services/DependencyService';
+import { fileService } from '../../services/FileService';
+import { resultService } from '../../services/ResultService';
+import { userSettingService } from '../../services/UserSettingService';
 import { ScanHandler } from './ScanHandler';
-import { Project } from '../workspace/Project';
+import { Project } from '../../workspace/Project';
 
 export class Scan extends ScanHandler {
   constructor(project: Project, msgToUI: Electron.WebContents) {

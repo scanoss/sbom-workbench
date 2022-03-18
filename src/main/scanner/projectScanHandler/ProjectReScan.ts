@@ -3,7 +3,7 @@ import { modelProvider } from '../../services/ModelProvider';
 import { treeService } from '../../services/TreeService';
 import { ProjectFilterPath } from '../../workspace/filters/ProjectFilterPath';
 import { workspace } from '../../workspace/Workspace';
-import { ReScan } from '../ReScan';
+import { ReScan } from '../scanHandler/ReScan';
 import { ProjectScanHandler } from './ProjectScanHandler';
 
 export class ProjectReScan extends ProjectScanHandler {

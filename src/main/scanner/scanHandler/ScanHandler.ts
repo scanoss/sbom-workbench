@@ -1,8 +1,7 @@
-
 import { EventEmitter } from 'events';
 import { Scanner } from 'scanoss';
-import { ScanState } from '../../api/types';
-import { Project } from '../workspace/Project';
+import { ScanState } from '../../../api/types';
+import { Project } from '../../workspace/Project';
 
 export abstract class ScanHandler extends EventEmitter {
   private msgToUI!: Electron.WebContents;

@@ -1,7 +1,7 @@
 import log from 'electron-log';
-import { ScanState } from '../../api/types';
-import { rescanService } from '../services/RescanService';
-import { Project } from '../workspace/Project';
+import { ScanState } from '../../../api/types';
+import { rescanService } from '../../services/RescanService';
+import { Project } from '../../workspace/Project';
 import { Scan } from './Scan';
 
 export class ReScan extends Scan {

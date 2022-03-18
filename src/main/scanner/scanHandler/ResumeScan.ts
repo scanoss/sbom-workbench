@@ -1,5 +1,5 @@
-import { IpcEvents } from '../../api/ipc-events';
-import { ScanState } from '../../api/types';
+import { IpcEvents } from '../../../api/ipc-events';
+import { ScanState } from '../../../api/types';
 import { Scan } from './Scan';
 
 export class ResumeScan extends Scan {
