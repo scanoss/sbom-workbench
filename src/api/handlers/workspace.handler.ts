@@ -10,6 +10,8 @@ import { licenseService } from '../../main/services/LicenseService';
 import { modelProvider } from '../../main/services/ModelProvider';
 import { Scan } from '../../main/scanner/Scan';
 import { projectService } from '../../main/services/ProjectService';
+import { ProjectScan } from '../../main/scanner/projectScanHandler/ProjectScan';
+
 
 ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
   try {
@@ -38,12 +40,9 @@ ipcMain.handle(IpcEvents.WORKSPACE_DELETE_PROJECT, async (event, projectPath: st
 // In future versions, the scanner will be launched by the user.
 ipcMain.handle(IpcEvents.WORKSPACE_CREATE_PROJECT, async (event, project: INewProject) => {
   try {
-    const p = await projectService.scan(project, event.sender);
-    await modelProvider.init(p.getMyPath());
-    await licenseService.import();
-    const scan = new Scan(p, event.sender);
-    scan.init();
-    scan.scan();
+    const projectScan = new ProjectScan();
+    await projectScan.set(project, event.sender);
+    await projectScan.init();
     return Response.ok();
   } catch (error: any) {
     console.error(error);

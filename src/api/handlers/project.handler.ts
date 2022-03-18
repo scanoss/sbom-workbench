@@ -11,6 +11,8 @@ import { modelProvider } from '../../main/services/ModelProvider';
 import { licenseService } from '../../main/services/LicenseService';
 import { treeService } from '../../main/services/TreeService';
 import { ResumeScan } from '../../main/scanner/ResumeScan';
+import { ProjectReScan } from '../../main/scanner/projectScanHandler/ProjectReScan';
+import { ProjectResume } from '../../main/scanner/projectScanHandler/ProjectResume';
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
  
@@ -51,33 +53,17 @@ ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
   await Promise.all(pPromises);
 });
 
-ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
-  const path = arg;
-  const p: Project = workspace.getProject(new ProjectFilterPath(path));
-  await p.open();
-  const scan = new ResumeScan(p, event.sender);
-  await scan.scanStateValidation();
-  scan.init();
-  scan.scan();
+ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, projectPath: any) => {
+  const projectResume = new ProjectResume();
+  await projectResume.set(projectPath, event.sender);
+  await projectResume.init();
 });
 
 ipcMain.handle(IpcEvents.PROJECT_RESCAN, async (event, projectPath: string) => {
   try {
-    const p = workspace.getProject(new ProjectFilterPath(projectPath));
-    await p.upgrade();
-    const tree = treeService.init(event.sender, p.getMyPath(), p.metadata.getScanRoot());
-    p.setTree(tree);
-    const summary = tree.getSummarize();
-    p.filesToScan = summary.files;
-    p.filesSummary = summary;
-    p.filesNotScanned = {};
-    p.processedFiles = 0;
-    p.metadata.setFileCounter(summary.include);
-    await modelProvider.init(p.getMyPath());
-    await licenseService.import();
-    const scan = new ReScan(p, event.sender);
-    scan.init();
-    scan.scan();
+    const projectRescan = new ProjectReScan();
+    await projectRescan.set(projectPath, event.sender);
+    await projectRescan.init();
     return Response.ok();
   } catch (error: any) {
     console.error(error);
