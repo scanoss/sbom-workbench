@@ -16,5 +16,4 @@ export class ResumeScan extends Scan {
       processed: (100 * this.project.processedFiles) / this.project.filesSummary.include,
     });
   }
-
 }
