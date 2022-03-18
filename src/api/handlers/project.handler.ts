@@ -13,12 +13,12 @@ import { treeService } from '../../main/services/TreeService';
 import { ResumeScan } from '../../main/scanner/ResumeScan';
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
-  let created: any;
+ 
 
   // TO DO factory to create filters depending on arguments
   const p: Project = await workspace.openProject(new ProjectFilterPath(arg));
-  p.setMailbox(event.sender);
-
+  // p.setMailbox(event.sender);
+  p.getTree().setMailbox(event.sender);
   const response = {
     logical_tree: p.getTree().getRootFolder(),
     work_root: p.getMyPath(),
@@ -41,7 +41,6 @@ function getUserHome() {
 }
 
 ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
-  
   const projectList = workspace.getOpenedProjects();
   let pPromises = [];
   for (const p of projectList) pPromises.push(p.save());
@@ -54,31 +53,30 @@ ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
 
 ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, arg: any) => {
   const path = arg;
-  await workspace.closeAllProjects();
   const p: Project = workspace.getProject(new ProjectFilterPath(path));
-  p.setMailbox(event.sender);
-  const tree = treeService.init(event.sender, p.getMyPath(), p.metadata.getScanRoot());
-  p.setTree(tree);
-  const scan = new ResumeScan(p, event.sender); 
+  await p.open();
+  const scan = new ResumeScan(p, event.sender);
   await scan.scanStateValidation();
   scan.init();
-  scan.cleanWorkDirectory();
   scan.scan();
-  // await p.resumeScanner();
 });
 
 ipcMain.handle(IpcEvents.PROJECT_RESCAN, async (event, projectPath: string) => {
   try {
     const p = workspace.getProject(new ProjectFilterPath(projectPath));
-    p.setMailbox(event.sender);
     await p.upgrade();
     const tree = treeService.init(event.sender, p.getMyPath(), p.metadata.getScanRoot());
     p.setTree(tree);
+    const summary = tree.getSummarize();
+    p.filesToScan = summary.files;
+    p.filesSummary = summary;
+    p.filesNotScanned = {};
+    p.processedFiles = 0;
+    p.metadata.setFileCounter(summary.include);
     await modelProvider.init(p.getMyPath());
     await licenseService.import();
     const scan = new ReScan(p, event.sender);
     scan.init();
-    scan.cleanWorkDirectory();
     scan.scan();
     return Response.ok();
   } catch (error: any) {

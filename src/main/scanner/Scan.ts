@@ -7,7 +7,6 @@ import { fileHelper } from '../helpers/FileHelper';
 import { componentService } from '../services/ComponentService';
 import { dependencyService } from '../services/DependencyService';
 import { fileService } from '../services/FileService';
-import { rescanService } from '../services/RescanService';
 import { resultService } from '../services/ResultService';
 import { userSettingService } from '../services/UserSettingService';
 import { ScanHandler } from './ScanHandler';
@@ -20,48 +19,31 @@ export class Scan extends ScanHandler {
   }
 
   public async init() {
-    const scannerCfg: ScannerCfg = new ScannerCfg();
-    const { DEFAULT_API_INDEX, APIS } = userSettingService.get();
-
-    if (this.project.getApi()) {
-      scannerCfg.API_URL = this.project.getApi();
-      scannerCfg.API_KEY = this.project.getApiKey();
-    } else {
-      scannerCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
-      scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
-    }
-
-    scannerCfg.CONCURRENCY_LIMIT = 20;
-    scannerCfg.DISPATCHER_QUEUE_SIZE_MAX_LIMIT = 500;
-    scannerCfg.DISPATCHER_QUEUE_SIZE_MIN_LIMIT = 450;
-
-    this.scanner = new Scanner(scannerCfg);
-    this.project.scanner = this.scanner;
-    this.scanner.setWorkDirectory(this.project.getMyPath());
-
+    this.setScannerConfig();
+    this.cleanWorkDirectory();
     this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (response) => {
-      this.processedFiles += response.getNumberOfFilesScanned();
+      this.project.processedFiles += response.getNumberOfFilesScanned();
       const filesScanned = response.getFilesScanned();
-
       // eslint-disable-next-line no-restricted-syntax
-      for (const file of filesScanned) delete this.filesToScan[`${this.project.getScanRoot()}${file}`];
-      this.project.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+      for (const file of filesScanned) delete this.project.filesToScan[`${this.project.getScanRoot()}${file}`];
+      this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
         stage: ScanState.SCANNING,
-        processed: (100 * this.processedFiles) / this.project.getTree().getSummarize().include,
+        processed: (100 * this.project.processedFiles) / this.project.filesSummary.include,
       });
     });
 
     this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response, filesNotScanned) => {
       this.project.tree.attachResults(response.getServerResponse());
-      Object.assign(this.filesNotScanned, filesNotScanned);
+      Object.assign(this.project.filesNotScanned, this.project.filesNotScanned);
       this.project.save();
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       await this.done(resultPath);
+      log.info(`%c[ SCANNER ]: Start scanning dependencies`, 'color: green');
+      await this.scanDependencies();
       this.project.metadata.setScannerState(ScanState.FINISHED);
       this.project.metadata.save();
-      console.log('[ SCANNER ]: Scan finished', this.project.getMyPath());
       this.sendToUI(IpcEvents.SCANNER_FINISH_SCAN, {
         success: true,
         resultsPath: this.project.metadata.getMyPath(),
@@ -81,11 +63,31 @@ export class Scan extends ScanHandler {
   }
 
   public async done(resultPath: string) {
-    await fileService.insert(this.project.getTree().getRootFolder().getFiles()); 
+    await fileService.insert(this.project.getTree().getRootFolder().getFiles());
     const files = await fileHelper.getPathFileId();
-    await resultService.insertFromFile(resultPath, files); 
+    await resultService.insertFromFile(resultPath, files);
     await componentService.importComponents();
-    // await this.scanDependencies();
+  }
+
+  private setScannerConfig() {
+    const scannerCfg: ScannerCfg = new ScannerCfg();
+    const { DEFAULT_API_INDEX, APIS } = userSettingService.get();
+
+    if (this.project.getApi()) {
+      scannerCfg.API_URL = this.project.getApi();
+      scannerCfg.API_KEY = this.project.getApiKey();
+    } else {
+      scannerCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
+      scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
+    }
+
+    scannerCfg.CONCURRENCY_LIMIT = 20;
+    scannerCfg.DISPATCHER_QUEUE_SIZE_MAX_LIMIT = 500;
+    scannerCfg.DISPATCHER_QUEUE_SIZE_MIN_LIMIT = 450;
+
+    this.scanner = new Scanner(scannerCfg);
+    this.project.scanner = this.scanner;
+    this.scanner.setWorkDirectory(this.project.getMyPath());
   }
 
   public async scan() {
@@ -93,12 +95,11 @@ export class Scan extends ScanHandler {
       stage: this.project.metadata.getScannerState(),
       processed: 0,
     });
-    const files = this.project.getTree().getSummarize();
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: this.project.metadata.getScannerState(),
       processed: 0,
     });
-    const scanIn = this.adapterToScannerInput(files.files);
+    const scanIn = this.adapterToScannerInput(this.project.filesToScan);
     this.scanner.scan(scanIn);
   }
 

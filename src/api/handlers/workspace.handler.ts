@@ -43,9 +43,7 @@ ipcMain.handle(IpcEvents.WORKSPACE_CREATE_PROJECT, async (event, project: INewPr
     await licenseService.import();
     const scan = new Scan(p, event.sender);
     scan.init();
-    scan.cleanWorkDirectory();
     scan.scan();
-
     return Response.ok();
   } catch (error: any) {
     console.error(error);

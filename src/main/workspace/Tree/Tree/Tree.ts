@@ -94,6 +94,7 @@ export class Tree {
 
   public loadTree(data: any): void {
     this.rootFolder = this.deserialize(data) as Folder;
+    
   }
 
   private deserialize(data: any): Node {
@@ -181,7 +182,6 @@ export class Tree {
     if (node.getType() === 'file') {
       this.filesIndexed += 1;
       if (this.filesIndexed % 100 === 0) {
-        console.log(`[PROJECT] ${this.filesIndexed} files indexed`);
         this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
           stage: `indexing`,
           processed: this.filesIndexed,

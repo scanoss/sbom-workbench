@@ -11,10 +11,10 @@ export class ReScan extends Scan {
   }
 
   public async done(resultPath: string) {
-    log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
     await rescanService.reScan(this.project.getTree().getRootFolder().getFiles(), resultPath);
     const results = await rescanService.getNewResults();
     this.project.getTree().sync(results);
+    log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
     this.project.save();
   }
 }
