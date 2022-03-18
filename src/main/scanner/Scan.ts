@@ -90,20 +90,20 @@ export class Scan extends ScanHandler {
     this.scanner.setWorkDirectory(this.project.getMyPath());
   }
 
+  public scannerStatus() {
+    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+      stage: this.project.metadata.getScannerState(),
+      processed: 0,
+    });
+  }
+
   public async scan() {
-    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: this.project.metadata.getScannerState(),
-      processed: 0,
-    });
-    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: this.project.metadata.getScannerState(),
-      processed: 0,
-    });
+    this.scannerStatus();
     const scanIn = this.adapterToScannerInput(this.project.filesToScan);
     this.scanner.scan(scanIn);
   }
 
-  private adapterToScannerInput(filesToScan: Record<string, string>): Array<ScannerInput> {
+  protected adapterToScannerInput(filesToScan: Record<string, string>): Array<ScannerInput> {
     const fullScanList: Array<string> = [];
     const quickScanList: Array<string> = [];
 
