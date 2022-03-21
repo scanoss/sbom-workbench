@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { modelProvider } from '../services/ModelProvider';
 
 class FileHelper {
@@ -8,6 +9,13 @@ class FileHelper {
       return acc;
     }, {});
     return pathFileId;
+  }
+
+  public async fileExist(file: string): Promise<boolean> {
+    return fs.promises
+      .access(file, fs.constants.F_OK)
+      .then(() => true)
+      .catch(() => false);
   }
 }
 
