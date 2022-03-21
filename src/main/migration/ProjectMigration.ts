@@ -1,6 +1,7 @@
 import { Migration } from './Migration';
 import { dbLicenseMigration0200 } from './scripts/0200';
 import { metadataMigration0210 } from './scripts/0210';
+import { dependenciesMigration0220 } from './scripts/0220';
 
 export class ProjectMigration extends Migration {
   private scripts: Record<string, Array<(data: string) => void>>;
@@ -14,6 +15,7 @@ export class ProjectMigration extends Migration {
       '0.17.0': [], // Min version supported
       '0.20.0': [dbLicenseMigration0200],
       '0.21.0': [metadataMigration0210],
+      '0.22.0': [dependenciesMigration0220],
     };
   }
 
