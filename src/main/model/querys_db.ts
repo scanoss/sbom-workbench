@@ -28,7 +28,7 @@ export class Querys {
     'CREATE TABLE IF NOT EXISTS files (fileId INTEGER PRIMARY KEY ASC,path TEXT,identified INTEGER DEFAULT 0, ignored INTEGER DEFAULT 0, dirty INTEGER DEFAULT 0, type TEXT);';
 
   DEPENDENCY_TABLE =
-    'CREATE TABLE IF NOT EXISTS dependencies (dependencyId INTEGER PRIMARY KEY ASC,fileId INTEGER ,purl TEXT, version TEXT, scope TEXT DEFAULT NULL, rejectedAt DATETIME DEFAULT NULL,licenses TEXT,component TEXT,FOREIGN KEY(fileID) REFERENCES files(fileId) ON DELETE CASCADE);';
+    'CREATE TABLE IF NOT EXISTS dependencies (dependencyId INTEGER PRIMARY KEY ASC,fileId INTEGER ,purl TEXT, version TEXT, scope TEXT DEFAULT NULL, rejectedAt DATETIME DEFAULT NULL,licenses TEXT,component TEXT,FOREIGN KEY(fileId) REFERENCES files(fileId) ON DELETE CASCADE,UNIQUE(purl,version,fileId));';
 
   SQL_DB_TABLES =
     this.SQL_CREATE_TABLE_RESULTS +
@@ -204,7 +204,7 @@ export class Querys {
   INNER JOIN files f ON r.fileId=f.fileId INNER JOIN file_inventories fi ON fi.fileId=f.fileId
   INNER JOIN inventories i ON i.id=fi.inventoryid INNER JOIN component_versions  cv ON i.cvid=cv.id ORDER BY r.purl;`;
 
-  SQL_DEPENDENCIES_INSERT = `INSERT INTO dependencies (fileId, purl, version, scope , licenses, component) VALUES (?,?,?,?,?,?);`;
+  SQL_DEPENDENCIES_INSERT = `INSERT OR IGNORE INTO dependencies (fileId, purl, version, scope , licenses, component) VALUES (?,?,?,?,?,?);`;
 
   SQL_GET_ALL_DEPENDENCIES = `SELECT d.dependencyId,d.component AS componentName,d.purl,d.version,d.licenses,d.component, i.id AS inventory,cv.id AS compid,d.rejectedAt,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN '${FileStatusType.IDENTIFIED}' WHEN i.id IS NULL AND d.rejectedAt IS NOT NULL THEN '${FileStatusType.ORIGINAL}' ELSE '${FileStatusType.PENDING}' END) AS status FROM dependencies d 
   INNER JOIN files f ON f.fileId =  d.fileId
@@ -216,8 +216,11 @@ export class Querys {
   SQL_GET_ALL_FILES = `SELECT f.fileId AS id,f.type,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.license, r.component AS componentName, r.url,comp.purl,comp.version 
   FROM files f LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions comp ON
   comp.purl = r.purl AND comp.version = r.version
- LEFT JOIN file_inventories fi ON fi.fileId=f.fileId #FILTER ;`;
+  LEFT JOIN file_inventories fi ON fi.fileId=f.fileId #FILTER ;`;
 
   SQL_GET_RESULTS_PRELOADINVENTORY =
     'SELECT f.fileId AS id,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f INNER JOIN results r ON f.fileId=r.fileId LEFT JOIN component_versions comp ON comp.purl=r.purl AND comp.version=r.version #FILTER';
+
+  SQL_DELETE_DIRTY_DEPENDENCIES = `DELETE FROM dependencies WHERE dependencyId IN (SELECT dependencyId FROM dependencies WHERE dependencyId NOT IN (SELECT d.dependencyId FROM dependencies d WHERE d.purl IN (#PURLS) AND d.version IN (#VERSIONS)
+  AND d.licenses IN (#LICENSES)));`;
 }
