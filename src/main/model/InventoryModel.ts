@@ -439,7 +439,7 @@ export class InventoryModel extends Model {
     });
   }
 
-  async attachFileInventoryBatch(inventoryFiles: any) {
+  async attachFileInventoryBatch(inventoryFiles: any): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -452,6 +452,23 @@ export class InventoryModel extends Model {
       } catch (error) {
         log.error(error);
         reject(new Error('Unable to attach inventory'));
+      }
+    });
+  }
+
+  public async deleteDirtyDependencyInventories(): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const deleteQuery = `DELETE FROM inventories WHERE cvid IN(
+          SELECT cv.id FROM component_versions cv WHERE NOT EXISTS (SELECT 1 FROM dependencies WHERE purl = cv.purl AND version = cv.version) ORDER BY cv.id) AND source='declared' ;`;
+        const db = await this.openDb();
+        db.all(deleteQuery, (err: any) => {
+          db.close();
+          if (err) throw err;
+          else resolve();
+        });
+      } catch (error) {
+        reject(error);
       }
     });
   }

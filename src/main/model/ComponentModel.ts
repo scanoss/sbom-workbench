@@ -323,12 +323,7 @@ export class ComponentModel extends Model {
       try {
         const db = await this.openDb();
         db.all(
-          `SELECT DISTINCT cv.id FROM (
-            SELECT notValid.purl,notValid.version FROM results notValid WHERE NOT EXISTS
-            (SELECT valid.purl,valid.version FROM results valid WHERE valid.dirty=0 AND notValid.purl=valid.purl AND notValid.version=valid.version)
-             ) AS possibleNotValid
-             INNER JOIN component_versions cv ON cv.purl=possibleNotValid.purl AND cv.version=possibleNotValid.version
-             WHERE cv.id NOT IN (SELECT cvid FROM inventories);`,
+         `SELECT cv.id FROM component_versions cv  WHERE NOT EXISTS (SELECT 1 FROM results WHERE purl=cv.purl AND version=cv.version) AND cv.id NOT IN (SELECT i.cvid FROM inventories i);`,
           (err: any, data: any) => {
             db.close();
             if (err) throw err;
@@ -364,7 +359,7 @@ export class ComponentModel extends Model {
       try {
         const db = await this.openDb();
         db.run(
-          `UPDATE component_versions  SET source='manual' WHERE  id IN ( SELECT i.cvid FROM inventories i INNER JOIN component_versions cv ON cv.id=i.cvid WHERE (cv.purl,cv.version) NOT IN (SELECT r.purl,r.version FROM results r));`,
+          `UPDATE component_versions  SET source='manual' WHERE  id IN ( SELECT i.cvid FROM inventories i INNER JOIN component_versions cv ON cv.id=i.cvid AND i.source="detected" WHERE (cv.purl,cv.version) NOT IN (SELECT r.purl,r.version FROM results r));`,
           (err: any) => {
             db.close();
             if (err) throw err;
