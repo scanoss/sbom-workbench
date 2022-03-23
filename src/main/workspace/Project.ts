@@ -57,6 +57,8 @@ export class Project extends EventEmitter {
 
   scanner!: Scanner;
 
+  DepScanner: Dep;
+
   msgToUI!: Electron.WebContents;
 
   filesSummary: any;
@@ -207,6 +209,7 @@ export class Project extends EventEmitter {
     this.initializeScanner();
     this.scanner.cleanWorkDirectory();
     this.save();
+    this.scanDependencies();
 
     log.info(`%c[ SCANNER ]: Start scanning path = ${this.metadata.getScanRoot()}`, 'color: green');
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
@@ -214,7 +217,7 @@ export class Project extends EventEmitter {
       processed: 0,
     });
     const scanIn = this.adapterToScannerInput(summary.files);
-    this.scanner.scan(scanIn);
+    await this.scanner.scan(scanIn);
   }
 
   private adapterToScannerInput(filesToScan: Record<string, string>): Array<ScannerInput> {
@@ -296,10 +299,9 @@ export class Project extends EventEmitter {
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       if (this.metadata.getScannerState() === ScanState.RESCANNING) {
         log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
-        await rescanService.reScan(this.tree.getRootFolder().getFiles(), resultPath);
+        await rescanService.reScan(this.tree.getRootFolder().getFiles(), resultPath, this.metadata.getMyPath());
         const results = await rescanService.getNewResults();
         this.tree.sync(results);
-        this.save();
       } else {
         await fileService.insert(this.tree.getRootFolder().getFiles());
         // await this.store.file.insertFiles(this.tree.getRootFolder().getFiles());
@@ -307,11 +309,11 @@ export class Project extends EventEmitter {
         await resultService.insertFromFile(resultPath, files);
         // await this.store.result.insertFromFile(resultPath, files);
         await componentService.importComponents();
-        await this.scanDependencies();
       }
-
+      await this.addDependencies();
       this.metadata.setScannerState(ScanState.FINISHED);
       this.metadata.save();
+      this.save();
       await this.close();
       this.sendToUI(IpcEvents.SCANNER_FINISH_SCAN, {
         success: true,
@@ -491,12 +493,17 @@ export class Project extends EventEmitter {
         f.file = f.file.replace(rootPath, '');
       });
       fs.promises.writeFile(`${this.metadata.getMyPath()}/dependencies.json`, JSON.stringify(dependencies, null, 2));
-      this.tree.addDependencies(dependencies);
-      this.save();
-      await dependencyService.insert(dependencies);
     } catch (e) {
       log.error(e);
     }
+  }
+
+  public async addDependencies() {
+    const dependencies = JSON.parse(
+      await fs.promises.readFile(`${this.metadata.getMyPath()}/dependencies.json`, 'utf8')
+    );
+    this.tree.addDependencies(dependencies);
+    await dependencyService.insert(dependencies);
   }
 
   public async setGlobalFilter(filter: IWorkbenchFilter) {

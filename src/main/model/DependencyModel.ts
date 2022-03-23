@@ -1,5 +1,5 @@
 import log from 'electron-log';
-import { DependencyDTO } from '../../api/types';
+
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Model } from './Model';
 import { Querys } from './querys_db';
@@ -103,6 +103,25 @@ export class DependencyModel extends Model {
           }
         );
       } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
+  public deleteDirty(data: Record<string, string>): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const SQLquery = query.SQL_DELETE_DIRTY_DEPENDENCIES.replace('#PURLS', data.purls)
+          .replace('#VERSIONS', data.versions)
+          .replace('#LICENSES', data.licenses);
+        const db = await this.openDb();
+        db.run(SQLquery, async (err: any, _dep: any) => {
+          db.close();
+          if (err) throw err;
+          resolve();
+        });
+      } catch (error: any) {
         log.error(error);
         reject(error);
       }

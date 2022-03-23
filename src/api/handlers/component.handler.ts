@@ -4,10 +4,11 @@ import { IpcEvents } from '../ipc-events';
 import { Response } from '../Response';
 import { componentService } from '../../main/services/ComponentService';
 import { workspace } from '../../main/workspace/Workspace';
+import { modelProvider } from '../../main/services/ModelProvider';
 
 ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, component: Component) => {
   try {
-    const newComp = await workspace.getOpenedProjects()[0].store.component.create(component);
+    const newComp = await modelProvider.model.component.create(component);
     return Response.ok({ message: 'Component created successfully', data: newComp });
   } catch (error: any) {
     console.log('Catch an error: ', error);
@@ -17,7 +18,7 @@ ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, component: Component) =
 
 ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE, async (_event, comp: Component, lic: License) => {
   const link = { license_id: lic.id, compid: comp.compid };
-  await workspace.getOpenedProjects()[0].store.license.licenseAttach(link);
+  await modelProvider.model.license.licenseAttach(link);
   return { status: 'ok', message: 'test' };
 });
 
