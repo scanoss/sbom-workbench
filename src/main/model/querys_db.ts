@@ -204,7 +204,7 @@ export class Querys {
   INNER JOIN files f ON r.fileId=f.fileId INNER JOIN file_inventories fi ON fi.fileId=f.fileId
   INNER JOIN inventories i ON i.id=fi.inventoryid INNER JOIN component_versions  cv ON i.cvid=cv.id ORDER BY r.purl;`;
 
-  SQL_DEPENDENCIES_INSERT = `INSERT INTO dependencies (fileId, purl, version, scope , licenses, component) VALUES (?,?,?,?,?,?);`;
+  SQL_DEPENDENCIES_INSERT = `INSERT OR IGNORE INTO dependencies (fileId, purl, version, scope , licenses, component) VALUES (?,?,?,?,?,?);`;
 
   SQL_GET_ALL_DEPENDENCIES = `SELECT d.dependencyId,d.component AS componentName,d.purl,d.version,d.licenses,d.component, i.id AS inventory,cv.id AS compid,d.rejectedAt,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN '${FileStatusType.IDENTIFIED}' WHEN i.id IS NULL AND d.rejectedAt IS NOT NULL THEN '${FileStatusType.ORIGINAL}' ELSE '${FileStatusType.PENDING}' END) AS status FROM dependencies d 
   INNER JOIN files f ON f.fileId =  d.fileId

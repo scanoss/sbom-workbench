@@ -185,6 +185,7 @@ export class ScanTask extends ScannerTask {
       await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8')
     );
     this.project.tree.addDependencies(dependencies);
+    this.project.save();
     await dependencyService.insert(dependencies);
   }
 }

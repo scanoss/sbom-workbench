@@ -1,10 +1,13 @@
+import { IDependencyResponse } from 'scanoss';
+import fs from 'fs';
 import { utilHelper } from '../helpers/UtilHelper';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { componentService } from './ComponentService';
+import { dependencyService } from './DependencyService';
 import { modelProvider } from './ModelProvider';
 
 class RescanService {
-  public async reScan(files: Array<any>, resultPath: string): Promise<void> {
+  public async reScan(files: Array<any>, resultPath: string, projectPath: string): Promise<void> {
     try {
       const aux = utilHelper.convertsArrayOfStringToString(files, 'path');
 
@@ -35,16 +38,28 @@ class RescanService {
       if (dirtyFiles.length > 0) {
         await modelProvider.model.inventory.deleteDirtyFileInventories(dirtyFiles);
       }
-      const notValidComp: number[] = await modelProvider.model.component.getNotValid();
-
-      if (notValidComp.length > 0) {
-        await modelProvider.model.component.deleteByID(notValidComp);
-      }
-
       await modelProvider.model.result.deleteDirty();
       await modelProvider.model.file.deleteDirty();
       await modelProvider.model.component.updateOrphanToManual();
       await componentService.importComponents();
+
+      // DEPENDENCIES
+
+      const dependencies = JSON.parse(await fs.promises.readFile(`${projectPath}/dependencies.json`, 'utf-8'));
+      // Insert new dependencies
+      await dependencyService.insert(dependencies);
+
+      // delete dirty dependencies
+      await modelProvider.model.dependency.deleteDirty(this.dirtyModelDependencyAdapter(dependencies));
+
+      // Delete dirty dependencies inventories
+      await modelProvider.model.inventory.deleteDirtyDependencyInventories();
+
+      const notValidDetecteComponents: number[] = await modelProvider.model.component.getNotValid();
+
+      if (notValidDetecteComponents.length > 0) {
+        await modelProvider.model.component.deleteByID(notValidDetecteComponents);
+      }
 
       const emptyInv: any = await modelProvider.model.inventory.emptyInventory();
       if (emptyInv) {
@@ -88,6 +103,32 @@ class RescanService {
     });
 
     return results;
+  }
+
+  private dirtyModelDependencyAdapter(dep: IDependencyResponse): Record<string, string> {
+    const dependencies = {
+      paths: [],
+      purls: [],
+      versions: [],
+      licenses: [],
+    };
+    dep.filesList.forEach((d) => {
+      d.dependenciesList.forEach((e) => {
+        dependencies.paths.push(d.file);
+        dependencies.purls.push(e.purl);
+        dependencies.versions.push(e.version);
+        const licenses = e.licensesList.join(',');
+        dependencies.licenses.push(licenses);
+      });
+    });
+    const aux = {
+      purls: `'${dependencies.purls.join("','")}'`,
+      versions: `'${dependencies.versions.join("','")}'`,
+      licenses: `'${dependencies.licenses.join("','")}'`,
+      paths: `'${dependencies.paths.join("','")}'`,
+    };
+
+    return aux;
   }
 }
 export const rescanService = new RescanService();

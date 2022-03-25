@@ -10,7 +10,7 @@ import { ScanTask } from './ScanTask';
 
 export class ReScanTask extends ScanTask {
   public async done(resultPath: string) {
-    await rescanService.reScan(this.project.getTree().getRootFolder().getFiles(), resultPath);
+    await rescanService.reScan(this.project.getTree().getRootFolder().getFiles(), resultPath, this.project.getMyPath());
     const results = await rescanService.getNewResults();
     this.project.getTree().sync(results);
     log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
