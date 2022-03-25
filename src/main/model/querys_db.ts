@@ -223,4 +223,5 @@ export class Querys {
 
   SQL_DELETE_DIRTY_DEPENDENCIES = `DELETE FROM dependencies WHERE dependencyId IN (SELECT dependencyId FROM dependencies WHERE dependencyId NOT IN (SELECT d.dependencyId FROM dependencies d WHERE d.purl IN (#PURLS) AND d.version IN (#VERSIONS)
   AND d.licenses IN (#LICENSES)));`;
+
 }

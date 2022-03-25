@@ -37,9 +37,7 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (_event, arg: Inventory) => {
   try {
     const p = workspace.getOpenedProjects()[0];
     const inv = await inventoryService.create(arg);
-   // treeService.updateNodeStatus();
-
-    p.sendToUI(IpcEvents.TREE_UPDATING, {});
+    p.getTree().sendToUI(IpcEvents.TREE_UPDATING, {});
     resultService
       .getResultsFromIDs(arg.files)
       .then((files: any) => {

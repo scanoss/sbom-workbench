@@ -95,8 +95,7 @@ ipcMain.handle(IpcEvents.FILE_GET_ID_FROM_PATH, async (_event, arg: string) => {
 ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
   const project = workspace.getOpenedProjects()[0];
   const data = await resultService.ignore(arg);
-
-  project.sendToUI(IpcEvents.TREE_UPDATING, {});
+  project.getTree().sendToUI(IpcEvents.TREE_UPDATING, {});
   resultService
     .getResultsFromIDs(arg)
     .then((filesToUpdate: any) => {
