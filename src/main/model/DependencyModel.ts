@@ -1,5 +1,4 @@
 import log from 'electron-log';
-
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Model } from './Model';
 import { Querys } from './querys_db';

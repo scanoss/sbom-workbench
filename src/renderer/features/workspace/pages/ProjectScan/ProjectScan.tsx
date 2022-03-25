@@ -86,6 +86,7 @@ const ProjectScan = () => {
   };
 
   const handlerScannerFinish = (_event, args) => {
+    console.log('scanner finish', args);
     if (args.success) {
       onShowScan(args.resultsPath);
     }
