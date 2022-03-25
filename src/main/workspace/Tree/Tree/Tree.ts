@@ -10,6 +10,7 @@ import { TreeViewMode } from './TreeViewMode/TreeViewMode';
 import { TreeViewDefault } from './TreeViewMode/TreeViewDefault';
 import { defaultBannedList } from '../../filtering/defaultFilter';
 
+
 const fs = require('fs');
 const pathLib = require('path');
 
@@ -192,7 +193,7 @@ export class Tree {
         node.setScanMode(this.scanMode(scanRoot + node.getValue()));
       } else {
         node.setAction('filter');
-        node.setStatusFromFilter(NodeStatus.FILTERED);
+        node.setStatusDeep(NodeStatus.FILTERED);
         node.setClassName('filter-item');
       }
     } else if (node.getType() === 'folder') {
@@ -201,8 +202,9 @@ export class Tree {
         for (i = 0; i < node.getChildrenCount(); i += 1) this.applyFilters(scanRoot, node.getChild(i), bannedList);
       } else {
         node.setAction('filter');
-        node.setStatusFromFilter(NodeStatus.FILTERED);
-        node.setClassName('filter-item');
+        node.setClassNameDeep('filter-item');
+        node.setActionDeep('filter');
+        node.setStatusDeep(NodeStatus.FILTERED);
       }
     }
   }

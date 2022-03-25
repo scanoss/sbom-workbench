@@ -10,6 +10,7 @@ import { resultService } from '../../main/services/ResultService';
 import { treeService } from '../../main/services/TreeService';
 import { NodeStatus } from '../../main/workspace/Tree/Tree/Node';
 import { workspace } from '../../main/workspace/Workspace';
+import { modelProvider } from '../../main/services/ModelProvider';
 
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (_event, invget: Partial<Inventory>) => {
   let inv: any;
@@ -36,8 +37,6 @@ ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (_event, arg: Inventory) => {
   try {
     const p = workspace.getOpenedProjects()[0];
     const inv = await inventoryService.create(arg);
-   // treeService.updateNodeStatus();
-
     p.getTree().sendToUI(IpcEvents.TREE_UPDATING, {});
     resultService
       .getResultsFromIDs(arg.files)
@@ -103,7 +102,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (_event, arg: Partial<Inventory
       .catch((e) => {
         throw e;
       });
-    const success = await p.store.inventory.delete(arg);
+    const success = await modelProvider.model.inventory.delete(arg);
     if (success) return { status: 'ok', message: 'Inventory deleted successfully', success };
     return { status: 'error', message: 'Inventory was not deleted successfully', success };
   } catch (e) {
@@ -114,7 +113,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (_event, arg: Partial<Inventory
 
 ipcMain.handle(IpcEvents.INVENTORY_FROM_COMPONENT, async (_event) => {
   try {
-    const data = await workspace.getOpenedProjects()[0].store.inventory.getFromComponent();
+    const data = await modelProvider.model.inventory.getFromComponent();
     if (data) return { status: 'ok', message: 'Inventories from component', data };
     return { status: 'error', message: 'Inventory from component was not successfully retrieve', data };
   } catch (e) {

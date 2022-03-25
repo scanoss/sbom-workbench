@@ -31,6 +31,8 @@ export class Project {
 
   scanner!: Scanner;
 
+  DepScanner: Dep;
+
   msgToUI!: Electron.WebContents;
 
   filesSummary: any;
@@ -226,6 +228,35 @@ export class Project {
       log.error(e);
       return null;
     }
+  }
+
+  private async scanDependencies(): Promise<void> {
+    const allFiles = [];
+    const rootPath = this.metadata.getScanRoot();
+    this.tree
+      .getRootFolder()
+      .getFiles()
+      .forEach((f: File) => {
+        allFiles.push(rootPath + f.path);
+      });
+
+    try {
+      const dependencies = await new DependencyScanner().scan(allFiles);
+      dependencies.filesList.forEach((f) => {
+        f.file = f.file.replace(rootPath, '');
+      });
+      fs.promises.writeFile(`${this.metadata.getMyPath()}/dependencies.json`, JSON.stringify(dependencies, null, 2));
+    } catch (e) {
+      log.error(e);
+    }
+  }
+
+  public async addDependencies() {
+    const dependencies = JSON.parse(
+      await fs.promises.readFile(`${this.metadata.getMyPath()}/dependencies.json`, 'utf8')
+    );
+    this.tree.addDependencies(dependencies);
+    await dependencyService.insert(dependencies);
   }
 
   public async setGlobalFilter(filter: IWorkbenchFilter) {

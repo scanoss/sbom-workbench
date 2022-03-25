@@ -25,7 +25,7 @@ interface inventoryProgress {
   acceptedComponents: number;
 }
 
-class ReportService {
+class ReportService  {
   public async getReportSummary() {
     try {
       let tempSummary: any = {};

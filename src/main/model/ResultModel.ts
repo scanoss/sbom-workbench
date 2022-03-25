@@ -11,7 +11,7 @@ import { QueryBuilder } from './queryBuilder/QueryBuilder';
 const query = new Querys();
 
 export class ResultModel extends Model {
-  public static readonly entityMapper = { path: 'f.path' };
+  public static readonly entityMapper = { path: 'f.path', source: 'comp.source' };
 
   component: ComponentModel;
 
@@ -297,10 +297,11 @@ export class ResultModel extends Model {
         const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_RESULTS, this.getEntityMapper());
         db.all(SQLquery.SQL, ...SQLquery.params, (err: any, data: any) => {
           db.close();
-          if (err) throw new Error('[ DB ERROR ] : files in folder');
-          else resolve(data);
+          if (err) throw err;
+          resolve(data);
         });
       } catch (error) {
+        log.error(error);
         reject(error);
       }
     });

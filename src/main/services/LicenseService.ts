@@ -6,7 +6,6 @@ class LicenseService {
     await modelProvider.model.license.importFromJSON(licenses);
   }
 
-
   public async import() {
     await modelProvider.model.license.importFromJSON(licenses);
   }

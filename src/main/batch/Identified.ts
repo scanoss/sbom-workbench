@@ -28,13 +28,10 @@ export class Identified extends Batch {
       if (this.getOverWrite()) {
         await new Restore(this.getFolder(), this.getOverWrite()).execute();
       }
-
       const ids = (await this.getFilesToProcess(this.queryBuilder, 'id')) as Array<number>;
-
-      this.updateTree(ids, NodeStatus.IDENTIFIED);
-
       this.inventory.files = ids;
       const success = await inventoryService.create(this.inventory);
+      this.updateTree(ids, NodeStatus.IDENTIFIED);
 
       if (success) return success;
 

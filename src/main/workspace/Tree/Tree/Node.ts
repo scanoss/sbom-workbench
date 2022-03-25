@@ -115,9 +115,7 @@ export default abstract class Node {
     return this.type;
   }
 
-  public setStatusFromFilter(status: NodeStatus): void {
-    this.status = status;
-  }
+  public abstract setStatusDeep(status: NodeStatus): void;
 
   public setFilteredMatch(isFilteredMatch: boolean): void {
     this.isFilteredMatch = isFilteredMatch;
@@ -160,4 +158,8 @@ export default abstract class Node {
   public abstract getClone(): Node;
 
   public abstract getClonePath(paths: Record<string, number>): Node;
+
+  public abstract setClassNameDeep(className: string): void;
+
+  public abstract setActionDeep(action: string): void;
 }

@@ -127,7 +127,7 @@ export default class File extends Node {
 
   public filter(paths: Record<string, number>): boolean {
     if (!paths[this.getPath()]) {
-      this.status = NodeStatus.NOMATCH;
+      if (this.status !== NodeStatus.FILTERED) this.status = NodeStatus.NOMATCH;
       this.setStatusOnClassnameAs(this.status);
       this.setFilteredMatch(false);
       return false;
@@ -146,5 +146,17 @@ export default class File extends Node {
       return copy;
     }
     return null;
+  }
+
+  public setClassNameDeep(className: string): void {
+    this.setClassName(className);
+  }
+
+  public setActionDeep(action: string): void {
+    this.setAction(action);
+  }
+
+  public setStatusDeep(status: NodeStatus): void { 
+    this.status = status;
   }
 }

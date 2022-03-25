@@ -47,6 +47,7 @@ const FileTree = () => {
   };
 
   const onSelectNode = async (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
+    console.log(node);
     const { children, value } = node;
     if (!children) {
       history.push({
