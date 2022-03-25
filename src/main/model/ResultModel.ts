@@ -293,10 +293,8 @@ export class ResultModel extends Model {
   public async getAll(queryBuilder: QueryBuilder) {
     return new Promise<any>(async (resolve, reject) => {
       try {
-        console.log('getAll', queryBuilder.getFilters());
         const db = await this.openDb();
         const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_RESULTS, this.getEntityMapper());
-        console.log(SQLquery.SQL);
         db.all(SQLquery.SQL, ...SQLquery.params, (err: any, data: any) => {
           db.close();
           if (err) throw err;

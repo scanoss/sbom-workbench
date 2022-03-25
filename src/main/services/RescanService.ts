@@ -1,5 +1,5 @@
-import fs from 'fs';
 import { IDependencyResponse } from 'scanoss';
+import fs from 'fs';
 import { utilHelper } from '../helpers/UtilHelper';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { componentService } from './ComponentService';
@@ -38,7 +38,6 @@ class RescanService {
       if (dirtyFiles.length > 0) {
         await modelProvider.model.inventory.deleteDirtyFileInventories(dirtyFiles);
       }
-
       await modelProvider.model.result.deleteDirty();
       await modelProvider.model.file.deleteDirty();
       await modelProvider.model.component.updateOrphanToManual();
@@ -68,7 +67,6 @@ class RescanService {
         await modelProvider.model.inventory.deleteAllEmpty(result);
       }
     } catch (err: any) {
-      console.error(err);
       throw new Error('[ RESCAN DB ] Unable to insert new results');
     }
   }

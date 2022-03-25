@@ -1,4 +1,6 @@
 import { isBinaryFileSync } from 'isbinaryfile';
+import { IDependencyResponse } from 'scanoss';
+import log from 'electron-log';
 import Node, { NodeStatus } from './Node';
 import File from './File';
 import Folder from './Folder';
@@ -6,7 +8,8 @@ import { IpcEvents } from '../../../../api/ipc-events';
 import * as Filtering from '../../filtering';
 import { TreeViewMode } from './TreeViewMode/TreeViewMode';
 import { TreeViewDefault } from './TreeViewMode/TreeViewDefault';
-import { IDependencyResponse } from 'scanoss';
+import { defaultBannedList } from '../../filtering/defaultFilter';
+
 
 const fs = require('fs');
 const pathLib = require('path');
@@ -24,12 +27,16 @@ export class Tree {
 
   private fileTreeViewMode: TreeViewMode;
 
-  constructor(path: string) {
+  private summary;
+
+  constructor(path: string, msgToUI: Electron.WebContents) {
     const pathParts = path.split(pathLib.sep);
     this.rootName = pathParts[pathParts.length - 1];
     this.rootPath = path;
     this.rootFolder = new Folder('', this.rootName);
     this.fileTreeViewMode = new TreeViewDefault();
+    this.summary = {};
+    this.msgToUI = msgToUI;
   }
 
   setMailbox(mailbox: Electron.WebContents) {
@@ -37,7 +44,10 @@ export class Tree {
   }
 
   sendToUI(eventName, data: any) {
-    if (this.msgToUI) this.msgToUI.send(eventName, data);
+    if (this.msgToUI) {
+      this.msgToUI.send(eventName, data);
+      this.msgToUI.send(eventName, data);
+    }
   }
 
   public buildTree(): Node {
@@ -85,6 +95,7 @@ export class Tree {
 
   public loadTree(data: any): void {
     this.rootFolder = this.deserialize(data) as Folder;
+    
   }
 
   private deserialize(data: any): Node {
@@ -114,8 +125,15 @@ export class Tree {
     return this.rootFolder.getFiltered();
   }
 
-  public summarize(root: string, summary: any): any {
-    return this.rootFolder.summarize(root, summary);
+  public summarize(root: string): any {
+    const summary = { total: 0, include: 0, filter: 0, files: {} };
+    const sum = this.rootFolder.summarize(root, summary);
+    this.summary = sum;
+    return sum;
+  }
+
+  public getSummarize(): any {
+    return this.summary;
   }
 
   private scanMode(filePath: string) {
@@ -149,15 +167,27 @@ export class Tree {
     return 'FULL_SCAN';
   }
 
+  public fileTreeFilter(projectPath: string, scanRoot: string) {
+    const bannedList = new Filtering.BannedList('NoFilter');
+    if (!fs.existsSync(`${projectPath}/filter.json`))
+      fs.writeFileSync(`${projectPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
+    bannedList.load(`${projectPath}/filter.json`);
+
+    log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
+    log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
+    this.applyFilters(scanRoot, this.getRootFolder(), bannedList);
+  }
+
   public applyFilters(scanRoot: string, node: Node, bannedList: Filtering.BannedList) {
     let i = 0;
     if (node.getType() === 'file') {
       this.filesIndexed += 1;
-      if (this.filesIndexed % 100 === 0)
+      if (this.filesIndexed % 100 === 0) {
         this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
           stage: `indexing`,
           processed: this.filesIndexed,
         });
+      }
       if (bannedList.evaluate(scanRoot + node.getValue())) {
         node.setAction('scan');
         node.setScanMode(this.scanMode(scanRoot + node.getValue()));
