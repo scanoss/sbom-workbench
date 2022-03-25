@@ -211,14 +211,12 @@ export default class Folder extends Node {
 
   public filter(paths: Record<string, number>): boolean {
     this.setFilteredMatch(false);
-    if (this.getStatusClassName() !== NodeStatus.FILTERED) {
-      this.children.forEach((child) => {
-        if (child.filter(paths) === true) this.setFilteredMatch(true);
-      });
-      this.updateStatusFlags();
-      this.status = this.getStatusClassName();
-      this.setStatusOnClassnameAs(this.status);
-    }
+    this.children.forEach((child) => {
+      if (child.filter(paths) === true) this.setFilteredMatch(true);
+    });
+    this.updateStatusFlags();
+    this.status = this.getStatusClassName();
+    this.setStatusOnClassnameAs(this.status);
     return this.getFilteredMatch();
   }
 
@@ -237,5 +235,20 @@ export default class Folder extends Node {
     copy.status = copy.getStatusClassName();
     copy.setStatusOnClassnameAs(copy.status);
     return copy;
+  }
+
+  public setClassNameDeep(className: string): void {
+    this.setClassName(className);
+    this.getChildren().forEach((node) => node.setClassNameDeep(className));
+  }
+
+  public setActionDeep(action: string): void {
+    this.setAction(action);
+    this.getChildren().forEach((node) => node.setActionDeep(action));
+  }
+
+  public setStatusDeep(status: NodeStatus): void {
+    this.status = status;
+    this.getChildren().forEach((node) => node.setStatusDeep(status));
   }
 }

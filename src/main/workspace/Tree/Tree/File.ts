@@ -147,4 +147,16 @@ export default class File extends Node {
     }
     return null;
   }
+
+  public setClassNameDeep(className: string): void {
+    this.setClassName(className);
+  }
+
+  public setActionDeep(action: string): void {
+    this.setAction(action);
+  }
+
+  public setStatusDeep(status: NodeStatus): void { 
+    this.status = status;
+  }
 }
