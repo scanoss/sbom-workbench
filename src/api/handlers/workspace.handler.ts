@@ -6,7 +6,7 @@ import { Response } from '../Response';
 import { INewProject, IProject, License } from '../types';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
-import { ProjectScan } from '../../main/scanner/projectScanHandler/ProjectScan';
+import { ScanTask } from '../../main/scanner/ScanTask';
 
 ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
   try {
@@ -35,9 +35,10 @@ ipcMain.handle(IpcEvents.WORKSPACE_DELETE_PROJECT, async (event, projectPath: st
 // In future versions, the scanner will be launched by the user.
 ipcMain.handle(IpcEvents.WORKSPACE_CREATE_PROJECT, async (event, project: INewProject) => {
   try {
-    const projectScan = new ProjectScan();
-    await projectScan.set(project, event.sender);
-    await projectScan.init();
+    const scanTask = new ScanTask(event.sender);
+    await scanTask.set(project);
+    await scanTask.init();
+    await scanTask.run();
     return Response.ok();
   } catch (error: any) {
     console.error(error);

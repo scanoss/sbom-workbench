@@ -1,21 +1,38 @@
 import log from 'electron-log';
 import { DependencyScanner, Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
 import fs from 'fs';
-import { IpcEvents } from '../../../api/ipc-events';
-import { ScanState } from '../../../api/types';
-import { fileHelper } from '../../helpers/FileHelper';
-import { componentService } from '../../services/ComponentService';
-import { dependencyService } from '../../services/DependencyService';
-import { fileService } from '../../services/FileService';
-import { resultService } from '../../services/ResultService';
-import { userSettingService } from '../../services/UserSettingService';
-import { ScanHandler } from './ScanHandler';
-import { Project } from '../../workspace/Project';
+import { IpcEvents } from '../../api/ipc-events';
+import { INewProject, IProject, ProjectState, ScanState } from '../../api/types';
+import { fileHelper } from '../helpers/FileHelper';
+import { componentService } from '../services/ComponentService';
+import { dependencyService } from '../services/DependencyService';
+import { fileService } from '../services/FileService';
+import { resultService } from '../services/ResultService';
+import { userSettingService } from '../services/UserSettingService';
+import { ScannerTask } from './ScannerTask';
+import { workspace } from '../workspace/Workspace';
+import { modelProvider } from '../services/ModelProvider';
+import { licenseService } from '../services/LicenseService';
+import { treeService } from '../services/TreeService';
 
-export class Scan extends ScanHandler {
-  constructor(project: Project, msgToUI: Electron.WebContents) {
-    super(project, msgToUI);
-    this.project.metadata.setScannerState(ScanState.SCANNING);
+export class ScanTask extends ScannerTask {
+  public async set(project: INewProject | string): Promise<void> { 
+    const p = await workspace.createProject(project as INewProject);
+    await modelProvider.init(p.getMyPath());
+    await licenseService.import();
+    const tree = treeService.init(this.msgToUI, p.getMyPath(), p.metadata.getScanRoot());
+    const summary = tree.getSummarize();
+    log.transports.file.resolvePath = () => `${p.metadata.getMyPath()}/project.log`;
+    p.state = ProjectState.OPENED;
+    p.filesToScan = summary.files;
+    p.filesSummary = summary;
+    p.filesNotScanned = {};
+    p.processedFiles = 0;
+    p.metadata.setFileCounter(summary.include);
+    p.metadata.setScannerState(ScanState.SCANNING);
+    p.setTree(tree);
+    p.save();
+    this.project = p;
   }
 
   public async init() {
@@ -97,7 +114,7 @@ export class Scan extends ScanHandler {
     });
   }
 
-  public async scan() {
+  public async run() {
     this.scannerStatus();
     const scanIn = this.adapterToScannerInput(this.project.filesToScan);
     this.scanner.scan(scanIn);

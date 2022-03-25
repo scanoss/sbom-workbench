@@ -6,8 +6,8 @@ import { userSettingService } from '../../main/services/UserSettingService';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { Project } from '../../main/workspace/Project';
 import { workspace } from '../../main/workspace/Workspace';
-import { ProjectReScan } from '../../main/scanner/projectScanHandler/ProjectReScan';
-import { ProjectResume } from '../../main/scanner/projectScanHandler/ProjectResume';
+import { ResumeScanTask } from '../../main/scanner/ResumeScanTask';
+import { ReScanTask } from '../../main/scanner/ReScanTask';
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
   // TO DO factory to create filters depending on arguments
@@ -45,17 +45,19 @@ ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
   await Promise.all(pPromises);
 });
 
-ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, projectPath: any) => {
-  const projectResume = new ProjectResume();
-  await projectResume.set(projectPath, event.sender);
-  await projectResume.init();
+ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, projectPath: string) => {
+  const resumeScanTask = new ResumeScanTask(event.sender);
+  await resumeScanTask.set(projectPath);
+  await resumeScanTask.init();
+  await resumeScanTask.run();
 });
 
 ipcMain.handle(IpcEvents.PROJECT_RESCAN, async (event, projectPath: string) => {
   try {
-    const projectRescan = new ProjectReScan();
-    await projectRescan.set(projectPath, event.sender);
-    await projectRescan.init();
+    const reScanTask = new ReScanTask(event.sender);
+    await reScanTask.set(projectPath);
+    await reScanTask.init();
+    await reScanTask.run();
     return Response.ok();
   } catch (error: any) {
     console.error(error);
