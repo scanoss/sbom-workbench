@@ -16,7 +16,7 @@ import { licenseService } from '../services/LicenseService';
 import { treeService } from '../services/TreeService';
 
 export class ScanTask extends ScannerTask {
-  public async set(project: INewProject | string): Promise<void> { 
+  public async set(project: INewProject | string): Promise<void> {
     const p = await workspace.createProject(project as INewProject);
     await modelProvider.init(p.getMyPath());
     await licenseService.import();
@@ -57,8 +57,7 @@ export class ScanTask extends ScannerTask {
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       await this.done(resultPath);
-      log.info(`%c[ SCANNER ]: Start scanning dependencies`, 'color: green');
-      await this.scanDependencies();
+      await this.addDependencies();
       this.project.metadata.setScannerState(ScanState.FINISHED);
       this.project.metadata.save();
       this.sendToUI(IpcEvents.SCANNER_FINISH_SCAN, {
@@ -117,7 +116,32 @@ export class ScanTask extends ScannerTask {
   public async run() {
     this.scannerStatus();
     const scanIn = this.adapterToScannerInput(this.project.filesToScan);
+    this.scanDependencies();
     this.scanner.scan(scanIn);
+  }
+
+  private async scanDependencies(): Promise<void> {
+    const allFiles = [];
+    const rootPath = this.project.metadata.getScanRoot();
+    this.project.tree
+      .getRootFolder()
+      .getFiles()
+      .forEach((f: File) => {
+        allFiles.push(rootPath + f.path);
+      });
+
+    try {
+      const dependencies = await new DependencyScanner().scan(allFiles);
+      dependencies.filesList.forEach((f) => {
+        f.file = f.file.replace(rootPath, '');
+      });
+      fs.promises.writeFile(
+        `${this.project.metadata.getMyPath()}/dependencies.json`,
+        JSON.stringify(dependencies, null, 2)
+      );
+    } catch (e) {
+      log.error(e);
+    }
   }
 
   protected adapterToScannerInput(filesToScan: Record<string, string>): Array<ScannerInput> {
@@ -156,31 +180,11 @@ export class ScanTask extends ScannerTask {
     this.scanner.cleanWorkDirectory();
   }
 
-  public async scanDependencies(): Promise<void> {
-    const allFiles = [];
-    const rootPath = this.project.metadata.getScanRoot();
-    this.project
-      .getTree()
-      .getRootFolder()
-      .getFiles()
-      .forEach((f: File) => {
-        allFiles.push(rootPath + f.path);
-      });
-
-    try {
-      const dependencies = await new DependencyScanner().scan(allFiles);
-      dependencies.filesList.forEach((f) => {
-        f.file = f.file.replace(rootPath, '');
-      });
-      fs.promises.writeFile(
-        `${this.project.metadata.getMyPath()}/dependencies.json`,
-        JSON.stringify(dependencies, null, 2)
-      );
-      this.project.getTree().addDependencies(dependencies);
-      this.project.save();
-      await dependencyService.insert(dependencies);
-    } catch (e) {
-      log.error(e);
-    }
+  public async addDependencies() {
+    const dependencies = JSON.parse(
+      await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8')
+    );
+    this.project.tree.addDependencies(dependencies);
+    await dependencyService.insert(dependencies);
   }
 }
