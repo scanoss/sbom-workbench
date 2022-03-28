@@ -3,10 +3,9 @@ import { ScanState } from '../../api/types';
 import { ProjectFilterPath } from '../workspace/filters/ProjectFilterPath';
 import { Project } from '../workspace/Project';
 import { workspace } from '../workspace/Workspace';
-import { ScanTask } from './ScanTask';
+import { ScannerTask } from './ScannerTask';
 
-export class ResumeScanTask extends ScanTask {
-
+export class ResumeScanTask extends ScannerTask {
   public async scanStateValidation() {
     const scanState: ScanState = this.project.metadata.getScannerState();
     if (scanState !== ScanState.SCANNING && scanState !== ScanState.RESCANNING)
@@ -14,7 +13,7 @@ export class ResumeScanTask extends ScanTask {
     await this.project.open();
   }
 
-  public scannerStatus(){
+  public scannerStatus() {
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: ScanState.SCANNING,
       processed: (100 * this.project.processedFiles) / this.project.filesSummary.include,
