@@ -6,9 +6,9 @@ import { rescanService } from '../services/RescanService';
 import { treeService } from '../services/TreeService';
 import { ProjectFilterPath } from '../workspace/filters/ProjectFilterPath';
 import { workspace } from '../workspace/Workspace';
-import { ScanTask } from './ScanTask';
+import { ScannerTask } from './ScannerTask';
 
-export class ReScanTask extends ScanTask {
+export class ReScanTask extends ScannerTask {
   public async done(resultPath: string) {
     await rescanService.reScan(this.project.getTree().getRootFolder().getFiles(), resultPath, this.project.getMyPath());
     const results = await rescanService.getNewResults();
@@ -17,7 +17,7 @@ export class ReScanTask extends ScanTask {
     this.project.save();
   }
 
-  public async set(projectPath : string): Promise<void> {
+  public async set(projectPath: string): Promise<void> {
     const p = workspace.getProject(new ProjectFilterPath(projectPath));
     await p.upgrade();
     const tree = treeService.init(this.msgToUI, p.getMyPath(), p.metadata.getScanRoot());
