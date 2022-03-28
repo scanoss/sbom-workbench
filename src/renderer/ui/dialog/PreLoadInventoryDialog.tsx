@@ -11,9 +11,11 @@ import {
   TextareaAutosize,
   Tooltip,
 } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import React, { useEffect, useState } from 'react';
 import { List, AutoSizer } from 'react-virtualized';
 import { inventoryService } from '../../../api/inventory-service';
+import { IWorkbenchFilter } from '../../../api/types';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -61,12 +63,13 @@ interface IPreLoadInventoryDialog {
   open: boolean;
   folder: string;
   overwrite: boolean;
+  showInfoFilter: boolean;
   onClose: (response: any) => void;
   onCancel: () => void;
 }
 
 export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
-  const { open, folder, overwrite, onClose, onCancel } = props;
+  const { open, folder, overwrite, showInfoFilter, onClose, onCancel } = props;
   const classes = useStyles();
 
   const [inventories, setInventories] = useState<any[]>([]);
@@ -133,11 +136,16 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
     <div>
       <Dialog open={open} maxWidth="sm" scroll="body" fullWidth onClose={onCancel} className={`${classes.size} dialog`}>
         <span className="dialog-title">Accept All</span>
+        {showInfoFilter && (
+          <Alert className="line-bottom" severity="info">
+            This action will be applied based on your current filter criteria.
+          </Alert>
+        )}
         <DialogContent>
           <FormControlLabel control={<Checkbox checked={AllChecked()} onClick={() => selectAll()} />} label="All" />
           <hr className="divider-no-license" />
           <div className="list-container">
-            <AutoSizer style={{ width: '100%', height: '250px', border:'transparent' }}>
+            <AutoSizer style={{ width: '100%', height: '250px', border: 'transparent' }}>
               {({ width, height }) => (
                 <List
                   width={width}
@@ -221,18 +229,17 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
             </AutoSizer>
           </div>
           <div>
-            {inventoryNoLicenseCount <= 0 ? (
-              <div />
-            ) : (
-              <>
-                <hr className="divider-no-license" />
-                <div>
-                  <p className="no-license-note">
-                    {inventoryNoLicenseCount} component(s) will not be identified as they do not have a license declared with the component. Please manually identify these.
-                  </p>
-                </div>
-              </>
-            )}
+            <div>
+              {inventoryNoLicenseCount > 0 && (
+                <>
+                  <hr className="divider-no-license" />
+                  <Alert severity="warning">
+                    {inventoryNoLicenseCount} component(s) will not be identified as they do not have a license declared
+                    with the component. Please manually identify these.
+                  </Alert>
+                </>
+              )}
+            </div>
           </div>
           <hr className="divider" />
           <div className="dialog-form-field">

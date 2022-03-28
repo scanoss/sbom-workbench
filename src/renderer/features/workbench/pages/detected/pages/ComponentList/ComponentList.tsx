@@ -1,7 +1,6 @@
 import { makeStyles, Paper, IconButton, InputBase, Link } from '@material-ui/core';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
 import { AppContext, IAppContext } from '../../../../../../context/AppProvider';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
@@ -51,7 +50,7 @@ export const ComponentList = () => {
   const { limit, onScroll } = usePagination(20);
 
   const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, dispatch, isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const { name, components } = state;
 
@@ -91,7 +90,15 @@ export const ComponentList = () => {
                   Not results found with <strong>{searchQuery} </strong>
                 </>
               ) : (
-                <>No components were detected</>
+                <>
+                  {isFilterActive ? (
+                    <>
+                      No components were detected matching the <strong>current filter criteria</strong>
+                    </>
+                  ) : (
+                    <>No components were detected</>
+                  )}
+                </>
               )}
             </p>
           )}

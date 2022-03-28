@@ -18,7 +18,7 @@ import {
 import SearchIcon from '@material-ui/icons/Search';
 import AddIcon from '@material-ui/icons/Add';
 import React, { useEffect, useState, useContext } from 'react';
-import { Autocomplete } from '@material-ui/lab';
+import { Alert, Autocomplete } from '@material-ui/lab';
 import { Inventory } from '../../../api/types';
 import { InventoryForm } from '../../context/types';
 import { componentService } from '../../../api/component-service';
@@ -58,15 +58,16 @@ const useStyles = makeStyles((theme) => ({
 interface InventoryDialogProps {
   open: boolean;
   inventory: Partial<InventoryForm>;
+  recentUsedComponents: Array<string>;
+  showInfoFilter: boolean;
   onClose: (inventory: Inventory) => void;
   onCancel: () => void;
-  recentUsedComponents: Array<string>;
 }
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
   const dialogCtrl = useContext<any>(DialogContext);
-  const { open, inventory, onClose, onCancel, recentUsedComponents } = props;
+  const { open, inventory, onClose, onCancel, showInfoFilter, recentUsedComponents } = props;
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
   const [components, setComponents] = useState<any[]>([]);
   const [versions, setVersions] = useState<any[]>([]);
@@ -241,7 +242,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       onClose={onCancel}
     >
       <span className="dialog-title">{!form.id ? 'Identify Component' : 'Edit Identification'}</span>
-
+      {showInfoFilter && (
+        <Alert className="line-bottom" severity="info">
+          This action will be applied based on your current filter criteria.
+        </Alert>
+      )}
       <form onSubmit={onSubmit}>
         <div className="dialog-content">
           <div className={`${classes.componentVersion} dialog-row`}>

@@ -6,10 +6,11 @@ import { DialogContext, IDialogContext } from '../context/DialogProvider';
 import { DialogResponse, DIALOG_ACTIONS } from '../context/types';
 import { WorkbenchContext, IWorkbenchContext } from '../features/workbench/store';
 
-
 const useContextual = () => {
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
-  const { state, dispatch, executeBatch, restoreFile, ignoreFile } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, isFilterActive, dispatch, executeBatch, restoreFile, ignoreFile } = useContext(
+    WorkbenchContext
+  ) as IWorkbenchContext;
 
   const showOverwrite = (node: any) => node.hasIdentified || node.hasIgnored;
 
@@ -25,14 +26,19 @@ const useContextual = () => {
   };
 
   const showConfirmDialog = async (): Promise<DialogResponse> => {
-    return dialogCtrl.openAlertDialog('This action will be executed on all files within this folder. Are you sure?', [
-      { label: 'Cancel', action: 'cancel', role: 'cancel' },
-      { label: 'Yes', role: 'success' },
-    ]);
+    return dialogCtrl.openAlertDialog(
+      !isFilterActive
+        ? 'This action will be executed on all files within this folder. Are you sure?'
+        : 'This action will be executed on all filtered files within this folder. Are you sure?',
+      [
+        { label: 'Cancel', action: 'cancel', role: 'cancel' },
+        { label: 'Yes', role: 'success' },
+      ]
+    );
   };
 
   const showPreLoadInventoryDialog = async (path: string, overwrite: boolean): Promise<any> => {
-    const response = await dialogCtrl.openPreLoadInventoryDialog(path, overwrite);
+    const response = await dialogCtrl.openPreLoadInventoryDialog(path, overwrite, isFilterActive);
     return response;
   };
 
@@ -54,7 +60,7 @@ const useContextual = () => {
   };
 
   const identifyAll = async (node: any): Promise<boolean> => {
-    const inventory = await dialogCtrl.openInventory({ usage: 'file' }, state.recentUsedComponents);
+    const inventory = await dialogCtrl.openInventory({ usage: 'file' }, state.recentUsedComponents, isFilterActive);
     if (inventory) {
       const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
       if (inventory && action !== DIALOG_ACTIONS.CANCEL) {

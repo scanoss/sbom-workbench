@@ -24,11 +24,19 @@
   align-items: center;
 }
 
+.align-end {
+  align-items: flex-end;
+}
+
 // displays
 .d-none {
   display: none !important;
 }
 
+// lines
+.line-bottom {
+  border-bottom: 1px solid #eaeaea;
+}
 
 // margins and padding
 

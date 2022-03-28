@@ -37,7 +37,7 @@ const FileTree = () => {
   const history = useHistory();
   const contextual = useContextual();
 
-  const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { state, isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { tree, file } = state;
 
   const [nodes, setNodes] = React.useState([]);
@@ -79,23 +79,23 @@ const FileTree = () => {
         ]
       : [
           {
-            label: 'Accept all',
+            label: !isFilterActive ? 'Accept all' : 'Accept all filtered files',
             click: () => contextual.acceptAll(node),
             enabled: !onlyRestore,
           },
           { type: 'separator' },
           {
-            label: 'Identify all files as...',
+            label: !isFilterActive ? 'Identify all files as...' : 'Identify all filtered files as...',
             click: () => contextual.identifyAll(node),
             enabled: !onlyRestore,
           },
           {
-            label: 'Mark all files as original',
+            label: !isFilterActive ? 'Mark all files as original' : 'Mark all filtered files as original',
             click: () => contextual.ignoreAll(node),
             enabled: !onlyRestore,
           },
           {
-            label: 'Restore all files',
+            label: !isFilterActive ? 'Restore all files' : 'Restore all filtered files',
             click: () => contextual.restoreAll(node),
             enabled: node.hasIdentified || node.hasIgnored,
           },
@@ -137,7 +137,6 @@ const FileTree = () => {
       setNodes(convertTreeToNode(tree, nodes.length > 0 ? nodes : [tree]));
     }
   }, [tree]);
-
 
   return (
     <div className="file-tree-container">
