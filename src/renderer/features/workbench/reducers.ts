@@ -12,6 +12,7 @@ import {
   SET_NODE,
   SET_RECENT_USED_COMPONENT,
   SET_FILTER,
+  RESET_FILTER,
 } from './actions';
 import { ComponentGroup, IWorkbenchFilter, Node } from '../../../api/types';
 
@@ -164,6 +165,12 @@ export default function reducer(state: State = initialState, action): State {
       return {
         ...state,
         filter: clean(override ? filter : { ...state.filter, ...filter }),
+      };
+    }
+    case RESET_FILTER: {
+      return {
+        ...state,
+        filter: clean({ ...state.filter, usage: null, status: null }),
       };
     }
     case RESET:

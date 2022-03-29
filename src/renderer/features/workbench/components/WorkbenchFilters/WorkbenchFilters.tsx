@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   FormControl,
   FormLabel,
@@ -6,7 +6,6 @@ import {
   FormControlLabel,
   Radio,
   FormGroup,
-  Checkbox,
   Box,
   Collapse,
   IconButton,
@@ -14,28 +13,41 @@ import {
   Tooltip,
   Switch,
   Divider,
+  makeStyles,
 } from '@material-ui/core';
 import KeyboardArrowDownOutlinedIcon from '@material-ui/icons/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@material-ui/icons/KeyboardArrowUpOutlined';
 import DeleteIcon from '@material-ui/icons/DeleteOutlined';
-import { FileStatusType, FileTreeViewMode, FileUsageType, IWorkbenchFilter } from '../../../../../api/types';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+
+import { FileStatusType, FileTreeViewMode, FileUsageType } from '../../../../../api/types';
 import { WorkbenchContext } from '../../store';
-import { setFilter } from '../../actions';
+import { setFilter, resetFilter } from '../../actions';
 import { projectService } from '../../../../../api/project-service';
 
+const useStyles = makeStyles((theme) => ({
+  info: {
+    maxWidth: 100,
+    textAlign: 'center',
+    lineHeight: 'normal',
+  },
+}));
+
 const WorkbenchFilters = () => {
-  const { dispatch, state } = useContext(WorkbenchContext);
-  const { filter } = state;
+  const { dispatch, state, isFilterActive } = useContext(WorkbenchContext);
+  const { filter, loaded } = state;
+  const classes = useStyles();
 
   const [open, setOpen] = useState<boolean>(false);
-  const isFilterActive = (currentFilter: IWorkbenchFilter) => currentFilter?.status || currentFilter?.usage;
+  const [fileTreeViewMode, setFileTreeViewMode] = useState<boolean>(false);
 
   const handleChange = (filter, value) => {
     dispatch(setFilter({ [filter]: value !== 'all' ? value : null }));
   };
 
   const handleReset = (event) => {
-    dispatch(setFilter({ status: null, usage: null }));
+    dispatch(resetFilter());
+    setFileTreeViewMode(false);
   };
 
   const handleClick = (filterValue, value) => {
@@ -44,10 +56,9 @@ const WorkbenchFilters = () => {
     }
   };
 
-  const setFileTreeViewMode = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) await projectService.setFileTreeViewMode(FileTreeViewMode.PRUNE);
-    else await projectService.setFileTreeViewMode(FileTreeViewMode.DEFAULT);
-  };
+  useEffect(() => {
+    projectService.setFileTreeViewMode(fileTreeViewMode ? FileTreeViewMode.PRUNE : FileTreeViewMode.DEFAULT);
+  }, [fileTreeViewMode]);
 
   const FormControlElement = (props) => {
     const { label } = props;
@@ -62,10 +73,38 @@ const WorkbenchFilters = () => {
     <>
       <Box id="WorkbenchFilters" boxShadow={1} className={`workbench-filters ${open ? 'no-collapsed' : 'collapsed'}`}>
         <header className="workbench-filters-header">
-          <h4 className="mr-1 mb-0 mt-0">Filters</h4>
-          {isFilterActive(filter) && (
-            <Tooltip title="Clean filters">
-              <IconButton size="small" aria-label="clean" className="btn-clean" onClick={handleReset}>
+          <h4 className="mr-1 mb-0 mt-0 d-flex align-end">
+            Filters
+            <Tooltip
+              classes={{ tooltip: classes.info }}
+              title={
+                <>
+                  <p className="mt-1 mb-1">Set global filters to work with a reduce set of results.</p>
+                  <p>
+                    <small>
+                      USAGE <br />
+                      Filter by match type. Full file or snippet match.
+                    </small>
+                  </p>
+                  <p>
+                    <small>
+                      STATUS <br />
+                      Filter by identification status.
+                    </small>
+                  </p>
+                </>
+              }
+              placement="bottom"
+              arrow
+            >
+              <small>
+                <InfoOutlinedIcon className="ml-1" fontSize="inherit" />
+              </small>
+            </Tooltip>
+          </h4>
+          {isFilterActive && (
+            <Tooltip title="Clear filters">
+              <IconButton size="small" aria-label="clear" className="btn-clean" onClick={handleReset}>
                 <DeleteIcon fontSize="inherit" />
               </IconButton>
             </Tooltip>
@@ -73,7 +112,10 @@ const WorkbenchFilters = () => {
         </header>
         <Collapse in={open} collapsedHeight={34}>
           <form className="workbench-filters-body">
-            <FormControl component="fieldset" className="workbench-filters-group usage">
+            <FormControl
+              component="fieldset"
+              className={`workbench-filters-group usage ${filter?.usage ? 'active' : ''}`}
+            >
               <FormLabel component="span">Usage</FormLabel>
               <RadioGroup
                 aria-label="usage"
@@ -91,7 +133,10 @@ const WorkbenchFilters = () => {
 
             <Divider orientation="vertical" flexItem />
 
-            <FormControl component="fieldset" className="workbench-filters-group status">
+            <FormControl
+              component="fieldset"
+              className={`workbench-filters-group usage ${filter?.status ? 'active' : ''}`}
+            >
               <FormLabel component="span">Status</FormLabel>
               <RadioGroup
                 aria-label="status"
@@ -133,11 +178,29 @@ const WorkbenchFilters = () => {
             <Divider orientation="vertical" flexItem />
 
             <FormGroup>
-              <Tooltip title="Show only filtered matches" disableHoverListener={open} placement="top" arrow>
+              <Tooltip
+                classes={{ tooltip: classes.info }}
+                placement={open ? 'right' : 'bottom'}
+                title={
+                  <>
+                    <p className="mt-1 mb-1">Show only filtered matches in filetree</p>
+                  </>
+                }
+                disableHoverListener={open}
+                arrow
+              >
                 <FormControlLabel
+                  disabled={!isFilterActive}
                   className="tree-toggle-switch"
-                  control={<Switch onChange={setFileTreeViewMode} size="small" color="primary" />}
-                  label={open ? <small>Show only filtered matches</small> : ''}
+                  control={
+                    <Switch
+                      onChange={(e) => setFileTreeViewMode(e.target.checked)}
+                      checked={fileTreeViewMode}
+                      size="small"
+                      color="primary"
+                    />
+                  }
+                  label={open ? <small>Show only filtered matches in filetree</small> : ''}
                 />
               </Tooltip>
             </FormGroup>

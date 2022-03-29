@@ -16,14 +16,14 @@ import { PreLoadInventoryDialog } from '../ui/dialog/PreLoadInventoryDialog';
 import { ProgressDialog } from '../ui/dialog/ProgressDialog';
 
 export interface IDialogContext {
-  openInventory: (inventory: Partial<InventoryForm>, recentUsedComponents: string[]) => Promise<Inventory | null>;
+  openInventory: (inventory: Partial<InventoryForm>, recentUsedComponents: string[], showInfoFilter: boolean) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
   openAlertDialog: (message?: string, buttons?: any[]) => Promise<DialogResponse>;
   openLicenseCreate: (save?: boolean) => Promise<DialogResponse>;
   openSettings: () => Promise<DialogResponse>;
   openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
-  openPreLoadInventoryDialog: (folder: string, overwrite: boolean) => Promise<boolean>;
+  openPreLoadInventoryDialog: (folder: string, overwrite: boolean, showInfoFilter: boolean) => Promise<boolean>;
   createProgressDialog: (message: string) => Promise<LoaderController>;
 }
 
@@ -33,18 +33,21 @@ export const DialogProvider: React.FC = ({ children }) => {
   const [inventoryDialog, setInventoryDialog] = useState<{
     open: boolean;
     inventory: Partial<InventoryForm>;
+    showInfoFilter: boolean;
     recentUsedComponents: string[];
     onClose?: (inventory) => void;
-  }>({ open: false, inventory: {}, recentUsedComponents: [] });
+  }>({ open: false, inventory: {}, recentUsedComponents: [], showInfoFilter: false });
 
   const openInventory = (
     inventory: Partial<InventoryForm>,
-    recentUsedComponents: string[]
+    recentUsedComponents: string[],
+    showInfoFilter = false,
   ): Promise<Inventory | null> => {
     return new Promise<Inventory>((resolve) => {
       setInventoryDialog({
         inventory,
         recentUsedComponents,
+        showInfoFilter,
         open: true,
         onClose: (inv) => {
           setInventoryDialog((dialog) => ({ ...dialog, open: false }));
@@ -219,15 +222,17 @@ export const DialogProvider: React.FC = ({ children }) => {
     folder: string;
     open: boolean;
     overwrite: boolean;
+    showInfoFilter: boolean;
     onClose?: (response: any) => void;
-  }>({ folder: '', open: false, overwrite: false });
+  }>({ folder: '', open: false, overwrite: false, showInfoFilter: false });
 
-  const openPreLoadInventoryDialog = (folder: string, overwrite: boolean) => {
+  const openPreLoadInventoryDialog = (folder: string, overwrite: boolean, showInfoFilter = false) => {
     return new Promise<boolean>((resolve) => {
       setPreLoadInventoryDialog({
         overwrite,
         folder,
         open: true,
+        showInfoFilter,
         onClose: (response) => {
           setPreLoadInventoryDialog((dialog) => ({ ...dialog, open: false }));
           resolve(response);
@@ -269,6 +274,7 @@ export const DialogProvider: React.FC = ({ children }) => {
       <InventoryDialog
         open={inventoryDialog.open}
         inventory={inventoryDialog.inventory}
+        showInfoFilter={inventoryDialog.showInfoFilter}
         onCancel={() => inventoryDialog.onClose && inventoryDialog.onClose(null)}
         onClose={(inventory) => inventoryDialog.onClose && inventoryDialog.onClose(inventory)}
         recentUsedComponents={inventoryDialog.recentUsedComponents}
@@ -320,6 +326,7 @@ export const DialogProvider: React.FC = ({ children }) => {
         folder={preLoadInventory.folder}
         open={preLoadInventory.open}
         overwrite={preLoadInventory.overwrite}
+        showInfoFilter={preLoadInventory.showInfoFilter}
         onCancel={() => preLoadInventory.onClose && preLoadInventory.onClose(null)}
         onClose={(response) => preLoadInventory.onClose && preLoadInventory.onClose(response)}
       />

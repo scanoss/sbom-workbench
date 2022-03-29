@@ -34,6 +34,7 @@ export interface IWorkbenchContext {
 
   state: State;
   dispatch: any;
+  isFilterActive: boolean;
 }
 
 export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(null);
@@ -164,6 +165,8 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     dispatch(setCurrentNode(node));
   };
 
+  const isFilterActive: boolean = !!state.filter?.status || !!state.filter?.usage;
+
   useEffect(async () => {
     if (state.loaded) {
       await projectService.setFilter(state.filter);
@@ -216,6 +219,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       detachFile,
       deleteInventory,
       executeBatch,
+      isFilterActive,
     }),
     [
       state,
@@ -229,6 +233,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       detachFile,
       deleteInventory,
       executeBatch,
+      isFilterActive,
     ]
   );
 

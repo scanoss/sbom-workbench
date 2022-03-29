@@ -8,7 +8,7 @@
     flex-direction: column;
     align-items: flex-start;
 
-    margin: 16px 16px 0;
+    margin: 10px 16px 0;
   }
 
   .MuiFormControlLabel-root {
@@ -94,12 +94,18 @@
   }
 
   .workbench-filters-group  {
+    align-items: flex-start;
     margin-bottom: 16px;
 
     .MuiFormLabel-root {
       margin-right: 8px;
       font-size: 14px;
       margin-bottom: 8px;
+    }
+
+    &.active .MuiFormLabel-root  {
+      color: rgba(0, 0, 0, 0.87);
+      font-weight: 500;
     }
 
     .MuiRadio-root {
