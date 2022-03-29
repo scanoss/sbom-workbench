@@ -1,12 +1,12 @@
 import React from 'react';
-import { Switch, Route, useHistory, useRouteMatch } from 'react-router-dom';
+import { Switch, Route, useRouteMatch } from 'react-router-dom';
+import FilterSnackbar from './components/FilterSnackbar';
 import { ComponentDetail } from './pages/ComponentDetail/ComponentDetail';
 import { ComponentList } from './pages/ComponentList/ComponentList';
 import { Editor } from './pages/Editor/Editor';
 
 const Detected = () => {
-  const history = useHistory();
-  const { path, url } = useRouteMatch();
+  const { path } = useRouteMatch();
 
   return (
     <>
@@ -21,6 +21,8 @@ const Detected = () => {
           <Editor />
         </Route>
       </Switch>
+
+      <FilterSnackbar />
     </>
   );
 };

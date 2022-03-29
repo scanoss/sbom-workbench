@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
 
 const WorkbenchFilters = () => {
   const { dispatch, state, isFilterActive } = useContext(WorkbenchContext);
-  const { filter } = state;
+  const { filter, loaded } = state;
   const classes = useStyles();
 
   const [open, setOpen] = useState<boolean>(false);
@@ -83,13 +83,13 @@ const WorkbenchFilters = () => {
                   <p>
                     <small>
                       USAGE <br />
-                      Filter by complete file or code snippet match.
+                      Filter by match type. Full file or snippet match.
                     </small>
                   </p>
                   <p>
                     <small>
                       STATUS <br />
-                      Filter by file status.
+                      Filter by identification status.
                     </small>
                   </p>
                 </>

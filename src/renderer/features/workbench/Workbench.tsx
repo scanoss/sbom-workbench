@@ -53,7 +53,7 @@ const Workbench = () => {
         pane1Style={report ? { display: 'none' } : {}}
       >
         <aside className="panel explorer">
-          {ENABLE_WORKBENCH_FILTERS && <WorkbenchFilters />}
+          {ENABLE_WORKBENCH_FILTERS && loaded && <WorkbenchFilters />}
           <FileTree />
         </aside>
         <main id="Workbench" className="match-info">
