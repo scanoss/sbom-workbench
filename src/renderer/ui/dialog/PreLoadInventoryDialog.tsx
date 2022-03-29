@@ -136,12 +136,12 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
     <div>
       <Dialog open={open} maxWidth="sm" scroll="body" fullWidth onClose={onCancel} className={`${classes.size} dialog`}>
         <span className="dialog-title">Accept All</span>
-        {showInfoFilter && (
-          <Alert className="line-bottom" severity="info">
-            This action will be applied based on your current filter criteria.
-          </Alert>
-        )}
         <DialogContent>
+          {showInfoFilter && (
+            <Alert className="mt-1 mb-1" severity="info" >
+              This action will be applied based on your current filter criteria.
+            </Alert>
+          )}
           <FormControlLabel control={<Checkbox checked={AllChecked()} onClick={() => selectAll()} />} label="All" />
           <hr className="divider-no-license" />
           <div className="list-container">

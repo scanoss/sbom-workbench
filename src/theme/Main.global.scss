@@ -38,6 +38,15 @@ a {
 
 }
 
+.MuiAlert-root {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+
+.MuiAlert-standardInfo {
+  color: #5387f8 !important;
+  border: 1px solid #2196f3;
+}
 
 .MuiChip-root.identified {
   border-radius: 4px;

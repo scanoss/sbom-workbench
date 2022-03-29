@@ -242,13 +242,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       onClose={onCancel}
     >
       <span className="dialog-title">{!form.id ? 'Identify Component' : 'Edit Identification'}</span>
-      {showInfoFilter && (
-        <Alert className="line-bottom" severity="info">
-          This action will be applied based on your current filter criteria.
-        </Alert>
-      )}
       <form onSubmit={onSubmit}>
         <div className="dialog-content">
+          {showInfoFilter && (
+            <Alert className="" severity="info">
+              This action will be applied based on your current filter criteria.
+            </Alert>
+          )}
           <div className={`${classes.componentVersion} dialog-row`}>
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
