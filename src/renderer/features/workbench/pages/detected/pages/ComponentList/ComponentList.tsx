@@ -1,14 +1,15 @@
-import { makeStyles, Paper, IconButton, InputBase, Link } from '@material-ui/core';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Alert } from '@material-ui/lab';
-import { AppContext, IAppContext } from '../../../../../../context/AppProvider';
+import { Button, Link } from '@material-ui/core';
+import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
-import { setComponent } from '../../../../actions';
+import { resetFilter, setComponent } from '../../../../actions';
 import usePagination from '../../../../../../hooks/usePagination';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
+import EmptyResult from './components/EmptyResult/EmptyResult';
 
 const filter = (items, query) => {
   if (!items) {
@@ -27,32 +28,13 @@ const filter = (items, query) => {
   return result;
 };
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: '2px 4px',
-    display: 'flex',
-    alignItems: 'center',
-    width: 420,
-  },
-  input: {
-    marginLeft: theme.spacing(1),
-    flex: 1,
-  },
-  iconButton: {
-    padding: 10,
-  },
-}));
-
 export const ComponentList = () => {
   const history = useHistory();
-  const classes = useStyles();
 
   const { limit, onScroll } = usePagination(20);
 
-  const { scanBasePath } = useContext(AppContext) as IAppContext;
   const { state, dispatch, isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
-
-  const { name, components } = state;
+  const { components } = state;
 
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filter(components, searchQuery);
@@ -84,23 +66,26 @@ export const ComponentList = () => {
               ))}
             </section>
           ) : (
-            <p>
-              {searchQuery ? (
-                <>
-                  Not results found with <strong>{searchQuery} </strong>
-                </>
-              ) : (
-                <>
-                  {isFilterActive ? (
-                    <>
-                      No components were detected matching the <strong>current filter criteria</strong>
-                    </>
-                  ) : (
-                    <>No components were detected</>
-                  )}
-                </>
-              )}
-            </p>
+            <>
+              <EmptyResult>
+                {searchQuery ? (
+                  <>Not results found with &quot;{searchQuery}&quot;</>
+                ) : isFilterActive ? (
+                  <>
+                    <div className="mb-3">No components found matching the current filter criteria</div>
+                    <Button
+                      size="small"
+                      startIcon={<DeleteForeverOutlinedIcon />}
+                      onClick={() => dispatch(resetFilter())}
+                    >
+                      CLEAR FILTERS
+                    </Button>
+                  </>
+                ) : (
+                  <>No components were detected</>
+                )}
+              </EmptyResult>
+            </>
           )}
 
           {filterItems?.length > limit && (

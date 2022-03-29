@@ -22,7 +22,7 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 
 import { FileStatusType, FileTreeViewMode, FileUsageType } from '../../../../../api/types';
 import { WorkbenchContext } from '../../store';
-import { setFilter } from '../../actions';
+import { setFilter, resetFilter } from '../../actions';
 import { projectService } from '../../../../../api/project-service';
 
 const useStyles = makeStyles((theme) => ({
@@ -46,7 +46,7 @@ const WorkbenchFilters = () => {
   };
 
   const handleReset = (event) => {
-    dispatch(setFilter({ status: null, usage: null }));
+    dispatch(resetFilter());
     setFileTreeViewMode(false);
   };
 

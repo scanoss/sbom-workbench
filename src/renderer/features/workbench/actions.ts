@@ -11,6 +11,7 @@ export const SET_VERSION = 'APP/WORKBENCH/SET_VERSION';
 export const SET_HISTORY = 'APP/WORKBENCH/SET_HISTORY';
 export const SET_NODE = 'APP/WORKBENCH/SET_NODE';
 export const SET_FILTER = 'APP/WORKBENCH/SET_FILTER';
+export const RESET_FILTER = 'APP/WORKBENCH/RESET_FILTER';
 export const SET_RECENT_USED_COMPONENT = 'APP/WORKBENCH/SET_RECENT_USED_COMPONENT';
 export const RESET = 'APP/WORKBENCH/RESET';
 
@@ -67,6 +68,10 @@ export const setFilter = (filter: IWorkbenchFilter, override = false) => ({
 export const setRecentUsedComponent = (purl: string) => ({
   type: SET_RECENT_USED_COMPONENT,
   purl,
+});
+
+export const resetFilter = () => ({
+  type: RESET_FILTER,
 });
 
 export const reset = () => ({

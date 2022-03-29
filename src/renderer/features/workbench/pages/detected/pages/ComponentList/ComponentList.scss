@@ -1,17 +1,22 @@
 #ComponentList, #IdentifiedList {
   display: grid;
-  grid-template-rows: auto 1fr;
+  // grid-template-rows: auto 1fr;
   height: 100%;
 
   .app-page {
     height: 100%;
+    display: grid;
   }
 
   .app-header {
     .search-box {
       width: $search-box-width
     }
+  }
 
+  .app-content {
+    // height: 100%;
+    overflow-y: visible;
   }
 
   .component-list {
