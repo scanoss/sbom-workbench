@@ -16,7 +16,7 @@ const FileViewer = () => {
   const [fileType, setFileType] = React.useState<FileType>(null);
 
   useEffect(() => {
-    const dep = dependencies?.filesList?.find((d) => d.file === file)?.dependenciesList;
+    const dep = dependencies.has(file);
     setFileType(dep ? FileType.dependencies : FileType.code);
   }, [file]);
 
