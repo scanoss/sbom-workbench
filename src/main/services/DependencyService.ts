@@ -30,8 +30,8 @@ class DependencyService {
 
   public async accept(params: any): Promise<DependencyDTO> {
     try {
-      if (!params.id) throw new Error('Dependency id is required');
-      const queryBuilderDependency = QueryBuilderCreator.create({ id: params.id });
+      if (!params.dependencyId) throw new Error('Dependency id is required');
+      const queryBuilderDependency = QueryBuilderCreator.create({ id: params.dependencyId });
       let dependency: any = (await modelProvider.model.dependency.getAll(queryBuilderDependency))[0];
 
       const queryBuilerComp = QueryBuilderCreator.create({ purl: params.purl, version: params.version });
@@ -64,7 +64,7 @@ class DependencyService {
       }
       await modelProvider.model.dependency.update(dependency);
       await modelProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.license, source: 'declared' });
-      const response = (await this.getAll({ id: params.id }))[0];
+      const response = (await this.getAll({ id: params.dependencyId }))[0];
       return response;
     } catch (error: any) {
       log.error(error);

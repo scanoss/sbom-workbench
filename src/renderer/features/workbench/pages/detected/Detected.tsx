@@ -3,7 +3,7 @@ import { Switch, Route, useRouteMatch } from 'react-router-dom';
 import FilterSnackbar from './components/FilterSnackbar';
 import { ComponentDetail } from './pages/ComponentDetail/ComponentDetail';
 import { ComponentList } from './pages/ComponentList/ComponentList';
-import { Editor } from './pages/Editor/Editor';
+import FileViewer from './pages/FileViewer/FileViewer';
 
 const Detected = () => {
   const { path } = useRouteMatch();
@@ -18,7 +18,7 @@ const Detected = () => {
           <ComponentDetail />
         </Route>
         <Route path={`${path}/file`}>
-          <Editor />
+          <FileViewer />
         </Route>
       </Switch>
 

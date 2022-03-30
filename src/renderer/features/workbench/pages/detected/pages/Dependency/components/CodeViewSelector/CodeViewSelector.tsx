@@ -5,13 +5,18 @@ import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginBottom: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   button: {
     fontSize: 16,
     minWidth: 32,
   },
 }));
+
+export enum CodeViewSelectorMode {
+  CODE,
+  GRAPH,
+}
 
 const CodeViewSelector = ({ active, setView }) => {
   const classes = useStyles();
@@ -22,8 +27,8 @@ const CodeViewSelector = ({ active, setView }) => {
         <Tooltip title="Raw view" arrow>
           <Button
             className={classes.button}
-            onClick={() => setView('code')}
-            color={active === 'code' ? 'primary' : 'default'}
+            onClick={() => setView(CodeViewSelectorMode.CODE)}
+            color={active === CodeViewSelectorMode.CODE ? 'primary' : 'default'}
             aria-label="code"
           >
             <CodeOutlinedIcon fontSize="inherit" />
@@ -32,8 +37,8 @@ const CodeViewSelector = ({ active, setView }) => {
         <Tooltip title="Dependency view" arrow>
           <Button
             className={classes.button}
-            onClick={() => setView('graph')}
-            color={active === 'graph' ? 'primary' : 'default'}
+            onClick={() => setView(CodeViewSelectorMode.GRAPH)}
+            color={active === CodeViewSelectorMode.GRAPH ? 'primary' : 'default'}
             aria-label="graph"
           >
             <AccountTreeOutlined fontSize="inherit" />
