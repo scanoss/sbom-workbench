@@ -127,6 +127,25 @@ export class DependencyModel extends Model {
     });
   }
 
+  public getDependenciesFiles(): Promise<Array<Record<string, string>>> {
+    return new Promise<Array<Record<string, string>>> (async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.all(
+          'SELECT DISTINCT f.path FROM files f INNER JOIN dependencies d ON d.fileId=f.fileId;',
+          async (err: any, dep: Array<Record<string, string>>) => {
+            db.close();
+            if (err) throw err;
+            resolve(dep);
+          }
+        );
+      } catch (error: any) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
   public getEntityMapper(): Record<string, string> {
     return DependencyModel.entityMapper;
   }
