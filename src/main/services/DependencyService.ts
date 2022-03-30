@@ -30,7 +30,7 @@ class DependencyService {
 
   public async accept(params: any): Promise<DependencyDTO> {
     try {
-      if (!params.id) throw new Error('Dependency id is required');
+      if (!params.dependencyId) throw new Error('Dependency id is required');
       const queryBuilderDependency = QueryBuilderCreator.create({ id: params.dependencyId });
       let dependency: any = (await modelProvider.model.dependency.getAll(queryBuilderDependency))[0];
       const queryBuilerComp = QueryBuilderCreator.create({ purl: params.purl, version: params.version });
@@ -63,7 +63,7 @@ class DependencyService {
       }
       await modelProvider.model.dependency.update(dependency);
       await modelProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.license, source: 'declared' });
-      const response = (await this.getAll({ id: params.id }))[0];
+      const response = (await this.getAll({ id: params.dependencyId }))[0];
       return response;
     } catch (error: any) {
       log.error(error);
@@ -92,6 +92,27 @@ class DependencyService {
         dependencies.add(d.path);
       });
       return dependencies;
+   } catch (error: any) {
+      log.error(error);
+      return error;
+   }
+  }
+  
+  public async acceptAll(depFilePath: string): Promise<Array<DependencyDTO>> {
+    try {
+      let dependencies = await this.getAll({ filePath: depFilePath });
+      dependencies = dependencies.filter((dep: any) => dep.valid === true);
+      const response = [];
+      for (const dep of dependencies) {
+        const d = await this.accept({
+          id: dep.dependencyId,
+          purl: dep.purl,
+          version: dep.version,
+          license: dep.licenses[0],
+        });
+        response.push(d);
+      }
+      return response;
     } catch (error: any) {
       log.error(error);
       return error;

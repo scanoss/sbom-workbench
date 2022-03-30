@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
-import { IDependency } from 'scanoss';
 import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
@@ -18,11 +17,7 @@ import { InventoryForm } from '../../../../../../context/types';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import { getExtension } from '../../../../../../../shared/utils/utils';
 import { fileService } from '../../../../../../../api/services/file.service';
-import CodeViewSelector from './components/CodeViewSelector/CodeViewSelector';
-import DependencyTree from './components/DependencyTree/DependencyTree';
 import NoLocalFile from './components/NoLocalFile/NoLocalFile';
-import { dependencyService } from '../../../../../../../api/services/dependency.service';
-
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -31,7 +26,7 @@ export interface FileContent {
   error: boolean;
 }
 
-export const Editor = () => {
+const Editor = () => {
   const history = useHistory();
 
   const { state, dispatch, createInventory, ignoreFile, restoreFile, detachFile } = useContext(
@@ -49,8 +44,6 @@ export const Editor = () => {
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
   const [fullFile, setFullFile] = useState<boolean>(null);
-  const [dependencies, setDependencies] = useState<IDependency[]>(null);
-  const [view, setView] = useState<'code' | 'graph'>('code');
 
   const init = () => {
     setMatchInfo(null);
@@ -59,16 +52,10 @@ export const Editor = () => {
     setLocalFileContent({ content: null, error: false });
     setRemoteFileContent({ content: null, error: false });
 
-
     getInventories();
     getResults();
 
-
     if (file) {
-      getDependencies(file);
-      const dep = state.dependencies?.filesList?.find((d) => d.file === file)?.dependenciesList;
-      setView(dep ? 'graph' : 'code');
-      setDependencies(dep);
       loadLocalFile(file);
     }
   };
@@ -93,11 +80,6 @@ export const Editor = () => {
       setRemoteFileContent({ content: null, error: true });
     }
   };
-
-  const getDependencies = async (path: string): Promise<any> => {
-    const dep = await dependencyService.getAll({ path });
-    console.log (dep);
-  }
 
   const getInventories = async () => {
     const inv = await inventoryService.getAll({ files: [file] });
@@ -307,22 +289,17 @@ export const Editor = () => {
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
                 <>
-                  {dependencies && <CodeViewSelector active={view} setView={setView} />}
-                  {view === 'code' ? (
-                    <MemoCodeEditor
-                      language={getExtension(file)}
-                      content={localFileContent.content}
-                      highlight={currentMatch?.lines || null}
-                    />
-                  ) : (
-                    <DependencyTree dependencies={dependencies} />
-                  )}
+                  <MemoCodeEditor
+                    language={getExtension(file)}
+                    content={localFileContent.content}
+                    highlight={currentMatch?.lines || null}
+                  />
                 </>
               ) : imported ? <NoLocalFile /> : null}
             </div>
             {inventories?.length === 0 && matchInfo?.length === 0 ? (
               <div className="editor">
-                <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} showLabel={!dependencies} />
+                <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} showLabel />
               </div>
             ) : (
               <div className="editor">
