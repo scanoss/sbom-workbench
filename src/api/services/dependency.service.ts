@@ -22,5 +22,3 @@ class DepencyService extends BaseService {
 }
 
 export const dependencyService = new DepencyService();
-
-document.dep = dependencyService;
