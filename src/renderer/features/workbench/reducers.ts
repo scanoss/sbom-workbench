@@ -1,4 +1,3 @@
-import { IDependencyResponse } from 'scanoss';
 import {
   LOAD_SCAN_FAIL,
   LOAD_SCAN_SUCCESS,
@@ -25,7 +24,7 @@ export interface State {
   progress: number;
   summary: any;
   tree: any;
-  dependencies: IDependencyResponse;
+  dependencies: Set<string>;
   file: string | null;
   mainComponents: ComponentGroup[];
   recentUsedComponents: Array<string>;
@@ -46,7 +45,7 @@ export const initialState: State = {
   progress: 0,
   summary: null,
   tree: null,
-  dependencies: null,
+  dependencies: new Set<string>(),
   file: null,
   mainComponents: null,
   recentUsedComponents: null,

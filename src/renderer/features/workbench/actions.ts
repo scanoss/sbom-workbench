@@ -15,7 +15,7 @@ export const RESET_FILTER = 'APP/WORKBENCH/RESET_FILTER';
 export const SET_RECENT_USED_COMPONENT = 'APP/WORKBENCH/SET_RECENT_USED_COMPONENT';
 export const RESET = 'APP/WORKBENCH/RESET';
 
-export const loadScanSuccess = (name, imported, tree, components: ComponentGroup[], dependencies: IDependencyResponse) => ({
+export const loadScanSuccess = (name, imported, tree, components: ComponentGroup[], dependencies: Set<string>) => ({
   type: LOAD_SCAN_SUCCESS,
   name,
   imported,
