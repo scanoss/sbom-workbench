@@ -84,6 +84,27 @@ class DependencyService {
       return error;
     }
   }
+
+  public async acceptAll(depFilePath: string): Promise<Array<DependencyDTO>> {
+    try {
+      let dependencies = await this.getAll({ filePath: depFilePath });
+      dependencies = dependencies.filter((dep: any) => dep.valid === true);
+      const response = [];
+      for (const dep of dependencies) {
+        const d = await this.accept({
+          id: dep.dependencyId,
+          purl: dep.purl,
+          version: dep.version,
+          license: dep.licenses[0],
+        });
+        response.push(d);
+      }
+      return response;
+    } catch (error: any) {
+      log.error(error);
+      return error;
+    }
+  }
 }
 
 export const dependencyService = new DependencyService();
