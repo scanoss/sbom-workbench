@@ -28,6 +28,8 @@ class DependencyHelper {
       return acc;
     }, {});
     dep.forEach((d) => {
+      if (d.valid === 1) d.valid = true;
+      else d.valid = false;
       if (d.inventory) {
         d.inventory = inv[d.inventory];
         d.component = comp[d.compid];
