@@ -86,13 +86,13 @@ export class DependencyModel extends Model {
     });
   }
 
-  public update(dependency: any, reject?: boolean) {
+  public update(dependency: any, rejected?: boolean) {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.run(
           `UPDATE dependencies SET rejectedAt=? WHERE purl=? AND version=?;`,
-          reject ? new Date().toISOString() : null,
+          rejected ? new Date().toISOString() : null,
           dependency.purl,
           dependency.version,
           async (err: any, dep: any) => {
