@@ -1,8 +1,7 @@
 import { ipcRenderer } from 'electron';
-import { IDependencyResponse } from 'scanoss';
 import { projectService } from '../../api/services/project.service';
 import { componentService } from '../../api/services/component.service';
-import { ComponentGroup, IWorkbenchFilter, ComponentSource, IWorkbenchFilterParams } from '../../api/types';
+import { ComponentGroup, ComponentSource, IWorkbenchFilterParams } from '../../api/types';
 import { sortComponents } from '../../shared/utils/scan-util';
 import { IpcEvents } from '../../api/ipc-events';
 import AppConfig from '../../config/AppConfigModule';
@@ -14,7 +13,7 @@ export interface ScanResult {
   imported: boolean;
   scanRoot: string;
   fileTree: any;
-  dependencies: IDependencyResponse;
+  dependencies: Set<string>;
 }
 
 class WorkbenchController {
