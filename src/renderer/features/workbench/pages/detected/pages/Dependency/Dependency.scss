@@ -1,0 +1,30 @@
+#Dependency {
+  display: grid;
+
+  .app-header {
+    padding-bottom: 0;
+
+    .subheader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      margin-top: 16px;
+
+      .search-box {
+        width: $search-box-width;
+        margin-bottom: 16px;
+      }
+
+    }
+
+
+  }
+
+  .app-content {
+
+  }
+}
+
+
+

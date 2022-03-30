@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import Tree, { renderers as Renderers, selectors } from 'react-virtualized-tree';
+import Tree, { renderers as Renderers } from 'react-virtualized-tree';
 import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '../../../../../shared/utils/filetree-utils';
 import useContextual from '../../../../hooks/useContextual';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
@@ -28,7 +28,7 @@ const FileTreeNode = ({ node, onClick, onContextMenu }) => {
 
         {node.type === 'file' && node.isDependencyFile && <i className="fa fa-dependency-file" />}
       </span>
-      <span className='ft-node-label'>{node.name}</span>
+      <span className="ft-node-label">{node.name}</span>
     </span>
   );
 };
@@ -38,7 +38,7 @@ const FileTree = () => {
   const contextual = useContextual();
 
   const { state, isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const { tree, file } = state;
+  const { tree } = state;
 
   const [nodes, setNodes] = React.useState([]);
 
@@ -47,7 +47,6 @@ const FileTree = () => {
   };
 
   const onSelectNode = async (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
-    console.log(node);
     const { children, value } = node;
     if (!children) {
       history.push({
@@ -138,33 +137,42 @@ const FileTree = () => {
     }
   }, [tree]);
 
+  // loader
+  if (!tree) {
+    return (
+      <div className="loader">
+        <span>Indexing...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="file-tree-container">
-      {tree ? (
-        <Tree nodes={nodes} onChange={handleChange}>
-          {({ style, node, ...rest }: any) => (
-            <div
-              style={{ ...style, ...{ paddingLeft: style.marginLeft, margin: 0 } }}
-              className={`ft-node ${node.className} ${node.id === state.node?.path ? 'selected' : ''} ${node.isFilteredMatch ? 'matched' : ''} ${node.isDependencyFile ? 'is-dependency-file' : ''}`}
+      <Tree nodes={nodes} onChange={handleChange}>
+        {({ style, node, ...rest }: any) => (
+          <div
+            style={{ ...style, ...{ paddingLeft: style.marginLeft, margin: 0 } }}
+            className={`
+              ft-node
+              ${node.className}
+              ${node.id === state.node?.path ? 'selected' : ''}
+              ${node.isFilteredMatch ? 'matched' : ''}
+              ${node.isDependencyFile ? 'is-dependency-file' : ''}
+            `}
+          >
+            <Expandable
+              node={node}
+              {...rest}
+              iconsClassNameMap={{
+                expanded: 'fa fa-angle-down',
+                collapsed: 'fa fa-angle-right',
+              }}
             >
-               <Expandable
-                node={node}
-                {...rest}
-                iconsClassNameMap={{
-                  expanded: 'fa fa-angle-down',
-                  collapsed: 'fa fa-angle-right',
-                }}
-              >
-                <FileTreeNode node={node} onClick={onSelectNode} onContextMenu={onContextMenu} />
-              </Expandable>
-            </div>
-          )}
-        </Tree>
-      ) : (
-        <div className="loader">
-          <span>Indexing...</span>
-        </div>
-      )}
+              <FileTreeNode node={node} onClick={onSelectNode} onContextMenu={onContextMenu} />
+            </Expandable>
+          </div>
+        )}
+      </Tree>
     </div>
   );
 };

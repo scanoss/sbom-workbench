@@ -30,6 +30,7 @@
 @import './features/workbench/Workbench';
 @import './features/workbench/pages/report/Report.scss';
 @import './features/workbench/pages/detected/pages/Editor/Editor';
+@import './features/workbench/pages/detected/pages/Dependency/Dependency';
 @import './features/workbench/pages/detected/pages/ComponentList/ComponentList';
 @import './features/workbench/pages/detected/pages/ComponentDetail/ComponentDetail';
 @import './features/workbench/pages/identified/pages/InventoryDetail/InventoryDetail.scss';
@@ -49,7 +50,7 @@
 @import './features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 @import './features/workbench/components/ComponentInfo/ComponentInfo.scss';
 @import './features/workbench/components/NoMatchFound/NoMatchFound.scss';
-@import './features/workbench/pages/detected/pages/Editor/components/DependencyTree/DependencyTree';
+@import './features/workbench/pages/detected/pages/Dependency/components/DependencyTree/DependencyTree';
 @import './ui/dialog/PreLoadInventoryDialog.scss';
 @import './components/NotificationCenter/NotificationCenter.scss';
 @import './features/workbench/components/WorkbenchFilters/WorkbenchFilters.scss';
