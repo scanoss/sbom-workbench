@@ -8,6 +8,7 @@ import { Project } from '../../main/workspace/Project';
 import { workspace } from '../../main/workspace/Workspace';
 import { ResumeScanTask } from '../../main/scanner/ResumeScanTask';
 import { ReScanTask } from '../../main/scanner/ReScanTask';
+import { dependencyService } from '../../main/services/DependencyService';
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
   // TO DO factory to create filters depending on arguments
@@ -17,11 +18,10 @@ ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
     logical_tree: p.getTree().getRootFolder(),
     work_root: p.getMyPath(),
     scan_root: p.getScanRoot(),
-    dependencies: await p.getDependencies(),
+    dependencies: await p.getDependencies(), // call dependencyService.getDependenciesFiles() instead of p.getDependencies()
     uuid: p.getUUID(),
     source: p.getDto().source,
   };
-
   return {
     status: 'ok',
     message: 'Project loaded',
