@@ -33,7 +33,6 @@ class DependencyService {
       if (!params.dependencyId) throw new Error('Dependency id is required');
       const queryBuilderDependency = QueryBuilderCreator.create({ id: params.dependencyId });
       let dependency: any = (await modelProvider.model.dependency.getAll(queryBuilderDependency))[0];
-
       const queryBuilerComp = QueryBuilderCreator.create({ purl: params.purl, version: params.version });
       let comp = (await modelProvider.model.component.getAll(queryBuilerComp))[0];
       // Adds license to dependency if the user define one
@@ -85,6 +84,20 @@ class DependencyService {
     }
   }
 
+  public async getDependenciesFiles(): Promise<Set<string>> {
+    try {
+      const dependencies = new Set<string>();
+      const dep = await modelProvider.model.dependency.getDependenciesFiles();
+      dep.forEach((d) => {
+        dependencies.add(d.path);
+      });
+      return dependencies;
+   } catch (error: any) {
+      log.error(error);
+      return error;
+   }
+  }
+  
   public async acceptAll(depFilePath: string): Promise<Array<DependencyDTO>> {
     try {
       let dependencies = await this.getAll({ filePath: depFilePath });
@@ -105,6 +118,7 @@ class DependencyService {
       return error;
     }
   }
+
 }
 
 export const dependencyService = new DependencyService();
