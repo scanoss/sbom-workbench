@@ -2,6 +2,7 @@ import { ipcMain } from 'electron';
 import { dependencyService } from '../../main/services/DependencyService';
 import { IpcEvents } from '../ipc-events';
 import { Response } from '../Response';
+import { DependencyDTO } from '../types';
 
 ipcMain.handle(IpcEvents.DEPENDENCY_GET_ALL, async (event, params: any) => {
   try {
@@ -23,9 +24,9 @@ ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT, async (event, params: any) => {
   }
 });
 
-ipcMain.handle(IpcEvents.DEPENDENCY_REJECT, async (event, dependencyId: number) => {
+ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE, async (event, dependencyId: number) => {
   try {
-    const dependency = await dependencyService.reject(dependencyId);
+    const dependency = await dependencyService.restore(dependencyId);
     return Response.ok({ message: 'Component created successfully', data: dependency });
   } catch (error: any) {
     console.log('Catch an error: ', error);
@@ -33,9 +34,9 @@ ipcMain.handle(IpcEvents.DEPENDENCY_REJECT, async (event, dependencyId: number) 
   }
 });
 
-ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT_ALL, async (event, depFilePath: string) => {
+ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT_ALL, async (event, acceptedDependencies: Array<DependencyDTO>) => {
   try {
-    const response = await dependencyService.acceptAll(depFilePath);
+    const response = await dependencyService.acceptAll(acceptedDependencies);
     return Response.ok({ message: 'Component created successfully', data: response });
   } catch (error: any) {
     console.log('Catch an error: ', error);
@@ -43,3 +44,12 @@ ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT_ALL, async (event, depFilePath: strin
   }
 });
 
+ipcMain.handle(IpcEvents.DEPENDENCY_REJECT, async (event, dependencyId: number) => {
+  try {
+    const response = await dependencyService.reject(dependencyId);
+    return Response.ok({ message: 'Component created successfully', data: response });
+  } catch (error: any) {
+    console.log('Catch an error: ', error);
+    return Response.fail({ message: error.message });
+  }
+});

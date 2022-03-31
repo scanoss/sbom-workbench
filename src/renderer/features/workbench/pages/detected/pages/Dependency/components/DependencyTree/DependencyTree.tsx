@@ -11,15 +11,23 @@ import {
 } from '@material-ui/core';
 import CheckIcon from '@material-ui/icons/Check';
 import BanIcon from '@material-ui/icons/NotInterested';
+import { RestoreOutlined } from '@material-ui/icons';
+// import { List, AutoSizer } from 'react-virtualized';
 import IconComponent from '../../../../../../components/IconComponent/IconComponent';
 
 interface DependencyTreeProps {
   dependencies: any[]; // TODO: define type
   onDependencyAccept: (dep: any) => void;
   onDependencyReject: (dep: any) => void;
-};
+  onDependencyRestore: (dep: any) => void;
+}
 
-const DependencyTree = ({ dependencies, onDependencyAccept, onDependencyReject }: DependencyTreeProps) => {
+const DependencyTree = ({
+  dependencies,
+  onDependencyAccept,
+  onDependencyReject,
+  onDependencyRestore,
+}: DependencyTreeProps) => {
   return (
     <div id="DependencyTree" className="dependencies-tree">
       <div className="dependencies-tree-header mt-1 mb-2">
@@ -43,9 +51,15 @@ const DependencyTree = ({ dependencies, onDependencyAccept, onDependencyReject }
                   <IconComponent name={dependency.purl.replace(/pkg:.*\//, '')} size={24} />
                 </ListItemIcon>
                 <ListItemText primary={decodeURIComponent(dependency.purl)} />
-                <div className="ml-1">
+                <div className='license-version-container'>
+                <div className="pill-version">
                   <small>{dependency.version || '-'}</small>
                 </div>
+                <div className="pill-license">
+                  <small>{dependency.licenses[0] || '-'}</small>
+                </div>
+                </div>
+
 
                 <div className="item-action-buttons">
                   {dependency.status === 'pending' && (
@@ -62,20 +76,11 @@ const DependencyTree = ({ dependencies, onDependencyAccept, onDependencyReject }
                       </Tooltip>
                     </>
                   )}
-                  {dependency.status === 'ignored' && (
+                  {(dependency.status === 'original' || dependency.status === 'identified') && (
                     <>
-                      <Tooltip title="Accept">
-                        <IconButton size="small" onClick={() => onDependencyAccept(dependency)}>
-                          <CheckIcon className="icon check" fontSize="inherit" />
-                        </IconButton>
-                      </Tooltip>
-                    </>
-                  )}
-                  {dependency.status === 'identified' && (
-                    <>
-                      <Tooltip title="Dismiss">
-                        <IconButton size="small" onClick={() => onDependencyReject(dependency)}>
-                          <BanIcon className="icon ban" fontSize="inherit" />
+                      <Tooltip title="Restore">
+                        <IconButton size="small" onClick={() => onDependencyRestore(dependency)}>
+                          <RestoreOutlined className="icon" fontSize="inherit" />
                         </IconButton>
                       </Tooltip>
                     </>

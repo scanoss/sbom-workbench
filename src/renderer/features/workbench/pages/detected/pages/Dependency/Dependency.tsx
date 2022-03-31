@@ -1,11 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button } from '@material-ui/core';
-import { dialog } from 'electron';
 import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
 import { AppContext, IAppContext } from '../../../../../../context/AppProvider';
-import { FileType, Inventory } from '../../../../../../../api/types';
+import { DependencyDTO, FileType } from '../../../../../../../api/types';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import { getExtension } from '../../../../../../../shared/utils/utils';
 import CodeViewSelector, { CodeViewSelectorMode } from './components/CodeViewSelector/CodeViewSelector';
@@ -14,7 +13,6 @@ import NoLocalFile from './components/NoLocalFile/NoLocalFile';
 import { dependencyService } from '../../../../../../../api/services/dependency.service';
 import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
-import { dialogController } from '../../../../../../controllers/dialog-controller';
 import { DIALOG_ACTIONS } from '../../../../../../context/types';
 
 const MemoCodeEditor = React.memo(CodeEditor);
@@ -41,6 +39,10 @@ const filter = (items, query) => {
   return result;
 };
 
+const validDependencies = (filteredDependencies) => {
+  return filteredDependencies?.filter((item) => item.valid === true && item.status === 'pending');
+};
+
 const Dependency = () => {
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
@@ -55,6 +57,7 @@ const Dependency = () => {
   const [view, setView] = useState<CodeViewSelectorMode>(CodeViewSelectorMode.GRAPH);
 
   const items = filter(dependencies, searchQuery);
+  const validDep: Array<DependencyDTO> = validDependencies(items);
 
   const init = () => {
     setLocalFileContent({ content: null, error: false });
@@ -83,29 +86,29 @@ const Dependency = () => {
   };
 
   const onAcceptAllHandler = async () => {
-    console.log('onAcceptAllPressed');
-
     const { action } = await dialogCtrl.openAlertDialog('Are you sure you want to accept all dependencies?', [
       { label: 'Cancel', role: 'cancel' },
       { label: 'Accept All', action: 'accept', role: 'accept' },
     ]);
 
     if (action !== DIALOG_ACTIONS.CANCEL) {
-      console.log('acceptPressed');
+      await dependencyService.acceptAll(validDep);
+      getDependencies(file);
     }
   };
 
   const onAcceptHandler = async (dependency) => {
-    console.log('onAcceptPressed', dependency);
     await dependencyService.accept(dependency);
+    getDependencies(file);
+  };
 
+  const onRestoreHandler = async (dependency) => {
+    await dependencyService.restore(dependency.dependencyId);
     getDependencies(file);
   };
 
   const onRejectHandler = async (dependency) => {
-    console.log('onRejectPressed', dependency);
-    await dependencyService.reject(dependency);
-
+    await dependencyService.reject(dependency.dependencyId);
     getDependencies(file);
   };
 
@@ -130,12 +133,12 @@ const Dependency = () => {
 
             <Button
               size="small"
-              disabled={dependencies.length === 0}
+              disabled={validDep.length === 0}
               variant="contained"
               color="secondary"
               onClick={onAcceptAllHandler}
             >
-              Accept All ({dependencies.length})
+              Accept All ({validDep.length})
             </Button>
           </section>
         </header>
@@ -150,6 +153,7 @@ const Dependency = () => {
                     dependencies={items}
                     onDependencyAccept={onAcceptHandler}
                     onDependencyReject={onRejectHandler}
+                    onDependencyRestore={onRestoreHandler}
                   />
                 )}
               </>
