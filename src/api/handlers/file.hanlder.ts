@@ -8,6 +8,7 @@ import { NodeStatus } from '../../main/workspace/Tree/Tree/Node';
 import { utilHelper } from '../../main/helpers/UtilHelper';
 import { FilterTrue } from '../../main/batch/Filter/FilterTrue';
 import { resultService } from '../../main/services/ResultService';
+import { modelProvider } from '../../main/services/ModelProvider';
 
 const path = require('path');
 
@@ -76,7 +77,7 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
 ipcMain.handle(IpcEvents.FILE_GET, async (_event, arg: Partial<File>) => {
   let data;
   try {
-    data = await workspace.getOpenedProjects()[0].store.file.get(arg);
+    data = await  modelProvider.model.file.get(arg);
     return { status: 'ok', message: 'Get file', data };
   } catch (error) {
     return { status: 'error', message: 'Get file were not successfully retrieve', data };
@@ -85,7 +86,7 @@ ipcMain.handle(IpcEvents.FILE_GET, async (_event, arg: Partial<File>) => {
 
 ipcMain.handle(IpcEvents.FILE_GET_ID_FROM_PATH, async (_event, arg: string) => {
   try {
-    const data = await workspace.getOpenedProjects()[0].store.file.getIdFromPath(arg);
+    const data = await modelProvider.model.file.getIdFromPath(arg);
     return { status: 'ok', message: 'Get id from file path', data };
   } catch (error) {
     return { status: 'error', message: 'Get file were not successfully retrieve' };
