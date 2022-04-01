@@ -1,7 +1,3 @@
-import { Remove } from "@material-ui/icons";
-import { runMain } from "module";
-import { Export } from "../main/export/Export";
-
 export interface IAppConfig {
   APP_NAME: string;
 
