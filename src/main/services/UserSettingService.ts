@@ -4,7 +4,7 @@ import { IWorkspaceCfg } from '../../api/types';
 import { wsUtils } from '../workspace/WsUtils/WsUtils';
 
 import packageJson from '../../package.json';
-import { API_URL } from '../../shared/Config';
+import AppConfig from '../../config/AppConfigModule';
 
 class UserSettingService {
   private myPath: string;
@@ -16,7 +16,7 @@ class UserSettingService {
   private defaultStore: IWorkspaceCfg = {
     TOKEN: '',
     DEFAULT_API_INDEX: 0,
-    APIS: [{ URL: `${API_URL}/scan/direct`, API_KEY: '', DESCRIPTION: '' }],
+    APIS: [{ URL: `${AppConfig.API_URL}/scan/direct`, API_KEY: '', DESCRIPTION: '' }],
     SCAN_MODE: 'FULL_SCAN',
     VERSION: app.isPackaged === true ? app.getVersion() : packageJson.version,
   };

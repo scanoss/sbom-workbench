@@ -5,7 +5,7 @@ import { componentService } from '../../api/services/component.service';
 import { ComponentGroup, IWorkbenchFilter, ComponentSource, IWorkbenchFilterParams } from '../../api/types';
 import { sortComponents } from '../../shared/utils/scan-util';
 import { IpcEvents } from '../../api/ipc-events';
-import { API_URL } from '../../shared/Config';
+import AppConfig from '../../config/AppConfigModule';
 
 const pathUtil = require('path');
 
@@ -51,7 +51,7 @@ class WorkbenchController {
    */
   public async fetchRemoteFile(hash: string): Promise<string> {
     // TODO: move api url to API Config
-    const response = await fetch(`${API_URL}/file_contents/${hash}`);
+    const response = await fetch(`${AppConfig.API_URL}/file_contents/${hash}`);
     if (!response.ok) throw new Error('File not found');
 
     return response.text();
