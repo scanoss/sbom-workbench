@@ -1,4 +1,4 @@
-import { API_URL } from '../../shared/Config';
+import AppConfig from '../../config/AppConfigModule';
 import { BaseService } from './base.service';
 
 class ObligationsService extends BaseService {
@@ -15,7 +15,7 @@ class ObligationsService extends BaseService {
         return this.cache.get(spdxId);
       }
 
-      const response = await fetch(`${API_URL}/license/obligations/${spdxId}`);
+      const response = await fetch(`${AppConfig.API_URL}/license/obligations/${spdxId}`);
       if (response.ok) {
         const obligations = this.mapper(await response.json());
         this.cache.set(spdxId, obligations);
