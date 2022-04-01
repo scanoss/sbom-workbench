@@ -31,7 +31,7 @@ export class Accept extends Batch {
       filesToUpdate.files = ids;
       const success = await inventoryService.InventoryAttachFileBatch(filesToUpdate);
       if (success) {
-        this.updateTree(ids, NodeStatus.IDENTIFIED);
+        await this.updateTree(ids, NodeStatus.IDENTIFIED);
         return inv;
       }
       throw new Error('inventory accept failed');
