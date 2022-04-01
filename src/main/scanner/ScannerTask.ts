@@ -11,6 +11,8 @@ import { fileHelper } from '../helpers/FileHelper';
 import { resultService } from '../services/ResultService';
 import { componentService } from '../services/ComponentService';
 import { userSettingService } from '../services/UserSettingService';
+import AppConfig from '../../config/AppConfigModule';
+import { AutoAccept } from '../task/Inventory/AutoAccept';
 
 export abstract class ScannerTask extends EventEmitter {
   protected msgToUI!: Electron.WebContents;
@@ -56,6 +58,13 @@ export abstract class ScannerTask extends EventEmitter {
       await this.done(resultPath);
       await this.addDependencies();
       this.project.metadata.setScannerState(ScanState.FINISHED);
+      this.project.metadata.save();
+      if (AppConfig.FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN) {
+        console.log('Auto Accept Enabled');
+        const autoAccept = new AutoAccept();
+        const response = await autoAccept.run();
+        console.log(response);
+      }
       this.project.metadata.save();
       this.sendToUI(IpcEvents.SCANNER_FINISH_SCAN, {
         success: true,
