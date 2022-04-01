@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button } from '@material-ui/core';
+import { Button, Typography } from '@material-ui/core';
 import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
@@ -149,12 +149,25 @@ const Dependency = () => {
                 {view === CodeViewSelectorMode.CODE ? (
                   <MemoCodeEditor language={getExtension(file)} content={localFileContent.content} highlight={null} />
                 ) : (
-                  <DependencyTree
-                    dependencies={items}
-                    onDependencyAccept={onAcceptHandler}
-                    onDependencyReject={onRejectHandler}
-                    onDependencyRestore={onRestoreHandler}
-                  />
+                  <>
+                    <div className="dependencies-tree-header mt-1 mb-2">
+                      <div className="dependencies-tree-header-title">
+                        <Typography variant="subtitle2">
+                          <b>
+                            {items.length}/{dependencies.length}
+                          </b>{' '}
+                          {dependencies.length > 1 ? 'dependencies' : 'dependency'} found
+                        </Typography>
+                      </div>
+                    </div>
+
+                    <DependencyTree
+                      dependencies={items}
+                      onDependencyAccept={onAcceptHandler}
+                      onDependencyReject={onRejectHandler}
+                      onDependencyRestore={onRestoreHandler}
+                    />
+                  </>
                 )}
               </>
             ) : imported ? (

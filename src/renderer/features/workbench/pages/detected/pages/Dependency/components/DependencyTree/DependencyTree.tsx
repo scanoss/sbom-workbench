@@ -20,14 +20,7 @@ const DependencyTree = ({
   onDependencyRestore,
 }: DependencyTreeProps) => {
   return (
-    <div id="DependencyTree" className="dependencies-tree">
-      <div className="dependencies-tree-header mt-1 mb-2">
-        <div className="dependencies-tree-header-title">
-          <Typography variant="subtitle2">
-            <b>{dependencies.length}</b> {dependencies.length > 1 ? 'dependencies' : 'dependency'} found
-          </Typography>
-        </div>
-      </div>
+    <div id="DependencyTree" className="dependencies-tree">      
       <div className="dependencies-tree-content">
         <AutoSizer style={{ width: '100%', height: '200px' }}>
           {({ width, height }) => (
@@ -61,7 +54,6 @@ const DependencyTree = ({
                           <small>{value.licenses[0] || '-'}</small>
                         </div>
                       </div>
-
                       <div className="item-action-buttons">
                         {value.status === 'pending' && value.valid === true && (
                           <>
