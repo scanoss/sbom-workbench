@@ -2,12 +2,12 @@ import path from 'path';
 import { app } from 'electron';
 import fs from 'fs';
 import { IProject, ScanState } from '../../api/types';
-import { MIN_VERSION_SUPPORTED } from '../../shared/Config';
 import { SemVerCompareVersion } from '../helpers/SemVer';
 import { Metadata } from './Metadata';
 import { Project } from './Project';
 import { workspace } from './Workspace';
 import packageJson from '../../package.json';
+import AppConfig from '../../config/AppConfigModule';
 
 const AdmZip = require('adm-zip');
 
@@ -119,7 +119,7 @@ export class ProjectZipper {
   private isValidZipVersion(): boolean {
     const appVersion = app.isPackaged === true ? app.getVersion() : packageJson.version;
     if (
-      SemVerCompareVersion(MIN_VERSION_SUPPORTED, this.zipVersion) > 0 ||
+      SemVerCompareVersion(AppConfig.MIN_VERSION_SUPPORTED, this.zipVersion) > 0 ||
       SemVerCompareVersion(appVersion, this.zipVersion) < 0
     )
       return false;
