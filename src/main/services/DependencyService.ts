@@ -28,7 +28,7 @@ class DependencyService {
     }
   }
 
-  public async accept(params: any): Promise<DependencyDTO> {
+  public async accept(params: DependencyDTO): Promise<DependencyDTO> {
     try {
       if (!params.dependencyId) throw new Error('Dependency id is required');
       const queryBuilderDependency = QueryBuilderCreator.create({ id: params.dependencyId });
@@ -37,15 +37,15 @@ class DependencyService {
       let comp = (await modelProvider.model.component.getAll(queryBuilerComp))[0];
       // Adds license to dependency if the user define one
       if (dependency.licenses.length === 0) {
-        dependency = { ...dependency, licenses: params.license };
+        dependency = { ...dependency, licenses: params.licenses[0] };
         await modelProvider.model.dependency.insertLicense(dependency);
       }
 
-      let lic: any = await modelProvider.model.license.getBySpdxId(params.license);
-      const licenseName = licenseHelper.licenseNameToSPDXID(params.license);
+      let lic: any = await modelProvider.model.license.getBySpdxId(params.licenses[0]);
+      const licenseName = licenseHelper.licenseNameToSPDXID(params.licenses[0]);
       if (!lic)
         lic = await modelProvider.model.license.create({
-          spdxid: params.license,
+          spdxid: params.licenses[0],
           name: licenseName,
           fulltext: '',
           url: '',
@@ -62,7 +62,7 @@ class DependencyService {
         await modelProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
       }
       await modelProvider.model.dependency.update(dependency);
-      await modelProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.license, source: 'declared' });
+      await modelProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.licenses[0], source: 'declared' });
       const response = (await this.getAll({ id: params.dependencyId }))[0];
       return response;
     } catch (error: any) {
@@ -71,11 +71,13 @@ class DependencyService {
     }
   }
 
-  public async reject(dependencyId: number): Promise<boolean> {
+  public async restore(dependencyId: number): Promise<boolean> {
     try {
       const dep = (await this.getAll({ id: dependencyId }))[0];
-      await modelProvider.model.inventory.delete(dep.inventory);
-      if (dep.component.source === 'manual') await modelProvider.model.component.deleteByID([dep.component.compid]);
+      if (dep.status === 'identified') {
+        await modelProvider.model.inventory.delete(dep.inventory);
+        if (dep.component.source === 'manual') await modelProvider.model.component.deleteByID([dep.component.compid]);
+      }
       await modelProvider.model.dependency.update(dep);
       return true;
     } catch (error: any) {
@@ -92,24 +94,23 @@ class DependencyService {
         dependencies.add(d.path);
       });
       return dependencies;
-   } catch (error: any) {
+    } catch (error: any) {
       log.error(error);
       return error;
-   }
+    }
   }
-  
-  public async acceptAll(depFilePath: string): Promise<Array<DependencyDTO>> {
+
+  public async acceptAll(acceptedDep: Array<DependencyDTO>): Promise<Array<DependencyDTO>> {
     try {
-      let dependencies = await this.getAll({ filePath: depFilePath });
-      dependencies = dependencies.filter((dep: any) => dep.valid === true);
+      const dependencies = acceptedDep;
       const response = [];
       for (const dep of dependencies) {
         const d = await this.accept({
-          id: dep.dependencyId,
+          dependencyId: dep.dependencyId,
           purl: dep.purl,
           version: dep.version,
-          license: dep.licenses[0],
-        });
+          licenses: dep.licenses,
+        } as DependencyDTO);
         response.push(d);
       }
       return response;
@@ -119,6 +120,17 @@ class DependencyService {
     }
   }
 
+  public async reject(dependencyId: number): Promise<DependencyDTO> {
+    try {
+      const dep = (await this.getAll({ id: dependencyId }))[0];
+      await modelProvider.model.dependency.update(dep, true);
+      const response = (await this.getAll({ id: dependencyId }))[0];
+      return response;
+    } catch (error: any) {
+      log.error(error);
+      return error;
+    }
+  }
 }
 
 export const dependencyService = new DependencyService();
