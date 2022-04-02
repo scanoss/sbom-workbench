@@ -92,7 +92,7 @@ const Editor = () => {
   };
 
   const create = async (defaultInventory, selFiles) => {
-    const inventory = await dialogCtrl.openInventory(defaultInventory, state.recentUsedComponents);
+    const inventory = await dialogCtrl.openInventory(defaultInventory, state.recentUsedComponents,);
     if (!inventory) return;
 
     const newInventory = await createInventory({
@@ -123,7 +123,7 @@ const Editor = () => {
         usage: 'file',
       },
       state.recentUsedComponents
-    );
+    ); 
     if (response) {
       const id = await fileService.getIdFromPath(file);
       if (!id) return;
