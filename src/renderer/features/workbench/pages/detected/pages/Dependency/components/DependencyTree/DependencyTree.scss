@@ -3,11 +3,16 @@
   display: grid;
   grid-template-rows: auto 1fr;
 
+  li.MuiDivider-root.MuiDivider-middle{
+    list-style: none;
+  }
+
   .dependencies-tree-content {
+    padding-top: 0.5%;
     align-self: baseline;
     max-height: 100%;
     background: white;
-    overflow: auto;
+ 
   }
 
   .MuiListItemIcon-root {
@@ -46,8 +51,7 @@
       background-color: #e0e0e0;
     }
   }
-
-  .MuiListItem-root {
+    .MuiListItem-root {
     &.pending .item-icon::before {
       background-color: var(--color-status-pending);
     }
@@ -60,5 +64,43 @@
       background-color: var(--color-status-identified);
     }
   }
+
+  li.MuiListItem-root.MuiListItem-gutters {
+    border-bottom: solid 0.3px #cac7c7;
+  }
+
+  .license-version-container{
+    display: flex;
+    align-items: flex-start;   
+    width: 29%;
+  }
+
+  @mixin pill {
+    border-radius: 4px;
+    font-size: 12px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 8px;
+  }
+
+  .pill-license , .pill-version{
+    @include pill;
+    width: max-content;
+  }
+
+  .pill-version {  
+    color: #2563EB;
+    background-color: #BFDBFE;
+
+  }
+
+  .pill-license{  
+    background-color: #E4E4E7;
+    color: #52525B;   
+    margin-left: 4px;
+  }
+
 
 }

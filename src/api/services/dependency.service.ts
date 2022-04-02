@@ -15,13 +15,18 @@ class DepencyService extends BaseService {
     return this.response(response);
   }
 
-  public async reject(dependencyId: number): Promise<DependencyDTO> {
-    const response = await ipcRenderer.invoke(IpcEvents.DEPENDENCY_REJECT, dependencyId);
+  public async restore(dependencyId: number): Promise<DependencyDTO> {
+    const response = await ipcRenderer.invoke(IpcEvents.DEPENDENCY_RESTORE, dependencyId);
     return this.response(response);
   }
 
-  public async acceptAll(depFilePath: string): Promise<DependencyDTO> {
-    const response = await ipcRenderer.invoke(IpcEvents.DEPENDENCY_ACCEPT_ALL, depFilePath);
+  public async acceptAll(dependencies: Array<DependencyDTO>): Promise<Array<DependencyDTO>> {
+    const response = await ipcRenderer.invoke(IpcEvents.DEPENDENCY_ACCEPT_ALL, dependencies);
+    return this.response(response);
+  }
+
+  public async reject(dependencyId: number): Promise<DependencyDTO> {
+    const response = await ipcRenderer.invoke(IpcEvents.DEPENDENCY_REJECT, dependencyId);
     return this.response(response);
   }
 }
