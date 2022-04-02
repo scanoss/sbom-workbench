@@ -1,35 +1,49 @@
 #DependencyTree {
   height: calc(100%);
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: 1fr;
 
-  li.MuiDivider-root.MuiDivider-middle{
-    list-style: none;
+  .ReactVirtualized__Grid {
+    outline: none;
+    background-color: white; // FIXME: find alternative
+
+    &__innerScrollContainer {
+      background-color: white;
+    }
   }
 
-  .dependencies-tree-content {
-    padding-top: 0.5%;
-    align-self: baseline;
-    max-height: 100%;
-    background: white;
- 
-  }
-
-  .MuiListItemIcon-root {
-    min-width: 0;
-    margin-right: 12px;
-  }
 
   .MuiListItem-root {
     padding-top: 4px;
     padding-bottom: 4px;
-  }
 
-  .MuiListItemText-primary {
-    font-size: 14px;
-    font-weight: 400;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+    &.MuiListItem-gutters {
+      border-bottom: solid 1px #e0e0e0;
+    }
+
+    &.pending .item-icon::before {
+      background-color: var(--color-status-pending);
+    }
+
+    &.ignored .item-icon::before {
+      background-color: var(--color-status-ignored);
+    }
+
+    &.identified .item-icon::before {
+      background-color: var(--color-status-identified);
+    }
+
+    .MuiListItemIcon-root {
+      min-width: 0;
+      margin-right: 12px;
+    }
+
+    .MuiListItemText-primary {
+      font-size: 14px;
+      font-weight: 400;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
   }
 
   .item-action-buttons {
@@ -51,27 +65,12 @@
       background-color: #e0e0e0;
     }
   }
-    .MuiListItem-root {
-    &.pending .item-icon::before {
-      background-color: var(--color-status-pending);
-    }
 
-    &.ignored .item-icon::before {
-      background-color: var(--color-status-ignored);
-    }
 
-    &.identified .item-icon::before {
-      background-color: var(--color-status-identified);
-    }
-  }
-
-  li.MuiListItem-root.MuiListItem-gutters {
-    border-bottom: solid 0.3px #cac7c7;
-  }
 
   .license-version-container{
     display: flex;
-    align-items: flex-start;   
+    align-items: flex-start;
     width: 29%;
   }
 
@@ -90,15 +89,15 @@
     width: max-content;
   }
 
-  .pill-version {  
+  .pill-version {
     color: #2563EB;
     background-color: #BFDBFE;
 
   }
 
-  .pill-license{  
+  .pill-license{
     background-color: #E4E4E7;
-    color: #52525B;   
+    color: #52525B;
     margin-left: 4px;
   }
 
