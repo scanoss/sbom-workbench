@@ -5,14 +5,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { License } from '../../../api/types';
 import { licenseService } from '../../../api/services/license.service';
 import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
-
-
-// TO DO
-
 import { licenseHelper } from '../../../main/helpers/LicenseHelper';
 import { DialogContext } from '../../context/DialogProvider';
-
-
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -123,6 +117,10 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
       </form>
     </Dialog>
   );
+};
+
+LicenseDialog.defaultProps = {
+  save: false,
 };
 
 export default LicenseDialog;

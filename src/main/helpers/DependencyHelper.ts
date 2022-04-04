@@ -1,7 +1,7 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-param-reassign */
 
-import { DependencyDTO, Inventory } from '../../api/types';
+import { Dependency, Inventory } from '../../api/types';
 
 class DependencyHelper {
   public dependecyModelAdapter(dependency: any) {
@@ -16,7 +16,7 @@ class DependencyHelper {
     dep: Array<any>,
     inventory: any,
     component: any
-  ): Promise<Array<DependencyDTO>> {
+  ): Promise<Array<Dependency>> {
     let inv: any = inventory;
     let comp: any = component;
     inv = inv.reduce((acc, curr) => {

@@ -1,6 +1,7 @@
 import log from 'electron-log';
 import { IDependencyResponse } from 'scanoss';
-import { DependencyDTO } from '../../api/types';
+import { NewDependencyDTO } from '../../api/dto';
+import { Dependency } from '../../api/types';
 import { dependencyHelper } from '../helpers/DependencyHelper';
 import { fileHelper } from '../helpers/FileHelper';
 import { licenseHelper } from '../helpers/LicenseHelper';
@@ -14,7 +15,7 @@ class DependencyService {
     await modelProvider.model.dependency.insert(files, filesDependencies);
   }
 
-  public async getAll(params: any): Promise<Array<DependencyDTO>> {
+  public async getAll(params: any): Promise<Array<Dependency>> {
     try {
       const queryBuilder = QueryBuilderCreator.create(params);
       const dependencies = await modelProvider.model.dependency.getAll(queryBuilder);
@@ -28,7 +29,7 @@ class DependencyService {
     }
   }
 
-  public async accept(params: DependencyDTO): Promise<DependencyDTO> {
+  public async accept(params: NewDependencyDTO): Promise<Dependency> {
     try {
       if (!params.dependencyId) throw new Error('Dependency id is required');
       const queryBuilderDependency = QueryBuilderCreator.create({ id: params.dependencyId });
@@ -37,15 +38,15 @@ class DependencyService {
       let comp = (await modelProvider.model.component.getAll(queryBuilerComp))[0];
       // Adds license to dependency if the user define one
       if (dependency.licenses.length === 0) {
-        dependency = { ...dependency, licenses: params.licenses[0] };
+        dependency = { ...dependency, licenses: params.license };
         await modelProvider.model.dependency.insertLicense(dependency);
       }
 
-      let lic: any = await modelProvider.model.license.getBySpdxId(params.licenses[0]);
-      const licenseName = licenseHelper.licenseNameToSPDXID(params.licenses[0]);
+      let lic: any = await modelProvider.model.license.getBySpdxId(params.license);
+      const licenseName = licenseHelper.licenseNameToSPDXID(params.license);
       if (!lic)
         lic = await modelProvider.model.license.create({
-          spdxid: params.licenses[0],
+          spdxid: params.license,
           name: licenseName,
           fulltext: '',
           url: '',
@@ -62,7 +63,7 @@ class DependencyService {
         await modelProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
       }
       await modelProvider.model.dependency.update(dependency);
-      await modelProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.licenses[0], source: 'declared' });
+      await modelProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.license, source: 'declared' });
       const response = (await this.getAll({ id: params.dependencyId }))[0];
       return response;
     } catch (error: any) {
@@ -100,7 +101,7 @@ class DependencyService {
     }
   }
 
-  public async acceptAll(acceptedDep: Array<DependencyDTO>): Promise<Array<DependencyDTO>> {
+  public async acceptAll(acceptedDep: Array<Dependency>): Promise<Array<Dependency>> {
     try {
       const dependencies = acceptedDep;
       const response = [];
@@ -110,7 +111,7 @@ class DependencyService {
           purl: dep.purl,
           version: dep.version,
           licenses: dep.licenses,
-        } as DependencyDTO);
+        } as Dependency);
         response.push(d);
       }
       return response;
@@ -120,7 +121,7 @@ class DependencyService {
     }
   }
 
-  public async reject(dependencyId: number): Promise<DependencyDTO> {
+  public async reject(dependencyId: number): Promise<Dependency> {
     try {
       const dep = (await this.getAll({ id: dependencyId }))[0];
       await modelProvider.model.dependency.update(dep, true);
