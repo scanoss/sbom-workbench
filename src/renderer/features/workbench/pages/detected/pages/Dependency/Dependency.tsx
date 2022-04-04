@@ -4,7 +4,7 @@ import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
 import { AppContext, IAppContext } from '../../../../../../context/AppProvider';
-import { DependencyDTO, FileType } from '../../../../../../../api/types';
+import { Dependency, FileType } from '../../../../../../../api/types';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import { getExtension } from '../../../../../../../shared/utils/utils';
 import CodeViewSelector, { CodeViewSelectorMode } from './components/CodeViewSelector/CodeViewSelector';
@@ -14,8 +14,8 @@ import { dependencyService } from '../../../../../../../api/services/dependency.
 import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
 import { DIALOG_ACTIONS } from '../../../../../../context/types';
-
-const MemoCodeEditor = React.memo(CodeEditor);
+import WorkbenchDialogContext, { IWorkbenchDialogContext } from '../../../../../../context/WorkbenchDialogProvider';
+import { NewDependencyDTO } from '../../../../../../../api/dto';
 
 export interface FileContent {
   content: string | null;
@@ -39,25 +39,28 @@ const filter = (items, query) => {
   return result;
 };
 
-const validDependencies = (filteredDependencies) => {
-  return filteredDependencies?.filter((item) => item.valid === true && item.status === 'pending');
-};
+const validDependencies = (items: Array<Dependency>) =>
+  items?.filter((item) => item.valid && item.status === 'pending');
 
-const Dependency = () => {
+const MemoCodeEditor = React.memo(CodeEditor);
+
+const DependencyViewer = () => {
   const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
+  const workbenchDialogCtrl = useContext(WorkbenchDialogContext) as IWorkbenchDialogContext;
+
   const { imported } = state;
 
   const file = state.node?.type === 'file' ? state.node.path : null;
 
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
-  const [dependencies, setDependencies] = useState<any[]>([]);
+  const [dependencies, setDependencies] = useState<Dependency[]>([]);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const [view, setView] = useState<CodeViewSelectorMode>(CodeViewSelectorMode.GRAPH);
 
-  const items = filter(dependencies, searchQuery);
-  const validDep: Array<DependencyDTO> = validDependencies(items);
+  const items: Array<Dependency> = filter(dependencies, searchQuery);
+  const validItems: Array<Dependency> = validDependencies(items);
 
   const init = () => {
     setLocalFileContent({ content: null, error: false });
@@ -92,13 +95,26 @@ const Dependency = () => {
     ]);
 
     if (action !== DIALOG_ACTIONS.CANCEL) {
-      await dependencyService.acceptAll(validDep);
+      await dependencyService.acceptAll(validItems);
       getDependencies(file);
     }
   };
 
-  const onAcceptHandler = async (dependency) => {
-    await dependencyService.accept(dependency);
+  const onAcceptHandler = async (dependency: Dependency) => {
+    let dep: NewDependencyDTO = {
+      dependencyId: dependency.dependencyId,
+      purl: dependency.purl,
+      license: dependency.licenses[0],
+      version: dependency.version,
+    };
+
+    if (!dependency.valid) {
+      const { action, data } = await workbenchDialogCtrl.openDependencyDialog(dependency);
+      if (action === DIALOG_ACTIONS.CANCEL) return;
+      dep = data;
+    }
+
+    await dependencyService.accept(dep);
     getDependencies(file);
   };
 
@@ -133,12 +149,12 @@ const Dependency = () => {
 
             <Button
               size="small"
-              disabled={validDep.length === 0}
+              disabled={validItems.length === 0}
               variant="contained"
               color="secondary"
               onClick={onAcceptAllHandler}
             >
-              Accept All ({validDep.length})
+              Accept All ({validItems.length})
             </Button>
           </section>
         </header>
@@ -180,4 +196,4 @@ const Dependency = () => {
   );
 };
 
-export default Dependency;
+export default DependencyViewer;

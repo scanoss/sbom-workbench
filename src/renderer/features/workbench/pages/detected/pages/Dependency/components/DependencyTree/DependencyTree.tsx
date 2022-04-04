@@ -5,9 +5,10 @@ import BanIcon from '@material-ui/icons/NotInterested';
 import { RestoreOutlined } from '@material-ui/icons';
 import { List, AutoSizer } from 'react-virtualized';
 import IconComponent from '../../../../../../components/IconComponent/IconComponent';
+import { Dependency } from '../../../../../../../../../api/types';
 
 interface DependencyTreeProps {
-  dependencies: any[]; // TODO: define type
+  dependencies: Array<Dependency>;
   onDependencyAccept: (dep: any) => void;
   onDependencyReject: (dep: any) => void;
   onDependencyRestore: (dep: any) => void;
@@ -30,52 +31,48 @@ const DependencyTree = ({
             rowHeight={40}
             overscanRowCount={10}
             scrollToAlignment="start"
-            rowRenderer={({ index, key, style, parent }) => {
-              const value = dependencies[index];
+            rowRenderer={({ index, key, style }) => {
+              const item = dependencies[index];
               return (
-                <React.Fragment key={value.purl}>
+                <React.Fragment key={key}>
                   <ListItem
                     style={style}
                     className={`
-                  ${value.status}
-                  ${value.valid ? 'valid' : 'invalid'}
-                `}
+                      ${item.status}
+                      ${item.valid ? 'valid' : 'invalid'}
+                    `}
                   >
                     <ListItemIcon className="item-icon">
-                      <IconComponent name={value.purl.replace(/pkg:.*\//, '')} size={24} />
+                      <IconComponent name={item.purl.replace(/pkg:.*\//, '')} size={24} />
                     </ListItemIcon>
-                    <ListItemText primary={decodeURIComponent(value.purl)} />
+                    <ListItemText primary={decodeURIComponent(item.purl)} />
                     <div className="license-version-container">
                       <div className="pill-version">
-                        <small>{value.version || '-'}</small>
+                        <small>{item.version || '-'}</small>
                       </div>
                       <div className="pill-license">
-                        <small>{value.licenses[0] || '-'}</small>
+                        <small>{item.licenses[0] || '-'}</small>
                       </div>
                     </div>
                     <div className="item-action-buttons">
-                      {value.status === 'pending' && value.valid === true && (
+                      {item.status === 'pending' && (
                         <>
                           <Tooltip title="Accept">
-                            <IconButton size="small" onClick={() => onDependencyAccept(value)}>
+                            <IconButton size="small" onClick={() => onDependencyAccept(item)}>
                               <CheckIcon className="icon check" fontSize="inherit" />
                             </IconButton>
                           </Tooltip>
-                        </>
-                      )}
-                      {value.status === 'pending' && (
-                        <>
                           <Tooltip title="Dismiss">
-                            <IconButton size="small" onClick={() => onDependencyReject(value)}>
+                            <IconButton size="small" onClick={() => onDependencyReject(item)}>
                               <BanIcon className="icon ban" fontSize="inherit" />
                             </IconButton>
                           </Tooltip>
                         </>
                       )}
-                      {(value.status === 'original' || value.status === 'identified') && (
+                      {(item.status === 'original' || item.status === 'identified') && (
                         <>
                           <Tooltip title="Restore">
-                            <IconButton size="small" onClick={() => onDependencyRestore(value)}>
+                            <IconButton size="small" onClick={() => onDependencyRestore(item)}>
                               <RestoreOutlined className="icon" fontSize="inherit" />
                             </IconButton>
                           </Tooltip>

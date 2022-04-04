@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
-import Dependency from '../Dependency/Dependency';
+import DependencyViewer from '../Dependency/Dependency';
 import Editor from '../Editor/Editor';
 
 enum FileType {
@@ -23,7 +23,7 @@ const FileViewer = () => {
   return (
     <>
       {fileType === FileType.code && <Editor />}
-      {fileType === FileType.dependencies && <Dependency />}
+      {fileType === FileType.dependencies && <DependencyViewer />}
     </>
   );
 };
