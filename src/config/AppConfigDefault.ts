@@ -1,3 +1,4 @@
+import { ExportFormat } from '../api/types';
 import { IAppConfig } from './IAppConfig';
 
 export const AppConfigDefault: IAppConfig = {
@@ -7,6 +8,12 @@ export const AppConfigDefault: IAppConfig = {
   DEFAULT_WORKSPACE_NAME: 'scanoss-workspace',
   FF_ENABLE_COMPONENT_LOGO: true,
   FF_ENABLE_WORKBENCH_FILTERS: true,
-  FF_EXPORT_FORMAT_OPTIONS: ['spdx', 'csv', 'html', 'raw', 'json'],
+  FF_EXPORT_FORMAT_OPTIONS: [
+    ExportFormat.CSV,
+    ExportFormat.SPDXLITEJSON,
+    ExportFormat.WFP,
+    ExportFormat.RAW,
+    ExportFormat.HTMLSUMMARY,
+  ],
   FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN: false,
 };

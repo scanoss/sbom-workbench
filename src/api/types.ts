@@ -140,7 +140,7 @@ export enum HashType {
   SHA256 = 'sha256',
 }
 
-export enum FormatVersion {
+export enum ExportFormat {
   SPDX20 = 'SPDX20',
   SPDXLITE = 'SPDXLITE',
   CSV = 'CSV',
