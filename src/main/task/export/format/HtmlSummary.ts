@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { reportService } from '../../services/ReportService';
+import { reportService } from '../../../services/ReportService';
 import { Format } from '../Format';
 
 const pathLib = require('path');
@@ -13,9 +13,8 @@ export class HtmlSummary extends Format {
   // @override
   public async generate() {
     const isDev = process.env.NODE_ENV !== 'production';
-
     const PATH = isDev
-      ? pathLib.join(__dirname, '../../../../assets/exportTemplates/')
+      ? pathLib.join(__dirname, '../../../../../assets/exportTemplates/')
       : pathLib.join(__dirname, '../assets/exportTemplates/');
 
     let HTMLtemplate = fs.readFileSync(`${PATH}template.html`, 'utf8').toString();

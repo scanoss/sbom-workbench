@@ -2,6 +2,8 @@ import { Inventory } from '../../../api/types';
 import { Accept } from '../../batch/Accept';
 import { inventoryService } from '../../services/InventoryService';
 import { workspace } from '../../workspace/Workspace';
+import { ITask } from '../Task';
+import { AutoAcceptDTO } from './AutoAcceptDTO';
 
 export class AutoAccept implements ITask<AutoAcceptDTO> {
   public async run(): Promise<AutoAcceptDTO> {

@@ -6,7 +6,7 @@ import { Response } from '../Response';
 import { INewProject, IProject, License } from '../types';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
-import { ScanTask } from '../../main/scanner/ScanTask';
+import { ScanTask } from '../../main/task/scanner/ScanTask';
 
 ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
   try {

@@ -1,8 +1,8 @@
-import { IpcEvents } from '../../api/ipc-events';
-import { ScanState } from '../../api/types';
-import { ProjectFilterPath } from '../workspace/filters/ProjectFilterPath';
-import { Project } from '../workspace/Project';
-import { workspace } from '../workspace/Workspace';
+import { IpcEvents } from '../../../api/ipc-events';
+import { ScanState } from '../../../api/types';
+import { ProjectFilterPath } from '../../workspace/filters/ProjectFilterPath';
+import { Project } from '../../workspace/Project';
+import { workspace } from '../../workspace/Workspace';
 import { ScannerTask } from './ScannerTask';
 
 export class ResumeScanTask extends ScannerTask {

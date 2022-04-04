@@ -420,6 +420,7 @@ export class InventoryModel extends Model {
               inventories[i].notes ? inventories[i].notes : null,
               inventories[i].url ? inventories[i].url : 'n/a',
               inventories[i].spdxid ? inventories[i].spdxid : 'n/a',
+              'detected',
               function (this: any, err: any) {
                 inventories[i].id = this.lastID;
                 inv.push(inventories[i]);
