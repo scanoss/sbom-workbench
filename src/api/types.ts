@@ -215,7 +215,7 @@ export enum FileTreeViewMode {
   PRUNE,
 }
 
-export interface DependencyDTO {
+export interface Dependency {
   dependencyId: number;
   fileId: number;
   licenses: string[];
@@ -225,4 +225,5 @@ export interface DependencyDTO {
   component: Component;
   status: FileStatusType.IDENTIFIED | FileStatusType.ORIGINAL | FileStatusType.PENDING;
   inventory: Inventory;
+  valid: boolean;
 }

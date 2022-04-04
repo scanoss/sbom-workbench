@@ -11,6 +11,7 @@ import About from './features/about/About';
 
 import './App.global.scss';
 import AppConfig from '../config/AppConfigModule';
+import { WorkbenchDialogProvider } from './context/WorkbenchDialogProvider';
 
 export default class App {
   /**
@@ -30,7 +31,9 @@ export default class App {
               <Route exact path="/" component={Workspace} /> {/* Redirect not working with new browser windows */}
               <Route path="/workspace" component={Workspace} />
               <WorkbenchProvider>
-                <Route path="/workbench" component={Workbench} />
+                <WorkbenchDialogProvider>
+                  <Route path="/workbench" component={Workbench} />
+                </WorkbenchDialogProvider>
               </WorkbenchProvider>
               <Route path="/about" exact component={About} />
 
