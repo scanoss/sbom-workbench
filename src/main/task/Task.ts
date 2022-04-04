@@ -1,3 +1,3 @@
-interface ITask <T> {
-  run(): Promise<T>;
+export interface ITask<T> {
+  run(params: T): Promise<T>;
 }

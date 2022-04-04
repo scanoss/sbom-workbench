@@ -2,19 +2,20 @@ import { EventEmitter } from 'events';
 import { DependencyScanner, Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
 import fs from 'fs';
 import log from 'electron-log';
-import { INewProject, ScanState } from '../../api/types';
-import { dependencyService } from '../services/DependencyService';
-import { Project } from '../workspace/Project';
-import { IpcEvents } from '../../api/ipc-events';
-import { fileService } from '../services/FileService';
-import { fileHelper } from '../helpers/FileHelper';
-import { resultService } from '../services/ResultService';
-import { componentService } from '../services/ComponentService';
-import { userSettingService } from '../services/UserSettingService';
-import AppConfig from '../../config/AppConfigModule';
-import { AutoAccept } from '../task/Inventory/AutoAccept';
+import { INewProject, ScanState } from '../../../api/types';
+import { dependencyService } from '../../services/DependencyService';
+import { Project } from '../../workspace/Project';
+import { IpcEvents } from '../../../api/ipc-events';
+import { fileService } from '../../services/FileService';
+import { fileHelper } from '../../helpers/FileHelper';
+import { resultService } from '../../services/ResultService';
+import { componentService } from '../../services/ComponentService';
+import { userSettingService } from '../../services/UserSettingService';
+import AppConfig from '../../../config/AppConfigModule';
+import { AutoAccept } from '../Inventory/AutoAccept';
+import { ITask } from '../Task';
 
-export abstract class ScannerTask extends EventEmitter {
+export abstract class ScannerTask extends EventEmitter implements ITask<void> {
   protected msgToUI!: Electron.WebContents;
 
   protected scanner: Scanner;
@@ -60,10 +61,8 @@ export abstract class ScannerTask extends EventEmitter {
       this.project.metadata.setScannerState(ScanState.FINISHED);
       this.project.metadata.save();
       if (AppConfig.FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN) {
-        console.log('Auto Accept Enabled');
         const autoAccept = new AutoAccept();
-        const response = await autoAccept.run();
-        console.log(response);
+        await autoAccept.run();
       }
       this.project.metadata.save();
       this.sendToUI(IpcEvents.SCANNER_FINISH_SCAN, {

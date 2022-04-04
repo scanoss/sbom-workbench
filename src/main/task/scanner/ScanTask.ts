@@ -1,11 +1,11 @@
 import log from 'electron-log';
 
-import { INewProject, ProjectState, ScanState } from '../../api/types';
+import { INewProject, ProjectState, ScanState } from '../../../api/types';
 import { ScannerTask } from './ScannerTask';
-import { workspace } from '../workspace/Workspace';
-import { modelProvider } from '../services/ModelProvider';
-import { licenseService } from '../services/LicenseService';
-import { treeService } from '../services/TreeService';
+import { workspace } from '../../workspace/Workspace';
+import { modelProvider } from '../../services/ModelProvider';
+import { licenseService } from '../../services/LicenseService';
+import { treeService } from '../../services/TreeService';
 
 export class ScanTask extends ScannerTask {
   public async set(project: INewProject): Promise<void> {
