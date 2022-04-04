@@ -1,11 +1,11 @@
 import { IpcEvents } from '../ipc-events';
 import { BaseService } from './base.service';
-import { FormatVersion } from '../types';
+import { ExportFormat } from '../types';
 
 const { ipcRenderer } = require('electron');
 
 class Export extends BaseService {
-  public async export(path: string, ext: FormatVersion): Promise<any> {
+  public async export(path: string, ext: ExportFormat): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.EXPORT, path, ext);
     return response;
   }
@@ -16,4 +16,4 @@ class Export extends BaseService {
   }
 }
 
-export const ExportFormat = new Export();
+export const exportFormat = new Export();

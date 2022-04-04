@@ -1,4 +1,4 @@
-import { utilModel } from '../../model/UtilModel';
+import { utilModel } from '../../../model/UtilModel';
 import { Format } from '../Format';
 
 export class Spdxv20 extends Format {

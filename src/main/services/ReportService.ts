@@ -30,7 +30,7 @@ class ReportService  {
     try {
       let tempSummary: any = {};
       tempSummary = await modelProvider.model.inventory.getCurrentSummary();
-      const projectSummary = await workspace.getOpenedProjects()[0].getTree().getSummarize(); // filesSummary;
+      const projectSummary = await workspace.getOpenedProjects()[0].filesSummary;
       const summary = {
         totalFiles: tempSummary.totalFiles,
         includedFiles: projectSummary.include,
