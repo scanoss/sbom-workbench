@@ -178,7 +178,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                   <TextField
                     required
                     {...params}
-                    InputProps={{ ...params.InputProps, disableUnderline: true, className: classes.autocomplete }}
+                    InputProps={{ ...params.InputProps, disableUnderline: true, className: 'autocomplete-option' }}
                   />
                 )}
                 onChange={(e, { id, name }) => setForm({ ...form, license_id: id, license_name: name })}
