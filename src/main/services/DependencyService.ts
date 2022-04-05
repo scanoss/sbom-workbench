@@ -21,7 +21,7 @@ class DependencyService {
       const dependencies = await modelProvider.model.dependency.getAll(queryBuilder);
       const inventory: any = await modelProvider.model.inventory.getAll();
       const component: any = await modelProvider.model.component.getAll();
-      dependencyHelper.mergeInventoryComponentToDependency(dependencies, inventory, component);
+      dependencyHelper.mergeInventoryComponentToDependency(dependencies, inventory, component);     
       return dependencies;
     } catch (err: any) {
       log.error(err);
@@ -78,13 +78,13 @@ class DependencyService {
   }
 
   public async restore(dependencyId: number): Promise<boolean> {
-    try {
+    try {    
       const dep = (await this.getAll({ id: dependencyId }))[0];
       if (dep.status === 'identified') {
         await modelProvider.model.inventory.delete(dep.inventory);
         if (dep.component.source === 'manual') await modelProvider.model.component.deleteByID([dep.component.compid]);
-      }
-      await modelProvider.model.dependency.update(dep);
+      }     
+      await modelProvider.model.dependency.restore({dependencyId: dependencyId,version:dep.originalVersion,licenses:dep.originalLicense});
       return true;
     } catch (error: any) {
       log.error(error);

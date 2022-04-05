@@ -11,8 +11,7 @@ class DepencyService extends BaseService {
     return this.response(response);
   }
 
-  public async accept(params: NewDependencyDTO): Promise<Dependency> {
-    console.log('accept params: ', params);
+  public async accept(params: NewDependencyDTO): Promise<Dependency> {   
     const response = await ipcRenderer.invoke(IpcEvents.DEPENDENCY_ACCEPT, params);
     return this.response(response);
   }
