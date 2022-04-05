@@ -226,4 +226,6 @@ export interface Dependency {
   status: FileStatusType.IDENTIFIED | FileStatusType.ORIGINAL | FileStatusType.PENDING;
   inventory: Inventory;
   valid: boolean;
+  originalVersion: string;
+  originalLicense: string;
 }
