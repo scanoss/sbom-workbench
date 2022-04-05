@@ -6,13 +6,18 @@ import { Querys } from './querys_db';
 const query = new Querys();
 
 export class DependencyModel extends Model {
-  public static readonly entityMapper = { path: 'f.path', purl: 'd.purl', version: 'd.version', id: 'd.dependencyId' };
+  public static readonly entityMapper = {
+    path: 'f.path',
+    purl: 'd.purl',
+    version: 'd.version',
+    id: 'd.dependencyId',
+  };
 
   public constructor(path: string) {
     super(path);
   }
 
-  public async insert(files: Record<string, number>, filesDependencies: any) { 
+  public async insert(files: Record<string, number>, filesDependencies: any) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -27,8 +32,16 @@ export class DependencyModel extends Model {
                 dependency.purl ? dependency.purl : null,
                 dependency.version ? dependency.version : null,
                 dependency.scope ? dependency.scope : null,
-                dependency.licensesList.length > 0 && dependency.licensesList[0] !=='' ?  dependency.licensesList.join(',') : null,
-                dependency.component
+                dependency.licensesList.length > 0 &&
+                  dependency.licensesList[0] !== ''
+                  ? dependency.licensesList.join(',')
+                  : null,
+                dependency.component,
+                dependency.version ? dependency.version : null,
+                dependency.licensesList.length > 0 &&
+                  dependency.licensesList[0] !== ''
+                  ? dependency.licensesList.join(',')
+                  : null
               );
             });
           });
@@ -47,7 +60,11 @@ export class DependencyModel extends Model {
   public async getAll(queryBuilder: QueryBuilder) {
     return new Promise<Array<any>>(async (resolve, reject) => {
       try {
-        const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_DEPENDENCIES, DependencyModel.entityMapper);
+        const SQLquery = this.getSQL(
+          queryBuilder,
+          query.SQL_GET_ALL_DEPENDENCIES,
+          DependencyModel.entityMapper
+        );
         const db = await this.openDb();
         db.all(SQLquery.SQL, ...SQLquery.params, async (err: any, dep: any) => {
           db.close();
@@ -55,6 +72,8 @@ export class DependencyModel extends Model {
           dep.forEach((d) => {
             if (d.licenses) d.licenses = d.licenses.split(',');
             else d.licenses = [];
+            if (d.originalLicense)
+              d.originalLicense = d.originalLicense.split(',');
           });
           resolve(dep);
         });
@@ -129,10 +148,36 @@ export class DependencyModel extends Model {
     });
   }
 
+  public restore(dependency: any) { 
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.run(
+          `UPDATE dependencies SET rejectedAt=?, licenses=? , version=? WHERE dependencyId=?;`,
+          null,
+          dependency.licenses ? dependency.licenses.join(',') : null,
+          dependency.version ? dependency.version : null,
+          dependency.dependencyId,
+          async (err: any, dep: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          }
+        );
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
   public deleteDirty(data: Record<string, string>): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       try {
-        const SQLquery = query.SQL_DELETE_DIRTY_DEPENDENCIES.replace('#PURLS', data.purls)
+        const SQLquery = query.SQL_DELETE_DIRTY_DEPENDENCIES.replace(
+          '#PURLS',
+          data.purls
+        )
           .replace('#VERSIONS', data.versions)
           .replace('#LICENSES', data.licenses);
         const db = await this.openDb();
@@ -149,22 +194,24 @@ export class DependencyModel extends Model {
   }
 
   public getDependenciesFiles(): Promise<Array<Record<string, string>>> {
-    return new Promise<Array<Record<string, string>>> (async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.all(
-          'SELECT DISTINCT f.path FROM files f INNER JOIN dependencies d ON d.fileId=f.fileId;',
-          async (err: any, dep: Array<Record<string, string>>) => {
-            db.close();
-            if (err) throw err;
-            resolve(dep);
-          }
-        );
-      } catch (error: any) {
-        log.error(error);
-        reject(error);
+    return new Promise<Array<Record<string, string>>>(
+      async (resolve, reject) => {
+        try {
+          const db = await this.openDb();
+          db.all(
+            'SELECT DISTINCT f.path FROM files f INNER JOIN dependencies d ON d.fileId=f.fileId;',
+            async (err: any, dep: Array<Record<string, string>>) => {
+              db.close();
+              if (err) throw err;
+              resolve(dep);
+            }
+          );
+        } catch (error: any) {
+          log.error(error);
+          reject(error);
+        }
       }
-    });
+    );
   }
 
   public getEntityMapper(): Record<string, string> {
