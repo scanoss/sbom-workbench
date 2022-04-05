@@ -39,7 +39,12 @@ class DependencyService {
       // Adds license to dependency if the user define one
       if (dependency.licenses.length === 0) {
         dependency = { ...dependency, licenses: params.license };
-        await modelProvider.model.dependency.insertLicense(dependency);
+        await modelProvider.model.dependency.updateLicense(dependency);
+      }
+
+      if(!dependency.version){
+        dependency = { ...dependency, version: params.version };
+        await modelProvider.model.dependency.updateVersion(dependency);
       }
 
       let lic: any = await modelProvider.model.license.getBySpdxId(params.license);
@@ -110,8 +115,8 @@ class DependencyService {
           dependencyId: dep.dependencyId,
           purl: dep.purl,
           version: dep.version,
-          licenses: dep.licenses,
-        } as Dependency);
+          license: dep.licenses[0],
+        } as NewDependencyDTO);
         response.push(d);
       }
       return response;
