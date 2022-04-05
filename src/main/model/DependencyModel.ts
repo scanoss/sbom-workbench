@@ -12,7 +12,7 @@ export class DependencyModel extends Model {
     super(path);
   }
 
-  public async insert(files: Record<string, number>, filesDependencies: any) {
+  public async insert(files: Record<string, number>, filesDependencies: any) { 
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -24,10 +24,10 @@ export class DependencyModel extends Model {
               db.run(
                 query.SQL_DEPENDENCIES_INSERT,
                 fileId,
-                dependency.purl,
-                dependency.version,
+                dependency.purl ? dependency.purl : null,
+                dependency.version ? dependency.version : null,
                 dependency.scope ? dependency.scope : null,
-                dependency.licensesList.join(','),
+                dependency.licensesList.length > 0 && dependency.licensesList[0] !=='' ?  dependency.licensesList.join(',') : null,
                 dependency.component
               );
             });
@@ -65,13 +65,34 @@ export class DependencyModel extends Model {
     });
   }
 
-  public insertLicense(dependency: any) {
+  public updateLicense(dependency: any) {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.run(
           'UPDATE dependencies SET licenses=? WHERE dependencyId=?',
           dependency.licenses,
+          dependency.dependencyId,
+          async (err: any, dep: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(true);
+          }
+        );
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
+  public updateVersion(dependency: any) {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.run(
+          'UPDATE dependencies SET version=? WHERE dependencyId=?',
+          dependency.version,
           dependency.dependencyId,
           async (err: any, dep: any) => {
             db.close();
