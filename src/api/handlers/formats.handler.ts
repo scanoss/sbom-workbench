@@ -22,7 +22,6 @@ ipcMain.handle(IpcEvents.EXPORT, async (_event, path: string, format: ExportForm
       const complete = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles) < 100;
       auxPath = complete ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;
     }
-    console.log('format',format);
     const exportTask = new Export();
     exportTask.setFormat(format);
     const success = await exportTask.run(auxPath); 

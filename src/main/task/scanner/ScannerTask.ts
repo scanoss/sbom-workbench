@@ -15,7 +15,7 @@ import AppConfig from '../../../config/AppConfigModule';
 import { AutoAccept } from '../Inventory/AutoAccept';
 import { ITask } from '../Task';
 
-export abstract class ScannerTask extends EventEmitter implements ITask<void> {
+export abstract class ScannerTask extends EventEmitter implements ITask<void, boolean> {
   protected msgToUI!: Electron.WebContents;
 
   protected scanner: Scanner;
@@ -123,6 +123,7 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void> {
     const scanIn = this.adapterToScannerInput(this.project.filesToScan);
     this.scanDependencies();
     this.scanner.scan(scanIn);
+    return true;
   }
 
   private async scanDependencies(): Promise<void> {

@@ -3,10 +3,10 @@ import { Accept } from '../../batch/Accept';
 import { inventoryService } from '../../services/InventoryService';
 import { workspace } from '../../workspace/Workspace';
 import { ITask } from '../Task';
-import { AutoAcceptDTO } from './AutoAcceptDTO';
+import { AutoAcceptResult } from './AutoAcceptResult';
 
-export class AutoAccept implements ITask<AutoAcceptDTO> {
-  public async run(): Promise<AutoAcceptDTO> {
+export class AutoAccept implements ITask<void, AutoAcceptResult> {
+  public async run(): Promise<AutoAcceptResult> {
     const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
     const inventories = await inventoryService.preLoadInventoriesAcceptAll({ folder: '/' }, filter);
     const validInventories = inventories.filter((el) => el.spdxid) as Array<Inventory>;
@@ -15,7 +15,7 @@ export class AutoAccept implements ITask<AutoAcceptDTO> {
     const componentsRejected = totalInventories - componentsAccepted;
     const acceptAll = new Accept('/', false, validInventories, 'AutoAccept');
     await acceptAll.execute();
-    const autoAcceptDTO: AutoAcceptDTO = {
+    const autoAcceptDTO: AutoAcceptResult = {
       success: true,
       message: 'Auto Accept success',
       componentsAccepted,
