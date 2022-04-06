@@ -321,7 +321,9 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                 </div>
               </>
             )}
-            <div className="dialog-form-field mt-7">
+            <div
+              className={AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS ? 'dialog-form-field mt-7' : 'dialog-form-field'}
+            >
               <label className="dialog-form-field-label">
                 SBOM Ledger Token <span className="optional">- Optional</span>
               </label>

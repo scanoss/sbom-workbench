@@ -5,7 +5,7 @@ import { DependencyDTO } from '../types';
 const { ipcRenderer } = require('electron');
 
 class DepencyService extends BaseService {
-  public async getAll(params: any): Promise<any> {
+  public async getAll(params: any): Promise<Array<DependencyDTO>> {
     const response = await ipcRenderer.invoke(IpcEvents.DEPENDENCY_GET_ALL, params);
     return this.response(response);
   }
@@ -20,7 +20,4 @@ class DepencyService extends BaseService {
     return this.response(response);
   }
 }
-
 export const dependencyService = new DepencyService();
-
-document.dep = dependencyService;

@@ -15,7 +15,7 @@ import { ExportResult } from './ExportResult';
 export class Export implements ITask<string, ExportResult> {
   private format: Format;
 
-  public async run(path: string) {
+  public async run(path: string): Promise<ExportResult> {
     try {
       const result = await this.format.save(path);
       return result;
