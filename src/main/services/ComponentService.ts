@@ -1,15 +1,16 @@
 import log from 'electron-log';
-import { Component, ComponentGroup, IWorkbenchFilter } from '../../api/types';
+import { Component, ComponentGroup, IWorkbenchFilterParams, License } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
+import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
 
 class ComponentService {
-  public async getComponentFiles(data: Partial<Component>, filter: IWorkbenchFilter): Promise<any> {
+  public async getComponentFiles(data: Partial<Component>, params: IWorkbenchFilterParams): Promise<any> {
     try {
-      const params = { purl: data.purl, version: data.version, ...filter };
-      const queryBuilder = QueryBuilderCreator.create(params);
+      const filter = workspace.getOpenedProjects()[0].getFilter(params);
+      const queryBuilder = QueryBuilderCreator.create({ purl: data.purl, version: data.version, ...filter });
       const files: any = await modelProvider.model.file.getAll(queryBuilder);
       const inventories: any = await modelProvider.model.inventory.getAll();
       const compid = inventories.map((inv) => inv.cvid);
@@ -34,10 +35,11 @@ class ComponentService {
     }
   }
 
-  public async getAll(params: IWorkbenchFilter) {
+  public async getAll(params: IWorkbenchFilterParams) {
     try {
-      const queryBuilder: QueryBuilder = QueryBuilderCreator.create(params);
-      const queryBuilderSummary: QueryBuilder = QueryBuilderCreator.create({ ...params, status: null }); // Keep summary independent from summary
+      const filter = workspace.getOpenedProjects()[0].getFilter(params);
+      const queryBuilder: QueryBuilder = QueryBuilderCreator.create(filter);
+      const queryBuilderSummary: QueryBuilder = QueryBuilderCreator.create({ ...filter, status: null }); // Keep summary independent from summary
       let comp = await modelProvider.model.component.getAll(queryBuilder);
       const summary = await modelProvider.model.component.summary(queryBuilderSummary);
       comp = componentHelper.addSummary(comp, summary);
@@ -51,9 +53,11 @@ class ComponentService {
     }
   }
 
-  public async get(component: Partial<ComponentGroup>, params: IWorkbenchFilter) {
+  public async get(component: Partial<ComponentGroup>, params: IWorkbenchFilterParams) {
     try {
-      const response = await this.getAll({ purl: component.purl, ...params });
+      const workbenchFilter = workspace.getOpenedProjects()[0].getFilter(params);
+      const filter = { purl: component.purl, ...workbenchFilter };
+      const response = await this.getAll({ filter });
       return response[0] || null;
     } catch (error: any) {
       log.error(error);
@@ -113,7 +117,8 @@ class ComponentService {
 
   public async importComponents() {
     try {
-      const components: Array<Partial<Component>> = await modelProvider.model.component.getUniqueComponentsFromResults();
+      const components: Array<Partial<Component>> =
+        await modelProvider.model.component.getUniqueComponentsFromResults();
       await modelProvider.model.component.import(components);
       const componentLicenses = await modelProvider.model.component.getLicensesAttachedToComponentsFromResults();
       await modelProvider.model.license.bulkAttachComponentLicense(componentLicenses);
@@ -138,6 +143,27 @@ class ComponentService {
     } catch (error) {
       log.error(error);
       return error;
+    }
+  }
+
+  public async create(newComp: Component): Promise<Component> {
+    try {
+      const result = await modelProvider.model.component.create(newComp);
+      return result;
+    } catch (error: any) {
+      log.error(error);
+      return error;
+    }
+  }
+
+  public async attachLicense(component: Component, license: License): Promise<boolean> {
+    try {
+      const link = { license_id: license.id, compid: component.compid };
+      await modelProvider.model.license.licenseAttach(link);
+      return true;
+    } catch (error: any) {
+      log.error(error);
+      return false;
     }
   }
 }

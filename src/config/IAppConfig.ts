@@ -1,4 +1,4 @@
-import { ExportFormat } from "../api/types";
+import { ExportFormat } from '../api/types';
 
 export interface IAppConfig {
   APP_NAME: string;
@@ -12,4 +12,5 @@ export interface IAppConfig {
   FF_ENABLE_WORKBENCH_FILTERS: boolean;
   FF_EXPORT_FORMAT_OPTIONS: Array<ExportFormat>;
   FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN: boolean;
+  FF_ENABLE_API_CONNECTION_SETTINGS: boolean;
 }
