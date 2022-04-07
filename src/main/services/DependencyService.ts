@@ -34,8 +34,8 @@ class DependencyService {
       if (!params.dependencyId) throw new Error('Dependency id is required');
       const queryBuilderDependency = QueryBuilderCreator.create({ id: params.dependencyId });
       let dependency: Dependency = (await modelProvider.model.dependency.getAll(queryBuilderDependency))[0];
-      const queryBuilerComp = QueryBuilderCreator.create({ purl: params.purl, version: params.version });
-      let comp = (await modelProvider.model.component.getAll(queryBuilerComp))[0];
+      const queryBuilderComp = QueryBuilderCreator.create({ purl: params.purl, version: params.version });
+      let comp = (await modelProvider.model.component.getAll(queryBuilderComp))[0];
 
       dependency = { ...dependency, licenses: [params.license], version: params.version };
       await modelProvider.model.dependency.updateLicenseAndVersion(dependency);
@@ -60,7 +60,9 @@ class DependencyService {
       else {
         await modelProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
       }
-      await modelProvider.model.dependency.update(dependency);
+      const dep = [];
+      dep.push(null,dependency.scope,dependency.purl,dependency.version,dependency.dependencyId);
+      await modelProvider.model.dependency.update(dep);
       await modelProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.license, source: 'declared' });
       const response = (await this.getAll({ id: params.dependencyId }))[0];
       return response;
@@ -122,7 +124,9 @@ class DependencyService {
   public async reject(dependencyId: number): Promise<Dependency> {
     try {
       const dep = (await this.getAll({ id: dependencyId }))[0];
-      await modelProvider.model.dependency.update(dep, true);
+      const params= [];
+      params.push(new Date().toISOString(),dep.scope,dep.purl,dep.version,dep.dependencyId);
+      await modelProvider.model.dependency.update(params, true);
       const response = (await this.getAll({ id: dependencyId }))[0];
       return response;
     } catch (error: any) {
