@@ -12,11 +12,11 @@ class DependencyHelper {
     return dep;
   }
 
-  public async mergeInventoryComponentToDependency(
+  public mergeInventoryComponentToDependency(
     dep: Array<any>,
     inventory: any,
     component: any
-  ): Promise<Array<Dependency>> {
+  ): Array<Dependency> {
     let inv: any = inventory;
     let comp: any = component;
     inv = inv.reduce((acc, curr) => {
