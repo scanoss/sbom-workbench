@@ -1,7 +1,7 @@
 import React from 'react';
 import { ButtonGroup, Button, makeStyles, Tooltip } from '@material-ui/core';
-import AccountTreeOutlined from '@material-ui/icons/AccountTreeOutlined';
 import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
+import ExtensionOutlinedIcon from '@material-ui/icons/ExtensionOutlined';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -10,6 +10,11 @@ const useStyles = makeStyles((theme) => ({
   button: {
     fontSize: 16,
     minWidth: 32,
+
+    '&:not(.MuiButton-containedPrimary)': {
+      backgroundColor: '#fff',
+      color: '#000',
+    },
   },
 }));
 
@@ -23,7 +28,7 @@ const CodeViewSelector = ({ active, setView }) => {
 
   return (
     <div className={classes.root}>
-      <ButtonGroup variant="outlined" size="small" aria-label="file view selector">
+      <ButtonGroup variant="contained" size="small" aria-label="file view selector">
         <Tooltip title="Raw view" arrow>
           <Button
             className={classes.button}
@@ -41,7 +46,7 @@ const CodeViewSelector = ({ active, setView }) => {
             color={active === CodeViewSelectorMode.GRAPH ? 'primary' : 'default'}
             aria-label="graph"
           >
-            <AccountTreeOutlined fontSize="inherit" />
+            <ExtensionOutlinedIcon fontSize="inherit" />
           </Button>
         </Tooltip>
       </ButtonGroup>

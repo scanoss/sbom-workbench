@@ -19,7 +19,6 @@ import { Autocomplete } from '@material-ui/lab';
 import { Dependency } from '../../../api/types';
 import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
 import { ResponseStatus } from '../../../api/Response';
-import { componentService } from '../../../api/services/component.service';
 import { licenseService } from '../../../api/services/license.service';
 import { DialogContext } from '../../context/DialogProvider';
 import { NewDependencyDTO } from '../../../api/dto';
@@ -27,7 +26,7 @@ import { NewDependencyDTO } from '../../../api/dto';
 const useStyles = makeStyles((theme) => ({
   size: {
     '& .MuiDialog-paperWidthMd': {
-      width: '600px',
+      width: '500px',
     },
   },
   row: {
@@ -119,76 +118,76 @@ const DependencyDialog = (props: DependencyDialogProps) => {
       open={open}
       onClose={onCancel}
     >
-      <span className="dialog-title">Accept Dependency</span>
+      <span className="dialog-title">
+        Accept <b>{decodeURIComponent(dependency.component?.name || dependency.componentName || dependency.purl)}</b>
+      </span>
 
       <form onSubmit={handleClose}>
         <div className="dialog-content">
-          <div className={`${classes.row} dialog-row`}>
-            <div className="dialog-form-field">
-              <div className="dialog-form-field-label">
-                <label>License</label>
-                <Tooltip title="Add new license">
-                  <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
-                    <AddIcon fontSize="inherit" />
-                  </IconButton>
-                </Tooltip>
-              </div>
-              <Paper className="dialog-form-field-control">
-                <SearchIcon className={classes.search} />
-                <Autocomplete
-                  fullWidth
-                  options={licenses || []}
-                  groupBy={(option) => option?.type}
-                  value={
-                    licenses && form.license
-                      ? { spdxid: form.license, name: licenses.find((item) => item.spdxid === form.license)?.name }
-                      : ''
-                  }
-                  getOptionSelected={(option: any) => option.spdxid === form.license}
-                  getOptionLabel={(option: any) => option.name || option.spdxid}
-                  renderOption={(option: any) => (
-                    <div className={classes.option}>
-                      <span>{option.name}</span>
-                      <span className="middle">{option.spdxid}</span>
-                    </div>
-                  )}
-                  filterOptions={(options, params) => {
-                    return options.filter(
-                      (option) =>
-                        option.name.toLowerCase().includes(params.inputValue.toLowerCase()) ||
-                        option.spdxid.toLowerCase().includes(params.inputValue.toLowerCase())
-                    );
-                  }}
-                  disableClearable
-                  renderInput={(params) => (
-                    <TextField
-                      required
-                      {...params}
-                      InputProps={{
-                        ...params.InputProps,
-                        disableUnderline: true,
-                        className: 'autocomplete-option',
-                      }}
-                    />
-                  )}
-                  onChange={(e, { spdxid }) => setForm({ ...form, license: spdxid })}
-                />
-              </Paper>
+          <div className="dialog-form-field">
+            <div className="dialog-form-field-label">
+              <label>License</label>
+              <Tooltip title="Add new license">
+                <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
+                  <AddIcon fontSize="inherit" />
+                </IconButton>
+              </Tooltip>
             </div>
+            <Paper className="dialog-form-field-control">
+              <SearchIcon className={classes.search} />
+              <Autocomplete
+                fullWidth
+                options={licenses || []}
+                groupBy={(option) => option?.type}
+                value={
+                  licenses && form.license
+                    ? { spdxid: form.license, name: licenses.find((item) => item.spdxid === form.license)?.name }
+                    : ''
+                }
+                getOptionSelected={(option: any) => option.spdxid === form.license}
+                getOptionLabel={(option: any) => option.name || option.spdxid}
+                renderOption={(option: any) => (
+                  <div className={classes.option}>
+                    <span>{option.name}</span>
+                    <span className="middle">{option.spdxid}</span>
+                  </div>
+                )}
+                filterOptions={(options, params) => {
+                  return options.filter(
+                    (option) =>
+                      option.name.toLowerCase().includes(params.inputValue.toLowerCase()) ||
+                      option.spdxid.toLowerCase().includes(params.inputValue.toLowerCase())
+                  );
+                }}
+                disableClearable
+                renderInput={(params) => (
+                  <TextField
+                    required
+                    {...params}
+                    InputProps={{
+                      ...params.InputProps,
+                      disableUnderline: true,
+                      className: 'autocomplete-option',
+                    }}
+                  />
+                )}
+                onChange={(e, { spdxid }) => setForm({ ...form, license: spdxid })}
+              />
+            </Paper>
+          </div>
 
-            <div className="dialog-form-field d-flex flex-column space-between">
-              <label className="dialog-form-field-label">Version</label>
-              <Paper className="dialog-form-field-control">
-                <InputBase
-                  name="version"
-                  fullWidth
-                  value={form.version || ''}
-                  placeholder="Version"
-                  onChange={(e) => inputHandler(e.target.name, e.target.value)}
-                  required
-                />
-              </Paper>
-            </div>
+          <div className="dialog-form-field d-flex flex-column space-between">
+            <label className="dialog-form-field-label">Version</label>
+            <Paper className="dialog-form-field-control">
+              <InputBase
+                name="version"
+                fullWidth
+                value={form.version || ''}
+                placeholder="Version"
+                onChange={(e) => inputHandler(e.target.name, e.target.value)}
+                required
+              />
+            </Paper>
           </div>
         </div>
 
