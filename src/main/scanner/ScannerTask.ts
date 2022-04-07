@@ -113,7 +113,7 @@ export abstract class ScannerTask extends EventEmitter {
   public async run() {
     this.scannerStatus();
     const scanIn = this.adapterToScannerInput(this.project.filesToScan);
-    this.scanDependencies();
+    await this.scanDependencies();
     this.scanner.scan(scanIn);
   }
 
@@ -132,7 +132,7 @@ export abstract class ScannerTask extends EventEmitter {
       dependencies.filesList.forEach((f) => {
         f.file = f.file.replace(rootPath, '');
       });
-      fs.promises.writeFile(
+      await fs.promises.writeFile(
         `${this.project.metadata.getMyPath()}/dependencies.json`,
         JSON.stringify(dependencies, null, 2)
       );
@@ -178,11 +178,15 @@ export abstract class ScannerTask extends EventEmitter {
   }
 
   public async addDependencies() {
-    const dependencies = JSON.parse(
-      await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8')
-    );
-    this.project.tree.addDependencies(dependencies);
-    this.project.save();
-    await dependencyService.insert(dependencies);
+    try {
+      const dependencies = JSON.parse(
+        await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8')
+      );
+      this.project.tree.addDependencies(dependencies);
+      this.project.save();
+      await dependencyService.insert(dependencies);
+    } catch (e) {
+      log.error(e);
+    }
   }
 }
