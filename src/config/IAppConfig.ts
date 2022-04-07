@@ -2,6 +2,7 @@ import { ExportFormat } from '../api/types';
 
 export interface IAppConfig {
   APP_NAME: string;
+  ABOUT_MESSAGE: string;
 
   API_URL: string;
   MIN_VERSION_SUPPORTED: string;

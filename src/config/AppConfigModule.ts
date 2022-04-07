@@ -1,4 +1,5 @@
 /* eslint-disable global-require */
+import log from 'electron-log';
 import { AppConfigDefault } from './AppConfigDefault';
 import { IAppConfig } from './IAppConfig';
 
@@ -8,7 +9,7 @@ try {
   const overrideConf = require('./override.conf.json');
   conf = { ...conf, ...overrideConf };
 } catch (e) {
-  console.log('No override config found');
+  log.info(`%c[ CONFIGMODULE ]: No override config found`, 'color: yellow');
 }
 
 const AppConfig: IAppConfig = conf;
