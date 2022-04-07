@@ -1,6 +1,7 @@
 import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions } from 'electron';
 import path from 'path';
 import { IpcEvents } from '../api/ipc-events';
+import AppConfig from '../config/AppConfigModule';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -266,6 +267,7 @@ export default class MenuBuilder {
 
   buildAboutDialog() {
     const aboutWindow = new BrowserWindow({
+      title: AppConfig.APP_NAME,
       parent: this.mainWindow,
       resizable: false,
       width: 500,

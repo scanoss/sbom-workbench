@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import React from 'react';
 import icon from '../../../../assets/icon.png';
+import AppConfig from '../../../config/AppConfigModule';
 import LicensesText from './LicensesText';
 
 const electron = window.require('electron');
@@ -26,9 +27,7 @@ const About = () => {
         <div className="d-flex align-center">
           <img src={icon} alt="logo" className="mr-4" />
           <div>
-            <p style={{ fontSize: '0.9rem', marginBottom: 0 }}>
-              SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.
-            </p>
+            <p style={{ fontSize: '0.9rem', marginBottom: 0 }}>{AppConfig.ABOUT_MESSAGE}</p>
             <p style={{ fontSize: '0.75rem', margin: 0 }} className="text-right">
               VERSION: {app.getVersion()}
             </p>
