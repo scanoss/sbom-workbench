@@ -9,7 +9,7 @@ const pathLib = require('path');
 
 const crypto = require('crypto');
 
-ipcMain.handle(IpcEvents.EXPORT, async (_event, path: string, format: ExportFormat) => {
+ipcMain.handle(IpcEvents.EXPORT, async (_event, path: string, format: ExportFormat) => { // NewExportDTO
   try {
     let auxPath = path;
     if (
@@ -22,12 +22,12 @@ ipcMain.handle(IpcEvents.EXPORT, async (_event, path: string, format: ExportForm
       const complete = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles) < 100;
       auxPath = complete ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;
     }
-    console.log('format',format);
     const exportTask = new Export();
-    exportTask.setFormat(format);
-    const success = await exportTask.run(auxPath); 
-    return Response.ok( { message: 'File exported successfully', data: success });
-  } catch (e:any) {
+    exportTask.setFormat(format);    
+    const success = await exportTask.run(auxPath);
+
+    return Response.ok({ message: 'File exported successfully', data: success });
+  } catch (e: any) {
     console.log('Catch an error: ', e);
     return Response.fail({ message: e.message });
   }

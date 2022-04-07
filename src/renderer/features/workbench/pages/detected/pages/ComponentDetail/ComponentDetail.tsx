@@ -47,7 +47,7 @@ export const ComponentDetail = () => {
 
   const getFiles = async () => {
     const response = await componentService.getFiles({ purl: component.purl, version }, { status: null });
-    setFiles(mapFiles(response.data));
+    setFiles(mapFiles(response));
   };
 
   const onAction = async (file: any, action: MATCH_CARD_ACTIONS) => {

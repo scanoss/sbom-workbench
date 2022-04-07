@@ -1,3 +1,3 @@
-export interface ITask<T> {
-  run(params: T): Promise<T>;
+export interface ITask<UseCasePort, UseCaseResult> {
+  run(params: UseCasePort): Promise<UseCaseResult>;
 }

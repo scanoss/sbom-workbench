@@ -1,4 +1,4 @@
-export interface AutoAcceptDTO {
+export interface AutoAcceptResult {
   success: boolean;
   message: string;
   componentsAccepted: number;
