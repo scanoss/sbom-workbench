@@ -16,6 +16,9 @@ function setup() {
     onProjectDelete: jest.fn(),
     onProjectRestore: jest.fn(),
     onProjectCreate: jest.fn(),
+    onProjectImport: jest.fn(),
+    onProjectExport: jest.fn(),
+    onProjectRescan: jest.fn(),
   };
 
   const enzymeWrapper = shallow(<ProjectList {...props} />);
