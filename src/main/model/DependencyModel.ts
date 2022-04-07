@@ -2,7 +2,7 @@ import log from 'electron-log';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Model } from './Model';
 import { Querys } from './querys_db';
-import { Dependency } from '../../api/types';
+import {Component, Dependency, FileStatusType, Inventory} from '../../api/types';
 
 const query = new Querys();
 
@@ -107,15 +107,12 @@ export class DependencyModel extends Model {
     });
   }
 
-  public update(dependency: any, rejected?: boolean) {
+  public update(dependency: any) {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.run(
-          `UPDATE dependencies SET rejectedAt=? WHERE purl=? AND version=?;`,
-          rejected ? new Date().toISOString() : null,
-          dependency.purl,
-          dependency.version,
+          `UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=? WHERE dependencyId=?;`,...dependency,
           async (err: any, dep: any) => {
             db.close();
             if (err) throw err;
