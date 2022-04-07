@@ -89,7 +89,15 @@ const DependencyViewer = () => {
   };
 
   const onAcceptAllHandler = async () => {
-    const { action } = await dialogCtrl.openAlertDialog('Are you sure you want to accept all dependencies?', [
+    const message = `All declared dependencies will be accepted.
+
+      <div class="MuiPaper-root MuiAlert-root MuiAlert-standardWarning MuiPaper-elevation0">
+        <div class="MuiAlert-icon"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.99L19.53 19H4.47L12 5.99M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"></path></svg></div>
+        <div class="MuiAlert-message">Some dependencies will not be accepted because they lack version or license details.</div>
+      </div>
+  `;
+
+    const { action } = await dialogCtrl.openAlertDialog(message, [
       { label: 'Cancel', role: 'cancel' },
       { label: 'Accept All', action: 'accept', role: 'accept' },
     ]);
@@ -101,20 +109,10 @@ const DependencyViewer = () => {
   };
 
   const onAcceptHandler = async (dependency: Dependency) => {
-    let dep: NewDependencyDTO = {
-      dependencyId: dependency.dependencyId,
-      purl: dependency.purl,
-      license: dependency.licenses[0],
-      version: dependency.version,
-    };
+    const { action, data } = await workbenchDialogCtrl.openDependencyDialog(dependency);
+    if (action === DIALOG_ACTIONS.CANCEL) return;
 
-    if (!dependency.valid) {
-      const { action, data } = await workbenchDialogCtrl.openDependencyDialog(dependency);
-      if (action === DIALOG_ACTIONS.CANCEL) return;
-      dep = data;
-    }
-
-    await dependencyService.accept(dep);
+    await dependencyService.accept(data);
     getDependencies(file);
   };
 
@@ -136,15 +134,19 @@ const DependencyViewer = () => {
     <>
       <section id="Dependency" className="app-page">
         <header className="app-header">
-          <Breadcrumb />
-          <div className="d-flex align-center mb-2">
+          <div className="d-flex space-between">
+            <Breadcrumb />
             <CodeViewSelector active={view} setView={setView} />
+          </div>
+          <div className="d-flex align-center mb-2">
             <h3 className="mt-0 mb-0">Declared Dependencies</h3>
           </div>
-
           <section className="subheader">
             <div className="search-box">
-              <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
+              <SearchBox
+                disabled={view === CodeViewSelectorMode.CODE}
+                onChange={(value) => setSearchQuery(value.trim().toLowerCase())}
+              />
             </div>
 
             <Button
@@ -169,10 +171,11 @@ const DependencyViewer = () => {
                     <div className="dependencies-tree-header mt-1 mb-2">
                       <div className="dependencies-tree-header-title">
                         <Typography variant="subtitle2">
+                          Showing{' '}
                           <b>
-                            {items.length}/{dependencies.length}
+                            {items.length} of {dependencies.length}
                           </b>{' '}
-                          {dependencies.length > 1 ? 'dependencies' : 'dependency'} found
+                          {dependencies.length > 1 ? 'dependencies' : 'dependency'} found in <b>{file}</b>
                         </Typography>
                       </div>
                     </div>

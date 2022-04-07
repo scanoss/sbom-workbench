@@ -50,8 +50,8 @@ const Reports = () => {
   const [detectedData, setDetectedData] = useState(null);
   const [identifiedData, setIdentifiedData] = useState(null);
 
-  const setTab = () => {
-    if (state.tree.hasIdentified || state.tree.hasIgnored) {
+  const setTab = (identified) => {
+    if (state.tree.hasIdentified || state.tree.hasIgnored || identified.licenses.length > 0) {
       historyState.push(`${path}/identified`);
     }
   };
@@ -63,7 +63,7 @@ const Reports = () => {
       const identified = await reportService.identified();
       setDetectedData({ ...detected, summary });
       setIdentifiedData({ ...identified, summary });
-      setTab();
+      setTab(identified);
     };
     init();
   }, []);

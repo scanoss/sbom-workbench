@@ -21,7 +21,7 @@ class DependencyService {
       const dependencies = await modelProvider.model.dependency.getAll(queryBuilder);
       const inventory: any = await modelProvider.model.inventory.getAll();
       const component: any = await modelProvider.model.component.getAll();
-      dependencyHelper.mergeInventoryComponentToDependency(dependencies, inventory, component);     
+      dependencyHelper.mergeInventoryComponentToDependency(dependencies, inventory, component);
       return dependencies;
     } catch (err: any) {
       log.error(err);
@@ -33,19 +33,12 @@ class DependencyService {
     try {
       if (!params.dependencyId) throw new Error('Dependency id is required');
       const queryBuilderDependency = QueryBuilderCreator.create({ id: params.dependencyId });
-      let dependency: any = (await modelProvider.model.dependency.getAll(queryBuilderDependency))[0];
+      let dependency: Dependency = (await modelProvider.model.dependency.getAll(queryBuilderDependency))[0];
       const queryBuilerComp = QueryBuilderCreator.create({ purl: params.purl, version: params.version });
       let comp = (await modelProvider.model.component.getAll(queryBuilerComp))[0];
-      // Adds license to dependency if the user define one
-      if (dependency.licenses.length === 0) {
-        dependency = { ...dependency, licenses: params.license };
-        await modelProvider.model.dependency.updateLicense(dependency);
-      }
 
-      if(!dependency.version){
-        dependency = { ...dependency, version: params.version };
-        await modelProvider.model.dependency.updateVersion(dependency);
-      }
+      dependency = { ...dependency, licenses: [params.license], version: params.version };
+      await modelProvider.model.dependency.updateLicenseAndVersion(dependency);
 
       let lic: any = await modelProvider.model.license.getBySpdxId(params.license);
       const licenseName = licenseHelper.licenseNameToSPDXID(params.license);
@@ -59,7 +52,7 @@ class DependencyService {
 
       if (!comp)
         comp = await modelProvider.model.component.create({
-          name: dependency.componentName,
+          name: dependency.componentName || dependency.purl,
           version: params.version,
           purl: params.purl,
           license_id: lic.id,
@@ -78,12 +71,12 @@ class DependencyService {
   }
 
   public async restore(dependencyId: number): Promise<boolean> {
-    try {    
+    try {
       const dep = (await this.getAll({ id: dependencyId }))[0];
       if (dep.status === 'identified') {
         await modelProvider.model.inventory.delete(dep.inventory);
         if (dep.component.source === 'manual') await modelProvider.model.component.deleteByID([dep.component.compid]);
-      }     
+      }
       await modelProvider.model.dependency.restore({dependencyId: dependencyId,version:dep.originalVersion,licenses:dep.originalLicense});
       return true;
     } catch (error: any) {
