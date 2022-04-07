@@ -19,10 +19,11 @@ const useStyles = makeStyles((theme) => ({
 export interface SearchBoxProps {
   placeholder: string;
   responseDelay: number;
+  disabled: boolean;
   onChange: (value: string) => void;
 }
 
-const SearchBox = ({ placeholder, responseDelay, onChange }: SearchBoxProps) => {
+const SearchBox = ({ placeholder, responseDelay, disabled, onChange }: SearchBoxProps) => {
   const classes = useStyles();
   const [query, setQuery] = useState('');
 
@@ -37,6 +38,7 @@ const SearchBox = ({ placeholder, responseDelay, onChange }: SearchBoxProps) => 
         <SearchIcon />
       </IconButton>
       <InputBase
+        disabled={disabled}
         className={classes.input}
         onKeyUp={(e: any) => setQuery(e.target.value)}
         placeholder={placeholder}
@@ -46,6 +48,6 @@ const SearchBox = ({ placeholder, responseDelay, onChange }: SearchBoxProps) => 
   );
 };
 
-SearchBox.defaultProps = { placeholder: 'Search...', responseDelay: 300 };
+SearchBox.defaultProps = { placeholder: 'Search...', responseDelay: 300, disabled: false };
 
 export default SearchBox;

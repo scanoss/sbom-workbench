@@ -2,6 +2,7 @@ import log from 'electron-log';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Model } from './Model';
 import { Querys } from './querys_db';
+import { Dependency } from '../../api/types';
 
 const query = new Querys();
 
@@ -29,7 +30,7 @@ export class DependencyModel extends Model {
               db.run(
                 query.SQL_DEPENDENCIES_INSERT,
                 fileId,
-                dependency.purl ? dependency.purl : null,
+                dependency.purl ? decodeURIComponent(dependency.purl) : null,
                 dependency.version ? dependency.version : null,
                 dependency.scope ? dependency.scope : null,
                 dependency.licensesList.length > 0 &&
@@ -57,8 +58,8 @@ export class DependencyModel extends Model {
     });
   }
 
-  public async getAll(queryBuilder: QueryBuilder) {
-    return new Promise<Array<any>>(async (resolve, reject) => {
+  public async getAll(queryBuilder: QueryBuilder): Promise<Array<Dependency>> {
+    return new Promise<Array<Dependency>>(async (resolve, reject) => {
       try {
         const SQLquery = this.getSQL(
           queryBuilder,
@@ -84,33 +85,13 @@ export class DependencyModel extends Model {
     });
   }
 
-  public updateLicense(dependency: any) {
+  public updateLicenseAndVersion(dependency: Dependency): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.run(
-          'UPDATE dependencies SET licenses=? WHERE dependencyId=?',
-          dependency.licenses,
-          dependency.dependencyId,
-          async (err: any, dep: any) => {
-            db.close();
-            if (err) throw err;
-            resolve(true);
-          }
-        );
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
-  public updateVersion(dependency: any) {
-    return new Promise<boolean>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.run(
-          'UPDATE dependencies SET version=? WHERE dependencyId=?',
+          'UPDATE dependencies SET licenses=?, version=? WHERE dependencyId=?',
+          dependency.licenses.join(','),
           dependency.version,
           dependency.dependencyId,
           async (err: any, dep: any) => {
@@ -148,7 +129,7 @@ export class DependencyModel extends Model {
     });
   }
 
-  public restore(dependency: any) { 
+  public restore(dependency: any) {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
