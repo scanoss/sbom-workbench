@@ -12,7 +12,7 @@ import { BaseService } from './base.service';
 const { ipcRenderer } = require('electron');
 
 class ComponentService extends BaseService {
-  public async create(component: Partial<NewComponentDTO>): Promise<any> {
+  public async create(component: Partial<NewComponentDTO>): Promise<Component> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_CREATE, component);
     return this.response(response);
   }
@@ -24,7 +24,7 @@ class ComponentService extends BaseService {
 
   public async attachLicense(component: Partial<Component>, license: Partial<License>): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_ATTACH_LICENSE, component, license);
-    return response;
+    return this.response(response);
   }
 
   public async detachLicense(component: Component, license: License): Promise<any> {
@@ -34,7 +34,7 @@ class ComponentService extends BaseService {
 
   public async getFiles(component: Partial<Component>, params: IWorkbenchFilter = null): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_FILES, component, params);
-    return response;
+    return this.response(response);
   }
 
   public async getAll(params?: IWorkbenchFilterParams): Promise<any> {

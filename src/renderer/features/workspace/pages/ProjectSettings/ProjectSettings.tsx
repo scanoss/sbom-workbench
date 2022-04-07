@@ -22,6 +22,7 @@ import { userSettingService } from '../../../../../api/services/userSetting.serv
 import { workspaceService } from '../../../../../api/services/workspace.service';
 import { ResponseStatus } from '../../../../../api/Response';
 import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
+import AppConfig from '../../../../../config/AppConfigModule';
 
 const pathUtil = require('path');
 
@@ -257,43 +258,47 @@ const ProjectSettings = () => {
               </div>
               <div className="api-conections-container">
                 <div className="api-subcontainer">
-                  <div className="api-conections-label-container mb-3">
-                    <label className="input-label">API Connections</label>
-                  </div>
-                  <div className="label-input-container">
-                    <div className="label-icon">
-                      <label className="input-label h3">
-                        Knowledgebase API
-                        <span className="optional"> - Optional</span>
-                      </label>
-                    </div>
-                    <Paper className="input-text-container">
-                      <Select
-                        onChange={(e: any) => {
-                          setProjectSettings({
-                            ...projectSettings,
-                            api: e.target?.value.URL,
-                            api_key: e.target?.value.API_KEY,
-                          });
-                        }}
-                        defaultValue={0}
-                        fullWidth
-                        disableUnderline
-                        className={classes.select}
-                      >
-                        <MenuItem value={0}>
-                          <span className="item-default">Use default settings</span>
-                        </MenuItem>
-                        ;
-                        {apis.map((api) => (
-                          <MenuItem value={api} key={api.key}>
-                            <span>API URL: {api.URL}</span>
-                            {api.API_KEY && <span className="api_key"> - API KEY: {api.API_KEY}</span>}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </Paper>
-                  </div>
+                  {AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS && (
+                    <>
+                      <div className="api-conections-label-container mb-3">
+                        <label className="input-label">API Connections</label>
+                      </div>
+                      <div className="label-input-container">
+                        <div className="label-icon">
+                          <label className="input-label h3">
+                            Knowledgebase API
+                            <span className="optional"> - Optional</span>
+                          </label>
+                        </div>
+                        <Paper className="input-text-container">
+                          <Select
+                            onChange={(e: any) => {
+                              setProjectSettings({
+                                ...projectSettings,
+                                api: e.target?.value.URL,
+                                api_key: e.target?.value.API_KEY,
+                              });
+                            }}
+                            defaultValue={0}
+                            fullWidth
+                            disableUnderline
+                            className={classes.select}
+                          >
+                            <MenuItem value={0}>
+                              <span className="item-default">Use default settings</span>
+                            </MenuItem>
+                            ;
+                            {apis.map((api) => (
+                              <MenuItem value={api} key={api.key}>
+                                <span>API URL: {api.URL}</span>
+                                {api.API_KEY && <span className="api_key"> - API KEY: {api.API_KEY}</span>}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </Paper>
+                      </div>
+                    </>
+                  )}
                   <div className="label-input-container mt-5">
                     <div className="label-icon">
                       <label className="input-label h3">

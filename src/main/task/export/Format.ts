@@ -1,4 +1,6 @@
+import log from 'electron-log';
 import fs from 'fs';
+import { ExportResult } from './ExportResult';
 import { ExportModel } from './Model/ExportModel';
 
 export abstract class Format {
@@ -12,12 +14,24 @@ export abstract class Format {
 
   public abstract generate();
 
-  public async save(path: string) {
+  public async save(path: string): Promise<ExportResult> {
     const file = await this.generate();
     try {
-      return await fs.promises.writeFile(`${path}${this.extension}`, file);
+      await fs.promises.writeFile(`${path}${this.extension}`, file);
+      return {
+        success: true,
+        message: 'Export successful',
+        extension: this.extension,
+        file: `${path}${this.extension}`,
+      };
     } catch (error) {
-      return error;
+      log.error(error);
+      return {
+        success: false,
+        message: 'Export not successful',
+        extension: this.extension,
+        file: `${path}${this.extension}`,
+      };
     }
   }
 }

@@ -10,14 +10,16 @@ import { HtmlSummary } from './format/HtmlSummary';
 import { ExportFormat } from '../../../api/types';
 import { SpdxLiteJson } from './format/SpdxLiteJson';
 import { ITask } from '../Task';
+import { ExportResult } from './ExportResult';
 
-export class Export implements ITask<any> {
+export class Export implements ITask<string, ExportResult> {
   private format: Format;
 
-  public async run(path: string) {
+  public async run(path: string): Promise<ExportResult> {
     try {
-      return await this.format.save(path);
-    } catch (error) {
+      const result = await this.format.save(path);
+      return result;
+    } catch (error: any) {
       return error;
     }
   }
