@@ -12,7 +12,7 @@
     "sourceMap": true,
     /* Additional Checks */
     "noUnusedLocals": false,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     /* Module Resolution Options */
