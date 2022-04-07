@@ -26,9 +26,9 @@ ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT, async (event, params: NewDependencyD
   }
 });
 
-ipcMain.handle(IpcEvents.DEPENDENCY_REJECT, async (_event, dependencyId: number) => {
+ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE, async (_event, dependencyId: number) => {
   try {
-    const dependency = await dependencyService.reject(dependencyId);
+    const dependency = await dependencyService.restore(dependencyId);
     return Response.ok({ message: 'Component created successfully', data: dependency });
   } catch (error: any) {
     log.error(error);
