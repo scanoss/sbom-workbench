@@ -119,19 +119,19 @@ export class FileModel extends Model {
       }
     });
   }
-
-  public async getIdFromPath(path: string) {
-    return new Promise(async (resolve, reject) => {
+//TODO: REMOVE THIS METHOD AND USE GET
+  public async getIdFromPath(path: string): Promise<number> {
+    return new Promise<number> ( async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.get('SELECT fileId AS id FROM files WHERE path=?;', path, (err: any, id: any) => {
+        db.get('SELECT fileId FROM files WHERE path=?;', path, (err: any, file: any) => {
           if (err) throw err;
           db.close();
-          resolve(id);
+          resolve(file.fileId);
         });
-      } catch (error) {
+      } catch (error: any) {
         log.error(error);
-        reject(new Error('ERROR ATTACHING FILES TO RESULTS'));
+       reject(error);
       }
     });
   }

@@ -1,6 +1,4 @@
-/* eslint-disable import/no-cycle */
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import { ipcRenderer } from 'electron';
 import { InventoryDialog } from '../ui/dialog/InventoryDialog';
 import { ComponentGroup, Inventory, NewComponentDTO } from '../../api/types';
@@ -16,7 +14,7 @@ import { PreLoadInventoryDialog } from '../ui/dialog/PreLoadInventoryDialog';
 import { ProgressDialog } from '../ui/dialog/ProgressDialog';
 
 export interface IDialogContext {
-  openInventory: (inventory: Partial<InventoryForm>, recentUsedComponents: string[], showInfoFilter: boolean) => Promise<Inventory | null>;
+  openInventory: (inventory: Partial<InventoryForm>, recentUsedComponents: string[], showInfoFilter?: boolean) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
   openAlertDialog: (message?: string, buttons?: any[]) => Promise<DialogResponse>;
@@ -24,7 +22,7 @@ export interface IDialogContext {
   openSettings: () => Promise<DialogResponse>;
   openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
   openPreLoadInventoryDialog: (folder: string, overwrite: boolean, showInfoFilter: boolean) => Promise<boolean>;
-  createProgressDialog: (message: string) => Promise<LoaderController>;
+  createProgressDialog: (message: ReactNode) => Promise<LoaderController>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -147,7 +145,7 @@ export const DialogProvider: React.FC = ({ children }) => {
     message?: React.ReactNode;
   }>({ open: false, loader: false });
 
-  const createProgressDialog = (message = 'Wait a moment please'): Promise<LoaderController> => {
+  const createProgressDialog = (message: React.ReactNode = 'Wait a moment please'): Promise<LoaderController> => {
     return new Promise<LoaderController>((resolve) => {
       setProgressDialog({
         open: false,

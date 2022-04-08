@@ -27,7 +27,7 @@ import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
-import { exportFormat } from '../../../../../api/services/export.service';
+import { exportService } from '../../../../../api/services/export.service';
 import { dialogController } from '../../../../controllers/dialog-controller';
 import { ExportFormat, IProject } from '../../../../../api/types';
 import { workspaceService } from '../../../../../api/services/workspace.service';
@@ -191,7 +191,7 @@ const Export = ({ state }) => {
       defaultPath: `${data.work_root}/${data.name}`,
     });
     if (path && path !== undefined) {
-      await exportFormat.export(path, format);
+      await exportService.export(path, format);
     }
   };
 
