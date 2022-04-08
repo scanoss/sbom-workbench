@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 
 interface ProgressDialogProps {
   open: boolean;
-  message: string;
+  message: React.ReactNode;
   loader: boolean;
 }
 

@@ -24,6 +24,7 @@ module.exports = {
     'no-async-promise-executor': ['off'],
     // 'no-func-names': ['on','as-needed'],
     'react/no-array-index-key': ['warn'],
+    'import/no-cycle': ['warn'],
   },
   parserOptions: {
     ecmaVersion: 2020,

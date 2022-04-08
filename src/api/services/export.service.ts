@@ -17,4 +17,4 @@ class Export extends BaseService {
   }
 }
 
-export const exportFormat = new Export();
+export const exportService = new Export();

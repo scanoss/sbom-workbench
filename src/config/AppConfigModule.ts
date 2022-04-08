@@ -8,9 +8,9 @@ let conf = AppConfigDefault;
 try {
   const overrideConf = require('./override.conf.json');
   conf = { ...conf, ...overrideConf };
-} catch (e) {
-  log.info(`%c[ CONFIGMODULE ]: No override config found`, 'color: yellow');
-}
+  log.info(`%c[ CONFIGMODULE ]: Override config file found`, 'color: yellow');
+  // eslint-disable-next-line no-empty
+} catch (e) {}
 
 const AppConfig: IAppConfig = conf;
 

@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
-import { IDependency } from 'scanoss';
 import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
@@ -49,7 +48,7 @@ export const Editor = () => {
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
   const [fullFile, setFullFile] = useState<boolean>(null);
-  const [dependencies, setDependencies] = useState<IDependency[]>(null);
+  const [dependencies, setDependencies] = useState<any[]>(null);
   const [view, setView] = useState<'code' | 'graph'>('code');
 
   const init = () => {
@@ -143,11 +142,11 @@ export const Editor = () => {
       state.recentUsedComponents
     );
     if (response) {
-      const data = await fileService.getIdFromPath(file);
-      if (!data) return;
+      const id = await fileService.getIdFromPath(file);
+      if (!id) return;
       await createInventory({
         ...response,
-        files: [data.id],
+        files: [id],
       });
       getInventories();
       getResults();
