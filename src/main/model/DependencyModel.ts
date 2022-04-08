@@ -2,7 +2,7 @@ import log from 'electron-log';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Model } from './Model';
 import { Querys } from './querys_db';
-import {Component, Dependency, FileStatusType, Inventory} from '../../api/types';
+import { Dependency } from '../../api/types';
 
 const query = new Querys();
 
@@ -85,58 +85,13 @@ export class DependencyModel extends Model {
     });
   }
 
-  public updateLicenseAndVersion(dependency: Dependency): Promise<boolean> {
+  public update(dependency: Array<any>) {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.run(
-          'UPDATE dependencies SET licenses=?, version=? WHERE dependencyId=?',
-          dependency.licenses.join(','),
-          dependency.version,
-          dependency.dependencyId,
-          async (err: any, dep: any) => {
-            db.close();
-            if (err) throw err;
-            resolve(true);
-          }
-        );
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
-  public update(dependency: any) {
-    return new Promise<boolean>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.run(
-          `UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=? WHERE dependencyId=?;`,...dependency,
-          async (err: any, dep: any) => {
-            db.close();
-            if (err) throw err;
-            resolve(true);
-          }
-        );
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
-  public restore(dependency: any) {
-    return new Promise<boolean>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.run(
-          `UPDATE dependencies SET rejectedAt=?, licenses=? , version=? WHERE dependencyId=?;`,
-          null,
-          dependency.licenses ? dependency.licenses.join(',') : null,
-          dependency.version ? dependency.version : null,
-          dependency.dependencyId,
-          async (err: any, dep: any) => {
+          `UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?;`,...dependency,
+          async (err: any, _dep: any) => {
             db.close();
             if (err) throw err;
             resolve(true);
