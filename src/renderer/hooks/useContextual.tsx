@@ -94,8 +94,8 @@ const useContextual = () => {
   };
 
   const restore = async (node: any): Promise<boolean> => {
-    const file = await fileService.getIdFromPath(node.value);
-    return restoreFile([file.id]);
+    const fileId = await fileService.getIdFromPath(node.value);
+    return restoreFile([fileId]);
   };
 
   return {

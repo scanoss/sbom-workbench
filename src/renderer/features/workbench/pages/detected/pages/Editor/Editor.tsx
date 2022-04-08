@@ -143,11 +143,11 @@ export const Editor = () => {
       state.recentUsedComponents
     );
     if (response) {
-      const data = await fileService.getIdFromPath(file);
-      if (!data) return;
+      const id = await fileService.getIdFromPath(file);
+      if (!id) return;
       await createInventory({
         ...response,
-        files: [data.id],
+        files: [id],
       });
       getInventories();
       getResults();
