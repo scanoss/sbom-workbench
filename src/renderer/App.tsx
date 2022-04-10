@@ -12,7 +12,6 @@ import Workspace from './features/workspace';
 import About from './features/about/About';
 
 import './App.global.scss';
-import { WorkbenchDialogProvider } from './context/WorkbenchDialogProvider';
 
 export default class App {
   /**
