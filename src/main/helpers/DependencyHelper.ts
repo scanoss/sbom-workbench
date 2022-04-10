@@ -1,7 +1,7 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-param-reassign */
 
-import { Dependency, Inventory } from '../../api/types';
+import { Dependency } from '../../api/types';
 
 class DependencyHelper {
   public dependecyModelAdapter(dependency: any) {

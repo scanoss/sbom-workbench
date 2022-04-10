@@ -37,18 +37,16 @@ class DependencyService {
       const queryBuilderComp = QueryBuilderCreator.create({ purl: params.purl, version: params.version });
       let comp = (await modelProvider.model.component.getAll(queryBuilderComp))[0];
 
-      dependency = { ...dependency, licenses: [params.license], version: params.version };
-      await modelProvider.model.dependency.updateLicenseAndVersion(dependency);
-
-      let lic: any = await modelProvider.model.license.getBySpdxId(params.license);
-      const licenseName = licenseHelper.licenseNameToSPDXID(params.license);
-      if (!lic)
+      let lic: any = await modelProvider.model.license.getBySpdxId(dependency.licenses.length > 0 ? dependency.licenses[0] : params.license);
+      if (!lic) {
+        const licenseName = licenseHelper.licenseNameToSPDXID(dependency.licenses.length > 0 ? dependency.licenses[0] : params.license);
         lic = await modelProvider.model.license.create({
-          spdxid: params.license,
+          spdxid: dependency.licenses.length>0 ? dependency.licenses[0] : params.license,
           name: licenseName,
           fulltext: '',
           url: '',
         });
+      }
 
       if (!comp)
         comp = await modelProvider.model.component.create({
@@ -60,9 +58,13 @@ class DependencyService {
       else {
         await modelProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
       }
+
+      // Update dependency
+      dependency = { ...dependency, licenses: [params.license], version: params.version };
       const dep = [];
-      dep.push(null,dependency.scope,dependency.purl,dependency.version,dependency.dependencyId);
+      dep.push(null,dependency.scope? dependency.scope: null,dependency.purl,dependency.version,dependency.licenses.join(','),dependency.dependencyId);
       await modelProvider.model.dependency.update(dep);
+
       await modelProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.license, source: 'declared' });
       const response = (await this.getAll({ id: params.dependencyId }))[0];
       return response;
@@ -79,7 +81,9 @@ class DependencyService {
         await modelProvider.model.inventory.delete(dep.inventory);
         if (dep.component.source === 'manual') await modelProvider.model.component.deleteByID([dep.component.compid]);
       }
-      await modelProvider.model.dependency.restore({dependencyId: dependencyId,version:dep.originalVersion,licenses:dep.originalLicense});
+      const params= [];
+      params.push(null,dep.scope? dep.scope: null,dep.purl,dep.originalVersion,dep.originalLicense ? dep.originalLicense.join(',') : null ,dep.dependencyId);
+      await modelProvider.model.dependency.update(params);
       return true;
     } catch (error: any) {
       log.error(error);
@@ -125,7 +129,7 @@ class DependencyService {
     try {
       const dep = (await this.getAll({ id: dependencyId }))[0];
       const params= [];
-      params.push(new Date().toISOString(),dep.scope,dep.purl,dep.version,dep.dependencyId);
+      params.push(new Date().toISOString(),dep.scope? dep.scope :null,dep.purl,dep.version,dep.licenses.length > 0 ? dep.licenses.join(','): null,dep.dependencyId);
       await modelProvider.model.dependency.update(params);
       const response = (await this.getAll({ id: dependencyId }))[0];
       return response;
