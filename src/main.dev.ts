@@ -15,8 +15,9 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import path from 'path';
 import * as os from 'os';
-import MenuBuilder from './main/menu';
 
+import AppConfig from './config/AppConfigModule';
+import MenuBuilder from './main/menu';
 import { workspace } from './main/workspace/Workspace';
 import { userSettingService } from './main/services/UserSettingService';
 import { WorkspaceMigration } from './main/migration/WorkspaceMigration';
@@ -33,7 +34,6 @@ import './api/handlers/report.handler';
 import './api/handlers/license.handler';
 import './api/handlers/dependency.handler';
 import './api/handlers/userSetting.handler';
-import AppConfig from './config/AppConfigModule';
 
 export default class AppUpdater {
   constructor() {

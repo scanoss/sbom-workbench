@@ -16,13 +16,13 @@ import { useHistory } from 'react-router-dom';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { Add } from '@material-ui/icons';
-import { AppContext, IAppContext } from '../../../../context/AppProvider';
-import { INewProject } from '../../../../../api/types';
-import { userSettingService } from '../../../../../api/services/userSetting.service';
-import { workspaceService } from '../../../../../api/services/workspace.service';
-import { ResponseStatus } from '../../../../../api/Response';
-import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
-import AppConfig from '../../../../../config/AppConfigModule';
+import { AppContext, IAppContext } from '@context/AppProvider';
+import { INewProject } from '@api/types';
+import { userSettingService } from '@api/services/userSetting.service';
+import { workspaceService } from '@api/services/workspace.service';
+import { ResponseStatus } from '@api/Response';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import AppConfig from '@config/AppConfigModule';
 
 const pathUtil = require('path');
 
@@ -76,8 +76,8 @@ const ProjectSettings = () => {
     source: null,
   });
 
-  const [projectValidName, setprojectValidName] = useState(false);
-  const [projectNameExists, setprojectNameExists] = useState(false);
+  const [projectValidName, setProjectValidName] = useState(false);
+  const [projectNameExists, setProjectNameExists] = useState(false);
 
   useEffect(() => {
     init();
@@ -111,15 +111,15 @@ const ProjectSettings = () => {
     const re = /^[^\s^\x00-\x1f\\?*:"";<>|/.][^\x00-\x1f\\?*:"";<>|/]*[^\s^\x00-\x1f\\?*:"";<>|/.]+$/;
 
     if (found) {
-      setprojectNameExists(true);
+      setProjectNameExists(true);
     } else {
-      setprojectNameExists(false);
+      setProjectNameExists(false);
     }
 
     if (projectSettings.name.trim() !== '' && re.test(projectSettings.name)) {
-      setprojectValidName(true);
+      setProjectValidName(true);
     } else {
-      setprojectValidName(false);
+      setProjectValidName(false);
     }
   }, [projectSettings.name, projects]);
 

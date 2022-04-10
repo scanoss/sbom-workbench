@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { IconButton, Link } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router-dom';
-import { AppContext, IAppContext } from '../../../../context/AppProvider';
+import { AppContext, IAppContext } from '@context/AppProvider';
 
 const ProjectDrop = () => {
   const history = useHistory();

@@ -2,16 +2,16 @@ import React from 'react';
 import { render } from 'react-dom';
 import { HashRouter, Route } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider, Theme } from '@material-ui/core/styles';
+import { DialogProvider } from '@context/DialogProvider';
+import { WorkbenchDialogProvider } from '@context/WorkbenchDialogProvider';
+import AppConfig from '@config/AppConfigModule';
 import { WorkbenchProvider } from './features/workbench/store';
-import { DialogProvider } from './context/DialogProvider';
 import Workbench from './features/workbench/Workbench';
 import AppProvider from './context/AppProvider';
 import Workspace from './features/workspace';
 import About from './features/about/About';
 
 import './App.global.scss';
-import AppConfig from '../config/AppConfigModule';
-import { WorkbenchDialogProvider } from './context/WorkbenchDialogProvider';
 
 export default class App {
   /**

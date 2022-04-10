@@ -10,6 +10,15 @@
     "strict": true,
     "pretty": true,
     "sourceMap": true,
+    "paths": {
+      "@assets/*": ["assets/*"],
+      "@shared/*": ["src/shared/*"],
+      "@config/*": ["src/config/*"],
+      "@api/*": ["src/api/*"],
+      "@context/*": ["src/renderer/context/*"],
+      "@components/*": ["src/renderer/components/*"],
+      "@hooks/*": ["src/renderer/hooks/*"],
+    },
     /* Additional Checks */
     "noUnusedLocals": false,
     "noUnusedParameters": false,

@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { AppContext, IAppContext } from '../../../../context/AppProvider';
-import { IProject } from '../../../../../api/types';
-import { workspaceService } from '../../../../../api/services/workspace.service';
-import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
-import { DIALOG_ACTIONS } from '../../../../context/types';
+import { AppContext, IAppContext } from '@context/AppProvider';
+import { IProject } from '@api/types';
+import { workspaceService } from '@api/services/workspace.service';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import { DIALOG_ACTIONS } from '@context/types';
+import AppConfig from '@config/AppConfigModule';
+import SearchBox from '@components/SearchBox/SearchBox';
 import ProjectList from '../Components/ProjectList';
-import SearchBox from '../../../../components/SearchBox/SearchBox';
 import AddProjectButton from '../Components/AddProjectButton/AddProjectButton';
-import AppConfig from '../../../../../config/AppConfigModule';
 
 const Workspace = () => {
   const history = useHistory();
