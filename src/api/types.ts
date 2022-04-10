@@ -228,5 +228,5 @@ export interface Dependency {
   inventory: Inventory;
   valid: boolean;
   originalVersion: string;
-  originalLicense: string;
+  originalLicense: string[];
 }
