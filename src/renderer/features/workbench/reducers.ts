@@ -1,3 +1,4 @@
+import { ComponentGroup, IWorkbenchFilter, Node } from '@api/types';
 import {
   LOAD_SCAN_FAIL,
   LOAD_SCAN_SUCCESS,
@@ -13,7 +14,6 @@ import {
   SET_FILTER,
   RESET_FILTER,
 } from './actions';
-import { ComponentGroup, IWorkbenchFilter, Node } from '../../../api/types';
 
 const MAX_RECENT_USED_COMPONENTS = 3;
 

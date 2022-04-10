@@ -1,22 +1,22 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
-import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
-import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
-import { workbenchController } from '../../../../../../controllers/workbench-controller';
-import { AppContext, IAppContext } from '../../../../../../context/AppProvider';
-import { FileType, Inventory } from '../../../../../../../api/types';
-import LabelCard from '../../../../components/LabelCard/LabelCard';
-import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
-import { mapFiles } from '../../../../../../../shared/utils/scan-util';
-import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
-import { inventoryService } from '../../../../../../../api/services/inventory.service';
-import { resultService } from '../../../../../../../api/services/results.service';
-import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
-import { InventoryForm } from '../../../../../../context/types';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import { AppContext, IAppContext } from '@context/AppProvider';
+import { FileType, Inventory } from '@api/types';
+import { mapFiles } from '@shared/utils/scan-util';
+import { inventoryService } from '@api/services/inventory.service';
+import { resultService } from '@api/services/results.service';
+import { InventoryForm } from '@context/types';
+import { getExtension } from '@shared/utils/utils';
+import { fileService } from '@api/services/file.service';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
-import { getExtension } from '../../../../../../../shared/utils/utils';
-import { fileService } from '../../../../../../../api/services/file.service';
+import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
+import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
+import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
+import LabelCard from '../../../../components/LabelCard/LabelCard';
+import { workbenchController } from '../../../../../../controllers/workbench-controller';
+import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import NoLocalFile from './components/NoLocalFile/NoLocalFile';
 
 const MemoCodeEditor = React.memo(CodeEditor);
@@ -92,7 +92,7 @@ const Editor = () => {
   };
 
   const create = async (defaultInventory, selFiles) => {
-    const inventory = await dialogCtrl.openInventory(defaultInventory, state.recentUsedComponents,);
+    const inventory = await dialogCtrl.openInventory(defaultInventory, state.recentUsedComponents);
     if (!inventory) return;
 
     const newInventory = await createInventory({
@@ -123,7 +123,7 @@ const Editor = () => {
         usage: 'file',
       },
       state.recentUsedComponents
-    ); 
+    );
     if (response) {
       const id = await fileService.getIdFromPath(file);
       if (!id) return;
@@ -295,7 +295,9 @@ const Editor = () => {
                     highlight={currentMatch?.lines || null}
                   />
                 </>
-              ) : imported ? <NoLocalFile /> : null}
+              ) : imported ? (
+                <NoLocalFile />
+              ) : null}
             </div>
             {inventories?.length === 0 && matchInfo?.length === 0 ? (
               <div className="editor">

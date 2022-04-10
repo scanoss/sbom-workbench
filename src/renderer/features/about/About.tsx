@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import React from 'react';
-import icon from '../../../../assets/icon.png';
-import AppConfig from '../../../config/AppConfigModule';
+import AppConfig from '@config/AppConfigModule';
+import icon from '@assets/icon.png';
 import LicensesText from './LicensesText';
 
 const electron = window.require('electron');
