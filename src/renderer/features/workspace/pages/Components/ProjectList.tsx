@@ -18,7 +18,7 @@ import ReplayIcon from '@material-ui/icons/Replay';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
 import GetAppOutlined from '@material-ui/icons/GetAppOutlined';
-import { IProject, ScanState } from '../../../../../api/types';
+import { IProject, ScanState } from '@api/types';
 import AppConfig from '../../../../../config/AppConfigModule';
 
 const filter = (items, query) => {

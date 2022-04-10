@@ -1,21 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Button, Typography } from '@material-ui/core';
+import { DIALOG_ACTIONS } from '@context/types';
+import { dependencyService } from '@api/services/dependency.service';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import { AppContext, IAppContext } from '@context/AppProvider';
+import { Dependency, FileType } from '@api/types';
+import { getExtension } from '@shared/utils/utils';
 import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
-import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
-import { AppContext, IAppContext } from '../../../../../../context/AppProvider';
-import { Dependency, FileType } from '../../../../../../../api/types';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
-import { getExtension } from '../../../../../../../shared/utils/utils';
 import CodeViewSelector, { CodeViewSelectorMode } from './components/CodeViewSelector/CodeViewSelector';
 import DependencyTree from './components/DependencyTree/DependencyTree';
 import NoLocalFile from './components/NoLocalFile/NoLocalFile';
-import { dependencyService } from '../../../../../../../api/services/dependency.service';
 import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
-import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import WorkbenchDialogContext, { IWorkbenchDialogContext } from '../../../../../../context/WorkbenchDialogProvider';
-import { NewDependencyDTO } from '../../../../../../../api/dto';
 
 export interface FileContent {
   content: string | null;

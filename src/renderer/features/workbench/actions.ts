@@ -1,5 +1,4 @@
-import { IDependencyResponse } from 'scanoss';
-import { ComponentGroup, Node, IWorkbenchFilter } from '../../../api/types';
+import { ComponentGroup, Node, IWorkbenchFilter } from '@api/types';
 
 export const LOAD_SCAN_SUCCESS = 'APP/WORKBENCH/LOAD_SCAN_SUCCESS';
 export const LOAD_SCAN_FAIL = 'APP/WORKBENCH/LOAD_SCAN_FAIL';
