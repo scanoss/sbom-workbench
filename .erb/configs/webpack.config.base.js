@@ -36,6 +36,15 @@ export default {
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     modules: [path.join(__dirname, '../../src'), 'node_modules'],
+    alias: {
+      '@assets': path.resolve(__dirname, '../../assets/'),
+      '@shared': path.resolve(__dirname, '../../src/shared/'),
+      '@config': path.resolve(__dirname, '../../src/config/'),
+      '@api': path.resolve(__dirname, '../../src/api/'),
+      '@context': path.resolve(__dirname, '../../src/renderer/context/'),
+      '@components': path.resolve(__dirname, '../../src/renderer/components/'),
+      '@hooks': path.resolve(__dirname, '../../src/renderer/hooks/'),
+    }
   },
 
   plugins: [

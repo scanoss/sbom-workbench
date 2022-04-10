@@ -15,7 +15,7 @@ class FileService extends BaseService {
     return response;
   }
 
-  public async getIdFromPath(args: string): Promise<any> {
+  public async getIdFromPath(args: string): Promise<number> {
     const response = await ipcRenderer.invoke(IpcEvents.FILE_GET_ID_FROM_PATH, args);
     return this.response(response);
   }

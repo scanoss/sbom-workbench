@@ -9,6 +9,7 @@ import { utilHelper } from '../../main/helpers/UtilHelper';
 import { FilterTrue } from '../../main/batch/Filter/FilterTrue';
 import { resultService } from '../../main/services/ResultService';
 import { modelProvider } from '../../main/services/ModelProvider';
+import { fileService } from "../../main/services/FileService";
 
 const path = require('path');
 
@@ -77,25 +78,25 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
 ipcMain.handle(IpcEvents.FILE_GET, async (_event, arg: Partial<File>) => {
   let data;
   try {
-    data = await  modelProvider.model.file.get(arg);
+    data = await modelProvider.model.file.get(arg);
     return { status: 'ok', message: 'Get file', data };
   } catch (error) {
     return { status: 'error', message: 'Get file were not successfully retrieve', data };
   }
 });
-
-ipcMain.handle(IpcEvents.FILE_GET_ID_FROM_PATH, async (_event, arg: string) => {
+// TODO: USE GET_FILES AND REMOVE THIS SERVICE
+ipcMain.handle(IpcEvents.FILE_GET_ID_FROM_PATH, async (_event, filePath: string) => {
   try {
-    const data = await modelProvider.model.file.getIdFromPath(arg);
-    return { status: 'ok', message: 'Get id from file path', data };
+    const id = await fileService.getFileIdFromPath(filePath);
+    return { status: 'ok', message: 'Get id from file path', data: id };
   } catch (error) {
     return { status: 'error', message: 'Get file were not successfully retrieve' };
   }
 });
 
-ipcMain.handle(IpcEvents.IGNORED_FILES, async (event, arg: number[]) => {
+ipcMain.handle(IpcEvents.IGNORED_FILES, async (_event, arg: number[]) => {
   const project = workspace.getOpenedProjects()[0];
-  const data = await resultService.ignore(arg);
+  const data = await fileService.ignore(arg);
   project.getTree().sendToUI(IpcEvents.TREE_UPDATING, {});
   resultService
     .getResultsFromIDs(arg)

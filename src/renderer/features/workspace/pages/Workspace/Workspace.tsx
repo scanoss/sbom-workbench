@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { AppContext, IAppContext } from '../../../../context/AppProvider';
-import { IProject } from '../../../../../api/types';
-import { workspaceService } from '../../../../../api/services/workspace.service';
-import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
-import { DIALOG_ACTIONS } from '../../../../context/types';
-import * as Config from '../../../../../shared/Config';
+import { AppContext, IAppContext } from '@context/AppProvider';
+import { IProject } from '@api/types';
+import { workspaceService } from '@api/services/workspace.service';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import { DIALOG_ACTIONS } from '@context/types';
+import AppConfig from '@config/AppConfigModule';
+import SearchBox from '@components/SearchBox/SearchBox';
 import ProjectList from '../Components/ProjectList';
-import SearchBox from '../../../../components/SearchBox/SearchBox';
 import AddProjectButton from '../Components/AddProjectButton/AddProjectButton';
 
 const Workspace = () => {
@@ -29,7 +29,7 @@ const Workspace = () => {
   const cleanup = () => {};
 
   const onShowScanHandler = async (project: IProject) => {
-    if (project.appVersion >= Config.MIN_VERSION_SUPPORTED) {
+    if (project.appVersion >= AppConfig.MIN_VERSION_SUPPORTED) {
       setScanPath({ path: project.work_root, action: 'none' });
       history.push('/workbench');
     } else {

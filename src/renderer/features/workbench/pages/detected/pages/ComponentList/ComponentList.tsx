@@ -1,15 +1,15 @@
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Alert } from '@material-ui/lab';
-import { Button, Link } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined';
+import SearchBox from '@components/SearchBox/SearchBox';
+import usePagination from '@hooks/usePagination';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import { resetFilter, setComponent } from '../../../../actions';
-import usePagination from '../../../../../../hooks/usePagination';
-import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
-import SearchBox from '../../../../../../components/SearchBox/SearchBox';
 import EmptyResult from './components/EmptyResult/EmptyResult';
+import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 
 const filter = (items, query) => {
   if (!items) {

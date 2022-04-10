@@ -16,12 +16,13 @@ import { useHistory } from 'react-router-dom';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { Add } from '@material-ui/icons';
-import { AppContext, IAppContext } from '../../../../context/AppProvider';
-import { INewProject } from '../../../../../api/types';
-import { userSettingService } from '../../../../../api/services/userSetting.service';
-import { workspaceService } from '../../../../../api/services/workspace.service';
-import { ResponseStatus } from '../../../../../api/Response';
-import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
+import { AppContext, IAppContext } from '@context/AppProvider';
+import { INewProject } from '@api/types';
+import { userSettingService } from '@api/services/userSetting.service';
+import { workspaceService } from '@api/services/workspace.service';
+import { ResponseStatus } from '@api/Response';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import AppConfig from '@config/AppConfigModule';
 
 const pathUtil = require('path');
 
@@ -75,8 +76,8 @@ const ProjectSettings = () => {
     source: null,
   });
 
-  const [projectValidName, setprojectValidName] = useState(false);
-  const [projectNameExists, setprojectNameExists] = useState(false);
+  const [projectValidName, setProjectValidName] = useState(false);
+  const [projectNameExists, setProjectNameExists] = useState(false);
 
   useEffect(() => {
     init();
@@ -110,15 +111,15 @@ const ProjectSettings = () => {
     const re = /^[^\s^\x00-\x1f\\?*:"";<>|/.][^\x00-\x1f\\?*:"";<>|/]*[^\s^\x00-\x1f\\?*:"";<>|/.]+$/;
 
     if (found) {
-      setprojectNameExists(true);
+      setProjectNameExists(true);
     } else {
-      setprojectNameExists(false);
+      setProjectNameExists(false);
     }
 
     if (projectSettings.name.trim() !== '' && re.test(projectSettings.name)) {
-      setprojectValidName(true);
+      setProjectValidName(true);
     } else {
-      setprojectValidName(false);
+      setProjectValidName(false);
     }
   }, [projectSettings.name, projects]);
 
@@ -257,43 +258,47 @@ const ProjectSettings = () => {
               </div>
               <div className="api-conections-container">
                 <div className="api-subcontainer">
-                  <div className="api-conections-label-container mb-3">
-                    <label className="input-label">API Connections</label>
-                  </div>
-                  <div className="label-input-container">
-                    <div className="label-icon">
-                      <label className="input-label h3">
-                        Knowledgebase API
-                        <span className="optional"> - Optional</span>
-                      </label>
-                    </div>
-                    <Paper className="input-text-container">
-                      <Select
-                        onChange={(e: any) => {
-                          setProjectSettings({
-                            ...projectSettings,
-                            api: e.target?.value.URL,
-                            api_key: e.target?.value.API_KEY,
-                          });
-                        }}
-                        defaultValue={0}
-                        fullWidth
-                        disableUnderline
-                        className={classes.select}
-                      >
-                        <MenuItem value={0}>
-                          <span className="item-default">Use default settings</span>
-                        </MenuItem>
-                        ;
-                        {apis.map((api) => (
-                          <MenuItem value={api} key={api.key}>
-                            <span>API URL: {api.URL}</span>
-                            {api.API_KEY && <span className="api_key"> - API KEY: {api.API_KEY}</span>}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </Paper>
-                  </div>
+                  {AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS && (
+                    <>
+                      <div className="api-conections-label-container mb-3">
+                        <label className="input-label">API Connections</label>
+                      </div>
+                      <div className="label-input-container">
+                        <div className="label-icon">
+                          <label className="input-label h3">
+                            Knowledgebase API
+                            <span className="optional"> - Optional</span>
+                          </label>
+                        </div>
+                        <Paper className="input-text-container">
+                          <Select
+                            onChange={(e: any) => {
+                              setProjectSettings({
+                                ...projectSettings,
+                                api: e.target?.value.URL,
+                                api_key: e.target?.value.API_KEY,
+                              });
+                            }}
+                            defaultValue={0}
+                            fullWidth
+                            disableUnderline
+                            className={classes.select}
+                          >
+                            <MenuItem value={0}>
+                              <span className="item-default">Use default settings</span>
+                            </MenuItem>
+                            ;
+                            {apis.map((api) => (
+                              <MenuItem value={api} key={api.key}>
+                                <span>API URL: {api.URL}</span>
+                                {api.API_KEY && <span className="api_key"> - API KEY: {api.API_KEY}</span>}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </Paper>
+                      </div>
+                    </>
+                  )}
                   <div className="label-input-container mt-5">
                     <div className="label-icon">
                       <label className="input-label h3">

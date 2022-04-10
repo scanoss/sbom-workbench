@@ -2,17 +2,20 @@ import { EventEmitter } from 'events';
 import { DependencyScanner, Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
 import fs from 'fs';
 import log from 'electron-log';
-import { INewProject, ScanState } from '../../api/types';
-import { dependencyService } from '../services/DependencyService';
-import { Project } from '../workspace/Project';
-import { IpcEvents } from '../../api/ipc-events';
-import { fileService } from '../services/FileService';
-import { fileHelper } from '../helpers/FileHelper';
-import { resultService } from '../services/ResultService';
-import { componentService } from '../services/ComponentService';
-import { userSettingService } from '../services/UserSettingService';
+import { INewProject, ScanState } from '../../../api/types';
+import { dependencyService } from '../../services/DependencyService';
+import { Project } from '../../workspace/Project';
+import { IpcEvents } from '../../../api/ipc-events';
+import { fileService } from '../../services/FileService';
+import { fileHelper } from '../../helpers/FileHelper';
+import { resultService } from '../../services/ResultService';
+import { componentService } from '../../services/ComponentService';
+import { userSettingService } from '../../services/UserSettingService';
+import AppConfig from '../../../config/AppConfigModule';
+import { AutoAccept } from '../Inventory/AutoAccept';
+import { ITask } from '../Task';
 
-export abstract class ScannerTask extends EventEmitter {
+export abstract class ScannerTask extends EventEmitter implements ITask<void, boolean> {
   protected msgToUI!: Electron.WebContents;
 
   protected scanner: Scanner;
@@ -56,6 +59,11 @@ export abstract class ScannerTask extends EventEmitter {
       await this.done(resultPath);
       await this.addDependencies();
       this.project.metadata.setScannerState(ScanState.FINISHED);
+      this.project.metadata.save();
+      if (AppConfig.FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN) {
+        const autoAccept = new AutoAccept();
+        await autoAccept.run();
+      }
       this.project.metadata.save();
       this.sendToUI(IpcEvents.SCANNER_FINISH_SCAN, {
         success: true,
@@ -113,8 +121,9 @@ export abstract class ScannerTask extends EventEmitter {
   public async run() {
     this.scannerStatus();
     const scanIn = this.adapterToScannerInput(this.project.filesToScan);
-    this.scanDependencies();
+    await this.scanDependencies();
     this.scanner.scan(scanIn);
+    return true;
   }
 
   private async scanDependencies(): Promise<void> {
@@ -132,7 +141,7 @@ export abstract class ScannerTask extends EventEmitter {
       dependencies.filesList.forEach((f) => {
         f.file = f.file.replace(rootPath, '');
       });
-      fs.promises.writeFile(
+      await fs.promises.writeFile(
         `${this.project.metadata.getMyPath()}/dependencies.json`,
         JSON.stringify(dependencies, null, 2)
       );
@@ -178,11 +187,15 @@ export abstract class ScannerTask extends EventEmitter {
   }
 
   public async addDependencies() {
-    const dependencies = JSON.parse(
-      await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8')
-    );
-    this.project.tree.addDependencies(dependencies);
-    this.project.save();
-    await dependencyService.insert(dependencies);
+    try {
+      const dependencies = JSON.parse(
+        await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8')
+      );
+      this.project.tree.addDependencies(dependencies);
+      this.project.save();
+      await dependencyService.insert(dependencies);
+    } catch (e) {
+      log.error(e);
+    }
   }
 }

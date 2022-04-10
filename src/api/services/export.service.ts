@@ -1,13 +1,14 @@
 import { IpcEvents } from '../ipc-events';
 import { BaseService } from './base.service';
-import { FormatVersion } from '../types';
+import { ExportFormat } from '../types';
+import { ExportDTO } from '../../main/task/export/ExportDTO';
 
 const { ipcRenderer } = require('electron');
 
 class Export extends BaseService {
-  public async export(path: string, ext: FormatVersion): Promise<any> {
+  public async export(path: string, ext: ExportFormat): Promise<ExportDTO> {
     const response = await ipcRenderer.invoke(IpcEvents.EXPORT, path, ext);
-    return response;
+    return this.response(response);
   }
 
   public async notarizeSBOM(args: string | null = null): Promise<any> {
@@ -16,4 +17,4 @@ class Export extends BaseService {
   }
 }
 
-export const ExportFormat = new Export();
+export const exportService = new Export();

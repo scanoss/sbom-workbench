@@ -3,7 +3,7 @@ import { Chart } from 'chart.js';
 import { Button, Tooltip } from '@material-ui/core';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import { shell } from 'electron';
-import { ExportFormat } from '../../../../../../api/services/export.service';
+import { exportService } from '../../../../../../api/services/export.service';
 import { HashType } from '../../../../../../api/types';
 import { projectService } from '../../../../../../api/services/project.service';
 
@@ -13,7 +13,7 @@ const LicensesChart = ({ data }) => {
   const [token, setToken] = useState<string>('');
 
   const notarizeSBOM = async () => {
-    const hash = await ExportFormat.notarizeSBOM(HashType.SHA256);
+    const hash = await exportService.notarizeSBOM(HashType.SHA256);
     shell.openExternal(`https://sbom.info/?hash=${hash}&type=${HashType.SHA256}&token=${token}`);
   };
 
@@ -22,7 +22,7 @@ const LicensesChart = ({ data }) => {
     setToken(TOKEN || '');
   };
   useEffect(() => {
-    const percentage = Math.floor(((data?.detectedIdentifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);    
+    const percentage = Math.floor(((data?.detectedIdentifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
     setPercentage(percentage);
 
     readToken();

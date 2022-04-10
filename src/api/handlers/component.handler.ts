@@ -1,45 +1,47 @@
 import { ipcMain } from 'electron';
+import log from 'electron-log';
 import { Component, License, ComponentGroup, IWorkbenchFilterParams } from '../types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from '../Response';
 import { componentService } from '../../main/services/ComponentService';
-import { workspace } from '../../main/workspace/Workspace';
-import { modelProvider } from '../../main/services/ModelProvider';
 
-ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (event, component: Component) => {
+ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (_event, component: Component) => {
   try {
-    const newComp = await modelProvider.model.component.create(component);
+    const newComp = await componentService.create(component);
     return Response.ok({ message: 'Component created successfully', data: newComp });
   } catch (error: any) {
-    console.log('Catch an error: ', error);
+    log.error(error);
     return Response.fail({ message: error.message });
   }
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE, async (_event, comp: Component, lic: License) => {
-  const link = { license_id: lic.id, compid: comp.compid };
-  await modelProvider.model.license.licenseAttach(link);
-  return { status: 'ok', message: 'test' };
+  try {
+    const success = await componentService.attachLicense(comp, lic);
+    return Response.ok({ message: 'License attached successfully', data: success });
+  } catch (error: any) {
+    log.error(error);
+    return Response.fail({ message: error.message });
+  }
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (_event, component: Component, params: IWorkbenchFilterParams) => {
-  const filter = workspace.getOpenedProjects()[0].getFilter(params);
-  const data = await componentService.getComponentFiles(component, filter);
-  return { status: 'ok', message: 'test', data };
+  try {
+    const data = await componentService.getComponentFiles(component, params);
+    return Response.ok({ message: 'Component files succesfully retrieved', data });
+  } catch (error: any) {
+    log.error(error);
+    return Response.fail({ message: error.message });
+  }
 });
 
 ipcMain.handle(IpcEvents.COMPONENT_GET_ALL, async (_event, params: IWorkbenchFilterParams) => {
   try {
-    const filter = workspace.getOpenedProjects()[0].getFilter(params);
-    
-    const data = await componentService.getAll(filter);
-    return {
-      status: 'ok',
-      message: 'Components getAll retrieve successfully',
-      data,
-    };
-  } catch (e) {
-    return { status: 'fail' };
+    const data = await componentService.getAll(params);
+    return Response.ok({ message: 'All components succesfully retrieved', data });
+  } catch (error: any) {
+    log.error(error);
+    return Response.fail({ message: error.message });
   }
 });
 
@@ -47,11 +49,11 @@ ipcMain.handle(
   IpcEvents.COMPONENT_GET,
   async (_event, component: Partial<ComponentGroup>, params: IWorkbenchFilterParams) => {
     try {
-      const filter = workspace.getOpenedProjects()[0].getFilter(params);
-      const data = await componentService.get(component, filter);
-      return { status: 'ok', message: 'Component group retrieve successfully', data };
-    } catch (e) {
-      return { status: 'fail' };
+      const data = await componentService.get(component, params);
+      return Response.ok({ message: 'Component retrieve successfully', data });
+    } catch (error: any) {
+      log.error(error);
+      return Response.fail({ message: error.message });
     }
   }
 );

@@ -37,14 +37,6 @@ class ResultService {
     }
   }
 
-  public async ignore(ids: number[]) {
-    try {
-      const success = await modelProvider.model.file.ignored(ids);
-      return success;
-    } catch (e) {
-      return e;
-    }
-  }
 
   public async getFromPath(path: string) {
     try {

@@ -18,8 +18,8 @@ import ReplayIcon from '@material-ui/icons/Replay';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
 import GetAppOutlined from '@material-ui/icons/GetAppOutlined';
-import { IProject, ScanState } from '../../../../../api/types';
-import * as Config from '../../../../../shared/Config';
+import { IProject, ScanState } from '@api/types';
+import AppConfig from '../../../../../config/AppConfigModule';
 
 const filter = (items, query) => {
   if (!items) return null;
@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const isProjectFinished = (project: IProject): boolean => project.scannerState === ScanState.FINISHED;
-const isProjectDeprecated = (project: IProject): boolean => project.appVersion < Config.MIN_VERSION_SUPPORTED;
+const isProjectDeprecated = (project: IProject): boolean => project.appVersion < AppConfig.MIN_VERSION_SUPPORTED;
 const isProjectImported = (project: IProject): boolean => project.source === 'IMPORTED';
 
 interface ProjectListProps {
@@ -197,7 +197,7 @@ const ProjectList = (props: ProjectListProps) => {
             <h3>No projects found</h3>
             <p>
               You can start by&nbsp;
-              <Link onClick={() => props.onProjectCreate()}>scanning a new project</Link><br></br>or <Link onClick={() => props.onProjectImport()}>importing a project</Link>.
+              <Link onClick={() => props.onProjectCreate()}>scanning a new project</Link><br />or <Link onClick={() => props.onProjectImport()}>importing a project</Link>.
             </p>
           </div>
         </div>

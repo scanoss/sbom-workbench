@@ -6,9 +6,9 @@ import { userSettingService } from '../../main/services/UserSettingService';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { Project } from '../../main/workspace/Project';
 import { workspace } from '../../main/workspace/Workspace';
-import { ResumeScanTask } from '../../main/scanner/ResumeScanTask';
-import { ReScanTask } from '../../main/scanner/ReScanTask';
 import { dependencyService } from '../../main/services/DependencyService';
+import { ResumeScanTask } from '../../main/task/scanner/ResumeScanTask';
+import { ReScanTask } from '../../main/task/scanner/ReScanTask';
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
   // TO DO factory to create filters depending on arguments

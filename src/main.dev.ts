@@ -15,12 +15,12 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import path from 'path';
 import * as os from 'os';
-import MenuBuilder from './main/menu';
 
+import AppConfig from './config/AppConfigModule';
+import MenuBuilder from './main/menu';
 import { workspace } from './main/workspace/Workspace';
 import { userSettingService } from './main/services/UserSettingService';
 import { WorkspaceMigration } from './main/migration/WorkspaceMigration';
-import { DEFAULT_WORKSPACE_NAME } from './shared/Config';
 
 // handlers
 import './api/handlers/inventory.handler';
@@ -151,7 +151,7 @@ app.on('activate', () => {
 });
 
 async function init() {
-  const root = `${os.homedir()}/${DEFAULT_WORKSPACE_NAME}`;
+  const root = `${os.homedir()}/${AppConfig.DEFAULT_WORKSPACE_NAME}`;
   await workspace.read(root);
   await userSettingService.read(root);
   new WorkspaceMigration(userSettingService.get().VERSION, root).up();

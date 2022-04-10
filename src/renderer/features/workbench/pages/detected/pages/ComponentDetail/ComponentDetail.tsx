@@ -1,17 +1,17 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
+import { Inventory } from '@api/types';
+import { componentService } from '@api/services/component.service';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import { DIALOG_ACTIONS } from '@context/types';
+import { mapFiles } from '@shared/utils/scan-util';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
-import { Inventory } from '../../../../../../../api/types';
 import { FileList } from '../ComponentList/components/FileList';
 import { ComponentInfo } from '../../../../components/ComponentInfo/ComponentInfo';
-import { componentService } from '../../../../../../../api/services/component.service';
 
 import { IdentifiedList } from '../ComponentList/components/IdentifiedList';
-import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
-import { DIALOG_ACTIONS } from '../../../../../../context/types';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
-import { mapFiles } from '../../../../../../../shared/utils/scan-util';
 import { setHistoryCrumb, setVersion } from '../../../../actions';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
@@ -33,7 +33,7 @@ export const ComponentDetail = () => {
   ) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { component, version, filter } = state;
+  const { component, version } = state;
 
   const [files, setFiles] = useState<any[]>([]);
   const [filterFiles, setFilterFiles] = useState<{ pending: any[]; identified: any[]; ignored: any[] }>({
@@ -47,7 +47,7 @@ export const ComponentDetail = () => {
 
   const getFiles = async () => {
     const response = await componentService.getFiles({ purl: component.purl, version }, { status: null });
-    setFiles(mapFiles(response.data));
+    setFiles(mapFiles(response));
   };
 
   const onAction = async (file: any, action: MATCH_CARD_ACTIONS) => {

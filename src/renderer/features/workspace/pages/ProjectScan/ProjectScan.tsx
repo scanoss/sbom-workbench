@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { IconButton } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { AppContext, IAppContext } from '../../../../context/AppProvider';
+import { AppContext, IAppContext } from '@context/AppProvider';
+import { IpcEvents } from '@api/ipc-events';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import { projectService } from '@api/services/project.service';
 import * as controller from '../../../../controllers/home-controller';
-import { IpcEvents } from '../../../../../api/ipc-events';
-import { DialogContext, IDialogContext } from '../../../../context/DialogProvider';
-import { projectService } from '../../../../../api/services/project.service';
 import CircularComponent from '../Components/CircularComponent';
 
 const { ipcRenderer } = require('electron');

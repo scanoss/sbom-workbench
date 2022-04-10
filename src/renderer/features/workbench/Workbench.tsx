@@ -2,8 +2,9 @@ import { CircularProgress } from '@material-ui/core';
 import React, { useContext, useEffect } from 'react';
 import { Redirect, Route, Switch, useLocation, useRouteMatch } from 'react-router-dom';
 import SplitPane from 'react-split-pane';
+import { AppContext, IAppContext } from '@context/AppProvider';
+import AppConfig from '@config/AppConfigModule';
 import { WorkbenchContext, IWorkbenchContext } from './store';
-import { AppContext, IAppContext } from '../../context/AppProvider';
 import AppBar from './components/AppBar/AppBar';
 import Detected from './pages/detected/Detected';
 import Identified from './pages/identified/Identified';
@@ -11,7 +12,6 @@ import Reports from './pages/report/Report';
 import FileTree from './components/FileTree/FileTree';
 import { reset } from './actions';
 import WorkbenchFilters from './components/WorkbenchFilters/WorkbenchFilters';
-import { ENABLE_WORKBENCH_FILTERS } from '../../../shared/Config';
 import { dialogController } from '../../controllers/dialog-controller';
 
 const Workbench = () => {
@@ -53,7 +53,7 @@ const Workbench = () => {
         pane1Style={report ? { display: 'none' } : {}}
       >
         <aside className="panel explorer">
-          {ENABLE_WORKBENCH_FILTERS && loaded && <WorkbenchFilters />}
+          {AppConfig.FF_ENABLE_WORKBENCH_FILTERS && loaded && <WorkbenchFilters />}
           <FileTree />
         </aside>
         <main id="Workbench" className="match-info">

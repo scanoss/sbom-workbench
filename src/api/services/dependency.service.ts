@@ -31,5 +31,4 @@ class DepencyService extends BaseService {
     return this.response(response);
   }
 }
-
 export const dependencyService = new DepencyService();

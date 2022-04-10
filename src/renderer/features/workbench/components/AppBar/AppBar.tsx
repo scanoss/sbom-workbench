@@ -27,10 +27,11 @@ import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { WorkbenchContext, IWorkbenchContext } from '../../store';
-import { ExportFormat } from '../../../../../api/services/export.service';
+import { exportService } from '../../../../../api/services/export.service';
 import { dialogController } from '../../../../controllers/dialog-controller';
-import { FormatVersion, IProject } from '../../../../../api/types';
+import { ExportFormat, IProject } from '../../../../../api/types';
 import { workspaceService } from '../../../../../api/services/workspace.service';
+import AppConfig from '../../../../../config/AppConfigModule';
 
 const Navigation = () => {
   const history = useHistory();
@@ -167,6 +168,7 @@ const AppTitle = ({ title }) => {
 };
 
 const Export = ({ state }) => {
+  const exportLabels = { CSV: 'CSV', SPDXLITEJSON: 'SPDX Lite', WFP: 'WFP', RAW: 'RAW', HTMLSUMMARY: 'HTML Summary' };
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -178,54 +180,79 @@ const Export = ({ state }) => {
     setAnchorEl(null);
   };
 
-  const onExport = async (format: FormatVersion) => {
+  const onExport = async (format: ExportFormat) => {
     await exportFile(format);
     handleClose();
   };
 
-  const exportFile = async (format: FormatVersion) => {
+  const exportFile = async (format: ExportFormat) => {
     const data: IProject = await workspaceService.getProjectDTO();
     const path = dialogController.showSaveDialog({
       defaultPath: `${data.work_root}/${data.name}`,
     });
     if (path && path !== undefined) {
-      await ExportFormat.export(path, format);
+      await exportService.export(path, format);
     }
   };
 
   return (
     <div>
-      <Button
-        startIcon={<GetAppIcon />}
-        aria-controls="customized-menu"
-        aria-haspopup="true"
-        variant="contained"
-        color="primary"
-        onClick={onExportClicked}
-      >
-        Export
-      </Button>
-      <Menu
-        style={{ marginTop: '35px' }}
-        id="fade-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={open}
-        onClose={handleClose}
-        TransitionComponent={Fade}
-      >
-        <MenuItem disabled={state.progress === 0} onClick={() => onExport(FormatVersion.CSV)}>
-          CSV
-        </MenuItem>
-        <MenuItem disabled={state.progress === 0} onClick={() => onExport(FormatVersion.SPDXLITEJSON)}>
-          SPDX Lite
-        </MenuItem>
-        <MenuItem onClick={() => onExport(FormatVersion.WFP)}>WFP</MenuItem>
-        <MenuItem onClick={() => onExport(FormatVersion.RAW)}>RAW</MenuItem>
-        <MenuItem disabled={state.progress === 0} onClick={() => onExport(FormatVersion.HTMLSUMMARY)}>
-          HTML Summary
-        </MenuItem>
-      </Menu>
+      {!AppConfig.FF_EXPORT_FORMAT_OPTIONS ||
+        (AppConfig.FF_EXPORT_FORMAT_OPTIONS.length === 0 && (
+          <Button
+            startIcon={<GetAppIcon />}
+            aria-controls="customized-menu"
+            aria-haspopup="true"
+            variant="contained"
+            color="primary"
+            disabled
+          >
+            Export
+          </Button>
+        ))}
+
+      {AppConfig.FF_EXPORT_FORMAT_OPTIONS && AppConfig.FF_EXPORT_FORMAT_OPTIONS.length === 1 && (
+        <Button
+          startIcon={<GetAppIcon />}
+          aria-controls="customized-menu"
+          aria-haspopup="true"
+          variant="contained"
+          color="primary"
+          onClick={() => onExport(AppConfig.FF_EXPORT_FORMAT_OPTIONS[0] as ExportFormat)}
+        >
+          Export {exportLabels[AppConfig.FF_EXPORT_FORMAT_OPTIONS[0]]}
+        </Button>
+      )}
+
+      {AppConfig.FF_EXPORT_FORMAT_OPTIONS && AppConfig.FF_EXPORT_FORMAT_OPTIONS.length > 1 && (
+        <>
+          <Button
+            startIcon={<GetAppIcon />}
+            aria-controls="customized-menu"
+            aria-haspopup="true"
+            variant="contained"
+            color="primary"
+            onClick={onExportClicked}
+          >
+            Export
+          </Button>
+          <Menu
+            style={{ marginTop: '35px' }}
+            id="fade-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={open}
+            onClose={handleClose}
+            TransitionComponent={Fade}
+          >
+            {AppConfig.FF_EXPORT_FORMAT_OPTIONS.map((format) => (
+              <MenuItem key={format} disabled={state.progress === 0} onClick={() => onExport(format as ExportFormat)}>
+                {exportLabels[format]}
+              </MenuItem>
+            ))}
+          </Menu>
+        </>
+      )}
     </div>
   );
 };

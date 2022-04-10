@@ -1,11 +1,11 @@
 import log from 'electron-log';
-import { ScanState } from '../../api/types';
-import { licenseService } from '../services/LicenseService';
-import { modelProvider } from '../services/ModelProvider';
-import { rescanService } from '../services/RescanService';
-import { treeService } from '../services/TreeService';
-import { ProjectFilterPath } from '../workspace/filters/ProjectFilterPath';
-import { workspace } from '../workspace/Workspace';
+import { ScanState } from '../../../api/types';
+import { licenseService } from '../../services/LicenseService';
+import { modelProvider } from '../../services/ModelProvider';
+import { rescanService } from '../../services/RescanService';
+import { treeService } from '../../services/TreeService';
+import { ProjectFilterPath } from '../../workspace/filters/ProjectFilterPath';
+import { workspace } from '../../workspace/Workspace';
 import { ScannerTask } from './ScannerTask';
 
 export class ReScanTask extends ScannerTask {

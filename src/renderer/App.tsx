@@ -1,9 +1,11 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { HashRouter, Redirect, Route } from 'react-router-dom';
+import { HashRouter, Route } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider, Theme } from '@material-ui/core/styles';
+import { DialogProvider } from '@context/DialogProvider';
+import { WorkbenchDialogProvider } from '@context/WorkbenchDialogProvider';
+import AppConfig from '@config/AppConfigModule';
 import { WorkbenchProvider } from './features/workbench/store';
-import { DialogProvider } from './context/DialogProvider';
 import Workbench from './features/workbench/Workbench';
 import AppProvider from './context/AppProvider';
 import Workspace from './features/workspace';
@@ -19,6 +21,7 @@ export default class App {
    * @returns {JSX.Element}
    */
   public async setup(): Promise<void | Element | React.Component> {
+    this.setTitle();
     const theme = this.loadTheme();
 
     const app = (
@@ -45,6 +48,10 @@ export default class App {
     this.setupAppMenuListeners();
 
     return render(app, document.getElementById('root'));
+  }
+
+  private setTitle() {
+    document.title = AppConfig.APP_NAME;
   }
 
   setupAppMenuListeners() {

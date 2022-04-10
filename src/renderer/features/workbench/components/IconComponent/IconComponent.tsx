@@ -1,12 +1,12 @@
 import React from 'react';
 import componentDefault from '../../../../../../assets/imgs/component-default.svg';
-import { ENABLE_COMPONENT_LOGO } from '../../../../../shared/Config';
+import AppConfig from '../../../../../config/AppConfigModule';
 
 const IconComponent = ({ name, size }) => {
   return (
     <div id="IconComponent">
       <figure style={{ width: size, height: size }}>
-        {ENABLE_COMPONENT_LOGO ? (
+        {AppConfig.FF_ENABLE_COMPONENT_LOGO ? (
           <img
             alt="component logo"
             height={size}

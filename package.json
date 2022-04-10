@@ -87,7 +87,8 @@
       "output": "release"
     },
     "extraResources": [
-      "./assets/**"
+      "./assets/**",
+      "./src/shared/config/*.conf.json"
     ],
     "publish": {
       "provider": "github",

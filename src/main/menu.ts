@@ -1,6 +1,7 @@
 import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions } from 'electron';
 import path from 'path';
 import { IpcEvents } from '../api/ipc-events';
+import AppConfig from '../config/AppConfigModule';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -56,7 +57,6 @@ export default class MenuBuilder {
   }
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
-    const self = this;
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
       label: 'Scanoss',
       submenu: [
@@ -150,8 +150,8 @@ export default class MenuBuilder {
       submenu: [
         {
           label: 'About',
-          click() {
-            self.buildAboutDialog();
+          click: () => {
+            this.buildAboutDialog();
           },
         },
       ],
@@ -163,7 +163,7 @@ export default class MenuBuilder {
     return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
   }
 
-  buildDefaultTemplate() {
+  buildDefaultTemplate(): MenuItemConstructorOptions[] {
     const templateDefault = [
       {
         label: '&File',
@@ -261,11 +261,12 @@ export default class MenuBuilder {
       },
     ];
 
-    return templateDefault;
+    return templateDefault as MenuItemConstructorOptions[];
   }
 
   buildAboutDialog() {
     const aboutWindow = new BrowserWindow({
+      title: AppConfig.APP_NAME,
       parent: this.mainWindow,
       resizable: false,
       width: 500,
