@@ -206,14 +206,14 @@ export class Querys {
 
   SQL_DEPENDENCIES_INSERT = `INSERT OR IGNORE INTO dependencies (fileId, purl, version, scope , licenses, component,originalVersion,originalLicense) VALUES (?,?,?,?,?,?,?,?);`;
 
-  SQL_GET_ALL_DEPENDENCIES = `SELECT d.dependencyId,d.component AS componentName,d.purl,d.version,d.licenses,d.component, i.id AS inventory,cv.id AS compid,d.rejectedAt,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN '${FileStatusType.IDENTIFIED}' WHEN i.id IS NULL AND d.rejectedAt IS NOT NULL THEN '${FileStatusType.ORIGINAL}' ELSE '${FileStatusType.PENDING}' END) AS status,(CASE WHEN d.purl IS NOT NULL AND d.version IS NOT NULL AND licenses IS NOT NULL THEN true ELSE false END) AS valid,d.originalVersion,d.originalLicense FROM dependencies d 
+  SQL_GET_ALL_DEPENDENCIES = `SELECT d.dependencyId,d.component AS componentName,d.purl,d.version,d.licenses,d.component, i.id AS inventory,cv.id AS compid,d.rejectedAt,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN '${FileStatusType.IDENTIFIED}' WHEN i.id IS NULL AND d.rejectedAt IS NOT NULL THEN '${FileStatusType.ORIGINAL}' ELSE '${FileStatusType.PENDING}' END) AS status,(CASE WHEN d.purl IS NOT NULL AND d.version IS NOT NULL AND licenses IS NOT NULL THEN true ELSE false END) AS valid,d.originalVersion,d.originalLicense, d.fileId FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId
-  LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version 
+  LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version
   LEFT JOIN inventories i ON cv.id = i.cvid AND i.source='declared' #FILTER;`;
 
   SQL_GET_ALL_RESULTS = `SELECT f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending,r.source,r.idtype AS usage,r.component,r.version,r.license AS spdxid,r.url,r.purl,f.type FROM files f LEFT JOIN results r ON f.fileId=r.fileId LEFT JOIN component_versions comp ON comp.purl=r.purl AND comp.version=r.version #FILTER;`;
 
-  SQL_GET_ALL_FILES = `SELECT f.fileId AS id,f.type,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.license, r.component AS componentName, r.url,comp.purl,comp.version 
+  SQL_GET_ALL_FILES = `SELECT f.fileId AS id,f.type,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.license, r.component AS componentName, r.url,comp.purl,comp.version
   FROM files f LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions comp ON
   comp.purl = r.purl AND comp.version = r.version
   LEFT JOIN file_inventories fi ON fi.fileId=f.fileId #FILTER ;`;
@@ -223,5 +223,10 @@ export class Querys {
 
   SQL_DELETE_DIRTY_DEPENDENCIES = `DELETE FROM dependencies WHERE dependencyId IN (SELECT dependencyId FROM dependencies WHERE dependencyId NOT IN (SELECT d.dependencyId FROM dependencies d WHERE d.purl IN (#PURLS) AND d.version IN (#VERSIONS)
   AND d.licenses IN (#LICENSES)));`;
+
+  SQL_DEPENDENCY_STATUS = `SELECT f.path,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN 'IDENTIFIED' WHEN i.id IS NULL AND d.rejectedAt IS NOT NULL THEN 'IGNORED' ELSE 'PENDING' END) AS status FROM dependencies d
+  INNER JOIN files f ON f.fileId =  d.fileId
+  LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version
+  LEFT JOIN inventories i ON cv.id = i.cvid AND i.source='declared'  GROUP BY status;`;
 
 }
