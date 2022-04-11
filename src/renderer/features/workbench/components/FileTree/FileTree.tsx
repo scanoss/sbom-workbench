@@ -62,6 +62,7 @@ const FileTree = () => {
   };
 
   const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
+    console.log('onContextMenu', node);
     const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED' || node.status === 'FILTERED';
     const menu = !node.children
       ? [

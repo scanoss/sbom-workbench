@@ -1,5 +1,6 @@
 import Node, { NodeStatus } from './Node';
 
+
 export default class Folder extends Node {
   private children: Node[];
 
@@ -57,6 +58,8 @@ export default class Folder extends Node {
     return NodeStatus.FILTERED;
   }
 
+
+  // TODO:Refactor on the status logic
   private updateStatusFlags(): void {
     this.hasPending = false;
     this.hasIdentified = false;
@@ -66,11 +69,12 @@ export default class Folder extends Node {
 
     for (const child of this.children) {
       if (child.getType() === 'folder') {
-        this.hasPending = child.hasPending || this.hasPending;
-        this.hasIdentified = child.hasIdentified || this.hasIdentified;
-        this.hasIgnored = child.hasIgnored || this.hasIgnored;
-        this.hasNoMatch = child.hasNoMatch || this.hasNoMatch;
-        this.hasFiltered = child.hasFiltered || this.hasFiltered;
+        const c = child as Folder;
+        this.hasPending = c.hasPending  || this.hasPending;
+        this.hasIdentified = c.hasIdentified || this.hasIdentified;
+        this.hasIgnored = c.hasIgnored || this.hasIgnored;
+        this.hasNoMatch = c.hasNoMatch || this.hasNoMatch;
+        this.hasFiltered = c.hasFiltered || this.hasFiltered;
       } else {
         if (child.status === NodeStatus.PENDING) this.hasPending = true;
         if (child.status === NodeStatus.IDENTIFIED) this.hasIdentified = true;

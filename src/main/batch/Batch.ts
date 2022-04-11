@@ -48,17 +48,9 @@ export abstract class Batch {
     return this.overWrite;
   }
 
-  public async updateTree(ids: Array<number>, status: NodeStatus): Promise<boolean> {
-    return this.getResults(ids)
-      .then((results) => {
-        const paths = utilHelper.getArrayFromObjectFilter(results, 'path', new FilterTrue()) as Array<string>;
-        treeService.updateStatus(paths, status);
-        return true;
-      })
-      .catch((error) => {
-        throw error;
-      });
-  }
+public async updateTree(fileIds: Array<number>, status: NodeStatus): Promise<void> {
+   await treeService.updateTree(fileIds, status);
+}
 
   public abstract execute();
 }
