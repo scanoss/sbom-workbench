@@ -1,13 +1,14 @@
-import { Inventory } from '../../api/types';
-import { utilHelper } from '../helpers/UtilHelper';
-import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
-import { inventoryService } from '../services/InventoryService';
-import { treeService } from '../services/TreeService';
-import { workspace } from '../workspace/Workspace';
-import { Batch } from './Batch';
-import { FilterOR } from './Filter/FilterOR';
-import { FilterTrue } from './Filter/FilterTrue';
-import { GenericFilter } from './Filter/GenericFilter';
+import {Inventory} from '../../api/types';
+import {utilHelper} from '../helpers/UtilHelper';
+import {QueryBuilderCreator} from '../model/queryBuilder/QueryBuilderCreator';
+import {inventoryService} from '../services/InventoryService';
+import {treeService} from '../services/TreeService';
+import {workspace} from '../workspace/Workspace';
+import {Batch} from './Batch';
+import {FilterOR} from './Filter/FilterOR';
+import {FilterTrue} from './Filter/FilterTrue';
+import {GenericFilter} from './Filter/GenericFilter';
+import {NodeStatus} from "../workspace/Tree/Tree/Node";
 
 export class Restore extends Batch {
   public async execute() {
@@ -19,7 +20,7 @@ export class Restore extends Batch {
         path: this.getFolder(),
       });
       const ids: Array<number> = (await this.getFilesToProcess(builder, 'id', filter)) as Array<number>;
-      this.restoreTree(ids);
+      this.updateTree(ids,NodeStatus.PENDING);
       const success = await inventoryService.detach({ files: ids } as Partial<Inventory>);
       if (success) return success;
 
@@ -29,15 +30,4 @@ export class Restore extends Batch {
     }
   }
 
-  private async restoreTree(ids: Array<number>): Promise<boolean> {
-    return this.getResults(ids)
-      .then((results) => {
-        const paths = utilHelper.getArrayFromObjectFilter(results, 'path', new FilterTrue()) as Array<string>;
-        treeService.retoreStatus(paths);
-        return true;
-      })
-      .catch((error) => {
-        throw error;
-      });
-  }
 }

@@ -5,6 +5,7 @@ import { NewDependencyDTO } from '../dto';
 import { IpcEvents } from '../ipc-events';
 import { Response } from '../Response';
 import { Dependency } from '../types';
+import { treeService } from "../../main/services/TreeService";
 
 ipcMain.handle(IpcEvents.DEPENDENCY_GET_ALL, async (event, params: { path: string }) => {
   try {
@@ -19,6 +20,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_GET_ALL, async (event, params: { path: strin
 ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT, async (event, params: NewDependencyDTO) => {
   try {
     const dependency = await dependencyService.accept(params);
+    treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: dependency });
   } catch (error: any) {
     log.error(error);
@@ -29,6 +31,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT, async (event, params: NewDependencyD
 ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE, async (_event, dependencyId: number) => {
   try {
     const dependency = await dependencyService.restore(dependencyId);
+    treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: dependency });
   } catch (error: any) {
     log.error(error);
@@ -39,6 +42,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE, async (_event, dependencyId: number
 ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT_ALL, async (event, acceptedDependencies: Array<Dependency>) => {
   try {
     const response = await dependencyService.acceptAll(acceptedDependencies);
+    treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: response });
   } catch (error: any) {
     console.log('Catch an error: ', error);
@@ -49,6 +53,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT_ALL, async (event, acceptedDependenci
 ipcMain.handle(IpcEvents.DEPENDENCY_REJECT, async (event, dependencyId: number) => {
   try {
     const response = await dependencyService.reject(dependencyId);
+    treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: response });
   } catch (error: any) {
     console.log('Catch an error: ', error);
