@@ -79,17 +79,17 @@ const WorkbenchFilters = () => {
               classes={{ tooltip: classes.info }}
               title={
                 <>
-                  <p className="mt-1 mb-1">Set global filters to work with a reduce set of results.</p>
+                  <p className="mt-1 mb-1">Use filters to modify displayed results.</p>
                   <p>
                     <small>
                       USAGE <br />
-                      Filter by match type. Full file or snippet match.
+                      Filter by file match type: File or Snippet.
                     </small>
                   </p>
                   <p>
                     <small>
                       STATUS <br />
-                      Filter by identification status.
+                      Filter by the status of each file.
                     </small>
                   </p>
                 </>
