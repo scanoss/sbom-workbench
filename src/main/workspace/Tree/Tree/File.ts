@@ -1,4 +1,4 @@
-import Node, { NodeStatus } from './Node';
+import Node, {NodeStatus} from './Node';
 
 export default class File extends Node {
   private isDependencyFile: boolean;
@@ -122,7 +122,11 @@ export default class File extends Node {
   }
 
   public addDependency(path: string): void {
-    if (this.getPath() === path) this.isDependencyFile = true;
+    if (this.getPath() === path){
+      this.status = NodeStatus.PENDING;
+      this.setStatusOnClassnameAs(this.status);
+      this.isDependencyFile = true;
+    }
   }
 
   public filter(paths: Record<string, number>): boolean {
@@ -156,7 +160,7 @@ export default class File extends Node {
     this.setAction(action);
   }
 
-  public setStatusDeep(status: NodeStatus): void { 
+  public setStatusDeep(status: NodeStatus): void {
     this.status = status;
   }
 }

@@ -1,16 +1,16 @@
-import { ipcMain } from 'electron';
-import { IFolderInventory, Inventory } from '../types';
-import { IpcEvents } from '../ipc-events';
-import { Batch } from '../../main/batch/Batch';
-import { BatchFactory } from '../../main/batch/BatchFactory';
-import { FilterTrue } from '../../main/batch/Filter/FilterTrue';
-import { utilHelper } from '../../main/helpers/UtilHelper';
-import { inventoryService } from '../../main/services/InventoryService';
-import { resultService } from '../../main/services/ResultService';
-import { treeService } from '../../main/services/TreeService';
-import { NodeStatus } from '../../main/workspace/Tree/Tree/Node';
-import { workspace } from '../../main/workspace/Workspace';
-import { modelProvider } from '../../main/services/ModelProvider';
+import {ipcMain} from 'electron';
+import {IFolderInventory, Inventory} from '../types';
+import {IpcEvents} from '../ipc-events';
+import {Batch} from '../../main/batch/Batch';
+import {BatchFactory} from '../../main/batch/BatchFactory';
+import {FilterTrue} from '../../main/batch/Filter/FilterTrue';
+import {utilHelper} from '../../main/helpers/UtilHelper';
+import {inventoryService} from '../../main/services/InventoryService';
+import {resultService} from '../../main/services/ResultService';
+import {treeService} from '../../main/services/TreeService';
+import {NodeStatus} from '../../main/workspace/Tree/Tree/Node';
+import {workspace} from '../../main/workspace/Workspace';
+import {modelProvider} from '../../main/services/ModelProvider';
 
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (_event, invget: Partial<Inventory>) => {
   let inv: any;
@@ -35,22 +35,8 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (_event, inv: Partial<Inventory>) 
 
 ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (_event, arg: Inventory) => {
   try {
-    const p = workspace.getOpenedProjects()[0];
     const inv = await inventoryService.create(arg);
-    p.getTree().sendToUI(IpcEvents.TREE_UPDATING, {});
-    resultService
-      .getResultsFromIDs(arg.files)
-      .then((files: any) => {
-        const paths = utilHelper.getArrayFromObjectFilter(files, 'path', new FilterTrue()) as Array<string>;
-        paths.forEach((path) => {
-          p.getTree().getRootFolder().setStatus(path, NodeStatus.IDENTIFIED);
-        });
-        p.updateTree();
-        return true;
-      })
-      .catch((e) => {
-        throw e;
-      });
+    treeService.updateTree(arg.files, NodeStatus.IDENTIFIED);
     return { status: 'ok', message: 'Inventory created', data: inv };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
@@ -70,18 +56,8 @@ ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (_event, arg: Partial<Inve
 
 ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (_event, inv: Partial<Inventory>) => {
   try {
-    resultService
-      .getResultsFromIDs(inv.files)
-      .then((files: any) => {
-        const paths = utilHelper.getArrayFromObjectFilter(files, 'path', new FilterTrue()) as Array<string>;
-        treeService.retoreStatus(paths);
-        return true;
-      })
-      .catch((e) => {
-        throw e;
-      });
     const success: boolean = await inventoryService.detach(inv);
-
+    treeService.updateTree(inv.files, NodeStatus.PENDING);
     return { status: 'ok', message: 'File detached to inventory successfully', success };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
@@ -91,17 +67,12 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (_event, inv: Partial<Inve
 
 ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (_event, arg: Partial<Inventory>) => {
   try {
-    const p = workspace.getOpenedProjects()[0];
-    p.store.inventory
-      .getInventoryFiles(arg)
-      .then((files: any) => {
-        const paths = utilHelper.getArrayFromObjectFilter(files, 'path', new FilterTrue()) as Array<string>;
-        treeService.retoreStatus(paths);
-        return true;
-      })
-      .catch((e) => {
-        throw e;
-      });
+    const inventoryFiles= await inventoryService.get(arg);
+    const files = inventoryFiles.files.reduce((acc, file) => {
+      acc.push(file.id);
+      return acc;
+    }, []);
+    treeService.updateTree(files, NodeStatus.PENDING);
     const success = await modelProvider.model.inventory.delete(arg);
     if (success) return { status: 'ok', message: 'Inventory deleted successfully', success };
     return { status: 'error', message: 'Inventory was not deleted successfully', success };

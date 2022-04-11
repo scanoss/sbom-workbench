@@ -3,6 +3,7 @@ import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Model } from './Model';
 import { Querys } from './querys_db';
 import { Dependency } from '../../api/types';
+import {NodeStatus} from "../workspace/Tree/Tree/Node";
 
 const query = new Querys();
 
@@ -134,6 +135,25 @@ export class DependencyModel extends Model {
           db.all(
             'SELECT DISTINCT f.path FROM files f INNER JOIN dependencies d ON d.fileId=f.fileId;',
             async (err: any, dep: Array<Record<string, string>>) => {
+              db.close();
+              if (err) throw err;
+              resolve(dep);
+            }
+          );
+        } catch (error: any) {
+          log.error(error);
+          reject(error);
+        }
+      }
+    );
+  }
+
+  public getStatus(){
+    return new Promise<Array<Record<string, NodeStatus>>>(
+      async (resolve, reject) => {
+        try {
+          const db = await this.openDb();
+          db.all(query.SQL_DEPENDENCY_STATUS, async (err: any, dep: Array<Record<string, NodeStatus>>) => {
               db.close();
               if (err) throw err;
               resolve(dep);
