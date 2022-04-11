@@ -91,8 +91,7 @@ ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (_event, inv: Partial<Inve
 
 ipcMain.handle(IpcEvents.INVENTORY_DELETE, async (_event, arg: Partial<Inventory>) => {
   try {
-    const p = workspace.getOpenedProjects()[0];
-    p.store.inventory
+    modelProvider.model.inventory
       .getInventoryFiles(arg)
       .then((files: any) => {
         const paths = utilHelper.getArrayFromObjectFilter(files, 'path', new FilterTrue()) as Array<string>;
