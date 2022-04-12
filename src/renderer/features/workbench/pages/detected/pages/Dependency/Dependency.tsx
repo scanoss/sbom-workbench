@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, Typography } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import { DIALOG_ACTIONS } from '@context/types';
 import { dependencyService } from '@api/services/dependency.service';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
@@ -15,6 +15,7 @@ import NoLocalFile from './components/NoLocalFile/NoLocalFile';
 import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
 import WorkbenchDialogContext, { IWorkbenchDialogContext } from '../../../../../../context/WorkbenchDialogProvider';
+import ActionButton from './components/ActionButton/ActionButton';
 
 export interface FileContent {
   content: string | null;
@@ -30,16 +31,11 @@ const filter = (items, query) => {
     return items;
   }
 
-  const result = items.filter((item) => {
+  return items.filter((item) => {
     const name = item.purl.toLowerCase();
     return name.includes(query.toLowerCase());
   });
-
-  return result;
 };
-
-const validDependencies = (items: Array<Dependency>) =>
-  items?.filter((item) => item.valid && item.status === 'pending');
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -51,15 +47,16 @@ const DependencyViewer = () => {
 
   const { imported } = state;
 
-  const file = state.node?.type === 'file' ? state.node.path : null;
 
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [dependencies, setDependencies] = useState<Dependency[]>([]);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const [view, setView] = useState<CodeViewSelectorMode>(CodeViewSelectorMode.GRAPH);
 
+  const file = state.node?.type === 'file' ? state.node.path : null;
   const items: Array<Dependency> = filter(dependencies, searchQuery);
-  const validItems: Array<Dependency> = validDependencies(items);
+  const pendingItems: Array<Dependency> = items?.filter((item) => item.status === 'pending');
+  const validItems: Array<Dependency> = pendingItems.filter((item) => item.valid);
 
   const init = () => {
     setLocalFileContent({ content: null, error: false });
@@ -89,7 +86,6 @@ const DependencyViewer = () => {
 
   const onAcceptAllHandler = async () => {
     const message = `All declared dependencies will be accepted.
-
       <div class="MuiPaper-root MuiAlert-root MuiAlert-standardWarning MuiPaper-elevation0">
         <div class="MuiAlert-icon"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.99L19.53 19H4.47L12 5.99M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"></path></svg></div>
         <div class="MuiAlert-message">Some dependencies will not be accepted because they lack version or license details.</div>
@@ -103,6 +99,20 @@ const DependencyViewer = () => {
 
     if (action !== DIALOG_ACTIONS.CANCEL) {
       await dependencyService.acceptAll(validItems);
+      getDependencies(file);
+    }
+  };
+
+  const onDismissAllHandler = async () => {
+    const message = `All pending declared dependencies will be dismissed.`;
+
+    const { action } = await dialogCtrl.openAlertDialog(message, [
+      { label: 'Cancel', role: 'cancel' },
+      { label: 'Dismiss All', action: 'accept', role: 'accept' },
+    ]);
+
+    if (action !== DIALOG_ACTIONS.CANCEL) {
+      await dependencyService.rejectAll({ dependencyIds: pendingItems.map((item: Dependency) => item.dependencyId) });
       getDependencies(file);
     }
   };
@@ -148,15 +158,11 @@ const DependencyViewer = () => {
               />
             </div>
 
-            <Button
-              size="small"
-              disabled={validItems.length === 0}
-              variant="contained"
-              color="secondary"
-              onClick={onAcceptAllHandler}
-            >
-              Accept All ({validItems.length})
-            </Button>
+            <ActionButton
+              count={[validItems.length, pendingItems.length]}
+              onAcceptAll={onAcceptAllHandler}
+              onDismissAll={onDismissAllHandler}
+            />
           </section>
         </header>
         <main className="editors editors-full app-content">
