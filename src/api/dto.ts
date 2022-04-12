@@ -4,3 +4,8 @@ export interface NewDependencyDTO {
   license: string;
   version: string;
 }
+
+export interface RejectAllDependeciesDTO {
+  dependencyIds?: number[];
+  path?: string;
+}
