@@ -6,6 +6,7 @@ import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { AppContext, IAppContext } from '@context/AppProvider';
 import { Dependency, FileType } from '@api/types';
 import { getExtension } from '@shared/utils/utils';
+import { DeclaredDependencyContext, IDeclaredDependencyContext } from '@context/DeclaredDependencyProvider';
 import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
@@ -40,13 +41,13 @@ const filter = (items, query) => {
 const MemoCodeEditor = React.memo(CodeEditor);
 
 const DependencyViewer = () => {
-  const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanBasePath } = useContext(AppContext) as IAppContext;
+  const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const store = useContext(DeclaredDependencyContext) as IDeclaredDependencyContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const workbenchDialogCtrl = useContext(WorkbenchDialogContext) as IWorkbenchDialogContext;
 
   const { imported } = state;
-
 
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [dependencies, setDependencies] = useState<Dependency[]>([]);
@@ -85,59 +86,35 @@ const DependencyViewer = () => {
   };
 
   const onAcceptAllHandler = async () => {
-    const message = `All declared dependencies will be accepted.
-      <div class="MuiPaper-root MuiAlert-root MuiAlert-standardWarning MuiPaper-elevation0">
-        <div class="MuiAlert-icon"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.99L19.53 19H4.47L12 5.99M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"></path></svg></div>
-        <div class="MuiAlert-message">Some dependencies will not be accepted because they lack version or license details.</div>
-      </div>
-  `;
-
-    const { action } = await dialogCtrl.openAlertDialog(message, [
-      { label: 'Cancel', role: 'cancel' },
-      { label: 'Accept All', action: 'accept', role: 'accept' },
-    ]);
-
-    if (action !== DIALOG_ACTIONS.CANCEL) {
-      await dependencyService.acceptAll(validItems);
-      getDependencies(file);
-    }
+    store.acceptAll(validItems);
   };
 
   const onDismissAllHandler = async () => {
-    const message = `All pending declared dependencies will be dismissed.`;
-
-    const { action } = await dialogCtrl.openAlertDialog(message, [
-      { label: 'Cancel', role: 'cancel' },
-      { label: 'Dismiss All', action: 'accept', role: 'accept' },
-    ]);
-
-    if (action !== DIALOG_ACTIONS.CANCEL) {
-      await dependencyService.rejectAll({ dependencyIds: pendingItems.map((item: Dependency) => item.dependencyId) });
-      getDependencies(file);
-    }
+    store.rejectAll({ dependencyIds: pendingItems.map((item: Dependency) => item.dependencyId) });
   };
 
   const onAcceptHandler = async (dependency: Dependency) => {
     const { action, data } = await workbenchDialogCtrl.openDependencyDialog(dependency);
     if (action === DIALOG_ACTIONS.CANCEL) return;
 
-    await dependencyService.accept(data);
-    getDependencies(file);
+    store.accept(data);
   };
 
   const onRestoreHandler = async (dependency) => {
-    await dependencyService.restore(dependency.dependencyId);
-    getDependencies(file);
+    store.restore(dependency.dependencyId);
   };
 
-  const onRejectHandler = async (dependency) => {
-    await dependencyService.reject(dependency.dependencyId);
-    getDependencies(file);
+  const onRejectHandler = (dependency) => {
+    store.reject(dependency.dependencyId);
   };
 
   useEffect(() => {
     init();
   }, [file]);
+
+  useEffect(() => {
+    if (!store.loading && file) getDependencies(file);
+  }, [store.loading]); // TODO: remove this after migrate to redux
 
   return (
     <>

@@ -62,63 +62,78 @@ const FileTree = () => {
   };
 
   const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
-    console.log('onContextMenu', node);
     const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED' || node.status === 'FILTERED';
-    const menu = !node.children
-      ? [
-          {
-            label: 'Mark file as original',
-            click: () => contextual.ignore(node),
-            enabled: !onlyRestore && node.status !== 'FILTERED' && node.status !== 'NO-MATCH',
-          },
-          {
-            label: 'Restore file',
-            click: () => contextual.restore(node),
-            enabled: node.status === 'IDENTIFIED' || node.status === 'IGNORED',
-          },
-        ]
-      : [
-          {
-            label: !isFilterActive ? 'Accept all' : 'Accept all filtered files',
-            click: () => contextual.acceptAll(node),
-            enabled: !onlyRestore,
-          },
-          { type: 'separator' },
-          {
-            label: !isFilterActive ? 'Identify all files as...' : 'Identify all filtered files as...',
-            click: () => contextual.identifyAll(node),
-            enabled: !onlyRestore,
-          },
-          {
-            label: !isFilterActive ? 'Mark all files as original' : 'Mark all filtered files as original',
-            click: () => contextual.ignoreAll(node),
-            enabled: !onlyRestore,
-          },
-          {
-            label: !isFilterActive ? 'Restore all files' : 'Restore all filtered files',
-            click: () => contextual.restoreAll(node),
-            enabled: node.hasIdentified || node.hasIgnored,
-          },
-          { type: 'separator' },
-          {
-            label: 'Expand/Collapse',
-            submenu: [
-              {
-                label: 'Expand all',
-                click: () => onExpandAll(node),
-              },
-              {
-                label: 'Expand to matches',
-                click: () => onExpandAll(node, true),
-              },
-              {
-                label: 'Collapse all',
-                click: () => onCollapseAll(node),
-              },
-            ],
-          },
-        ];
 
+    let menu = [];
+    if (node.isDependencyFile) {
+      menu = [
+        {
+          label: 'Accept all dependencies',
+          click: () => contextual.acceptAllDependencies(node),
+          enabled: node.status === 'PENDING',
+        },
+        {
+          label: 'Dismiss all dependencies',
+          click: () => contextual.rejectAllDependencies(node),
+          enabled: node.status === 'PENDING',
+        },
+      ];
+    } else {
+      menu = !node.children
+        ? [
+            {
+              label: 'Mark file as original',
+              click: () => contextual.ignore(node),
+              enabled: !onlyRestore && node.status !== 'FILTERED' && node.status !== 'NO-MATCH',
+            },
+            {
+              label: 'Restore file',
+              click: () => contextual.restore(node),
+              enabled: node.status === 'IDENTIFIED' || node.status === 'IGNORED',
+            },
+          ]
+        : [
+            {
+              label: !isFilterActive ? 'Accept all' : 'Accept all filtered files',
+              click: () => contextual.acceptAll(node),
+              enabled: !onlyRestore,
+            },
+            { type: 'separator' },
+            {
+              label: !isFilterActive ? 'Identify all files as...' : 'Identify all filtered files as...',
+              click: () => contextual.identifyAll(node),
+              enabled: !onlyRestore,
+            },
+            {
+              label: !isFilterActive ? 'Mark all files as original' : 'Mark all filtered files as original',
+              click: () => contextual.ignoreAll(node),
+              enabled: !onlyRestore,
+            },
+            {
+              label: !isFilterActive ? 'Restore all files' : 'Restore all filtered files',
+              click: () => contextual.restoreAll(node),
+              enabled: node.hasIdentified || node.hasIgnored,
+            },
+            { type: 'separator' },
+            {
+              label: 'Expand/Collapse',
+              submenu: [
+                {
+                  label: 'Expand all',
+                  click: () => onExpandAll(node),
+                },
+                {
+                  label: 'Expand to matches',
+                  click: () => onExpandAll(node, true),
+                },
+                {
+                  label: 'Collapse all',
+                  click: () => onCollapseAll(node),
+                },
+              ],
+            },
+          ];
+    }
     Menu.buildFromTemplate(menu).popup(remote.getCurrentWindow());
   };
 
