@@ -1,12 +1,12 @@
 import log from 'electron-log';
-import { IDependencyResponse } from 'scanoss';
-import { NewDependencyDTO } from '../../api/dto';
-import { Dependency } from '../../api/types';
-import { dependencyHelper } from '../helpers/DependencyHelper';
-import { fileHelper } from '../helpers/FileHelper';
-import { licenseHelper } from '../helpers/LicenseHelper';
-import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
-import { modelProvider } from './ModelProvider';
+import {IDependencyResponse} from 'scanoss';
+import {NewDependencyDTO} from '../../api/dto';
+import {Dependency, FileStatusType} from '../../api/types';
+import {dependencyHelper} from '../helpers/DependencyHelper';
+import {fileHelper} from '../helpers/FileHelper';
+import {licenseHelper} from '../helpers/LicenseHelper';
+import {QueryBuilderCreator} from '../model/queryBuilder/QueryBuilderCreator';
+import {modelProvider} from './ModelProvider';
 
 class DependencyService {
   public async insert(dependencies: IDependencyResponse): Promise<void> {
@@ -132,6 +132,36 @@ class DependencyService {
       params.push(new Date().toISOString(),dep.scope? dep.scope :null,dep.purl,dep.version,dep.licenses.length > 0 ? dep.licenses.join(','): null,dep.dependencyId);
       await modelProvider.model.dependency.update(params);
       const response = (await this.getAll({ id: dependencyId }))[0];
+      return response;
+    } catch (error: any) {
+      log.error(error);
+      return error;
+    }
+  }
+
+  public async rejectAllByIds(dependencyIds: Array<number>): Promise<Array<Dependency>> {
+    try {
+      const response = [];
+      for(let i = 0; i < dependencyIds.length; i+=1) {
+        const dep = await this.reject(dependencyIds[i]);
+        response.push(dep);
+      }
+    return response;
+    } catch (error: any) {
+      log.error(error);
+      return error;
+    }
+  }
+
+  public async rejectAllByPath(path :string): Promise<Array<Dependency>> {
+    try {
+      const dependencies = await this.getAll({ path });
+      const dependencyIds = dependencies.filter((d) => d.status === FileStatusType.PENDING).map((d) => d.dependencyId);
+      const response = [];
+      for(let i = 0; i < dependencyIds.length; i+=1) {
+        const dep = await this.reject(dependencyIds[i]);
+        response.push(dep);
+      }
       return response;
     } catch (error: any) {
       log.error(error);
