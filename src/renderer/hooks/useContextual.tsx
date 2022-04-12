@@ -1,16 +1,18 @@
 import React, { useContext } from 'react';
-import { fileService } from '../../api/services/file.service';
-import { resultService } from '../../api/services/results.service';
-import { InventoryAction } from '../../api/types';
-import { DialogContext, IDialogContext } from '../context/DialogProvider';
-import { DialogResponse, DIALOG_ACTIONS } from '../context/types';
+import { fileService } from '@api/services/file.service';
+import { resultService } from '@api/services/results.service';
+import { InventoryAction } from '@api/types';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { WorkbenchContext, IWorkbenchContext } from '../features/workbench/store';
+import { DeclaredDependencyContext, IDeclaredDependencyContext } from '@context/DeclaredDependencyProvider';
 
 const useContextual = () => {
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
-  const { state, isFilterActive, dispatch, executeBatch, restoreFile, ignoreFile } = useContext(
+  const { state, isFilterActive, executeBatch, restoreFile, ignoreFile } = useContext(
     WorkbenchContext
   ) as IWorkbenchContext;
+  const dependencyContext = useContext(DeclaredDependencyContext) as IDeclaredDependencyContext
 
   const showOverwrite = (node: any) => node.hasIdentified || node.hasIgnored;
 
@@ -98,6 +100,12 @@ const useContextual = () => {
     return restoreFile([fileId]);
   };
 
+  const acceptAllDependencies = async (node: any): Promise<boolean> =>
+    dependencyContext.acceptAll({ path: node.value });
+
+  const rejectAllDependencies = async (node: any): Promise<boolean> =>
+    dependencyContext.rejectAll({ path: node.value });
+
   return {
     acceptAll,
     identifyAll,
@@ -105,6 +113,8 @@ const useContextual = () => {
     restoreAll,
     restore,
     ignore,
+    acceptAllDependencies,
+    rejectAllDependencies,
   };
 };
 
