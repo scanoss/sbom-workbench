@@ -5,9 +5,8 @@ import BanIcon from '@material-ui/icons/NotInterested';
 import { RestoreOutlined } from '@material-ui/icons';
 import { List, AutoSizer } from 'react-virtualized';
 import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
+import { Dependency } from '@api/types';
 import IconComponent from '../../../../../../components/IconComponent/IconComponent';
-import { Dependency } from '../../../../../../../../../api/types';
-
 
 interface DependencyTreeProps {
   dependencies: Array<Dependency>;
@@ -68,7 +67,7 @@ const DependencyTree = ({
                     </div>
 
                     <div className="info-container license">
-                      {item.version ? (
+                      {item.licenses && item.licenses.length > 0 ? (
                         <>
                           <Typography variant="subtitle1">License</Typography>
                           <div className="pill-license">
