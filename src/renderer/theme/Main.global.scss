@@ -95,3 +95,25 @@ a {
     color: var(--color-status-ignored);
   }
 }
+
+.custom-alert {
+  color: rgb(102, 60, 0);
+  background-color: rgb(255, 244, 229);
+  display: flex;
+  padding: 6px 16px;
+  font-size: 0.875rem;
+  font-weight: 400;
+  border-radius: 4px;
+
+  .MuiAlert-standardWarning .MuiAlert-icon {
+    color: #ff9800;
+  }
+
+  .MuiAlert-icon {
+    display: flex;
+    opacity: 0.9;
+    padding: 7px 0;
+    font-size: 22px;
+    margin-right: 12px;
+  }
+}
