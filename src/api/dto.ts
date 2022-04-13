@@ -1,3 +1,5 @@
+import {Dependency} from "@api/types";
+
 export interface NewDependencyDTO {
   dependencyId?: number;
   purl: string;
@@ -7,5 +9,10 @@ export interface NewDependencyDTO {
 
 export interface RejectAllDependeciesDTO {
   dependencyIds?: number[];
+  path?: string;
+}
+
+export interface AcceptAllDependeciesDTO {
+  dependencies?: Array<Dependency>;
   path?: string;
 }

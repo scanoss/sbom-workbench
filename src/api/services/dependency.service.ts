@@ -1,7 +1,7 @@
 import { IpcEvents } from '../ipc-events';
 import { BaseService } from './base.service';
 import { Dependency } from '../types';
-import {NewDependencyDTO, RejectAllDependeciesDTO} from '../dto';
+import {AcceptAllDependeciesDTO, NewDependencyDTO, RejectAllDependeciesDTO} from '../dto';
 
 const { ipcRenderer } = require('electron');
 
@@ -21,8 +21,8 @@ class DepencyService extends BaseService {
     return this.response(response);
   }
 
-  public async acceptAll(dependencies: Array<Dependency>): Promise<Array<Dependency>> {
-    const response = await ipcRenderer.invoke(IpcEvents.DEPENDENCY_ACCEPT_ALL, dependencies);
+  public async acceptAll(params: AcceptAllDependeciesDTO): Promise<Array<Dependency>> {
+    const response = await ipcRenderer.invoke(IpcEvents.DEPENDENCY_ACCEPT_ALL,params);
     return this.response(response);
   }
 

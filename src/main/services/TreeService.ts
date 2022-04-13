@@ -75,6 +75,7 @@ class TreeService {
         } else
           status[item.path].add(item.status);
       });
+
       // Get dependencies status for each path
     const dependencyStatus = [];
       for (const [path, stat] of Object.entries(status as Record<string, Set<string>>)) {
