@@ -32,7 +32,6 @@ class DepencyService extends BaseService {
   }
 
   public async rejectAll(params: RejectAllDependeciesDTO): Promise<Array<Dependency>> {
-    console.log(params);
     const response = await ipcRenderer.invoke(IpcEvents.DEPENDENCY_REJECT_ALL, params);
     return this.response(response);
   }
