@@ -36,8 +36,8 @@ class DependencyService {
       let dependency: Dependency = (await modelProvider.model.dependency.getAll(queryBuilderDependency))[0];
       const queryBuilderComp = QueryBuilderCreator.create({ purl: params.purl, version: params.version });
       let comp = (await modelProvider.model.component.getAll(queryBuilderComp))[0];
-
       let lic: any = await modelProvider.model.license.getBySpdxId(dependency.licenses.length > 0 ? dependency.licenses[0] : params.license);
+      //Create license if it not exists in the catalog
       if (!lic) {
         const licenseName = licenseHelper.licenseNameToSPDXID(dependency.licenses.length > 0 ? dependency.licenses[0] : params.license);
         lic = await modelProvider.model.license.create({
@@ -47,7 +47,7 @@ class DependencyService {
           url: '',
         });
       }
-
+      //Create component if it not exists in the catalog
       if (!comp)
         comp = await modelProvider.model.component.create({
           name: dependency.componentName || dependency.purl,
@@ -55,9 +55,8 @@ class DependencyService {
           purl: params.purl,
           license_id: lic.id,
         });
-      else {
+      else
         await modelProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
-      }
 
       // Update dependency
       dependency = { ...dependency, licenses: [params.license], version: params.version };
@@ -65,6 +64,7 @@ class DependencyService {
       dep.push(null,dependency.scope? dependency.scope: null,dependency.purl,dependency.version,dependency.licenses.join(','),dependency.dependencyId);
       await modelProvider.model.dependency.update(dep);
 
+      // Create inventory
       await modelProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.license, source: 'declared' });
       const response = (await this.getAll({ id: params.dependencyId }))[0];
       return response;
@@ -105,7 +105,7 @@ class DependencyService {
     }
   }
 
-  public async acceptAll(acceptedDep: Array<Dependency>): Promise<Array<Dependency>> {
+  public async acceptAllByIds(acceptedDep: Array<Dependency>): Promise<Array<Dependency>> {
     try {
       const dependencies = acceptedDep;
       const response = [];
@@ -129,6 +129,7 @@ class DependencyService {
     try {
       const dep = (await this.getAll({ id: dependencyId }))[0];
       const params= [];
+    //  `UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?
       params.push(new Date().toISOString(),dep.scope? dep.scope :null,dep.purl,dep.version,dep.licenses.length > 0 ? dep.licenses.join(','): null,dep.dependencyId);
       await modelProvider.model.dependency.update(params);
       const response = (await this.getAll({ id: dependencyId }))[0];
@@ -161,6 +162,27 @@ class DependencyService {
       for(let i = 0; i < dependencyIds.length; i+=1) {
         const dep = await this.reject(dependencyIds[i]);
         response.push(dep);
+      }
+      return response;
+    } catch (error: any) {
+      log.error(error);
+      return error;
+    }
+  }
+
+  public async acceptAllByPath(path: string): Promise<Array<Dependency>> {
+    try {
+      let dependencies = await this.getAll({ path });
+      dependencies = dependencies.filter((d) => d.status === FileStatusType.PENDING && d.valid==true);
+      const response = [];
+      for (const dep of dependencies) {
+        const d = await this.accept({
+          dependencyId: dep.dependencyId,
+          purl: dep.purl,
+          version: dep.version,
+          license: dep.licenses[0],
+        } as NewDependencyDTO);
+        response.push(d);
       }
       return response;
     } catch (error: any) {

@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import log from 'electron-log';
 import { dependencyService } from '../../main/services/DependencyService';
-import {NewDependencyDTO, RejectAllDependeciesDTO} from '../dto';
+import {AcceptAllDependeciesDTO, NewDependencyDTO, RejectAllDependeciesDTO} from '../dto';
 import { IpcEvents } from '../ipc-events';
 import { Response } from '../Response';
 import { Dependency } from '../types';
@@ -39,9 +39,13 @@ ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE, async (_event, dependencyId: number
   }
 });
 
-ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT_ALL, async (event, acceptedDependencies: Array<Dependency>) => {
+ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT_ALL, async (event, params: AcceptAllDependeciesDTO) => {
   try {
-    const response = await dependencyService.acceptAll(acceptedDependencies);
+    let response;
+    if(params.dependencies)
+     response = await dependencyService.acceptAllByIds(params.dependencies);
+    else
+      response = await dependencyService.acceptAllByPath(params.path);
     treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: response });
   } catch (error: any) {
