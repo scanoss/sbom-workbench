@@ -42,29 +42,29 @@ const AppProvider = ({ children }) => {
   const [scanPath, setScanPath] = useState<IScan>();
   const [settingsNewProject, setSettingsNewProject] = useState<INewProject>();
 
-  const newProject = () => {
-    const projectPath = dialogController.showOpenDialog({
+  const newProject = async () => {
+    const paths = await dialogController.showOpenDialog({
       properties: ['openDirectory'],
     });
 
-    if (projectPath) {
-      setScanPath({ path: projectPath, action: 'scan' });
+    if (paths && paths.length > 0) {
+      setScanPath({ path: paths[0], action: 'scan' });
       history.push('/workspace/new/settings');
     }
   };
 
   const importProject = async () => {
-    const path = dialogController.showOpenDialog({
+    const paths = await dialogController.showOpenDialog({
       properties: ['openFile'],
       filters: [{ name: 'Zip files', extensions: ['zip'] }],
     });
 
-    if (!path) return;
+    if (!paths || paths.length === 0) return;
     const dialog = await dialogCtrl.createProgressDialog('IMPORTING PROJECT');
     dialog.present();
 
     try {
-      const project = await workspaceService.importProject(path);
+      const project = await workspaceService.importProject(paths[0]);
       const projects = await workspaceService.getAllProjects(); // FIXME: see problem using state on callback IPC event to avoid this
 
       setTimeout(async () => {
@@ -89,7 +89,7 @@ const AppProvider = ({ children }) => {
   };
 
   const exportProject = async (project: IProject) => {
-    const path = dialogController.showSaveDialog({
+    const path = await dialogController.showSaveDialog({
       defaultPath: `${os.homedir()}/Downloads/${project.name}.zip`,
     });
 
