@@ -1,20 +1,21 @@
+import { ipcRenderer } from 'electron';
+import { IpcEvents } from '@api/ipc-events';
+
 const electron = window.require('electron');
 const { remote } = electron;
 const { dialog } = remote;
 
 class DialogController {
-  public showOpenDialog(options): string {
-    const result = dialog.showOpenDialogSync(remote.getCurrentWindow(), options);
-    return result ? result[0] : null;
+  public async showOpenDialog(options): Promise<string> {
+    return ipcRenderer.invoke(IpcEvents.DIALOG_SHOW_OPEN_DIALOG, options);
   }
 
-  public showSaveDialog(options): string {
-    const result = dialog.showSaveDialogSync(remote.getCurrentWindow(), options);
-    return result;
+  public showSaveDialog(options): Promise<string> {
+    return ipcRenderer.invoke(IpcEvents.DIALOG_SHOW_SAVE_DIALOG, options);
   }
 
-  public showError(title: string, content: string) {
-    dialog.showErrorBox(title, content);
+  public showError(title: string, content: string): void {
+    ipcRenderer.send(IpcEvents.DIALOG_SHOW_ERROR_BOX, title, content);
   }
 }
 
