@@ -55,6 +55,7 @@ export const DeclaredDependencyProvider: React.FC = ({ children }) => {
 
     if (action !== DIALOG_ACTIONS.CANCEL) {
       setLoading(true);
+      console.log(params);
       await dependencyService.acceptAll(params);
       setLoading(false);
       return true;
