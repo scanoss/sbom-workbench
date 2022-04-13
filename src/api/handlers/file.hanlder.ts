@@ -9,7 +9,7 @@ import { utilHelper } from '../../main/helpers/UtilHelper';
 import { FilterTrue } from '../../main/batch/Filter/FilterTrue';
 import { resultService } from '../../main/services/ResultService';
 import { modelProvider } from '../../main/services/ModelProvider';
-import { fileService } from "../../main/services/FileService";
+import { fileService } from '../../main/services/FileService';
 
 const path = require('path');
 

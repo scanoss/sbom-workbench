@@ -187,10 +187,10 @@ const Export = ({ state }) => {
 
   const exportFile = async (format: ExportFormat) => {
     const data: IProject = await workspaceService.getProjectDTO();
-    const path = dialogController.showSaveDialog({
+    const path = await dialogController.showSaveDialog({
       defaultPath: `${data.work_root}/${data.name}`,
     });
-    if (path && path !== undefined) {
+    if (path) {
       await exportService.export(path, format);
     }
   };
