@@ -1,8 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Card, CardContent, Tooltip, ButtonBase } from '@material-ui/core';
-import { ComponentGroup } from '../../../../../api/types';
+import { useSelector } from 'react-redux';
+import { ComponentGroup } from '@api/types';
 import IconComponent from '../IconComponent/IconComponent';
-import { WorkbenchContext } from '../../store';
+import { selectWorkbench } from '../../../../store/workbench-store/workbenchSlice';
 
 interface ComponentCardProps {
   component: ComponentGroup;
@@ -10,7 +11,7 @@ interface ComponentCardProps {
 }
 
 const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
-  const { state } = useContext(WorkbenchContext);
+  const state = useSelector(selectWorkbench);
 
   const multiple: boolean = component.versions.length > 1;
   const identified = component.identifiedAs.filter((item) => item.purl !== component.purl);

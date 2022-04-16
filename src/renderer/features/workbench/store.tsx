@@ -2,38 +2,16 @@
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
-import { inventoryService } from '@api/services/inventory.service';
-import { Inventory, InventoryAction, IWorkbenchFilter, Node } from '@api/types';
-import { reportService } from '@api/services/report.service';
+import { Node } from '@api/types';
 import { IpcEvents } from '@api/ipc-events';
-import { fileService } from '@api/services/file.service';
 import { projectService } from '@api/services/project.service';
-import { AppContext } from '@context/AppProvider';
-import reducer, { initialState, State } from './reducers';
-import { workbenchController } from '../../controllers/workbench-controller';
-import {
-  loadScanSuccess,
-  setComponent,
-  setComponents,
-  setProgress,
-  updateTree,
-  setCurrentNode,
-  setRecentUsedComponent,
-} from './actions';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { selectWorkbench, updateTree } from '../../store/workbench-store/workbenchSlice';
+import { update } from '../../store/workbench-store/workbenchThunks';
+import { selectNavigationState, setCurrentNode } from '../../store/navigation-store/navigationSlice';
 
 export interface IWorkbenchContext {
-  loadScan: (path: string) => Promise<boolean>;
-  createInventory: (inventory: Inventory) => Promise<Inventory>;
-  updateInventory: (inventory: Inventory) => Promise<Inventory>;
-  deleteInventory: (inventoryId: number) => Promise<boolean>;
-  ignoreFile: (files: number[]) => Promise<boolean>;
-  restoreFile: (files: number[]) => Promise<boolean>;
-  attachFile: (inventoryId: number, files: number[]) => Promise<boolean>;
-  detachFile: (files: number[]) => Promise<boolean>;
-  executeBatch: (path: string, action: InventoryAction, data?: any) => Promise<boolean>;
-
-  state: State;
-  dispatch: any;
   isFilterActive: boolean;
 }
 
@@ -41,146 +19,31 @@ export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(nu
 
 export const WorkbenchProvider: React.FC = ({ children }) => {
   const history = useHistory();
+  const dispatch = useDispatch();
 
-  const { setScanBasePath } = React.useContext<any>(AppContext);
-  const [state, dispatch] = React.useReducer(reducer, initialState);
-  const { loaded, component } = state;
-
-  const loadScan = async (path: string) => {
-    try {
-      if (loaded) return true; // && state.path != path
-
-      console.log(`STORE: loading scan: ${path}`);
-      const { name, imported, fileTree, scanRoot, dependencies } = await workbenchController.loadScan(path);
-      dispatch(loadScanSuccess(name, imported, fileTree, [], dependencies));
-
-      setScanBasePath(scanRoot);
-      update();
-      return true;
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
-  };
-
-  const createInventory = async (inventory: Inventory): Promise<Inventory> => {
-    const response = await inventoryService.create(inventory);
-    if (inventory) dispatch(setRecentUsedComponent(inventory.purl));
-    update();
-    return response;
-  };
-
-  const updateInventory = async (inventory: Inventory): Promise<Inventory> => {
-    const response = await inventoryService.update(inventory);
-    update();
-    return response;
-  };
-
-  const attachFile = async (inventoryId: number, files: number[]): Promise<boolean> => {
-    try {
-      await inventoryService.attach({ id: inventoryId, files });
-      update();
-      return true;
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
-  };
-
-  const detachFile = async (files: number[]): Promise<boolean> => {
-    await inventoryService.detach({ files });
-    update();
-    return true;
-  };
-
-  const deleteInventory = async (id: number): Promise<boolean> => {
-    try {
-      await inventoryService.delete({ id });
-      update();
-      return true;
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
-  };
-
-  const ignoreFile = async (files: number[]): Promise<boolean> => {
-    const success = await fileService.ignored(files);
-    update();
-    return success;
-  };
-
-  const restoreFile = async (files: number[]): Promise<boolean> => {
-    const success = await inventoryService.detach({ files });
-    update();
-    return success;
-  };
-
-  const executeBatch = async (path: string, action: InventoryAction, data = null): Promise<boolean> => {
-    try {
-      await inventoryService.folder({
-        action,
-        folder: path,
-        overwrite: false,
-        ...data,
-      });
-
-      update();
-      return true;
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
-  };
-
-  const update = async () => {
-    const params: IWorkbenchFilter = state.filter;
-    if (component) {
-      let comp = await workbenchController.getComponent(component.purl);
-      if (!comp) {
-        // TODO: remove this block after backend changes. Do it for her!
-        comp = {
-          ...component,
-          versions: null,
-          summary: {
-            pending: 0,
-            identified: 0,
-            ignored: 0,
-          },
-        };
-      }
-      if (comp) dispatch(setComponent(comp));
-    }
-
-    const components = await workbenchController.getComponents();
-    dispatch(setComponents(components));
-
-    const summary = await reportService.getSummary();
-    dispatch(setProgress(summary));
-  };
+  const { loaded } = useSelector(selectWorkbench);
+  const { filter } = useSelector(selectNavigationState);
 
   const onTreeRefreshed = (_event, fileTree) => dispatch(updateTree(fileTree));
 
-  const setNode = async (node: Node) => {
-    dispatch(setCurrentNode(node));
-  };
+  const setNode = async (node: Node) => dispatch(setCurrentNode(node));
 
-  const isFilterActive: boolean = !!state.filter?.status || !!state.filter?.usage;
+  const isFilterActive: boolean = !!filter?.status || !!filter?.usage;
 
   useEffect(() => {
     const setFilter = async () => {
-      if (state.loaded) {
-        await projectService.setFilter(state.filter);
-        update();
+      if (loaded) {
+        await projectService.setFilter(filter);
+        dispatch(update());
       }
     };
 
     setFilter();
-  }, [state.filter]);
+  }, [filter]);
 
   // TODO: use custom navigation
   useEffect(() => {
-    if (!state.loaded) return null;
+    if (!loaded) return null;
 
     const unlisten = history.listen((data) => {
       const param = new URLSearchParams(data.search).get('path');
@@ -197,7 +60,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     return () => {
       unlisten();
     };
-  }, [state.loaded]);
+  }, [loaded]);
 
   const setupListeners = () => {
     ipcRenderer.on(IpcEvents.TREE_UPDATED, onTreeRefreshed);
@@ -212,33 +75,9 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const value = React.useMemo(
     () => ({
-      state,
-      dispatch,
-      loadScan,
-      createInventory,
-      updateInventory,
-      ignoreFile,
-      restoreFile,
-      attachFile,
-      detachFile,
-      deleteInventory,
-      executeBatch,
       isFilterActive,
     }),
-    [
-      state,
-      dispatch,
-      loadScan,
-      createInventory,
-      updateInventory,
-      ignoreFile,
-      restoreFile,
-      attachFile,
-      detachFile,
-      deleteInventory,
-      executeBatch,
-      isFilterActive,
-    ]
+    [isFilterActive]
   );
 
   return <WorkbenchContext.Provider value={value}>{children}</WorkbenchContext.Provider>;

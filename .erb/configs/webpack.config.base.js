@@ -44,6 +44,7 @@ export default {
       '@context': path.resolve(__dirname, '../../src/renderer/context/'),
       '@components': path.resolve(__dirname, '../../src/renderer/components/'),
       '@hooks': path.resolve(__dirname, '../../src/renderer/hooks/'),
+      '@store': path.resolve(__dirname, '../../src/renderer/store/'),
     }
   },
 

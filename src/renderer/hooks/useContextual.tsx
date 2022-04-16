@@ -4,14 +4,15 @@ import { resultService } from '@api/services/results.service';
 import { InventoryAction } from '@api/types';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
-import { WorkbenchContext, IWorkbenchContext } from '../features/workbench/store';
 import { DeclaredDependencyContext, IDeclaredDependencyContext } from '@context/DeclaredDependencyProvider';
+import { useDispatch } from 'react-redux';
+import { WorkbenchContext, IWorkbenchContext } from '../features/workbench/store';
+import { executeBatch, ignoreFile, restoreFile } from '../store/inventory-store/inventoryThunks';
 
 const useContextual = () => {
+  const dispatch = useDispatch();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
-  const { state, isFilterActive, executeBatch, restoreFile, ignoreFile } = useContext(
-    WorkbenchContext
-  ) as IWorkbenchContext;
+  const { isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
   const dependencyContext = useContext(DeclaredDependencyContext) as IDeclaredDependencyContext
 
   const showOverwrite = (node: any) => node.hasIdentified || node.hasIgnored;
@@ -44,60 +45,81 @@ const useContextual = () => {
     return response;
   };
 
-  const acceptAll = async (node: any): Promise<boolean> => {
+  const acceptAll = async (node: any) => {
     const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
 
     if (action !== DIALOG_ACTIONS.CANCEL) {
       const response: any = await showPreLoadInventoryDialog(node.value || '/', action === 'overwrite');
       if (response) {
-        return executeBatch(node.value, InventoryAction.ACCEPT, {
-          overwrite: action === 'overwrite',
-          data: response.inventories,
-          notes: response.notes,
-        });
+        dispatch(
+          executeBatch({
+            path: node.value,
+            action: InventoryAction.ACCEPT,
+            data: {
+              overwrite: action === 'overwrite',
+              data: response.inventories,
+              notes: response.notes,
+            },
+          })
+        );
       }
     }
-
-    return false;
   };
 
-  const identifyAll = async (node: any): Promise<boolean> => {
-    const inventory = await dialogCtrl.openInventory({ usage: 'file' }, state.recentUsedComponents, isFilterActive);
+  const identifyAll = async (node: any) => {
+    // TODO: state.recentUsedComponents
+    const inventory = await dialogCtrl.openInventory({ usage: 'file' }, [], isFilterActive);
     if (inventory) {
       const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
       if (inventory && action !== DIALOG_ACTIONS.CANCEL) {
-        return executeBatch(node.value, InventoryAction.IDENTIFY, { data: inventory });
+        dispatch(
+          executeBatch({
+            path: node.value,
+            action: InventoryAction.IDENTIFY,
+            data: {
+              data: inventory,
+            },
+          })
+        );
       }
     }
-    return false;
   };
 
-  const ignoreAll = async (node: any): Promise<boolean> => {
+  const ignoreAll = async (node: any) => {
     const { action } = showOverwrite(node) ? await showOverwriteDialog() : await showConfirmDialog();
     if (action !== DIALOG_ACTIONS.CANCEL) {
-      return executeBatch(node.value, InventoryAction.IGNORE, { overwrite: action === 'overwrite' });
+      dispatch(
+        executeBatch({
+          path: node.value,
+          action: InventoryAction.IGNORE,
+          data: {
+            overwrite: action === 'overwrite',
+          },
+        })
+      );
     }
-
-    return false;
   };
 
-  const restoreAll = async (node: any): Promise<boolean> => {
+  const restoreAll = async (node: any) => {
     const { action } = await showConfirmDialog();
     if (action !== DIALOG_ACTIONS.CANCEL) {
-      return executeBatch(node.value, InventoryAction.RESTORE);
+      dispatch(
+        executeBatch({
+          path: node.value,
+          action: InventoryAction.RESTORE,
+        })
+      );
     }
-
-    return false;
   };
 
-  const ignore = async (node: any): Promise<boolean> => {
+  const ignore = async (node: any) => {
     const [result] = await resultService.get(node.value);
-    return ignoreFile([result.id]);
+    dispatch(ignoreFile([result.id]));
   };
 
-  const restore = async (node: any): Promise<boolean> => {
+  const restore = async (node: any) => {
     const fileId = await fileService.getIdFromPath(node.value);
-    return restoreFile([fileId]);
+    dispatch(restoreFile([fileId]));
   };
 
   const acceptAllDependencies = async (node: any): Promise<boolean> =>

@@ -4,21 +4,24 @@ import { Redirect, Route, Switch, useLocation, useRouteMatch } from 'react-route
 import SplitPane from 'react-split-pane';
 import { AppContext, IAppContext } from '@context/AppProvider';
 import AppConfig from '@config/AppConfigModule';
-import { WorkbenchContext, IWorkbenchContext } from './store';
+import { useDispatch, useSelector } from 'react-redux';
 import AppBar from './components/AppBar/AppBar';
 import Detected from './pages/detected/Detected';
 import Identified from './pages/identified/Identified';
 import Reports from './pages/report/Report';
 import FileTree from './components/FileTree/FileTree';
-import { reset } from './actions';
 import WorkbenchFilters from './components/WorkbenchFilters/WorkbenchFilters';
-import { dialogController } from '../../controllers/dialog-controller';
+import { loadProject } from '../../store/workbench-store/workbenchThunks';
+import { reset, selectWorkbench } from '../../store/workbench-store/workbenchSlice';
 
 const Workbench = () => {
   const { path } = useRouteMatch();
   const { pathname } = useLocation();
 
-  const { dispatch, state, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const dispatch = useDispatch();
+  const state = useSelector(selectWorkbench);
+
+  // const { dispatch, state, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
   const { scanPath } = useContext(AppContext) as IAppContext;
   const { loaded } = state;
 
@@ -26,10 +29,12 @@ const Workbench = () => {
 
   const onInit = async () => {
     const { path } = scanPath;
-    const result = path ? await loadScan(path) : false;
+    dispatch(loadProject(path));
+    /*
     if (!result) {
       dialogController.showError('Error', 'Cannot read scan.');
     }
+    */
   };
 
   const onDestroy = () => {

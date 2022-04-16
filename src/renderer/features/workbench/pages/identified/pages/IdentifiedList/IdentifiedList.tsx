@@ -1,16 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
-import SearchIcon from '@material-ui/icons/Search';
 import { Alert } from '@material-ui/lab';
 import { componentService } from '../../../../../../../api/services/component.service';
 import { inventoryService } from '../../../../../../../api/services/inventory.service';
-import { setComponent } from '../../../../actions';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import RecognizedCard from '../../../../components/RecognizedCard/RecognizedCard';
 import usePagination from '../../../../../../hooks/usePagination';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectWorkbench } from '../../../../../../store/workbench-store/workbenchSlice';
+import { setComponent } from '../../../../../../store/component-store/componentSlice';
 
 const filter = (items, query) => {
   if (!items) {
@@ -48,14 +49,11 @@ const useStyles = makeStyles((theme) => ({
 export const IdentifiedList = () => {
   const history = useHistory();
   const classes = useStyles();
+  const dispatch = useDispatch();
   const { limit, onScroll } = usePagination();
 
-  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
-
   const [inventoryList, setInventoryList] = useState<any>([]);
-
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
-
   const filterItems = filter(inventoryList, searchQuery);
 
   const onSelectComponent = async (grouped) => {

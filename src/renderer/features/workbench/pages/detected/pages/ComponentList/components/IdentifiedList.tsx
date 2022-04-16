@@ -1,14 +1,16 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { WorkbenchContext, IWorkbenchContext } from '../../../../../store';
+import { useSelector } from 'react-redux';
 import { FileList } from './FileList';
+import { selectComponentState } from '../../../../../../../store/component-store/componentSlice';
 
 export const IdentifiedList = ({ files, emptyMessage, onAction }) => {
-  const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { component } = useSelector(selectComponentState);
   const [groups, setGroups] = useState({});
 
   const fetchGroups = () => {
     const grupedFiles = files.reduce((acc, file) => {
       const key = file.component.name;
+      // eslint-disable-next-line no-prototype-builtins
       if (!acc.hasOwnProperty(key)) acc[key] = [];
       acc[key].push(file);
       return acc;
@@ -22,8 +24,8 @@ export const IdentifiedList = ({ files, emptyMessage, onAction }) => {
   return (
     <div className="file-group-container">
       {Object.keys(groups).map((key) => (
-        <section key={key} className={`group ${key !== state.component.name ? 'current' : ''}`}>
-          {key !== state.component.name && (
+        <section key={key} className={`group ${key !== component.name ? 'current' : ''}`}>
+          {key !== component.name && (
             <>
               <h3>
                 Identified as <span className="component">{key}</span>

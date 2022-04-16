@@ -3,8 +3,11 @@
 import React, { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Tree, { renderers as Renderers } from 'react-virtualized-tree';
-import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '../../../../../shared/utils/filetree-utils';
-import useContextual from '../../../../hooks/useContextual';
+import { useSelector } from 'react-redux';
+import { collapseAll, expandAll, expandToMatches } from '@shared/utils/filetree-utils';
+import useContextual from '@hooks/useContextual';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { IWorkbenchContext, WorkbenchContext } from '../../store';
 
 const { Expandable } = Renderers;
@@ -37,8 +40,9 @@ const FileTree = () => {
   const history = useHistory();
   const contextual = useContextual();
 
-  const { state, isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const { tree } = state;
+  const { tree } = useSelector(selectWorkbench);
+  const state = useSelector(selectNavigationState);
+  const { isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const [nodes, setNodes] = React.useState([]);
 
@@ -148,13 +152,14 @@ const FileTree = () => {
   };
 
   useEffect(() => {
-    if (tree) {
-      setNodes(convertTreeToNode(tree, nodes.length > 0 ? nodes : [tree]));
+    if (tree && tree.length) {
+      // setNodes(convertTreeToNode(tree , nodes.length > 0 ? nodes : [tree]));
+      setNodes(tree);
     }
   }, [tree]);
 
   // loader
-  if (!tree) {
+  if (!tree || tree.length === 0) {
     return (
       <div className="loader">
         <span>Indexing...</span>

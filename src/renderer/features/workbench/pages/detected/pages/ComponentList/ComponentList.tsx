@@ -5,11 +5,13 @@ import { Button } from '@material-ui/core';
 import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined';
 import SearchBox from '@components/SearchBox/SearchBox';
 import usePagination from '@hooks/usePagination';
+import { useDispatch, useSelector } from 'react-redux';
 import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
-import { resetFilter, setComponent } from '../../../../actions';
 import EmptyResult from './components/EmptyResult/EmptyResult';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
+import { selectComponentState, setComponent } from '../../../../../../store/component-store/componentSlice';
+import { resetFilter } from '../../../../../../store/workbench-store/workbenchSlice';
 
 const filter = (items, query) => {
   if (!items) {
@@ -30,11 +32,11 @@ const filter = (items, query) => {
 
 export const ComponentList = () => {
   const history = useHistory();
-
+  const dispatch = useDispatch();
   const { limit, onScroll } = usePagination(20);
 
-  const { state, dispatch, isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const { components } = state;
+  const { components } = useSelector(selectComponentState);
+  const { isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
 
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filter(components, searchQuery);

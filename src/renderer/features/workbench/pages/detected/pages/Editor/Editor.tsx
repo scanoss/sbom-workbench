@@ -10,14 +10,22 @@ import { resultService } from '@api/services/results.service';
 import { InventoryForm } from '@context/types';
 import { getExtension } from '@shared/utils/utils';
 import { fileService } from '@api/services/file.service';
+import { useDispatch, useSelector } from 'react-redux';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
 import LabelCard from '../../../../components/LabelCard/LabelCard';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
-import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
 import NoLocalFile from './components/NoLocalFile/NoLocalFile';
+import {
+  createInventory,
+  detachFile,
+  ignoreFile,
+  restoreFile
+} from '../../../../../../store/inventory-store/inventoryThunks';
+import { selectWorkbench } from '../../../../../../store/workbench-store/workbenchSlice';
+import { selectNavigationState } from '../../../../../../store/navigation-store/navigationSlice';
 
 const MemoCodeEditor = React.memo(CodeEditor);
 
@@ -28,15 +36,14 @@ export interface FileContent {
 
 const Editor = () => {
   const history = useHistory();
+  const dispatch = useDispatch();
 
-  const { state, dispatch, createInventory, ignoreFile, restoreFile, detachFile } = useContext(
-    WorkbenchContext
-  ) as IWorkbenchContext;
-  const { scanBasePath } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
-  const { imported } = state;
 
-  const file = state.node?.type === 'file' ? state.node.path : null;
+  const { path: scanBasePath, imported, summary } = useSelector(selectWorkbench);
+  const { node } = useSelector(selectNavigationState);
+
+  const file = node?.type === 'file' ? node.path : null;
 
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);
@@ -92,15 +99,24 @@ const Editor = () => {
   };
 
   const create = async (defaultInventory, selFiles) => {
-    const inventory = await dialogCtrl.openInventory(defaultInventory, state.recentUsedComponents);
+    // TODO: use recent components
+    const inventory = await dialogCtrl.openInventory(defaultInventory, []);
     if (!inventory) return;
+    /*
 
     const newInventory = await createInventory({
       ...inventory,
       files: selFiles,
     });
+*/
+    dispatch(
+      createInventory({
+        ...inventory,
+        files: selFiles,
+      })
+    );
 
-    setInventories((previous) => [...previous, newInventory]);
+    // setInventories((previous) => [...previous, newInventory]);
     getResults();
   };
 
@@ -122,37 +138,33 @@ const Editor = () => {
       {
         usage: 'file',
       },
-      state.recentUsedComponents
+      []
     );
     if (response) {
       const id = await fileService.getIdFromPath(file);
       if (!id) return;
-      await createInventory({
-        ...response,
-        files: [id],
-      });
-      getInventories();
-      getResults();
+      await dispatch(
+        createInventory({
+          ...response,
+          files: [id],
+        })
+      );
     }
   };
 
   const onIgnorePressed = async (result) => {
-    await ignoreFile([result.id]);
-    getResults();
+    dispatch(ignoreFile([result.id]));
   };
 
   const onRestorePressed = async (result) => {
-    await restoreFile([result.id]);
-    getResults();
+    dispatch(restoreFile([result.id]));
   };
 
   const onDetachPressed = async (inventory) => {
     const inv = await inventoryService.get({ id: inventory.id });
     const fileResult = inv.files.find((item) => item.path === file);
     if (fileResult) {
-      await detachFile([fileResult.id]);
-      getInventories();
-      getResults();
+      dispatch(detachFile([fileResult.id]));
     }
   };
 
@@ -183,7 +195,7 @@ const Editor = () => {
   useEffect(() => {
     getInventories();
     getResults();
-  }, [state.summary]);
+  }, [summary]);
 
   const onAction = (action: MATCH_INFO_CARD_ACTIONS, result: any = null) => {
     switch (action) {

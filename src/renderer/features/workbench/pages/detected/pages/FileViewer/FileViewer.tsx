@@ -1,7 +1,9 @@
-import React, { useContext, useEffect } from 'react';
-import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import DependencyViewer from '../Dependency/Dependency';
 import Editor from '../Editor/Editor';
+import { selectWorkbench } from '../../../../../../store/workbench-store/workbenchSlice';
+import { selectNavigationState } from '../../../../../../store/navigation-store/navigationSlice';
 
 enum FileType {
   code,
@@ -9,14 +11,14 @@ enum FileType {
 }
 
 const FileViewer = () => {
-  const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const { dependencies } = state;
+  const { dependencies } = useSelector(selectWorkbench);
+  const { node } = useSelector(selectNavigationState);
 
-  const file = state.node?.type === 'file' ? state.node.path : null;
+  const file = node?.type === 'file' ? node.path : null;
   const [fileType, setFileType] = React.useState<FileType>(null);
 
   useEffect(() => {
-    const dep = dependencies.has(file);
+    const dep = dependencies.includes(file);
     setFileType(dep ? FileType.dependencies : FileType.code);
   }, [file]);
 
