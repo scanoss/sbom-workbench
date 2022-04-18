@@ -12,6 +12,11 @@ class DependencyService {
   public async insert(dependencies: IDependencyResponse): Promise<void> {
     const filesDependencies = dependencyHelper.dependecyModelAdapter(dependencies);
     const files = await fileHelper.getPathFileId();
+    const filesIds = [];
+    filesDependencies.forEach((fileDependency) => {
+      filesIds.push(files[fileDependency.file]);
+    });
+    await modelProvider.model.file.updateFileType( filesIds,"MATCH");
     await modelProvider.model.dependency.insert(files, filesDependencies);
   }
 
