@@ -168,7 +168,17 @@ const AppTitle = ({ title }) => {
 };
 
 const Export = ({ state }) => {
-  const exportLabels = { CSV: 'CSV', SPDXLITEJSON: 'SPDX Lite', WFP: 'WFP', RAW: 'RAW', HTMLSUMMARY: 'HTML Summary' };
+  const exportLabels = {
+    'CSV': {
+    label: 'CSV',
+      showNoProgress:false,
+    },
+    'SPDXLITE':{label:'SPDX Lite',
+    showOnNoneProgress: false } ,
+    'WFP':{label:'WFP', showNoProgress:true } ,
+    'RAW': {label:'RAW',
+    showNoProgress:true},
+    'HTMLSUMMARY':{label:'HTML Summary', showNoProgress:true }  };
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -219,8 +229,9 @@ const Export = ({ state }) => {
           variant="contained"
           color="primary"
           onClick={() => onExport(AppConfig.FF_EXPORT_FORMAT_OPTIONS[0] as ExportFormat)}
+          disabled={state.progress === 0 && !exportLabels[AppConfig.FF_EXPORT_FORMAT_OPTIONS[0]].showNoProgress}
         >
-          Export {exportLabels[AppConfig.FF_EXPORT_FORMAT_OPTIONS[0]]}
+          Export {exportLabels[AppConfig.FF_EXPORT_FORMAT_OPTIONS[0]].label}
         </Button>
       )}
 
@@ -246,8 +257,8 @@ const Export = ({ state }) => {
             TransitionComponent={Fade}
           >
             {AppConfig.FF_EXPORT_FORMAT_OPTIONS.map((format) => (
-              <MenuItem key={format} disabled={state.progress === 0} onClick={() => onExport(format as ExportFormat)}>
-                {exportLabels[format]}
+              <MenuItem key={format} disabled={state.progress === 0 && !exportLabels[format].showNoProgress} onClick={() => onExport(format as ExportFormat)}>
+                {exportLabels[format].label}
               </MenuItem>
             ))}
           </Menu>
