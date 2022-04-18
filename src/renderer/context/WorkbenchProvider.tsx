@@ -7,9 +7,9 @@ import { IpcEvents } from '@api/ipc-events';
 import { projectService } from '@api/services/project.service';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { selectWorkbench, updateTree } from '../../store/workbench-store/workbenchSlice';
-import { update } from '../../store/workbench-store/workbenchThunks';
-import { selectNavigationState, setCurrentNode } from '../../store/navigation-store/navigationSlice';
+import { selectWorkbench, updateTree } from '@store/workbench-store/workbenchSlice';
+import { update } from '@store/workbench-store/workbenchThunks';
+import { selectNavigationState, setCurrentNode } from '@store/navigation-store/navigationSlice';
 
 export interface IWorkbenchContext {
   isFilterActive: boolean;

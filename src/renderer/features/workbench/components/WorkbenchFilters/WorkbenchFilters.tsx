@@ -23,7 +23,7 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import { useDispatch, useSelector } from 'react-redux';
 import { projectService } from '@api/services/project.service';
 import { FileStatusType, FileTreeViewMode, FileUsageType } from '@api/types';
-import { WorkbenchContext } from '../../store';
+import { WorkbenchContext } from '@context/WorkbenchProvider';
 import { resetFilter, selectNavigationState, setFilter } from '../../../../store/navigation-store/navigationSlice';
 
 const useStyles = makeStyles((theme) => ({

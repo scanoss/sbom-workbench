@@ -8,7 +8,7 @@ import { collapseAll, expandAll, expandToMatches } from '@shared/utils/filetree-
 import useContextual from '@hooks/useContextual';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
-import { IWorkbenchContext, WorkbenchContext } from '../../store';
+import { IWorkbenchContext, WorkbenchContext } from '@context/WorkbenchProvider';
 
 const { Expandable } = Renderers;
 

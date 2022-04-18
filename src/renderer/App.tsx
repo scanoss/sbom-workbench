@@ -7,7 +7,7 @@ import { WorkbenchDialogProvider } from '@context/WorkbenchDialogProvider';
 import AppConfig from '@config/AppConfigModule';
 import DeclaredDependencyProvider from '@context/DeclaredDependencyProvider';
 import { Provider } from 'react-redux';
-import { WorkbenchProvider } from './features/workbench/store';
+import { WorkbenchProvider } from '@context/WorkbenchProvider';
 import Workbench from './features/workbench/Workbench';
 import AppProvider from './context/AppProvider';
 import Workspace from './features/workspace';

@@ -6,12 +6,12 @@ import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined'
 import SearchBox from '@components/SearchBox/SearchBox';
 import usePagination from '@hooks/usePagination';
 import { useDispatch, useSelector } from 'react-redux';
-import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
+import { WorkbenchContext, IWorkbenchContext } from '@context/WorkbenchProvider';
+import { resetFilter } from '@store/navigation-store/navigationSlice';
+import { selectComponentState, setComponent } from '@store/component-store/componentSlice';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import EmptyResult from './components/EmptyResult/EmptyResult';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
-import { selectComponentState, setComponent } from '../../../../../../store/component-store/componentSlice';
-import { resetFilter } from '../../../../../../store/workbench-store/workbenchSlice';
 
 const filter = (items, query) => {
   if (!items) {

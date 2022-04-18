@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { makeStyles, Snackbar } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
-import { WorkbenchContext, IWorkbenchContext } from '../../../store';
+import { WorkbenchContext, IWorkbenchContext } from '@context/WorkbenchProvider';
 import FilterIcon from '../../../../../../../assets/imgs/filter-icon.svg';
 import { useLocation } from 'react-router-dom';
 

@@ -6,8 +6,8 @@ import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { DeclaredDependencyContext, IDeclaredDependencyContext } from '@context/DeclaredDependencyProvider';
 import { useDispatch } from 'react-redux';
-import { WorkbenchContext, IWorkbenchContext } from '../features/workbench/store';
-import { executeBatch, ignoreFile, restoreFile } from '../store/inventory-store/inventoryThunks';
+import { WorkbenchContext, IWorkbenchContext } from '@context/WorkbenchProvider';
+import { executeBatch, ignoreFile, restoreFile } from '@store/inventory-store/inventoryThunks';
 
 const useContextual = () => {
   const dispatch = useDispatch();

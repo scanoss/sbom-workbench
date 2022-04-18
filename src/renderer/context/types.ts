@@ -1,4 +1,4 @@
-import { Inventory } from '../../api/types';
+import { Inventory } from '@api/types';
 
 export enum DIALOG_ACTIONS {
   OK = 'ok',

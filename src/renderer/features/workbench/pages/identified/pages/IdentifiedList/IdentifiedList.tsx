@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { Alert } from '@material-ui/lab';
 import { componentService } from '../../../../../../../api/services/component.service';
 import { inventoryService } from '../../../../../../../api/services/inventory.service';
-import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
+import { WorkbenchContext, IWorkbenchContext } from '@context/WorkbenchProvider';
 import RecognizedCard from '../../../../components/RecognizedCard/RecognizedCard';
 import usePagination from '../../../../../../hooks/usePagination';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
