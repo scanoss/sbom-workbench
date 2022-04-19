@@ -26,11 +26,12 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import { WorkbenchContext, IWorkbenchContext } from '../../store';
-import { exportService } from '../../../../../api/services/export.service';
+import { useSelector } from 'react-redux';
+import { exportService } from '@api/services/export.service';
+import { ExportFormat, IProject } from '@api/types';
+import { workspaceService } from '@api/services/workspace.service';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { dialogController } from '../../../../controllers/dialog-controller';
-import { ExportFormat, IProject } from '../../../../../api/types';
-import { workspaceService } from '../../../../../api/services/workspace.service';
 import AppConfig from '../../../../../config/AppConfigModule';
 
 const Navigation = () => {
@@ -49,8 +50,6 @@ const Navigation = () => {
 };
 
 const AppMenu = () => {
-  const history = useHistory();
-
   return (
     <section id="AppMenu">
       <NavLink to="/workbench/detected" activeClassName="active" tabIndex={-1}>
@@ -269,7 +268,7 @@ const Export = ({ state }) => {
 const AppBar = ({ exp }) => {
   const history = useHistory();
   const { pathname } = useLocation();
-  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const state = useSelector(selectWorkbench);
   const report = pathname.startsWith('/workbench/report');
 
   const onBackPressed = () => {

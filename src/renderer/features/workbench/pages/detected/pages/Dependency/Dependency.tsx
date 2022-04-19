@@ -2,12 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Typography } from '@material-ui/core';
 import { DIALOG_ACTIONS } from '@context/types';
 import { dependencyService } from '@api/services/dependency.service';
-import { DialogContext, IDialogContext } from '@context/DialogProvider';
-import { AppContext, IAppContext } from '@context/AppProvider';
 import { Dependency, FileType } from '@api/types';
 import { getExtension } from '@shared/utils/utils';
 import { DeclaredDependencyContext, IDeclaredDependencyContext } from '@context/DeclaredDependencyProvider';
-import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
+import { useSelector } from 'react-redux';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import CodeViewSelector, { CodeViewSelectorMode } from './components/CodeViewSelector/CodeViewSelector';
@@ -17,6 +15,8 @@ import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
 import WorkbenchDialogContext, { IWorkbenchDialogContext } from '../../../../../../context/WorkbenchDialogProvider';
 import ActionButton from './components/ActionButton/ActionButton';
+import { selectWorkbench } from '../../../../../../store/workbench-store/workbenchSlice';
+import { selectNavigationState } from '../../../../../../store/navigation-store/navigationSlice';
 
 export interface FileContent {
   content: string | null;
@@ -41,20 +41,18 @@ const filter = (items, query) => {
 const MemoCodeEditor = React.memo(CodeEditor);
 
 const DependencyViewer = () => {
-  const { scanBasePath } = useContext(AppContext) as IAppContext;
-  const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
   const store = useContext(DeclaredDependencyContext) as IDeclaredDependencyContext;
-  const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const workbenchDialogCtrl = useContext(WorkbenchDialogContext) as IWorkbenchDialogContext;
 
-  const { imported } = state;
+  const { path: scanBasePath, imported } = useSelector(selectWorkbench);
+  const { node } = useSelector(selectNavigationState);
 
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [dependencies, setDependencies] = useState<Dependency[]>([]);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const [view, setView] = useState<CodeViewSelectorMode>(CodeViewSelectorMode.GRAPH);
 
-  const file = state.node?.type === 'file' ? state.node.path : null;
+  const file = node?.type === 'file' ? node.path : null;
   const items: Array<Dependency> = filter(dependencies, searchQuery);
   const pendingItems: Array<Dependency> = items?.filter((item) => item.status === 'pending');
   const validItems: Array<Dependency> = pendingItems.filter((item) => item.valid);

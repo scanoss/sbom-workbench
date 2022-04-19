@@ -1,4 +1,4 @@
-import { Inventory } from '../../api/types';
+import { Inventory } from '@api/types';
 
 export enum DIALOG_ACTIONS {
   OK = 'ok',
@@ -31,3 +31,10 @@ export interface InventoryForm {
   usage: string;
   notes: string;
 }
+
+export interface IScan {
+  projectName?: string;
+  path: string;
+  action: string;
+}
+

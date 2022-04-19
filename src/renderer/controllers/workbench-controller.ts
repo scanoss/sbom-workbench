@@ -12,6 +12,7 @@ export interface ScanResult {
   name: string;
   imported: boolean;
   scanRoot: string;
+  projectRoot: string;
   fileTree: any;
   dependencies: Set<string>;
 }
@@ -87,10 +88,12 @@ class WorkbenchController {
     // TODO: get from scan result
     const name = work.split(pathUtil.sep)[work.split(pathUtil.sep).length - 1];
 
+    console.log(data);
     return {
       name,
       imported,
       scanRoot: data.scan_root,
+      projectRoot: work,
       fileTree: tree,
       dependencies,
     };

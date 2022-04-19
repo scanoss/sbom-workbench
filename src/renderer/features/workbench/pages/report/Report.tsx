@@ -1,10 +1,11 @@
-import { ButtonGroup, Button, Tooltip, createStyles, makeStyles } from '@material-ui/core';
-import React, { useContext, useEffect, useState } from 'react';
+import { Button, Tooltip, createStyles, makeStyles } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
 import { NavLink, Redirect, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import { reportService } from '@api/services/report.service';
+import { useSelector } from 'react-redux';
 import DetectedReport from './pages/DetectedReport';
 import IdentifiedReport from './pages/IdentifiedReport';
-import { reportService } from '../../../../../api/services/report.service';
-import { WorkbenchContext, IWorkbenchContext } from '../../store';
+import { selectWorkbench } from '../../../../store/workbench-store/workbenchSlice';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -45,7 +46,7 @@ const Nav = () => {
 const Reports = () => {
   const historyState = useHistory();
   const { path } = useRouteMatch();
-  const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const state = useSelector(selectWorkbench);
 
   const [detectedData, setDetectedData] = useState(null);
   const [identifiedData, setIdentifiedData] = useState(null);
