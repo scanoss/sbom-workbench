@@ -7,7 +7,7 @@ import { IpcEvents } from '@api/ipc-events';
 import { projectService } from '@api/services/project.service';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { load, selectWorkbench, updateTree } from '@store/workbench-store/workbenchSlice';
+import { load, selectWorkbench, setTree } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState, setCurrentNode } from '@store/navigation-store/navigationSlice';
 
 export const WorkbenchContext = React.createContext(null);
@@ -19,7 +19,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   const { loaded } = useSelector(selectWorkbench);
   const { filter } = useSelector(selectNavigationState);
 
-  const onTreeRefreshed = (_event, fileTree) => dispatch(updateTree(fileTree));
+  const onTreeRefreshed = (_event, fileTree) => dispatch(setTree(fileTree));
 
   const setNode = async (node: Node) => dispatch(setCurrentNode(node));
 
