@@ -40,6 +40,7 @@ export const workbenchSlice = createSlice({
   name: 'workbench',
   initialState,
   reducers: {
+    load: (state, action: PayloadAction<WorkbenchState>) => {},
     updateTree: (state, action: PayloadAction<any>) => {
       const tree = action.payload;
       const nodes = convertTreeToNode(tree, []);
@@ -80,7 +81,7 @@ export const workbenchSlice = createSlice({
 });
 
 // actions
-export const { updateTree, setProgress, setHistory, reset } = workbenchSlice.actions;
+export const { load, updateTree, setProgress, setHistory, reset } = workbenchSlice.actions;
 
 // selectors
 export const selectWorkbench = (state: RootState) => state.workbench;

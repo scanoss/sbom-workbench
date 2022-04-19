@@ -5,14 +5,15 @@ import SplitPane from 'react-split-pane';
 import { AppContext, IAppContext } from '@context/AppProvider';
 import AppConfig from '@config/AppConfigModule';
 import { useDispatch, useSelector } from 'react-redux';
+import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
+import { reset, selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { loadProject } from '@store/workbench-store/workbenchThunks';
 import AppBar from './components/AppBar/AppBar';
 import Detected from './pages/detected/Detected';
 import Identified from './pages/identified/Identified';
 import Reports from './pages/report/Report';
 import FileTree from './components/FileTree/FileTree';
 import WorkbenchFilters from './components/WorkbenchFilters/WorkbenchFilters';
-import { loadProject } from '../../store/workbench-store/workbenchThunks';
-import { reset, selectWorkbench } from '../../store/workbench-store/workbenchSlice';
 
 const Workbench = () => {
   const { path } = useRouteMatch();
@@ -20,9 +21,8 @@ const Workbench = () => {
 
   const dispatch = useDispatch();
   const state = useSelector(selectWorkbench);
+  const { scanPath } = useSelector(selectWorkspaceState);
 
-  // const { dispatch, state, loadScan } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const { scanPath } = useContext(AppContext) as IAppContext;
   const { loaded } = state;
 
   const report = pathname.startsWith('/workbench/report');
@@ -30,11 +30,6 @@ const Workbench = () => {
   const onInit = async () => {
     const { path } = scanPath;
     dispatch(loadProject(path));
-    /*
-    if (!result) {
-      dialogController.showError('Error', 'Cannot read scan.');
-    }
-    */
   };
 
   const onDestroy = () => {

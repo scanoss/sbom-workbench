@@ -7,15 +7,10 @@ import { IpcEvents } from '@api/ipc-events';
 import { projectService } from '@api/services/project.service';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { selectWorkbench, updateTree } from '@store/workbench-store/workbenchSlice';
-import { update } from '@store/workbench-store/workbenchThunks';
+import { load, selectWorkbench, updateTree } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState, setCurrentNode } from '@store/navigation-store/navigationSlice';
 
-export interface IWorkbenchContext {
-  isFilterActive: boolean;
-}
-
-export const WorkbenchContext = React.createContext<IWorkbenchContext | null>(null);
+export const WorkbenchContext = React.createContext(null);
 
 export const WorkbenchProvider: React.FC = ({ children }) => {
   const history = useHistory();
@@ -28,13 +23,11 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const setNode = async (node: Node) => dispatch(setCurrentNode(node));
 
-  const isFilterActive: boolean = !!filter?.status || !!filter?.usage;
-
   useEffect(() => {
     const setFilter = async () => {
-      if (loaded) {
+      if (loaded) {  // TODO: remove from here
         await projectService.setFilter(filter);
-        dispatch(update());
+        dispatch(load());
       }
     };
 
@@ -73,12 +66,5 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   useEffect(setupListeners, []);
   useEffect(() => () => removeListeners(), []);
 
-  const value = React.useMemo(
-    () => ({
-      isFilterActive,
-    }),
-    [isFilterActive]
-  );
-
-  return <WorkbenchContext.Provider value={value}>{children}</WorkbenchContext.Provider>;
+  return <WorkbenchContext.Provider value={[]}>{children}</WorkbenchContext.Provider>;
 };

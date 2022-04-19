@@ -3,29 +3,18 @@ import { ipcRenderer } from 'electron';
 import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import * as os from 'os';
-import { INewProject, IProject } from '../../api/types';
-import { workspaceService } from '../../api/services/workspace.service';
-import { IpcEvents } from '../../api/ipc-events';
+import { fetchProjects } from '@store/workspace-store/workspaceThunks';
+import { INewProject, IProject } from '@api/types';
+import { workspaceService } from '@api/services/workspace.service';
+import { IpcEvents } from '@api/ipc-events';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
 import { DialogContext, IDialogContext } from './DialogProvider';
 import { dialogController } from '../controllers/dialog-controller';
 
 const { shell } = require('electron');
 
-export interface IScan {
-  projectName?: string;
-  path: string;
-  action: string;
-}
-
 export interface IAppContext {
-  projects: IProject[];
-  setProjects: (projects: IProject[]) => void;
-  scanPath?: IScan;
-  setScanPath: (file: IScan) => void;
-  scanBasePath?: string;
-  setScanBasePath: (file: string) => void;
-  setSettingsNewProject: (project: INewProject) => void;
-  settingsNewProject?: INewProject;
   newProject: () => void;
   exportProject: (project: IProject) => void;
   importProject: () => void;
@@ -35,12 +24,8 @@ export const AppContext = React.createContext<IAppContext | null>(null);
 
 const AppProvider = ({ children }) => {
   const history = useHistory();
+  const dispatch = useDispatch();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
-
-  const [projects, setProjects] = useState<IProject[] | null>(null);
-  const [scanBasePath, setScanBasePath] = useState<string>();
-  const [scanPath, setScanPath] = useState<IScan>();
-  const [settingsNewProject, setSettingsNewProject] = useState<INewProject>();
 
   const newProject = async () => {
     const paths = await dialogController.showOpenDialog({
@@ -48,7 +33,7 @@ const AppProvider = ({ children }) => {
     });
 
     if (paths && paths.length > 0) {
-      setScanPath({ path: paths[0], action: 'scan' });
+      dispatch(setScanPath({ path: paths[0], action: 'scan' }));
       history.push('/workspace/new/settings');
     }
   };
@@ -64,13 +49,11 @@ const AppProvider = ({ children }) => {
     dialog.present();
 
     try {
-      const project = await workspaceService.importProject(paths[0]);
-      const projects = await workspaceService.getAllProjects(); // FIXME: see problem using state on callback IPC event to avoid this
-
+      await workspaceService.importProject(paths[0]);
       setTimeout(async () => {
         dialog.finish({ message: 'SUCCESSFUL IMPORT' });
         dialog.dismiss({ delay: 1500 });
-        setProjects(projects);
+        dispatch(fetchProjects());
       }, 2000);
     } catch (err: any) {
       dialog.dismiss();
@@ -167,15 +150,7 @@ const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
-        projects,
-        setProjects,
-        scanPath,
-        setScanPath,
-        scanBasePath,
-        setScanBasePath,
         newProject,
-        setSettingsNewProject,
-        settingsNewProject,
         exportProject,
         importProject,
       }}

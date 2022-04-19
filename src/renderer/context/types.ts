@@ -31,3 +31,10 @@ export interface InventoryForm {
   usage: string;
   notes: string;
 }
+
+export interface IScan {
+  projectName?: string;
+  path: string;
+  action: string;
+}
+

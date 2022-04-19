@@ -6,8 +6,7 @@ import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined'
 import SearchBox from '@components/SearchBox/SearchBox';
 import usePagination from '@hooks/usePagination';
 import { useDispatch, useSelector } from 'react-redux';
-import { WorkbenchContext, IWorkbenchContext } from '@context/WorkbenchProvider';
-import { resetFilter } from '@store/navigation-store/navigationSlice';
+import { resetFilter, selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { selectComponentState, setComponent } from '@store/component-store/componentSlice';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import EmptyResult from './components/EmptyResult/EmptyResult';
@@ -36,7 +35,7 @@ export const ComponentList = () => {
   const { limit, onScroll } = usePagination(20);
 
   const { components } = useSelector(selectComponentState);
-  const { isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { isFilterActive } = useSelector(selectNavigationState);
 
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filter(components, searchQuery);

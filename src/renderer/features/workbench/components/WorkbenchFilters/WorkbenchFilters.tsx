@@ -23,8 +23,7 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import { useDispatch, useSelector } from 'react-redux';
 import { projectService } from '@api/services/project.service';
 import { FileStatusType, FileTreeViewMode, FileUsageType } from '@api/types';
-import { WorkbenchContext } from '@context/WorkbenchProvider';
-import { resetFilter, selectNavigationState, setFilter } from '../../../../store/navigation-store/navigationSlice';
+import { setFilter, resetFilter, selectNavigationState } from '@store/navigation-store/navigationSlice';
 
 const useStyles = makeStyles((theme) => ({
   info: {
@@ -37,8 +36,7 @@ const useStyles = makeStyles((theme) => ({
 const WorkbenchFilters = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { filter } = useSelector(selectNavigationState);
-  const { isFilterActive } = useContext(WorkbenchContext);
+  const { filter, isFilterActive } = useSelector(selectNavigationState);
 
   const [open, setOpen] = useState<boolean>(false);
   const [fileTreeViewMode, setFileTreeViewMode] = useState<boolean>(false);

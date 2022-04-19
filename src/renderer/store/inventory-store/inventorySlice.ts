@@ -1,14 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createListenerMiddleware, createSlice } from '@reduxjs/toolkit';
 import { createInventory } from './inventoryThunks';
 
 export interface InventoryState {
   loading: boolean;
-  recents: string[];
 }
 
 const initialState: InventoryState = {
   loading: false,
-  recents: [],
 };
 
 const inventorySlice = createSlice({
@@ -27,5 +25,7 @@ const inventorySlice = createSlice({
     },
   },
 });
+
+// actions
 
 export default inventorySlice.reducer;

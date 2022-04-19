@@ -5,15 +5,15 @@ import { InventoryAction } from '@api/types';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { DeclaredDependencyContext, IDeclaredDependencyContext } from '@context/DeclaredDependencyProvider';
-import { useDispatch } from 'react-redux';
-import { WorkbenchContext, IWorkbenchContext } from '@context/WorkbenchProvider';
+import { useDispatch, useSelector } from 'react-redux';
 import { executeBatch, ignoreFile, restoreFile } from '@store/inventory-store/inventoryThunks';
+import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 
 const useContextual = () => {
   const dispatch = useDispatch();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
-  const { isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const dependencyContext = useContext(DeclaredDependencyContext) as IDeclaredDependencyContext
+  const dependencyContext = useContext(DeclaredDependencyContext) as IDeclaredDependencyContext;
+  const { isFilterActive } = useSelector(selectNavigationState);
 
   const showOverwrite = (node: any) => node.hasIdentified || node.hasIgnored;
 
