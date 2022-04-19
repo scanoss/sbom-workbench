@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { convertTreeToNode } from '@shared/utils/filetree-utils';
-import { IWorkbenchFilter, Node } from '@api/types';
+import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '@shared/utils/filetree-utils';
 import { loadProject } from './workbenchThunks';
 import { RootState } from '../rootReducer';
 
@@ -8,7 +7,7 @@ export interface WorkbenchState {
   path: string;
   name: string;
   imported: boolean;
-  tree: any; // TODO: define type
+  tree: any[]; // TODO: define type
   summary: any; // TODO: define type
   progress: number;
   dependencies: string[]; // TODO: move to dependency store
@@ -41,10 +40,19 @@ export const workbenchSlice = createSlice({
   initialState,
   reducers: {
     load: (state, action: PayloadAction<WorkbenchState>) => {},
-    updateTree: (state, action: PayloadAction<any>) => {
+    setTree: (state, action: PayloadAction<any>) => {
       const tree = action.payload;
-      const nodes = convertTreeToNode(tree, []);
-      state.tree = nodes;
+      state.tree = convertTreeToNode(tree, state.tree);
+    },
+    updateTree: (state, action: PayloadAction<any>) => {
+      state.tree = action.payload;
+    },
+    expandTree: (state, action: PayloadAction<{ node: any; toMatch: boolean }>) => {
+      const { node, toMatch } = action.payload;
+      state.tree = !toMatch ? expandAll(state.tree, node) : expandToMatches(state.tree, node);
+    },
+    collapseTree: (state, action) => {
+      state.tree = collapseAll(state.tree, action.payload);
     },
     setProgress: (state, action: PayloadAction<any>) => {
       const summary = action.payload;
@@ -81,7 +89,8 @@ export const workbenchSlice = createSlice({
 });
 
 // actions
-export const { load, updateTree, setProgress, setHistory, reset } = workbenchSlice.actions;
+export const { load, setTree, updateTree, collapseTree, expandTree, setProgress, setHistory, reset } =
+  workbenchSlice.actions;
 
 // selectors
 export const selectWorkbench = (state: RootState) => state.workbench;
