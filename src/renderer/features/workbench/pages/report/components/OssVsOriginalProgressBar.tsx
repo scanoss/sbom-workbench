@@ -4,15 +4,14 @@ import { Chart } from 'chart.js';
 const OssVsOriginalProgressBar = ({ data }) => {
   const chartRef = React.createRef<any>();
   const [matchedFiles, setMatchedFiles] = useState<number>(0);
-  const totalFiles = data.scannedFiles === 0 ? data.totalFiles : data.scannedFiles;
-  const ossFiles = (data.identifiedFiles * 100) / totalFiles;
-  const pendingFiles = (data.pendingFiles * 100) / totalFiles;
+  const totalFiles = data.pending + data.summary.noMatchFiles + data.identified.total + data.original;
+  const ossFiles = (data.identified.total * 100) / totalFiles;
+  const pendingFiles = (data.pending * 100) / totalFiles;
   const percentage = ossFiles + pendingFiles;
 
   useEffect(() => {
-    setMatchedFiles(data.totalFiles);
-    const originalFiles = totalFiles - (data.identifiedFiles + data.pendingFiles);
-
+    setMatchedFiles(data.summary.matchFiles);
+    const originalFiles = data.summary.noMatchFiles + data.original;
     const chart = new Chart(chartRef.current, {
       type: 'bar',
       data: {
@@ -20,14 +19,14 @@ const OssVsOriginalProgressBar = ({ data }) => {
         datasets: [
           {
             label: 'OSS',
-            data: [data.identifiedFiles],
+            data: [data.identified.total],
             borderWidth: 0,
             backgroundColor: ['#22C55E'],
             barThickness: 34,
           },
           {
             label: 'Pending',
-            data: [data.pendingFiles],
+            data: [data.pending],
             borderWidth: 0,
             backgroundColor: ['#F97316'],
             barThickness: 34,
@@ -108,7 +107,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
       </div>
       <div className="total-files-container">
         <span className="total-files-label">
-          <strong>{data.scannedFiles}</strong> scanned files
+          <strong>{totalFiles}</strong> total files
         </span>
       </div>
     </div>

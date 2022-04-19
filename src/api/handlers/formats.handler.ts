@@ -19,11 +19,11 @@ ipcMain.handle(IpcEvents.EXPORT, async (_event, path: string, format: ExportForm
       format === ExportFormat.SPDXLITEJSON
     ) {
       const data: any = await reportService.getReportSummary();
-      const complete = Math.floor(((data?.identifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles) < 100;
+      const complete = Math.floor(((data?.identified.scan + data?.original) * 100) / data.summary.matchFiles) < 100; //(data.identified.scanned + data.original) *100 / data.summary.matchFiles
       auxPath = complete ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;
     }
     const exportTask = new Export();
-    exportTask.setFormat(format);    
+    exportTask.setFormat(format);
     const success = await exportTask.run(auxPath);
 
     return Response.ok({ message: 'File exported successfully', data: success });

@@ -258,7 +258,7 @@ export class FileModel extends Model {
     });
   }
 
-  public async updateFileType(fileIds: number[], fileType: string) {
+  public updateFileType(fileIds: number[], fileType: string) {
     return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -267,6 +267,27 @@ export class FileModel extends Model {
           if (err) throw err;
           db.close();
           resolve();
+        });
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
+  public getSummary() {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.get(`SELECT COUNT(*) as totalFiles , (SELECT COUNT(*) FROM files WHERE type='MATCH') AS matchFiles,
+                (SELECT COUNT(*) FROM files WHERE type='FILTERED') AS filterFiles,
+                (SELECT COUNT(*) FROM files WHERE type='NO-MATCH') AS  noMatchFiles, (SELECT COUNT(*) FROM files f WHERE f.type="MATCH" AND f.identified=1) AS scannedIdentified,
+                (SELECT COUNT(*) AS detectedIdentifiedFiles FROM files f WHERE f.identified=1) AS totalIdentified,
+                (SELECT COUNT(*) AS detectedIdentifiedFiles FROM files f WHERE f.ignored=1) AS original,
+                (SELECT COUNT(*) AS pending FROM files f WHERE f.identified=0 AND f.ignored=0 AND f.type="MATCH") AS pending  FROM files;`, (err: any, data: any) => {
+          db.close();
+          if (err) throw err;
+          else resolve(data);
         });
       } catch (error) {
         log.error(error);

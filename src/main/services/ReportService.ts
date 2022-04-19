@@ -25,24 +25,38 @@ interface inventoryProgress {
   acceptedComponents: number;
 }
 
+export interface ISummary {
+  summary:{
+    matchFiles: number;
+    noMatchFiles:number;
+    filterFiles:number;
+    totalFiles:number;
+  },
+  identified:{
+    scan:number;
+    total:number;
+  },
+  pending:number;
+  original:number;
+}
+
 class ReportService  {
-  public async getReportSummary() {
+  public async getReportSummary():Promise<ISummary> {
     try {
-      let tempSummary: any = {};
-      tempSummary = await modelProvider.model.inventory.getCurrentSummary();
-      const projectSummary = await workspace.getOpenedProjects()[0].filesSummary;
+      const auxSummary = await modelProvider.model.file.getSummary();
       const summary = {
-        totalFiles: tempSummary.totalFiles,
-        includedFiles: projectSummary.include,
-        filteredFiles: projectSummary.filter,
-        scannedFiles: tempSummary.scannedFiles,
-        pendingFiles: tempSummary.pending,
-        identifiedFiles: tempSummary.identified,
-        ignoredFiles: tempSummary.original,
-        detectedFiles: tempSummary.match,
-        noMatchFiles: tempSummary.noMatch,
-        detectedIdentifiedFiles: tempSummary.detectedIdentifiedFiles,
-      };
+        summary: {
+          matchFiles: auxSummary.matchFiles,
+          noMatchFiles: auxSummary.noMatchFiles,
+          filterFiles: auxSummary.filterFiles,
+          totalFiles: auxSummary.totalFiles,
+        },identified: {
+          scan: auxSummary.scannedIdentified,
+          total: auxSummary.totalIdentified,
+        },
+        pending:auxSummary.pending,
+        original:auxSummary.original,
+      } as ISummary;
       return summary;
     } catch (error) {
       return error;
