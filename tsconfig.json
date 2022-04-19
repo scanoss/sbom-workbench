@@ -18,6 +18,7 @@
       "@context/*": ["src/renderer/context/*"],
       "@components/*": ["src/renderer/components/*"],
       "@hooks/*": ["src/renderer/hooks/*"],
+      "@store/*": ["src/renderer/store/*"]
     },
     /* Additional Checks */
     "noUnusedLocals": false,

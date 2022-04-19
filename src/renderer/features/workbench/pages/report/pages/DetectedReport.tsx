@@ -7,13 +7,10 @@ import MatchesForLicense from '../components/MatchesForLicense';
 import MatchesChart from '../components/MatchesChart';
 import VulnerabilitiesCard from '../components/VulnerabilitiesCard';
 import LicensesObligations from '../components/LicensesObligations';
-import { WorkbenchContext, IWorkbenchContext } from '../../../store';
 
 Chart.register(...registerables);
 
 const DetectedReport = ({ data }) => {
-  const { dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
-
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
 
   const onLicenseSelected = (license: string) => {

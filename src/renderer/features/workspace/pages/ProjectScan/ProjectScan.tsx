@@ -2,10 +2,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { IconButton } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { AppContext, IAppContext } from '@context/AppProvider';
 import { IpcEvents } from '@api/ipc-events';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { projectService } from '@api/services/project.service';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
 import * as controller from '../../../../controllers/home-controller';
 import CircularComponent from '../Components/CircularComponent';
 
@@ -14,7 +15,9 @@ const { ipcRenderer } = require('electron');
 const ProjectScan = () => {
   const history = useHistory();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
-  const { scanPath, setScanPath, settingsNewProject } = useContext(AppContext) as IAppContext;
+  const dispatch = useDispatch();
+
+  const { scanPath, newProject } = useSelector(selectWorkspaceState);
 
   const [progress, setProgress] = useState<number>(0);
   const [stage, setStage] = useState<string>('');
@@ -29,7 +32,7 @@ const ProjectScan = () => {
 
       if (action === 'resume') controller.resume(path);
       if (action === 'rescan') controller.rescan(path);
-      if (action === 'scan') controller.scan(settingsNewProject);
+      if (action === 'scan') controller.scan(newProject);
     } catch (e) {
       console.error(e);
     }
@@ -42,7 +45,7 @@ const ProjectScan = () => {
   };
 
   const onShowScan = (path) => {
-    setScanPath({ path, action: 'none' });
+    dispatch(setScanPath({ path, action: 'none' }));
     history.replace('/workbench/report');
   };
 

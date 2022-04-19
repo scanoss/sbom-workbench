@@ -16,13 +16,14 @@ import { useHistory } from 'react-router-dom';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { Add } from '@material-ui/icons';
-import { AppContext, IAppContext } from '@context/AppProvider';
 import { INewProject } from '@api/types';
 import { userSettingService } from '@api/services/userSetting.service';
 import { workspaceService } from '@api/services/workspace.service';
 import { ResponseStatus } from '@api/Response';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import AppConfig from '@config/AppConfigModule';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectWorkspaceState, setNewProject, setScanPath } from '@store/workspace-store/workspaceSlice';
 
 const pathUtil = require('path');
 
@@ -58,14 +59,15 @@ const useStyles = makeStyles((theme) => ({
 const ProjectSettings = () => {
   const classes = useStyles();
   const history = useHistory();
+  const dispatch = useDispatch();
 
-  const { scanPath, setScanPath, setSettingsNewProject } = useContext<IAppContext>(AppContext);
+  const { projects, scanPath } = useSelector(selectWorkspaceState);
+
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const [licenses, setLicenses] = useState([]);
   const [apis, setApis] = useState([]);
 
-  const [projects, setProjects] = useState<any[] | null>([]);
   const [projectSettings, setProjectSettings] = useState<INewProject>({
     name: '',
     scan_root: '',
@@ -89,9 +91,6 @@ const ProjectSettings = () => {
 
     const apiUrlKey = await userSettingService.get();
     setApis(apiUrlKey.APIS);
-
-    const projects = await workspaceService.getAllProjects();
-    setProjects(projects);
 
     const { path } = scanPath;
     const projectName = path.split(pathUtil.sep)[path.split(pathUtil.sep).length - 1];
@@ -124,8 +123,8 @@ const ProjectSettings = () => {
   }, [projectSettings.name, projects]);
 
   const submit = async () => {
-    setScanPath({ ...scanPath, projectName: projectSettings.name });
-    setSettingsNewProject(projectSettings);
+    dispatch(setScanPath({ ...scanPath, projectName: projectSettings.name }));
+    dispatch(setNewProject(projectSettings));
     history.push('/workspace/new/scan');
   };
 

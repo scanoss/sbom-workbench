@@ -1,9 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { makeStyles, Snackbar } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
-import { WorkbenchContext, IWorkbenchContext } from '../../../store';
-import FilterIcon from '../../../../../../../assets/imgs/filter-icon.svg';
 import { useLocation } from 'react-router-dom';
+import { selectNavigationState } from '@store/navigation-store/navigationSlice';
+import { useSelector } from 'react-redux';
+import FilterIcon from '@assets/imgs/filter-icon.svg';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -28,7 +29,7 @@ const FilterSnackbar = () => {
   const classes = useStyles();
   const curLoc = useLocation();
 
-  const { isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { isFilterActive } = useSelector(selectNavigationState);
 
   // FIXME: create app.routes.ts and set data for each route
   const isShow = isFilterActive && !curLoc.pathname.startsWith('/workbench/detected/file');

@@ -1,8 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
 import { Breadcrumbs, Link, makeStyles, Typography } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
-import { WorkbenchContext, IWorkbenchContext } from '../../store';
+import { useSelector } from 'react-redux';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 
 const useStyles = makeStyles({
   itemLink: {
@@ -18,12 +20,13 @@ const Breadcrumb = () => {
   const history = useHistory();
   const classes = useStyles();
 
-  const { state, dispatch } = useContext(WorkbenchContext) as IWorkbenchContext;
+  const { tree } = useSelector(selectWorkbench);
+  const { node } = useSelector(selectNavigationState);
 
-  const items = state.node ? state.node.path.substring(1).split('/') : [];
+  const items = node ? node.path.substring(1).split('/') : [];
 
   const nodes = [
-    { name: state.tree?.label, type: 'folder', path: null },
+    { name: tree[0].label, type: 'folder', path: null },
     ...items.map((item, index) => {
       return {
         type: 'folder',
@@ -45,20 +48,20 @@ const Breadcrumb = () => {
       <AccountTreeOutlinedIcon fontSize="inherit" className="mr-1" style={{ marginTop: '4px' }} />
 
       <Breadcrumbs separator="›" aria-label="breadcrumb">
-        {nodes.map((node, index) =>
+        {nodes.map((iNode, index) =>
           index < nodes.length - 1 ? (
             <Link
-              key={node.path}
+              key={iNode.path}
               className={classes.itemLink}
               underline="hover"
               color="inherit"
-              onClick={() => goToNode(node)}
+              onClick={() => goToNode(iNode)}
             >
-              {node.name}
+              {iNode.name}
             </Link>
           ) : (
-            <Typography key={node.path} className={classes.current}>
-              {node.name}
+            <Typography key={iNode.path} className={classes.current}>
+              {iNode.name}
             </Typography>
           )
         )}

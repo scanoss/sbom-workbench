@@ -7,20 +7,25 @@ import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { DIALOG_ACTIONS } from '@context/types';
 import AppConfig from '@config/AppConfigModule';
 import SearchBox from '@components/SearchBox/SearchBox';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProjects } from '@store/workspace-store/workspaceThunks';
+import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
 import ProjectList from '../Components/ProjectList';
 import AddProjectButton from '../Components/AddProjectButton/AddProjectButton';
 
 const Workspace = () => {
   const history = useHistory();
+  const dispatch = useDispatch();
 
-  const { projects, setProjects, setScanPath, newProject, exportProject, importProject } = useContext(AppContext) as IAppContext;
+  const { projects } = useSelector(selectWorkspaceState);
+
+  const { newProject, exportProject, importProject } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const init = async () => {
     try {
-      const projects = await workspaceService.getAllProjects();
-      setProjects(projects);
+      dispatch(fetchProjects());
     } catch (error) {
       alert(error);
     }
@@ -30,7 +35,7 @@ const Workspace = () => {
 
   const onShowScanHandler = async (project: IProject) => {
     if (project.appVersion >= AppConfig.MIN_VERSION_SUPPORTED) {
-      setScanPath({ path: project.work_root, action: 'none' });
+      dispatch(setScanPath({ path: project.work_root, action: 'none' }));
       history.push('/workbench');
     } else {
       const { action } = await dialogCtrl.openAlertDialog(
@@ -43,7 +48,7 @@ const Workspace = () => {
 
       if (action !== DIALOG_ACTIONS.CANCEL) {
         await deleteProject(project);
-        setScanPath({ path: project.scan_root, action: 'scan' });
+        dispatch(setScanPath({ path: project.scan_root, action: 'scan' }));
         history.push('/workspace/new/settings');
       }
     }
@@ -79,14 +84,14 @@ const Workspace = () => {
       role: 'accept',
     });
     if (action === DIALOG_ACTIONS.OK) {
-      setScanPath({ path: project.work_root, action: 'rescan', projectName: project.name });
+      dispatch(setScanPath({ path: project.work_root, action: 'rescan', projectName: project.name }));
       history.push('/workspace/new/scan');
       init();
     }
   };
 
   const onRestoreHandler = async (project: IProject) => {
-    setScanPath({ path: project.work_root, action: 'resume', projectName: project.name });
+    dispatch(setScanPath({ path: project.work_root, action: 'resume', projectName: project.name }));
     history.push('/workspace/new/scan');
   };
 

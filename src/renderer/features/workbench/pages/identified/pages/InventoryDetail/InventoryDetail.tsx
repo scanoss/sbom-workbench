@@ -4,22 +4,22 @@ import { useHistory, useParams } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
-import { IWorkbenchContext, WorkbenchContext } from '../../../../store';
-import { Inventory } from '../../../../../../../api/types';
-import { FileList } from './components/FileList';
-import { inventoryService } from '../../../../../../../api/services/inventory.service';
-import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
+import { Inventory } from '@api/types';
+import { inventoryService } from '@api/services/inventory.service';
+import { mapFiles } from '@shared/utils/scan-util';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import { DIALOG_ACTIONS, InventoryForm } from '@context/types';
+import { useDispatch } from 'react-redux';
+import { deleteInventory, detachFile, updateInventory } from '@store/inventory-store/inventoryThunks';
 import Label from '../../../../components/Label/Label';
-import { mapFiles } from '../../../../../../../shared/utils/scan-util';
-import { AppContext, IAppContext } from '../../../../../../context/AppProvider';
-import { DialogContext, IDialogContext } from '../../../../../../context/DialogProvider';
-import { DIALOG_ACTIONS, InventoryForm } from '../../../../../../context/types';
+import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
+import { FileList } from './components/FileList';
 
 export const InventoryDetail = () => {
   const history = useHistory();
+  const dispatch = useDispatch();
   const { id } = useParams<any>();
 
-  const { state, detachFile, deleteInventory, updateInventory } = useContext(WorkbenchContext) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const [inventory, setInventory] = useState<Inventory>();
@@ -37,7 +37,6 @@ export const InventoryDetail = () => {
   };
 
   const onEditClicked = async () => {
-
     const inventoryForm: Partial<InventoryForm> = {
       ...inventory,
       id: inventory.id,
@@ -46,11 +45,12 @@ export const InventoryDetail = () => {
       version: inventory.component.version,
     };
 
-    const nInv = await dialogCtrl.openInventory(inventoryForm, state.recentUsedComponents);
+    // TODO: use recent components
+    const nInv = await dialogCtrl.openInventory(inventoryForm, []);
     if (!nInv) return;
 
-    const inv = await updateInventory(nInv);
-    setInventory(inv);
+    dispatch(updateInventory(nInv));
+    // setInventory(inv);
   };
 
   const onRemoveClicked = async () => {
@@ -59,7 +59,7 @@ export const InventoryDetail = () => {
       role: 'delete',
     });
     if (action === DIALOG_ACTIONS.OK) {
-      await deleteInventory(inventory?.id);
+      await dispatch(deleteInventory(inventory.id));
       history.goBack();
     }
   };
@@ -73,7 +73,7 @@ export const InventoryDetail = () => {
         });
         break;
       case MATCH_CARD_ACTIONS.ACTION_DETACH:
-        detachFile([file.id]);
+        dispatch(detachFile([file.id]));
         getInventory();
         break;
       default:
