@@ -163,4 +163,6 @@ export default class File extends Node {
   public setStatusDeep(status: NodeStatus): void {
     this.status = status;
   }
+
+
 }

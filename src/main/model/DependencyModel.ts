@@ -19,18 +19,17 @@ export class DependencyModel extends Model {
     super(path);
   }
 
-  public async insert(files: Record<string, number>, filesDependencies: any) {
+  public async insert(filesDependencies: any) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
           db.run('begin transaction');
           filesDependencies.forEach((file) => {
-            const fileId = files[file.file];
             file.dependenciesList.forEach((dependency) => {
               db.run(
                 query.SQL_DEPENDENCIES_INSERT,
-                fileId,
+                file.fileId,
                 dependency.purl ? decodeURIComponent(dependency.purl) : null,
                 dependency.version ? dependency.version : null,
                 dependency.scope ? dependency.scope : null,

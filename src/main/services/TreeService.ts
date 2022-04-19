@@ -58,37 +58,40 @@ class TreeService {
       });
   }
 
-  private async getDependencyStatus() : Promise <Array<Record<string,NodeStatus>>> {
+  private async getDependencyStatus() : Promise <Array<Record<string,any>>> {
     const dependencies = await modelProvider.model.dependency.getStatus(); // getAll
     const dep = this.mapToDependencyStatus(dependencies);
     return dep;
   }
 
-  private mapToDependencyStatus(dependencies) : Array<Record<string,NodeStatus>> {
+  private mapToDependencyStatus(dependencies) : Array<Record<string,any>> {
       // Group path and dependencies status
     const status = {};
       dependencies.forEach(item => {
         if (!status[item.path]) {
           const aux = new Set();
           aux.add(item.status);
-          status[item.path] = aux;
+          status[item.path] = {
+            status: aux,
+            fileId: item.fileId
+          };
         } else
-          status[item.path].add(item.status);
+          status[item.path].status.add(item.status);
       });
-
       // Get dependencies status for each path
     const dependencyStatus = [];
-      for (const [path, stat] of Object.entries(status as Record<string, Set<string>>)) {
+      for (const [path, data] of Object.entries(status as Record<string, any>)) {
         let depStat = "";
-        if( stat.has("IGNORED"))
+        if( data.status.has("IGNORED"))
           depStat = "IGNORED";
-        if( stat.has("IDENTIFIED"))
+        if( data.status.has("IDENTIFIED"))
           depStat = "IDENTIFIED";
-        if(stat.has("PENDING"))
+        if(data.status.has("PENDING"))
           depStat = "PENDING";
         dependencyStatus.push({
           path,
-          status: depStat
+          fileId: data.fileId,
+          status: depStat,
         });
       }
       return dependencyStatus;
@@ -101,8 +104,23 @@ class TreeService {
 
   private async updateDependencyStatus(): Promise<boolean>  {
     this.getDependencyStatus().then((dep) => {
+      const depGroupedByStatus = dep.reduce((acc, item) => {
+        if (!acc[item.status]) {
+          acc[item.status] = [];
+        }
+        acc[item.status].push(item.fileId);
+        return acc;
+      }, {});
+      // Update file status on database
+      if(depGroupedByStatus.PENDING)
+         modelProvider.model.file.restore(depGroupedByStatus.PENDING);
+      if(depGroupedByStatus.IDENTIFIED)
+        modelProvider.model.file.identified(depGroupedByStatus.IDENTIFIED);
+      if(depGroupedByStatus.IGNORED)
+        modelProvider.model.file.ignored(depGroupedByStatus.IGNORED);
+    //Update file status on fileTree
       dep.forEach((d) => {
-        this.updateStatus([d.path], d.status);
+        this.updateStatus([d.path], d.status as NodeStatus);
      });
       this.updateDone();
     });
