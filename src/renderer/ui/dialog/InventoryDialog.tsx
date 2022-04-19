@@ -19,12 +19,14 @@ import SearchIcon from '@material-ui/icons/Search';
 import AddIcon from '@material-ui/icons/Add';
 import React, { useEffect, useState, useContext } from 'react';
 import { Alert, Autocomplete } from '@material-ui/lab';
-import { Inventory } from '../../../api/types';
-import { InventoryForm } from '../../context/types';
-import { componentService } from '../../../api/services/component.service';
-import { licenseService } from '../../../api/services/license.service';
-import { DialogContext } from '../../context/DialogProvider';
-import { ResponseStatus } from '../../../api/Response';
+import { Inventory } from '@api/types';
+import { InventoryForm } from '@context/types';
+import { componentService } from '@api/services/component.service';
+import { licenseService } from '@api/services/license.service';
+import { DialogContext } from '@context/DialogProvider';
+import { ResponseStatus } from '@api/Response';
+import { useSelector } from 'react-redux';
+import { selectComponentState } from '@store/component-store/componentSlice';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -67,7 +69,9 @@ interface InventoryDialogProps {
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
   const dialogCtrl = useContext<any>(DialogContext);
-  const { open, inventory, onClose, onCancel, showInfoFilter, recentUsedComponents } = props;
+  const { recents } = useSelector(selectComponentState);
+
+  const { open, inventory, onClose, onCancel, showInfoFilter } = props;
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
   const [components, setComponents] = useState<any[]>([]);
   const [versions, setVersions] = useState<any[]>([]);
@@ -151,17 +155,17 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const setGlobalComponents = (components) => {
-    let recents = [];
+    let nRecents = [];
     const nComponents = components.filter((comp) => comp.type !== 'Recents');
-    if (recentUsedComponents && recentUsedComponents.length > 0) {
-      for (const component of recentUsedComponents) {
+    if (recents && recents.length > 0) {
+      for (const component of recents) {
         const recent = nComponents
           .filter((item) => item.purl === component)
           .map((comp) => ({ ...comp, type: 'Recents' }));
-        recents = [...recents, ...recent];
+        nRecents = [...nRecents, ...recent];
       }
     }
-    setComponents([...recents, ...nComponents]);
+    setComponents([...nRecents, ...nComponents]);
   };
 
   const openLicenseDialog = async () => {

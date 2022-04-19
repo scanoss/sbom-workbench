@@ -6,13 +6,15 @@ import { DialogProvider } from '@context/DialogProvider';
 import { WorkbenchDialogProvider } from '@context/WorkbenchDialogProvider';
 import AppConfig from '@config/AppConfigModule';
 import DeclaredDependencyProvider from '@context/DeclaredDependencyProvider';
-import { WorkbenchProvider } from './features/workbench/store';
+import { Provider } from 'react-redux';
+import { WorkbenchProvider } from '@context/WorkbenchProvider';
 import Workbench from './features/workbench/Workbench';
 import AppProvider from './context/AppProvider';
 import Workspace from './features/workspace';
 import About from './features/about/About';
 
 import './App.global.scss';
+import store from './store/store';
 
 export default class App {
   /**
@@ -26,24 +28,26 @@ export default class App {
 
     const app = (
       <HashRouter>
-        <MuiThemeProvider theme={theme}>
-          <DialogProvider>
-            <AppProvider>
-              <Route exact path="/" component={Workspace} /> {/* Redirect not working with new browser windows */}
-              <Route path="/workspace" component={Workspace} />
-              <WorkbenchProvider>
-                <WorkbenchDialogProvider>
-                  <DeclaredDependencyProvider>
-                    <Route path="/workbench" component={Workbench} />
-                  </DeclaredDependencyProvider>
-                </WorkbenchDialogProvider>
-              </WorkbenchProvider>
-              <Route path="/about" exact component={About} />
+        <Provider store={store}>
+          <MuiThemeProvider theme={theme}>
+            <DialogProvider>
+              <AppProvider>
+                <Route exact path="/" component={Workspace} /> {/* Redirect not working with new browser windows */}
+                <Route path="/workspace" component={Workspace} />
+                <WorkbenchProvider>
+                  <WorkbenchDialogProvider>
+                    <DeclaredDependencyProvider>
+                      <Route path="/workbench" component={Workbench} />
+                    </DeclaredDependencyProvider>
+                  </WorkbenchDialogProvider>
+                </WorkbenchProvider>
+                <Route path="/about" exact component={About} />
 
-              {/* <Redirect from="/" to="/workspace" /> */}
-            </AppProvider>
-          </DialogProvider>
-        </MuiThemeProvider>
+                {/* <Redirect from="/" to="/workspace" /> */}
+              </AppProvider>
+            </DialogProvider>
+          </MuiThemeProvider>
+        </Provider>
       </HashRouter>
     );
 

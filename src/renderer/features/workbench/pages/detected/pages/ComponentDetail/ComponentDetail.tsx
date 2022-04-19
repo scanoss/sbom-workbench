@@ -6,13 +6,15 @@ import { componentService } from '@api/services/component.service';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { DIALOG_ACTIONS } from '@context/types';
 import { mapFiles } from '@shared/utils/scan-util';
-import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
+import { useDispatch, useSelector } from 'react-redux';
+import { createInventory, detachFile, ignoreFile, restoreFile } from '@store/inventory-store/inventoryThunks';
+import { selectNavigationState, setVersion } from '@store/navigation-store/navigationSlice';
+import { selectComponentState } from '@store/component-store/componentSlice';
+import { selectWorkbench, setHistory } from '@store/workbench-store/workbenchSlice';
 import { FileList } from '../ComponentList/components/FileList';
 import { ComponentInfo } from '../../../../components/ComponentInfo/ComponentInfo';
-
 import { IdentifiedList } from '../ComponentList/components/IdentifiedList';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
-import { setHistoryCrumb, setVersion } from '../../../../actions';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
 import TabNavigation from './components/TabNavigation/TabNavigation';
@@ -27,13 +29,13 @@ const TABS = {
 
 export const ComponentDetail = () => {
   const history = useHistory();
+  const dispatch = useDispatch();
 
-  const { state, dispatch, detachFile, createInventory, ignoreFile, restoreFile } = useContext(
-    WorkbenchContext
-  ) as IWorkbenchContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { component, version } = state;
+  const { summary, history: stateHistory } = useSelector(selectWorkbench);
+  const { component } = useSelector(selectComponentState);
+  const { filter, node, version } = useSelector(selectNavigationState);
 
   const [files, setFiles] = useState<any[]>([]);
   const [filterFiles, setFilterFiles] = useState<{ pending: any[]; identified: any[]; ignored: any[] }>({
@@ -110,7 +112,7 @@ export const ComponentDetail = () => {
   };
 
   const onIgnorePressed = async (file) => {
-    await ignoreFile([file.id]);
+    dispatch(ignoreFile([file.id]));
   };
 
   const onIgnoreAllPressed = async () => {
@@ -121,7 +123,7 @@ export const ComponentDetail = () => {
     );
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.pending.map((file) => file.id);
-      await ignoreFile(selFiles);
+      dispatch(ignoreFile(selFiles));
     }
   };
 
@@ -134,7 +136,7 @@ export const ComponentDetail = () => {
 
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.ignored.map((file) => file.id);
-      await restoreFile(selFiles);
+      dispatch(restoreFile(selFiles));
     }
   };
 
@@ -146,16 +148,16 @@ export const ComponentDetail = () => {
     );
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.identified.map((file) => file.id);
-      await detachFile(selFiles);
+      dispatch(detachFile(selFiles));
     }
   };
 
   const onDetachPressed = async (file) => {
-    await detachFile([file.id]);
+    dispatch(detachFile([file.id]));
   };
 
   const onRestorePressed = async (file) => {
-    await restoreFile([file.id]);
+    dispatch(restoreFile([file.id]));
   };
 
   const onDetailPressed = async (file) => {
@@ -163,13 +165,16 @@ export const ComponentDetail = () => {
   };
 
   const create = async (defaultInventory, selFiles) => {
-    const inventory = await dialogCtrl.openInventory(defaultInventory, state.recentUsedComponents);
+    // TODO: use recent componebnts
+    const inventory = await dialogCtrl.openInventory(defaultInventory, []);
     if (!inventory) return;
 
-    const newInventory = await createInventory({
-      ...inventory,
-      files: selFiles,
-    });
+    dispatch(
+      createInventory({
+        ...inventory,
+        files: selFiles,
+      })
+    );
   };
 
   useEffect(() => {
@@ -182,10 +187,10 @@ export const ComponentDetail = () => {
   }, [files]);
 
   useEffect(() => {
-    const nTab = TABS[state.filter?.status] || state.history.section || tab || TABS.pending;
+    const nTab = TABS[filter?.status] || stateHistory.section || tab || TABS.pending;
 
     setTab(parseInt(nTab, 10));
-  }, [state.filter]);
+  }, [filter]);
 
   useEffect(() => {
     setFilterFiles({
@@ -194,7 +199,7 @@ export const ComponentDetail = () => {
       ignored: [],
     });
     getFiles();
-  }, [state.version, state.node]);
+  }, [version, node]);
 
   useEffect(() => {
     setFilterFiles({
@@ -206,10 +211,10 @@ export const ComponentDetail = () => {
 
   useEffect(() => {
     getFiles();
-  }, [state.summary]);
+  }, [summary]);
 
   useEffect(() => {
-    dispatch(setHistoryCrumb({ section: tab }));
+    dispatch(setHistory({ section: tab }));
   }, [tab]);
 
   const renderTab = () => {

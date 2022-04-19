@@ -1,11 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { CircularProgress } from '@material-ui/core';
+import { inventoryService } from '@api/services/inventory.service';
+import { Inventory } from '@api/types';
+import { useSelector } from 'react-redux';
+import { selectComponentState } from '@store/component-store/componentSlice';
 import InventoryCard from '../../../../components/InventoryCard/InventoryCard';
 import { ComponentInfo } from '../../../../components/ComponentInfo/ComponentInfo';
-import { inventoryService } from '../../../../../../../api/services/inventory.service';
-import { Inventory } from '../../../../../../../api/types';
-import { WorkbenchContext, IWorkbenchContext } from '../../../../store';
 
 const style = {
   list: {
@@ -17,8 +18,7 @@ const style = {
 
 export const InventoryList = () => {
   const history = useHistory();
-  const { state } = useContext(WorkbenchContext) as IWorkbenchContext;
-
+  const { component } = useSelector(selectComponentState);
   const [inventories, setInventories] = useState<Inventory[]>(null);
 
   const onInit = async () => {
@@ -26,7 +26,7 @@ export const InventoryList = () => {
   };
 
   const getInventories = async () => {
-    const query = { purl: state.component.purl };
+    const query = { purl: component.purl };
     const inv = await inventoryService.getAll(query);
     setInventories(inv || []);
   };
@@ -57,7 +57,7 @@ export const InventoryList = () => {
         <header className="app-header">
           <div className="header">
             <div>
-              <ComponentInfo component={state.component} />
+              <ComponentInfo component={component} />
             </div>
           </div>
         </header>

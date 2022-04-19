@@ -6,7 +6,7 @@ import { AppContext, IAppContext } from '@context/AppProvider';
 
 const ProjectDrop = () => {
   const history = useHistory();
-  const { setScanPath, newProject } = useContext(AppContext) as IAppContext;
+  const { newProject } = useContext(AppContext) as IAppContext;
 
   const onSelectProjectHandler = () => {
     newProject();

@@ -16,7 +16,7 @@ export interface IDeclaredDependencyContext {
 
 export const DeclaredDependencyContext = React.createContext<IDeclaredDependencyContext>(null);
 
-export const DeclaredDependencyProvider: React.FC = ({ children }) => {
+const DeclaredDependencyProvider: React.FC = ({ children }) => {
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const [loading, setLoading] = useState(false);
 

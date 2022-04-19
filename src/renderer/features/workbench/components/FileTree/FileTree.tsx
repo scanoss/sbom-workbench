@@ -1,11 +1,13 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Tree, { renderers as Renderers } from 'react-virtualized-tree';
-import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '../../../../../shared/utils/filetree-utils';
-import useContextual from '../../../../hooks/useContextual';
-import { IWorkbenchContext, WorkbenchContext } from '../../store';
+import { useSelector } from 'react-redux';
+import { collapseAll, expandAll, expandToMatches } from '@shared/utils/filetree-utils';
+import useContextual from '@hooks/useContextual';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 
 const { Expandable } = Renderers;
 
@@ -37,8 +39,8 @@ const FileTree = () => {
   const history = useHistory();
   const contextual = useContextual();
 
-  const { state, isFilterActive } = useContext(WorkbenchContext) as IWorkbenchContext;
-  const { tree } = state;
+  const { tree } = useSelector(selectWorkbench);
+  const state = useSelector(selectNavigationState);
 
   const [nodes, setNodes] = React.useState([]);
 
@@ -94,23 +96,23 @@ const FileTree = () => {
           ]
         : [
             {
-              label: !isFilterActive ? 'Accept all' : 'Accept all filtered files',
+              label: !state.isFilterActive ? 'Accept all' : 'Accept all filtered files',
               click: () => contextual.acceptAll(node),
               enabled: !onlyRestore,
             },
             { type: 'separator' },
             {
-              label: !isFilterActive ? 'Identify all files as...' : 'Identify all filtered files as...',
+              label: !state.isFilterActive ? 'Identify all files as...' : 'Identify all filtered files as...',
               click: () => contextual.identifyAll(node),
               enabled: !onlyRestore,
             },
             {
-              label: !isFilterActive ? 'Mark all files as original' : 'Mark all filtered files as original',
+              label: !state.isFilterActive ? 'Mark all files as original' : 'Mark all filtered files as original',
               click: () => contextual.ignoreAll(node),
               enabled: !onlyRestore,
             },
             {
-              label: !isFilterActive ? 'Restore all files' : 'Restore all filtered files',
+              label: !state.isFilterActive ? 'Restore all files' : 'Restore all filtered files',
               click: () => contextual.restoreAll(node),
               enabled: node.hasIdentified || node.hasIgnored,
             },
@@ -148,13 +150,14 @@ const FileTree = () => {
   };
 
   useEffect(() => {
-    if (tree) {
-      setNodes(convertTreeToNode(tree, nodes.length > 0 ? nodes : [tree]));
+    if (tree && tree.length) {
+      // setNodes(convertTreeToNode(tree , nodes.length > 0 ? nodes : [tree]));
+      setNodes(tree);
     }
   }, [tree]);
 
   // loader
-  if (!tree) {
+  if (!tree || tree.length === 0) {
     return (
       <div className="loader">
         <span>Indexing...</span>

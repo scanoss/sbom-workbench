@@ -20,10 +20,10 @@ import KeyboardArrowUpOutlinedIcon from '@material-ui/icons/KeyboardArrowUpOutli
 import DeleteIcon from '@material-ui/icons/DeleteOutlined';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 
-import { FileStatusType, FileTreeViewMode, FileUsageType } from '../../../../../api/types';
-import { WorkbenchContext } from '../../store';
-import { setFilter, resetFilter } from '../../actions';
-import { projectService } from '../../../../../api/services/project.service';
+import { useDispatch, useSelector } from 'react-redux';
+import { projectService } from '@api/services/project.service';
+import { FileStatusType, FileTreeViewMode, FileUsageType } from '@api/types';
+import { setFilter, resetFilter, selectNavigationState } from '@store/navigation-store/navigationSlice';
 
 const useStyles = makeStyles((theme) => ({
   info: {
@@ -34,15 +34,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const WorkbenchFilters = () => {
-  const { dispatch, state, isFilterActive } = useContext(WorkbenchContext);
-  const { filter, loaded } = state;
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const { filter, isFilterActive } = useSelector(selectNavigationState);
 
   const [open, setOpen] = useState<boolean>(false);
   const [fileTreeViewMode, setFileTreeViewMode] = useState<boolean>(false);
 
   const handleChange = (filter, value) => {
-    dispatch(setFilter({ [filter]: value !== 'all' ? value : null }));
+    dispatch(setFilter({ filter: { [filter]: value !== 'all' ? value : null } }));
   };
 
   const handleReset = (event) => {
@@ -52,7 +52,7 @@ const WorkbenchFilters = () => {
 
   const handleClick = (filterValue, value) => {
     if (filter && filter[filterValue] === value) {
-      dispatch(setFilter({ [filterValue]: null }));
+      dispatch(setFilter({ filter: { [filterValue]: null } }));
     }
   };
 

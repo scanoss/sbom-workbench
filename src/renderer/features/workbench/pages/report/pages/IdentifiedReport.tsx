@@ -7,7 +7,6 @@ import LicensesChart from '../components/LicensesChart';
 import IdentificationProgress from '../components/IdentificationProgress';
 import LicensesTable from '../components/LicensesTable';
 import MatchesForLicense from '../components/MatchesForLicense';
-import { WorkbenchContext, IWorkbenchContext } from '../../../store';
 import LicensesObligations from '../components/LicensesObligations';
 import obligationsService from '../../../../../../api/services/obligations.service';
 import OssVsOriginalProgressBar from '../components/OssVsOriginalProgressBar';
@@ -34,7 +33,9 @@ const IdentifiedReport = ({ data }) => {
     setMatchedLicenseSelected(matchedLicense);
   };
 
-  useEffect(init, []);
+  useEffect(() => {
+    init();
+  }, []);
 
   // empty report
   if (isEmpty) {
