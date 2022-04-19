@@ -258,6 +258,23 @@ export class FileModel extends Model {
     });
   }
 
+  public async updateFileType(fileIds: number[], fileType: string) {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        const SQLquery = `UPDATE files SET type=? WHERE fileId IN (${fileIds.toString()});`;
+        db.run(SQLquery,fileType, (err: any) => {
+          if (err) throw err;
+          db.close();
+          resolve();
+        });
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
   public getEntityMapper(): Record<string, string> {
     return FileModel.entityMapper;
   }

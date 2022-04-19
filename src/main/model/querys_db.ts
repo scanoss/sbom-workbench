@@ -224,7 +224,7 @@ export class Querys {
   SQL_DELETE_DIRTY_DEPENDENCIES = `DELETE FROM dependencies WHERE dependencyId IN (SELECT dependencyId FROM dependencies WHERE dependencyId NOT IN (SELECT d.dependencyId FROM dependencies d WHERE d.purl IN (#PURLS) AND d.version IN (#VERSIONS)
   AND d.licenses IN (#LICENSES)));`;
 
-  SQL_DEPENDENCY_STATUS = `SELECT DISTINCT f.path,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN 'IDENTIFIED' WHEN d.rejectedAt IS NOT NULL THEN 'IGNORED' ELSE 'PENDING' END) AS status FROM dependencies d
+  SQL_DEPENDENCY_STATUS = `SELECT DISTINCT f.path,d.fileId,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN 'IDENTIFIED' WHEN d.rejectedAt IS NOT NULL THEN 'IGNORED' ELSE 'PENDING' END) AS status FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId
   LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version
   LEFT JOIN inventories i ON cv.id = i.cvid AND i.source='declared' AND instr(d.licenses, i.spdxid)>0;`;
