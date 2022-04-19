@@ -262,7 +262,8 @@ export class FileModel extends Model {
     return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.run("UPDATE files SET type=? WHERE fileId IN (?);",fileType,...fileIds, (err: any) => {
+        const SQLquery = `UPDATE files SET type=? WHERE fileId IN (${fileIds.toString()});`;
+        db.run(SQLquery,fileType, (err: any) => {
           if (err) throw err;
           db.close();
           resolve();

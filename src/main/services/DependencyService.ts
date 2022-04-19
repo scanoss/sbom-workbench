@@ -14,10 +14,11 @@ class DependencyService {
     const files = await fileHelper.getPathFileId();
     const filesIds = [];
     filesDependencies.forEach((fileDependency) => {
+      fileDependency.fileId=files[fileDependency.file];
       filesIds.push(files[fileDependency.file]);
     });
     await modelProvider.model.file.updateFileType( filesIds,"MATCH");
-    await modelProvider.model.dependency.insert(files, filesDependencies);
+    await modelProvider.model.dependency.insert(filesDependencies);
   }
 
   public async getAll(params: any): Promise<Array<Dependency>> {

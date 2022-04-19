@@ -111,13 +111,14 @@ class TreeService {
         acc[item.status].push(item.fileId);
         return acc;
       }, {});
+      // Update file status on database
       if(depGroupedByStatus.PENDING)
          modelProvider.model.file.restore(depGroupedByStatus.PENDING);
       if(depGroupedByStatus.IDENTIFIED)
         modelProvider.model.file.identified(depGroupedByStatus.IDENTIFIED);
       if(depGroupedByStatus.IGNORED)
         modelProvider.model.file.ignored(depGroupedByStatus.IGNORED);
-
+    //Update file status on fileTree
       dep.forEach((d) => {
         this.updateStatus([d.path], d.status as NodeStatus);
      });
