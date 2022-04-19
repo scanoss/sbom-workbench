@@ -1,12 +1,11 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 import Tree, { renderers as Renderers } from 'react-virtualized-tree';
-import { useSelector } from 'react-redux';
-import { collapseAll, expandAll, expandToMatches } from '@shared/utils/filetree-utils';
+import { useDispatch, useSelector } from 'react-redux';
 import useContextual from '@hooks/useContextual';
-import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { collapseTree, expandTree, selectWorkbench, updateTree } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 
 const { Expandable } = Renderers;
@@ -38,14 +37,21 @@ const FileTreeNode = ({ node, onClick, onContextMenu }) => {
 const FileTree = () => {
   const history = useHistory();
   const contextual = useContextual();
+  const dispatch = useDispatch();
 
   const { tree } = useSelector(selectWorkbench);
   const state = useSelector(selectNavigationState);
 
-  const [nodes, setNodes] = React.useState([]);
+  const onChange = (nodes) => {
+    dispatch(updateTree(nodes));
+  };
 
-  const handleChange = (nodes) => {
-    setNodes(nodes);
+  const onExpandAll = (node: any, toMatch = false) => {
+    dispatch(expandTree({ node, toMatch }));
+  };
+
+  const onCollapseAll = (node: any) => {
+    dispatch(collapseTree(node));
   };
 
   const onSelectNode = async (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
@@ -139,23 +145,6 @@ const FileTree = () => {
     Menu.buildFromTemplate(menu).popup(remote.getCurrentWindow());
   };
 
-  const onExpandAll = (node: any, toMatch = false) => {
-    const ns = !toMatch ? expandAll(nodes, node) : expandToMatches(nodes, node);
-    setNodes(ns);
-  };
-
-  const onCollapseAll = (node: any) => {
-    const ns = collapseAll(nodes, node);
-    setNodes(ns);
-  };
-
-  useEffect(() => {
-    if (tree && tree.length) {
-      // setNodes(convertTreeToNode(tree , nodes.length > 0 ? nodes : [tree]));
-      setNodes(tree);
-    }
-  }, [tree]);
-
   // loader
   if (!tree || tree.length === 0) {
     return (
@@ -164,10 +153,9 @@ const FileTree = () => {
       </div>
     );
   }
-
   return (
     <div className="file-tree-container">
-      <Tree nodes={nodes} onChange={handleChange}>
+      <Tree nodes={tree} onChange={onChange}>
         {({ style, node, ...rest }: any) => (
           <div
             style={{ ...style, ...{ paddingLeft: style.marginLeft, margin: 0 } }}
