@@ -128,8 +128,8 @@ class InventoryService  {
   ): Promise<Array<Partial<Inventory>>> {
     try {
       let queryBuilder = null;
-      if (data.overwrite) queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder });
-      else queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder });
+      if (data.overwrite) queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder});
+      else queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder, status: 'PENDING' });
       const files: any = await modelProvider.model.result.getResultsPreLoadInventory(queryBuilder);
       const components: any = await modelProvider.model.component.getAll(queryBuilder);
       let inventories = this.getPreLoadInventory(files) as Array<Partial<Inventory>>;
