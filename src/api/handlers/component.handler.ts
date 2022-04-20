@@ -15,16 +15,6 @@ ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (_event, component: Component) 
   }
 });
 
-ipcMain.handle(IpcEvents.COMPONENT_ATTACH_LICENSE, async (_event, comp: Component, lic: License) => {
-  try {
-    const success = await componentService.attachLicense(comp, lic);
-    return Response.ok({ message: 'License attached successfully', data: success });
-  } catch (error: any) {
-    log.error(error);
-    return Response.fail({ message: error.message });
-  }
-});
-
 ipcMain.handle(IpcEvents.COMPONENT_GET_FILES, async (_event, component: Component, params: IWorkbenchFilterParams) => {
   try {
     const data = await componentService.getComponentFiles(component, params);

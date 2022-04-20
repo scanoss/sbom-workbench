@@ -28,3 +28,18 @@ export interface FileDTO{
   type: string;
   status: string;
 }
+
+export interface LicenseDTO{
+    id: number;
+    name: string;
+    spdxid:string;
+    url: string;
+    official: number;
+}
+
+export interface NewLicenseDTO{
+  name: string;
+  fulltext: string;
+  url?: string;
+  spdxid?: string;
+}
