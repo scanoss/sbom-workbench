@@ -35,11 +35,9 @@ export default class File extends Node {
   public attachResults(component: any, path: string): boolean {
     if (this.getPath() === path) {
       this.components.push(component);
-
       this.setClassName('match-info-results status-pending');
       this.original = NodeStatus.MATCH;
       this.status = NodeStatus.PENDING;
-
       return true;
     }
     return false;
@@ -163,6 +161,5 @@ export default class File extends Node {
   public setStatusDeep(status: NodeStatus): void {
     this.status = status;
   }
-
 
 }
