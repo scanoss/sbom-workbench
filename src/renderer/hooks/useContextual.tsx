@@ -118,8 +118,8 @@ const useContextual = () => {
   };
 
   const restore = async (node: any) => {
-    const fileId = await fileService.getIdFromPath(node.value);
-    dispatch(restoreFile([fileId]));
+    const file = await fileService.get({path:node.value}); //await fileService.getIdFromPath(node.value);
+    dispatch(restoreFile([file.fileId]));
   };
 
   const acceptAllDependencies = async (node: any): Promise<boolean> =>
