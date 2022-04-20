@@ -58,31 +58,20 @@ export default class Folder extends Node {
     return NodeStatus.FILTERED;
   }
 
-
-  // TODO:Refactor on the status logic
   private updateStatusFlags(): void {
     this.hasPending = false;
     this.hasIdentified = false;
     this.hasIgnored = false;
     this.hasNoMatch = false;
     this.hasFiltered = false;
-
     for (const child of this.children) {
-      if (child.getType() === 'folder') {
-        const c = child as Folder;
-        this.hasPending = c.hasPending  || this.hasPending;
-        this.hasIdentified = c.hasIdentified || this.hasIdentified;
-        this.hasIgnored = c.hasIgnored || this.hasIgnored;
-        this.hasNoMatch = c.hasNoMatch || this.hasNoMatch;
-        this.hasFiltered = c.hasFiltered || this.hasFiltered;
-      } else {
-        if (child.status === NodeStatus.PENDING) this.hasPending = true;
-        if (child.status === NodeStatus.IDENTIFIED) this.hasIdentified = true;
-        if (child.status === NodeStatus.IGNORED) this.hasIgnored = true;
-        if (child.status === NodeStatus.NOMATCH) this.hasNoMatch = true;
-        if (child.status === NodeStatus.FILTERED) this.hasFiltered = true;
-        if (this.hasPending && this.hasIdentified && this.hasIgnored && this.hasNoMatch && this.hasFiltered) break;
-      }
+      const status = child.getStatus();
+      if (status === NodeStatus.PENDING) this.hasPending = true;
+      if (status === NodeStatus.IDENTIFIED) this.hasIdentified = true;
+      if (status === NodeStatus.IGNORED) this.hasIgnored = true;
+      if (status === NodeStatus.NOMATCH) this.hasNoMatch = true;
+      if (status === NodeStatus.FILTERED) this.hasFiltered = true;
+      if (this.hasPending && this.hasIdentified && this.hasIgnored && this.hasNoMatch && this.hasFiltered) break;
     }
   }
 
@@ -161,17 +150,6 @@ export default class Folder extends Node {
 
   public setOriginal(status: NodeStatus): void {
     this.original = status;
-  }
-
-  // Used only for migration
-  public updateAllStatusFlags() {
-    for (const child of this.children)
-      if (child.type === 'folder') {
-        child.updateAllStatusFlags();
-        this.updateStatusFlags();
-        this.status = this.getStatusClassName();
-        this.setStatusOnClassnameAs(this.status);
-      }
   }
 
   public getFiles(): Array<any> {

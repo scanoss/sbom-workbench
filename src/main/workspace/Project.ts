@@ -3,7 +3,6 @@ import fs from 'fs';
 import log from 'electron-log';
 import { IDependencyResponse, Scanner } from 'scanoss';
 import { FileTreeViewMode, IProjectCfg, IWorkbenchFilter, IWorkbenchFilterParams, ProjectState } from '../../api/types';
-import * as Filtering from './filtering';
 import { ScanModel } from '../model/ScanModel';
 import { Metadata } from './Metadata';
 import { ProjectMigration } from '../migration/ProjectMigration';
@@ -19,8 +18,6 @@ export class Project {
 
   project_name: string;
 
-  banned_list: Filtering.BannedList;
-
   logical_tree: Tree;
 
   tree: Tree;
@@ -31,15 +28,11 @@ export class Project {
 
   scanner!: Scanner;
 
-  DepScanner: Dep;
-
   msgToUI!: Electron.WebContents;
 
   filesSummary: any;
 
   processedFiles = 0;
-
-  filesIndexed = 0;
 
   filesToScan: any;
 
