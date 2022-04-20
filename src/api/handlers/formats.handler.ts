@@ -11,21 +11,9 @@ const crypto = require('crypto');
 
 ipcMain.handle(IpcEvents.EXPORT, async (_event, path: string, format: ExportFormat) => { // NewExportDTO
   try {
-    let auxPath = path;
-    if (
-      format === ExportFormat.CSV ||
-      format === ExportFormat.SPDX20 ||
-      format === ExportFormat.SPDXLITE ||
-      format === ExportFormat.SPDXLITEJSON
-    ) {
-      const data: any = await reportService.getReportSummary();
-      const complete = Math.floor(((data?.identified.scan + data?.original) * 100) / data.summary.matchFiles) < 100;
-      auxPath = complete ? `${pathLib.dirname(path)}/uncompleted_${pathLib.basename(path)}` : path;
-    }
     const exportTask = new Export();
     exportTask.setFormat(format);
-    const success = await exportTask.run(auxPath);
-
+    const success = await exportTask.run(path);
     return Response.ok({ message: 'File exported successfully', data: success });
   } catch (e: any) {
     console.log('Catch an error: ', e);
