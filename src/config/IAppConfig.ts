@@ -5,6 +5,7 @@ export interface IAppConfig {
   ABOUT_MESSAGE: string;
 
   API_URL: string;
+  API_KEY: string;
   MIN_VERSION_SUPPORTED: string;
   DEFAULT_WORKSPACE_NAME: string;
 

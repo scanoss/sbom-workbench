@@ -154,5 +154,6 @@ async function init() {
   const root = `${os.homedir()}/${AppConfig.DEFAULT_WORKSPACE_NAME}`;
   await workspace.read(root);
   await userSettingService.read(root);
+  await userSettingService.update();
   new WorkspaceMigration(userSettingService.get().VERSION, root).up();
 }
