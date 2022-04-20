@@ -99,16 +99,6 @@ class Workspace extends EventEmitter {
     return p;
   }
 
-  public resumeProjectByPath(path: string) {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const p of this.projectList) {
-      if (p.getMyPath() === path) {
-        p.resume();
-        break;
-      }
-    }
-  }
-
   public getMyPath() {
     return this.wsPath;
   }
