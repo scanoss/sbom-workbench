@@ -1,4 +1,6 @@
 import { modelProvider } from './ModelProvider';
+import {QueryBuilderCreator} from "../model/queryBuilder/QueryBuilderCreator";
+import {FileDTO, GetFileDTO} from "@api/dto";
 
 class FileService {
   public async insert(files: Array<any>) {
@@ -14,9 +16,10 @@ class FileService {
     }
   }
 
-  public async getFileIdFromPath(path: string): Promise<number> {
+  public async get(params: GetFileDTO): Promise<FileDTO> {
     try {
-      const file = await modelProvider.model.file.getIdFromPath(path);
+      const queryBuilder = QueryBuilderCreator.create(params);
+      const file = await modelProvider.model.file.get(queryBuilder);
       return file;
     }catch (e: any){
       return e;

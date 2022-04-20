@@ -1,5 +1,6 @@
 import { IpcEvents } from '../ipc-events';
 import { BaseService } from './base.service';
+import {FileDTO, GetFileDTO} from "@api/dto";
 
 
 const { ipcRenderer } = require('electron');
@@ -10,13 +11,8 @@ class FileService extends BaseService {
     return response;
   }
 
-  public async get(args: Partial<File>): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.FILE_GET, args);
-    return response;
-  }
-
-  public async getIdFromPath(args: string): Promise<number> {
-    const response = await ipcRenderer.invoke(IpcEvents.FILE_GET_ID_FROM_PATH, args);
+  public async get(params: GetFileDTO): Promise<FileDTO> {
+    const response = await ipcRenderer.invoke(IpcEvents.FILE_GET, params);
     return this.response(response);
   }
 

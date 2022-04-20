@@ -1,9 +1,11 @@
-import React, { useContext, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import { DIALOG_ACTIONS } from '@context/types';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { dependencyService } from '@api/services/dependency.service';
 import { NewDependencyDTO } from '@api/dto';
 import { Dependency } from '@api/types';
+import {useDispatch, useSelector} from "react-redux";
+import {load, selectWorkbench} from "@store/workbench-store/workbenchSlice";
 
 export interface IDeclaredDependencyContext {
   loading: boolean;
@@ -19,6 +21,8 @@ export const DeclaredDependencyContext = React.createContext<IDeclaredDependency
 const DeclaredDependencyProvider: React.FC = ({ children }) => {
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const {loaded} = useSelector(selectWorkbench);
 
   const accept = async (params: NewDependencyDTO) => {
     setLoading(true);
@@ -81,6 +85,12 @@ const DeclaredDependencyProvider: React.FC = ({ children }) => {
 
     return false;
   };
+
+ //TODO: Remove after migrate to Redux
+  useEffect(() => {
+    if(!loading && loaded)
+      dispatch(load());
+  }, [loading]);
 
   return (
     <DeclaredDependencyContext.Provider

@@ -1,10 +1,11 @@
 import { IpcEvents } from '../ipc-events';
 import { BaseService } from './base.service';
+import {ISummary} from "../../main/services/ReportService";
 
 const { ipcRenderer } = require('electron');
 
 class ReportService extends BaseService {
-  public async getSummary(args: string | null = null): Promise<any> {
+  public async getSummary(args: string | null = null): Promise<ISummary> {
     const response = await ipcRenderer.invoke(IpcEvents.REPORT_SUMMARY, args);
     return this.response(response);
   }
