@@ -100,6 +100,8 @@ export const ComponentDetail = () => {
     const selFiles = filterFiles.pending.map((file) => file.id);
 
     const inv: Partial<Inventory> = {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       component: component?.name,
       version: version || component?.versions[0]?.version,
       spdxid: component?.versions[0].licenses[0]?.spdxid,
@@ -166,7 +168,7 @@ export const ComponentDetail = () => {
 
   const create = async (defaultInventory, selFiles) => {
     // TODO: use recent componebnts
-    const inventory = await dialogCtrl.openInventory(defaultInventory, []);
+    const inventory = await dialogCtrl.openInventory(defaultInventory);
     if (!inventory) return;
 
     dispatch(

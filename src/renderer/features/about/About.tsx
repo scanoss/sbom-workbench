@@ -25,7 +25,7 @@ const About = () => {
         }}
       >
         <div className="d-flex align-center">
-          <img src={icon} alt="logo" className="mr-4" />
+          <img src={icon} width="64" alt="logo" className="mr-4" />
           <div>
             <p style={{ fontSize: '0.9rem', marginBottom: 0 }}>{AppConfig.ABOUT_MESSAGE}</p>
             <p style={{ fontSize: '0.75rem', margin: 0 }} className="text-right">

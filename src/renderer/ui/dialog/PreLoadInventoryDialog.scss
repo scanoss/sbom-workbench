@@ -29,11 +29,9 @@ textarea {
   height: 0px;
 }
 
-.divider { 
+.divider {
   margin-bottom: 24px;
 }
-
-
 
 .list-item-icon {
   width: 20px;
@@ -43,15 +41,14 @@ textarea {
 
 
 .list-item-text , .list-item-text-no-license {
-  font-size: 16px;
+  font-size: 14px;
   color: #3B82F6;
   margin-left: 6px;
 }
 
 .check {
-  color: #3B82F6;  
+  color: #3B82F6;
 }
-
 
 .scroll-list {
   max-height: 250px;
@@ -125,7 +122,7 @@ textarea {
   }
 
   .list-item-text-no-license {
-    color: grey;  
+    color: grey;
   }
 
   .svg-no-license{
