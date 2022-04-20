@@ -1,21 +1,22 @@
 import { IpcEvents } from '../ipc-events';
 import { License } from '../types';
 import { BaseService } from './base.service';
+import {LicenseDTO, NewLicenseDTO} from "@api/dto";
 
 const { ipcRenderer } = require('electron');
 
 class LicenseService extends BaseService {
-  public async get(args: Partial<License>): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.LICENSE_GET, args);
-    return response;
+  public async get(id: number): Promise<LicenseDTO> {
+    const response = await ipcRenderer.invoke(IpcEvents.LICENSE_GET, id);
+    return this.response(response);
   }
 
-  public async getAll(): Promise<any> {
+  public async getAll(): Promise<Array<LicenseDTO>> {
     const response = await ipcRenderer.invoke(IpcEvents.LICENSE_GET_ALL);
-    return response;
+    return this.response(response);
   }
 
-  public async create(license: Partial<License>): Promise<any> {
+  public async create(license: NewLicenseDTO): Promise<LicenseDTO> {
     const response = await ipcRenderer.invoke(IpcEvents.LICENSE_CREATE, license);
     return this.response(response);
   }

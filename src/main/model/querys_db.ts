@@ -129,7 +129,7 @@ export class Querys {
   SQL_SELECT_LICENSE = 'SELECT id, spdxid, name, url FROM licenses WHERE ';
 
   // GET LICENSES
-  SQL_SELECT_ALL_LICENSES = 'SELECT id, spdxid, name, url FROM licenses ORDER BY name ASC;';
+  SQL_SELECT_ALL_LICENSES = 'SELECT id, spdxid, name, url, official FROM licenses ORDER BY name ASC;';
 
   // GET ALL THE INVENTORIES
   SQL_GET_ALL_INVENTORIES = `SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i

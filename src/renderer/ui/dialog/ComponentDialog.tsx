@@ -62,7 +62,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
 
   const fetchData = async () => {
     if (open) {
-      const { data } = await licenseService.getAll();
+      const data = await licenseService.getAll();
       setLicenses(data);
     }
   };

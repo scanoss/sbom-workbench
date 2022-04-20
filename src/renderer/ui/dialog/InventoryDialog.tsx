@@ -86,7 +86,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     const licensesResponse = await licenseService.getAll();
     const compCatalogue = componentsResponse.map((component) => ({ ...component, type: 'Catalogued' }));
     setGlobalComponents(compCatalogue);
-    const catalogue = licensesResponse.data.map((item) => ({
+    const catalogue = licensesResponse.map((item) => ({
       spdxid: item.spdxid,
       name: item.name,
       type: 'Catalogued',
