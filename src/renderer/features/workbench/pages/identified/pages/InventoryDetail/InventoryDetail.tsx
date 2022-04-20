@@ -46,7 +46,7 @@ export const InventoryDetail = () => {
     };
 
     // TODO: use recent components
-    const nInv = await dialogCtrl.openInventory(inventoryForm, []);
+    const nInv = await dialogCtrl.openInventory(inventoryForm);
     if (!nInv) return;
 
     dispatch(updateInventory(nInv));

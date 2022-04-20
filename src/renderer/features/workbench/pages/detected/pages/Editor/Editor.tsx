@@ -22,7 +22,7 @@ import {
   createInventory,
   detachFile,
   ignoreFile,
-  restoreFile
+  restoreFile,
 } from '../../../../../../store/inventory-store/inventoryThunks';
 import { selectWorkbench } from '../../../../../../store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '../../../../../../store/navigation-store/navigationSlice';
@@ -99,16 +99,9 @@ const Editor = () => {
   };
 
   const create = async (defaultInventory, selFiles) => {
-    // TODO: use recent components
-    const inventory = await dialogCtrl.openInventory(defaultInventory, []);
+    const inventory = await dialogCtrl.openInventory(defaultInventory);
     if (!inventory) return;
-    /*
 
-    const newInventory = await createInventory({
-      ...inventory,
-      files: selFiles,
-    });
-*/
     dispatch(
       createInventory({
         ...inventory,
@@ -116,7 +109,6 @@ const Editor = () => {
       })
     );
 
-    // setInventories((previous) => [...previous, newInventory]);
     getResults();
   };
 
@@ -134,12 +126,9 @@ const Editor = () => {
   };
 
   const onNoMatchIdentifyPressed = async (result) => {
-    const response = await dialogCtrl.openInventory(
-      {
-        usage: 'file',
-      },
-      []
-    );
+    const response = await dialogCtrl.openInventory({
+      usage: 'file',
+    });
     if (response) {
       const id = await fileService.getIdFromPath(file);
       if (!id) return;
