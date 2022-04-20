@@ -3,6 +3,7 @@ import { Querys } from './querys_db';
 import { Model } from './Model';
 import { utilModel } from './UtilModel';
 import { License } from '../../api/types';
+import {LicenseDTO, NewLicenseDTO} from "@api/dto";
 
 const query = new Querys();
 
@@ -31,43 +32,22 @@ export class LicenseModel extends Model {
   }
 
   // CREATE LICENSE
-  public create(license: Partial<License>) {
-    return new Promise<License>(async (resolve, reject) => {
+  public create(license: NewLicenseDTO) {
+    return new Promise<Partial<LicenseDTO>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(async function () {
           db.run('begin transaction');
           db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 0);
-          db.run('commit', function (this: any, err: any) {
+          db.run('commit', function  (this: any, err: any) {
             db.close();
             if (err || this.lastID === 0) throw new Error('The license was not created or already exist');
-            license.id = this.lastID;
-            resolve(<License>license);
+            resolve({id:this.lastID,...license});
           });
         });
       } catch (error) {
         log.error(error);
         reject(error);
-      }
-    });
-  }
-
-  // INSERT LICENSES FROM A FILE
-  public importFromFile(path: string) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        const json: Record<any, any> = await utilModel.readFile(path);
-        for (const [key, license] of Object.entries(json)) {
-          db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, (err: any) => {
-            if (err) throw err;
-          });
-        }
-        db.close();
-        resolve(true);
-      } catch (error) {
-        log.error(error);
-        reject(new Error('unable to insert licenses'));
       }
     });
   }
@@ -95,18 +75,16 @@ export class LicenseModel extends Model {
   }
 
   // GET LICENSE
-  public get(data: Partial<License>) {
-    return new Promise<License>(async (resolve, reject) => {
+  public get(id: number) {
+    return new Promise<LicenseDTO>(async (resolve, reject) => {
       try {
-        const sqlGet = this.sqlGetLicenseQuery(data);
         const db = await this.openDb();
-        db.serialize(function () {
-          db.get(sqlGet, (err: any, license: any) => {
+          db.get(`${query.SQL_SELECT_LICENSE} id=${id};`, (err: any, license: LicenseDTO) => {
             db.close();
             if (err || license === undefined) throw new Error('Unable to get license ');
             resolve(license);
           });
-        });
+
       } catch (error) {
         log.error(error);
         reject(error);
@@ -114,21 +92,13 @@ export class LicenseModel extends Model {
     });
   }
 
-  private sqlGetLicenseQuery(data: any) {
-    let sqlQuery: string;
-    if (data.name) sqlQuery = `${query.SQL_SELECT_LICENSE}name='${data.name}';`;
-    else if (data.spdxid) sqlQuery = `${query.SQL_SELECT_LICENSE}spdxid='${data.spdxid}';`;
-    else sqlQuery = `${query.SQL_SELECT_LICENSE}id=${data.id};`;
-    return sqlQuery;
-  }
-
   // GET LICENSE
   public getAll() {
-    return new Promise<License>(async (resolve, reject) => {
+    return new Promise <Array<LicenseDTO>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
-          db.all(query.SQL_SELECT_ALL_LICENSES, (err: any, license: any) => {
+          db.all(query.SQL_SELECT_ALL_LICENSES, (err: any, license: Array<LicenseDTO>) => {
             db.close();
             if (err) throw new Error('Unable to get all licenses');
             resolve(license);
