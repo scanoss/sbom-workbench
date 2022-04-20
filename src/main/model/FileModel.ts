@@ -4,6 +4,7 @@ import { File } from '../../api/types';
 import { InventoryModel } from './InventoryModel';
 import { Model } from './Model';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
+import {FileDTO} from "@api/dto";
 
 const query = new Querys();
 
@@ -13,6 +14,7 @@ export class FileModel extends Model {
     purl: 'comp.purl',
     version: 'comp.version',
     source: 'comp.source',
+    id: 'fileId',
   };
 
   inventory: InventoryModel;
@@ -22,17 +24,19 @@ export class FileModel extends Model {
     this.inventory = new InventoryModel(path);
   }
 
-  public async get(file: Partial<File>) {
-    return new Promise(async (resolve, reject) => {
+  public async get(queryBuilder: QueryBuilder) {
+    return new Promise<FileDTO>(async (resolve, reject) => {
       try {
-        let result: any;
-        if (file.path) result = await this.getByPath(file);
-        else resolve([]);
-
-        if (result !== undefined) resolve(result);
+        const SQLquery = this.getSQL(queryBuilder, `SELECT f.fileId, f.path,(CASE WHEN f.identified=1 THEN 'IDENTIFIED' WHEN f.identified=0 AND f.ignored=0 THEN 'PENDING' ELSE 'ORIGINAL' END) AS status, f.type FROM files f #FILTER;`, this.getEntityMapper());
+        const db = await this.openDb();
+        db.get(SQLquery.SQL, ...SQLquery.params, (err: any, file: FileDTO) => {
+          db.close();
+          if (err) throw err;
+          resolve(file);
+        });
       } catch (error) {
         log.error(error);
-        reject(new Error('Unable to retrieve file'));
+        reject(error);
       }
     });
   }
@@ -116,22 +120,6 @@ export class FileModel extends Model {
       } catch (error) {
         log.error(error);
         reject(new Error('ERROR INSERTING FILES'));
-      }
-    });
-  }
-//TODO: REMOVE THIS METHOD AND USE GET
-  public async getIdFromPath(path: string): Promise<number> {
-    return new Promise<number> ( async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.get('SELECT fileId FROM files WHERE path=?;', path, (err: any, file: any) => {
-          if (err) throw err;
-          db.close();
-          resolve(file.fileId);
-        });
-      } catch (error: any) {
-        log.error(error);
-       reject(error);
       }
     });
   }
@@ -258,7 +246,7 @@ export class FileModel extends Model {
     });
   }
 
-  public async updateFileType(fileIds: number[], fileType: string) {
+  public updateFileType(fileIds: number[], fileType: string) {
     return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
@@ -267,6 +255,27 @@ export class FileModel extends Model {
           if (err) throw err;
           db.close();
           resolve();
+        });
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
+  public getSummary() {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.get(`SELECT COUNT(*) as totalFiles , (SELECT COUNT(*) FROM files WHERE type='MATCH') AS matchFiles,
+                (SELECT COUNT(*) FROM files WHERE type='FILTERED') AS filterFiles,
+                (SELECT COUNT(*) FROM files WHERE type='NO-MATCH') AS  noMatchFiles, (SELECT COUNT(*) FROM files f WHERE f.type="MATCH" AND f.identified=1) AS scannedIdentified,
+                (SELECT COUNT(*) AS detectedIdentifiedFiles FROM files f WHERE f.identified=1) AS totalIdentified,
+                (SELECT COUNT(*) AS detectedIdentifiedFiles FROM files f WHERE f.ignored=1) AS original,
+                (SELECT COUNT(*) AS pending FROM files f WHERE f.identified=0 AND f.ignored=0 AND f.type="MATCH") AS pending  FROM files;`, (err: any, data: any) => {
+          db.close();
+          if (err) throw err;
+          else resolve(data);
         });
       } catch (error) {
         log.error(error);

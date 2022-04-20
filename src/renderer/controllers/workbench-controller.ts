@@ -87,8 +87,6 @@ class WorkbenchController {
 
     // TODO: get from scan result
     const name = work.split(pathUtil.sep)[work.split(pathUtil.sep).length - 1];
-
-    console.log(data);
     return {
       name,
       imported,

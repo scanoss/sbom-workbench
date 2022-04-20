@@ -130,12 +130,12 @@ const Editor = () => {
       usage: 'file',
     });
     if (response) {
-      const id = await fileService.getIdFromPath(file);
-      if (!id) return;
+      const f = await fileService.get({path:file});
+      if (!f) return;
       await dispatch(
         createInventory({
           ...response,
-          files: [id],
+          files: [f.fileId],
         })
       );
     }

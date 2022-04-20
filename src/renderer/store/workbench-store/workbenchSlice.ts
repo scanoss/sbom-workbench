@@ -2,13 +2,14 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '@shared/utils/filetree-utils';
 import { loadProject } from './workbenchThunks';
 import { RootState } from '../rootReducer';
+import {ISummary} from "../../../main/services/ReportService";
 
 export interface WorkbenchState {
   path: string;
   name: string;
   imported: boolean;
   tree: any[]; // TODO: define type
-  summary: any; // TODO: define type
+  summary: ISummary; // TODO: define type
   progress: number;
   dependencies: string[]; // TODO: move to dependency store
   file: string | null;
@@ -54,13 +55,13 @@ export const workbenchSlice = createSlice({
     collapseTree: (state, action) => {
       state.tree = collapseAll(state.tree, action.payload);
     },
-    setProgress: (state, action: PayloadAction<any>) => {
+    setProgress: (state, action: PayloadAction<ISummary>) => {
       const summary = action.payload;
 
       const progress =
-        summary?.detectedFiles === 0
+        summary.summary.matchFiles === 0
           ? 100
-          : ((summary?.detectedIdentifiedFiles + summary?.ignoredFiles) * 100) / summary?.detectedFiles;
+          : ((summary.identified.scan + summary.original) * 100) / summary.summary.matchFiles;
 
       state.progress = progress;
       state.summary = summary;
