@@ -2,14 +2,15 @@ import * as fs from 'fs';
 import { ipcMain } from 'electron';
 import { isBinaryFileSync } from 'isbinaryfile';
 import { IpcEvents } from '../ipc-events';
-import { File, FileType } from '../types';
+import { FileType } from '../types';
 import { workspace } from '../../main/workspace/Workspace';
 import { NodeStatus } from '../../main/workspace/Tree/Tree/Node';
 import { utilHelper } from '../../main/helpers/UtilHelper';
 import { FilterTrue } from '../../main/batch/Filter/FilterTrue';
 import { resultService } from '../../main/services/ResultService';
-import { modelProvider } from '../../main/services/ModelProvider';
 import { fileService } from '../../main/services/FileService';
+import { Response } from '../Response';
+import {GetFileDTO} from "@api/dto";
 
 const path = require('path');
 
@@ -75,22 +76,13 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
   }
 });
 
-ipcMain.handle(IpcEvents.FILE_GET, async (_event, arg: Partial<File>) => {
+ipcMain.handle(IpcEvents.FILE_GET, async (_event, params: GetFileDTO) => {
   let data;
   try {
-    data = await modelProvider.model.file.get(arg);
-    return { status: 'ok', message: 'Get file', data };
+    data = await fileService.get(params);
+    return Response.ok({ message: 'File retrieve successfully', data });
   } catch (error) {
-    return { status: 'error', message: 'Get file were not successfully retrieve', data };
-  }
-});
-// TODO: USE GET_FILES AND REMOVE THIS SERVICE
-ipcMain.handle(IpcEvents.FILE_GET_ID_FROM_PATH, async (_event, filePath: string) => {
-  try {
-    const id = await fileService.getFileIdFromPath(filePath);
-    return { status: 'ok', message: 'Get id from file path', data: id };
-  } catch (error) {
-    return { status: 'error', message: 'Get file were not successfully retrieve' };
+    return Response.fail({ message: error.message });
   }
 });
 

@@ -87,24 +87,24 @@ const AppProgress = ({ summary, progress }) => {
             <header>
               <Typography className="title d-flex space-between">
                 <span>Detected files</span>
-                <span>{summary?.detectedFiles}</span>
+                <span>{summary?.summary.matchFiles}</span>
               </Typography>
               <hr />
             </header>
 
             <section className="d-flex space-between mt-1">
               <div className="mr-4">
-                <Typography className="has-status-bullet pending">{summary?.pendingFiles}</Typography>
+                <Typography className="has-status-bullet pending">{summary?.pending}</Typography>
                 <p className="m-0">PENDING</p>
               </div>
 
               <div className="mr-3">
-                <Typography className="has-status-bullet identified">{summary?.detectedIdentifiedFiles}</Typography>
+                <Typography className="has-status-bullet identified">{summary?.identified.scan}</Typography>
                 <p className="m-0">IDENTIFIED</p>
               </div>
 
               <div>
-                <Typography className="has-status-bullet ignored">{summary?.ignoredFiles}</Typography>
+                <Typography className="has-status-bullet ignored">{summary?.original}</Typography>
                 <p className="m-0">ORIGINAL</p>
               </div>
             </section>

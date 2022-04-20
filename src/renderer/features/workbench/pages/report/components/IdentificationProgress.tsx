@@ -22,7 +22,7 @@ const LicensesChart = ({ data }) => {
     setToken(TOKEN || '');
   };
   useEffect(() => {
-    const percentage = Math.floor(((data?.detectedIdentifiedFiles + data?.ignoredFiles) * 100) / data.detectedFiles);
+    const percentage = Math.floor(((data?.identified.scan + data?.original) * 100) / data.summary.matchFiles);
     setPercentage(percentage);
 
     readToken();
@@ -34,14 +34,14 @@ const LicensesChart = ({ data }) => {
         datasets: [
           {
             label: 'Identified',
-            data: [data.detectedIdentifiedFiles + data.ignoredFiles],
+            data: [data?.identified.scan + data?.original],
             borderWidth: 0,
             backgroundColor: ['#22C55E'],
             barThickness: 34,
           },
           {
             label: 'Pending',
-            data: [data.pendingFiles],
+            data: [data.pending],
             borderWidth: 0,
             backgroundColor: ['#F97316'],
             barThickness: 34,
@@ -62,7 +62,7 @@ const LicensesChart = ({ data }) => {
             display: false,
           },
           x: {
-            max: data.detectedFiles === 0 ? 1 : data.detectedFiles,
+            max: data.summary.matchFiles === 0 ? 1 : data.summary.matchFiles,
             stacked: true,
             beginAtZero: true,
             grid: {
@@ -104,7 +104,7 @@ const LicensesChart = ({ data }) => {
       </div>
       <div className="total-files-container">
         <span className="total-files-label">
-          <strong>{data.detectedFiles}</strong> detected files
+          <strong>{data.summary.matchFiles}</strong> detected files
         </span>
       </div>
       <div className={token ? 'notarize-container' : 'hide'}>

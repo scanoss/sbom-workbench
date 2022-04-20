@@ -285,7 +285,7 @@
     #oss-percentage{
         font-size: 25px;
         display: block;
-        height: auto;       
+        height: auto;
         background-color: #f5f5f5a1;
         padding-top: 28px;
         font-size: 35px;
@@ -411,11 +411,11 @@
         const auxSummaryData = '#SUMMARY';
         const auxData = Array.from(JSON.parse(identifiedData));
         const summaryData = JSON.parse(auxSummaryData);
-        const originalFiles = summaryData.scannedFiles - (summaryData.identifiedFiles + summaryData.pendingFiles);
-        const ossFiles = (summaryData.identifiedFiles * 100) / summaryData.scannedFiles;
-        const pendingFiles = (summaryData.pendingFiles * 100) / summaryData.scannedFiles;
+        const totalFiles = summaryData.pending + summaryData.summary.noMatchFiles + summaryData.identified.total + summaryData.original;
+        const originalFiles = summaryData.summary.noMatchFiles + summaryData.original;
+        const ossFiles = (summaryData.identified.total * 100) / totalFiles;
+        const pendingFiles = (summaryData.pending * 100) / totalFiles;
         const percentage = ossFiles + pendingFiles;
-
         const labels = [];
         const values = [];
         const rowDataTable = {};
@@ -600,15 +600,15 @@
                         <div class="comp-detail-container">
                           <div class="comp-label">
                             <p>Component</p>
-                          </div>  
+                          </div>
                         <div class="comp-info">
                             <p>${compName}</p>
                           </div>
                         </div>
-                         <div class="comp-detail-container"> 
+                         <div class="comp-detail-container">
                          <div class="comp-label">
                           <p>Purl</p>
-                         </div>  
+                         </div>
                          <div class="comp-info">
                           <p>${value.purl}</p>
                         </div>
@@ -616,13 +616,13 @@
                         <div class="comp-detail-container">
                           <div class="comp-label">
                             <p>Versions</p>
-                          </div>  
-                          <div class="comp-info">
-                            <p>${version}</p>    
                           </div>
-                        </div>          
+                          <div class="comp-info">
+                            <p>${version}</p>
+                          </div>
                         </div>
-                     
+                        </div>
+
                     </td>
                 </tr>`;
                 }
@@ -671,8 +671,8 @@
         function progressBar() {
             const spanPercentage = document.querySelector('#oss-percentage');
             spanPercentage.innerHTML=`${Math.floor(percentage)}%`;
-            const totalFiles = document.querySelector('#total-files');
-            totalFiles.innerText = `Total files: ${summaryData.scannedFiles}`;
+            const totalFilesText = document.querySelector('#total-files');
+            totalFilesText.innerText = `total files: ${totalFiles}`;
 
             const chart = new Chart(document.getElementById('progress-bar'), {
                 type: 'bar',
@@ -680,15 +680,15 @@
                     labels: [``],
                     datasets: [
                         {
-                            label: `OSS: ${summaryData.identifiedFiles}`,
-                            data: [summaryData.identifiedFiles],
+                            label: `OSS: ${summaryData.identified.total}`,
+                            data: [summaryData.identified.total],
                             borderWidth: 0,
                             backgroundColor: ['#22C55E'],
                             barThickness: 34,
                         },
                         {
-                            label: `Pending: ${summaryData.pendingFiles}`,
-                            data: [summaryData.pendingFiles],
+                            label: `Pending: ${summaryData.pending}`,
+                            data: [summaryData.pending],
                             borderWidth: 0,
                             backgroundColor: ['#F97316'],
                             barThickness: 34,
@@ -720,7 +720,7 @@
                             display: false,
                         },
                         x: {
-                            max: summaryData.scannedFiles,
+                            max: totalFiles,
                             stacked: true,
                             beginAtZero: true,
                             grid: {
@@ -736,8 +736,8 @@
                 plugins: [
                     {
                         id: 'line',
-                        afterDraw: (chart) => {                           
-                            const meta = chart.getDatasetMeta(1); // Gets datasats[1]
+                        afterDraw: (chart) => {
+                            const meta = chart.getDatasetMeta(1); // Gets datasets[1]
                             if (!meta.hidden) {
                                 meta.data.forEach((element) => {
                                     const { x } = element.tooltipPosition();
@@ -745,7 +745,7 @@
                                     chart.ctx.moveTo(x, 30);
                                     chart.ctx.strokeStyle = 'black';
                                     chart.ctx.lineTo(x, 90);
-                                    chart.ctx.stroke();                                   
+                                    chart.ctx.stroke();
                                     chart.ctx.save();
                                 });
                             }

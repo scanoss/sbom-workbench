@@ -373,22 +373,6 @@ export class InventoryModel extends Model {
     });
   }
 
-  getCurrentSummary() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.get(query.SQL_GET_RESULTS_SUMMARY, (err: any, data: any) => {
-          db.close();
-          if (err) throw err;
-          else resolve(data);
-        });
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
   public async deleteDirtyFileInventories(id: number[]) {
     return new Promise<void>(async (resolve, reject) => {
       try {
