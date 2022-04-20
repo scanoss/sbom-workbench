@@ -27,6 +27,7 @@ import { DialogContext } from '@context/DialogProvider';
 import { ResponseStatus } from '@api/Response';
 import { useSelector } from 'react-redux';
 import { selectComponentState } from '@store/component-store/componentSlice';
+import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -60,8 +61,6 @@ const useStyles = makeStyles((theme) => ({
 interface InventoryDialogProps {
   open: boolean;
   inventory: Partial<InventoryForm>;
-  recentUsedComponents: Array<string>;
-  showInfoFilter: boolean;
   onClose: (inventory: Inventory) => void;
   onCancel: () => void;
 }
@@ -69,9 +68,11 @@ interface InventoryDialogProps {
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
   const dialogCtrl = useContext<any>(DialogContext);
-  const { recents } = useSelector(selectComponentState);
 
-  const { open, inventory, onClose, onCancel, showInfoFilter } = props;
+  const { recents } = useSelector(selectComponentState);
+  const { isFilterActive } = useSelector(selectNavigationState);
+
+  const { open, inventory, onClose, onCancel } = props;
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
   const [components, setComponents] = useState<any[]>([]);
   const [versions, setVersions] = useState<any[]>([]);
@@ -248,7 +249,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       <span className="dialog-title">{!form.id ? 'Identify Component' : 'Edit Identification'}</span>
       <form onSubmit={onSubmit}>
         <div className="dialog-content">
-          {showInfoFilter && (
+          {isFilterActive && (
             <Alert className="" severity="info">
               This action will be applied based on your current filter criteria.
             </Alert>

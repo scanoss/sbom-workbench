@@ -14,8 +14,10 @@ import {
 import { Alert } from '@material-ui/lab';
 import React, { useEffect, useState } from 'react';
 import { List, AutoSizer } from 'react-virtualized';
-import { IWorkbenchFilter } from '../../../api/types';
-import { inventoryService } from '../../../api/services/inventory.service';
+import { useSelector } from 'react-redux';
+import { selectNavigationState } from '@store/navigation-store/navigationSlice';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { inventoryService } from '@api/services/inventory.service';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -63,19 +65,22 @@ interface IPreLoadInventoryDialog {
   open: boolean;
   folder: string;
   overwrite: boolean;
-  showInfoFilter: boolean;
   onClose: (response: any) => void;
   onCancel: () => void;
 }
 
 export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
-  const { open, folder, overwrite, showInfoFilter, onClose, onCancel } = props;
+  const { open, folder, overwrite, onClose, onCancel } = props;
   const classes = useStyles();
 
+  const { isFilterActive } = useSelector(selectNavigationState);
+  const { dependencies } = useSelector(selectWorkbench);
   const [inventories, setInventories] = useState<any[]>([]);
   const [checked, setChecked] = useState<any[]>([]);
   const [inventoryNoLicenseCount, setInventoryNoLicenseCount] = useState<number>(0);
   const [validInventories, setValidInventories] = useState<any[]>([]);
+
+  const dependenciesInFolder = dependencies.filter((dependency) => dependency.startsWith(folder));
 
   const handleToggle = (value: any) => () => {
     const currentIndex = checked.findIndex(
@@ -137,21 +142,21 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
       <Dialog open={open} maxWidth="sm" scroll="body" fullWidth onClose={onCancel} className={`${classes.size} dialog`}>
         <span className="dialog-title">Accept All</span>
         <DialogContent>
-          {showInfoFilter && (
-            <Alert className="mt-1 mb-1" severity="info" >
+          {isFilterActive && (
+            <Alert className="mt-1 mb-1" severity="info">
               This action will be applied based on your current filter criteria.
             </Alert>
           )}
           <FormControlLabel control={<Checkbox checked={AllChecked()} onClick={() => selectAll()} />} label="All" />
           <hr className="divider-no-license" />
           <div className="list-container">
-            <AutoSizer style={{ width: '100%', height: '250px', border: 'transparent' }}>
+            <AutoSizer style={{ width: '100%', height: '220px', border: 'transparent' }}>
               {({ width, height }) => (
                 <List
                   width={width}
                   height={height}
                   rowCount={inventories.length}
-                  rowHeight={50}
+                  rowHeight={40}
                   rowRenderer={({ index, key, style, parent }) => {
                     const value = inventories[index];
                     return (
@@ -235,7 +240,15 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                   <hr className="divider-no-license" />
                   <Alert severity="warning">
                     {inventoryNoLicenseCount} component(s) will not be identified as they do not have a license declared
-                    with the component. Please manually identify these.
+                    with the component. Please, identify them manually.
+                  </Alert>
+                </>
+              )}
+              {dependenciesInFolder.length > 0 && (
+                <>
+                  <Alert severity="warning" className="mt-1">
+                    Dependencies declared in <strong>{dependenciesInFolder.join(' - ')}</strong> will not be accepted.
+                    Please, identify them manually.
                   </Alert>
                 </>
               )}

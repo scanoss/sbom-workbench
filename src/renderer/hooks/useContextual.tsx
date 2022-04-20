@@ -41,7 +41,7 @@ const useContextual = () => {
   };
 
   const showPreLoadInventoryDialog = async (path: string, overwrite: boolean): Promise<any> => {
-    const response = await dialogCtrl.openPreLoadInventoryDialog(path, overwrite, isFilterActive);
+    const response = await dialogCtrl.openPreLoadInventoryDialog(path, overwrite);
     return response;
   };
 
@@ -68,7 +68,7 @@ const useContextual = () => {
 
   const identifyAll = async (node: any) => {
     // TODO: state.recentUsedComponents
-    const inventory = await dialogCtrl.openInventory({ usage: 'file' }, [], isFilterActive);
+    const inventory = await dialogCtrl.openInventory({ usage: 'file' });
     if (inventory) {
       const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
       if (inventory && action !== DIALOG_ACTIONS.CANCEL) {
