@@ -22,15 +22,6 @@ class ComponentService extends BaseService {
     return response;
   }
 
-  public async attachLicense(component: Partial<Component>, license: Partial<License>): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_ATTACH_LICENSE, component, license);
-    return this.response(response);
-  }
-
-  public async detachLicense(component: Component, license: License): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_DETACH_LICENSE, component, license);
-    return response;
-  }
 
   public async getFiles(component: Partial<Component>, params: IWorkbenchFilter = null): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_FILES, component, params);
