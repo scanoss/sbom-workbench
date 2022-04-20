@@ -75,7 +75,7 @@ const DependencyDialog = (props: DependencyDialogProps) => {
 
   const init = async () => {
     if (open) {
-      const { data } = await licenseService.getAll();
+      const data  = await licenseService.getAll();
       setLicenses(data);
     }
   };

@@ -43,7 +43,7 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
     e.preventDefault();
     try {
       const license: Partial<License> = form;
-      const response = save ? await licenseService.create(license) : {...license, spdxid: licenseHelper.licenseNameToSPDXID(form.name)};
+      const response = save ? await licenseService.create({ name:form.name, fulltext: form.fulltext  }) : {...license, spdxid: licenseHelper.licenseNameToSPDXID(form.name)};
       onClose({ action: DIALOG_ACTIONS.OK, data: response });
     } catch (error) {
       await dialogCtrl.openConfirmDialog(
