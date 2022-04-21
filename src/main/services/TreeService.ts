@@ -126,6 +126,27 @@ class TreeService {
     });
     return true;
   }
+
+  public retoreStatus(files: Array<number>) {
+    try {
+      modelProvider.model.result.getSummaryByids(files)
+        .then((files: any) => {
+          const paths = utilHelper.getArrayFromObjectFilter(files, 'path', new FilterTrue()) as Array<string>;
+          const project = workspace.getOpenedProjects()[0];
+          project.getTree().sendToUI(IpcEvents.TREE_UPDATING, {});
+          project.getTree().restoreStatus(paths);
+          project.updateTree();
+          return true;
+        })
+        .catch((e) => {
+          throw e;
+        });
+      return true;
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
 }
 
 export const treeService = new TreeService();

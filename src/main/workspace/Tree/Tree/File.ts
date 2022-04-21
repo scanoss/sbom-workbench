@@ -1,7 +1,7 @@
 import Node, {NodeStatus} from './Node';
 
 export default class File extends Node {
-  private isDependencyFile: boolean;
+ private isDependencyFile: boolean;
 
   constructor(name: string, path: string) {
     super(name, path);
@@ -160,6 +160,10 @@ export default class File extends Node {
 
   public setStatusDeep(status: NodeStatus): void {
     this.status = status;
+  }
+
+  public isDependency(): boolean {
+    return this.isDependencyFile;
   }
 
 }

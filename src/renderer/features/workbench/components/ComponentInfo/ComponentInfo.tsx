@@ -4,7 +4,6 @@ import Title from '../Title/Title';
 export const ComponentInfo = ({ component }: { component: any }) => {
   const [over, setOver] = useState<boolean>(false);
   const group = !!component.versions;
-
   const version = group
     ? component.versions?.length === 1
       ? component.versions[0].version
