@@ -70,7 +70,7 @@ const FileTree = () => {
   };
 
   const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
-    const onlyRestore = node.status === 'IDENTIFIED' || node.status === 'IGNORED' || node.status === 'FILTERED';
+    const onlyRestore =  !node.hasPendingProgress;
 
     let menu = [];
     if (node.isDependencyFile) {
@@ -120,7 +120,7 @@ const FileTree = () => {
             {
               label: !state.isFilterActive ? 'Restore all files' : 'Restore all filtered files',
               click: () => contextual.restoreAll(node),
-              enabled: node.hasIdentified || node.hasIgnored,
+              enabled: node.hasIgnoredProgress || node.hasIdentifiedProgress,
             },
             { type: 'separator' },
             {

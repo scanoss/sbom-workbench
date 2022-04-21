@@ -57,7 +57,7 @@ ipcMain.handle(IpcEvents.INVENTORY_ATTACH_FILE, async (_event, arg: Partial<Inve
 ipcMain.handle(IpcEvents.INVENTORY_DETACH_FILE, async (_event, inv: Partial<Inventory>) => {
   try {
     const success: boolean = await inventoryService.detach(inv);
-    treeService.updateTree(inv.files, NodeStatus.PENDING);
+    treeService.retoreStatus(inv.files);
     return { status: 'ok', message: 'File detached to inventory successfully', success };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);

@@ -14,6 +14,12 @@ export default class Folder extends Node {
 
   hasFiltered: boolean;
 
+  private hasIdentifiedProgress: boolean;
+
+  private hasPendingProgress: boolean;
+
+  private hasIgnoredProgress: boolean;
+
   constructor(path: string, label: string) {
     super(path, label);
     this.children = [];
@@ -23,6 +29,9 @@ export default class Folder extends Node {
     this.hasIgnored = false;
     this.hasNoMatch = false;
     this.hasFiltered = false;
+    this.hasIdentifiedProgress = false;
+    this.hasPendingProgress = false;
+    this.hasIgnoredProgress = false;
   }
 
   public addChild(node: Node): void {
@@ -39,9 +48,11 @@ export default class Folder extends Node {
   }
 
   public getStatus(): NodeStatus {
-    return this.statusLogic();
+    return this.getStatusClassName();
+
   }
 
+  //TODO: Refactor  remove this method
   private statusLogic(): NodeStatus {
     if (this.children.some((child) => child.getStatus() === NodeStatus.PENDING)) return NodeStatus.PENDING;
     if (this.children.some((child) => child.getStatus() === NodeStatus.IDENTIFIED)) return NodeStatus.IDENTIFIED;
@@ -58,12 +69,19 @@ export default class Folder extends Node {
     return NodeStatus.FILTERED;
   }
 
+
+  // TODO:Refactor on the status logic
   private updateStatusFlags(): void {
     this.hasPending = false;
     this.hasIdentified = false;
     this.hasIgnored = false;
     this.hasNoMatch = false;
     this.hasFiltered = false;
+
+    this.hasIdentifiedProgress = false;
+    this.hasPendingProgress = false;
+    this.hasIgnoredProgress = false;
+
     for (const child of this.children) {
       const status = child.getStatus();
       if (status === NodeStatus.PENDING) this.hasPending = true;
@@ -71,7 +89,10 @@ export default class Folder extends Node {
       if (status === NodeStatus.IGNORED) this.hasIgnored = true;
       if (status === NodeStatus.NOMATCH) this.hasNoMatch = true;
       if (status === NodeStatus.FILTERED) this.hasFiltered = true;
-      if (this.hasPending && this.hasIdentified && this.hasIgnored && this.hasNoMatch && this.hasFiltered) break;
+      if (status === NodeStatus.IDENTIFIED && !child.isDependency()) this.hasIdentifiedProgress = true;
+      if (status === NodeStatus.PENDING && !child.isDependency()) this.hasPendingProgress = true;
+      if (status === NodeStatus.IGNORED && !child.isDependency()) this.hasIgnoredProgress = true;
+      if (this.hasPending && this.hasIdentified && this.hasIgnored && this.hasNoMatch && this.hasFiltered &&  this.hasIdentifiedProgress && this.hasPendingProgress && this.hasIgnoredProgress ) break;
     }
   }
 
@@ -233,4 +254,10 @@ export default class Folder extends Node {
     this.status = status;
     this.getChildren().forEach((node) => node.setStatusDeep(status));
   }
+
+  public isDependency(): boolean {
+    return false;
+  }
+
+
 }
