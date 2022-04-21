@@ -15,7 +15,7 @@ const useContextual = () => {
   const dependencyContext = useContext(DeclaredDependencyContext) as IDeclaredDependencyContext;
   const { isFilterActive } = useSelector(selectNavigationState);
 
-  const showOverwrite = (node: any) => node.hasIdentified || node.hasIgnored;
+  const showOverwrite = (node: any) => node.hasIdentifiedProgress || node.hasIgnoredProgress;
 
   const showOverwriteDialog = async (): Promise<DialogResponse> => {
     return dialogCtrl.openAlertDialog(
