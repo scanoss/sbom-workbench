@@ -162,4 +162,6 @@ export default abstract class Node {
   public abstract setClassNameDeep(className: string): void;
 
   public abstract setActionDeep(action: string): void;
+
+  public abstract isDependency(): boolean;
 }
