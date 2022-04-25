@@ -95,6 +95,7 @@ const Editor = () => {
 
   const getResults = async () => {
     const results = await resultService.get(file);
+    console.log(results);
     setMatchInfo(mapFiles(results));
   };
 
@@ -250,7 +251,7 @@ const Editor = () => {
                               vendor: match.component?.vendor,
                               version: match.component?.version,
                               usage: match.type,
-                              license: match.component?.licenses && match.component?.licenses[0]?.name,
+                              license: match.component?.licenses.find((l) => l.spdxid === match.license[0])?.name || match.license[0],
                               url: match.component?.url,
                               purl: match.component?.purl,
                             }}
