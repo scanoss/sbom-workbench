@@ -48,9 +48,11 @@ export default class Folder extends Node {
   }
 
   public getStatus(): NodeStatus {
-    return this.statusLogic();
+    return this.getStatusClassName();
+
   }
 
+  //TODO: Refactor  remove this method
   private statusLogic(): NodeStatus {
     if (this.children.some((child) => child.getStatus() === NodeStatus.PENDING)) return NodeStatus.PENDING;
     if (this.children.some((child) => child.getStatus() === NodeStatus.IDENTIFIED)) return NodeStatus.IDENTIFIED;
@@ -81,7 +83,7 @@ export default class Folder extends Node {
     this.hasIgnoredProgress = false;
 
     for (const child of this.children) {
-        const status = child.getStatus();
+      const status = child.getStatus();
       if (status === NodeStatus.PENDING) this.hasPending = true;
       if (status === NodeStatus.IDENTIFIED) this.hasIdentified = true;
       if (status === NodeStatus.IGNORED) this.hasIgnored = true;

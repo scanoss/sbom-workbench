@@ -55,7 +55,8 @@ class ComponentService {
 
   public async get(component: Partial<ComponentGroup>, params: IWorkbenchFilterParams) {
     try {
-      const workbenchFilter = workspace.getOpenedProjects()[0].getFilter(params);
+      const p = workspace.getOpenedProjects()[0]
+      const workbenchFilter = p.getFilter(params);
       const filter = { purl: component.purl, ...workbenchFilter };
       const response = await this.getAll({ filter });
       return response[0] || null;
