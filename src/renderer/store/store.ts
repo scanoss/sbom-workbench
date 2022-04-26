@@ -1,6 +1,7 @@
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import { inventoryMiddleware } from '@store/inventory-store/inventoryMiddleware';
 import { rootMiddleware } from '@store/rootMiddleware';
+import { dependencyMiddleware } from '@store/dependency-store/dependencyMiddleware';
 import rootReducer, { RootState } from './rootReducer';
 
 const store = configureStore({
@@ -9,6 +10,8 @@ const store = configureStore({
     getDefaultMiddleware()
       .prepend(rootMiddleware.middleware)
       .prepend(inventoryMiddleware.middleware)
+      .prepend(dependencyMiddleware.middleware)
+
 });
 
 export type AppDispatch = typeof store.dispatch;

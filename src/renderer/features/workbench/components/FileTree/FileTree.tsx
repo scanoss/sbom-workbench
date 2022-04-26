@@ -70,7 +70,7 @@ const FileTree = () => {
   };
 
   const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
-    const onlyRestore =  !node.hasPendingProgress;
+    const onlyRestore = !node.hasPendingProgress;
 
     let menu = [];
     if (node.isDependencyFile) {

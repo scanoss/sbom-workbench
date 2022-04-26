@@ -16,6 +16,7 @@ import { load, reset, setProgress } from '@store/workbench-store/workbenchSlice'
 import * as component from '@store/component-store/componentSlice';
 import * as navigation from '@store/navigation-store/navigationSlice';
 import { loadProject } from '@store/workbench-store/workbenchThunks';
+import { accept, getAll, reject, rejectAll, restore } from '@store/dependency-store/dependencyThunks';
 
 export const rootMiddleware = createListenerMiddleware();
 
@@ -42,6 +43,20 @@ rootMiddleware.startListening({
     if (state.component.component) {
       listenerApi.dispatch(fetchComponent(state.component.component.purl));
     }
+  },
+});
+
+rootMiddleware.startListening({
+  matcher: isAnyOf(
+    accept.fulfilled,
+    reject.fulfilled,
+    restore.fulfilled,
+    getAll.fulfilled,
+    rejectAll.fulfilled,
+  ),
+  effect: async (action, listenerApi) => {
+    const summary = await reportService.getSummary();
+    listenerApi.dispatch(setProgress(summary));
   },
 });
 
