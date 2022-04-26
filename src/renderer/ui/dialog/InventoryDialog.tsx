@@ -139,7 +139,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const addCustomComponentVersion = async (component) => {
     const { name, version, licenses, purl, url } = component;
-    const comp = await componentService.get({ purl: component.purl }, { unique: true });
+    const comp = await componentService.get({ purl: component.purl}, { unique: true });
     const nComponents = components.filter((item) => item.purl !== purl);
     setGlobalComponents([...nComponents, comp]);
     setVersions([version, ...versions]);

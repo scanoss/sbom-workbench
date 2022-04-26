@@ -58,7 +58,7 @@ class ComponentService {
       const p = workspace.getOpenedProjects()[0]
       const workbenchFilter = p.getFilter(params);
       const filter = { purl: component.purl, ...workbenchFilter };
-      const response = await this.getAll({ filter });
+      const response = await this.getAll({ unique:params.unique ,filter });
       return response[0] || null;
     } catch (error: any) {
       log.error(error);
