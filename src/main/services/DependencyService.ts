@@ -11,12 +11,15 @@ import {modelProvider} from './ModelProvider';
 class DependencyService {
   public async insert(dependencies: IDependencyResponse): Promise<void> {
     const filesDependencies = dependencyHelper.dependecyModelAdapter(dependencies);
+    console.log(filesDependencies);
     const files = await fileHelper.getPathFileId();
+    console.log(files);
     const filesIds = [];
     filesDependencies.forEach((fileDependency) => {
       fileDependency.fileId=files[fileDependency.file];
       filesIds.push(files[fileDependency.file]);
     });
+
     await modelProvider.model.file.updateFileType( filesIds,"MATCH");
     await modelProvider.model.dependency.insert(filesDependencies);
   }
