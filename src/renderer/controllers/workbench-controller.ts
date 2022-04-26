@@ -69,7 +69,7 @@ class WorkbenchController {
   public async getComponent(purl: string, params: IWorkbenchFilterParams = null): Promise<ComponentGroup> {
     const comp = await componentService.get(
       { purl },
-      { ...params, filter: { ...params?.filter, source: ComponentSource.ENGINE } }
+      { ...params, filter: { ...params?.filter } }
     );
     return comp;
   }
