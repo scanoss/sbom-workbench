@@ -6,7 +6,7 @@ const MatchesChart = ({ data }) => {
   const [percentage, setPercentage] = useState<number>(0);
 
   useEffect(() => {
-    const percentage = Math.floor((data?.detectedFiles * 100) / data?.scannedFiles);
+    const percentage = Math.floor((data?.summary.matchFiles * 100) / (data.summary.noMatchFiles + data.summary.matchFiles));
     const noMatches = 100 - percentage;
     setPercentage(percentage);
 
@@ -64,7 +64,7 @@ const MatchesChart = ({ data }) => {
                 return ``;
               },
               title() {
-                return `${data?.detectedFiles} of ${data?.scannedFiles} files scanned`;
+                return `${data.summary.matchFiles} of ${data.summary.noMatchFiles + data.summary.matchFiles} files scanned`;
               },
             },
             displayColors: false,
@@ -101,7 +101,7 @@ const MatchesChart = ({ data }) => {
           </div>
           <div className="total-files-container">
             <span className="total-files-label">
-              <strong> {data.scannedFiles}</strong> scanned files
+              <strong> {data.summary.noMatchFiles + data.summary.matchFiles}</strong> scanned files
             </span>
           </div>
         </>
