@@ -95,7 +95,6 @@ const Editor = () => {
 
   const getResults = async () => {
     const results = await resultService.get(file);
-    console.log(results);
     setMatchInfo(mapFiles(results));
   };
 
@@ -131,7 +130,7 @@ const Editor = () => {
       usage: 'file',
     });
     if (response) {
-      const f = await fileService.get({path:file});
+      const f = await fileService.get({ path:file });
       if (!f) return;
       await dispatch(
         createInventory({

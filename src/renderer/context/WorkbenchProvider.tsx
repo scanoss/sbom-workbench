@@ -25,7 +25,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     const setFilter = async () => {
-      if (loaded) {  // TODO: remove from here
+      if (loaded) { // TODO: remove from here
         await projectService.setFilter(filter);
         dispatch(load());
       }
@@ -39,6 +39,8 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     if (!loaded) return null;
 
     const unlisten = history.listen((data) => {
+      if (data.pathname === '/workspace') return;
+
       const param = new URLSearchParams(data.search).get('path');
       if (!param) {
         setNode(null);
