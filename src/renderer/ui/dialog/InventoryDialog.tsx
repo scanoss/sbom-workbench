@@ -78,10 +78,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const [versions, setVersions] = useState<any[]>([]);
   const [licenses, setLicenses] = useState<any[]>([]);
   const [licensesAll, setLicensesAll] = useState<any[]>();
+  const [loaded, setLoaded] = useState<boolean>(false);
 
   const setDefaults = () => setForm(inventory);
 
-  const init = async () => {
+  const onOpenDialog = async () => {
+    setDefaults();
+
     const componentsResponse = await componentService.getAll({ unique: true });
     const licensesResponse = await licenseService.getAll();
     const compCatalogue = componentsResponse.map((component) => ({ ...component, type: 'Catalogued' }));
@@ -94,7 +97,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     setLicensesAll(catalogue);
     setLicenses(catalogue);
 
-    setDefaults();
+    setLoaded(true);
+  };
+
+  const onCloseDialog = () => {
+    setLoaded(false);
+    setForm({});
   };
 
   const openComponentDialog = async () => {
@@ -203,12 +211,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   useEffect(() => {
-    if (open) {
-      init();
-    }
+    if (open) onOpenDialog();
+    else onCloseDialog();
   }, [open]);
 
   useEffect(() => {
+    if (!loaded) return;
+
     const component = components.find((item) => item.purl === form.purl);
     if (component) {
       setVersions(component.versions.map((item) => item.version));
@@ -217,6 +226,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   }, [form.purl]);
 
   useEffect(() => {
+    if (!loaded) return;
+
     const lic = components
       .find((item) => item?.purl === form?.purl)
       ?.versions.find((item) => item.version === form.version)
@@ -233,6 +244,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   }, [form.version]);
 
   useEffect(() => {
+    if (!loaded) return;
+
     if (versions && versions[0]) setForm({ ...form, version: versions[0] });
   }, [versions]);
 
