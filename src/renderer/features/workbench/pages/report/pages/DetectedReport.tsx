@@ -51,10 +51,12 @@ const DetectedReport = ({ data }) => {
           <MatchesChart data={data.summary} />
         </Card>
 
+        {/*
         <Card className="report-item vulnerabilites">
           <div className="report-title">Vulnerabilites</div>
           <VulnerabilitiesCard data={data.vulnerabilities} />
         </Card>
+        */}
 
         <Card className="report-item licenses-obligation">
           <LicensesObligations data={data.licenses} />
