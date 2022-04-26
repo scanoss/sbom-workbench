@@ -2,7 +2,7 @@
   "name": "scanoss-workbench",
   "productName": "SCANOSS Audit Workbench",
   "description": "Desktop version to use SCANOSS OSS in your projects",
-  "version": "0.22.2",
+  "version": "0.23.0",
   "main": "./main.prod.js",
   "author": {
     "name": "SCANOSS",
