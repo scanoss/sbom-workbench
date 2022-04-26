@@ -5,7 +5,6 @@ import { createMuiTheme, MuiThemeProvider, Theme } from '@material-ui/core/style
 import { DialogProvider } from '@context/DialogProvider';
 import { WorkbenchDialogProvider } from '@context/WorkbenchDialogProvider';
 import AppConfig from '@config/AppConfigModule';
-import DeclaredDependencyProvider from '@context/DeclaredDependencyProvider';
 import { Provider } from 'react-redux';
 import { WorkbenchProvider } from '@context/WorkbenchProvider';
 import Workbench from './features/workbench/Workbench';
@@ -36,9 +35,7 @@ export default class App {
                 <Route path="/workspace" component={Workspace} />
                 <WorkbenchProvider>
                   <WorkbenchDialogProvider>
-                    <DeclaredDependencyProvider>
-                      <Route path="/workbench" component={Workbench} />
-                    </DeclaredDependencyProvider>
+                    <Route path="/workbench" component={Workbench} />
                   </WorkbenchDialogProvider>
                 </WorkbenchProvider>
                 <Route path="/about" exact component={About} />

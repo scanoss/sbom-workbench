@@ -4,15 +4,15 @@ import { resultService } from '@api/services/results.service';
 import { InventoryAction } from '@api/types';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
-import { DeclaredDependencyContext, IDeclaredDependencyContext } from '@context/DeclaredDependencyProvider';
 import { useDispatch, useSelector } from 'react-redux';
 import { executeBatch, ignoreFile, restoreFile } from '@store/inventory-store/inventoryThunks';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
+import { rejectAll, acceptAll as acceptAllDep } from '@store/dependency-store/dependencyThunks';
 
 const useContextual = () => {
   const dispatch = useDispatch();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
-  const dependencyContext = useContext(DeclaredDependencyContext) as IDeclaredDependencyContext;
+
   const { isFilterActive } = useSelector(selectNavigationState);
 
   const showOverwrite = (node: any) => node.hasIdentifiedProgress || node.hasIgnoredProgress;
@@ -118,15 +118,40 @@ const useContextual = () => {
   };
 
   const restore = async (node: any) => {
-    const file = await fileService.get({path:node.value}); //await fileService.getIdFromPath(node.value);
+    const file = await fileService.get({ path:node.value });
     dispatch(restoreFile([file.fileId]));
   };
 
-  const acceptAllDependencies = async (node: any): Promise<boolean> =>
-    dependencyContext.acceptAll({ path: node.value });
+  const acceptAllDependencies = async (node: any) => {
+    // TODO: remove duplicated code
+    const message = `All valid pending dependencies will be accepted.
+      <div class="custom-alert mt-3">
+        <div class="MuiAlert-icon"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.99L19.53 19H4.47L12 5.99M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"></path></svg></div>
+        <div class="MuiAlert-message">Those dependencies that lack the version or license details will not be accepted.</div>
+      </div>`;
 
-  const rejectAllDependencies = async (node: any): Promise<boolean> =>
-    dependencyContext.rejectAll({ path: node.value });
+    const { action } = await dialogCtrl.openAlertDialog(message, [
+      { label: 'Cancel', role: 'cancel' },
+      { label: 'Accept All', action: 'accept', role: 'accept' },
+    ]);
+
+    if (action !== DIALOG_ACTIONS.CANCEL) {
+      dispatch(acceptAllDep({ path: node.value }));
+    }
+  };
+
+  const rejectAllDependencies = async (node: any) => {
+    // TODO: remove duplicated code
+    const message = `All pending dependencies will be dismissed.`;
+    const { action } = await dialogCtrl.openAlertDialog(message, [
+      { label: 'Cancel', role: 'cancel' },
+      { label: 'Dismiss All', action: 'accept', role: 'accept' },
+    ]);
+
+    if (action !== DIALOG_ACTIONS.CANCEL) {
+      dispatch(rejectAll({ path: node.value }));
+    }
+  };
 
   return {
     acceptAll,

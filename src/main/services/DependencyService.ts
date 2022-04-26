@@ -83,17 +83,18 @@ class DependencyService {
     }
   }
 
-  public async restore(dependencyId: number): Promise<boolean> {
+  public async restore(dependencyId: number): Promise<Dependency> {
     try {
       const dep = (await this.getAll({ id: dependencyId }))[0];
       if (dep.status === 'identified') {
         await modelProvider.model.inventory.delete(dep.inventory);
         if (dep.component.source === 'manual') await modelProvider.model.component.deleteByID([dep.component.compid]);
       }
-      const params= [];
-      params.push(null,dep.scope? dep.scope: null,dep.purl,dep.originalVersion,dep.originalLicense ? dep.originalLicense.join(',') : null ,dep.dependencyId);
+      const params = [];
+      params.push(null, dep.scope? dep.scope: null,dep.purl,dep.originalVersion,dep.originalLicense ? dep.originalLicense.join(',') : null, dep.dependencyId);
       await modelProvider.model.dependency.update(params);
-      return true;
+      const response = (await this.getAll({ id: dependencyId }))[0];
+      return response;
     } catch (error: any) {
       log.error(error);
       return error;

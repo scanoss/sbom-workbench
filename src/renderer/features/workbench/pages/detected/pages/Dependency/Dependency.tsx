@@ -1,11 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Typography } from '@material-ui/core';
 import { DIALOG_ACTIONS } from '@context/types';
-import { dependencyService } from '@api/services/dependency.service';
 import { Dependency, FileType } from '@api/types';
 import { getExtension } from '@shared/utils/utils';
-import { DeclaredDependencyContext, IDeclaredDependencyContext } from '@context/DeclaredDependencyProvider';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { reset, selectDependencyState } from '@store/dependency-store/dependencySlice';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { selectNavigationState } from '@store/navigation-store/navigationSlice';
+import { accept, acceptAll, getAll, reject, rejectAll, restore } from '@store/dependency-store/dependencyThunks';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import CodeViewSelector, { CodeViewSelectorMode } from './components/CodeViewSelector/CodeViewSelector';
@@ -15,8 +18,6 @@ import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
 import WorkbenchDialogContext, { IWorkbenchDialogContext } from '../../../../../../context/WorkbenchDialogProvider';
 import ActionButton from './components/ActionButton/ActionButton';
-import { selectWorkbench } from '../../../../../../store/workbench-store/workbenchSlice';
-import { selectNavigationState } from '../../../../../../store/navigation-store/navigationSlice';
 
 export interface FileContent {
   content: string | null;
@@ -41,14 +42,16 @@ const filter = (items, query) => {
 const MemoCodeEditor = React.memo(CodeEditor);
 
 const DependencyViewer = () => {
-  const store = useContext(DeclaredDependencyContext) as IDeclaredDependencyContext;
-  const workbenchDialogCtrl = useContext(WorkbenchDialogContext) as IWorkbenchDialogContext;
+  const dispatch = useDispatch();
 
+  const workbenchDialogCtrl = useContext(WorkbenchDialogContext) as IWorkbenchDialogContext;
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
+
+  const { dependencies, loading } = useSelector(selectDependencyState);
   const { path: scanBasePath, imported } = useSelector(selectWorkbench);
   const { node } = useSelector(selectNavigationState);
 
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
-  const [dependencies, setDependencies] = useState<Dependency[]>([]);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const [view, setView] = useState<CodeViewSelectorMode>(CodeViewSelectorMode.GRAPH);
 
@@ -58,12 +61,12 @@ const DependencyViewer = () => {
   const validItems: Array<Dependency> = pendingItems.filter((item) => item.valid);
 
   const init = () => {
+    dispatch(reset());
     setLocalFileContent({ content: null, error: false });
-    setDependencies([]);
 
     if (file) {
+      dispatch(getAll(file));
       loadLocalFile(file);
-      getDependencies(file);
     }
   };
 
@@ -78,41 +81,54 @@ const DependencyViewer = () => {
     }
   };
 
-  const getDependencies = async (path: string): Promise<any> => {
-    const dep = await dependencyService.getAll({ path });
-    setDependencies(dep);
-  };
-
   const onAcceptAllHandler = async () => {
-    store.acceptAll(validItems);
+    const message = `All valid pending dependencies will be accepted.
+      <div class="custom-alert mt-3">
+        <div class="MuiAlert-icon"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.99L19.53 19H4.47L12 5.99M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"></path></svg></div>
+        <div class="MuiAlert-message">Those dependencies that lack the version or license details will not be accepted.</div>
+      </div>`;
+
+    const { action } = await dialogCtrl.openAlertDialog(message, [
+      { label: 'Cancel', role: 'cancel' },
+      { label: 'Accept All', action: 'accept', role: 'accept' },
+    ]);
+
+    if (action !== DIALOG_ACTIONS.CANCEL) {
+      dispatch(acceptAll({ dependencies: validItems }));
+    }
   };
 
   const onDismissAllHandler = async () => {
-    store.rejectAll({ dependencyIds: pendingItems.map((item: Dependency) => item.dependencyId) });
+    const message = `All pending dependencies will be dismissed.`;
+
+    const { action } = await dialogCtrl.openAlertDialog(message, [
+      { label: 'Cancel', role: 'cancel' },
+      { label: 'Dismiss All', action: 'accept', role: 'accept' },
+    ]);
+
+    if (action !== DIALOG_ACTIONS.CANCEL) {
+      dispatch(rejectAll({ dependencyIds: pendingItems.map((item: Dependency) => item.dependencyId) }));
+    }
   };
 
   const onAcceptHandler = async (dependency: Dependency) => {
     const { action, data } = await workbenchDialogCtrl.openDependencyDialog(dependency);
-    if (action === DIALOG_ACTIONS.CANCEL) return;
-
-    store.accept(data);
+    if (action !== DIALOG_ACTIONS.CANCEL) {
+      dispatch(accept(data));
+    }
   };
 
   const onRestoreHandler = async (dependency) => {
-    store.restore(dependency.dependencyId);
+    dispatch(restore(dependency.dependencyId));
   };
 
   const onRejectHandler = (dependency) => {
-    store.reject(dependency.dependencyId);
+    dispatch(reject(dependency.dependencyId));
   };
 
   useEffect(() => {
     init();
   }, [file]);
-
-  useEffect(() => {
-    if (!store.loading && file) getDependencies(file);
-  }, [store.loading]); // TODO: remove this after migrate to redux
 
   return (
     <>
