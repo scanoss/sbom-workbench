@@ -13,11 +13,12 @@ import {dependencyHelper} from "../../helpers/DependencyHelper";
 import {fileHelper} from "../../helpers/FileHelper";
 import {modelProvider} from "../../services/ModelProvider";
 import {Tree} from "../../workspace/Tree/Tree/Tree";
+import {NodeStatus} from "../../workspace/Tree/Tree/Node";
 
 export async function migration0230(projectPath: string): Promise<void> {
   log.info("Migration 0230 In progress...");
     await regenerateDependencyTable(projectPath);
-  await importDependencies(projectPath);
+  await init(projectPath);
 }
 
 
@@ -38,20 +39,15 @@ async function regenerateDependencyTable(projectPath): Promise<void> {
 }
 
 
- async function  importDependencies(projectPath: string){
+ async function  init(projectPath: string){
   try {
 
     const dependencies = JSON.parse(
       await fs.promises.readFile(`${projectPath}/dependencies.json`, 'utf8'));
 
     //import dependencies on file fileTree
-    const project = await fs.promises.readFile(`${projectPath}/tree.json`, 'utf8');
-    const a = JSON.parse(project);
-    const tree = new Tree(projectPath, null);
-    tree.loadTree(a.tree.rootFolder);
-    tree.addDependencies(dependencies);
-    a.tree  = tree;
-    await fs.promises.writeFile(`${projectPath}/tree.json`, JSON.stringify(a));
+    await updateTree(projectPath,dependencies);
+
 
     // import dependencies on DB
     const filesDependencies = dependencyHelper.dependecyModelAdapter(dependencies);
@@ -68,6 +64,50 @@ async function regenerateDependencyTable(projectPath): Promise<void> {
     log.error(e);
   }
 }
+
+async function updateTree(projectPath:string,dependencies){
+  const project = await fs.promises.readFile(`${projectPath}/tree.json`, 'utf8');
+  const a = JSON.parse(project);
+  const tree = new Tree(projectPath, null);
+  tree.loadTree(a.tree.rootFolder);
+  tree.addDependencies(dependencies);
+  const rootFolder = tree.getRootFolder();
+  addProgressFlags(rootFolder);
+  a.tree  = tree;
+  await fs.promises.writeFile(`${projectPath}/tree.json`, JSON.stringify(a));
+}
+
+function addProgressFlags(node) {
+  if (node.type == "folder") {
+    node.hasIdentifiedProgress = false;
+    node.hasPendingProgress = false;
+    node.hasIgnoredProgress = false;
+
+    node.hasPending = false;
+    node.hasIdentified = false;
+    node.hasIgnored = false;
+    node.hasNoMatch = false;
+    node.hasFiltered = false;
+
+
+    for (const child of node.getChildren()) {
+      addProgressFlags(child);
+      const status = child.getStatus();
+      if (status === NodeStatus.PENDING) node.hasPending = true;
+      if (status === NodeStatus.IDENTIFIED) node.hasIdentified = true;
+      if (status === NodeStatus.IGNORED) node.hasIgnored = true;
+      if (status === NodeStatus.NOMATCH) node.hasNoMatch = true;
+      if (status === NodeStatus.FILTERED) node.hasFiltered = true;
+      if (status === NodeStatus.IDENTIFIED && !child.isDependency()) node.hasIdentifiedProgress = true;
+      if (status === NodeStatus.PENDING && !child.isDependency()) node.hasPendingProgress = true;
+      if (status === NodeStatus.IGNORED && !child.isDependency()) node.hasIgnoredProgress = true;
+      const stat = node.getStatus();
+      node.setStatusOnClassnameAs(stat);
+    }
+
+  }
+}
+
 
 async function getPathFileId(projectPath:string) {
   const query = new Querys();

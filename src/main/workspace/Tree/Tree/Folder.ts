@@ -61,7 +61,7 @@ export default class Folder extends Node {
     return NodeStatus.FILTERED;
   }
 
-  private getStatusClassName(): NodeStatus {
+  public getStatusClassName(): NodeStatus {
     if (this.hasPending) return NodeStatus.PENDING;
     if (this.hasIdentified) return NodeStatus.IDENTIFIED;
     if (this.hasIgnored) return NodeStatus.IGNORED;
@@ -70,8 +70,8 @@ export default class Folder extends Node {
   }
 
 
-  // TODO:Refactor on the status logic
-  private updateStatusFlags(): void {
+
+  public updateStatusFlags(): void {
     this.hasPending = false;
     this.hasIdentified = false;
     this.hasIgnored = false;
