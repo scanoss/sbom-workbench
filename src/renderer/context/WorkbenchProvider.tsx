@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { Node } from '@api/types';
@@ -9,6 +8,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { load, selectWorkbench, setTree } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState, setCurrentNode } from '@store/navigation-store/navigationSlice';
+import { selectDependencyState } from '@store/dependency-store/dependencySlice';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
 
 export const WorkbenchContext = React.createContext(null);
 
@@ -16,25 +17,35 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   const history = useHistory();
   const dispatch = useDispatch();
 
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
+
   const { loaded } = useSelector(selectWorkbench);
   const { filter } = useSelector(selectNavigationState);
+  const { batchRunning } = useSelector(selectDependencyState);
+
+  const [dialog, setDialog] = React.useState(null);
 
   const onTreeRefreshed = (_event, fileTree) => dispatch(setTree(fileTree));
-
   const setNode = async (node: Node) => dispatch(setCurrentNode(node));
 
+  /**
+   * Dispatch load action when a filter is set
+   * TODO: remove from here
+   */
   useEffect(() => {
-    const setFilter = async () => {
-      if (loaded) { // TODO: remove from here
+    const run = async () => {
+      if (loaded) {
         await projectService.setFilter(filter);
         dispatch(load());
       }
     };
 
-    setFilter();
+    run();
   }, [filter]);
 
-  // TODO: use custom navigation
+  /**
+   *  Listener for navigation events
+   */
   useEffect(() => {
     if (!loaded) return null;
 
@@ -57,6 +68,26 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
     };
   }, [loaded]);
 
+  /**
+   * Effect to display generic dialog on specific batch actions
+   */
+  useEffect(() => {
+    const run = async () => {
+      if (!dialog) {
+        const dlg = await dialogCtrl.createProgressDialog('Please wait...');
+        setDialog(dlg);
+      }
+
+      if (batchRunning) {
+        await dialog.present();
+      } else {
+        await dialog.dismiss();
+      }
+    };
+
+    run();
+  }, [batchRunning]);
+
   const setupListeners = () => {
     ipcRenderer.on(IpcEvents.TREE_UPDATED, onTreeRefreshed);
   };
@@ -67,6 +98,7 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   useEffect(setupListeners, []);
   useEffect(() => () => removeListeners(), []);
+
 
   return <WorkbenchContext.Provider value={[]}>{children}</WorkbenchContext.Provider>;
 };
