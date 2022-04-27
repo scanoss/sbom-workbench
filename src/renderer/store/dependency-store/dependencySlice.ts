@@ -6,11 +6,13 @@ import { RootState } from '@store/rootReducer';
 export interface DependencyState {
   dependencies: Dependency[];
   loading: boolean;
+  batchRunning: boolean;
 }
 
 const initialState: DependencyState = {
   dependencies: [],
   loading: false,
+  batchRunning: false,
 };
 
 export const dependencySlice = createSlice({
@@ -46,22 +48,22 @@ export const dependencySlice = createSlice({
       );
     },
     [acceptAll.pending.type]: (state) => {
-      state.loading = true;
+      state.batchRunning = true;
     },
     [acceptAll.fulfilled.type]: (state) => {
-      state.loading = false;
+      state.batchRunning = false;
     },
     [acceptAll.rejected.type]: (state) => {
-      state.loading = false;
+      state.batchRunning = false;
     },
     [rejectAll.pending.type]: (state) => {
-      state.loading = true;
+      state.batchRunning = true;
     },
     [rejectAll.fulfilled.type]: (state) => {
-      state.loading = false;
+      state.batchRunning = false;
     },
     [rejectAll.rejected.type]: (state) => {
-      state.loading = false;
+      state.batchRunning = false;
     },
   },
 });
