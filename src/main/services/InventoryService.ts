@@ -64,7 +64,7 @@ class InventoryService  {
         // eslint-disable-next-line no-param-reassign
         inventory = (await modelProvider.model.inventory.create(inventory)) as Inventory;
       } else inventory.id = inv.id;
-      this.attach(inventory);
+      await this.attach(inventory);
       inventory.component = component as Component;
       return inventory as Inventory;
     } catch (error: any) {
