@@ -79,9 +79,9 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
       }
 
       if (batchRunning) {
-        await dialog.present();
+        await dialog?.present();
       } else {
-        await dialog.dismiss();
+        await dialog?.dismiss();
       }
     };
 
