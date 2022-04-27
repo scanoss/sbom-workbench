@@ -1,10 +1,10 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { ipcRenderer } from 'electron';
 import { IpcEvents } from '@api/ipc-events';
+import { Dependency, Inventory, NewComponentDTO } from '@api/types';
 import { InventoryDialog } from '../ui/dialog/InventoryDialog';
-import { ComponentGroup, Inventory, NewComponentDTO } from '../../api/types';
 import { InventorySelectorDialog } from '../features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
-import { DialogResponse, InventoryForm, InventorySelectorResponse, LoaderController } from './types';
+import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse, LoaderController } from './types';
 import { ConfirmDialog } from '../ui/dialog/ConfirmDialog';
 import { LicenseDialog } from '../ui/dialog/LicenseDialog';
 import { ComponentDialog } from '../ui/dialog/ComponentDialog';
@@ -12,6 +12,7 @@ import SettingsDialog from '../ui/dialog/SettingsDialog';
 import { AlertDialog } from '../ui/dialog/AlertDialog';
 import { PreLoadInventoryDialog } from '../ui/dialog/PreLoadInventoryDialog';
 import { ProgressDialog } from '../ui/dialog/ProgressDialog';
+import DependencyDialog from '../ui/dialog/DependencyDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
@@ -23,6 +24,7 @@ export interface IDialogContext {
   openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
   openPreLoadInventoryDialog: (folder: string, overwrite: boolean) => Promise<boolean>;
   createProgressDialog: (message: ReactNode) => Promise<LoaderController>;
+  openDependencyDialog: (dependency: Dependency) => Promise<DialogResponse>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -146,7 +148,8 @@ export const DialogProvider: React.FC = ({ children }) => {
       resolve({
         present: () => setProgressDialog((dialog) => ({ ...dialog, open: true, loader: true })),
         finish: ({ message }) => setProgressDialog((dialog) => ({ ...dialog, message, loader: false })),
-        dismiss: (props) => setTimeout(() => setProgressDialog((dialog) => ({ ...dialog, open: false })), props?.delay || 0),
+        dismiss: (props) =>
+          setTimeout(() => setProgressDialog((dialog) => ({ ...dialog, open: false })), props?.delay || 0),
       });
     });
   };
@@ -229,6 +232,30 @@ export const DialogProvider: React.FC = ({ children }) => {
     });
   };
 
+  const [dependencyDialog, setDependencyDialog] = useState<{
+    open: boolean;
+    dependency: Partial<Dependency>;
+    onClose?: (response: DialogResponse) => void;
+    onCancel?: () => void;
+  }>({ open: false, dependency: {} });
+
+  const openDependencyDialog = (dependency: Dependency): Promise<DialogResponse> => {
+    return new Promise<DialogResponse>((resolve) => {
+      setDependencyDialog({
+        dependency,
+        open: true,
+        onCancel: () => {
+          setDependencyDialog((dialog) => ({ ...dialog, open: false }));
+          resolve({ action: DIALOG_ACTIONS.CANCEL });
+        },
+        onClose: (response: DialogResponse) => {
+          setDependencyDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(response);
+        },
+      });
+    });
+  };
+
   const handleOpenSettings = () => {
     openSettings();
   };
@@ -256,6 +283,7 @@ export const DialogProvider: React.FC = ({ children }) => {
         openSettings,
         openPreLoadInventoryDialog,
         createProgressDialog,
+        openDependencyDialog,
       }}
     >
       {children}
@@ -317,6 +345,13 @@ export const DialogProvider: React.FC = ({ children }) => {
       />
 
       <ProgressDialog open={progressDialog.open} message={progressDialog.message} loader={progressDialog.loader} />
+
+      <DependencyDialog
+        open={dependencyDialog.open}
+        dependency={dependencyDialog.dependency}
+        onCancel={() => dependencyDialog.onCancel && dependencyDialog.onCancel()}
+        onClose={(dep) => dependencyDialog.onClose && dependencyDialog.onClose(dep)}
+      />
     </DialogContext.Provider>
   );
 };
