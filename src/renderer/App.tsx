@@ -3,7 +3,6 @@ import { render } from 'react-dom';
 import { HashRouter, Route } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider, Theme } from '@material-ui/core/styles';
 import { DialogProvider } from '@context/DialogProvider';
-import { WorkbenchDialogProvider } from '@context/WorkbenchDialogProvider';
 import AppConfig from '@config/AppConfigModule';
 import { Provider } from 'react-redux';
 import { WorkbenchProvider } from '@context/WorkbenchProvider';
@@ -34,9 +33,7 @@ export default class App {
                 <Route exact path="/" component={Workspace} /> {/* Redirect not working with new browser windows */}
                 <Route path="/workspace" component={Workspace} />
                 <WorkbenchProvider>
-                  <WorkbenchDialogProvider>
-                    <Route path="/workbench" component={Workbench} />
-                  </WorkbenchDialogProvider>
+                  <Route path="/workbench" component={Workbench} />
                 </WorkbenchProvider>
                 <Route path="/about" exact component={About} />
 

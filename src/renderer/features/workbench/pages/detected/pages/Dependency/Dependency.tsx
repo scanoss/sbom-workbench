@@ -16,7 +16,6 @@ import DependencyTree from './components/DependencyTree/DependencyTree';
 import NoLocalFile from './components/NoLocalFile/NoLocalFile';
 import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
-import WorkbenchDialogContext, { IWorkbenchDialogContext } from '../../../../../../context/WorkbenchDialogProvider';
 import ActionButton from './components/ActionButton/ActionButton';
 
 export interface FileContent {
@@ -44,7 +43,6 @@ const MemoCodeEditor = React.memo(CodeEditor);
 const DependencyViewer = () => {
   const dispatch = useDispatch();
 
-  const workbenchDialogCtrl = useContext(WorkbenchDialogContext) as IWorkbenchDialogContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const { dependencies, loading } = useSelector(selectDependencyState);
@@ -112,7 +110,7 @@ const DependencyViewer = () => {
   };
 
   const onAcceptHandler = async (dependency: Dependency) => {
-    const { action, data } = await workbenchDialogCtrl.openDependencyDialog(dependency);
+    const { action, data } = await dialogCtrl.openDependencyDialog(dependency);
     if (action !== DIALOG_ACTIONS.CANCEL) {
       dispatch(accept(data));
     }
