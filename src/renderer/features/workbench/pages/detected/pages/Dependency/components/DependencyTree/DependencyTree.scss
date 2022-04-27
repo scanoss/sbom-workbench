@@ -18,7 +18,7 @@
     padding-top: 4px;
     padding-bottom: 4px;
     display: grid;
-    grid-template-columns: auto 400px 120px auto;
+    grid-template-columns: 70px 1fr 0.3fr 0.3fr ;
 
     &.MuiListItem-gutters {
       border-bottom: solid 1px #e4e2e2;
@@ -41,12 +41,25 @@
       margin-right: 12px;
     }
 
-    .MuiListItemText-primary {
+    .MuiListItemText-primary, .MuiListItemText-secondary {
       font-size: 16px;
+      line-height: normal;
       font-weight: 700;
       white-space: pre-wrap;
       word-wrap: break-word;
+      text-overflow: clip;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      overflow: hidden;
     }
+
+    .MuiListItemText-secondary {
+      font-size: 10px;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
 
     &:hover .item-action-buttons  {
       opacity: 1;
@@ -54,6 +67,7 @@
   }
 
   .item-action-buttons {
+    background: white;
     display: flex;
     align-items: center;
     position: absolute;
