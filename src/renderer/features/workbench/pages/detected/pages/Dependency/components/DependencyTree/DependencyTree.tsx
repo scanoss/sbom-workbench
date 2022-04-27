@@ -46,7 +46,8 @@ const DependencyTree = ({
                     <ListItemIcon className="item-icon">
                       <IconComponent name={item.purl.replace(/pkg:.*\//, '')} size={24} />
                     </ListItemIcon>
-                    <ListItemText primary={item.component?.name || item.componentName || item.purl} />
+
+                    <ListItemText primary={item.component?.name || item.componentName || item.purl} secondary={item.purl} />
 
                     <div className="info-container version">
                       {item.version ? (
