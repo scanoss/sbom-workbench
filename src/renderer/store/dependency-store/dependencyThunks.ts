@@ -1,6 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { dependencyService } from '@api/services/dependency.service';
-import { AcceptAllDependeciesDTO, NewDependencyDTO, RejectAllDependeciesDTO } from '@api/dto';
+import {
+  AcceptAllDependeciesDTO,
+  NewDependencyDTO,
+  RejectAllDependeciesDTO,
+  RestoreAllDependenciesDTO
+} from '@api/dto';
 
 export const getAll = createAsyncThunk('dependency/fetchAll', async (path: string) => {
   const response = await dependencyService.getAll({ path });
@@ -34,6 +39,14 @@ export const rejectAll = createAsyncThunk(
   'dependency/rejectAll',
   async (rejectAllDependeciesDTO: RejectAllDependeciesDTO) => {
     const response = await dependencyService.rejectAll(rejectAllDependeciesDTO);
+    return response;
+  }
+);
+
+export const restoreAll = createAsyncThunk(
+  'dependency/restoreAll',
+  async (restoreAllDependenciesDTO: RestoreAllDependenciesDTO) => {
+    const response = await dependencyService.restoreAll(restoreAllDependenciesDTO);
     return response;
   }
 );
