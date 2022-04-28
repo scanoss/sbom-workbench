@@ -1,10 +1,9 @@
 import { ipcMain } from 'electron';
 import log from 'electron-log';
 import { dependencyService } from '../../main/services/DependencyService';
-import {AcceptAllDependeciesDTO, NewDependencyDTO, RejectAllDependeciesDTO} from '../dto';
+import {AcceptAllDependeciesDTO, NewDependencyDTO, RejectAllDependeciesDTO, RestoreAllDependenciesDTO} from '../dto';
 import { IpcEvents } from '../ipc-events';
 import { Response } from '../Response';
-import { Dependency } from '../types';
 import { treeService } from "../../main/services/TreeService";
 
 ipcMain.handle(IpcEvents.DEPENDENCY_GET_ALL, async (event, params: { path: string }) => {
@@ -33,6 +32,21 @@ ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE, async (_event, dependencyId: number
     const dependency = await dependencyService.restore(dependencyId);
     treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: dependency });
+  } catch (error: any) {
+    log.error(error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE_ALL, async (_event, params: RestoreAllDependenciesDTO) => {
+  try {
+    let response=[];
+    if(params.path)
+      response = await dependencyService.restoreAllByPath(params.path);
+    else
+      response = await dependencyService.restoreAllByIds(params.dependencyIds);
+    treeService.updateDependencyStatusOnTree();
+    return Response.ok({ message: 'Component created successfully', data: response });
   } catch (error: any) {
     log.error(error);
     return Response.fail({ message: error.message });

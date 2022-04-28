@@ -1,6 +1,6 @@
 import { IpcEvents } from '../ipc-events';
 import { BaseService } from './base.service';
-import {ISummary} from "../../main/services/ReportService";
+import { ISummary } from "../../main/services/ReportService";
 
 const { ipcRenderer } = require('electron');
 

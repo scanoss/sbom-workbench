@@ -1,6 +1,6 @@
+import { FileDTO, GetFileDTO } from "@api/dto";
 import { modelProvider } from './ModelProvider';
-import {QueryBuilderCreator} from "../model/queryBuilder/QueryBuilderCreator";
-import {FileDTO, GetFileDTO} from "@api/dto";
+import { QueryBuilderCreator } from "../model/queryBuilder/QueryBuilderCreator";
 
 class FileService {
   public async insert(files: Array<any>) {
