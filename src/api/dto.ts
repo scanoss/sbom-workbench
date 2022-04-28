@@ -1,4 +1,4 @@
-import {Dependency} from "@api/types";
+import { Dependency } from "@api/types";
 
 export interface NewDependencyDTO {
   dependencyId?: number;
@@ -8,6 +8,11 @@ export interface NewDependencyDTO {
 }
 
 export interface RejectAllDependeciesDTO {
+  dependencyIds?: number[];
+  path?: string;
+}
+
+export interface RestoreAllDependenciesDTO {
   dependencyIds?: number[];
   path?: string;
 }

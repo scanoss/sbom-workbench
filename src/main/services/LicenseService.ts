@@ -1,19 +1,19 @@
+import { LicenseDTO, NewLicenseDTO } from "@api/dto";
 import { licenses } from '../model/licenses';
 import { modelProvider } from './ModelProvider';
-import {LicenseDTO, NewLicenseDTO} from "@api/dto";
-import {License} from "@api/types";
-import {licenseHelper} from "../helpers/LicenseHelper";
+import { licenseHelper } from "../helpers/LicenseHelper";
 
 class LicenseService {
 
   public async getAll(): Promise<Array<LicenseDTO>> {
-    return await modelProvider.model.license.getAll();
+    const licenses = await modelProvider.model.license.getAll();
+    return licenses;
   }
 
   public async get(id: number): Promise<LicenseDTO> {
-    return await modelProvider.model.license.get(id);
+   const license = await modelProvider.model.license.get(id);
+   return license;
   }
-
 
   public async import() {
     await modelProvider.model.license.importFromJSON(licenses);

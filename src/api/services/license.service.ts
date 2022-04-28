@@ -1,7 +1,6 @@
+import { LicenseDTO, NewLicenseDTO } from "@api/dto";
 import { IpcEvents } from '../ipc-events';
-import { License } from '../types';
 import { BaseService } from './base.service';
-import {LicenseDTO, NewLicenseDTO} from "@api/dto";
 
 const { ipcRenderer } = require('electron');
 

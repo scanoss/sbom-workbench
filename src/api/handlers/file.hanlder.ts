@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { ipcMain } from 'electron';
 import { isBinaryFileSync } from 'isbinaryfile';
+import { GetFileDTO } from "@api/dto";
 import { IpcEvents } from '../ipc-events';
 import { FileType } from '../types';
 import { workspace } from '../../main/workspace/Workspace';
@@ -10,7 +11,6 @@ import { FilterTrue } from '../../main/batch/Filter/FilterTrue';
 import { resultService } from '../../main/services/ResultService';
 import { fileService } from '../../main/services/FileService';
 import { Response } from '../Response';
-import {GetFileDTO} from "@api/dto";
 
 const path = require('path');
 
@@ -64,7 +64,6 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
       const file = fs.readFileSync(filePath).toString();
       fileContent.content = file;
     }
-
     return {
       status: 'ok',
       message: 'File content retrieved',
