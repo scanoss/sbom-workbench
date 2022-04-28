@@ -7,7 +7,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { reset, selectDependencyState } from '@store/dependency-store/dependencySlice';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
-import { accept, acceptAll, getAll, reject, rejectAll, restore } from '@store/dependency-store/dependencyThunks';
+import {
+  accept,
+  acceptAll,
+  getAll,
+  reject,
+  rejectAll,
+  restore,
+  restoreAll
+} from '@store/dependency-store/dependencyThunks';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
@@ -93,7 +101,6 @@ const DependencyViewer = () => {
 
   const onDismissAllHandler = async () => {
     const message = `All pending dependencies will be dismissed.`;
-
     const { action } = await dialogCtrl.openAlertDialog(message, [
       { label: 'Cancel', role: 'cancel' },
       { label: 'Dismiss All', action: 'accept', role: 'accept' },
@@ -106,14 +113,13 @@ const DependencyViewer = () => {
 
   const onRestoreAllHandler = async () => {
     const message = `All accepted or dismissed dependencies will be restored.`;
-
     const { action } = await dialogCtrl.openAlertDialog(message, [
       { label: 'Cancel', role: 'cancel' },
       { label: 'Restore All', action: 'accept', role: 'accept' },
     ]);
 
     if (action !== DIALOG_ACTIONS.CANCEL) {
-      // dispatch(rejectAll({ dependencyIds: pendingItems.map((item: Dependency) => item.dependencyId) }));
+      dispatch(restoreAll({ dependencyIds: workedItems.map((item: Dependency) => item.dependencyId) }));
     }
   };
 
@@ -156,7 +162,7 @@ const DependencyViewer = () => {
           </div>
 
           <section className="subheader">
-            <TabNavigation tab={statusFilter} onChange={(status) => setStatusFilter(status)}/>
+            <TabNavigation tab={statusFilter} onChange={(status) => setStatusFilter(status)} />
             <ActionButton
               count={[validItems.length, pendingItems.length, workedItems.length]}
               onAcceptAll={onAcceptAllHandler}

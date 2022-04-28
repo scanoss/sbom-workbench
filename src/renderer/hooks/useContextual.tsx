@@ -7,7 +7,7 @@ import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { useDispatch, useSelector } from 'react-redux';
 import { executeBatch, ignoreFile, restoreFile } from '@store/inventory-store/inventoryThunks';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
-import { rejectAll, acceptAll as acceptAllDep } from '@store/dependency-store/dependencyThunks';
+import { rejectAll, acceptAll as acceptAllDep, restoreAll as restoreAllDep } from '@store/dependency-store/dependencyThunks';
 
 const useContextual = () => {
   const dispatch = useDispatch();
@@ -153,6 +153,19 @@ const useContextual = () => {
     }
   };
 
+  const restoreAllDependencies = async (node: any) => {
+    // TODO: remove duplicated code
+    const message = `All accepted or dismissed dependencies will be restored.`;
+    const { action } = await dialogCtrl.openAlertDialog(message, [
+      { label: 'Cancel', role: 'cancel' },
+      { label: 'Restore All', action: 'accept', role: 'accept' },
+    ]);
+
+    if (action !== DIALOG_ACTIONS.CANCEL) {
+      dispatch(restoreAllDep({ path: node.value }));
+    }
+  };
+
   return {
     acceptAll,
     identifyAll,
@@ -162,6 +175,7 @@ const useContextual = () => {
     ignore,
     acceptAllDependencies,
     rejectAllDependencies,
+    restoreAllDependencies,
   };
 };
 

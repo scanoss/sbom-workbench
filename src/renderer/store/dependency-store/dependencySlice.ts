@@ -1,6 +1,14 @@
 import { Dependency } from '@api/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { accept, acceptAll, getAll, reject, rejectAll, restore } from '@store/dependency-store/dependencyThunks';
+import {
+  accept,
+  acceptAll,
+  getAll,
+  reject,
+  rejectAll,
+  restore,
+  restoreAll
+} from '@store/dependency-store/dependencyThunks';
 import { RootState } from '@store/rootReducer';
 
 export interface DependencyState {
@@ -63,6 +71,15 @@ export const dependencySlice = createSlice({
       state.batchRunning = false;
     },
     [rejectAll.rejected.type]: (state) => {
+      state.batchRunning = false;
+    },
+    [restoreAll.pending.type]: (state) => {
+      state.batchRunning = true;
+    },
+    [restoreAll.fulfilled.type]: (state) => {
+      state.batchRunning = false;
+    },
+    [restoreAll.rejected.type]: (state) => {
       state.batchRunning = false;
     },
   },
