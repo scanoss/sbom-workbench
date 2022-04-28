@@ -28,7 +28,7 @@
       background-color: var(--color-status-pending);
     }
 
-    &.ignored .item-icon::before {
+    &.original .item-icon::before {
       background-color: var(--color-status-ignored);
     }
 
