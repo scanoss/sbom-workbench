@@ -1,12 +1,12 @@
 import log from 'electron-log';
-import {IDependencyResponse} from 'scanoss';
-import {NewDependencyDTO} from '../../api/dto';
-import {Dependency, FileStatusType} from '../../api/types';
-import {dependencyHelper} from '../helpers/DependencyHelper';
-import {fileHelper} from '../helpers/FileHelper';
-import {licenseHelper} from '../helpers/LicenseHelper';
-import {QueryBuilderCreator} from '../model/queryBuilder/QueryBuilderCreator';
-import {modelProvider} from './ModelProvider';
+import { IDependencyResponse } from 'scanoss';
+import { NewDependencyDTO } from '../../api/dto';
+import { Dependency, FileStatusType } from '../../api/types';
+import { dependencyHelper } from '../helpers/DependencyHelper';
+import { fileHelper } from '../helpers/FileHelper';
+import { licenseHelper } from '../helpers/LicenseHelper';
+import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
+import { modelProvider } from './ModelProvider';
 
 class DependencyService {
   public async insert(dependencies: IDependencyResponse): Promise<void> {
@@ -14,11 +14,11 @@ class DependencyService {
     const files = await fileHelper.getPathFileId();
     const filesIds = [];
     filesDependencies.forEach((fileDependency) => {
-      fileDependency.fileId=files[fileDependency.file];
+      fileDependency.fileId = files[fileDependency.file];
       filesIds.push(files[fileDependency.file]);
     });
 
-    await modelProvider.model.file.updateFileType( filesIds,"MATCH");
+    await modelProvider.model.file.updateFileType(filesIds, 'MATCH');
     await modelProvider.model.dependency.insert(filesDependencies);
   }
 
@@ -43,18 +43,22 @@ class DependencyService {
       let dependency: Dependency = (await modelProvider.model.dependency.getAll(queryBuilderDependency))[0];
       const queryBuilderComp = QueryBuilderCreator.create({ purl: params.purl, version: params.version });
       let comp = (await modelProvider.model.component.getAll(queryBuilderComp))[0];
-      let lic: any = await modelProvider.model.license.getBySpdxId(dependency.licenses.length > 0 ? dependency.licenses[0] : params.license);
-      //Create license if it not exists in the catalog
+      let lic: any = await modelProvider.model.license.getBySpdxId(
+        dependency.licenses.length > 0 ? dependency.licenses[0] : params.license
+      );
+      // Create license if it not exists in the catalog
       if (!lic) {
-        const licenseName = licenseHelper.licenseNameToSPDXID(dependency.licenses.length > 0 ? dependency.licenses[0] : params.license);
+        const licenseName = licenseHelper.licenseNameToSPDXID(
+          dependency.licenses.length > 0 ? dependency.licenses[0] : params.license
+        );
         lic = await modelProvider.model.license.create({
-          spdxid: dependency.licenses.length>0 ? dependency.licenses[0] : params.license,
+          spdxid: dependency.licenses.length > 0 ? dependency.licenses[0] : params.license,
           name: licenseName,
           fulltext: '',
           url: '',
         });
       }
-      //Create component if it not exists in the catalog
+      // Create component if it not exists in the catalog
       if (!comp)
         comp = await modelProvider.model.component.create({
           name: dependency.componentName || dependency.purl,
@@ -62,13 +66,19 @@ class DependencyService {
           purl: params.purl,
           license_id: lic.id,
         });
-      else
-        await modelProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
+      else await modelProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
 
       // Update dependency
       dependency = { ...dependency, licenses: [params.license], version: params.version };
       const dep = [];
-      dep.push(null,dependency.scope? dependency.scope: null,dependency.purl,dependency.version,dependency.licenses.join(','),dependency.dependencyId);
+      dep.push(
+        null,
+        dependency.scope ? dependency.scope : null,
+        dependency.purl,
+        dependency.version,
+        dependency.licenses.join(','),
+        dependency.dependencyId
+      );
       await modelProvider.model.dependency.update(dep);
 
       // Create inventory
@@ -89,10 +99,47 @@ class DependencyService {
         if (dep.component.source === 'manual') await modelProvider.model.component.deleteByID([dep.component.compid]);
       }
       const params = [];
-      params.push(null, dep.scope? dep.scope: null,dep.purl,dep.originalVersion,dep.originalLicense ? dep.originalLicense.join(',') : null, dep.dependencyId);
+      params.push(
+        null,
+        dep.scope ? dep.scope : null,
+        dep.purl,
+        dep.originalVersion,
+        dep.originalLicense ? dep.originalLicense.join(',') : null,
+        dep.dependencyId
+      );
       await modelProvider.model.dependency.update(params);
       const response = (await this.getAll({ id: dependencyId }))[0];
       return response;
+    } catch (error: any) {
+      log.error(error);
+      return error;
+    }
+  }
+
+  public async restoreAllByIds(dependenciesIds:number []): Promise<Array<Dependency>> {
+    try {
+      const results = [];
+      for(let i = 0; i < dependenciesIds.length; i+=1) {
+        const result = await this.restore(dependenciesIds[i]);
+        results.push(result);
+      }
+      return results;
+    } catch (error: any) {
+      log.error(error);
+      return error;
+    }
+  }
+
+  public async restoreAllByPath(path: string): Promise<Array<Dependency>> {
+    try {
+      const results = [];
+      const dependencies = await this.getAll({ path });
+      const dependencyIds = dependencies.filter((d) => d.status === FileStatusType.IDENTIFIED || d.status === FileStatusType.ORIGINAL).map((d) => d.dependencyId);
+      for(let i = 0; i < dependencyIds.length; i+=1) {
+        const result = await this.restore(dependencyIds[i]);
+        results.push(result);
+      }
+      return results;
     } catch (error: any) {
       log.error(error);
       return error;
@@ -136,9 +183,16 @@ class DependencyService {
   public async reject(dependencyId: number): Promise<Dependency> {
     try {
       const dep = (await this.getAll({ id: dependencyId }))[0];
-      const params= [];
-    //  `UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?
-      params.push(new Date().toISOString(),dep.scope? dep.scope :null,dep.purl,dep.version,dep.licenses.length > 0 ? dep.licenses.join(','): null,dep.dependencyId);
+      const params = [];
+      //  `UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?
+      params.push(
+        new Date().toISOString(),
+        dep.scope ? dep.scope : null,
+        dep.purl,
+        dep.version,
+        dep.licenses.length > 0 ? dep.licenses.join(',') : null,
+        dep.dependencyId
+      );
       await modelProvider.model.dependency.update(params);
       const response = (await this.getAll({ id: dependencyId }))[0];
       return response;
@@ -151,23 +205,23 @@ class DependencyService {
   public async rejectAllByIds(dependencyIds: Array<number>): Promise<Array<Dependency>> {
     try {
       const response = [];
-      for(let i = 0; i < dependencyIds.length; i+=1) {
+      for (let i = 0; i < dependencyIds.length; i += 1) {
         const dep = await this.reject(dependencyIds[i]);
         response.push(dep);
       }
-    return response;
+      return response;
     } catch (error: any) {
       log.error(error);
       return error;
     }
   }
 
-  public async rejectAllByPath(path :string): Promise<Array<Dependency>> {
+  public async rejectAllByPath(path: string): Promise<Array<Dependency>> {
     try {
       const dependencies = await this.getAll({ path });
       const dependencyIds = dependencies.filter((d) => d.status === FileStatusType.PENDING).map((d) => d.dependencyId);
       const response = [];
-      for(let i = 0; i < dependencyIds.length; i+=1) {
+      for (let i = 0; i < dependencyIds.length; i += 1) {
         const dep = await this.reject(dependencyIds[i]);
         response.push(dep);
       }
@@ -181,7 +235,7 @@ class DependencyService {
   public async acceptAllByPath(path: string): Promise<Array<Dependency>> {
     try {
       let dependencies = await this.getAll({ path });
-      dependencies = dependencies.filter((d) => d.status === FileStatusType.PENDING && d.valid==true);
+      dependencies = dependencies.filter((d) => d.status === FileStatusType.PENDING && d.valid == true);
       const response = [];
       for (const dep of dependencies) {
         const d = await this.accept({
