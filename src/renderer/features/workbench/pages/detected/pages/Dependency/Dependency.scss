@@ -1,8 +1,23 @@
 #Dependency {
   display: grid;
 
+  .tabs {
+    .MuiTab-root {
+      min-width: 140px;
+
+      &:first-child {
+        min-width: 60px;
+      }
+    }
+  }
+
   .app-header {
     padding-bottom: 0;
+
+    .search-box {
+      width: $search-box-width;
+      margin-bottom: 16px;
+    }
 
     .subheader {
       display: flex;
@@ -10,19 +25,7 @@
       align-items: center;
 
       margin-top: 16px;
-
-      .search-box {
-        width: $search-box-width;
-        margin-bottom: 16px;
-      }
-
     }
-
-
-  }
-
-  .app-content {
-
   }
 }
 

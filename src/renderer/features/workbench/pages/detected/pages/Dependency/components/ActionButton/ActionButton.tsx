@@ -6,10 +6,12 @@ const ActionButton = ({
   count,
   onAcceptAll,
   onDismissAll,
+  onRestoreAll,
 }: {
-  count: [number, number];
+  count: [number, number, number];
   onAcceptAll: () => void;
   onDismissAll: () => void;
+  onRestoreAll: () => void;
 }) => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
@@ -26,7 +28,7 @@ const ActionButton = ({
     <>
       <ButtonGroup
         size="small"
-        disabled={count[0] === 0 && count[1] === 0}
+        disabled={count[0] === 0 && count[1] === 0 && count[2] === 0}
         ref={anchorRef}
         variant="contained"
         color="secondary"
@@ -44,6 +46,9 @@ const ActionButton = ({
             <MenuList id="split-button-menu">
               <MenuItem key="test" disabled={count[1] === 0} onClick={onDismissAll}>
                 Dismiss all pending ({count[1]})
+              </MenuItem>
+              <MenuItem key="test" disabled={count[2] === 0} onClick={onRestoreAll}>
+                Restore all ({count[2]})
               </MenuItem>
             </MenuList>
           </ClickAwayListener>
