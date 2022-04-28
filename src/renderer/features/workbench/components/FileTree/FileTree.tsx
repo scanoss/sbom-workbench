@@ -85,6 +85,11 @@ const FileTree = () => {
           click: () => contextual.rejectAllDependencies(node),
           enabled: node.status === 'PENDING',
         },
+        {
+          label: 'Restore all dependencies',
+          // click: () => contextual.rejectAllDependencies(node),
+          // enabled: node.status === 'PENDING',
+        },
       ];
     } else {
       menu = !node.children

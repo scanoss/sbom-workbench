@@ -17,24 +17,16 @@ import NoLocalFile from './components/NoLocalFile/NoLocalFile';
 import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
 import ActionButton from './components/ActionButton/ActionButton';
+import TabNavigation, { DependencyStatus } from './components/TabNavigation/TabNavigation';
 
 export interface FileContent {
   content: string | null;
   error: boolean;
 }
 
-const filter = (items, query) => {
-  if (!items) {
-    return null;
-  }
-
-  if (!query) {
-    return items;
-  }
-
-  return items.filter((item) => {
-    const name = item.purl.toLowerCase();
-    return name.includes(query.toLowerCase());
+const filter = (items, query, status) => {
+  return items?.filter((item) => {
+    return (!status || item.status === status) && (!query || item.purl.toLowerCase().includes(query.toLowerCase()));
   });
 };
 
@@ -45,18 +37,21 @@ const DependencyViewer = () => {
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { dependencies, loading } = useSelector(selectDependencyState);
+  const { dependencies } = useSelector(selectDependencyState);
   const { path: scanBasePath, imported } = useSelector(selectWorkbench);
   const { node } = useSelector(selectNavigationState);
 
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<DependencyStatus | null>(null);
+
   const [view, setView] = useState<CodeViewSelectorMode>(CodeViewSelectorMode.GRAPH);
 
   const file = node?.type === 'file' ? node.path : null;
-  const items: Array<Dependency> = filter(dependencies, searchQuery);
+  const items: Array<Dependency> = filter(dependencies, searchQuery, statusFilter);
   const pendingItems: Array<Dependency> = items?.filter((item) => item.status === 'pending');
   const validItems: Array<Dependency> = pendingItems.filter((item) => item.valid);
+  const workedItems: Array<Dependency> = items?.filter((item) => item.status === 'identified' || item.status === 'original');
 
   const init = () => {
     dispatch(reset());
@@ -109,6 +104,19 @@ const DependencyViewer = () => {
     }
   };
 
+  const onRestoreAllHandler = async () => {
+    const message = `All accepted or dismissed dependencies will be restored.`;
+
+    const { action } = await dialogCtrl.openAlertDialog(message, [
+      { label: 'Cancel', role: 'cancel' },
+      { label: 'Restore All', action: 'accept', role: 'accept' },
+    ]);
+
+    if (action !== DIALOG_ACTIONS.CANCEL) {
+      // dispatch(rejectAll({ dependencyIds: pendingItems.map((item: Dependency) => item.dependencyId) }));
+    }
+  };
+
   const onAcceptHandler = async (dependency: Dependency) => {
     const { action, data } = await dialogCtrl.openDependencyDialog(dependency);
     if (action !== DIALOG_ACTIONS.CANCEL) {
@@ -131,7 +139,7 @@ const DependencyViewer = () => {
   return (
     <>
       <section id="Dependency" className="app-page">
-        <header className="app-header">
+        <header className="app-header mb-3">
           <div className="d-flex space-between">
             <Breadcrumb />
             <CodeViewSelector active={view} setView={setView} />
@@ -139,20 +147,24 @@ const DependencyViewer = () => {
           <div className="d-flex align-center mb-2">
             <h3 className="mt-0 mb-0">Declared Dependencies</h3>
           </div>
-          <section className="subheader">
-            <div className="search-box">
-              <SearchBox
-                disabled={view === CodeViewSelectorMode.CODE}
-                onChange={(value) => setSearchQuery(value.trim().toLowerCase())}
-              />
-            </div>
 
+          <div className="search-box">
+            <SearchBox
+              disabled={view === CodeViewSelectorMode.CODE}
+              onChange={(value) => setSearchQuery(value.trim().toLowerCase())}
+            />
+          </div>
+
+          <section className="subheader">
+            <TabNavigation tab={statusFilter} onChange={(status) => setStatusFilter(status)}/>
             <ActionButton
-              count={[validItems.length, pendingItems.length]}
+              count={[validItems.length, pendingItems.length, workedItems.length]}
               onAcceptAll={onAcceptAllHandler}
               onDismissAll={onDismissAllHandler}
+              onRestoreAll={onRestoreAllHandler}
             />
           </section>
+
         </header>
         <main className="editors editors-full app-content">
           <div className="editor">
