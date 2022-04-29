@@ -38,7 +38,8 @@ function dbMigration0200(projectPath): Promise<void> {
 
 async function depMigration(projectPath) {
   const depPath = `${projectPath}/dependencies.json`;
-  if (fileHelper.fileExist(depPath)) {
+  const exist = await fileHelper.fileExist(depPath);
+  if (exist) {
     const oldDep = JSON.parse(await fs.promises.readFile(depPath, 'utf-8'));
     const newDep = parseOldDependency(oldDep);
     fs.promises.unlink(depPath);
