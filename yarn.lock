@@ -10704,10 +10704,10 @@ saxes@^5.0.1:
   dependencies:
     xmlchars "^2.2.0"
 
-scanoss@^0.2.25:
-  version "0.2.25"
-  resolved "https://registry.yarnpkg.com/scanoss/-/scanoss-0.2.25.tgz#8e0e7491107fc0dc0a6e83759998e40c28dea971"
-  integrity sha512-3xnnxK79CnDHox37zECVDA1YcUvOtWg3bh3MAaunKxnfL/I/MJxnRSWByaBCTpqeBqFei89W/Wht3C6GGz3NlA==
+scanoss@^0.2.27:
+  version "0.2.27"
+  resolved "https://registry.yarnpkg.com/scanoss/-/scanoss-0.2.27.tgz#c13175b87d2643d67c7ddd5149971d4c3f6a6f0f"
+  integrity sha512-4sK+skIgEWm4NJsbPBYXux9IRbxTVtSNRH+xkKLZGep+JTAcsaY3VNZTt3B8hHQ435RRdc0DQlnFLP1JaKQ58Q==
   dependencies:
     "@grpc/grpc-js" "^1.5.5"
     abort-controller "^3.0.0"
