@@ -5,6 +5,7 @@
 import path from 'path';
 import webpack from 'webpack';
 import { dependencies as externals } from '../../src/package.json';
+import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
 
 export default {
   externals: [...Object.keys(externals || {})],

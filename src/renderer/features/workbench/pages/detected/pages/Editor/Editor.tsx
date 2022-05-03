@@ -26,8 +26,10 @@ import {
 } from '../../../../../../store/inventory-store/inventoryThunks';
 import { selectWorkbench } from '../../../../../../store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '../../../../../../store/navigation-store/navigationSlice';
+import CodeViewer from '../../../../components/CodeViewer/CodeViewer';
 
-const MemoCodeEditor = React.memo(CodeEditor);
+// const MemoCodeEditor = React.memo(CodeEditor);
+const MemoCodeEditor = React.memo(CodeViewer);
 
 export interface FileContent {
   content: string | null;
