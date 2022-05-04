@@ -164,4 +164,7 @@ export default abstract class Node {
   public abstract setActionDeep(action: string): void;
 
   public abstract isDependency(): boolean;
+
+  // Only looks for a specific filename one depth level. WARNING: It does not verify in subfolders!
+  public abstract containsFile(filename: string): boolean;
 }

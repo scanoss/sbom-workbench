@@ -95,7 +95,7 @@ export class Tree {
 
   public loadTree(data: any): void {
     this.rootFolder = this.deserialize(data) as Folder;
-    
+
   }
 
   private deserialize(data: any): Node {
@@ -222,5 +222,9 @@ export class Tree {
   public async getTree(): Promise<Node> {
     const tree = await this.fileTreeViewMode.getTree(this.getRootFolder());
     return tree;
+  }
+
+  public getRootPath(): string {
+    return this.rootPath
   }
 }

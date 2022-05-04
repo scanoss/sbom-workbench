@@ -259,5 +259,11 @@ export default class Folder extends Node {
     return false;
   }
 
+  public containsFile(filename: string): boolean {
+    for (const child of this.getChildren()) {
+      if(child.getName() === filename) return true;
+    }
+    return false;
+  }
 
 }
