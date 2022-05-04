@@ -1,44 +1,48 @@
 import React, { useEffect } from 'react';
 import * as monaco from 'monaco-editor';
 
-export const CodeViewer = ({ content, language, highlight }) => {
+const CodeViewer = ({ value, language, highlight }) => {
+  const editorRef = React.createRef<HTMLDivElement>();
   const [editor, setEditor] = React.useState(null);
+
   const initMonaco = () => {
-    const editorInstance = monaco.editor.create(document.getElementById('editor'), {
-      value: content,
+    const editorInstance = monaco.editor.create(editorRef.current, {
+      value,
       language,
       readOnly: true,
+      automaticLayout: true,
       theme: 'vs-dark',
       lineNumbers: 'on',
+      fontSize: 12,
     });
 
-    /*const decorations = editorInstance.deltaDecorations(
-      [],
-      [
-        {
-          range: new monaco.Range(3, 1, 30, 10),
-          options: {
-            isWholeLine: true,
-            className: 'myContentClass',
-            glyphMarginClassName: 'myGlyphMarginClass'
+    if (highlight) {
+      const [start, end] = highlight.split('-');
+      const decorations = editorInstance.deltaDecorations(
+        [],
+        [
+          {
+            range: new monaco.Range(Number(start), 1, Number(end), 1),
+            options: {
+              isWholeLine: true,
+              className: 'line-highlighted',
+            }
           }
-        }
-      ]
-    );*/
+        ]
+      );
+    }
     setEditor(editorInstance);
   };
 
   useEffect(() => {
-    editor?.updateOptions({
-      value: content,
-    });
-  }, [content]);
+    editor?.setValue(value);
+  }, [value]);
 
   useEffect(() => {
     initMonaco()
   }, []);
 
-  return <div id="editor" />;
+  return <div ref={editorRef} style={{ width: '100%', height: '100%' }} />;
 };
 
 export default CodeViewer;

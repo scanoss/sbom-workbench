@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
-import { AppContext, IAppContext } from '@context/AppProvider';
 import { FileType, Inventory } from '@api/types';
 import { mapFiles } from '@shared/utils/scan-util';
 import { inventoryService } from '@api/services/inventory.service';
@@ -11,25 +10,18 @@ import { InventoryForm } from '@context/types';
 import { getExtension } from '@shared/utils/utils';
 import { fileService } from '@api/services/file.service';
 import { useDispatch, useSelector } from 'react-redux';
+import { createInventory, detachFile, ignoreFile, restoreFile } from '@store/inventory-store/inventoryThunks';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
-import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
 import LabelCard from '../../../../components/LabelCard/LabelCard';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
 import NoLocalFile from './components/NoLocalFile/NoLocalFile';
-import {
-  createInventory,
-  detachFile,
-  ignoreFile,
-  restoreFile,
-} from '../../../../../../store/inventory-store/inventoryThunks';
-import { selectWorkbench } from '../../../../../../store/workbench-store/workbenchSlice';
-import { selectNavigationState } from '../../../../../../store/navigation-store/navigationSlice';
 import CodeViewer from '../../../../components/CodeViewer/CodeViewer';
 
-// const MemoCodeEditor = React.memo(CodeEditor);
-const MemoCodeEditor = React.memo(CodeViewer);
+const MemoCodeViewer = React.memo(CodeViewer);
 
 export interface FileContent {
   content: string | null;
@@ -132,7 +124,7 @@ const Editor = () => {
       usage: 'file',
     });
     if (response) {
-      const f = await fileService.get({ path:file });
+      const f = await fileService.get({ path: file });
       if (!f) return;
       await dispatch(
         createInventory({
@@ -252,7 +244,9 @@ const Editor = () => {
                               vendor: match.component?.vendor,
                               version: match.component?.version,
                               usage: match.type,
-                              license: match.component?.licenses.find((l) => l.spdxid === match.license[0])?.name || match.license[0],
+                              license:
+                                match.component?.licenses.find((l) => l.spdxid === match.license[0])?.name ||
+                                match.license[0],
                               url: match.component?.url,
                               purl: match.component?.purl,
                             }}
@@ -279,9 +273,9 @@ const Editor = () => {
           <main className="editors editors-full app-content">
             <div className="editor">
               {matchInfo && (localFileContent?.content || remoteFileContent?.content) ? (
-                <MemoCodeEditor
+                <MemoCodeViewer
                   language={getExtension(file)}
-                  content={localFileContent.content || remoteFileContent.content}
+                  value={localFileContent.content || remoteFileContent.content}
                   highlight={currentMatch?.lines || null}
                 />
               ) : null}
@@ -292,9 +286,9 @@ const Editor = () => {
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
                 <>
-                  <MemoCodeEditor
+                  <MemoCodeViewer
                     language={getExtension(file)}
-                    content={localFileContent.content}
+                    value={localFileContent.content}
                     highlight={currentMatch?.lines || null}
                   />
                 </>
@@ -309,9 +303,9 @@ const Editor = () => {
             ) : (
               <div className="editor">
                 {currentMatch && remoteFileContent?.content ? (
-                  <MemoCodeEditor
+                  <MemoCodeViewer
                     language={getExtension(file)}
-                    content={remoteFileContent.content}
+                    value={remoteFileContent.content}
                     highlight={currentMatch?.oss_lines || null}
                   />
                 ) : null}

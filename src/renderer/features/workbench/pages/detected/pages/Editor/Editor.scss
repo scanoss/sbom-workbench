@@ -71,32 +71,7 @@
 }
 
 .editors {
-
-  .code-viewer.truncatedStart code > span:first-child, .code-viewer.truncatedEnd code > span:last-child {
-    position: relative;
-
-    &::before {
-      content: 'Content too long, file was truncated';
-      position: absolute;
-      width: 100%;
-      text-align: center;
-      font-size: 10px;
-    }
-  }
-
-  .code-viewer.truncatedStart code > span:first-child {
-    padding-top: 35px;
-    &::before {
-      top: 10px;
-     }
-  }
-
-  .code-viewer.truncatedEnd code > span:last-child {
-    padding-bottom: 35px;
-    &::before {
-      bottom: 10px;
-     }
-  }
+  overflow-y: visible !important;
 
   &.editors-full {
     grid-template-columns: 100%;
@@ -104,43 +79,17 @@
 
   .editor {
     height: 100%;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
 
-
-    .line-highlighted {
-      display: block;
-      background-color: #343b24 !important; // 266a8452
-
-    }
-
-    .linenumber {
-      color: #eeeeee;
-    }
-
-    span:not(.linenumber) {
-      user-select: text !important;
-      -webkit-user-select: text !important;
-      -webkit-user-drag: initial !important;
-    }
-
-    pre {
-      margin: 0;
-      padding: 0 !important;
+    #viewer {
+      display: grid;
       height: 100%;
-
-      code {
-        display: grid;
-      }
+      width: 100%;
     }
 
-    p {
-      font-style: normal;
-      font-weight: bold;
-      font-size: 20px;
-      padding: 0;
-      margin: 0;
+    .line-highlighted{
+      background: #343b24;
     }
   }
 
@@ -152,7 +101,6 @@
     justify-content: center;
     align-items: center;
 
-
     p {
       margin-top: 10px;
       margin-bottom: 35px;
@@ -161,11 +109,6 @@
       max-width: 300px;
     }
   }
-}
-
-
-.myContentClass {
-  background: #6B7381;
 }
 
 
