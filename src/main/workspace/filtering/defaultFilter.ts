@@ -4,26 +4,28 @@ const defaultBannedList = {
   filters: [
     { condition: '=', value: '0', ftype: 'SIZE', scope: 'FILE' },
 
-    //Folders and files filters
+    // Folders and files filters
     { condition: 'starts', value: '.', ftype: 'NAME' },
 
-    //Folder filters
+    // Vendor folders
+    { condition: 'fullmatch', value: 'node_modules', ftype: 'NAME', scope: 'FOLDER' },
+    { condition: 'fullmatch', value: 'vendor', ftype: 'NAME', scope: 'FOLDER' },
+
+
+    // Folder filters
     { condition: 'ends', value: '.egg-info', ftype: 'NAME', scope: 'FOLDER' },
-
     { condition: 'fullmatch', value: 'nbproject', ftype: 'NAME', scope: 'FOLDER' },
-    { condition: 'fullmatch', value: 'nbbuild', ftype: 'NAME', scope: 'FOLDER'  },
-    { condition: 'fullmatch', value: 'nbdist', ftype: 'NAME', scope: 'FOLDER'  },
-    { condition: 'fullmatch', value: '__pycache__', ftype: 'NAME', scope: 'FOLDER'  },
-    { condition: 'fullmatch', value: 'venv', ftype: 'NAME', scope: 'FOLDER'  },
-    { condition: 'fullmatch', value: '_yardoc', ftype: 'NAME', scope: 'FOLDER'  },
-    { condition: 'fullmatch', value: 'eggs', ftype: 'NAME', scope: 'FOLDER'  },
-    { condition: 'fullmatch', value: 'wheels', ftype: 'NAME', scope: 'FOLDER'  },
-    { condition: 'fullmatch', value: 'htmlcov', ftype: 'NAME', scope: 'FOLDER'  },
-    { condition: 'fullmatch', value: '__pypackages__', ftype: 'NAME', scope: 'FOLDER'  },
+    { condition: 'fullmatch', value: 'nbbuild', ftype: 'NAME', scope: 'FOLDER' },
+    { condition: 'fullmatch', value: 'nbdist', ftype: 'NAME', scope: 'FOLDER' },
+    { condition: 'fullmatch', value: '__pycache__', ftype: 'NAME', scope: 'FOLDER' },
+    { condition: 'fullmatch', value: 'venv', ftype: 'NAME', scope: 'FOLDER' },
+    { condition: 'fullmatch', value: '_yardoc', ftype: 'NAME', scope: 'FOLDER' },
+    { condition: 'fullmatch', value: 'eggs', ftype: 'NAME', scope: 'FOLDER' },
+    { condition: 'fullmatch', value: 'wheels', ftype: 'NAME', scope: 'FOLDER' },
+    { condition: 'fullmatch', value: 'htmlcov', ftype: 'NAME', scope: 'FOLDER' },
+    { condition: 'fullmatch', value: '__pypackages__', ftype: 'NAME', scope: 'FOLDER' },
 
-
-    //Files filters
-
+    // Files filters
     { condition: 'fullmatch', value: 'gradlew', ftype: 'NAME', scope: 'FILE' },
     { condition: 'fullmatch', value: 'gradlew.bat', ftype: 'NAME', scope: 'FILE' },
     { condition: 'fullmatch', value: 'mvnw', ftype: 'NAME', scope: 'FILE' },
@@ -37,14 +39,10 @@ const defaultBannedList = {
     { condition: 'fullmatch', value: 'copying.lib', ftype: 'NAME', scope: 'FILE' },
     { condition: 'fullmatch', value: 'makefile', ftype: 'NAME', scope: 'FILE' },
 
-
     { condition: 'starts', value: '.asar', ftype: 'NAME', scope: 'FILE' },
-
 
     { condition: 'ends', value: 'news', ftype: 'NAME', scope: 'FILE' },
     { condition: 'ends', value: 'authors', ftype: 'NAME', scope: 'FILE' },
-
-
     { condition: 'ends', value: '-doc', ftype: 'NAME', scope: 'FILE' },
     { condition: 'ends', value: 'changelog', ftype: 'NAME', scope: 'FILE' },
     { condition: 'ends', value: 'config', ftype: 'NAME', scope: 'FILE' },
