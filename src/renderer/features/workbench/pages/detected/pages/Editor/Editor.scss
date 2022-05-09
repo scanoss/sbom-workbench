@@ -59,22 +59,20 @@
     }
   }
 }
-
-.info-files, .editors {
+.info-files {
+  margin-top: 10px;
   display: grid;
-  grid-template-columns: calc(50% - 10px) 50%;
+  grid-template-columns: calc(50% - 10px) 50%;;
   grid-gap: 10px;
 }
 
-.info-files {
-  margin-top: 10px;
-}
-
 .editors {
+  display: grid;
   overflow-y: visible !important;
 
-  &.editors-full {
-    grid-template-columns: 100%;
+  &.diff-view {
+    grid-template-columns: calc(50% - 10px) 50%;;
+    grid-gap: 10px;
   }
 
   .editor {
@@ -88,7 +86,7 @@
       width: 100%;
     }
 
-    .line-highlighted{
+    .line-highlight {
       background: #343b24;
     }
   }

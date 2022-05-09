@@ -14,11 +14,9 @@ import { createInventory, detachFile, ignoreFile, restoreFile } from '@store/inv
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
-import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
 import LabelCard from '../../../../components/LabelCard/LabelCard';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
-import NoLocalFile from './components/NoLocalFile/NoLocalFile';
 import CodeViewer from '../../../../components/CodeViewer/CodeViewer';
 
 const MemoCodeViewer = React.memo(CodeViewer);
@@ -28,7 +26,7 @@ export interface FileContent {
   error: boolean;
 }
 
-const Editor = () => {
+export const Editor = () => {
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -44,12 +42,12 @@ const Editor = () => {
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
-  const [fullFile, setFullFile] = useState<boolean>(null);
+  const [isDiffView, setIsDiffView] = useState<boolean>(false);
 
   const init = () => {
     setMatchInfo(null);
     setInventories(null);
-    setFullFile(false);
+    setIsDiffView(false);
     setLocalFileContent({ content: null, error: false });
     setRemoteFileContent({ content: null, error: false });
 
@@ -169,9 +167,9 @@ const Editor = () => {
 
   useEffect(() => {
     if (currentMatch) {
-      const full = currentMatch?.type === 'file';
-      setFullFile(full);
-      if (!full || imported) loadRemoteFile(currentMatch.md5_file);
+      const diff = currentMatch?.type !== 'file';
+      setIsDiffView(diff);
+      if (diff || imported) loadRemoteFile(currentMatch.md5_file);
     }
   }, [currentMatch]);
 
@@ -269,19 +267,30 @@ const Editor = () => {
           </>
         </header>
 
-        {fullFile ? (
-          <main className="editors editors-full app-content">
+        <main className={`
+          editors
+          app-content
+          ${isDiffView ? 'diff-view' : ''}
+          `}>
+          <div className="editor">
+            <MemoCodeViewer
+              language={getExtension(file)}
+              value={localFileContent?.content || remoteFileContent?.content || ''}
+              highlight={currentMatch?.lines || null}
+            />
+          </div>
+
+          {isDiffView && currentMatch && remoteFileContent?.content && (
             <div className="editor">
-              {matchInfo && (localFileContent?.content || remoteFileContent?.content) ? (
-                <MemoCodeViewer
-                  language={getExtension(file)}
-                  value={localFileContent.content || remoteFileContent.content}
-                  highlight={currentMatch?.lines || null}
-                />
-              ) : null}
+              <MemoCodeViewer
+                language={getExtension(file)}
+                value={remoteFileContent.content || ''}
+                highlight={currentMatch.oss_lines || null}
+              />
             </div>
-          </main>
-        ) : (
+          )}
+        </main>
+          {/*
           <main className="editors app-content">
             <div className="editor">
               {matchInfo && localFileContent?.content ? (
@@ -312,7 +321,7 @@ const Editor = () => {
               </div>
             )}
           </main>
-        )}
+          */}
       </section>
     </>
   );

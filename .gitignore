@@ -51,3 +51,5 @@ npm-debug.log.*
 
 # workbench
 src/config/override.conf.json
+*.worker.js
+*.worker.js.LICENSE.txt
