@@ -14,6 +14,7 @@ import { userSettingService } from '../../services/UserSettingService';
 import AppConfig from '../../../config/AppConfigModule';
 import { AutoAccept } from '../Inventory/AutoAccept';
 import { ITask } from '../Task';
+import {IndexTask} from "../search/indexTask";
 
 export abstract class ScannerTask extends EventEmitter implements ITask<void, boolean> {
   protected msgToUI!: Electron.WebContents;
@@ -88,6 +89,7 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
     const files = await fileHelper.getPathFileId();
     await resultService.insertFromFile(resultPath, files);
     await componentService.importComponents();
+    await new IndexTask().run();
   }
 
   private setScannerConfig() {
