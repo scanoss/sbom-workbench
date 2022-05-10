@@ -210,7 +210,7 @@ export const Editor = () => {
           <>
             <header className="match-info-header">
               {(!matchInfo || !inventories) && (
-                <Skeleton variant="rect" width="50%" height={60} style={{ marginBottom: 18 }} />
+                <Skeleton variant="rect" width="50%" height={58} style={{ marginBottom: 15 }} />
               )}
 
               {matchInfo && inventories && (matchInfo.length > 0 || inventories.length > 0) && (
@@ -285,16 +285,21 @@ export const Editor = () => {
           `}
         >
           <div className="editor">
-            <MemoCodeViewer
-              id={CodeViewerManager.LEFT}
-              language={getExtension(file)}
-              value={
-                localFileContent?.content ||
-                remoteFileContent?.content ||
-                (imported ? "// This project was imported. Source file can't be displayed." : '')
-              }
-              highlight={currentMatch?.lines || null}
-            />
+            {/* TODO: we need to remove this IF statement. Should we keep editor instance to better performance and UX. Problem: editors not re-layout on changing file */}
+            {localFileContent?.content || remoteFileContent?.content || imported ? (
+              <MemoCodeViewer
+                id={CodeViewerManager.LEFT}
+                language={getExtension(file)}
+                value={
+                  localFileContent?.content ||
+                  remoteFileContent?.content ||
+                  (imported ? "// This project was imported. Source file can't be displayed." : '')
+                }
+                highlight={currentMatch?.lines || null}
+              />
+            ) : (
+              <div className="file-loader">Loading local file</div>
+            )}
           </div>
 
           {isDiffView && currentMatch && (

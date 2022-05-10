@@ -174,7 +174,7 @@ const DependencyViewer = () => {
 
         </header>
         <main className="editors editors-full app-content">
-          <div className="editor">
+          <div className="">
             {localFileContent?.content ? (
               <>
                 {view === CodeViewSelectorMode.CODE ? (

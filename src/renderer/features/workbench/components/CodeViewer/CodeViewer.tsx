@@ -42,6 +42,7 @@ const CodeViewer = ({ id, value, language, highlight, options }: ICodeViewerProp
     theme: 'vs-dark',
     fontSize: 12,
     lineNumbers: 'on',
+    scrollBeyondLastLine: false,
     glyphMargin: highlight && highlight !== 'all',
   });
 
@@ -55,7 +56,7 @@ const CodeViewer = ({ id, value, language, highlight, options }: ICodeViewerProp
       const nModel = monaco.editor.createModel(value, language);
       mEditor.setModel(nModel);
       mEditor.focus();
-      mEditor.layout();
+      // mEditor.layout({} as monaco.editor.IDimension);
     }
   };
 
