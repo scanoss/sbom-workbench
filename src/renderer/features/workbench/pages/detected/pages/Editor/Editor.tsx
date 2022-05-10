@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
@@ -15,9 +15,11 @@ import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
-import LabelCard from '../../../../components/LabelCard/LabelCard';
+import FileToolbar, { ToolbarActions } from '../../../../components/FileToolbar/FileToolbar';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
 import CodeViewer from '../../../../components/CodeViewer/CodeViewer';
+import { CodeViewerManager } from './CodeViewerManager';
+import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 
 const MemoCodeViewer = React.memo(CodeViewer);
 
@@ -258,70 +260,63 @@ export const Editor = () => {
               )}
 
               <div className="info-files">
-                <LabelCard label="Source File" file={file} status={null} />
-                {matchInfo && currentMatch && currentMatch.file && (
-                  <LabelCard label="Component File" status={null} file={currentMatch.file} />
+                <FileToolbar id={CodeViewerManager.LEFT} label="Source File" file={`${scanBasePath}${file}`} />
+                {matchInfo && currentMatch && currentMatch.file ? (
+                  <FileToolbar
+                    id={isDiffView ? CodeViewerManager.RIGHT : CodeViewerManager.LEFT}
+                    label="Component File"
+                    file={currentMatch.file}
+                    actions={[ToolbarActions.FIND]}
+                  />
+                ) : (
+                  inventories?.length === 0 &&
+                  matchInfo?.length === 0 && <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} showLabel />
                 )}
               </div>
             </header>
           </>
         </header>
 
-        <main className={`
+        <main
+          className={`
           editors
           app-content
           ${isDiffView ? 'diff-view' : ''}
-          `}>
+          `}
+        >
           <div className="editor">
             <MemoCodeViewer
+              id={CodeViewerManager.LEFT}
               language={getExtension(file)}
-              value={localFileContent?.content || remoteFileContent?.content || ''}
+              value={
+                localFileContent?.content ||
+                remoteFileContent?.content ||
+                (imported ? "// This project was imported. Source file can't be displayed." : '')
+              }
               highlight={currentMatch?.lines || null}
             />
           </div>
 
-          {isDiffView && currentMatch && remoteFileContent?.content && (
+          {isDiffView && currentMatch && (
             <div className="editor">
-              <MemoCodeViewer
-                language={getExtension(file)}
-                value={remoteFileContent.content || ''}
-                highlight={currentMatch.oss_lines || null}
-              />
+              {remoteFileContent?.content ? (
+                <MemoCodeViewer
+                  id={CodeViewerManager.RIGHT}
+                  language={getExtension(file)}
+                  value={remoteFileContent.content || ''}
+                  highlight={currentMatch.oss_lines || null}
+                />
+              ) : (
+                <div className="file-loader">Loading remote file</div>
+              )}
             </div>
           )}
         </main>
-          {/*
-          <main className="editors app-content">
-            <div className="editor">
-              {matchInfo && localFileContent?.content ? (
-                <>
-                  <MemoCodeViewer
-                    language={getExtension(file)}
-                    value={localFileContent.content}
-                    highlight={currentMatch?.lines || null}
-                  />
-                </>
-              ) : imported ? (
-                <NoLocalFile />
-              ) : null}
-            </div>
-            {inventories?.length === 0 && matchInfo?.length === 0 ? (
-              <div className="editor">
-                <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} showLabel />
-              </div>
-            ) : (
-              <div className="editor">
-                {currentMatch && remoteFileContent?.content ? (
-                  <MemoCodeViewer
-                    language={getExtension(file)}
-                    value={remoteFileContent.content}
-                    highlight={currentMatch?.oss_lines || null}
-                  />
-                ) : null}
-              </div>
-            )}
-          </main>
-          */}
+        {/*
+          ) : imported ? (
+            <NoLocalFile />
+          ) : null}
+         */}
       </section>
     </>
   );

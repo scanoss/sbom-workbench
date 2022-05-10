@@ -1,5 +1,6 @@
 #editor {
   display: grid;
+  height: 100%;
 
   .app-header {
     padding-bottom: 0;
@@ -48,9 +49,6 @@
   grid-gap: 10px;
   overflow-y: auto;
   max-height: 160px;
-  padding: 3px 0;
-
-
 
   @media screen and (max-width: 1100px) {
    grid-template-columns: 100%;
@@ -86,8 +84,21 @@
       width: 100%;
     }
 
+    .file-loader {
+      margin: auto;
+      font-size: 12px;
+    }
+
     .line-highlight {
-      background: #343b24;
+      background: rgba(52, 59, 36, 0.73);
+    }
+
+    .editor-widget.find-widget.reduced-find-widget.visible {
+      z-index: 6;
+    }
+
+    .monaco-editor, .monaco-editor .overflow-guard {
+      border-radius: 4px;
     }
   }
 

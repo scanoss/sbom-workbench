@@ -1,14 +1,16 @@
 import React, { useEffect } from 'react';
 import * as monaco from 'monaco-editor';
+import CodeViewerManagerInstance from '../../pages/detected/pages/Editor/CodeViewerManager';
 
 interface ICodeViewerProps {
+  id: string;
   value: string;
   language: string;
   highlight: string;
   options?: monaco.editor.IStandaloneEditorConstructionOptions;
 }
 
-const CodeViewer = ({ value, language, highlight, options }: ICodeViewerProps) => {
+const CodeViewer = ({ id, value, language, highlight, options }: ICodeViewerProps) => {
   const editor = React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const editorContainerRef = React.createRef<HTMLDivElement>();
 
@@ -21,13 +23,16 @@ const CodeViewer = ({ value, language, highlight, options }: ICodeViewerProps) =
         ...getDefaultOptions(),
         ...options,
       });
-    }
 
+      // set editor in manager
+      CodeViewerManagerInstance.set(id, editor.current);
+    }
   };
 
   const destroyMonaco = () => {
     if (editor.current) {
       editor.current.dispose();
+      CodeViewerManagerInstance.set(id, null);
     }
   };
 
@@ -41,16 +46,17 @@ const CodeViewer = ({ value, language, highlight, options }: ICodeViewerProps) =
   });
 
   const updateContent = () => {
-    if (editor.current) {
-      const model = editor.current.getModel();
-      if (model) {
-        model.dispose();
-      }
-      const nModel = monaco.editor.createModel(value, language);
-      editor.current.setModel(nModel);
-    }
+    const { current: mEditor } = editor;
 
-    // editor.current.getAction("actions.find").run();
+    if (mEditor) {
+      const model = mEditor.getModel();
+      if (model) model.dispose();
+
+      const nModel = monaco.editor.createModel(value, language);
+      mEditor.setModel(nModel);
+      mEditor.focus();
+      mEditor.layout();
+    }
   };
 
   const updateHighlight = () => {

@@ -1,19 +1,22 @@
 .no-match-container {
+  border: 1px solid gray;
+  border-style: dashed;
+  padding: 0 12px;
+  background-color: #ffffff7a;
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
+  border-radius: 4px;
+  box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.06), 0px 1px 3px rgba(0, 0, 0, 0.1);
 
   .no-match-content {
+    width: 100%;
     display: flex;
     align-items: center;
-    flex-direction: column;
+    justify-content: space-between;
 
     .no-match-title {
-      font-size: 30px;
-      margin-bottom: 15px;
+      font-size: 16px;
+      margin: 0;
     }
   }
 }

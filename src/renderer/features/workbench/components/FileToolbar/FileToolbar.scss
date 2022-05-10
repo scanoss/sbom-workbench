@@ -1,0 +1,40 @@
+.label-card {
+  background-color: #ffff;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.06), 0px 1px 3px rgba(0, 0, 0, 0.1);
+
+  @media screen and (max-width: $md) {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .label-card-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+
+      .label-title {
+        margin-left: 4px;
+        font-weight: 600;
+        color: #212020;
+        font-size: 18px;
+      }
+
+      .actions {
+        opacity: 0.5;
+        display: flex;
+        gap: 4px;
+
+        .copy-path {
+          font-size: 16px;
+        }
+      }
+    }
+
+    &:hover .actions {opacity: 1;}
+}
+
