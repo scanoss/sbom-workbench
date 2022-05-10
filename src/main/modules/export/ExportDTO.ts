@@ -1,3 +1,3 @@
-import { ExportResult } from '../../task/export/ExportResult';
+import { IExportResult } from './IExportResult';
 
-export type ExportDTO = ExportResult;
+export type ExportDTO = IExportResult;

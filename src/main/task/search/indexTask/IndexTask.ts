@@ -1,9 +1,9 @@
-import { ITask } from "../Task";
-import { modelProvider } from "../../services/ModelProvider";
-import { Indexer } from "../../modules/searchEngine/indexer/Indexer";
-import { IndexerAdapter } from "../../modules/searchEngine/indexer/IndexerAdapter";
-import { IIndexer } from "../../modules/searchEngine/indexer/IIndexer";
-import { workspace } from "../../workspace/Workspace";
+import { ITask } from "../../Task";
+import { modelProvider } from "../../../services/ModelProvider";
+import { Indexer } from "../../../modules/searchEngine/indexer/Indexer";
+import { IndexerAdapter } from "../../../modules/searchEngine/indexer/IndexerAdapter";
+import { IIndexer } from "../../../modules/searchEngine/indexer/IIndexer";
+import { workspace } from "../../../workspace/Workspace";
 
 export class IndexTask implements  ITask<void, any> {
 
@@ -22,7 +22,7 @@ export class IndexTask implements  ITask<void, any> {
     const p = workspace.getOpenedProjects()[0];
     const scanRoot = p.getScanRoot();
   modelFiles.forEach((file: any) => {
-    filesToIndex.push({ fileId: file.id, path: `${scanRoot}${file.path}` });
+      filesToIndex.push({ fileId: file.id, path: `${scanRoot}${file.path}` });
     });
     return filesToIndex;
   }

@@ -14,7 +14,7 @@ import { userSettingService } from '../../services/UserSettingService';
 import AppConfig from '../../../config/AppConfigModule';
 import { AutoAccept } from '../Inventory/AutoAccept';
 import { ITask } from '../Task';
-import {IndexTask} from "../search/indexTask";
+import { IndexTask } from "../search/indexTask/IndexTask";
 
 export abstract class ScannerTask extends EventEmitter implements ITask<void, boolean> {
   protected msgToUI!: Electron.WebContents;

@@ -8,6 +8,7 @@ import { treeService } from '../../main/services/TreeService';
 import { NodeStatus } from '../../main/workspace/Tree/Tree/Node';
 import { workspace } from '../../main/workspace/Workspace';
 import { modelProvider } from '../../main/services/ModelProvider';
+import {SearchTask} from "../../main/task/search/searchTask/SearchTask";
 
 ipcMain.handle(IpcEvents.INVENTORY_GET_ALL, async (_event, invget: Partial<Inventory>) => {
   let inv: any;

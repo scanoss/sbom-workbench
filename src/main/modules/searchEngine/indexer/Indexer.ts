@@ -29,18 +29,4 @@ export class Indexer {
       });
     });
   }
-
-  public getIndex(pathToDictionary: string) {
-    const index = new Index('memory');
-    const indexerAdapter = new IndexerAdapter();
-    if (fs.existsSync(pathToDictionary)) {
-      fs.readdirSync(pathToDictionary).forEach((filename) => {
-        const file = path.join(pathToDictionary, filename);
-        const indexFile = indexerAdapter.getFileIndex(filename);
-        const data: any = fs.readFileSync(file, 'utf8');
-        index.import(indexFile, data ?? null);
-      });
-    }
-    return index;
-  }
 }
