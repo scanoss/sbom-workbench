@@ -110,7 +110,7 @@ const CircularComponent = ({ stage, progress, pauseScan }: CircularComponentProp
           <span className={classes.stageStep}>STAGE {stage.stageStep}/3</span>
         </div>
         <div className={classes.pauseContainer}>
-          <Button startIcon={<PauseIcon />} onClick={pauseScan}>
+          <Button disabled={stage.stageStep !== 2} startIcon={<PauseIcon />} onClick={pauseScan}>
             <span className={classes.pause}>PAUSE</span>
           </Button>
         </div>
