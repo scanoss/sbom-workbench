@@ -3,7 +3,10 @@ import { CircularProgress, makeStyles, Button } from '@material-ui/core';
 import PauseIcon from '@material-ui/icons/Pause';
 
 interface CircularComponentProps {
-  stage: string;
+  stage: {
+    stageName: string;
+    stageStep: number;
+  };
   progress: number;
   pauseScan: () => void;
 }
@@ -68,11 +71,16 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  stageStep: {
+    fontWeight: 'bold',
+    fontSize: '0.8em',
+    marginTop: '2px',
+  }
 }));
 
 const CircularComponent = ({ stage, progress, pauseScan }: CircularComponentProps) => {
   const classes = useStyles();
-  const variant = stage === 'preparing' || stage === 'indexing' ? 'indeterminate' : 'determinate';
+  const variant = stage.stageName === 'preparing' || stage.stageName === 'indexing' ? 'indeterminate' : 'determinate';
 
   return (
     <div className={classes.parentBox}>
@@ -98,7 +106,8 @@ const CircularComponent = ({ stage, progress, pauseScan }: CircularComponentProp
             {Math.round(progress)}
             {variant === 'determinate' ? '%' : ''}
           </span>
-          <span className={classes.stage}>{stage.toUpperCase()}</span>
+          <span className={classes.stage}>{stage.stageName.toUpperCase()}</span>
+          <span className={classes.stageStep}>STAGE {stage.stageStep}/3</span>
         </div>
         <div className={classes.pauseContainer}>
           <Button startIcon={<PauseIcon />} onClick={pauseScan}>

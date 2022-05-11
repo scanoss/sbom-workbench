@@ -45,7 +45,10 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
       // eslint-disable-next-line no-restricted-syntax
       for (const file of filesScanned) delete this.project.filesToScan[`${this.project.getScanRoot()}${file}`];
       this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-        stage: ScanState.SCANNING,
+        stage: {
+          stageName: ScanState.SCANNING,
+          stageStep: 2,
+        },
         processed: (100 * this.project.processedFiles) / this.project.filesSummary.include,
       });
     });
@@ -58,6 +61,7 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       await this.done(resultPath);
+      await new IndexTask().run(this.msgToUI);
       await this.addDependencies();
       this.project.metadata.setScannerState(ScanState.FINISHED);
       this.project.metadata.save();
@@ -89,7 +93,6 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
     const files = await fileHelper.getPathFileId();
     await resultService.insertFromFile(resultPath, files);
     await componentService.importComponents();
-    await new IndexTask().run();
   }
 
   private setScannerConfig() {
@@ -115,7 +118,10 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
 
   public scannerStatus() {
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: this.project.metadata.getScannerState(),
+      stage: {
+        stageName:this.project.metadata.getScannerState(),
+        stageStep: 2,
+      },
       processed: 0,
     });
   }
