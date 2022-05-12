@@ -15,7 +15,10 @@ export class ResumeScanTask extends ScannerTask {
 
   public scannerStatus() {
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: ScanState.SCANNING,
+      stage: {
+        stageName: ScanState.SCANNING,
+        stageStep: '1/1',
+      },
       processed: (100 * this.project.processedFiles) / this.project.filesSummary.include,
     });
   }

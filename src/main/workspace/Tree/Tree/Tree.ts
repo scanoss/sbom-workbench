@@ -183,7 +183,10 @@ export class Tree {
       this.filesIndexed += 1;
       if (this.filesIndexed % 100 === 0) {
         this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-          stage: `indexing`,
+          stage: {
+            stageName: `indexing`,
+            stageStep: 1,
+          },
           processed: this.filesIndexed,
         });
       }

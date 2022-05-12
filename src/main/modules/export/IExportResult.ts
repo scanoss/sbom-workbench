@@ -1,4 +1,4 @@
-export interface ExportResult {
+export interface IExportResult {
   success: boolean;
   message: string;
   extension: string;

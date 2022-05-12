@@ -1,7 +1,7 @@
 import { IpcEvents } from '../ipc-events';
 import { BaseService } from './base.service';
 import { ExportFormat } from '../types';
-import { ExportDTO } from '../../main/task/export/ExportDTO';
+import { ExportDTO } from '../../main/modules/export/ExportDTO';
 
 const { ipcRenderer } = require('electron');
 

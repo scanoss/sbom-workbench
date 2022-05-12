@@ -1,19 +1,20 @@
-import { EventEmitter } from "events";
-import { DependencyScanner, SbomMode, Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from "scanoss";
-import fs from "fs";
-import log from "electron-log";
-import { INewProject, ScanState } from "../../../api/types";
-import { dependencyService } from "../../services/DependencyService";
-import { Project } from "../../workspace/Project";
-import { IpcEvents } from "../../../api/ipc-events";
-import { fileService } from "../../services/FileService";
-import { fileHelper } from "../../helpers/FileHelper";
-import { resultService } from "../../services/ResultService";
-import { componentService } from "../../services/ComponentService";
-import { userSettingService } from "../../services/UserSettingService";
-import AppConfig from "../../../config/AppConfigModule";
-import { AutoAccept } from "../Inventory/AutoAccept";
-import { ITask } from "../Task";
+import { EventEmitter } from 'events';
+import { DependencyScanner, Scanner, SbomMode, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
+import fs from 'fs';
+import log from 'electron-log';
+import { INewProject, ScanState } from '../../../api/types';
+import { dependencyService } from '../../services/DependencyService';
+import { Project } from '../../workspace/Project';
+import { IpcEvents } from '../../../api/ipc-events';
+import { fileService } from '../../services/FileService';
+import { fileHelper } from '../../helpers/FileHelper';
+import { resultService } from '../../services/ResultService';
+import { componentService } from '../../services/ComponentService';
+import { userSettingService } from '../../services/UserSettingService';
+import AppConfig from '../../../config/AppConfigModule';
+import { AutoAccept } from '../Inventory/AutoAccept';
+import { ITask } from '../Task';
+import { IndexTask } from "../search/indexTask/IndexTask";
 
 export abstract class ScannerTask extends EventEmitter implements ITask<void, boolean> {
   protected msgToUI!: Electron.WebContents;
@@ -44,7 +45,10 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
       // eslint-disable-next-line no-restricted-syntax
       for (const file of filesScanned) delete this.project.filesToScan[`${this.project.getScanRoot()}${file}`];
       this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-        stage: ScanState.SCANNING,
+        stage: {
+          stageName: ScanState.SCANNING,
+          stageStep: 2,
+        },
         processed: (100 * this.project.processedFiles) / this.project.filesSummary.include,
       });
     });
@@ -57,6 +61,7 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       await this.done(resultPath);
+      await new IndexTask().run(this.msgToUI);
       await this.addDependencies();
       this.project.metadata.setScannerState(ScanState.FINISHED);
       this.project.metadata.save();
@@ -88,7 +93,6 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
     const files = await fileHelper.getPathFileId();
     await resultService.insertFromFile(resultPath, files);
     await componentService.importComponents();
-
   }
 
   private setScannerConfig() {
@@ -114,7 +118,10 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
 
   public scannerStatus() {
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
-      stage: this.project.metadata.getScannerState(),
+      stage: {
+        stageName:this.project.metadata.getScannerState(),
+        stageStep: 2,
+      },
       processed: 0,
     });
   }
