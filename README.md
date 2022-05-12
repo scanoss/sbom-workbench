@@ -1,5 +1,7 @@
 <div align="center">
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/scanoss/audit-workbench)
+![License](https://img.shields.io/badge/license-GPL--2.0-brightgreen)
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/xsk)](https://api.reuse.software/info/github.com/SAP/xsk)
 
 </div>
