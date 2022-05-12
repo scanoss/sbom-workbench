@@ -15,14 +15,32 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    padding: 12px;
+    align-items: center;
+    padding: 8px 12px;
+    gap: 10px;
 
-      .label-title {
-        margin-left: 4px;
-        font-weight: 600;
-        color: #212020;
-        font-size: 18px;
+    .MuiListItemText-root {
+      margin: 0 6px;
+
+      .MuiListItemText-primary {
+        font-size: 0.85rem;
+        font-weight: 500;
       }
+
+      .MuiListItemText-secondary {
+        font-size: 0.75rem;
+
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        word-break: break-all;
+      }
+    }
+
+
+
 
       .actions {
         opacity: 0.5;

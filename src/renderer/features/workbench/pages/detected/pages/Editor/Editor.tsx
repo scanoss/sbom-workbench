@@ -260,13 +260,19 @@ export const Editor = () => {
               )}
 
               <div className="info-files">
-                <FileToolbar id={CodeViewerManager.LEFT} label="Source File" file={`${scanBasePath}${file}`} />
+                <FileToolbar
+                  id={CodeViewerManager.LEFT}
+                  label="Source File"
+                  fullpath={`${scanBasePath}${file}`}
+                  file={file}
+                />
                 {matchInfo && currentMatch && currentMatch.file ? (
                   <FileToolbar
                     id={isDiffView ? CodeViewerManager.RIGHT : CodeViewerManager.LEFT}
                     label="Component File"
+                    fullpath={`${scanBasePath}${currentMatch.file}`}
                     file={currentMatch.file}
-                    actions={[ToolbarActions.FIND]}
+                    actions={[ToolbarActions.FIND, ToolbarActions.COPY_PATH]}
                   />
                 ) : (
                   inventories?.length === 0 &&
