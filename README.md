@@ -1,9 +1,9 @@
 <div align="center">
 
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/xsk)](https://api.reuse.software/info/github.com/SAP/xsk)
-[![Github Tag][github-tag-image]][github-tag-url]
 
 </div>
+
 # SCANOSS AUDIT WORKBENCH
 The SCANOSS Audit Workbench is a graphical user interface to scan and audit source code using SCANOSS API.
 
