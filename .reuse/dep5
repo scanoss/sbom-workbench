@@ -1,0 +1,21 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: SCANOSS Audit Workbench
+Upstream-Contact: SCANOSS <info@scanoss.com>
+Source: https://github.com/scanoss/audit-workbench
+
+
+Files: src/* assets/* .* *.md *.json  *.js *.lock
+Copyright: 2021 SCANOSS Audit Workbench <info@scanoss.com>
+License: GPL-2.0-only
+
+Files: .erb/* .vscode/*
+Copyright: Electron React Boilerplate <electronreactboilerplate@gmail.com>
+License: MIT
+
+Files: assets/fonts/Inter-*
+Copyright: Rasmus <https://github.com/rsms/inter>
+License: OFL-1.1
+
+Files: assets/fonts/SpaceMono-*
+Copyright: Colophon <https://www.colophon-foundry.org/>
+License: OFL-1.1
