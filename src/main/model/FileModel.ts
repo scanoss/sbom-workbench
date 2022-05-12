@@ -1,10 +1,9 @@
 import log from 'electron-log';
+import { FileDTO } from "@api/dto";
 import { Querys } from './querys_db';
-import { File } from '../../api/types';
 import { InventoryModel } from './InventoryModel';
 import { Model } from './Model';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
-import {FileDTO} from "@api/dto";
 
 const query = new Querys();
 
@@ -42,7 +41,7 @@ export class FileModel extends Model {
   }
 
   public getAll(queryBuilder?: QueryBuilder): Promise<any[]> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<any>(async (resolve, reject) => {
       try {
         const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_FILES, this.getEntityMapper());
         const db = await this.openDb();
@@ -75,29 +74,6 @@ export class FileModel extends Model {
       } catch (error) {
         log.error(error);
         reject(new Error('Ignore files were not successfully retrieved'));
-      }
-    });
-  }
-
-  private getByPath(file: Partial<File>) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(function () {
-          db.get(query.SQL_GET_FILE_BY_PATH, file.path, (err: any, data: any) => {
-            if (data.identified === 0 && data.ignored === 0) {
-              data.pending = 1;
-            } else {
-              data.pending = 0;
-            }
-            db.close();
-            if (err) throw err;
-            else resolve(data);
-          });
-        });
-      } catch (error) {
-        log.error(error);
-        reject(new Error('File were not successfully retrieved'));
       }
     });
   }

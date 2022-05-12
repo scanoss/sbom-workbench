@@ -1,21 +1,22 @@
 /* eslint-disable no-async-promise-executor */
 
-import { Format } from './Format';
-import { Spdxv20 } from './format/Spdxv20';
-import { SpdxLite } from './format/SpdxLite';
-import { Csv } from './format/Csv';
-import { Raw } from './format/Raw';
-import { Wfp } from './format/Wfp';
-import { HtmlSummary } from './format/HtmlSummary';
-import { ExportFormat } from '../../../api/types';
-import { SpdxLiteJson } from './format/SpdxLiteJson';
+import { Format } from '../../modules/export/Format';
+import { Spdxv20 } from '../../modules/export/format/Spdxv20';
+import { SpdxLite } from '../../modules/export/format/SpdxLite';
+import { Csv } from '../../modules/export/format/Csv';
+import { Raw } from '../../modules/export/format/Raw';
+import { Wfp } from '../../modules/export/format/Wfp';
+import { HtmlSummary } from '../../modules/export/format/HtmlSummary';
+import { SpdxLiteJson } from '../../modules/export/format/SpdxLiteJson';
 import { ITask } from '../Task';
-import { ExportResult } from './ExportResult';
+import { IExportResult } from "../../modules/export/IExportResult";
+import { ExportFormat } from "../../../api/types";
 
-export class Export implements ITask<string, ExportResult> {
+
+export class Export implements ITask<string, IExportResult> {
   private format: Format;
 
-  public async run(path: string): Promise<ExportResult> {
+  public async run(path: string): Promise<IExportResult> {
     try {
       const result = await this.format.save(path);
       return result;

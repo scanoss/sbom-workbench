@@ -31,6 +31,7 @@ export class ReScanTask extends ScannerTask {
     p.metadata.setScannerState(ScanState.RESCANNING);
     await modelProvider.init(p.getMyPath());
     await licenseService.import();
+    p.save();
     this.project = p;
   }
 }
