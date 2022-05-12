@@ -140,8 +140,6 @@ export class Querys {
 
   SQL_SELECT_INVENTORIES_NOT_HAVING_FILES = `SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories) AND i.source='detected';`;
 
-  SQL_GET_FILE_BY_PATH = 'SELECT fileId,path,identified,ignored FROM files WHERE path=?;';
-
   SQL_GET_SPDX_COMP_DATA = `SELECT DISTINCT c.purl,c.version,c.url,c.name,i.spdxid AS concludedLicense,i.notes,l.spdxid AS declareLicense,lic.fulltext,lic.official
   FROM inventories  i
   LEFT JOIN license_view l ON l.cvid=i.cvid

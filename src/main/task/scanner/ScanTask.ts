@@ -9,6 +9,7 @@ import { treeService } from '../../services/TreeService';
 
 export class ScanTask extends ScannerTask {
   public async set(project: INewProject): Promise<void> {
+    await workspace.closeAllProjects();
     const p = await workspace.createProject(project);
     await modelProvider.init(p.getMyPath());
     await licenseService.import();

@@ -5,6 +5,7 @@ import { QueryBuilderCustom } from './QueryBuilderCustom';
 import { QueryBuilderIN } from './QueryBuilderIN';
 import { QueryBuilderStatus } from './QueryBuilderStatus';
 import { QueryBuilderUsage } from './QueryBuilderUsage';
+import { QueryBuilderFileIdIn } from './QueryBuilderFilIdIN';
 import { QueryBuilderFilename } from './QueryBuilderFilename';
 
 export class QueryBuilderCreator {
@@ -37,6 +38,11 @@ export class QueryBuilderCreator {
       }
       if (params.id) {
         builder.add(new QueryBuilderCustom('id', '=', params.id));
+      }
+      if (params.fileId) {
+        const queryBuilderIN = new QueryBuilderIN();
+        queryBuilderIN.add(new QueryBuilderFileIdIn(params.fileId));
+        return queryBuilderIN;
       }
       if (params.filename) {
         builder.add(new QueryBuilderFilename(params.filename));

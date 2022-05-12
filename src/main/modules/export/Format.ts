@@ -1,7 +1,8 @@
 import log from 'electron-log';
 import fs from 'fs';
-import { ExportResult } from './ExportResult';
+
 import { ExportModel } from './Model/ExportModel';
+import { IExportResult } from "./IExportResult";
 
 export abstract class Format {
   protected export: ExportModel;
@@ -14,7 +15,7 @@ export abstract class Format {
 
   public abstract generate();
 
-  public async save(path: string): Promise<ExportResult> {
+  public async save(path: string): Promise<IExportResult> {
     const file = await this.generate();
     try {
       await fs.promises.writeFile(`${path}${this.extension}`, file);
