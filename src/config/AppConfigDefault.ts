@@ -20,4 +20,5 @@ export const AppConfigDefault: IAppConfig = {
   ],
   FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN: false,
   FF_ENABLE_API_CONNECTION_SETTINGS: true,
+  SEARCH_ENGINE_DEFAULT_LIMIT: 10,
 };

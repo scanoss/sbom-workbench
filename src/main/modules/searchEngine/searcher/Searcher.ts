@@ -9,7 +9,10 @@ export class Searcher {
   private index: any;
 
   public search(params: ISearcher): number[] {
-    return this.index.search(params.query,params.params? params.params : {});
+    if(this.index) {
+    return this.index.search(params.query,params.params? params.params : null);
+    }
+    return [];
   }
 
   public setIndex(index: any) {
@@ -17,8 +20,9 @@ export class Searcher {
   }
 
   public loadIndex(pathToDictionary: string) {
-    const index = new Index('memory');
+    let index = new Index('memory');
     const indexerAdapter = new IndexerAdapter();
+
     if (fs.existsSync(pathToDictionary)) {
       fs.readdirSync(pathToDictionary).forEach((filename) => {
         const file = path.join(pathToDictionary, filename);
@@ -26,6 +30,8 @@ export class Searcher {
         const data: any = fs.readFileSync(file, 'utf8');
         index.import(indexFile, data ?? null);
       });
+    }else{
+      index =null;
     }
    this.index = index;
   }

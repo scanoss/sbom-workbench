@@ -1,7 +1,6 @@
 import { IpcEvents } from '../ipc-events';
 import { BaseService } from './base.service';
-import { FileDTO, GetFileDTO } from "@api/dto";
-
+import { FileDTO, GetFileDTO } from "../dto";
 
 const { ipcRenderer } = require('electron');
 
