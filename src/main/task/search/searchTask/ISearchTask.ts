@@ -4,6 +4,6 @@ export interface ISearchTask {
     offset?: number;
     limit?: number;
     bool?: "or" | "and";
-    tokenizer? : "strict" | "forward" | "reverse" | "full";
+    tokenize ? : "strict" | "forward" | "reverse" | "full";
   }
 }

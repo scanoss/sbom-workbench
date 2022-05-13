@@ -1,4 +1,4 @@
-import { Searcher } from '../../../modules/searchEngine/searcher/Searcher';
+import { searcher } from '../../../modules/searchEngine/searcher/Searcher';
 import { workspace } from '../../../workspace/Workspace';
 import { ITask } from '../../Task';
 import { modelProvider } from '../../../services/ModelProvider';
@@ -7,11 +7,15 @@ import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCre
 import { AppConfigDefault } from '../../../../config/AppConfigDefault';
 
 export class SearchTask implements ITask<ISearchTask, ISearchTask> {
-  private searcher: Searcher;
+  private search = searcher;
+
+  private readonly DICTIONARY_FOLDER = '/dictionary/';
+
+  private isFinished: boolean;
 
   constructor() {
-    this.searcher = new Searcher();
-    this.searcher.loadIndex(`${workspace.getOpenProject().getMyPath()}/dictionary/`);
+    this.search.loadIndex(`${workspace.getOpenProject().getMyPath()}${this.DICTIONARY_FOLDER}`);
+    this.isFinished = false;
   }
 
   public async run(params: ISearchTask): Promise<ISearchTask> {
@@ -19,11 +23,18 @@ export class SearchTask implements ITask<ISearchTask, ISearchTask> {
       const limit = AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT;
       params.params = { limit };
     }
-    console.log(params.params);
-    const fileIds = this.searcher.search(params);
+    const fileIds = this.search.search(params);
     const results = (await modelProvider.model.file.getAll(
       QueryBuilderCreator.create({ fileId: fileIds })
     )) as unknown as ISearchTask;
-    return results;
+    if (!this.isFinished){
+      return results;
+    }
+    throw new Error('SearchTask is finished');
+
+  }
+
+  public finish(): void {
+    this.isFinished = true;
   }
 }

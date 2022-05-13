@@ -9,10 +9,12 @@ import { workspace } from '../../main/workspace/Workspace';
 import { dependencyService } from '../../main/services/DependencyService';
 import { ResumeScanTask } from '../../main/task/scanner/ResumeScanTask';
 import { ReScanTask } from '../../main/task/scanner/ReScanTask';
+import { searcher } from "../../main/modules/searchEngine/searcher/Searcher";
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
   // TO DO factory to create filters depending on arguments
   const p: Project = await workspace.openProject(new ProjectFilterPath(arg));
+  searcher.closeIndex();
   p.getTree().setMailbox(event.sender);
   const response = {
     logical_tree: p.getTree().getRootFolder(),
