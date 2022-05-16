@@ -1,5 +1,6 @@
 #editor {
   display: grid;
+  height: 100%;
 
   .app-header {
     padding-bottom: 0;
@@ -48,9 +49,6 @@
   grid-gap: 10px;
   overflow-y: auto;
   max-height: 160px;
-  padding: 3px 0;
-
-
 
   @media screen and (max-width: 1100px) {
    grid-template-columns: 100%;
@@ -59,87 +57,50 @@
     }
   }
 }
-
-.info-files, .editors {
+.info-files {
+  margin-top: 10px;
   display: grid;
-  grid-template-columns: calc(50% - 10px) 50%;
+  grid-template-columns: calc(50% - 10px) 50%;;
   grid-gap: 10px;
 }
 
-.info-files {
-  margin-top: 10px;
-}
-
 .editors {
+  display: grid;
+  overflow-y: visible !important;
 
-  .code-viewer.truncatedStart code > span:first-child, .code-viewer.truncatedEnd code > span:last-child {
-    position: relative;
-
-    &::before {
-      content: 'Content too long, file was truncated';
-      position: absolute;
-      width: 100%;
-      text-align: center;
-      font-size: 10px;
-    }
-  }
-
-  .code-viewer.truncatedStart code > span:first-child {
-    padding-top: 35px;
-    &::before {
-      top: 10px;
-     }
-  }
-
-  .code-viewer.truncatedEnd code > span:last-child {
-    padding-bottom: 35px;
-    &::before {
-      bottom: 10px;
-     }
-  }
-
-  &.editors-full {
-    grid-template-columns: 100%;
+  &.diff-view {
+    grid-template-columns: calc(50% - 10px) 50%;;
+    grid-gap: 10px;
   }
 
   .editor {
     height: 100%;
-    overflow: hidden;
     display: flex;
-    flex-direction: column;
+    background: #1a1a1a;
+    border-radius: 4px;
 
-    .line-highlighted {
-      display: block;
-      background-color: #343b24 !important; // 266a8452
-
-    }
-
-    .linenumber {
-      color: #eeeeee;
-    }
-
-    span:not(.linenumber) {
-      user-select: text !important;
-      -webkit-user-select: text !important;
-      -webkit-user-drag: initial !important;
-    }
-
-    pre {
-      margin: 0;
-      padding: 0 !important;
+    #viewer {
+      display: grid;
       height: 100%;
-
-      code {
-        display: grid;
-      }
+      width: 100%;
     }
 
-    p {
-      font-style: normal;
-      font-weight: bold;
-      font-size: 20px;
-      padding: 0;
-      margin: 0;
+    .file-loader {
+      margin: auto;
+      font-size: 12px;
+      color: #d9d7d7;
+    }
+
+    .line-highlight {
+      background: rgba(52, 59, 36, 0.73);
+    }
+
+    .editor-widget.find-widget.reduced-find-widget.visible {
+      z-index: 6;
+    }
+
+    .monaco-editor, .monaco-editor .overflow-guard {
+      border-radius: 4px;
     }
   }
 
@@ -150,7 +111,6 @@
     height: 100%;
     justify-content: center;
     align-items: center;
-
 
     p {
       margin-top: 10px;

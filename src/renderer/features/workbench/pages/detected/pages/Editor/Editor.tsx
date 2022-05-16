@@ -1,8 +1,7 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
-import { AppContext, IAppContext } from '@context/AppProvider';
 import { FileType, Inventory } from '@api/types';
 import { mapFiles } from '@shared/utils/scan-util';
 import { inventoryService } from '@api/services/inventory.service';
@@ -11,30 +10,26 @@ import { InventoryForm } from '@context/types';
 import { getExtension } from '@shared/utils/utils';
 import { fileService } from '@api/services/file.service';
 import { useDispatch, useSelector } from 'react-redux';
+import { createInventory, detachFile, ignoreFile, restoreFile } from '@store/inventory-store/inventoryThunks';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
-import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
-import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
-import LabelCard from '../../../../components/LabelCard/LabelCard';
+import FileToolbar, { ToolbarActions } from '../../../../components/FileToolbar/FileToolbar';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
-import NoLocalFile from './components/NoLocalFile/NoLocalFile';
-import {
-  createInventory,
-  detachFile,
-  ignoreFile,
-  restoreFile,
-} from '../../../../../../store/inventory-store/inventoryThunks';
-import { selectWorkbench } from '../../../../../../store/workbench-store/workbenchSlice';
-import { selectNavigationState } from '../../../../../../store/navigation-store/navigationSlice';
+import CodeViewer from '../../../../components/CodeViewer/CodeViewer';
+import { CodeViewerManager } from './CodeViewerManager';
+import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
+import * as FileUtils from '@shared/utils/file-utils';
 
-const MemoCodeEditor = React.memo(CodeEditor);
+const MemoCodeViewer = React.memo(CodeViewer);
 
 export interface FileContent {
   content: string | null;
   error: boolean;
 }
 
-const Editor = () => {
+export const Editor = () => {
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -50,12 +45,12 @@ const Editor = () => {
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
-  const [fullFile, setFullFile] = useState<boolean>(null);
+  const [isDiffView, setIsDiffView] = useState<boolean>(false);
 
   const init = () => {
     setMatchInfo(null);
     setInventories(null);
-    setFullFile(false);
+    setIsDiffView(false);
     setLocalFileContent({ content: null, error: false });
     setRemoteFileContent({ content: null, error: false });
 
@@ -130,7 +125,7 @@ const Editor = () => {
       usage: 'file',
     });
     if (response) {
-      const f = await fileService.get({ path:file });
+      const f = await fileService.get({ path: file });
       if (!f) return;
       await dispatch(
         createInventory({
@@ -175,9 +170,9 @@ const Editor = () => {
 
   useEffect(() => {
     if (currentMatch) {
-      const full = currentMatch?.type === 'file';
-      setFullFile(full);
-      if (!full || imported) loadRemoteFile(currentMatch.md5_file);
+      const diff = currentMatch?.type !== 'file';
+      setIsDiffView(diff);
+      if (diff || imported) loadRemoteFile(currentMatch.md5_file);
     }
   }, [currentMatch]);
 
@@ -216,7 +211,7 @@ const Editor = () => {
           <>
             <header className="match-info-header">
               {(!matchInfo || !inventories) && (
-                <Skeleton variant="rect" width="50%" height={60} style={{ marginBottom: 18 }} />
+                <Skeleton variant="rect" width="50%" height={58} style={{ marginBottom: 15 }} />
               )}
 
               {matchInfo && inventories && (matchInfo.length > 0 || inventories.length > 0) && (
@@ -250,7 +245,9 @@ const Editor = () => {
                               vendor: match.component?.vendor,
                               version: match.component?.version,
                               usage: match.type,
-                              license: match.component?.licenses.find((l) => l.spdxid === match.license[0])?.name || match.license[0],
+                              license:
+                                match.component?.licenses.find((l) => l.spdxid === match.license[0])?.name ||
+                                match.license[0],
                               url: match.component?.url,
                               purl: match.component?.purl,
                             }}
@@ -264,59 +261,78 @@ const Editor = () => {
               )}
 
               <div className="info-files">
-                <LabelCard label="Source File" file={file} status={null} />
-                {matchInfo && currentMatch && currentMatch.file && (
-                  <LabelCard label="Component File" status={null} file={currentMatch.file} />
+                <FileToolbar
+                  id={CodeViewerManager.LEFT}
+                  label="Source File"
+                  fullpath={`${scanBasePath}${file}`}
+                  file={file}
+                />
+                {matchInfo && currentMatch && currentMatch.file ? (
+                  <FileToolbar
+                    id={isDiffView ? CodeViewerManager.RIGHT : CodeViewerManager.LEFT}
+                    label="Component File"
+                    fullpath={FileUtils.getFileURL(currentMatch)}
+                    file={currentMatch.file}
+                    actions={
+                      FileUtils.canOpenURL(currentMatch)
+                        ? [ToolbarActions.FIND, ToolbarActions.COPY_PATH, ToolbarActions.OPEN_IN_BROWSER]
+                        : [ToolbarActions.FIND, ToolbarActions.COPY_PATH]
+                    }
+                  />
+                ) : (
+                  inventories?.length === 0 &&
+                  matchInfo?.length === 0 && <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} showLabel />
                 )}
               </div>
             </header>
           </>
         </header>
 
-        {fullFile ? (
-          <main className="editors editors-full app-content">
-            <div className="editor">
-              {matchInfo && (localFileContent?.content || remoteFileContent?.content) ? (
-                <MemoCodeEditor
-                  language={getExtension(file)}
-                  content={localFileContent.content || remoteFileContent.content}
-                  highlight={currentMatch?.lines || null}
-                />
-              ) : null}
-            </div>
-          </main>
-        ) : (
-          <main className="editors app-content">
-            <div className="editor">
-              {matchInfo && localFileContent?.content ? (
-                <>
-                  <MemoCodeEditor
-                    language={getExtension(file)}
-                    content={localFileContent.content}
-                    highlight={currentMatch?.lines || null}
-                  />
-                </>
-              ) : imported ? (
-                <NoLocalFile />
-              ) : null}
-            </div>
-            {inventories?.length === 0 && matchInfo?.length === 0 ? (
-              <div className="editor">
-                <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} showLabel />
-              </div>
+        <main
+          className={`
+          editors
+          app-content
+          ${isDiffView ? 'diff-view' : ''}
+          `}
+        >
+          <div className="editor">
+            {/* TODO: we need to remove this IF statement. Should we keep editor instance to better performance and UX. Problem: editors not re-layout on changing file */}
+            {localFileContent?.content || remoteFileContent?.content || imported ? (
+              <MemoCodeViewer
+                id={CodeViewerManager.LEFT}
+                language={getExtension(file)}
+                value={
+                  localFileContent?.content ||
+                  remoteFileContent?.content ||
+                  (imported ? "// This project was imported. Source file can't be displayed." : '')
+                }
+                highlight={currentMatch?.lines || null}
+              />
             ) : (
-              <div className="editor">
-                {currentMatch && remoteFileContent?.content ? (
-                  <MemoCodeEditor
-                    language={getExtension(file)}
-                    content={remoteFileContent.content}
-                    highlight={currentMatch?.oss_lines || null}
-                  />
-                ) : null}
-              </div>
+              <div className="file-loader">Loading local file</div>
             )}
-          </main>
-        )}
+          </div>
+
+          {isDiffView && currentMatch && (
+            <div className="editor">
+              {remoteFileContent?.content ? (
+                <MemoCodeViewer
+                  id={CodeViewerManager.RIGHT}
+                  language={getExtension(file)}
+                  value={remoteFileContent.content || ''}
+                  highlight={currentMatch.oss_lines || null}
+                />
+              ) : (
+                <div className="file-loader">Loading remote file</div>
+              )}
+            </div>
+          )}
+        </main>
+        {/*
+          ) : imported ? (
+            <NoLocalFile />
+          ) : null}
+         */}
       </section>
     </>
   );

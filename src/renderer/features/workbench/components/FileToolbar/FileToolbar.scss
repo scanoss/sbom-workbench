@@ -1,0 +1,56 @@
+.label-card {
+  background-color: #ffff;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.06), 0px 1px 3px rgba(0, 0, 0, 0.1);
+
+  @media screen and (max-width: $md) {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .label-card-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    gap: 10px;
+
+    .MuiListItemText-root {
+      margin: 0 6px;
+
+      .MuiListItemText-primary {
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+
+      .MuiListItemText-secondary {
+        font-size: 0.75rem;
+
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        word-break: break-all;
+      }
+    }
+
+
+      .actions {
+        opacity: 0.5;
+        display: flex;
+        gap: 4px;
+
+        .copy-path, .open-in-browser {
+          font-size: 16px;
+        }
+      }
+    }
+
+    &:hover .actions {opacity: 1;}
+}
+

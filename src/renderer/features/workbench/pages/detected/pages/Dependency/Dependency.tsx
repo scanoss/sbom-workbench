@@ -22,10 +22,11 @@ import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import CodeViewSelector, { CodeViewSelectorMode } from './components/CodeViewSelector/CodeViewSelector';
 import DependencyTree from './components/DependencyTree/DependencyTree';
 import NoLocalFile from './components/NoLocalFile/NoLocalFile';
-import CodeEditor from '../../../../components/CodeEditor/CodeEditor';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
 import ActionButton from './components/ActionButton/ActionButton';
 import TabNavigation, { DependencyStatus } from './components/TabNavigation/TabNavigation';
+import { CodeViewerManager } from '../Editor/CodeViewerManager';
+import CodeViewer from '../../../../components/CodeViewer/CodeViewer';
 
 export interface FileContent {
   content: string | null;
@@ -38,7 +39,7 @@ const filter = (items, query, status) => {
   });
 };
 
-const MemoCodeEditor = React.memo(CodeEditor);
+const MemoCodeViewer = React.memo(CodeViewer);
 
 const DependencyViewer = () => {
   const dispatch = useDispatch();
@@ -173,11 +174,16 @@ const DependencyViewer = () => {
 
         </header>
         <main className="editors editors-full app-content">
-          <div className="editor">
+          <div className="">
             {localFileContent?.content ? (
               <>
                 {view === CodeViewSelectorMode.CODE ? (
-                  <MemoCodeEditor language={getExtension(file)} content={localFileContent.content} highlight={null} />
+                  <MemoCodeViewer
+                    id={CodeViewerManager.LEFT}
+                    language={getExtension(file)}
+                    value={localFileContent.content}
+                    highlight={null}
+                  />
                 ) : (
                   <>
                     <div className="dependencies-tree-header mt-1 mb-2">
