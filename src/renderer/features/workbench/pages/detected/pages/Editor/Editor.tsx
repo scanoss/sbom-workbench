@@ -20,6 +20,7 @@ import { workbenchController } from '../../../../../../controllers/workbench-con
 import CodeViewer from '../../../../components/CodeViewer/CodeViewer';
 import { CodeViewerManager } from './CodeViewerManager';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
+import * as FileUtils from '@shared/utils/file-utils';
 
 const MemoCodeViewer = React.memo(CodeViewer);
 
@@ -270,9 +271,13 @@ export const Editor = () => {
                   <FileToolbar
                     id={isDiffView ? CodeViewerManager.RIGHT : CodeViewerManager.LEFT}
                     label="Component File"
-                    fullpath={`${scanBasePath}${currentMatch.file}`}
+                    fullpath={FileUtils.getFileURL(currentMatch)}
                     file={currentMatch.file}
-                    actions={[ToolbarActions.FIND, ToolbarActions.COPY_PATH]}
+                    actions={
+                      FileUtils.canOpenURL(currentMatch)
+                        ? [ToolbarActions.FIND, ToolbarActions.COPY_PATH, ToolbarActions.OPEN_IN_BROWSER]
+                        : [ToolbarActions.FIND, ToolbarActions.COPY_PATH]
+                    }
                   />
                 ) : (
                   inventories?.length === 0 &&

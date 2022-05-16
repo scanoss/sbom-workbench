@@ -1,10 +1,10 @@
 import React from 'react';
-import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import OpenInBrowserOutlinedIcon from '@material-ui/icons/OpenInBrowserOutlined';
 import FindInPageOutlinedIcon from '@material-ui/icons/FindInPageOutlined';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+
 import { IconButton, ListItemText, Tooltip, Typography } from '@material-ui/core';
 import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
-import Label from '../Label/Label';
 import CodeViewerManagerInstance from '../../pages/detected/pages/Editor/CodeViewerManager';
 
 const { shell } = require('electron')
@@ -55,8 +55,8 @@ const FileToolbar = ({ id, label, fullpath, file, actions }: FileToolbarProps) =
     {
       id: ToolbarActions.OPEN_IN_BROWSER,
       hint: 'Open file in browser',
-      icon: <OpenInBrowserOutlinedIcon fontSize="inherit" />,
-      run: () => console.log(fullpath),
+      icon: <OpenInNewIcon fontSize="inherit" />,
+      run: () => shell.openExternal(fullpath),
     },
   ];
 
