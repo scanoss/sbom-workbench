@@ -4,7 +4,7 @@ Upstream-Contact: SCANOSS <info@scanoss.com>
 Source: https://github.com/scanoss/audit-workbench
 
 
-Files: src/* assets/* *.md *.json  *.js *.lock
+Files: src/* assets/* .* *.md *.json  *.js *.lock
 Copyright: 2021 SCANOSS Audit Workbench <info@scanoss.com>
 License: GPL-2.0-only
 
