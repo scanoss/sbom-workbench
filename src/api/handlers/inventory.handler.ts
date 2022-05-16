@@ -30,7 +30,7 @@ ipcMain.handle(IpcEvents.INVENTORY_GET, async (_event, inv: Partial<Inventory>) 
   }
 });
 
-ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (_event, arg: Inventory) => {
+ipcMain.handle(IpcEvents.INVENTORY_CREATE, async (event, arg: Inventory) => {
   try {
     const inv = await inventoryService.create(arg);
     treeService.updateTree(arg.files, NodeStatus.IDENTIFIED);

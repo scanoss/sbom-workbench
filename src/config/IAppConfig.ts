@@ -15,4 +15,7 @@ export interface IAppConfig {
   FF_EXPORT_FORMAT_OPTIONS: Array<ExportFormat>;
   FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN: boolean;
   FF_ENABLE_API_CONNECTION_SETTINGS: boolean;
+
+  // search engine
+  SEARCH_ENGINE_DEFAULT_LIMIT: number;
 }
