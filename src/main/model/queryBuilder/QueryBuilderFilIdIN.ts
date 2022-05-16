@@ -9,7 +9,7 @@ export class QueryBuilderFileIdIn extends QueryBuilder {
   }
 
   public getSQL(entityMapper: Record<string, string>): string {
-    return `fi.fileId IN (${this.value.toString()})`;
+    return `f.fileId IN (${this.value.toString()})`;
   }
 
   public getFilters(): any[] {

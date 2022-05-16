@@ -1,12 +1,9 @@
 import { ipcMain } from 'electron';
-import { License } from '../types';
-import { IpcEvents } from '../ipc-events';
-import { licenseHelper } from '../../main/helpers/LicenseHelper';
-import { Response } from '../Response';
-import { modelProvider } from '../../main/services/ModelProvider';
-import {licenseService} from "../../main/services/LicenseService";
-import {NewLicenseDTO} from "@api/dto";
 import log from "electron-log";
+import { NewLicenseDTO } from "@api/dto";
+import { IpcEvents } from '../ipc-events';
+import { Response } from '../Response';
+import { licenseService } from "../../main/services/LicenseService";
 
 
 ipcMain.handle(IpcEvents.LICENSE_GET_ALL, async (_event) => {
@@ -25,7 +22,7 @@ ipcMain.handle(IpcEvents.LICENSE_GET, async (_event, id:number) => {
     return Response.ok({ message: 'License successfully', data: license });
   } catch (error: any) {
     log.error(error);
-    return Response.fail({message: error.message});
+    return Response.fail({ message: error.message });
   }
 });
 

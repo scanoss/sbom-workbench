@@ -1,7 +1,6 @@
 import { IpcEvents } from '../ipc-events';
 import {
   Component,
-  License,
   ComponentGroup,
   NewComponentDTO,
   IWorkbenchFilter,

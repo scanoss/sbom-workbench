@@ -35,6 +35,7 @@ import './api/handlers/license.handler';
 import './api/handlers/dependency.handler';
 import './api/handlers/userSetting.handler';
 import './api/handlers/dialog.handler';
+import './api/handlers/search.handler';
 
 export default class AppUpdater {
   constructor() {
