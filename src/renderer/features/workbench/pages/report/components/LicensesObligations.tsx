@@ -28,6 +28,9 @@ const LicensesObligations = ({ data }) => {
       return acc;
     }, {});
 
+    console.log(aux);
+    console.log(data)
+
     setLicenseHash(aux);
   };
 
@@ -62,12 +65,12 @@ const LicensesObligations = ({ data }) => {
                 <TableCell className="tableCellForLicensePill">
                   <div className="container-licenses-pills">
                     {license.incompatibles?.map((incompatibleLicense, index) =>
-                      licenseHash[incompatibleLicense] === undefined ? (
+                      !licenseHash[incompatibleLicense] ? (
                         <div key={index} className="tinyPillLicenseContainer">
                           <span className="tinyPillLicenseLabel">{incompatibleLicense}</span>
                         </div>
                       ) : (
-                        <div key={incompatibleLicense.index} className="incompatible tinyPillLicenseContainer">
+                        <div key={index} className="incompatible tinyPillLicenseContainer">
                           <span className="incompatible">{incompatibleLicense}</span>
                         </div>
                       )

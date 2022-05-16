@@ -118,7 +118,14 @@
     "testURL": "http://localhost/",
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/.erb/mocks/fileMock.js",
-      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
+      "\\.(css|less|sass|scss)$": "identity-obj-proxy",
+      "^@api(.*)$": "<rootDir>/src/api$1",
+      "^@assets(.*)$": "<rootDir>/assets$1",
+      "^@config(.*)$": "<rootDir>/src/config$1",
+      "^@context(.*)$": "<rootDir>/src/renderer/context/$1",
+      "^@components(.*)$": "<rootDir>/src/renderer/components/$1",
+      "^@hooks(.*)$": "<rootDir>/src/renderer/hooks$1",
+      "^@store(.*)$": "<rootDir>/src/renderer/store$1"
     },
     "moduleFileExtensions": [
       "js",
@@ -262,7 +269,7 @@
     "react-virtualized": "^9.22.3",
     "react-virtualized-tree": "^3.4.1",
     "regenerator-runtime": "^0.13.5",
-    "scanoss": "^0.2.27",
+    "scanoss": "^0.2.28",
     "sort-paths": "^1.1.1",
     "source-map-support": "^0.5.19",
     "uuid": "^8.3.2"

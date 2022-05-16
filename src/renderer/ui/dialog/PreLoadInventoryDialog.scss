@@ -8,7 +8,7 @@
   padding: 0px 8px;
 }
 
-.list-container{
+.list-container {
   border: transparent;
   border-radius: 20px;
   :focus{
@@ -24,7 +24,7 @@ textarea {
   font-size: 0.75rem;
 }
 
-.divider , .divider-no-license{
+.divider, .divider-no-license{
   border: 0.5px solid #D4D4D8;
   height: 0px;
 }
@@ -129,4 +129,11 @@ textarea {
     fill: grey;
   }
 
+}
+
+
+#PreloadInventoryDialog {
+  .info-box {
+    font-size: 12px;
+  }
 }

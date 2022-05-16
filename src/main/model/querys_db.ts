@@ -151,10 +151,9 @@ export class Querys {
 
   SQL_GET_CSV_DATA = `SELECT DISTINCT i.id AS inventoryId,f.fileId,i.usage,i.notes,i.spdxid AS identified_license,r.license AS detected_license,cv.purl,cv.version,f.path,cv.name AS identified_component,r.component AS detected_component
   FROM inventories i
-  INNER JOIN file_inventories fi ON fi.inventoryid=i.id
-  INNER JOIN files f ON fi.fileId=f.fileId
-  LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions cv ON cv.id=i.cvid
-  WHERE i.source='detected';`;
+  LEFT JOIN file_inventories fi ON fi.inventoryid=i.id
+  LEFT JOIN files f ON fi.fileId=f.fileId
+  LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions cv ON cv.id=i.cvid`;
 
   SQL_GET_SUMMARY_BY_PURL_VERSION = 'SELECT identified,pending,ignored FROM summary WHERE purl=? AND version=?;';
 

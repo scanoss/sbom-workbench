@@ -31,9 +31,11 @@ class ObligationsService extends BaseService {
   private mapper(obligations) {
     return Object.keys(obligations).map((key) => ({
       label: key,
-      ...obligations[key][0],
-      copyleft: obligations[key][0].copyleft === "yes",
-      incompatibles: obligations[key][0].incompatible_with ? obligations[key][0].incompatible_with?.split(',') : [],
+      ...obligations[key],
+      copyleft: obligations[key].copyleft === "yes",
+      incompatibles: obligations[key].incompatible_with
+        ? obligations[key].incompatible_with?.replace(/\s/g, '').split(',')
+        : [],
     }))[0];
   }
 }

@@ -1,19 +1,19 @@
-import { EventEmitter } from 'events';
-import { DependencyScanner, Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
-import fs from 'fs';
-import log from 'electron-log';
-import { INewProject, ScanState } from '../../../api/types';
-import { dependencyService } from '../../services/DependencyService';
-import { Project } from '../../workspace/Project';
-import { IpcEvents } from '../../../api/ipc-events';
-import { fileService } from '../../services/FileService';
-import { fileHelper } from '../../helpers/FileHelper';
-import { resultService } from '../../services/ResultService';
-import { componentService } from '../../services/ComponentService';
-import { userSettingService } from '../../services/UserSettingService';
-import AppConfig from '../../../config/AppConfigModule';
-import { AutoAccept } from '../Inventory/AutoAccept';
-import { ITask } from '../Task';
+import { EventEmitter } from "events";
+import { DependencyScanner, SbomMode, Scanner, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from "scanoss";
+import fs from "fs";
+import log from "electron-log";
+import { INewProject, ScanState } from "../../../api/types";
+import { dependencyService } from "../../services/DependencyService";
+import { Project } from "../../workspace/Project";
+import { IpcEvents } from "../../../api/ipc-events";
+import { fileService } from "../../services/FileService";
+import { fileHelper } from "../../helpers/FileHelper";
+import { resultService } from "../../services/ResultService";
+import { componentService } from "../../services/ComponentService";
+import { userSettingService } from "../../services/UserSettingService";
+import AppConfig from "../../../config/AppConfigModule";
+import { AutoAccept } from "../Inventory/AutoAccept";
+import { ITask } from "../Task";
 
 export abstract class ScannerTask extends EventEmitter implements ITask<void, boolean> {
   protected msgToUI!: Electron.WebContents;
@@ -177,6 +177,18 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
         fileList: quickScanList,
         folderRoot: this.project.metadata.getScanRoot(),
         winnowingMode: WinnowingMode.WINNOWING_ONLY_MD5,
+      });
+    }
+
+    // Allows to ignore a list of components from a SBOM place in the root folder
+    const rootFolder = this.project.getTree().getRootFolder();
+    const rootPath = this.project.getScanRoot();
+    if (rootFolder.containsFile('scanoss-ignore.json')) {
+      const sbom = fs.readFileSync(`${rootPath}/scanoss-ignore.json`, "utf-8")
+
+      result.forEach((_, index, arr) => {
+        arr[index].sbom = sbom;
+        arr[index].sbomMode = SbomMode.SBOM_IGNORE;
       });
     }
     return result;
