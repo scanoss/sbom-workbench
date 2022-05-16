@@ -3,6 +3,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/scanoss/audit-workbench)
 ![License](https://img.shields.io/badge/license-GPL--2.0-brightgreen)
 [![REUSE status](https://api.reuse.software/badge/github.com/scanoss/audit-workbench)](https://api.reuse.software/info/github.com/scanoss/audit-workbench)
+![flujo de trabajo de ejemplo](https://github.com/scanoss/audit-workbench/actions/workflows/test.yml/badge.svg)
 
 </div>
 
