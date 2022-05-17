@@ -323,7 +323,7 @@ export class ComponentModel extends Model {
       try {
         const db = await this.openDb();
         db.all(
-         `SELECT cv.id FROM component_versions cv  WHERE NOT EXISTS (SELECT 1 FROM results WHERE purl=cv.purl AND version=cv.version) AND cv.id NOT IN (SELECT i.cvid FROM inventories i);`,
+          `SELECT cv.id FROM component_versions cv  WHERE NOT EXISTS (SELECT 1 FROM results WHERE purl=cv.purl AND version=cv.version) AND cv.id NOT IN (SELECT i.cvid FROM inventories i);`,
           (err: any, data: any) => {
             db.close();
             if (err) throw err;
@@ -423,6 +423,56 @@ export class ComponentModel extends Model {
       } catch (error) {
         log.error(error);
         reject(error);
+      }
+    });
+  }
+
+  public getMostReliableLicensePerComponent() {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.all(
+          "SELECT * FROM (SELECT cv.id AS cvid,rl.source,rl.spdxid AS reliableLicense,(CASE WHEN rl.source ='component_declared' THEN 1 WHEN rl.source = 'file_header' THEN 2 ELSE 3 END) ranking FROM results r LEFT JOIN component_versions cv \n" +
+            'ON cv.purl=r.purl  AND cv.version= r.version LEFT JOIN result_license rl \n' +
+            'ON r.id = rl.resultId\n' +
+            'GROUP BY cvid, rl.source,rl.spdxid\n' +
+            "HAVING rl.source LIKE 'component_declared' OR rl.source='file_header' OR rl.source = 'file_spdx_tag'\n" +
+            'ORDER BY ranking )AS compLicense\n' +
+            'GROUP BY cvid;',
+          (err: any, data: any) => {
+            db.close();
+            if (err) throw err;
+            resolve(data);
+          }
+        );
+      } catch (error) {
+        log.error(error);
+        reject(error);
+      }
+    });
+  }
+
+  public updateMostReliableLicense(reliableLicenses: any): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const db = await this.openDb();
+        db.run('begin transaction');
+        db.serialize(() => {
+          for (let i = 0; i < reliableLicenses.length; i += 1) {
+            db.run(
+              'UPDATE component_versions SET reliableLicense=? WHERE id=?',
+              reliableLicenses[i].reliableLicense,
+              reliableLicenses[i].cvid
+            );
+          }
+          db.run('commit', (err: any) => {
+            db.close();
+            if (err) throw err;
+            resolve();
+          });
+        });
+      } catch (error: any) {
+        log.error(error);
       }
     });
   }

@@ -107,6 +107,7 @@ class ComponentService {
         version.licenses = [];
         version.licenses = iterator.licenses;
         version.cvid = iterator.compid;
+        version.reliableLicense = iterator.reliableLicense;
         aux.versions.push(version);
       }
       result.push(aux);
@@ -123,6 +124,9 @@ class ComponentService {
       await modelProvider.model.component.import(components);
       const componentLicenses = await modelProvider.model.component.getLicensesAttachedToComponentsFromResults();
       await modelProvider.model.license.bulkAttachComponentLicense(componentLicenses);
+      // Add most reliable license to each component
+      const componentReliableLicense = await modelProvider.model.component.getMostReliableLicensePerComponent();
+      await modelProvider.model.component.updateMostReliableLicense(componentReliableLicense);
       return true;
     } catch (error: any) {
       return error;

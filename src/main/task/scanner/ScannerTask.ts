@@ -88,6 +88,7 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
     const files = await fileHelper.getPathFileId();
     await resultService.insertFromFile(resultPath, files);
     await componentService.importComponents();
+
   }
 
   private setScannerConfig() {

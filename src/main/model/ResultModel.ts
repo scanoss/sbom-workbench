@@ -49,32 +49,54 @@ export class ResultModel extends Model {
   }
 
   // INSERT RESULTS FROM FILE
-  insertFromFile(resultPath: string, files: any) {
+  public insertFromFile(resultPath: string, files: any) {
     return new Promise(async (resolve) => {
       try {
+        const resultLicense: any = {};
         const self = this;
         const result: Record<any, any> = await utilModel.readFile(resultPath);
         const db = await this.openDb();
-        db.serialize(() => {
+        db.serialize(async () => {
           db.run('begin transaction');
           let data: any;
           for (const [key, value] of Object.entries(result)) {
             for (let i = 0; i < value.length; i += 1) {
               const filePath = key;
               data = value[i];
-              if (data.id !== 'none') self.insertResultBulk(db, data, files[filePath]);
+              if (data.id !== 'none') {
+                const resultId = await self.insertResultBulk(db, data, files[filePath]);
+                resultLicense[resultId] = data.licenses;
+              }
             }
           }
-          db.run('commit', (err: any) => {
+          db.run('commit', async (err: any) => {
             if (err) throw err;
             db.close();
-            resolve(true);
+            resolve(resultLicense);
           });
         });
       } catch (error) {
         log.error(error);
         resolve(false);
       }
+    });
+  }
+
+  public insertResultLicense(data:Record<number,Array<any>>){
+    return new Promise<void>(async (resolve) => {
+      const db= await this.openDb();
+      db.serialize(async () => {
+        db.run('begin transaction');
+        for (const [key, value] of Object.entries(data)) {
+          for(let i=0 ; i<value.length; i+=1){
+            db.run('INSERT INTO result_license (spdxid,source,resultId) VALUES (?,?,?);',value[i].name,value[i].source,key);
+          }
+        }
+        db.run('commit',(error: Error) =>{
+            db.close();
+            resolve();
+        });
+      });
     });
   }
 
@@ -131,31 +153,36 @@ export class ResultModel extends Model {
     });
   }
 
-  private insertResultBulk(db: any, data: any, fileId: number) {
-    let licenses: string;
-    if (data.licenses.length >= 0 && data.licenses)
-      licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses);
-    else licenses = null;
-    db.run(
-      query.SQL_INSERT_RESULTS,
-      data.file_hash,
-      data.vendor,
-      data.component,
-      data.version,
-      data.latest,
-      licenses,
-      data.url,
-      data.lines,
-      data.oss_lines,
-      data.matched,
-      data.file,
-      data.id,
-      data.url_hash,
-      data.purl ? data.purl[0] : ' ',
-      fileId,
-      data.file_url,
-      'engine'
-    );
+  private insertResultBulk(db: any, data: any, fileId: number): Promise<number> {
+    return new Promise<number>((resolve) => {
+      let licenses: string;
+      if (data.licenses.length >= 0 && data.licenses)
+        licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses);
+      else licenses = null;
+      db.run(
+        query.SQL_INSERT_RESULTS,
+        data.file_hash,
+        data.vendor,
+        data.component,
+        data.version,
+        data.latest,
+        licenses,
+        data.url,
+        data.lines,
+        data.oss_lines,
+        data.matched,
+        data.file,
+        data.id,
+        data.url_hash,
+        data.purl ? data.purl[0] : ' ',
+        fileId,
+        data.file_url,
+        'engine',
+        function (this: any, error: any) {
+          resolve(this.lastID);
+        }
+      );
+    });
   }
 
   private async insertResultBulkReScan(db: any, data: any, fileId: number) {

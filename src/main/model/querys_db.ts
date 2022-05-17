@@ -16,7 +16,7 @@ export class Querys {
     'CREATE TABLE IF NOT EXISTS status (files integer, scanned integer default 0, status text, project integer, user text, message text, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, type text, size text);';
 
   COMPDB_SQL_CREATE_TABLE_COMPVERS =
-    'CREATE TABLE IF NOT EXISTS component_versions (id INTEGER PRIMARY KEY , name text,  version TEXT NOT NULL , description text, url text, purl TEXT ,source text, UNIQUE(purl,version));';
+    'CREATE TABLE IF NOT EXISTS component_versions (id INTEGER PRIMARY KEY , name text,  version TEXT NOT NULL , description text, url text, purl TEXT ,source text,reliableLicense varchar(100) DEFAULT NULL, UNIQUE(purl,version));';
 
   COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS =
     'CREATE TABLE IF NOT EXISTS license_component_version (id INTEGER PRIMARY KEY ASC, cvid INTEGER NOT NULL, licid INTEGER NOT NULL , UNIQUE(cvid,licid), FOREIGN KEY (cvid) references component_versions(id) ON DELETE CASCADE, FOREIGN KEY (licid) references licenses(id)ON DELETE CASCADE);';
@@ -30,6 +30,8 @@ export class Querys {
   DEPENDENCY_TABLE =
     'CREATE TABLE IF NOT EXISTS dependencies (dependencyId INTEGER PRIMARY KEY ASC,fileId INTEGER ,purl TEXT, version TEXT, scope TEXT DEFAULT NULL, rejectedAt DATETIME DEFAULT NULL,licenses TEXT,component TEXT,originalVersion TEXT,originalLicense TEXT,FOREIGN KEY(fileId) REFERENCES files(fileId) ON DELETE CASCADE,UNIQUE(purl,version,fileId));';
 
+  RESULT_LICENSE = 'CREATE TABLE IF NOT EXISTS result_license (resultLicenseId INTEGER PRIMARY KEY,resultId integer NOT NULL ,spdxid varchar(90) NOT NULL, source varchar(45) NOT NULL , FOREIGN KEY (resultId) REFERENCES results(id), UNIQUE(resultId,source,spdxid));'
+
   SQL_DB_TABLES =
     this.SQL_CREATE_TABLE_RESULTS +
     this.FILES_TABLE +
@@ -38,7 +40,8 @@ export class Querys {
     this.COMPDB_SQL_CREATE_TABLE_COMPVERS +
     this.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS +
     this.COMPDB_LICENSES_TABLE +
-    this.DEPENDENCY_TABLE;
+    this.DEPENDENCY_TABLE +
+    this.RESULT_LICENSE;
 
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS
@@ -164,7 +167,6 @@ export class Querys {
 
   SQL_DELETE_INVENTORY_BY_ID = 'DELETE FROM inventories WHERE id =?';
 
-  SQL_SET_RESULTS_TO_PENDING_BY_PATH_PURL_VERSION = 'UPDATE results SET ignored=0,identified=0 WHERE results.id = ?;';
 
   SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION =
     'UPDATE files SET identified=0 WHERE fileId IN (SELECT fileId FROM file_inventories WHERE inventoryid=?)';
@@ -191,9 +193,9 @@ export class Querys {
   INNER JOIN component_versions comp ON r.purl=comp.purl AND r.version=comp.version #FILTER
   GROUP BY r.purl, r.version;`;
 
-  SQL_GET_ALL_COMPONENTS = `SELECT DISTINCT vendor.vendor,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id,comp.source
+  SQL_GET_ALL_COMPONENTS = `SELECT DISTINCT vendor.vendor,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id,comp.source,comp.reliableLicense
   FROM
-  (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id, comp.source FROM components AS comp
+  (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id, comp.source, comp.reliableLicense FROM components AS comp
   LEFT JOIN results r ON r.purl=comp.purl AND r.version = comp.version LEFT JOIN files f ON f.fileId=r.fileId
   LEFT JOIN license_view lic ON comp.id=lic.cvid
   #FILTER ) AS comp LEFT JOIN

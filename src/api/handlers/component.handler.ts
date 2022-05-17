@@ -39,7 +39,9 @@ ipcMain.handle(
   IpcEvents.COMPONENT_GET,
   async (_event, component: Partial<ComponentGroup>, params: IWorkbenchFilterParams) => {
     try {
+      console.log("Request",component);
       const data = await componentService.get(component, params);
+      console.log(data);
       return Response.ok({ message: 'Component retrieve successfully', data });
     } catch (error: any) {
       log.error(error);

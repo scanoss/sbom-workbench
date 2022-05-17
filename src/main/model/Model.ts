@@ -10,8 +10,8 @@ import { Querys } from './querys_db';
 const query = new Querys();
 
 export class Model {
-  private dbPath: string; 
-  
+  private dbPath: string;
+
   public static readonly entityMapper = null;
 
   constructor(path: string) {
@@ -36,7 +36,7 @@ export class Model {
         if (err) {
           reject(new Error('Unable to create DB'));
         } else {
-          db.exec(query.SQL_DB_TABLES,async () => {    
+          db.exec(query.SQL_DB_TABLES,async () => {
             db.close();
             await this.createViews();
             resolve(true);
@@ -73,7 +73,7 @@ export class Model {
         db.serialize(function () {
           db.run("begin transaction");
           db.run(
-            'CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url,source) AS SELECT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url,comp.source FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;'
+            'CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url,source,reliableLicense) AS SELECT DISTINCT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url,comp.source,comp.reliableLicense FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;'
           );
           db.run(
             'CREATE VIEW IF NOT EXISTS license_view (cvid,name,spdxid,url,license_id) AS SELECT lcv.cvid,lic.name,lic.spdxid,lic.url,lic.id FROM license_component_version AS lcv LEFT JOIN licenses AS lic ON lcv.licid=lic.id;'
@@ -82,17 +82,17 @@ export class Model {
           db.run(`
           CREATE VIEW IF NOT EXISTS summary AS SELECT cv.id AS compid,cv.purl,cv.version,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
           SUM(f.identified=0 AND f.ignored=0) AS pending
-          FROM files f INNER JOIN Results r ON r.fileId=f.fileId  
+          FROM files f INNER JOIN Results r ON r.fileId=f.fileId
           INNER JOIN component_versions cv ON cv.purl=r.purl
           AND cv.version=r.version
-          GROUP BY r.purl, r.version 
-          ORDER BY cv.id ASC;          
+          GROUP BY r.purl, r.version
+          ORDER BY cv.id ASC;
           `)
           db.run('commit',(err)=>{
             db.close();
             if(err)resolve(false)
             else resolve(true);
-          });         
+          });
         });
       } catch (error) {
         log.error(error);
@@ -102,7 +102,7 @@ export class Model {
 
   public getEntityMapper():Record<string,string>{
     return Model.entityMapper;
-  } 
+  }
 
   public getSQL(queryBuilder:QueryBuilder , SQLquery:string, entityMapper:Record<string,string>){
     let SQL = SQLquery;

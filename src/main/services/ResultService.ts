@@ -58,7 +58,8 @@ class ResultService {
   }
 
   public async insertFromFile(resultPath: string, files: any) {
-    await modelProvider.model.result.insertFromFile(resultPath, files);
+    const resultLicenses:any = await modelProvider.model.result.insertFromFile(resultPath, files);
+    await modelProvider.model.result.insertResultLicense(resultLicenses);
   }
 }
 export const resultService = new ResultService();
