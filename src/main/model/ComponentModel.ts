@@ -6,6 +6,7 @@ import { Component } from '../../api/types';
 import { LicenseModel } from './LicenseModel';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { componentHelper } from '../helpers/ComponentHelper';
+import {IComponentLicenseReliable} from "./interfaces/component/IComponentLicenseReliable";
 
 const query = new Querys();
 
@@ -427,8 +428,8 @@ export class ComponentModel extends Model {
     });
   }
 
-  public getMostReliableLicensePerComponent() {
-    return new Promise<any>(async (resolve, reject) => {
+  public getMostReliableLicensePerComponent():Promise<Array<IComponentLicenseReliable>> {
+    return new Promise<Array<IComponentLicenseReliable>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.all(
@@ -439,7 +440,7 @@ export class ComponentModel extends Model {
             HAVING rl.source LIKE 'component_declared' OR rl.source='file_header' OR rl.source = 'file_spdx_tag'
             ORDER BY ranking )AS compLicense
             GROUP BY cvid;`,
-          (err: any, data: any) => {
+          (err: any, data: Array<IComponentLicenseReliable>) => {
             db.close();
             if (err) throw err;
             resolve(data);
@@ -452,7 +453,7 @@ export class ComponentModel extends Model {
     });
   }
 
-  public updateMostReliableLicense(reliableLicenses: any): Promise<void> {
+  public updateMostReliableLicense(reliableLicenses: Array<IComponentLicenseReliable>): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
