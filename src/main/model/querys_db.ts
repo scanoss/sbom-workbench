@@ -27,7 +27,7 @@ export class Querys {
   DEPENDENCY_TABLE =
     'CREATE TABLE IF NOT EXISTS dependencies (dependencyId INTEGER PRIMARY KEY ASC,fileId INTEGER ,purl TEXT, version TEXT, scope TEXT DEFAULT NULL, rejectedAt DATETIME DEFAULT NULL,licenses TEXT,component TEXT,originalVersion TEXT,originalLicense TEXT,FOREIGN KEY(fileId) REFERENCES files(fileId) ON DELETE CASCADE,UNIQUE(purl,version,fileId));';
 
-  RESULT_LICENSE = 'CREATE TABLE IF NOT EXISTS result_license (resultLicenseId INTEGER PRIMARY KEY,resultId integer NOT NULL ,spdxid varchar(90) NOT NULL, source varchar(45) NOT NULL , FOREIGN KEY (resultId) REFERENCES results(id) ON DELETE CASCADE, UNIQUE(resultId,source,spdxid));'
+  RESULT_LICENSE = 'CREATE TABLE IF NOT EXISTS result_license (resultLicenseId INTEGER PRIMARY KEY,resultId integer NOT NULL ,spdxid varchar(90) NOT NULL, source varchar(45) NOT NULL ,patent_hints varchar(10),copyLeft varchar(10), osadl_updated datetime,incompatible_with text, checklist_url varchar(150),FOREIGN KEY (resultId) REFERENCES results(id) ON DELETE CASCADE, UNIQUE(resultId,source,spdxid));'
 
   SQL_DB_TABLES =
     this.SQL_CREATE_TABLE_RESULTS +

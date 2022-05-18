@@ -93,13 +93,18 @@ export class ResultModel extends Model {
       const db = await this.openDb();
       db.serialize(async () => {
         db.run('begin transaction');
-        for (const [key, value] of Object.entries<Array<IResultLicense>>(data)) {
+        for (const [resultId, value] of Object.entries<Array<IResultLicense>>(data)) {
           for (let i = 0; i < value.length; i += 1) {
             db.run(
-              'INSERT INTO result_license (spdxid,source,resultId) VALUES (?,?,?);',
+              'INSERT INTO result_license (spdxid,source,resultId,patent_hints,copyLeft,osadl_updated,incompatible_with,checklist_url) VALUES (?,?,?,?,?,?,?,?);',
               value[i].name,
               value[i].source,
-              key
+              resultId,
+              value[i].patent_hints ? value[i].patent_hints : null,
+              value[i].copyleft ? value[i].copyleft : null,
+              value[i].osadl_updated ? value[i].osadl_updated : null,
+              value[i].incompatible_with ? value[i].incompatible_with : null,
+              value[i].checklist_url ? value[i].checklist_url : null
             );
           }
         }
