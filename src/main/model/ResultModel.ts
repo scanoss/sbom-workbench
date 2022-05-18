@@ -24,21 +24,27 @@ export class ResultModel extends Model {
     return new Promise<void>(async (resolve, reject) => {
       try {
         const self = this;
+        const resultLicense: any = {};
         const result: Record<any, any> = await utilModel.readFile(resultPath);
         const db = await this.openDb();
-        db.serialize(() => {
+        db.serialize(async () => {
           db.run('begin transaction');
           let data: any;
           for (const [key, value] of Object.entries(result)) {
             for (let i = 0; i < value.length; i += 1) {
               const filePath = key;
               data = value[i];
-              if (data.id !== 'none') self.insertResultBulkReScan(db, data, files[filePath]);
+              if (data.id !== 'none') {
+               const resultId = await  self.insertResultBulkReScan(db, data, files[filePath]);
+               if(resultId>0) resultLicense[resultId] = data.licenses;
+              }
             }
           }
           db.run('commit', () => {
             db.close();
-            resolve();
+            if(Object.keys(result).length>0)
+              resolve(resultLicense);
+            resolve(null);
           });
         });
       } catch (error) {
@@ -82,19 +88,24 @@ export class ResultModel extends Model {
     });
   }
 
-  public insertResultLicense(data:Record<number,Array<any>>){
+  public insertResultLicense(data: Record<number, Array<any>>) {
     return new Promise<void>(async (resolve) => {
-      const db= await this.openDb();
+      const db = await this.openDb();
       db.serialize(async () => {
         db.run('begin transaction');
         for (const [key, value] of Object.entries(data)) {
-          for(let i=0 ; i<value.length; i+=1){
-            db.run('INSERT INTO result_license (spdxid,source,resultId) VALUES (?,?,?);',value[i].name,value[i].source,key);
+          for (let i = 0; i < value.length; i += 1) {
+            db.run(
+              'INSERT INTO result_license (spdxid,source,resultId) VALUES (?,?,?);',
+              value[i].name,
+              value[i].source,
+              key
+            );
           }
         }
-        db.run('commit',(error: Error) =>{
-            db.close();
-            resolve();
+        db.run('commit', (error: Error) => {
+          db.close();
+          resolve();
         });
       });
     });
@@ -185,33 +196,39 @@ export class ResultModel extends Model {
     });
   }
 
-  private async insertResultBulkReScan(db: any, data: any, fileId: number) {
-    const self = this;
-    let licenses: string;
-    if (data.licenses.length >= 0) licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses);
-    else licenses = null;
+  private async insertResultBulkReScan(db: any, data: any, fileId: number): Promise<number> {
+    return new Promise<number>((resolve) => {
+      const self = this;
+      let licenses: string;
+      if (data.licenses.length >= 0) licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses);
+      else licenses = null;
 
-    const SQLquery = `SELECT id FROM results WHERE md5_file ${
-      data.file_hash ? `='${data.file_hash}'` : 'IS NULL'
-    } AND vendor ${data.vendor ? `='${data.vendor}'` : 'IS NULL'} AND component ${
-      data.component ? `='${data.component}'` : 'IS NULL'
-    } AND version ${data.version ? `='${data.version}'` : 'IS NULL'} AND latest_version ${
-      data.latest ? `='${data.latest}'` : 'IS NULL'
-    } AND license ${licenses ? `='${licenses}'` : 'IS NULL'} AND url ${
-      data.url ? `='${data.url}'` : 'IS NULL'
-    } AND lines ${data.lines ? `='${data.lines}'` : 'IS NULL'} AND oss_lines ${
-      data.oss_lines ? `='${data.oss_lines}'` : 'IS NULL'
-    } AND matched ${data.matched ? `='${data.matched}'` : 'IS NULL'} AND filename ${
-      data.file ? `='${data.file}'` : 'IS NULL'
-    } AND md5_comp ${data.url_hash ? `='${data.url_hash}'` : 'IS NULL'} AND purl = '${
-      data.purl ? data.purl[0] : ' '
-    }' AND fileId = ${fileId}  AND file_url ${data.file_url ? `='${data.file_url}'` : 'IS NULL'} AND idtype='${
-      data.id
-    }' ; `;
-    db.serialize(() => {
-      db.get(SQLquery, function (err: any, result: any) {
-        if (result !== undefined) db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
-        else self.insertResultBulk(db, data, fileId);
+      const SQLquery = `SELECT id FROM results WHERE md5_file ${
+        data.file_hash ? `='${data.file_hash}'` : 'IS NULL'
+      } AND vendor ${data.vendor ? `='${data.vendor}'` : 'IS NULL'} AND component ${
+        data.component ? `='${data.component}'` : 'IS NULL'
+      } AND version ${data.version ? `='${data.version}'` : 'IS NULL'} AND latest_version ${
+        data.latest ? `='${data.latest}'` : 'IS NULL'
+      } AND license ${licenses ? `='${licenses}'` : 'IS NULL'} AND url ${
+        data.url ? `='${data.url}'` : 'IS NULL'
+      } AND lines ${data.lines ? `='${data.lines}'` : 'IS NULL'} AND oss_lines ${
+        data.oss_lines ? `='${data.oss_lines}'` : 'IS NULL'
+      } AND matched ${data.matched ? `='${data.matched}'` : 'IS NULL'} AND filename ${
+        data.file ? `='${data.file}'` : 'IS NULL'
+      } AND md5_comp ${data.url_hash ? `='${data.url_hash}'` : 'IS NULL'} AND purl = '${
+        data.purl ? data.purl[0] : ' '
+      }' AND fileId = ${fileId}  AND file_url ${data.file_url ? `='${data.file_url}'` : 'IS NULL'} AND idtype='${
+        data.id
+      }' ; `;
+      db.serialize(() => {
+        db.get(SQLquery, function (err: any, result: any) {
+          if (result !== undefined) {
+            db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
+            resolve(-1);
+          }
+          const id = self.insertResultBulk(db, data, fileId);
+          resolve(id);
+        });
       });
     });
   }

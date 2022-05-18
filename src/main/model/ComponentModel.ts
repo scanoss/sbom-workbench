@@ -432,13 +432,13 @@ export class ComponentModel extends Model {
       try {
         const db = await this.openDb();
         db.all(
-          "SELECT * FROM (SELECT cv.id AS cvid,rl.source,rl.spdxid AS reliableLicense,(CASE WHEN rl.source ='component_declared' THEN 1 WHEN rl.source = 'file_header' THEN 2 ELSE 3 END) ranking FROM results r LEFT JOIN component_versions cv \n" +
-            'ON cv.purl=r.purl  AND cv.version= r.version LEFT JOIN result_license rl \n' +
-            'ON r.id = rl.resultId\n' +
-            'GROUP BY cvid, rl.source,rl.spdxid\n' +
-            "HAVING rl.source LIKE 'component_declared' OR rl.source='file_header' OR rl.source = 'file_spdx_tag'\n" +
-            'ORDER BY ranking )AS compLicense\n' +
-            'GROUP BY cvid;',
+          `SELECT * FROM (SELECT cv.id AS cvid,rl.source,rl.spdxid AS reliableLicense,(CASE WHEN rl.source ='component_declared' THEN 1 WHEN rl.source = 'file_header' THEN 2 ELSE 3 END) ranking FROM results r LEFT JOIN component_versions cv
+            ON cv.purl=r.purl  AND cv.version= r.version LEFT JOIN result_license rl
+            ON r.id = rl.resultId
+            GROUP BY cvid, rl.source,rl.spdxid
+            HAVING rl.source LIKE 'component_declared' OR rl.source='file_header' OR rl.source = 'file_spdx_tag'
+            ORDER BY ranking )AS compLicense
+            GROUP BY cvid;`,
           (err: any, data: any) => {
             db.close();
             if (err) throw err;
