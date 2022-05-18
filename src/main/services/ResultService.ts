@@ -1,6 +1,7 @@
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { modelProvider } from './ModelProvider';
+import {IInsertResult} from "../model/interfaces/IInsertResult";
 
 class ResultService {
   public async getResultsByids(ids: number[], project: any) {
@@ -58,7 +59,7 @@ class ResultService {
   }
 
   public async insertFromFile(resultPath: string, files: any) {
-    const resultLicenses:any = await modelProvider.model.result.insertFromFile(resultPath, files);
+    const resultLicenses:IInsertResult = await modelProvider.model.result.insertFromFile(resultPath, files);
     await modelProvider.model.result.insertResultLicense(resultLicenses);
   }
 }

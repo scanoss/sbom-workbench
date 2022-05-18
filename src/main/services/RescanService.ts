@@ -5,6 +5,7 @@ import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { componentService } from './ComponentService';
 import { dependencyService } from './DependencyService';
 import { modelProvider } from './ModelProvider';
+import { IInsertResult } from "../model/interfaces/IInsertResult";
 
 class RescanService {
   public async reScan(files: Array<any>, resultPath: string, projectPath: string): Promise<void> {
@@ -33,7 +34,7 @@ class RescanService {
         return previousValue;
       }, []);
 
-      const resultLicenses:any = await modelProvider.model.result.insertFromFileReScan(resultPath, filesToUpdate);
+      const resultLicenses:IInsertResult = await modelProvider.model.result.insertFromFileReScan(resultPath, filesToUpdate);
       if(resultLicenses) await modelProvider.model.result.insertResultLicense(resultLicenses);
       const dirtyFiles = await modelProvider.model.file.getDirty();
       if (dirtyFiles.length > 0) {

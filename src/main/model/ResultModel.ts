@@ -7,6 +7,7 @@ import { utilModel } from './UtilModel';
 import { ComponentModel } from './ComponentModel';
 import { licenseHelper } from '../helpers/LicenseHelper';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
+import { IInsertResult, IResultLicense } from './interfaces/IInsertResult';
 
 const query = new Querys();
 
@@ -20,8 +21,8 @@ export class ResultModel extends Model {
     this.component = new ComponentModel(path);
   }
 
-  insertFromFileReScan(resultPath: string, files: any) {
-    return new Promise<void>(async (resolve, reject) => {
+  insertFromFileReScan(resultPath: string, files: any): Promise<IInsertResult> {
+    return new Promise<IInsertResult>(async (resolve, reject) => {
       try {
         const self = this;
         const resultLicense: any = {};
@@ -35,15 +36,14 @@ export class ResultModel extends Model {
               const filePath = key;
               data = value[i];
               if (data.id !== 'none') {
-               const resultId = await  self.insertResultBulkReScan(db, data, files[filePath]);
-               if(resultId>0) resultLicense[resultId] = data.licenses;
+                const resultId = await self.insertResultBulkReScan(db, data, files[filePath]);
+                if (resultId > 0) resultLicense[resultId] = data.licenses;
               }
             }
           }
           db.run('commit', () => {
             db.close();
-            if(Object.keys(result).length>0)
-              resolve(resultLicense);
+            if (Object.keys(result).length > 0) resolve(resultLicense);
             resolve(null);
           });
         });
@@ -55,8 +55,8 @@ export class ResultModel extends Model {
   }
 
   // INSERT RESULTS FROM FILE
-  public insertFromFile(resultPath: string, files: any) {
-    return new Promise(async (resolve) => {
+  public insertFromFile(resultPath: string, files: any): Promise<IInsertResult> {
+    return new Promise<IInsertResult>(async (resolve) => {
       try {
         const resultLicense: any = {};
         const self = this;
@@ -83,17 +83,17 @@ export class ResultModel extends Model {
         });
       } catch (error) {
         log.error(error);
-        resolve(false);
+        resolve(null);
       }
     });
   }
 
-  public insertResultLicense(data: Record<number, Array<any>>) {
+  public insertResultLicense(data: IInsertResult) {
     return new Promise<void>(async (resolve) => {
       const db = await this.openDb();
       db.serialize(async () => {
         db.run('begin transaction');
-        for (const [key, value] of Object.entries(data)) {
+        for (const [key, value] of Object.entries<Array<IResultLicense>>(data)) {
           for (let i = 0; i < value.length; i += 1) {
             db.run(
               'INSERT INTO result_license (spdxid,source,resultId) VALUES (?,?,?);',
