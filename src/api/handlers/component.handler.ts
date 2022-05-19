@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import log from 'electron-log';
-import { Component , ComponentGroup, IWorkbenchFilterParams } from '../types';
+import { Component, ComponentGroup, IWorkbenchFilterParams } from '../types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from '../Response';
 import { componentService } from '../../main/services/ComponentService';
@@ -39,9 +39,7 @@ ipcMain.handle(
   IpcEvents.COMPONENT_GET,
   async (_event, component: Partial<ComponentGroup>, params: IWorkbenchFilterParams) => {
     try {
-      console.log("Request",component);
       const data = await componentService.get(component, params);
-      console.log(data);
       return Response.ok({ message: 'Component retrieve successfully', data });
     } catch (error: any) {
       log.error(error);

@@ -130,9 +130,28 @@ class InventoryService  {
       let queryBuilder = null;
       if (data.overwrite) queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder});
       else queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.folder, status: 'PENDING' });
-      const files: any = await modelProvider.model.result.getResultsPreLoadInventory(queryBuilder);
+      let files: any = await modelProvider.model.result.getResultsPreLoadInventory(queryBuilder);
+      files =  files.reduce((acc,curr)=>{
+        if(!acc[curr.id]) {
+          const aux = {
+            id: curr.id,
+            source: curr.source,
+            component: curr.component,
+            version: curr.version,
+            url: curr.url,
+            purl: curr.purl,
+            usage: curr.type,
+            spdxid: []
+          };
+          aux.spdxid.push(curr.spdxid);
+          acc[curr.id] = aux;
+        }
+          else
+            acc[curr.id].spdxid.push(curr.spdxid);
+          return acc;
+      },{});
       const components: any = await modelProvider.model.component.getAll(queryBuilder);
-      let inventories = this.getPreLoadInventory(files) as Array<Partial<Inventory>>;
+      let inventories = this.getPreLoadInventory(Object.values(files)) as Array<Partial<Inventory>>;
       inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);
       return inventories;
     } catch (err: any) {
@@ -144,7 +163,7 @@ class InventoryService  {
     const aux: any = {};
     const count = results.length;
     for (let i = 0; i < count; i += 1) {
-      const spdx = results[i].spdxid?.split(',')[0] ? results[i].spdxid.split(',')[0] : '-';
+      const spdx = results[i].spdxid.length > 0 ? results[i].spdxid[0] : '-';
       const key = `${results[i].component.toLowerCase()}${results[i].version}${spdx}${results[i].usage}`;
       if (!aux[key]) {
         aux[key] = {
@@ -159,7 +178,6 @@ class InventoryService  {
         };
       } else aux[key].files.push(results[i].id);
     }
-
     return Object.values(aux);
   }
 

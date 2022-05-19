@@ -1,9 +1,9 @@
 import log from 'electron-log';
+import { LicenseDTO, NewLicenseDTO } from '@api/dto';
 import { Querys } from './querys_db';
 import { Model } from './Model';
-import { utilModel } from './UtilModel';
 import { License } from '../../api/types';
-import {LicenseDTO, NewLicenseDTO} from "@api/dto";
+import { IComponentLicense } from './interfaces/component/IComponentLicense';
 
 const query = new Querys();
 
@@ -39,10 +39,10 @@ export class LicenseModel extends Model {
         db.serialize(async function () {
           db.run('begin transaction');
           db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 0);
-          db.run('commit', function  (this: any, err: any) {
+          db.run('commit', function (this: any, err: any) {
             db.close();
             if (err || this.lastID === 0) throw new Error('The license was not created or already exist');
-            resolve({id:this.lastID,...license});
+            resolve({ id: this.lastID, ...license });
           });
         });
       } catch (error) {
@@ -79,12 +79,11 @@ export class LicenseModel extends Model {
     return new Promise<LicenseDTO>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-          db.get(`${query.SQL_SELECT_LICENSE} id=${id};`, (err: any, license: LicenseDTO) => {
-            db.close();
-            if (err || license === undefined) throw new Error('Unable to get license ');
-            resolve(license);
-          });
-
+        db.get(`${query.SQL_SELECT_LICENSE} id=${id};`, (err: any, license: LicenseDTO) => {
+          db.close();
+          if (err || license === undefined) throw new Error('Unable to get license ');
+          resolve(license);
+        });
       } catch (error) {
         log.error(error);
         reject(error);
@@ -94,7 +93,7 @@ export class LicenseModel extends Model {
 
   // GET LICENSE
   public getAll() {
-    return new Promise <Array<LicenseDTO>>(async (resolve, reject) => {
+    return new Promise<Array<LicenseDTO>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(function () {
@@ -111,7 +110,7 @@ export class LicenseModel extends Model {
     });
   }
 
-  public async bulkAttachComponentLicense(data: any) {
+  public async bulkAttachComponentLicense(data: Array<IComponentLicense>) {
     return new Promise<void>(async (resolve, reject) => {
       try {
         let licenses: any = await this.getAll();

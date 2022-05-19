@@ -5,6 +5,7 @@ import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
+import {ComponentAdapter} from "../adapters/ComponentAdapter";
 
 class ComponentService {
   public async getComponentFiles(data: Partial<Component>, params: IWorkbenchFilterParams): Promise<any> {
@@ -122,7 +123,8 @@ class ComponentService {
       const components: Array<Partial<Component>> =
         await modelProvider.model.component.getUniqueComponentsFromResults();
       await modelProvider.model.component.import(components);
-      const componentLicenses = await modelProvider.model.component.getLicensesAttachedToComponentsFromResults();
+      const data = await modelProvider.model.component.getLicensesAttachedToComponentsFromResults();
+      const componentLicenses = new ComponentAdapter().componentLicenses(data);
       await modelProvider.model.license.bulkAttachComponentLicense(componentLicenses);
       // Add most reliable license to each component
       const componentReliableLicense = await modelProvider.model.component.getMostReliableLicensePerComponent();
