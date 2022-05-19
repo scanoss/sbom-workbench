@@ -226,6 +226,7 @@ export class Project {
   public async setGlobalFilter(filter: IWorkbenchFilter) {
     try {
       if (!(JSON.stringify({ ...filter, path: null }) === JSON.stringify({ ...this.filter, path: null }))) {
+        this.tree.sendToUI(IpcEvents.TREE_UPDATING, {});
         this.tree.setTreeViewMode(TreeViewModeCreator.create(filter, this.fileTreeViewMode));
         this.notifyTree();
       }

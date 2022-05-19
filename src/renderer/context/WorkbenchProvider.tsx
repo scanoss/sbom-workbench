@@ -6,10 +6,11 @@ import { IpcEvents } from '@api/ipc-events';
 import { projectService } from '@api/services/project.service';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { load, selectWorkbench, setTree } from '@store/workbench-store/workbenchSlice';
-import { selectNavigationState, setCurrentNode } from '@store/navigation-store/navigationSlice';
+import { load, selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { selectNavigationState, setCurrentNode, setLoading } from '@store/navigation-store/navigationSlice';
 import { selectDependencyState } from '@store/dependency-store/dependencySlice';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import { setTree } from '@store/workbench-store/workbenchThunks';
 
 export const WorkbenchContext = React.createContext(null);
 
@@ -25,7 +26,14 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
 
   const [dialog, setDialog] = React.useState(null);
 
-  const onTreeRefreshed = (_event, fileTree) => dispatch(setTree(fileTree));
+  const onTreeUpdating = (_event) => {
+    console.log("onTreeUpdating");
+    dispatch(setLoading(true));
+  }
+  const onTreeRefreshed = (_event, fileTree) => {
+    console.log("onTreeRefreshed");
+    dispatch(setTree(fileTree));
+  };
   const setNode = async (node: Node) => dispatch(setCurrentNode(node));
 
   /**
@@ -89,10 +97,12 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
   }, [batchRunning]);
 
   const setupListeners = () => {
+    ipcRenderer.on(IpcEvents.TREE_UPDATING, onTreeUpdating);
     ipcRenderer.on(IpcEvents.TREE_UPDATED, onTreeRefreshed);
   };
 
   const removeListeners = () => {
+    ipcRenderer.on(IpcEvents.TREE_UPDATING, onTreeUpdating);
     ipcRenderer.removeListener(IpcEvents.TREE_UPDATED, onTreeRefreshed);
   };
 

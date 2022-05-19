@@ -4,6 +4,13 @@
   font-weight: 400;
   margin-top: 6px;
 
+  .spinner-loader {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+    z-index: 99;
+  }
+
   .ReactVirtualized__Grid__innerScrollContainer {
     overflow: visible !important;
   }
