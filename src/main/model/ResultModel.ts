@@ -171,10 +171,6 @@ export class ResultModel extends Model {
 
   private insertResultBulk(db: any, data: any, fileId: number): Promise<number> {
     return new Promise<number>((resolve) => {
-      /*let licenses: string;
-      if (data.licenses.length >= 0 && data.licenses)
-        licenses = licenseHelper.getStringOfLicenseNameFromArray(data.licenses); */
-     // else licenses = null;
       db.run(
         query.SQL_INSERT_RESULTS,
         data.file_hash,

@@ -87,7 +87,7 @@ export class Model {
           AND cv.version=r.version
           GROUP BY r.purl, r.version
           ORDER BY cv.id ASC;
-          `)
+          `);
           db.run('commit',(err)=>{
             db.close();
             if(err)resolve(false)
