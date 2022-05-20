@@ -147,14 +147,13 @@ export class ComponentModel extends Model {
       try {
         const db = await this.openDb();
         db.all(
-          `SELECT cv.id,r.license FROM component_versions cv INNER JOIN results r ON cv.purl=r.purl AND cv.version = r.version;`,
+          `SELECT DISTINCT cv.id,rl.spdxid FROM component_versions cv
+           INNER JOIN results r ON cv.purl=r.purl AND cv.version = r.version
+           INNER JOIN result_license rl ON r.id=rl.resultId
+           ORDER BY cv.id;`,
           async (err: any, data: Array<any>) => {
             db.close();
             if (err) throw err;
-            data.forEach((item) => {
-              if (item.license === ' ' || item.license === '' || item.license === null) item.license = null;
-              else item.license = item.license.split(',');
-            });
             resolve(data);
           }
         );
