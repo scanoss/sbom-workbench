@@ -5,14 +5,15 @@ import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
-import {ComponentAdapter} from "../adapters/ComponentAdapter";
+import { ComponentAdapter } from '../adapters/ComponentAdapter';
 
 class ComponentService {
   public async getComponentFiles(data: Partial<Component>, params: IWorkbenchFilterParams): Promise<any> {
     try {
       const filter = workspace.getOpenedProjects()[0].getFilter(params);
       const queryBuilder = QueryBuilderCreator.create({ purl: data.purl, version: data.version, ...filter });
-      const files: any = await modelProvider.model.file.getAll(queryBuilder);
+      let files: any = await modelProvider.model.file.getAll(queryBuilder);
+      files = new ComponentAdapter().componentFileAdapter(files);
       const inventories: any = await modelProvider.model.inventory.getAll();
       const compid = inventories.map((inv) => inv.cvid);
       const queryComp = QueryBuilderCreator.create({ compid });
@@ -27,7 +28,6 @@ class ComponentService {
           files[i].inventory = index[files[i].inventoryid];
           files[i].component = components.find((component: any) => files[i].inventory.cvid === component.compid);
         }
-        if (files[i].license) files[i].license = files[i].license.split(',');
       }
       return files;
     } catch (error: any) {
@@ -56,10 +56,10 @@ class ComponentService {
 
   public async get(component: Partial<ComponentGroup>, params: IWorkbenchFilterParams) {
     try {
-      const p = workspace.getOpenedProjects()[0]
+      const p = workspace.getOpenedProjects()[0];
       const workbenchFilter = p.getFilter(params);
       const filter = { purl: component.purl, ...workbenchFilter };
-      const response = await this.getAll({ unique:params.unique ,filter });
+      const response = await this.getAll({ unique: params.unique, filter });
       return response[0] || null;
     } catch (error: any) {
       log.error(error);

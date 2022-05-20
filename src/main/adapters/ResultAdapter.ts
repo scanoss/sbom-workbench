@@ -1,6 +1,6 @@
 export class ResultAdapter {
   public adapt(result: any) {
-   const response = result.reduce((acc, curr) => {
+    const response = result.reduce((acc, curr) => {
       if (!acc[curr.resultId]) {
         const aux = {
           id: curr.id,
@@ -25,11 +25,10 @@ export class ResultAdapter {
         acc[curr.resultId] = aux;
       } else {
         acc[curr.resultId].license.push(curr.spdxid);
-      }return acc;
+      }
+      return acc;
     }, {});
 
-   return Object.values(response);
+    return Object.values(response);
   }
-
-
 }
