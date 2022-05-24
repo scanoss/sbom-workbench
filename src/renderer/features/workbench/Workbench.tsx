@@ -2,7 +2,6 @@ import { CircularProgress } from '@material-ui/core';
 import React, { useContext, useEffect } from 'react';
 import { Redirect, Route, Switch, useLocation, useRouteMatch } from 'react-router-dom';
 import SplitPane from 'react-split-pane';
-import { AppContext, IAppContext } from '@context/AppProvider';
 import AppConfig from '@config/AppConfigModule';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
@@ -14,6 +13,8 @@ import Identified from './pages/identified/Identified';
 import Reports from './pages/report/Report';
 import FileTree from './components/FileTree/FileTree';
 import WorkbenchFilters from './components/WorkbenchFilters/WorkbenchFilters';
+import Search from './pages/search/Search';
+import SearchPanel from './components/SearchPanel/SearchPanel';
 
 const Workbench = () => {
   const { path } = useRouteMatch();
@@ -52,14 +53,17 @@ const Workbench = () => {
         defaultSize={320}
         pane1Style={report ? { display: 'none' } : {}}
       >
-        <aside className="panel explorer">
-          {AppConfig.FF_ENABLE_WORKBENCH_FILTERS && loaded && <WorkbenchFilters />}
-          <FileTree />
+        <aside id="Sidebar" className="sidebar">
+          {false && AppConfig.FF_ENABLE_WORKBENCH_FILTERS && loaded && <WorkbenchFilters />}
+          {false && <FileTree /> }
+
+          {true && <SearchPanel /> }
         </aside>
-        <main id="Workbench" className="match-info">
+        <main id="Workbench" className="workbench">
           {loaded ? (
             <Switch>
               <Route path={`${path}/identified`} component={Identified} />
+              <Route path={`${path}/search`} component={Search} />
               <Route path={`${path}/detected`} component={Detected} />
               <Route path={`${path}/report`} component={Reports} />
 

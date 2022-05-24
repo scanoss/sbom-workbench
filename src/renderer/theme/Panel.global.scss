@@ -1,9 +1,13 @@
 .panel {
-  header {
-    padding: 10px;
+  height: 100%;
+  width: 100%;
 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: grid;
+  grid-template-rows: auto 1fr;
+
+  .panel-title h4 {
+    margin: 0;
   }
 }
+
+
