@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
+import { CsvAdapter } from '../../../task/export/format/formatAdapter/CsvAdapter';
 import { Format } from '../Format';
-import { CsvAdapter } from "./formatAdapter/CsvAdapter";
 
 export class Csv extends Format {
   constructor() {
