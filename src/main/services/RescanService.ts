@@ -5,6 +5,7 @@ import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { componentService } from './ComponentService';
 import { dependencyService } from './DependencyService';
 import { modelProvider } from './ModelProvider';
+import { IInsertResult } from "../model/interfaces/IInsertResult";
 
 class RescanService {
   public async reScan(files: Array<any>, resultPath: string, projectPath: string): Promise<void> {
@@ -33,7 +34,8 @@ class RescanService {
         return previousValue;
       }, []);
 
-      await modelProvider.model.result.insertFromFileReScan(resultPath, filesToUpdate);
+      const resultLicenses:IInsertResult = await modelProvider.model.result.insertFromFileReScan(resultPath, filesToUpdate);
+      if(resultLicenses) await modelProvider.model.result.insertResultLicense(resultLicenses);
       const dirtyFiles = await modelProvider.model.file.getDirty();
       if (dirtyFiles.length > 0) {
         await modelProvider.model.inventory.deleteDirtyFileInventories(dirtyFiles);
@@ -44,7 +46,6 @@ class RescanService {
       await componentService.importComponents();
 
       // DEPENDENCIES
-
       const dependencies = JSON.parse(await fs.promises.readFile(`${projectPath}/dependencies.json`, 'utf-8'));
       // Insert new dependencies
       await dependencyService.insert(dependencies);
@@ -66,6 +67,10 @@ class RescanService {
         const result = emptyInv.map((item: Record<string, number>) => item.id);
         await modelProvider.model.inventory.deleteAllEmpty(result);
       }
+
+      // Updates most reliable license for each component
+      const mostReliableLicensePerComponent = await modelProvider.model.component.getMostReliableLicensePerComponent();
+      await modelProvider.model.component.updateMostReliableLicense(mostReliableLicensePerComponent);
     } catch (err: any) {
       throw new Error('[ RESCAN DB ] Unable to insert new results');
     }

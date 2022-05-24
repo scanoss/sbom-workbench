@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { Format } from '../Format';
+import { CsvAdapter } from "./formatAdapter/CsvAdapter";
 
 export class Csv extends Format {
   constructor() {
@@ -12,7 +13,7 @@ export class Csv extends Format {
     for (const inventory of data) {
       csv += `${inventory.inventoryId},${inventory.usage || ''},${inventory.notes || ''},${
         inventory.identified_license
-      },${inventory.detected_license ? inventory.detected_license.replace(/,/g, ' ') : 'n/a'},${
+      },${inventory.detected_license.length > 0 ? inventory.detected_license.join(' ') : 'n/a'},${
         inventory.identified_component
       },${inventory.detected_component ? inventory.detected_component : 'n/a'},"${inventory.path || ''}","${
         inventory.purl
@@ -24,7 +25,8 @@ export class Csv extends Format {
   // @override
   public async generate() {
     const data = await this.export.getCsvData();
-    const csv = this.csvCreate(data);
+    const csvData = new CsvAdapter().adapt(data);
+    const csv = this.csvCreate(csvData);
     return csv;
   }
 }

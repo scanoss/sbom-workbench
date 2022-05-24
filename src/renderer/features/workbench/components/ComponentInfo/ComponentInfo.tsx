@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import Title from '../Title/Title';
 
 export const ComponentInfo = ({ component }: { component: any }) => {
+  const getReliableLicense = (licenses: Array<any>, spdxid: string) => {
+    return licenses.find((license) => license.spdxid === spdxid) || licenses[0];
+  };
   const [over, setOver] = useState<boolean>(false);
   const group = !!component.versions;
   const version = group
@@ -9,7 +12,12 @@ export const ComponentInfo = ({ component }: { component: any }) => {
       ? component.versions[0].version
       : `${component.versions.length} versions`
     : component.version;
-  const license = (component.licenses || component.versions) ? group ? component.versions[0].licenses[0]?.name : component.licenses[0] : '-';
+  const license =
+    component.licenses || component.versions
+      ? group
+        ? getReliableLicense(component.versions[0].licenses,component.versions[0].reliableLicense)?.name
+        : component.licenses[0]
+      : '-';
 
   return (
     <div className="component-info">

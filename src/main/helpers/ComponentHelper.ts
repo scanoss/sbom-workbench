@@ -35,6 +35,7 @@ class ComponentHelper {
       transformation.version = data[i].version;
       transformation.vendor = data[i].vendor;
       transformation.source = data[i].source;
+      transformation.reliableLicense = data[i].reliableLicense;
       if (data[i].filesCount) transformation.filesCount = data[i].filesCount;
 
       if (data[i].license_id) {
