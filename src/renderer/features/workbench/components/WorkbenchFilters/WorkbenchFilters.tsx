@@ -13,7 +13,7 @@ import {
   Tooltip,
   Switch,
   Divider,
-  makeStyles,
+  makeStyles, Input, InputBase
 } from '@material-ui/core';
 import KeyboardArrowDownOutlinedIcon from '@material-ui/icons/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@material-ui/icons/KeyboardArrowUpOutlined';
@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { projectService } from '@api/services/project.service';
 import { FileStatusType, FileTreeViewMode, FileUsageType } from '@api/types';
 import { setFilter, resetFilter, selectNavigationState } from '@store/navigation-store/navigationSlice';
+import SearchBox from '@components/SearchBox/SearchBox';
 
 const useStyles = makeStyles((theme) => ({
   info: {
@@ -43,6 +44,10 @@ const WorkbenchFilters = () => {
 
   const handleChange = (filter, value) => {
     dispatch(setFilter({ filter: { [filter]: value !== 'all' ? value : null } }));
+  };
+
+  const handleFilenameChange = (term: string) => {
+    dispatch(setFilter({ filter: { filename: term || null } }));
   };
 
   const handleReset = (event) => {
@@ -71,7 +76,7 @@ const WorkbenchFilters = () => {
 
   return (
     <>
-      <Box id="WorkbenchFilters" boxShadow={1} className={`workbench-filters ${open ? 'no-collapsed' : 'collapsed'}`}>
+      <Box id="WorkbenchFilters" boxShadow={0} className={`workbench-filters ${open ? 'no-collapsed' : 'collapsed'}`}>
         <header className="workbench-filters-header">
           <h4 className="mr-1 mb-0 mt-0 d-flex align-end">
             Filters
@@ -92,6 +97,13 @@ const WorkbenchFilters = () => {
                       Filter by the status of each file.
                     </small>
                   </p>
+                  <p>
+                    <small>
+                      PATH <br />
+                      Filter by the path of each file.
+                    </small>
+                  </p>
+
                 </>
               }
               placement="bottom"
@@ -110,7 +122,7 @@ const WorkbenchFilters = () => {
             </Tooltip>
           )}
         </header>
-        <Collapse in={open} collapsedHeight={34}>
+        <Collapse in={open} collapsedHeight={30}>
           <form className="workbench-filters-body">
             <FormControl
               component="fieldset"
@@ -207,15 +219,21 @@ const WorkbenchFilters = () => {
           </form>
         </Collapse>
 
-        <Button size="small" onClick={() => setOpen(!open)}>
+        <Button onClick={() => setOpen(!open)}>
           {open ? (
             <KeyboardArrowUpOutlinedIcon fontSize="inherit" />
           ) : (
             <KeyboardArrowDownOutlinedIcon fontSize="inherit" />
           )}
         </Button>
+
+        <SearchBox
+          value={filter?.filename || ''}
+          placeholder="Filter by path (e.g. *.js)"
+          onChange={(e) => handleFilenameChange(e)}
+        />
       </Box>
-    </>
+      </>
   );
 };
 

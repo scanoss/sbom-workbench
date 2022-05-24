@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '@shared/utils/filetree-utils';
-import { loadProject } from './workbenchThunks';
+import { loadProject, setTree } from './workbenchThunks';
 import { RootState } from '../rootReducer';
 import {ISummary} from "../../../main/services/ReportService";
 
@@ -41,10 +41,10 @@ export const workbenchSlice = createSlice({
   initialState,
   reducers: {
     load: (state, action: PayloadAction<WorkbenchState>) => {},
-    setTree: (state, action: PayloadAction<any>) => {
+   /* setTree: (state, action: PayloadAction<any>) => {
       const tree = action.payload;
       state.tree = convertTreeToNode(tree, state.tree);
-    },
+    },*/
     updateTree: (state, action: PayloadAction<any>) => {
       state.tree = action.payload;
     },
@@ -86,11 +86,14 @@ export const workbenchSlice = createSlice({
       state.tree = convertTreeToNode(fileTree, [fileTree]);
       state.dependencies = Array.from(dependencies);
     });
+    builder.addCase(setTree.fulfilled, (state, action) => {
+      state.tree = action.payload;
+    });
   },
 });
 
 // actions
-export const { load, setTree, updateTree, collapseTree, expandTree, setProgress, setHistory, reset } =
+export const { load, updateTree, collapseTree, expandTree, setProgress, setHistory, reset } =
   workbenchSlice.actions;
 
 // selectors

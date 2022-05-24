@@ -46,7 +46,6 @@ export class Tree {
   sendToUI(eventName, data: any) {
     if (this.msgToUI) {
       this.msgToUI.send(eventName, data);
-      this.msgToUI.send(eventName, data);
     }
   }
 

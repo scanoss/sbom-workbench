@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import useContextual from '@hooks/useContextual';
 import { collapseTree, expandTree, selectWorkbench, updateTree } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
+import { CircularProgress } from '@material-ui/core';
 
 const { Expandable } = Renderers;
 
@@ -160,6 +161,12 @@ const FileTree = () => {
   }
   return (
     <div className="file-tree-container">
+
+      { state.loading &&
+        <div className="spinner-loader">
+          <CircularProgress size={12} />
+        </div>
+      }
       <Tree nodes={tree} onChange={onChange}>
         {({ style, node, ...rest }: any) => (
           <div

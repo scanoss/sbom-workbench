@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Paper, IconButton, InputBase, makeStyles } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -12,18 +13,20 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
   },
   iconButton: {
+    opacity: 0.6,
     padding: 10,
   },
 }));
 
 export interface SearchBoxProps {
+  value?: string;
   placeholder: string;
   responseDelay: number;
   disabled: boolean;
   onChange: (value: string) => void;
 }
 
-const SearchBox = ({ placeholder, responseDelay, disabled, onChange }: SearchBoxProps) => {
+const SearchBox = ({ value, placeholder, responseDelay, disabled, onChange }: SearchBoxProps) => {
   const classes = useStyles();
   const [query, setQuery] = useState('');
 
@@ -32,22 +35,30 @@ const SearchBox = ({ placeholder, responseDelay, disabled, onChange }: SearchBox
     return () => clearTimeout(timeOutId);
   }, [query]);
 
+  useEffect(() => {
+    if (value !== query) setQuery(value);
+  }, [value]);
+
   return (
-    <Paper component="form" className={classes.root}>
-      <IconButton className={classes.iconButton} aria-label="menu">
-        <SearchIcon />
-      </IconButton>
+    <Paper id="SearchBox" component="form" className={classes.root}>
+      <SearchIcon className={`start-icon ${classes.iconButton}`} />
       <InputBase
         disabled={disabled}
         className={classes.input}
-        onKeyUp={(e: any) => setQuery(e.target.value)}
+        value={query}
+        onChange={(e: any) => setQuery(e.target.value)}
         placeholder={placeholder}
         inputProps={{ 'aria-label': placeholder, spellCheck: 'false' }}
       />
+      {query && (
+        <IconButton size="small" className={`end-icon ${classes.iconButton}`} onClick={() => setQuery('')}>
+          <CloseIcon fontSize="inherit" />
+        </IconButton>
+      )}
     </Paper>
   );
 };
 
-SearchBox.defaultProps = { placeholder: 'Search...', responseDelay: 300, disabled: false };
+SearchBox.defaultProps = { value: '', placeholder: 'Search...', responseDelay: 300, disabled: false };
 
 export default SearchBox;

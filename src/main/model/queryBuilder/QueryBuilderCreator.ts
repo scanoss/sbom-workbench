@@ -5,6 +5,7 @@ import { QueryBuilderCustom } from './QueryBuilderCustom';
 import { QueryBuilderIN } from './QueryBuilderIN';
 import { QueryBuilderStatus } from './QueryBuilderStatus';
 import { QueryBuilderUsage } from './QueryBuilderUsage';
+import { QueryBuilderFilename } from './QueryBuilderFilename';
 
 export class QueryBuilderCreator {
   public static create(params: Record<string, any>): QueryBuilder {
@@ -36,6 +37,9 @@ export class QueryBuilderCreator {
       }
       if (params.id) {
         builder.add(new QueryBuilderCustom('id', '=', params.id));
+      }
+      if (params.filename) {
+        builder.add(new QueryBuilderFilename(params.filename));
       }
     }
     return builder;

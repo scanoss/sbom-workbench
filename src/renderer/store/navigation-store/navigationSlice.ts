@@ -4,6 +4,7 @@ import { RootState } from '@store/rootReducer';
 
 export interface NavigationState {
   node: Node;
+  loading: boolean;
   filter: IWorkbenchFilter;
   isFilterActive: boolean;
   version: string;
@@ -12,6 +13,7 @@ export interface NavigationState {
 const initialState: NavigationState = {
   node: null,
   filter: {},
+  loading: false,
   isFilterActive: false,
   version: null,
 };
@@ -28,11 +30,13 @@ export const NavigationSlice = createSlice({
     setFilter: (state, action: PayloadAction<{ filter: IWorkbenchFilter; override?: boolean }>) => {
       const { filter, override } = action.payload;
       state.filter = clean(override ? filter : { ...state.filter, ...filter });
-      state.isFilterActive = !!filter?.status || !!filter?.usage;
-
+      state.isFilterActive = !!filter?.status || !!filter?.usage || !!filter?.filename;
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
     },
     resetFilter: (state) => {
-      state.filter = clean({ ...state.filter, usage: null, status: null });
+      state.filter = clean({ ...state.filter, usage: null, status: null, filename: null });
       state.isFilterActive = false;
     },
     setCurrentNode: (state, action: PayloadAction<any>) => {
@@ -51,7 +55,7 @@ export const NavigationSlice = createSlice({
 });
 
 // actions
-export const { setFilter, resetFilter, setCurrentNode, setVersion, reset } = NavigationSlice.actions;
+export const { setFilter, resetFilter, setLoading, setCurrentNode, setVersion, reset } = NavigationSlice.actions;
 
 // selectors
 export const selectNavigationState = (state: RootState) => state.navigation;

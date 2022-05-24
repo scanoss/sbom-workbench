@@ -1,10 +1,10 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import workspaceReducer from './workspace-store/workspaceSlice';
 import workbenchReducer from './workbench-store/workbenchSlice';
-import componentReducer from './component-store/componentSlice';
 import inventoryReducer from './inventory-store/inventorySlice';
 import navigationReducer from './navigation-store/navigationSlice';
 import dependencyReducer from './dependency-store/dependencySlice';
+import componentReducer from './component-store/componentSlice';
 
 const rootReducer = combineReducers({
   workspace: workspaceReducer,

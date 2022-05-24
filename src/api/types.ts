@@ -177,6 +177,7 @@ export interface IWorkbenchFilter {
   usage?: FileUsageType;
   status?: FileStatusType;
   purl?: string;
+  filename?: string;
 }
 
 export interface IWorkbenchFilterParams {
