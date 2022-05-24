@@ -9,9 +9,6 @@ import {
   Fade,
   Menu,
   MenuItem,
-  withStyles,
-  styled,
-  Box,
 } from '@material-ui/core';
 
 import React, { useContext, useEffect, useState } from 'react';
@@ -19,6 +16,8 @@ import HomeOutlinedIcon from '@material-ui/icons/HomeOutlined';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import InsertChartOutlinedTwoToneIcon from '@material-ui/icons/InsertChartOutlinedTwoTone';
 import GavelIcon from '@material-ui/icons/Gavel';
+import SearchIcon from '@material-ui/icons/Search';
+
 // eslint-disable-next-line import/no-named-default
 import { default as MaterialAppBar } from '@material-ui/core/AppBar';
 import { NavLink, useHistory, useLocation } from 'react-router-dom';
@@ -56,6 +55,13 @@ const AppMenu = () => {
         <Tooltip title="Detected components">
           <Button color="inherit">
             <GavelIcon />
+          </Button>
+        </Tooltip>
+      </NavLink>
+      <NavLink to="/workbench/search" activeClassName="active" tabIndex={-1}>
+        <Tooltip title="Search keywords">
+          <Button color="inherit">
+            <SearchIcon />
           </Button>
         </Tooltip>
       </NavLink>
