@@ -22,7 +22,7 @@ class Searcher {
 
   public loadIndex(pathToDictionary: string) {
     if (!this.index) {
-      const index = new Index('memory');
+      const index = new Index();
       const indexerAdapter = new IndexerAdapter();
       if (fs.existsSync(pathToDictionary)) {
         fs.readdirSync(pathToDictionary).forEach((filename) => {
