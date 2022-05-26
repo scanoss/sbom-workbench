@@ -54,10 +54,15 @@ const Workbench = () => {
         pane1Style={report ? { display: 'none' } : {}}
       >
         <aside id="Sidebar" className="sidebar">
-          {false && AppConfig.FF_ENABLE_WORKBENCH_FILTERS && loaded && <WorkbenchFilters />}
-          {false && <FileTree /> }
-
-          {true && <SearchPanel /> }
+          <Switch>
+            <Route path={[`${path}/detected`, `${path}/identified`]}>
+              {AppConfig.FF_ENABLE_WORKBENCH_FILTERS && loaded && <WorkbenchFilters />}
+              <FileTree />
+            </Route>
+            <Route path={`${path}/search`}>
+              <SearchPanel />
+            </Route>
+          </Switch>
         </aside>
         <main id="Workbench" className="workbench">
           {loaded ? (

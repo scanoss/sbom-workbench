@@ -16,13 +16,18 @@ const SearchPanel = () => {
   };
 
   const onSearchResponse = (event, data) => {
-    console.log(data);
-    setResults(data);
+    setResults(
+      data.map(({ id, path }) => ({
+        id,
+        path,
+        filename: path.split('/').pop(),
+      }))
+    );
   };
 
   const onRowClick = ({ row }, event) => {
     history.push({
-      pathname: '/workbench/detected/file',
+      pathname: '/workbench/search/file',
       search: `?path=file|${encodeURIComponent(row.path)}`,
     });
   };
@@ -58,11 +63,13 @@ const SearchPanel = () => {
         <DataGrid
           columns={[
             {
-              field: 'path',
+              field: 'filename',
               headerName: 'Results',
               editable: false,
               sortable: false,
               flex: 1,
+              // eslint-disable-next-line react/display-name
+              renderCell: ({ row }) => <span title={row.path}>{row.filename}</span>,
             },
           ]}
           rows={results}
