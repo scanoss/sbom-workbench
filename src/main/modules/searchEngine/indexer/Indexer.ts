@@ -18,7 +18,7 @@ export class Indexer extends  EventEmitter{
   }
 
   public index(files: Array<IIndexer>) {
-    const index = new Index('memory', { tokenize:"full", resolution:25});
+    const index = new Index( { depth: 1, bidirectional: 0, resolution: 9, minlength: 2 } );
     for (let i = 0; i < files.length; i += 1) {
       try {
         if(i % 100 === 0) {
