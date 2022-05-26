@@ -3,7 +3,6 @@ export interface ISearchTask {
   params? : {
     offset?: number;
     limit?: number;
-    bool?: "or" | "and";
-    tokenize ? : "strict" | "forward" | "reverse" | "full";
+    suggest? : boolean;
   }
 }
