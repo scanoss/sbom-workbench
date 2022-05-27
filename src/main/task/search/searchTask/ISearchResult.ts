@@ -1,4 +1,4 @@
-export interface ISearcherResult{
+export interface ISearchResult{
   id: number;
   type: string;
   path: string;
