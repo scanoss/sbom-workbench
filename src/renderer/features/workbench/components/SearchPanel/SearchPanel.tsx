@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, Button, makeStyles } from '@material-ui/core';
 import SearchBox from '@components/SearchBox/SearchBox';
 import { ipcRenderer } from 'electron';
@@ -16,6 +16,9 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 1,
   },
   dataGrid: {
+    '& .MuiDataGrid-columnHeader': {
+      fontSize: '0.7rem',
+    },
     border: 2,
     '& .MuiDataGrid-cell': {
       border: 0,
@@ -42,28 +45,28 @@ const SearchPanel = () => {
   const history = useHistory();
   const classes = useStyles();
 
+  const searchQuery = useRef(null);
   const [results, setResults] = React.useState<any[]>([]);
   const [selected, setSelected] = React.useState<any[]>([]);
 
   const onSearchHandler = (query: string) => {
+    searchQuery.current = query;
     ipcRenderer.send(IpcEvents.SEARCH_ENGINE_SEARCH, { query });
   };
 
   const onSearchResponse = (event, data) => {
-    setResults(
-      mapFiles(data)
-    );
+    setResults(mapFiles(data));
   };
 
   const onRowClick = ({ row }, event) => {
     history.push({
       pathname: '/workbench/search/file',
-      search: `?path=file|${encodeURIComponent(row.path)}`,
+      search: `?path=file|${encodeURIComponent(row.path)}&find=${encodeURIComponent(searchQuery.current)}`,
     });
   };
 
   const onSelectionHandler = (data, details) => {
-    setSelected(data)
+    setSelected(data);
   };
 
   const onIdentifyAllHandler = () => {
@@ -117,7 +120,7 @@ const SearchPanel = () => {
           checkboxSelection
           disableColumnMenu
           disableSelectionOnClick
-          hideFooterPagination
+          hideFooter
           onRowClick={onRowClick}
           onSelectionModelChange={onSelectionHandler}
         />
