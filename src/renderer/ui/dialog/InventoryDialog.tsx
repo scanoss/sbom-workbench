@@ -96,7 +96,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }));
     setLicensesAll(catalogue);
     setLicenses(catalogue);
-
+    setMatchedLicenses(compCatalogue, inventory);
     setLoaded(true);
   };
 
@@ -199,6 +199,25 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     });
   };
 
+  /**
+   * Adds the matched license for purl+version to the list of licenses.
+   */
+  const setMatchedLicenses = (components, form): any[] => {
+    const licenses = components
+      .find((item) => item?.purl === form?.purl)
+      ?.versions.find((item) => item.version === form.version)
+      ?.licenses.map((item) => ({
+        spdxid: item.spdxid,
+        name: item.name,
+        type: 'Matched',
+      }));
+
+    if (licenses) {
+      setLicenses([...licenses, ...licensesAll]);
+    }
+    return licenses;
+  };
+
   const isValid = () => {
     const { version, component, purl, spdxid, usage } = form;
     return spdxid && version && component && purl && usage;
@@ -228,17 +247,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   useEffect(() => {
     if (!loaded) return;
 
-    const lic = components
-      .find((item) => item?.purl === form?.purl)
-      ?.versions.find((item) => item.version === form.version)
-      ?.licenses.map((item) => ({
-        spdxid: item.spdxid,
-        name: item.name,
-        type: 'Matched',
-      }));
-
+    const lic = setMatchedLicenses(components, form);
     if (lic) {
-      setLicenses([...lic, ...licensesAll]);
       setForm({ ...form, spdxid: lic[0]?.spdxid });
     }
   }, [form.version]);

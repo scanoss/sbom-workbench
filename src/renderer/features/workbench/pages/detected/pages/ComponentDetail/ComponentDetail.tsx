@@ -98,13 +98,12 @@ export const ComponentDetail = () => {
 
   const onIdentifyAllPressed = async () => {
     const selFiles = filterFiles.pending.map((file) => file.id);
-
     const inv: Partial<Inventory> = {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       component: component?.name,
       version: version || component?.versions[0]?.version,
-      spdxid: component?.versions[0].licenses[0]?.spdxid,
+      spdxid: component?.versions[0].reliableLicense ?? component?.versions[0].reliableLicense.licenses[0]?.spdxid,
       url: component?.url,
       purl: component?.purl,
       usage: 'file',
