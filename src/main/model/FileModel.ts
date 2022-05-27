@@ -1,5 +1,5 @@
 import log from 'electron-log';
-import { FileDTO } from "@api/dto";
+import { FileDTO } from '@api/dto';
 import { Querys } from './querys_db';
 import { InventoryModel } from './InventoryModel';
 import { Model } from './Model';
@@ -26,7 +26,11 @@ export class FileModel extends Model {
   public async get(queryBuilder: QueryBuilder) {
     return new Promise<FileDTO>(async (resolve, reject) => {
       try {
-        const SQLquery = this.getSQL(queryBuilder, `SELECT f.fileId, f.path,(CASE WHEN f.identified=1 THEN 'IDENTIFIED' WHEN f.identified=0 AND f.ignored=0 THEN 'PENDING' ELSE 'ORIGINAL' END) AS status, f.type FROM files f #FILTER;`, this.getEntityMapper());
+        const SQLquery = this.getSQL(
+          queryBuilder,
+          `SELECT f.fileId, f.path,(CASE WHEN f.identified=1 THEN 'IDENTIFIED' WHEN f.identified=0 AND f.ignored=0 THEN 'PENDING' ELSE 'ORIGINAL' END) AS status, f.type FROM files f #FILTER;`,
+          this.getEntityMapper()
+        );
         const db = await this.openDb();
         db.get(SQLquery.SQL, ...SQLquery.params, (err: any, file: FileDTO) => {
           db.close();
@@ -227,7 +231,7 @@ export class FileModel extends Model {
       try {
         const db = await this.openDb();
         const SQLquery = `UPDATE files SET type=? WHERE fileId IN (${fileIds.toString()});`;
-        db.run(SQLquery,fileType, (err: any) => {
+        db.run(SQLquery, fileType, (err: any) => {
           if (err) throw err;
           db.close();
           resolve();
@@ -243,16 +247,19 @@ export class FileModel extends Model {
     return new Promise<any>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.get(`SELECT COUNT(*) as totalFiles , (SELECT COUNT(*) FROM files WHERE type='MATCH') AS matchFiles,
+        db.get(
+          `SELECT COUNT(*) as totalFiles , (SELECT COUNT(*) FROM files WHERE type='MATCH') AS matchFiles,
                 (SELECT COUNT(*) FROM files WHERE type='FILTERED') AS filterFiles,
                 (SELECT COUNT(*) FROM files WHERE type='NO-MATCH') AS  noMatchFiles, (SELECT COUNT(*) FROM files f WHERE f.type="MATCH" AND f.identified=1) AS scannedIdentified,
                 (SELECT COUNT(*) AS detectedIdentifiedFiles FROM files f WHERE f.identified=1) AS totalIdentified,
                 (SELECT COUNT(*) AS detectedIdentifiedFiles FROM files f WHERE f.ignored=1) AS original,
-                (SELECT COUNT(*) AS pending FROM files f WHERE f.identified=0 AND f.ignored=0 AND f.type="MATCH") AS pending  FROM files;`, (err: any, data: any) => {
-          db.close();
-          if (err) throw err;
-          else resolve(data);
-        });
+                (SELECT COUNT(*) AS pending FROM files f WHERE f.identified=0 AND f.ignored=0 AND f.type="MATCH") AS pending  FROM files;`,
+          (err: any, data: any) => {
+            db.close();
+            if (err) throw err;
+            else resolve(data);
+          }
+        );
       } catch (error) {
         log.error(error);
         reject(error);
