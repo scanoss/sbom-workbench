@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { NavLink, Redirect, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import { reportService } from '@api/services/report.service';
 import { useSelector } from 'react-redux';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import DetectedReport from './pages/DetectedReport';
 import IdentifiedReport from './pages/IdentifiedReport';
-import { selectWorkbench } from '../../../../store/workbench-store/workbenchSlice';
 
 const useStyles = makeStyles(() =>
   createStyles({

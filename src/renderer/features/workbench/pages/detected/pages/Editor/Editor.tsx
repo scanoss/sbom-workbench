@@ -13,6 +13,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createInventory, detachFile, ignoreFile, restoreFile } from '@store/inventory-store/inventoryThunks';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
+import * as FileUtils from '@shared/utils/file-utils';
+import useSearchParams from '@hooks/useSearchParams';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
 import FileToolbar, { ToolbarActions } from '../../../../components/FileToolbar/FileToolbar';
@@ -20,7 +22,6 @@ import { workbenchController } from '../../../../../../controllers/workbench-con
 import CodeViewer from '../../../../components/CodeViewer/CodeViewer';
 import { CodeViewerManager } from './CodeViewerManager';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
-import * as FileUtils from '@shared/utils/file-utils';
 
 const MemoCodeViewer = React.memo(CodeViewer);
 
@@ -32,6 +33,7 @@ export interface FileContent {
 export const Editor = () => {
   const history = useHistory();
   const dispatch = useDispatch();
+  const find = useSearchParams().get('find');
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -307,6 +309,7 @@ export const Editor = () => {
                   (imported ? "// This project was imported. Source file can't be displayed." : '')
                 }
                 highlight={currentMatch?.lines || null}
+                searchString={find}
               />
             ) : (
               <div className="file-loader">Loading local file</div>
@@ -321,6 +324,7 @@ export const Editor = () => {
                   language={getExtension(file)}
                   value={remoteFileContent.content || ''}
                   highlight={currentMatch.oss_lines || null}
+                  searchString={find}
                 />
               ) : (
                 <div className="file-loader">Loading remote file</div>

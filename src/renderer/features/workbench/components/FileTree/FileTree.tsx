@@ -26,7 +26,7 @@ const FileTreeNode = ({ node, onClick, onContextMenu }) => {
         {node.type === 'folder' &&
           (node.state?.expanded ? <i className="fa fa-folder-open" /> : <i className="fa fa-folder" />)}
 
-        {node.type === 'file' && !node.isDependencyFile && <i className="fa fa-file" />}
+        {node.type === 'file' && !node.isDependencyFile && <i className="fa fa-file-o" />}
 
         {node.type === 'file' && node.isDependencyFile && <i className="fa fa-dependency-file" />}
       </span>
