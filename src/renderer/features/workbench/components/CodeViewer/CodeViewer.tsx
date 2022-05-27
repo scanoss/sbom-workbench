@@ -7,10 +7,11 @@ interface ICodeViewerProps {
   value: string;
   language: string;
   highlight: string;
+  searchString?: string;
   options?: monaco.editor.IStandaloneEditorConstructionOptions;
 }
 
-const CodeViewer = ({ id, value, language, highlight, options }: ICodeViewerProps) => {
+const CodeViewer = ({ id, value, language, highlight, searchString, options }: ICodeViewerProps) => {
   const editor = React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const editorContainerRef = React.createRef<HTMLDivElement>();
 
@@ -87,6 +88,24 @@ const CodeViewer = ({ id, value, language, highlight, options }: ICodeViewerProp
     }
   };
 
+  const findAndGo = (searchString: string) => {
+    const { current: mEditor } = editor;
+    console.log('find', searchString);
+
+    try {
+      const model = mEditor.getModel();
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const { range } = model.findMatches(searchString)[0];
+      mEditor.setSelection(range);
+    } catch (e) {
+      console.log(e);
+    }
+
+    mEditor.getAction('actions.find').run();
+  };
+
   useEffect(() => {
     initMonaco();
     return destroyMonaco;
@@ -100,11 +119,16 @@ const CodeViewer = ({ id, value, language, highlight, options }: ICodeViewerProp
     updateHighlight();
   }, [highlight]);
 
+  useEffect(() => {
+    if (searchString) findAndGo(searchString);
+  }, [searchString]);
+
   return <div ref={editorContainerRef} style={{ width: '100%', height: '100%' }} />;
 };
 
 export default CodeViewer;
 
 CodeViewer.defaultProps = {
+  searchString: null,
   options: {},
 };
