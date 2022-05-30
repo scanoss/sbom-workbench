@@ -148,7 +148,7 @@ const SearchPanel = () => {
         </Box>
       </header>
       <main className="panel-body">
-        <Button size="small" className={classes.button} onClick={onIdentifyAllHandler}>Identify All</Button>
+        {/* <Button size="small" className={classes.button} onClick={onIdentifyAllHandler}>Identify All</Button> */}
         <DataGrid
           className={classes.dataGrid}
           columns={[

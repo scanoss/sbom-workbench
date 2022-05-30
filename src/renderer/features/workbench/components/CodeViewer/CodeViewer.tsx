@@ -106,6 +106,9 @@ const CodeViewer = ({ id, value, language, highlight, highlights, options }: ICo
 
       mEditor.deltaDecorations([], matches);
       mEditor.revealRangeNearTop(matches[0].range);
+
+      // TODO: research "setHiddenAreas" to implement reduced view
+      // mEditor.setHiddenAreas(matches.map(m => m.range))
     } catch (e) {
       console.log(e);
     }
