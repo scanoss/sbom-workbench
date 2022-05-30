@@ -14,6 +14,7 @@ class Searcher {
   }
 
   public search(params: ISearcher): number[] {
+    const result = []
     if (this.index) {
       return this.index.search(params.query,params.params? params.params : null);
     }

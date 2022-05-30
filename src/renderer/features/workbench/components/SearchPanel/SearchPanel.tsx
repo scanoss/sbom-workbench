@@ -1,12 +1,15 @@
 import React, { useEffect, useRef } from 'react';
-import { Box, Button, makeStyles } from '@material-ui/core';
+import { Box, Button, Chip, makeStyles, TextField } from '@material-ui/core';
 import SearchBox from '@components/SearchBox/SearchBox';
 import { ipcRenderer } from 'electron';
 import { IpcEvents } from '@api/ipc-events';
 import { DataGrid } from '@material-ui/data-grid';
 import { useHistory } from 'react-router-dom';
 import { mapFiles } from '@shared/utils/scan-util';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import * as SearchUtils from '@shared/utils/search-utils';
 import TreeNode from '../TreeNode/TreeNode';
+import SearchIcon from '@material-ui/icons/Search';
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -14,6 +17,12 @@ const useStyles = makeStyles((theme) => ({
     top: 12,
     right: 8,
     zIndex: 1,
+  },
+  searchInput: {
+    '& .MuiInputBase-input': {
+      fontSize: '0.8rem',
+      padding: '7px 0px !important',
+    },
   },
   dataGrid: {
     '& .MuiDataGrid-columnHeader': {
@@ -46,12 +55,27 @@ const SearchPanel = () => {
   const classes = useStyles();
 
   const searchQuery = useRef(null);
+  const [value, setValue] = React.useState<string[]>([]);
   const [results, setResults] = React.useState<any[]>([]);
   const [selected, setSelected] = React.useState<any[]>([]);
 
-  const onSearchHandler = (query: string) => {
-    searchQuery.current = query;
+  const goto = (path: string) => {
+    history.push({
+      pathname: '/workbench/search/file',
+      search: `?path=file|${encodeURIComponent(path)}&highlight=${encodeURIComponent(searchQuery.current)}`,
+    });
+  };
+
+  const onTagsHandler = (tags: string[]) => {
+    const nTags = tags
+      .map((tag) => tag.toLowerCase().trim())
+      .map((tag) => SearchUtils.getTerms(tag))
+      .flat();
+
+    const query = nTags.join(' ');
+    setValue(nTags);
     ipcRenderer.send(IpcEvents.SEARCH_ENGINE_SEARCH, { query });
+    searchQuery.current = query;
   };
 
   const onSearchResponse = (event, data) => {
@@ -59,10 +83,13 @@ const SearchPanel = () => {
   };
 
   const onRowClick = ({ row }, event) => {
-    history.push({
-      pathname: '/workbench/search/file',
-      search: `?path=file|${encodeURIComponent(row.path)}&find=${encodeURIComponent(searchQuery.current)}`,
-    });
+    goto(row.path);
+  };
+
+  const onCellKeyDown = ({ row }, event) => {
+    if (event.code === 'Enter') {
+      goto(row.path);
+    }
   };
 
   const onSelectionHandler = (data, details) => {
@@ -86,15 +113,35 @@ const SearchPanel = () => {
   return (
     <div className="panel panel-left search-panel-container">
       <header className="panel-header">
-        <Box boxShadow={1} className="p-3">
+        <Box boxShadow={1} className="p-3 pr-2 pb-1">
           <div className="panel-title">
             <h4>Search</h4>
           </div>
           <div className="search-panel mt-3">
-            <div className="search-panel-input">
-              <SearchBox
-                placeholder="Search by keywords"
-                onChange={onSearchHandler}
+            <div className="search-panel-input d-flex align-center">
+              <SearchIcon className="start-icon mr-1" />
+              <Autocomplete
+                multiple
+                fullWidth
+                forcePopupIcon
+                size="small"
+                options={['license', 'copyright', 'author', 'version']}
+                freeSolo
+                value={value}
+                onChange={(event, data) => onTagsHandler(data)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    className={classes.searchInput}
+                    autoFocus
+                    variant="standard"
+                    InputProps={{
+                      ...params.InputProps,
+                      placeholder: value.length === 0 ? 'Search by keywords' : '',
+                      disableUnderline: true,
+                    }}
+                  />
+                )}
               />
             </div>
           </div>
@@ -122,6 +169,7 @@ const SearchPanel = () => {
           disableSelectionOnClick
           hideFooter
           onRowClick={onRowClick}
+          onCellKeyDown={onCellKeyDown}
           onSelectionModelChange={onSelectionHandler}
         />
       </main>

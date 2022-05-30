@@ -25,6 +25,7 @@ module.exports = {
     // 'no-func-names': ['on','as-needed'],
     'react/no-array-index-key': ['warn'],
     'import/no-cycle': ['warn'],
+    'no-empty-pattern': ['off'],
   },
   parserOptions: {
     ecmaVersion: 2020,

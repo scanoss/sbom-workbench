@@ -7,11 +7,11 @@ interface ICodeViewerProps {
   value: string;
   language: string;
   highlight: string;
-  searchString?: string;
+  highlights?: string[];
   options?: monaco.editor.IStandaloneEditorConstructionOptions;
 }
 
-const CodeViewer = ({ id, value, language, highlight, searchString, options }: ICodeViewerProps) => {
+const CodeViewer = ({ id, value, language, highlight, highlights, options }: ICodeViewerProps) => {
   const editor = React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const editorContainerRef = React.createRef<HTMLDivElement>();
 
@@ -56,7 +56,7 @@ const CodeViewer = ({ id, value, language, highlight, searchString, options }: I
 
       const nModel = monaco.editor.createModel(value, language);
       mEditor.setModel(nModel);
-      mEditor.focus();
+      // mEditor.focus();
       // mEditor.layout({} as monaco.editor.IDimension);
     }
   };
@@ -70,15 +70,11 @@ const CodeViewer = ({ id, value, language, highlight, searchString, options }: I
             range: new monaco.Range(start, 1, end, 1),
             options: {
               isWholeLine: true,
-              className: 'line-highlight',
-              glyphMarginClassName: 'line-highlight',
+              className: 'lineHighlightDecoration',
             },
           };
         });
-        editor.current.deltaDecorations(
-          [],
-          decorations,
-        );
+        editor.current.deltaDecorations([], decorations);
 
         editor.current.revealLineNearTop(decorations[0].range.startLineNumber);
       } else {
@@ -88,22 +84,31 @@ const CodeViewer = ({ id, value, language, highlight, searchString, options }: I
     }
   };
 
-  const findAndGo = (searchString: string) => {
+  const highlightTerms = (terms: string[]) => {
     const { current: mEditor } = editor;
-    console.log('find', searchString);
 
     try {
       const model = mEditor.getModel();
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const { range } = model.findMatches(searchString)[0];
-      mEditor.setSelection(range);
+      const matches = terms
+        .map((term) =>
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          model.findMatches(term).map(({ range }) => ({
+            range,
+            options: {
+              inlineClassName: 'inlineWordHighlightDecoration',
+              linesDecorationsClassName: 'lineHighlightLineDecoration',
+            },
+          }))
+        )
+        .flat();
+
+      mEditor.deltaDecorations([], matches);
+      mEditor.revealRangeNearTop(matches[0].range);
     } catch (e) {
       console.log(e);
     }
-
-    mEditor.getAction('actions.find').run();
   };
 
   useEffect(() => {
@@ -120,8 +125,8 @@ const CodeViewer = ({ id, value, language, highlight, searchString, options }: I
   }, [highlight]);
 
   useEffect(() => {
-    if (searchString) findAndGo(searchString);
-  }, [searchString]);
+    if (highlights) highlightTerms(highlights);
+  }, [highlights]);
 
   return <div ref={editorContainerRef} style={{ width: '100%', height: '100%' }} />;
 };
@@ -129,6 +134,6 @@ const CodeViewer = ({ id, value, language, highlight, searchString, options }: I
 export default CodeViewer;
 
 CodeViewer.defaultProps = {
-  searchString: null,
+  highlights: null,
   options: {},
 };

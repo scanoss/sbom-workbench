@@ -15,6 +15,7 @@ import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import * as FileUtils from '@shared/utils/file-utils';
 import useSearchParams from '@hooks/useSearchParams';
+import * as SearchUtils from '@shared/utils/search-utils';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
 import FileToolbar, { ToolbarActions } from '../../../../components/FileToolbar/FileToolbar';
@@ -33,7 +34,7 @@ export interface FileContent {
 export const Editor = () => {
   const history = useHistory();
   const dispatch = useDispatch();
-  const find = useSearchParams().get('find');
+  const highlightParam = useSearchParams().get('highlight');
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -41,6 +42,7 @@ export const Editor = () => {
   const { node } = useSelector(selectNavigationState);
 
   const file = node?.type === 'file' ? node.path : null;
+  const highlight = highlightParam ? SearchUtils.getTerms(highlightParam) : null;
 
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);
@@ -309,7 +311,7 @@ export const Editor = () => {
                   (imported ? "// This project was imported. Source file can't be displayed." : '')
                 }
                 highlight={currentMatch?.lines || null}
-                searchString={find}
+                highlights={highlight || null}
               />
             ) : (
               <div className="file-loader">Loading local file</div>
@@ -324,7 +326,7 @@ export const Editor = () => {
                   language={getExtension(file)}
                   value={remoteFileContent.content || ''}
                   highlight={currentMatch.oss_lines || null}
-                  searchString={find}
+                  highlights={highlight || null}
                 />
               ) : (
                 <div className="file-loader">Loading remote file</div>
