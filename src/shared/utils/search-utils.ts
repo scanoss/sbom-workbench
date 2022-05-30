@@ -13,7 +13,7 @@ const getTerms = (querySearch: string, regex = /[\W_]+/): string[] => {
  */
 const getTokensFamily = (token: string): string[] => {
   const data = {
-    licensed: ['licensed', 'licenses'],
+    licensed: ['license', 'licenses'],
     licenses: ['licensed', 'licenses'],
     license: ['licensed', 'licenses'],
   };
@@ -23,4 +23,5 @@ const getTokensFamily = (token: string): string[] => {
 
 export {
   getTerms,
+  getTokensFamily
 }
