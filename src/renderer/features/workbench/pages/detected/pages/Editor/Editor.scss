@@ -91,8 +91,19 @@
       color: #d9d7d7;
     }
 
-    .line-highlight {
+    .lineHighlightDecoration {
       background: rgba(52, 59, 36, 0.73);
+    }
+
+    .lineHighlightLineDecoration {
+      background: rgb(76, 105, 9);
+      width: 3px !important;
+      margin-left: 3px;
+    }
+
+    .inlineWordHighlightDecoration {
+      background: rgba(52, 59, 36, 0.73);
+      filter: saturate(7);
     }
 
     .editor-widget.find-widget.reduced-find-widget.visible {
