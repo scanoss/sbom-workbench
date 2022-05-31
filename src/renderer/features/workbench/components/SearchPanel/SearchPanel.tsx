@@ -1,6 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Box, Button, Chip, makeStyles, TextField } from '@material-ui/core';
-import SearchBox from '@components/SearchBox/SearchBox';
+import React, { SetStateAction, useEffect, useRef } from 'react';
+import { Box, Button, makeStyles, TextField } from '@material-ui/core';
 import { ipcRenderer } from 'electron';
 import { IpcEvents } from '@api/ipc-events';
 import { DataGrid } from '@material-ui/data-grid';
@@ -8,8 +7,10 @@ import { useHistory } from 'react-router-dom';
 import { mapFiles } from '@shared/utils/scan-util';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import * as SearchUtils from '@shared/utils/search-utils';
-import TreeNode from '../TreeNode/TreeNode';
 import SearchIcon from '@material-ui/icons/Search';
+import { AppConfigDefault } from '@config/AppConfigDefault';
+import TreeNode from '../TreeNode/TreeNode';
+import { ISearchResult } from '../../../../../main/task/search/searchTask/ISearchResult';
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -27,6 +28,13 @@ const useStyles = makeStyles((theme) => ({
   dataGrid: {
     '& .MuiDataGrid-columnHeader': {
       fontSize: '0.7rem',
+    },
+    '& .MuiTablePagination-caption': {
+      fontSize: '0.8rem',
+      fontWeight: 500,
+    },
+    '& .MuiTablePagination-actions': {
+      marginLeft: 10,
     },
     border: 2,
     '& .MuiDataGrid-cell': {
@@ -54,10 +62,28 @@ const SearchPanel = () => {
   const history = useHistory();
   const classes = useStyles();
 
+  const resultsSet = useRef<Set<string>>(new Set());
   const searchQuery = useRef(null);
+
+  const serverPage = useRef(0);
+  const [localPage, setLocalPage] = React.useState(0);
+
   const [value, setValue] = React.useState<string[]>([]);
   const [results, setResults] = React.useState<any[]>([]);
   const [selected, setSelected] = React.useState<any[]>([]);
+
+  // finish flag is necessary due row count and limit are undefined on search engine
+  const [finishPagination, setFinishPagination] = React.useState<boolean>(false);
+
+  const search = () => {
+    ipcRenderer.send(IpcEvents.SEARCH_ENGINE_SEARCH, {
+      query: searchQuery.current,
+      params: {
+        offset: serverPage.current * AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT,
+        limit: AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT,
+      },
+    });
+  };
 
   const goto = (path: string) => {
     history.push({
@@ -67,26 +93,38 @@ const SearchPanel = () => {
   };
 
   const onTagsHandler = (tags: string[]) => {
+    serverPage.current = 0;
+    setFinishPagination(false);
+    setLocalPage(0);
+
     const nTags = tags
       .map((tag) => tag.toLowerCase().trim())
       .map((tag) => SearchUtils.getTerms(tag))
       .flat();
 
-    const query = nTags.join(' ');
+    searchQuery.current = nTags.join(' ');
     setValue(nTags);
-    ipcRenderer.send(IpcEvents.SEARCH_ENGINE_SEARCH, { query });
-    searchQuery.current = query;
   };
 
   const onSearchResponse = (event, data) => {
-    setResults(mapFiles(data));
+    setResults(
+      serverPage.current === 0
+        ? data
+        : (oldState) => {
+            // we need to remove duplicates because pagination could be response with previous items
+            const nItems = data.filter((item) => !resultsSet.current.has(item.id));
+            return [...oldState, ...nItems];
+          }
+    );
+
+    if (data.length === 0) setFinishPagination(true);
   };
 
-  const onRowClick = ({ row }, event) => {
+  const onRowClickHandler = ({ row }, event) => {
     goto(row.path);
   };
 
-  const onCellKeyDown = ({ row }, event) => {
+  const onCellKeyDownHandler = ({ row }, event) => {
     if (event.code === 'Enter') {
       goto(row.path);
     }
@@ -100,13 +138,34 @@ const SearchPanel = () => {
     console.log('Identify all');
   };
 
+  const onPageChangeHandler = (pageNumber, details) => {
+    setLocalPage(pageNumber);
+
+    if (pageNumber === Math.floor(results.length / 100) - 1) {
+      serverPage.current += 1;
+      search();
+    }
+  };
+
+  // keeps up to date the results set
+  useEffect(() => {
+    resultsSet.current = new Set(results.map(item => item.id));
+  }, [results]);
+
+  // trigger the search on value change
+  useEffect(() => {
+    search();
+  }, [value]); //
+
   const setupListeners = () => {
     ipcRenderer.on(IpcEvents.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
   };
+
   const removeListeners = () => {
     ipcRenderer.removeListener(IpcEvents.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
   };
 
+  // on mount/unmount listeners
   useEffect(setupListeners, []);
   useEffect(() => () => removeListeners(), []);
 
@@ -151,10 +210,11 @@ const SearchPanel = () => {
         {/* <Button size="small" className={classes.button} onClick={onIdentifyAllHandler}>Identify All</Button> */}
         <DataGrid
           className={classes.dataGrid}
+          rows={results}
           columns={[
             {
               field: 'filename',
-              headerName: `${selected?.length} of ${results?.length} rows selected`,
+              headerName: `${selected?.length} rows selected`,
               editable: false,
               sortable: false,
               flex: 1,
@@ -162,21 +222,31 @@ const SearchPanel = () => {
               renderCell: ({ row }) => <TreeNode node={row} />,
             },
           ]}
-          rows={results}
+          localeText={{
+            MuiTablePagination: {
+              labelDisplayedRows: ({ from, to, count }) =>
+                `${from} - ${to} of ${
+                  count >= AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT && !finishPagination ? `+${count}` : count
+                }`,
+            },
+          }}
           rowHeight={23}
+          page={localPage}
           checkboxSelection
           disableColumnMenu
+          rowsPerPageOptions={[AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT]}
+          hideFooterSelectedRowCount
+          hideFooterRowCount
           disableSelectionOnClick
-          hideFooter
-          onRowClick={onRowClick}
-          onCellKeyDown={onCellKeyDown}
+          onPageChange={onPageChangeHandler}
+          onRowClick={onRowClickHandler}
+          onCellKeyDown={onCellKeyDownHandler}
           onSelectionModelChange={onSelectionHandler}
         />
       </main>
-      <footer className="panel-footer">
-      </footer>
+      <footer className="panel-footer" />
     </div>
   );
-}
+};
 
 export default SearchPanel;

@@ -25,7 +25,7 @@ export class SearchTask implements ITask<ISearchTask, Array<ISearchResult>> {
       params.params = { limit };
     }
     const fileIds = this.search.search(params);
-    const results: any = (await modelProvider.model.file.getAll(
+    const results: any = (await modelProvider.model.file.getAllBySearch(
       QueryBuilderCreator.create({ fileId: fileIds })
     )) as unknown as ISearchResult;
     const files = results.reduce((acc, curr) => {
