@@ -3,6 +3,7 @@ import path from 'path';
 import { setInterval } from 'timers';
 import { IndexerAdapter } from '../indexer/IndexerAdapter';
 import { ISearcher } from './ISearcher';
+import { getTokensFamily, getTerms } from '../../../../shared/utils/search-utils';
 
 const { Index } = require('flexsearch');
 
@@ -14,11 +15,29 @@ class Searcher {
   }
 
   public search(params: ISearcher): number[] {
-    const result = []
     if (this.index) {
-      return this.index.search(params.query,params.params? params.params : null);
+      let results = this.index.search(params.query, params.params ? params.params : null);
+      const querys = getTerms(params.query);
+      for (let i = 0; i < querys.length; i += 1) {
+        const resultTokenFamily = this.serchInTokensFamily(querys[i], params);
+        if (resultTokenFamily.length > 0) results = results.concat(resultTokenFamily);
+      }
+      return results;
     }
     return [];
+  }
+
+  private serchInTokensFamily(token: string, params: ISearcher): number[] {
+    let results = [];
+    const tokensFamily = getTokensFamily(token);
+    if (tokensFamily) {
+      tokensFamily.forEach((tf) => {
+        const filesMatched = this.index.search(tf, params.params ? params.params : null);
+        if (filesMatched.length > 0) results = results.concat(filesMatched);
+        results = results.concat(filesMatched);
+      });
+    }
+    return results;
   }
 
   public loadIndex(pathToDictionary: string) {
