@@ -1,12 +1,26 @@
+import { familyToken } from './FamilyToken';
+
 /**
  * Return a list of query terms by splitting the search query
  * @param querySearch The search query
  * @param regex The regex to split the query by. The default use same regex as the tokenizer
  */
-import { familyToken } from './FamilyToken';
-
 const getTerms = (querySearch: string, regex = /[\W_]+/): string[] => {
   return querySearch.split(regex);
+};
+
+/**
+ * Return a list of query terms by splitting the search query, including the tokens family
+ * @param querySearch The search query
+ * @param regex The regex to split the query by. The default use same regex as the tokenizer
+ */
+const getTermsFamily = (querySearch: string, regex = /[\W_]+/): string[] => {
+  return getTerms(querySearch, regex).concat(
+    getTerms(querySearch, regex)
+      .map(getTokensFamily)
+      .filter((item) => item)
+      .flat()
+  );
 };
 
 /**
@@ -21,4 +35,4 @@ const addFamilyToken = (newFamily: Array<string>) => {
   familyToken.addFamily(newFamily);
 };
 
-export { getTerms, getTokensFamily };
+export { getTerms, getTermsFamily, getTokensFamily };

@@ -14,8 +14,8 @@ import { createInventory, detachFile, ignoreFile, restoreFile } from '@store/inv
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import * as FileUtils from '@shared/utils/file-utils';
-import useSearchParams from '@hooks/useSearchParams';
 import * as SearchUtils from '@shared/utils/search-utils';
+import useSearchParams from '@hooks/useSearchParams';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
 import FileToolbar, { ToolbarActions } from '../../../../components/FileToolbar/FileToolbar';
@@ -42,7 +42,7 @@ export const Editor = () => {
   const { node } = useSelector(selectNavigationState);
 
   const file = node?.type === 'file' ? node.path : null;
-  const highlight = highlightParam ? SearchUtils.getTerms(highlightParam) : null;
+  const highlight = highlightParam ? SearchUtils.getTermsFamily(highlightParam) : null;
 
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);
@@ -324,7 +324,7 @@ export const Editor = () => {
                 <MemoCodeViewer
                   id={CodeViewerManager.RIGHT}
                   language={getExtension(file)}
-                  value={remoteFileContent.content || ''}
+                  value={remoteFileContent.content || 't'}
                   highlight={currentMatch.oss_lines || null}
                   highlights={highlight || null}
                 />
