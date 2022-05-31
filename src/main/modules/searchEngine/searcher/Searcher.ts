@@ -16,15 +16,13 @@ class Searcher {
 
   public search(params: ISearcher): number[] {
     if (this.index) {
+      let results = this.index.search(params.query, params.params ? params.params : null);
       const querys = getTerms(params.query);
-      let r = [];
       for (let i = 0; i < querys.length; i += 1) {
-        const aux = this.index.search(querys[i], params.params ? params.params : null);
-        r = r.concat(aux);
         const resultTokenFamily = this.serchInTokensFamily(querys[i], params);
-        if (resultTokenFamily.length > 0) r = r.concat(resultTokenFamily);
+        if (resultTokenFamily.length > 0) results = results.concat(resultTokenFamily);
       }
-      return r;
+      return results;
     }
     return [];
   }
