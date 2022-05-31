@@ -1,4 +1,11 @@
-/* eslint-disable global-require */
+/* eslint-disablelocaleText={{
+          footerTotalVisibleRows: (visibleCount, totalCount) =>
+            `${visibleCount.toLocaleString()} / ${totalCount.toLocaleString()}does nothing`,
+          MuiTablePagination: {
+            labelDisplayedRows: ({ from, to, count }) =>
+              `${from} - ${to} of more than ${to}`,
+          },
+        }} global-require */
 import log from 'electron-log';
 import { AppConfigDefault } from './AppConfigDefault';
 import { IAppConfig } from './IAppConfig';

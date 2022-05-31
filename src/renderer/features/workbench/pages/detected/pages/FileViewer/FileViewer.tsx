@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import DependencyViewer from '../Dependency/Dependency';
 import Editor from '../Editor/Editor';
-import { selectWorkbench } from '../../../../../../store/workbench-store/workbenchSlice';
-import { selectNavigationState } from '../../../../../../store/navigation-store/navigationSlice';
 
 enum FileType {
   code,

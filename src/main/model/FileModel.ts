@@ -4,6 +4,7 @@ import { Querys } from './querys_db';
 import { InventoryModel } from './InventoryModel';
 import { Model } from './Model';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
+import * as util from 'util';
 
 const query = new Querys();
 
@@ -59,6 +60,16 @@ export class FileModel extends Model {
         reject(error);
       }
     });
+  }
+
+  public async getAllBySearch(queryBuilder?: QueryBuilder): Promise<any[]> {
+    const db = await this.openDb();
+    const SQLQuery = this.getSQL(queryBuilder, query.SQL_GET_ALL_FILES_BY_SEARCH, this.getEntityMapper());
+
+    const call = util.promisify(db.all.bind(db));
+    const files = await call(SQLQuery.SQL, ...SQLQuery.params);
+    db.close();
+    return files;
   }
 
   ignored(files: number[]) {
