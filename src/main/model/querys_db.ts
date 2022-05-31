@@ -215,6 +215,10 @@ export class Querys {
   LEFT JOIN file_inventories fi ON fi.fileId=f.fileId
   LEFT JOIN result_license rl ON rl.resultId=r.id #FILTER ;`;
 
+  SQL_GET_ALL_FILES_BY_SEARCH = `SELECT f.fileId AS id,f.path,f.type,r.idtype AS usage,
+(CASE WHEN f.ignored = 1 THEN 'ignored' WHEN f.identified = 1 THEN 'identified' WHEN f.type = 'MATCH' THEN 'pending' ELSE NULL END) as status
+FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
+
   SQL_GET_RESULTS_PRELOADINVENTORY =
     'SELECT f.fileId AS id,r.source,r.idtype AS usage,r.component,r.version,rl.spdxid,r.url,r.purl,f.type FROM files f INNER JOIN results r ON f.fileId=r.fileId LEFT JOIN component_versions comp ON comp.purl=r.purl AND comp.version=r.version LEFT JOIN result_license rl ON rl.resultId=r.id #FILTER';
 
