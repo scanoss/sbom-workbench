@@ -3,14 +3,14 @@ import log from 'electron-log';
 import { EventEmitter } from "events";
 import { IIndexer } from './IIndexer';
 import { IpcEvents } from "../../../../api/ipc-events";
+import { getSearchConfig } from '../../../../shared/utils/search-utils';
 
 const path = require('path');
 const { Index } = require('flexsearch');
 
-
 export class Indexer extends  EventEmitter{
 
-  private msgToUI : Electron.WebContents;
+  private msgToUI: Electron.WebContents;
 
   constructor(msgToUI: Electron.WebContents) {
     super();
@@ -18,10 +18,10 @@ export class Indexer extends  EventEmitter{
   }
 
   public index(files: Array<IIndexer>) {
-    const index = new Index( { depth: 1, bidirectional: 0, resolution: 9, minlength: 2 } );
+    const index = new Index(getSearchConfig());
     for (let i = 0; i < files.length; i += 1) {
       try {
-        if(i % 100 === 0) {
+        if (i % 100 === 0) {
           this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
             stage: {
               stageName: `Creating search index`,
@@ -30,8 +30,8 @@ export class Indexer extends  EventEmitter{
             processed: i*100/files.length,
           });
         }
-       const fileContent = fs.readFileSync(files[i].path, 'utf-8');
-       index.add(files[i].fileId, fileContent);
+        const fileContent = fs.readFileSync(files[i].path, 'utf-8');
+        index.add(files[i].fileId, fileContent);
       } catch (e) {
         log.error(e);
       }
@@ -40,7 +40,7 @@ export class Indexer extends  EventEmitter{
   }
 
   public async saveIndex(index: any, pathToDictionary: string) {
-    if(!fs.existsSync(pathToDictionary)) {
+    if (!fs.existsSync(pathToDictionary)) {
       fs.rmdir(pathToDictionary, { recursive: true }, (err) => {
       });
     }

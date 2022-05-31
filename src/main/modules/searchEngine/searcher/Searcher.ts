@@ -3,7 +3,7 @@ import path from 'path';
 import { setInterval } from 'timers';
 import { IndexerAdapter } from '../indexer/IndexerAdapter';
 import { ISearcher } from './ISearcher';
-import { getTokensFamily, getTerms } from '../../../../shared/utils/search-utils';
+import { getTokensFamily, getTerms, getSearchConfig } from '../../../../shared/utils/search-utils';
 
 const { Index } = require('flexsearch');
 
@@ -42,7 +42,7 @@ class Searcher {
 
   public loadIndex(pathToDictionary: string) {
     if (!this.index) {
-      const index = new Index({ depth: 1, bidirectional: 0, resolution: 9, minlength: 2 });
+      const index = new Index(getSearchConfig());
       const indexerAdapter = new IndexerAdapter();
       if (fs.existsSync(pathToDictionary)) {
         fs.readdirSync(pathToDictionary).forEach((filename) => {
