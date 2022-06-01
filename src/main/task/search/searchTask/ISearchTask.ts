@@ -1,8 +1,8 @@
 export interface ISearchTask {
   query: string;
-  params? : {
+  params?: {
     offset?: number;
     limit?: number;
-    suggest? : boolean;
-  }
+    suggest?: boolean;
+  };
 }

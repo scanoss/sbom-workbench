@@ -1,5 +1,3 @@
-import { familyToken } from './FamilyToken';
-
 /**
  * Return the default configuration for the search engine. It used by flexsearch on index and searcher creation.
  * @returns The default configuration
@@ -51,30 +49,4 @@ const getTerms = (querySearch: string, regex = /[\W_]+/): string[] => {
   return querySearch.split(regex);
 };
 
-/**
- * Return a list of query terms by splitting the search query, including the tokens family
- * @param querySearch The search query
- * @param regex The regex to split the query by. The default use same regex as the tokenizer
- */
-const getTermsFamily = (querySearch: string, regex = /[\W_]+/): string[] => {
-  return getTerms(querySearch, regex).concat(
-    getTerms(querySearch, regex)
-      .map(getTokensFamily)
-      .filter((item) => item)
-      .flat()
-  );
-};
-
-/**
- * Get tokens family associated to a single token
- * @param token The token to get the family
- */
-const getTokensFamily = (token: string): string[] => {
-  return familyToken.getFamily(token);
-};
-
-const addFamilyToken = (newFamily: Array<string>) => {
-  familyToken.addFamily(newFamily);
-};
-
-export { getSearchConfig, unStemmify, getTerms, getTermsFamily, getTokensFamily };
+export { getSearchConfig, unStemmify, getTerms };
