@@ -2,7 +2,6 @@ import { EventEmitter } from 'events';
 import { ITask } from '../../Task';
 import { modelProvider } from '../../../services/ModelProvider';
 import { Indexer } from '../../../modules/searchEngine/indexer/Indexer';
-import { IndexerAdapter } from '../../../modules/searchEngine/indexer/IndexerAdapter';
 import { IIndexer } from '../../../modules/searchEngine/indexer/IIndexer';
 import { workspace } from '../../../workspace/Workspace';
 

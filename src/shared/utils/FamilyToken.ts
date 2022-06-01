@@ -24,7 +24,7 @@ class FamilyToken {
   }
 
   private setDefaults() {
-    this.addFamily(['license', 'licenses', 'licensed', 'licence']);
+    // this.addFamily(['license', 'licenses', 'licensed', 'licence']);
   }
 }
 

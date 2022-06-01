@@ -3,7 +3,7 @@ import path from 'path';
 import { setInterval } from 'timers';
 import { IndexerAdapter } from '../indexer/IndexerAdapter';
 import { ISearcher } from './ISearcher';
-import { getTokensFamily, getTerms } from '../../../../shared/utils/search-utils';
+import { getSearchConfig } from '../../../../shared/utils/search-utils';
 
 const { Index } = require('flexsearch');
 
@@ -16,33 +16,15 @@ class Searcher {
 
   public search(params: ISearcher): number[] {
     if (this.index) {
-      let results = this.index.search(params.query, params.params ? params.params : null);
-      const querys = getTerms(params.query);
-      for (let i = 0; i < querys.length; i += 1) {
-        const resultTokenFamily = this.serchInTokensFamily(querys[i], params);
-        if (resultTokenFamily.length > 0) results = results.concat(resultTokenFamily);
-      }
+      const results = this.index.search(params.query, params.params ? params.params : null);
       return results;
     }
     return [];
   }
 
-  private serchInTokensFamily(token: string, params: ISearcher): number[] {
-    let results = [];
-    const tokensFamily = getTokensFamily(token);
-    if (tokensFamily) {
-      tokensFamily.forEach((tf) => {
-        const filesMatched = this.index.search(tf, params.params ? params.params : null);
-        if (filesMatched.length > 0) results = results.concat(filesMatched);
-        results = results.concat(filesMatched);
-      });
-    }
-    return results;
-  }
-
   public loadIndex(pathToDictionary: string) {
     if (!this.index) {
-      const index = new Index({ depth: 1, bidirectional: 0, resolution: 9, minlength: 2 });
+      const index = new Index(getSearchConfig());
       const indexerAdapter = new IndexerAdapter();
       if (fs.existsSync(pathToDictionary)) {
         fs.readdirSync(pathToDictionary).forEach((filename) => {
