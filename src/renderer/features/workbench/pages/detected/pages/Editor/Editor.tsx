@@ -42,7 +42,7 @@ export const Editor = () => {
   const { node } = useSelector(selectNavigationState);
 
   const file = node?.type === 'file' ? node.path : null;
-  const highlight = highlightParam ? SearchUtils.getTermsFamily(highlightParam) : null;
+  const highlight = highlightParam ? SearchUtils.unStemmify(highlightParam) : null;
 
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);

@@ -61,8 +61,6 @@ const useStyles = makeStyles((theme) => ({
 const SearchPanel = () => {
   const history = useHistory();
   const classes = useStyles();
-
-  const resultsSet = useRef<Set<string>>(new Set());
   const searchQuery = useRef(null);
 
   const serverPage = useRef(0);
@@ -71,9 +69,6 @@ const SearchPanel = () => {
   const [value, setValue] = React.useState<string[]>([]);
   const [results, setResults] = React.useState<any[]>([]);
   const [selected, setSelected] = React.useState<any[]>([]);
-
-  // finish flag is necessary due row count and limit are undefined on search engine
-  const [finishPagination, setFinishPagination] = React.useState<boolean>(false);
 
   const search = () => {
     ipcRenderer.send(IpcEvents.SEARCH_ENGINE_SEARCH, {
@@ -94,7 +89,6 @@ const SearchPanel = () => {
 
   const onTagsHandler = (tags: string[]) => {
     serverPage.current = 0;
-    setFinishPagination(false);
     setLocalPage(0);
 
     const nTags = tags
@@ -107,17 +101,7 @@ const SearchPanel = () => {
   };
 
   const onSearchResponse = (event, data) => {
-    setResults(
-      serverPage.current === 0
-        ? data
-        : (oldState) => {
-            // we need to remove duplicates because pagination could be response with previous items
-            const nItems = data.filter((item) => !resultsSet.current.has(item.id));
-            return [...oldState, ...nItems];
-          }
-    );
-
-    if (data.length === 0) setFinishPagination(true);
+    setResults(serverPage.current === 0 ? data : (oldState) => [...oldState, ...data]);
   };
 
   const onRowClickHandler = ({ row }, event) => {
@@ -138,19 +122,14 @@ const SearchPanel = () => {
     console.log('Identify all');
   };
 
-  const onPageChangeHandler = (pageNumber, details) => {
-    setLocalPage(pageNumber);
-
-    if (pageNumber === Math.floor(results.length / 100) - 1) {
-      serverPage.current += 1;
+  const onPageChangeHandler = (localPageNumber, details) => {
+    setLocalPage(localPageNumber);
+    const nextPageServer = Math.floor( (localPageNumber + 1)  / (AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT / 100));
+    if (nextPageServer > serverPage.current) {
+      serverPage.current = nextPageServer;
       search();
     }
   };
-
-  // keeps up to date the results set
-  useEffect(() => {
-    resultsSet.current = new Set(results.map(item => item.id));
-  }, [results]);
 
   // trigger the search on value change
   useEffect(() => {
@@ -226,7 +205,7 @@ const SearchPanel = () => {
             MuiTablePagination: {
               labelDisplayedRows: ({ from, to, count }) =>
                 `${from} - ${to} of ${
-                  count >= AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT && !finishPagination ? `+${count}` : count
+                  count >= (serverPage.current + 1) * AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT ? `+${count}` : count
                 }`,
             },
           }}

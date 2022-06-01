@@ -25,15 +25,15 @@ export class SearchTask implements ITask<ISearchTask, Array<ISearchResult>> {
       params.params = { limit };
     }
     const fileIds = this.search.search(params);
-    const results: any = (await modelProvider.model.file.getAllBySearch(
+    const results: Array<ISearchResult> = await modelProvider.model.file.getAllBySearch(
       QueryBuilderCreator.create({ fileId: fileIds })
-    )) as unknown as ISearchResult;
+    );
     const files = results.reduce((acc, curr) => {
       if (!acc[curr.path]) acc[curr.path] = curr;
       return acc;
-    }, {});
+    }, {} as Record<string, ISearchResult>);
     if (!this.isFinished) {
-      return Object.values(files) as Array<ISearchResult>;
+      return Object.values(files);
     }
     throw new Error('SearchTask is finished');
   }
