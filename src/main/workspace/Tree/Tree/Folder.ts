@@ -1,4 +1,4 @@
-import Node, { NodeStatus } from './Node';
+import Node, {NodeStatus} from './Node';
 
 
 export default class Folder extends Node {
@@ -52,7 +52,6 @@ export default class Folder extends Node {
 
   }
 
-  //TODO: Refactor  remove this method
   private statusLogic(): NodeStatus {
     if (this.children.some((child) => child.getStatus() === NodeStatus.PENDING)) return NodeStatus.PENDING;
     if (this.children.some((child) => child.getStatus() === NodeStatus.IDENTIFIED)) return NodeStatus.IDENTIFIED;
@@ -173,10 +172,13 @@ export default class Folder extends Node {
     this.original = status;
   }
 
-  public getFiles(): Array<any> {
+  public getFiles(filter?: Record<string, any>): Array<any> {
     const files: Array<any> = [];
+    if(filter && filter.skipIgnoredFolders){
+      if(this.status === NodeStatus.FILTERED) return files;
+    }
     this.children.forEach((child) => {
-      files.push(...child.getFiles());
+      files.push(...child.getFiles(filter));
     });
     return files;
   }
