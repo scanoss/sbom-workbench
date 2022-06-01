@@ -83,7 +83,7 @@ export default class File extends Node {
     return this.status;
   }
 
-  public getFiles(): Array<any> {
+  public getFiles(filter?:Record<string, any>): Array<any> {
     let type = '';
     if (this.status === NodeStatus.PENDING) type = NodeStatus.MATCH;
     if (this.status === NodeStatus.FILTERED) type = NodeStatus.FILTERED;

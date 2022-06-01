@@ -139,7 +139,7 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
     const rootPath = this.project.metadata.getScanRoot();
     this.project.tree
       .getRootFolder()
-      .getFiles()
+      .getFiles({ skipIgnoredFolders: true })
       .forEach((f: File) => {
         allFiles.push(rootPath + f.path);
       });
