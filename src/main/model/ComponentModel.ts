@@ -456,8 +456,8 @@ export class ComponentModel extends Model {
     return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.run('begin transaction');
         db.serialize(() => {
+          db.run('begin transaction');
           for (let i = 0; i < reliableLicenses.length; i += 1) {
             db.run(
               'UPDATE component_versions SET reliableLicense=? WHERE id=?',
@@ -473,6 +473,7 @@ export class ComponentModel extends Model {
         });
       } catch (error: any) {
         log.error(error);
+        reject();
       }
     });
   }
