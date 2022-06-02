@@ -96,7 +96,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }));
     setLicensesAll(catalogue);
     setLicenses(catalogue);
-    setMatchedLicenses(compCatalogue, inventory);
+    setMatchedLicenses(compCatalogue, inventory, catalogue);
     setLoaded(true);
   };
 
@@ -202,7 +202,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   /**
    * Adds the matched license for purl+version to the list of licenses.
    */
-  const setMatchedLicenses = (components, form): any[] => {
+  const setMatchedLicenses = (components, form, all): any[] => {
     const licenses = components
       .find((item) => item?.purl === form?.purl)
       ?.versions.find((item) => item.version === form.version)
@@ -213,7 +213,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       }));
 
     if (licenses) {
-      setLicenses([...licenses, ...licensesAll]);
+      setLicenses([...licenses, ...all]);
     }
     return licenses;
   };
@@ -247,7 +247,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   useEffect(() => {
     if (!loaded) return;
 
-    const lic = setMatchedLicenses(components, form);
+    const lic = setMatchedLicenses(components, form, licensesAll);
     if (lic) {
       setForm({ ...form, spdxid: lic[0]?.spdxid });
     }
