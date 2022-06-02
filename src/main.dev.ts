@@ -36,6 +36,7 @@ import './api/handlers/dependency.handler';
 import './api/handlers/userSetting.handler';
 import './api/handlers/dialog.handler';
 import './api/handlers/search.handler';
+import { broadcastManager } from "./main/broadcastManager/BroadcastManager";
 
 export default class AppUpdater {
   constructor() {
@@ -92,13 +93,13 @@ const createWindow = async () => {
       enableRemoteModule: true,
     },
   });
-
+  broadcastManager.set(mainWindow.webContents);
   const mainURL = `file://${__dirname}/renderer/index.html`;
   mainWindow.loadURL(mainURL);
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
-  mainWindow.webContents.on('did-finish-load', () => {
+  mainWindow.webContents.on('did-finish-load', (e) => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }

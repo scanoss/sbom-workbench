@@ -1,5 +1,5 @@
 import { CircularProgress } from '@material-ui/core';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Redirect, Route, Switch, useLocation, useRouteMatch } from 'react-router-dom';
 import SplitPane from 'react-split-pane';
 import AppConfig from '@config/AppConfigModule';
@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 import { reset, selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { loadProject } from '@store/workbench-store/workbenchThunks';
+import { IpcEvents } from '@api/ipc-events';
 import AppBar from './components/AppBar/AppBar';
 import Detected from './pages/detected/Detected';
 import Identified from './pages/identified/Identified';
@@ -15,6 +16,8 @@ import FileTree from './components/FileTree/FileTree';
 import WorkbenchFilters from './components/WorkbenchFilters/WorkbenchFilters';
 import Search from './pages/search/Search';
 import SearchPanel from './components/SearchPanel/SearchPanel';
+
+const { ipcRenderer } = require('electron');
 
 const Workbench = () => {
   const { path } = useRouteMatch();
@@ -25,16 +28,24 @@ const Workbench = () => {
   const { scanPath } = useSelector(selectWorkspaceState);
 
   const { loaded } = state;
+  const [loadMessage, setLoadMessage] = useState<string>(null);
 
   const report = pathname.startsWith('/workbench/report');
 
+  const onMigrationInit = (e, { data }) => setLoadMessage(data);
+  const onMigrationFinish = (e) => setLoadMessage(null);
+
   const onInit = async () => {
+    ipcRenderer.on(IpcEvents.MIGRATION_INIT, onMigrationInit);
+    ipcRenderer.on(IpcEvents.MIGRATION_FINISH, onMigrationFinish);
     const { path } = scanPath;
     dispatch(loadProject(path));
   };
 
   const onDestroy = () => {
     console.log('Closing workbench...');
+    ipcRenderer.removeListener(IpcEvents.MIGRATION_INIT, onMigrationInit);
+    ipcRenderer.removeListener(IpcEvents.MIGRATION_FINISH, onMigrationFinish);
     dispatch(reset());
   };
 
@@ -77,6 +88,7 @@ const Workbench = () => {
           ) : (
             <div className="loader">
               <CircularProgress size={30} />
+              <p>{loadMessage}</p>
             </div>
           )}
         </main>
