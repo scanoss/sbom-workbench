@@ -12,7 +12,7 @@ export class Indexer extends  EventEmitter{
 
   private msgToUI: Electron.WebContents;
 
-  constructor(msgToUI: Electron.WebContents) {
+  constructor(msgToUI?: Electron.WebContents) {
     super();
     this.msgToUI = msgToUI;
   }
@@ -53,6 +53,6 @@ export class Indexer extends  EventEmitter{
   }
 
   private sendToUI(eventName, data: any) {
-    this.msgToUI.send(eventName, data);
+    if (this.msgToUI) this.msgToUI.send(eventName, data);
   }
 }

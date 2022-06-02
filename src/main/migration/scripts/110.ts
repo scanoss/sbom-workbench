@@ -1,11 +1,17 @@
 import sqlite3 from 'sqlite3';
 import log from 'electron-log';
+import fs from 'fs';
 import { modelProvider } from '../../services/ModelProvider';
 import { Querys } from '../../model/querys_db';
 import { utilModel } from '../../model/UtilModel';
+import { broadcastManager } from '../../broadcastManager/BroadcastManager';
+import { IpcEvents } from '../../../api/ipc-events';
+import { Indexer } from '../../modules/searchEngine/indexer/Indexer';
+import { IIndexer } from '../../modules/searchEngine/indexer/IIndexer';
 
 export async function migration110(projectPath: string): Promise<void> {
   log.info('Migration 1.1.0 In progress...');
+  broadcastManager.get().send(IpcEvents.MIGRATION_INIT, { data: 'Updating project to v1.1.0' });
   await modelProvider.init(projectPath);
   await updateTables(projectPath);
   await removeLicenseColumOnResult(projectPath);
@@ -14,7 +20,9 @@ export async function migration110(projectPath: string): Promise<void> {
   await insertResultLicense(projectPath, filesResult, result);
   const componentReliableLicense = await modelProvider.model.component.getMostReliableLicensePerComponent();
   await modelProvider.model.component.updateMostReliableLicense(componentReliableLicense);
+  await indexMigration(projectPath);
   log.info('Migration 1.1.0 finished');
+  broadcastManager.get().send(IpcEvents.MIGRATION_FINISH);
 }
 
 async function updateTables(projectPath: string) {
@@ -101,8 +109,12 @@ async function removeLicenseColumOnResult(projectPath: string) {
         if (err) log.error(err);
         db.serialize(async () => {
           db.run('begin transaction');
-          db.run( 'CREATE TABLE IF NOT EXISTS t1_backup (id integer primary key asc,md5_file text,fileId integer, vendor text, component text, version text, latest_version text, cpe text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,file_url text,source text,dirty INTEGER default 0, FOREIGN KEY (fileId) REFERENCES files(fileId));');
-          db.run('INSERT INTO t1_backup SELECT id,md5_file,fileId, vendor, component,version,latest_version, cpe , url , lines, oss_lines , matched, filename , size, idtype, md5_comp,compid ,purl,file_url ,source,dirty FROM results;');
+          db.run(
+            'CREATE TABLE IF NOT EXISTS t1_backup (id integer primary key asc,md5_file text,fileId integer, vendor text, component text, version text, latest_version text, cpe text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,file_url text,source text,dirty INTEGER default 0, FOREIGN KEY (fileId) REFERENCES files(fileId));'
+          );
+          db.run(
+            'INSERT INTO t1_backup SELECT id,md5_file,fileId, vendor, component,version,latest_version, cpe , url , lines, oss_lines , matched, filename , size, idtype, md5_comp,compid ,purl,file_url ,source,dirty FROM results;'
+          );
           db.run('DROP TABLE results;');
           db.run('DROP VIEW IF EXISTS summary;');
           db.run('ALTER TABLE t1_backup RENAME TO results;');
@@ -126,4 +138,22 @@ async function removeLicenseColumOnResult(projectPath: string) {
       reject(e);
     }
   });
+}
+
+async function indexMigration(projectPath: string) {
+  await modelProvider.init(projectPath);
+  const files = await modelProvider.model.file.getAll(null);
+  const indexer = new Indexer();
+  const data = JSON.parse(await fs.promises.readFile(`${projectPath}/metadata.json`, 'utf-8'));
+  const filesToIndex = fileAdapter(files, data.scan_root);
+  const index = indexer.index(filesToIndex);
+  await indexer.saveIndex(index, `${projectPath}/dictionary/`);
+}
+
+function fileAdapter(modelFiles: any, scanRoot: string): Array<IIndexer> {
+  const filesToIndex = [];
+  modelFiles.forEach((file: any) => {
+    if (file.filter !== 'FILTERED') filesToIndex.push({ fileId: file.id, path: `${scanRoot}${file.path}` });
+  });
+  return filesToIndex;
 }
