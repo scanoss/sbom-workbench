@@ -11,6 +11,7 @@ import { IIndexer } from '../../modules/searchEngine/indexer/IIndexer';
 
 export async function migration110(projectPath: string): Promise<void> {
   log.info('Migration 1.1.0 In progress...');
+  broadcastManager.get().send(IpcEvents.MIGRATION_INIT, { data: 'Updating project to v1.1.0' });
   await modelProvider.init(projectPath);
   await updateTables(projectPath);
   await removeLicenseColumOnResult(projectPath);
@@ -19,8 +20,9 @@ export async function migration110(projectPath: string): Promise<void> {
   await insertResultLicense(projectPath, filesResult, result);
   const componentReliableLicense = await modelProvider.model.component.getMostReliableLicensePerComponent();
   await modelProvider.model.component.updateMostReliableLicense(componentReliableLicense);
-  await indexMigration(projectPath)
+  await indexMigration(projectPath);
   log.info('Migration 1.1.0 finished');
+  broadcastManager.get().send(IpcEvents.MIGRATION_FINISH);
 }
 
 async function updateTables(projectPath: string) {
@@ -139,7 +141,6 @@ async function removeLicenseColumOnResult(projectPath: string) {
 }
 
 async function indexMigration(projectPath: string) {
-  broadcastManager.get().send(IpcEvents.MIGRATION_INIT, { data: 'Creating search index' });
   await modelProvider.init(projectPath);
   const files = await modelProvider.model.file.getAll(null);
   const indexer = new Indexer();
@@ -147,7 +148,6 @@ async function indexMigration(projectPath: string) {
   const filesToIndex = fileAdapter(files, data.scan_root);
   const index = indexer.index(filesToIndex);
   await indexer.saveIndex(index, `${projectPath}/dictionary/`);
-  broadcastManager.get().send(IpcEvents.MIGRATION_FINISH);
 }
 
 function fileAdapter(modelFiles: any, scanRoot: string): Array<IIndexer> {

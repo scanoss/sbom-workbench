@@ -86,10 +86,12 @@ const Workbench = () => {
               <Redirect from={path} to={`${path}/detected`} />
             </Switch>
           ) : (
-            <div className="loader">
-              <CircularProgress size={30} />
-              <p>{loadMessage}</p>
-            </div>
+            <section className="loader">
+              <div className="text-center">
+                <CircularProgress size={30} />
+                <p className="m-0 mt-2 font-medium"><small>{loadMessage  || ' '}</small></p>
+              </div>
+            </section>
           )}
         </main>
       </SplitPane>
