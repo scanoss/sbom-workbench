@@ -76,7 +76,7 @@ async function insertResultLicense(projectPath: string, filesResult: Array<any>,
             results[fr.path].forEach((r) => {
               r.licenses.forEach((l) => {
                 db.run(
-                  'INSERT INTO result_license (spdxid,source,resultId,patent_hints,copyLeft,osadl_updated,incompatible_with,checklist_url) VALUES (?,?,?,?,?,?,?,?);',
+                  'INSERT OR IGNORE INTO result_license (spdxid,source,resultId,patent_hints,copyLeft,osadl_updated,incompatible_with,checklist_url) VALUES (?,?,?,?,?,?,?,?);',
                   l.name,
                   l.source,
                   fr.resultId,
@@ -89,15 +89,16 @@ async function insertResultLicense(projectPath: string, filesResult: Array<any>,
               });
             });
           });
-          db.run('commit', (err: any) => {
+          db.run('commit', (err: Error) => {
             if (err) throw err;
             db.close();
             resolve();
           });
         });
       });
-    } catch (e) {
-      reject(e);
+    } catch (err: any) {
+      log.error(err);
+      reject();
     }
   });
 }
