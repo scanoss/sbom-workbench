@@ -24,7 +24,6 @@ class TreeService {
   private updateStatus(paths: Array<string>, status: NodeStatus) {
     try {
       const project = workspace.getOpenedProjects()[0];
-      project.getTree().sendToUI(IpcEvents.TREE_UPDATING, {});
       paths.forEach((path) => {
         project.getTree().getRootFolder().setStatus(path, status);
       });
