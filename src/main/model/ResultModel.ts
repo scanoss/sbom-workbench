@@ -96,7 +96,7 @@ export class ResultModel extends Model {
         for (const [resultId, value] of Object.entries<Array<IResultLicense>>(data)) {
           for (let i = 0; i < value.length; i += 1) {
             db.run(
-              'INSERT INTO result_license (spdxid,source,resultId,patent_hints,copyLeft,osadl_updated,incompatible_with,checklist_url) VALUES (?,?,?,?,?,?,?,?);',
+              'INSERT OR IGNORE INTO result_license (spdxid,source,resultId,patent_hints,copyLeft,osadl_updated,incompatible_with,checklist_url) VALUES (?,?,?,?,?,?,?,?);',
               value[i].name,
               value[i].source,
               resultId,
