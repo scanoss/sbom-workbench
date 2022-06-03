@@ -42,13 +42,22 @@ export class ProjectZipper {
     const zip = new AdmZip();
     // Create a folder in the zip.
     zip.addFile(path.basename(projectPath) + path.sep, Buffer.alloc(0), '');
+    zip.addFile(`${path.basename(projectPath)}/dictionary/${path.sep}`,Buffer.alloc(0),'');
 
     // Copy all files from project folder to the zip except metadata.json.
     // Before zipping, the api and api key needs to be removed from metadata.
     const dirContent = await fs.promises.readdir(projectPath);
-    for (const file of dirContent)
-      if (file !== 'metadata.json')
-        zip.addLocalFile(path.join(projectPath, file), path.basename(projectPath) + path.sep);
+    for (const file of dirContent) {
+      if (file !== 'metadata.json') {
+        if (file !== 'dictionary') {
+          zip.addLocalFile(path.join(projectPath, file), path.basename(projectPath) + path.sep);
+        } else {
+          zip.addLocalFolder(path.join(projectPath, file),`${path.basename(projectPath)}/dictionary${path.sep}`);
+        }
+      }
+    }
+
+
 
     // Read metadata and delete de api and apiKey fields.
     const txtMetadata = await fs.promises.readFile(path.join(projectPath, 'metadata.json'), 'utf8');
@@ -83,13 +92,17 @@ export class ProjectZipper {
 
   private extractProjectDataFromZip() {
     this.zipEntries.forEach((entry) => {
-      if (entry.isDirectory) this.zipFolderCount += 1;
+      if (entry.isDirectory){
+        if(!entry.entryName.includes('dictionary'))
+          this.zipFolderCount += 1;
+      }
       if (entry.name === 'metadata.json') {
         const metadata = JSON.parse(entry.getData().toString('utf8'));
         this.zipVersion = metadata.appVersion;
         this.scannerState = metadata.scannerState;
         this.projectName = metadata.name;
       }
+      console.log(this.zipFolderCount);
       this.zipFiles.add(entry.name);
     });
   }
@@ -136,5 +149,3 @@ export class ProjectZipper {
     projectMetadata.save();
   }
 }
-
-
