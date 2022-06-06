@@ -7,8 +7,8 @@ import {
   IWorkbenchFilterParams,
 } from '../types';
 import { BaseService } from './base.service';
-import { ISearchgRPCComponent } from "../../main/task/Component/IComponent/ISearchgRPCComponent";
-import {IComponentResult} from "../../main/task/Component/IComponent/IComponentResult";
+import { ISearchgRPCComponent } from '../../main/task/ComponentCatalog/IComponent/ISearchgRPCComponent';
+import { IComponentResult } from '../../main/task/ComponentCatalog/IComponent/IComponentResult';
 
 const { ipcRenderer } = require('electron');
 
@@ -39,7 +39,7 @@ class ComponentService extends BaseService {
     return this.response(response);
   }
 
-  public async getGlobalComponents(params:  ISearchgRPCComponent): Promise<IComponentResult> {
+  public async getGlobalComponents(params: ISearchgRPCComponent): Promise<Array<IComponentResult>> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_GLOBAL_COMPONENTS,params);
     return this.response(response);
   }
