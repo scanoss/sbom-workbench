@@ -9,7 +9,7 @@ import { treeService } from "../../main/services/TreeService";
 ipcMain.handle(IpcEvents.DEPENDENCY_GET_ALL, async (event, params: { path: string }) => {
   try {
     const dependencies = await dependencyService.getAll(params);
-    return Response.ok({ message: 'Component created successfully', data: dependencies });
+    return Response.ok({ message: 'ComponentCatalog created successfully', data: dependencies });
   } catch (error: any) {
     log.error(error);
     return Response.fail({ message: error.message });
@@ -20,7 +20,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT, async (event, params: NewDependencyD
   try {
     const dependency = await dependencyService.accept(params);
     treeService.updateDependencyStatusOnTree();
-    return Response.ok({ message: 'Component created successfully', data: dependency });
+    return Response.ok({ message: 'ComponentCatalog created successfully', data: dependency });
   } catch (error: any) {
     log.error(error);
     return Response.fail({ message: error.message });
@@ -31,7 +31,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE, async (_event, dependencyId: number
   try {
     const dependency = await dependencyService.restore(dependencyId);
     treeService.updateDependencyStatusOnTree();
-    return Response.ok({ message: 'Component created successfully', data: dependency });
+    return Response.ok({ message: 'ComponentCatalog created successfully', data: dependency });
   } catch (error: any) {
     log.error(error);
     return Response.fail({ message: error.message });
@@ -46,7 +46,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE_ALL, async (_event, params: RestoreA
     else
       response = await dependencyService.restoreAllByIds(params.dependencyIds);
     treeService.updateDependencyStatusOnTree();
-    return Response.ok({ message: 'Component created successfully', data: response });
+    return Response.ok({ message: 'ComponentCatalog created successfully', data: response });
   } catch (error: any) {
     log.error(error);
     return Response.fail({ message: error.message });
@@ -61,7 +61,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT_ALL, async (event, params: AcceptAllD
     else
       response = await dependencyService.acceptAllByPath(params.path);
     treeService.updateDependencyStatusOnTree();
-    return Response.ok({ message: 'Component created successfully', data: response });
+    return Response.ok({ message: 'ComponentCatalog created successfully', data: response });
   } catch (error: any) {
     console.log('Catch an error: ', error);
     return Response.fail({ message: error.message });
@@ -72,7 +72,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_REJECT, async (event, dependencyId: number) 
   try {
     const response = await dependencyService.reject(dependencyId);
     treeService.updateDependencyStatusOnTree();
-    return Response.ok({ message: 'Component created successfully', data: response });
+    return Response.ok({ message: 'ComponentCatalog created successfully', data: response });
   } catch (error: any) {
     console.log('Catch an error: ', error);
     return Response.fail({ message: error.message });
@@ -87,7 +87,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_REJECT_ALL, async (event, param: RejectAllDe
     else
     response = await dependencyService.rejectAllByPath(param.path);
     treeService.updateDependencyStatusOnTree();
-    return Response.ok({ message: 'Component created successfully', data: response });
+    return Response.ok({ message: 'ComponentCatalog created successfully', data: response });
   } catch (error: any) {
     console.log('Catch an error: ', error);
     return Response.fail({ message: error.message });
