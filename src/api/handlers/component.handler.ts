@@ -4,6 +4,8 @@ import { Component, ComponentGroup, IWorkbenchFilterParams } from '../types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from '../Response';
 import { componentService } from '../../main/services/ComponentService';
+import { ISearchgRPCComponent } from '../../main/task/Component/IComponent/ISearchgRPCComponent';
+import { ComponentgRPCTask } from '../../main/task/Component/ComponentgRPCTask';
 
 ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (_event, component: Component) => {
   try {
@@ -47,3 +49,13 @@ ipcMain.handle(
     }
   }
 );
+
+ipcMain.handle(IpcEvents.COMPONENT_GET_GLOBAL_COMPONENTS, async (_event, params: ISearchgRPCComponent) => {
+  try {
+    const components = await new ComponentgRPCTask().run(params);
+    return Response.ok({ message: 'Component retrieve successfully', data: components });
+  } catch (error: any) {
+    log.error(error);
+    return Response.fail({ message: error.message });
+  }
+});
