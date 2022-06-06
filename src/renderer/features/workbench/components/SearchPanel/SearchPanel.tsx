@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
   dataGrid: {
     '& .MuiDataGrid-columnHeader': {
       fontSize: '0.7rem',
+      marginBottom: 10,
     },
     '& .MuiTablePagination-caption': {
       fontSize: '0.8rem',
@@ -39,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     border: 2,
     '& .MuiDataGrid-cell': {
       border: 0,
-      padding: '0 3px',
+      padding: '0 10px 0 20px', //  padding: '0 3px'
     },
     '& .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
       visibility: 'hidden',
@@ -211,11 +212,12 @@ const SearchPanel = () => {
           }}
           rowHeight={23}
           page={localPage}
-          checkboxSelection
+          checkboxSelection={false}
           disableColumnMenu
           rowsPerPageOptions={[AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT]}
           hideFooterSelectedRowCount
           hideFooterRowCount
+          headerHeight={0}
           disableSelectionOnClick
           onPageChange={onPageChangeHandler}
           onRowClick={onRowClickHandler}

@@ -56,7 +56,6 @@ class ProjectService extends BaseService {
   }
 
   public async setFilter(filter: IWorkbenchFilter): Promise<any> {
-    console.log("filter");
     const response = await ipcRenderer.invoke(IpcEvents.PROJECT_SET_FILTER, filter);
     return this.response(response);
   }

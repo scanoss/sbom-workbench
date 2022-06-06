@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { selectComponentState } from '@store/component-store/componentSlice';
 import { FileList } from './FileList';
-import { selectComponentState } from '../../../../../../../store/component-store/componentSlice';
 
 export const IdentifiedList = ({ files, emptyMessage, onAction }) => {
   const { component } = useSelector(selectComponentState);
@@ -9,7 +9,7 @@ export const IdentifiedList = ({ files, emptyMessage, onAction }) => {
 
   const fetchGroups = () => {
     const grupedFiles = files.reduce((acc, file) => {
-      const key = file.component.name;
+      const key = file.component?.name;
       // eslint-disable-next-line no-prototype-builtins
       if (!acc.hasOwnProperty(key)) acc[key] = [];
       acc[key].push(file);

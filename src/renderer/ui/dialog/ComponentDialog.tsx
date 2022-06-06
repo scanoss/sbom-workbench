@@ -76,7 +76,9 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     }
   };
 
-  useEffect(() => fetchData(), [open]);
+  useEffect(() => {
+    fetchData();
+  }, [open]);
   useEffect(setDefaults, [component]);
   useEffect(getLicense, [licenses]);
 

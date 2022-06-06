@@ -97,6 +97,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     setLicensesAll(catalogue);
     setLicenses(catalogue);
     setMatchedLicenses(compCatalogue, inventory, catalogue);
+
+    const component = compCatalogue.find((item) => item.purl === inventory.purl);
+    if (component) setVersions(component.versions.map((item) => item.version));
+
     setLoaded(true);
   };
 
@@ -293,9 +297,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   fullWidth
                   options={components || []}
                   groupBy={(option) => option?.type}
-                  value={{ name: form?.component, purl: form?.purl }}
+                  value={form.component && form.purl ? { name: form.component, purl: form.purl } : null}
                   getOptionSelected={(option, value) => option.purl === value.purl}
-                  getOptionLabel={(option) => option.name}
+                  getOptionLabel={(option) => option.name || ''}
                   renderOption={(option) => (
                     <div className={classes.option}>
                       <span>{option.name}</span>
@@ -332,7 +336,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 <Autocomplete
                   fullWidth
                   options={versions || []}
-                  value={form?.version || ''}
+                  value={form?.version || null}
                   disableClearable
                   onChange={(e, value) => autocompleteHandler('version', value)}
                   renderInput={(params) => (
@@ -370,10 +374,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   value={
                     licenses && form.spdxid
                       ? { spdxid: form.spdxid, name: licenses.find((item) => item.spdxid === form.spdxid)?.name }
-                      : ''
+                      : null
                   }
                   getOptionSelected={(option: any) => option.spdxid === form.spdxid}
-                  getOptionLabel={(option: any) => option.name || option.spdxid}
+                  getOptionLabel={(option: any) => option.name || option.spdxid || ''}
                   renderOption={(option: any) => (
                     <div className={classes.option}>
                       <span>{option.name}</span>
@@ -424,7 +428,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   name="purl"
                   fullWidth
                   readOnly
-                  value={form?.purl || ''}
+                  value={form?.purl || null}
                   onChange={(e) => inputHandler(e)}
                   required
                 />
@@ -439,7 +443,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 <Select
                   name="usage"
                   fullWidth
-                  value={form?.usage || ''}
+                  value={form?.usage || "file"}
                   disableUnderline
                   onChange={(e) => inputHandler(e)}
                 >
