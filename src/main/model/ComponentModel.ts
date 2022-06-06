@@ -34,7 +34,7 @@ export class ComponentModel extends Model {
           const summary = await this.summaryByPurlVersion(comp);
           comp.summary = summary;
           resolve(comp);
-        } else throw new Error('Component not found');
+        } else throw new Error('ComponentCatalog not found');
       } catch (error) {
         log.error(error);
         reject(error);
@@ -84,7 +84,7 @@ export class ComponentModel extends Model {
             async function (this: any, err: any) {
               db.close();
               if (err) throw err;
-              if (this.lastID === 0) reject(new Error('Component already exists'));
+              if (this.lastID === 0) reject(new Error('ComponentCatalog already exists'));
               await self.license.licenseAttach({
                 license_id: component.license_id,
                 compid: this.lastID,

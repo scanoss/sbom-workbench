@@ -273,7 +273,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       open={open}
       onClose={onCancel}
     >
-      <span className="dialog-title">{!form.id ? 'Identify Component' : 'Edit Identification'}</span>
+      <span className="dialog-title">{!form.id ? 'Identify ComponentCatalog' : 'Edit Identification'}</span>
       <form onSubmit={onSubmit}>
         <div className="dialog-content">
           {isFilterActive && (

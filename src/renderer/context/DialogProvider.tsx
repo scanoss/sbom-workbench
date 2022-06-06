@@ -197,7 +197,7 @@ export const DialogProvider: React.FC = ({ children }) => {
     onClose?: (response: DialogResponse) => void;
   }>({ open: false, component: {} });
 
-  const openComponentDialog = (component: Partial<NewComponentDTO> = {}, label = 'Create Component') => {
+  const openComponentDialog = (component: Partial<NewComponentDTO> = {}, label = 'Create ComponentCatalog') => {
     return new Promise<DialogResponse>((resolve) => {
       setComponentDialog({
         open: true,
