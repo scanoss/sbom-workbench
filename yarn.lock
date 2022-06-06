@@ -1205,10 +1205,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@grpc/grpc-js@^1.5.5":
-  version "1.5.7"
-  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.5.7.tgz#c83a5dc1d0cf7b8aa82371cfa7125955d1f25a96"
-  integrity sha512-RAlSbZ9LXo0wNoHKeUlwP9dtGgVBDUbnBKFpfAv5iSqMG4qWz9um2yLH215+Wow1I48etIa1QMS+WAGmsE/7HQ==
+"@grpc/grpc-js@^1.5.5", "@grpc/grpc-js@^1.6.7":
+  version "1.6.7"
+  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.6.7.tgz#4c4fa998ff719fe859ac19fe977fdef097bb99aa"
+  integrity sha512-eBM03pu9hd3VqDQG+kHahiG1x80RGkkqqRb1Pchcwqej/KkAH95gAvKs6laqaHCycYaPK+TKuNQnOz9UXYA8qw==
   dependencies:
     "@grpc/proto-loader" "^0.6.4"
     "@types/node" ">=12.12.47"
@@ -2099,6 +2099,13 @@
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-2.0.3.tgz#9c088679876f374eb5983f150d4787aa6fb32d7e"
   integrity sha512-FvUupuM3rlRsRtCN+fDudtmytGO6iHJuuRKS1Ss0pG5z8oX0diNEw94UEL7hgDbpN94rgaK5R7sWm6RrSkZuAQ==
+
+"@types/util.promisify@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@types/util.promisify/-/util.promisify-1.0.4.tgz#e3a87a6580e18cdd72c5f3631a0aa7a1edc37acb"
+  integrity sha512-sqbKBFegMRBvFOTq1+dXmRNfZvGZTNT+PlmIla/RFWLTQuNIKK3F9txxuG35Hk5Yl72pQLKdMBKwieqDcgzJ4Q==
+  dependencies:
+    "@types/node" "*"
 
 "@types/verror@^1.10.3":
   version "1.10.4"
@@ -6099,10 +6106,10 @@ good-listener@^1.2.2:
   dependencies:
     delegate "^3.1.2"
 
-google-protobuf@^3.19.4:
-  version "3.19.4"
-  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.19.4.tgz#8d32c3e34be9250956f28c0fb90955d13f311888"
-  integrity sha512-OIPNCxsG2lkIvf+P5FNfJ/Km95CsXOBecS9ZcAU6m2Rq3svc0Apl9nB3GMDNKfQ9asNv4KjyAqGwPQFrVle3Yg==
+google-protobuf@^3.19.4, google-protobuf@^3.20.1:
+  version "3.20.1"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.20.1.tgz#1b255c2b59bcda7c399df46c65206aa3c7a0ce8b"
+  integrity sha512-XMf1+O32FjYIV3CYu6Tuh5PNbfNEU5Xu22X+Xkdb/DUexFlCzhvv7d5Iirm4AOwn8lv4al1YvIhzGrg2j9Zfzw==
 
 got@^11.7.0:
   version "11.8.2"
