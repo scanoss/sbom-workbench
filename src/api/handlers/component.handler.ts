@@ -4,8 +4,10 @@ import { Component, ComponentGroup, IWorkbenchFilterParams } from '../types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from '../Response';
 import { componentService } from '../../main/services/ComponentService';
-import { ISearchgRPCComponent } from '../../main/task/ComponentCatalog/IComponent/ISearchgRPCComponent';
-import { SearchComponentTask } from '../../main/task/ComponentCatalog/SearchComponentTask';
+import { ISearchComponent } from '../../main/task/componentCatalog/iComponentCatalog/ISearchComponent';
+import { SearchComponentTask } from '../../main/task/componentCatalog/SearchComponentTask';
+import { ISearchComponentVersion } from '../../main/task/componentCatalog/iComponentCatalog/ISearchComponentVersion';
+import { SearchComponentVersionTask } from '../../main/task/componentCatalog/SearchComponentVersionTask';
 
 ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (_event, component: Component) => {
   try {
@@ -50,10 +52,20 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(IpcEvents.COMPONENT_GET_GLOBAL_COMPONENTS, async (_event, params: ISearchgRPCComponent) => {
+ipcMain.handle(IpcEvents.COMPONENT_GET_GLOBAL_COMPONENTS, async (_event, params: ISearchComponent) => {
   try {
     const components = await new SearchComponentTask().run(params);
     return Response.ok({ message: 'ComponentCatalog retrieve successfully', data: components });
+  } catch (error: any) {
+    log.error(error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+ipcMain.handle(IpcEvents.COMPONENT_GET_GLOBAL_COMPONENT_VERSION, async (_event, params: ISearchComponentVersion) => {
+  try {
+    const componentVersions = await new SearchComponentVersionTask().run(params);
+    return Response.ok({ message: 'ComponentCatalog retrieve successfully', data: componentVersions });
   } catch (error: any) {
     log.error(error);
     return Response.fail({ message: error.message });
