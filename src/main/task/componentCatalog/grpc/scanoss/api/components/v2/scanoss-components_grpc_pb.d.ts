@@ -3,8 +3,8 @@
 // package: scanoss.api.components.v2
 // file: scanoss/api/components/v2/scanoss-components.proto
 
-import * as scanoss_api_components_v2_scanoss_components_pb from "./scanoss-components_pb";
-import * as scanoss_api_common_v2_scanoss_common_pb from "../../common/v2/scanoss-common_pb";
+import * as scanoss_api_components_v2_scanoss_components_pb from "../../../../scanoss/api/components/v2/scanoss-components_pb";
+import * as scanoss_api_common_v2_scanoss_common_pb from "../../../../scanoss/api/common/v2/scanoss-common_pb";
 import * as grpc from "@grpc/grpc-js";
 
 interface IComponentsService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {

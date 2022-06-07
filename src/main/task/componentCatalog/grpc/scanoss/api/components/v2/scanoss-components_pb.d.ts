@@ -2,7 +2,7 @@
 // file: scanoss/api/components/v2/scanoss-components.proto
 
 import * as jspb from "google-protobuf";
-import * as scanoss_api_common_v2_scanoss_common_pb from "../../common/v2/scanoss-common_pb";
+import * as scanoss_api_common_v2_scanoss_common_pb from "../../../../scanoss/api/common/v2/scanoss-common_pb";
 
 export class CompSearchRequest extends jspb.Message {
   getSearch(): string;

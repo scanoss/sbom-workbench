@@ -25,12 +25,12 @@
 // THE SOFTWARE.
 //
 // **
-// ComponentCatalog definition details
+// Component definition details
 // *
 'use strict';
 var grpc = require('@grpc/grpc-js');
-var scanoss_api_components_v2_scanoss$components_pb = require('./scanoss-components_pb.d.ts');
-var scanoss_api_common_v2_scanoss$common_pb = require('../../common/v2/scanoss-common_pb.d.ts');
+var scanoss_api_components_v2_scanoss$components_pb = require('../../../../scanoss/api/components/v2/scanoss-components_pb.js');
+var scanoss_api_common_v2_scanoss$common_pb = require('../../../../scanoss/api/common/v2/scanoss-common_pb.js');
 
 function serialize_scanoss_api_common_v2_EchoRequest(arg) {
   if (!(arg instanceof scanoss_api_common_v2_scanoss$common_pb.EchoRequest)) {
@@ -100,7 +100,7 @@ function deserialize_scanoss_api_components_v2_CompVersionResponse(buffer_arg) {
 
 
 //
-// Expose all of the SCANOSS ComponentCatalog RPCs here
+// Expose all of the SCANOSS Component RPCs here
 var ComponentsService = exports.ComponentsService = {
   // Standard echo
 echo: {

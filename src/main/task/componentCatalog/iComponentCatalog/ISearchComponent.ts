@@ -1,4 +1,4 @@
-export interface ISearchgRPCComponent {
+export interface ISearchComponent {
   search?: string;
   vendor?: string;
   component?: string;

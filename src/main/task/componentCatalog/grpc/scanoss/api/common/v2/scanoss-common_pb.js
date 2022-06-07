@@ -75,7 +75,7 @@ proto.scanoss.api.common.v2.StatusResponse.toObject = function(includeInstance, 
 
 
 /**
- * Deserializes binary data (in grpc wire format).
+ * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.scanoss.api.common.v2.StatusResponse}
  */
@@ -87,7 +87,7 @@ proto.scanoss.api.common.v2.StatusResponse.deserializeBinary = function(bytes) {
 
 
 /**
- * Deserializes binary data (in grpc wire format) from the
+ * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
  * @param {!proto.scanoss.api.common.v2.StatusResponse} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
@@ -118,7 +118,7 @@ proto.scanoss.api.common.v2.StatusResponse.deserializeBinaryFromReader = functio
 
 
 /**
- * Serializes the message to binary data (in grpc wire format).
+ * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.scanoss.api.common.v2.StatusResponse.prototype.serializeBinary = function() {
@@ -129,7 +129,7 @@ proto.scanoss.api.common.v2.StatusResponse.prototype.serializeBinary = function(
 
 
 /**
- * Serializes the given message to binary data (in grpc wire
+ * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
  * @param {!proto.scanoss.api.common.v2.StatusResponse} message
  * @param {!jspb.BinaryWriter} writer
@@ -243,7 +243,7 @@ proto.scanoss.api.common.v2.EchoRequest.toObject = function(includeInstance, msg
 
 
 /**
- * Deserializes binary data (in grpc wire format).
+ * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.scanoss.api.common.v2.EchoRequest}
  */
@@ -255,7 +255,7 @@ proto.scanoss.api.common.v2.EchoRequest.deserializeBinary = function(bytes) {
 
 
 /**
- * Deserializes binary data (in grpc wire format) from the
+ * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
  * @param {!proto.scanoss.api.common.v2.EchoRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
@@ -282,7 +282,7 @@ proto.scanoss.api.common.v2.EchoRequest.deserializeBinaryFromReader = function(m
 
 
 /**
- * Serializes the message to binary data (in grpc wire format).
+ * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.scanoss.api.common.v2.EchoRequest.prototype.serializeBinary = function() {
@@ -293,7 +293,7 @@ proto.scanoss.api.common.v2.EchoRequest.prototype.serializeBinary = function() {
 
 
 /**
- * Serializes the given message to binary data (in grpc wire
+ * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
  * @param {!proto.scanoss.api.common.v2.EchoRequest} message
  * @param {!jspb.BinaryWriter} writer
@@ -385,7 +385,7 @@ proto.scanoss.api.common.v2.EchoResponse.toObject = function(includeInstance, ms
 
 
 /**
- * Deserializes binary data (in grpc wire format).
+ * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.scanoss.api.common.v2.EchoResponse}
  */
@@ -397,7 +397,7 @@ proto.scanoss.api.common.v2.EchoResponse.deserializeBinary = function(bytes) {
 
 
 /**
- * Deserializes binary data (in grpc wire format) from the
+ * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
  * @param {!proto.scanoss.api.common.v2.EchoResponse} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
@@ -424,7 +424,7 @@ proto.scanoss.api.common.v2.EchoResponse.deserializeBinaryFromReader = function(
 
 
 /**
- * Serializes the message to binary data (in grpc wire format).
+ * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.scanoss.api.common.v2.EchoResponse.prototype.serializeBinary = function() {
@@ -435,7 +435,7 @@ proto.scanoss.api.common.v2.EchoResponse.prototype.serializeBinary = function() 
 
 
 /**
- * Serializes the given message to binary data (in grpc wire
+ * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
  * @param {!proto.scanoss.api.common.v2.EchoResponse} message
  * @param {!jspb.BinaryWriter} writer
