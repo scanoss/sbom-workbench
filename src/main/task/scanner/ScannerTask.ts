@@ -12,7 +12,7 @@ import { resultService } from '../../services/ResultService';
 import { componentService } from '../../services/ComponentService';
 import { userSettingService } from '../../services/UserSettingService';
 import AppConfig from '../../../config/AppConfigModule';
-import { AutoAccept } from '../Inventory/AutoAccept';
+import { AutoAccept } from '../inventory/AutoAccept';
 import { ITask } from '../Task';
 import { IndexTask } from "../search/indexTask/IndexTask";
 
