@@ -9,6 +9,8 @@ export const AppConfigDefault: IAppConfig = {
   API_KEY: '',
   MIN_VERSION_SUPPORTED: '0.17.0',
   DEFAULT_WORKSPACE_NAME: 'scanoss-workspace',
+  DEFAULT_IP_gRPC: 'scanoss.com',
+  DEFAULT_PORT_gRPC: 443,
   FF_ENABLE_COMPONENT_LOGO: true,
   FF_ENABLE_WORKBENCH_FILTERS: true,
   FF_EXPORT_FORMAT_OPTIONS: [

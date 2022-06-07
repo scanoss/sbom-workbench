@@ -8,6 +8,8 @@ export interface IAppConfig {
   API_KEY: string;
   MIN_VERSION_SUPPORTED: string;
   DEFAULT_WORKSPACE_NAME: string;
+  DEFAULT_IP_gRPC: string;
+  DEFAULT_PORT_gRPC: number;
 
   // feature flags
   FF_ENABLE_COMPONENT_LOGO: boolean;

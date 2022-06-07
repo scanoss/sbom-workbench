@@ -11,13 +11,13 @@ var jspb = require('google-protobuf');
 var goog = jspb;
 var global = Function('return this')();
 
-var scanoss_api_common_v2_scanoss$common_pb = require('../../common/v2/scanoss-common_pb.d.ts');
+var scanoss_api_common_v2_scanoss$common_pb = require('../../../../scanoss/api/common/v2/scanoss-common_pb.js');
 goog.exportSymbol('proto.scanoss.api.components.v2.CompSearchRequest', null, global);
 goog.exportSymbol('proto.scanoss.api.components.v2.CompSearchResponse', null, global);
-goog.exportSymbol('proto.scanoss.api.components.v2.CompSearchResponse.ComponentCatalog', null, global);
+goog.exportSymbol('proto.scanoss.api.components.v2.CompSearchResponse.Component', null, global);
 goog.exportSymbol('proto.scanoss.api.components.v2.CompVersionRequest', null, global);
 goog.exportSymbol('proto.scanoss.api.components.v2.CompVersionResponse', null, global);
-goog.exportSymbol('proto.scanoss.api.components.v2.CompVersionResponse.ComponentCatalog', null, global);
+goog.exportSymbol('proto.scanoss.api.components.v2.CompVersionResponse.Component', null, global);
 goog.exportSymbol('proto.scanoss.api.components.v2.CompVersionResponse.License', null, global);
 goog.exportSymbol('proto.scanoss.api.components.v2.CompVersionResponse.Version', null, global);
 
@@ -84,7 +84,7 @@ proto.scanoss.api.components.v2.CompSearchRequest.toObject = function(includeIns
 
 
 /**
- * Deserializes binary data (in grpc wire format).
+ * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.scanoss.api.components.v2.CompSearchRequest}
  */
@@ -96,7 +96,7 @@ proto.scanoss.api.components.v2.CompSearchRequest.deserializeBinary = function(b
 
 
 /**
- * Deserializes binary data (in grpc wire format) from the
+ * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
  * @param {!proto.scanoss.api.components.v2.CompSearchRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
@@ -143,7 +143,7 @@ proto.scanoss.api.components.v2.CompSearchRequest.deserializeBinaryFromReader = 
 
 
 /**
- * Serializes the message to binary data (in grpc wire format).
+ * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.scanoss.api.components.v2.CompSearchRequest.prototype.serializeBinary = function() {
@@ -154,7 +154,7 @@ proto.scanoss.api.components.v2.CompSearchRequest.prototype.serializeBinary = fu
 
 
 /**
- * Serializes the given message to binary data (in grpc wire
+ * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
  * @param {!proto.scanoss.api.components.v2.CompSearchRequest} message
  * @param {!jspb.BinaryWriter} writer
@@ -365,7 +365,7 @@ proto.scanoss.api.components.v2.CompSearchResponse.toObject = function(includeIn
 
 
 /**
- * Deserializes binary data (in grpc wire format).
+ * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.scanoss.api.components.v2.CompSearchResponse}
  */
@@ -377,7 +377,7 @@ proto.scanoss.api.components.v2.CompSearchResponse.deserializeBinary = function(
 
 
 /**
- * Deserializes binary data (in grpc wire format) from the
+ * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
  * @param {!proto.scanoss.api.components.v2.CompSearchResponse} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
@@ -410,7 +410,7 @@ proto.scanoss.api.components.v2.CompSearchResponse.deserializeBinaryFromReader =
 
 
 /**
- * Serializes the message to binary data (in grpc wire format).
+ * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.scanoss.api.components.v2.CompSearchResponse.prototype.serializeBinary = function() {
@@ -421,7 +421,7 @@ proto.scanoss.api.components.v2.CompSearchResponse.prototype.serializeBinary = f
 
 
 /**
- * Serializes the given message to binary data (in grpc wire
+ * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
  * @param {!proto.scanoss.api.components.v2.CompSearchResponse} message
  * @param {!jspb.BinaryWriter} writer
@@ -464,7 +464,7 @@ proto.scanoss.api.components.v2.CompSearchResponse.Component = function(opt_data
 };
 goog.inherits(proto.scanoss.api.components.v2.CompSearchResponse.Component, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
-  proto.scanoss.api.components.v2.CompSearchResponse.Component.displayName = 'proto.scanoss.api.components.v2.CompSearchResponse.ComponentCatalog';
+  proto.scanoss.api.components.v2.CompSearchResponse.Component.displayName = 'proto.scanoss.api.components.v2.CompSearchResponse.Component';
 }
 
 
@@ -509,7 +509,7 @@ proto.scanoss.api.components.v2.CompSearchResponse.Component.toObject = function
 
 
 /**
- * Deserializes binary data (in grpc wire format).
+ * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.scanoss.api.components.v2.CompSearchResponse.Component}
  */
@@ -521,7 +521,7 @@ proto.scanoss.api.components.v2.CompSearchResponse.Component.deserializeBinary =
 
 
 /**
- * Deserializes binary data (in grpc wire format) from the
+ * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
  * @param {!proto.scanoss.api.components.v2.CompSearchResponse.Component} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
@@ -556,7 +556,7 @@ proto.scanoss.api.components.v2.CompSearchResponse.Component.deserializeBinaryFr
 
 
 /**
- * Serializes the message to binary data (in grpc wire format).
+ * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.scanoss.api.components.v2.CompSearchResponse.Component.prototype.serializeBinary = function() {
@@ -567,7 +567,7 @@ proto.scanoss.api.components.v2.CompSearchResponse.Component.prototype.serialize
 
 
 /**
- * Serializes the given message to binary data (in grpc wire
+ * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
  * @param {!proto.scanoss.api.components.v2.CompSearchResponse.Component} message
  * @param {!jspb.BinaryWriter} writer
@@ -645,7 +645,7 @@ proto.scanoss.api.components.v2.CompSearchResponse.Component.prototype.setUrl = 
 
 
 /**
- * repeated ComponentCatalog components = 1;
+ * repeated Component components = 1;
  * @return {!Array<!proto.scanoss.api.components.v2.CompSearchResponse.Component>}
  */
 proto.scanoss.api.components.v2.CompSearchResponse.prototype.getComponentsList = function() {
@@ -765,7 +765,7 @@ proto.scanoss.api.components.v2.CompVersionRequest.toObject = function(includeIn
 
 
 /**
- * Deserializes binary data (in grpc wire format).
+ * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.scanoss.api.components.v2.CompVersionRequest}
  */
@@ -777,7 +777,7 @@ proto.scanoss.api.components.v2.CompVersionRequest.deserializeBinary = function(
 
 
 /**
- * Deserializes binary data (in grpc wire format) from the
+ * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
  * @param {!proto.scanoss.api.components.v2.CompVersionRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
@@ -808,7 +808,7 @@ proto.scanoss.api.components.v2.CompVersionRequest.deserializeBinaryFromReader =
 
 
 /**
- * Serializes the message to binary data (in grpc wire format).
+ * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.scanoss.api.components.v2.CompVersionRequest.prototype.serializeBinary = function() {
@@ -819,7 +819,7 @@ proto.scanoss.api.components.v2.CompVersionRequest.prototype.serializeBinary = f
 
 
 /**
- * Serializes the given message to binary data (in grpc wire
+ * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
  * @param {!proto.scanoss.api.components.v2.CompVersionRequest} message
  * @param {!jspb.BinaryWriter} writer
@@ -934,7 +934,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.toObject = function(includeI
 
 
 /**
- * Deserializes binary data (in grpc wire format).
+ * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.scanoss.api.components.v2.CompVersionResponse}
  */
@@ -946,7 +946,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.deserializeBinary = function
 
 
 /**
- * Deserializes binary data (in grpc wire format) from the
+ * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
  * @param {!proto.scanoss.api.components.v2.CompVersionResponse} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
@@ -979,7 +979,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.deserializeBinaryFromReader 
 
 
 /**
- * Serializes the message to binary data (in grpc wire format).
+ * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.scanoss.api.components.v2.CompVersionResponse.prototype.serializeBinary = function() {
@@ -990,7 +990,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.prototype.serializeBinary = 
 
 
 /**
- * Serializes the given message to binary data (in grpc wire
+ * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
  * @param {!proto.scanoss.api.components.v2.CompVersionResponse} message
  * @param {!jspb.BinaryWriter} writer
@@ -1079,7 +1079,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.License.toObject = function(
 
 
 /**
- * Deserializes binary data (in grpc wire format).
+ * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.scanoss.api.components.v2.CompVersionResponse.License}
  */
@@ -1091,7 +1091,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.License.deserializeBinary = 
 
 
 /**
- * Deserializes binary data (in grpc wire format) from the
+ * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
  * @param {!proto.scanoss.api.components.v2.CompVersionResponse.License} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
@@ -1130,7 +1130,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.License.deserializeBinaryFro
 
 
 /**
- * Serializes the message to binary data (in grpc wire format).
+ * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.scanoss.api.components.v2.CompVersionResponse.License.prototype.serializeBinary = function() {
@@ -1141,7 +1141,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.License.prototype.serializeB
 
 
 /**
- * Serializes the given message to binary data (in grpc wire
+ * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
  * @param {!proto.scanoss.api.components.v2.CompVersionResponse.License} message
  * @param {!jspb.BinaryWriter} writer
@@ -1310,7 +1310,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.Version.toObject = function(
 
 
 /**
- * Deserializes binary data (in grpc wire format).
+ * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.scanoss.api.components.v2.CompVersionResponse.Version}
  */
@@ -1322,7 +1322,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.Version.deserializeBinary = 
 
 
 /**
- * Deserializes binary data (in grpc wire format) from the
+ * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
  * @param {!proto.scanoss.api.components.v2.CompVersionResponse.Version} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
@@ -1354,7 +1354,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.Version.deserializeBinaryFro
 
 
 /**
- * Serializes the message to binary data (in grpc wire format).
+ * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.scanoss.api.components.v2.CompVersionResponse.Version.prototype.serializeBinary = function() {
@@ -1365,7 +1365,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.Version.prototype.serializeB
 
 
 /**
- * Serializes the given message to binary data (in grpc wire
+ * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
  * @param {!proto.scanoss.api.components.v2.CompVersionResponse.Version} message
  * @param {!jspb.BinaryWriter} writer
@@ -1453,7 +1453,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.Component = function(opt_dat
 };
 goog.inherits(proto.scanoss.api.components.v2.CompVersionResponse.Component, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
-  proto.scanoss.api.components.v2.CompVersionResponse.Component.displayName = 'proto.scanoss.api.components.v2.CompVersionResponse.ComponentCatalog';
+  proto.scanoss.api.components.v2.CompVersionResponse.Component.displayName = 'proto.scanoss.api.components.v2.CompVersionResponse.Component';
 }
 /**
  * List of repeated fields within this message type.
@@ -1507,7 +1507,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.Component.toObject = functio
 
 
 /**
- * Deserializes binary data (in grpc wire format).
+ * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.scanoss.api.components.v2.CompVersionResponse.Component}
  */
@@ -1519,7 +1519,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.Component.deserializeBinary 
 
 
 /**
- * Deserializes binary data (in grpc wire format) from the
+ * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
  * @param {!proto.scanoss.api.components.v2.CompVersionResponse.Component} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
@@ -1559,7 +1559,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.Component.deserializeBinaryF
 
 
 /**
- * Serializes the message to binary data (in grpc wire format).
+ * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.scanoss.api.components.v2.CompVersionResponse.Component.prototype.serializeBinary = function() {
@@ -1570,7 +1570,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.Component.prototype.serializ
 
 
 /**
- * Serializes the given message to binary data (in grpc wire
+ * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
  * @param {!proto.scanoss.api.components.v2.CompVersionResponse.Component} message
  * @param {!jspb.BinaryWriter} writer
@@ -1687,7 +1687,7 @@ proto.scanoss.api.components.v2.CompVersionResponse.Component.prototype.clearVer
 
 
 /**
- * optional ComponentCatalog component = 1;
+ * optional Component component = 1;
  * @return {?proto.scanoss.api.components.v2.CompVersionResponse.Component}
  */
 proto.scanoss.api.components.v2.CompVersionResponse.prototype.getComponent = function() {
