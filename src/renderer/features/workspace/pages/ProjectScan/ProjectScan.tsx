@@ -20,7 +20,7 @@ const ProjectScan = () => {
   const { scanPath, newProject } = useSelector(selectWorkspaceState);
 
   const [progress, setProgress] = useState<number>(0);
-  const [stage, setStage] = useState<any>({ stageName: '', stageStep: 1 });
+  const [stage, setStage] = useState<any>({ stageName: 'indexing', stageStep: 1 });
 
   const init = async () => {
     ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
