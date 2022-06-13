@@ -40,10 +40,9 @@ export class Indexer extends  EventEmitter{
   }
 
   public async saveIndex(index: any, pathToDictionary: string) {
-    if (!fs.existsSync(pathToDictionary)) {
-      fs.rmdir(pathToDictionary, { recursive: true }, (err) => {
-      });
-    }
+    fs.rmdirSync(pathToDictionary, {
+      recursive: true,
+    });
     fs.mkdirSync(pathToDictionary);
     await index.export((key: any, data: string | NodeJS.ArrayBufferView) => {
       fs.writeFile(`${pathToDictionary}${key}.json`, data !== undefined ? data : '', (err) => {
