@@ -69,7 +69,7 @@
   overflow-y: visible !important;
 
   &.diff-view {
-    grid-template-columns: calc(50% - 10px) 50%;;
+    grid-template-columns: calc(50% - 10px) 50%;
     grid-gap: 10px;
   }
 

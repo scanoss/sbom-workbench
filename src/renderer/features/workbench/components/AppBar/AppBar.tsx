@@ -32,6 +32,7 @@ import { workspaceService } from '@api/services/workspace.service';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { dialogController } from '../../../../controllers/dialog-controller';
 import AppConfig from '../../../../../config/AppConfigModule';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
 
 const Navigation = () => {
   const history = useHistory();
@@ -173,12 +174,14 @@ const AppTitle = ({ title }) => {
 };
 
 const Export = ({ state }) => {
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
+
   const exportLabels = {
-    CSV: { label: 'CSV', showNoProgress: false },
-    SPDXLITEJSON: { label: 'SPDX Lite', showOnNoneProgress: false },
-    WFP: { label: 'WFP', showNoProgress: true },
-    RAW: { label: 'RAW', showNoProgress: true },
-    HTMLSUMMARY: { label: 'HTML Summary', showNoProgress: true },
+    CSV: { label: 'CSV', showNoProgress: false, hint: 'Export Comma Separate Value identification report' },
+    SPDXLITEJSON: { label: 'SPDX Lite', showOnNoneProgress: false, hint: 'Export an SPDX compliant SBOM report' },
+    WFP: { label: 'WFP', showNoProgress: true, hint: 'Export the Winnowing Fingerprint data of the scanned project' },
+    RAW: { label: 'RAW', showNoProgress: true, hint: 'Export the raw JSON responses from the SCANOSS Platform' },
+    HTMLSUMMARY: { label: 'HTML Summary', showNoProgress: true, hint: 'Export a HTML summary of the Identification report' },
   };
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -192,6 +195,12 @@ const Export = ({ state }) => {
   };
 
   const onExport = async (format: ExportFormat) => {
+    if (state.progress === 0 && !exportLabels[format].showNoProgress) {
+      await dialogCtrl.openAlertDialog(
+        'Warning: you need to accept the results before export in order to confirm the scanner output. '
+      );
+    }
+
     await exportFile(format);
     handleClose();
   };
@@ -260,13 +269,15 @@ const Export = ({ state }) => {
             {AppConfig.FF_EXPORT_FORMAT_OPTIONS.map(
               (format) =>
                 exportLabels[format] && (
-                  <MenuItem
-                    key={format}
-                    disabled={false && state.progress === 0 && !exportLabels[format].showNoProgress}
-                    onClick={() => onExport(format as ExportFormat)}
-                  >
-                    {exportLabels[format].label}
-                  </MenuItem>
+                  <Tooltip title={exportLabels[format].hint} placement="left" arrow>
+                    <MenuItem
+                      key={format}
+                      /* disabled={state.progress === 0 && !exportLabels[format].showNoProgress} */
+                      onClick={() => onExport(format as ExportFormat)}
+                    >
+                      {exportLabels[format].label}
+                    </MenuItem>
+                  </Tooltip>
                 )
             )}
           </Menu>

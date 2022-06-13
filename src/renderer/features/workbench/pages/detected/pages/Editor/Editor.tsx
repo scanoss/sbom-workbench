@@ -300,7 +300,8 @@ export const Editor = () => {
           `}
         >
           <div className="editor">
-            {/* TODO: we need to remove this IF statement. Should we keep editor instance to better performance and UX. Problem: editors not re-layout on changing file */}
+            {/* TODO: we need to remove this IF statement. Should we keep editor instance to better performance and UX.
+                Problem: editors not re-layout on changing file */}
             {localFileContent?.content || remoteFileContent?.content || imported ? (
               <MemoCodeViewer
                 id={CodeViewerManager.LEFT}
@@ -334,11 +335,6 @@ export const Editor = () => {
             </div>
           )}
         </main>
-        {/*
-          ) : imported ? (
-            <NoLocalFile />
-          ) : null}
-         */}
       </section>
     </>
   );
