@@ -1,5 +1,6 @@
 :root {
   --color-primary: #6366F1;
+  --color-primary-lighten: #E0E7FF;
   --text-color-primary: #505050;
 
   --color-status-pending: #F97316;
@@ -17,6 +18,11 @@
 .color-primary {
   color: var(--color-primary);
 }
+
+.bg-primary {
+  background-color: var(--color-primary-lighten) !important;
+}
+
 
 
 // Colors
