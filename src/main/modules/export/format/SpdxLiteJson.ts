@@ -2,6 +2,7 @@ import * as os from 'os';
 import { Buffer } from 'buffer';
 import { utilModel } from '../../../model/UtilModel';
 import { Format } from '../Format';
+import { workspace } from '../../../workspace/Workspace';
 
 const crypto = require('crypto');
 
@@ -26,7 +27,7 @@ export class SpdxLiteJson extends Format {
         (p) => p.versionInfo === data[i].version && p.externalRefs[0].referenceLocator === data[i].purl
       );
       if (aux !== undefined) {
-        if (new RegExp(`\\b${data[i].declareLicense}\\b`).test(aux.licenseDeclared) === false) {     
+        if (new RegExp(`\\b${data[i].declareLicense}\\b`).test(aux.licenseDeclared) === false) {
           aux.licenseDeclared = aux.licenseDeclared.concat(' AND ', data[i].declareLicense);
         }
       } else {
@@ -58,6 +59,13 @@ export class SpdxLiteJson extends Format {
 
     spdx.SPDXID = spdx.SPDXID.replace('###', hex);
 
+    // Add DocumentNameSpace
+    const p = workspace.getOpenProject();
+    let projectName = p.getProjectName();
+    projectName = projectName.replace(/\s/g, '');
+    spdx.documentNamespace = spdx.documentNamespace.replace('DOCUMENTNAME', projectName);
+    spdx.documentNamespace = spdx.documentNamespace.replace('UUID', hex);
+
     return JSON.stringify(spdx, undefined, 4);
   }
 
@@ -67,6 +75,7 @@ export class SpdxLiteJson extends Format {
       dataLicense: 'CC0-1.0',
       SPDXID: 'SPDXRef-###',
       name: 'SCANOSS-SBOM',
+      documentNamespace: 'https://spdx.org/spdxdocs/DOCUMENTNAME-UUID',
       creationInfo: {
         creators: ['Tool: SCANOSS Audit Workbench', `User: ${os.userInfo().username}`],
         created: utilModel.getTimeStamp(),
