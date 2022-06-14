@@ -271,6 +271,7 @@
     "react-virtualized": "^9.22.3",
     "react-virtualized-tree": "^3.4.1",
     "regenerator-runtime": "^0.13.5",
+    "remixicon": "^2.5.0",
     "scanoss": "^0.2.28",
     "sort-paths": "^1.1.1",
     "source-map-support": "^0.5.19",
