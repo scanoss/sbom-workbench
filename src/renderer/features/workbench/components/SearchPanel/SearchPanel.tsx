@@ -1,5 +1,5 @@
 import React, { SetStateAction, useEffect, useRef } from 'react';
-import { Box, Button, makeStyles, TextField } from '@material-ui/core';
+import { Box, Button, Chip, makeStyles, TextField } from '@material-ui/core';
 import { ipcRenderer } from 'electron';
 import { IpcEvents } from '@api/ipc-events';
 import { DataGrid } from '@material-ui/data-grid';
@@ -18,6 +18,11 @@ const useStyles = makeStyles((theme) => ({
     top: 12,
     right: 8,
     zIndex: 1,
+  },
+  autocomplete: {
+    '& .MuiAutocomplete-endAdornment': {
+
+    },
   },
   searchInput: {
     '& .MuiInputBase-input': {
@@ -151,40 +156,45 @@ const SearchPanel = () => {
 
   return (
     <div className="panel panel-left search-panel-container">
-      <header className="panel-header">
-        <Box boxShadow={1} className="p-3 pr-2 pb-1">
-          <div className="panel-title">
-            <h4>Search</h4>
+      <header className="panel-header p-3 pr-2 pb-1">
+        <div className="panel-title">
+          <h4>Keyword Search</h4>
+        </div>
+        <div className="search-panel mt-3">
+          <div className="search-panel-input d-flex align-center">
+            <i className="ri-search-line mr-1" />
+            <Autocomplete
+              className={classes.autocomplete}
+              multiple
+              fullWidth
+              forcePopupIcon
+              size="small"
+              options={['license', 'copyright', 'author', 'version']}
+              freeSolo
+              value={value}
+              renderTags={(value: readonly string[], getTagProps) =>
+                value.map((option: string, index: number) => (
+                  // eslint-disable-next-line react/jsx-key
+                  <Chip color="primary" variant="outlined" size="small" label={option} {...getTagProps({ index })} className="bg-primary mr-1" />
+                ))
+              }
+              onChange={(event, data) => onTagsHandler(data)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  className={classes.searchInput}
+                  autoFocus
+                  variant="standard"
+                  InputProps={{
+                    ...params.InputProps,
+                    placeholder: value.length === 0 ? 'Search by keywords' : '',
+                    disableUnderline: true,
+                  }}
+                />
+              )}
+            />
           </div>
-          <div className="search-panel mt-3">
-            <div className="search-panel-input d-flex align-center">
-              <SearchIcon className="start-icon mr-1" />
-              <Autocomplete
-                multiple
-                fullWidth
-                forcePopupIcon
-                size="small"
-                options={['license', 'copyright', 'author', 'version']}
-                freeSolo
-                value={value}
-                onChange={(event, data) => onTagsHandler(data)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    className={classes.searchInput}
-                    autoFocus
-                    variant="standard"
-                    InputProps={{
-                      ...params.InputProps,
-                      placeholder: value.length === 0 ? 'Search by keywords' : '',
-                      disableUnderline: true,
-                    }}
-                  />
-                )}
-              />
-            </div>
-          </div>
-        </Box>
+        </div>
       </header>
       <main className="panel-body">
         {/* <Button size="small" className={classes.button} onClick={onIdentifyAllHandler}>Identify All</Button> */}
