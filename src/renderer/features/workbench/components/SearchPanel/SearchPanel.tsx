@@ -32,8 +32,18 @@ const useStyles = makeStyles((theme) => ({
   },
   dataGrid: {
     '& .MuiDataGrid-columnHeader': {
-      fontSize: '0.7rem',
-      marginBottom: 10,
+      fontSize: '12px',
+      fontWeight: '400 !important',
+      padding: 0,
+      '& .MuiDataGrid-columnSeparator': {
+        display: 'none',
+      },
+    },
+    '& .MuiDataGrid-columnHeaderCheckbox': {
+      '& .MuiSvgIcon-root': {
+        width: '0.85em',
+        height: '0.85em',
+      },
     },
     '& .MuiTablePagination-caption': {
       fontSize: '0.8rem',
@@ -45,10 +55,15 @@ const useStyles = makeStyles((theme) => ({
     border: 2,
     '& .MuiDataGrid-cell': {
       border: 0,
-      padding: '0 10px 0 20px', //  padding: '0 3px'
+      padding: '0 3px',
     },
     '& .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
       visibility: 'hidden',
+
+      '& .MuiSvgIcon-root': {
+        width: '0.85em',
+        height: '0.85em',
+      },
     },
     '& .MuiDataGrid-cell.MuiDataGrid-cellCheckbox[data-value=true]': {
       visibility: 'visible !important',
@@ -156,7 +171,7 @@ const SearchPanel = () => {
 
   return (
     <div className="panel panel-left search-panel-container">
-      <header className="panel-header p-3 pr-2 pb-1">
+      <header className="panel-header border-bottom p-3 pr-2 pb-1">
         <div className="panel-title">
           <h4>Keyword Search</h4>
         </div>
@@ -204,7 +219,7 @@ const SearchPanel = () => {
           columns={[
             {
               field: 'filename',
-              headerName: `${selected?.length} rows selected`,
+              headerName: `${selected?.length} files selected`,
               editable: false,
               sortable: false,
               flex: 1,
@@ -222,12 +237,12 @@ const SearchPanel = () => {
           }}
           rowHeight={23}
           page={localPage}
-          checkboxSelection={false}
           disableColumnMenu
           rowsPerPageOptions={[AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT]}
           hideFooterSelectedRowCount
           hideFooterRowCount
-          headerHeight={0}
+          checkboxSelection
+          headerHeight={41}
           disableSelectionOnClick
           onPageChange={onPageChangeHandler}
           onRowClick={onRowClickHandler}
