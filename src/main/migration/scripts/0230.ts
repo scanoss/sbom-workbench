@@ -11,8 +11,8 @@ import { ProjectFilterPath } from "../../workspace/filters/ProjectFilterPath";
 import { dependencyHelper } from "../../helpers/DependencyHelper";
 import { fileHelper } from "../../helpers/FileHelper";
 import { modelProvider } from "../../services/ModelProvider";
-import { Tree } from "../../workspace/Tree/Tree/Tree";
-import { NodeStatus } from "../../workspace/Tree/Tree/Node";
+import { Tree } from "../../workspace/tree/Tree";
+import { NodeStatus } from "../../workspace/tree/Node";
 
 export async function migration0230(projectPath: string): Promise<void> {
   log.info("Migration 0230 In progress...");
@@ -57,7 +57,9 @@ async function regenerateDependencyTable(projectPath): Promise<void> {
 async function updateFlagsOnTree(projectPath:string){
   const project = await fs.promises.readFile(`${projectPath}/tree.json`, 'utf8');
   const a = JSON.parse(project);
-  const tree = new Tree(projectPath, null);
+  const m = await fs.promises.readFile(`${projectPath}/metadata.json`, 'utf8');
+  const metadata = JSON.parse(m);
+  const tree = new Tree(metadata.scan_root,projectPath, null);
   tree.loadTree(a.tree.rootFolder);
   const rootFolder = tree.getRootFolder();
   addProgressFlags(rootFolder);
@@ -68,7 +70,9 @@ async function updateFlagsOnTree(projectPath:string){
 async function updateDependenciesOnTree(projectPath:string,dependencies){
   const project = await fs.promises.readFile(`${projectPath}/tree.json`, 'utf8');
   const a = JSON.parse(project);
-  const tree = new Tree(projectPath, null);
+  const m = await fs.promises.readFile(`${projectPath}/metadata.json`, 'utf8');
+  const metadata = JSON.parse(m);
+  const tree = new Tree(metadata.scan_root,projectPath, null);
   tree.loadTree(a.tree.rootFolder);
   tree.addDependencies(dependencies);
   a.tree  = tree;

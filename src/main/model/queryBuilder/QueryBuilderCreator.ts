@@ -7,6 +7,7 @@ import { QueryBuilderStatus } from './QueryBuilderStatus';
 import { QueryBuilderUsage } from './QueryBuilderUsage';
 import { QueryBuilderFileIdIn } from './QueryBuilderFilIdIN';
 import { QueryBuilderFilename } from './QueryBuilderFilename';
+import { QueryBuilderFIlePathIN } from './QueryBuilderFilePathIN';
 
 export class QueryBuilderCreator {
   public static create(params: Record<string, any>): QueryBuilder {
@@ -46,6 +47,11 @@ export class QueryBuilderCreator {
       }
       if (params.filename) {
         builder.add(new QueryBuilderFilename(params.filename));
+      }
+      if (params.paths) {
+        const queryBuilderIN = new QueryBuilderIN();
+        queryBuilderIN.add(new QueryBuilderFIlePathIN(params.paths));
+        return queryBuilderIN;
       }
     }
     return builder;

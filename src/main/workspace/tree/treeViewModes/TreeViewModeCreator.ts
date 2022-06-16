@@ -1,4 +1,4 @@
-import { ComponentSource, FileTreeViewMode } from '../../../../../api/types';
+import { ComponentSource, FileTreeViewMode } from '../../../../api/types';
 import { TreeViewMode } from './TreeViewMode';
 import { TreeViewDefault } from './TreeViewDefault';
 import { TreeViewFilterNotPrune } from './TreeViewFilterNotPrune';

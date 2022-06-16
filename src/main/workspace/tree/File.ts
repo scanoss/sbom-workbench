@@ -1,7 +1,8 @@
-import Node, {NodeStatus} from './Node';
+import Node, { NodeStatus } from './Node';
+import { BlackListAbstract } from './blackList/BlackListAbstract';
 
 export default class File extends Node {
- private isDependencyFile: boolean;
+  private isDependencyFile: boolean;
 
   constructor(name: string, path: string) {
     super(name, path);
@@ -83,7 +84,8 @@ export default class File extends Node {
     return this.status;
   }
 
-  public getFiles(filter?:Record<string, any>): Array<any> {
+  public getFiles(banned: BlackListAbstract = null): Array<any> {
+    if(banned && banned.evaluate(this)) return [];
     let type = '';
     if (this.status === NodeStatus.PENDING) type = NodeStatus.MATCH;
     if (this.status === NodeStatus.FILTERED) type = NodeStatus.FILTERED;
@@ -120,7 +122,7 @@ export default class File extends Node {
   }
 
   public addDependency(path: string): void {
-    if (this.getPath() === path){
+    if (this.getPath() === path) {
       this.status = NodeStatus.PENDING;
       this.setStatusOnClassnameAs(this.status);
       this.isDependencyFile = true;
@@ -169,5 +171,4 @@ export default class File extends Node {
   public containsFile(filename: string): boolean {
     return this.getName() === filename;
   }
-
 }

@@ -4,10 +4,14 @@ import { modelProvider } from '../../../services/ModelProvider';
 import { Indexer } from '../../../modules/searchEngine/indexer/Indexer';
 import { IIndexer } from '../../../modules/searchEngine/indexer/IIndexer';
 import { workspace } from '../../../workspace/Workspace';
+import { BlackListKeyWordIndex } from '../../../workspace/tree/blackList/BlackListKeyWordIndex';
+import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCreator';
 
 export class IndexTask extends EventEmitter implements ITask<Electron.WebContents, any> {
   public async run(event: Electron.WebContents): Promise<any> {
-    const files = await modelProvider.model.file.getAll(null);
+    const f = workspace.getOpenProject().getTree().getRootFolder().getFiles(new BlackListKeyWordIndex());
+    const paths = f.map((fi) => fi.path);
+    const files = await modelProvider.model.file.getAll(QueryBuilderCreator.create(paths));
     const indexer = new Indexer(event);
     const filesToIndex = this.fileAdapter(files);
     const index = indexer.index(filesToIndex);
@@ -20,7 +24,7 @@ export class IndexTask extends EventEmitter implements ITask<Electron.WebContent
     const p = workspace.getOpenedProjects()[0];
     const scanRoot = p.metadata.getScanRoot();
     modelFiles.forEach((file: any) => {
-      if (file.filter !== 'FILTERED') filesToIndex.push({ fileId: file.id, path: `${scanRoot}${file.path}` });
+      filesToIndex.push({ fileId: file.id, path: `${scanRoot}${file.path}` });
     });
     return filesToIndex;
   }

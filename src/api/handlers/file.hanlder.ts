@@ -5,7 +5,7 @@ import { GetFileDTO } from "@api/dto";
 import { IpcEvents } from '../ipc-events';
 import { FileType } from '../types';
 import { workspace } from '../../main/workspace/Workspace';
-import { NodeStatus } from '../../main/workspace/Tree/Tree/Node';
+import { NodeStatus } from '../../main/workspace/tree/Node';
 import { utilHelper } from '../../main/helpers/UtilHelper';
 import { FilterTrue } from '../../main/batch/Filter/FilterTrue';
 import { resultService } from '../../main/services/ResultService';

@@ -1,5 +1,5 @@
-import Node, {NodeStatus} from './Node';
-
+import Node, { NodeStatus } from './Node';
+import { BlackListAbstract } from './blackList/BlackListAbstract';
 
 export default class Folder extends Node {
   private children: Node[];
@@ -49,7 +49,6 @@ export default class Folder extends Node {
 
   public getStatus(): NodeStatus {
     return this.getStatusClassName();
-
   }
 
   private statusLogic(): NodeStatus {
@@ -67,8 +66,6 @@ export default class Folder extends Node {
     if (this.hasNoMatch) return NodeStatus.NOMATCH;
     return NodeStatus.FILTERED;
   }
-
-
 
   public updateStatusFlags(): void {
     this.hasPending = false;
@@ -91,7 +88,17 @@ export default class Folder extends Node {
       if (status === NodeStatus.IDENTIFIED && !child.isDependency()) this.hasIdentifiedProgress = true;
       if (status === NodeStatus.PENDING && !child.isDependency()) this.hasPendingProgress = true;
       if (status === NodeStatus.IGNORED && !child.isDependency()) this.hasIgnoredProgress = true;
-      if (this.hasPending && this.hasIdentified && this.hasIgnored && this.hasNoMatch && this.hasFiltered &&  this.hasIdentifiedProgress && this.hasPendingProgress && this.hasIgnoredProgress ) break;
+      if (
+        this.hasPending &&
+        this.hasIdentified &&
+        this.hasIgnored &&
+        this.hasNoMatch &&
+        this.hasFiltered &&
+        this.hasIdentifiedProgress &&
+        this.hasPendingProgress &&
+        this.hasIgnoredProgress
+      )
+        break;
     }
   }
 
@@ -172,13 +179,11 @@ export default class Folder extends Node {
     this.original = status;
   }
 
-  public getFiles(filter?: Record<string, any>): Array<any> {
+  public getFiles(banned: BlackListAbstract = null): Array<any> {
     const files: Array<any> = [];
-    if(filter && filter.skipIgnoredFolders){
-      if(this.status === NodeStatus.FILTERED) return files;
-    }
+    if (banned && banned.evaluate(this)) return files;
     this.children.forEach((child) => {
-      files.push(...child.getFiles(filter));
+      files.push(...child.getFiles(banned));
     });
     return files;
   }
@@ -263,9 +268,8 @@ export default class Folder extends Node {
 
   public containsFile(filename: string): boolean {
     for (const child of this.getChildren()) {
-      if(child.getName() === filename) return true;
+      if (child.getName() === filename) return true;
     }
     return false;
   }
-
 }

@@ -1,4 +1,4 @@
-import { NodeStatus } from '../main/workspace/Tree/Tree/Node';
+import { NodeStatus } from '../main/workspace/tree/Node';
 
 export enum ScanState {
   CREATED = 'CREATED',

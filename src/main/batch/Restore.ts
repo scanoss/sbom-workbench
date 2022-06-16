@@ -8,7 +8,7 @@ import {Batch} from './Batch';
 import {FilterOR} from './Filter/FilterOR';
 import {FilterTrue} from './Filter/FilterTrue';
 import {GenericFilter} from './Filter/GenericFilter';
-import {NodeStatus} from "../workspace/Tree/Tree/Node";
+import {NodeStatus} from "../workspace/tree/Node";
 
 export class Restore extends Batch {
   public async execute() {

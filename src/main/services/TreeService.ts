@@ -1,7 +1,7 @@
 import log from 'electron-log';
 import { IpcEvents } from '../../api/ipc-events';
-import { NodeStatus } from '../workspace/Tree/Tree/Node';
-import { Tree } from '../workspace/Tree/Tree/Tree';
+import { NodeStatus } from '../workspace/tree/Node';
+import { Tree } from '../workspace/tree/Tree';
 import { workspace } from '../workspace/Workspace';
 import { utilHelper } from '../helpers/UtilHelper';
 import { FilterTrue } from '../batch/Filter/FilterTrue';
@@ -10,10 +10,10 @@ import { modelProvider } from './ModelProvider';
 class TreeService {
   public init(event: Electron.WebContents, projectPath: string, scanRoot: string): Tree {
     try {
-      const tree = new Tree(scanRoot, event);
-      tree.buildTree();
-      tree.fileTreeFilter(projectPath, scanRoot);
-      tree.summarize(scanRoot);
+      const tree = new Tree(scanRoot, projectPath ,event);
+      tree.build();
+      tree.setFilter();
+      tree.summarize();
       return tree;
     } catch (e: any) {
       log.error(e);

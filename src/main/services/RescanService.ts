@@ -1,7 +1,7 @@
 import { IDependencyResponse } from 'scanoss';
 import fs from 'fs';
 import { utilHelper } from '../helpers/UtilHelper';
-import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { NodeStatus } from '../workspace/tree/Node';
 import { componentService } from './ComponentService';
 import { dependencyService } from './DependencyService';
 import { modelProvider } from './ModelProvider';
