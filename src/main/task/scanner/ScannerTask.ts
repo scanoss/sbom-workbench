@@ -15,6 +15,8 @@ import AppConfig from '../../../config/AppConfigModule';
 import { AutoAccept } from '../Inventory/AutoAccept';
 import { ITask } from '../Task';
 import { IndexTask } from "../search/indexTask/IndexTask";
+import { BlackListDependencies } from "../../workspace/tree/blackList/BlackListDependencies";
+import {AllFiles} from "../../workspace/tree/blackList/BlackListFalse";
 
 export abstract class ScannerTask extends EventEmitter implements ITask<void, boolean> {
   protected msgToUI!: Electron.WebContents;
@@ -136,10 +138,11 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
 
   private async scanDependencies(): Promise<void> {
     const allFiles = [];
+    //
     const rootPath = this.project.metadata.getScanRoot();
     this.project.tree
       .getRootFolder()
-      .getFiles({ skipIgnoredFolders: true })
+      .getFiles(new BlackListDependencies())
       .forEach((f: File) => {
         allFiles.push(rootPath + f.path);
       });

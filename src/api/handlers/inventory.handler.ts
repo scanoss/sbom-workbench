@@ -5,7 +5,7 @@ import { Batch } from '../../main/batch/Batch';
 import { BatchFactory } from '../../main/batch/BatchFactory';
 import { inventoryService } from '../../main/services/InventoryService';
 import { treeService } from '../../main/services/TreeService';
-import { NodeStatus } from '../../main/workspace/Tree/Tree/Node';
+import { NodeStatus } from '../../main/workspace/tree/Node';
 import { workspace } from '../../main/workspace/Workspace';
 import { modelProvider } from '../../main/services/ModelProvider';
 

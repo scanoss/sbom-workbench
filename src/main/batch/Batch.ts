@@ -2,7 +2,7 @@ import { utilHelper } from '../helpers/UtilHelper';
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { resultService } from '../services/ResultService';
 import { treeService } from '../services/TreeService';
-import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { NodeStatus } from '../workspace/tree/Node';
 import { Filter } from './Filter/Filter';
 import { FilterTrue } from './Filter/FilterTrue';
 

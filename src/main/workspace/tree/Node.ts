@@ -1,3 +1,5 @@
+import { BlackListAbstract } from "./blackList/BlackListAbstract";
+
 export enum NodeStatus {
   FILTERED = 'FILTERED',
   NOMATCH = 'NO-MATCH',
@@ -147,7 +149,7 @@ export default abstract class Node {
 
   public abstract getStatus(): NodeStatus;
 
-  public abstract getFiles(filter?: Record<string,any>): Array<any>;
+  public abstract getFiles(banned: BlackListAbstract): Array<any>;
 
   public abstract summarize(root: string, summary: any): any;
 

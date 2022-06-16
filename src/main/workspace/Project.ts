@@ -6,9 +6,9 @@ import { FileTreeViewMode, IProjectCfg, IWorkbenchFilter, IWorkbenchFilterParams
 import { ScanModel } from '../model/ScanModel';
 import { Metadata } from './Metadata';
 import { ProjectMigration } from '../migration/ProjectMigration';
-import { Tree } from './Tree/Tree/Tree';
+import { Tree } from './tree/Tree';
 import { modelProvider } from '../services/ModelProvider';
-import { TreeViewModeCreator } from './Tree/Tree/TreeViewMode/TreeViewModeCreator';
+import { TreeViewModeCreator } from './tree/treeViewModes/TreeViewModeCreator';
 import { IpcEvents } from '../../api/ipc-events';
 
 export class Project {
@@ -88,7 +88,7 @@ export class Project {
     this.filesSummary = a.filesSummary;
     await modelProvider.init(this.metadata.getMyPath());
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
-    this.tree = new Tree(this.metadata.getMyPath(), this.msgToUI);
+    this.tree = new Tree(this.metadata.getScanRoot(),this.metadata.getMyPath(), this.msgToUI);
     this.tree.loadTree(a.tree.rootFolder);
     return true;
   }

@@ -1,6 +1,6 @@
 import { Inventory } from '../../api/types';
 import { inventoryService } from '../services/InventoryService';
-import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { NodeStatus } from '../workspace/tree/Node';
 import { Batch } from './Batch';
 import { Restore } from './Restore';
 

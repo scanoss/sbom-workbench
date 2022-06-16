@@ -1,7 +1,7 @@
 import { ComponentSource, FileStatusType } from '../../api/types';
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
-import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { NodeStatus } from '../workspace/tree/Node';
 import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
 import { Restore } from './Restore';

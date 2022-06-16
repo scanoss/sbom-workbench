@@ -4,11 +4,11 @@ import log from 'electron-log';
 import Node, { NodeStatus } from './Node';
 import File from './File';
 import Folder from './Folder';
-import { IpcEvents } from '../../../../api/ipc-events';
-import * as Filtering from '../../filtering';
-import { TreeViewMode } from './TreeViewMode/TreeViewMode';
-import { TreeViewDefault } from './TreeViewMode/TreeViewDefault';
-import { defaultBannedList } from '../../filtering/defaultFilter';
+import { IpcEvents } from '../../../api/ipc-events';
+import * as Filtering from '../filtering';
+import { TreeViewMode } from './treeViewModes/TreeViewMode';
+import { TreeViewDefault } from './treeViewModes/TreeViewDefault';
+import { defaultBannedList } from '../filtering/defaultFilter';
 
 
 const fs = require('fs');
@@ -21,6 +21,8 @@ export class Tree {
 
   private rootPath: string;
 
+  private projectPath: string;
+
   private msgToUI!: Electron.WebContents;
 
   private filesIndexed = 0;
@@ -29,7 +31,7 @@ export class Tree {
 
   private summary;
 
-  constructor(path: string, msgToUI: Electron.WebContents) {
+  constructor(path: string, projectPath: string, msgToUI: Electron.WebContents) {
     const pathParts = path.split(pathLib.sep);
     this.rootName = pathParts[pathParts.length - 1];
     this.rootPath = path;
@@ -37,6 +39,7 @@ export class Tree {
     this.fileTreeViewMode = new TreeViewDefault();
     this.summary = {};
     this.msgToUI = msgToUI;
+    this.projectPath = projectPath;
   }
 
   setMailbox(mailbox: Electron.WebContents) {
@@ -49,7 +52,7 @@ export class Tree {
     }
   }
 
-  public buildTree(): Node {
+  public build(): Node {
     this.buildTreeRec(this.rootPath, this.rootFolder);
     return this.rootFolder;
   }
@@ -124,9 +127,9 @@ export class Tree {
     return this.rootFolder.getFiltered();
   }
 
-  public summarize(root: string): any {
+  public summarize(): any {
     const summary = { total: 0, include: 0, filter: 0, files: {} };
-    const sum = this.rootFolder.summarize(root, summary);
+    const sum = this.rootFolder.summarize(this.rootPath, summary);
     this.summary = sum;
     return sum;
   }
@@ -166,15 +169,15 @@ export class Tree {
     return 'FULL_SCAN';
   }
 
-  public fileTreeFilter(projectPath: string, scanRoot: string) {
+  public setFilter() {
     const bannedList = new Filtering.BannedList('NoFilter');
-    if (!fs.existsSync(`${projectPath}/filter.json`))
-      fs.writeFileSync(`${projectPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
-    bannedList.load(`${projectPath}/filter.json`);
+    if (!fs.existsSync(`${this.projectPath}/filter.json`))
+      fs.writeFileSync(`${this.projectPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
+    bannedList.load(`${this.projectPath}/filter.json`);
 
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
     log.info(`%c[ PROJECT ]: Applying filters to the tree`, 'color: green');
-    this.applyFilters(scanRoot, this.getRootFolder(), bannedList);
+    this.applyFilters(this.rootPath, this.getRootFolder(), bannedList);
   }
 
   public applyFilters(scanRoot: string, node: Node, bannedList: Filtering.BannedList) {

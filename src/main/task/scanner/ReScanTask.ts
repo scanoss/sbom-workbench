@@ -7,6 +7,7 @@ import { treeService } from '../../services/TreeService';
 import { ProjectFilterPath } from '../../workspace/filters/ProjectFilterPath';
 import { workspace } from '../../workspace/Workspace';
 import { ScannerTask } from './ScannerTask';
+import { AllFiles } from "../../workspace/tree/blackList/BlackListFalse";
 
 export class ReScanTask extends ScannerTask {
   public async done(resultPath: string) {

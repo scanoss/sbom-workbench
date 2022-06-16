@@ -1,5 +1,5 @@
-import { QueryBuilderCreator } from '../../../../model/queryBuilder/QueryBuilderCreator';
-import { modelProvider } from '../../../../services/ModelProvider';
+import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCreator';
+import { modelProvider } from '../../../services/ModelProvider';
 import Node from '../Node';
 import { TreeViewMode } from './TreeViewMode';
 

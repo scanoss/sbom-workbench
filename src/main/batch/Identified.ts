@@ -2,7 +2,7 @@ import { ComponentSource, FileStatusType, FileUsageType, Inventory } from '../..
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { inventoryService } from '../services/InventoryService';
-import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { NodeStatus } from '../workspace/tree/Node';
 import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
 import { Restore } from './Restore';

@@ -3,7 +3,7 @@ import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Model } from './Model';
 import { Querys } from './querys_db';
 import { Dependency } from '../../api/types';
-import {NodeStatus} from "../workspace/Tree/Tree/Node";
+import { NodeStatus } from "../workspace/tree/Node";
 
 const query = new Querys();
 
