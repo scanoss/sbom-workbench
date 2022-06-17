@@ -39,16 +39,11 @@
       }
     }
 
-
-      .actions {
-        opacity: 0.5;
-        display: flex;
-        gap: 4px;
-
-        .copy-path, .open-in-browser {
-          font-size: 16px;
-        }
-      }
+    .actions {
+      opacity: 0.5;
+      display: flex;
+      gap: 2px;
+    }
     }
 
     &:hover .actions {opacity: 1;}
