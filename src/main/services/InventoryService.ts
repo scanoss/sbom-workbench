@@ -1,6 +1,6 @@
 import log from 'electron-log';
 import { modelProvider } from './ModelProvider';
-import { Inventory, Component, IFolderInventory, IWorkbenchFilter } from '../../api/types';
+import { Inventory, Component, IBatchInventory, IWorkbenchFilter } from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 
@@ -123,7 +123,7 @@ class InventoryService  {
   }
 
   public async preLoadInventoriesAcceptAll(
-    data: Partial<IFolderInventory>,
+    data: Partial<IBatchInventory>,
     filter: IWorkbenchFilter
   ): Promise<Array<Partial<Inventory>>> {
     try {

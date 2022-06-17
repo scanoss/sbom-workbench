@@ -1,14 +1,9 @@
 import React from 'react';
-import OpenInBrowserOutlinedIcon from '@material-ui/icons/OpenInBrowserOutlined';
-import FindInPageOutlinedIcon from '@material-ui/icons/FindInPageOutlined';
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 
 import { IconButton, ListItemText, Tooltip, Typography } from '@material-ui/core';
-import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
 import CodeViewerManagerInstance from '../../pages/detected/pages/Editor/CodeViewerManager';
 
-const { shell } = require('electron')
-
+const { shell } = require('electron');
 
 export enum ToolbarActions {
   COPY_PATH = 'copy-path',
@@ -37,25 +32,25 @@ const FileToolbar = ({ id, label, fullpath, file, actions }: FileToolbarProps) =
     {
       id: ToolbarActions.FIND,
       hint: 'Find in file',
-      icon: <FindInPageOutlinedIcon fontSize="inherit" />,
+      icon: <i className="ri-file-search-line" />,
       run: () => CodeViewerManagerInstance.get(id)?.getAction('actions.find').run(),
     },
     {
       id: ToolbarActions.COPY_PATH,
       hint: 'Copy file path',
-      icon: <FileCopyOutlinedIcon fontSize="inherit" />,
+      icon: <i className="ri-file-copy-line" />,
       run: () => navigator.clipboard.writeText(fullpath),
     },
     {
       id: ToolbarActions.OPEN,
       hint: 'Open file in folder',
-      icon: <OpenInBrowserOutlinedIcon fontSize="inherit" />,
+      icon: <i className="ri-share-box-line" />,
       run: () => shell.showItemInFolder(fullpath),
     },
     {
       id: ToolbarActions.OPEN_IN_BROWSER,
       hint: 'Open file in browser',
-      icon: <OpenInNewIcon fontSize="inherit" />,
+      icon: <i className="ri-share-box-line" />,
       run: () => shell.openExternal(fullpath),
     },
   ];

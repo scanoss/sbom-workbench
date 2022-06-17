@@ -163,12 +163,16 @@ export enum InventoryAction {
   ACCEPT = 'ACCEPT',
 }
 
-export interface IFolderInventory {
-  folder: string;
+export interface IBatchInventory {
   action: InventoryAction;
   overwrite: boolean;
-  data?: Partial<Inventory> | Partial<Array<Inventory>>;
-  notes?: string;
+  data: {
+    path?: string;
+    files?: string[];
+    inventory?: Partial<Inventory>;
+    inventories?: Partial<Inventory[]>;
+    notes?: string;
+  };
 }
 
 export interface IWorkbenchFilter {
