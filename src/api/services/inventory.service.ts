@@ -1,6 +1,6 @@
 import { IpcEvents } from '../ipc-events';
 import { BaseService } from './base.service';
-import { IFolderInventory, Inventory } from '../types';
+import { IBatchInventory, Inventory } from '../types';
 
 const { ipcRenderer } = require('electron');
 
@@ -45,12 +45,12 @@ class InventoryService extends BaseService {
     return this.response(response);
   }
 
-  public async folder(args: IFolderInventory): Promise<any[]> {
-    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_FOLDER, args);
+  public async batch(args: IBatchInventory): Promise<any[]> {
+    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_BATCH, args);
     return this.response(response);
   }
 
-  public async acceptAllPreLoadInventory(data: Partial<IFolderInventory>): Promise<Partial<Array<Inventory>>> {
+  public async acceptAllPreLoadInventory(data: Partial<IBatchInventory>): Promise<Partial<Array<Inventory>>> {
     const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_ACCEPT_PRE_LOAD, data);
     return this.response(response);
   }

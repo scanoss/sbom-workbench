@@ -1,22 +1,29 @@
-import React, { SetStateAction, useEffect, useRef } from 'react';
-import { Box, Button, Chip, makeStyles, TextField } from '@material-ui/core';
+import React, { SetStateAction, useContext, useEffect, useRef } from 'react';
+import { Chip, IconButton, makeStyles, TextField } from '@material-ui/core';
 import { ipcRenderer } from 'electron';
 import { IpcEvents } from '@api/ipc-events';
 import { DataGrid } from '@material-ui/data-grid';
 import { useHistory } from 'react-router-dom';
-import { mapFiles } from '@shared/utils/scan-util';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import * as SearchUtils from '@shared/utils/search-utils';
-import SearchIcon from '@material-ui/icons/Search';
 import { AppConfigDefault } from '@config/AppConfigDefault';
 import TreeNode from '../TreeNode/TreeNode';
-import { ISearchResult } from '../../../../../main/task/search/searchTask/ISearchResult';
+import { DIALOG_ACTIONS } from '@context/types';
+import { executeBatch } from '@store/inventory-store/inventoryThunks';
+import { InventoryAction } from '@api/types';
+import { useDispatch } from 'react-redux';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import useBatch from '@hooks/useBatch';
+
+const electron = window.require('electron');
+const { remote } = electron;
+const { Menu } = remote;
 
 const useStyles = makeStyles((theme) => ({
   button: {
     position: 'absolute',
-    top: 12,
-    right: 8,
+    top: 9,
+    right: 9,
     zIndex: 1,
   },
   autocomplete: {
@@ -84,6 +91,10 @@ const SearchPanel = () => {
   const classes = useStyles();
   const searchQuery = useRef(null);
 
+  const dispatch = useDispatch();
+  const batch = useBatch();
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
+
   const serverPage = useRef(0);
   const [localPage, setLocalPage] = React.useState(0);
 
@@ -139,13 +150,24 @@ const SearchPanel = () => {
     setSelected(data);
   };
 
-  const onIdentifyAllHandler = () => {
-    console.log('Identify all');
+  const onMenuActionHandler = () => {
+    const menu = [
+      {
+        label: 'Identify all files as...',
+        click: batch.identifyAll,
+      },
+      {
+        label: 'Mark all files as original',
+        click: () => batch.ignoreAll,
+      },
+    ];
+
+    Menu.buildFromTemplate(menu).popup(remote.getCurrentWindow());
   };
 
   const onPageChangeHandler = (localPageNumber, details) => {
     setLocalPage(localPageNumber);
-    const nextPageServer = Math.floor( (localPageNumber + 1)  / (AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT / 100));
+    const nextPageServer = Math.floor((localPageNumber + 1) / (AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT / 100));
     if (nextPageServer > serverPage.current) {
       serverPage.current = nextPageServer;
       search();
@@ -182,7 +204,6 @@ const SearchPanel = () => {
               className={classes.autocomplete}
               multiple
               fullWidth
-              forcePopupIcon
               size="small"
               options={['license', 'copyright', 'author', 'version']}
               freeSolo
@@ -190,7 +211,14 @@ const SearchPanel = () => {
               renderTags={(value: readonly string[], getTagProps) =>
                 value.map((option: string, index: number) => (
                   // eslint-disable-next-line react/jsx-key
-                  <Chip color="primary" variant="outlined" size="small" label={option} {...getTagProps({ index })} className="bg-primary mr-1" />
+                  <Chip
+                    color="primary"
+                    variant="outlined"
+                    size="small"
+                    label={option}
+                    {...getTagProps({ index })}
+                    className="bg-primary mr-1"
+                  />
                 ))
               }
               onChange={(event, data) => onTagsHandler(data)}
@@ -212,7 +240,14 @@ const SearchPanel = () => {
         </div>
       </header>
       <main className="panel-body">
-        {/* <Button size="small" className={classes.button} onClick={onIdentifyAllHandler}>Identify All</Button> */}
+        <IconButton
+          disabled={selected?.length === 0}
+          size="small"
+          className={classes.button}
+          onClick={onMenuActionHandler}
+        >
+          <i className="ri-more-line" />
+        </IconButton>
         <DataGrid
           className={classes.dataGrid}
           rows={results}

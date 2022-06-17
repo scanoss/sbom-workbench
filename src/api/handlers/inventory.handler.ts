@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { IFolderInventory, Inventory } from '../types';
+import { IBatchInventory, Inventory } from '../types';
 import { IpcEvents } from '../ipc-events';
 import { Batch } from '../../main/batch/Batch';
 import { BatchFactory } from '../../main/batch/BatchFactory';
@@ -90,20 +90,20 @@ ipcMain.handle(IpcEvents.INVENTORY_FROM_COMPONENT, async (_event) => {
   }
 });
 
-ipcMain.handle(IpcEvents.INVENTORY_FOLDER, async (_event, params: IFolderInventory) => {
+ipcMain.handle(IpcEvents.INVENTORY_BATCH, async (_event, params: IBatchInventory) => {
   try {
     const factory = new BatchFactory();
     const bachAction: Batch = factory.create(params);
     const success = await bachAction.execute();
-    if (success) return { status: 'ok', message: 'Inventory folder successfully', success };
-    return { status: 'fail', message: 'Inventory folder error' };
+    if (success) return { status: 'ok', message: 'Inventory batch successfully', success };
+    return { status: 'fail', message: 'Inventory batch error' };
   } catch (e) {
     console.log('Catch an error on inventory: ', e);
     return { status: 'fail' };
   }
 });
 
-ipcMain.handle(IpcEvents.INVENTORY_ACCEPT_PRE_LOAD, async (_event, data: Partial<IFolderInventory>) => {
+ipcMain.handle(IpcEvents.INVENTORY_ACCEPT_PRE_LOAD, async (_event, data: Partial<IBatchInventory>) => {
   try {
     const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
     const inventories: Array<Partial<Inventory>> = await inventoryService.preLoadInventoriesAcceptAll(data, filter);

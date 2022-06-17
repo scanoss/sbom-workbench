@@ -1,4 +1,4 @@
-import { Inventory, InventoryAction } from '@api/types';
+import { IBatchInventory, Inventory, InventoryAction } from '@api/types';
 import { inventoryService } from '@api/services/inventory.service';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { fileService } from '@api/services/file.service';
@@ -43,12 +43,11 @@ export const restoreFile = createAsyncThunk('inventory/restore', async (files: n
 
 export const executeBatch = createAsyncThunk(
   'inventory/executeBatch',
-  async ({ path, action, data }: { path: string; action: InventoryAction; data?: any }, { dispatch }) => {
-    const response = await inventoryService.folder({
+  async ({ action, data }: IBatchInventory, { dispatch }) => {
+    const response = await inventoryService.batch({
       action,
-      folder: path,
       overwrite: false,
-      ...data,
+      data,
     });
     return response;
   }

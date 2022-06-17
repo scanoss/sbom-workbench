@@ -7,7 +7,11 @@ import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { useDispatch, useSelector } from 'react-redux';
 import { executeBatch, ignoreFile, restoreFile } from '@store/inventory-store/inventoryThunks';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
-import { rejectAll, acceptAll as acceptAllDep, restoreAll as restoreAllDep } from '@store/dependency-store/dependencyThunks';
+import {
+  rejectAll,
+  acceptAll as acceptAllDep,
+  restoreAll as restoreAllDep,
+} from '@store/dependency-store/dependencyThunks';
 
 const useContextual = () => {
   const dispatch = useDispatch();
@@ -51,14 +55,15 @@ const useContextual = () => {
     if (action !== DIALOG_ACTIONS.CANCEL) {
       const response: any = await showPreLoadInventoryDialog(node.value || '/', action === 'overwrite');
       if (response) {
+        const { notes, inventories } = response;
         dispatch(
           executeBatch({
-            path: node.value,
             action: InventoryAction.ACCEPT,
+            overwrite: action === 'overwrite',
             data: {
-              overwrite: action === 'overwrite',
-              data: response.inventories,
-              notes: response.notes,
+              path: node.value,
+              inventories,
+              notes,
             },
           })
         );
@@ -67,17 +72,17 @@ const useContextual = () => {
   };
 
   const identifyAll = async (node: any) => {
-    // TODO: state.recentUsedComponents
     const inventory = await dialogCtrl.openInventory({ usage: 'file' });
     if (inventory) {
       const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
       if (inventory && action !== DIALOG_ACTIONS.CANCEL) {
         dispatch(
           executeBatch({
-            path: node.value,
             action: InventoryAction.IDENTIFY,
+            overwrite: action === 'overwrite',
             data: {
-              data: inventory,
+              path: node.value,
+              inventory,
             },
           })
         );
@@ -90,10 +95,10 @@ const useContextual = () => {
     if (action !== DIALOG_ACTIONS.CANCEL) {
       dispatch(
         executeBatch({
-          path: node.value,
+          overwrite: action === 'overwrite',
           action: InventoryAction.IGNORE,
           data: {
-            overwrite: action === 'overwrite',
+            path: node.value,
           },
         })
       );
@@ -105,8 +110,11 @@ const useContextual = () => {
     if (action !== DIALOG_ACTIONS.CANCEL) {
       dispatch(
         executeBatch({
-          path: node.value,
           action: InventoryAction.RESTORE,
+          overwrite: false,
+          data: {
+            path: node.value,
+          },
         })
       );
     }
