@@ -4,6 +4,7 @@ import { metadataMigration0210 } from './scripts/0210';
 import { dependenciesMigration0220 } from './scripts/0220';
 import { migration0230 } from './scripts/0230';
 import { migration110 } from './scripts/110';
+import { migration120 } from './scripts/120';
 
 export class ProjectMigration extends Migration {
   private scripts: Record<string, Array<(data: string) => void>>;
@@ -19,7 +20,8 @@ export class ProjectMigration extends Migration {
       '0.21.0': [metadataMigration0210],
       '0.22.0': [dependenciesMigration0220],
       '0.23.0': [migration0230],
-      '1.1.0': [migration110], // Max version supported
+      '1.1.0': [migration110],
+      '1.2.0': [migration120], // Max version supported
     };
   }
 

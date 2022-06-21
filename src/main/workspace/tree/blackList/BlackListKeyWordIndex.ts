@@ -21,7 +21,7 @@ export class BlackListKeyWordIndex extends BlackListAbstract {
       'copying.lib',
     ]);
     this.vendorFolders = new Set(['node_modules', 'vendor']);
-    this.scanRoot = workspace.getOpenProject().getScanRoot();
+    this.scanRoot = workspace.getOpenProject()?.getScanRoot();
   }
 
   public evaluate(node: Node): boolean {
