@@ -1,15 +1,15 @@
 import React, { useContext } from 'react';
 import { fileService } from '@api/services/file.service';
 import { resultService } from '@api/services/results.service';
-import { InventoryAction } from '@api/types';
+import { InventoryAction, InventorySourceType } from '@api/types';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
-import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
+import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
 import { useDispatch, useSelector } from 'react-redux';
 import { executeBatch, ignoreFile, restoreFile } from '@store/inventory-store/inventoryThunks';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import {
-  rejectAll,
   acceptAll as acceptAllDep,
+  rejectAll,
   restoreAll as restoreAllDep,
 } from '@store/dependency-store/dependencyThunks';
 
@@ -60,8 +60,11 @@ const useContextual = () => {
           executeBatch({
             action: InventoryAction.ACCEPT,
             overwrite: action === 'overwrite',
+            source: {
+              type: InventorySourceType.PATH,
+              input: node.value,
+            },
             data: {
-              path: node.value,
               inventories,
               notes,
             },
@@ -80,8 +83,11 @@ const useContextual = () => {
           executeBatch({
             action: InventoryAction.IDENTIFY,
             overwrite: action === 'overwrite',
+            source: {
+              type: InventorySourceType.PATH,
+              input: node.value,
+            },
             data: {
-              path: node.value,
               inventory,
             },
           })
@@ -97,8 +103,9 @@ const useContextual = () => {
         executeBatch({
           overwrite: action === 'overwrite',
           action: InventoryAction.IGNORE,
-          data: {
-            path: node.value,
+          source: {
+            type: InventorySourceType.PATH,
+            input: node.value,
           },
         })
       );
@@ -112,8 +119,9 @@ const useContextual = () => {
         executeBatch({
           action: InventoryAction.RESTORE,
           overwrite: false,
-          data: {
-            path: node.value,
+          source: {
+            type: InventorySourceType.PATH,
+            input: node.value,
           },
         })
       );
@@ -126,7 +134,7 @@ const useContextual = () => {
   };
 
   const restore = async (node: any) => {
-    const file = await fileService.get({ path:node.value });
+    const file = await fileService.get({ path: node.value });
     dispatch(restoreFile([file.fileId]));
   };
 

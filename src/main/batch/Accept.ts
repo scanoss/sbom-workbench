@@ -1,4 +1,4 @@
-import { Inventory } from '../../api/types';
+import { IBatchInventory, Inventory } from '../../api/types';
 import { inventoryService } from '../services/InventoryService';
 import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { Batch } from './Batch';
@@ -9,8 +9,8 @@ export class Accept extends Batch {
 
   private note: string;
 
-  constructor(folder: string, overwrite: boolean, inventories: Partial<Array<Inventory>>, note: string) {
-    super(folder, overwrite);
+  constructor(params: IBatchInventory, inventories: Partial<Array<Inventory>>, note: string) {
+    super(params);
     this.note = note;
     this.inventories = inventories;
   }
@@ -18,7 +18,7 @@ export class Accept extends Batch {
   public async execute() {
     try {
       if (this.getOverWrite()) {
-        await new Restore(this.getFolder(), this.getOverWrite()).execute();
+        await new Restore(this.getParams()).execute();
       }
       const ids = this.getFilesToUpdateFromInventories(this.inventories);
       if (this.note) {

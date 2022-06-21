@@ -1,4 +1,4 @@
-import { ComponentSource, FileStatusType, FileUsageType, Inventory } from '../../api/types';
+import { ComponentSource, IBatchInventory, Inventory } from '../../api/types';
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { inventoryService } from '../services/InventoryService';
@@ -12,8 +12,8 @@ export class Identified extends Batch {
 
   private queryBuilder: QueryBuilder;
 
-  constructor(folder: string, params: boolean, inventory: Partial<Inventory>) {
-    super(folder, params);
+  constructor(params: IBatchInventory, inventory: Partial<Inventory>) {
+    super(params);
     this.inventory = inventory;
     const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
     this.queryBuilder = QueryBuilderCreator.create({
@@ -26,7 +26,7 @@ export class Identified extends Batch {
   public async execute() {
     try {
       if (this.getOverWrite()) {
-        await new Restore(this.getFolder(), this.getOverWrite()).execute();
+        await new Restore(this.getParams()).execute();
       }
       const ids = (await this.getFilesToProcess(this.queryBuilder, 'id')) as Array<number>;
       this.inventory.files = ids;

@@ -1,23 +1,24 @@
 import {
-  Dialog,
-  ListItem,
-  Checkbox,
-  DialogContent,
-  makeStyles,
-  ListItemIcon,
   Button,
-  Paper,
+  Checkbox,
+  Dialog,
+  DialogContent,
   FormControlLabel,
+  ListItem,
+  ListItemIcon,
+  makeStyles,
+  Paper,
   TextareaAutosize,
   Tooltip,
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import React, { useEffect, useState } from 'react';
-import { List, AutoSizer } from 'react-virtualized';
+import { AutoSizer, List } from 'react-virtualized';
 import { useSelector } from 'react-redux';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { inventoryService } from '@api/services/inventory.service';
+import { InventorySourceType } from '@api/types';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -114,7 +115,10 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
   };
 
   const init = async () => {
-    const response = await inventoryService.acceptAllPreLoadInventory({ folder, overwrite });
+    const response = await inventoryService.acceptAllPreLoadInventory({
+      source: { type: InventorySourceType.PATH, input: folder },
+      overwrite,
+    });
     const inv = response.sort((a, b) => {
       if (a.spdxid === null) return 1;
       if (b.spdxid === null) return -1;

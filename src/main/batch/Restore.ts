@@ -1,26 +1,29 @@
-import {Inventory} from '../../api/types';
-import {utilHelper} from '../helpers/UtilHelper';
-import {QueryBuilderCreator} from '../model/queryBuilder/QueryBuilderCreator';
-import {inventoryService} from '../services/InventoryService';
-import {treeService} from '../services/TreeService';
-import {workspace} from '../workspace/Workspace';
-import {Batch} from './Batch';
-import {FilterOR} from './Filter/FilterOR';
-import {FilterTrue} from './Filter/FilterTrue';
-import {GenericFilter} from './Filter/GenericFilter';
-import {NodeStatus} from "../workspace/Tree/Tree/Node";
+import { Inventory } from '../../api/types';
+import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
+import { inventoryService } from '../services/InventoryService';
+import { workspace } from '../workspace/Workspace';
+import { Batch } from './Batch';
+import { FilterOR } from './Filter/FilterOR';
+import { GenericFilter } from './Filter/GenericFilter';
+import { NodeStatus } from '../workspace/Tree/Tree/Node';
+import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
+import {treeService} from "../services/TreeService";
 
 export class Restore extends Batch {
+  private getQueryBuilder(): QueryBuilder {
+    const queryBuilderFilter = workspace.getOpenedProjects()[0].getGlobalFilter();
+    const builder = QueryBuilderCreator.create({
+      ...queryBuilderFilter,
+      path: this.getFolder(),
+    });
+    return builder;
+  }
+
   public async execute() {
     try {
       const filter = new FilterOR(new GenericFilter('identified', 1), new GenericFilter('ignored', 1));
-      const queryBuilderFilter = workspace.getOpenedProjects()[0].getGlobalFilter();
-      const builder = QueryBuilderCreator.create({
-        ...queryBuilderFilter,
-        path: this.getFolder(),
-      });
-      const ids: Array<number> = (await this.getFilesToProcess(builder, 'id', filter)) as Array<number>;
-      this.updateTree(ids,NodeStatus.PENDING);
+      const ids: Array<number> = (await this.getFilesToProcess(this.getQueryBuilder(), 'id', filter)) as Array<number>;
+      treeService.retoreStatus(ids);
       const success = await inventoryService.detach({ files: ids } as Partial<Inventory>);
       if (success) return success;
 
@@ -29,5 +32,4 @@ export class Restore extends Batch {
       return error;
     }
   }
-
 }

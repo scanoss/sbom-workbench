@@ -163,12 +163,19 @@ export enum InventoryAction {
   ACCEPT = 'ACCEPT',
 }
 
+export enum InventorySourceType {
+  PATH = 'PATH',
+  FILE = 'FILE',
+}
+
 export interface IBatchInventory {
   action: InventoryAction;
   overwrite: boolean;
-  data: {
-    path?: string;
-    files?: string[];
+  source: {
+    type: InventorySourceType ;
+    input: any;
+  };
+  data?: {
     inventory?: Partial<Inventory>;
     inventories?: Partial<Inventory[]>;
     notes?: string;
