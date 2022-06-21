@@ -1,4 +1,4 @@
-import { Inventory } from '../../../api/types';
+import { Inventory, InventoryAction, InventorySourceType } from '../../../api/types';
 import { Accept } from '../../batch/Accept';
 import { inventoryService } from '../../services/InventoryService';
 import { workspace } from '../../workspace/Workspace';
@@ -8,12 +8,23 @@ import { AutoAcceptResult } from './AutoAcceptResult';
 export class AutoAccept implements ITask<void, AutoAcceptResult> {
   public async run(): Promise<AutoAcceptResult> {
     const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
-    const inventories = await inventoryService.preLoadInventoriesAcceptAll({ folder: '/' }, filter);
+    const inventories = await inventoryService.preLoadInventoriesAcceptAll(
+      { source: { type: InventorySourceType.PATH, input: '/' } },
+      filter
+    );
     const validInventories = inventories.filter((el) => el.spdxid) as Array<Inventory>;
     const totalInventories = inventories.length;
     const componentsAccepted = validInventories.length;
     const componentsRejected = totalInventories - componentsAccepted;
-    const acceptAll = new Accept('/', false, validInventories, 'AutoAccept');
+    const acceptAll = new Accept(
+      {
+        action: InventoryAction.ACCEPT,
+        source: { type: InventorySourceType.PATH, input: '/' },
+        overwrite: false,
+      },
+      validInventories,
+      'AutoAccept'
+    );
     await acceptAll.execute();
     const autoAcceptDTO: AutoAcceptResult = {
       success: true,

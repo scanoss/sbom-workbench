@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
 import { executeBatch } from '@store/inventory-store/inventoryThunks';
-import { InventoryAction } from '@api/types';
+import { InventoryAction, InventorySourceType } from '@api/types';
 import { useDispatch } from 'react-redux';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 
@@ -9,7 +9,7 @@ const useBatch = () => {
   const dispatch = useDispatch();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const showOverwrite = (data: any[]) => data.some((e) => e.isIdentified);
+  const showOverwrite = (data: any[]) => true || data.some((e) => e.isIdentified);
 
   const showOverwriteDialog = async (): Promise<DialogResponse> => {
     return dialogCtrl.openAlertDialog(
@@ -38,8 +38,11 @@ const useBatch = () => {
           executeBatch({
             action: InventoryAction.IDENTIFY,
             overwrite: action === 'overwrite',
+            source: {
+              type: InventorySourceType.FILE,
+              input: files,
+            },
             data: {
-              files,
               inventory,
             },
           })
@@ -55,8 +58,9 @@ const useBatch = () => {
         executeBatch({
           action: InventoryAction.IGNORE,
           overwrite: action === 'overwrite',
-          data: {
-            files,
+          source: {
+            type: InventorySourceType.FILE,
+            input: files,
           },
         })
       );
