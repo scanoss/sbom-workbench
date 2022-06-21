@@ -154,11 +154,11 @@ const SearchPanel = () => {
     const menu = [
       {
         label: 'Identify all files as...',
-        click: batch.identifyAll,
+        click: () => batch.identifyAll(selected),
       },
       {
         label: 'Mark all files as original',
-        click: () => batch.ignoreAll,
+        click: () => batch.ignoreAll(selected),
       },
     ];
 
