@@ -1,13 +1,10 @@
 import sqlite3 from 'sqlite3';
 import log from 'electron-log';
-import fs from 'fs';
 import { modelProvider } from '../../services/ModelProvider';
 import { Querys } from '../../model/querys_db';
 import { utilModel } from '../../model/UtilModel';
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
 import { IpcEvents } from '../../../api/ipc-events';
-import { Indexer } from '../../modules/searchEngine/indexer/Indexer';
-import { IIndexer } from '../../modules/searchEngine/indexer/IIndexer';
 
 export async function migration110(projectPath: string): Promise<void> {
   log.info('Migration 1.1.0 In progress...');
@@ -20,7 +17,6 @@ export async function migration110(projectPath: string): Promise<void> {
   await insertResultLicense(projectPath, filesResult, result);
   const componentReliableLicense = await modelProvider.model.component.getMostReliableLicensePerComponent();
   await modelProvider.model.component.updateMostReliableLicense(componentReliableLicense);
-  await indexMigration(projectPath);
   log.info('Migration 1.1.0 finished');
   broadcastManager.get().send(IpcEvents.MIGRATION_FINISH);
 }
@@ -139,22 +135,4 @@ async function removeLicenseColumOnResult(projectPath: string) {
       reject(e);
     }
   });
-}
-
-async function indexMigration(projectPath: string) {
-  await modelProvider.init(projectPath);
-  const files = await modelProvider.model.file.getAll(null);
-  const indexer = new Indexer();
-  const data = JSON.parse(await fs.promises.readFile(`${projectPath}/metadata.json`, 'utf-8'));
-  const filesToIndex = fileAdapter(files, data.scan_root);
-  const index = indexer.index(filesToIndex);
-  await indexer.saveIndex(index, `${projectPath}/dictionary/`);
-}
-
-function fileAdapter(modelFiles: any, scanRoot: string): Array<IIndexer> {
-  const filesToIndex = [];
-  modelFiles.forEach((file: any) => {
-    if (file.filter !== 'FILTERED') filesToIndex.push({ fileId: file.id, path: `${scanRoot}${file.path}` });
-  });
-  return filesToIndex;
 }
