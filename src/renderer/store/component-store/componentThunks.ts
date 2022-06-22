@@ -16,5 +16,6 @@ export const fetchComponent = createAsyncThunk('workbench/loadComponent', async 
 
 export const fetchComponents = createAsyncThunk('workbench/loadComponents', async () => {
   const response = await workbenchController.getComponents();
+  console.log(response);
   return response;
 });
