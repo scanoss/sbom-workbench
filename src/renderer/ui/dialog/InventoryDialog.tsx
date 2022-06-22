@@ -19,7 +19,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import AddIcon from '@material-ui/icons/Add';
 import React, { useEffect, useState, useContext } from 'react';
 import { Alert, Autocomplete } from '@material-ui/lab';
-import { Inventory } from '@api/types';
+import { ComponentGroup, Inventory } from '@api/types';
 import { InventoryForm } from '@context/types';
 import { componentService } from '@api/services/component.service';
 import { licenseService } from '@api/services/license.service';
@@ -119,7 +119,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const openComponentVersionDialog = async () => {
     // FIXME: This is a hack to get the component name, should be change component dialog to use spdxid.
     const license = licenses.find((item) => item.spdxid === form.spdxid);
-
     const response = await dialogCtrl.openComponentDialog(
       { name: form.component, purl: form.purl, url: form.url, license_name: license?.name },
       'Add Version'
@@ -129,41 +128,44 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }
   };
 
-  const addCustomComponent = async (component) => {
-    const { name, version, licenses, purl, url } = component;
-    const comp = await componentService.get({ purl }, { unique: true });
-    setGlobalComponents([...components, comp]);
+  const addCustomComponent = async (component: Partial<ComponentGroup>) => {
+    // const { name, version, licenses, purl, url } = component;
+    // const comp = await componentService.get({ purl }, { unique: true });
+    setGlobalComponents([...components, component]);
 
     setLicenses([
       ...licenses,
-      { spdxid: component.licenses[0].spdxid, name: component.licenses[0].name, type: 'Catalogued' },
+      {
+        spdxid: component.versions[0].licenses[0].spdxid,
+        name: component.versions[0].licenses[0].name,
+        type: 'Catalogued',
+      },
     ]);
-
     setForm({
       ...form,
-      component: name,
-      version,
-      spdxid: licenses[0].spdxid,
-      purl,
-      url: url || '',
+      component: component.name,
+      version:component.versions[0].version,
+      spdxid: component.versions[0].licenses[0].spdxid,
+      purl: component.purl,
+      url: component.url || '',
     });
   };
 
   const addCustomComponentVersion = async (component) => {
-    const { name, version, licenses, purl, url } = component;
-    const comp = await componentService.get({ purl: component.purl}, { unique: true });
-    const nComponents = components.filter((item) => item.purl !== purl);
+   // const { name, version, licenses, purl, url } = component;
+    const comp = await componentService.get({ purl: component.purl }, { unique: true });
+    const nComponents = components.filter((item) => item.purl !== component.purl);
     setGlobalComponents([...nComponents, comp]);
-    setVersions([version, ...versions]);
+    setVersions([component.versions[0].version, ...versions]);
     // setLicenses(licenses);
 
     setForm({
       ...form,
-      component: name,
-      version,
-      spdxid: licenses[0].spdxid,
-      purl,
-      url: url || '',
+      component: component.name,
+      version:component.versions[0].version,
+      spdxid: component.versions[0].licenses[0].license.spdxid,
+      purl:component.purl,
+      url: component.url || '',
     });
   };
 
@@ -443,7 +445,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 <Select
                   name="usage"
                   fullWidth
-                  value={form?.usage || "file"}
+                  value={form?.usage || 'file'}
                   disableUnderline
                   onChange={(e) => inputHandler(e)}
                 >

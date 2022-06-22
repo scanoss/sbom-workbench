@@ -8,7 +8,7 @@ import { ISearchComponentVersion } from '../../main/task/componentCatalog/iCompo
 const { ipcRenderer } = require('electron');
 
 class ComponentService extends BaseService {
-  public async create(component: NewComponentDTO): Promise<Component> {
+  public async create(component: NewComponentDTO): Promise<Partial<ComponentGroup>> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_CREATE, component);
     return this.response(response);
   }
@@ -45,7 +45,3 @@ class ComponentService extends BaseService {
 }
 
 export const componentService = new ComponentService();
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-document.comp = componentService;
