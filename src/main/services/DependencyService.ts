@@ -59,13 +59,15 @@ class DependencyService {
         });
       }
       // Create component if it not exists in the catalog
-      if (!comp)
-        comp = await modelProvider.model.component.create({
+      if (!comp){
+        const componentId = await modelProvider.model.component.create({
           name: dependency.componentName || dependency.purl,
-          version: params.version,
+          versions: [{ version:params.version,licenseId: lic.id }],
           purl: params.purl,
-          license_id: lic.id,
+          url: null,
         });
+      comp = await modelProvider.model.component.get(componentId);
+      }
       else await modelProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
 
       // Update dependency
