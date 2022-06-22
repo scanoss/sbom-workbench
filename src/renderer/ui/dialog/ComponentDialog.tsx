@@ -50,13 +50,19 @@ interface ComponentDialogProps {
 export const ComponentDialog = (props: ComponentDialogProps) => {
   const classes = useStyles();
   const { open, onClose, onCancel, component, label } = props;
-  const [form, setForm] = useState<Partial<NewComponentDTO>>({});
+  const [form, setForm] = useState<Partial<{
+    name: string;
+    version;
+    licenseId: string;
+    purl: string;
+    url: string;
+  }>>({});
   const dialogCtrl = useContext<any>(DialogContext);
   const [licenses, setLicenses] = useState<any[]>();
   const [readOnly, setReadOnly] = useState<boolean>();
 
   const setDefaults = () => {
-    setForm(component);
+    // setForm(component);
     setReadOnly(!!component.name);
   };
 
@@ -68,11 +74,12 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   };
 
   const getLicense = () => {
-    if (!form.license_id && form.license_name) {
-      const license = licenses.find((l) => l.name === form.license_name);
+    if (!form.licenseId) {
+      // && form.license_name
+      /*      const license = licenses.find((l) => l.name === form.license_name);
       if (license) {
         setForm({ ...form, license_id: license.id });
-      }
+      } */
     }
   };
 
@@ -92,8 +99,24 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   const handleClose = async (e) => {
     e.preventDefault();
     try {
-      const response = await componentService.create(form);
-      onClose({ action: DIALOG_ACTIONS.OK, data: response });
+      const { name, version, licenseId, purl, url } = form;
+
+      const dto: NewComponentDTO = {
+        name,
+        purl,
+        url,
+        versions: [
+          {
+            version,
+            licenseId,
+          },
+        ],
+      };
+
+      console.log(dto);
+
+      // const response = await componentService.create(dto);
+      // onClose({ action: DIALOG_ACTIONS.OK, data: response });
     } catch (error: any) {
       console.log('error', error);
       await dialogCtrl.openConfirmDialog(error.message, { label: 'Accept', role: 'accept' }, true);
@@ -104,13 +127,13 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     const response = await dialogCtrl.openLicenseCreate();
     if (response && response.action === ResponseStatus.OK) {
       setLicenses([...licenses, response.data]);
-      setForm({ ...form, license_id: response.data.id, license_name: response.data.name });
+      setForm({ ...form, licenseId: response.data.id });
     }
   };
 
   const isValid = () => {
-    const { name, version, license_id, purl } = form;
-    return name && version && license_id && purl;
+    const { name, version, licenseId, purl } = form;
+    return name && version && licenseId && purl;
   };
 
   return (
@@ -172,7 +195,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               <Autocomplete
                 fullWidth
                 options={licenses || []}
-                value={{ id: form?.license_id, name: form?.license_name }}
+                // value={{ id: form?.licenseId }}
                 getOptionSelected={(option, value) => option.id === value.id}
                 getOptionLabel={(option) => option.name || ''}
                 disableClearable
@@ -183,7 +206,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                     InputProps={{ ...params.InputProps, disableUnderline: true, className: 'autocomplete-option' }}
                   />
                 )}
-                onChange={(e, { id, name }) => setForm({ ...form, license_id: id, license_name: name })}
+                onChange={(e, { id, name }) => setForm({ ...form, licenseId: id })}
               />
             </Paper>
           </div>

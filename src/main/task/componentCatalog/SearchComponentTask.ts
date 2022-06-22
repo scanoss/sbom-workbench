@@ -1,4 +1,3 @@
-import * as util from 'util';
 import { ITask } from '../Task';
 import { ISearchComponent } from './iComponentCatalog/ISearchComponent';
 import { IComponentResult } from './iComponentCatalog/IComponentResult';
@@ -14,9 +13,10 @@ export class SearchComponentTask implements ITask<ISearchComponent, Array<ICompo
 
     const pSearchComponents = new Promise((resolve, reject) => {
       client.searchComponents(req, (err, resp) => {
-        if (err) reject(err)
-        else resolve(resp)
-      })});
+        if (err) reject(err);
+        else resolve(resp);
+      });
+    });
 
     const resp = (await pSearchComponents) as ComponentMessages.CompSearchResponse;
     const results = CompSearchResponseAdapter.convert(resp);

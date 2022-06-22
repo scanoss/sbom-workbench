@@ -1,20 +1,14 @@
 import { IpcEvents } from '../ipc-events';
-import {
-  Component,
-  ComponentGroup,
-  NewComponentDTO,
-  IWorkbenchFilter,
-  IWorkbenchFilterParams,
-} from '../types';
+import { Component, ComponentGroup, NewComponentDTO, IWorkbenchFilter, IWorkbenchFilterParams } from '../types';
 import { BaseService } from './base.service';
 import { ISearchComponent } from '../../main/task/componentCatalog/iComponentCatalog/ISearchComponent';
 import { IComponentResult } from '../../main/task/componentCatalog/iComponentCatalog/IComponentResult';
-import { ISearchComponentVersion } from "../../main/task/componentCatalog/iComponentCatalog/ISearchComponentVersion";
+import { ISearchComponentVersion } from '../../main/task/componentCatalog/iComponentCatalog/ISearchComponentVersion';
 
 const { ipcRenderer } = require('electron');
 
 class ComponentService extends BaseService {
-  public async create(component: Partial<NewComponentDTO>): Promise<Component> {
+  public async create(component: NewComponentDTO): Promise<Component> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_CREATE, component);
     return this.response(response);
   }
@@ -23,7 +17,6 @@ class ComponentService extends BaseService {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_DELETE, component);
     return response;
   }
-
 
   public async getFiles(component: Partial<Component>, params: IWorkbenchFilter = null): Promise<any> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_FILES, component, params);
@@ -41,19 +34,18 @@ class ComponentService extends BaseService {
   }
 
   public async getGlobalComponents(params: ISearchComponent): Promise<Array<IComponentResult>> {
-    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_GLOBAL_COMPONENTS,params);
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_GLOBAL_COMPONENTS, params);
     return this.response(response);
   }
 
   public async getGlobalComponentVersion(params: ISearchComponentVersion): Promise<IComponentResult> {
-    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_GLOBAL_COMPONENT_VERSION,params);
+    const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_GLOBAL_COMPONENT_VERSION, params);
     return this.response(response);
   }
-
-
 }
 
 export const componentService = new ComponentService();
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 document.comp = componentService;
-
