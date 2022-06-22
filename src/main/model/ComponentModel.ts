@@ -84,7 +84,7 @@ export class ComponentModel extends Model {
             async function (this: any, err: any) {
               db.close();
               if (err) throw err;
-              if (this.lastID === 0) reject(new Error('ComponentCatalog already exists'));
+              if (this.lastID === 0) reject(new Error('Component already exists'));
               await self.license.licenseAttach({
                 license_id: component.license_id,
                 compid: this.lastID,

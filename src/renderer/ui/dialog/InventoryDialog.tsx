@@ -17,6 +17,7 @@ import {
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import AddIcon from '@material-ui/icons/Add';
+import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import React, { useEffect, useState, useContext } from 'react';
 import { Alert, Autocomplete } from '@material-ui/lab';
 import { Inventory } from '@api/types';
@@ -111,6 +112,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const openComponentDialog = async () => {
     const response = await dialogCtrl.openComponentDialog();
+    if (response && response.action === ResponseStatus.OK) {
+      addCustomComponent(response.data);
+    }
+  };
+
+  const openComponentSearcherDialog = async () => {
+    const response = await dialogCtrl.openComponentSearcherDialog('test');
     if (response && response.action === ResponseStatus.OK) {
       addCustomComponent(response.data);
     }
@@ -273,7 +281,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       open={open}
       onClose={onCancel}
     >
-      <span className="dialog-title">{!form.id ? 'Identify ComponentCatalog' : 'Edit Identification'}</span>
+      <span className="dialog-title">{!form.id ? 'Identify Component' : 'Edit Identification'}</span>
       <form onSubmit={onSubmit}>
         <div className="dialog-content">
           {isFilterActive && (
@@ -288,6 +296,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 <Tooltip title="Add new component">
                   <IconButton color="inherit" size="small" onClick={openComponentDialog}>
                     <AddIcon fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
+
+                <Tooltip title="Search component online">
+                  <IconButton color="inherit" size="small" onClick={openComponentSearcherDialog}>
+                    <SearchOutlinedIcon fontSize="inherit" />
                   </IconButton>
                 </Tooltip>
               </div>
