@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import log from 'electron-log';
-import { Component, ComponentGroup, IWorkbenchFilterParams } from '../types';
+import { Component, ComponentGroup, IWorkbenchFilterParams, NewComponentDTO } from '../types';
 import { IpcEvents } from '../ipc-events';
 import { Response } from '../Response';
 import { componentService } from '../../main/services/ComponentService';
@@ -9,7 +9,7 @@ import { SearchComponentTask } from '../../main/task/componentCatalog/SearchComp
 import { ISearchComponentVersion } from '../../main/task/componentCatalog/iComponentCatalog/ISearchComponentVersion';
 import { SearchComponentVersionTask } from '../../main/task/componentCatalog/SearchComponentVersionTask';
 
-ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (_event, component: Component) => {
+ipcMain.handle(IpcEvents.COMPONENT_CREATE, async (_event, component: NewComponentDTO) => {
   try {
     const newComp = await componentService.create(component);
     return Response.ok({ message: 'ComponentCatalog created successfully', data: newComp });

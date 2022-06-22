@@ -1,5 +1,5 @@
 import log from 'electron-log';
-import { Component, ComponentGroup, IWorkbenchFilterParams, License } from '../../api/types';
+import { Component, ComponentGroup, IWorkbenchFilterParams, License, NewComponentDTO } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
@@ -153,7 +153,7 @@ class ComponentService {
     }
   }
 
-  public async create(newComp: Component): Promise<Component> {
+  public async create(newComp: NewComponentDTO): Promise<Component> { // create(newComp: NewComponentDTO)
     try {
       const result = await modelProvider.model.component.create(newComp);
       return result;
