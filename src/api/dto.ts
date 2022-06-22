@@ -1,4 +1,4 @@
-import { Dependency } from "@api/types";
+import { Dependency } from '@api/types';
 
 export interface NewDependencyDTO {
   dependencyId?: number;
@@ -22,27 +22,27 @@ export interface AcceptAllDependeciesDTO {
   path?: string;
 }
 
-export interface GetFileDTO{
+export interface GetFileDTO {
   path?: string;
   id?: number;
 }
 
-export interface FileDTO{
+export interface FileDTO {
   fileId: number;
   path: string;
   type: string;
   status: string;
 }
 
-export interface LicenseDTO{
-    id: number;
-    name: string;
-    spdxid:string;
-    url: string;
-    official: number;
+export interface LicenseDTO {
+  id: number;
+  name: string;
+  spdxid: string;
+  url: string;
+  official: number;
 }
 
-export interface NewLicenseDTO{
+export interface NewLicenseDTO {
   name: string;
   fulltext: string;
   url?: string;
