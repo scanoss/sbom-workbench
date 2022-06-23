@@ -1,17 +1,8 @@
-import {
-  Dialog,
-  DialogActions,
-  Button,
-  makeStyles,
-  DialogContentText,
-  Card,
-  DialogContent,
-  Tooltip,
-} from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Dialog, DialogActions, Button, makeStyles, DialogContentText, DialogContent } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
-import { DIALOG_ACTIONS, DialogResponse } from '../../context/types';
+import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
