@@ -153,8 +153,8 @@ export class LicenseModel extends Model {
   }
 
   // ATTACH LICENSE TO A COMPONENT VERSION
-  public licenseAttach(data: any) {
-    return new Promise(async (resolve, reject) => {
+  public async licenseAttach(data: any): Promise<boolean>{
+    return new Promise<boolean>(async (resolve, reject) => {
       try {
         if (data.license_id && data.compid) {
           const success = await this.attachLicensebyId(data);
@@ -193,16 +193,15 @@ export class LicenseModel extends Model {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        const stmt = db.prepare(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID);
-        stmt.run(data.compid, data.license_id, (err: any) => {
-          if (err) reject(new Error('License was not attached'));
-          db.close();
-          stmt.finalize();
-          resolve(true);
+        db.serialize(()=> {
+          db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
+            if (err) throw err;
+            db.close();
+            resolve(true);
+          });
         });
       } catch (err) {
         log.error(err);
-        reject(err);
       }
     });
   }

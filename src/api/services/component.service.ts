@@ -4,6 +4,7 @@ import { BaseService } from './base.service';
 import { ISearchComponent } from '../../main/task/componentCatalog/iComponentCatalog/ISearchComponent';
 import { IComponentResult } from '../../main/task/componentCatalog/iComponentCatalog/IComponentResult';
 import { ISearchComponentVersion } from '../../main/task/componentCatalog/iComponentCatalog/ISearchComponentVersion';
+import {IComponentVersionResult} from "../../main/task/componentCatalog/iComponentCatalog/IComponentVersionResult";
 
 const { ipcRenderer } = require('electron');
 
@@ -38,7 +39,7 @@ class ComponentService extends BaseService {
     return this.response(response);
   }
 
-  public async getGlobalComponentVersion(params: ISearchComponentVersion): Promise<IComponentResult> {
+  public async getGlobalComponentVersion(params: ISearchComponentVersion): Promise<IComponentVersionResult> {
     const response = await ipcRenderer.invoke(IpcEvents.COMPONENT_GET_GLOBAL_COMPONENT_VERSION, params);
     return this.response(response);
   }
