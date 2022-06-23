@@ -16,12 +16,12 @@ import React, { useContext, useEffect, useState } from 'react';
 import SearchIcon from '@material-ui/icons/Search';
 import AddIcon from '@material-ui/icons/Add';
 import { Autocomplete } from '@material-ui/lab';
-import { Dependency } from '../../../api/types';
-import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
-import { ResponseStatus } from '../../../api/Response';
-import { licenseService } from '../../../api/services/license.service';
-import { DialogContext } from '../../context/DialogProvider';
-import { NewDependencyDTO } from '../../../api/dto';
+import { Dependency } from '@api/types';
+import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
+import { ResponseStatus } from '@api/Response';
+import { licenseService } from '@api/services/license.service';
+import { DialogContext } from '@context/DialogProvider';
+import { NewDependencyDTO } from '@api/dto';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -75,12 +75,14 @@ const DependencyDialog = (props: DependencyDialogProps) => {
 
   const init = async () => {
     if (open) {
-      const data  = await licenseService.getAll();
+      const data = await licenseService.getAll();
       setLicenses(data);
     }
   };
 
-  useEffect(() => init(), [open]);
+  useEffect(() => {
+    init();
+  }, [open]);
   useEffect(() => setDefaults(), [dependency]);
 
   const inputHandler = (name, value) => {

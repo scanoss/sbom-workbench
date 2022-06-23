@@ -13,6 +13,7 @@ import { AlertDialog } from '../ui/dialog/AlertDialog';
 import { PreLoadInventoryDialog } from '../ui/dialog/PreLoadInventoryDialog';
 import { ProgressDialog } from '../ui/dialog/ProgressDialog';
 import DependencyDialog from '../ui/dialog/DependencyDialog';
+import ComponentSearcherDialog from '../ui/dialog/ComponentSearcherDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
@@ -22,6 +23,7 @@ export interface IDialogContext {
   openLicenseCreate: (save?: boolean) => Promise<DialogResponse>;
   openSettings: () => Promise<DialogResponse>;
   openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
+  openComponentSearcherDialog: (query: string) => Promise<DialogResponse>;
   openPreLoadInventoryDialog: (folder: string, overwrite: boolean) => Promise<boolean>;
   createProgressDialog: (message: ReactNode) => Promise<LoaderController>;
   openDependencyDialog: (dependency: Dependency) => Promise<DialogResponse>;
@@ -197,7 +199,7 @@ export const DialogProvider: React.FC = ({ children }) => {
     onClose?: (response: DialogResponse) => void;
   }>({ open: false, component: {} });
 
-  const openComponentDialog = (component: Partial<NewComponentDTO> = {}, label = 'Create ComponentCatalog') => {
+  const openComponentDialog = (component: Partial<NewComponentDTO> = {}, label = 'Create Component') => {
     return new Promise<DialogResponse>((resolve) => {
       setComponentDialog({
         open: true,
@@ -256,6 +258,30 @@ export const DialogProvider: React.FC = ({ children }) => {
     });
   };
 
+  const [componentSearcherDialog, setComponentSearcherDialog] = useState<{
+    open: boolean;
+    query: string;
+    onClose?: (response: DialogResponse) => void;
+    onCancel?: () => void;
+  }>({ open: false, query: null });
+
+  const openComponentSearcherDialog = (query: string): Promise<DialogResponse> => {
+    return new Promise<DialogResponse>((resolve) => {
+      setComponentSearcherDialog({
+        query,
+        open: true,
+        onCancel: () => {
+          setComponentSearcherDialog((dialog) => ({ ...dialog, open: false }));
+          resolve({ action: DIALOG_ACTIONS.CANCEL });
+        },
+        onClose: (response: DialogResponse) => {
+          setComponentSearcherDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(response);
+        },
+      });
+    });
+  };
+
   const handleOpenSettings = () => {
     openSettings();
   };
@@ -280,6 +306,7 @@ export const DialogProvider: React.FC = ({ children }) => {
         openAlertDialog,
         openLicenseCreate,
         openComponentDialog,
+        openComponentSearcherDialog,
         openSettings,
         openPreLoadInventoryDialog,
         createProgressDialog,
@@ -351,6 +378,13 @@ export const DialogProvider: React.FC = ({ children }) => {
         dependency={dependencyDialog.dependency}
         onCancel={() => dependencyDialog.onCancel && dependencyDialog.onCancel()}
         onClose={(dep) => dependencyDialog.onClose && dependencyDialog.onClose(dep)}
+      />
+
+      <ComponentSearcherDialog
+        open={componentSearcherDialog.open}
+        query={componentSearcherDialog.query}
+        onCancel={() => componentSearcherDialog.onCancel && componentSearcherDialog.onCancel()}
+        onClose={(dep) => componentSearcherDialog.onClose && componentSearcherDialog.onClose(dep)}
       />
     </DialogContext.Provider>
   );
