@@ -153,17 +153,21 @@ class ComponentService {
     }
   }
 
-  public async create(newComp: NewComponentDTO): Promise<Component> { // create(newComp: NewComponentDTO)
-    try {
-      const result = await modelProvider.model.component.create(newComp);
-      return result;
-    } catch (error: any) {
-      log.error(error);
-      return error;
+  public async create(newComp: NewComponentDTO): Promise<Partial<ComponentGroup>> {
+    for (let i = 0; i < newComp.versions.length; i += 1) {
+      const comp = {
+        ...newComp,
+        versions: [{ version: newComp.versions[i].version, licenseId: newComp.versions[i].version }],
+      };
+      await modelProvider.model.component.create(comp);
     }
+    const component = await modelProvider.model.component.getAll(QueryBuilderCreator.create({ purl: newComp.purl }));
+    const compPurl: any = this.groupComponentsByPurl(component);
+    const response = await this.mergeComponentByPurl(compPurl);
+    return response[0];
   }
 
-  public async attachLicense(component: Component, license: License): Promise<boolean> {
+  /*  public async attachLicense(component: Component, license: License): Promise<boolean> {
     try {
       const link = { license_id: license.id, compid: component.compid };
       await modelProvider.model.license.licenseAttach(link);
@@ -172,7 +176,7 @@ class ComponentService {
       log.error(error);
       return false;
     }
-  }
+  } */
 }
 
 export const componentService = new ComponentService();

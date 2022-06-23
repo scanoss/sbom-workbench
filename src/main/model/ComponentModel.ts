@@ -2,7 +2,7 @@
 import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Model } from './Model';
-import { Component } from '../../api/types';
+import {Component, NewComponentDTO} from '../../api/types';
 import { LicenseModel } from './LicenseModel';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { componentHelper } from '../helpers/ComponentHelper';
@@ -67,30 +67,28 @@ export class ComponentModel extends Model {
   }
 
   // CREATE COMPONENT
-  create(component: any) {
+ public async create(component: NewComponentDTO):Promise<number>{
     const self = this;
-    return new Promise<Component>(async (resolve, reject) => {
+    return new Promise<number>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
           db.run(
-            query.COMPDB_SQL_COMP_VERSION_INSERT,
+            query.COMPDB_SQL_COMP_VERSION_CREATE,
             component.name,
-            component.version,
+            component.versions[0].version,
             component.description ? component.description : 'n/a',
             component.url ? component.url : null,
             component.purl,
             'manual',
             async function (this: any, err: any) {
               db.close();
-              if (err) throw err;
-              if (this.lastID === 0) reject(new Error('Component already exists'));
+              if (err) reject(new Error('Component already exists'));
               await self.license.licenseAttach({
-                license_id: component.license_id,
+                license_id: component.versions[0].licenseId,
                 compid: this.lastID,
               });
-              const newComp = await self.get(this.lastID);
-              resolve(newComp);
+              resolve(this.lastID);
             }
           );
         });

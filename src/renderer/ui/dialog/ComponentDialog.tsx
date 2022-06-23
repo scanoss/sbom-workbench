@@ -50,13 +50,15 @@ interface ComponentDialogProps {
 export const ComponentDialog = (props: ComponentDialogProps) => {
   const classes = useStyles();
   const { open, onClose, onCancel, component, label } = props;
-  const [form, setForm] = useState<Partial<{
-    name: string;
-    version;
-    licenseId: string;
-    purl: string;
-    url: string;
-  }>>({});
+  const [form, setForm] = useState<
+    Partial<{
+      name: string;
+      version;
+      licenseId: string;
+      purl: string;
+      url: string;
+    }>
+  >({});
   const dialogCtrl = useContext<any>(DialogContext);
   const [licenses, setLicenses] = useState<any[]>();
   const [readOnly, setReadOnly] = useState<boolean>();
@@ -100,7 +102,6 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     e.preventDefault();
     try {
       const { name, version, licenseId, purl, url } = form;
-
       const dto: NewComponentDTO = {
         name,
         purl,
@@ -113,10 +114,9 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
         ],
       };
 
-      console.log(dto);
-
-      // const response = await componentService.create(dto);
-      // onClose({ action: DIALOG_ACTIONS.OK, data: response });
+      const response = await componentService.create(dto);
+      console.log(response);
+      onClose({ action: DIALOG_ACTIONS.OK, data: response });
     } catch (error: any) {
       console.log('error', error);
       await dialogCtrl.openConfirmDialog(error.message, { label: 'Accept', role: 'accept' }, true);
