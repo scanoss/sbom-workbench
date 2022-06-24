@@ -4,7 +4,7 @@ import { BaseService } from './base.service';
 import { ISearchComponent } from '../../main/task/componentCatalog/iComponentCatalog/ISearchComponent';
 import { IComponentResult } from '../../main/task/componentCatalog/iComponentCatalog/IComponentResult';
 import { ISearchComponentVersion } from '../../main/task/componentCatalog/iComponentCatalog/ISearchComponentVersion';
-import {IComponentVersionResult} from "../../main/task/componentCatalog/iComponentCatalog/IComponentVersionResult";
+import { IComponentVersionResult } from '../../main/task/componentCatalog/iComponentCatalog/IComponentVersionResult';
 
 const { ipcRenderer } = require('electron');
 

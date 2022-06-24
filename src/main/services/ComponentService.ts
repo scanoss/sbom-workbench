@@ -155,13 +155,18 @@ class ComponentService {
 
   public async create(newComp: NewComponentDTO): Promise<Partial<ComponentGroup>> {
     const promises = newComp.versions.map((v) =>
-      modelProvider.model.component.create({ ...newComp, versions: [{ version: v.version, licenseId: v.licenseId }] })
+      modelProvider.model.component.create({
+        ...newComp,
+        versions: [{ version: v.version, licenseId: v.licenseId ? v.licenseId : null }],
+      })
     );
     const results = await Promise.all(promises.map((p) => p.catch((e) => e)));
     const validComponents = results.filter((result) => !(result instanceof Error));
     if (results.length - validComponents.length === newComp.versions.length)
       throw new Error('Component already exists');
-    const licenseAttachPromises = validComponents.map((p) => modelProvider.model.license.licenseAttach(p));
+    // Get those versions what have licenses attached
+    const componentLicense = validComponents.filter((p) => p.license_id !== '' && p.license_id !== null);
+    const licenseAttachPromises = componentLicense.map((cl) => modelProvider.model.license.licenseAttach(cl));
     await Promise.all(licenseAttachPromises);
     const component = await modelProvider.model.component.getAll(QueryBuilderCreator.create({ purl: newComp.purl }));
     const compPurl: any = this.groupComponentsByPurl(component);
@@ -171,3 +176,5 @@ class ComponentService {
 }
 
 export const componentService = new ComponentService();
+
+
