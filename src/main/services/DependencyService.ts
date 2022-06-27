@@ -66,6 +66,7 @@ class DependencyService {
           purl: params.purl,
           url: null,
         });
+        await modelProvider.model.license.licenseAttach({ compid:componentId , license_id: lic.id });
       comp = await modelProvider.model.component.get(componentId);
       }
       else await modelProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
@@ -237,7 +238,7 @@ class DependencyService {
   public async acceptAllByPath(path: string): Promise<Array<Dependency>> {
     try {
       let dependencies = await this.getAll({ path });
-      dependencies = dependencies.filter((d) => d.status === FileStatusType.PENDING && d.valid == true);
+      dependencies = dependencies.filter((d) => d.status === FileStatusType.PENDING && d.valid === true);
       const response = [];
       for (const dep of dependencies) {
         const d = await this.accept({

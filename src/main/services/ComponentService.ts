@@ -154,29 +154,27 @@ class ComponentService {
   }
 
   public async create(newComp: NewComponentDTO): Promise<Partial<ComponentGroup>> {
-    for (let i = 0; i < newComp.versions.length; i += 1) {
-      const comp = {
+    const promises = newComp.versions.map((v) =>
+      modelProvider.model.component.create({
         ...newComp,
-        versions: [{ version: newComp.versions[i].version, licenseId: newComp.versions[i].version }],
-      };
-      await modelProvider.model.component.create(comp);
-    }
+        versions: [{ version: v.version, licenseId: v.licenseId ? v.licenseId : null }],
+      })
+    );
+    const results = await Promise.all(promises.map((p) => p.catch((e) => e)));
+    const validComponents = results.filter((result) => !(result instanceof Error));
+    if (results.length - validComponents.length === newComp.versions.length)
+      throw new Error('Component already exists');
+    // Get those versions what have licenses attached
+    const componentLicense = validComponents.filter((p) => p.license_id !== '' && p.license_id !== null);
+    const licenseAttachPromises = componentLicense.map((cl) => modelProvider.model.license.licenseAttach(cl));
+    await Promise.all(licenseAttachPromises);
     const component = await modelProvider.model.component.getAll(QueryBuilderCreator.create({ purl: newComp.purl }));
     const compPurl: any = this.groupComponentsByPurl(component);
     const response = await this.mergeComponentByPurl(compPurl);
     return response[0];
   }
-
-  /*  public async attachLicense(component: Component, license: License): Promise<boolean> {
-    try {
-      const link = { license_id: license.id, compid: component.compid };
-      await modelProvider.model.license.licenseAttach(link);
-      return true;
-    } catch (error: any) {
-      log.error(error);
-      return false;
-    }
-  } */
 }
 
 export const componentService = new ComponentService();
+
+
