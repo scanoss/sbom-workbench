@@ -4,6 +4,9 @@ import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { componentService } from '@api/services/component.service';
 import { DataGrid } from '@material-ui/data-grid';
 import useApi from '@hooks/useApi';
+import { importGlobalComponent } from '@store/component-store/componentThunks';
+import { useDispatch } from 'react-redux';
+import { DialogContext } from "@context/DialogProvider";
 import { IComponentResult } from '../../../main/task/componentCatalog/iComponentCatalog/IComponentResult';
 
 const useStyles = makeStyles((theme) => ({
@@ -35,9 +38,10 @@ interface ComponentSearcherDialogProps {
 
 const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const { open, query, onClose, onCancel } = props;
   const { data, error, loading, execute } = useApi<IComponentResult[]>();
-
+  const dialogCtrl = useContext<any>(DialogContext);
   const [results, setResults] = React.useState<any[]>([]);
   const [selected, setSelected] = React.useState<any[]>([]);
   const [queryTerm, setQueryTerm] = useState<string>('');
@@ -53,12 +57,16 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
 
   const handleClose = async (e) => {
     e.preventDefault();
-    // const compSelected = results.find((el) =>  );
-
-
     try {
-      console.log('handleClose');
+      // Takes the selected component
+      const componentSelected: IComponentResult = results.find((el) => el.id === selected[0]);
+      // TODO: see https://github.com/reduxjs/redux-toolkit/issues/1589
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const response = await dispatch(importGlobalComponent(componentSelected)).unwrap();
+      onClose({ action: DIALOG_ACTIONS.OK, data: response });
     } catch (error: any) {
+      await dialogCtrl.openConfirmDialog(error.message, { label: 'Accept', role: 'accept' }, true);
       console.log('error', error);
     }
   };
@@ -92,7 +100,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                   placeholder="Search"
                   onChange={(e) => setQueryTerm(e.target.value)}
                 />
-                {loading && <CircularProgress size={18} className="mr-2" /> }
+                {loading && <CircularProgress size={18} className="mr-2" />}
               </Paper>
 
               <Button disabled={loading} type="submit" variant="outlined" color="primary">

@@ -2,11 +2,11 @@
 import log from 'electron-log';
 import { Querys } from './querys_db';
 import { Model } from './Model';
-import {Component, NewComponentDTO} from '../../api/types';
+import { Component, NewComponentDTO } from '../../api/types';
 import { LicenseModel } from './LicenseModel';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { componentHelper } from '../helpers/ComponentHelper';
-import {IComponentLicenseReliable} from "./interfaces/component/IComponentLicenseReliable";
+import { IComponentLicenseReliable } from './interfaces/component/IComponentLicenseReliable';
 
 const query = new Querys();
 
@@ -67,9 +67,9 @@ export class ComponentModel extends Model {
   }
 
   // CREATE COMPONENT
- public async create(component: NewComponentDTO):Promise<number>{
+  public async create(component: NewComponentDTO): Promise<any> {
     const self = this;
-    return new Promise<number>(async (resolve, reject) => {
+    return new Promise<any>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
@@ -81,14 +81,10 @@ export class ComponentModel extends Model {
             component.url ? component.url : null,
             component.purl,
             'manual',
-            async function (this: any, err: any) {
+             function (this: any, err: any) {
               db.close();
               if (err) reject(new Error('Component already exists'));
-              await self.license.licenseAttach({
-                license_id: component.versions[0].licenseId,
-                compid: this.lastID,
-              });
-              resolve(this.lastID);
+              resolve({ compid: this.lastID, license_id: component.versions[0].licenseId });
             }
           );
         });
@@ -425,7 +421,7 @@ export class ComponentModel extends Model {
     });
   }
 
-  public getMostReliableLicensePerComponent():Promise<Array<IComponentLicenseReliable>> {
+  public getMostReliableLicensePerComponent(): Promise<Array<IComponentLicenseReliable>> {
     return new Promise<Array<IComponentLicenseReliable>>(async (resolve, reject) => {
       try {
         const db = await this.openDb();
