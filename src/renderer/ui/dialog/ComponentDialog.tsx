@@ -64,7 +64,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   const [readOnly, setReadOnly] = useState<boolean>();
 
   const setDefaults = () => {
-    // setForm(component);
+    setForm(component);
     setReadOnly(!!component.name);
   };
 
@@ -75,21 +75,21 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     }
   };
 
-  const getLicense = () => {
+/*  const getLicense = () => {
     if (!form.licenseId) {
       // && form.license_name
-      /*      const license = licenses.find((l) => l.name === form.license_name);
+      /!*      const license = licenses.find((l) => l.name === form.license_name);
       if (license) {
         setForm({ ...form, license_id: license.id });
-      } */
+      } *!/
     }
-  };
+  };*/
 
   useEffect(() => {
     fetchData();
   }, [open]);
   useEffect(setDefaults, [component]);
-  useEffect(getLicense, [licenses]);
+  // useEffect(getLicense, [licenses]);
 
   const inputHandler = (name, value) => {
     setForm({
@@ -115,8 +115,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
       };
 
       const response = await componentService.create(dto);
-      console.log(response);
-      onClose({ action: DIALOG_ACTIONS.OK, data: response });
+      onClose({ action: DIALOG_ACTIONS.OK, data: { component: response, created: dto } });
     } catch (error: any) {
       console.log('error', error);
       await dialogCtrl.openConfirmDialog(error.message, { label: 'Accept', role: 'accept' }, true);

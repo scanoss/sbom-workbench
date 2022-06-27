@@ -157,7 +157,7 @@ class ComponentService {
     for (let i = 0; i < newComp.versions.length; i += 1) {
       const comp = {
         ...newComp,
-        versions: [{ version: newComp.versions[i].version, licenseId: newComp.versions[i].version }],
+        versions: [{ version: newComp.versions[i].version, licenseId: newComp.versions[i].licenseId }],
       };
       await modelProvider.model.component.create(comp);
     }
