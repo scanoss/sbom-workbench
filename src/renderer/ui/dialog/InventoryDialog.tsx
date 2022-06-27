@@ -136,9 +136,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }
   };
 
-  const addCustomComponent = async (component: Partial<ComponentGroup>) => {
-    // const { name, version, licenses, purl, url } = component;
-    // const comp = await componentService.get({ purl }, { unique: true });
+  const addCustomComponent = async ({ component, created }) => {
     setGlobalComponents([...components, component]);
 
     setLicenses([
@@ -149,31 +147,29 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         type: 'Catalogued',
       },
     ]);
+
     setForm({
       ...form,
       component: component.name,
-      version:component.versions[0].version,
-      spdxid: component.versions[0].licenses[0].spdxid,
+      version: component.versions[0].version,
+      spdxid: component.versions[0].licenseId,
       purl: component.purl,
       url: component.url || '',
     });
   };
 
-  const addCustomComponentVersion = async (component) => {
-   // const { name, version, licenses, purl, url } = component;
-    const comp = await componentService.get({ purl: component.purl }, { unique: true });
+  const addCustomComponentVersion = async ({ component, created }) => {
     const nComponents = components.filter((item) => item.purl !== component.purl);
-    setGlobalComponents([...nComponents, comp]);
-    setVersions([component.versions[0].version, ...versions]);
-    // setLicenses(licenses);
+    setGlobalComponents([...nComponents, component]);
+    setVersions([created.versions[0].version, ...versions]);
 
     setForm({
       ...form,
-      component: component.name,
-      version:component.versions[0].version,
-      spdxid: component.versions[0].licenses[0].license.spdxid,
-      purl:component.purl,
-      url: component.url || '',
+      component: created.name,
+      version: created.versions[0].version,
+      spdxid: created.versions[0].licenseId,
+      purl: created.purl,
+      url: created.url || '',
     });
   };
 
