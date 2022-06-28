@@ -61,11 +61,13 @@ export const importGlobalComponent = createAsyncThunk(
     newLicenses.forEach(function (nl) {
       lic[nl.spdxid] = nl;
     });
-    const versions = component.versions.flatMap((v) =>
-      v.licenses.map((l) => {
-        return { version: v.version, licenseId: lic[l.spdxId].id };
-      })
-    );
+    const versions = component.versions.flatMap((v) => {
+      const licenseVersion = { version: v.version, licenses: [] };
+      v.licenses.forEach((l) => {
+        licenseVersion.licenses.push(lic[l.spdxId].id);
+      });
+      return licenseVersion;
+    });
     const response = await componentService.create({
       name: component.component,
       versions,

@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import log from 'electron-log';
+import util from 'util';
 import { Querys } from './querys_db';
 import { Model } from './Model';
-import { Component, NewComponentDTO } from '../../api/types';
+import { Component } from '../../api/types';
 import { LicenseModel } from './LicenseModel';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { IComponentLicenseReliable } from './interfaces/component/IComponentLicenseReliable';
+import { INewComponent } from './interfaces/component/INewComponent';
 
 const query = new Querys();
 
@@ -67,32 +69,30 @@ export class ComponentModel extends Model {
   }
 
   // CREATE COMPONENT
-  public async create(component: NewComponentDTO): Promise<any> {
-    const self = this;
-    return new Promise<any>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(() => {
-          db.run(
-            query.COMPDB_SQL_COMP_VERSION_CREATE,
-            component.name,
-            component.versions[0].version,
-            component.description ? component.description : 'n/a',
-            component.url ? component.url : null,
-            component.purl,
-            'manual',
-             function (this: any, err: any) {
-              db.close();
-              if (err) reject(new Error('Component already exists'));
-              resolve({ compid: this.lastID, license_id: component.versions[0].licenseId });
-            }
-          );
-        });
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
+  public async create(component: INewComponent): Promise<number> {
+    const db = await this.openDb();
+    const call = util.promisify((callback) => {
+      db.run(
+        query.COMPDB_SQL_COMP_VERSION_CREATE,
+        component.name,
+        component.version,
+        component.description ? component.description : 'n/a',
+        component.url ? component.url : null,
+        component.purl,
+        component.source,
+        function (this: any, err: any) {
+          if (err) callback(err, null);
+          else callback(null, this.lastID);
+        }
+      );
     });
+    const compid = await call();
+    db.close();
+    if (compid) {
+      const licenses = component.licenses.map((l) => this.license.licenseAttach({ compid, license_id: l }));
+      await Promise.all(licenses);
+    }
+    return compid as number;
   }
 
   // GET COMPONENT VERSIONS

@@ -75,7 +75,7 @@ export interface NewComponentDTO {
   name: string;
   versions: {
     version: string;
-    licenseId?: string;
+    licenses?: Array<number>;
   }[];
   purl: string;
   url: string;

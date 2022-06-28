@@ -7,6 +7,7 @@ import { fileHelper } from '../helpers/FileHelper';
 import { licenseHelper } from '../helpers/LicenseHelper';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { modelProvider } from './ModelProvider';
+import { componentSource } from '../model/interfaces/component/INewComponent';
 
 class DependencyService {
   public async insert(dependencies: IDependencyResponse): Promise<void> {
@@ -59,17 +60,17 @@ class DependencyService {
         });
       }
       // Create component if it not exists in the catalog
-      if (!comp){
+      if (!comp) {
         const componentId = await modelProvider.model.component.create({
           name: dependency.componentName || dependency.purl,
-          versions: [{ version:params.version,licenseId: lic.id }],
+          version: params.version,
+          licenses: [lic.id],
           purl: params.purl,
           url: null,
+          source: componentSource.MANUAL,
         });
-        await modelProvider.model.license.licenseAttach({ compid:componentId , license_id: lic.id });
-      comp = await modelProvider.model.component.get(componentId);
-      }
-      else await modelProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
+        comp = await modelProvider.model.component.get(componentId);
+      } else await modelProvider.model.license.licenseAttach({ license_id: lic.id, compid: comp.compid });
 
       // Update dependency
       dependency = { ...dependency, licenses: [params.license], version: params.version };
@@ -119,10 +120,10 @@ class DependencyService {
     }
   }
 
-  public async restoreAllByIds(dependenciesIds:number []): Promise<Array<Dependency>> {
+  public async restoreAllByIds(dependenciesIds: number[]): Promise<Array<Dependency>> {
     try {
       const results = [];
-      for(let i = 0; i < dependenciesIds.length; i+=1) {
+      for (let i = 0; i < dependenciesIds.length; i += 1) {
         const result = await this.restore(dependenciesIds[i]);
         results.push(result);
       }
@@ -137,8 +138,10 @@ class DependencyService {
     try {
       const results = [];
       const dependencies = await this.getAll({ path });
-      const dependencyIds = dependencies.filter((d) => d.status === FileStatusType.IDENTIFIED || d.status === FileStatusType.ORIGINAL).map((d) => d.dependencyId);
-      for(let i = 0; i < dependencyIds.length; i+=1) {
+      const dependencyIds = dependencies
+        .filter((d) => d.status === FileStatusType.IDENTIFIED || d.status === FileStatusType.ORIGINAL)
+        .map((d) => d.dependencyId);
+      for (let i = 0; i < dependencyIds.length; i += 1) {
         const result = await this.restore(dependencyIds[i]);
         results.push(result);
       }

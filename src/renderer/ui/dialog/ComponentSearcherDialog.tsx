@@ -71,7 +71,6 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
   const { data, error, loading, execute } = useApi<IComponentResult[]>();
   const dialogCtrl = useContext<any>(DialogContext);
   const [results, setResults] = React.useState<any[]>([]);
-  const [selected, setSelected] = React.useState<any[]>([]);
   const [queryTerm, setQueryTerm] = useState<ISearchComponent>({ search: '', package: '', component: '', vendor: '' });
   const [advanceSearch, setAdavanceSearch] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>('Advanced search');
@@ -91,9 +90,8 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
   };
 
   const onSelectionHandler = async (data) => {
-    const componentSelected: IComponentResult = results.find((el) => el.id === data[0]);
-    setComponentSelected(componentSelected);
-
+    const compSelected: IComponentResult = results.find((el) => el.id === data[0]);
+    setComponentSelected(compSelected);
   };
 
   const handleClose = async () => {
@@ -104,9 +102,8 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
         false
       );
       if (dialogResponse.action === DIALOG_ACTIONS.OK) {
-        console.log(componentSelected);
         const response = await dispatch(importGlobalComponent(componentSelected)).unwrap();
-        onClose({ action: DIALOG_ACTIONS.OK, data: response });
+        if (response) onClose({ action: DIALOG_ACTIONS.OK, data: response });
       }
     } catch (error: any) {
       await dialogCtrl.openConfirmDialog(error.message, { label: 'Accept', role: 'accept' }, true);
@@ -125,7 +122,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
   }, [data]);
 
   useEffect(() => {
-   if(componentSelected) handleClose();
+    if (componentSelected) handleClose();
   }, [componentSelected]);
 
   return (
