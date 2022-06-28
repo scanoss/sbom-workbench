@@ -44,6 +44,7 @@ export const restoreFile = createAsyncThunk('inventory/restore', async (files: n
 export const executeBatch = createAsyncThunk(
   'inventory/executeBatch',
   async (iBatchInventory: IBatchInventory, { dispatch }) => {
+    console.log(iBatchInventory);
     const response = await inventoryService.batch(iBatchInventory);
     return response;
   }

@@ -9,7 +9,7 @@ const useBatch = () => {
   const dispatch = useDispatch();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const showOverwrite = (data: any[]) => true || data.some((e) => e.isIdentified);
+  const showOverwrite = (data: any[]) => data.some((e) => e.status === 'identified' || e.status === 'ignored');
 
   const showOverwriteDialog = async (): Promise<DialogResponse> => {
     return dialogCtrl.openAlertDialog(
@@ -40,7 +40,7 @@ const useBatch = () => {
             overwrite: action === 'overwrite',
             source: {
               type: InventorySourceType.FILE,
-              input: files,
+              input: files.map((f) => f.id),
             },
             data: {
               inventory,
@@ -60,7 +60,7 @@ const useBatch = () => {
           overwrite: action === 'overwrite',
           source: {
             type: InventorySourceType.FILE,
-            input: files,
+            input: files.map((f) => f.id),
           },
         })
       );
