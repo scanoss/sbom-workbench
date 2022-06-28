@@ -54,7 +54,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     Partial<{
       name: string;
       version;
-      licenseId: string;
+      licenseId: number;
       purl: string;
       url: string;
     }>
@@ -75,21 +75,10 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     }
   };
 
-/*  const getLicense = () => {
-    if (!form.licenseId) {
-      // && form.license_name
-      /!*      const license = licenses.find((l) => l.name === form.license_name);
-      if (license) {
-        setForm({ ...form, license_id: license.id });
-      } *!/
-    }
-  };*/
-
   useEffect(() => {
     fetchData();
   }, [open]);
   useEffect(setDefaults, [component]);
-  // useEffect(getLicense, [licenses]);
 
   const inputHandler = (name, value) => {
     setForm({
@@ -109,7 +98,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
         versions: [
           {
             version,
-            licenseId,
+            licenses: [licenseId],
           },
         ],
       };

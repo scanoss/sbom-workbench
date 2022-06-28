@@ -138,21 +138,21 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   const addCustomComponent = async ({ component, created }) => {
     setGlobalComponents([...components, component]);
-
-    setLicenses([
-      ...licenses,
-      {
-        spdxid: component.versions[0].licenses[0].spdxid,
-        name: component.versions[0].licenses[0].name,
-        type: 'Catalogued',
-      },
-    ]);
-
+    if (component.versions[0].licenses[0] !== undefined) {
+      setLicenses([
+        ...licenses,
+        {
+          spdxid: component.versions[0].licenses[0].spdxid,
+          name: component.versions[0].licenses[0].name,
+          type: 'Catalogued',
+        },
+      ]);
+    }
     setForm({
       ...form,
       component: component.name,
       version: component.versions[0].version,
-      spdxid: component.versions[0].licenseId,
+      spdxid: component.versions[0].licenses[0]?.spdxid,
       purl: component.purl,
       url: component.url || '',
     });
