@@ -11,9 +11,10 @@ import TreeNode from '../TreeNode/TreeNode';
 import { DIALOG_ACTIONS } from '@context/types';
 import { executeBatch } from '@store/inventory-store/inventoryThunks';
 import { InventoryAction } from '@api/types';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import useBatch from '@hooks/useBatch';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 
 const electron = window.require('electron');
 const { remote } = electron;
@@ -90,6 +91,7 @@ const SearchPanel = () => {
   const history = useHistory();
   const classes = useStyles();
   const searchQuery = useRef(null);
+  const { summary } = useSelector(selectWorkbench);
 
   const dispatch = useDispatch();
   const batch = useBatch();
@@ -150,15 +152,20 @@ const SearchPanel = () => {
     setSelected(data);
   };
 
+  const getFilesSelected = () => {
+    const set = new Set(selected);
+    return results.filter((r) => set.has(r.id));
+  };
+
   const onMenuActionHandler = () => {
     const menu = [
       {
         label: 'Identify all files as...',
-        click: () => batch.identifyAll(selected),
+        click: () => batch.identifyAll(getFilesSelected()),
       },
       {
         label: 'Mark all files as original',
-        click: () => batch.ignoreAll(selected),
+        click: () => batch.ignoreAll(getFilesSelected()),
       },
     ];
 
@@ -186,6 +193,10 @@ const SearchPanel = () => {
   const removeListeners = () => {
     ipcRenderer.removeListener(IpcEvents.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
   };
+
+  useEffect(() => {
+    search();
+  }, [summary]);
 
   // on mount/unmount listeners
   useEffect(setupListeners, []);
