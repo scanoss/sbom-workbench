@@ -5,9 +5,8 @@ import { workspace } from '../workspace/Workspace';
 import { Batch } from './Batch';
 import { FilterOR } from './Filter/FilterOR';
 import { GenericFilter } from './Filter/GenericFilter';
-import { NodeStatus } from '../workspace/Tree/Tree/Node';
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
-import {treeService} from "../services/TreeService";
+import { treeService } from '../services/TreeService';
 
 export class Restore extends Batch {
   private getQueryBuilder(): QueryBuilder {
