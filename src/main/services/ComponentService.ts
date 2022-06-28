@@ -1,11 +1,12 @@
 import log from 'electron-log';
-import { Component, ComponentGroup, IWorkbenchFilterParams, License, NewComponentDTO } from '../../api/types';
+import { Component, ComponentGroup, IWorkbenchFilterParams, NewComponentDTO } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
 import { ComponentAdapter } from '../adapters/ComponentAdapter';
+import { componentSource } from '../model/interfaces/component/INewComponent';
 
 class ComponentService {
   public async getComponentFiles(data: Partial<Component>, params: IWorkbenchFilterParams): Promise<any> {
@@ -157,17 +158,15 @@ class ComponentService {
     const promises = newComp.versions.map((v) =>
       modelProvider.model.component.create({
         ...newComp,
-        versions: [{ version: v.version, licenseId: v.licenseId ? v.licenseId : null }],
+        version: v.version,
+        licenses: v.licenses,
+        source: componentSource.MANUAL,
       })
     );
     const results = await Promise.all(promises.map((p) => p.catch((e) => e)));
     const validComponents = results.filter((result) => !(result instanceof Error));
     if (results.length - validComponents.length === newComp.versions.length)
       throw new Error('Component already exists');
-    // Get those versions what have licenses attached
-    const componentLicense = validComponents.filter((p) => p.license_id !== '' && p.license_id !== null);
-    const licenseAttachPromises = componentLicense.map((cl) => modelProvider.model.license.licenseAttach(cl));
-    await Promise.all(licenseAttachPromises);
     const component = await modelProvider.model.component.getAll(QueryBuilderCreator.create({ purl: newComp.purl }));
     const compPurl: any = this.groupComponentsByPurl(component);
     const response = await this.mergeComponentByPurl(compPurl);
@@ -176,5 +175,3 @@ class ComponentService {
 }
 
 export const componentService = new ComponentService();
-
-
