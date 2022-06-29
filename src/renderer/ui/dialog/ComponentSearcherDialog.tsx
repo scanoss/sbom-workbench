@@ -89,9 +89,8 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
     }
   };
 
-  const onSelectionHandler = async (data) => {
-    const compSelected: IComponentResult = results.find((el) => el.id === data[0]);
-    setComponentSelected(compSelected);
+  const onRowClickHandler = async ({ row }, event) => {
+    setComponentSelected({ ...row });
   };
 
   const handleClose = async () => {
@@ -103,7 +102,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
       );
       if (dialogResponse.action === DIALOG_ACTIONS.OK) {
         const response = await dispatch(importGlobalComponent(componentSelected)).unwrap();
-        if (response) onClose({ action: DIALOG_ACTIONS.OK, data: response });
+        if (response) onClose({ action: DIALOG_ACTIONS.OK, data: { component: response } });
       }
     } catch (error: any) {
       await dialogCtrl.openConfirmDialog(error.message, { label: 'Accept', role: 'accept' }, true);
@@ -249,7 +248,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
           rowHeight={22}
           disableColumnMenu
           disableColumnSelector
-          onSelectionModelChange={onSelectionHandler}
+          onRowClick={onRowClickHandler}
           hideFooter
         />
       </form>
