@@ -16,19 +16,21 @@ import useApi from '@hooks/useApi';
 import { importGlobalComponent } from '@store/component-store/componentThunks';
 import { useDispatch } from 'react-redux';
 import { DialogContext } from '@context/DialogProvider';
-import { Autocomplete } from '@material-ui/lab';
+import { Alert, Autocomplete } from '@material-ui/lab';
 import { AppDispatch } from '@store/store';
 import CompareArrowsIcon from '@material-ui/icons/CompareArrows';
 import SearchIcon from '@material-ui/icons/Search';
 import { packages } from '@assets/data/ComponentCatalogPackages';
 import CloseIcon from '@material-ui/icons/Close';
+import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
+import { projectService } from '@api/services/project.service';
 import { IComponentResult } from '../../../main/task/componentCatalog/iComponentCatalog/IComponentResult';
 import { ISearchComponent } from '../../../main/task/componentCatalog/iComponentCatalog/ISearchComponent';
 
 const useStyles = makeStyles((theme) => ({
   size: {
     '& .MuiDialog-paperWidthMd': {
-      width: '500px',
+      width: '700px',
     },
   },
   search: {
@@ -55,6 +57,15 @@ const useStyles = makeStyles((theme) => ({
     borderBottom: '1px solid #D4D4D8',
     height: 55,
   },
+  alertContainer: {
+    backgroundColor: '#f4f4f5',
+    paddingTop: 2,
+  },
+  alert: {
+    marginLeft: 10,
+    marginRight: 10,
+    marginTop: 5,
+  },
 }));
 
 interface ComponentSearcherDialogProps {
@@ -75,6 +86,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
   const [advanceSearch, setAdavanceSearch] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>('Advanced search');
   const [componentSelected, setComponentSelected] = useState<IComponentResult>(null);
+  const [apiKey, setApiKey] = useState<string>(null);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -87,6 +99,11 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
       const { search } = queryTerm;
       execute(() => componentService.getGlobalComponents({ ...{ search, packages: queryTerm.package }, limit: 100 }));
     }
+  };
+
+  const init = async () => {
+    const response = await projectService.getApiKey();
+    setApiKey(response);
   };
 
   const onRowClickHandler = async ({ row }, event) => {
@@ -121,6 +138,10 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
   }, [data]);
 
   useEffect(() => {
+    if (open) init();
+  }, [open]);
+
+  useEffect(() => {
     if (componentSelected) handleClose();
   }, [componentSelected]);
 
@@ -152,7 +173,13 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
           </IconButton>
         </div>
       </div>
-
+      {!apiKey && (
+        <div className={classes.alertContainer}>
+          <Alert icon={<WarningOutlinedIcon fontSize="inherit" />} severity="error" className={classes.alert}>
+            You need to provide an API key in the settings to search components online. Get yours now.
+          </Alert>
+        </div>
+      )}
       <form onSubmit={handleSearch}>
         <div className="dialog-content">
           <div className="dialog-row">
@@ -160,7 +187,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
               {advanceSearch === false ? (
                 <Paper className="dialog-form-field-control w-100 mr-4">
                   <InputBase
-                    disabled={loading}
+                    disabled={loading || !apiKey}
                     name="search"
                     fullWidth
                     value={queryTerm.search}
@@ -173,7 +200,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                 <>
                   <Paper className="dialog-form-field-control w-100 mr-4">
                     <InputBase
-                      disabled={loading}
+                      disabled={loading || !apiKey}
                       name="Name"
                       fullWidth
                       value={queryTerm.component}
@@ -182,26 +209,24 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                     />
                     {loading && <CircularProgress size={18} className="mr-2" />}
                   </Paper>
-                  <div>
-                    <Paper>
-                      <InputBase
-                        disabled={loading}
-                        name="Vendor"
-                        fullWidth
-                        value={queryTerm.vendor}
-                        placeholder="Vendor"
-                        onChange={(e) => setQueryTerm({ ...queryTerm, vendor: e.target.value })}
-                      />
-                      {loading && <CircularProgress size={18} className="mr-2" />}
-                    </Paper>
-                  </div>
+                  <Paper>
+                    <InputBase
+                      disabled={loading || !apiKey}
+                      name="Vendor"
+                      fullWidth
+                      value={queryTerm.vendor}
+                      placeholder="Vendor"
+                      onChange={(e) => setQueryTerm({ ...queryTerm, vendor: e.target.value })}
+                    />
+                    {loading && <CircularProgress size={18} className="mr-2" />}
+                  </Paper>
                 </>
               )}
-
               <div>
                 <Autocomplete
                   id="combo-box-demo"
                   options={packages}
+                  disabled={!apiKey}
                   onChange={(event, value) => {
                     setQueryTerm({ ...queryTerm, package: value || '' });
                   }}
@@ -219,7 +244,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                   )}
                 />
               </div>
-              <IconButton disabled={loading} type="submit">
+              <IconButton disabled={loading || !apiKey} type="submit">
                 {' '}
                 <SearchIcon />
               </IconButton>
