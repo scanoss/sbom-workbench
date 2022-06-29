@@ -118,7 +118,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const openComponentSearcherDialog = async () => {
-    const response = await dialogCtrl.openComponentSearcherDialog('test');
+    const response = await dialogCtrl.openComponentSearcherDialog('');
     if (response && response.action === ResponseStatus.OK) {
       addCustomComponent(response.data);
     }
