@@ -9,7 +9,7 @@ import { workspace } from '../../main/workspace/Workspace';
 import { dependencyService } from '../../main/services/DependencyService';
 import { ResumeScanTask } from '../../main/task/scanner/ResumeScanTask';
 import { ReScanTask } from '../../main/task/scanner/ReScanTask';
-import { searcher } from "../../main/modules/searchEngine/searcher/Searcher";
+import { searcher } from '../../main/modules/searchEngine/searcher/Searcher';
 
 ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
   // TO DO factory to create filters depending on arguments
@@ -119,6 +119,21 @@ ipcMain.handle(IpcEvents.PROJECT_SET_FILE_TREE_VIEW_MODE, async (event, mode: Fi
     const p = workspace.getOpenedProjects()[0];
     p.setFileTreeViewMode(mode);
     return Response.ok({ message: 'Filter setted succesfully', data: true });
+  } catch (e: any) {
+    return Response.fail({ message: e.message });
+  }
+});
+
+ipcMain.handle(IpcEvents.GET_API_KEY, async (event) => {
+  try {
+    const p = workspace.getOpenedProjects()[0];
+    let apiKey = p.getApiKey();
+    if (apiKey === undefined) {
+      const { APIS, DEFAULT_API_INDEX } = userSettingService.get();
+      if (DEFAULT_API_INDEX > 0) apiKey = APIS[DEFAULT_API_INDEX].API_KEY;
+      else apiKey = null;
+    }
+    return Response.ok({ message: '', data: apiKey });
   } catch (e: any) {
     return Response.fail({ message: e.message });
   }
