@@ -1,4 +1,4 @@
-/* eslint-disable max-classes-per-file */
+``/* eslint-disable max-classes-per-file */
 import fs from 'fs';
 import log from 'electron-log';
 import { IDependencyResponse, Scanner } from 'scanoss';
