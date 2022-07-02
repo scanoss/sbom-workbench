@@ -7,14 +7,11 @@ import { useHistory } from 'react-router-dom';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import * as SearchUtils from '@shared/utils/search-utils';
 import { AppConfigDefault } from '@config/AppConfigDefault';
-import TreeNode from '../TreeNode/TreeNode';
-import { DIALOG_ACTIONS } from '@context/types';
-import { executeBatch } from '@store/inventory-store/inventoryThunks';
-import { InventoryAction } from '@api/types';
 import { useDispatch, useSelector } from 'react-redux';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import useBatch from '@hooks/useBatch';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import TreeNode from '../TreeNode/TreeNode';
 
 const electron = window.require('electron');
 const { remote } = electron;
@@ -28,9 +25,7 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 1,
   },
   autocomplete: {
-    '& .MuiAutocomplete-endAdornment': {
-
-    },
+    '& .MuiAutocomplete-endAdornment': {},
   },
   searchInput: {
     '& .MuiInputBase-input': {
@@ -103,6 +98,8 @@ const SearchPanel = () => {
   const [value, setValue] = React.useState<string[]>([]);
   const [results, setResults] = React.useState<any[]>([]);
   const [selected, setSelected] = React.useState<any[]>([]);
+  const refSelected = useRef([]);
+  const refResults = useRef([]);
 
   const search = () => {
     ipcRenderer.send(IpcEvents.SEARCH_ENGINE_SEARCH, {
@@ -135,7 +132,7 @@ const SearchPanel = () => {
   };
 
   const onSearchResponse = (event, data) => {
-    setResults(serverPage.current === 0 ? data : (oldState) => [...oldState, ...data]);
+    setResults(serverPage.current === 0 ? (oldState) => [...data] : (oldState) => [...oldState, ...data]);
   };
 
   const onRowClickHandler = ({ row }, event) => {
@@ -153,23 +150,37 @@ const SearchPanel = () => {
   };
 
   const getFilesSelected = () => {
-    const set = new Set(selected);
-    return results.filter((r) => set.has(r.id));
+    const set = new Set(refSelected.current);
+    return refResults.current.filter((r) => set.has(r.id));
+  };
+
+  const onActionMenuHandler = (e, params) => {
+    switch (params) {
+      case 'action-identifyAll':
+        batch.identifyAll(getFilesSelected());
+        break;
+      case 'action-markAllAsOriginal':
+        batch.ignoreAll(getFilesSelected());
+        break;
+      default:
+        break;
+    }
   };
 
   const onMenuActionHandler = () => {
     const menu = [
       {
         label: 'Identify all files as...',
-        click: () => batch.identifyAll(getFilesSelected()),
+        actionId: 'action-identifyAll',
+        // click: () => batch.identifyAll(getFilesSelected()),
       },
       {
         label: 'Mark all files as original',
-        click: () => batch.ignoreAll(getFilesSelected()),
+        actionId: 'action-markAllAsOriginal',
+        // click: () => batch.ignoreAll(getFilesSelected()),
       },
     ];
-
-    Menu.buildFromTemplate(menu).popup(remote.getCurrentWindow());
+    ipcRenderer.send(IpcEvents.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
   };
 
   const onPageChangeHandler = (localPageNumber, details) => {
@@ -186,12 +197,19 @@ const SearchPanel = () => {
     search();
   }, [value]); //
 
+  useEffect(() => {
+    refSelected.current = selected;
+    refResults.current = results;
+  }, [selected, results]);
+
   const setupListeners = () => {
     ipcRenderer.on(IpcEvents.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
+    ipcRenderer.on(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
   };
 
   const removeListeners = () => {
     ipcRenderer.removeListener(IpcEvents.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
+    ipcRenderer.removeListener(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
   };
 
   useEffect(() => {
@@ -265,7 +283,7 @@ const SearchPanel = () => {
           columns={[
             {
               field: 'filename',
-              headerName: `${selected?.length} files selected`,
+              headerName: `${selected.length} files selected`,
               editable: false,
               sortable: false,
               flex: 1,
