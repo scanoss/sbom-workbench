@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Tree, { renderers as Renderers } from 'react-virtualized-tree';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,12 +8,10 @@ import useContextual from '@hooks/useContextual';
 import { collapseTree, expandTree, selectWorkbench, updateTree } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { CircularProgress } from '@material-ui/core';
+import { ipcRenderer } from 'electron';
+import { IpcEvents } from '@api/ipc-events';
 
 const { Expandable } = Renderers;
-
-const electron = window.require('electron');
-const { remote } = electron;
-const { Menu } = remote;
 
 const FileTreeNode = ({ node, onClick, onContextMenu }) => {
   return (
@@ -42,6 +40,51 @@ const FileTree = () => {
 
   const { tree } = useSelector(selectWorkbench);
   const state = useSelector(selectNavigationState);
+  const selectedNode = React.useRef<any>(null);
+
+  const onActionMenuHandler = (e, params) => {
+    const { current: node } = selectedNode;
+    switch (params) {
+      case 'action-restore':
+        contextual.restore(node);
+        break;
+      case 'action-original':
+        contextual.ignore(node);
+        break;
+      case 'action-aceptAll':
+        contextual.acceptAll(node);
+        break;
+      case 'action-identifyAllAs':
+        contextual.identifyAll(node);
+        break;
+      case 'action-markAllAsOriginal':
+        contextual.ignoreAll(node);
+        break;
+      case 'action-restoreAll':
+        contextual.restoreAll(node);
+        break;
+      case 'action-expandAll':
+        onExpandAll(node);
+        break;
+      case 'action-expandAllToMatches':
+        onExpandAll(node, true);
+        break;
+      case 'action-colapseAll':
+        onCollapseAll(node);
+        break;
+      case 'action-AceptAllDependencies':
+        contextual.acceptAllDependencies(node);
+        break;
+      case 'action-dismissAllDependencies':
+        contextual.rejectAllDependencies(node);
+        break;
+      case 'action-restorellDependencies':
+        contextual.restoreAllDependencies(node);
+        break;
+      default:
+        break;
+    }
+  };
 
   const onChange = (nodes) => {
     dispatch(updateTree(nodes));
@@ -72,23 +115,23 @@ const FileTree = () => {
 
   const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
     const onlyRestore = !node.hasPendingProgress;
-
+    selectedNode.current = node;
     let menu = [];
     if (node.isDependencyFile) {
       menu = [
         {
           label: 'Accept all dependencies',
-          click: () => contextual.acceptAllDependencies(node),
+          actionId: 'action-AceptAllDependencies',
           enabled: node.status === 'PENDING',
         },
         {
           label: 'Dismiss all dependencies',
-          click: () => contextual.rejectAllDependencies(node),
+          actionId: 'action-dismissAllDependencies',
           enabled: node.status === 'PENDING',
         },
         {
           label: 'Restore all dependencies',
-          click: () => contextual.restoreAllDependencies(node),
+          actionId: 'action-restorellDependencies',
           // enabled: node.status === 'PENDING',
         },
       ];
@@ -97,35 +140,38 @@ const FileTree = () => {
         ? [
             {
               label: 'Mark file as original',
-              click: () => contextual.ignore(node),
-              enabled: !onlyRestore && node.status !== 'FILTERED' && node.status !== 'NO-MATCH',
+
+              // click: () => contextual.ignore(node),
+              actionId: 'action-original',
+              // enabled: !onlyRestore && node.status !== 'FILTERED' && node.status !== 'NO-MATCH',
+              enabled: node.status !== 'FILTERED' && node.status !== 'NO-MATCH' && !node.isDependencyFile, // TODO: CHECK WITH FRANCO
             },
             {
               label: 'Restore file',
-              click: () => contextual.restore(node),
+              actionId: 'action-restore',
               enabled: node.status === 'IDENTIFIED' || node.status === 'IGNORED',
             },
           ]
         : [
             {
               label: !state.isFilterActive ? 'Accept all' : 'Accept all filtered files',
-              click: () => contextual.acceptAll(node),
+              actionId: 'action-aceptAll',
               enabled: !onlyRestore,
             },
             { type: 'separator' },
             {
               label: !state.isFilterActive ? 'Identify all files as...' : 'Identify all filtered files as...',
-              click: () => contextual.identifyAll(node),
+              actionId: 'action-identifyAllAs',
               enabled: !onlyRestore,
             },
             {
               label: !state.isFilterActive ? 'Mark all files as original' : 'Mark all filtered files as original',
-              click: () => contextual.ignoreAll(node),
+              actionId: 'action-markAllAsOriginal',
               enabled: !onlyRestore,
             },
             {
               label: !state.isFilterActive ? 'Restore all files' : 'Restore all filtered files',
-              click: () => contextual.restoreAll(node),
+              actionId: 'action-restoreAll',
               enabled: node.hasIgnoredProgress || node.hasIdentifiedProgress,
             },
             { type: 'separator' },
@@ -134,22 +180,29 @@ const FileTree = () => {
               submenu: [
                 {
                   label: 'Expand all',
-                  click: () => onExpandAll(node),
+                  actionId: 'action-expandAll',
                 },
                 {
                   label: 'Expand to matches',
-                  click: () => onExpandAll(node, true),
+                  actionId: 'action-expandAllToMatches',
                 },
                 {
                   label: 'Collapse all',
-                  click: () => onCollapseAll(node),
+                  actionId: 'action-colapseAll',
                 },
               ],
             },
           ];
     }
-    Menu.buildFromTemplate(menu).popup(remote.getCurrentWindow());
+    ipcRenderer.send(IpcEvents.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
   };
+
+  useEffect(() => {
+    ipcRenderer.on(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
+    return () => {
+      ipcRenderer.removeListener(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
+    };
+  }, []);
 
   // loader
   if (!tree || tree.length === 0) {
@@ -161,12 +214,11 @@ const FileTree = () => {
   }
   return (
     <div className="file-tree-container">
-
-      { state.loading &&
+      {state.loading && (
         <div className="spinner-loader">
           <CircularProgress size={12} />
         </div>
-      }
+      )}
       <Tree nodes={tree} onChange={onChange}>
         {({ style, node, ...rest }: any) => (
           <div

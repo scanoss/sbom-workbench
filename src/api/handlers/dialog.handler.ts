@@ -4,7 +4,7 @@
  * TODO: We should use a contextBridge to manage this connection?
  * See:  https://medium.com/developer-rants/opening-system-dialogs-in-electron-from-the-renderer-6daf49782fd8
  */
-import { dialog, ipcMain } from 'electron';
+import { dialog, ipcMain, Menu } from 'electron';
 import { IpcEvents } from '../ipc-events';
 
 const window = require('electron').BrowserWindow;
@@ -25,4 +25,22 @@ ipcMain.on(IpcEvents.DIALOG_SHOW_ERROR_BOX, (event, title: string, content: stri
     title,
     message: content,
   });
+});
+
+ipcMain.on(IpcEvents.DIALOG_BUILD_CUSTOM_POPUP_MENU, (event, params: any) => {
+  params.forEach((p) => {
+    if (p.actionId)
+      p.click = () => {
+        event.sender.send(IpcEvents.CONTEXT_MENU_COMMAND, p.actionId);
+      };
+    if (p.submenu) {
+      p.submenu.forEach((s) => {
+        s.click = () => {
+          event.sender.send(IpcEvents.CONTEXT_MENU_COMMAND, s.actionId);
+        };
+      });
+    }
+  });
+  const menu = Menu.buildFromTemplate(params);
+  menu.popup(window.fromWebContents(event.sender));
 });

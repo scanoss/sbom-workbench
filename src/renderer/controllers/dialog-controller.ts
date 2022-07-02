@@ -1,10 +1,6 @@
 import { ipcRenderer } from 'electron';
 import { IpcEvents } from '@api/ipc-events';
 
-const electron = window.require('electron');
-const { remote } = electron;
-const { dialog } = remote;
-
 class DialogController {
   public async showOpenDialog(options): Promise<string> {
     return ipcRenderer.invoke(IpcEvents.DIALOG_SHOW_OPEN_DIALOG, options);
