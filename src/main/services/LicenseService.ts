@@ -1,5 +1,5 @@
 import { LicenseDTO, NewLicenseDTO } from "@api/dto";
-import { licenses } from '../model/licenses';
+import { licenses } from '../../../assets/data/licenses';
 import { modelProvider } from './ModelProvider';
 import { licenseHelper } from "../helpers/LicenseHelper";
 
