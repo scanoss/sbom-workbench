@@ -28,8 +28,6 @@ export class Project {
 
   scanner!: Scanner;
 
-  msgToUI!: Electron.WebContents;
-
   filesSummary: any;
 
   processedFiles = 0;
@@ -88,7 +86,7 @@ export class Project {
     this.filesSummary = a.filesSummary;
     await modelProvider.init(this.metadata.getMyPath());
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
-    this.tree = new Tree(this.metadata.getMyPath(), this.msgToUI);
+    this.tree = new Tree(this.metadata.getMyPath());
     this.tree.loadTree(a.tree.rootFolder);
     return true;
   }

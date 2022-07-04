@@ -4,18 +4,12 @@ import { EventEmitter } from "events";
 import { IIndexer } from './IIndexer';
 import { IpcEvents } from "../../../../api/ipc-events";
 import { getSearchConfig } from '../../../../shared/utils/search-utils';
+import { broadcastManager } from "../../../broadcastManager/BroadcastManager";
 
 const path = require('path');
 const { Index } = require('flexsearch');
 
-export class Indexer extends  EventEmitter{
-
-  private msgToUI: Electron.WebContents;
-
-  constructor(msgToUI?: Electron.WebContents) {
-    super();
-    this.msgToUI = msgToUI;
-  }
+export class Indexer {
 
   public index(files: Array<IIndexer>) {
     const index = new Index(getSearchConfig());
@@ -40,9 +34,8 @@ export class Indexer extends  EventEmitter{
   }
 
   public async saveIndex(index: any, pathToDictionary: string) {
-    if (!fs.existsSync(pathToDictionary)) {
-      fs.rmdir(pathToDictionary, { recursive: true }, (err) => {
-      });
+    if (fs.existsSync(pathToDictionary)) {
+      fs.rmdirSync(pathToDictionary, { recursive: true });
     }
     fs.mkdirSync(pathToDictionary);
     await index.export((key: any, data: string | NodeJS.ArrayBufferView) => {
@@ -53,6 +46,6 @@ export class Indexer extends  EventEmitter{
   }
 
   private sendToUI(eventName, data: any) {
-    if (this.msgToUI) this.msgToUI.send(eventName, data);
+    broadcastManager.get().send(eventName,data)
   }
 }

@@ -15,23 +15,17 @@ import AppConfig from '../../../config/AppConfigModule';
 import { AutoAccept } from '../inventory/AutoAccept';
 import { ITask } from '../Task';
 import { IndexTask } from "../search/indexTask/IndexTask";
+import { broadcastManager } from "../../broadcastManager/BroadcastManager";
 
-export abstract class ScannerTask extends EventEmitter implements ITask<void, boolean> {
-  protected msgToUI!: Electron.WebContents;
-
+export abstract class ScannerTask implements ITask<void, boolean> {
   protected scanner: Scanner;
 
   protected scannerState: ScanState;
 
   protected project: Project;
 
-  constructor(msgToUI: Electron.WebContents) {
-    super();
-    this.msgToUI = msgToUI;
-  }
-
   protected sendToUI(eventName, data: any) {
-    if (this.msgToUI) this.msgToUI.send(eventName, data);
+    broadcastManager.get().send(eventName, data)
   }
 
   public abstract set(project: INewProject | string): Promise<void>;
@@ -61,7 +55,7 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       await this.done(resultPath);
-      await new IndexTask().run(this.msgToUI);
+      await new IndexTask().run();
       await this.addDependencies();
       this.project.metadata.setScannerState(ScanState.FINISHED);
       this.project.metadata.save();
@@ -126,7 +120,7 @@ export abstract class ScannerTask extends EventEmitter implements ITask<void, bo
     });
   }
 
-  public async run() {
+  public async run(): Promise<boolean> {
     this.scannerStatus();
     const scanIn = this.adapterToScannerInput(this.project.filesToScan);
     await this.scanDependencies();

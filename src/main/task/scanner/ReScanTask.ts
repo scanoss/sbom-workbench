@@ -20,7 +20,7 @@ export class ReScanTask extends ScannerTask {
   public async set(projectPath: string): Promise<void> {
     const p = workspace.getProject(new ProjectFilterPath(projectPath));
     await p.upgrade();
-    const tree = treeService.init(this.msgToUI, p.getMyPath(), p.metadata.getScanRoot());
+    const tree = treeService.init(p.getMyPath(), p.metadata.getScanRoot());
     p.setTree(tree);
     const summary = tree.getSummarize();
     p.filesToScan = summary.files;

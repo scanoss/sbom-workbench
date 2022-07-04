@@ -46,6 +46,8 @@ export default class AppUpdater {
   }
 }
 
+
+app.commandLine.appendSwitch("--disable-gpu-sandbox")
 let mainWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production') {

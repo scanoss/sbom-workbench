@@ -9,6 +9,7 @@ import * as Filtering from '../../filtering';
 import { TreeViewMode } from './TreeViewMode/TreeViewMode';
 import { TreeViewDefault } from './TreeViewMode/TreeViewDefault';
 import { defaultBannedList } from '../../filtering/defaultFilter';
+import { broadcastManager } from "../../../broadcastManager/BroadcastManager";
 
 
 const fs = require('fs');
@@ -21,32 +22,23 @@ export class Tree {
 
   private rootPath: string;
 
-  private msgToUI!: Electron.WebContents;
-
   private filesIndexed = 0;
 
   private fileTreeViewMode: TreeViewMode;
 
   private summary;
 
-  constructor(path: string, msgToUI: Electron.WebContents) {
+  constructor(path: string) {
     const pathParts = path.split(pathLib.sep);
     this.rootName = pathParts[pathParts.length - 1];
     this.rootPath = path;
     this.rootFolder = new Folder('', this.rootName);
     this.fileTreeViewMode = new TreeViewDefault();
     this.summary = {};
-    this.msgToUI = msgToUI;
-  }
-
-  setMailbox(mailbox: Electron.WebContents) {
-    this.msgToUI = mailbox;
   }
 
   sendToUI(eventName, data: any) {
-    if (this.msgToUI) {
-      this.msgToUI.send(eventName, data);
-    }
+    broadcastManager.get().send(eventName, data)
   }
 
   public buildTree(): Node {
