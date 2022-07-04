@@ -1,4 +1,4 @@
-``/* eslint-disable max-classes-per-file */
+/* eslint-disable max-classes-per-file */
 import fs from 'fs';
 import log from 'electron-log';
 import { IDependencyResponse, Scanner } from 'scanoss';
@@ -27,8 +27,6 @@ export class Project {
   store!: ScanModel;
 
   scanner!: Scanner;
-
-  msgToUI!: Electron.WebContents;
 
   filesSummary: any;
 
@@ -88,7 +86,7 @@ export class Project {
     this.filesSummary = a.filesSummary;
     await modelProvider.init(this.metadata.getMyPath());
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
-    this.tree = new Tree(this.metadata.getScanRoot(),this.metadata.getMyPath(), this.msgToUI);
+    this.tree = new Tree(this.metadata.getScanRoot(),this.metadata.getMyPath());
     this.tree.loadTree(a.tree.rootFolder);
     return true;
   }
