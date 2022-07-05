@@ -1,7 +1,7 @@
 import React from 'react';
 import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
 import { Breadcrumbs, Link, makeStyles, Typography } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
@@ -17,7 +17,7 @@ const useStyles = makeStyles({
 });
 
 const Breadcrumb = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const classes = useStyles();
 
   const { tree } = useSelector(selectWorkbench);
@@ -37,7 +37,7 @@ const Breadcrumb = () => {
   ];
 
   const goToNode = (node: any) => {
-    history.push({
+    navigate({
       pathname: '/workbench/detected',
       search: node.path ? `?path=folder|${encodeURIComponent(node.path)}` : null,
     });

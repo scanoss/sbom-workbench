@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Alert } from '@material-ui/lab';
 import { Button } from '@material-ui/core';
 import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined';
@@ -30,7 +30,8 @@ const filter = (items, query) => {
 };
 
 export const ComponentList = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { limit, onScroll } = usePagination(20);
 
@@ -41,9 +42,9 @@ export const ComponentList = () => {
   const filterItems = filter(components, searchQuery);
 
   const onSelectComponent = (component) => {
-    history.push({
+    navigate({
       pathname: '/workbench/detected/component',
-      search: history.location.search,
+      search: location.search,
     });
 
     dispatch(setComponent(component));

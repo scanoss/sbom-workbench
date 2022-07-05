@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { CircularProgress } from '@material-ui/core';
 import { inventoryService } from '@api/services/inventory.service';
 import { Inventory } from '@api/types';
@@ -17,7 +17,7 @@ const style = {
 };
 
 export const InventoryList = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { component } = useSelector(selectComponentState);
   const [inventories, setInventories] = useState<Inventory[]>(null);
 
@@ -32,7 +32,7 @@ export const InventoryList = () => {
   };
 
   const onInventorySelected = async (inventory: Inventory) => {
-    history.push(`/workbench/identified/inventory/${inventory.id}`);
+    navigate(`/workbench/identified/inventory/${inventory.id}`);
   };
 
   useEffect(() => {

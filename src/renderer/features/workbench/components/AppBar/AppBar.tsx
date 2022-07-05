@@ -20,7 +20,7 @@ import SearchIcon from '@material-ui/icons/Search';
 
 // eslint-disable-next-line import/no-named-default
 import { default as MaterialAppBar } from '@material-ui/core/AppBar';
-import { NavLink, useHistory, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
@@ -35,14 +35,14 @@ import AppConfig from '../../../../../config/AppConfigModule';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 
 const Navigation = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <section id="Navigation">
-      <IconButton onClick={() => history.goBack()}>
+      <IconButton onClick={() => navigate(-1)}>
         <ArrowBackIcon />
       </IconButton>
-      <IconButton onClick={() => history.goForward()}>
+      <IconButton onClick={() => navigate(1)}>
         <ArrowForwardIcon />
       </IconButton>
     </section>
@@ -52,28 +52,28 @@ const Navigation = () => {
 const AppMenu = () => {
   return (
     <section id="AppMenu">
-      <NavLink to="/workbench/detected" activeClassName="active" tabIndex={-1}>
+      <NavLink to="/workbench/detected" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}  tabIndex={-1}>
         <Tooltip title="Detected components">
           <Button color="inherit">
             <GavelIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/search" activeClassName="active" tabIndex={-1}>
+      <NavLink to="/workbench/search" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}  tabIndex={-1}>
         <Tooltip title="Search keywords">
           <Button color="inherit">
             <SearchIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/identified" activeClassName="active" tabIndex={-1}>
+      <NavLink to="/workbench/identified" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} tabIndex={-1}>
         <Tooltip title="Identified components">
           <Button color="inherit">
             <CheckCircleOutlineOutlinedIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/report" activeClassName="active" tabIndex={-1}>
+      <NavLink to="/workbench/report" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} tabIndex={-1}>
         <Tooltip title="Reports">
           <Button color="inherit">
             <InsertChartOutlinedTwoToneIcon />
@@ -288,13 +288,13 @@ const Export = ({ state }) => {
 };
 
 const AppBar = ({ exp }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const state = useSelector(selectWorkbench);
   const report = pathname.startsWith('/workbench/report');
 
   const onBackPressed = () => {
-    history.push('/workspace');
+    navigate('/workspace');
   };
 
   return (

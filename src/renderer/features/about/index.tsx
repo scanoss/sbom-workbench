@@ -7,7 +7,7 @@ import LicensesText from './LicensesText';
 const electron = window.require('electron');
 const { app } = electron.remote;
 
-const About = () => {
+const AboutModule = () => {
   return (
     <div
       style={{
@@ -101,4 +101,4 @@ const About = () => {
   );
 };
 
-export default About;
+export default AboutModule;

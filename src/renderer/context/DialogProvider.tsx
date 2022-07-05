@@ -31,7 +31,7 @@ export interface IDialogContext {
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
 
-export const DialogProvider: React.FC = ({ children }) => {
+export const DialogProvider: React.FC<any> = ({ children }) => {
   const [inventoryDialog, setInventoryDialog] = useState<{
     open: boolean;
     inventory: Partial<InventoryForm>;

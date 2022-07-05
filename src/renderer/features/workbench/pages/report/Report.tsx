@@ -1,6 +1,6 @@
 import { Button, Tooltip, createStyles, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
-import { NavLink, Redirect, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import { Navigate, NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import { reportService } from '@api/services/report.service';
 import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
@@ -18,12 +18,15 @@ const useStyles = makeStyles(() =>
 );
 
 const Nav = () => {
-  const { path } = useRouteMatch();
   const classes = useStyles();
 
   return (
     <section className="nav">
-      <NavLink to={`${path}/detected`} activeClassName="active" tabIndex={-1}>
+      <NavLink
+        to="detected"
+        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+        tabIndex={-1}
+      >
         <Tooltip
           title="Potential Bill of Materials based on automatic detection"
           classes={{ tooltip: classes.tooltip }}
@@ -31,7 +34,11 @@ const Nav = () => {
           <Button size="large">Detected</Button>
         </Tooltip>
       </NavLink>
-      <NavLink to={`${path}/identified`} activeClassName="active" tabIndex={-1}>
+      <NavLink
+        to="identified"
+        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+        tabIndex={-1}
+      >
         <Tooltip
           title="Actual Bill of Materials based on confirmed identifications"
           classes={{ tooltip: classes.tooltip }}
@@ -44,8 +51,7 @@ const Nav = () => {
 };
 
 const Reports = () => {
-  const historyState = useHistory();
-  const { path } = useRouteMatch();
+  const navigate = useNavigate();
   const state = useSelector(selectWorkbench);
 
   const [detectedData, setDetectedData] = useState(null);
@@ -53,7 +59,7 @@ const Reports = () => {
 
   const setTab = (identified) => {
     if (state.tree.hasIdentified || state.tree.hasIgnored || identified.licenses.length > 0) {
-      historyState.push(`${path}/identified`);
+      navigate('identified', { replace: true });
     }
   };
 
@@ -76,15 +82,11 @@ const Reports = () => {
           <Nav />
         </header>
         <main className="app-content">
-          <Switch>
-            <Route exact path={`${path}/detected`}>
-              {detectedData && <DetectedReport data={detectedData} />}
-            </Route>
-            <Route exact path={`${path}/identified`}>
-              {identifiedData && <IdentifiedReport data={identifiedData} />}
-            </Route>
-            <Redirect from={path} to={`${path}/detected`} />
-          </Switch>
+          <Routes>
+            <Route path="detected" element={detectedData && <DetectedReport data={detectedData} />} />
+            <Route path="identified" element={identifiedData && <IdentifiedReport data={identifiedData} />} />
+            <Route path="" element={<Navigate to="detected" />} />
+          </Routes>
         </main>
       </section>
     </>

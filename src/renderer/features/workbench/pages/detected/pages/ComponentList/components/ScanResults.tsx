@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ClearIcon from '@material-ui/icons/Clear';
 import { Button, Card, IconButton } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import MatchesChart from '../../../../report/components/MatchesChart';
 import VulnerabilitiesCard from '../../../../report/components/VulnerabilitiesCard';
@@ -10,7 +10,7 @@ import LicensesTable from '../../../../report/components/LicensesTable';
 import { report } from '../../../../../api/services/report.service';
 
 const ScanResults = ({ name }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [licenses, setLicenses] = useState<any[]>([]);
   const [vulnerabilites, setVulnerabilites] = useState<any[]>([]);
   const [progress, setProgress] = useState<any>(null);
@@ -37,7 +37,7 @@ const ScanResults = ({ name }) => {
             <div className="div-scan-title">
               <h1 className="header-title">Scan Results</h1>
             </div>
-            <Button variant="outlined" color="primary" onClick={() => history.push('/report')}>
+            <Button variant="outlined" color="primary" onClick={() => navigate('/report')}>
               More details
             </Button>
           </header>

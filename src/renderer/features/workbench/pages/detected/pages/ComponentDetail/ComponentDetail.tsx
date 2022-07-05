@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import { Inventory } from '@api/types';
 import { componentService } from '@api/services/component.service';
@@ -28,7 +28,7 @@ const TABS = {
 };
 
 export const ComponentDetail = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
@@ -55,7 +55,7 @@ export const ComponentDetail = () => {
   const onAction = async (file: any, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push({
+        navigate({
           pathname: '/workbench/detected/file',
           search: `?path=file|${encodeURIComponent(file.path)}`,
         });
@@ -163,7 +163,7 @@ export const ComponentDetail = () => {
   };
 
   const onDetailPressed = async (file) => {
-    history.push(`/workbench/identified/inventory/${file.inventoryid}`);
+    navigate(`/workbench/identified/inventory/${file.inventoryid}`);
   };
 
   const create = async (defaultInventory, selFiles) => {

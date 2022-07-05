@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { Node } from '@api/types';
 import { IpcEvents } from '@api/ipc-events';
@@ -15,8 +15,8 @@ import { setTree } from '@store/workbench-store/workbenchThunks';
 export const WorkbenchContext = React.createContext(null);
 
 export const WorkbenchProvider: React.FC<any> = ({ children }) => {
-  const history = useHistory();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -29,7 +29,8 @@ export const WorkbenchProvider: React.FC<any> = ({ children }) => {
   const onTreeUpdating = (_event) => {
     console.log("onTreeUpdating");
     dispatch(setLoading(true));
-  }
+  };
+
   const onTreeRefreshed = (_event, fileTree) => {
     console.log("onTreeRefreshed");
     dispatch(setTree(fileTree));
@@ -56,27 +57,19 @@ export const WorkbenchProvider: React.FC<any> = ({ children }) => {
    */
   useEffect(() => {
     if (loaded) {
-      const unlisten = history.listen((data) => {
-        if (data.pathname === '/workspace') return;
+      if (location.pathname === '/workspace') return;
+      const param = new URLSearchParams(location.search).get('path');
+      if (!param) {
+        setNode(null);
+        return;
+      }
 
-        const param = new URLSearchParams(data.search).get('path');
-        if (!param) {
-          setNode(null);
-          return;
-        }
-
-        const [type, path]: any[] = decodeURIComponent(param).split('|');
-        if (path) {
-          setNode({ type, path });
-        }
-      });
-
-      return () => {
-        unlisten();
-      };
+      const [type, path]: any[] = decodeURIComponent(param).split('|');
+      if (path) {
+        setNode({ type, path });
+      }
     }
-    return () => null;
-  }, [loaded]);
+  }, [location, loaded]);
 
   /**
    * Effect to display generic dialog on specific batch actions

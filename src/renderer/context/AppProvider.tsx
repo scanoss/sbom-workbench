@@ -1,14 +1,14 @@
-import { Button, LinearProgress, Snackbar } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { ipcRenderer } from 'electron';
-import React, { useContext, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as os from 'os';
 import { fetchProjects } from '@store/workspace-store/workspaceThunks';
-import { INewProject, IProject } from '@api/types';
+import { IProject } from '@api/types';
 import { workspaceService } from '@api/services/workspace.service';
 import { IpcEvents } from '@api/ipc-events';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
+import { useDispatch } from 'react-redux';
+import { setScanPath } from '@store/workspace-store/workspaceSlice';
 import { DialogContext, IDialogContext } from './DialogProvider';
 import { dialogController } from '../controllers/dialog-controller';
 
@@ -23,7 +23,7 @@ export interface IAppContext {
 export const AppContext = React.createContext<IAppContext | null>(null);
 
 const AppProvider = ({ children }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -34,7 +34,7 @@ const AppProvider = ({ children }) => {
 
     if (paths && paths.length > 0) {
       dispatch(setScanPath({ path: paths[0], action: 'scan' }));
-      history.push('/workspace/new/settings');
+      navigate('/workspace/new/settings');
     }
   };
 
