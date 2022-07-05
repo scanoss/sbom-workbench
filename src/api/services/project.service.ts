@@ -65,7 +65,7 @@ class ProjectService extends BaseService {
     return this.response(response);
   }
 
-  public async getApiKey(): Promise<any> {
+  public async getApiKey(): Promise<string> {
     const response = await ipcRenderer.invoke(IpcEvents.GET_API_KEY);
     return this.response(response);
   }

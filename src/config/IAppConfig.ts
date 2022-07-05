@@ -3,6 +3,7 @@ import { ExportFormat } from '../api/types';
 export interface IAppConfig {
   APP_NAME: string;
   ABOUT_MESSAGE: string;
+  SCANOSS_WEBSITE_URL: string;
 
   API_URL: string;
   API_KEY: string;

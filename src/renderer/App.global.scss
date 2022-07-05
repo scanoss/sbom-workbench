@@ -23,7 +23,7 @@
 /* utils */
 @import './theme/Utils.global.scss';
 
-/* compon./ents */
+/* components */
 @import './features/workspace/pages/Workspace/Workspace';
 @import './features/workspace/pages/ProjectDrop/ProjectDrop';
 @import './features/workspace/pages/ProjectScan/ProjectScan';
@@ -52,7 +52,8 @@
 @import './features/workbench/components/ComponentInfo/ComponentInfo.scss';
 @import './features/workbench/components/NoMatchFound/NoMatchFound.scss';
 @import './features/workbench/pages/detected/pages/Dependency/components/DependencyTree/DependencyTree';
-@import './ui/dialog/PreLoadInventoryDialog.scss';
+@import './ui/dialog/PreLoadInventoryDialog';
+@import './ui/dialog/ComponentSearcherDialog';
 @import './components/NotificationCenter/NotificationCenter.scss';
 @import './features/workbench/components/WorkbenchFilters/WorkbenchFilters.scss';
 
