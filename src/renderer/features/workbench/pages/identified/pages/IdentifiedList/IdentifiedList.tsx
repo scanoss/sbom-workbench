@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useNavigate } from 'react-router-dom';
 import { Alert } from '@material-ui/lab';
 import { componentService } from '../../../../../../../api/services/component.service';
 import { inventoryService } from '../../../../../../../api/services/inventory.service';
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const IdentifiedList = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const classes = useStyles();
   const dispatch = useDispatch();
   const { limit, onScroll } = usePagination();
@@ -60,7 +60,7 @@ export const IdentifiedList = () => {
     const { purl } = grouped.inventories[0];
     const comp = await componentService.get({ purl }, { unique: true });
     dispatch(setComponent(comp));
-    history.push(`/workbench/identified/inventory`);
+    navigate(`/workbench/identified/inventory`);
   };
 
   const init = async () => {

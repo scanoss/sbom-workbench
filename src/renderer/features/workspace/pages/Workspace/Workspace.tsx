@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AppContext, IAppContext } from '@context/AppProvider';
 import { IProject } from '@api/types';
 import { workspaceService } from '@api/services/workspace.service';
@@ -14,7 +14,7 @@ import ProjectList from '../Components/ProjectList';
 import AddProjectButton from '../Components/AddProjectButton/AddProjectButton';
 
 const Workspace = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { projects } = useSelector(selectWorkspaceState);
@@ -36,7 +36,7 @@ const Workspace = () => {
   const onShowScanHandler = async (project: IProject) => {
     if (project.appVersion >= AppConfig.MIN_VERSION_SUPPORTED) {
       dispatch(setScanPath({ path: project.work_root, action: 'none' }));
-      history.push('/workbench');
+      navigate('/workbench/detected');
     } else {
       const { action } = await dialogCtrl.openAlertDialog(
         'This project was scanned with a previous version that is no longer supported. Would you like to delete it and scan it again?',
@@ -49,7 +49,7 @@ const Workspace = () => {
       if (action !== DIALOG_ACTIONS.CANCEL) {
         await deleteProject(project);
         dispatch(setScanPath({ path: project.scan_root, action: 'scan' }));
-        history.push('/workspace/new/settings');
+        navigate('/workspace/new/settings');
       }
     }
   };
@@ -85,14 +85,14 @@ const Workspace = () => {
     });
     if (action === DIALOG_ACTIONS.OK) {
       dispatch(setScanPath({ path: project.work_root, action: 'rescan', projectName: project.name }));
-      history.push('/workspace/new/scan');
+      navigate('/workspace/new/scan');
       init();
     }
   };
 
   const onRestoreHandler = async (project: IProject) => {
     dispatch(setScanPath({ path: project.work_root, action: 'resume', projectName: project.name }));
-    history.push('/workspace/new/scan');
+    navigate('/workspace/new/scan');
   };
 
   const onExportHandler = async (project: IProject) => {

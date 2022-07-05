@@ -1,18 +1,19 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { HashRouter, Route } from 'react-router-dom';
-import { createMuiTheme, MuiThemeProvider, Theme } from '@material-ui/core/styles';
-import { DialogProvider } from '@context/DialogProvider';
-import AppConfig from '@config/AppConfigModule';
+import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { createMuiTheme, MuiThemeProvider, Theme } from '@material-ui/core/styles';
+import AppConfig from '@config/AppConfigModule';
+import { DialogProvider } from '@context/DialogProvider';
 import { WorkbenchProvider } from '@context/WorkbenchProvider';
-import Workbench from './features/workbench/Workbench';
-import AppProvider from './context/AppProvider';
-import Workspace from './features/workspace';
-import About from './features/about/About';
+import AppProvider from '@context/AppProvider';
+import store from '@store/store';
+import WorkbenchModule from './features/workbench';
+import WorkspaceModule from './features/workspace';
+import AboutModule from './features/about';
 
 import './App.global.scss';
-import store from './store/store';
+
 
 export default class App {
   /**
@@ -31,13 +32,14 @@ export default class App {
             <MuiThemeProvider theme={theme}>
               <DialogProvider>
                 <AppProvider>
-                  <Route exact path="/" component={Workspace} /> {/* Redirect not working with new browser windows */}
-                  <Route path="/workspace" component={Workspace} />
                   <WorkbenchProvider>
-                    <Route path="/workbench" component={Workbench} />
+                    <Routes>
+                      <Route index element={<WorkspaceModule />} />
+                      <Route path="/workspace/*" element={<WorkspaceModule />} />
+                      <Route path="/workbench/*" element={<WorkbenchModule />} />
+                      <Route path="/about" element={<AboutModule />} />
+                    </Routes>
                   </WorkbenchProvider>
-                  <Route path="/about" exact component={About} />
-                  {/* <Redirect from="/" to="/workspace" /> */}
                 </AppProvider>
               </DialogProvider>
             </MuiThemeProvider>

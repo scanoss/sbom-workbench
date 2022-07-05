@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
 import { Chart, registerables } from 'chart.js';
 import { Button, Card } from '@material-ui/core';
@@ -16,7 +16,7 @@ Chart.register(...registerables);
 const MAX_LICENSES = 4;
 
 const IdentifiedReport = ({ data }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [obligations, setObligations] = useState(null);
 
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
@@ -45,7 +45,7 @@ const IdentifiedReport = ({ data }) => {
           <div className="report-message">
             <InsertDriveFileOutlinedIcon fontSize="inherit" color="primary" style={{ fontSize: '100px' }} />
             <h2>Nothing identified yet.</h2>
-            <Button variant="contained" color="primary" onClick={() => history.push('/workbench/detected')}>
+            <Button variant="contained" color="primary" onClick={() => navigate('/workbench/detected')}>
               Start Identification
             </Button>
           </div>

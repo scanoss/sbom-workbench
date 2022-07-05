@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { IpcEvents } from '@api/ipc-events';
@@ -13,7 +13,7 @@ import CircularComponent from '../Components/CircularComponent';
 const { ipcRenderer } = require('electron');
 
 const ProjectScan = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const dispatch = useDispatch();
 
@@ -46,7 +46,7 @@ const ProjectScan = () => {
 
   const onShowScan = (path) => {
     dispatch(setScanPath({ path, action: 'none' }));
-    history.replace('/workbench/report');
+    navigate('/workbench/report',  { replace: true });
   };
 
   const handlerScannerStatus = (_event, args) => {
@@ -68,7 +68,7 @@ const ProjectScan = () => {
       },
       true
     );
-    history.push('/workspace');
+    navigate('/workspace');
   };
 
   const onPauseHandler = async () => {
@@ -82,7 +82,7 @@ const ProjectScan = () => {
     );
     if (action === 'ok') {
       await projectService.stop();
-      history.push('/workspace');
+      navigate('/workspace');
     }
 
     // ipcRenderer.send(IpcEvents.PROJECT_STOP);

@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Tree, { renderers as Renderers } from 'react-virtualized-tree';
 import { useDispatch, useSelector } from 'react-redux';
 import useContextual from '@hooks/useContextual';
@@ -34,7 +34,7 @@ const FileTreeNode = ({ node, onClick, onContextMenu }) => {
 };
 
 const FileTree = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const contextual = useContextual();
   const dispatch = useDispatch();
 
@@ -101,12 +101,12 @@ const FileTree = () => {
   const onSelectNode = async (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
     const { children, value } = node;
     if (!children) {
-      history.push({
+      navigate({
         pathname: '/workbench/detected/file',
         search: `?path=file|${encodeURIComponent(value)}`,
       });
     } else {
-      history.push({
+      navigate({
         pathname: '/workbench/detected',
         search: node.value ? `?path=folder|${encodeURIComponent(value)}` : null,
       });
@@ -204,14 +204,6 @@ const FileTree = () => {
     };
   }, []);
 
-  // loader
-  if (!tree || tree.length === 0) {
-    return (
-      <div className="loader">
-        <span>Indexing...</span>
-      </div>
-    );
-  }
   return (
     <div className="file-tree-container">
       {state.loading && (

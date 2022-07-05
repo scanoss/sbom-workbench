@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { IconButton, Link } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AppContext, IAppContext } from '@context/AppProvider';
 
 const ProjectDrop = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { newProject } = useContext(AppContext) as IAppContext;
 
   const onSelectProjectHandler = () => {
@@ -18,7 +18,7 @@ const ProjectDrop = () => {
         <header className="app-header">
           <div>
             <h4 className="header-subtitle back">
-              <IconButton onClick={() => history.goBack()} component="span">
+              <IconButton onClick={() => navigate(-1)} component="span">
                 <ArrowBackIcon />
               </IconButton>
               New Project

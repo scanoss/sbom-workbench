@@ -1,6 +1,6 @@
 import { Chip } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
@@ -16,7 +16,7 @@ import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import { FileList } from './components/FileList';
 
 export const InventoryDetail = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams<any>();
 
@@ -32,7 +32,7 @@ export const InventoryDetail = () => {
       setFiles(mapFiles(inv.files));
     } catch (error) {
       console.error(error);
-      history.goBack();
+      navigate(-1);
     }
   };
 
@@ -60,14 +60,14 @@ export const InventoryDetail = () => {
     });
     if (action === DIALOG_ACTIONS.OK) {
       await dispatch(deleteInventory(inventory.id));
-      history.goBack();
+      navigate(-1);
     }
   };
 
   const onAction = (file: any, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        history.push({
+        navigate({
           pathname: `/workbench/detected/file`,
           search: `?path=file|${encodeURIComponent(file.path)}`,
         });

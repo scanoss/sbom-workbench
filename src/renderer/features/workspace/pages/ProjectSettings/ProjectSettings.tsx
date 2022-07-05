@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SearchIcon from '@material-ui/icons/Search';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { Add } from '@material-ui/icons';
@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ProjectSettings = () => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { projects, scanPath } = useSelector(selectWorkspaceState);
@@ -125,7 +125,7 @@ const ProjectSettings = () => {
   const submit = async () => {
     dispatch(setScanPath({ ...scanPath, projectName: projectSettings.name }));
     dispatch(setNewProject(projectSettings));
-    history.push('/workspace/new/scan');
+    navigate('/workspace/new/scan');
   };
 
   const handleClose = (e) => {
@@ -157,7 +157,7 @@ const ProjectSettings = () => {
         <header className="app-header">
           <div>
             <h4 className="header-subtitle back">
-              <IconButton onClick={() => history.goBack()} component="span">
+              <IconButton onClick={() => navigate(-1)} component="span">
                 <ArrowBackIcon />
               </IconButton>
               Project Settings

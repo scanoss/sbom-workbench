@@ -3,7 +3,7 @@ import { Chip, IconButton, makeStyles, TextField } from '@material-ui/core';
 import { ipcRenderer } from 'electron';
 import { IpcEvents } from '@api/ipc-events';
 import { DataGrid } from '@material-ui/data-grid';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import * as SearchUtils from '@shared/utils/search-utils';
 import { AppConfigDefault } from '@config/AppConfigDefault';
@@ -83,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SearchPanel = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const classes = useStyles();
   const searchQuery = useRef(null);
   const { summary } = useSelector(selectWorkbench);
@@ -112,7 +112,7 @@ const SearchPanel = () => {
   };
 
   const goto = (path: string) => {
-    history.push({
+    navigate({
       pathname: '/workbench/search/file',
       search: `?path=file|${encodeURIComponent(path)}&highlight=${encodeURIComponent(searchQuery.current)}`,
     });

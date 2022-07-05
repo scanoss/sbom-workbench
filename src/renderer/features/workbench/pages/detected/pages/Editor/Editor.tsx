@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { FileType, Inventory } from '@api/types';
@@ -32,7 +32,7 @@ export interface FileContent {
 }
 
 export const Editor = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const highlightParam = useSearchParams().get('highlight');
 
@@ -157,7 +157,7 @@ export const Editor = () => {
   };
 
   const onDetailPressed = async (result) => {
-    history.push(`/workbench/identified/inventory/${result.id}`);
+    navigate(`/workbench/identified/inventory/${result.id}`);
   };
 
   useEffect(() => {
