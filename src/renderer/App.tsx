@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { HashRouter, Route } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider, Theme } from '@material-ui/core/styles';
 import { DialogProvider } from '@context/DialogProvider';
@@ -25,29 +25,32 @@ export default class App {
     const theme = this.loadTheme();
 
     const app = (
-      <HashRouter>
-        <Provider store={store}>
-          <MuiThemeProvider theme={theme}>
-            <DialogProvider>
-              <AppProvider>
-                <Route exact path="/" component={Workspace} /> {/* Redirect not working with new browser windows */}
-                <Route path="/workspace" component={Workspace} />
-                <WorkbenchProvider>
-                  <Route path="/workbench" component={Workbench} />
-                </WorkbenchProvider>
-                <Route path="/about" exact component={About} />
-
-                {/* <Redirect from="/" to="/workspace" /> */}
-              </AppProvider>
-            </DialogProvider>
-          </MuiThemeProvider>
-        </Provider>
-      </HashRouter>
+      <>
+        <HashRouter>
+          <Provider store={store}>
+            <MuiThemeProvider theme={theme}>
+              <DialogProvider>
+                <AppProvider>
+                  <Route exact path="/" component={Workspace} /> {/* Redirect not working with new browser windows */}
+                  <Route path="/workspace" component={Workspace} />
+                  <WorkbenchProvider>
+                    <Route path="/workbench" component={Workbench} />
+                  </WorkbenchProvider>
+                  <Route path="/about" exact component={About} />
+                  {/* <Redirect from="/" to="/workspace" /> */}
+                </AppProvider>
+              </DialogProvider>
+            </MuiThemeProvider>
+          </Provider>
+        </HashRouter>
+      </>
     );
 
     this.setupAppMenuListeners();
 
-    return render(app, document.getElementById('root'));
+    const container = document.getElementById('root')!;
+    const root = createRoot(container);
+    root.render(app);
   }
 
   private setTitle() {

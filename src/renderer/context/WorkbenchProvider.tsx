@@ -14,7 +14,7 @@ import { setTree } from '@store/workbench-store/workbenchThunks';
 
 export const WorkbenchContext = React.createContext(null);
 
-export const WorkbenchProvider: React.FC = ({ children }) => {
+export const WorkbenchProvider: React.FC<any> = ({ children }) => {
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -55,25 +55,27 @@ export const WorkbenchProvider: React.FC = ({ children }) => {
    *  Listener for navigation events
    */
   useEffect(() => {
-    if (!loaded) return null;
+    if (loaded) {
+      const unlisten = history.listen((data) => {
+        if (data.pathname === '/workspace') return;
 
-    const unlisten = history.listen((data) => {
-      if (data.pathname === '/workspace') return;
+        const param = new URLSearchParams(data.search).get('path');
+        if (!param) {
+          setNode(null);
+          return;
+        }
 
-      const param = new URLSearchParams(data.search).get('path');
-      if (!param) {
-        setNode(null);
-        return;
-      }
+        const [type, path]: any[] = decodeURIComponent(param).split('|');
+        if (path) {
+          setNode({ type, path });
+        }
+      });
 
-      const [type, path]: any[] = decodeURIComponent(param).split('|');
-      if (path) {
-        setNode({ type, path });
-      }
-    });
-    return () => {
-      unlisten();
-    };
+      return () => {
+        unlisten();
+      };
+    }
+    return () => null;
   }, [loaded]);
 
   /**
