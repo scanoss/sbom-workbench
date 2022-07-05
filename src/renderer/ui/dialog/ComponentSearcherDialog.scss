@@ -1,0 +1,45 @@
+#ComponentSearcherDialog {
+
+  & .MuiDialog-paperWidthMd {
+    width: 800px;
+  }
+
+  .external-link {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .dialog-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 4px 4px 16px;
+  }
+
+  .dialog-row.searcher {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 10px;
+
+    .dialog-form-field {
+      flex: 1;
+
+      &.package {
+        flex: 0 0 160px;
+      }
+    }
+  }
+
+  .results-datagrid {
+    height: 400px;
+
+    & .MuiDataGrid-cell {
+      font-size: 12px;
+    }
+
+    & .MuiDataGrid-cell:focus-within {
+      outline: none !important;
+    }
+  }
+}

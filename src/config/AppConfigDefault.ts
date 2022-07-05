@@ -7,6 +7,7 @@ export const AppConfigDefault: IAppConfig = {
     'SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.',
   API_URL: 'https://osskb.org/api',
   API_KEY: '',
+  SCANOSS_WEBSITE_URL: 'https://www.scanoss.com',
   MIN_VERSION_SUPPORTED: '0.17.0',
   DEFAULT_WORKSPACE_NAME: 'scanoss-workspace',
   DEFAULT_IP_gRPC: 'scanoss.com',
