@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Alert } from '@material-ui/lab';
-import { Button } from '@material-ui/core';
-import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined';
+import { Alert } from '@mui/lab';
+import { Button } from '@mui/material';
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import SearchBox from '@components/SearchBox/SearchBox';
 import usePagination from '@hooks/usePagination';
 import { useDispatch, useSelector } from 'react-redux';

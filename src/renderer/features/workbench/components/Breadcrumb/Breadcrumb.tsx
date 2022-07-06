@@ -1,6 +1,6 @@
 import React from 'react';
-import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
-import { Breadcrumbs, Link, makeStyles, Typography } from '@material-ui/core';
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import { Breadcrumbs, Link, makeStyles, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';

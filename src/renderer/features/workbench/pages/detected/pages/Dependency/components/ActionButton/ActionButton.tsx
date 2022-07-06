@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { Button, ButtonGroup, ClickAwayListener, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import { Button, ButtonGroup, ClickAwayListener, MenuItem, MenuList, Paper, Popper } from '@mui/material';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const ActionButton = ({
   count,

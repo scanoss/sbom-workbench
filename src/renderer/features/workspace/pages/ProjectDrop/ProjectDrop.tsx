@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { IconButton, Link } from '@material-ui/core';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import { IconButton, Link } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import { AppContext, IAppContext } from '@context/AppProvider';
 

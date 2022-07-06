@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { makeStyles, Paper, IconButton, InputBase } from '@material-ui/core';
+import { makeStyles, Paper, IconButton, InputBase } from '@mui/material';
 import { useHistory, useNavigate } from 'react-router-dom';
-import { Alert } from '@material-ui/lab';
+import { Alert } from '@mui/lab';
 import { componentService } from '../../../../../../../api/services/component.service';
 import { inventoryService } from '../../../../../../../api/services/inventory.service';
 import { WorkbenchContext, IWorkbenchContext } from '@context/WorkbenchProvider';

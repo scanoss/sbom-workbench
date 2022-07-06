@@ -11,11 +11,11 @@ import {
   InputBase,
   TextField,
   IconButton,
-} from '@material-ui/core';
+} from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import SearchIcon from '@material-ui/icons/Search';
-import AddIcon from '@material-ui/icons/Add';
-import { Autocomplete } from '@material-ui/lab';
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+import { Autocomplete } from '@mui/lab';
 import { Dependency } from '@api/types';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { ResponseStatus } from '@api/Response';

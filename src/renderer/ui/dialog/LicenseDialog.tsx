@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { Dialog, Paper, DialogActions, Button, makeStyles, InputBase, TextareaAutosize } from '@material-ui/core';
+import { Dialog, Paper, DialogActions, Button, makeStyles, InputBase, TextareaAutosize } from '@mui/material';
 
 import React, { useContext, useEffect, useState } from 'react';
 import { License } from '../../../api/types';

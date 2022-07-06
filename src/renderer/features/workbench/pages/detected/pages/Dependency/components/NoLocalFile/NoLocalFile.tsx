@@ -1,5 +1,5 @@
 import React from 'react';
-import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 
 const NoLocalFile = () => (
   <div id="NoLocalFile">

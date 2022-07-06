@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 import { inventoryService } from '@api/services/inventory.service';
 import { Inventory } from '@api/types';
 import { useSelector } from 'react-redux';

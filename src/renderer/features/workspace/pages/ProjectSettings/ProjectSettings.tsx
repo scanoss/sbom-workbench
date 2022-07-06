@@ -9,13 +9,13 @@ import {
   Tooltip,
   Select,
   MenuItem,
-} from '@material-ui/core';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import SearchIcon from '@material-ui/icons/Search';
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import { Add } from '@material-ui/icons';
+import Autocomplete from '@mui/lab/Autocomplete';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Add } from '@mui/icons-material';
 import { INewProject } from '@api/types';
 import { userSettingService } from '@api/services/userSetting.service';
 import { workspaceService } from '@api/services/workspace.service';

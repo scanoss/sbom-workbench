@@ -14,11 +14,11 @@ import {
   Switch,
   Divider,
   makeStyles, Input, InputBase
-} from '@material-ui/core';
-import KeyboardArrowDownOutlinedIcon from '@material-ui/icons/KeyboardArrowDownOutlined';
-import KeyboardArrowUpOutlinedIcon from '@material-ui/icons/KeyboardArrowUpOutlined';
-import DeleteIcon from '@material-ui/icons/DeleteOutlined';
-import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+} from '@mui/material';
+import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
+import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { projectService } from '@api/services/project.service';

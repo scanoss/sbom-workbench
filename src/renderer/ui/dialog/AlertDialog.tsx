@@ -1,7 +1,7 @@
-import { Dialog, DialogActions, Button, makeStyles, DialogContentText, DialogContent } from '@material-ui/core';
+import { Dialog, DialogActions, Button, makeStyles, DialogContentText, DialogContent } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
 
 const useStyles = makeStyles((theme) => ({

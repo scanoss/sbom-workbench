@@ -1,4 +1,4 @@
-import { Button, Tooltip, createStyles, makeStyles } from '@material-ui/core';
+import { Button, Tooltip, createStyles, makeStyles } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Navigate, NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import { reportService } from '@api/services/report.service';

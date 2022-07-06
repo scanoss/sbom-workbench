@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
+import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import { Inventory } from '@api/types';
 import { componentService } from '@api/services/component.service';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';

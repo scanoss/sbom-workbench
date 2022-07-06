@@ -12,12 +12,12 @@ import {
   TableRow,
   Tooltip,
   Chip,
-} from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
-import ReplayIcon from '@material-ui/icons/Replay';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
-import GetAppOutlined from '@material-ui/icons/GetAppOutlined';
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ReplayIcon from '@mui/icons-material/Replay';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import WarningOutlinedIcon from '@mui/icons-material/WarningOutlined';
+import GetAppOutlined from '@mui/icons-material/GetAppOutlined';
 import { IProject, ScanState } from '@api/types';
 import AppConfig from '../../../../../config/AppConfigModule';
 

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { ButtonGroup, Button, Popper, Paper, ClickAwayListener, MenuList, MenuItem } from '@material-ui/core';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import { ButtonGroup, Button, Popper, Paper, ClickAwayListener, MenuList, MenuItem } from '@mui/material';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const ActionButton = ({
   tab,

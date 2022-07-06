@@ -1,9 +1,9 @@
-import { Dialog, DialogActions, Button, makeStyles, DialogContentText, Card, DialogContent, Tooltip } from '@material-ui/core';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
+import { Dialog, DialogActions, Button, makeStyles, DialogContentText, Card, DialogContent, Tooltip } from '@mui/material';
+import MuiDialogTitle from '@mui/material/DialogTitle';
 import React, { useEffect, useState } from 'react';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import InfoIcon from '@material-ui/icons/Info';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import InfoIcon from '@mui/icons-material/Info';
 import { Inventory } from '../../../../../api/types';
 import Label from '../Label/Label';
 import { DIALOG_ACTIONS, InventorySelectorResponse } from '../../../../context/types';

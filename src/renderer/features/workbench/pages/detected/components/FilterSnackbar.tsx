@@ -1,6 +1,6 @@
 import React from 'react';
-import { makeStyles, Snackbar } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import { makeStyles, Snackbar } from '@mui/material';
+import { Alert } from '@mui/lab';
 import { useLocation } from 'react-router-dom';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { useSelector } from 'react-redux';

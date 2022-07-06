@@ -10,8 +10,8 @@ import {
   Paper,
   TextareaAutosize,
   Tooltip,
-} from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+} from '@mui/material';
+import { Alert } from '@mui/lab';
 import React, { useEffect, useState } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { useSelector } from 'react-redux';

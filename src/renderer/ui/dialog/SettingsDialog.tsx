@@ -1,9 +1,9 @@
-import { Button, Dialog, DialogActions, IconButton, InputBase, makeStyles, Paper, Tooltip } from '@material-ui/core';
-import TextField from '@material-ui/core/TextField';
-import AddIcon from '@material-ui/icons/Add';
-import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
+import { Button, Dialog, DialogActions, IconButton, InputBase, makeStyles, Paper, Tooltip } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import AddIcon from '@mui/icons-material/Add';
+import Autocomplete, { createFilterOptions } from '@mui/lab/Autocomplete';
 import React, { useEffect, useState } from 'react';
-import DeleteIcon from '@material-ui/icons/Delete';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
 import { IWorkspaceCfg } from '../../../api/types';
 import { userSettingService } from '../../../api/services/userSetting.service';

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, IconButton, ListItem, ListItemIcon, ListItemText, Paper, Tooltip, Typography } from '@material-ui/core';
-import CheckIcon from '@material-ui/icons/Check';
-import BanIcon from '@material-ui/icons/NotInterested';
-import { RestoreOutlined } from '@material-ui/icons';
+import { Card, IconButton, ListItem, ListItemIcon, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
+import BanIcon from '@mui/icons-material/NotInterested';
+import { RestoreOutlined } from '@mui/icons-material';
 import { List, AutoSizer } from 'react-virtualized';
-import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
+import WarningOutlinedIcon from '@mui/icons-material/WarningOutlined';
 import { Dependency } from '@api/types';
 import IconComponent from '../../../../../../components/IconComponent/IconComponent';
 

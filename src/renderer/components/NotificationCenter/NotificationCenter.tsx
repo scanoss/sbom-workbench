@@ -1,4 +1,4 @@
-import { Snackbar, LinearProgress } from '@material-ui/core';
+import { Snackbar, LinearProgress } from '@mui/material';
 import React from 'react';
 
 const NotificationCenter = () => {

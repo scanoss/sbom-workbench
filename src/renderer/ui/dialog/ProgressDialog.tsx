@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, makeStyles, DialogContent, LinearProgress } from '@material-ui/core';
+import { Dialog, makeStyles, DialogContent, LinearProgress } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   size: {

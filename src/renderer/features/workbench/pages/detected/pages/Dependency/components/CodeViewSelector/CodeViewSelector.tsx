@@ -1,7 +1,7 @@
 import React from 'react';
-import { ButtonGroup, Button, makeStyles, Tooltip } from '@material-ui/core';
-import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
-import ExtensionOutlinedIcon from '@material-ui/icons/ExtensionOutlined';
+import { ButtonGroup, Button, makeStyles, Tooltip } from '@mui/material';
+import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
+import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 
 const useStyles = makeStyles((theme) => ({
   root: {

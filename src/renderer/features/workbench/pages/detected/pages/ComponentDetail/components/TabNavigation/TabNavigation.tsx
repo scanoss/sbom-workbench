@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, Tabs, Tab } from '@material-ui/core';
+import { Paper, Tabs, Tab } from '@mui/material';
 import { ComponentGroup } from '../../../../../../../../../api/types';
 
 export interface TabNavigationProps {

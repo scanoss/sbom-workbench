@@ -2,7 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { createMuiTheme, MuiThemeProvider, Theme } from '@material-ui/core/styles';
+import { createMuiTheme, MuiThemeProvider, Theme } from '@mui/material/styles';
 import AppConfig from '@config/AppConfigModule';
 import { DialogProvider } from '@context/DialogProvider';
 import { WorkbenchProvider } from '@context/WorkbenchProvider';

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import useContextual from '@hooks/useContextual';
 import { collapseTree, expandTree, selectWorkbench, updateTree } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 import { ipcRenderer } from 'electron';
 import { IpcEvents } from '@api/ipc-events';
 

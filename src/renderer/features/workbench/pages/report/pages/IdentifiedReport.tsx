@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { Chart, registerables } from 'chart.js';
-import { Button, Card } from '@material-ui/core';
+import { Button, Card } from '@mui/material';
 import LicensesChart from '../components/LicensesChart';
 import IdentificationProgress from '../components/IdentificationProgress';
 import LicensesTable from '../components/LicensesTable';

@@ -1,9 +1,9 @@
-import { Chip } from '@material-ui/core';
+import { Chip } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import IconButton from '@material-ui/core/IconButton';
-import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
-import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
+import IconButton from '@mui/material/IconButton';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Inventory } from '@api/types';
 import { inventoryService } from '@api/services/inventory.service';
 import { mapFiles } from '@shared/utils/scan-util';

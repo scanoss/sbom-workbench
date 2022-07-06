@@ -14,12 +14,12 @@ import {
   TextField,
   IconButton,
   Tooltip,
-} from '@material-ui/core';
-import SearchIcon from '@material-ui/icons/Search';
-import AddIcon from '@material-ui/icons/Add';
-import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import React, { useEffect, useState, useContext } from 'react';
-import { Alert, Autocomplete } from '@material-ui/lab';
+import { Alert, Autocomplete } from '@mui/lab';
 import { ComponentGroup, Inventory } from '@api/types';
 import { InventoryForm } from '@context/types';
 import { componentService } from '@api/services/component.service';

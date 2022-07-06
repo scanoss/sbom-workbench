@@ -1,10 +1,10 @@
 import React from 'react';
-import CheckIcon from '@material-ui/icons/Check';
-import BanIcon from '@material-ui/icons/NotInterested';
-import { Tooltip } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
-import RestoreOutlined from '@material-ui/icons/RestoreOutlined';
-import DescriptionOutlined from '@material-ui/icons/DescriptionOutlined';
+import CheckIcon from '@mui/icons-material/Check';
+import BanIcon from '@mui/icons-material/NotInterested';
+import { Tooltip } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import RestoreOutlined from '@mui/icons-material/RestoreOutlined';
+import DescriptionOutlined from '@mui/icons-material/DescriptionOutlined';
 import Label from '../Label/Label';
 
 export enum MATCH_CARD_ACTIONS {

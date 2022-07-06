@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button, ButtonGroup, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener/ClickAwayListener';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import AddIcon from '@material-ui/icons/Add';
+import { Button, ButtonGroup, Grow, MenuItem, MenuList, Paper, Popper } from '@mui/material';
+import ClickAwayListener from '@mui/material/ClickAwayListener/ClickAwayListener';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import AddIcon from '@mui/icons-material/Add';
 
 const options = ['Create a merge commit', 'Squash and merge', 'Rebase and merge'];
 

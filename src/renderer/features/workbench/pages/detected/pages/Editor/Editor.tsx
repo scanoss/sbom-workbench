@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Skeleton } from '@material-ui/lab';
+import { Skeleton } from '@mui/lab';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { FileType, Inventory } from '@api/types';
 import { mapFiles } from '@shared/utils/scan-util';

@@ -9,22 +9,22 @@ import {
   Fade,
   Menu,
   MenuItem,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import React, { useContext, useEffect, useState } from 'react';
-import HomeOutlinedIcon from '@material-ui/icons/HomeOutlined';
-import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
-import InsertChartOutlinedTwoToneIcon from '@material-ui/icons/InsertChartOutlinedTwoTone';
-import GavelIcon from '@material-ui/icons/Gavel';
-import SearchIcon from '@material-ui/icons/Search';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
+import InsertChartOutlinedTwoToneIcon from '@mui/icons-material/InsertChartOutlinedTwoTone';
+import GavelIcon from '@mui/icons-material/Gavel';
+import SearchIcon from '@mui/icons-material/Search';
 
 // eslint-disable-next-line import/no-named-default
-import { default as MaterialAppBar } from '@material-ui/core/AppBar';
+import { default as MaterialAppBar } from '@mui/material/AppBar';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
-import GetAppIcon from '@material-ui/icons/GetApp';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
+import GetAppIcon from '@mui/icons-material/GetApp';
 import { useSelector } from 'react-redux';
 import { exportService } from '@api/services/export.service';
 import { ExportFormat, IProject } from '@api/types';
