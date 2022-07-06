@@ -39,10 +39,10 @@ const Navigation = () => {
 
   return (
     <section id="Navigation">
-      <IconButton onClick={() => navigate(-1)}>
+      <IconButton onClick={() => navigate(-1)} size="large">
         <ArrowBackIcon />
       </IconButton>
-      <IconButton onClick={() => navigate(1)}>
+      <IconButton onClick={() => navigate(1)} size="large">
         <ArrowForwardIcon />
       </IconButton>
     </section>
@@ -297,31 +297,34 @@ const AppBar = ({ exp }) => {
     navigate('/workspace');
   };
 
-  return (
-    <>
-      <MaterialAppBar id="AppBar" elevation={1}>
-        <Toolbar>
-          <div className="slot start">
-            <Tooltip title="Back to projects">
-              <IconButton onClick={onBackPressed} edge="start" color="inherit" aria-label="menu">
-                <HomeOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-            <Divider orientation="vertical" flexItem />
-            <Navigation />
-            <Divider orientation="vertical" flexItem />
-            <AppMenu />
-          </div>
+  return <>
+    <MaterialAppBar id="AppBar" elevation={1}>
+      <Toolbar>
+        <div className="slot start">
+          <Tooltip title="Back to projects">
+            <IconButton
+              onClick={onBackPressed}
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              size="large">
+              <HomeOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+          <Divider orientation="vertical" flexItem />
+          <Navigation />
+          <Divider orientation="vertical" flexItem />
+          <AppMenu />
+        </div>
 
-          <AppTitle title={state.name} />
+        <AppTitle title={state.name} />
 
-          <div className="slot end">
-            {!report ? <AppProgress summary={state.summary} progress={state.progress} /> : <Export state={state} />}
-          </div>
-        </Toolbar>
-      </MaterialAppBar>
-    </>
-  );
+        <div className="slot end">
+          {!report ? <AppProgress summary={state.summary} progress={state.progress} /> : <Export state={state} />}
+        </div>
+      </Toolbar>
+    </MaterialAppBar>
+  </>;
 };
 
 AppBar.defaultProps = { exp: false };

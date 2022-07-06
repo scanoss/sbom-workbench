@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Checkbox,
@@ -6,13 +7,12 @@ import {
   FormControlLabel,
   ListItem,
   ListItemIcon,
-  makeStyles,
   Paper,
   TextareaAutosize,
   Tooltip,
 } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { Alert } from '@mui/lab';
-import React, { useEffect, useState } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { useSelector } from 'react-redux';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
@@ -271,7 +271,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
             Notes <span className="optional">- Optional</span>
           </label>
           <Paper className="dialog-form-field-control">
-            <TextareaAutosize name="notes" cols={30} rows={6} />
+            <TextareaAutosize name="notes" cols={30} minRows={6} />
           </Paper>
         </div>
         <form onSubmit={onSubmit}>

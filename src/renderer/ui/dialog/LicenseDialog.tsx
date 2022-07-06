@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { Dialog, Paper, DialogActions, Button, makeStyles, InputBase, TextareaAutosize } from '@mui/material';
-
 import React, { useContext, useEffect, useState } from 'react';
-import { License } from '../../../api/types';
-import { licenseService } from '../../../api/services/license.service';
-import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
+import { Dialog, Paper, DialogActions, Button, InputBase, TextareaAutosize } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { License } from '@api/types';
+import { licenseService } from '@api/services/license.service';
+import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
+import { DialogContext } from '@context/DialogProvider';
 import { licenseHelper } from '../../../main/helpers/LicenseHelper';
-import { DialogContext } from '../../context/DialogProvider';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -94,7 +94,7 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
                 name="fulltext"
                 value={form?.fulltext}
                 cols={30}
-                rows={8}
+                minRows={8}
                 onChange={(e) => inputHandler(e)}
               />
             </Paper>

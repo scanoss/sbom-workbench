@@ -1,8 +1,9 @@
 import React, { SetStateAction, useContext, useEffect, useRef } from 'react';
-import { Chip, IconButton, makeStyles, TextField } from '@mui/material';
+import { Chip, IconButton, TextField } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { ipcRenderer } from 'electron';
 import { IpcEvents } from '@api/ipc-events';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 import Autocomplete from '@mui/lab/Autocomplete';
 import * as SearchUtils from '@shared/utils/search-utils';

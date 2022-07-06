@@ -1,5 +1,6 @@
 import React from 'react';
-import { makeStyles, Snackbar } from '@mui/material';
+import { Snackbar } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { Alert } from '@mui/lab';
 import { useLocation } from 'react-router-dom';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';

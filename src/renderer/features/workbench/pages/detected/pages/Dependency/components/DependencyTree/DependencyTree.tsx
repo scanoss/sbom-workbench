@@ -89,12 +89,12 @@ const DependencyTree = ({
                       {item.status === 'pending' && (
                         <>
                           <Tooltip title="Accept">
-                            <IconButton onClick={() => onDependencyAccept(item)}>
+                            <IconButton onClick={() => onDependencyAccept(item)} size="large">
                               <CheckIcon className="icon check" fontSize="inherit" />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Dismiss">
-                            <IconButton onClick={() => onDependencyReject(item)}>
+                            <IconButton onClick={() => onDependencyReject(item)} size="large">
                               <BanIcon className="icon ban" fontSize="inherit" />
                             </IconButton>
                           </Tooltip>
@@ -103,7 +103,7 @@ const DependencyTree = ({
                       {(item.status === 'original' || item.status === 'identified') && (
                         <>
                           <Tooltip title="Restore">
-                            <IconButton onClick={() => onDependencyRestore(item)}>
+                            <IconButton onClick={() => onDependencyRestore(item)} size="large">
                               <RestoreOutlined className="icon" fontSize="inherit" />
                             </IconButton>
                           </Tooltip>

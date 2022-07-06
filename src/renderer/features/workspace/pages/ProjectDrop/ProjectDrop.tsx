@@ -12,26 +12,24 @@ const ProjectDrop = () => {
     newProject();
   };
 
-  return (
-    <>
-      <section id="ProjectScan" className="app-page">
-        <header className="app-header">
-          <div>
-            <h4 className="header-subtitle back">
-              <IconButton onClick={() => navigate(-1)} component="span">
-                <ArrowBackIcon />
-              </IconButton>
-              New Project
-            </h4>
-            {/* <h1>New Project</h1> */}
-          </div>
-        </header>
-        <main className="app-content">
-          <Link onClick={onSelectProjectHandler}>Select folder</Link>
-        </main>
-      </section>
-    </>
-  );
+  return <>
+    <section id="ProjectScan" className="app-page">
+      <header className="app-header">
+        <div>
+          <h4 className="header-subtitle back">
+            <IconButton onClick={() => navigate(-1)} component="span" size="large">
+              <ArrowBackIcon />
+            </IconButton>
+            New Project
+          </h4>
+          {/* <h1>New Project</h1> */}
+        </div>
+      </header>
+      <main className="app-content">
+        <Link onClick={onSelectProjectHandler}>Select folder</Link>
+      </main>
+    </section>
+  </>;
 };
 
 export default ProjectDrop;

@@ -1,17 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { makeStyles, Paper, IconButton, InputBase } from '@mui/material';
-import { useHistory, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { makeStyles } from '@mui/styles';
+import { useNavigate } from 'react-router-dom';
 import { Alert } from '@mui/lab';
-import { componentService } from '../../../../../../../api/services/component.service';
-import { inventoryService } from '../../../../../../../api/services/inventory.service';
-import { WorkbenchContext, IWorkbenchContext } from '@context/WorkbenchProvider';
+import { componentService } from '@api/services/component.service';
+import { inventoryService } from '@api/services/inventory.service';
+import { useDispatch } from 'react-redux';
 import RecognizedCard from '../../../../components/RecognizedCard/RecognizedCard';
 import usePagination from '../../../../../../hooks/usePagination';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import SearchBox from '../../../../../../components/SearchBox/SearchBox';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectWorkbench } from '../../../../../../store/workbench-store/workbenchSlice';
-import { setComponent } from '../../../../../../store/component-store/componentSlice';
+import { setComponent } from '@store/component-store/componentSlice';
 
 const filter = (items, query) => {
   if (!items) {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Paper, IconButton, InputBase, makeStyles } from '@mui/material';
+import { Paper, IconButton, InputBase } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 

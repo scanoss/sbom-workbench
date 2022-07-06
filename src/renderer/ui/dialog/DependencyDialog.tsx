@@ -1,17 +1,7 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable jsx-a11y/label-has-associated-control */
-
-import {
-  Dialog,
-  Tooltip,
-  Paper,
-  DialogActions,
-  Button,
-  makeStyles,
-  InputBase,
-  TextField,
-  IconButton,
-} from '@mui/material';
+import { Dialog, Tooltip, Paper, DialogActions, Button, InputBase, TextField, IconButton } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import React, { useContext, useEffect, useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
@@ -146,7 +136,7 @@ const DependencyDialog = (props: DependencyDialogProps) => {
                     ? { spdxid: form.license, name: licenses.find((item) => item.spdxid === form.license)?.name }
                     : ''
                 }
-                getOptionSelected={(option: any) => option.spdxid === form.license}
+                isOptionEqualToValue={(option: any) => option.spdxid === form.license}
                 getOptionLabel={(option: any) => option.name || option.spdxid}
                 renderOption={(option: any) => (
                   <div className={classes.option}>

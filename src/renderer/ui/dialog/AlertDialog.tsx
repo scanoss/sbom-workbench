@@ -1,5 +1,6 @@
-import { Dialog, DialogActions, Button, makeStyles, DialogContentText, DialogContent } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Dialog, DialogActions, Button, DialogContentText, DialogContent } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
@@ -62,7 +63,11 @@ export const AlertDialog = (props: AlertDialogProps) => {
       onClose={handleCancel}
     >
       <DialogContent className={classes.content}>
-        <IconButton aria-label="close" className={classes.closeButton} onClick={handleCancel}>
+        <IconButton
+          aria-label="close"
+          className={classes.closeButton}
+          onClick={handleCancel}
+          size="large">
           <CloseIcon />
         </IconButton>
         <DialogContentText className={classes.text}>

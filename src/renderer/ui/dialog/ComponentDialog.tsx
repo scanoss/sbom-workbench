@@ -1,27 +1,17 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable jsx-a11y/label-has-associated-control */
-
-import {
-  Dialog,
-  Tooltip,
-  Paper,
-  DialogActions,
-  Button,
-  makeStyles,
-  InputBase,
-  TextField,
-  IconButton,
-} from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import { Dialog, Tooltip, Paper, DialogActions, Button, InputBase, TextField, IconButton } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { Autocomplete } from '@mui/lab';
-import { NewComponentDTO } from '../../../api/types';
-import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
-import { ResponseStatus } from '../../../api/Response';
-import { componentService } from '../../../api/services/component.service';
-import { licenseService } from '../../../api/services/license.service';
-import { DialogContext } from '../../context/DialogProvider';
+import { NewComponentDTO } from '@api/types';
+import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
+import { ResponseStatus } from '@api/Response';
+import { componentService } from '@api/services/component.service';
+import { licenseService } from '@api/services/license.service';
+import { DialogContext } from '@context/DialogProvider';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -184,7 +174,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                 fullWidth
                 options={licenses || []}
                 // value={{ id: form?.licenseId }}
-                getOptionSelected={(option, value) => option.id === value.id}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 getOptionLabel={(option) => option.name || ''}
                 disableClearable
                 renderInput={(params) => (

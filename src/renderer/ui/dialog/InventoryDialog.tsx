@@ -6,7 +6,6 @@ import {
   Paper,
   DialogActions,
   Button,
-  makeStyles,
   InputBase,
   Select,
   MenuItem,
@@ -29,6 +28,7 @@ import { ResponseStatus } from '@api/Response';
 import { useSelector } from 'react-redux';
 import { selectComponentState } from '@store/component-store/componentSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -310,7 +310,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   options={components || []}
                   groupBy={(option) => option?.type}
                   value={form.component && form.purl ? { name: form.component, purl: form.purl } : null}
-                  getOptionSelected={(option, value) => option.purl === value.purl}
+                  isOptionEqualToValue={(option, value) => option.purl === value.purl}
                   getOptionLabel={(option) => option.name || ''}
                   renderOption={(option) => (
                     <div className={classes.option}>
@@ -388,7 +388,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       ? { spdxid: form.spdxid, name: licenses.find((item) => item.spdxid === form.spdxid)?.name }
                       : null
                   }
-                  getOptionSelected={(option: any) => option.spdxid === form.spdxid}
+                  isOptionEqualToValue={(option: any) => option.spdxid === form.spdxid}
                   getOptionLabel={(option: any) => option.name || option.spdxid || ''}
                   renderOption={(option: any) => (
                     <div className={classes.option}>
@@ -475,7 +475,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   name="notes"
                   value={form?.notes || ''}
                   cols={30}
-                  rows={8}
+                  minRows={8}
                   onChange={(e) => inputHandler(e)}
                 />
               </Paper>

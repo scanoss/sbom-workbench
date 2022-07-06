@@ -1,6 +1,7 @@
-import { Dialog, DialogActions, Button, makeStyles, DialogContentText, Card, DialogContent, Tooltip } from '@mui/material';
-import MuiDialogTitle from '@mui/material/DialogTitle';
 import React, { useEffect, useState } from 'react';
+import { Dialog, DialogActions, Button, DialogContentText, Card, DialogContent, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import MuiDialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import InfoIcon from '@mui/icons-material/Info';
@@ -64,7 +65,11 @@ export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => 
     >
       <MuiDialogTitle>
         <span>Existing groups</span>
-        <IconButton aria-label="close" className={classes.closeButton} onClick={handleCancel}>
+        <IconButton
+          aria-label="close"
+          className={classes.closeButton}
+          onClick={handleCancel}
+          size="large">
           <CloseIcon />
         </IconButton>
       </MuiDialogTitle>

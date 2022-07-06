@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Dialog, Paper, IconButton, InputBase, CircularProgress, TextField, Button } from '@mui/material';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { componentService } from '@api/services/component.service';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import useApi from '@hooks/useApi';
 import { importGlobalComponent } from '@store/component-store/componentThunks';
 import { useDispatch } from 'react-redux';
@@ -106,7 +106,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
     >
       <header className="dialog-title">
         <span>Online Component Search</span>
-        <IconButton aria-label="close" onClick={onCancel}>
+        <IconButton aria-label="close" onClick={onCancel} size="large">
           <CloseIcon />
         </IconButton>
       </header>
@@ -204,7 +204,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
               </Paper>
             </div>
 
-            <IconButton disabled={loading || disabled} type="submit">
+            <IconButton disabled={loading || disabled} type="submit" size="large">
               <SearchIcon />
             </IconButton>
           </div>

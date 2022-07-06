@@ -100,30 +100,28 @@ const ProjectScan = () => {
     return cleanup;
   }, []);
 
-  return (
-    <>
-      <section id="ProjectScan" className="app-page">
-        <header className="app-header">
-          <div>
-            <h4 className="header-subtitle back">
-              <IconButton onClick={onPauseHandler} component="span">
-                <ArrowBackIcon />
-              </IconButton>
-              SCANNING
-            </h4>
-            <h1>{scanPath.projectName}</h1>
+  return <>
+    <section id="ProjectScan" className="app-page">
+      <header className="app-header">
+        <div>
+          <h4 className="header-subtitle back">
+            <IconButton onClick={onPauseHandler} component="span" size="large">
+              <ArrowBackIcon />
+            </IconButton>
+            SCANNING
+          </h4>
+          <h1>{scanPath.projectName}</h1>
+        </div>
+      </header>
+      <main className="app-content">
+        <div className="progressbar">
+          <div className="circular-progress-container">
+            <CircularComponent stage={stage} progress={progress} pauseScan={() => onPauseHandler()} />
           </div>
-        </header>
-        <main className="app-content">
-          <div className="progressbar">
-            <div className="circular-progress-container">
-              <CircularComponent stage={stage} progress={progress} pauseScan={() => onPauseHandler()} />
-            </div>
-          </div>
-        </main>
-      </section>
-    </>
-  );
+        </div>
+      </main>
+    </section>
+  </>;
 };
 
 export default ProjectScan;

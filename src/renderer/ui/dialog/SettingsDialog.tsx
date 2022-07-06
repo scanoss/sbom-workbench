@@ -1,14 +1,14 @@
-import { Button, Dialog, DialogActions, IconButton, InputBase, makeStyles, Paper, Tooltip } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Button, Dialog, DialogActions, IconButton, InputBase, Paper, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import TextField from '@mui/material/TextField';
 import AddIcon from '@mui/icons-material/Add';
-import Autocomplete, { createFilterOptions } from '@mui/lab/Autocomplete';
-import React, { useEffect, useState } from 'react';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
-import { IWorkspaceCfg } from '../../../api/types';
-import { userSettingService } from '../../../api/services/userSetting.service';
-import App from '../../App';
-import AppConfig from '../../../config/AppConfigModule';
+import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
+import { IWorkspaceCfg } from '@api/types';
+import { userSettingService } from '@api/services/userSetting.service';
+import AppConfig from '@config/AppConfigModule';
 
 const filter = createFilterOptions();
 

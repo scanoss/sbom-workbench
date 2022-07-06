@@ -1,5 +1,6 @@
 import React from 'react';
-import { ButtonGroup, Button, makeStyles, Tooltip } from '@mui/material';
+import { ButtonGroup, Button, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 
