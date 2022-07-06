@@ -196,7 +196,7 @@ const ProjectList = (props: ProjectListProps) => {
           <h3>No projects found</h3>
           <p>
             You can start by&nbsp;
-            <Link onClick={() => props.onProjectCreate()}>scanning a new project</Link><br />or <Link onClick={() => props.onProjectImport()}>importing a project</Link>.
+            <Link onClick={() => props.onProjectCreate()} underline="hover">scanning a new project</Link><br />or <Link onClick={() => props.onProjectImport()} underline="hover">importing a project</Link>.
           </p>
         </div>
       </div>

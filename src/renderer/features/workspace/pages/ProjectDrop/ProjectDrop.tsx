@@ -26,7 +26,7 @@ const ProjectDrop = () => {
         </div>
       </header>
       <main className="app-content">
-        <Link onClick={onSelectProjectHandler}>Select folder</Link>
+        <Link onClick={onSelectProjectHandler} underline="hover">Select folder</Link>
       </main>
     </section>
   </>;
