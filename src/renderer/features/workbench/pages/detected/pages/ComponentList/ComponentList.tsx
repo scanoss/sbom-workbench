@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Alert } from '@mui/lab';
+import Alert from '@mui/material/Alert';
 import { Button } from '@mui/material';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import SearchBox from '@components/SearchBox/SearchBox';

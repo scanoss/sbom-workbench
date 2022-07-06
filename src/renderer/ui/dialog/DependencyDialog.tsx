@@ -5,7 +5,7 @@ import { makeStyles } from '@mui/styles';
 import React, { useContext, useEffect, useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import { Autocomplete } from '@mui/lab';
+import Autocomplete from '@mui/material/Autocomplete';
 import { Dependency } from '@api/types';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { ResponseStatus } from '@api/Response';
@@ -138,11 +138,13 @@ const DependencyDialog = (props: DependencyDialogProps) => {
                 }
                 isOptionEqualToValue={(option: any) => option.spdxid === form.license}
                 getOptionLabel={(option: any) => option.name || option.spdxid}
-                renderOption={(option: any) => (
-                  <div className={classes.option}>
-                    <span>{option.name}</span>
-                    <span className="middle">{option.spdxid}</span>
-                  </div>
+                renderOption={(props, option, { selected }) => (
+                  <li {...props}>
+                    <div className={classes.option}>
+                      <span>{option.name}</span>
+                      <span className="middle">{option.spdxid}</span>
+                    </div>
+                  </li>
                 )}
                 filterOptions={(options, params) => {
                   return options.filter(

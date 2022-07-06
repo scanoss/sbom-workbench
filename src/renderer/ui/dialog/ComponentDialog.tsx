@@ -5,7 +5,7 @@ import { Dialog, Tooltip, Paper, DialogActions, Button, InputBase, TextField, Ic
 import { makeStyles } from '@mui/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import { Autocomplete } from '@mui/lab';
+import Autocomplete from '@mui/material/Autocomplete';
 import { NewComponentDTO } from '@api/types';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { ResponseStatus } from '@api/Response';

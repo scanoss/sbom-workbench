@@ -16,10 +16,10 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.grey[500],
   },
   deleteButton: {
-    backgroundColor: theme.palette.error.main,
+    //backgroundColor: theme.palette.error.main,
     color: 'white',
     '&:hover': {
-      backgroundColor: theme.palette.error.dark,
+      //backgroundColor: theme.palette.error.dark,
     },
   },
   content: {

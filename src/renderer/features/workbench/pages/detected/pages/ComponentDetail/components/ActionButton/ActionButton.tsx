@@ -1,6 +1,13 @@
 import React, { useRef, useState } from 'react';
-import { ButtonGroup, Button, Popper, Paper, ClickAwayListener, MenuList, MenuItem } from '@mui/material';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import Paper from '@mui/material/Paper';
+import Popper from '@mui/material/Popper';
+import MenuItem from '@mui/material/MenuItem';
+import MenuList from '@mui/material/MenuList';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { Grow } from '@mui/material';
 
 const ActionButton = ({
   tab,
@@ -10,11 +17,18 @@ const ActionButton = ({
   onDetachAllPressed,
   onRestoreAllPressed,
 }) => {
-  const [open, setOpen] = useState(false);
-  const anchorRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = React.useState(false);
+  const anchorRef = React.useRef<HTMLDivElement>(null);
 
-  const handleCloseButtonGroup = (event: React.MouseEvent<Document, MouseEvent>) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event: Event) => {
+    if (
+      anchorRef.current &&
+      anchorRef.current.contains(event.target as HTMLElement)
+    ) {
       return;
     }
 
@@ -32,29 +46,38 @@ const ActionButton = ({
             variant="contained"
             color="secondary"
           >
-            <Button size="small" variant="contained" color="secondary" onClick={onIdentifyAllPressed}>
+            <Button variant="contained" onClick={onIdentifyAllPressed}>
               Identify All ({files.pending.length})
             </Button>
-            <Button color="secondary" size="small" onClick={() => setOpen((prevOpen) => !prevOpen)}>
-              <ArrowDropDownIcon />
+            <Button color="secondary" onClick={handleToggle}>
+              <ArrowDropDownIcon fontSize="inherit" />
             </Button>
           </ButtonGroup>
           <Popper open={open} anchorEl={anchorRef.current} transition disablePortal>
-            <Paper>
-              <ClickAwayListener onClickAway={handleCloseButtonGroup}>
-                <MenuList id="split-button-menu">
-                  <MenuItem
-                    key="test"
-                    onClick={() => {
-                      setOpen(false);
-                      onIgnoreAllPressed();
-                    }}
-                  >
-                    Mark all as original ({files.pending.length})
-                  </MenuItem>
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
+            {({ TransitionProps, placement }) => (
+              <Grow
+                {...TransitionProps}
+                style={{
+                  transformOrigin:
+                    placement === 'bottom' ? 'center top' : 'center bottom',
+                }}
+              >
+                <Paper>
+                  <ClickAwayListener onClickAway={handleClose}>
+                    <MenuList id="split-button-menu" autoFocusItem>
+                      <MenuItem
+                        onClick={() => {
+                          setOpen(false);
+                          onIgnoreAllPressed();
+                        }}
+                      >
+                        Mark all as original ({files.pending.length})
+                      </MenuItem>
+                    </MenuList>
+                  </ClickAwayListener>
+                </Paper>
+              </Grow>
+            )}
           </Popper>
         </>
       )}

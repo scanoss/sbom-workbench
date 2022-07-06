@@ -1,5 +1,5 @@
 import { Button } from '@mui/material';
-import { Alert } from '@mui/lab';
+import Alert from '@mui/material/Alert';
 import React from 'react';
 import usePagination from '../../../../../../../hooks/usePagination';
 import MatchCard, { MATCH_CARD_ACTIONS } from '../../../../../components/MatchCard/MatchCard';

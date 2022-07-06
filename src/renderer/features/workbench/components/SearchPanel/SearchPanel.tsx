@@ -5,7 +5,7 @@ import { ipcRenderer } from 'electron';
 import { IpcEvents } from '@api/ipc-events';
 import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
-import Autocomplete from '@mui/lab/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
 import * as SearchUtils from '@shared/utils/search-utils';
 import { AppConfigDefault } from '@config/AppConfigDefault';
 import { useDispatch, useSelector } from 'react-redux';

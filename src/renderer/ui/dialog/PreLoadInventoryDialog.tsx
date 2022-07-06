@@ -12,7 +12,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { Alert } from '@mui/lab';
+import Alert from '@mui/material/Alert';
 import { AutoSizer, List } from 'react-virtualized';
 import { useSelector } from 'react-redux';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
@@ -36,10 +36,10 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.grey[500],
   },
   deleteButton: {
-    backgroundColor: theme.palette.error.main,
+    // backgroundColor: theme.palette.error.main,
     color: 'white',
     '&:hover': {
-      backgroundColor: theme.palette.error.dark,
+      // backgroundColor: theme.palette.error.dark,
     },
   },
   content: {

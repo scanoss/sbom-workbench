@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from 'react-router-dom';
-import { Alert } from '@mui/lab';
+import Alert from '@mui/material/Alert';
 import { componentService } from '@api/services/component.service';
 import { inventoryService } from '@api/services/inventory.service';
 import { useDispatch } from 'react-redux';

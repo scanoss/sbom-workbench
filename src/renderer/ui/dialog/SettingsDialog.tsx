@@ -280,7 +280,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                         // Regular option
                         return `${option.URL} ${option.API_KEY ? `(${option.API_KEY})` : ''}`;
                       }}
-                      renderOption={(option, props) =>
+                      renderOption={(props, option, { selected }) =>
                         option.new ? (
                           <li {...props} className={classes.new}>
                             {option.URL}

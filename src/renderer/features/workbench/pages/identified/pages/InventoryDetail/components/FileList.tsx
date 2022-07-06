@@ -1,4 +1,4 @@
-import { Alert } from '@mui/lab';
+import Alert from '@mui/material/Alert';
 import React from 'react';
 import MatchCard, { MATCH_CARD_ACTIONS } from '../../../../../components/MatchCard/MatchCard';
 

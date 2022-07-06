@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { Button, ButtonGroup, ClickAwayListener, MenuItem, MenuList, Paper, Popper } from '@mui/material';
+import React from 'react';
+import { Button, ButtonGroup, Menu, MenuItem } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const ActionButton = ({
@@ -13,15 +13,15 @@ const ActionButton = ({
   onDismissAll: () => void;
   onRestoreAll: () => void;
 }) => {
-  const [open, setOpen] = useState(false);
-  const anchorRef = useRef<HTMLDivElement>(null);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
-  const handleCloseButtonGroup = (event: React.MouseEvent<Document, MouseEvent>) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
-      return;
-    }
+  const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    setOpen(false);
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
@@ -29,31 +29,28 @@ const ActionButton = ({
       <ButtonGroup
         size="small"
         disabled={count[0] === 0 && count[1] === 0 && count[2] === 0}
-        ref={anchorRef}
         variant="contained"
         color="secondary"
       >
         <Button disabled={count[0] === 0} size="small" variant="contained" color="secondary" onClick={onAcceptAll}>
           Accept All ({count[0]})
         </Button>
-        <Button color="secondary" size="small" onClick={() => setOpen(true)}>
+        <Button color="secondary" size="small" onClick={handleOpen}>
           <ArrowDropDownIcon />
         </Button>
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+        >
+          <MenuItem disabled={count[1] === 0} onClick={() => { handleClose(); onDismissAll();}}>
+            Dismiss all pending ({count[1]})
+          </MenuItem>
+          <MenuItem disabled={count[2] === 0}  onClick={() => { handleClose(); onRestoreAll();}}>
+            Restore all ({count[2]})
+          </MenuItem>
+        </Menu>
       </ButtonGroup>
-      <Popper open={open} anchorEl={anchorRef.current} transition disablePortal>
-        <Paper>
-          <ClickAwayListener onClickAway={handleCloseButtonGroup}>
-            <MenuList id="split-button-menu">
-              <MenuItem key="test" disabled={count[1] === 0} onClick={onDismissAll}>
-                Dismiss all pending ({count[1]})
-              </MenuItem>
-              <MenuItem key="test" disabled={count[2] === 0} onClick={onRestoreAll}>
-                Restore all ({count[2]})
-              </MenuItem>
-            </MenuList>
-          </ClickAwayListener>
-        </Paper>
-      </Popper>
     </>
   );
 };

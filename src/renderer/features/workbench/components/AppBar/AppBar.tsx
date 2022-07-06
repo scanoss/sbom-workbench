@@ -30,9 +30,9 @@ import { exportService } from '@api/services/export.service';
 import { ExportFormat, IProject } from '@api/types';
 import { workspaceService } from '@api/services/workspace.service';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { dialogController } from '../../../../controllers/dialog-controller';
 import AppConfig from '../../../../../config/AppConfigModule';
-import { DialogContext, IDialogContext } from '@context/DialogProvider';
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -52,28 +52,44 @@ const Navigation = () => {
 const AppMenu = () => {
   return (
     <section id="AppMenu">
-      <NavLink to="/workbench/detected" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}  tabIndex={-1}>
+      <NavLink
+        to="/workbench/detected"
+        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+        tabIndex={-1}
+      >
         <Tooltip title="Detected components">
           <Button color="inherit">
             <GavelIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/search" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}  tabIndex={-1}>
+      <NavLink
+        to="/workbench/search"
+        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+        tabIndex={-1}
+      >
         <Tooltip title="Search keywords">
           <Button color="inherit">
             <SearchIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/identified" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} tabIndex={-1}>
+      <NavLink
+        to="/workbench/identified"
+        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+        tabIndex={-1}
+      >
         <Tooltip title="Identified components">
           <Button color="inherit">
             <CheckCircleOutlineOutlinedIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/report" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} tabIndex={-1}>
+      <NavLink
+        to="/workbench/report"
+        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+        tabIndex={-1}
+      >
         <Tooltip title="Reports">
           <Button color="inherit">
             <InsertChartOutlinedTwoToneIcon />
@@ -181,7 +197,11 @@ const Export = ({ state }) => {
     SPDXLITEJSON: { label: 'SPDX Lite', showOnNoneProgress: false, hint: 'Export an SPDX compliant SBOM report' },
     WFP: { label: 'WFP', showNoProgress: true, hint: 'Export the Winnowing Fingerprint data of the scanned project' },
     RAW: { label: 'RAW', showNoProgress: true, hint: 'Export the raw JSON responses from the SCANOSS Platform' },
-    HTMLSUMMARY: { label: 'HTML Summary', showNoProgress: true, hint: 'Export a HTML summary of the Identification report' },
+    HTMLSUMMARY: {
+      label: 'HTML Summary',
+      showNoProgress: true,
+      hint: 'Export a HTML summary of the Identification report',
+    },
   };
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -257,21 +277,12 @@ const Export = ({ state }) => {
           >
             Export
           </Button>
-          <Menu
-            style={{ marginTop: '35px' }}
-            id="fade-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={open}
-            onClose={handleClose}
-            TransitionComponent={Fade}
-          >
+          <Menu anchorEl={anchorEl} keepMounted open={open} onClose={handleClose} TransitionComponent={Fade}>
             {AppConfig.FF_EXPORT_FORMAT_OPTIONS.map(
               (format) =>
                 exportLabels[format] && (
-                  <Tooltip title={exportLabels[format].hint} placement="left" arrow>
+                  <Tooltip key={format} title={exportLabels[format].hint} placement="left" arrow>
                     <MenuItem
-                      key={format}
                       /* disabled={state.progress === 0 && !exportLabels[format].showNoProgress} */
                       onClick={() => onExport(format as ExportFormat)}
                     >
@@ -297,34 +308,31 @@ const AppBar = ({ exp }) => {
     navigate('/workspace');
   };
 
-  return <>
-    <MaterialAppBar id="AppBar" elevation={1}>
-      <Toolbar>
-        <div className="slot start">
-          <Tooltip title="Back to projects">
-            <IconButton
-              onClick={onBackPressed}
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              size="large">
-              <HomeOutlinedIcon />
-            </IconButton>
-          </Tooltip>
-          <Divider orientation="vertical" flexItem />
-          <Navigation />
-          <Divider orientation="vertical" flexItem />
-          <AppMenu />
-        </div>
+  return (
+    <>
+      <MaterialAppBar id="AppBar" elevation={1}>
+        <Toolbar>
+          <div className="slot start">
+            <Tooltip title="Back to projects">
+              <IconButton onClick={onBackPressed} edge="start" color="inherit" aria-label="menu" size="large">
+                <HomeOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+            <Divider orientation="vertical" flexItem />
+            <Navigation />
+            <Divider orientation="vertical" flexItem />
+            <AppMenu />
+          </div>
 
-        <AppTitle title={state.name} />
+          <AppTitle title={state.name} />
 
-        <div className="slot end">
-          {!report ? <AppProgress summary={state.summary} progress={state.progress} /> : <Export state={state} />}
-        </div>
-      </Toolbar>
-    </MaterialAppBar>
-  </>;
+          <div className="slot end">
+            {!report ? <AppProgress summary={state.summary} progress={state.progress} /> : <Export state={state} />}
+          </div>
+        </Toolbar>
+      </MaterialAppBar>
+    </>
+  );
 };
 
 AppBar.defaultProps = { exp: false };

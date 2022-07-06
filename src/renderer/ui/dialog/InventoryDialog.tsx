@@ -18,7 +18,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import React, { useEffect, useState, useContext } from 'react';
-import { Alert, Autocomplete } from '@mui/lab';
+import Autocomplete from '@mui/material/Autocomplete';
+import Alert from '@mui/material/Alert';
 import { ComponentGroup, Inventory } from '@api/types';
 import { InventoryForm } from '@context/types';
 import { componentService } from '@api/services/component.service';
@@ -312,11 +313,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   value={form.component && form.purl ? { name: form.component, purl: form.purl } : null}
                   isOptionEqualToValue={(option, value) => option.purl === value.purl}
                   getOptionLabel={(option) => option.name || ''}
-                  renderOption={(option) => (
-                    <div className={classes.option}>
-                      <span>{option.name}</span>
-                      <span className="middle">{option.purl}</span>
-                    </div>
+                  renderOption={(props, option, { selected }) => (
+                    <li {...props}>
+                      <div className={classes.option}>
+                        <span>{option.name}</span>
+                        <span className="middle">{option.purl}</span>
+                      </div>
+                    </li>
                   )}
                   disableClearable
                   onChange={(e, value) => autocompleteHandler('purl', value.purl)}
@@ -390,11 +393,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   }
                   isOptionEqualToValue={(option: any) => option.spdxid === form.spdxid}
                   getOptionLabel={(option: any) => option.name || option.spdxid || ''}
-                  renderOption={(option: any) => (
-                    <div className={classes.option}>
-                      <span>{option.name}</span>
-                      <span className="middle">{option.spdxid}</span>
-                    </div>
+                  renderOption={(props, option, { selected }) => (
+                    <li {...props}>
+                      <div className={classes.option}>
+                        <span>{option.name}</span>
+                        <span className="middle">{option.spdxid}</span>
+                      </div>
+                    </li>
                   )}
                   filterOptions={(options, params) => {
                     return options.filter(

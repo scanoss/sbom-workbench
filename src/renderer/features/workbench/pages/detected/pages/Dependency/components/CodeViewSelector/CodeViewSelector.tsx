@@ -34,7 +34,7 @@ const CodeViewSelector = ({ active, setView }) => {
           <Button
             className={classes.button}
             onClick={() => setView(CodeViewSelectorMode.CODE)}
-            color={active === CodeViewSelectorMode.CODE ? 'primary' : 'default'}
+            color={active === CodeViewSelectorMode.CODE ? 'primary' : 'secondary'}
             aria-label="code"
           >
             <CodeOutlinedIcon fontSize="inherit" />
@@ -44,7 +44,7 @@ const CodeViewSelector = ({ active, setView }) => {
           <Button
             className={classes.button}
             onClick={() => setView(CodeViewSelectorMode.GRAPH)}
-            color={active === CodeViewSelectorMode.GRAPH ? 'primary' : 'default'}
+            color={active === CodeViewSelectorMode.GRAPH ? 'primary' : 'secondary'}
             aria-label="graph"
           >
             <ExtensionOutlinedIcon fontSize="inherit" />
