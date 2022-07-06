@@ -13,7 +13,7 @@ export class ScanTask extends ScannerTask {
     const p = await workspace.createProject(project);
     await modelProvider.init(p.getMyPath());
     await licenseService.import();
-    const tree = treeService.init(this.msgToUI, p.getMyPath(), p.metadata.getScanRoot());
+    const tree = treeService.init(p.getMyPath(), p.metadata.getScanRoot());
     const summary = tree.getSummarize();
     log.transports.file.resolvePath = () => `${p.metadata.getMyPath()}/project.log`;
     p.state = ProjectState.OPENED;

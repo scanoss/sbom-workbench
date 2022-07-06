@@ -4,6 +4,8 @@ import log from 'electron-log';
 import Node, { NodeStatus } from './Node';
 import File from './File';
 import Folder from './Folder';
+
+import { broadcastManager } from "../../broadcastManager/BroadcastManager";
 import { IpcEvents } from '../../../api/ipc-events';
 import * as Filtering from '../filtering';
 import { TreeViewMode } from './treeViewModes/TreeViewMode';
@@ -23,33 +25,24 @@ export class Tree {
 
   private projectPath: string;
 
-  private msgToUI!: Electron.WebContents;
-
   private filesIndexed = 0;
 
   private fileTreeViewMode: TreeViewMode;
 
   private summary;
 
-  constructor(path: string, projectPath: string, msgToUI: Electron.WebContents) {
+  constructor(path: string, projectPath: string) {
     const pathParts = path.split(pathLib.sep);
     this.rootName = pathParts[pathParts.length - 1];
     this.rootPath = path;
     this.rootFolder = new Folder('', this.rootName);
     this.fileTreeViewMode = new TreeViewDefault();
     this.summary = {};
-    this.msgToUI = msgToUI;
     this.projectPath = projectPath;
   }
 
-  setMailbox(mailbox: Electron.WebContents) {
-    this.msgToUI = mailbox;
-  }
-
   sendToUI(eventName, data: any) {
-    if (this.msgToUI) {
-      this.msgToUI.send(eventName, data);
-    }
+    broadcastManager.get().send(eventName, data)
   }
 
   public build(): Node {

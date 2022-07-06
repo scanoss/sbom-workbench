@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import log from 'electron-log';
 import { Project } from './Project';
@@ -7,13 +6,12 @@ import { INewProject, IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../../../assets/data/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
 
-class Workspace extends EventEmitter {
+class Workspace {
   private projectList: Array<Project>;
 
   private wsPath: string;
 
   constructor() {
-    super();
     this.projectList = [];
   }
 

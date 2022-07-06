@@ -9,7 +9,7 @@ class ProjectService {
   public async scan(project: INewProject, event: Electron.WebContents): Promise<Project> {
     const p = await workspace.createProject(project);
     await modelProvider.init(p.getMyPath());
-    const tree = treeService.init(event, p.getMyPath(), p.metadata.getScanRoot());
+    const tree = treeService.init(p.getMyPath(), p.metadata.getScanRoot());
     const summary = tree.getSummarize();
     log.transports.file.resolvePath = () => `${p.metadata.getMyPath()}/project.log`;
     p.state = ProjectState.OPENED;

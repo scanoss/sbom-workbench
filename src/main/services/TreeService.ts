@@ -8,9 +8,9 @@ import { FilterTrue } from '../batch/Filter/FilterTrue';
 import { modelProvider } from './ModelProvider';
 
 class TreeService {
-  public init(event: Electron.WebContents, projectPath: string, scanRoot: string): Tree {
+  public init(projectPath: string, scanRoot: string): Tree {
     try {
-      const tree = new Tree(scanRoot, projectPath ,event);
+      const tree = new Tree(scanRoot, projectPath);
       tree.build();
       tree.setFilter();
       tree.summarize();
