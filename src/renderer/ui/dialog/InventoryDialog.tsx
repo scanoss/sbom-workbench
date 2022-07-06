@@ -293,20 +293,20 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <div className="dialog-form-field-label">
                 <label>Component</label>
                 <Tooltip title="Add new component">
-                  <IconButton color="inherit" size="small" onClick={openComponentDialog}>
+                  <IconButton tabIndex={-1} color="inherit" size="small" onClick={openComponentDialog}>
                     <AddIcon fontSize="inherit" />
                   </IconButton>
                 </Tooltip>
 
                 <Tooltip title="Search component online">
-                  <IconButton color="inherit" size="small" onClick={openComponentSearcherDialog}>
+                  <IconButton tabIndex={-1} color="inherit" size="small" onClick={openComponentSearcherDialog}>
                     <SearchOutlinedIcon fontSize="inherit" />
                   </IconButton>
                 </Tooltip>
               </div>
               <Paper className="dialog-form-field-control">
-                <SearchIcon className={classes.search} />
                 <Autocomplete
+                  size="small"
                   fullWidth
                   options={components || []}
                   groupBy={(option) => option?.type}
@@ -328,6 +328,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       {...params}
                       InputProps={{
                         ...params.InputProps,
+                        startAdornment: <SearchIcon className={classes.search} />,
                         disableUnderline: true,
                         className: 'autocomplete-option',
                       }}
@@ -341,14 +342,14 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <div className="dialog-form-field-label">
                 <label>Version</label>
                 <Tooltip title="Add new version">
-                  <IconButton color="inherit" size="small" onClick={openComponentVersionDialog}>
+                  <IconButton tabIndex={-1} color="inherit" size="small" onClick={openComponentVersionDialog}>
                     <AddIcon fontSize="inherit" />
                   </IconButton>
                 </Tooltip>
               </div>
               <Paper className="dialog-form-field-control">
-                <SearchIcon className={classes.search} />
                 <Autocomplete
+                  size="small"
                   fullWidth
                   options={versions || []}
                   value={form?.version || null}
@@ -360,6 +361,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       {...params}
                       InputProps={{
                         ...params.InputProps,
+                        startAdornment: <SearchIcon className={classes.search} />,
                         disableUnderline: true,
                         className: 'autocomplete-option',
                       }}
@@ -375,14 +377,14 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <div className="dialog-form-field-label">
                 <label>License</label>
                 <Tooltip title="Add new license">
-                  <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
+                  <IconButton tabIndex={-1} color="inherit" size="small" onClick={openLicenseDialog}>
                     <AddIcon fontSize="inherit" />
                   </IconButton>
                 </Tooltip>
               </div>
               <Paper className="dialog-form-field-control">
-                <SearchIcon className={classes.search} />
                 <Autocomplete
+                  size="small"
                   fullWidth
                   options={licenses || []}
                   groupBy={(option) => option?.type}
@@ -415,6 +417,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       {...params}
                       InputProps={{
                         ...params.InputProps,
+                        startAdornment: <SearchIcon className={classes.search} />,
                         disableUnderline: true,
                         className: 'autocomplete-option',
                       }}
@@ -432,7 +435,14 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 URL <span className="optional">- Optional</span>
               </label>
               <Paper className="dialog-form-field-control">
-                <InputBase name="url" fullWidth readOnly value={form?.url} onChange={(e) => inputHandler(e)} />
+                <TextField
+                  size="small"
+                  name="url"
+                  fullWidth
+                  disabled
+                  value={form?.url}
+                  onChange={(e) => inputHandler(e)}
+                />
               </Paper>
             </div>
           </div>
@@ -441,10 +451,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">PURL</label>
               <Paper className="dialog-form-field-control">
-                <InputBase
+                <TextField
                   name="purl"
+                  size="small"
                   fullWidth
-                  readOnly
+                  disabled
                   value={form?.purl || null}
                   onChange={(e) => inputHandler(e)}
                   required
@@ -459,6 +470,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <Paper className="dialog-form-field-control">
                 <Select
                   name="usage"
+                  size="small"
                   fullWidth
                   value={form?.usage || 'file'}
                   disableUnderline
@@ -476,10 +488,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 Notes <span className="optional">- Optional</span>
               </label>
               <Paper className="dialog-form-field-control">
-                <TextareaAutosize
+                <TextField
                   name="notes"
+                  fullWidth
+                  multiline
+                  maxRows={4}
                   value={form?.notes || ''}
-                  cols={30}
                   minRows={8}
                   onChange={(e) => inputHandler(e)}
                 />
@@ -488,7 +502,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           </div>
         </div>
         <DialogActions>
-          <Button onClick={onCancel}>Cancel</Button>
+          <Button tabIndex={-1} onClick={onCancel}>Cancel</Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
             Identify
           </Button>
