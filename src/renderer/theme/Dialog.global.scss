@@ -95,6 +95,12 @@
     }
   }
 
+  .MuiAutocomplete-root {
+    .MuiOutlinedInput-root.MuiInputBase-sizeSmall {
+      padding: 0 6px;
+    }
+  }
+
     /* ,
     iconButton: {
       padding: 7,

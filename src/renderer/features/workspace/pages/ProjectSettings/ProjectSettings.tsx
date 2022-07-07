@@ -28,10 +28,6 @@ const useStyles = makeStyles((theme) => ({
     padding: '8px 16px 8px 8px',
     outline: 'none',
   },
-  select: {
-    padding: '8px 16px',
-    outline: 'none',
-  },
   new: {
     fontSize: '0.9rem',
     fontWeight: 600,
@@ -148,7 +144,7 @@ const ProjectSettings = () => {
         <header className="app-header">
           <div>
             <h4 className="header-subtitle back">
-              <IconButton onClick={() => navigate(-1)} component="span" size="large">
+              <IconButton tabIndex={-1} onClick={() => navigate(-1)} component="span" size="large">
                 <ArrowBackIcon />
               </IconButton>
               Project Settings
@@ -167,7 +163,7 @@ const ProjectSettings = () => {
                       projectNameExists || !projectValidName ? 'error' : ''
                     }`}
                   >
-                    <InputBase
+                    <TextField
                       className="project-name-input"
                       spellCheck={false}
                       fullWidth
@@ -190,7 +186,7 @@ const ProjectSettings = () => {
                     <label className="input-label">
                       License
                       <Tooltip title="Add new license">
-                        <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
+                        <IconButton tabIndex={-1} color="inherit" size="small" onClick={openLicenseDialog}>
                           <Add fontSize="inherit" />
                         </IconButton>
                       </Tooltip>
@@ -198,8 +194,8 @@ const ProjectSettings = () => {
                     </label>
                   </div>
                   <Paper className="input-text-container license-input-container">
-                    <SearchIcon className="icon" />
                     <Autocomplete
+                      size="small"
                       onChange={(e, value) =>
                         setProjectSettings({
                           ...projectSettings,
@@ -212,14 +208,12 @@ const ProjectSettings = () => {
                           ? licenses?.find((license) => license?.spdxid === projectSettings?.default_license)
                           : ''
                       }
-                      className={classes.search}
-                      placeholder="URL"
                       selectOnFocus
                       clearOnBlur
                       handleHomeEndKeys
                       options={licenses}
                       isOptionEqualToValue={(option: any) => option.spdxid === projectSettings.default_license}
-                      getOptionLabel={(option: any) => option.name || option.spdxid}
+                      getOptionLabel={(option: any) => option.name || option.spdxid || ''}
                       renderOption={(props, option, { selected }) => (
                         <li {...props}>
                           <div className={classes.option}>
@@ -240,6 +234,7 @@ const ProjectSettings = () => {
                           {...params}
                           InputProps={{
                             ...params.InputProps,
+                            startAdornment: <SearchIcon />,
                             disableUnderline: true,
                           }}
                         />
@@ -262,8 +257,9 @@ const ProjectSettings = () => {
                             <span className="optional"> - Optional</span>
                           </label>
                         </div>
-                        <Paper className="input-text-container">
+                        <Paper>
                           <Select
+                            size="small"
                             onChange={(e: any) => {
                               setProjectSettings({
                                 ...projectSettings,
@@ -274,7 +270,6 @@ const ProjectSettings = () => {
                             defaultValue={0}
                             fullWidth
                             disableUnderline
-                            className={classes.select}
                           >
                             <MenuItem value={0}>
                               <span className="item-default">Use default settings</span>
@@ -297,11 +292,11 @@ const ProjectSettings = () => {
                         SBOM Ledger Token <span className="optional">- Optional</span>
                       </label>
                     </div>
-                    <Paper className="input-text-container">
-                      <InputBase
+                    <Paper>
+                      <TextField
+                        size="small"
                         name="token"
                         placeholder="Use default settings"
-                        style={{ padding: '8px', paddingLeft: '16px' }}
                         fullWidth
                         onChange={(e) =>
                           setProjectSettings({

@@ -13,7 +13,6 @@
 
       .project-license-container {
         .input-container {
-          transform: scale(0.9);
           transform-origin: 0;
 
           &-license {
@@ -30,12 +29,10 @@
           }
 
           .input-text-container {
-            margin-top: 1rem;
-            padding-left: 8px;
+            margin-top: 0.5rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-bottom: 2px solid transparent;
 
             .input-autocomplete {
               height: 40px;
@@ -69,9 +66,6 @@
           display: flex;
           flex-direction: column;
 
-          transform: scale(0.9);
-          transform-origin: 0;
-
           .api-conections-label-container {
 
             .api-conections-label {
@@ -81,6 +75,10 @@
         }
       }
     }
+  }
+
+  .input-container-license, .api-subcontainer {
+    max-width: 500px;
   }
 
   .label-input-container {
