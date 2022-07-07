@@ -1,12 +1,10 @@
 import fs from 'fs';
 import log from 'electron-log';
-import { EventEmitter } from "events";
 import { IIndexer } from './IIndexer';
 import { IpcEvents } from "../../../../api/ipc-events";
 import { getSearchConfig } from '../../../../shared/utils/search-utils';
 import { broadcastManager } from "../../../broadcastManager/BroadcastManager";
 
-const path = require('path');
 const { Index } = require('flexsearch');
 
 export class Indexer {
@@ -36,6 +34,9 @@ export class Indexer {
   public async saveIndex(index: any, pathToDictionary: string) {
     if (fs.existsSync(pathToDictionary)) {
       fs.rmdirSync(pathToDictionary, { recursive: true });
+      fs.rm(pathToDictionary, { recursive:true }, (err) => {
+        log.error(err);
+      })
     }
     fs.mkdirSync(pathToDictionary);
     await index.export((key: any, data: string | NodeJS.ArrayBufferView) => {
