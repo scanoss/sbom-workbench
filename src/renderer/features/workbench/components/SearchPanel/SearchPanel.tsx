@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
         height: '0.85em',
       },
     },
-    '& .MuiDataGrid-cell.MuiDataGrid-cellCheckbox[data-value=true]': {
+    '& .MuiDataGrid-row.Mui-selected .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
       visibility: 'visible !important',
     },
     '& .MuiDataGrid-row:hover': {
@@ -305,7 +305,6 @@ const SearchPanel = () => {
           disableColumnMenu
           rowsPerPageOptions={[AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT]}
           hideFooterSelectedRowCount
-          hideFooterRowCount
           checkboxSelection
           headerHeight={41}
           disableSelectionOnClick
