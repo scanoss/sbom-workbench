@@ -10,8 +10,6 @@ import { selectWorkspaceState, setScanPath } from '@store/workspace-store/worksp
 import * as controller from '../../../../controllers/home-controller';
 import CircularComponent from '../Components/CircularComponent';
 
-const { ipcRenderer } = require('electron');
-
 const ProjectScan = () => {
   const navigate = useNavigate();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
@@ -23,9 +21,9 @@ const ProjectScan = () => {
   const [stage, setStage] = useState<any>({ stageName: 'indexing', stageStep: 1 });
 
   const init = async () => {
-    ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
-    ipcRenderer.on(IpcEvents.SCANNER_FINISH_SCAN, handlerScannerFinish);
-    ipcRenderer.on(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
+    window.electron.ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
+    window.electron.ipcRenderer.on(IpcEvents.SCANNER_FINISH_SCAN, handlerScannerFinish);
+    window.electron.ipcRenderer.on(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
 
     try {
       const { path, action } = scanPath;
@@ -39,9 +37,9 @@ const ProjectScan = () => {
   };
 
   const cleanup = () => {
-    ipcRenderer.removeListener(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
-    ipcRenderer.removeListener(IpcEvents.SCANNER_FINISH_SCAN, handlerScannerFinish);
-    ipcRenderer.removeListener(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
+    window.electron.ipcRenderer.removeListener(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
+    window.electron.ipcRenderer.removeListener(IpcEvents.SCANNER_FINISH_SCAN, handlerScannerFinish);
+    window.electron.ipcRenderer.removeListener(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
   };
 
   const onShowScan = (path) => {
@@ -50,6 +48,7 @@ const ProjectScan = () => {
   };
 
   const handlerScannerStatus = (_event, args) => {
+    console.log("Handler scanner status",args);
     setProgress(args.processed);
     setStage(args.stage);
   };
@@ -85,7 +84,7 @@ const ProjectScan = () => {
       navigate('/workspace');
     }
 
-    // ipcRenderer.send(IpcEvents.PROJECT_STOP);
+    // window.electron.ipcRenderer.send(IpcEvents.PROJECT_STOP);
   };
 
   const handlerScannerFinish = (_event, args) => {

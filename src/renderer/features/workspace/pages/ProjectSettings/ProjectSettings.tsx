@@ -16,7 +16,6 @@ import AppConfig from '@config/AppConfigModule';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectWorkspaceState, setNewProject, setScanPath } from '@store/workspace-store/workspaceSlice';
 
-const pathUtil = require('path');
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -80,7 +79,7 @@ const ProjectSettings = () => {
     setApis(apiUrlKey.APIS);
 
     const { path } = scanPath;
-    const projectName = path.split(pathUtil.sep)[path.split(pathUtil.sep).length - 1];
+    const projectName = path.split(window.path.sep)[path.split(window.path.sep).length - 1];
     setProjectSettings({
       ...projectSettings,
       scan_root: path,

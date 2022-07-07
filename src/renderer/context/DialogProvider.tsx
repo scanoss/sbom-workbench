@@ -287,11 +287,11 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
   };
 
   const setupAppMenuListeners = () => {
-    ipcRenderer.on(IpcEvents.MENU_OPEN_SETTINGS, handleOpenSettings);
+    window.electron.ipcRenderer.on(IpcEvents.MENU_OPEN_SETTINGS, handleOpenSettings);
   };
 
   const removeAppMenuListeners = () => {
-    ipcRenderer.removeListener(IpcEvents.MENU_OPEN_SETTINGS, handleOpenSettings);
+    window.electron.ipcRenderer.removeListener(IpcEvents.MENU_OPEN_SETTINGS, handleOpenSettings);
   };
 
   useEffect(setupAppMenuListeners, []);

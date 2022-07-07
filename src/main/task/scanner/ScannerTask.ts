@@ -14,10 +14,9 @@ import { userSettingService } from '../../services/UserSettingService';
 import AppConfig from '../../../config/AppConfigModule';
 import { AutoAccept } from '../inventory/AutoAccept';
 import { ITask } from '../Task';
-import { IndexTask } from "../search/indexTask/IndexTask";
-import { broadcastManager } from "../../broadcastManager/BroadcastManager";
-import { BlackListDependencies } from "../../workspace/tree/blackList/BlackListDependencies";
-
+import { IndexTask } from '../search/indexTask/IndexTask';
+import { broadcastManager } from '../../broadcastManager/BroadcastManager';
+import { BlackListDependencies } from '../../workspace/tree/blackList/BlackListDependencies';
 
 export abstract class ScannerTask implements ITask<void, boolean> {
   protected scanner: Scanner;
@@ -27,7 +26,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
   protected project: Project;
 
   protected sendToUI(eventName, data: any) {
-    broadcastManager.get().send(eventName, data)
+    broadcastManager.get().send(eventName, data);
   }
 
   public abstract set(project: INewProject | string): Promise<void>;
@@ -115,7 +114,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
   public scannerStatus() {
     this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
       stage: {
-        stageName:this.project.metadata.getScannerState(),
+        stageName: this.project.metadata.getScannerState(),
         stageStep: 2,
       },
       processed: 0,
@@ -188,7 +187,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
     const rootFolder = this.project.getTree().getRootFolder();
     const rootPath = this.project.getScanRoot();
     if (rootFolder.containsFile('scanoss-ignore.json')) {
-      const sbom = fs.readFileSync(`${rootPath}/scanoss-ignore.json`, "utf-8")
+      const sbom = fs.readFileSync(`${rootPath}/scanoss-ignore.json`, 'utf-8');
 
       result.forEach((_, index, arr) => {
         arr[index].sbom = sbom;

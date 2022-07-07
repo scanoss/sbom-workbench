@@ -99,7 +99,7 @@ const SearchPanel = () => {
   const refResults = useRef([]);
 
   const search = () => {
-    ipcRenderer.send(IpcEvents.SEARCH_ENGINE_SEARCH, {
+    window.electron.ipcRenderer.send(IpcEvents.SEARCH_ENGINE_SEARCH, {
       query: searchQuery.current,
       params: {
         offset: serverPage.current * AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT,
@@ -177,7 +177,7 @@ const SearchPanel = () => {
         // click: () => batch.ignoreAll(getFilesSelected()),
       },
     ];
-    ipcRenderer.send(IpcEvents.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
+    window.electron.ipcRenderer.send(IpcEvents.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
   };
 
   const onPageChangeHandler = (localPageNumber, details) => {
@@ -200,13 +200,13 @@ const SearchPanel = () => {
   }, [selected, results]);
 
   const setupListeners = () => {
-    ipcRenderer.on(IpcEvents.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
-    ipcRenderer.on(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
+    window.electron.ipcRenderer.on(IpcEvents.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
+    window.electron.ipcRenderer.on(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
   };
 
   const removeListeners = () => {
-    ipcRenderer.removeListener(IpcEvents.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
-    ipcRenderer.removeListener(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
+    window.electron.ipcRenderer.removeListener(IpcEvents.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
+    window.electron.ipcRenderer.removeListener(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
   };
 
   useEffect(() => {

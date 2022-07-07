@@ -8,7 +8,7 @@ import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPat
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
 import { ScanTask } from '../../main/task/scanner/ScanTask';
 
-ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
+ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (_event) => {
   try {
     const projects = await workspace.getProjectsDtos();
     return Response.ok({
@@ -21,7 +21,7 @@ ipcMain.handle(IpcEvents.WORKSPACE_PROJECT_LIST, async (event) => {
   }
 });
 
-ipcMain.handle(IpcEvents.WORKSPACE_DELETE_PROJECT, async (event, projectPath: string) => {
+ipcMain.handle(IpcEvents.WORKSPACE_DELETE_PROJECT, async (_event, projectPath: string) => {
   try {
     await workspace.removeProjectFilter(new ProjectFilterPath(projectPath));
     return Response.ok();
@@ -33,9 +33,9 @@ ipcMain.handle(IpcEvents.WORKSPACE_DELETE_PROJECT, async (event, projectPath: st
 
 // This service creates a new project and launch automatically the scanner.
 // In future versions, the scanner will be launched by the user.
-ipcMain.handle(IpcEvents.WORKSPACE_CREATE_PROJECT, async (event, project: INewProject) => {
+ipcMain.handle(IpcEvents.WORKSPACE_CREATE_PROJECT, async (_event, project: INewProject) => {
   try {
-    const scanTask = new ScanTask(event.sender);
+    const scanTask = new ScanTask();
     await scanTask.set(project);
     await scanTask.init();
     await scanTask.run();
@@ -46,7 +46,7 @@ ipcMain.handle(IpcEvents.WORKSPACE_CREATE_PROJECT, async (event, project: INewPr
   }
 });
 
-ipcMain.handle(IpcEvents.UTILS_GET_PROJECT_DTO, async (event) => {
+ipcMain.handle(IpcEvents.UTILS_GET_PROJECT_DTO, async (_event) => {
   try {
     const path: IProject = workspace.getOpenedProjects()[0].getDto();
     return Response.ok({ message: 'Project path succesfully retrieved', data: path });
@@ -76,7 +76,7 @@ ipcMain.handle(IpcEvents.WORKSPACE_IMPORT_PROJECT, async (_event, zippedProjectP
   }
 });
 
-ipcMain.handle(IpcEvents.WORKSPACE_EXPORT_PROJECT, async (event, pathToSave: string, projectPath: string) => {
+ipcMain.handle(IpcEvents.WORKSPACE_EXPORT_PROJECT, async (_event, pathToSave: string, projectPath: string) => {
   try {
     await new ProjectZipper().export(pathToSave, projectPath);
     return Response.ok({ message: 'Project exported succesfully', data: true });

@@ -194,13 +194,13 @@ const FileTree = () => {
             },
           ];
     }
-    ipcRenderer.send(IpcEvents.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
+    window.electron.ipcRenderer.send(IpcEvents.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
   };
 
   useEffect(() => {
-    ipcRenderer.on(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
+    window.electron.ipcRenderer.on(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
     return () => {
-      ipcRenderer.removeListener(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
+      window.electron.ipcRenderer.removeListener(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
     };
   }, []);
 

@@ -10,8 +10,6 @@ import AppBar from './components/AppBar/AppBar';
 import MainSidebar from './components/MainSidebar/MainSidebar';
 import MainPanel from './components/MainPanel/MainPanel';
 
-const { ipcRenderer } = require('electron');
-
 const WorkbenchModule = () => {
   const { pathname } = useLocation();
   const dispatch = useDispatch();
@@ -25,16 +23,16 @@ const WorkbenchModule = () => {
   const onMigrationFinish = (e) => setLoaderMessage(null);
 
   const onInit = async () => {
-    ipcRenderer.on(IpcEvents.MIGRATION_INIT, onMigrationInit);
-    ipcRenderer.on(IpcEvents.MIGRATION_FINISH, onMigrationFinish);
+    window.electron.ipcRenderer.on(IpcEvents.MIGRATION_INIT, onMigrationInit);
+    window.electron.ipcRenderer.on(IpcEvents.MIGRATION_FINISH, onMigrationFinish);
     const { path } = scanPath;
     dispatch(loadProject(path));
   };
 
   const onDestroy = () => {
     console.log('Closing workbench...');
-    ipcRenderer.removeListener(IpcEvents.MIGRATION_INIT, onMigrationInit);
-    ipcRenderer.removeListener(IpcEvents.MIGRATION_FINISH, onMigrationFinish);
+    window.electron.ipcRenderer.removeListener(IpcEvents.MIGRATION_INIT, onMigrationInit);
+    window.electron.ipcRenderer.removeListener(IpcEvents.MIGRATION_FINISH, onMigrationFinish);
     dispatch(reset());
   };
 

@@ -66,7 +66,7 @@ export default class App {
   }
 
   setupAppMenuListeners() {
-    /* ipcRenderer.on(IpcEvents.MENU_OPEN_SETTINGS, async (event) => {
+    /* window.electron.ipcRenderer.on(IpcEvents.MENU_OPEN_SETTINGS, async (event) => {
       console.log('menu open', event);
       // window.location.hash = '/workbench/detected';
     }); */

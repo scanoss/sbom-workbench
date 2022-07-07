@@ -92,13 +92,13 @@ export const WorkbenchProvider: React.FC<any> = ({ children }) => {
   }, [batchRunning]);
 
   const setupListeners = () => {
-    ipcRenderer.on(IpcEvents.TREE_UPDATING, onTreeUpdating);
-    ipcRenderer.on(IpcEvents.TREE_UPDATED, onTreeRefreshed);
+    window.electron.ipcRenderer.on(IpcEvents.TREE_UPDATING, onTreeUpdating);
+    window.electron.ipcRenderer.on(IpcEvents.TREE_UPDATED, onTreeRefreshed);
   };
 
   const removeListeners = () => {
-    ipcRenderer.on(IpcEvents.TREE_UPDATING, onTreeUpdating);
-    ipcRenderer.removeListener(IpcEvents.TREE_UPDATED, onTreeRefreshed);
+    window.electron.ipcRenderer.on(IpcEvents.TREE_UPDATING, onTreeUpdating);
+    window.electron.ipcRenderer.removeListener(IpcEvents.TREE_UPDATED, onTreeRefreshed);
   };
 
   useEffect(setupListeners, []);

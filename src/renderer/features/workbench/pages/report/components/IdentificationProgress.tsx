@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js';
 import { Button, Tooltip } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { shell } from 'electron';
 import { exportService } from '../../../../../../api/services/export.service';
 import { HashType } from '../../../../../../api/types';
 import { projectService } from '../../../../../../api/services/project.service';
@@ -14,7 +13,7 @@ const LicensesChart = ({ data }) => {
 
   const notarizeSBOM = async () => {
     const hash = await exportService.notarizeSBOM(HashType.SHA256);
-    shell.openExternal(`https://sbom.info/?hash=${hash}&type=${HashType.SHA256}&token=${token}`);
+    window.shell.openExternal(`https://sbom.info/?hash=${hash}&type=${HashType.SHA256}&token=${token}`);
   };
 
   const readToken = async () => {

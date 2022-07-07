@@ -6,7 +6,6 @@ import { sortComponents } from '../../shared/utils/scan-util';
 import { IpcEvents } from '../../api/ipc-events';
 import AppConfig from '../../config/AppConfigModule';
 
-const pathUtil = require('path');
 
 export interface ScanResult {
   name: string;
@@ -38,7 +37,7 @@ class WorkbenchController {
    * @memberof WorkbenchController
    */
   public async fetchLocalFile(path: string): Promise<string> {
-    const { data } = await ipcRenderer.invoke(IpcEvents.FILE_GET_CONTENT, path);
+    const { data } = await window.electron.ipcRenderer.invoke(IpcEvents.FILE_GET_CONTENT, path);
     return data.content;
   }
 
@@ -86,7 +85,7 @@ class WorkbenchController {
     const imported = data.source === 'IMPORTED';
 
     // TODO: get from scan result
-    const name = work.split(pathUtil.sep)[work.split(pathUtil.sep).length - 1];
+    const name = work.split(window.path.sep)[work.split(window.path.sep).length - 1];
     return {
       name,
       imported,

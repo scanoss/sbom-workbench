@@ -55,7 +55,7 @@ function isAllowed(filePath: string) {
   return true;
 }
 
-ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
+ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (_event, filePath: string) => {
   const fileContent = { content: null };
   try {
     if (!isAllowed(filePath)) {
@@ -80,7 +80,7 @@ ipcMain.handle(IpcEvents.FILE_GET, async (_event, params: GetFileDTO) => {
   try {
     data = await fileService.get(params);
     return Response.ok({ message: 'File retrieve successfully', data });
-  } catch (error) {
+  } catch (error: any) {
     return Response.fail({ message: error.message });
   }
 });
