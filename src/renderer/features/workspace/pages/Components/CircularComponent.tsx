@@ -1,6 +1,7 @@
 import React from 'react';
-import { CircularProgress, makeStyles, Button } from '@material-ui/core';
-import PauseIcon from '@material-ui/icons/Pause';
+import { CircularProgress, Button } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import PauseIcon from '@mui/icons-material/Pause';
 
 interface CircularComponentProps {
   stage: {

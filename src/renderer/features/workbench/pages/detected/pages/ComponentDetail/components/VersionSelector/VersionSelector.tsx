@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Menu, MenuItem } from '@material-ui/core';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import { Button, Menu, MenuItem } from '@mui/material';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const VersionSelector = ({ versions, version, onSelect, component }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

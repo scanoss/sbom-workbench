@@ -1,27 +1,17 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable jsx-a11y/label-has-associated-control */
-
-import {
-  Dialog,
-  Tooltip,
-  Paper,
-  DialogActions,
-  Button,
-  makeStyles,
-  InputBase,
-  TextField,
-  IconButton,
-} from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
-import SearchIcon from '@material-ui/icons/Search';
-import AddIcon from '@material-ui/icons/Add';
-import { Autocomplete } from '@material-ui/lab';
-import { NewComponentDTO } from '../../../api/types';
-import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
-import { ResponseStatus } from '../../../api/Response';
-import { componentService } from '../../../api/services/component.service';
-import { licenseService } from '../../../api/services/license.service';
-import { DialogContext } from '../../context/DialogProvider';
+import { Dialog, Tooltip, Paper, DialogActions, Button, InputBase, TextField, IconButton } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+import Autocomplete from '@mui/material/Autocomplete';
+import { NewComponentDTO } from '@api/types';
+import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
+import { ResponseStatus } from '@api/Response';
+import { componentService } from '@api/services/component.service';
+import { licenseService } from '@api/services/license.service';
+import { DialogContext } from '@context/DialogProvider';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -142,12 +132,12 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">Component</label>
               <Paper className="dialog-form-field-control">
-                <InputBase
+                <TextField
                   name="name"
+                  size="small"
                   fullWidth
-                  readOnly={readOnly}
+                  disabled={readOnly}
                   value={form?.name}
-                  placeholder="Component"
                   onChange={(e) => inputHandler(e.target.name, e.target.value)}
                   required
                 />
@@ -157,11 +147,11 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">Version</label>
               <Paper className="dialog-form-field-control">
-                <InputBase
+                <TextField
                   name="version"
+                  size="small"
                   fullWidth
                   value={form?.version}
-                  placeholder="Version"
                   onChange={(e) => inputHandler(e.target.name, e.target.value)}
                   required
                 />
@@ -173,25 +163,31 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
             <div className="dialog-form-field-label">
               <label>License</label>
               <Tooltip title="Add new license">
-                <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
+                <IconButton tabIndex={-1} color="inherit" size="small" onClick={openLicenseDialog}>
                   <AddIcon fontSize="inherit" />
                 </IconButton>
               </Tooltip>
             </div>
             <Paper className="dialog-form-field-control">
-              <SearchIcon className={classes.search} />
               <Autocomplete
                 fullWidth
+                size="small"
                 options={licenses || []}
                 // value={{ id: form?.licenseId }}
-                getOptionSelected={(option, value) => option.id === value.id}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 getOptionLabel={(option) => option.name || ''}
                 disableClearable
                 renderInput={(params) => (
                   <TextField
-                    required
                     {...params}
-                    InputProps={{ ...params.InputProps, disableUnderline: true, className: 'autocomplete-option' }}
+                    size="small"
+                    required
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: <SearchIcon className={classes.search} />,
+                      disableUnderline: true,
+                      className: 'autocomplete-option',
+                    }}
                   />
                 )}
                 onChange={(e, { id, name }) => setForm({ ...form, licenseId: id })}
@@ -204,9 +200,9 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
               <div className="dialog-form-field">
                 <label className="dialog-form-field-label">PURL</label>
                 <Paper className="dialog-form-field-control">
-                  <InputBase
+                  <TextField
                     name="purl"
-                    placeholder="PURL"
+                    size="small"
                     fullWidth
                     value={form?.purl}
                     onChange={(e) => inputHandler(e.target.name, e.target.value)}
@@ -220,9 +216,10 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                   URL <span className="optional">- Optional</span>
                 </label>
                 <Paper className="dialog-form-field-control">
-                  <InputBase
+                  <TextField
                     name="url"
-                    placeholder="URL"
+                    size="small"
+                    required
                     fullWidth
                     value={form?.url}
                     onChange={(e) => inputHandler(e.target.name, e.target.value)}
@@ -234,7 +231,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
         </div>
 
         <DialogActions>
-          <Button onClick={onCancel}>Cancel</Button>
+          <Button tabIndex={-1} onClick={onCancel}>Cancel</Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
             Create
           </Button>

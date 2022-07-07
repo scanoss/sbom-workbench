@@ -3,11 +3,11 @@ import {
   CardContent,
   Typography,
   ButtonBase, Chip, CardActions, Button
-} from '@material-ui/core';
+} from '@mui/material';
 import React from 'react';
 import { Inventory } from '../../../../../api/types';
 import Label from '../Label/Label';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 interface InventoryCardProps {
   inventory: Inventory;

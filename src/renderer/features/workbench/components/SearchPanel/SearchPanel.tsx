@@ -1,10 +1,11 @@
 import React, { SetStateAction, useContext, useEffect, useRef } from 'react';
-import { Chip, IconButton, makeStyles, TextField } from '@material-ui/core';
+import { Chip, IconButton, TextField } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { ipcRenderer } from 'electron';
 import { IpcEvents } from '@api/ipc-events';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
 import * as SearchUtils from '@shared/utils/search-utils';
 import { AppConfigDefault } from '@config/AppConfigDefault';
 import { useDispatch, useSelector } from 'react-redux';
@@ -68,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
         height: '0.85em',
       },
     },
-    '& .MuiDataGrid-cell.MuiDataGrid-cellCheckbox[data-value=true]': {
+    '& .MuiDataGrid-row.Mui-selected .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
       visibility: 'visible !important',
     },
     '& .MuiDataGrid-row:hover': {
@@ -304,7 +305,6 @@ const SearchPanel = () => {
           disableColumnMenu
           rowsPerPageOptions={[AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT]}
           hideFooterSelectedRowCount
-          hideFooterRowCount
           checkboxSelection
           headerHeight={41}
           disableSelectionOnClick

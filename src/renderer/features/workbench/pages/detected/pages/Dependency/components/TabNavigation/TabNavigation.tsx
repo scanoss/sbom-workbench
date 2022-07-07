@@ -1,4 +1,4 @@
-import { Paper, Tab, Tabs } from '@material-ui/core';
+import { Paper, Tab, Tabs } from '@mui/material';
 import React from 'react';
 
 export enum DependencyStatus {

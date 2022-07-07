@@ -1,9 +1,9 @@
-import { Chip } from '@material-ui/core';
+import { Chip } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import IconButton from '@material-ui/core/IconButton';
-import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
-import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
+import IconButton from '@mui/material/IconButton';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Inventory } from '@api/types';
 import { inventoryService } from '@api/services/inventory.service';
 import { mapFiles } from '@shared/utils/scan-util';
@@ -85,54 +85,52 @@ export const InventoryDetail = () => {
     getInventory();
   }, []);
 
-  return (
-    <>
-      <section className="app-page">
-        <header className="app-header">
-          <div className="identified-info-card">
-            <div className="actions">
-              <IconButton className="btn-delete" onClick={onEditClicked}>
-                <EditOutlinedIcon />
-              </IconButton>
-              <IconButton className="btn-delete" onClick={onRemoveClicked}>
-                <DeleteOutlineOutlinedIcon />
-              </IconButton>
-            </div>
+  return <>
+    <section className="app-page">
+      <header className="app-header">
+        <div className="identified-info-card">
+          <div className="actions">
+            <IconButton className="btn-delete" onClick={onEditClicked} size="large">
+              <EditOutlinedIcon />
+            </IconButton>
+            <IconButton className="btn-delete" onClick={onRemoveClicked} size="large">
+              <DeleteOutlineOutlinedIcon />
+            </IconButton>
+          </div>
 
-            <Chip className="identified" variant="outlined" label="Identified Group" />
+          <Chip className="identified" variant="outlined" label="Identified Group" />
 
-            <div className="d-flex">
-              <div className="info">
-                <Label label="COMPONENT" textColor="gray" />
-                <h4>{inventory?.component.name}</h4>
-              </div>
-              <div className="info">
-                <Label label="VERSION" textColor="gray" />
-                <h4>{inventory?.component.version}</h4>
-              </div>
-              <div className="info">
-                <Label label="LICENSE" textColor="gray" />
-                <h4>{inventory?.license_name}</h4>
-              </div>
+          <div className="d-flex">
+            <div className="info">
+              <Label label="COMPONENT" textColor="gray" />
+              <h4>{inventory?.component.name}</h4>
             </div>
-            <div className="d-flex">
-              <div className="info">
-                <Label label="USAGE" textColor="gray" />
-                <h4>{inventory?.usage}</h4>
-              </div>
-              <div className="info">
-                <Label label="NOTES" textColor="gray" />
-                <span className="notes">{inventory?.notes}</span>
-              </div>
+            <div className="info">
+              <Label label="VERSION" textColor="gray" />
+              <h4>{inventory?.component.version}</h4>
+            </div>
+            <div className="info">
+              <Label label="LICENSE" textColor="gray" />
+              <h4>{inventory?.license_name}</h4>
             </div>
           </div>
-        </header>
-        <main className="app-content">
-          <FileList files={files} onAction={onAction} />
-        </main>
-      </section>
-    </>
-  );
+          <div className="d-flex">
+            <div className="info">
+              <Label label="USAGE" textColor="gray" />
+              <h4>{inventory?.usage}</h4>
+            </div>
+            <div className="info">
+              <Label label="NOTES" textColor="gray" />
+              <span className="notes">{inventory?.notes}</span>
+            </div>
+          </div>
+        </div>
+      </header>
+      <main className="app-content">
+        <FileList files={files} onAction={onAction} />
+      </main>
+    </section>
+  </>;
 };
 
 export default InventoryDetail;

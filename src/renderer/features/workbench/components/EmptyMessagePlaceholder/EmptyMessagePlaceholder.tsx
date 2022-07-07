@@ -1,7 +1,5 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core';
-import componentEmpty from '@assets/imgs/component-empty.svg';
-import SearchIcon from '@material-ui/icons/Search';
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles((theme) => ({
   container: {

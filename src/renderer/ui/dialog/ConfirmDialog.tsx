@@ -1,7 +1,8 @@
 import React from 'react';
-import { Dialog, DialogActions, Button, makeStyles, DialogContentText, DialogContent } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+import { Dialog, DialogActions, Button, DialogContentText, DialogContent } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
 
 const useStyles = makeStyles((theme) => ({
@@ -63,7 +64,11 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
       onClose={handleCancel}
     >
       <DialogContent className={classes.content}>
-        <IconButton aria-label="close" className={classes.closeButton} onClick={handleCancel}>
+        <IconButton
+          aria-label="close"
+          className={classes.closeButton}
+          onClick={handleCancel}
+          size="large">
           <CloseIcon />
         </IconButton>
         <DialogContentText className={classes.text}>

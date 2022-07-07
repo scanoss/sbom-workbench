@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Chart, registerables } from 'chart.js';
-import { Card } from '@material-ui/core';
+import { Card } from '@mui/material';
 import LicensesChart from '../components/LicensesChart';
 import LicensesTable from '../components/LicensesTable';
 import MatchesForLicense from '../components/MatchesForLicense';

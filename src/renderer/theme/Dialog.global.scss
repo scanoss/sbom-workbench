@@ -89,15 +89,15 @@
       color: #6c6c6e;
     }
 
-    input, select, .MuiSelect-root {
-      height: 42px;
-      padding: 0px 10px;
-      color: #6c6c6e;
-    }
-
     .MuiSelect-root {
       display: flex;
       align-items: center;
+    }
+  }
+
+  .MuiAutocomplete-root {
+    .MuiOutlinedInput-root.MuiInputBase-sizeSmall {
+      padding: 0 6px;
     }
   }
 

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import { DIALOG_ACTIONS } from '@context/types';
 import { Dependency, FileType } from '@api/types';
 import { getExtension } from '@shared/utils/utils';

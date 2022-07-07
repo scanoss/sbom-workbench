@@ -9,40 +9,40 @@ import {
   Fade,
   Menu,
   MenuItem,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import React, { useContext, useEffect, useState } from 'react';
-import HomeOutlinedIcon from '@material-ui/icons/HomeOutlined';
-import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
-import InsertChartOutlinedTwoToneIcon from '@material-ui/icons/InsertChartOutlinedTwoTone';
-import GavelIcon from '@material-ui/icons/Gavel';
-import SearchIcon from '@material-ui/icons/Search';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
+import InsertChartOutlinedTwoToneIcon from '@mui/icons-material/InsertChartOutlinedTwoTone';
+import GavelIcon from '@mui/icons-material/Gavel';
+import SearchIcon from '@mui/icons-material/Search';
 
 // eslint-disable-next-line import/no-named-default
-import { default as MaterialAppBar } from '@material-ui/core/AppBar';
+import { default as MaterialAppBar } from '@mui/material/AppBar';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
-import GetAppIcon from '@material-ui/icons/GetApp';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
+import GetAppIcon from '@mui/icons-material/GetApp';
 import { useSelector } from 'react-redux';
 import { exportService } from '@api/services/export.service';
 import { ExportFormat, IProject } from '@api/types';
 import { workspaceService } from '@api/services/workspace.service';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { dialogController } from '../../../../controllers/dialog-controller';
 import AppConfig from '../../../../../config/AppConfigModule';
-import { DialogContext, IDialogContext } from '@context/DialogProvider';
 
 const Navigation = () => {
   const navigate = useNavigate();
 
   return (
     <section id="Navigation">
-      <IconButton onClick={() => navigate(-1)}>
+      <IconButton onClick={() => navigate(-1)} size="large">
         <ArrowBackIcon />
       </IconButton>
-      <IconButton onClick={() => navigate(1)}>
+      <IconButton onClick={() => navigate(1)} size="large">
         <ArrowForwardIcon />
       </IconButton>
     </section>
@@ -52,28 +52,44 @@ const Navigation = () => {
 const AppMenu = () => {
   return (
     <section id="AppMenu">
-      <NavLink to="/workbench/detected" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}  tabIndex={-1}>
+      <NavLink
+        to="/workbench/detected"
+        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+        tabIndex={-1}
+      >
         <Tooltip title="Detected components">
           <Button color="inherit">
             <GavelIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/search" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}  tabIndex={-1}>
+      <NavLink
+        to="/workbench/search"
+        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+        tabIndex={-1}
+      >
         <Tooltip title="Search keywords">
           <Button color="inherit">
             <SearchIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/identified" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} tabIndex={-1}>
+      <NavLink
+        to="/workbench/identified"
+        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+        tabIndex={-1}
+      >
         <Tooltip title="Identified components">
           <Button color="inherit">
             <CheckCircleOutlineOutlinedIcon />
           </Button>
         </Tooltip>
       </NavLink>
-      <NavLink to="/workbench/report" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} tabIndex={-1}>
+      <NavLink
+        to="/workbench/report"
+        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+        tabIndex={-1}
+      >
         <Tooltip title="Reports">
           <Button color="inherit">
             <InsertChartOutlinedTwoToneIcon />
@@ -181,7 +197,11 @@ const Export = ({ state }) => {
     SPDXLITEJSON: { label: 'SPDX Lite', showOnNoneProgress: false, hint: 'Export an SPDX compliant SBOM report' },
     WFP: { label: 'WFP', showNoProgress: true, hint: 'Export the Winnowing Fingerprint data of the scanned project' },
     RAW: { label: 'RAW', showNoProgress: true, hint: 'Export the raw JSON responses from the SCANOSS Platform' },
-    HTMLSUMMARY: { label: 'HTML Summary', showNoProgress: true, hint: 'Export a HTML summary of the Identification report' },
+    HTMLSUMMARY: {
+      label: 'HTML Summary',
+      showNoProgress: true,
+      hint: 'Export a HTML summary of the Identification report',
+    },
   };
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -257,21 +277,12 @@ const Export = ({ state }) => {
           >
             Export
           </Button>
-          <Menu
-            style={{ marginTop: '35px' }}
-            id="fade-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={open}
-            onClose={handleClose}
-            TransitionComponent={Fade}
-          >
+          <Menu anchorEl={anchorEl} keepMounted open={open} onClose={handleClose} TransitionComponent={Fade}>
             {AppConfig.FF_EXPORT_FORMAT_OPTIONS.map(
               (format) =>
                 exportLabels[format] && (
-                  <Tooltip title={exportLabels[format].hint} placement="left" arrow>
+                  <Tooltip key={format} title={exportLabels[format].hint} placement="left" arrow>
                     <MenuItem
-                      key={format}
                       /* disabled={state.progress === 0 && !exportLabels[format].showNoProgress} */
                       onClick={() => onExport(format as ExportFormat)}
                     >
@@ -303,7 +314,7 @@ const AppBar = ({ exp }) => {
         <Toolbar>
           <div className="slot start">
             <Tooltip title="Back to projects">
-              <IconButton onClick={onBackPressed} edge="start" color="inherit" aria-label="menu">
+              <IconButton onClick={onBackPressed} edge="start" color="inherit" aria-label="menu" size="large">
                 <HomeOutlinedIcon />
               </IconButton>
             </Tooltip>

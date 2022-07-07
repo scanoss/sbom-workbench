@@ -1,24 +1,18 @@
 import React from 'react';
-import { Button, ButtonGroup, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener/ClickAwayListener';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import AddIcon from '@material-ui/icons/Add';
-
-const options = ['Create a merge commit', 'Squash and merge', 'Rebase and merge'];
+import { Button, ButtonGroup, Grow, MenuItem, MenuList, Paper, Popper } from '@mui/material';
+import { ClickAwayListener } from '@mui/base';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import AddIcon from '@mui/icons-material/Add';
 
 const AddProjectButton = ({ onNewProject, onImportProject }) => {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
 
-  const handleMenuItemClick = (event: React.MouseEvent<HTMLLIElement, MouseEvent>, index: number) => {
-    setOpen(false);
-  };
-
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
 
-  const handleClose = (event: React.MouseEvent<Document, MouseEvent>) => {
+  const handleClose = (event: MouseEvent | TouchEvent) => {
     if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
       return;
     }
@@ -28,7 +22,7 @@ const AddProjectButton = ({ onNewProject, onImportProject }) => {
 
   return (
     <>
-      <ButtonGroup variant="contained" ref={anchorRef} color="primary" aria-label="add new project button">
+      <ButtonGroup variant="contained" ref={anchorRef} aria-label="Add new project">
         <Button startIcon={<AddIcon />} onClick={onNewProject}>
           New project
         </Button>
@@ -36,7 +30,7 @@ const AddProjectButton = ({ onNewProject, onImportProject }) => {
           size="small"
           aria-controls={open ? 'split-button-menu' : undefined}
           aria-expanded={open ? 'true' : undefined}
-          aria-label="add new project"
+          aria-label="Add new project"
           aria-haspopup="menu"
           onClick={handleToggle}
         >
@@ -52,7 +46,7 @@ const AddProjectButton = ({ onNewProject, onImportProject }) => {
             }}
           >
             <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
+              <ClickAwayListener onClickAway={(e) => handleClose(e)}>
                 <MenuList id="split-button-menu">
                   <MenuItem
                     onClick={(event) => {

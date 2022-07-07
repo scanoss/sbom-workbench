@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FormControl,
   FormLabel,
@@ -13,12 +13,13 @@ import {
   Tooltip,
   Switch,
   Divider,
-  makeStyles, Input, InputBase
-} from '@material-ui/core';
-import KeyboardArrowDownOutlinedIcon from '@material-ui/icons/KeyboardArrowDownOutlined';
-import KeyboardArrowUpOutlinedIcon from '@material-ui/icons/KeyboardArrowUpOutlined';
-import DeleteIcon from '@material-ui/icons/DeleteOutlined';
-import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+
+import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
+import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { projectService } from '@api/services/project.service';
@@ -103,7 +104,6 @@ const WorkbenchFilters = () => {
                       Filter by the path of each file.
                     </small>
                   </p>
-
                 </>
               }
               placement="bottom"
@@ -122,7 +122,7 @@ const WorkbenchFilters = () => {
             </Tooltip>
           )}
         </header>
-        <Collapse in={open} collapsedHeight={30}>
+        <Collapse in={open} collapsedSize={30}>
           <form className="workbench-filters-body">
             <FormControl
               component="fieldset"
@@ -233,7 +233,7 @@ const WorkbenchFilters = () => {
           onChange={(e) => handleFilenameChange(e)}
         />
       </Box>
-      </>
+    </>
   );
 };
 

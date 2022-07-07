@@ -1,21 +1,11 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable jsx-a11y/label-has-associated-control */
-
-import {
-  Dialog,
-  Tooltip,
-  Paper,
-  DialogActions,
-  Button,
-  makeStyles,
-  InputBase,
-  TextField,
-  IconButton,
-} from '@material-ui/core';
+import { Dialog, Tooltip, Paper, DialogActions, Button, InputBase, TextField, IconButton } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import React, { useContext, useEffect, useState } from 'react';
-import SearchIcon from '@material-ui/icons/Search';
-import AddIcon from '@material-ui/icons/Add';
-import { Autocomplete } from '@material-ui/lab';
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+import Autocomplete from '@mui/material/Autocomplete';
 import { Dependency } from '@api/types';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { ResponseStatus } from '@api/Response';
@@ -146,13 +136,15 @@ const DependencyDialog = (props: DependencyDialogProps) => {
                     ? { spdxid: form.license, name: licenses.find((item) => item.spdxid === form.license)?.name }
                     : ''
                 }
-                getOptionSelected={(option: any) => option.spdxid === form.license}
+                isOptionEqualToValue={(option: any) => option.spdxid === form.license}
                 getOptionLabel={(option: any) => option.name || option.spdxid}
-                renderOption={(option: any) => (
-                  <div className={classes.option}>
-                    <span>{option.name}</span>
-                    <span className="middle">{option.spdxid}</span>
-                  </div>
+                renderOption={(props, option, { selected }) => (
+                  <li {...props}>
+                    <div className={classes.option}>
+                      <span>{option.name}</span>
+                      <span className="middle">{option.spdxid}</span>
+                    </div>
+                  </li>
                 )}
                 filterOptions={(options, params) => {
                   return options.filter(

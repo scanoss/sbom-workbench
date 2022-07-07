@@ -1,19 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Dialog, Paper, IconButton, InputBase, CircularProgress, TextField, Button } from '@material-ui/core';
+import { Dialog, Paper, IconButton, InputBase, CircularProgress, TextField, Button } from '@mui/material';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { componentService } from '@api/services/component.service';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import useApi from '@hooks/useApi';
 import { importGlobalComponent } from '@store/component-store/componentThunks';
 import { useDispatch } from 'react-redux';
 import { DialogContext } from '@context/DialogProvider';
-import { Alert, Autocomplete } from '@material-ui/lab';
+import Autocomplete from '@mui/material/Autocomplete';
+import Alert from '@mui/material/Alert';
 import { AppDispatch } from '@store/store';
-import CompareArrowsIcon from '@material-ui/icons/CompareArrows';
-import SearchIcon from '@material-ui/icons/Search';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import SearchIcon from '@mui/icons-material/Search';
 import { packages } from '@assets/data/ComponentCatalogPackages';
-import CloseIcon from '@material-ui/icons/Close';
-import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import WarningOutlinedIcon from '@mui/icons-material/WarningOutlined';
 import { projectService } from '@api/services/project.service';
 import { IComponentResult } from '../../../main/task/componentCatalog/iComponentCatalog/IComponentResult';
 import { ISearchComponent } from '../../../main/task/componentCatalog/iComponentCatalog/ISearchComponent';
@@ -106,7 +107,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
     >
       <header className="dialog-title">
         <span>Online Component Search</span>
-        <IconButton aria-label="close" onClick={onCancel}>
+        <IconButton aria-label="close" onClick={onCancel} size="large">
           <CloseIcon />
         </IconButton>
       </header>
@@ -204,7 +205,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
               </Paper>
             </div>
 
-            <IconButton disabled={loading || disabled} type="submit">
+            <IconButton disabled={loading || disabled} type="submit" size="large">
               <SearchIcon />
             </IconButton>
           </div>

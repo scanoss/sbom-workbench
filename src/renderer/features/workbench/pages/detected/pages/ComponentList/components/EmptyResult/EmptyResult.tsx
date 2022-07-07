@@ -1,6 +1,6 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core';
-import componentEmpty from '../../../../../../../../../../assets/imgs/component-empty.svg';
+import { makeStyles } from '@mui/styles';
+import componentEmpty from '@assets/imgs/component-empty.svg';
 
 const useStyles = makeStyles((theme) => ({
   container: {

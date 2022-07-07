@@ -1,14 +1,14 @@
-import { Button, Dialog, DialogActions, IconButton, InputBase, makeStyles, Paper, Tooltip } from '@material-ui/core';
-import TextField from '@material-ui/core/TextField';
-import AddIcon from '@material-ui/icons/Add';
-import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import React, { useEffect, useState } from 'react';
-import DeleteIcon from '@material-ui/icons/Delete';
-import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
-import { IWorkspaceCfg } from '../../../api/types';
-import { userSettingService } from '../../../api/services/userSetting.service';
-import App from '../../App';
-import AppConfig from '../../../config/AppConfigModule';
+import { Button, Dialog, DialogActions, IconButton, InputBase, Paper, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import TextField from '@mui/material/TextField';
+import AddIcon from '@mui/icons-material/Add';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
+import { IWorkspaceCfg } from '@api/types';
+import { userSettingService } from '@api/services/userSetting.service';
+import AppConfig from '@config/AppConfigModule';
 
 const filter = createFilterOptions();
 
@@ -18,9 +18,6 @@ const useStyles = makeStyles((theme) => ({
       width: '600px',
     },
   },
-  search: {
-    padding: '0px 15px',
-  },
   new: {
     fontSize: '0.9rem',
     fontWeight: 600,
@@ -29,6 +26,7 @@ const useStyles = makeStyles((theme) => ({
   option: {
     display: 'flex',
     flexDirection: 'column',
+    padding: 6,
     '& span.middle': {
       fontSize: '0.8rem',
       color: '#6c6c6e',
@@ -77,8 +75,9 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">API URL</label>
             <Paper className="dialog-form-field-control">
-              <InputBase
+              <TextField
                 name="url"
+                size="small"
                 fullWidth
                 value={data.URL}
                 onChange={(e) => setData({ ...data, URL: e.target.value })}
@@ -92,8 +91,9 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
               API KEY <span className="optional">- Optional</span>
             </label>
             <Paper className="dialog-form-field-control">
-              <InputBase
+              <TextField
                 name="apikey"
+                size="small"
                 fullWidth
                 value={data.API_KEY}
                 onChange={(e) => setData({ ...data, API_KEY: e.target.value })}
@@ -102,7 +102,7 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
           </div>
         </div>
         <DialogActions>
-          <Button onClick={onCancel}>Cancel</Button>
+          <Button tabIndex={-1} onClick={onCancel}>Cancel</Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
             Add
           </Button>
@@ -226,15 +226,15 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   <div className="dialog-form-field-label">
                     <label>Knowledgebase API</label>
                     <Tooltip title="Add new endpoint" onClick={onNewEndpointHandler}>
-                      <IconButton color="inherit" size="small">
+                      <IconButton tabIndex={-1} color="inherit" size="small">
                         <AddIcon fontSize="inherit" />
                       </IconButton>
                     </Tooltip>
                   </div>
-                  <Paper>
+                  <Paper className="dialog-form-field-control">
                     <Autocomplete
+                      fullWidth
                       value={selectedApi}
-                      className={classes.search}
                       onChange={handleOnChange}
                       onKeyPress={(e: any) => {
                         if (e.key === 'Enter') {
@@ -280,25 +280,27 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                         // Regular option
                         return `${option.URL} ${option.API_KEY ? `(${option.API_KEY})` : ''}`;
                       }}
-                      renderOption={(option, props) =>
+                      renderOption={(props, option, { selected }) =>
                         option.new ? (
                           <li {...props} className={classes.new}>
                             {option.URL}
                           </li>
                         ) : (
-                          <li {...props} className="w-100 d-flex space-between align-center">
-                            <div className={classes.option}>
-                              <span>{option.URL}</span>
-                              {option.API_KEY && <span className="middle">API KEY: {option.API_KEY}</span>}
-                            </div>
-                            <IconButton
-                              size="small"
-                              aria-label="delete"
-                              className="btn-delete"
-                              onClick={(e) => handleTrash(e, option)}
-                            >
-                              <DeleteIcon fontSize="inherit" />
-                            </IconButton>
+                          <li {...props}>
+                            <article  className="w-100 d-flex space-between align-center">
+                              <div className={classes.option}>
+                                <span>{option.URL}</span>
+                                {option.API_KEY && <span className="middle">API KEY: {option.API_KEY}</span>}
+                              </div>
+                              <IconButton
+                                size="small"
+                                aria-label="delete"
+                                className="btn-delete"
+                                onClick={(e) => handleTrash(e, option)}
+                              >
+                                <DeleteIcon fontSize="inherit" />
+                              </IconButton>
+                            </article>
                           </li>
                         )
                       }
@@ -328,8 +330,8 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                 SBOM Ledger Token <span className="optional">- Optional</span>
               </label>
               <Paper className="dialog-form-field-control">
-                <InputBase
-                  name="url"
+                <TextField
+                  name="token"
                   fullWidth
                   value={sbomLedgerToken}
                   onChange={(e) => setSbomLedgerToken(e.target.value)}
@@ -338,7 +340,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
             </div>
           </div>
           <DialogActions>
-            <Button onClick={onCancel}>Cancel</Button>
+            <Button tabIndex={-1} onClick={onCancel}>Cancel</Button>
             <Button type="submit" variant="contained" color="secondary">
               Save
             </Button>

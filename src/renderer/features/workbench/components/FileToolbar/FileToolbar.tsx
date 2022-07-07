@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { IconButton, ListItemText, Tooltip, Typography } from '@material-ui/core';
+import { IconButton, ListItemText, Tooltip, Typography } from '@mui/material';
 import CodeViewerManagerInstance from '../../pages/detected/pages/Editor/CodeViewerManager';
 
 const { shell } = require('electron');

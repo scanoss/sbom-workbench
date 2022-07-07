@@ -2,18 +2,24 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { createMuiTheme, MuiThemeProvider, Theme } from '@material-ui/core/styles';
+
 import AppConfig from '@config/AppConfigModule';
 import { DialogProvider } from '@context/DialogProvider';
 import { WorkbenchProvider } from '@context/WorkbenchProvider';
 import AppProvider from '@context/AppProvider';
 import store from '@store/store';
+import { createTheme, ThemeProvider, StyledEngineProvider, Theme } from '@mui/material/styles';
+
 import WorkbenchModule from './features/workbench';
 import WorkspaceModule from './features/workspace';
 import AboutModule from './features/about';
 
 import './App.global.scss';
 
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
 
 export default class App {
   /**
@@ -26,26 +32,26 @@ export default class App {
     const theme = this.loadTheme();
 
     const app = (
-      <>
-        <HashRouter>
-          <Provider store={store}>
-            <MuiThemeProvider theme={theme}>
-              <DialogProvider>
-                <AppProvider>
-                  <WorkbenchProvider>
-                    <Routes>
-                      <Route index element={<WorkspaceModule />} />
-                      <Route path="/workspace/*" element={<WorkspaceModule />} />
-                      <Route path="/workbench/*" element={<WorkbenchModule />} />
-                      <Route path="/about" element={<AboutModule />} />
-                    </Routes>
-                  </WorkbenchProvider>
-                </AppProvider>
-              </DialogProvider>
-            </MuiThemeProvider>
-          </Provider>
-        </HashRouter>
-      </>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={theme}>
+          <HashRouter>
+              <Provider store={store}>
+                    <DialogProvider>
+                      <AppProvider>
+                        <WorkbenchProvider>
+                          <Routes>
+                            <Route index element={<WorkspaceModule />} />
+                            <Route path="/workspace/*" element={<WorkspaceModule />} />
+                            <Route path="/workbench/*" element={<WorkbenchModule />} />
+                            <Route path="/about" element={<AboutModule />} />
+                          </Routes>
+                        </WorkbenchProvider>
+                      </AppProvider>
+                    </DialogProvider>
+              </Provider>
+            </HashRouter>
+        </ThemeProvider>
+      </StyledEngineProvider>
     );
 
     this.setupAppMenuListeners();
@@ -66,9 +72,12 @@ export default class App {
     }); */
   }
 
+
+
   private loadTheme(): Theme {
-    const theme = createMuiTheme({
+    const theme = createTheme({
       palette: {
+        mode: 'light',
         primary: {
           main: '#6366F1',
         },
@@ -90,7 +99,7 @@ export default class App {
     });
 
     theme.shadows[1] = '0px 1px 3px 0px #0000001A; 1px 0px 2px 0px #0000000F';
-
+    console.log(theme);
     return theme;
   }
 }

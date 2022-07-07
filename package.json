@@ -244,11 +244,14 @@
     "yarn-deduplicate": "^3.1.0"
   },
   "dependencies": {
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
     "@grpc/grpc-js": "^1.6.7",
-    "@material-ui/core": "^4.11.4",
-    "@material-ui/data-grid": "^4.0.0-alpha.37",
-    "@material-ui/icons": "^4.11.2",
-    "@material-ui/lab": "^4.0.0-alpha.58",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/lab": "^5.0.0-alpha.89",
+    "@mui/material": "^5.8.7",
+    "@mui/styles": "^5.8.7",
+    "@mui/x-data-grid": "^5.12.3",
     "@reduxjs/toolkit": "^1.8.1",
     "abort-controller": "^3.0.0",
     "adm-zip": "^0.5.9",

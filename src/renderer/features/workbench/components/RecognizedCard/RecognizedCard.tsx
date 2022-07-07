@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Typography, Tooltip, ButtonBase } from '@material-ui/core';
+import { Card, CardContent, Typography, Tooltip, ButtonBase } from '@mui/material';
 import IconComponent from '../IconComponent/IconComponent';
 
 interface RecognizedCardProps {

@@ -1,7 +1,8 @@
 import React from 'react';
-import { ButtonGroup, Button, makeStyles, Tooltip } from '@material-ui/core';
-import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
-import ExtensionOutlinedIcon from '@material-ui/icons/ExtensionOutlined';
+import { ButtonGroup, Button, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
+import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,7 +34,7 @@ const CodeViewSelector = ({ active, setView }) => {
           <Button
             className={classes.button}
             onClick={() => setView(CodeViewSelectorMode.CODE)}
-            color={active === CodeViewSelectorMode.CODE ? 'primary' : 'default'}
+            color={active === CodeViewSelectorMode.CODE ? 'primary' : 'secondary'}
             aria-label="code"
           >
             <CodeOutlinedIcon fontSize="inherit" />
@@ -43,7 +44,7 @@ const CodeViewSelector = ({ active, setView }) => {
           <Button
             className={classes.button}
             onClick={() => setView(CodeViewSelectorMode.GRAPH)}
-            color={active === CodeViewSelectorMode.GRAPH ? 'primary' : 'default'}
+            color={active === CodeViewSelectorMode.GRAPH ? 'primary' : 'secondary'}
             aria-label="graph"
           >
             <ExtensionOutlinedIcon fontSize="inherit" />

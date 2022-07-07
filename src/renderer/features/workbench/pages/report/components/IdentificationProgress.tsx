@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js';
-import { Button, Tooltip } from '@material-ui/core';
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import { Button, Tooltip } from '@mui/material';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { shell } from 'electron';
 import { exportService } from '../../../../../../api/services/export.service';
 import { HashType } from '../../../../../../api/types';

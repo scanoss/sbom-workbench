@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconButton, Menu, MenuItem } from '@material-ui/core';
+import { IconButton, Menu, MenuItem } from '@mui/material';
 
 const MenuButton = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

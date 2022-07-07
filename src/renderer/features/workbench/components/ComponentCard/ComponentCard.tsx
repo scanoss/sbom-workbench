@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Tooltip, ButtonBase } from '@material-ui/core';
+import { Card, CardContent, Tooltip, ButtonBase } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { ComponentGroup } from '@api/types';
 import IconComponent from '../IconComponent/IconComponent';

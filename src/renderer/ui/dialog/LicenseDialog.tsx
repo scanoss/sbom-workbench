@@ -1,22 +1,19 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { Dialog, Paper, DialogActions, Button, makeStyles, InputBase, TextareaAutosize } from '@material-ui/core';
-
 import React, { useContext, useEffect, useState } from 'react';
-import { License } from '../../../api/types';
-import { licenseService } from '../../../api/services/license.service';
-import { DialogResponse, DIALOG_ACTIONS } from '../../context/types';
+import { Dialog, Paper, DialogActions, Button, InputBase, TextField } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { License } from '@api/types';
+import { licenseService } from '@api/services/license.service';
+import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
+import { DialogContext } from '@context/DialogProvider';
 import { licenseHelper } from '../../../main/helpers/LicenseHelper';
-import { DialogContext } from '../../context/DialogProvider';
 
 const useStyles = makeStyles((theme) => ({
   size: {
     '& .MuiDialog-paperWidthMd': {
       width: '500px',
     },
-  },
-  search: {
-    padding: '10px 0px 10px 10px',
-  },
+  }
 }));
 
 interface LicenseDialogProps {
@@ -63,7 +60,7 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
     if (open) {
       setForm({});
     }
-  }, [open])
+  }, [open]);
 
   return (
     <Dialog
@@ -81,7 +78,7 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">Name</label>
             <Paper className="dialog-form-field-control">
-              <InputBase name="name" fullWidth value={form?.name} onChange={(e) => inputHandler(e)}  />
+              <TextField name="name" size="small" fullWidth value={form?.name} onChange={(e) => inputHandler(e)} />
             </Paper>
             <p className="dialog-form-field-hint">
               SpdxID: {form?.name ? licenseHelper.licenseNameToSPDXID(form.name) : '-'}
@@ -90,11 +87,13 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">Full text</label>
             <Paper className="dialog-form-field-control">
-              <TextareaAutosize
+              <TextField
                 name="fulltext"
+                size="small"
+                fullWidth
+                multiline
                 value={form?.fulltext}
-                cols={30}
-                rows={8}
+                minRows={8}
                 onChange={(e) => inputHandler(e)}
               />
             </Paper>
@@ -104,12 +103,12 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
               URL <span className="optional">- Optional</span>
             </label>
             <Paper className="dialog-form-field-control">
-              <InputBase name="url" fullWidth value={form?.url} onChange={(e) => inputHandler(e)} />
+              <TextField name="url" size="small" fullWidth value={form?.url} onChange={(e) => inputHandler(e)} />
             </Paper>
           </div>
         </div>
         <DialogActions>
-          <Button onClick={onCancel}>Cancel</Button>
+          <Button tabIndex={-1} onClick={onCancel}>Cancel</Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
             Create
           </Button>

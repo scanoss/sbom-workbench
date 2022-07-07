@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Skeleton } from '@material-ui/lab';
+import Skeleton from '@mui/material/Skeleton';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { FileType, Inventory } from '@api/types';
 import { mapFiles } from '@shared/utils/scan-util';
@@ -207,137 +207,135 @@ export const Editor = () => {
     }
   };
 
-  return (
-    <>
-      <section id="editor" className="app-page">
-        <header className="app-header">
-          <Breadcrumb />
-          <>
-            <header className="match-info-header">
-              {(!matchInfo || !inventories) && (
-                <Skeleton variant="rect" width="50%" height={58} style={{ marginBottom: 15 }} />
-              )}
+  return <>
+    <section id="editor" className="app-page">
+      <header className="app-header">
+        <Breadcrumb />
+        <>
+          <header className="match-info-header">
+            {(!matchInfo || !inventories) && (
+              <Skeleton variant="rectangular" width="50%" height={58} style={{ marginBottom: 15 }} />
+            )}
 
-              {matchInfo && inventories && (matchInfo.length > 0 || inventories.length > 0) && (
-                <section className="content">
-                  <div className="match-info-default-container">
-                    {inventories.length > 0
-                      ? inventories.map((inventory) => (
-                          <MatchInfoCard
-                            key={inventory.id}
-                            selected={currentMatch === inventory}
-                            match={{
-                              component: inventory.component.name,
-                              vendor: inventory.component?.vendor,
-                              version: inventory.component.version,
-                              usage: inventory.usage,
-                              license: inventory.spdxid,
-                              url: inventory.component.url,
-                              purl: inventory.component.purl,
-                            }}
-                            status="identified"
-                            onSelect={() => null}
-                            onAction={(action) => onAction(action, inventory)}
-                          />
-                        ))
-                      : matchInfo?.map((match, index) => (
-                          <MatchInfoCard
-                            key={match.id}
-                            selected={currentMatch === match}
-                            match={{
-                              component: match.component?.name,
-                              vendor: match.component?.vendor,
-                              version: match.component?.version,
-                              usage: match.type,
-                              license:
-                                match.component?.licenses.find((l) => l.spdxid === match.license[0])?.name ||
-                                match.license[0],
-                              url: match.component?.url,
-                              purl: match.component?.purl,
-                            }}
-                            status={match.status}
-                            onSelect={() => setCurrentMatch(matchInfo[index])}
-                            onAction={(action) => onAction(action, match)}
-                          />
-                        ))}
-                  </div>
-                </section>
-              )}
+            {matchInfo && inventories && (matchInfo.length > 0 || inventories.length > 0) && (
+              <section className="content">
+                <div className="match-info-default-container">
+                  {inventories.length > 0
+                    ? inventories.map((inventory) => (
+                        <MatchInfoCard
+                          key={inventory.id}
+                          selected={currentMatch === inventory}
+                          match={{
+                            component: inventory.component.name,
+                            vendor: inventory.component?.vendor,
+                            version: inventory.component.version,
+                            usage: inventory.usage,
+                            license: inventory.spdxid,
+                            url: inventory.component.url,
+                            purl: inventory.component.purl,
+                          }}
+                          status="identified"
+                          onSelect={() => null}
+                          onAction={(action) => onAction(action, inventory)}
+                        />
+                      ))
+                    : matchInfo?.map((match, index) => (
+                        <MatchInfoCard
+                          key={match.id}
+                          selected={currentMatch === match}
+                          match={{
+                            component: match.component?.name,
+                            vendor: match.component?.vendor,
+                            version: match.component?.version,
+                            usage: match.type,
+                            license:
+                              match.component?.licenses.find((l) => l.spdxid === match.license[0])?.name ||
+                              match.license[0],
+                            url: match.component?.url,
+                            purl: match.component?.purl,
+                          }}
+                          status={match.status}
+                          onSelect={() => setCurrentMatch(matchInfo[index])}
+                          onAction={(action) => onAction(action, match)}
+                        />
+                      ))}
+                </div>
+              </section>
+            )}
 
-              <div className="info-files">
-                <FileToolbar
-                  id={CodeViewerManager.LEFT}
-                  label="Source File"
-                  fullpath={`${scanBasePath}${file}`}
-                  file={file}
-                />
-                {matchInfo && currentMatch && currentMatch.file ? (
-                  <FileToolbar
-                    id={isDiffView ? CodeViewerManager.RIGHT : CodeViewerManager.LEFT}
-                    label="Component File"
-                    fullpath={FileUtils.getFileURL(currentMatch)}
-                    file={currentMatch.file}
-                    actions={
-                      FileUtils.canOpenURL(currentMatch)
-                        ? [ToolbarActions.FIND, ToolbarActions.COPY_PATH, ToolbarActions.OPEN_IN_BROWSER]
-                        : [ToolbarActions.FIND, ToolbarActions.COPY_PATH]
-                    }
-                  />
-                ) : (
-                  inventories?.length === 0 &&
-                  matchInfo?.length === 0 && <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} showLabel />
-                )}
-              </div>
-            </header>
-          </>
-        </header>
-
-        <main
-          className={`
-          editors
-          app-content
-          ${isDiffView ? 'diff-view' : ''}
-          `}
-        >
-          <div className="editor">
-            {/* TODO: we need to remove this IF statement. Should we keep editor instance to better performance and UX.
-                Problem: editors not re-layout on changing file */}
-            {localFileContent?.content || remoteFileContent?.content || imported ? (
-              <MemoCodeViewer
+            <div className="info-files">
+              <FileToolbar
                 id={CodeViewerManager.LEFT}
+                label="Source File"
+                fullpath={`${scanBasePath}${file}`}
+                file={file}
+              />
+              {matchInfo && currentMatch && currentMatch.file ? (
+                <FileToolbar
+                  id={isDiffView ? CodeViewerManager.RIGHT : CodeViewerManager.LEFT}
+                  label="Component File"
+                  fullpath={FileUtils.getFileURL(currentMatch)}
+                  file={currentMatch.file}
+                  actions={
+                    FileUtils.canOpenURL(currentMatch)
+                      ? [ToolbarActions.FIND, ToolbarActions.COPY_PATH, ToolbarActions.OPEN_IN_BROWSER]
+                      : [ToolbarActions.FIND, ToolbarActions.COPY_PATH]
+                  }
+                />
+              ) : (
+                inventories?.length === 0 &&
+                matchInfo?.length === 0 && <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} showLabel />
+              )}
+            </div>
+          </header>
+        </>
+      </header>
+
+      <main
+        className={`
+        editors
+        app-content
+        ${isDiffView ? 'diff-view' : ''}
+        `}
+      >
+        <div className="editor">
+          {/* TODO: we need to remove this IF statement. Should we keep editor instance to better performance and UX.
+              Problem: editors not re-layout on changing file */}
+          {localFileContent?.content || remoteFileContent?.content || imported ? (
+            <MemoCodeViewer
+              id={CodeViewerManager.LEFT}
+              language={getExtension(file)}
+              value={
+                localFileContent?.content ||
+                remoteFileContent?.content ||
+                (imported ? "// This project was imported. Source file can't be displayed." : '')
+              }
+              highlight={currentMatch?.lines || null}
+              highlights={highlight || null}
+            />
+          ) : (
+            <div className="file-loader">Loading local file</div>
+          )}
+        </div>
+
+        {isDiffView && currentMatch && (
+          <div className="editor">
+            {remoteFileContent?.content ? (
+              <MemoCodeViewer
+                id={CodeViewerManager.RIGHT}
                 language={getExtension(file)}
-                value={
-                  localFileContent?.content ||
-                  remoteFileContent?.content ||
-                  (imported ? "// This project was imported. Source file can't be displayed." : '')
-                }
-                highlight={currentMatch?.lines || null}
+                value={remoteFileContent.content || 't'}
+                highlight={currentMatch.oss_lines || null}
                 highlights={highlight || null}
               />
             ) : (
-              <div className="file-loader">Loading local file</div>
+              <div className="file-loader">Loading remote file</div>
             )}
           </div>
-
-          {isDiffView && currentMatch && (
-            <div className="editor">
-              {remoteFileContent?.content ? (
-                <MemoCodeViewer
-                  id={CodeViewerManager.RIGHT}
-                  language={getExtension(file)}
-                  value={remoteFileContent.content || 't'}
-                  highlight={currentMatch.oss_lines || null}
-                  highlights={highlight || null}
-                />
-              ) : (
-                <div className="file-loader">Loading remote file</div>
-              )}
-            </div>
-          )}
-        </main>
-      </section>
-    </>
-  );
+        )}
+      </main>
+    </section>
+  </>;
 };
 
 export default Editor;

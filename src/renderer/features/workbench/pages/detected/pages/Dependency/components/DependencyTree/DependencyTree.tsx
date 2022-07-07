@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, IconButton, ListItem, ListItemIcon, ListItemText, Paper, Tooltip, Typography } from '@material-ui/core';
-import CheckIcon from '@material-ui/icons/Check';
-import BanIcon from '@material-ui/icons/NotInterested';
-import { RestoreOutlined } from '@material-ui/icons';
+import { Card, IconButton, ListItem, ListItemIcon, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
+import BanIcon from '@mui/icons-material/NotInterested';
+import { RestoreOutlined } from '@mui/icons-material';
 import { List, AutoSizer } from 'react-virtualized';
-import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
+import WarningOutlinedIcon from '@mui/icons-material/WarningOutlined';
 import { Dependency } from '@api/types';
 import IconComponent from '../../../../../../components/IconComponent/IconComponent';
 
@@ -89,12 +89,12 @@ const DependencyTree = ({
                       {item.status === 'pending' && (
                         <>
                           <Tooltip title="Accept">
-                            <IconButton onClick={() => onDependencyAccept(item)}>
+                            <IconButton onClick={() => onDependencyAccept(item)} size="large">
                               <CheckIcon className="icon check" fontSize="inherit" />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Dismiss">
-                            <IconButton onClick={() => onDependencyReject(item)}>
+                            <IconButton onClick={() => onDependencyReject(item)} size="large">
                               <BanIcon className="icon ban" fontSize="inherit" />
                             </IconButton>
                           </Tooltip>
@@ -103,7 +103,7 @@ const DependencyTree = ({
                       {(item.status === 'original' || item.status === 'identified') && (
                         <>
                           <Tooltip title="Restore">
-                            <IconButton onClick={() => onDependencyRestore(item)}>
+                            <IconButton onClick={() => onDependencyRestore(item)} size="large">
                               <RestoreOutlined className="icon" fontSize="inherit" />
                             </IconButton>
                           </Tooltip>

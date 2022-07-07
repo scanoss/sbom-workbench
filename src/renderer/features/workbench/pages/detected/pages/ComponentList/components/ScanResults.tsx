@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import ClearIcon from '@material-ui/icons/Clear';
-import { Button, Card, IconButton } from '@material-ui/core';
+import ClearIcon from '@mui/icons-material/Clear';
+import { Button, Card, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { ExpandLess, ExpandMore } from '@material-ui/icons';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import MatchesChart from '../../../../report/components/MatchesChart';
 import VulnerabilitiesCard from '../../../../report/components/VulnerabilitiesCard';
 import LicensesChart from '../../../../report/components/LicensesChart';
