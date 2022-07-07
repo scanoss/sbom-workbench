@@ -2,10 +2,9 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { app } from 'electron';
 import { IProject, ScanState } from '../../api/types';
-import packageJson from '../../package.json';
+import packageJson from '../../../package.json';
 
 export class Metadata {
-
   private appVersion: string;
 
   private date: string;

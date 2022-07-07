@@ -12,13 +12,15 @@ The SCANOSS Audit Workbench is a graphical user interface to scan and audit sour
 
 
 ## Prerequisites
-- Node.js v14.x (Unfortunately sqlite3 not supports node.js v16+ so far. We strongly recommend handling your node versions using [nvm](https://github.com/nvm-sh/nvm))
-- Yarn (see [installation](https://classic.yarnpkg.com/en/docs/install/#debian-stable))
+- Node.js v14+
+- NPM (Node Packages Manager)
+
+We strongly recommend handling your node and npm versions using [nvm](https://github.com/nvm-sh/nvm)
 
 ## Install 
 
 ```bash
-yarn install
+npm install
 ```
 
 ## Starting Development
@@ -26,7 +28,7 @@ yarn install
 Start the app in the `dev` environment:
 
 ```bash
-yarn start
+npm start
 ```
 
 ## Packaging for Production
@@ -34,7 +36,7 @@ yarn start
 To package apps for the local platform:
 
 ```bash
-yarn package
+npm run package
 ```
 
 ## Docs

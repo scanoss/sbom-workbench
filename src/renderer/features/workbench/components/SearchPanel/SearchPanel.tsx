@@ -14,10 +14,6 @@ import useBatch from '@hooks/useBatch';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import TreeNode from '../TreeNode/TreeNode';
 
-const electron = window.require('electron');
-const { remote } = electron;
-const { Menu } = remote;
-
 const useStyles = makeStyles((theme) => ({
   button: {
     position: 'absolute',

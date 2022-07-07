@@ -4,9 +4,6 @@ import AppConfig from '@config/AppConfigModule';
 import icon from '@assets/icon.png';
 import LicensesText from './LicensesText';
 
-const electron = window.require('electron');
-const { app } = electron.remote;
-
 const AboutModule = () => {
   return (
     <div
@@ -29,7 +26,7 @@ const AboutModule = () => {
           <div>
             <p style={{ fontSize: '0.9rem', marginBottom: 0 }}>{AppConfig.ABOUT_MESSAGE}</p>
             <p style={{ fontSize: '0.75rem', margin: 0 }} className="text-right">
-              VERSION: {app.getVersion()}
+              VERSION: {/* {app.getVersion()} */}
             </p>
           </div>
         </div>
