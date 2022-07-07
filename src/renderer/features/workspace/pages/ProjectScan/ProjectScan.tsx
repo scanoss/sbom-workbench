@@ -47,12 +47,12 @@ const ProjectScan = () => {
     navigate('/workbench/report',  { replace: true });
   };
 
-  const handlerScannerStatus = (args) => {
+  const handlerScannerStatus = (e, args) => {
     setProgress(args.processed);
     setStage(args.stage);
   };
 
-  const handlerScannerError = async (err) => {
+  const handlerScannerError = async (e, err) => {
     const errorMessage = `<strong>Scan Paused</strong>
 
     <span style="font-style: italic;">${err.name || ''} ${err.message || ''} ${err.code || ''}</span>
@@ -86,7 +86,7 @@ const ProjectScan = () => {
     // window.electron.ipcRenderer.send(IpcEvents.PROJECT_STOP);
   };
 
-  const handlerScannerFinish = (args) => {
+  const handlerScannerFinish = (e, args) => {
     if (args.success) {
       onShowScan(args.resultsPath);
     }

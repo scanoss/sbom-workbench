@@ -1,12 +1,13 @@
 import { Channels } from 'main/preload';
+import {IpcRendererEvent} from "electron";
 
 declare global {
   interface Window {
     electron: {
       ipcRenderer: {
         send(channel: Channels, ...args: unknown[]): void;
-        on(channel: string, func: (...args: unknown[]) => void): (() => void) | undefined;
-        once(channel: string, func: (...args: unknown[]) => void): void;
+        on(channel: string, func: (_event: IpcRendererEvent, ...args: unknown[]) => void): (() => void) | undefined;
+        once(channel: string, func: (_event: IpcRendererEvent, ...args: unknown[]) => void): void;
         invoke(channel: string, ...args: unknown[]): Promise<any>;
         removeListener(channel: string, func: (...args: any) => void): void;
       };
