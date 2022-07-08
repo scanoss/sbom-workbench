@@ -2,11 +2,11 @@ import { ipcMain } from 'electron';
 import log from 'electron-log';
 import { dependencyService } from '../../main/services/DependencyService';
 import { AcceptAllDependeciesDTO, NewDependencyDTO, RejectAllDependeciesDTO, RestoreAllDependenciesDTO } from '../dto';
-import { IpcEvents } from '../ipc-events';
+import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
 import { treeService } from "../../main/services/TreeService";
 
-ipcMain.handle(IpcEvents.DEPENDENCY_GET_ALL, async (event, params: { path: string }) => {
+ipcMain.handle(IpcChannels.DEPENDENCY_GET_ALL, async (event, params: { path: string }) => {
   try {
     const dependencies = await dependencyService.getAll(params);
     return Response.ok({ message: 'Component created successfully', data: dependencies });
@@ -16,7 +16,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_GET_ALL, async (event, params: { path: strin
   }
 });
 
-ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT, async (event, params: NewDependencyDTO) => {
+ipcMain.handle(IpcChannels.DEPENDENCY_ACCEPT, async (event, params: NewDependencyDTO) => {
   try {
     const dependency = await dependencyService.accept(params);
     treeService.updateDependencyStatusOnTree();
@@ -27,7 +27,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT, async (event, params: NewDependencyD
   }
 });
 
-ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE, async (_event, dependencyId: number) => {
+ipcMain.handle(IpcChannels.DEPENDENCY_RESTORE, async (_event, dependencyId: number) => {
   try {
     const dependency = await dependencyService.restore(dependencyId);
     treeService.updateDependencyStatusOnTree();
@@ -38,7 +38,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE, async (_event, dependencyId: number
   }
 });
 
-ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE_ALL, async (_event, params: RestoreAllDependenciesDTO) => {
+ipcMain.handle(IpcChannels.DEPENDENCY_RESTORE_ALL, async (_event, params: RestoreAllDependenciesDTO) => {
   try {
     let response=[];
     if(params.path)
@@ -53,7 +53,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_RESTORE_ALL, async (_event, params: RestoreA
   }
 });
 
-ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT_ALL, async (event, params: AcceptAllDependeciesDTO) => {
+ipcMain.handle(IpcChannels.DEPENDENCY_ACCEPT_ALL, async (event, params: AcceptAllDependeciesDTO) => {
   try {
     let response;
     if(params.dependencies)
@@ -68,7 +68,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_ACCEPT_ALL, async (event, params: AcceptAllD
   }
 });
 
-ipcMain.handle(IpcEvents.DEPENDENCY_REJECT, async (event, dependencyId: number) => {
+ipcMain.handle(IpcChannels.DEPENDENCY_REJECT, async (event, dependencyId: number) => {
   try {
     const response = await dependencyService.reject(dependencyId);
     treeService.updateDependencyStatusOnTree();
@@ -79,7 +79,7 @@ ipcMain.handle(IpcEvents.DEPENDENCY_REJECT, async (event, dependencyId: number) 
   }
 });
 
-ipcMain.handle(IpcEvents.DEPENDENCY_REJECT_ALL, async (event, param: RejectAllDependeciesDTO) => {
+ipcMain.handle(IpcChannels.DEPENDENCY_REJECT_ALL, async (event, param: RejectAllDependeciesDTO) => {
   try {
     let response
     if(param.dependencyIds)

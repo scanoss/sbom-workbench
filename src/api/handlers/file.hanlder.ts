@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { ipcMain } from 'electron';
 import { isBinaryFileSync } from 'isbinaryfile';
 import { GetFileDTO } from "@api/dto";
-import { IpcEvents } from '../ipc-events';
+import { IpcChannels } from '../ipc-channels';
 import { FileType } from '../types';
 import { workspace } from '../../main/workspace/Workspace';
 import { NodeStatus } from '../../main/workspace/tree/Node';
@@ -55,7 +55,7 @@ function isAllowed(filePath: string) {
   return true;
 }
 
-ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
+ipcMain.handle(IpcChannels.FILE_GET_CONTENT, async (_event, filePath: string) => {
   const fileContent = { content: null };
   try {
     if (!isAllowed(filePath)) {
@@ -75,20 +75,20 @@ ipcMain.handle(IpcEvents.FILE_GET_CONTENT, async (event, filePath: string) => {
   }
 });
 
-ipcMain.handle(IpcEvents.FILE_GET, async (_event, params: GetFileDTO) => {
+ipcMain.handle(IpcChannels.FILE_GET, async (_event, params: GetFileDTO) => {
   let data;
   try {
     data = await fileService.get(params);
     return Response.ok({ message: 'File retrieve successfully', data });
-  } catch (error) {
+  } catch (error: any) {
     return Response.fail({ message: error.message });
   }
 });
 
-ipcMain.handle(IpcEvents.IGNORED_FILES, async (_event, arg: number[]) => {
+ipcMain.handle(IpcChannels.IGNORED_FILES, async (_event, arg: number[]) => {
   const project = workspace.getOpenedProjects()[0];
   const data = await fileService.ignore(arg);
-  project.getTree().sendToUI(IpcEvents.TREE_UPDATING, {});
+  project.getTree().sendToUI(IpcChannels.TREE_UPDATING, {});
   resultService
     .getResultsFromIDs(arg)
     .then((filesToUpdate: any) => {

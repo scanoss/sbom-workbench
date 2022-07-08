@@ -1,72 +1,72 @@
-import { IpcEvents } from '../ipc-events';
+import { IpcChannels } from '../ipc-channels';
 import { FileTreeViewMode, IProject, IWorkbenchFilter } from '../types';
 import { BaseService } from './base.service';
 
-const { ipcRenderer } = require('electron');
+
 
 class ProjectService extends BaseService {
   public async get(args: Partial<IProject>): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.INVENTORY_GET, args);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.INVENTORY_GET, args);
     return response;
   }
 
   public async resume(path: string): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_RESUME_SCAN, path);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_RESUME_SCAN, path);
     return response;
   }
 
   public async stop(): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_STOP_SCAN);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_STOP_SCAN);
     return response;
   }
 
   public async create(project: IProject): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_CREATE_SCAN, project);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_CREATE_SCAN, project);
     return response;
   }
 
   public async rescan(path: string): Promise<void> {
-    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_RESCAN, path);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_RESCAN, path);
     return this.response(response);
   }
 
   public async load(path: string): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_OPEN_SCAN, path);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_OPEN_SCAN, path);
     return response;
   }
 
   public async getProjectName(): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.UTILS_PROJECT_NAME);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.UTILS_PROJECT_NAME);
     return response;
   }
 
   public async getNodeFromPath(path: string): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.UTILS_GET_NODE_FROM_PATH, path);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.UTILS_GET_NODE_FROM_PATH, path);
     return this.response(response);
   }
 
   public async getToken(): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.GET_TOKEN);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.GET_TOKEN);
     return this.response(response);
   }
 
   public async getTree(): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_READ_TREE);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_READ_TREE);
     return this.response(response);
   }
 
   public async setFilter(filter: IWorkbenchFilter): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_SET_FILTER, filter);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_SET_FILTER, filter);
     return this.response(response);
   }
 
   public async setFileTreeViewMode(mode: FileTreeViewMode): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.PROJECT_SET_FILE_TREE_VIEW_MODE, mode);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_SET_FILE_TREE_VIEW_MODE, mode);
     return this.response(response);
   }
 
   public async getApiKey(): Promise<string> {
-    const response = await ipcRenderer.invoke(IpcEvents.GET_API_KEY);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.GET_API_KEY);
     return this.response(response);
   }
 }

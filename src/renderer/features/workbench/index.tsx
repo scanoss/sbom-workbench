@@ -5,12 +5,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 import { reset } from '@store/workbench-store/workbenchSlice';
 import { loadProject } from '@store/workbench-store/workbenchThunks';
-import { IpcEvents } from '@api/ipc-events';
+import { IpcChannels } from '@api/ipc-channels';
 import AppBar from './components/AppBar/AppBar';
 import MainSidebar from './components/MainSidebar/MainSidebar';
 import MainPanel from './components/MainPanel/MainPanel';
-
-const { ipcRenderer } = require('electron');
 
 const WorkbenchModule = () => {
   const { pathname } = useLocation();
@@ -25,16 +23,16 @@ const WorkbenchModule = () => {
   const onMigrationFinish = (e) => setLoaderMessage(null);
 
   const onInit = async () => {
-    ipcRenderer.on(IpcEvents.MIGRATION_INIT, onMigrationInit);
-    ipcRenderer.on(IpcEvents.MIGRATION_FINISH, onMigrationFinish);
+    window.electron.ipcRenderer.on(IpcChannels.MIGRATION_INIT, onMigrationInit);
+    window.electron.ipcRenderer.on(IpcChannels.MIGRATION_FINISH, onMigrationFinish);
     const { path } = scanPath;
     dispatch(loadProject(path));
   };
 
   const onDestroy = () => {
     console.log('Closing workbench...');
-    ipcRenderer.removeListener(IpcEvents.MIGRATION_INIT, onMigrationInit);
-    ipcRenderer.removeListener(IpcEvents.MIGRATION_FINISH, onMigrationFinish);
+    window.electron.ipcRenderer.removeListener(IpcChannels.MIGRATION_INIT, onMigrationInit);
+    window.electron.ipcRenderer.removeListener(IpcChannels.MIGRATION_FINISH, onMigrationFinish);
     dispatch(reset());
   };
 

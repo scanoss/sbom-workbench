@@ -1,9 +1,9 @@
 import { ipcMain } from 'electron';
-import { IpcEvents } from '../ipc-events';
+import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
 import { reportService } from '../../main/services/ReportService';
 
-ipcMain.handle(IpcEvents.REPORT_SUMMARY, async () => {
+ipcMain.handle(IpcChannels.REPORT_SUMMARY, async () => {
   try {
     const summary = await reportService.getReportSummary();
     return Response.ok({ message: 'Summary retrieve successfully retrieved', data: summary });
@@ -13,7 +13,7 @@ ipcMain.handle(IpcEvents.REPORT_SUMMARY, async () => {
   }
 });
 
-ipcMain.handle(IpcEvents.REPORT_IDENTIFIED, async () => {
+ipcMain.handle(IpcChannels.REPORT_IDENTIFIED, async () => {
   try {
     const identified = await reportService.getReportIdentified();
     return Response.ok({ message: 'Identified report successfully retrieved', data: identified });
@@ -23,7 +23,7 @@ ipcMain.handle(IpcEvents.REPORT_IDENTIFIED, async () => {
   }
 });
 
-ipcMain.handle(IpcEvents.REPORT_DETECTED, async (event, arg: string) => {
+ipcMain.handle(IpcChannels.REPORT_DETECTED, async (event, arg: string) => {
   try {
     const data = await reportService.getDetected();
     return {

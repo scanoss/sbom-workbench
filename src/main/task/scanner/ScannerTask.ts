@@ -5,7 +5,7 @@ import log from 'electron-log';
 import { INewProject, ScanState } from '../../../api/types';
 import { dependencyService } from '../../services/DependencyService';
 import { Project } from '../../workspace/Project';
-import { IpcEvents } from '../../../api/ipc-events';
+import { IpcChannels } from '../../../api/ipc-channels';
 import { fileService } from '../../services/FileService';
 import { fileHelper } from '../../helpers/FileHelper';
 import { resultService } from '../../services/ResultService';
@@ -14,10 +14,9 @@ import { userSettingService } from '../../services/UserSettingService';
 import AppConfig from '../../../config/AppConfigModule';
 import { AutoAccept } from '../inventory/AutoAccept';
 import { ITask } from '../Task';
-import { IndexTask } from "../search/indexTask/IndexTask";
-import { broadcastManager } from "../../broadcastManager/BroadcastManager";
-import { BlackListDependencies } from "../../workspace/tree/blackList/BlackListDependencies";
-
+import { IndexTask } from '../search/indexTask/IndexTask';
+import { broadcastManager } from '../../broadcastManager/BroadcastManager';
+import { BlackListDependencies } from '../../workspace/tree/blackList/BlackListDependencies';
 
 export abstract class ScannerTask implements ITask<void, boolean> {
   protected scanner: Scanner;
@@ -27,7 +26,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
   protected project: Project;
 
   protected sendToUI(eventName, data: any) {
-    broadcastManager.get().send(eventName, data)
+    broadcastManager.get().send(eventName, data);
   }
 
   public abstract set(project: INewProject | string): Promise<void>;
@@ -40,7 +39,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
       const filesScanned = response.getFilesScanned();
       // eslint-disable-next-line no-restricted-syntax
       for (const file of filesScanned) delete this.project.filesToScan[`${this.project.getScanRoot()}${file}`];
-      this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+      this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
         stage: {
           stageName: ScanState.SCANNING,
           stageStep: 2,
@@ -66,7 +65,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
         await autoAccept.run();
       }
       this.project.metadata.save();
-      this.sendToUI(IpcEvents.SCANNER_FINISH_SCAN, {
+      this.sendToUI(IpcChannels.SCANNER_FINISH_SCAN, {
         success: true,
         resultsPath: this.project.metadata.getMyPath(),
       });
@@ -80,7 +79,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
     this.scanner.on('error', async (error) => {
       this.project.save();
       await this.project.close();
-      this.sendToUI(IpcEvents.SCANNER_ERROR_STATUS, error);
+      this.sendToUI(IpcChannels.SCANNER_ERROR_STATUS, error);
     });
   }
 
@@ -113,9 +112,9 @@ export abstract class ScannerTask implements ITask<void, boolean> {
   }
 
   public scannerStatus() {
-    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+    this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
       stage: {
-        stageName:this.project.metadata.getScannerState(),
+        stageName: this.project.metadata.getScannerState(),
         stageStep: 2,
       },
       processed: 0,
@@ -188,7 +187,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
     const rootFolder = this.project.getTree().getRootFolder();
     const rootPath = this.project.getScanRoot();
     if (rootFolder.containsFile('scanoss-ignore.json')) {
-      const sbom = fs.readFileSync(`${rootPath}/scanoss-ignore.json`, "utf-8")
+      const sbom = fs.readFileSync(`${rootPath}/scanoss-ignore.json`, 'utf-8');
 
       result.forEach((_, index, arr) => {
         arr[index].sbom = sbom;

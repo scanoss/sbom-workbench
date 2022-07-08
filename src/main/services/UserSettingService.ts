@@ -3,7 +3,7 @@ import fs from 'fs';
 import { IWorkspaceCfg } from '../../api/types';
 import { wsUtils } from '../workspace/WsUtils/WsUtils';
 
-import packageJson from '../../../package.json';
+import packageJson from '../../../release/app/package.json';
 import AppConfig from '../../config/AppConfigModule';
 
 class UserSettingService {
