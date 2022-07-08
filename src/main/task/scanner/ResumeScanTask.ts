@@ -1,4 +1,4 @@
-import { IpcEvents } from '../../../api/ipc-events';
+import { IpcChannels } from '../../../api/ipc-channels';
 import { ScanState } from '../../../api/types';
 import { ProjectFilterPath } from '../../workspace/filters/ProjectFilterPath';
 import { Project } from '../../workspace/Project';
@@ -14,7 +14,7 @@ export class ResumeScanTask extends ScannerTask {
   }
 
   public scannerStatus() {
-    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+    this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
       stage: {
         stageName: ScanState.SCANNING,
         stageStep: 2,

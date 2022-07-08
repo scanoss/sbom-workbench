@@ -1,42 +1,42 @@
-import { IpcEvents } from '../ipc-events';
+import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
 import { INewProject, IProject, License } from '../types';
 
-const { ipcRenderer } = require('electron');
+
 
 class WorkspaceService extends BaseService {
   public async getAllProjects(): Promise<IProject[]> {
-    const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_PROJECT_LIST);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.WORKSPACE_PROJECT_LIST);
     return this.response(response);
   }
 
   public async deleteProject(args): Promise<void> {
-    const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_DELETE_PROJECT, args);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.WORKSPACE_DELETE_PROJECT, args);
     return this.response(response);
   }
 
   public async getProjectDTO(): Promise<any> {
-    const response = await ipcRenderer.invoke(IpcEvents.UTILS_GET_PROJECT_DTO);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.UTILS_GET_PROJECT_DTO);
     return this.response(response);
   }
 
   public async getLicenses(): Promise<Array<License>> {
-    const response = await ipcRenderer.invoke(IpcEvents.GET_LICENSES);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.GET_LICENSES);
     return this.response(response);
   }
 
   public async createProject(project: INewProject): Promise<void> {
-    const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_CREATE_PROJECT, project);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.WORKSPACE_CREATE_PROJECT, project);
     return this.response(response);
   }
 
   public async importProject(projectZipPath: string): Promise<IProject> {
-    const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_IMPORT_PROJECT, projectZipPath);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.WORKSPACE_IMPORT_PROJECT, projectZipPath);
     return this.response(response);
   }
 
   public async exportProject(pathToSave: string, projectPath: string): Promise<void> {
-    const response = await ipcRenderer.invoke(IpcEvents.WORKSPACE_EXPORT_PROJECT, pathToSave, projectPath);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.WORKSPACE_EXPORT_PROJECT, pathToSave, projectPath);
     return this.response(response);
   }
 }

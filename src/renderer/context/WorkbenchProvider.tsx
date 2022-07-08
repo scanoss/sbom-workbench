@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { Node } from '@api/types';
-import { IpcEvents } from '@api/ipc-events';
+import { IpcChannels } from '@api/ipc-channels';
 import { projectService } from '@api/services/project.service';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -92,13 +92,13 @@ export const WorkbenchProvider: React.FC<any> = ({ children }) => {
   }, [batchRunning]);
 
   const setupListeners = () => {
-    ipcRenderer.on(IpcEvents.TREE_UPDATING, onTreeUpdating);
-    ipcRenderer.on(IpcEvents.TREE_UPDATED, onTreeRefreshed);
+    window.electron.ipcRenderer.on(IpcChannels.TREE_UPDATING, onTreeUpdating);
+    window.electron.ipcRenderer.on(IpcChannels.TREE_UPDATED, onTreeRefreshed);
   };
 
   const removeListeners = () => {
-    ipcRenderer.on(IpcEvents.TREE_UPDATING, onTreeUpdating);
-    ipcRenderer.removeListener(IpcEvents.TREE_UPDATED, onTreeRefreshed);
+    window.electron.ipcRenderer.on(IpcChannels.TREE_UPDATING, onTreeUpdating);
+    window.electron.ipcRenderer.removeListener(IpcChannels.TREE_UPDATED, onTreeRefreshed);
   };
 
   useEffect(setupListeners, []);

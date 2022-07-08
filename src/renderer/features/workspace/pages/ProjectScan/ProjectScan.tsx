@@ -2,15 +2,13 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { IpcEvents } from '@api/ipc-events';
+import { IpcChannels } from '@api/ipc-channels';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { projectService } from '@api/services/project.service';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
 import * as controller from '../../../../controllers/home-controller';
 import CircularComponent from '../Components/CircularComponent';
-
-const { ipcRenderer } = require('electron');
 
 const ProjectScan = () => {
   const navigate = useNavigate();
@@ -23,9 +21,9 @@ const ProjectScan = () => {
   const [stage, setStage] = useState<any>({ stageName: 'indexing', stageStep: 1 });
 
   const init = async () => {
-    ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
-    ipcRenderer.on(IpcEvents.SCANNER_FINISH_SCAN, handlerScannerFinish);
-    ipcRenderer.on(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
+    window.electron.ipcRenderer.on(IpcChannels.SCANNER_UPDATE_STATUS, handlerScannerStatus);
+    window.electron.ipcRenderer.on(IpcChannels.SCANNER_FINISH_SCAN, handlerScannerFinish);
+    window.electron.ipcRenderer.on(IpcChannels.SCANNER_ERROR_STATUS, handlerScannerError);
 
     try {
       const { path, action } = scanPath;
@@ -39,9 +37,9 @@ const ProjectScan = () => {
   };
 
   const cleanup = () => {
-    ipcRenderer.removeListener(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
-    ipcRenderer.removeListener(IpcEvents.SCANNER_FINISH_SCAN, handlerScannerFinish);
-    ipcRenderer.removeListener(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
+    window.electron.ipcRenderer.removeListener(IpcChannels.SCANNER_UPDATE_STATUS, handlerScannerStatus);
+    window.electron.ipcRenderer.removeListener(IpcChannels.SCANNER_FINISH_SCAN, handlerScannerFinish);
+    window.electron.ipcRenderer.removeListener(IpcChannels.SCANNER_ERROR_STATUS, handlerScannerError);
   };
 
   const onShowScan = (path) => {
@@ -49,12 +47,12 @@ const ProjectScan = () => {
     navigate('/workbench/report',  { replace: true });
   };
 
-  const handlerScannerStatus = (_event, args) => {
+  const handlerScannerStatus = (e, args) => {
     setProgress(args.processed);
     setStage(args.stage);
   };
 
-  const handlerScannerError = async (_event, err) => {
+  const handlerScannerError = async (e, err) => {
     const errorMessage = `<strong>Scan Paused</strong>
 
     <span style="font-style: italic;">${err.name || ''} ${err.message || ''} ${err.code || ''}</span>
@@ -85,11 +83,10 @@ const ProjectScan = () => {
       navigate('/workspace');
     }
 
-    // ipcRenderer.send(IpcEvents.PROJECT_STOP);
+    // window.electron.ipcRenderer.send(IpcEvents.PROJECT_STOP);
   };
 
-  const handlerScannerFinish = (_event, args) => {
-    console.log('scanner finish', args);
+  const handlerScannerFinish = (e, args) => {
     if (args.success) {
       onShowScan(args.resultsPath);
     }

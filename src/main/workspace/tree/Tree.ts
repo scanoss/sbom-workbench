@@ -5,13 +5,12 @@ import Node, { NodeStatus } from './Node';
 import File from './File';
 import Folder from './Folder';
 
-import { broadcastManager } from "../../broadcastManager/BroadcastManager";
-import { IpcEvents } from '../../../api/ipc-events';
+import { broadcastManager } from '../../broadcastManager/BroadcastManager';
+import { IpcChannels } from '../../../api/ipc-channels';
 import * as Filtering from '../filtering';
 import { TreeViewMode } from './treeViewModes/TreeViewMode';
 import { TreeViewDefault } from './treeViewModes/TreeViewDefault';
 import { defaultBannedList } from '../filtering/defaultFilter';
-
 
 const fs = require('fs');
 const pathLib = require('path');
@@ -42,7 +41,7 @@ export class Tree {
   }
 
   sendToUI(eventName, data: any) {
-    broadcastManager.get().send(eventName, data)
+    broadcastManager.get().send(eventName, data);
   }
 
   public build(): Node {
@@ -90,7 +89,6 @@ export class Tree {
 
   public loadTree(data: any): void {
     this.rootFolder = this.deserialize(data) as Folder;
-
   }
 
   private deserialize(data: any): Node {
@@ -178,7 +176,7 @@ export class Tree {
     if (node.getType() === 'file') {
       this.filesIndexed += 1;
       if (this.filesIndexed % 100 === 0) {
-        this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+        this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
           stage: {
             stageName: `indexing`,
             stageStep: 1,
@@ -223,6 +221,6 @@ export class Tree {
   }
 
   public getRootPath(): string {
-    return this.rootPath
+    return this.rootPath;
   }
 }

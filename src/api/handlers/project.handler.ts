@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { FileTreeViewMode, IWorkbenchFilter } from '../types';
-import { IpcEvents } from '../ipc-events';
+import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
 import { userSettingService } from '../../main/services/UserSettingService';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
@@ -11,7 +11,7 @@ import { ResumeScanTask } from '../../main/task/scanner/ResumeScanTask';
 import { ReScanTask } from '../../main/task/scanner/ReScanTask';
 import { searcher } from '../../main/modules/searchEngine/searcher/Searcher';
 
-ipcMain.handle(IpcEvents.PROJECT_OPEN_SCAN, async (event, arg: any) => {
+ipcMain.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, arg: any) => {
   // TO DO factory to create filters depending on arguments
   const p: Project = await workspace.openProject(new ProjectFilterPath(arg));
   searcher.closeIndex();
@@ -35,7 +35,7 @@ function getUserHome() {
   return process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 }
 
-ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
+ipcMain.handle(IpcChannels.PROJECT_STOP_SCAN, async (_event) => {
   const projectList = workspace.getOpenedProjects();
   let pPromises = [];
   for (const p of projectList) pPromises.push(p.save());
@@ -46,14 +46,14 @@ ipcMain.handle(IpcEvents.PROJECT_STOP_SCAN, async (_event) => {
   await Promise.all(pPromises);
 });
 
-ipcMain.handle(IpcEvents.PROJECT_RESUME_SCAN, async (event, projectPath: string) => {
+ipcMain.handle(IpcChannels.PROJECT_RESUME_SCAN, async (event, projectPath: string) => {
   const resumeScanTask = new ResumeScanTask();
   await resumeScanTask.set(projectPath);
   await resumeScanTask.init();
   await resumeScanTask.run();
 });
 
-ipcMain.handle(IpcEvents.PROJECT_RESCAN, async (event, projectPath: string) => {
+ipcMain.handle(IpcChannels.PROJECT_RESCAN, async (event, projectPath: string) => {
   try {
     const reScanTask = new ReScanTask();
     await reScanTask.set(projectPath);
@@ -66,12 +66,12 @@ ipcMain.handle(IpcEvents.PROJECT_RESCAN, async (event, projectPath: string) => {
   }
 });
 
-ipcMain.handle(IpcEvents.UTILS_PROJECT_NAME, async (event) => {
+ipcMain.handle(IpcChannels.UTILS_PROJECT_NAME, async (event) => {
   const projectName = workspace.getOpenedProjects()[0].project_name;
   return { status: 'ok', message: 'Project name retrieve succesfully', data: projectName };
 });
 
-ipcMain.handle(IpcEvents.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
+ipcMain.handle(IpcChannels.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
   try {
     const p = workspace.getOpenedProjects()[0];
     const node = p.getTree().getNode(path);
@@ -81,7 +81,7 @@ ipcMain.handle(IpcEvents.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
   }
 });
 
-ipcMain.handle(IpcEvents.GET_TOKEN, async (event) => {
+ipcMain.handle(IpcChannels.GET_TOKEN, async (event) => {
   try {
     let token = workspace.getOpenedProjects()[0].getToken();
     if (!token || token === '') {
@@ -94,7 +94,7 @@ ipcMain.handle(IpcEvents.GET_TOKEN, async (event) => {
   }
 });
 
-ipcMain.handle(IpcEvents.PROJECT_READ_TREE, (event) => {
+ipcMain.handle(IpcChannels.PROJECT_READ_TREE, (event) => {
   try {
     const tree = workspace.getOpenedProjects()[0].getTree().getRootFolder();
     return Response.ok({ message: 'Tree read successfully', data: tree });
@@ -103,7 +103,7 @@ ipcMain.handle(IpcEvents.PROJECT_READ_TREE, (event) => {
   }
 });
 
-ipcMain.handle(IpcEvents.PROJECT_SET_FILTER, async (event, filter: IWorkbenchFilter) => {
+ipcMain.handle(IpcChannels.PROJECT_SET_FILTER, async (event, filter: IWorkbenchFilter) => {
   try {
     const p = workspace.getOpenedProjects()[0];
     await p.setGlobalFilter(filter);
@@ -113,7 +113,7 @@ ipcMain.handle(IpcEvents.PROJECT_SET_FILTER, async (event, filter: IWorkbenchFil
   }
 });
 
-ipcMain.handle(IpcEvents.PROJECT_SET_FILE_TREE_VIEW_MODE, async (event, mode: FileTreeViewMode) => {
+ipcMain.handle(IpcChannels.PROJECT_SET_FILE_TREE_VIEW_MODE, async (event, mode: FileTreeViewMode) => {
   try {
     const p = workspace.getOpenedProjects()[0];
     p.setFileTreeViewMode(mode);
@@ -123,7 +123,7 @@ ipcMain.handle(IpcEvents.PROJECT_SET_FILE_TREE_VIEW_MODE, async (event, mode: Fi
   }
 });
 
-ipcMain.handle(IpcEvents.GET_API_KEY, async (event) => {
+ipcMain.handle(IpcChannels.GET_API_KEY, async (event) => {
   try {
     const p = workspace.getOpenedProjects()[0];
     let apiKey = p.getApiKey();

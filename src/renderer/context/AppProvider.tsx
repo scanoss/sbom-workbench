@@ -1,18 +1,14 @@
 import { Button } from '@mui/material';
-import { ipcRenderer } from 'electron';
 import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as os from 'os';
 import { fetchProjects } from '@store/workspace-store/workspaceThunks';
 import { IProject } from '@api/types';
 import { workspaceService } from '@api/services/workspace.service';
-import { IpcEvents } from '@api/ipc-events';
+import { IpcChannels } from '@api/ipc-channels';
 import { useDispatch } from 'react-redux';
 import { setScanPath } from '@store/workspace-store/workspaceSlice';
 import { DialogContext, IDialogContext } from './DialogProvider';
 import { dialogController } from '../controllers/dialog-controller';
-
-const { shell } = require('electron');
 
 export interface IAppContext {
   newProject: () => void;
@@ -73,7 +69,7 @@ const AppProvider = ({ children }) => {
 
   const exportProject = async (project: IProject) => {
     const path = await dialogController.showSaveDialog({
-      defaultPath: `${os.homedir()}/Downloads/${project.name}.zip`,
+      defaultPath: `${window.os.homedir()}/Downloads/${project.name}.zip`,
     });
 
     if (!path) return;
@@ -110,7 +106,7 @@ const AppProvider = ({ children }) => {
                   style={{ padding: 0, lineHeight: 1, minWidth: 0 }}
                   onClick={() => {
                     dismiss();
-                    shell.showItemInFolder(path);
+                    window.shell.showItemInFolder(path);
                   }}
                 >
                   OPEN
@@ -135,13 +131,13 @@ const AppProvider = ({ children }) => {
   };
 
   const setupAppMenuListeners = () => {
-    ipcRenderer.on(IpcEvents.MENU_NEW_PROJECT, newProject);
-    ipcRenderer.on(IpcEvents.MENU_IMPORT_PROJECT, importProject);
+    window.electron.ipcRenderer.on(IpcChannels.MENU_NEW_PROJECT, newProject);
+    window.electron.ipcRenderer.on(IpcChannels.MENU_IMPORT_PROJECT, importProject);
   };
 
   const removeAppMenuListeners = () => {
-    ipcRenderer.removeListener(IpcEvents.MENU_OPEN_SETTINGS, newProject);
-    ipcRenderer.removeListener(IpcEvents.MENU_IMPORT_PROJECT, importProject);
+    window.electron.ipcRenderer.removeListener(IpcChannels.MENU_OPEN_SETTINGS, newProject);
+    window.electron.ipcRenderer.removeListener(IpcChannels.MENU_IMPORT_PROJECT, importProject);
   };
 
   useEffect(setupAppMenuListeners, []);

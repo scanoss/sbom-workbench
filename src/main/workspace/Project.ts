@@ -9,7 +9,7 @@ import { ProjectMigration } from '../migration/ProjectMigration';
 import { Tree } from './tree/Tree';
 import { modelProvider } from '../services/ModelProvider';
 import { TreeViewModeCreator } from './tree/treeViewModes/TreeViewModeCreator';
-import { IpcEvents } from '../../api/ipc-events';
+import { IpcChannels } from '../../api/ipc-channels';
 
 export class Project {
   work_root: string;
@@ -201,7 +201,7 @@ export class Project {
 
   public async notifyTree() {
     const tree = await this.tree.getTree();
-    this.tree.sendToUI(IpcEvents.TREE_UPDATED, tree);
+    this.tree.sendToUI(IpcChannels.TREE_UPDATED, tree);
   }
 
   public getNode(path: string) {
@@ -224,7 +224,7 @@ export class Project {
   public async setGlobalFilter(filter: IWorkbenchFilter) {
     try {
       if (!(JSON.stringify({ ...filter, path: null }) === JSON.stringify({ ...this.filter, path: null }))) {
-        this.tree.sendToUI(IpcEvents.TREE_UPDATING, {});
+        this.tree.sendToUI(IpcChannels.TREE_UPDATING, {});
         this.tree.setTreeViewMode(TreeViewModeCreator.create(filter, this.fileTreeViewMode));
         this.notifyTree();
       }

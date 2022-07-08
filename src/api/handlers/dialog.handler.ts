@@ -5,21 +5,21 @@
  * See:  https://medium.com/developer-rants/opening-system-dialogs-in-electron-from-the-renderer-6daf49782fd8
  */
 import { dialog, ipcMain, Menu } from 'electron';
-import { IpcEvents } from '../ipc-events';
+import { IpcChannels } from '../ipc-channels';
 
 const window = require('electron').BrowserWindow;
 
-ipcMain.handle(IpcEvents.DIALOG_SHOW_OPEN_DIALOG, async (event, options) => {
+ipcMain.handle(IpcChannels.DIALOG_SHOW_OPEN_DIALOG, async (event, options) => {
   const { canceled, filePaths } = await dialog.showOpenDialog(window.getFocusedWindow(), options);
   return !canceled ? filePaths : null;
 });
 
-ipcMain.handle(IpcEvents.DIALOG_SHOW_SAVE_DIALOG, async (event, options) => {
+ipcMain.handle(IpcChannels.DIALOG_SHOW_SAVE_DIALOG, async (event, options) => {
   const { canceled, filePath } = await dialog.showSaveDialog(window.getFocusedWindow(), options);
   return !canceled ? filePath : null;
 });
 
-ipcMain.on(IpcEvents.DIALOG_SHOW_ERROR_BOX, (event, title: string, content: string) => {
+ipcMain.on(IpcChannels.DIALOG_SHOW_ERROR_BOX, (event, title: string, content: string) => {
   dialog.showMessageBox(window.getFocusedWindow(), {
     type: 'error',
     title,
@@ -27,16 +27,16 @@ ipcMain.on(IpcEvents.DIALOG_SHOW_ERROR_BOX, (event, title: string, content: stri
   });
 });
 
-ipcMain.on(IpcEvents.DIALOG_BUILD_CUSTOM_POPUP_MENU, (event, params: any) => {
+ipcMain.on(IpcChannels.DIALOG_BUILD_CUSTOM_POPUP_MENU, (event, params: any) => {
   params.forEach((p) => {
     if (p.actionId)
       p.click = () => {
-        event.sender.send(IpcEvents.CONTEXT_MENU_COMMAND, p.actionId);
+        event.sender.send(IpcChannels.CONTEXT_MENU_COMMAND, p.actionId);
       };
     if (p.submenu) {
       p.submenu.forEach((s) => {
         s.click = () => {
-          event.sender.send(IpcEvents.CONTEXT_MENU_COMMAND, s.actionId);
+          event.sender.send(IpcChannels.CONTEXT_MENU_COMMAND, s.actionId);
         };
       });
     }

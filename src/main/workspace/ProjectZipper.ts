@@ -6,7 +6,7 @@ import { SemVerCompareVersion } from '../helpers/SemVer';
 import { Metadata } from './Metadata';
 import { Project } from './Project';
 import { workspace } from './Workspace';
-import packageJson from '../../../package.json';
+import packageJson from '../../../release/app/package.json';
 import AppConfig from '../../config/AppConfigModule';
 
 const AdmZip = require('adm-zip');

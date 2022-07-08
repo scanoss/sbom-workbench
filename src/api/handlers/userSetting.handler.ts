@@ -1,10 +1,10 @@
 import { ipcMain } from 'electron';
 import { Response } from '../Response';
-import { IpcEvents } from '../ipc-events';
+import { IpcChannels } from '../ipc-channels';
 import { IWorkspaceCfg } from '../types';
 import { userSettingService } from '../../main/services/UserSettingService';
 
-ipcMain.handle(IpcEvents.USER_SETTING_SET, async (event, conf: Partial<IWorkspaceCfg>) => {
+ipcMain.handle(IpcChannels.USER_SETTING_SET, async (event, conf: Partial<IWorkspaceCfg>) => {
   try {
     const defUrl: any = userSettingService.getDefault().APIS[0];
     conf.APIS.splice(0, 0, defUrl);
@@ -17,7 +17,7 @@ ipcMain.handle(IpcEvents.USER_SETTING_SET, async (event, conf: Partial<IWorkspac
   }
 });
 
-ipcMain.handle(IpcEvents.USER_SETTING_GET, async (event) => {
+ipcMain.handle(IpcChannels.USER_SETTING_GET, async (event) => {
   try {
     const settings: Partial<IWorkspaceCfg> = userSettingService.get();
     settings.DEFAULT_API_INDEX -= 1;

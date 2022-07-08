@@ -4,11 +4,11 @@ import { modelProvider } from '../../services/ModelProvider';
 import { Querys } from '../../model/querys_db';
 import { utilModel } from '../../model/UtilModel';
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
-import { IpcEvents } from '../../../api/ipc-events';
+import { IpcChannels } from '../../../api/ipc-channels';
 
 export async function migration110(projectPath: string): Promise<void> {
   log.info('Migration 1.1.0 In progress...');
-  broadcastManager.get().send(IpcEvents.MIGRATION_INIT, { data: 'Updating project to v1.1.0' });
+  broadcastManager.get().send(IpcChannels.MIGRATION_INIT, { data: 'Updating project to v1.1.0' });
   await modelProvider.init(projectPath);
   await updateTables(projectPath);
   await removeLicenseColumOnResult(projectPath);
@@ -18,7 +18,7 @@ export async function migration110(projectPath: string): Promise<void> {
   const componentReliableLicense = await modelProvider.model.component.getMostReliableLicensePerComponent();
   await modelProvider.model.component.updateMostReliableLicense(componentReliableLicense);
   log.info('Migration 1.1.0 finished');
-  broadcastManager.get().send(IpcEvents.MIGRATION_FINISH);
+  broadcastManager.get().send(IpcChannels.MIGRATION_FINISH);
 }
 
 async function updateTables(projectPath: string) {

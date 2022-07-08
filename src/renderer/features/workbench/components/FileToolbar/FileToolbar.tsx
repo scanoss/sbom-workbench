@@ -3,7 +3,6 @@ import React from 'react';
 import { IconButton, ListItemText, Tooltip, Typography } from '@mui/material';
 import CodeViewerManagerInstance from '../../pages/detected/pages/Editor/CodeViewerManager';
 
-const { shell } = require('electron');
 
 export enum ToolbarActions {
   COPY_PATH = 'copy-path',
@@ -45,13 +44,13 @@ const FileToolbar = ({ id, label, fullpath, file, actions }: FileToolbarProps) =
       id: ToolbarActions.OPEN,
       hint: 'Open file in folder',
       icon: <i className="ri-share-box-line" />,
-      run: () => shell.showItemInFolder(fullpath),
+      run: () => window.shell.showItemInFolder(fullpath),
     },
     {
       id: ToolbarActions.OPEN_IN_BROWSER,
       hint: 'Open file in browser',
       icon: <i className="ri-share-box-line" />,
-      run: () => shell.openExternal(fullpath),
+      run: () => window.shell.openExternal(fullpath),
     },
   ];
 

@@ -1,7 +1,8 @@
 import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions } from 'electron';
 import path from 'path';
-import { IpcEvents } from '../api/ipc-events';
+import { IpcChannels } from '../api/ipc-channels';
 import AppConfig from '../config/AppConfigModule';
+
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -64,20 +65,20 @@ export default class MenuBuilder {
           label: '&New project',
           accelerator: 'Command+N',
           click: () => {
-            this.mainWindow.webContents.send(IpcEvents.MENU_NEW_PROJECT);
+            this.mainWindow.webContents.send(IpcChannels.MENU_NEW_PROJECT);
           },
         },
         {
           label: '&Import project',
           click: () => {
-            this.mainWindow.webContents.send(IpcEvents.MENU_IMPORT_PROJECT);
+            this.mainWindow.webContents.send(IpcChannels.MENU_IMPORT_PROJECT);
           },
         },
         {
           label: '&Settings',
           accelerator: 'Command+,',
           click: () => {
-            this.mainWindow.webContents.send(IpcEvents.MENU_OPEN_SETTINGS);
+            this.mainWindow.webContents.send(IpcChannels.MENU_OPEN_SETTINGS);
           },
         },
         {
@@ -172,20 +173,20 @@ export default class MenuBuilder {
             label: '&New project',
             accelerator: 'Ctrl+N',
             click: () => {
-              this.mainWindow.webContents.send(IpcEvents.MENU_NEW_PROJECT);
+              this.mainWindow.webContents.send(IpcChannels.MENU_NEW_PROJECT);
             },
           },
           {
             label: '&Import project',
             click: () => {
-              this.mainWindow.webContents.send(IpcEvents.MENU_IMPORT_PROJECT);
+              this.mainWindow.webContents.send(IpcChannels.MENU_IMPORT_PROJECT);
             },
           },
           {
             label: '&Settings',
             accelerator: 'Ctrl+Alt+S',
             click: () => {
-              this.mainWindow.webContents.send(IpcEvents.MENU_OPEN_SETTINGS);
+              this.mainWindow.webContents.send(IpcChannels.MENU_OPEN_SETTINGS);
             },
           },
           {
