@@ -36,6 +36,10 @@ const configuration: webpack.Configuration = {
     minimizer: [
       new TerserPlugin({
         parallel: true,
+        terserOptions: {
+          keep_classnames: /AbortSignal/,
+          keep_fnames: /AbortSignal/,
+        }
       }),
     ],
   },
