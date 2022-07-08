@@ -1,15 +1,15 @@
 import {IpcRendererEvent} from "electron";
-import {IpcEvents} from "@api/ipc-events";
+import {IpcChannels} from "@api/ipc-channels";
 
 declare global {
   interface Window {
     electron: {
       ipcRenderer: {
-        send(channel: IpcEvents, ...args: unknown[]): void;
-        on(channel: IpcEvents, func: (_event: IpcRendererEvent, ...args: unknown[]) => void): (() => void) | undefined;
-        once(channel: IpcEvents, func: (_event: IpcRendererEvent, ...args: unknown[]) => void): void;
-        invoke(channel: IpcEvents, ...args: unknown[]): Promise<any>;
-        removeListener(channel: IpcEvents, func: (...args: any) => void): void;
+        send(channel: IpcChannels, ...args: unknown[]): void;
+        on(channel: IpcChannels, func: (_event: IpcRendererEvent, ...args: unknown[]) => void): (() => void) | undefined;
+        once(channel: IpcChannels, func: (_event: IpcRendererEvent, ...args: unknown[]) => void): void;
+        invoke(channel: IpcChannels, ...args: unknown[]): Promise<any>;
+        removeListener(channel: IpcChannels, func: (...args: any) => void): void;
       };
     };
     os: {

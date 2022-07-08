@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { ipcRenderer } from 'electron';
-import { IpcEvents } from '@api/ipc-events';
+import { IpcChannels } from '@api/ipc-channels';
 import { Dependency, Inventory, NewComponentDTO } from '@api/types';
 import { InventoryDialog } from '../ui/dialog/InventoryDialog';
 import { InventorySelectorDialog } from '../features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
@@ -287,11 +287,11 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
   };
 
   const setupAppMenuListeners = () => {
-    window.electron.ipcRenderer.on(IpcEvents.MENU_OPEN_SETTINGS, handleOpenSettings);
+    window.electron.ipcRenderer.on(IpcChannels.MENU_OPEN_SETTINGS, handleOpenSettings);
   };
 
   const removeAppMenuListeners = () => {
-    window.electron.ipcRenderer.removeListener(IpcEvents.MENU_OPEN_SETTINGS, handleOpenSettings);
+    window.electron.ipcRenderer.removeListener(IpcChannels.MENU_OPEN_SETTINGS, handleOpenSettings);
   };
 
   useEffect(setupAppMenuListeners, []);

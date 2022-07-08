@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { IpcEvents } from '@api/ipc-events';
+import { IpcChannels } from '@api/ipc-channels';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { projectService } from '@api/services/project.service';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,9 +21,9 @@ const ProjectScan = () => {
   const [stage, setStage] = useState<any>({ stageName: 'indexing', stageStep: 1 });
 
   const init = async () => {
-    window.electron.ipcRenderer.on(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
-    window.electron.ipcRenderer.on(IpcEvents.SCANNER_FINISH_SCAN, handlerScannerFinish);
-    window.electron.ipcRenderer.on(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
+    window.electron.ipcRenderer.on(IpcChannels.SCANNER_UPDATE_STATUS, handlerScannerStatus);
+    window.electron.ipcRenderer.on(IpcChannels.SCANNER_FINISH_SCAN, handlerScannerFinish);
+    window.electron.ipcRenderer.on(IpcChannels.SCANNER_ERROR_STATUS, handlerScannerError);
 
     try {
       const { path, action } = scanPath;
@@ -37,9 +37,9 @@ const ProjectScan = () => {
   };
 
   const cleanup = () => {
-    window.electron.ipcRenderer.removeListener(IpcEvents.SCANNER_UPDATE_STATUS, handlerScannerStatus);
-    window.electron.ipcRenderer.removeListener(IpcEvents.SCANNER_FINISH_SCAN, handlerScannerFinish);
-    window.electron.ipcRenderer.removeListener(IpcEvents.SCANNER_ERROR_STATUS, handlerScannerError);
+    window.electron.ipcRenderer.removeListener(IpcChannels.SCANNER_UPDATE_STATUS, handlerScannerStatus);
+    window.electron.ipcRenderer.removeListener(IpcChannels.SCANNER_FINISH_SCAN, handlerScannerFinish);
+    window.electron.ipcRenderer.removeListener(IpcChannels.SCANNER_ERROR_STATUS, handlerScannerError);
   };
 
   const onShowScan = (path) => {

@@ -5,7 +5,7 @@ import log from 'electron-log';
 import { INewProject, ScanState } from '../../../api/types';
 import { dependencyService } from '../../services/DependencyService';
 import { Project } from '../../workspace/Project';
-import { IpcEvents } from '../../../api/ipc-events';
+import { IpcChannels } from '../../../api/ipc-channels';
 import { fileService } from '../../services/FileService';
 import { fileHelper } from '../../helpers/FileHelper';
 import { resultService } from '../../services/ResultService';
@@ -39,7 +39,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
       const filesScanned = response.getFilesScanned();
       // eslint-disable-next-line no-restricted-syntax
       for (const file of filesScanned) delete this.project.filesToScan[`${this.project.getScanRoot()}${file}`];
-      this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+      this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
         stage: {
           stageName: ScanState.SCANNING,
           stageStep: 2,
@@ -65,7 +65,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
         await autoAccept.run();
       }
       this.project.metadata.save();
-      this.sendToUI(IpcEvents.SCANNER_FINISH_SCAN, {
+      this.sendToUI(IpcChannels.SCANNER_FINISH_SCAN, {
         success: true,
         resultsPath: this.project.metadata.getMyPath(),
       });
@@ -79,7 +79,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
     this.scanner.on('error', async (error) => {
       this.project.save();
       await this.project.close();
-      this.sendToUI(IpcEvents.SCANNER_ERROR_STATUS, error);
+      this.sendToUI(IpcChannels.SCANNER_ERROR_STATUS, error);
     });
   }
 
@@ -112,7 +112,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
   }
 
   public scannerStatus() {
-    this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+    this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
       stage: {
         stageName: this.project.metadata.getScannerState(),
         stageStep: 2,

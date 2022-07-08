@@ -2,7 +2,7 @@ import React, { SetStateAction, useContext, useEffect, useRef } from 'react';
 import { Chip, IconButton, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { ipcRenderer } from 'electron';
-import { IpcEvents } from '@api/ipc-events';
+import { IpcChannels } from '@api/ipc-channels';
 import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -99,7 +99,7 @@ const SearchPanel = () => {
   const refResults = useRef([]);
 
   const search = () => {
-    window.electron.ipcRenderer.send(IpcEvents.SEARCH_ENGINE_SEARCH, {
+    window.electron.ipcRenderer.send(IpcChannels.SEARCH_ENGINE_SEARCH, {
       query: searchQuery.current,
       params: {
         offset: serverPage.current * AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT,
@@ -177,7 +177,7 @@ const SearchPanel = () => {
         // click: () => batch.ignoreAll(getFilesSelected()),
       },
     ];
-    window.electron.ipcRenderer.send(IpcEvents.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
+    window.electron.ipcRenderer.send(IpcChannels.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
   };
 
   const onPageChangeHandler = (localPageNumber, details) => {
@@ -200,13 +200,13 @@ const SearchPanel = () => {
   }, [selected, results]);
 
   const setupListeners = () => {
-    window.electron.ipcRenderer.on(IpcEvents.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
-    window.electron.ipcRenderer.on(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
+    window.electron.ipcRenderer.on(IpcChannels.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
+    window.electron.ipcRenderer.on(IpcChannels.CONTEXT_MENU_COMMAND, onActionMenuHandler);
   };
 
   const removeListeners = () => {
-    window.electron.ipcRenderer.removeListener(IpcEvents.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
-    window.electron.ipcRenderer.removeListener(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
+    window.electron.ipcRenderer.removeListener(IpcChannels.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
+    window.electron.ipcRenderer.removeListener(IpcChannels.CONTEXT_MENU_COMMAND, onActionMenuHandler);
   };
 
   useEffect(() => {

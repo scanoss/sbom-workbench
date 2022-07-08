@@ -1,5 +1,5 @@
 import log from 'electron-log';
-import { IpcEvents } from '../../api/ipc-events';
+import { IpcChannels } from '../../api/ipc-channels';
 import { NodeStatus } from '../workspace/tree/Node';
 import { Tree } from '../workspace/tree/Tree';
 import { workspace } from '../workspace/Workspace';
@@ -35,7 +35,7 @@ class TreeService {
 
   public updateStart(): void {
     const project = workspace.getOpenedProjects()[0];
-    project.getTree().sendToUI(IpcEvents.TREE_UPDATING, {});
+    project.getTree().sendToUI(IpcChannels.TREE_UPDATING, {});
   }
 
   public updateDone(): void {
@@ -127,7 +127,7 @@ class TreeService {
         .then((files: any) => {
           const paths = utilHelper.getArrayFromObjectFilter(files, 'path', new FilterTrue()) as Array<string>;
           const project = workspace.getOpenedProjects()[0];
-          project.getTree().sendToUI(IpcEvents.TREE_UPDATING, {});
+          project.getTree().sendToUI(IpcChannels.TREE_UPDATING, {});
           project.getTree().restoreStatus(paths);
           project.updateTree();
           return true;

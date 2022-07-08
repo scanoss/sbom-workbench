@@ -3,7 +3,7 @@ import { projectService } from '../../api/services/project.service';
 import { componentService } from '../../api/services/component.service';
 import { ComponentGroup, ComponentSource, IWorkbenchFilterParams } from '../../api/types';
 import { sortComponents } from '../../shared/utils/scan-util';
-import { IpcEvents } from '../../api/ipc-events';
+import { IpcChannels } from '@api/ipc-channels';
 import AppConfig from '../../config/AppConfigModule';
 
 
@@ -37,7 +37,7 @@ class WorkbenchController {
    * @memberof WorkbenchController
    */
   public async fetchLocalFile(path: string): Promise<string> {
-    const { data } = await window.electron.ipcRenderer.invoke(IpcEvents.FILE_GET_CONTENT, path);
+    const { data } = await window.electron.ipcRenderer.invoke(IpcChannels.FILE_GET_CONTENT, path);
     return data.content;
   }
 

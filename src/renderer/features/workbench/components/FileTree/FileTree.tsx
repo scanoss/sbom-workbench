@@ -9,7 +9,7 @@ import { collapseTree, expandTree, selectWorkbench, updateTree } from '@store/wo
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { CircularProgress } from '@mui/material';
 import { ipcRenderer } from 'electron';
-import { IpcEvents } from '@api/ipc-events';
+import { IpcChannels } from '@api/ipc-channels';
 
 const { Expandable } = Renderers;
 
@@ -194,13 +194,13 @@ const FileTree = () => {
             },
           ];
     }
-    window.electron.ipcRenderer.send(IpcEvents.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
+    window.electron.ipcRenderer.send(IpcChannels.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
   };
 
   useEffect(() => {
-    window.electron.ipcRenderer.on(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
+    window.electron.ipcRenderer.on(IpcChannels.CONTEXT_MENU_COMMAND, onActionMenuHandler);
     return () => {
-      window.electron.ipcRenderer.removeListener(IpcEvents.CONTEXT_MENU_COMMAND, onActionMenuHandler);
+      window.electron.ipcRenderer.removeListener(IpcChannels.CONTEXT_MENU_COMMAND, onActionMenuHandler);
     };
   }, []);
 

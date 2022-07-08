@@ -6,7 +6,7 @@ import File from './File';
 import Folder from './Folder';
 
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
-import { IpcEvents } from '../../../api/ipc-events';
+import { IpcChannels } from '../../../api/ipc-channels';
 import * as Filtering from '../filtering';
 import { TreeViewMode } from './treeViewModes/TreeViewMode';
 import { TreeViewDefault } from './treeViewModes/TreeViewDefault';
@@ -176,7 +176,7 @@ export class Tree {
     if (node.getType() === 'file') {
       this.filesIndexed += 1;
       if (this.filesIndexed % 100 === 0) {
-        this.sendToUI(IpcEvents.SCANNER_UPDATE_STATUS, {
+        this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
           stage: {
             stageName: `indexing`,
             stageStep: 1,

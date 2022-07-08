@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { IpcEvents } from '../ipc-events';
+import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
 import { reportService } from '../../main/services/ReportService';
 import { Export } from '../../main/task/export/Export';
@@ -9,7 +9,7 @@ const pathLib = require('path');
 
 const crypto = require('crypto');
 
-ipcMain.handle(IpcEvents.EXPORT, async (_event, path: string, format: ExportFormat) => { // NewExportDTO
+ipcMain.handle(IpcChannels.EXPORT, async (_event, path: string, format: ExportFormat) => { // NewExportDTO
   try {
     const exportTask = new Export();
     exportTask.setFormat(format);
@@ -21,7 +21,7 @@ ipcMain.handle(IpcEvents.EXPORT, async (_event, path: string, format: ExportForm
   }
 });
 
-ipcMain.handle(IpcEvents.EXPORT_NOTARIZE_SBOM, async (event, type: string) => {
+ipcMain.handle(IpcChannels.EXPORT_NOTARIZE_SBOM, async (event, type: string) => {
   try {
     const exportTask = new Export();
     exportTask.setFormat(ExportFormat.SPDX20);
