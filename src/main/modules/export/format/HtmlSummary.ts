@@ -15,7 +15,7 @@ export class HtmlSummary extends Format {
     const isDev = process.env.NODE_ENV !== 'production';
     const PATH = isDev
       ? pathLib.join(__dirname, '../../../../../assets/exportTemplates/')
-      : pathLib.join(__dirname, '../assets/exportTemplates/');
+      : pathLib.join(__dirname, '../../../assets/exportTemplates/');
 
     let HTMLtemplate = fs.readFileSync(`${PATH}template.html`, 'utf8').toString();
     const data: any = await reportService.getReportIdentified();
