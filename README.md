@@ -31,6 +31,8 @@ Start the app in the `dev` environment:
 npm start
 ```
 
+For live reloading you can use `npm run start --watch` to run the app using [Electronmon](https://github.com/catdad/electronmon#readme). Warning: this tool has a high memory consumption.
+
 ## Packaging for Production
 
 To package apps for the local platform:
