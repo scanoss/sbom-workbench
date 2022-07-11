@@ -51,3 +51,7 @@ contextBridge.exposeInMainWorld('shell', {
     await shell.openExternal(url, options);
   },
 });
+
+contextBridge.exposeInMainWorld('app', {
+  getVersion: () => '-', // TODO: app.getVersion() doesn't work from bridge. Use IPC "GET_APP_INFO" ?
+});

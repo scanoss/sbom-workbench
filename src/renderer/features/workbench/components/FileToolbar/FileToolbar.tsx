@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { IconButton, ListItemText, Tooltip, Typography } from '@mui/material';
 import CodeViewerManagerInstance from '../../pages/detected/pages/Editor/CodeViewerManager';
+import {IconButton, ListItemText} from "@mui/material";
 
 
 export enum ToolbarActions {
@@ -69,11 +69,9 @@ const FileToolbar = ({ id, label, fullpath, file, actions }: FileToolbarProps) =
 
         <div className="actions d-flex">
           {ACTIONS.filter((action) => actions.includes(action.id)).map((action) => (
-            <Tooltip key={action.id} title={action.hint}>
-              <IconButton disableRipple size="small" className={action.id} onClick={action.run}>
-                {action.icon}
-              </IconButton>
-            </Tooltip>
+            <IconButton sx={{ borderRadius: '5px', "&:hover": { backgroundColor: "rgba(218,218,218,0.42)" } }} key={action.id} title={action.hint} disableRipple size="small" className={action.id} onClick={action.run}>
+              {action.icon}
+            </IconButton>
           ))}
         </div>
       </div>
