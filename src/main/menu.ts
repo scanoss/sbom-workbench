@@ -2,6 +2,7 @@ import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions } from 'ele
 import path from 'path';
 import { IpcChannels } from '../api/ipc-channels';
 import AppConfig from '../config/AppConfigModule';
+import {resolveHtmlPath} from "./util";
 
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
@@ -22,9 +23,9 @@ export default class MenuBuilder {
 
   mainURL: string;
 
-  constructor(mainWindow: BrowserWindow, main: string) {
+  constructor(mainWindow: BrowserWindow) {
     this.mainWindow = mainWindow;
-    this.mainURL = main;
+    this.mainURL = resolveHtmlPath('index.html');
   }
 
   buildMenu(): Menu {
@@ -276,9 +277,8 @@ export default class MenuBuilder {
       autoHideMenuBar: true,
       backgroundColor: '#e4e4e7',
       webPreferences: {
-        nodeIntegration: true,
-        enableRemoteModule: true,
         devTools: false,
+        preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.erb/dll/preload.js'),
       },
     });
 

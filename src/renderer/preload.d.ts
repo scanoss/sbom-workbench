@@ -23,6 +23,9 @@ declare global {
       resolve(p: string, s: string): string;
       sep: string;
     };
+    app: {
+      getVersion(): string;
+    }
   }
 }
 
