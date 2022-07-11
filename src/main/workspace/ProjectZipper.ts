@@ -93,8 +93,7 @@ export class ProjectZipper {
   private extractProjectDataFromZip() {
     this.zipEntries.forEach((entry) => {
       if (entry.isDirectory){
-        if(!entry.entryName.includes('dictionary'))
-          this.zipFolderCount += 1;
+        if (!entry.entryName.includes('dictionary')) this.zipFolderCount += 1;
       }
       if (entry.name === 'metadata.json') {
         const metadata = JSON.parse(entry.getData().toString('utf8'));
@@ -102,7 +101,6 @@ export class ProjectZipper {
         this.scannerState = metadata.scannerState;
         this.projectName = metadata.name;
       }
-      console.log(this.zipFolderCount);
       this.zipFiles.add(entry.name);
     });
   }
