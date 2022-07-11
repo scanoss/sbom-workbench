@@ -3,7 +3,7 @@ import { Card, CardContent, Tooltip, ButtonBase } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { ComponentGroup } from '@api/types';
 import IconComponent from '../IconComponent/IconComponent';
-import { selectWorkbench } from '../../../../store/workbench-store/workbenchSlice';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 
 interface ComponentCardProps {
   component: ComponentGroup;

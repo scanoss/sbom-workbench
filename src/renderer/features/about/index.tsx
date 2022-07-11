@@ -26,7 +26,7 @@ const AboutModule = () => {
           <div>
             <p style={{ fontSize: '0.9rem', marginBottom: 0 }}>{AppConfig.ABOUT_MESSAGE}</p>
             <p style={{ fontSize: '0.75rem', margin: 0 }} className="text-right">
-              VERSION: {/* {app.getVersion()} */}
+              VERSION: { window.app.getVersion() }
             </p>
           </div>
         </div>
