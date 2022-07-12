@@ -286,16 +286,14 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     openSettings();
   };
 
-  const setupAppMenuListeners = () => {
-    window.electron.ipcRenderer.on(IpcChannels.MENU_OPEN_SETTINGS, handleOpenSettings);
+  const setupAppMenuListeners = (): (() => void) => {
+    const subscriptions = [];
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_OPEN_SETTINGS, handleOpenSettings));
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
 
-  const removeAppMenuListeners = () => {
-    window.electron.ipcRenderer.removeListener(IpcChannels.MENU_OPEN_SETTINGS, handleOpenSettings);
-  };
-
+  // setup listeners
   useEffect(setupAppMenuListeners, []);
-  useEffect(() => () => removeAppMenuListeners(), []);
 
   return (
     <DialogContext.Provider
