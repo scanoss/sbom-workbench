@@ -92,18 +92,14 @@ export const WorkbenchProvider: React.FC<any> = ({ children }) => {
   }, [batchRunning]);
 
   const setupListeners = () => {
-    window.electron.ipcRenderer.on(IpcChannels.TREE_UPDATING, onTreeUpdating);
-    window.electron.ipcRenderer.on(IpcChannels.TREE_UPDATED, onTreeRefreshed);
+    const subscriptions = [];
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.TREE_UPDATING, onTreeUpdating));
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.TREE_UPDATED, onTreeRefreshed));
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
 
-  const removeListeners = () => {
-    window.electron.ipcRenderer.on(IpcChannels.TREE_UPDATING, onTreeUpdating);
-    window.electron.ipcRenderer.removeListener(IpcChannels.TREE_UPDATED, onTreeRefreshed);
-  };
-
+  // setup listeners
   useEffect(setupListeners, []);
-  useEffect(() => () => removeListeners(), []);
-
 
   return <WorkbenchContext.Provider value={[]}>{children}</WorkbenchContext.Provider>;
 };

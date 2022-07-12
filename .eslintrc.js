@@ -28,6 +28,7 @@ module.exports = {
     'react/no-array-index-key': ['warn'],
     'import/no-cycle': ['warn'],
     'no-empty-pattern': ['off'],
+    "react-hooks/exhaustive-deps": "warn"
   },
   parserOptions: {
     ecmaVersion: 2020,

@@ -1,7 +1,6 @@
-import React, { SetStateAction, useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Chip, IconButton, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { ipcRenderer } from 'electron';
 import { IpcChannels } from '@api/ipc-channels';
 import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
@@ -177,6 +176,7 @@ const SearchPanel = () => {
         // click: () => batch.ignoreAll(getFilesSelected()),
       },
     ];
+
     window.electron.ipcRenderer.send(IpcChannels.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
   };
 
@@ -199,23 +199,19 @@ const SearchPanel = () => {
     refResults.current = results;
   }, [selected, results]);
 
-  const setupListeners = () => {
-    window.electron.ipcRenderer.on(IpcChannels.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
-    window.electron.ipcRenderer.on(IpcChannels.CONTEXT_MENU_COMMAND, onActionMenuHandler);
-  };
-
-  const removeListeners = () => {
-    window.electron.ipcRenderer.removeListener(IpcChannels.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse);
-    window.electron.ipcRenderer.removeListener(IpcChannels.CONTEXT_MENU_COMMAND, onActionMenuHandler);
+  const setupListeners = (): () => void => {
+    const subscriptions = [];
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse));
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.CONTEXT_MENU_COMMAND, onActionMenuHandler));
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
 
   useEffect(() => {
     search();
   }, [summary]);
 
-  // on mount/unmount listeners
+  // setup listeners
   useEffect(setupListeners, []);
-  useEffect(() => () => removeListeners(), []);
 
   return (
     <div className="panel panel-left search-panel-container">
