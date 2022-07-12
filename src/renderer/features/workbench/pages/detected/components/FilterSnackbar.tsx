@@ -17,6 +17,8 @@ const useStyles = makeStyles((theme) => ({
     '&:hover': {
       opacity: 0.2,
     },
+    left: '40%',
+    transform: 'translateX(-40%)',
   },
   alert: {
     backgroundColor: 'white',
