@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
 import * as controller from '../../../../controllers/home-controller';
 import CircularComponent from '../Components/CircularComponent';
+import {setupListeners} from "@reduxjs/toolkit/query";
 
 const ProjectScan = () => {
   const navigate = useNavigate();
@@ -21,10 +22,6 @@ const ProjectScan = () => {
   const [stage, setStage] = useState<any>({ stageName: 'indexing', stageStep: 1 });
 
   const init = async () => {
-    window.electron.ipcRenderer.on(IpcChannels.SCANNER_UPDATE_STATUS, handlerScannerStatus);
-    window.electron.ipcRenderer.on(IpcChannels.SCANNER_FINISH_SCAN, handlerScannerFinish);
-    window.electron.ipcRenderer.on(IpcChannels.SCANNER_ERROR_STATUS, handlerScannerError);
-
     try {
       const { path, action } = scanPath;
 
@@ -34,12 +31,6 @@ const ProjectScan = () => {
     } catch (e) {
       console.error(e);
     }
-  };
-
-  const cleanup = () => {
-    window.electron.ipcRenderer.removeListener(IpcChannels.SCANNER_UPDATE_STATUS, handlerScannerStatus);
-    window.electron.ipcRenderer.removeListener(IpcChannels.SCANNER_FINISH_SCAN, handlerScannerFinish);
-    window.electron.ipcRenderer.removeListener(IpcChannels.SCANNER_ERROR_STATUS, handlerScannerError);
   };
 
   const onShowScan = (path) => {
@@ -92,9 +83,19 @@ const ProjectScan = () => {
     }
   };
 
+  const setupListeners = (): () => void => {
+    const subscriptions = [];
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.SCANNER_UPDATE_STATUS, handlerScannerStatus));
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.SCANNER_FINISH_SCAN, handlerScannerFinish));
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.SCANNER_ERROR_STATUS, handlerScannerError));
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
+  };
+
+  // setup listeners
+  useEffect(setupListeners, []);
+
   useEffect(() => {
     init();
-    return cleanup;
   }, []);
 
   return <>

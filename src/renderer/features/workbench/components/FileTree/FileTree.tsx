@@ -44,6 +44,7 @@ const FileTree = () => {
 
   const onActionMenuHandler = (e, params) => {
     const { current: node } = selectedNode;
+
     switch (params) {
       case 'action-restore':
         contextual.restore(node);
@@ -197,12 +198,14 @@ const FileTree = () => {
     window.electron.ipcRenderer.send(IpcChannels.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
   };
 
-  useEffect(() => {
-    window.electron.ipcRenderer.on(IpcChannels.CONTEXT_MENU_COMMAND, onActionMenuHandler);
-    return () => {
-      window.electron.ipcRenderer.removeListener(IpcChannels.CONTEXT_MENU_COMMAND, onActionMenuHandler);
-    };
-  }, []);
+  const setupListeners = (): () => void => {
+    const subscriptions = [];
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.CONTEXT_MENU_COMMAND, onActionMenuHandler));
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
+  };
+
+  // setupListeners
+  useEffect(setupListeners, []);
 
   return (
     <div className="file-tree-container">

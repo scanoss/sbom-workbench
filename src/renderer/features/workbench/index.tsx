@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import SplitPane from 'react-split-pane';
 import { useDispatch, useSelector } from 'react-redux';
+import SplitPane from 'react-split-pane';
+
 import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 import { reset } from '@store/workbench-store/workbenchSlice';
 import { loadProject } from '@store/workbench-store/workbenchThunks';
@@ -19,31 +20,38 @@ const WorkbenchModule = () => {
 
   const report = pathname.startsWith('/workbench/report');
 
-  const onMigrationInit = (e, { data }) => setLoaderMessage(data);
-  const onMigrationFinish = (e) => setLoaderMessage(null);
+  const onMigrationInit = (_e, { data }) => setLoaderMessage(data);
+  const onMigrationFinish = (_e) => setLoaderMessage(null);
 
-  const onInit = async () => {
-    window.electron.ipcRenderer.on(IpcChannels.MIGRATION_INIT, onMigrationInit);
-    window.electron.ipcRenderer.on(IpcChannels.MIGRATION_FINISH, onMigrationFinish);
+  const onInit = () => {
+    console.log('Init workbench...');
     const { path } = scanPath;
     dispatch(loadProject(path));
+
+    return () => {
+      console.log('Closing workbench...');
+      dispatch(reset());
+    };
   };
 
-  const onDestroy = () => {
-    console.log('Closing workbench...');
-    window.electron.ipcRenderer.removeListener(IpcChannels.MIGRATION_INIT, onMigrationInit);
-    window.electron.ipcRenderer.removeListener(IpcChannels.MIGRATION_FINISH, onMigrationFinish);
-    dispatch(reset());
+  const setupListeners = (): (() => void) => {
+    const subscriptions = [];
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MIGRATION_INIT, onMigrationInit));
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MIGRATION_FINISH, onMigrationFinish));
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
 
-  useEffect(() => {
-    onInit();
-    return onDestroy;
-  }, []);
+  // setup listeners
+  useEffect(setupListeners, []);
+
+  // onInit/onDestroy
+  useEffect(onInit, []);
 
   return (
     <div>
       <AppBar />
+      {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+      {/* @ts-ignore */}
       <SplitPane
         split="vertical"
         minSize={320}

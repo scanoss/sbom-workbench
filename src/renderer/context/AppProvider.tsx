@@ -130,18 +130,14 @@ const AppProvider = ({ children }) => {
     }
   };
 
-  const setupAppMenuListeners = () => {
-    window.electron.ipcRenderer.on(IpcChannels.MENU_NEW_PROJECT, newProject);
-    window.electron.ipcRenderer.on(IpcChannels.MENU_IMPORT_PROJECT, importProject);
-  };
-
-  const removeAppMenuListeners = () => {
-    window.electron.ipcRenderer.removeListener(IpcChannels.MENU_OPEN_SETTINGS, newProject);
-    window.electron.ipcRenderer.removeListener(IpcChannels.MENU_IMPORT_PROJECT, importProject);
+  const setupAppMenuListeners = (): () => void => {
+    const subscriptions = [];
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_NEW_PROJECT, newProject));
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_IMPORT_PROJECT, importProject));
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
 
   useEffect(setupAppMenuListeners, []);
-  useEffect(() => () => removeAppMenuListeners(), []);
 
   return (
     <AppContext.Provider
