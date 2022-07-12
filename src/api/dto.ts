@@ -48,3 +48,12 @@ export interface NewLicenseDTO {
   url?: string;
   spdxid?: string;
 }
+
+export interface IAppInfo {
+  version: string;
+  name: string;
+  appPath: string;
+  work_root: string;
+  platform: string;
+  arch: string;
+}

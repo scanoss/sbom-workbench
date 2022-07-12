@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import * as os from 'os';
 import path from 'path';
+import {IpcChannels} from "@api/ipc-channels";
 
 const { shell } = require('electron');
 
@@ -53,5 +54,7 @@ contextBridge.exposeInMainWorld('shell', {
 });
 
 contextBridge.exposeInMainWorld('app', {
-  getVersion: () => '-', // TODO: app.getVersion() doesn't work from bridge. Use IPC "GET_APP_INFO" ?
+  getInfo: async () => {
+    return ipcRenderer.invoke(IpcChannels.APP_GET_APP_INFO);
+  },
 });
