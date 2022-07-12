@@ -79,7 +79,7 @@ const WorkbenchFilters = () => {
     <>
       <Box id="WorkbenchFilters" boxShadow={0} className={`workbench-filters ${open ? 'no-collapsed' : 'collapsed'}`}>
         <header className="workbench-filters-header">
-          <h4 className="mr-1 mb-0 mt-0 d-flex align-end">
+          <h4 className="mr-1 mb-2 mt-0 d-flex align-end">
             Filters
             <Tooltip
               classes={{ tooltip: classes.info }}
