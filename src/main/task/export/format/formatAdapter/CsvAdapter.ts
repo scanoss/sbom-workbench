@@ -1,6 +1,5 @@
 export class CsvAdapter{
   public adapt(data: any) {
-    console.log(data);
     const response = data.reduce((acc, curr) => {
       if (!acc[curr.fileId]) {
         const aux = {
@@ -18,8 +17,9 @@ export class CsvAdapter{
         };
         aux.detected_license.push(curr.detected_license);
         acc[curr.fileId] = aux;
-      } else
+      } else {
         acc[curr.fileId].detected_license.push(curr.detected_license);
+      }
       return acc;
     }, {});
     return Object.values(response);

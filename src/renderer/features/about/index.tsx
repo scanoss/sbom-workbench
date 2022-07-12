@@ -1,10 +1,22 @@
 /* eslint-disable no-restricted-globals */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AppConfig from '@config/AppConfigModule';
 import icon from '@assets/icon.png';
+import { IAppInfo } from '@api/dto';
 import LicensesText from './LicensesText';
 
 const AboutModule = () => {
+  const [appInfo, setAppInfo] = useState<IAppInfo>(null);
+
+  const onInit = async (): Promise<void> => {
+    const info = await window.app.getInfo();
+    setAppInfo(info);
+  };
+
+  useEffect(() => {
+    onInit();
+  }, []);
+
   return (
     <div
       style={{
@@ -26,12 +38,11 @@ const AboutModule = () => {
           <div>
             <p style={{ fontSize: '0.9rem', marginBottom: 0 }}>{AppConfig.ABOUT_MESSAGE}</p>
             <p style={{ fontSize: '0.75rem', margin: 0 }} className="text-right">
-              VERSION: { window.app.getVersion() }
+              VERSION: {appInfo?.version}
             </p>
           </div>
         </div>
       </header>
-
 
       <div
         style={{
