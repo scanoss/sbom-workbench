@@ -1,5 +1,6 @@
 import { IpcRendererEvent } from 'electron';
 import { IpcChannels } from '@api/ipc-channels';
+import {IAppInfo} from "@api/dto";
 
 declare global {
   interface Window {
@@ -27,7 +28,7 @@ declare global {
       sep: string;
     };
     app: {
-      getVersion(): string;
+      getInfo(): Promise<IAppInfo>;
     };
   }
 }
