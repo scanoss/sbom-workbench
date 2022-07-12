@@ -5,6 +5,7 @@ export class CompSearchRequestBuilder {
   public static build(raw: ISearchComponent): ComponentMessages.CompSearchRequest {
     const req = new ComponentMessages.CompSearchRequest();
     if (raw.search) req.setSearch(raw.search);
+    if (raw.vendor) req.setVendor(raw.vendor);
     if (raw.component) req.setComponent(raw.component);
     if (raw.package) req.setPackage(raw.package);
     if (raw.limit) req.setLimit(raw.limit);
