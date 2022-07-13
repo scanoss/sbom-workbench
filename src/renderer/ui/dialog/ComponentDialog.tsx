@@ -24,9 +24,6 @@ const useStyles = makeStyles((theme) => ({
     gridTemplateColumns: '1.5fr 0.75fr',
     gridGap: '20px',
   },
-  search: {
-    padding: '10px 0px 10px 10px',
-  },
 }));
 
 interface ComponentDialogProps {
@@ -128,7 +125,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
 
       <form onSubmit={handleClose}>
         <div className="dialog-content">
-          <div className={`${classes.componentVersion} dialog-row`}>
+          <div className={`dialog-row ${classes.componentVersion} `}>
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">Component</label>
               <Paper className="dialog-form-field-control">
@@ -184,7 +181,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                     required
                     InputProps={{
                       ...params.InputProps,
-                      startAdornment: <SearchIcon className={classes.search} />,
+                      startAdornment: <SearchIcon />,
                       disableUnderline: true,
                       className: 'autocomplete-option',
                     }}
@@ -231,7 +228,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
         </div>
 
         <DialogActions>
-          <Button tabIndex={-1} onClick={onCancel}>Cancel</Button>
+          <Button tabIndex={-1} color="inherit" onClick={onCancel}>Cancel</Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
             Create
           </Button>

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Dialog, Paper, IconButton, InputBase, CircularProgress, TextField, Button } from '@mui/material';
+import {Dialog, Paper, IconButton, CircularProgress, TextField, Button, Link} from '@mui/material';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { componentService } from '@api/services/component.service';
 import { DataGrid } from '@mui/x-data-grid';
@@ -14,11 +14,11 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import SearchIcon from '@mui/icons-material/Search';
 import { packages } from '@assets/data/ComponentCatalogPackages';
 import CloseIcon from '@mui/icons-material/Close';
-import WarningOutlinedIcon from '@mui/icons-material/WarningOutlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import { projectService } from '@api/services/project.service';
+import AppConfig from '@config/AppConfigModule';
 import { IComponentResult } from '../../../main/task/componentCatalog/iComponentCatalog/IComponentResult';
 import { ISearchComponent } from '../../../main/task/componentCatalog/iComponentCatalog/ISearchComponent';
-import AppConfig from '@config/AppConfigModule';
 
 interface ComponentSearcherDialogProps {
   open: boolean;
@@ -51,14 +51,14 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
   };
 
   const init = async () => {
-    const response = await projectService.getApiKey()
-    setQueryTerm({ search: '', package: '', component: '', vendor: '' })
+    const response = await projectService.getApiKey();
+    setQueryTerm({ search: '', package: '', component: '', vendor: '' });
     setDisabled(!response);
   };
 
   const destroy = async () => {
     setResults(null);
-    setQueryTerm(null)
+    setQueryTerm(null);
   };
 
   const onRowClickHandler = async ({ row }, event) => {
@@ -112,14 +112,19 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
         </IconButton>
       </header>
 
-      <form onSubmit={handleSearch}>
-        <div className="dialog-content">
+      <main className="dialog-content">
+        <form onSubmit={handleSearch}>
           {disabled && (
-            <Alert icon={<WarningOutlinedIcon fontSize="inherit" />} severity="error" className="alert">
+            <Alert icon={<WarningAmberOutlinedIcon fontSize="inherit" />} severity="error" className="alert">
               You need to provide an API key in the settings to search components online.{' '}
-              <a href={`${AppConfig.SCANOSS_WEBSITE_URL}/pricing`} target="_blank" className="external-link">
+              <Link
+                color="inherit"
+                href={`${AppConfig.SCANOSS_WEBSITE_URL}/pricing`}
+                target="_blank"
+                rel="noreferrer"
+              >
                 Get yours now.
-              </a>
+              </Link>
             </Alert>
           )}
 
@@ -130,15 +135,17 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                   <label>Search</label>
                 </div>
                 <Paper className="dialog-form-field-control w-100 mr-4">
-                  <InputBase
-                    readOnly={disabled}
-                    disabled={loading || disabled}
+                  <TextField
                     name="search"
+                    size="small"
+                    disabled={loading || disabled}
                     fullWidth
                     value={queryTerm?.search || ''}
                     onChange={(e) => setQueryTerm({ ...queryTerm, search: e.target.value })}
+                    InputProps={{
+                      endAdornment: loading ? <CircularProgress size={18} className="mr-2" /> : '',
+                    }}
                   />
-                  {loading && <CircularProgress size={18} className="mr-2" />}
                 </Paper>
               </div>
             ) : (
@@ -148,13 +155,16 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                     <label>Name</label>
                   </div>
                   <Paper className="dialog-form-field-control w-100 mr-4">
-                    <InputBase
-                      readOnly={disabled}
+                    <TextField
+                      name="name"
+                      size="small"
                       disabled={loading || disabled}
-                      name="Name"
                       fullWidth
                       value={queryTerm?.component || ''}
                       onChange={(e) => setQueryTerm({ ...queryTerm, component: e.target.value })}
+                      InputProps={{
+                        endAdornment: loading ? <CircularProgress size={18} className="mr-2" /> : '',
+                      }}
                     />
                     {loading && <CircularProgress size={18} className="mr-2" />}
                   </Paper>
@@ -164,10 +174,10 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                     <label>Vendor</label>
                   </div>
                   <Paper>
-                    <InputBase
-                      readOnly={disabled}
+                    <TextField
+                      name="vendor"
                       disabled={loading || disabled}
-                      name="Vendor"
+                      size="small"
                       fullWidth
                       value={queryTerm?.vendor || ''}
                       onChange={(e) => setQueryTerm({ ...queryTerm, vendor: e.target.value })}
@@ -176,13 +186,13 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                 </div>
               </>
             )}
-
             <div className="dialog-form-field package">
               <div className="dialog-form-field-label">
                 <label>Package</label>
               </div>
               <Paper className="dialog-form-field-control">
                 <Autocomplete
+                  size="small"
                   options={packages}
                   disabled={loading || disabled}
                   fullWidth
@@ -195,7 +205,6 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                       {...params}
                       InputProps={{
                         ...params.InputProps,
-                        readOnly: disabled,
                         disableUnderline: true,
                         className: 'autocomplete-option',
                       }}
@@ -215,26 +224,26 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
               {advancedSearch ? 'Standard search' : 'Advanced search'}
             </Button>
           </div>
-        </div>
-      </form>
+        </form>
 
-      <form onSubmit={handleClose}>
-        <DataGrid
-          className="results-datagrid"
-          rows={results || []}
-          columns={[
-            { field: 'component', width: 150 },
-            { field: 'purl', flex: 1 },
-            { field: 'url', flex: 1 },
-          ]}
-          localeText={{ noRowsLabel: loading ? 'Searching...' : results === null ? '' : 'No results found' }}
-          rowHeight={22}
-          disableColumnMenu
-          disableColumnSelector
-          onRowClick={onRowClickHandler}
-          hideFooter
-        />
-      </form>
+        <form onSubmit={handleClose}>
+          <DataGrid
+            className="results-datagrid"
+            rows={results || []}
+            columns={[
+              { field: 'component', width: 150 },
+              { field: 'purl', flex: 1 },
+              { field: 'url', flex: 1 },
+            ]}
+            localeText={{ noRowsLabel: loading ? 'Searching...' : results === null ? '' : 'No results found' }}
+            rowHeight={22}
+            disableColumnMenu
+            disableColumnSelector
+            onRowClick={onRowClickHandler}
+            hideFooter
+          />
+        </form>
+      </main>
     </Dialog>
   );
 };
