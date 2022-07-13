@@ -1,32 +1,22 @@
 #ComponentSearcherDialog {
 
+  // dialog size
   & .MuiDialog-paperWidthMd {
     width: 800px;
   }
 
-  .external-link {
-    color: inherit;
-    text-decoration: underline;
-  }
+  .dialog-content {
 
-  .dialog-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 4px 4px 16px;
-  }
+    // searcher form widths
+    .dialog-row.searcher {
+      align-items: flex-end;
 
-  .dialog-row.searcher {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 10px;
+      .dialog-form-field {
+        flex: 1;
 
-    .dialog-form-field {
-      flex: 1;
-
-      &.package {
-        flex: 0 0 160px;
+        &.package {
+          flex: 0 0 160px;
+        }
       }
     }
   }

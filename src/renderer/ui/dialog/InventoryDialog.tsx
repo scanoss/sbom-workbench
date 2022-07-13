@@ -47,9 +47,6 @@ const useStyles = makeStyles((theme) => ({
     gridTemplateColumns: '1.5fr 0.75fr',
     gridGap: '20px',
   },
-  search: {
-    padding: '10px 0px 10px 10px',
-  },
   option: {
     display: 'flex',
     flexDirection: 'column',
@@ -328,7 +325,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       {...params}
                       InputProps={{
                         ...params.InputProps,
-                        startAdornment: <SearchIcon className={classes.search} />,
+                        startAdornment: <SearchIcon />,
                         disableUnderline: true,
                         className: 'autocomplete-option',
                       }}
@@ -361,7 +358,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       {...params}
                       InputProps={{
                         ...params.InputProps,
-                        startAdornment: <SearchIcon className={classes.search} />,
+                        startAdornment: <SearchIcon />,
                         disableUnderline: true,
                         className: 'autocomplete-option',
                       }}
@@ -417,7 +414,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       {...params}
                       InputProps={{
                         ...params.InputProps,
-                        startAdornment: <SearchIcon className={classes.search} />,
+                        startAdornment: <SearchIcon />,
                         disableUnderline: true,
                         className: 'autocomplete-option',
                       }}

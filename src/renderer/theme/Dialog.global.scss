@@ -15,23 +15,38 @@
   }
 
   .dialog-title {
-    padding: 16px 20px;
-    font-size: 22px;
-    font-style: normal;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    min-height: 58px;
+    padding: 0 4px 0 16px;
+
+    font-size: 20px;
     font-weight: 400;
-    letter-spacing: 0em;
-    text-align: left;
+
     border-bottom: 1px solid #D4D4D8;
-    display: block;
   }
 
   .dialog-content {
       padding: 20px 24px;
       background-color: rgba(244, 244, 245, 1);
       overflow: hidden;
+
+      .dialog-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+
+        .dialog-form-field {
+          width: 100%;
+        }
+      }
   }
 
   .dialog-content > .dialog-form-field {
+
     &:first-child { margin-top: 0; }
   }
 
@@ -76,10 +91,6 @@
       color: #6c6c6e;
     }
 
-   /*  .MuiAutocomplete-input:first-child {
-      padding: 0px 0;
-    }
- */
     textarea {
       border: none;
       outline: 0px !important;
@@ -96,32 +107,10 @@
   }
 
   .MuiAutocomplete-root {
-    .MuiOutlinedInput-root.MuiInputBase-sizeSmall {
-      padding: 0 6px;
+    .MuiOutlinedInput-root.MuiInputBase-sizeSmall.MuiInputBase-adornedStart {
+      // padding: 0 6px;
     }
   }
 
-    /* ,
-    iconButton: {
-      padding: 7,
-    },
-    input: {
-      color: '#6c6c6e',
-      padding: theme.spacing(0.5),
-    },
-    autocomplete: {
-      color: '#6c6c6e',
-    },
-    actions: {
-      backgroundColor: 'var(--background-color-primary)',
-    },
-    option: {
-      display: 'flex',
-      flexDirection: 'column',
-      '& span.middle': {
-        fontSize: '0.8rem',
-        color: '#6c6c6e',
-      }
-    }
-  }));*/
+
 }
