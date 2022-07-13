@@ -57,7 +57,7 @@ const AppMenu = () => {
         className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
         tabIndex={-1}
       >
-        <Tooltip title="Detected components">
+        <Tooltip title="Detected components" enterDelay={650}>
           <Button color="inherit">
             <GavelIcon />
           </Button>
@@ -68,7 +68,7 @@ const AppMenu = () => {
         className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
         tabIndex={-1}
       >
-        <Tooltip title="Search keywords">
+        <Tooltip title="Search keywords" enterDelay={650}>
           <Button color="inherit">
             <SearchIcon />
           </Button>
@@ -79,7 +79,7 @@ const AppMenu = () => {
         className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
         tabIndex={-1}
       >
-        <Tooltip title="Identified components">
+        <Tooltip title="Identified components" enterDelay={650}>
           <Button color="inherit">
             <CheckCircleOutlineOutlinedIcon />
           </Button>
@@ -90,7 +90,7 @@ const AppMenu = () => {
         className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
         tabIndex={-1}
       >
-        <Tooltip title="Reports">
+        <Tooltip title="Reports" enterDelay={650}>
           <Button color="inherit">
             <InsertChartOutlinedTwoToneIcon />
           </Button>
