@@ -502,7 +502,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           </div>
         </div>
         <DialogActions>
-          <Button tabIndex={-1} onClick={onCancel}>Cancel</Button>
+          <Button tabIndex={-1} onClick={onCancel} color="inherit">Cancel</Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
             Identify
           </Button>

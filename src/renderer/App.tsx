@@ -35,21 +35,21 @@ export default class App {
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
           <HashRouter>
-              <Provider store={store}>
-                    <DialogProvider>
-                      <AppProvider>
-                        <WorkbenchProvider>
-                          <Routes>
-                            <Route index element={<WorkspaceModule />} />
-                            <Route path="/workspace/*" element={<WorkspaceModule />} />
-                            <Route path="/workbench/*" element={<WorkbenchModule />} />
-                            <Route path="/about" element={<AboutModule />} />
-                          </Routes>
-                        </WorkbenchProvider>
-                      </AppProvider>
-                    </DialogProvider>
-              </Provider>
-            </HashRouter>
+            <Provider store={store}>
+              <DialogProvider>
+                <AppProvider>
+                  <WorkbenchProvider>
+                    <Routes>
+                      <Route index element={<WorkspaceModule />} />
+                      <Route path="/workspace/*" element={<WorkspaceModule />} />
+                      <Route path="/workbench/*" element={<WorkbenchModule />} />
+                      <Route path="/about" element={<AboutModule />} />
+                    </Routes>
+                  </WorkbenchProvider>
+                </AppProvider>
+              </DialogProvider>
+            </Provider>
+          </HashRouter>
         </ThemeProvider>
       </StyledEngineProvider>
     );
@@ -71,8 +71,6 @@ export default class App {
       // window.location.hash = '/workbench/detected';
     }); */
   }
-
-
 
   private loadTheme(): Theme {
     const theme = createTheme({
@@ -99,7 +97,6 @@ export default class App {
     });
 
     theme.shadows[1] = '0px 1px 3px 0px #0000001A; 1px 0px 2px 0px #0000000F';
-    console.log(theme);
     return theme;
   }
 }

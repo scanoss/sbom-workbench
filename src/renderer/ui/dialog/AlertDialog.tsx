@@ -77,7 +77,7 @@ export const AlertDialog = (props: AlertDialogProps) => {
       <DialogActions className={classes.actions}>
         {buttons.map((button: any, index: number) =>
           button.role === 'cancel' ? (
-            <Button key={button.label} onClick={handleCancel} className={button.class}>
+            <Button key={button.label} onClick={handleCancel} className={button.class} color="inherit">
               {button.label}
             </Button>
           ) : button.role === 'action' ? (
@@ -92,7 +92,7 @@ export const AlertDialog = (props: AlertDialogProps) => {
             <Button
               key={button.label}
               autoFocus={index === buttons.length - 1}
-              className={button?.role === 'delete' && classes.deleteButton}
+              className={button?.role === 'delete' ? classes.deleteButton : ''}
               color="secondary"
               variant="contained"
               onClick={() => handleAccept(button.action)}

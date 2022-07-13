@@ -44,7 +44,7 @@ export const workbenchSlice = createSlice({
    /* setTree: (state, action: PayloadAction<any>) => {
       const tree = action.payload;
       state.tree = convertTreeToNode(tree, state.tree);
-    },*/
+    }, */
     updateTree: (state, action: PayloadAction<any>) => {
       state.tree = action.payload;
     },
@@ -84,7 +84,7 @@ export const workbenchSlice = createSlice({
       state.loaded = true;
       state.imported = imported;
       state.tree = convertTreeToNode(fileTree, [fileTree]);
-      state.dependencies = Array.from(dependencies);
+      state.dependencies = dependencies;
     });
     builder.addCase(setTree.fulfilled, (state, action) => {
       state.tree = action.payload;

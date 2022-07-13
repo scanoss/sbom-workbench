@@ -295,7 +295,7 @@ const SearchPanel = () => {
           rowHeight={23}
           page={localPage}
           disableColumnMenu
-          rowsPerPageOptions={[AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT]}
+          rowsPerPageOptions={[100]}
           hideFooterSelectedRowCount
           checkboxSelection
           headerHeight={41}
