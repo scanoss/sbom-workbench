@@ -1,8 +1,7 @@
-import { ipcRenderer } from 'electron';
-import { projectService } from '../../api/services/project.service';
-import { componentService } from '../../api/services/component.service';
-import { ComponentGroup, ComponentSource, IWorkbenchFilterParams } from '../../api/types';
-import { sortComponents } from '../../shared/utils/scan-util';
+import { projectService } from '@api/services/project.service';
+import { componentService } from '@api/services/component.service';
+import { ComponentGroup, ComponentSource, IWorkbenchFilterParams } from '@api/types';
+import { sortComponents } from '@shared/utils/scan-util';
 import { IpcChannels } from '@api/ipc-channels';
 import AppConfig from '../../config/AppConfigModule';
 
@@ -13,7 +12,7 @@ export interface ScanResult {
   scanRoot: string;
   projectRoot: string;
   fileTree: any;
-  dependencies: Set<string>;
+  dependencies: Array<string>;
 }
 
 class WorkbenchController {

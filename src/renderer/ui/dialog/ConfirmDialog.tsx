@@ -72,14 +72,18 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
           <CloseIcon />
         </IconButton>
         <DialogContentText className={classes.text}>
-          <div dangerouslySetInnerHTML={{ __html: message }} />
+          <span dangerouslySetInnerHTML={{ __html: message }} />
         </DialogContentText>
       </DialogContent>
       <DialogActions className={classes.actions}>
-        {!hideDeleteButton && <Button onClick={handleCancel}>Cancel</Button>}
+        {!hideDeleteButton && (
+          <Button color="inherit" onClick={handleCancel}>
+            Cancel
+          </Button>
+        )}
         <Button
           autoFocus
-          className={button?.role === 'delete' && classes.deleteButton}
+          className={button?.role === 'delete' ? classes.deleteButton : ''}
           color="secondary"
           variant="contained"
           onClick={handleAccept}

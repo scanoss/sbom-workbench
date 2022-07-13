@@ -97,7 +97,6 @@ export default class App {
     });
 
     theme.shadows[1] = '0px 1px 3px 0px #0000001A; 1px 0px 2px 0px #0000000F';
-    console.log(theme);
     return theme;
   }
 }

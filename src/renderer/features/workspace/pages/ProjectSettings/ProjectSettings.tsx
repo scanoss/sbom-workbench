@@ -16,7 +16,6 @@ import AppConfig from '@config/AppConfigModule';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectWorkspaceState, setNewProject, setScanPath } from '@store/workspace-store/workspaceSlice';
 
-
 const useStyles = makeStyles((theme) => ({
   size: {
     '& .MuiDialog-paperWidthMd': {
@@ -157,16 +156,13 @@ const ProjectSettings = () => {
               <div className="project-license-container">
                 <div className="input-container">
                   <label className="input-label">Project Name</label>
-                  <Paper
-                    className={`input-text-container project-name-container ${
-                      projectNameExists || !projectValidName ? 'error' : ''
-                    }`}
-                  >
+                  <Paper className="input-text-container project-name-container">
                     <TextField
-                      className="project-name-input"
                       spellCheck={false}
+                      error={projectNameExists || !projectValidName}
                       fullWidth
                       value={projectSettings.name}
+                      InputProps={{ style: { fontSize: 20, fontWeight: 500 } }}
                       onChange={(e) =>
                         setProjectSettings({
                           ...projectSettings,
