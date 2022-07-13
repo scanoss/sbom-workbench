@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
     '& .MuiDialog-paperWidthMd': {
       width: '500px',
     },
-  }
+  },
 }));
 
 interface LicenseDialogProps {
@@ -108,7 +108,7 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
           </div>
         </div>
         <DialogActions>
-          <Button tabIndex={-1} onClick={onCancel}>Cancel</Button>
+          <Button tabIndex={-1} color="inherit" onClick={onCancel}>Cancel</Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
             Create
           </Button>
