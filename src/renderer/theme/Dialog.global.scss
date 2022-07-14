@@ -36,7 +36,6 @@
       .dialog-row {
         display: flex;
         justify-content: space-between;
-        align-items: center;
         gap: 10px;
 
         .dialog-form-field {
@@ -46,11 +45,10 @@
   }
 
   .dialog-content > .dialog-form-field {
-
     &:first-child { margin-top: 0; }
   }
 
-  .dialog-content > .dialog-row:first-child > .dialog-form-field {
+  .dialog-content .dialog-row:first-child > .dialog-form-field {
       margin-top: 0;
   }
 

@@ -94,6 +94,30 @@ export default class App {
         },
         fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       },
+      components: {
+        MuiOutlinedInput: {
+          styleOverrides: {
+            root: {
+              '& fieldset': {
+                borderColor: 'transparent',
+              },
+              // TODO: we need to remove "!important" from rules. Currently, default style is more specific that custom styles. Could be controversial in the future
+              '&.Mui-disabled fieldset': {
+                border: 0,
+              },
+              '&:hover fieldset': {
+                borderColor: 'rgba(39, 39, 42, 0.2) !important',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#6366F1 !important',
+              },
+              '&.Mui-error fieldset': {
+                borderColor: '#d32f2f !important',
+              },
+            },
+          },
+        },
+      },
     });
 
     theme.shadows[1] = '0px 1px 3px 0px #0000001A; 1px 0px 2px 0px #0000000F';

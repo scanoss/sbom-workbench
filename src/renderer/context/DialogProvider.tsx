@@ -150,8 +150,14 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
       resolve({
         present: () => setProgressDialog((dialog) => ({ ...dialog, open: true, loader: true })),
         finish: ({ message }) => setProgressDialog((dialog) => ({ ...dialog, message, loader: false })),
-        dismiss: (props) =>
-          setTimeout(() => setProgressDialog((dialog) => ({ ...dialog, open: false })), props?.delay || 0),
+        dismiss: (props) => {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              setProgressDialog((dialog) => ({ ...dialog, open: false }));
+              resolve(true);
+            }, props?.delay || 0);
+          });
+        },
       });
     });
   };
@@ -312,18 +318,78 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
       }}
     >
       {children}
-      <InventoryDialog
-        open={inventoryDialog.open}
-        inventory={inventoryDialog.inventory}
-        onCancel={() => inventoryDialog.onClose && inventoryDialog.onClose(null)}
-        onClose={(inventory) => inventoryDialog.onClose && inventoryDialog.onClose(inventory)}
-      />
 
-      <InventorySelectorDialog
-        open={inventorySelectorDialog.open}
-        inventories={inventorySelectorDialog.inventories}
-        onClose={(response) => inventorySelectorDialog.onClose && inventorySelectorDialog.onClose(response)}
-      />
+      {inventoryDialog.open && (
+        <InventoryDialog
+          open={inventoryDialog.open}
+          inventory={inventoryDialog.inventory}
+          onCancel={() => inventoryDialog.onClose && inventoryDialog.onClose(null)}
+          onClose={(inventory) => inventoryDialog.onClose && inventoryDialog.onClose(inventory)}
+        />
+      )}
+
+      {inventorySelectorDialog.open && (
+        <InventorySelectorDialog
+          open={inventorySelectorDialog.open}
+          inventories={inventorySelectorDialog.inventories}
+          onClose={(response) => inventorySelectorDialog.onClose && inventorySelectorDialog.onClose(response)}
+        />
+      )}
+
+      {componentDialog.open && (
+        <ComponentDialog
+          open={componentDialog.open}
+          label={componentDialog.label}
+          component={componentDialog.component}
+          onCancel={() => componentDialog.onClose && componentDialog.onClose(null)}
+          onClose={(response) => componentDialog.onClose && componentDialog.onClose(response)}
+        />
+      )}
+
+      {licenseDialog.open && (
+        <LicenseDialog
+          open={licenseDialog.open}
+          onCancel={() => licenseDialog.onClose && licenseDialog.onClose(null)}
+          onClose={(response) => licenseDialog.onClose && licenseDialog.onClose(response)}
+          save={licenseDialog.save}
+        />
+      )}
+
+      {settingsDialog.open && (
+        <SettingsDialog
+          open={settingsDialog.open}
+          onCancel={() => settingsDialog.onClose && settingsDialog.onClose(null)}
+          onClose={(response) => settingsDialog.onClose && settingsDialog.onClose(response)}
+        />
+      )}
+
+      {preLoadInventory.open && (
+        <PreLoadInventoryDialog
+          folder={preLoadInventory.folder}
+          open={preLoadInventory.open}
+          overwrite={preLoadInventory.overwrite}
+          onCancel={() => preLoadInventory.onClose && preLoadInventory.onClose(null)}
+          onClose={(response) => preLoadInventory.onClose && preLoadInventory.onClose(response)}
+        />
+      )}
+
+      {dependencyDialog.open && (
+        <DependencyDialog
+          open={dependencyDialog.open}
+          dependency={dependencyDialog.dependency}
+          onCancel={() => dependencyDialog.onCancel && dependencyDialog.onCancel()}
+          onClose={(dep) => dependencyDialog.onClose && dependencyDialog.onClose(dep)}
+        />
+      )}
+
+      {componentSearcherDialog.open && (
+        <ComponentSearcherDialog
+          open={componentSearcherDialog.open}
+          query={componentSearcherDialog.query}
+          onCancel={() => componentSearcherDialog.onCancel && componentSearcherDialog.onCancel()}
+          onClose={(dep) => componentSearcherDialog.onClose && componentSearcherDialog.onClose(dep)}
+        />
+      )}
 
       <ConfirmDialog
         open={confirmDialog.open}
@@ -333,27 +399,6 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         onClose={(response) => confirmDialog.onClose && confirmDialog.onClose(response)}
       />
 
-      <ComponentDialog
-        open={componentDialog.open}
-        label={componentDialog.label}
-        component={componentDialog.component}
-        onCancel={() => componentDialog.onClose && componentDialog.onClose(null)}
-        onClose={(response) => componentDialog.onClose && componentDialog.onClose(response)}
-      />
-
-      <LicenseDialog
-        open={licenseDialog.open}
-        onCancel={() => licenseDialog.onClose && licenseDialog.onClose(null)}
-        onClose={(response) => licenseDialog.onClose && licenseDialog.onClose(response)}
-        save={licenseDialog.save}
-      />
-
-      <SettingsDialog
-        open={settingsDialog.open}
-        onCancel={() => settingsDialog.onClose && settingsDialog.onClose(null)}
-        onClose={(response) => settingsDialog.onClose && settingsDialog.onClose(response)}
-      />
-
       <AlertDialog
         open={alertDialog.open}
         message={alertDialog.message}
@@ -361,29 +406,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         onClose={(response) => alertDialog.onClose && alertDialog.onClose(response)}
       />
 
-      <PreLoadInventoryDialog
-        folder={preLoadInventory.folder}
-        open={preLoadInventory.open}
-        overwrite={preLoadInventory.overwrite}
-        onCancel={() => preLoadInventory.onClose && preLoadInventory.onClose(null)}
-        onClose={(response) => preLoadInventory.onClose && preLoadInventory.onClose(response)}
-      />
-
       <ProgressDialog open={progressDialog.open} message={progressDialog.message} loader={progressDialog.loader} />
-
-      <DependencyDialog
-        open={dependencyDialog.open}
-        dependency={dependencyDialog.dependency}
-        onCancel={() => dependencyDialog.onCancel && dependencyDialog.onCancel()}
-        onClose={(dep) => dependencyDialog.onClose && dependencyDialog.onClose(dep)}
-      />
-
-      <ComponentSearcherDialog
-        open={componentSearcherDialog.open}
-        query={componentSearcherDialog.query}
-        onCancel={() => componentSearcherDialog.onCancel && componentSearcherDialog.onCancel()}
-        onClose={(dep) => componentSearcherDialog.onClose && componentSearcherDialog.onClose(dep)}
-      />
     </DialogContext.Provider>
   );
 };
