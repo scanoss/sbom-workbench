@@ -7,6 +7,7 @@ export default function useApi<T>() {
 
   const execute = async (call: () => Promise<T>) => {
     try {
+      setError(false);
       setLoading(true);
       const response = await call();
       setData(response);

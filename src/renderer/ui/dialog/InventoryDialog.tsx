@@ -6,10 +6,8 @@ import {
   Paper,
   DialogActions,
   Button,
-  InputBase,
   Select,
   MenuItem,
-  TextareaAutosize,
   TextField,
   IconButton,
   Tooltip,
@@ -17,8 +15,9 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import React, { useEffect, useState, useContext } from 'react';
-import Autocomplete from '@mui/material/Autocomplete';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import Alert from '@mui/material/Alert';
 import { ComponentGroup, Inventory } from '@api/types';
 import { InventoryForm } from '@context/types';
@@ -30,6 +29,7 @@ import { useSelector } from 'react-redux';
 import { selectComponentState } from '@store/component-store/componentSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { makeStyles } from '@mui/styles';
+import CloseIcon from "@mui/icons-material/Close";
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -54,8 +54,17 @@ const useStyles = makeStyles((theme) => ({
       fontSize: '0.8rem',
       color: '#6c6c6e',
     },
+    '& .searcher': {
+      display: 'flex',
+      alignItems: 'center',
+      fontSize: 14,
+      fontWeight: 500,
+      color: theme.palette.primary.main,
+    },
   },
 }));
+
+const filter = createFilterOptions<any>();
 
 interface InventoryDialogProps {
   open: boolean;
@@ -115,8 +124,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     }
   };
 
-  const openComponentSearcherDialog = async () => {
-    const response = await dialogCtrl.openComponentSearcherDialog('');
+  const openComponentSearcherDialog = async (query = null) => {
+    const response = await dialogCtrl.openComponentSearcherDialog(query);
     if (response && response.action === ResponseStatus.OK) {
       addCustomComponent(response.data);
     }
@@ -200,7 +209,15 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     });
   };
 
-  const autocompleteHandler = (name, value) => {
+  const componentAutocompleteHandler = (value) => {
+    setForm({
+      ...form,
+      purl: value.purl,
+      component: value.name,
+    });
+  };
+
+  const defaultAutocompleteHandler = (name, value) => {
     setForm({
       ...form,
       [name]: value,
@@ -248,7 +265,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     const component = components.find((item) => item.purl === form.purl);
     if (component) {
       setVersions(component.versions.map((item) => item.version));
-      setForm({ ...form, url: component.url || '', component: component.name, purl: component.purl });
+      setForm({ ...form, component: component.name, url: component.url || '' });
     }
   }, [form.purl]);
 
@@ -263,7 +280,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
   useEffect(() => {
     if (!loaded) return;
-
     if (versions && versions[0]) setForm({ ...form, version: versions[0] });
   }, [versions]);
 
@@ -277,7 +293,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       open={open}
       onClose={onCancel}
     >
-      <span className="dialog-title">{!form.id ? 'Identify Component' : 'Edit Identification'}</span>
+      <header className="dialog-title">
+        <span>{!form.id ? 'Identify Component' : 'Edit Identification'}</span>
+        <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
+          <CloseIcon />
+        </IconButton>
+      </header>
+
       <form onSubmit={onSubmit}>
         <div className="dialog-content">
           {isFilterActive && (
@@ -289,37 +311,54 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
                 <label>Component</label>
-                <Tooltip title="Add new component">
-                  <IconButton tabIndex={-1} color="inherit" size="small" onClick={openComponentDialog}>
-                    <AddIcon fontSize="inherit" />
-                  </IconButton>
-                </Tooltip>
-
-                <Tooltip title="Search component online">
-                  <IconButton tabIndex={-1} color="inherit" size="small" onClick={openComponentSearcherDialog}>
-                    <SearchOutlinedIcon fontSize="inherit" />
-                  </IconButton>
-                </Tooltip>
+                <IconButton title="Add new component" tabIndex={-1} color="inherit" size="small" onClick={openComponentDialog}>
+                  <AddIcon fontSize="inherit" />
+                </IconButton>
               </div>
               <Paper className="dialog-form-field-control">
                 <Autocomplete
                   size="small"
                   fullWidth
+                  clearOnBlur
                   options={components || []}
                   groupBy={(option) => option?.type}
-                  value={form.component && form.purl ? { name: form.component, purl: form.purl } : null}
+                  value={form.component && form.purl ? { name: form.component, purl: form.purl } : {}}
                   isOptionEqualToValue={(option, value) => option.purl === value.purl}
+                  filterOptions={(options, params) => {
+                    const filtered = filter(options, params);
+
+                    const { inputValue } = params;
+                    // Suggest the search option
+                    if (inputValue !== '') {
+                      filtered.push({
+                        inputValue,
+                        search: true,
+                        name: `Search "${inputValue}" online`,
+                      });
+                    }
+
+                    return filtered;
+                  }}
                   getOptionLabel={(option) => option.name || ''}
                   renderOption={(props, option, { selected }) => (
                     <li {...props}>
                       <div className={classes.option}>
-                        <span>{option.name}</span>
-                        <span className="middle">{option.purl}</span>
+                        {option.search ? (
+                          <span color="primary" className="searcher">{ option.name }</span>
+                        ) : (
+                          <>
+                            <span>{option.name}</span>
+                            <span className="middle">{option.purl}</span>
+                          </>
+                        )}
                       </div>
                     </li>
                   )}
                   disableClearable
-                  onChange={(e, value) => autocompleteHandler('purl', value.purl)}
+                  onChange={(e, value) => {
+                    if (value.search) openComponentSearcherDialog(value.inputValue);
+                    else componentAutocompleteHandler(value);
+                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -338,11 +377,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
                 <label>Version</label>
-                <Tooltip title="Add new version">
-                  <IconButton tabIndex={-1} color="inherit" size="small" onClick={openComponentVersionDialog}>
-                    <AddIcon fontSize="inherit" />
-                  </IconButton>
-                </Tooltip>
+                <IconButton  title="Add new version" tabIndex={-1} color="inherit" size="small" onClick={openComponentVersionDialog}>
+                  <AddIcon fontSize="inherit" />
+                </IconButton>
               </div>
               <Paper className="dialog-form-field-control">
                 <Autocomplete
@@ -351,7 +388,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   options={versions || []}
                   value={form?.version || null}
                   disableClearable
-                  onChange={(e, value) => autocompleteHandler('version', value)}
+                  onChange={(e, value) => defaultAutocompleteHandler('version', value)}
                   renderInput={(params) => (
                     <TextField
                       required
@@ -373,11 +410,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
                 <label>License</label>
-                <Tooltip title="Add new license">
-                  <IconButton tabIndex={-1} color="inherit" size="small" onClick={openLicenseDialog}>
-                    <AddIcon fontSize="inherit" />
-                  </IconButton>
-                </Tooltip>
+                <IconButton title="Add new license" tabIndex={-1} color="inherit" size="small" onClick={openLicenseDialog}>
+                  <AddIcon fontSize="inherit" />
+                </IconButton>
               </div>
               <Paper className="dialog-form-field-control">
                 <Autocomplete
@@ -420,7 +455,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       }}
                     />
                   )}
-                  onChange={(e, value) => autocompleteHandler('spdxid', value.spdxid)}
+                  onChange={(e, value) => defaultAutocompleteHandler('spdxid', value.spdxid)}
                 />
               </Paper>
             </div>
@@ -499,7 +534,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           </div>
         </div>
         <DialogActions>
-          <Button tabIndex={-1} onClick={onCancel} color="inherit">Cancel</Button>
+          <Button tabIndex={-1} onClick={onCancel} color="inherit">
+            Cancel
+          </Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
             Identify
           </Button>
