@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import {Dialog, Paper, IconButton, CircularProgress, TextField, Button, Link} from '@mui/material';
+import { Dialog, Paper, IconButton, CircularProgress, TextField, Button, Link } from '@mui/material';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { componentService } from '@api/services/component.service';
 import { DataGrid } from '@mui/x-data-grid';
@@ -10,15 +10,17 @@ import { DialogContext } from '@context/DialogProvider';
 import Autocomplete from '@mui/material/Autocomplete';
 import Alert from '@mui/material/Alert';
 import { AppDispatch } from '@store/store';
-import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import RepeatOutlinedIcon from '@mui/icons-material/RepeatOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { packages } from '@assets/data/ComponentCatalogPackages';
 import CloseIcon from '@mui/icons-material/Close';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import { projectService } from '@api/services/project.service';
 import AppConfig from '@config/AppConfigModule';
+import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import { IComponentResult } from '../../../main/task/componentCatalog/iComponentCatalog/IComponentResult';
 import { ISearchComponent } from '../../../main/task/componentCatalog/iComponentCatalog/ISearchComponent';
+import IconComponent from '../../features/workbench/components/IconComponent/IconComponent';
 
 interface ComponentSearcherDialogProps {
   open: boolean;
@@ -39,26 +41,36 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
 
   const [disabled, setDisabled] = useState<boolean>(false);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    const { search, vendor, component, package: pck } = queryTerm;
-
-    const params = advancedSearch
-      ? { vendor, component, package: pck, limit: 100 }
-      : { search, package: pck, limit: 100 };
-
-    execute(() => componentService.getGlobalComponents(params));
-  };
-
   const init = async () => {
+    const defaultQuery = { search: query, package: '', component: '', vendor: '' };
+    setQueryTerm(defaultQuery);
+    if (query) search(defaultQuery);
+
+    // api key validation
     const response = await projectService.getApiKey();
-    setQueryTerm({ search: '', package: '', component: '', vendor: '' });
     setDisabled(!response);
   };
 
+  const search = (query: ISearchComponent = null) => {
+    const { search, vendor, component, package: pck } = query || queryTerm;
+
+    const params = advancedSearch
+      ? { vendor, component, package: pck, limit: 100 }
+      : { search: search.trim(), package: pck, limit: 100 };
+
+    setResults(null);
+    execute(() => componentService.getGlobalComponents(params));
+  };
+
   const destroy = async () => {
+    setAdvancedSearch(false);
     setResults(null);
     setQueryTerm(null);
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    search();
   };
 
   const onRowClickHandler = async ({ row }, event) => {
@@ -66,6 +78,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
   };
 
   const handleClose = async () => {
+    const dialog = await dialogCtrl.createProgressDialog('IMPORTING COMPONENT');
     try {
       const dialogResponse = await dialogCtrl.openConfirmDialog(
         `<h3 class='mt-0 mb-0'>Import Component</h3><p>Do you want to add <b>${componentSelected.component}</b> to your catalog?</p>`,
@@ -73,13 +86,35 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
         false
       );
       if (dialogResponse.action === DIALOG_ACTIONS.OK) {
+        dialog.present();
         const response = await dispatch(importGlobalComponent(componentSelected)).unwrap();
+        await dialog.dismiss();
         if (response) onClose({ action: DIALOG_ACTIONS.OK, data: { component: response } });
       }
     } catch (error: any) {
+      dialog.dismiss();
       await dialogCtrl.openConfirmDialog(error.message, { label: 'Accept', role: 'accept' }, true);
       console.log('error', error);
     }
+  };
+
+  const Message = () => {
+    if (error)
+      return (
+        <Alert severity="error" className="alert">
+          {error.toString()}
+        </Alert>
+      );
+
+    return (
+      <>
+        {loading ? (
+          <>
+            <CircularProgress size={18} className="mr-2" /> Searching...
+          </>
+        ) : results === null ? '' : 'No results found'}
+      </>
+    );
   };
 
   useEffect(() => {
@@ -107,22 +142,17 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
     >
       <header className="dialog-title">
         <span>Online Component Search</span>
-        <IconButton aria-label="close" onClick={onCancel} size="large">
+        <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
           <CloseIcon />
         </IconButton>
       </header>
 
       <main className="dialog-content">
-        <form onSubmit={handleSearch}>
+        <form onSubmit={handleSearch} className="mb-3">
           {disabled && (
             <Alert icon={<WarningAmberOutlinedIcon fontSize="inherit" />} severity="error" className="alert">
               You need to provide an API key in the settings to search components online.{' '}
-              <Link
-                color="inherit"
-                href={`${AppConfig.SCANOSS_WEBSITE_URL}/pricing`}
-                target="_blank"
-                rel="noreferrer"
-              >
+              <Link color="inherit" href={`${AppConfig.SCANOSS_WEBSITE_URL}/pricing`} target="_blank" rel="noreferrer">
                 Get yours now.
               </Link>
             </Alert>
@@ -138,13 +168,11 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                   <TextField
                     name="search"
                     size="small"
+                    focused
                     disabled={loading || disabled}
                     fullWidth
                     value={queryTerm?.search || ''}
                     onChange={(e) => setQueryTerm({ ...queryTerm, search: e.target.value })}
-                    InputProps={{
-                      endAdornment: loading ? <CircularProgress size={18} className="mr-2" /> : '',
-                    }}
                   />
                 </Paper>
               </div>
@@ -162,11 +190,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                       fullWidth
                       value={queryTerm?.component || ''}
                       onChange={(e) => setQueryTerm({ ...queryTerm, component: e.target.value })}
-                      InputProps={{
-                        endAdornment: loading ? <CircularProgress size={18} className="mr-2" /> : '',
-                      }}
                     />
-                    {loading && <CircularProgress size={18} className="mr-2" />}
                   </Paper>
                 </div>
                 <div className="dialog-form-field">
@@ -219,30 +243,62 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
             </IconButton>
           </div>
           <div className="dialog-row mt-2">
-            <Button color="primary" size="small" onClick={() => setAdvancedSearch(!advancedSearch)}>
-              <CompareArrowsIcon className="mr-1" />
+            <Button
+              startIcon={<RepeatOutlinedIcon />}
+              color="primary"
+              size="small"
+              onClick={() => setAdvancedSearch(!advancedSearch)}
+            >
               {advancedSearch ? 'Standard search' : 'Advanced search'}
             </Button>
           </div>
         </form>
 
-        <form onSubmit={handleClose}>
-          <DataGrid
-            className="results-datagrid"
-            rows={results || []}
-            columns={[
-              { field: 'component', width: 150 },
-              { field: 'purl', flex: 1 },
-              { field: 'url', flex: 1 },
-            ]}
-            localeText={{ noRowsLabel: loading ? 'Searching...' : results === null ? '' : 'No results found' }}
-            rowHeight={22}
-            disableColumnMenu
-            disableColumnSelector
-            onRowClick={onRowClickHandler}
-            hideFooter
-          />
-        </form>
+        <DataGrid
+          className="data-grid-result"
+          rows={results || []}
+          columns={[
+            {
+              field: 'component',
+              width: 170,
+              sortable: false,
+              renderCell: ({ row }) => (
+                <div className="component-name-cell" title={row.component}>
+                  <IconComponent name={row.component} size={24} />
+                  <h3>{row.component}</h3>
+                </div>
+              ),
+            },
+            { field: 'purl', flex: 1, sortable: false },
+            {
+              field: 'url',
+              flex: 1,
+              sortable: false,
+              renderCell: ({ row }) =>
+                row.url && (
+                  <div className="url-cell d-flex">
+                    <Link
+                      href={row.url}
+                      tabIndex={-1}
+                      onClick={(e) => e.stopPropagation()}
+                      target="_blank"
+                      color="primary"
+                      className="d-flex align-center"
+                    >
+                      {row.url}
+                      <OpenInNewOutlinedIcon fontSize="inherit" className="ml-1" />
+                    </Link>
+                  </div>
+                ),
+            },
+          ]}
+          localeText={{ noRowsLabel: (<Message />) as unknown as string }}
+          headerHeight={40}
+          rowHeight={22}
+          disableColumnMenu
+          onRowClick={onRowClickHandler}
+          hideFooter
+        />
       </main>
     </Dialog>
   );
