@@ -69,139 +69,157 @@ const ProjectList = (props: ProjectListProps) => {
   const { projects, searchQuery } = props;
   const filterProjects = filter(projects, searchQuery);
 
-  return <>
-    {projects && projects.length > 0 ? (
-      <TableContainer component={Paper}>
-        <Table className="projects-table" aria-label="projects table">
-          <TableHead>
-            <TableRow>
-              <TableCell width="50%">NAME</TableCell>
-              <TableCell>DATE</TableCell>
-              <TableCell>TOTAL FILES</TableCell>
-              <TableCell width={30} />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filterProjects.length !== 0 ? (
-              filterProjects.map((project) => (
-                <TableRow
-                  className={`
+  return (
+    <>
+      {projects && projects.length > 0 ? (
+        <TableContainer component={Paper}>
+          <Table className="projects-table" aria-label="projects table">
+            <TableHead>
+              <TableRow>
+                <TableCell width="50%">NAME</TableCell>
+                <TableCell>DATE</TableCell>
+                <TableCell>TOTAL FILES</TableCell>
+                <TableCell width={30} />
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filterProjects.length !== 0 ? (
+                filterProjects.map((project) => (
+                  <TableRow
+                    className={`
                     ${isProjectFinished(project) ? 'scanning-complete' : 'scanning-not-complete'}
                     ${isProjectDeprecated(project) ? 'project-deprecated' : ''}
                     `}
-                  hover
-                  key={project.name}
-                  onClick={() => isProjectFinished(project) && props.onProjectClick(project)}
-                >
-                  <TableCell component="th" scope="row">
-                    <div className="project-name">
-                      {isProjectDeprecated(project) && (
-                        <Tooltip
-                          classes={{ tooltip: classes.md }}
-                          title="This project was scanned with a previous version that is no longer supported."
-                        >
-                          <WarningOutlinedIcon fontSize="inherit" className="icon mr-1" />
-                        </Tooltip>
-                      )}
-                      <span>{project.name}</span>
-                      {isProjectImported(project) && (
-                        <Tooltip classes={{ tooltip: classes.md }} title="This project was imported. You will not be able to see the original source code.">
-                          <Chip label="IMPORTED" size="small" variant="outlined" className="ml-1" />
-                        </Tooltip>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>{format(project.date)}</TableCell>
-                  <TableCell>{project.files}</TableCell>
-                  <TableCell className="row-actions">
-                    <div className="btn-actions">
-                      {!isProjectFinished(project) && !isProjectDeprecated(project) && (
-                        <Tooltip title="Resume scan">
+                    hover
+                    key={project.name}
+                    onClick={() => isProjectFinished(project) && props.onProjectClick(project)}
+                  >
+                    <TableCell component="th" scope="row">
+                      <div className="project-name">
+                        {isProjectDeprecated(project) && (
+                          <Tooltip
+                            classes={{ tooltip: classes.md }}
+                            title="This project was scanned with a previous version that is no longer supported."
+                          >
+                            <WarningOutlinedIcon fontSize="inherit" className="icon mr-1" />
+                          </Tooltip>
+                        )}
+                        <span>{project.name}</span>
+                        {isProjectImported(project) && (
+                          <Tooltip
+                            classes={{ tooltip: classes.md }}
+                            title="This project was imported. You will not be able to see the original source code."
+                          >
+                            <Chip label="IMPORTED" size="small" variant="outlined" className="ml-1" />
+                          </Tooltip>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{format(project.date)}</TableCell>
+                    <TableCell>{project.files}</TableCell>
+                    <TableCell className="row-actions">
+                      <div className="btn-actions">
+                        {!isProjectFinished(project) && !isProjectDeprecated(project) && (
+                          <Tooltip title="Resume scan">
+                            <IconButton
+                              aria-label="restore"
+                              className="btn-restore"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                props.onProjectRestore(project);
+                              }}
+                              size="large"
+                            >
+                              <PlayArrowIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+
+                        {isProjectFinished(project) && !isProjectDeprecated(project) && (
+                          <>
+                            <Tooltip title="Export project">
+                              <IconButton
+                                aria-label="export"
+                                className="btn-export"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  props.onProjectExport(project);
+                                }}
+                                size="large"
+                              >
+                                <GetAppOutlined fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
+                            <Tooltip title="Rescan">
+                              <IconButton
+                                aria-label="rescan"
+                                className="btn-rescan"
+                                disabled={project.source === 'IMPORTED'}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  props.onProjectRescan(project);
+                                }}
+                                size="large"
+                              >
+                                <ReplayIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </>
+                        )}
+
+                        <Tooltip title="Remove project">
                           <IconButton
-                            aria-label="restore"
-                            className="btn-restore"
+                            aria-label="delete"
+                            className="btn-delete"
                             onClick={(event) => {
                               event.stopPropagation();
-                              props.onProjectRestore(project);
+                              props.onProjectDelete(project);
                             }}
-                            size="large">
-                            <PlayArrowIcon fontSize="small" />
+                            size="large"
+                          >
+                            <DeleteIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                      )}
-
-                      {isProjectFinished(project) && !isProjectDeprecated(project) && (
-                        <>
-                        <Tooltip title="Export project">
-                            <IconButton
-                              aria-label="export"
-                              className="btn-export"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                props.onProjectExport(project);
-                              }}
-                              size="large">
-                              <GetAppOutlined fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-
-                          <Tooltip title="Rescan">
-                            <IconButton
-                              aria-label="rescan"
-                              className="btn-rescan"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                props.onProjectRescan(project);
-                              }}
-                              size="large">
-                              <ReplayIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </>
-                      )}
-
-                      <Tooltip title="Remove project">
-                        <IconButton
-                          aria-label="delete"
-                          className="btn-delete"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            props.onProjectDelete(project);
-                          }}
-                          size="large">
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4}>
+                    <p className="text-center">
+                      Not projects found with <strong>{searchQuery}</strong>
+                    </p>
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={4}>
-                  <p className="text-center">
-                    Not projects found with <strong>{searchQuery}</strong>
-                  </p>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    ) : !projects ? (
-      <p>Loading projects...</p>
-    ) : (
-      <div className="empty-container">
-        <div className="empty-list">
-          <h3>No projects found</h3>
-          <p>
-            You can start by&nbsp;
-            <Link onClick={() => props.onProjectCreate()} underline="hover">scanning a new project</Link><br />or <Link onClick={() => props.onProjectImport()} underline="hover">importing a project</Link>.
-          </p>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : !projects ? (
+        <p>Loading projects...</p>
+      ) : (
+        <div className="empty-container">
+          <div className="empty-list">
+            <h3>No projects found</h3>
+            <p>
+              You can start by&nbsp;
+              <Link onClick={() => props.onProjectCreate()} underline="hover">
+                scanning a new project
+              </Link>
+              <br />
+              or{' '}
+              <Link onClick={() => props.onProjectImport()} underline="hover">
+                importing a project
+              </Link>
+              .
+            </p>
+          </div>
         </div>
-      </div>
-    )}
-  </>;
+      )}
+    </>
+  );
 };
 
 export default ProjectList;
