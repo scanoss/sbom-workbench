@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '@store/rootReducer';
 import { componentService } from '@api/services/component.service';
 import { licenseService } from '@api/services/license.service';
-import { NewLicenseDTO } from '@api/dto';
+import {ComponentResultDTO, NewLicenseDTO} from '@api/dto';
 import { IComponentResult } from '../../../main/task/componentCatalog/iComponentCatalog/IComponentResult';
 import { workbenchController } from '../../controllers/workbench-controller';
 
@@ -25,7 +25,7 @@ export const fetchComponents = createAsyncThunk('workbench/loadComponents', asyn
 
 export const importGlobalComponent = createAsyncThunk(
   'workbench/importGlobalComponent',
-  async (newComponent: IComponentResult) => {
+  async (newComponent: ComponentResultDTO) => {
     const licenses = async () => {
       const catalogLicenses = await licenseService.getAll();
       const lic = catalogLicenses.reduce((acc, curr) => {

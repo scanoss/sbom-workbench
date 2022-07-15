@@ -1,4 +1,6 @@
-import { Dependency } from '@api/types';
+import {ComponentGroup, Dependency} from '@api/types';
+import {ISearchComponent} from "../main/task/componentCatalog/iComponentCatalog/ISearchComponent";
+import {IComponentResult} from "../main/task/componentCatalog/iComponentCatalog/IComponentResult";
 
 export interface NewDependencyDTO {
   dependencyId?: number;
@@ -57,3 +59,7 @@ export interface IAppInfo {
   platform: string;
   arch: string;
 }
+
+export type SearchComponentDTO = ISearchComponent;
+
+export type ComponentResultDTO = IComponentResult;
