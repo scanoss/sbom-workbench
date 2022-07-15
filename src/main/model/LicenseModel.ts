@@ -34,21 +34,16 @@ export class LicenseModel extends Model {
   // CREATE LICENSE
   public create(license: NewLicenseDTO) {
     return new Promise<Partial<LicenseDTO>>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(async function () {
-          db.run('begin transaction');
-          db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 0);
-          db.run('commit', function (this: any, err: any) {
-            db.close();
-            if (err || this.lastID === 0) throw new Error('The license was not created or already exist');
-            resolve({ id: this.lastID, ...license });
-          });
+      const db = await this.openDb();
+      db.serialize(async function () {
+        db.run('begin transaction');
+        db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 0);
+        db.run('commit', function (this: any, err: any) {
+          db.close();
+          if (err || this.lastID === 0) reject(err !== null ? err : new Error('License already exists'));
+          resolve({ id: this.lastID, ...license });
         });
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
+      });
     });
   }
 
@@ -153,7 +148,7 @@ export class LicenseModel extends Model {
   }
 
   // ATTACH LICENSE TO A COMPONENT VERSION
-  public async licenseAttach(data: any): Promise<boolean>{
+  public async licenseAttach(data: any): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         if (data.license_id && data.compid) {
@@ -193,7 +188,7 @@ export class LicenseModel extends Model {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.serialize(()=> {
+        db.serialize(() => {
           db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
             if (err) throw err;
             db.close();
