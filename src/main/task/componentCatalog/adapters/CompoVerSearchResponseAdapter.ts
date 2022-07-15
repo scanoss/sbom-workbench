@@ -23,7 +23,6 @@ export class CompoVerSearchResponseAdapter {
       });
       output.versions.push(aux);
     });
-
     return output;
   }
 }

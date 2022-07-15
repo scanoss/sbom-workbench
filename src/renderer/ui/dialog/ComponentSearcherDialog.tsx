@@ -18,8 +18,7 @@ import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import { projectService } from '@api/services/project.service';
 import AppConfig from '@config/AppConfigModule';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
-import { IComponentResult } from '../../../main/task/componentCatalog/iComponentCatalog/IComponentResult';
-import { ISearchComponent } from '../../../main/task/componentCatalog/iComponentCatalog/ISearchComponent';
+import {ComponentResultDTO, SearchComponentDTO} from "@api/dto";
 import IconComponent from '../../features/workbench/components/IconComponent/IconComponent';
 
 interface ComponentSearcherDialogProps {
@@ -32,12 +31,12 @@ interface ComponentSearcherDialogProps {
 const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const { open, query, onClose, onCancel } = props;
-  const { data, error, loading, execute } = useApi<IComponentResult[]>();
+  const { data, error, loading, execute } = useApi<ComponentResultDTO[]>();
   const dialogCtrl = useContext<any>(DialogContext);
   const [results, setResults] = React.useState<any[]>(null);
-  const [queryTerm, setQueryTerm] = useState<ISearchComponent>(null);
+  const [queryTerm, setQueryTerm] = useState<SearchComponentDTO>(null);
   const [advancedSearch, setAdvancedSearch] = useState<boolean>(false);
-  const [componentSelected, setComponentSelected] = useState<IComponentResult>(null);
+  const [componentSelected, setComponentSelected] = useState<ComponentResultDTO>(null);
 
   const [disabled, setDisabled] = useState<boolean>(false);
 
@@ -51,7 +50,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
     setDisabled(!response);
   };
 
-  const search = (query: ISearchComponent = null) => {
+  const search = (query: SearchComponentDTO = null) => {
     const { search, vendor, component, package: pck } = query || queryTerm;
 
     const params = advancedSearch

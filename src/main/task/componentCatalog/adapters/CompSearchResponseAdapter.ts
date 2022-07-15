@@ -7,7 +7,6 @@ export class CompSearchResponseAdapter {
     response.getComponentsList().forEach((comp) => {
       output.push({ component: comp.getComponent(), purl: comp.getPurl(), url: comp.getUrl() });
     });
-
     return output;
   }
 }
