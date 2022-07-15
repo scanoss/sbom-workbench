@@ -1,8 +1,6 @@
-import { LicenseDTO, NewLicenseDTO } from "@api/dto";
+import { LicenseDTO, NewLicenseDTO } from "../dto";
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
-
-
 
 class LicenseService extends BaseService {
   public async get(id: number): Promise<LicenseDTO> {
@@ -22,4 +20,3 @@ class LicenseService extends BaseService {
 }
 
 export const licenseService = new LicenseService();
-

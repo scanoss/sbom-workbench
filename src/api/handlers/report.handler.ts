@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron';
+import log from 'electron-log';
 import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
 import { reportService } from '../../main/services/ReportService';
@@ -8,7 +9,7 @@ ipcMain.handle(IpcChannels.REPORT_SUMMARY, async () => {
     const summary = await reportService.getReportSummary();
     return Response.ok({ message: 'Summary retrieve successfully retrieved', data: summary });
   } catch (error: any) {
-    console.log('Catch an error: ', error);
+    log.error('[REPORT SUMMARY]: ', error);
     return Response.fail({ message: error.message });
   }
 });
@@ -18,11 +19,11 @@ ipcMain.handle(IpcChannels.REPORT_IDENTIFIED, async () => {
     const identified = await reportService.getReportIdentified();
     return Response.ok({ message: 'Identified report successfully retrieved', data: identified });
   } catch (error: any) {
-    console.log('Catch an error: ', error);
+    log.error('[REPORT IDENTIFIED]: ', error);
     return Response.fail({ message: error.message });
   }
 });
-
+// TODO: refactor on report detected handle. We should use Response class
 ipcMain.handle(IpcChannels.REPORT_DETECTED, async (event, arg: string) => {
   try {
     const data = await reportService.getDetected();
@@ -32,7 +33,7 @@ ipcMain.handle(IpcChannels.REPORT_DETECTED, async (event, arg: string) => {
       data,
     };
   } catch (e) {
-    console.log('Catch an error: ', e);
+    log.error('[REPORT DETECTED]: ', e);
     return { status: 'fail' };
   }
 });

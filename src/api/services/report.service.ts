@@ -1,6 +1,6 @@
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
-import { ISummary } from "../../main/services/ReportService";
+import { ISummary } from '../../main/services/ReportService';
 
 class ReportService extends BaseService {
   public async getSummary(args: string | null = null): Promise<ISummary> {
