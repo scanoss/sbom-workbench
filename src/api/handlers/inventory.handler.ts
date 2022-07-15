@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron';
+import log from 'electron-log';
 import { IBatchInventory, Inventory } from '../types';
 import { IpcChannels } from '../ipc-channels';
 import { Batch } from '../../main/batch/Batch';
@@ -15,7 +16,7 @@ ipcMain.handle(IpcChannels.INVENTORY_GET_ALL, async (_event, invget: Partial<Inv
     inv = await inventoryService.getAll(invget);
     return { status: 'ok', message: inv, data: inv };
   } catch (e) {
-    console.log('Catch an error: ', e);
+    log.error('[INVENTORY GET ALL]: ', e);
     return { status: 'fail' };
   }
 });
@@ -25,7 +26,7 @@ ipcMain.handle(IpcChannels.INVENTORY_GET, async (_event, inv: Partial<Inventory>
     const inventory: Inventory = await inventoryService.get(inv);
     return { status: 'ok', message: 'Inventory retrieve successfully', data: inventory };
   } catch (e) {
-    console.log('Catch an error: ', e);
+    log.error('[INVENTORY GET]: ', e);
     return { status: 'fail' };
   }
 });
@@ -36,7 +37,7 @@ ipcMain.handle(IpcChannels.INVENTORY_CREATE, async (event, arg: Inventory) => {
     treeService.updateTree(arg.files, NodeStatus.IDENTIFIED);
     return { status: 'ok', message: 'Inventory created', data: inv };
   } catch (e) {
-    console.log('Catch an error on inventory: ', e);
+    log.error('[INVENTORY CREATE]: ', e);
     return { status: 'fail' };
   }
 });
@@ -46,7 +47,7 @@ ipcMain.handle(IpcChannels.INVENTORY_ATTACH_FILE, async (_event, arg: Partial<In
     const success = await inventoryService.attach(arg);
     return { status: 'ok', message: 'File attached to inventory successfully', success };
   } catch (e) {
-    console.log('Catch an error on inventory: ', e);
+    log.error('[INVENTORY ATTACH FILE]: ', e);
     return { status: 'fail' };
   }
 });
@@ -57,7 +58,7 @@ ipcMain.handle(IpcChannels.INVENTORY_DETACH_FILE, async (_event, inv: Partial<In
     treeService.retoreStatus(inv.files);
     return { status: 'ok', message: 'File detached to inventory successfully', success };
   } catch (e) {
-    console.log('Catch an error on inventory: ', e);
+    log.error('[INVENTORY DETACH FILE]: ', e);
     return { status: 'fail' };
   }
 });
@@ -74,7 +75,7 @@ ipcMain.handle(IpcChannels.INVENTORY_DELETE, async (_event, arg: Partial<Invento
     if (success) return { status: 'ok', message: 'Inventory deleted successfully', success };
     return { status: 'error', message: 'Inventory was not deleted successfully', success };
   } catch (e) {
-    console.log('Catch an error on inventory: ', e);
+    log.error('[INVENTORY DELETE]: ', e);
     return { status: 'fail' };
   }
 });
@@ -85,7 +86,7 @@ ipcMain.handle(IpcChannels.INVENTORY_FROM_COMPONENT, async (_event) => {
     if (data) return { status: 'ok', message: 'Inventories from component', data };
     return { status: 'error', message: 'Inventory from component was not successfully retrieve', data };
   } catch (e) {
-    console.log('Catch an error on inventory: ', e);
+    log.error('[INVENTORY FROM COMPONENT]: ', e);
     return { status: 'fail' };
   }
 });
@@ -98,7 +99,7 @@ ipcMain.handle(IpcChannels.INVENTORY_BATCH, async (_event, params: IBatchInvento
     if (success) return { status: 'ok', message: 'Inventory batch successfully', success };
     return { status: 'fail', message: 'Inventory batch error' };
   } catch (e) {
-    console.log('Catch an error on inventory: ', e);
+    log.error('[INVENTORY BATCH]: ', e);
     return { status: 'fail' };
   }
 });
@@ -109,6 +110,7 @@ ipcMain.handle(IpcChannels.INVENTORY_ACCEPT_PRE_LOAD, async (_event, data: Parti
     const inventories: Array<Partial<Inventory>> = await inventoryService.preLoadInventoriesAcceptAll(data, filter);
     return { status: 'ok', message: 'Inventory folder successfully', data: inventories };
   } catch (e) {
+    log.error('[INVENTORY ACCEPT PRELOAD]: ',e);
     return { status: 'fail' };
   }
 });
@@ -118,6 +120,7 @@ ipcMain.handle(IpcChannels.INVENTORY_UPDATE, async (_event, inventory: Inventory
     const inv = await inventoryService.update(inventory);
     return { status: 'ok', message: 'Inventory succesfully updated', data: inv };
   } catch (e) {
+    log.error('[INVENTORY UPDATE]: ', e);
     return { status: 'fail' };
   }
 });

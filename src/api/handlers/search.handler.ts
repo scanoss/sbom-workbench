@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
+import log from 'electron-log';
 import { IpcChannels } from '../ipc-channels';
-import { Response } from '../Response';
 import { SearchTask } from '../../main/task/search/searchTask/SearchTask';
 import { ISearchTask } from '../../main/task/search/searchTask/ISearchTask';
 
@@ -19,6 +19,6 @@ ipcMain.on(IpcChannels.SEARCH_ENGINE_SEARCH, async (event, params: ISearchTask) 
       return true;
     })
     .catch((error: Error) => {
-      console.log(error.message);
+      log.error('[SEARCH ENGINE]: ',error.message);
     });
 });

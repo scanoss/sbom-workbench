@@ -16,7 +16,7 @@ ipcMain.handle(IpcChannels.WORKSPACE_PROJECT_LIST, async (_event) => {
       data: projects,
     });
   } catch (error: any) {
-    console.error(error);
+    log.error(error);
     return Response.fail({ message: error.message });
   }
 });
@@ -26,7 +26,7 @@ ipcMain.handle(IpcChannels.WORKSPACE_DELETE_PROJECT, async (_event, projectPath:
     await workspace.removeProjectFilter(new ProjectFilterPath(projectPath));
     return Response.ok();
   } catch (error: any) {
-    console.error(error);
+    log.error(error);
     return Response.fail({ message: error.message });
   }
 });
@@ -41,7 +41,7 @@ ipcMain.handle(IpcChannels.WORKSPACE_CREATE_PROJECT, async (_event, project: INe
     await scanTask.run();
     return Response.ok();
   } catch (error: any) {
-    console.error(error);
+    log.error(error);
     return Response.fail({ message: error.message });
   }
 });
@@ -61,7 +61,7 @@ ipcMain.handle(IpcChannels.GET_LICENSES, async (_event) => {
     const licenses: Array<License> = workspace.getLicenses();
     return Response.ok({ message: 'Project path succesfully retrieved', data: licenses });
   } catch (e: any) {
-    console.log('Catch an error: ', e);
+    log.log('Catch an error: ', e);
     return Response.fail({ message: e.message });
   }
 });

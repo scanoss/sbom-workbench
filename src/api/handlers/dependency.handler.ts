@@ -4,14 +4,14 @@ import { dependencyService } from '../../main/services/DependencyService';
 import { AcceptAllDependeciesDTO, NewDependencyDTO, RejectAllDependeciesDTO, RestoreAllDependenciesDTO } from '../dto';
 import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
-import { treeService } from "../../main/services/TreeService";
+import { treeService } from '../../main/services/TreeService';
 
 ipcMain.handle(IpcChannels.DEPENDENCY_GET_ALL, async (event, params: { path: string }) => {
   try {
     const dependencies = await dependencyService.getAll(params);
     return Response.ok({ message: 'Component created successfully', data: dependencies });
   } catch (error: any) {
-    log.error(error);
+    log.error('[DEPENDENCY GET ALL]: ', error);
     return Response.fail({ message: error.message });
   }
 });
@@ -22,7 +22,7 @@ ipcMain.handle(IpcChannels.DEPENDENCY_ACCEPT, async (event, params: NewDependenc
     treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: dependency });
   } catch (error: any) {
-    log.error(error);
+    log.error('[DEPENDENCY ACCEPT]: ', error);
     return Response.fail({ message: error.message });
   }
 });
@@ -33,22 +33,20 @@ ipcMain.handle(IpcChannels.DEPENDENCY_RESTORE, async (_event, dependencyId: numb
     treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: dependency });
   } catch (error: any) {
-    log.error(error);
+    log.error('[DEPENDENCY RESTORE]: ', error);
     return Response.fail({ message: error.message });
   }
 });
 
 ipcMain.handle(IpcChannels.DEPENDENCY_RESTORE_ALL, async (_event, params: RestoreAllDependenciesDTO) => {
   try {
-    let response=[];
-    if(params.path)
-      response = await dependencyService.restoreAllByPath(params.path);
-    else
-      response = await dependencyService.restoreAllByIds(params.dependencyIds);
+    let response = [];
+    if (params.path) response = await dependencyService.restoreAllByPath(params.path);
+    else response = await dependencyService.restoreAllByIds(params.dependencyIds);
     treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: response });
   } catch (error: any) {
-    log.error(error);
+    log.error('[DEPENDENCY RESTORE ALL]: ', error);
     return Response.fail({ message: error.message });
   }
 });
@@ -56,14 +54,12 @@ ipcMain.handle(IpcChannels.DEPENDENCY_RESTORE_ALL, async (_event, params: Restor
 ipcMain.handle(IpcChannels.DEPENDENCY_ACCEPT_ALL, async (event, params: AcceptAllDependeciesDTO) => {
   try {
     let response;
-    if(params.dependencies)
-     response = await dependencyService.acceptAllByIds(params.dependencies);
-    else
-      response = await dependencyService.acceptAllByPath(params.path);
+    if (params.dependencies) response = await dependencyService.acceptAllByIds(params.dependencies);
+    else response = await dependencyService.acceptAllByPath(params.path);
     treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: response });
   } catch (error: any) {
-    console.log('Catch an error: ', error);
+    log.error('[DEPENDENCY ACCEPT ALL]: ', error);
     return Response.fail({ message: error.message });
   }
 });
@@ -74,22 +70,20 @@ ipcMain.handle(IpcChannels.DEPENDENCY_REJECT, async (event, dependencyId: number
     treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: response });
   } catch (error: any) {
-    console.log('Catch an error: ', error);
+    log.error('[DEPENDENCY REJECT]: ', error);
     return Response.fail({ message: error.message });
   }
 });
 
 ipcMain.handle(IpcChannels.DEPENDENCY_REJECT_ALL, async (event, param: RejectAllDependeciesDTO) => {
   try {
-    let response
-    if(param.dependencyIds)
-    response = await dependencyService.rejectAllByIds(param.dependencyIds);
-    else
-    response = await dependencyService.rejectAllByPath(param.path);
+    let response;
+    if (param.dependencyIds) response = await dependencyService.rejectAllByIds(param.dependencyIds);
+    else response = await dependencyService.rejectAllByPath(param.path);
     treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: response });
   } catch (error: any) {
-    console.log('Catch an error: ', error);
+    log.error('[DEPENDENCY REJECT ALL]: ', error);
     return Response.fail({ message: error.message });
   }
 });
