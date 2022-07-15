@@ -5,6 +5,7 @@ import { gRPCConnectionService } from './gRPCConnection/GRPCConnection';
 import * as ComponentMessages from './grpc/scanoss/api/components/v2/scanoss-components_pb';
 import { CompSearchRequestBuilder } from './builders/CompSearchRequestBuilder';
 import { CompSearchResponseAdapter } from './adapters/CompSearchResponseAdapter';
+import { StatusCode } from './grpc/scanoss/api/common/v2/scanoss-common_pb';
 
 export class SearchComponentTask implements ITask<ISearchComponent, Array<IComponentResult>> {
   public async run(params: ISearchComponent): Promise<Array<IComponentResult>> {
@@ -17,8 +18,8 @@ export class SearchComponentTask implements ITask<ISearchComponent, Array<ICompo
         else resolve(resp);
       });
     });
-
     const resp = (await pSearchComponents) as ComponentMessages.CompSearchResponse;
+    if (resp.getStatus().getStatus() !== StatusCode.SUCCESS) throw new Error(resp.getStatus().getMessage());
     const results = CompSearchResponseAdapter.convert(resp);
     return results;
   }
