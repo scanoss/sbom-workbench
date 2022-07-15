@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProjectList should render an empty container 1`] = `
+<div
+  className="empty-container"
+>
+  <div
+    className="empty-list"
+  >
+    <h3>
+      No projects found
+    </h3>
+    <p>
+      You can start by 
+      <a
+        className="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineHover css-17dcqu8-MuiTypography-root-MuiLink-root"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+      >
+        scanning a new project
+      </a>
+      <br />
+      or
+       
+      <a
+        className="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineHover css-17dcqu8-MuiTypography-root-MuiLink-root"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+      >
+        importing a project
+      </a>
+      .
+    </p>
+  </div>
+</div>
+`;
