@@ -12,6 +12,7 @@ import { ResponseStatus } from '@api/Response';
 import { licenseService } from '@api/services/license.service';
 import { DialogContext } from '@context/DialogProvider';
 import { NewDependencyDTO } from '@api/dto';
+import CloseIcon from "@mui/icons-material/Close";
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -110,9 +111,14 @@ const DependencyDialog = (props: DependencyDialogProps) => {
       open={open}
       onClose={onCancel}
     >
-      <span className="dialog-title">
-        Accept <b>{decodeURIComponent(dependency.component?.name || dependency.componentName || dependency.purl)}</b>
-      </span>
+      <header className="dialog-title">
+        <span>
+          Accept <b>{decodeURIComponent(dependency.component?.name || dependency.componentName || dependency.purl)}</b>
+        </span>
+        <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
+          <CloseIcon />
+        </IconButton>
+      </header>
 
       <form onSubmit={handleClose}>
         <div className="dialog-content">
@@ -126,8 +132,8 @@ const DependencyDialog = (props: DependencyDialogProps) => {
               </Tooltip>
             </div>
             <Paper className="dialog-form-field-control">
-              <SearchIcon className={classes.search} />
               <Autocomplete
+                size="small"
                 fullWidth
                 options={licenses || []}
                 groupBy={(option) => option?.type}
@@ -161,6 +167,7 @@ const DependencyDialog = (props: DependencyDialogProps) => {
                     InputProps={{
                       ...params.InputProps,
                       disableUnderline: true,
+                      startAdornment: <SearchIcon />,
                       className: 'autocomplete-option',
                     }}
                   />
@@ -173,8 +180,9 @@ const DependencyDialog = (props: DependencyDialogProps) => {
           <div className="dialog-form-field d-flex flex-column space-between">
             <label className="dialog-form-field-label">Version</label>
             <Paper className="dialog-form-field-control">
-              <InputBase
+              <TextField
                 name="version"
+                size="small"
                 fullWidth
                 value={form.version || ''}
                 placeholder="Version"
@@ -186,7 +194,9 @@ const DependencyDialog = (props: DependencyDialogProps) => {
         </div>
 
         <DialogActions>
-          <Button onClick={onCancel}>Cancel</Button>
+          <Button color="inherit" tabIndex={-1} onClick={onCancel}>
+            Cancel
+          </Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
             Accept
           </Button>

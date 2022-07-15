@@ -8,7 +8,6 @@ import useContextual from '@hooks/useContextual';
 import { collapseTree, expandTree, selectWorkbench, updateTree } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { CircularProgress } from '@mui/material';
-import { ipcRenderer } from 'electron';
 import { IpcChannels } from '@api/ipc-channels';
 
 const { Expandable } = Renderers;

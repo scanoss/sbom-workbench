@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron';
 import { IpcChannels } from '@api/ipc-channels';
 
 class DialogController {

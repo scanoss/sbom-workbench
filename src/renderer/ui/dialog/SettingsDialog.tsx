@@ -9,6 +9,7 @@ import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { IWorkspaceCfg } from '@api/types';
 import { userSettingService } from '@api/services/userSetting.service';
 import AppConfig from '@config/AppConfigModule';
+import CloseIcon from "@mui/icons-material/Close";
 
 const filter = createFilterOptions();
 
@@ -102,7 +103,9 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
           </div>
         </div>
         <DialogActions>
-          <Button tabIndex={-1} onClick={onCancel}>Cancel</Button>
+          <Button tabIndex={-1} onClick={onCancel}>
+            Cancel
+          </Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
             Add
           </Button>
@@ -212,7 +215,13 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
         open={open}
         onClose={onCancel}
       >
-        <span className="dialog-title">Settings</span>
+        <header className="dialog-title">
+          <span>Settings</span>
+          <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
+            <CloseIcon />
+          </IconButton>
+        </header>
+
         <form onSubmit={handleClose}>
           <div className="dialog-content">
             {AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS && (
@@ -287,7 +296,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                           </li>
                         ) : (
                           <li {...props}>
-                            <article  className="w-100 d-flex space-between align-center">
+                            <article className="w-100 d-flex space-between align-center">
                               <div className={classes.option}>
                                 <span>{option.URL}</span>
                                 {option.API_KEY && <span className="middle">API KEY: {option.API_KEY}</span>}
@@ -340,7 +349,9 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
             </div>
           </div>
           <DialogActions>
-            <Button tabIndex={-1} onClick={onCancel}>Cancel</Button>
+            <Button tabIndex={-1} color="inherit" onClick={onCancel}>
+              Cancel
+            </Button>
             <Button type="submit" variant="contained" color="secondary">
               Save
             </Button>

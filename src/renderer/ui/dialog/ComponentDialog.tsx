@@ -12,6 +12,7 @@ import { ResponseStatus } from '@api/Response';
 import { componentService } from '@api/services/component.service';
 import { licenseService } from '@api/services/license.service';
 import { DialogContext } from '@context/DialogProvider';
+import CloseIcon from "@mui/icons-material/Close";
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -121,7 +122,12 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
       open={open}
       onClose={onCancel}
     >
-      <span className="dialog-title">{label}</span>
+      <header className="dialog-title">
+        <span>{label}</span>
+        <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
+          <CloseIcon />
+        </IconButton>
+      </header>
 
       <form onSubmit={handleClose}>
         <div className="dialog-content">
@@ -216,7 +222,6 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                   <TextField
                     name="url"
                     size="small"
-                    required
                     fullWidth
                     value={form?.url}
                     onChange={(e) => inputHandler(e.target.name, e.target.value)}

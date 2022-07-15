@@ -1,5 +1,4 @@
 import React, { useState, useEffect, ReactNode } from 'react';
-import { ipcRenderer } from 'electron';
 import { IpcChannels } from '@api/ipc-channels';
 import { Dependency, Inventory, NewComponentDTO } from '@api/types';
 import { InventoryDialog } from '../ui/dialog/InventoryDialog';

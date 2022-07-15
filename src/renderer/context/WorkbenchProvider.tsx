@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { ipcRenderer } from 'electron';
+import { useLocation } from 'react-router-dom';
 import { Node } from '@api/types';
 import { IpcChannels } from '@api/ipc-channels';
 import { projectService } from '@api/services/project.service';
