@@ -24,7 +24,7 @@ export class Csv extends Format {
 
   // @override
   public async generate() {
-    const data = await this.export.getCsvData();
+    const data = await this.export.getIdentifiedData();
     const csvData = new CsvAdapter().adapt(data);
     const csv = this.csvCreate(csvData);
     return csv;
