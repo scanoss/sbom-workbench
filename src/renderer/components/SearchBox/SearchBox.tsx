@@ -47,6 +47,7 @@ const SearchBox = ({ value, placeholder, responseDelay, disabled, onChange }: Se
         disabled={disabled}
         className={classes.input}
         value={query}
+        onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
         onChange={(e: any) => setQuery(e.target.value)}
         placeholder={placeholder}
         inputProps={{ 'aria-label': placeholder, spellCheck: 'false' }}
