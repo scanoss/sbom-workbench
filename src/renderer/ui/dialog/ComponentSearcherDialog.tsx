@@ -167,7 +167,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                   <TextField
                     name="search"
                     size="small"
-                    focused
+                    autoFocus
                     disabled={loading || disabled}
                     fullWidth
                     value={queryTerm?.search || ''}
@@ -216,8 +216,10 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
               <Paper className="dialog-form-field-control">
                 <Autocomplete
                   size="small"
+                  value="github"
                   options={packages}
                   disabled={loading || disabled}
+                  disableClearable
                   fullWidth
                   onChange={(event, value) => {
                     setQueryTerm({ ...queryTerm, package: value || '' });

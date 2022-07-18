@@ -1,25 +1,13 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
-import {
-  Dialog,
-  Paper,
-  DialogActions,
-  Button,
-  Select,
-  MenuItem,
-  TextField,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+import { Dialog, Paper, DialogActions, Button, Select, MenuItem, TextField, IconButton, Tooltip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import React, { useEffect, useState, useContext } from 'react';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import Alert from '@mui/material/Alert';
-import { ComponentGroup, Inventory } from '@api/types';
+import { Inventory } from '@api/types';
 import { InventoryForm } from '@context/types';
 import { componentService } from '@api/services/component.service';
 import { licenseService } from '@api/services/license.service';
@@ -29,7 +17,7 @@ import { useSelector } from 'react-redux';
 import { selectComponentState } from '@store/component-store/componentSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { makeStyles } from '@mui/styles';
-import CloseIcon from "@mui/icons-material/Close";
+import CloseIcon from '@mui/icons-material/Close';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -132,7 +120,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const openComponentVersionDialog = async () => {
-    // FIXME: This is a hack to get the component name, should be change component dialog to use spdxid.
+    // FIXME: This is a hack to get the license name, should be change the component dialog to use spdxid.
     const license = licenses.find((item) => item.spdxid === form.spdxid);
     const response = await dialogCtrl.openComponentDialog(
       { name: form.component, purl: form.purl, url: form.url, license_name: license?.name },
@@ -312,7 +300,22 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
                 <label>Component</label>
-                <IconButton title="Add new component" tabIndex={-1} color="inherit" size="small" onClick={openComponentDialog}>
+                <IconButton
+                  title="Search for components online"
+                  tabIndex={-1}
+                  color="inherit"
+                  size="small"
+                  onClick={() => openComponentSearcherDialog()}
+                >
+                  <SearchIcon fontSize="inherit" />
+                </IconButton>
+                <IconButton
+                  title="Add new custom component"
+                  tabIndex={-1}
+                  color="inherit"
+                  size="small"
+                  onClick={() => openComponentDialog()}
+                >
                   <AddIcon fontSize="inherit" />
                 </IconButton>
               </div>
@@ -345,7 +348,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                     <li {...props} key={option.purl}>
                       <div className={classes.option}>
                         {option.search ? (
-                          <span color="primary" className="searcher">{ option.name }</span>
+                          <span color="primary" className="searcher">
+                            {option.name}
+                          </span>
                         ) : (
                           <>
                             <span>{option.name}</span>
@@ -378,7 +383,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
                 <label>Version</label>
-                <IconButton  title="Add new version" tabIndex={-1} color="inherit" size="small" onClick={openComponentVersionDialog}>
+                <IconButton
+                  title="Add new version"
+                  tabIndex={-1}
+                  color="inherit"
+                  size="small"
+                  onClick={openComponentVersionDialog}
+                >
                   <AddIcon fontSize="inherit" />
                 </IconButton>
               </div>
@@ -411,7 +422,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
                 <label>License</label>
-                <IconButton title="Add new license" tabIndex={-1} color="inherit" size="small" onClick={openLicenseDialog}>
+                <IconButton
+                  title="Add new license"
+                  tabIndex={-1}
+                  color="inherit"
+                  size="small"
+                  onClick={openLicenseDialog}
+                >
                   <AddIcon fontSize="inherit" />
                 </IconButton>
               </div>

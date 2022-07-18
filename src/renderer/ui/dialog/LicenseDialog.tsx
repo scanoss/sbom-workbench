@@ -1,12 +1,13 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useContext, useEffect, useState } from 'react';
-import { Dialog, Paper, DialogActions, Button, InputBase, TextField } from '@mui/material';
+import {Dialog, Paper, DialogActions, Button, InputBase, TextField, IconButton} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { License } from '@api/types';
 import { licenseService } from '@api/services/license.service';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { DialogContext } from '@context/DialogProvider';
 import { licenseHelper } from '../../../main/helpers/LicenseHelper';
+import CloseIcon from "@mui/icons-material/Close";
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -72,13 +73,26 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
       open={open}
       onClose={onCancel}
     >
-      <span className="dialog-title">Create License</span>
+      <header className="dialog-title">
+        <span>Create License</span>
+        <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
+          <CloseIcon />
+        </IconButton>
+      </header>
+
       <form onSubmit={handleClose}>
         <div className="dialog-content">
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">Name</label>
             <Paper className="dialog-form-field-control">
-              <TextField name="name" size="small" fullWidth value={form?.name} onChange={(e) => inputHandler(e)} />
+              <TextField
+                name="name"
+                size="small"
+                fullWidth
+                autoFocus
+                value={form?.name}
+                onChange={(e) => inputHandler(e)}
+              />
             </Paper>
             <p className="dialog-form-field-hint">
               SpdxID: {form?.name ? licenseHelper.licenseNameToSPDXID(form.name) : '-'}
