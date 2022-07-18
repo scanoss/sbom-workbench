@@ -139,6 +139,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                   name="name"
                   size="small"
                   fullWidth
+                  autoFocus
                   disabled={readOnly}
                   value={form?.name}
                   onChange={(e) => inputHandler(e.target.name, e.target.value)}
