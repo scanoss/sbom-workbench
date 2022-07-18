@@ -166,12 +166,12 @@ const SearchPanel = () => {
   const onMenuActionHandler = () => {
     const menu = [
       {
-        label: 'Identify all files as...',
+        label: 'Identify selected files as...',
         actionId: 'action-identifyAll',
         // click: () => batch.identifyAll(getFilesSelected()),
       },
       {
-        label: 'Mark all files as original',
+        label: 'Mark selected files as original',
         actionId: 'action-markAllAsOriginal',
         // click: () => batch.ignoreAll(getFilesSelected()),
       },
