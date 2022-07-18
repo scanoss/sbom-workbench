@@ -144,7 +144,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const addCustomComponent = async ({ component, created }) => {
-    setGlobalComponents([...components, component]);
+    const nComponents = components.filter((item) => item.purl !== component.purl);
+    setGlobalComponents([...nComponents, component]);
     if (component.versions[0].licenses[0] !== undefined) {
       setLicenses([
         ...licenses,
@@ -341,7 +342,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   }}
                   getOptionLabel={(option) => option.name || ''}
                   renderOption={(props, option, { selected }) => (
-                    <li {...props}>
+                    <li {...props} key={option.purl}>
                       <div className={classes.option}>
                         {option.search ? (
                           <span color="primary" className="searcher">{ option.name }</span>
@@ -428,7 +429,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   isOptionEqualToValue={(option: any) => option.spdxid === form.spdxid}
                   getOptionLabel={(option: any) => option.name || option.spdxid || ''}
                   renderOption={(props, option, { selected }) => (
-                    <li {...props}>
+                    <li {...props} key={option.spdxid}>
                       <div className={classes.option}>
                         <span>{option.name}</span>
                         <span className="middle">{option.spdxid}</span>
