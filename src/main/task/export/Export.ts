@@ -1,5 +1,6 @@
 /* eslint-disable no-async-promise-executor */
 
+import {NewExportDTO} from "api/dto";
 import { Format } from '../../modules/export/Format';
 import { Spdxv20 } from '../../modules/export/format/Spdxv20';
 import { SpdxLite } from '../../modules/export/format/SpdxLite';
@@ -34,16 +35,16 @@ export class Export implements ITask<string, IExportResult> {
     }
   }
 
-  public setFormat(format: string) {
-    switch (format as ExportFormat) {
+  public setFormat(exportDTO: NewExportDTO) {
+    switch (exportDTO.format as ExportFormat) {
       case ExportFormat.SPDX20:
         this.format = new Spdxv20();
         break;
       case ExportFormat.SPDXLITE:
-        this.format = new SpdxLite();
+        this.format = new SpdxLite(exportDTO.source);
         break;
       case ExportFormat.CSV:
-        this.format = new Csv();
+        this.format = new Csv(exportDTO.source);
         break;
       case ExportFormat.RAW:
         this.format = new Raw();
@@ -52,7 +53,7 @@ export class Export implements ITask<string, IExportResult> {
         this.format = new Wfp();
         break;
       case ExportFormat.SPDXLITEJSON:
-        this.format = new SpdxLiteJson();
+        this.format = new SpdxLiteJson(exportDTO.source);
         break;
       case ExportFormat.HTMLSUMMARY:
         this.format = new HtmlSummary();

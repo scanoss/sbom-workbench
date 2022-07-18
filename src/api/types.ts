@@ -152,6 +152,11 @@ export enum ExportFormat {
   HTMLSUMMARY = 'HTMLSUMMARY',
 }
 
+export enum ExportSource {
+  DETECTED = 'DETECTED',
+  IDENTIFIED = 'IDENTIFIED',
+}
+
 export type IParams = Record<PropertyKey, any> & {
   // non-generic interface properties go here
   sort?: string;

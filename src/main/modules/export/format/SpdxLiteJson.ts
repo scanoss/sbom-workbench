@@ -3,6 +3,7 @@ import { Buffer } from 'buffer';
 import { utilModel } from '../../../model/UtilModel';
 import { Format } from '../Format';
 import { workspace } from '../../../workspace/Workspace';
+import { ExportSource } from '../../../../api/types';
 
 const crypto = require('crypto');
 
@@ -12,14 +13,20 @@ export enum LicenseType {
 }
 
 export class SpdxLiteJson extends Format {
-  constructor() {
+  private source: string;
+
+  constructor(source: string) {
     super();
+    this.source = source;
     this.extension = '-SPDXLite.json';
   }
 
   // @override
   public async generate() {
-    const data = await this.export.getIdentifiedData();
+    const data =
+      this.source === ExportSource.IDENTIFIED
+        ? await this.export.getIdentifiedData()
+        : await this.export.getDetectedData();
     const spdx = SpdxLiteJson.template();
     spdx.packages = [];
     for (let i = 0; i < data.length; i += 1) {

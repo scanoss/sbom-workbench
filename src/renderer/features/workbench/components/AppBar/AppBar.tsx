@@ -1,14 +1,14 @@
 import {
-  Toolbar,
-  IconButton,
-  Typography,
   Button,
-  LinearProgress,
   Divider,
-  Tooltip,
   Fade,
+  IconButton,
+  LinearProgress,
   Menu,
   MenuItem,
+  Toolbar,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 
 import React, { useContext, useEffect, useState } from 'react';
@@ -20,14 +20,14 @@ import SearchIcon from '@mui/icons-material/Search';
 
 // eslint-disable-next-line import/no-named-default
 import { default as MaterialAppBar } from '@mui/material/AppBar';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import { useSelector } from 'react-redux';
 import { exportService } from '@api/services/export.service';
-import { ExportFormat, IProject } from '@api/types';
+import { ExportFormat, ExportSource, IProject } from '@api/types';
 import { workspaceService } from '@api/services/workspace.service';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
@@ -231,7 +231,7 @@ const Export = ({ state }) => {
       defaultPath: `${data.work_root}/${data.name}`,
     });
     if (path) {
-      await exportService.export(path, format);
+      await exportService.export({ path, format, source: ExportSource.IDENTIFIED });
     }
   };
 

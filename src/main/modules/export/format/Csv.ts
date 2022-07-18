@@ -1,10 +1,14 @@
 /* eslint-disable no-restricted-syntax */
 import { CsvAdapter } from '../../../task/export/format/formatAdapter/CsvAdapter';
 import { Format } from '../Format';
+import { ExportSource } from '../../../../api/types';
 
 export class Csv extends Format {
-  constructor() {
+  private source: string;
+
+  constructor(source: string) {
     super();
+    this.source = source;
     this.extension = '.csv';
   }
 
@@ -24,7 +28,7 @@ export class Csv extends Format {
 
   // @override
   public async generate() {
-    const data = await this.export.getIdentifiedData();
+    const data = this.source === ExportSource.IDENTIFIED ? await this.export.getIdentifiedData() : null;
     const csvData = new CsvAdapter().adapt(data);
     const csv = this.csvCreate(csvData);
     return csv;
