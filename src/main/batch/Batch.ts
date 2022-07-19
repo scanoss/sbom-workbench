@@ -5,6 +5,8 @@ import { resultService } from '../services/ResultService';
 import { treeService } from '../services/TreeService';
 import { NodeStatus } from '../workspace/tree/Node';
 import { Filter } from './Filter/Filter';
+import { modelProvider } from '../services/ModelProvider';
+import { QueryBuilderFileIdIn } from '../model/queryBuilder/QueryBuilderFilIdIN';
 
 export abstract class Batch {
   private overWrite: boolean;
@@ -43,7 +45,10 @@ export abstract class Batch {
         if (filter) return utilHelper.getArrayFromObjectFilter(aux, value, filter);
         return utilHelper.getArrayFromObject(aux, value);
       }
-      return this.params.source.input;
+      const files = await modelProvider.model.file.getAll(new QueryBuilderFileIdIn(this.params.source.input)); // TODO:FIXME: repeated files in getAll files
+      // If not Overwrite, keep ignored and identified files
+      const result = files.filter((f) => this.overWrite || (!f.ignored && !f.identified)).map((f) => f.id);
+      return [...new Set(result)];
     } catch (e: any) {
       return e;
     }
