@@ -30,8 +30,10 @@ export class SpdxLiteJson extends Format {
     const spdx = SpdxLiteJson.template();
     spdx.packages = [];
     for (let i = 0; i < data.length; i += 1) {
-      const aux = spdx.packages.find(
-        (p) => p.versionInfo === data[i].version && p.externalRefs[0].referenceLocator === data[i].purl
+      const aux = spdx.packages.find((p) =>
+        p.versionInfo === data[i].version
+          ? data[i].version
+          : 'NOASSERTION' && p.externalRefs[0].referenceLocator === data[i].purl
       );
       if (aux !== undefined) {
         if (new RegExp(`\\b${data[i].detected_license}\\b`).test(aux.licenseDeclared) === false) {
@@ -41,12 +43,12 @@ export class SpdxLiteJson extends Format {
         const pkg: any = {};
         pkg.name = data[i].name;
         pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${data[i].purl}@${data[i].version}`).digest('hex')}`; // md5 purl@version
-        pkg.versionInfo = data[i].version;
+        pkg.versionInfo = data[i].version ? data[i].version : 'NOASSERTION';
         pkg.downloadLocation = data[i].url ? data[i].url : 'NOASSERTION';
         pkg.filesAnalyzed = false;
         pkg.homePage = data[i].url;
         pkg.licenseDeclared = data[i].detected_license ? data[i].detected_license : 'NOASSERTION';
-        pkg.licenseConcluded = data[i].identified_license !== 'N/A' ? data[i].identified_license : 'NOASSERTION';
+        pkg.licenseConcluded = this.source === ExportSource.DETECTED ? 'NOASSERTION' : data[i].identified_license;
         pkg.externalRefs = [
           {
             referenceCategory: 'PACKAGE MANAGER',

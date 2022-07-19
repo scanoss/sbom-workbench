@@ -144,17 +144,17 @@ export class Querys {
   SQL_SELECT_INVENTORIES_NOT_HAVING_FILES = `SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories) AND i.source='detected';`;
 
   SQL_GET_IDENTIFIED_DATA = `SELECT DISTINCT i.id AS inventoryId,f.fileId,i.usage,
-i.notes,i.spdxid AS identified_license,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE (SELECT d.originalLicense FROM dependencies d WHERE d.purl=cv.purl AND d.version=cv.version)END) AS detected_license ,
-cv.purl,cv.version,cv.url,(CASE WHEN f.path IS NOT NULL THEN f.path ELSE (SELECT f.path FROM files f WHERE f.fileId=dep.fileId) END) AS path,cv.name AS identified_component,
-(CASE WHEN  r.component IS NOT NULL THEN r.component ELSE dep.component END) AS detected_component,lic.fulltext,lic.official
-FROM inventories i
-LEFT JOIN file_inventories fi ON fi.inventoryid=i.id
-LEFT JOIN files f ON fi.fileId=f.fileId
-LEFT JOIN results r ON r.fileId=f.fileId
-LEFT JOIN component_versions cv ON cv.id=i.cvid
-LEFT JOIN result_license rl ON rl.resultId = r.id
-LEFT JOIN licenses lic ON lic.spdxid=i.spdxid
-LEFT JOIN dependencies dep ON cv.purl=dep.purl AND cv.version=dep.version;`;
+    i.notes,i.spdxid AS identified_license,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE (SELECT d.originalLicense FROM dependencies d WHERE d.purl=cv.purl AND d.version=cv.version)END) AS detected_license ,
+    cv.purl,cv.version,cv.url,(CASE WHEN f.path IS NOT NULL THEN f.path ELSE (SELECT f.path FROM files f WHERE f.fileId=dep.fileId) END) AS path,cv.name AS identified_component,
+    (CASE WHEN  r.component IS NOT NULL THEN r.component ELSE dep.component END) AS detected_component,lic.fulltext,lic.official
+    FROM inventories i
+    LEFT JOIN file_inventories fi ON fi.inventoryid=i.id
+    LEFT JOIN files f ON fi.fileId=f.fileId
+    LEFT JOIN results r ON r.fileId=f.fileId
+    LEFT JOIN component_versions cv ON cv.id=i.cvid
+    LEFT JOIN result_license rl ON rl.resultId = r.id
+    LEFT JOIN licenses lic ON lic.spdxid=i.spdxid
+    LEFT JOIN dependencies dep ON cv.purl=dep.purl AND cv.version=dep.version;`;
 
   SQL_GET_DETECTED_DATA = `SELECT DISTINCT f.fileId,r.idtype AS usage,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE dep.originalLicense END)AS identified_license,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE dep.originalLicense END) AS detected_license ,
            (CASE WHEN r.purl IS NOT NULL THEN r.purl ELSE dep.purl END) AS purl,(CASE WHEN r.version IS NOT NULL THEN r.version ELSE dep.version END) AS version,r.url,(CASE WHEN f.path IS NOT NULL THEN f.path ELSE (SELECT f.path FROM files f WHERE f.fileId=dep.fileId) END) AS path,

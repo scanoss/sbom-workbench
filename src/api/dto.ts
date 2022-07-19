@@ -66,6 +66,6 @@ export type ComponentResultDTO = IComponentResult;
 
 export interface NewExportDTO {
   format: ExportFormat;
-  source?: ExportSource;
+  source: ExportSource;
   path: string;
 }
