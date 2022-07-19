@@ -25,8 +25,7 @@ const WorkbenchModule = () => {
 
   const onInit = () => {
     console.log('Init workbench...');
-    const { path } = scanPath;
-    dispatch(loadProject(path));
+    dispatch(loadProject(scanPath?.path));
 
     return () => {
       console.log('Closing workbench...');
