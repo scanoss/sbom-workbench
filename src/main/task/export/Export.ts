@@ -53,7 +53,7 @@ export class Export implements ITask<string, IExportResult> {
         this.format = new Wfp();
         break;
       case ExportFormat.SPDXLITEJSON:
-        this.format = new SpdxLiteJson(exportDTO.source);
+        this.format = new SpdxLiteJson('DETECTED');
         break;
       case ExportFormat.HTMLSUMMARY:
         this.format = new HtmlSummary();
