@@ -3,7 +3,7 @@ import { QueryBuilder } from './QueryBuilder';
 export class QueryBuilderFileIdIn extends QueryBuilder {
   private value: any;
 
-  constructor(value: any) {
+  constructor(value: Array<number>) {
     super();
     this.value = value;
   }
