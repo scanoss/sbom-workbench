@@ -4,7 +4,7 @@
 import { Dialog, Paper, DialogActions, Button, Select, MenuItem, TextField, IconButton, Tooltip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import React, { useEffect, useState, useContext } from 'react';
+import React, {useEffect, useState, useContext, useRef} from 'react';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import Alert from '@mui/material/Alert';
 import { Inventory } from '@api/types';
@@ -74,7 +74,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const [versions, setVersions] = useState<any[]>([]);
   const [licenses, setLicenses] = useState<any[]>([]);
   const [licensesAll, setLicensesAll] = useState<any[]>();
-  const [loaded, setLoaded] = useState<boolean>(false);
+
+
+  const loaded = useRef<boolean>(false);
 
   const setDefaults = () => setForm(inventory);
 
@@ -95,13 +97,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     setMatchedLicenses(compCatalogue, inventory, catalogue);
 
     const component = compCatalogue.find((item) => item.purl === inventory.purl);
-    if (component) setVersions(component.versions.map((item) => item.version));
 
-    setLoaded(true);
+    if (component) setVersions(component.versions.map((item) => item.version));
+    else loaded.current = true;
   };
 
   const onCloseDialog = () => {
-    setLoaded(false);
+    loaded.current = false;
     setForm({});
   };
 
@@ -244,12 +246,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   useEffect(() => {
-    if (open) onOpenDialog();
-    else onCloseDialog();
-  }, [open]);
+    onOpenDialog();
+    return () => onCloseDialog();
+  }, []);
 
   useEffect(() => {
-    if (!loaded) return;
+    if (!loaded.current) return;
 
     const component = components.find((item) => item.purl === form.purl);
     if (component) {
@@ -259,7 +261,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   }, [form.purl]);
 
   useEffect(() => {
-    if (!loaded) return;
+    if (!loaded.current) return;
 
     const lic = setMatchedLicenses(components, form, licensesAll);
     if (lic) {
@@ -268,8 +270,13 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   }, [form.version]);
 
   useEffect(() => {
-    if (!loaded) return;
-    if (versions && versions[0]) setForm({ ...form, version: versions[0] });
+    // FIXME: this is a simple hack to avoid select the first version on default load. We need to decouple the default load of the effects chain
+    if (!loaded.current && versions && versions[0]) {
+      loaded.current = true;
+    } else if (versions && versions[0]) {
+
+      setForm({ ...form, version: versions[0] });
+    }
   }, [versions]);
 
   return (
