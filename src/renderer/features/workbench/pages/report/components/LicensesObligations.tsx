@@ -49,7 +49,7 @@ const LicensesObligations = ({ data }) => {
               <TableCell>INCOMPATIBLE LICENSES</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody className="selectable">
             {data?.map((license) => (
               <TableRow className="tableRowLicense" key={license.label}>
                 <TableCell component="th" scope="row">

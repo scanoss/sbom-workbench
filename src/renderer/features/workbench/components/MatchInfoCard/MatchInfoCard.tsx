@@ -127,7 +127,7 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
 
         {over && (
           <div
-            className="popover-container"
+            className="popover-container selectable"
             style={{ top: pos.y, left: pos.x }}
             onMouseEnter={() => setOver(true)}
             onMouseLeave={() => setOver(false)}

@@ -45,7 +45,7 @@ const Breadcrumb = () => {
   };
 
   return (
-    <div className="view d-flex mb-3">
+    <div className="view d-flex mb-3 selectable">
       <AccountTreeOutlinedIcon fontSize="inherit" className="mr-1" style={{ marginTop: '4px' }} />
 
       <Breadcrumbs separator="›" aria-label="breadcrumb">

@@ -27,7 +27,7 @@ export default function MatchesForLicense({ data }) {
               <TableCell align="right">Version</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody className="selectable">
             {data.components.map((row, index) => (
               <TableRow key={index}>
                 <TableCell component="th" scope="row" align="left">

@@ -22,14 +22,14 @@ export const ComponentInfo = ({ component }: { component: any }) => {
   return (
     <div className="component-info">
       <div onMouseEnter={() => setOver(true)} onMouseLeave={() => setOver(false)} className="container-component-info">
-        <div className="main-info">
+        <div className="main-info selectable">
           <div>
             <Title title={component?.name} />
           </div>
         </div>
 
         {over ? (
-          <div className="component-details-card">
+          <div className="component-details-card selectable">
             <div className="tiny-container-detail">
               <p className="title-detail">License</p>
               <p className="desc-detail">{license}</p>

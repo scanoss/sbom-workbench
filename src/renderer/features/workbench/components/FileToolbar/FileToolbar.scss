@@ -28,6 +28,7 @@
       }
 
       .MuiListItemText-secondary {
+        @extend .selectable;
         font-size: 0.75rem;
 
         -webkit-line-clamp: 1;
