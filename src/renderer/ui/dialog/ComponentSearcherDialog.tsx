@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Dialog, Paper, IconButton, CircularProgress, TextField, Button, Link } from '@mui/material';
+import {Dialog, Paper, IconButton, CircularProgress, TextField, Button, Link, DialogActions} from '@mui/material';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { componentService } from '@api/services/component.service';
 import { DataGrid } from '@mui/x-data-grid';
@@ -20,6 +20,7 @@ import AppConfig from '@config/AppConfigModule';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import {ComponentResultDTO, SearchComponentDTO} from "@api/dto";
 import IconComponent from '../../features/workbench/components/IconComponent/IconComponent';
+import {IComponentResult} from "../../../main/task/componentCatalog/iComponentCatalog/IComponentResult";
 
 interface ComponentSearcherDialogProps {
   open: boolean;
@@ -72,11 +73,15 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
     search();
   };
 
-  const onRowClickHandler = async ({ row }, event) => {
-    setComponentSelected({ ...row });
+  const onSelectionModelChange = (data, details) => {
+    const componentSelected: IComponentResult = results?.find((el) => el.id === data[0]);
+    setComponentSelected(componentSelected);
   };
 
-  const handleClose = async () => {
+  const handleClose = async (e) => {
+    e.preventDefault();
+    console.log(componentSelected?.purl);
+
     const dialog = await dialogCtrl.createProgressDialog('IMPORTING COMPONENT');
     try {
       const dialogResponse = await dialogCtrl.openConfirmDialog(
@@ -124,10 +129,6 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
     if (open) init();
     else destroy();
   }, [open]);
-
-  useEffect(() => {
-    if (componentSelected) handleClose();
-  }, [componentSelected]);
 
   return (
     <Dialog
@@ -297,10 +298,21 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
           headerHeight={40}
           rowHeight={22}
           disableColumnMenu
-          onRowClick={onRowClickHandler}
+          onSelectionModelChange={onSelectionModelChange}
           hideFooter
         />
       </main>
+
+      <form onSubmit={handleClose}>
+        <DialogActions>
+          <Button tabIndex={-1} onClick={onCancel} color="inherit">
+            Cancel
+          </Button>
+          <Button type="submit" variant="contained" color="secondary" disabled={!componentSelected}>
+            Add to the catalog
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 };
