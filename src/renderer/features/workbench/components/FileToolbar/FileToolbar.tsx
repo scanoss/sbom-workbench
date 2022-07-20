@@ -1,7 +1,7 @@
 import React from 'react';
 
-import CodeViewerManagerInstance from '../../pages/detected/pages/Editor/CodeViewerManager';
 import {IconButton, ListItemText} from "@mui/material";
+import CodeViewerManagerInstance from '../../pages/detected/pages/Editor/CodeViewerManager';
 
 
 export enum ToolbarActions {

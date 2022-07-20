@@ -158,3 +158,12 @@ a {
     opacity: 1;
   }
 }
+
+::selection {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.selectable, .selectable * {
+  -webkit-user-select: text !important;
+}

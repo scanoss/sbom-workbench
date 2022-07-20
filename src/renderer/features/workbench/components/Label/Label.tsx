@@ -12,10 +12,10 @@ const Label = ({ label, textColor, tooltip }: LabelType) => {
     <>
       {tooltip ? (
         <Tooltip title={label || ''}>
-          <span className={`label-boxie-${textColor}`}>{label}</span>
+          <span className={`label-boxie-${textColor} selectable`}>{label}</span>
         </Tooltip>
       ) : (
-        <span className={`label-boxie-${textColor}`}>{label}</span>
+        <span className={`label-boxie-${textColor} selectable`}>{label}</span>
       )}
     </>
   );
