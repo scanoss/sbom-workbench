@@ -12,6 +12,7 @@ export class CsvAdapter{
           detected_license: [],
           purl: curr.purl,
           version: curr.version,
+          latest_version: curr.latest_version,
           path: curr.path,
           identified_component: curr.identified_component,
           detected_component: curr.detected_component,

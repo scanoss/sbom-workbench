@@ -31,22 +31,19 @@ export class SpdxLiteJson extends Format {
     spdx.packages = [];
     spdx.documentDescribes = [];
     for (let i = 0; i < data.length; i += 1) {
-      // Prevents create packages without license or versions, the standard not support that
-      if (data[i].detected_license && data[i].version) {
-        const aux = spdx.packages.find((p) =>
-          p.versionInfo === data[i].version
-            ? data[i].version
-            : 'NOASSERTION' && p.externalRefs[0].referenceLocator === data[i].purl
-        );
-        if (aux !== undefined) {
-          if (new RegExp(`\\b${data[i].detected_license}\\b`).test(aux.licenseDeclared) === false) {
-            aux.licenseDeclared = aux.licenseDeclared.concat(' AND ', data[i].detected_license);
-          }
-        } else {
-          const pkg = this.getPackage(data[i]);
-          spdx.packages.push(pkg);
-          spdx.documentDescribes.push(pkg.SPDXID);
+      const aux = spdx.packages.find((p) =>
+        p.versionInfo === data[i].version
+          ? data[i].version
+          : 'NOASSERTION' && p.externalRefs[0].referenceLocator === data[i].purl
+      );
+      if (aux !== undefined && data[i].detected_license) {
+        if (new RegExp(`\\b${data[i].detected_license}\\b`).test(aux.licenseDeclared) === false) {
+          aux.licenseDeclared = aux.licenseDeclared.concat(' AND ', data[i].detected_license);
         }
+      } else {
+        const pkg = this.getPackage(data[i]);
+        spdx.packages.push(pkg);
+        spdx.documentDescribes.push(pkg.SPDXID);
       }
     }
 
@@ -56,7 +53,6 @@ export class SpdxLiteJson extends Format {
     const hex = hashSum.digest('hex');
 
     spdx.SPDXID = spdx.SPDXID.replace('###', hex);
-
     // Add DocumentNameSpace
     const p = workspace.getOpenProject();
     let projectName = p.getProjectName();
@@ -89,9 +85,9 @@ export class SpdxLiteJson extends Format {
     return buf.toString('base64');
   }
 
-  private getPackage(data: any){
+  private getPackage(data: any) {
     const pkg: any = {};
-    pkg.name = data.identified_component;
+    pkg.name = data.identified_component !== '' ? data.identified_component : data.purl;
     pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${data.purl}@${data.version}`).digest('hex')}`; // md5 purl@version
     pkg.versionInfo = data.version ? data.version : 'NOASSERTION';
     pkg.downloadLocation = data.url ? data.url : 'NOASSERTION';

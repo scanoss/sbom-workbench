@@ -231,7 +231,7 @@ const Export = ({ state }) => {
       defaultPath: `${data.work_root}/${data.name}`,
     });
     if (path) {
-      await exportService.export({ path, format, source: ExportSource.DETECTED });
+      await exportService.export({ path, format, source: ExportSource.IDENTIFIED });
     }
   };
 
