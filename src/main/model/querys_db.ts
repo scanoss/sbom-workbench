@@ -27,7 +27,8 @@ export class Querys {
   DEPENDENCY_TABLE =
     'CREATE TABLE IF NOT EXISTS dependencies (dependencyId INTEGER PRIMARY KEY ASC,fileId INTEGER ,purl TEXT, version TEXT, scope TEXT DEFAULT NULL, rejectedAt DATETIME DEFAULT NULL,licenses TEXT,component TEXT,originalVersion TEXT,originalLicense TEXT,FOREIGN KEY(fileId) REFERENCES files(fileId) ON DELETE CASCADE,UNIQUE(purl,version,fileId));';
 
-  RESULT_LICENSE = 'CREATE TABLE IF NOT EXISTS result_license (resultLicenseId INTEGER PRIMARY KEY,resultId integer NOT NULL ,spdxid varchar(90) NOT NULL, source varchar(45) NOT NULL ,patent_hints varchar(10),copyLeft varchar(10), osadl_updated datetime,incompatible_with text, checklist_url varchar(150),FOREIGN KEY (resultId) REFERENCES results(id) ON DELETE CASCADE, UNIQUE(resultId,source,spdxid));'
+  RESULT_LICENSE =
+    'CREATE TABLE IF NOT EXISTS result_license (resultLicenseId INTEGER PRIMARY KEY,resultId integer NOT NULL ,spdxid varchar(90) NOT NULL, source varchar(45) NOT NULL ,patent_hints varchar(10),copyLeft varchar(10), osadl_updated datetime,incompatible_with text, checklist_url varchar(150),FOREIGN KEY (resultId) REFERENCES results(id) ON DELETE CASCADE, UNIQUE(resultId,source,spdxid));';
 
   SQL_DB_TABLES =
     this.SQL_CREATE_TABLE_RESULTS +
@@ -103,7 +104,7 @@ export class Querys {
   SQL_GET_INVENTORY_BY_ID =
     'SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE i.id=?;';
 
-  SQL_SCAN_SELECT_FILE_RESULTS =`SELECT r.vendor,r.id AS resultId,f.fileId AS id,f.path AS file_path, r.url,r.lines, r.oss_lines, r.matched, r.filename as file, r.idtype as type, r.md5_file, r.md5_comp as url_hash,r.purl, r.version,r.latest_version as latest, f.identified, f.ignored, r.file_url,rl.spdxid,rl.source FROM files f INNER JOIN results r  ON r.fileId=f.fileId LEFT JOIN result_license rl ON r.id=rl.resultId  WHERE f.path=? ORDER BY f.path;`
+  SQL_SCAN_SELECT_FILE_RESULTS = `SELECT r.vendor,r.id AS resultId,f.fileId AS id,f.path AS file_path, r.url,r.lines, r.oss_lines, r.matched, r.filename as file, r.idtype as type, r.md5_file, r.md5_comp as url_hash,r.purl, r.version,r.latest_version as latest, f.identified, f.ignored, r.file_url,rl.spdxid,rl.source FROM files f INNER JOIN results r  ON r.fileId=f.fileId LEFT JOIN result_license rl ON r.id=rl.resultId  WHERE f.path=? ORDER BY f.path;`;
 
   // GET ALL THE INVENTORIES ATTACHED TO A FILE BY PATH
   SQL_SELECT_ALL_INVENTORIES_FROM_FILE =
@@ -142,18 +143,28 @@ export class Querys {
 
   SQL_SELECT_INVENTORIES_NOT_HAVING_FILES = `SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories) AND i.source='detected';`;
 
-  SQL_GET_SPDX_COMP_DATA = `SELECT DISTINCT c.purl,c.version,c.url,c.name,i.spdxid AS concludedLicense,i.notes,l.spdxid AS declareLicense,lic.fulltext,lic.official
-  FROM inventories  i
-  LEFT JOIN license_view l ON l.cvid=i.cvid
-  INNER JOIN component_versions c ON c.id=i.cvid
-  LEFT JOIN licenses lic ON lic.spdxid=i.spdxid;`;
+  SQL_GET_IDENTIFIED_DATA = `SELECT DISTINCT i.id AS inventoryId,f.fileId,i.usage,
+    i.notes,i.spdxid AS identified_license,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE (SELECT d.originalLicense FROM dependencies d WHERE d.purl=cv.purl AND d.version=cv.version)END) AS detected_license ,
+    cv.purl,cv.version,r.latest_version,cv.url,(CASE WHEN f.path IS NOT NULL THEN f.path ELSE (SELECT f.path FROM files f WHERE f.fileId=dep.fileId) END) AS path,cv.name AS identified_component,
+    (CASE WHEN  r.component IS NOT NULL THEN r.component ELSE dep.component END) AS detected_component,lic.fulltext,lic.official
+    FROM inventories i
+    LEFT JOIN file_inventories fi ON fi.inventoryid=i.id
+    LEFT JOIN files f ON fi.fileId=f.fileId
+    LEFT JOIN results r ON r.fileId=f.fileId
+    LEFT JOIN component_versions cv ON cv.id=i.cvid
+    LEFT JOIN result_license rl ON rl.resultId = r.id
+    LEFT JOIN licenses lic ON lic.spdxid=i.spdxid
+    LEFT JOIN dependencies dep ON cv.purl=dep.purl AND cv.version=dep.version;`;
 
-  SQL_GET_CSV_DATA = `SELECT DISTINCT i.id AS inventoryId,f.fileId,i.usage,i.notes,i.spdxid AS identified_license,rl.spdxid AS detected_license,cv.purl,cv.version,f.path,cv.name AS identified_component,r.component AS detected_component
-  FROM inventories i
-  LEFT JOIN file_inventories fi ON fi.inventoryid=i.id
-  LEFT JOIN files f ON fi.fileId=f.fileId
-  LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions cv ON cv.id=i.cvid
-  LEFT JOIN result_license rl ON rl.resultId = r.id;`
+  SQL_GET_DETECTED_DATA = `SELECT DISTINCT f.fileId,r.idtype AS usage,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE dep.originalLicense END)AS identified_license,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE dep.originalLicense END) AS detected_license ,
+           (CASE WHEN r.purl IS NOT NULL THEN r.purl ELSE dep.purl END) AS purl,(CASE WHEN r.version IS NOT NULL THEN r.version ELSE dep.version END) AS version,r.latest_version ,r.url,(CASE WHEN f.path IS NOT NULL THEN f.path ELSE (SELECT f.path FROM files f WHERE f.fileId=dep.fileId) END) AS path,
+           (CASE WHEN r.component IS NOT NULL THEN r.component ELSE dep.component END) AS identified_component,
+           (CASE WHEN  r.component IS NOT NULL THEN r.component ELSE dep.component END) AS detected_component,lic.fulltext,lic.official
+           FROM files f LEFT JOIN results r ON r.fileId=f.fileId
+           LEFT JOIN result_license rl ON rl.resultId = r.id
+           LEFT JOIN licenses lic ON lic.spdxid=rl.spdxid
+           LEFT JOIN dependencies dep ON dep.fileId = f.fileId
+           WHERE f.fileId IN (SELECT fileId FROM results) OR f.fileId IN (SELECT fileId FROM dependencies);`;
 
   SQL_GET_SUMMARY_BY_PURL_VERSION = 'SELECT identified,pending,ignored FROM summary WHERE purl=? AND version=?;';
 
@@ -163,7 +174,6 @@ export class Querys {
   SQL_GET_UNIQUE_COMPONENT = `SELECT DISTINCT purl,version,component AS name,url FROM results WHERE version!='' AND dirty=0;`;
 
   SQL_DELETE_INVENTORY_BY_ID = 'DELETE FROM inventories WHERE id =?';
-
 
   SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION =
     'UPDATE files SET identified=0 WHERE fileId IN (SELECT fileId FROM file_inventories WHERE inventoryid=?)';
@@ -231,5 +241,4 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   INNER JOIN files f ON f.fileId =  d.fileId
   LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version
   LEFT JOIN inventories i ON cv.id = i.cvid AND i.source='declared' AND instr(d.licenses, i.spdxid)>0;`;
-
 }

@@ -1,15 +1,19 @@
+import { ExportSource } from '../../../../api/types';
 import { workspace } from '../../../workspace/Workspace';
 import { Format } from '../Format';
 
 export class SpdxLite extends Format {
-  constructor() {
+  private source: string;
+
+  constructor(source: string) {
     super();
+    this.source = source;
     this.extension = '.SPDXLite.spdx';
   }
 
   // @override
   public async generate() {
-    const data = await this.export.getSpdxData();
+    const data = this.source === ExportSource.IDENTIFIED ? await this.export.getIdentifiedData() : null;
     let spdxLite = SpdxLite.templateHeader();
     let body = '';
     for (let i = 0; i < data.length; i += 1) {

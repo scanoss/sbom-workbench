@@ -18,10 +18,10 @@ export class ExportModel {
     this.query = new Querys();
   }
 
-  public getSpdxData() {
+  public getIdentifiedData() {
     return new Promise<any>((resolve, reject) => {
       try {
-        this.db.all(this.query.SQL_GET_SPDX_COMP_DATA, async (err: any, data: any) => {
+        this.db.all(this.query.SQL_GET_IDENTIFIED_DATA, async (err: any, data: any) => {
           this.db.close();
           if (err) throw err;
           else resolve(data);
@@ -32,13 +32,13 @@ export class ExportModel {
     });
   }
 
-  public getCsvData() {
+  public getDetectedData() {
     return new Promise<any>((resolve, reject) => {
       try {
-        this.db.all(this.query.SQL_GET_CSV_DATA, async (err: any, data: any) => {
+        this.db.all(this.query.SQL_GET_DETECTED_DATA, async (err: any, detected: any) => {
           this.db.close();
           if (err) throw err;
-          else resolve(data);
+          resolve(detected);
         });
       } catch (error) {
         reject(error);

@@ -3,6 +3,7 @@ import { Buffer } from 'buffer';
 import { utilModel } from '../../../model/UtilModel';
 import { Format } from '../Format';
 import { workspace } from '../../../workspace/Workspace';
+import { ExportSource } from '../../../../api/types';
 
 const crypto = require('crypto');
 
@@ -12,43 +13,37 @@ export enum LicenseType {
 }
 
 export class SpdxLiteJson extends Format {
-  constructor() {
+  private source: string;
+
+  constructor(source: string) {
     super();
+    this.source = source;
     this.extension = '-SPDXLite.json';
   }
 
   // @override
   public async generate() {
-    const data = await this.export.getSpdxData();
+    const data =
+      this.source === ExportSource.IDENTIFIED
+        ? await this.export.getIdentifiedData()
+        : await this.export.getDetectedData();
     const spdx = SpdxLiteJson.template();
     spdx.packages = [];
+    spdx.documentDescribes = [];
     for (let i = 0; i < data.length; i += 1) {
-      const aux = spdx.packages.find(
-        (p) => p.versionInfo === data[i].version && p.externalRefs[0].referenceLocator === data[i].purl
+      const aux = spdx.packages.find((p) =>
+        p.versionInfo === data[i].version
+          ? data[i].version
+          : 'NOASSERTION' && p.externalRefs[0].referenceLocator === data[i].purl
       );
-      if (aux !== undefined) {
-        if (new RegExp(`\\b${data[i].declareLicense}\\b`).test(aux.licenseDeclared) === false) {
-          aux.licenseDeclared = aux.licenseDeclared.concat(' AND ', data[i].declareLicense);
+      if (aux !== undefined && data[i].detected_license) {
+        if (new RegExp(`\\b${data[i].detected_license}\\b`).test(aux.licenseDeclared) === false) {
+          aux.licenseDeclared = aux.licenseDeclared.concat(' AND ', data[i].detected_license);
         }
       } else {
-        const pkg: any = {};
-        pkg.name = data[i].name;
-        pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${data[i].purl}@${data[i].version}`).digest('hex')}`; // md5 purl@version
-        pkg.versionInfo = data[i].version;
-        pkg.downloadLocation = data[i].url ? data[i].url : 'NOASSERTION';
-        pkg.filesAnalyzed = false;
-        pkg.homePage = data[i].url;
-        pkg.licenseDeclared = data[i].declareLicense ? data[i].declareLicense : 'NOASSERTION';
-        pkg.licenseConcluded = data[i].concludedLicense !== 'N/A' ? data[i].concludedLicense : 'NOASSERTION';
-        pkg.externalRefs = [
-          {
-            referenceCategory: 'PACKAGE MANAGER',
-            referenceLocator: data[i].purl,
-            referenceType: 'purl',
-          },
-        ];
-        if (data[i].official === LicenseType.CUSTOM) pkg.ExtractedText = this.fulltextToBase64(data[i].fulltext);
+        const pkg = this.getPackage(data[i]);
         spdx.packages.push(pkg);
+        spdx.documentDescribes.push(pkg.SPDXID);
       }
     }
 
@@ -58,7 +53,6 @@ export class SpdxLiteJson extends Format {
     const hex = hashSum.digest('hex');
 
     spdx.SPDXID = spdx.SPDXID.replace('###', hex);
-
     // Add DocumentNameSpace
     const p = workspace.getOpenProject();
     let projectName = p.getProjectName();
@@ -81,6 +75,7 @@ export class SpdxLiteJson extends Format {
         created: utilModel.getTimeStamp(),
       },
       packages: [] as any,
+      documentDescribes: [] as any,
     };
     return spdx;
   }
@@ -88,5 +83,30 @@ export class SpdxLiteJson extends Format {
   private fulltextToBase64(fulltext: string) {
     const buf = Buffer.from(fulltext);
     return buf.toString('base64');
+  }
+
+  private getPackage(data: any) {
+    const pkg: any = {};
+    pkg.name = data.identified_component !== '' ? data.identified_component : data.purl;
+    pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${data.purl}@${data.version}`).digest('hex')}`; // md5 purl@version
+    pkg.versionInfo = data.version ? data.version : 'NOASSERTION';
+    pkg.downloadLocation = data.url ? data.url : 'NOASSERTION';
+    pkg.filesAnalyzed = false;
+    pkg.homepage = data.url || 'NOASSERTION';
+    pkg.licenseDeclared = data.detected_license ? data.detected_license : 'NOASSERTION';
+    pkg.licenseConcluded = this.source === ExportSource.DETECTED ? 'NOASSERTION' : data.identified_license;
+    if (data.official === LicenseType.CUSTOM) {
+      pkg.copyrightText = this.fulltextToBase64(data.fulltext);
+    } else {
+      pkg.copyrightText = 'NOASSERTION';
+    }
+    pkg.externalRefs = [
+      {
+        referenceCategory: 'PACKAGE_MANAGER',
+        referenceLocator: data.purl,
+        referenceType: 'purl',
+      },
+    ];
+    return pkg;
   }
 }

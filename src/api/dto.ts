@@ -1,6 +1,6 @@
-import {ComponentGroup, Dependency} from '@api/types';
-import {ISearchComponent} from "../main/task/componentCatalog/iComponentCatalog/ISearchComponent";
-import {IComponentResult} from "../main/task/componentCatalog/iComponentCatalog/IComponentResult";
+import { ComponentGroup, Dependency, ExportFormat, ExportSource } from '@api/types';
+import { ISearchComponent } from '../main/task/componentCatalog/iComponentCatalog/ISearchComponent';
+import { IComponentResult } from '../main/task/componentCatalog/iComponentCatalog/IComponentResult';
 
 export interface NewDependencyDTO {
   dependencyId?: number;
@@ -63,3 +63,9 @@ export interface IAppInfo {
 export type SearchComponentDTO = ISearchComponent;
 
 export type ComponentResultDTO = IComponentResult;
+
+export interface NewExportDTO {
+  format: ExportFormat;
+  source: ExportSource;
+  path: string;
+}
