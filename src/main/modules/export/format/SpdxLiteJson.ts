@@ -29,35 +29,24 @@ export class SpdxLiteJson extends Format {
         : await this.export.getDetectedData();
     const spdx = SpdxLiteJson.template();
     spdx.packages = [];
+    spdx.documentDescribes = [];
     for (let i = 0; i < data.length; i += 1) {
-      const aux = spdx.packages.find((p) =>
-        p.versionInfo === data[i].version
-          ? data[i].version
-          : 'NOASSERTION' && p.externalRefs[0].referenceLocator === data[i].purl
-      );
-      if (aux !== undefined) {
-        if (new RegExp(`\\b${data[i].detected_license}\\b`).test(aux.licenseDeclared) === false) {
-          aux.licenseDeclared = aux.licenseDeclared.concat(' AND ', data[i].detected_license);
+      // Prevents create packages without license or versions, the standard not support that
+      if (data[i].detected_license && data[i].version) {
+        const aux = spdx.packages.find((p) =>
+          p.versionInfo === data[i].version
+            ? data[i].version
+            : 'NOASSERTION' && p.externalRefs[0].referenceLocator === data[i].purl
+        );
+        if (aux !== undefined) {
+          if (new RegExp(`\\b${data[i].detected_license}\\b`).test(aux.licenseDeclared) === false) {
+            aux.licenseDeclared = aux.licenseDeclared.concat(' AND ', data[i].detected_license);
+          }
+        } else {
+          const pkg = this.getPackage(data[i]);
+          spdx.packages.push(pkg);
+          spdx.documentDescribes.push(pkg.SPDXID);
         }
-      } else {
-        const pkg: any = {};
-        pkg.name = data[i].name;
-        pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${data[i].purl}@${data[i].version}`).digest('hex')}`; // md5 purl@version
-        pkg.versionInfo = data[i].version ? data[i].version : 'NOASSERTION';
-        pkg.downloadLocation = data[i].url ? data[i].url : 'NOASSERTION';
-        pkg.filesAnalyzed = false;
-        pkg.homePage = data[i].url;
-        pkg.licenseDeclared = data[i].detected_license ? data[i].detected_license : 'NOASSERTION';
-        pkg.licenseConcluded = this.source === ExportSource.DETECTED ? 'NOASSERTION' : data[i].identified_license;
-        pkg.externalRefs = [
-          {
-            referenceCategory: 'PACKAGE MANAGER',
-            referenceLocator: data[i].purl,
-            referenceType: 'purl',
-          },
-        ];
-        if (data[i].official === LicenseType.CUSTOM) pkg.ExtractedText = this.fulltextToBase64(data[i].fulltext);
-        spdx.packages.push(pkg);
       }
     }
 
@@ -90,6 +79,7 @@ export class SpdxLiteJson extends Format {
         created: utilModel.getTimeStamp(),
       },
       packages: [] as any,
+      documentDescribes: [] as any,
     };
     return spdx;
   }
@@ -97,5 +87,30 @@ export class SpdxLiteJson extends Format {
   private fulltextToBase64(fulltext: string) {
     const buf = Buffer.from(fulltext);
     return buf.toString('base64');
+  }
+
+  private getPackage(data: any){
+    const pkg: any = {};
+    pkg.name = data.identified_component;
+    pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${data.purl}@${data.version}`).digest('hex')}`; // md5 purl@version
+    pkg.versionInfo = data.version ? data.version : 'NOASSERTION';
+    pkg.downloadLocation = data.url ? data.url : 'NOASSERTION';
+    pkg.filesAnalyzed = false;
+    pkg.homepage = data.url || 'NOASSERTION';
+    pkg.licenseDeclared = data.detected_license ? data.detected_license : 'NOASSERTION';
+    pkg.licenseConcluded = this.source === ExportSource.DETECTED ? 'NOASSERTION' : data.identified_license;
+    if (data.official === LicenseType.CUSTOM) {
+      pkg.copyrightText = this.fulltextToBase64(data.fulltext);
+    } else {
+      pkg.copyrightText = 'NOASSERTION';
+    }
+    pkg.externalRefs = [
+      {
+        referenceCategory: 'PACKAGE_MANAGER',
+        referenceLocator: data.purl,
+        referenceType: 'purl',
+      },
+    ];
+    return pkg;
   }
 }
