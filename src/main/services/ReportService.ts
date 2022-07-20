@@ -1,5 +1,6 @@
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
+import { Dependency } from '../../api/types';
 
 interface licenseEntry {
   label: string;
@@ -26,22 +27,22 @@ interface inventoryProgress {
 }
 
 export interface ISummary {
-  summary:{
+  summary: {
     matchFiles: number;
-    noMatchFiles:number;
-    filterFiles:number;
-    totalFiles:number;
-  },
-  identified:{
-    scan:number;
-    total:number;
-  },
-  pending:number;
-  original:number;
+    noMatchFiles: number;
+    filterFiles: number;
+    totalFiles: number;
+  };
+  identified: {
+    scan: number;
+    total: number;
+  };
+  pending: number;
+  original: number;
 }
 
-class ReportService  {
-  public async getReportSummary():Promise<ISummary> {
+class ReportService {
+  public async getReportSummary(): Promise<ISummary> {
     try {
       const auxSummary = await modelProvider.model.file.getSummary();
       const summary = {
@@ -50,12 +51,13 @@ class ReportService  {
           noMatchFiles: auxSummary.noMatchFiles,
           filterFiles: auxSummary.filterFiles,
           totalFiles: auxSummary.totalFiles,
-        },identified: {
+        },
+        identified: {
           scan: auxSummary.scannedIdentified,
           total: auxSummary.totalIdentified,
         },
-        pending:auxSummary.pending,
-        original:auxSummary.original,
+        pending: auxSummary.pending,
+        original: auxSummary.original,
       } as ISummary;
       return summary;
     } catch (error) {
@@ -119,8 +121,8 @@ class ReportService  {
       const a = await workspace.getOpenedProjects()[0].getResults();
       for (const [key, results] of Object.entries(a)) {
         for (const result of results) {
-          if (result.id != 'none') {
-            if (result.licenses != undefined && result.licenses[0] != undefined) {
+          if (result.id !== 'none') {
+            if (result.licenses !== undefined && result.licenses[0] !== undefined) {
               if (!licenses.some((l) => l.label === result.licenses[0].name)) {
                 const newLicense = {
                   label: '',
@@ -160,7 +162,7 @@ class ReportService  {
               }
             }
             // Crypto
-            if (result.cryptography != undefined && result.cryptography[0] != undefined) {
+            if (result.cryptography !== undefined && result.cryptography[0] !== undefined) {
               if (!crypto.some((l) => l.label === result.cryptography[0].algorithm)) {
                 const newCrypto = { label: '', files: [], value: 1 };
                 newCrypto.label = result.cryptography[0].algorithm;
@@ -206,10 +208,9 @@ class ReportService  {
       vulnerabilities.high = vulnerabilitiesLists.high.length;
       vulnerabilities.moderate = vulnerabilitiesLists.moderate.length;
       vulnerabilities.low = vulnerabilitiesLists.low.length;
-
+      const dependencies = await modelProvider.model.dependency.getAll(null);
+      licenses = await this.mergeLicenseData(licenses, dependencies);
       if (licenses) this.checkForIncompatibilities(licenses);
-      // un-comment next line to output report data
-      // console.log(JSON.stringify({ licenses, crypto, summary }));
 
       return { licenses, crypto, vulnerabilities };
     } catch (e) {
@@ -230,6 +231,93 @@ class ReportService  {
             license.has_incompatibles.push(license.incompatibles[i]);
         }
     }
+  }
+
+  private async mergeLicenseData(licenses: licenseEntry[], dependencies: Array<any>): Promise<Array<licenseEntry>> {
+    const licenseMapper = licenses.reduce((acc, curr) => {
+      if (!acc[curr.label]) acc[curr.label] = curr;
+      return acc;
+    }, {} as any);
+
+    dependencies.forEach((dep) => {
+      if (!dep.originalLicense) {
+        if (dep.version || dep.purl || dep.component !== '') {
+          if (!licenseMapper.unknown) {
+            licenseMapper.unknown = {
+              components: [
+                {
+                  name: dep.component !== '' ? dep.component : dep.purl,
+                  vendor: null,
+                  version: dep.version,
+                  purl: dep.purl,
+                },
+              ],
+              label: 'unknown',
+              value: 1,
+              incompatibles: [],
+              has_incompatibles: [],
+              patent_hints: false,
+              copyleft: false,
+            };
+          } else
+            licenseMapper.unknown.components.push({
+              name: dep.component !== '' ? dep.component : dep.purl,
+              vendor: null,
+              version: dep.version,
+              purl: dep.purl,
+            });
+        }
+      } else {
+        dep.originalLicense?.forEach((l) => {
+          if (licenseMapper[l]) {
+            const componentIndex = licenseMapper[l].components.findIndex(
+              (c) => c.purl === dep.purl && c.version === dep.version
+            );
+            if (componentIndex > 0)
+              licenseMapper[l].components[componentIndex].push({
+                name: dep.componentName,
+                vendor: null,
+                version: dep.version,
+                purl: dep.purl,
+              });
+            else {
+              licenseMapper[l].components.push({
+                name: dep.componentName,
+                vendor: null,
+                version: dep.version,
+                purl: dep.purl,
+              });
+            }
+          } else {
+            licenseMapper[l] = {
+              components: [
+                {
+                  name: dep.componentName,
+                  vendor: null,
+                  version: dep.version,
+                  purl: dep.purl,
+                },
+              ],
+              label: l,
+              value: 1,
+              incompatibles: [],
+              has_incompatibles: [],
+              patent_hints: false,
+              copyleft: false,
+            };
+          }
+        });
+      }
+    });
+    // Used to position the unknown license element to the end of the array
+    const licenseArray = (Object.values(licenseMapper)) as Array<licenseEntry>;
+    if(licenseMapper.unknown){
+      const index = licenseArray.findIndex((l=> l.label === 'unknown'));
+      const aux = licenseArray[index];
+      licenseArray.splice(index,1)
+      licenseArray.push(aux);
+    }
+    return licenseArray as Array<licenseEntry>;
   }
 }
 
