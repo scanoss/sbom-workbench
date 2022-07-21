@@ -1,11 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Chart, registerables } from 'chart.js';
 import { Card } from '@mui/material';
 import LicensesChart from '../components/LicensesChart';
 import LicensesTable from '../components/LicensesTable';
 import MatchesForLicense from '../components/MatchesForLicense';
 import MatchesChart from '../components/MatchesChart';
-import VulnerabilitiesCard from '../components/VulnerabilitiesCard';
 import LicensesObligations from '../components/LicensesObligations';
 
 Chart.register(...registerables);
@@ -17,6 +16,10 @@ const DetectedReport = ({ data }) => {
     const matchedLicense = data.licenses.find((item) => item?.label === license);
     setMatchedLicenseSelected(matchedLicense);
   };
+
+  if (!data.licenses) {
+    return '';
+  }
 
   return (
     <>

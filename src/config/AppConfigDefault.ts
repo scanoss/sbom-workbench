@@ -15,10 +15,10 @@ export const AppConfigDefault: IAppConfig = {
   FF_ENABLE_COMPONENT_LOGO: true,
   FF_ENABLE_WORKBENCH_FILTERS: true,
   FF_EXPORT_FORMAT_OPTIONS: [
+    ExportFormat.RAW,
+    ExportFormat.WFP,
     ExportFormat.CSV,
     ExportFormat.SPDXLITEJSON,
-    ExportFormat.WFP,
-    ExportFormat.RAW,
     ExportFormat.HTMLSUMMARY,
   ],
   FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN: false,

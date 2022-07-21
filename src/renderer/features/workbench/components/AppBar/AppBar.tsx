@@ -189,124 +189,11 @@ const AppTitle = ({ title }) => {
   );
 };
 
-const Export = ({ state }) => {
-  const dialogCtrl = useContext(DialogContext) as IDialogContext;
-
-  const exportLabels = {
-    CSV: { label: 'CSV', showNoProgress: false, hint: 'Export Comma Separate Value identification report' },
-    SPDXLITEJSON: { label: 'SPDX Lite', showOnNoneProgress: false, hint: 'Export an SPDX compliant SBOM report' },
-    WFP: { label: 'WFP', showNoProgress: true, hint: 'Export the Winnowing Fingerprint data of the scanned project' },
-    RAW: { label: 'RAW', showNoProgress: true, hint: 'Export the raw JSON responses from the SCANOSS Platform' },
-    HTMLSUMMARY: {
-      label: 'HTML Summary',
-      showNoProgress: true,
-      hint: 'Export a HTML summary of the Identification report',
-    },
-  };
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-
-  const onExportClicked = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const onExport = async (format: ExportFormat) => {
-    if (state.progress === 0 && !exportLabels[format].showNoProgress) {
-      await dialogCtrl.openAlertDialog(
-        'Warning: you need to accept the results before export in order to confirm the scanner output. '
-      );
-    }
-
-    await exportFile(format);
-    handleClose();
-  };
-
-  const exportFile = async (format: ExportFormat) => {
-    const data: IProject = await workspaceService.getProjectDTO();
-    const path = await dialogController.showSaveDialog({
-      defaultPath: `${data.work_root}/${data.name}`,
-    });
-    if (path) {
-      await exportService.export({ path, format, source: ExportSource.IDENTIFIED });
-    }
-  };
-
-  return (
-    <div>
-      {!AppConfig.FF_EXPORT_FORMAT_OPTIONS ||
-        (AppConfig.FF_EXPORT_FORMAT_OPTIONS.length === 0 && (
-          <Button
-            startIcon={<GetAppIcon />}
-            aria-controls="customized-menu"
-            aria-haspopup="true"
-            variant="contained"
-            color="primary"
-            disabled
-          >
-            Export
-          </Button>
-        ))}
-
-      {AppConfig.FF_EXPORT_FORMAT_OPTIONS && AppConfig.FF_EXPORT_FORMAT_OPTIONS.length === 1 && (
-        <Button
-          startIcon={<GetAppIcon />}
-          aria-controls="customized-menu"
-          aria-haspopup="true"
-          variant="contained"
-          color="primary"
-          onClick={() => onExport(AppConfig.FF_EXPORT_FORMAT_OPTIONS[0] as ExportFormat)}
-          disabled={state.progress === 0 && !exportLabels[AppConfig.FF_EXPORT_FORMAT_OPTIONS[0]].showNoProgress}
-        >
-          Export {exportLabels[AppConfig.FF_EXPORT_FORMAT_OPTIONS[0]].label}
-        </Button>
-      )}
-
-      {AppConfig.FF_EXPORT_FORMAT_OPTIONS && AppConfig.FF_EXPORT_FORMAT_OPTIONS.length > 1 && (
-        <>
-          <Button
-            startIcon={<GetAppIcon />}
-            aria-controls="customized-menu"
-            aria-haspopup="true"
-            variant="contained"
-            color="primary"
-            onClick={onExportClicked}
-          >
-            Export
-          </Button>
-          <Menu anchorEl={anchorEl} keepMounted open={open} onClose={handleClose} TransitionComponent={Fade}>
-            {AppConfig.FF_EXPORT_FORMAT_OPTIONS.map(
-              (format) =>
-                exportLabels[format] && (
-                  <Tooltip key={format} title={exportLabels[format].hint} placement="left" arrow>
-                    <MenuItem
-                      /* disabled={state.progress === 0 && !exportLabels[format].showNoProgress} */
-                      onClick={() => onExport(format as ExportFormat)}
-                    >
-                      {exportLabels[format].label}
-                    </MenuItem>
-                  </Tooltip>
-                )
-            )}
-          </Menu>
-        </>
-      )}
-    </div>
-  );
-};
-
 const AppBar = ({ exp }) => {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const state = useSelector(selectWorkbench);
-  const report = pathname.startsWith('/workbench/report');
 
-  const onBackPressed = () => {
-    navigate('/workspace');
-  };
+  const onBackPressed = () =>  navigate('/workspace');
 
   return (
     <>
@@ -327,7 +214,7 @@ const AppBar = ({ exp }) => {
           <AppTitle title={state.name} />
 
           <div className="slot end">
-            {!report ? <AppProgress summary={state.summary} progress={state.progress} /> : <Export state={state} />}
+            <AppProgress summary={state.summary} progress={state.progress} />
           </div>
         </Toolbar>
       </MaterialAppBar>

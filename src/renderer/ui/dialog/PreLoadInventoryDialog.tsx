@@ -4,7 +4,7 @@ import {
   Checkbox,
   Dialog,
   DialogContent,
-  FormControlLabel,
+  FormControlLabel, IconButton,
   ListItem,
   ListItemIcon,
   Paper,
@@ -19,6 +19,7 @@ import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { inventoryService } from '@api/services/inventory.service';
 import { InventorySourceType } from '@api/types';
+import CloseIcon from "@mui/icons-material/Close";
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -151,7 +152,13 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
       onClose={onCancel}
       className={`${classes.size} dialog`}
     >
-      <span className="dialog-title">Accept All</span>
+      <header className="dialog-title">
+        <span>Accept All</span>
+        <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
+          <CloseIcon />
+        </IconButton>
+      </header>
+
       <DialogContent>
         {isFilterActive && (
           <Alert className="mt-1 mb-1" severity="info">
@@ -276,7 +283,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
         </div>
         <form onSubmit={onSubmit}>
           <div className="button-container">
-            <Button onClick={onCancel}>Cancel</Button>
+            <Button color="inherit" tabIndex={-1} onClick={onCancel}>Cancel</Button>
             <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
               Identify
             </Button>

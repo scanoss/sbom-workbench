@@ -25,6 +25,8 @@ declare global {
     };
     path: {
       resolve(p: string, s: string): string;
+      basename(path: string, extension?: string): string;
+      dirname(path: string): string;
       sep: string;
     };
     app: {

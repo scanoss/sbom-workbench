@@ -28,9 +28,6 @@ const LicensesObligations = ({ data }) => {
       return acc;
     }, {});
 
-    console.log(aux);
-    console.log(data)
-
     setLicenseHash(aux);
   };
 
