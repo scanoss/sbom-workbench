@@ -38,7 +38,10 @@ export class SpdxLiteJson extends Format {
       );
       if (aux !== undefined && data[i].detected_license) {
         if (new RegExp(`\\b${data[i].detected_license}\\b`).test(aux.licenseDeclared) === false) {
-          aux.licenseDeclared = aux.licenseDeclared.concat(' AND ', data[i].detected_license);
+          aux.licenseDeclared =
+            aux.licenseDeclared === 'NOASSERTION'
+              ? aux.licenseDeclared.replace('NOASSERTION', data[i].detected_license) // Not concat when NOASSERTION exists
+              : aux.licenseDeclared.concat(' AND ', data[i].detected_license);
         }
       } else {
         const pkg = this.getPackage(data[i]);
