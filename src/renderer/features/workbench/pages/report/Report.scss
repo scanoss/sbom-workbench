@@ -40,37 +40,38 @@
 
   .report-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
     grid-gap: 20px;
+    grid-template-columns: 1fr 1fr;
     margin-bottom: 16px;
 
-
     &.detected {
-      grid-template-rows: repeat(3, max-content);
+      grid-template-rows: 350px 150px auto;
 
-      .matches-for-license {
-        grid-row: 1/3;
-        grid-column: 2/3;
-      }
+      grid-template-areas:  "A B"
+                            "C B"
+                            "D D";
 
+      .licenses { grid-area: A; }
+      .matches { grid-area: C; }
+      .matches-for-license { grid-area: B; }
+      .licenses-obligation { grid-area: D; }
     }
 
     &.identified {
-      grid-template-rows: repeat(4, max-content);
+      grid-template-rows: auto auto 400px auto;
+      grid-template-areas:  "A A"
+                            "B B"
+                            "C D"
+                            "E E";
 
-      .identification-progress {
-        grid-column: 1/3;
-      }
+      .identification-progress { grid-area: A; }
+      .oss-original { grid-area: B; }
+      .licenses { grid-area: C }
+      .matches-for-license { grid-area: D; }
+      .licenses-obligation { grid-area: E; }
     }
 
-    .licenses-obligation {
-      grid-column: 1/3;
-    }
-
-
-
-
-    .report-item, .report-item-long {
+    .report-item {
       padding: 16px;
 
       .report-title {
@@ -88,9 +89,6 @@
       }
     }
 
-    .report-item-long {
-      height: 370px;
-    }
 
     .report-item.long-license-list , .report-item.licenses {
       display: flex;
@@ -222,8 +220,9 @@
   justify-self: center;
 }
 
-.report-second,.license-long-list-container {
+.report-full {
   display: grid;
+  height: calc(100% - 20px);
   grid-template-columns: 50% 50%;
   justify-content: space-between;
   align-items: center;

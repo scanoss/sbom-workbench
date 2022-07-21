@@ -13,13 +13,11 @@ import OssVsOriginalProgressBar from '../components/OssVsOriginalProgressBar';
 
 Chart.register(...registerables);
 
-const MAX_LICENSES = 4;
-
 const IdentifiedReport = ({ data }) => {
   const navigate = useNavigate();
   const [obligations, setObligations] = useState(null);
+  const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
 
-  const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
   const isEmpty = data.summary.identified.scan === 0 && data.summary.original === 0 && data.licenses.length === 0;
 
   const init = async () => {
@@ -61,19 +59,18 @@ const IdentifiedReport = ({ data }) => {
           <div className="report-title">Identification Progress</div>
           <IdentificationProgress data={data.summary} />
         </Card>
-        <Card className="report-item identification-progress">
+        <Card className="report-item oss-original">
           <div className="report-title">OSS vs Original</div>
           <OssVsOriginalProgressBar data={data.summary} />
         </Card>
-        <Card
-          className={data.licenses.length <= MAX_LICENSES ? 'report-item licenses' : 'report-item long-license-list'}
-        >
+
+        <Card className="report-item licenses">
           <div className="report-title">Licenses</div>
           {data.licenses.length > 0 ? (
-            <div className={data.licenses.length <= MAX_LICENSES ? 'report-second' : 'license-long-list-container'}>
+            <div className="report-full">
               <LicensesChart data={data.licenses} />
               <LicensesTable
-                matchedLicenseSelected={matchedLicenseSelected || data.licenses?.[0]}
+                matchedLicenseSelected={matchedLicenseSelected}
                 selectLicense={(license) => onLicenseSelected(license)}
                 data={data.licenses}
               />
@@ -82,16 +79,11 @@ const IdentifiedReport = ({ data }) => {
             <p className="report-empty">No licenses found</p>
           )}
         </Card>
-        <Card
-          className={
-            data.licenses.length <= MAX_LICENSES
-              ? 'report-item matches-for-license'
-              : 'report-item-long matches-for-licenses'
-          }
-        >
-          <div className="report-title">Matches for license</div>
+
+        <Card className="report-item matches-for-license">
+          <div className="report-title">Matches for {matchedLicenseSelected?.label}</div>
           {data.licenses.length > 0 ? (
-            <MatchesForLicense data={matchedLicenseSelected || data.licenses?.[0]} />
+            <MatchesForLicense data={matchedLicenseSelected} />
           ) : (
             <p className="report-empty">No matches found</p>
           )}

@@ -16,6 +16,8 @@ const useStyles = makeStyles({
 export default function MatchesForLicense({ data }) {
   const classes = useStyles();
 
+  console.log(data);
+
   return (
     <>
       <TableContainer>

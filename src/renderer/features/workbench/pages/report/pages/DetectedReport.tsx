@@ -10,7 +10,7 @@ import LicensesObligations from '../components/LicensesObligations';
 Chart.register(...registerables);
 
 const DetectedReport = ({ data }) => {
-  const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<string>(null);
+  const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
 
   const onLicenseSelected = (license: string) => {
     const matchedLicense = data.licenses.find((item) => item?.label === license);
@@ -24,13 +24,13 @@ const DetectedReport = ({ data }) => {
   return (
     <>
       <section className="report-layout detected">
-        <Card className={data.licenses.length < 4 ? 'report-item licenses' : 'report-item long-license-list'}>
+        <Card className="report-item licenses">
           <div className="report-title">Licenses</div>
           {data.licenses.length > 0 ? (
-            <div className={data.licenses.length < 4 ? 'report-second' : 'license-long-list-container'}>
+            <div className="report-full">
               <LicensesChart data={data.licenses} />
               <LicensesTable
-                matchedLicenseSelected={matchedLicenseSelected || data.licenses?.[0]}
+                matchedLicenseSelected={matchedLicenseSelected}
                 selectLicense={(license) => onLicenseSelected(license)}
                 data={data.licenses}
               />
@@ -41,9 +41,9 @@ const DetectedReport = ({ data }) => {
         </Card>
 
         <Card className="report-item matches-for-license">
-          <div className="report-title">Matches for license</div>
+          <div className="report-title">Matches for {matchedLicenseSelected?.label}</div>
           {data.licenses.length > 0 ? (
-            <MatchesForLicense data={matchedLicenseSelected || data.licenses?.[0]} />
+            <MatchesForLicense data={matchedLicenseSelected} />
           ) : (
             <p className="report-empty">No matches found</p>
           )}
