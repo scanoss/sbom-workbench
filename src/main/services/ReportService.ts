@@ -273,14 +273,14 @@ class ReportService {
             const componentIndex = licenseMapper[l].components.findIndex(
               (c) => c.purl === dep.purl && c.version === dep.version
             );
-            if (componentIndex > 0)
-              licenseMapper[l].components[componentIndex].push({
+            if (componentIndex < 0) {
+              licenseMapper[l].components.push({
                 name: dep.componentName,
                 vendor: null,
                 version: dep.version,
                 purl: dep.purl,
               });
-            else {
+            } else {
               licenseMapper[l].components.push({
                 name: dep.componentName,
                 vendor: null,
@@ -310,11 +310,11 @@ class ReportService {
       }
     });
     // Used to position the unknown license element to the end of the array
-    const licenseArray = (Object.values(licenseMapper)) as Array<licenseEntry>;
-    if(licenseMapper.unknown){
-      const index = licenseArray.findIndex((l=> l.label === 'unknown'));
+    const licenseArray = Object.values(licenseMapper) as Array<licenseEntry>;
+    if (licenseMapper.unknown) {
+      const index = licenseArray.findIndex((l) => l.label === 'unknown');
       const aux = licenseArray[index];
-      licenseArray.splice(index,1)
+      licenseArray.splice(index, 1);
       licenseArray.push(aux);
     }
     return licenseArray as Array<licenseEntry>;
