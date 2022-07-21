@@ -56,20 +56,23 @@ export abstract class ScannerTask implements ITask<void, boolean> {
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
       await this.done(resultPath);
-      await new IndexTask().run();
-      await this.addDependencies();
       this.project.metadata.setScannerState(ScanState.FINISHED);
       this.project.metadata.save();
       if (AppConfig.FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN) {
         const autoAccept = new AutoAccept();
         await autoAccept.run();
       }
+      // continue with the scanner pipeline
       this.project.metadata.save();
+      await this.scanDependencies();
+      await this.addDependencies();
+      await new IndexTask().run();
+      this.project.save();
+      await this.project.close();
       this.sendToUI(IpcChannels.SCANNER_FINISH_SCAN, {
         success: true,
         resultsPath: this.project.metadata.getMyPath(),
       });
-      await this.project.close();
     });
 
     this.scanner.on(ScannerEvents.SCANNER_LOG, (message, level) => {
@@ -124,22 +127,21 @@ export abstract class ScannerTask implements ITask<void, boolean> {
   public async run(): Promise<boolean> {
     this.scannerStatus();
     const scanIn = this.adapterToScannerInput(this.project.filesToScan);
-    await this.scanDependencies();
-    this.scanner.scan(scanIn);
+    await this.scanner.scan(scanIn);
+
     return true;
   }
 
   private async scanDependencies(): Promise<void> {
-    const allFiles = [];
-    const rootPath = this.project.metadata.getScanRoot();
-    this.project.tree
-      .getRootFolder()
-      .getFiles(new BlackListDependencies())
-      .forEach((f: File) => {
-        allFiles.push(rootPath + f.path);
-      });
-
     try {
+      const allFiles = [];
+      const rootPath = this.project.metadata.getScanRoot();
+      this.project.tree
+        .getRootFolder()
+        .getFiles(new BlackListDependencies())
+        .forEach((f: File) => {
+          allFiles.push(rootPath + f.path);
+        });
       const dependencies = await new DependencyScanner().scan(allFiles);
       dependencies.filesList.forEach((f) => {
         f.file = f.file.replace(rootPath, '');
