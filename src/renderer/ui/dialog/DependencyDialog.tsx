@@ -143,7 +143,7 @@ const DependencyDialog = (props: DependencyDialogProps) => {
                     : ''
                 }
                 isOptionEqualToValue={(option: any) => option.spdxid === form.license}
-                getOptionLabel={(option: any) => option.name || option.spdxid}
+                getOptionLabel={(option: any) => option.name || option.spdxid || ''}
                 renderOption={(props, option, { selected }) => (
                   <li {...props}>
                     <div className={classes.option}>

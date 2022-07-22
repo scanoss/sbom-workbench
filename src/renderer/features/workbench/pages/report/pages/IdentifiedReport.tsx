@@ -42,7 +42,8 @@ const IdentifiedReport = ({ data }) => {
         <div className="empty-container">
           <div className="report-message">
             <InsertDriveFileOutlinedIcon fontSize="inherit" color="primary" style={{ fontSize: '100px' }} />
-            <h2>Nothing identified yet.</h2>
+            <h2 className="mb-1">Nothing identified yet</h2>
+            <h5 className="mt-1 text-center">Verify the scanner output before including them in your SBOM in order to confirm detections or even include your own manual identifications.</h5>
             <Button variant="contained" color="primary" onClick={() => navigate('/workbench/detected')}>
               Start Identification
             </Button>

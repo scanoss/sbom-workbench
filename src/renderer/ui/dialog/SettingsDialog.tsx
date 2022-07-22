@@ -103,7 +103,7 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
           </div>
         </div>
         <DialogActions>
-          <Button tabIndex={-1} onClick={onCancel}>
+          <Button color="inherit" tabIndex={-1} onClick={onCancel}>
             Cancel
           </Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
