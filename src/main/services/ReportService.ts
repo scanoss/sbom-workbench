@@ -76,7 +76,7 @@ class ReportService {
         if (index >= 0) {
           licenses[index].components.push({
             name: element.comp_name,
-            vendor: element.comp_name,
+            vendor: element.vendor,
             url: element.url,
             purl: element.purl,
             version: element.version,
@@ -86,7 +86,7 @@ class ReportService {
           aux.components = [];
           aux.components.push({
             name: element.comp_name,
-            vendor: element.comp_name,
+            vendor: element.vendor,
             url: element.url,
             purl: element.purl,
             version: element.version,
