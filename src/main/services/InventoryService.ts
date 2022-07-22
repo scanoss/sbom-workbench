@@ -140,7 +140,7 @@ class InventoryService  {
             version: curr.version,
             url: curr.url,
             purl: curr.purl,
-            usage: curr.type,
+            usage: curr.usage,
             spdxid: []
           };
           aux.spdxid.push(curr.spdxid);
