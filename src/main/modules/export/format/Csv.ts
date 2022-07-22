@@ -17,10 +17,20 @@ export class Csv extends Format {
     for (let i = 0; i < data.length; i += 1) {
       const inventoryId = i + 1;
       const row = `${inventoryId},${data[i].path},${data[i].usage || 'n/a'},${
-        data[i].detected_component ? data[i].detected_component : 'n/a'
-      },${data[i].detected_license.length > 0 ? data[i].detected_license.join(';') : 'n/a'},${
-        data[i].version ? data[i].version : 'n/a'
-      },${data[i].latest_version ? data[i].latest_version : 'n/a'},${data[i].purl}\r\n`;
+        this.source === ExportSource.IDENTIFIED
+          ? data[i].identified_component
+          : data[i].detected_component
+          ? data[i].detected_component
+          : 'n/a'
+      },${
+        this.source === ExportSource.IDENTIFIED
+          ? data[i].identified_license[0]
+          : data[i].detected_license.length > 0
+          ? data[i].detected_license.join(';')
+          : 'n/a'
+      },${data[i].version ? data[i].version : 'n/a'},${data[i].latest_version ? data[i].latest_version : 'n/a'},${
+        data[i].purl
+      }\r\n`;
       csv += row;
     }
     return csv;
