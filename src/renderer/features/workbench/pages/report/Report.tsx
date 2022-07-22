@@ -1,15 +1,16 @@
-import React, {useEffect, useState} from 'react';
-import {Button, createStyles, Fade, Menu, MenuItem, Tooltip} from '@mui/material';
-import {makeStyles} from '@mui/styles';
-import {Navigate, NavLink, Route, Routes, useLocation, useNavigate} from 'react-router-dom';
-import {reportService} from '@api/services/report.service';
-import {useSelector} from 'react-redux';
-import {selectWorkbench} from '@store/workbench-store/workbenchSlice';
-import {ExportFormat, ExportSource, IProject} from '@api/types';
-import {exportService} from '@api/services/export.service';
+import React, { useEffect, useState } from 'react';
+import { Button, createStyles, Fade, Menu, MenuItem, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { Navigate, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { reportService } from '@api/services/report.service';
+import { useSelector } from 'react-redux';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { ExportFormat, ExportSource, IProject } from '@api/types';
+import { exportService } from '@api/services/export.service';
 import AppConfig from '@config/AppConfigModule';
 import GetAppIcon from '@mui/icons-material/GetApp';
-import {dialogController} from '../../../../controllers/dialog-controller';
+import { getFormatFilesAttributes } from '@shared/utils/file-utils';
+import { dialogController } from '../../../../controllers/dialog-controller';
 import IdentifiedReport from './pages/IdentifiedReport';
 import DetectedReport from './pages/DetectedReport';
 
@@ -102,8 +103,10 @@ const Export = ({ empty }) => {
 
   const exportFile = async (format: ExportFormat) => {
     const dirname = localStorage.getItem('last-path-used') || projectPath;
+    const attributes = getFormatFilesAttributes(format);
     const path = await dialogController.showSaveDialog({
-      defaultPath: `${dirname}/${name}`,
+      defaultPath: `${dirname}/${name}${attributes.prefix ? `-${attributes.prefix}` : ''}.${attributes.extension}`,
+      filters: [{ name: attributes.description, extensions: [attributes.extension] }],
     });
 
     if (path) {
@@ -158,11 +161,10 @@ const Export = ({ empty }) => {
           <Menu anchorEl={anchorEl} keepMounted open={open} onClose={handleClose} TransitionComponent={Fade}>
             {AppConfig.FF_EXPORT_FORMAT_OPTIONS.map(
               (format) =>
-                exportLabels[format] && exportLabels[format].sources.includes(source) && (
+                exportLabels[format] &&
+                exportLabels[format].sources.includes(source) && (
                   <Tooltip key={format} title={exportLabels[format].hint} placement="left" arrow>
-                    <MenuItem onClick={() => onExport(format as ExportFormat)}>
-                      {exportLabels[format].label}
-                    </MenuItem>
+                    <MenuItem onClick={() => onExport(format as ExportFormat)}>{exportLabels[format].label}</MenuItem>
                   </Tooltip>
                 )
             )}
