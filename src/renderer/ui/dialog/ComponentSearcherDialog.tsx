@@ -42,7 +42,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
   const [disabled, setDisabled] = useState<boolean>(false);
 
   const init = async () => {
-    const defaultQuery = { search: query, package: '', component: '', vendor: '' };
+    const defaultQuery = { search: query, package: 'github', component: '', vendor: '' };
     setQueryTerm(defaultQuery);
     if (query) search(defaultQuery);
 
@@ -217,7 +217,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
               <Paper className="dialog-form-field-control">
                 <Autocomplete
                   size="small"
-                  value="github"
+                  value={queryTerm?.package || ''}
                   options={packages}
                   disabled={loading || disabled}
                   disableClearable
