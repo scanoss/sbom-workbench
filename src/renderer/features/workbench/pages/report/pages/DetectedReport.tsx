@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Chart, registerables } from 'chart.js';
 import { Card } from '@mui/material';
 import LicensesChart from '../components/LicensesChart';
@@ -6,20 +6,28 @@ import LicensesTable from '../components/LicensesTable';
 import MatchesForLicense from '../components/MatchesForLicense';
 import MatchesChart from '../components/MatchesChart';
 import LicensesObligations from '../components/LicensesObligations';
+import obligationsService from "@api/services/obligations.service";
 
 Chart.register(...registerables);
 
 const DetectedReport = ({ data }) => {
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
+  const [obligations, setObligations] = useState(null);
+
+  const init = async () => {
+    const licenses = data.licenses.map((license) => license.label);
+    const obligations = await obligationsService.getObligations(licenses);
+    setObligations(obligations);
+  };
 
   const onLicenseSelected = (license: string) => {
     const matchedLicense = data.licenses.find((item) => item?.label === license);
     setMatchedLicenseSelected(matchedLicense);
   };
 
-  if (!data.licenses) {
-    return '';
-  }
+  useEffect(() => {
+    init();
+  }, []);
 
   return (
     <>
@@ -62,7 +70,11 @@ const DetectedReport = ({ data }) => {
         */}
 
         <Card className="report-item licenses-obligation">
-          <LicensesObligations data={data.licenses} />
+          {obligations ? (
+            <LicensesObligations data={obligations} />
+          ) : (
+            <p className="text-center mb-0 mt-0">Loading obligations info...</p>
+          )}
         </Card>
       </section>
     </>

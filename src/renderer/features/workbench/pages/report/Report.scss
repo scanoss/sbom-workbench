@@ -162,8 +162,14 @@
       color: #3B82F6;
       word-break: break-all;
 
-      svg {
-        margin-right: 5px;
+      figure {
+        margin: 0;
+        margin-right: 10px;
+      }
+
+      div > span.small {
+        font-size: 10px;
+        color: #3F3F46;
       }
     }
 
