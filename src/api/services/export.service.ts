@@ -1,4 +1,4 @@
-import {NewExportDTO} from "@api/dto";
+import { NewExportDTO } from '@api/dto';
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
 import { ExportDTO } from '../../main/modules/export/ExportDTO';

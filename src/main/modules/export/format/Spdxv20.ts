@@ -9,7 +9,7 @@ export class Spdxv20 extends Format {
 
   // @override
   public async generate() {
-    const data = await this.export.getSpdxData();
+    const data = await this.export.getIdentifiedData();
     const spdx = Spdxv20.template();
     spdx.Packages = [];
     spdx.creationInfo.created = utilModel.getTimeStamp();

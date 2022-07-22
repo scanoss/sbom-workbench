@@ -2,7 +2,7 @@ import log from 'electron-log';
 import fs from 'fs';
 
 import { ExportModel } from './Model/ExportModel';
-import { IExportResult } from "./IExportResult";
+import { IExportResult } from './IExportResult';
 
 export abstract class Format {
   protected export: ExportModel;
@@ -18,12 +18,12 @@ export abstract class Format {
   public async save(path: string): Promise<IExportResult> {
     const file = await this.generate();
     try {
-      await fs.promises.writeFile(`${path}${this.extension}`, file);
+      await fs.promises.writeFile(path, file);
       return {
         success: true,
         message: 'Export successful',
         extension: this.extension,
-        file: `${path}${this.extension}`,
+        file: path,
       };
     } catch (error) {
       log.error(error);
@@ -31,7 +31,7 @@ export abstract class Format {
         success: false,
         message: 'Export not successful',
         extension: this.extension,
-        file: `${path}${this.extension}`,
+        file: path,
       };
     }
   }
