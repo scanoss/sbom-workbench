@@ -13,7 +13,7 @@ export class Csv extends Format {
   }
 
   private csvCreate(data: any) {
-    let csv = `inventory_id,path,detected_usage,detected_component,detected_license,detected_version,detected_latest,detected_purl\n`;
+    let csv = `inventory_id,path,detected_usage,detected_component,detected_license,detected_version,detected_latest,detected_purls\n`;
     for (let i = 0; i < data.length; i += 1) {
       const inventoryId = i + 1;
       const row = `${inventoryId},${data[i].path},${data[i].usage || 'n/a'},${
