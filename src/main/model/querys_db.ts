@@ -143,11 +143,9 @@ export class Querys {
 
   SQL_SELECT_INVENTORIES_NOT_HAVING_FILES = `SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories) AND i.source='detected';`;
 
-  SQL_GET_IDENTIFIED_DATA = `SELECT DISTINCT i.id AS inventoryId,f.fileId,i.usage,
-    i.notes,i.spdxid AS identified_license,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE (SELECT d.originalLicense FROM dependencies d WHERE d.purl=cv.purl AND d.version=cv.version)END) AS detected_license ,
-    cv.purl,cv.version,(CASE WHEN (EXISTS (SELECT 1 FROM results r WHERE r.purl=cv.purl AND r.version=cv.version)) THEN r.latest_version ELSE NULL END) AS latest_version,cv.url,(CASE WHEN f.path IS NOT NULL THEN f.path ELSE (SELECT f.path FROM files f WHERE f.fileId=dep.fileId) END) AS path,cv.name AS identified_component,
-    (CASE WHEN  r.component IS NOT NULL THEN r.component ELSE dep.component END) AS detected_component,lic.fulltext,lic.official
-    FROM inventories i
+  SQL_GET_IDENTIFIED_DATA = `SELECT DISTINCT i.id AS inventoryId,f.fileId,i.usage, i.notes,i.spdxid AS identified_license,
+    (CASE WHEN (EXISTS (SELECT 1 FROM results r WHERE cv.purl=r.purl AND cv.version=r.version)) THEN rl.spdxid WHEN (EXISTS(SELECT 1 FROM license_component_version lcv WHERE lcv.cvid=cv.id) AND  EXISTS (SELECT 1 FROM dependencies d WHERE d.purl=cv.purl AND d.version=cv.version AND d.originalLicense IS NOT NULL))THEN (SELECT spdxid FROM licenses l INNER JOIN license_component_version lcv ON lcv.licid=l.id INNER JOIN component_versions compv ON compv.id=lcv.cvid WHERE compv.id=cv.id) ELSE (SELECT d.originalLicense FROM dependencies d WHERE d.purl=cv.purl AND d.version=cv.version) END) AS detected_license ,
+    cv.purl,cv.version,(CASE WHEN (EXISTS (SELECT 1 FROM results r WHERE r.purl=cv.purl AND r.version=cv.version)) THEN r.latest_version ELSE NULL END) AS latest_version,cv.url, (CASE WHEN f.path IS NOT NULL THEN f.path ELSE (SELECT f.path FROM files f WHERE f.fileId=dep.fileId) END) AS path,cv.name AS identified_component,(CASE WHEN  r.component IS NOT NULL THEN r.component ELSE dep.component END) AS detected_component,lic.fulltext,lic.official FROM inventories i
     LEFT JOIN file_inventories fi ON fi.inventoryid=i.id
     LEFT JOIN files f ON fi.fileId=f.fileId
     LEFT JOIN results r ON r.fileId=f.fileId
