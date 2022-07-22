@@ -145,7 +145,7 @@ export class Querys {
 
   SQL_GET_IDENTIFIED_DATA = `SELECT DISTINCT i.id AS inventoryId,f.fileId,i.usage,
     i.notes,i.spdxid AS identified_license,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE (SELECT d.originalLicense FROM dependencies d WHERE d.purl=cv.purl AND d.version=cv.version)END) AS detected_license ,
-    cv.purl,cv.version,r.latest_version,cv.url,(CASE WHEN f.path IS NOT NULL THEN f.path ELSE (SELECT f.path FROM files f WHERE f.fileId=dep.fileId) END) AS path,cv.name AS identified_component,
+    cv.purl,cv.version,(CASE WHEN (EXISTS (SELECT 1 FROM results r WHERE r.purl=cv.purl AND r.version=cv.version)) THEN r.latest_version ELSE NULL END) AS latest_version,cv.url,(CASE WHEN f.path IS NOT NULL THEN f.path ELSE (SELECT f.path FROM files f WHERE f.fileId=dep.fileId) END) AS path,cv.name AS identified_component,
     (CASE WHEN  r.component IS NOT NULL THEN r.component ELSE dep.component END) AS detected_component,lic.fulltext,lic.official
     FROM inventories i
     LEFT JOIN file_inventories fi ON fi.inventoryid=i.id
