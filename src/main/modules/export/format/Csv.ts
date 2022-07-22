@@ -13,13 +13,15 @@ export class Csv extends Format {
   }
 
   private csvCreate(data: any) {
-    let csv = `inventory_id,path,usage,detected_component,detected_license,detected_version,detected_latest,purl\r\n`;
-    for (const d of data) {
-      csv += `${d.inventoryId || 'n/a'},${d.path},${d.usage || 'n/a'},${
-        d.detected_component ? d.detected_component : 'n/a'
-      },${d.detected_license.length > 0 ? d.detected_license.join(' AND ') : 'n/a'},${d.version ? d.version : 'n/a'},${
-        d.latest_version ? d.latest_version : 'n/a'
-      },${d.purl}\r\n`;
+    let csv = `inventory_id,path,detected_usage,detected_component,detected_license,detected_version,detected_latest,detected_purl\n`;
+    for (let i = 0; i < data.length; i += 1) {
+      const inventoryId = i + 1;
+      const row = `${inventoryId},${data[i].path},${data[i].usage || 'n/a'},${
+        data[i].detected_component ? data[i].detected_component : 'n/a'
+      },${data[i].detected_license.length > 0 ? data[i].detected_license.join(';') : 'n/a'},${
+        data[i].version ? data[i].version : 'n/a'
+      },${data[i].latest_version ? data[i].latest_version : 'n/a'},${data[i].purl}\r\n`;
+      csv += row;
     }
     return csv;
   }
