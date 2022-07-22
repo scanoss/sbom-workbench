@@ -37,7 +37,7 @@ export default function MatchesForLicense({ data }) {
               <TableRow key={index}>
                 <TableCell component="th" scope="row" align="left">
                   <div className="table-cell">
-                    <IconComponent name={row.name} size={24} />
+                    <IconComponent name={row.vendor} size={24} />
                     <div className="d-flex flex-column">
                       <span>{row.name}</span>
                       <span className="small">{row.purl}</span>

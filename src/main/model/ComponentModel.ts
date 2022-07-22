@@ -295,9 +295,10 @@ export class ComponentModel extends Model {
       try {
         const db = await this.openDb();
         db.all(
-          `SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name, l.spdxid
+          `SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name, l.spdxid, r.vendor
         FROM component_versions c
         INNER JOIN inventories i ON c.id=i.cvid
+        LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
         INNER JOIN licenses l ON l.spdxid=i.spdxid ORDER BY i.spdxid;`,
           (err: any, data: any) => {
             db.close();
