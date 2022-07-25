@@ -81,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
 
 const CircularComponent = ({ stage, progress, pauseScan }: CircularComponentProps) => {
   const classes = useStyles();
-  const variant = stage.stageName === 'preparing' || stage.stageName === 'indexing' ? 'indeterminate' : 'determinate';
+  const variant = stage.stageName === 'preparing' || stage.stageName === 'indexing' || stage.stageStep === 3 ? 'indeterminate' : 'determinate';
 
   return (
     <div className={classes.parentBox}>
@@ -104,11 +104,11 @@ const CircularComponent = ({ stage, progress, pauseScan }: CircularComponentProp
       <div className={classes.typographyContainer}>
         <div className={classes.numberStageContainer}>
           <span className={classes.number}>
-            {Math.round(progress)}
+            {stage.stageStep !== 3 ? Math.round(progress) : <>-</>}
             {variant === 'determinate' ? '%' : ''}
           </span>
           <span className={classes.stage}>{stage.stageName.toUpperCase()}</span>
-          <span className={classes.stageStep}>STAGE {stage.stageStep}/3</span>
+          <span className={classes.stageStep}>STAGE {stage.stageStep}/4</span>
         </div>
         <div className={classes.pauseContainer}>
           <Button disabled={stage.stageStep !== 2} startIcon={<PauseIcon />} onClick={pauseScan}>

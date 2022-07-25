@@ -62,11 +62,12 @@ export abstract class ScannerTask implements ITask<void, boolean> {
         const autoAccept = new AutoAccept();
         await autoAccept.run();
       }
+
       // continue with the scanner pipeline
       this.project.metadata.save();
       await this.scanDependencies();
       await this.addDependencies();
-      await new IndexTask().run();
+      await this.createSearchIndex();
       this.project.save();
       await this.project.close();
       this.sendToUI(IpcChannels.SCANNER_FINISH_SCAN, {
@@ -114,7 +115,12 @@ export abstract class ScannerTask implements ITask<void, boolean> {
     this.scanner.setWorkDirectory(this.project.getMyPath());
   }
 
-  public scannerStatus() {
+  public async run(): Promise<boolean> {
+    await this.scan();
+    return true;
+  }
+
+  private async scan() {
     this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
       stage: {
         stageName: this.project.metadata.getScannerState(),
@@ -122,17 +128,19 @@ export abstract class ScannerTask implements ITask<void, boolean> {
       },
       processed: 0,
     });
-  }
-
-  public async run(): Promise<boolean> {
-    this.scannerStatus();
     const scanIn = this.adapterToScannerInput(this.project.filesToScan);
     await this.scanner.scan(scanIn);
-
-    return true;
   }
 
   private async scanDependencies(): Promise<void> {
+    this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
+      stage: {
+        stageName: `Analyzing dependencies`,
+        stageStep: 3,
+      },
+      processed: 0,
+    });
+
     try {
       const allFiles = [];
       const rootPath = this.project.metadata.getScanRoot();
@@ -153,6 +161,23 @@ export abstract class ScannerTask implements ITask<void, boolean> {
     } catch (e) {
       log.error(e);
     }
+  }
+
+  public async addDependencies() {
+    try {
+      const dependencies = JSON.parse(
+        await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8')
+      );
+      this.project.tree.addDependencies(dependencies);
+      this.project.save();
+      await dependencyService.insert(dependencies);
+    } catch (e) {
+      log.error(e);
+    }
+  }
+
+  private async createSearchIndex() {
+    await new IndexTask().run();
   }
 
   protected adapterToScannerInput(filesToScan: Record<string, string>): Array<ScannerInput> {
@@ -201,18 +226,5 @@ export abstract class ScannerTask implements ITask<void, boolean> {
 
   public cleanWorkDirectory() {
     this.scanner.cleanWorkDirectory();
-  }
-
-  public async addDependencies() {
-    try {
-      const dependencies = JSON.parse(
-        await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8')
-      );
-      this.project.tree.addDependencies(dependencies);
-      this.project.save();
-      await dependencyService.insert(dependencies);
-    } catch (e) {
-      log.error(e);
-    }
   }
 }

@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
 import * as controller from '../../../../controllers/home-controller';
 import CircularComponent from '../Components/CircularComponent';
-import {setupListeners} from "@reduxjs/toolkit/query";
 
 const ProjectScan = () => {
   const navigate = useNavigate();
@@ -35,7 +34,7 @@ const ProjectScan = () => {
 
   const onShowScan = (path) => {
     dispatch(setScanPath({ path, action: 'none' }));
-    navigate('/workbench/report',  { replace: true });
+    navigate('/workbench/report', { replace: true });
   };
 
   const handlerScannerStatus = (e, args) => {
@@ -83,7 +82,7 @@ const ProjectScan = () => {
     }
   };
 
-  const setupListeners = (): () => void => {
+  const setupListeners = (): (() => void) => {
     const subscriptions = [];
     subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.SCANNER_UPDATE_STATUS, handlerScannerStatus));
     subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.SCANNER_FINISH_SCAN, handlerScannerFinish));
@@ -98,28 +97,30 @@ const ProjectScan = () => {
     init();
   }, []);
 
-  return <>
-    <section id="ProjectScan" className="app-page">
-      <header className="app-header">
-        <div>
-          <h4 className="header-subtitle back">
-            <IconButton onClick={onPauseHandler} component="span" size="large">
-              <ArrowBackIcon />
-            </IconButton>
-            SCANNING
-          </h4>
-          <h1>{scanPath.projectName}</h1>
-        </div>
-      </header>
-      <main className="app-content">
-        <div className="progressbar">
-          <div className="circular-progress-container">
-            <CircularComponent stage={stage} progress={progress} pauseScan={() => onPauseHandler()} />
+  return (
+    <>
+      <section id="ProjectScan" className="app-page">
+        <header className="app-header">
+          <div>
+            <h4 className="header-subtitle back">
+              <IconButton onClick={onPauseHandler} component="span" size="large">
+                <ArrowBackIcon />
+              </IconButton>
+              SCANNING
+            </h4>
+            <h1>{scanPath.projectName}</h1>
           </div>
-        </div>
-      </main>
-    </section>
-  </>;
+        </header>
+        <main className="app-content">
+          <div className="progressbar">
+            <div className="circular-progress-container">
+              <CircularComponent stage={stage} progress={progress} pauseScan={() => onPauseHandler()} />
+            </div>
+          </div>
+        </main>
+      </section>
+    </>
+  );
 };
 
 export default ProjectScan;
