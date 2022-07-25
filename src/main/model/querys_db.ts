@@ -154,7 +154,7 @@ export class Querys {
     LEFT JOIN licenses lic ON lic.spdxid=i.spdxid
     LEFT JOIN dependencies dep ON cv.purl=dep.purl AND cv.version=dep.version;`;
 
-  SQL_GET_DETECTED_DATA = `SELECT DISTINCT f.fileId,r.idtype AS usage,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE dep.originalLicense END)AS identified_license,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE dep.originalLicense END) AS detected_license ,
+  SQL_GET_DETECTED_DATA = `SELECT DISTINCT f.fileId,(CASE WHEN r.idtype IS NOT NULL THEN r.idtype ELSE 'dependency' END) AS usage,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE dep.originalLicense END)AS identified_license,(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE dep.originalLicense END) AS detected_license ,
            (CASE WHEN r.purl IS NOT NULL THEN r.purl ELSE dep.purl END) AS purl,(CASE WHEN r.version IS NOT NULL THEN r.version ELSE dep.version END) AS version,r.latest_version ,r.url,(CASE WHEN f.path IS NOT NULL THEN f.path ELSE (SELECT f.path FROM files f WHERE f.fileId=dep.fileId) END) AS path,
            (CASE WHEN r.component IS NOT NULL THEN r.component ELSE dep.component END) AS identified_component,
            (CASE WHEN  r.component IS NOT NULL THEN r.component ELSE dep.component END) AS detected_component,lic.fulltext,lic.official

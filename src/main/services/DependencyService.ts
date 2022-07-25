@@ -86,7 +86,12 @@ class DependencyService {
       await modelProvider.model.dependency.update(dep);
 
       // Create inventory
-      await modelProvider.model.inventory.create({ cvid: comp.compid, spdxid: params.license, source: 'declared' });
+      await modelProvider.model.inventory.create({
+        cvid: comp.compid,
+        spdxid: params.license,
+        source: 'declared',
+        usage: 'dependency',
+      });
       const response = (await this.getAll({ id: params.dependencyId }))[0];
       return response;
     } catch (error: any) {
@@ -190,7 +195,6 @@ class DependencyService {
     try {
       const dep = (await this.getAll({ id: dependencyId }))[0];
       const params = [];
-      //  `UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?
       params.push(
         new Date().toISOString(),
         dep.scope ? dep.scope : null,
