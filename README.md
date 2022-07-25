@@ -10,7 +10,7 @@
 
 The SCANOSS Audit Workbench is a graphical user interface to scan and audit source code using SCANOSS API.
 
-<img src=".erb/img/workbench_1.c77c358" width="70%" />
+<img src=".erb/img/workbench_1.c77c358.png" width="70%" />
 
 
 Auditing your source code for license compliance has never been easier. Simply scan your source code directory to find and identify open source components. Generate your SPDX-Lite software bill of materials (SBOM) with the press of a button.
