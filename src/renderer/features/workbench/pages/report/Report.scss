@@ -178,13 +178,14 @@
     }
 
     .MuiTableContainer-root{
-      max-height: 95%;
+      max-height: 400px;
     }
 
       .tableRowLicense {
         .MuiTableCell-root {
           padding: 8px 16px;
         }
+
         .tableCellForLicensePill {
 
           .container-licenses-pills {
