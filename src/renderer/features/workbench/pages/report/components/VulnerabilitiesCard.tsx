@@ -1,6 +1,7 @@
 import React from 'react';
+import {Link} from "react-router-dom";
 
-const VulnerabilitiesCard = ({ data }) => {
+const VulnerabilitiesCard = ({ data, onDetailClick }) => {
   return (
     <div id="VulnerabilitiesContainer">
       <div className="vulnerabilitie-container">
@@ -19,6 +20,8 @@ const VulnerabilitiesCard = ({ data }) => {
         <span className="vulnerabilitie-number">{data?.low}</span>
         <span className="vulnerabilitie-label low">LOW</span>
       </div>
+
+      <Link to="../../vulnerabilities">See more detail </Link>
     </div>
   );
 };

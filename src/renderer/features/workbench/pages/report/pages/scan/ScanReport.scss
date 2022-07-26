@@ -49,12 +49,14 @@
 
       grid-template-areas:  "A B"
                             "C B"
-                            "D D";
+                            "D B"
+                            "E E";
 
       .licenses { grid-area: A; }
       .matches { grid-area: C; }
       .matches-for-license { grid-area: B; }
-      .licenses-obligation { grid-area: D; }
+      .vulnerabilities { grid-area: D; }
+      .licenses-obligation { grid-area: E; }
     }
 
     &.identified {
@@ -178,7 +180,7 @@
     }
 
     .MuiTableContainer-root{
-      max-height: 400px;
+      max-height: 650px;
     }
 
       .tableRowLicense {

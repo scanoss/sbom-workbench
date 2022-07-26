@@ -55,6 +55,8 @@ export const WorkbenchProvider: React.FC<any> = ({ children }) => {
    *  Listener for navigation events
    */
   useEffect(() => {
+    console.info('Navigate to', location.pathname);
+
     if (loaded) {
       if (location.pathname === '/workspace') return;
       const param = new URLSearchParams(location.search).get('path');
