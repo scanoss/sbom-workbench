@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { Chart, registerables } from 'chart.js';
 import { Button, Card } from '@mui/material';
-import LicensesChart from '../components/LicensesChart';
-import IdentificationProgress from '../components/IdentificationProgress';
-import LicensesTable from '../components/LicensesTable';
-import MatchesForLicense from '../components/MatchesForLicense';
-import LicensesObligations from '../components/LicensesObligations';
-import obligationsService from '../../../../../../api/services/obligations.service';
-import OssVsOriginalProgressBar from '../components/OssVsOriginalProgressBar';
+import LicensesChart from '../../components/LicensesChart';
+import IdentificationProgress from '../../components/IdentificationProgress';
+import LicensesTable from '../../components/LicensesTable';
+import MatchesForLicense from '../../components/MatchesForLicense';
+import LicensesObligations from '../../components/LicensesObligations';
+import obligationsService from '@api/services/obligations.service';
+import OssVsOriginalProgressBar from '../../components/OssVsOriginalProgressBar';
 
 Chart.register(...registerables);
 

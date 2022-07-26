@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import { Chart, registerables } from 'chart.js';
 import { Card } from '@mui/material';
-import LicensesChart from '../components/LicensesChart';
-import LicensesTable from '../components/LicensesTable';
-import MatchesForLicense from '../components/MatchesForLicense';
-import MatchesChart from '../components/MatchesChart';
-import LicensesObligations from '../components/LicensesObligations';
+import LicensesChart from '../../components/LicensesChart';
+import LicensesTable from '../../components/LicensesTable';
+import MatchesForLicense from '../../components/MatchesForLicense';
+import MatchesChart from '../../components/MatchesChart';
+import LicensesObligations from '../../components/LicensesObligations';
 import obligationsService from "@api/services/obligations.service";
+import VulnerabilitiesCard from "../../components/VulnerabilitiesCard";
 
 Chart.register(...registerables);
 
@@ -62,12 +63,11 @@ const DetectedReport = ({ data }) => {
           <MatchesChart data={data.summary} />
         </Card>
 
-        {/*
-        <Card className="report-item vulnerabilites">
-          <div className="report-title">Vulnerabilites</div>
+        <Card className="report-item vulnerabilities">
+          <div className="report-title">Vulnerabilities</div>
           <VulnerabilitiesCard data={data.vulnerabilities} />
         </Card>
-        */}
+
 
         <Card className="report-item licenses-obligation">
           {obligations ? (

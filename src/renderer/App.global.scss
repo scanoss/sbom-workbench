@@ -29,7 +29,7 @@
 @import './features/workspace/pages/ProjectScan/ProjectScan';
 @import './features/workspace/pages/ProjectSettings/ProjectSettings';
 @import './features/workbench/Workbench';
-@import './features/workbench/pages/report/Report.scss';
+@import './features/workbench/pages/report/pages/scan/ScanReport';
 @import './features/workbench/pages/detected/pages/Editor/Editor';
 @import './features/workbench/pages/detected/pages/Dependency/Dependency';
 @import './features/workbench/pages/detected/pages/ComponentList/ComponentList';
@@ -45,7 +45,7 @@
 @import './features/workbench/components/Pill/Pill';
 @import './features/workbench/components/Title/Title';
 @import './features/workbench/components/MatchCard/MatchCard';
-@import 'features/workbench/components/FileToolbar/FileToolbar';
+@import './features/workbench/components/FileToolbar/FileToolbar';
 @import './features/workbench/components/MatchInfoCard/MatchInfoCard';
 @import './features/workbench/components/InventoryCard/InventoryCard';
 @import './features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
