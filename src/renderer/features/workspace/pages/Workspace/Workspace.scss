@@ -26,17 +26,10 @@
   .projects-table {
       min-width: 650px;
 
-      .MuiTableHead-root {
-        background-color: #F4F4F5;
-        font-weight: 600;
-
-      }
-
       .MuiTableRow-root {
         cursor: pointer;
 
         &.scanning-not-complete, &.project-deprecated {
-
           cursor: default;
 
           .MuiTableCell-root{

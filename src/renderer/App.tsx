@@ -117,6 +117,15 @@ export default class App {
             },
           },
         },
+        MuiTableHead: {
+          styleOverrides: {
+            root: {
+              backgroundColor: '#FAFAFA',
+              fontWeight: 700,
+              fontsize: 16,
+            },
+          },
+        },
       },
     });
 
