@@ -3,11 +3,10 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
-@import "~react-virtualized/styles.css";
-@import "~react-virtualized-tree/lib/main.css";
-@import "~material-icons/css/material-icons.css";
+@import '~react-virtualized/styles.css';
+@import '~react-virtualized-tree/lib/main.css';
+@import '~material-icons/css/material-icons.css';
 // @import '~remixicon/fonts/remixicon.css';
-
 
 /* fonts & vars */
 @import './theme/fonts.scss';
@@ -54,7 +53,8 @@
 @import './features/workbench/pages/detected/pages/Dependency/components/DependencyTree/DependencyTree';
 @import './ui/dialog/PreLoadInventoryDialog';
 @import './ui/dialog/ComponentSearcherDialog';
-@import './components/NotificationCenter/NotificationCenter.scss';
-@import './features/workbench/components/WorkbenchFilters/WorkbenchFilters.scss';
+@import './components/NotificationCenter/NotificationCenter';
+@import './features/workbench/components/WorkbenchFilters/WorkbenchFilters';
+@import './features/workbench/pages/report/pages/vulnerabilities/VulnerabilitiesReport';
 
 /* 👮 css rules are forbidden here 👮 */

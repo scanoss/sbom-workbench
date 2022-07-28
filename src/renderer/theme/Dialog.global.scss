@@ -1,12 +1,11 @@
 .dialog {
-
   .MuiDialogTitle-root {
     font-size: 24px;
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0em;
     text-align: left;
-    border-bottom: 1px solid #D4D4D8;
+    border-bottom: 1px solid #d4d4d8;
     display: block;
   }
 
@@ -25,33 +24,34 @@
     font-size: 20px;
     font-weight: 400;
 
-    border-bottom: 1px solid #D4D4D8;
+    border-bottom: 1px solid #d4d4d8;
   }
 
   .dialog-content {
-      padding: 20px 24px;
-      background-color: rgba(244, 244, 245, 1);
-      overflow: hidden;
+    padding: 20px 24px;
+    background-color: rgba(244, 244, 245, 1);
+    overflow: hidden;
 
-      .dialog-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
+    .dialog-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
 
-        .dialog-form-field {
-          width: 100%;
-        }
+      .dialog-form-field {
+        width: 100%;
       }
+    }
   }
 
   .dialog-content > .dialog-form-field {
-    &:first-child { margin-top: 0; }
+    &:first-child {
+      margin-top: 0;
+    }
   }
 
   .dialog-content .dialog-row:first-child > .dialog-form-field {
-      margin-top: 0;
+    margin-top: 0;
   }
-
 
   .dialog-form-field {
     margin: 20px 0 0;
@@ -109,6 +109,24 @@
       // padding: 0 6px;
     }
   }
+}
 
+// TODO: unify dialogs forms into default-form
+.default-form {
+  .form-row {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+  }
 
+  .form-group {
+    label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 16px;
+      font-weight: 400;
+    }
+  }
 }
