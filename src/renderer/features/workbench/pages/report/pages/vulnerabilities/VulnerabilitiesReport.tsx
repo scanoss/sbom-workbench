@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import {
   Autocomplete,
@@ -32,8 +32,14 @@ interface IVulnerabilitiesFilter {
 }
 
 const VulnerabilitiesReport = () => {
-  const [data, setData] = useState<any[]>(
-    Array(20)
+  const data = useRef<any[]>(null);
+
+  const [items, setItems] = useState<any[]>([]);
+  const [components, setComponent] = useState<any[]>([]);
+  const [filter, setFilter] = useState<IVulnerabilitiesFilter>(null);
+
+  const init = async () => {
+    data.current = Array(20)
       .fill(null)
       .map((i, index) => ({
         component: `Angular-${index}`,
@@ -43,11 +49,11 @@ const VulnerabilitiesReport = () => {
         introduced: '3.2.7',
         reported: '3.2.7',
         patched: '3.2.8',
-      }))
-  );
+      }));
 
-  const [components, setComponent] = useState<any[]>([]);
-  const [filter, setFilter] = useState<IVulnerabilitiesFilter>(null);
+    setItems(data.current);
+    setComponent(Array.from(new Set(data.current.map((item) => item.component))));
+  };
 
   const filterItems = (items) => {
     return filter
@@ -57,18 +63,22 @@ const VulnerabilitiesReport = () => {
       : items;
   };
 
-  const items = filterItems(data);
-
   const onSeeDescriptionClickHandler = (_e, item) => {};
   const onCopyCVEClickHandler = (_e, item) => {};
 
-  // set component searcher options
-  useEffect(() => {
-    setComponent(Array.from(new Set(data.map((item) => item.component))));
-  }, [data]);
+  const onFilterHandler = (newFilter: IVulnerabilitiesFilter) => {
+    setFilter({ ...filter, ...newFilter });
+  };
 
+  // filter items
   useEffect(() => {
+    setItems(filterItems(data.current));
   }, [filter]);
+
+  // on mounted
+  useEffect(() => {
+    init();
+  }, []);
 
   return (
     <>
@@ -85,7 +95,7 @@ const VulnerabilitiesReport = () => {
                       id="input-component"
                       options={components}
                       disablePortal
-                      onChange={(e_, value) => setFilter({ ...filter, component: value })}
+                      onChange={(e_, value) => onFilterHandler({ component: value })}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -109,7 +119,7 @@ const VulnerabilitiesReport = () => {
                       limitTags={2}
                       forcePopupIcon
                       disableCloseOnSelect
-                      onChange={(e_, value) => setFilter({ ...filter, severity: value })}
+                      onChange={(e_, value) => onFilterHandler({ ...filter, severity: value })}
                       renderOption={(props, option, { selected }) => (
                         <li {...props}>
                           <Checkbox style={{ marginRight: 8 }} checked={selected} />
