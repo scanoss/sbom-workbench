@@ -3,26 +3,27 @@ import {Link} from "react-router-dom";
 
 const VulnerabilitiesCard = ({ data, onDetailClick }) => {
   return (
-    <div id="VulnerabilitiesContainer">
-      <div className="vulnerabilitie-container">
-        <span className="vulnerabilitie-number critical-number">{data?.critical}</span>
-        <span className="vulnerabilitie-label critical-label">CRITICAL</span>
-      </div>
-      <div className="vulnerabilitie-container high">
-        <span className="vulnerabilitie-number">{data?.high}</span>
-        <span className="vulnerabilitie-label high">HIGH</span>
-      </div>
-      <div className="vulnerabilitie-container medium">
-        <span className="vulnerabilitie-number">{data?.moderate}</span>
-        <span className="vulnerabilitie-label moderate">MODERATE</span>
-      </div>
-      <div className="vulnerabilitie-container moderate">
-        <span className="vulnerabilitie-number">{data?.low}</span>
-        <span className="vulnerabilitie-label low">LOW</span>
-      </div>
-
-      <Link to="../../vulnerabilities">See more detail </Link>
-    </div>
+    <article id="VulnerabilitiesCard">
+      <section>
+        <div className="vulnerability-container">
+          <span className="vulnerability-number critical-number">{data?.critical}</span>
+          <span className="vulnerability-label critical-label">CRITICAL</span>
+        </div>
+        <div className="vulnerability-container high">
+          <span className="vulnerability-number">{data?.high}</span>
+          <span className="vulnerability-label high">HIGH</span>
+        </div>
+        <div className="vulnerability-container medium">
+          <span className="vulnerability-number">{data?.moderate}</span>
+          <span className="vulnerability-label moderate">MODERATE</span>
+        </div>
+        <div className="vulnerability-container moderate">
+          <span className="vulnerability-number">{data?.low}</span>
+          <span className="vulnerability-label low">LOW</span>
+        </div>
+      </section>
+      <Link to="../../vulnerabilities">See more details</Link>
+    </article>
   );
 };
 export default VulnerabilitiesCard;
