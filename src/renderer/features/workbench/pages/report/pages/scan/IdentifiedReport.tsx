@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { Chart, registerables } from 'chart.js';
 import { Button, Card } from '@mui/material';
+import obligationsService from '@api/services/obligations.service';
 import LicensesChart from '../../components/LicensesChart';
 import IdentificationProgress from '../../components/IdentificationProgress';
 import LicensesTable from '../../components/LicensesTable';
 import MatchesForLicense from '../../components/MatchesForLicense';
 import LicensesObligations from '../../components/LicensesObligations';
-import obligationsService from '@api/services/obligations.service';
 import OssVsOriginalProgressBar from '../../components/OssVsOriginalProgressBar';
+import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 
 Chart.register(...registerables);
 
@@ -43,7 +44,10 @@ const IdentifiedReport = ({ data }) => {
           <div className="report-message">
             <InsertDriveFileOutlinedIcon fontSize="inherit" color="primary" style={{ fontSize: '100px' }} />
             <h2 className="mb-1">Nothing identified yet</h2>
-            <h5 className="mt-1 text-center">Verify the scanner output before including them in your SBOM in order to confirm detections or even include your own manual identifications.</h5>
+            <h5 className="mt-1 text-center">
+              Verify the scanner output before including them in your SBOM in order to confirm detections or even
+              include your own manual identifications.
+            </h5>
             <Button variant="contained" color="primary" onClick={() => navigate('/workbench/detected')}>
               Start Identification
             </Button>
@@ -88,6 +92,11 @@ const IdentifiedReport = ({ data }) => {
           ) : (
             <p className="report-empty">No matches found</p>
           )}
+        </Card>
+
+        <Card className="report-item vulnerabilities">
+          <div className="report-title">Vulnerabilities</div>
+          <VulnerabilitiesCard data={data.vulnerabilities} />
         </Card>
 
         <Card className="report-item licenses-obligation">

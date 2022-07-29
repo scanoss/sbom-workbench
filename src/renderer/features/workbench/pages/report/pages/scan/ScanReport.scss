@@ -9,7 +9,7 @@
 
   .nav {
     .MuiButton-root {
-      background: #D4D4D8;
+      background: #d4d4d8;
       color: #505055;
       font-weight: 600;
       padding: 8px 20px;
@@ -24,7 +24,7 @@
   }
 
   .empty-container {
-    width : 100%;
+    width: 100%;
     height: 70vh;
     display: flex;
     justify-content: center;
@@ -32,8 +32,8 @@
   }
 
   .report-message {
-    display:flex;
-    flex-direction:column;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     max-width: 400px;
   }
@@ -45,39 +45,65 @@
     margin-bottom: 16px;
 
     &.detected {
-      grid-template-rows: 350px 150px auto;
+      grid-template-rows: 350px 150px 150px auto auto;
 
-      grid-template-areas:  "A B"
-                            "C B"
-                            "D B"
-                            "E E";
+      grid-template-areas:
+        'A B'
+        'C B'
+        'D B'
+        'E E';
 
-      .licenses { grid-area: A; }
-      .matches { grid-area: C; }
-      .matches-for-license { grid-area: B; }
-      .vulnerabilities { grid-area: D; }
-      .licenses-obligation { grid-area: E; }
+      .licenses {
+        grid-area: A;
+      }
+      .matches {
+        grid-area: C;
+      }
+      .matches-for-license {
+        grid-area: B;
+      }
+      .vulnerabilities {
+        grid-area: D;
+      }
+      .licenses-obligation {
+        grid-area: E;
+      }
     }
 
     &.identified {
-      grid-template-rows: auto auto 400px auto;
-      grid-template-areas:  "A A"
-                            "B B"
-                            "C D"
-                            "E E";
+      grid-template-rows: auto auto 400px 150px auto;
+      grid-template-areas:
+        'A A'
+        'B B'
+        'C D'
+        'E D'
+        'F F';
 
-      .identification-progress { grid-area: A; }
-      .oss-original { grid-area: B; }
-      .licenses { grid-area: C }
-      .matches-for-license { grid-area: D; }
-      .licenses-obligation { grid-area: E; }
+      .identification-progress {
+        grid-area: A;
+      }
+      .oss-original {
+        grid-area: B;
+      }
+      .licenses {
+        grid-area: C;
+      }
+      .matches-for-license {
+        grid-area: D;
+      }
+      .vulnerabilities {
+        grid-area: E;
+      }
+      .licenses-obligation {
+        grid-area: F;
+      }
     }
 
     .report-item {
       padding: 16px;
 
       .report-title {
-        color: #27272A;
+        color: #27272a;
         font-size: 18px;
         font-style: normal;
         font-weight: 600;
@@ -86,18 +112,16 @@
       .report-empty {
         font-size: 16px;
         font-weight: 400;
-        color: #6B7381;
+        color: #6b7381;
         margin-top: 6px;
       }
     }
 
-
-    .report-item.long-license-list , .report-item.licenses {
+    .report-item.long-license-list,
+    .report-item.licenses {
       display: flex;
       flex-direction: column;
     }
-
-
 
     .report-item.long-license-list {
       display: grid;
@@ -107,49 +131,47 @@
     }
 
     .report-item.licenses {
-
       .report-empty {
         font-size: 16px;
         font-weight: 400;
-        color: #6B7381;
+        color: #6b7381;
         margin-top: 6px;
       }
-
     }
 
-    #IdentificationProgress, #OssProgress {
+    #IdentificationProgress,
+    #OssProgress {
       display: flex;
       justify-content: center;
       flex-direction: column;
 
-      .identification-canvas-container  {
+      .identification-canvas-container {
         margin-top: 22px;
         height: 55px;
         width: 100%;
         display: flex;
         justify-content: space-between;
 
-
         .label {
           float: left;
           margin-left: auto;
           margin-right: auto;
           text-align: center;
-          color: #22C55E;
+          color: #22c55e;
           margin-top: 4px;
           font-size: 34px;
           font-weight: 700;
         }
 
         .label-original {
-          color: #A1A1AA;
+          color: #a1a1aa;
         }
 
         .label-not-found {
           margin-top: -16px;
           font-size: 16px;
           font-weight: 400;
-          color: #6B7381;
+          color: #6b7381;
         }
 
         .progress-bar {
@@ -161,7 +183,7 @@
     .table-cell {
       display: flex;
       align-items: center;
-      color: #3B82F6;
+      color: #3b82f6;
       word-break: break-all;
 
       figure {
@@ -171,7 +193,7 @@
 
       div > span.small {
         font-size: 10px;
-        color: #3F3F46;
+        color: #3f3f46;
       }
     }
 
@@ -179,47 +201,46 @@
       word-break: break-all;
     }
 
-    .MuiTableContainer-root{
+    .MuiTableContainer-root {
       max-height: 650px;
     }
 
-      .tableRowLicense {
-        .MuiTableCell-root {
-          padding: 8px 16px;
-        }
+    .tableRowLicense {
+      .MuiTableCell-root {
+        padding: 8px 16px;
+      }
 
-        .tableCellForLicensePill {
+      .tableCellForLicensePill {
+        .container-licenses-pills {
+          display: flex;
+          align-items: center;
+          justify-content: center;
 
-          .container-licenses-pills {
+          .tinyPillLicenseContainer {
+            background-color: #e4e4e7;
+            width: fit-content;
+            height: fit-content;
             display: flex;
-            align-items: center;
             justify-content: center;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 10px;
 
-            .tinyPillLicenseContainer {
-              background-color: #E4E4E7;
-              width: fit-content;
-              height: fit-content;
-              display: flex;
-              justify-content: center;
-              padding: 2px 6px;
-              border-radius: 4px;
-              margin-right: 10px;
-
-              .tinyPillLicenseLabel{
-                color: #3F3F46;
-                font-size: 11px;
-                font-weight: 700;
-              }
-            }
-           .incompatible {
-              background-color: #EF4444;
-              color: white;
+            .tinyPillLicenseLabel {
+              color: #3f3f46;
               font-size: 11px;
               font-weight: 700;
             }
           }
+          .incompatible {
+            background-color: #ef4444;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+          }
         }
       }
+    }
   }
 }
 
@@ -241,7 +262,8 @@
   align-items: center;
 }
 
-#LicenseTable.license-short-list, #LicenseTable.license-list  {
+#LicenseTable.license-short-list,
+#LicenseTable.license-list {
   overflow-y: scroll;
   padding: 0 20px;
 }
@@ -250,7 +272,6 @@
   overflow-y: scroll;
   max-height: 100%;
 
-
   .license-list-item {
     display: flex;
     align-items: center;
@@ -258,7 +279,7 @@
     padding: 8px 10px;
 
     &-selected {
-      background-color: #E4E4E7;
+      background-color: #e4e4e7;
       border-radius: 4px;
     }
 
@@ -301,7 +322,6 @@
     justify-content: space-between;
     align-items: center;
 
-
     .label-match-container {
       display: flex;
       flex-direction: column;
@@ -310,17 +330,16 @@
       width: 35%;
 
       .label-match {
-        color: #6366F1;
+        color: #6366f1;
         padding: 0px;
         font-size: 2em;
         font-weight: 400;
       }
 
-      .label-match-sublabel{
-        color: #27272A;
+      .label-match-sublabel {
+        color: #27272a;
         font-size: 14px;
       }
-
     }
 
     .label-nomatch-container {
@@ -330,58 +349,66 @@
       align-items: center;
       width: 35%;
       .label-nomatch {
-        color: #A5B4FC;
+        color: #a5b4fc;
         padding: 0px;
         font-size: 2em;
         font-weight: 400;
       }
 
       .label-nomatch-sublabel {
-        color: #27272A;
+        color: #27272a;
         font-size: 14px;
       }
-
     }
   }
 }
 
-#VulnerabilitiesContainer {
-  display: flex;
-  align-items: flex-end;
-  margin-top: 10px;
-  justify-content: center;
+#VulnerabilitiesCard {
+  margin-top: 15px;
 
-  .vulnerabilitie-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+
+  section {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .vulnerability-container {
     display: flex;
     flex-direction: column;
     width: fit-content;
     align-items: center;
     margin-right: 1vw;
 
-    .vulnerabilitie-number {
-      color: #27272A;
+    .vulnerability-number {
+      color: #27272a;
       font-size: 24px;
     }
 
-    .vulnerabilitie-label {
+    .vulnerability-label {
       width: fit-content;
       border-radius: 4px;
       padding: 2px 12px;
     }
 
     .critical-label {
-      background-color: #EF4444;
-      color: #FFFFFF;
+      background-color: #ef4444;
+      color: #ffffff;
     }
 
     .high {
-      background-color: #FDBA74;
-      color: #C2410C;
+      background-color: #fdba74;
+      color: #c2410c;
     }
 
     .moderate {
-      background-color: #FDE047;
-      color: #A16207;
+      background-color: #fde047;
+      color: #a16207;
     }
 
     .low {
@@ -402,36 +429,35 @@
   }
 }
 
-.notarize-container{
+.notarize-container {
   display: flex;
   justify-content: center;
   flex-flow: row;
   margin-top: 20px;
-
 }
 
 .hide {
-  display:none;
+  display: none;
 }
 
-#OssProgress{
+#OssProgress {
   height: 105px;
 }
 
-#OssOriginalProgress{
+#OssOriginalProgress {
   height: 95px;
 }
 
 #Report .report-layout #OssProgress .identification-canvas-container .label {
   margin-top: 27px;
-  color: #5d5d5d ;
+  color: #5d5d5d;
 }
 
-#Report .report-layout #OssProgress .identification-canvas-container{
+#Report .report-layout #OssProgress .identification-canvas-container {
   height: 70px;
   margin-top: 5px;
 }
 
-#OssProgress .total-files-container{
+#OssProgress .total-files-container {
   margin-top: 10px;
 }
