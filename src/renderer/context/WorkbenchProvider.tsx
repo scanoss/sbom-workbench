@@ -77,11 +77,11 @@ export const WorkbenchProvider: React.FC<any> = ({ children }) => {
     const run = async () => {
       if (!dialog) {
         const dlg = await dialogCtrl.createProgressDialog('Please wait...');
-        setDialog(dlg);
+        setDialog(dlg); // TODO: use ref;
       }
 
       if (batchRunning) {
-        await dialog?.present();
+        await dialog?.present({message: 'Please wait...' });
       } else {
         await dialog?.dismiss();
       }
