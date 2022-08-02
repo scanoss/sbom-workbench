@@ -29,6 +29,8 @@ module.exports = {
     'import/no-cycle': ['warn'],
     'no-empty-pattern': ['off'],
     'react-hooks/exhaustive-deps': 'warn',
+    "no-plusplus": ["warn", { "allowForLoopAfterthoughts": true }]
+
   },
   parserOptions: {
     ecmaVersion: 2020,

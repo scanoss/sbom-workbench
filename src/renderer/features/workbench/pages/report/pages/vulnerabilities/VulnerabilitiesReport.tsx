@@ -47,7 +47,7 @@ const VulnerabilitiesReport = () => {
         cve: `CVE-2014-8181${index}`,
         source: 'Nvd',
         introduced: '3.2.7',
-        reported: '3.2.7',
+        reported: 'May 10, 2022',
         patched: '3.2.8',
       }));
 
@@ -116,14 +116,13 @@ const VulnerabilitiesReport = () => {
                       options={['critical', 'high', 'medium', 'low']}
                       disablePortal
                       multiple
-                      limitTags={2}
                       forcePopupIcon
                       disableCloseOnSelect
                       onChange={(e_, value) => onFilterHandler({ ...filter, severity: value })}
                       renderOption={(props, option, { selected }) => (
                         <li {...props}>
                           <Checkbox style={{ marginRight: 8 }} checked={selected} />
-                          {option}
+                          <span className={`tag tag-${option} option` }> {option} </span>
                         </li>
                       )}
                       renderTags={(value: readonly string[], getTagProps) =>
@@ -159,8 +158,8 @@ const VulnerabilitiesReport = () => {
           </section>
         </header>
         <main className="app-content">
-          <TableContainer component={Paper}>
-            <Table stickyHeader className="selectable" aria-label="vulnerabilities table">
+          <TableContainer className="vulnerabilities-table selectable" component={Paper}>
+            <Table stickyHeader aria-label="vulnerabilities table">
               <TableHead>
                 <TableRow>
                   <TableCell>Component</TableCell>
