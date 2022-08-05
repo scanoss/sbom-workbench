@@ -2,8 +2,8 @@ import { projectService } from '@api/services/project.service';
 import { workspaceService } from '@api/services/workspace.service';
 import { INewProject } from '@api/types';
 
-export const scan = (project: INewProject) => {
-  workspaceService.createProject(project);
+export const scan = async (project: INewProject) => {
+  await workspaceService.createProject(project);
 };
 
 export const resume = async (path: string) => {
@@ -18,4 +18,3 @@ export const open = async (path: string) => {
   const response = await projectService.load(path);
   return response;
 };
-

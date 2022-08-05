@@ -1,9 +1,7 @@
-import { EventEmitter } from 'events';
-import { DependencyScanner, Scanner, SbomMode, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
+import { Scanner, SbomMode, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
 import fs from 'fs';
 import log from 'electron-log';
-import { INewProject, ScanState } from '../../../api/types';
-import { dependencyService } from '../../services/DependencyService';
+import { ScanState } from '../../../api/types';
 import { Project } from '../../workspace/Project';
 import { IpcChannels } from '../../../api/ipc-channels';
 import { fileService } from '../../services/FileService';
@@ -14,11 +12,9 @@ import { userSettingService } from '../../services/UserSettingService';
 import AppConfig from '../../../config/AppConfigModule';
 import { AutoAccept } from '../inventory/AutoAccept';
 import { ITask } from '../Task';
-import { IndexTask } from '../search/indexTask/IndexTask';
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
-import { BlackListDependencies } from '../../workspace/tree/blackList/BlackListDependencies';
 
-export abstract class ScannerTask implements ITask<void, boolean> {
+export abstract class BaseScannerTask implements ITask<void, boolean> {
   protected scanner: Scanner;
 
   protected scannerState: ScanState;
@@ -29,7 +25,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
     broadcastManager.get().send(eventName, data);
   }
 
-  public abstract set(project: INewProject | string): Promise<void>;
+  public abstract set(project: Project | string): Promise<void>;
 
   public async init() {
     this.setScannerConfig();
@@ -63,17 +59,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
         await autoAccept.run();
       }
 
-      // continue with the scanner pipeline
-      this.project.metadata.save();
-      await this.scanDependencies();
-      await this.addDependencies();
-      await this.createSearchIndex();
       this.project.save();
-      await this.project.close();
-      this.sendToUI(IpcChannels.SCANNER_FINISH_SCAN, {
-        success: true,
-        resultsPath: this.project.metadata.getMyPath(),
-      });
     });
 
     this.scanner.on(ScannerEvents.SCANNER_LOG, (message, level) => {
@@ -117,7 +103,7 @@ export abstract class ScannerTask implements ITask<void, boolean> {
 
   public async run(): Promise<boolean> {
     await this.scan();
-    return true;
+    return true; // TODO: return boolean or throw exception?
   }
 
   private async scan() {
@@ -130,54 +116,6 @@ export abstract class ScannerTask implements ITask<void, boolean> {
     });
     const scanIn = this.adapterToScannerInput(this.project.filesToScan);
     await this.scanner.scan(scanIn);
-  }
-
-  private async scanDependencies(): Promise<void> {
-    this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
-      stage: {
-        stageName: `Analyzing dependencies`,
-        stageStep: 3,
-      },
-      processed: 0,
-    });
-
-    try {
-      const allFiles = [];
-      const rootPath = this.project.metadata.getScanRoot();
-      this.project.tree
-        .getRootFolder()
-        .getFiles(new BlackListDependencies())
-        .forEach((f: File) => {
-          allFiles.push(rootPath + f.path);
-        });
-      const dependencies = await new DependencyScanner().scan(allFiles);
-      dependencies.filesList.forEach((f) => {
-        f.file = f.file.replace(rootPath, '');
-      });
-      await fs.promises.writeFile(
-        `${this.project.metadata.getMyPath()}/dependencies.json`,
-        JSON.stringify(dependencies, null, 2)
-      );
-    } catch (e) {
-      log.error(e);
-    }
-  }
-
-  public async addDependencies() {
-    try {
-      const dependencies = JSON.parse(
-        await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8')
-      );
-      this.project.tree.addDependencies(dependencies);
-      this.project.save();
-      await dependencyService.insert(dependencies);
-    } catch (e) {
-      log.error(e);
-    }
-  }
-
-  private async createSearchIndex() {
-    await new IndexTask().run();
   }
 
   protected adapterToScannerInput(filesToScan: Record<string, string>): Array<ScannerInput> {

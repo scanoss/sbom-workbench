@@ -24,9 +24,9 @@ const ProjectScan = () => {
     try {
       const { path, action } = scanPath;
 
-      if (action === 'resume') controller.resume(path);
-      if (action === 'rescan') controller.rescan(path);
-      if (action === 'scan') controller.scan(newProject);
+      if (action === 'resume') await controller.resume(path);
+      if (action === 'rescan') await controller.rescan(path);
+      if (action === 'scan') await controller.scan(newProject);
     } catch (e) {
       console.error(e);
     }

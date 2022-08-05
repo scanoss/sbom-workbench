@@ -8,8 +8,9 @@ import { Project } from '../../main/workspace/Project';
 import { workspace } from '../../main/workspace/Workspace';
 import { dependencyService } from '../../main/services/DependencyService';
 import { ResumeScanTask } from '../../main/task/scanner/ResumeScanTask';
-import { ReScanTask } from '../../main/task/scanner/ReScanTask';
 import { searcher } from '../../main/modules/searchEngine/searcher/Searcher';
+import { ScannerPipelineTask } from '../../main/task/scanner/ScannerPipelineTask';
+import { Scanner } from '../../main/task/scanner/types';
 
 ipcMain.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, arg: any) => {
   // TO DO factory to create filters depending on arguments
@@ -55,10 +56,12 @@ ipcMain.handle(IpcChannels.PROJECT_RESUME_SCAN, async (event, projectPath: strin
 
 ipcMain.handle(IpcChannels.PROJECT_RESCAN, async (event, projectPath: string) => {
   try {
-    const reScanTask = new ReScanTask();
-    await reScanTask.set(projectPath);
-    await reScanTask.init();
-    await reScanTask.run();
+    const scanner = new ScannerPipelineTask();
+    await scanner.run({
+      type: Scanner.ScannerType.RESCAN,
+      projectPath,
+    });
+
     return Response.ok();
   } catch (error: any) {
     console.error(error);

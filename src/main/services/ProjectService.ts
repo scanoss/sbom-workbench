@@ -6,7 +6,7 @@ import { modelProvider } from './ModelProvider';
 import { treeService } from './TreeService';
 
 class ProjectService {
-  public async scan(project: INewProject, event: Electron.WebContents): Promise<Project> {
+  public async create(project: INewProject, event: Electron.WebContents = null): Promise<Project> {
     const p = await workspace.createProject(project);
     await modelProvider.init(p.getMyPath());
     const tree = treeService.init(p.getMyPath(), p.metadata.getScanRoot());
