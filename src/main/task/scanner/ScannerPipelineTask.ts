@@ -12,6 +12,7 @@ import { ReScanTask } from './ReScanTask';
 import { Project } from '../../workspace/Project';
 import { ProjectFilterPath } from '../../workspace/filters/ProjectFilterPath';
 import { Scanner } from './types';
+import {ResumeScanTask} from "./ResumeScanTask";
 
 export class ScannerPipelineTask implements ITask<Scanner.ScannerConfig, boolean> {
   public async run(params: Scanner.ScannerConfig): Promise<boolean> {
@@ -20,14 +21,17 @@ export class ScannerPipelineTask implements ITask<Scanner.ScannerConfig, boolean
     // initialize project
     const project: Project =
       params.type === Scanner.ScannerType.SCAN
-        ? await projectService.create(params.project)
+        ? await projectService.create(params.project) :
+        params.type === Scanner.ScannerType.RESUME ? await workspace.getProject(new ProjectFilterPath(params.projectPath))
         : await workspace.getProject(new ProjectFilterPath(params.projectPath));
+
 
     // scan
     const scanTask: BaseScannerTask =
       params.type === Scanner.ScannerType.SCAN
-        ? new ScanTask()
+        ? new ScanTask() : params.type === Scanner.ScannerType.RESUME ? new ResumeScanTask()
         : new ReScanTask();
+
 
     await scanTask.set(project);
     await scanTask.init();

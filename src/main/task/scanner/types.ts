@@ -5,6 +5,7 @@ export namespace Scanner {
   export enum ScannerType {
     SCAN,
     RESCAN,
+    RESUME,
   }
 
   export interface ScannerConfig {
