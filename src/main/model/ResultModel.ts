@@ -12,7 +12,9 @@ import { IInsertResult, IResultLicense } from './interfaces/IInsertResult';
 const query = new Querys();
 
 export class ResultModel extends Model {
-  public static readonly entityMapper = { path: 'f.path', source: 'comp.source' };
+  public static readonly entityMapper = { path: 'f.path', source: 'comp.source', purl: 'comp.purl',
+    version: 'comp.version'
+  };
 
   component: ComponentModel;
 

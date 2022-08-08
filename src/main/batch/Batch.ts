@@ -47,8 +47,7 @@ export abstract class Batch {
       }
       const files = await modelProvider.model.file.getAll(new QueryBuilderFileIdIn(this.params.source.input)); // TODO:FIXME: repeated files in getAll files
       // If not Overwrite, keep ignored and identified files
-      const result = files.filter((f) => this.overWrite || (!f.ignored && !f.identified)).map((f) => f.id);
-      return [...new Set(result)];
+      return files.filter((f) => this.overWrite || (!f.ignored && !f.identified)).map((f) => f.id);
     } catch (e: any) {
       return e;
     }
