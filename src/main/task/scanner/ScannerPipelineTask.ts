@@ -40,9 +40,8 @@ export class ScannerPipelineTask implements ITask<Scanner.ScannerConfig, boolean
     await new VulnerabilitiesTask(project).run();
 
     // search index
-    await new IndexTask().run();
+    await new IndexTask(project).run();
 
-    await project.save();
     await project.close();
 
     broadcastManager.get().send(IpcChannels.SCANNER_FINISH_SCAN, {

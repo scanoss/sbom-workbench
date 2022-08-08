@@ -4,8 +4,6 @@ import { licenseService } from '../../services/LicenseService';
 import { modelProvider } from '../../services/ModelProvider';
 import { rescanService } from '../../services/RescanService';
 import { treeService } from '../../services/TreeService';
-import { ProjectFilterPath } from '../../workspace/filters/ProjectFilterPath';
-import { workspace } from '../../workspace/Workspace';
 import { BaseScannerTask } from './BaseScannerTask';
 import { Project } from '../../workspace/Project';
 

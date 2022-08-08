@@ -14,7 +14,7 @@ import { AutoAccept } from '../inventory/AutoAccept';
 import { ITask } from '../Task';
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
 
-export abstract class BaseScannerTask implements ITask<void, boolean> {
+export abstract class BaseScannerTask implements ITask<void, void> {
   protected scanner: Scanner;
 
   protected scannerState: ScanState;
@@ -101,9 +101,9 @@ export abstract class BaseScannerTask implements ITask<void, boolean> {
     this.scanner.setWorkDirectory(this.project.getMyPath());
   }
 
-  public async run(): Promise<boolean> {
+  public async run(): Promise<void> {
     await this.scan();
-    return true; // TODO: return boolean or throw exception?
+    await this.project.save();
   }
 
   private async scan() {
