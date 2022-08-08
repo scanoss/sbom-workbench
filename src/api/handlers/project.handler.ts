@@ -48,10 +48,17 @@ ipcMain.handle(IpcChannels.PROJECT_STOP_SCAN, async (_event) => {
 });
 
 ipcMain.handle(IpcChannels.PROJECT_RESUME_SCAN, async (event, projectPath: string) => {
-  const resumeScanTask = new ResumeScanTask();
-  await resumeScanTask.set(projectPath);
-  await resumeScanTask.init();
-  await resumeScanTask.run();
+  try {
+    const scanner = new ScannerPipelineTask();
+    await scanner.run({
+      type: Scanner.ScannerType.RESUME,
+      projectPath,
+    });
+    return Response.ok();
+  } catch (error: any) {
+    console.error(error);
+    return Response.fail({ message: error.message });
+  }
 });
 
 ipcMain.handle(IpcChannels.PROJECT_RESCAN, async (event, projectPath: string) => {

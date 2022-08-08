@@ -42,6 +42,7 @@ export abstract class BaseScannerTask implements ITask<void, void> {
         },
         processed: (100 * this.project.processedFiles) / this.project.filesSummary.include,
       });
+      await this.project.save();
     });
 
     this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response, filesNotScanned) => {
