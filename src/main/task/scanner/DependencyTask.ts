@@ -8,14 +8,14 @@ import { broadcastManager } from '../../broadcastManager/BroadcastManager';
 import { Project } from '../../workspace/Project';
 import { dependencyService } from '../../services/DependencyService';
 
-export class DependencyTask implements ITask<void, boolean> {
+export class DependencyTask implements ITask<void, void> {
   private project: Project;
 
   constructor(project: Project) {
     this.project = project;
   }
 
-  public async run(params: void): Promise<boolean> {
+  public async run(params: void): Promise<void> {
     broadcastManager.get().send(IpcChannels.SCANNER_UPDATE_STATUS, {
       stage: {
         stageName: `Analyzing dependencies`,
@@ -26,8 +26,7 @@ export class DependencyTask implements ITask<void, boolean> {
 
     await this.scanDependencies();
     await this.addDependencies();
-
-    return Promise.resolve(true);
+    await this.project.save();
   }
 
   private async scanDependencies() {

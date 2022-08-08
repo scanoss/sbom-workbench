@@ -5,19 +5,27 @@ import { IIndexer } from '../../../modules/searchEngine/indexer/IIndexer';
 import { workspace } from '../../../workspace/Workspace';
 import { BlackListKeyWordIndex } from '../../../workspace/tree/blackList/BlackListKeyWordIndex';
 import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCreator';
+import {Project} from "../../../workspace/Project";
 
 export class IndexTask implements ITask<Electron.WebContents, any> {
-  public async run(): Promise<any> {
-    const project = workspace.getOpenProject();
-    if (!project) throw new Error('Not project opened');
+  private project: Project;
 
-    const f = project.getTree().getRootFolder().getFiles(new BlackListKeyWordIndex());
+  constructor(project: Project) {
+    this.project = project;
+  }
+
+
+  public async run(): Promise<any> {
+  /*  const project = workspace.getOpenProject();
+    if (!project) throw new Error('Not project opened');*/
+
+    const f = this.project.getTree().getRootFolder().getFiles(new BlackListKeyWordIndex());
     const paths = f.map((fi) => fi.path);
     const files = await modelProvider.model.file.getAll(QueryBuilderCreator.create(paths));
     const indexer = new Indexer();
     const filesToIndex = this.fileAdapter(files);
     const index = indexer.index(filesToIndex);
-    const projectPath = project.metadata.getMyPath();
+    const projectPath = this.project.metadata.getMyPath();
     await indexer.saveIndex(index, `${projectPath}/dictionary/`);
   }
 

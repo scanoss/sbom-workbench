@@ -2,14 +2,14 @@ import { ITask } from '../Task';
 import { Project } from '../../workspace/Project';
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
 
-export class VulnerabilitiesTask implements ITask<void, boolean> {
+export class VulnerabilitiesTask implements ITask<void, void> {
   private project: Project;
 
   constructor(project: Project) {
     this.project = project;
   }
 
-  run(params: void): Promise<boolean> {
+ public async run(params: void): Promise<void> {
     /* broadcastManager.get().send(IpcChannels.SCANNER_UPDATE_STATUS, {
       stage: {
         stageName: `Searching vulnerabilities`,
@@ -17,6 +17,7 @@ export class VulnerabilitiesTask implements ITask<void, boolean> {
       },
       processed: 0,
     }); */
+    await this.project.save();
     return Promise.resolve(undefined);
   }
 }
