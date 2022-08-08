@@ -13,7 +13,7 @@ class ComponentService {
     try {
       const filter = workspace.getOpenedProjects()[0].getFilter(params);
       const queryBuilder = QueryBuilderCreator.create({ purl: data.purl, version: data.version, ...filter });
-      let files: any = await modelProvider.model.file.getAll(queryBuilder);
+      let files: any = await modelProvider.model.result.getAll(queryBuilder);
       files = new ComponentAdapter().componentFileAdapter(files);
       const inventories: any = await modelProvider.model.inventory.getAll();
       const compid = inventories.map((inv) => inv.cvid);
