@@ -16,9 +16,8 @@ export class IndexTask implements ITask<Electron.WebContents, any> {
 
 
   public async run(): Promise<any> {
-  /*  const project = workspace.getOpenProject();
-    if (!project) throw new Error('Not project opened');*/
-
+    const project = workspace.getOpenProject();
+    if (!project) throw new Error('Not project opened');
     const f = this.project.getTree().getRootFolder().getFiles(new BlackListKeyWordIndex());
     const paths = f.map((fi) => fi.path);
     const files = await modelProvider.model.file.getAll(QueryBuilderCreator.create(paths));
