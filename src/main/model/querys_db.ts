@@ -30,6 +30,26 @@ export class Querys {
   RESULT_LICENSE =
     'CREATE TABLE IF NOT EXISTS result_license (resultLicenseId INTEGER PRIMARY KEY,resultId integer NOT NULL ,spdxid varchar(90) NOT NULL, source varchar(45) NOT NULL ,patent_hints varchar(10),copyLeft varchar(10), osadl_updated datetime,incompatible_with text, checklist_url varchar(150),FOREIGN KEY (resultId) REFERENCES results(id) ON DELETE CASCADE, UNIQUE(resultId,source,spdxid));';
 
+  VULNERABILITY_TABLE = `CREATE TABLE IF NOT EXISTS vulnerability (
+    cve varchar(30) NOT NULL CONSTRAINT PK_VULNERABILTY PRIMARY KEY,
+    source varchar(35) NOT NULL,
+    severity varchar(30) NOT NULL,
+    introduced varchar(35) NOT NULL,
+    reported varchar(30) NOT NULL,
+    patched varchar(35) NOT NULL,
+    summary varchar(45) NOT NULL
+    );`;
+
+  COMPONENT_VULNERABILITY = `CREATE TABLE IF NOT EXISTS component_vulnerability (
+    purl varchar(45) NOT NULL,
+    version varchar(45) NOT NULL,
+    cve varchar(30) NOT NULL,
+    rejectAt datetime,
+    CONSTRAINT component_vulnerability_pk PRIMARY KEY (purl,version,cve),
+    CONSTRAINT component_vulnerability_vulnerability FOREIGN KEY (cve)
+    REFERENCES vulnerability (cve)
+);`;
+
   SQL_DB_TABLES =
     this.SQL_CREATE_TABLE_RESULTS +
     this.FILES_TABLE +
@@ -39,7 +59,9 @@ export class Querys {
     this.COMPDB_SQL_CREATE_TABLE_LICENCES_FOR_COMPVERS +
     this.COMPDB_LICENSES_TABLE +
     this.DEPENDENCY_TABLE +
-    this.RESULT_LICENSE;
+    this.RESULT_LICENSE +
+    this.VULNERABILITY_TABLE +
+    this.COMPONENT_VULNERABILITY;
 
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS

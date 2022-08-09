@@ -1,8 +1,5 @@
-import { IpcChannels } from '../../../api/ipc-channels';
 import { ScanState } from '../../../api/types';
-import { ProjectFilterPath } from '../../workspace/filters/ProjectFilterPath';
 import { Project } from '../../workspace/Project';
-import { workspace } from '../../workspace/Workspace';
 import { BaseScannerTask } from './BaseScannerTask';
 
 export class ResumeScanTask extends BaseScannerTask {
