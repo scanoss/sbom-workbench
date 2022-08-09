@@ -4,6 +4,7 @@ import { InventoryModel } from './InventoryModel';
 import { LicenseModel } from './LicenseModel';
 import { ResultModel } from './ResultModel';
 import { DependencyModel } from './DependencyModel';
+import {VulnerabilityModel} from "./VulnerabilityModel";
 
 export class ScanModel {
   component: ComponentModel;
@@ -20,6 +21,8 @@ export class ScanModel {
 
   dependency: DependencyModel;
 
+  vulnerability: VulnerabilityModel;
+
   constructor(path: string) {
     this.file = new FileModel(path);
     this.inventory = new InventoryModel(path);
@@ -27,5 +30,6 @@ export class ScanModel {
     this.license = new LicenseModel(path);
     this.component = new ComponentModel(path);
     this.dependency = new DependencyModel(path);
+    this.vulnerability = new VulnerabilityModel(path);
   }
 }
