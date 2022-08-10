@@ -11,16 +11,14 @@ import { componentSource } from '../model/interfaces/component/INewComponent';
 
 class DependencyService {
   public async insert(dependencies: IDependencyResponse): Promise<void> {
-    const filesDependencies = dependencyHelper.dependecyModelAdapter(dependencies);
-    const files = await fileHelper.getPathFileId();
+    const files: Record<string,number> = await fileHelper.getPathFileId();
     const filesIds = [];
-    filesDependencies.forEach((fileDependency) => {
-      fileDependency.fileId = files[fileDependency.file];
+    dependencies.filesList.forEach((fileDependency) => {
       filesIds.push(files[fileDependency.file]);
     });
-
+    const dep = dependencyHelper.dependecyModelAdapter(dependencies.filesList,files);
     await modelProvider.model.file.updateFileType(filesIds, 'MATCH');
-    await modelProvider.model.dependency.insert(filesDependencies);
+    await modelProvider.model.dependency.insertAll(dep);
   }
 
   public async getAll(params: any): Promise<Array<Dependency>> {

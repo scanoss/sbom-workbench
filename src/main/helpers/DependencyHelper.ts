@@ -1,15 +1,34 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-param-reassign */
 
+import { FilesList } from "scanoss";
 import { Dependency } from '../../api/types';
+import { Dependency as Dep } from '../model/entity/Dependency'
 
 class DependencyHelper {
-  public dependecyModelAdapter(dependency: any) {
-    const dep = dependency.filesList.map((file) => {
-      file.dependenciesList.map((depList) => (depList.licensesList = depList.licensesList.map((lic) => lic.spdxId)));
-      return file;
+  public dependecyModelAdapter(fileList: Array<FilesList> , files: Record<string,number> ): Array<Dep> {
+  const dependencies : Array<Dep> = [];
+     fileList.forEach((file) => {
+      file.dependenciesList.forEach((depList)=>{
+        const auxDep = new Dep();
+        auxDep.fileId = files[file.file];
+          auxDep.version = depList.version;
+          auxDep.originalVersion = depList.version;
+          auxDep.purl = depList.purl;
+          auxDep.component = depList.component;
+          auxDep.scope = depList.scope ? depList.scope : null;
+          auxDep.licenses = [];
+          auxDep.originalLicense = [];
+        depList.licensesList.forEach((l)=>{
+          if(l.spdxId !== '') {
+            auxDep.licenses.push(l.spdxId);
+            auxDep.originalLicense.push(l.spdxId);
+          }
+        });
+        dependencies.push(auxDep);
+      });
     });
-    return dep;
+    return dependencies;
   }
 
   public mergeInventoryComponentToDependency(
