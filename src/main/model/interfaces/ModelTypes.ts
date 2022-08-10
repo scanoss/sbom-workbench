@@ -1,12 +1,5 @@
-export interface Vulnerability{
-  cve: string,
-  source:string,
-  severity:string,
-  introduced:string,
-  reported:string,
-  patched:string,
-  summary:string,
-}
+import {Vulnerability} from "../entity/Vulnerability";
+
 
 export interface ComponentVulnerability{
   purl:string;
