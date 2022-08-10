@@ -18,7 +18,7 @@ export class HtmlSummary extends Format {
       : pathLib.join(__dirname, '../../../assets/exportTemplates/');
 
     let HTMLtemplate = fs.readFileSync(`${PATH}template.html`, 'utf8').toString();
-    const data: any = await reportService.getReportIdentified();
+    const data: any = await reportService.getIdentified();
     const progress: any = await reportService.getReportSummary();
     HTMLtemplate = HTMLtemplate.replace('#DATA', JSON.stringify(data.licenses));
     HTMLtemplate = HTMLtemplate.replace('#SUMMARY', JSON.stringify(progress));

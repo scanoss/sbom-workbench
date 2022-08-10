@@ -13,7 +13,7 @@ import { ScannerPipelineTask } from '../../main/task/scanner/ScannerPipelineTask
 import { Scanner } from '../../main/task/scanner/types';
 
 ipcMain.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, arg: any) => {
-  // TO DO factory to create filters depending on arguments
+  // TODO: factory to create filters depending on arguments
   const p: Project = await workspace.openProject(new ProjectFilterPath(arg));
   searcher.closeIndex();
   const response = {
@@ -127,7 +127,7 @@ ipcMain.handle(IpcChannels.PROJECT_SET_FILE_TREE_VIEW_MODE, async (event, mode: 
   try {
     const p = workspace.getOpenedProjects()[0];
     p.setFileTreeViewMode(mode);
-    return Response.ok({ message: 'Filter setted succesfully', data: true });
+    return Response.ok({ message: 'Filter setted successfully', data: true });
   } catch (e: any) {
     return Response.fail({ message: e.message });
   }
@@ -135,14 +135,14 @@ ipcMain.handle(IpcChannels.PROJECT_SET_FILE_TREE_VIEW_MODE, async (event, mode: 
 
 ipcMain.handle(IpcChannels.GET_API_KEY, async (event) => {
   try {
-    const p = workspace.getOpenedProjects()[0];
+    const p = workspace.getOpenProject();
     let apiKey = p.getApiKey();
     if (apiKey === undefined) {
       const { APIS, DEFAULT_API_INDEX } = userSettingService.get();
       if (DEFAULT_API_INDEX > 0) apiKey = APIS[DEFAULT_API_INDEX].API_KEY;
       else apiKey = null;
     }
-    return Response.ok({ message: '', data: apiKey });
+    return Response.ok({ message: 'Api Key loaded successfully', data: apiKey });
   } catch (e: any) {
     return Response.fail({ message: e.message });
   }

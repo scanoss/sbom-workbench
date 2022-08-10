@@ -1,15 +1,18 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { Chart, registerables } from 'chart.js';
 import { Button, Card } from '@mui/material';
-import LicensesChart from '../components/LicensesChart';
-import IdentificationProgress from '../components/IdentificationProgress';
-import LicensesTable from '../components/LicensesTable';
-import MatchesForLicense from '../components/MatchesForLicense';
-import LicensesObligations from '../components/LicensesObligations';
-import obligationsService from '../../../../../../api/services/obligations.service';
-import OssVsOriginalProgressBar from '../components/OssVsOriginalProgressBar';
+import obligationsService from '@api/services/obligations.service';
+import { projectService } from '@api/services/project.service';
+import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
+import LicensesChart from '../../components/LicensesChart';
+import IdentificationProgress from '../../components/IdentificationProgress';
+import LicensesTable from '../../components/LicensesTable';
+import MatchesForLicense from '../../components/MatchesForLicense';
+import LicensesObligations from '../../components/LicensesObligations';
+import OssVsOriginalProgressBar from '../../components/OssVsOriginalProgressBar';
+import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 
 Chart.register(...registerables);
 
@@ -17,6 +20,7 @@ const IdentifiedReport = ({ data }) => {
   const navigate = useNavigate();
   const [obligations, setObligations] = useState(null);
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
+  const [blocked, setBlocked] = useState<boolean>(false);
 
   const isEmpty = data.summary.identified.scan === 0 && data.summary.original === 0 && data.licenses.length === 0;
 
@@ -24,6 +28,10 @@ const IdentifiedReport = ({ data }) => {
     const licenses = data.licenses.map((license) => license.label);
     const obligations = await obligationsService.getObligations(licenses);
     setObligations(obligations);
+
+    // api key validation TODO: move to store
+    const apiKey = await projectService.getApiKey();
+    setBlocked(!apiKey);
   };
 
   const onLicenseSelected = (license: string) => {
@@ -43,7 +51,10 @@ const IdentifiedReport = ({ data }) => {
           <div className="report-message">
             <InsertDriveFileOutlinedIcon fontSize="inherit" color="primary" style={{ fontSize: '100px' }} />
             <h2 className="mb-1">Nothing identified yet</h2>
-            <h5 className="mt-1 text-center">Verify the scanner output before including them in your SBOM in order to confirm detections or even include your own manual identifications.</h5>
+            <h5 className="mt-1 text-center">
+              Verify the scanner output before including them in your SBOM in order to confirm detections or even
+              include your own manual identifications.
+            </h5>
             <Button variant="contained" color="primary" onClick={() => navigate('/workbench/detected')}>
               Start Identification
             </Button>
@@ -89,6 +100,16 @@ const IdentifiedReport = ({ data }) => {
             <p className="report-empty">No matches found</p>
           )}
         </Card>
+
+        <Link to="../../vulnerabilities" className="w-100">
+          <Card className="report-item vulnerabilities">
+            <div className="report-title d-flex space-between align-center">
+              <span>Vulnerabilities</span>
+              <ArrowForwardOutlinedIcon fontSize="inherit" />
+            </div>
+            <VulnerabilitiesCard data={data.vulnerabilities} blocked={blocked} />
+          </Card>
+        </Link>
 
         <Card className="report-item licenses-obligation">
           {obligations ? (

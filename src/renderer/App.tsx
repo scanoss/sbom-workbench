@@ -73,14 +73,17 @@ export default class App {
   }
 
   private loadTheme(): Theme {
+    const primary = '#6366F1';
+    const secondary = '#22C55E';
+
     const theme = createTheme({
       palette: {
         mode: 'light',
         primary: {
-          main: '#6366F1',
+          main: primary,
         },
         secondary: {
-          main: '#22C55E',
+          main: secondary,
           contrastText: '#FFFFFF',
         },
         success: {
@@ -109,10 +112,30 @@ export default class App {
                 borderColor: 'rgba(39, 39, 42, 0.2) !important',
               },
               '&.Mui-focused fieldset': {
-                borderColor: '#6366F1 !important',
+                borderColor: `${primary} !important}`,
               },
               '&.Mui-error fieldset': {
                 borderColor: '#d32f2f !important',
+              },
+              '&.MuiInputBase-adornedStart .MuiSvgIcon-root': {
+                opacity: 0.5,
+              },
+              '&.Mui-focused.MuiInputBase-adornedStart .MuiSvgIcon-root': {
+                opacity: 1,
+              },
+              '&.Mui-focused.MuiInputBase-adornedStart > .MuiSvgIcon-root:first-child': {
+                color: primary,
+              },
+            },
+          },
+        },
+        MuiTableHead: {
+          styleOverrides: {
+            root: {
+              '& .MuiTableCell-root': {
+                color: '#27272A',
+                backgroundColor: '#FAFAFA !important',
+                fontWeight: 700,
               },
             },
           },

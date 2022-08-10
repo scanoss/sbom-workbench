@@ -1,0 +1,59 @@
+#VulnerabilitiesReportPage {
+  display: grid;
+
+  .app-content {
+    .vulnerabilities-table {
+      max-height: 100%;
+    }
+  }
+
+  .form-row.filter {
+    .form-group {
+      width: 350px;
+
+      &.filter-severity {
+        min-width: 350px;
+        width: auto;
+
+        .MuiAutocomplete-option {
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+
+        .tag:not(.option) {
+          padding: 0;
+        }
+
+        .tag.option {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+
+  .tag {
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 700;
+
+    &.tag-critical {
+      background: #ef4444;
+      color: white;
+    }
+
+    &.tag-high {
+      background: #fecaca;
+      color: #ef4444;
+    }
+
+    &.tag-medium {
+      background: #fed7aa;
+      color: #f38609;
+    }
+
+    &.tag-low {
+      background: #e4e4e7;
+    }
+  }
+}

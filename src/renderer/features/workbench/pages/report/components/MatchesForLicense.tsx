@@ -11,7 +11,6 @@ import IconComponent from "../../../components/IconComponent/IconComponent";
 const useStyles = makeStyles({
   table: {
     minWidth: 400,
-
     '& .MuiTableCell-root': {
       padding: '6px 12px',
     }
@@ -23,7 +22,7 @@ export default function MatchesForLicense({ data }) {
 
   return (
     <>
-      <TableContainer>
+      <TableContainer className="mt-2">
         <Table stickyHeader className={classes.table}>
           <TableHead>
             <TableRow>

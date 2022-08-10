@@ -16,7 +16,7 @@ ipcMain.handle(IpcChannels.REPORT_SUMMARY, async () => {
 
 ipcMain.handle(IpcChannels.REPORT_IDENTIFIED, async () => {
   try {
-    const identified = await reportService.getReportIdentified();
+    const identified = await reportService.getIdentified();
     return Response.ok({ message: 'Identified report successfully retrieved', data: identified });
   } catch (error: any) {
     log.error('[REPORT IDENTIFIED]: ', error);

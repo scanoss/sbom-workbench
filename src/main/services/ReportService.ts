@@ -1,24 +1,22 @@
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
-import { Dependency } from '../../api/types';
 
-interface licenseEntry {
+interface LicenseEntry {
   label: string;
   components: any[];
   value: number;
   incompatibles: string[];
-  has_incompatibles: [];
+  has_incompatibles: string[];
   copyleft: boolean;
   patent_hints: boolean;
 }
-interface cryptoEntry {
+interface CryptoEntry {
   label: string;
-  components: any[];
   value: number;
-  strength: number;
+  files: any[];
 }
 
-interface inventoryProgress {
+interface InventoryProgress {
   totalFiles: number;
   scannedFiles: number;
   excludedFiles: number;
@@ -43,63 +41,59 @@ export interface ISummary {
 
 class ReportService {
   public async getReportSummary(): Promise<ISummary> {
-    try {
-      const auxSummary = await modelProvider.model.file.getSummary();
-      const summary = {
-        summary: {
-          matchFiles: auxSummary.matchFiles,
-          noMatchFiles: auxSummary.noMatchFiles,
-          filterFiles: auxSummary.filterFiles,
-          totalFiles: auxSummary.totalFiles,
-        },
-        identified: {
-          scan: auxSummary.scannedIdentified,
-          total: auxSummary.totalIdentified,
-        },
-        pending: auxSummary.pending,
-        original: auxSummary.original,
-      } as ISummary;
-      return summary;
-    } catch (error) {
-      return error;
-    }
+    const auxSummary = await modelProvider.model.file.getSummary();
+    const summary: ISummary = {
+      summary: {
+        matchFiles: auxSummary.matchFiles,
+        noMatchFiles: auxSummary.noMatchFiles,
+        filterFiles: auxSummary.filterFiles,
+        totalFiles: auxSummary.totalFiles,
+      },
+      identified: {
+        scan: auxSummary.scannedIdentified,
+        total: auxSummary.totalIdentified,
+      },
+      pending: auxSummary.pending,
+      original: auxSummary.original,
+    };
+    return summary;
   }
 
-  public async getReportIdentified() {
-    try {
-      let data: any = [];
-      data = await modelProvider.model.component.getIdentifiedForReport();
-      const licenses = [];
-      data.forEach((element) => {
-        const aux: any = {};
-        const index = licenses.findIndex((obj) => obj.label === element.spdxid);
-        if (index >= 0) {
-          licenses[index].components.push({
-            name: element.comp_name,
-            vendor: element.vendor,
-            url: element.url,
-            purl: element.purl,
-            version: element.version,
-          });
-          licenses[index].value += 1;
-        } else {
-          aux.components = [];
-          aux.components.push({
-            name: element.comp_name,
-            vendor: element.vendor,
-            url: element.url,
-            purl: element.purl,
-            version: element.version,
-          });
-          aux.value = 1;
-          aux.label = element.spdxid;
-          licenses.push(aux);
-        }
-      });
-      return { licenses };
-    } catch (error) {
-      return error;
-    }
+  public async getIdentified() {
+    let data: any = [];
+    data = await modelProvider.model.component.getIdentifiedForReport();
+    const licenses = [];
+    data.forEach((element) => {
+      const aux: any = {};
+      const index = licenses.findIndex((obj) => obj.label === element.spdxid);
+      if (index >= 0) {
+        licenses[index].components.push({
+          name: element.comp_name,
+          vendor: element.vendor,
+          url: element.url,
+          purl: element.purl,
+          version: element.version,
+        });
+        licenses[index].value += 1;
+      } else {
+        aux.components = [];
+        aux.components.push({
+          name: element.comp_name,
+          vendor: element.vendor,
+          url: element.url,
+          purl: element.purl,
+          version: element.version,
+        });
+        aux.value = 1;
+        aux.label = element.spdxid;
+        licenses.push(aux);
+      }
+    });
+
+    // TODO: get vulnerabilities
+    const vulnerabilities = { critical: 0, high: 0, low: 0, moderate: 0 };
+
+    return { licenses, vulnerabilities };
   }
 
   public async getDetected() {
@@ -109,17 +103,13 @@ class ReportService {
       moderate: [],
       low: [],
     };
-    let success: boolean;
-    let licenses: licenseEntry[];
-    let crypto: cryptoEntry[];
-    let inventory: inventoryProgress;
+    let licenses: LicenseEntry[] = [];
+    const crypto: CryptoEntry[] = [{ label: 'None', files: [], value: 0 }];
     const vulnerabilities = { critical: 0, high: 0, low: 0, moderate: 0 };
-    licenses = [];
-    crypto = [{ label: 'None', files: [], value: 0 }];
 
     try {
       const a = await workspace.getOpenedProjects()[0].getResults();
-      for (const [key, results] of Object.entries(a)) {
+      for (const [key, results] of Object.entries<any[]>(a)) {
         for (const result of results) {
           if (result.id !== 'none') {
             if (result.licenses !== undefined && result.licenses[0] !== undefined) {
@@ -180,9 +170,9 @@ class ReportService {
               crypto[index].files.push(result.file);
 
               crypto[index].value = crypto[index].files.length;
-              //  }
             }
-            /* Vulnerabilities */
+
+            // Vulnerabilities
             if (result.vulnerabilities !== undefined) {
               let i = 0;
               for (i = 0; i < result.vulnerabilities.length; i++) {
@@ -219,21 +209,18 @@ class ReportService {
     }
   }
 
-  private checkForIncompatibilities(licenses: licenseEntry[]) {
-    let l = 0;
-    let i = 0;
-
-    for (l = 0; l < licenses.length; l += 1) {
+  private checkForIncompatibilities(licenses: LicenseEntry[]) {
+    for (let l = 0; l < licenses.length; l += 1) {
       const license = licenses[l];
       if (license.incompatibles !== undefined)
-        for (i = 0; i < license.incompatibles.length; i += 1) {
-          if (licenses.some((l) => l.label === license.incompatibles[i]))
+        for (let i = 0; i < license.incompatibles.length; i += 1) {
+          if (licenses.some((lic) => lic.label === license.incompatibles[i]))
             license.has_incompatibles.push(license.incompatibles[i]);
         }
     }
   }
 
-  private async mergeLicenseData(licenses: licenseEntry[], dependencies: Array<any>): Promise<Array<licenseEntry>> {
+  private async mergeLicenseData(licenses: LicenseEntry[], dependencies: Array<any>): Promise<Array<LicenseEntry>> {
     const licenseMapper = licenses.reduce((acc, curr) => {
       if (!acc[curr.label]) acc[curr.label] = curr;
       return acc;
@@ -310,14 +297,14 @@ class ReportService {
       }
     });
     // Used to position the unknown license element to the end of the array
-    const licenseArray = Object.values(licenseMapper) as Array<licenseEntry>;
+    const licenseArray = Object.values(licenseMapper) as Array<LicenseEntry>;
     if (licenseMapper.unknown) {
       const index = licenseArray.findIndex((l) => l.label === 'unknown');
       const aux = licenseArray[index];
       licenseArray.splice(index, 1);
       licenseArray.push(aux);
     }
-    return licenseArray as Array<licenseEntry>;
+    return licenseArray as Array<LicenseEntry>;
   }
 }
 
