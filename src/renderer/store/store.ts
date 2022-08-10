@@ -10,8 +10,7 @@ const store = configureStore({
     getDefaultMiddleware()
       .prepend(rootMiddleware.middleware)
       .prepend(inventoryMiddleware.middleware)
-      .prepend(dependencyMiddleware.middleware)
-
+      .prepend(dependencyMiddleware.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

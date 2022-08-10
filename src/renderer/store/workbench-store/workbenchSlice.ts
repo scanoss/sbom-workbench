@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '@shared/utils/filetree-utils';
 import { loadProject, setTree } from './workbenchThunks';
 import { RootState } from '../rootReducer';
-import {ISummary} from "../../../main/services/ReportService";
+import { ISummary } from "../../../main/services/ReportService";
 
 export interface WorkbenchState {
   path: string;
@@ -18,6 +18,9 @@ export interface WorkbenchState {
   };
   loading: boolean;
   loaded: boolean;
+  settings: {
+    isApiKeySetted: boolean;
+  };
 }
 
 const initialState: WorkbenchState = {
@@ -33,6 +36,9 @@ const initialState: WorkbenchState = {
   loaded: false,
   history: {
     section: null,
+  },
+  settings: {
+    isApiKeySetted: false,
   },
 };
 

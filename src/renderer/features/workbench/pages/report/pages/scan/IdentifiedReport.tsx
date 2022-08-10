@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { Chart, registerables } from 'chart.js';
 import { Button, Card } from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
+import { projectService } from '@api/services/project.service';
+import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import LicensesChart from '../../components/LicensesChart';
 import IdentificationProgress from '../../components/IdentificationProgress';
 import LicensesTable from '../../components/LicensesTable';
@@ -18,6 +20,7 @@ const IdentifiedReport = ({ data }) => {
   const navigate = useNavigate();
   const [obligations, setObligations] = useState(null);
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
+  const [blocked, setBlocked] = useState<boolean>(false);
 
   const isEmpty = data.summary.identified.scan === 0 && data.summary.original === 0 && data.licenses.length === 0;
 
@@ -25,6 +28,10 @@ const IdentifiedReport = ({ data }) => {
     const licenses = data.licenses.map((license) => license.label);
     const obligations = await obligationsService.getObligations(licenses);
     setObligations(obligations);
+
+    // api key validation TODO: move to store
+    const apiKey = await projectService.getApiKey();
+    setBlocked(!apiKey);
   };
 
   const onLicenseSelected = (license: string) => {
@@ -94,10 +101,15 @@ const IdentifiedReport = ({ data }) => {
           )}
         </Card>
 
-        <Card className="report-item vulnerabilities">
-          <div className="report-title">Vulnerabilities</div>
-          <VulnerabilitiesCard data={data.vulnerabilities} />
-        </Card>
+        <Link to="../../vulnerabilities" className="w-100">
+          <Card className="report-item vulnerabilities">
+            <div className="report-title d-flex space-between align-center">
+              <span>Vulnerabilities</span>
+              <ArrowForwardOutlinedIcon fontSize="inherit" />
+            </div>
+            <VulnerabilitiesCard data={data.vulnerabilities} blocked={blocked} />
+          </Card>
+        </Link>
 
         <Card className="report-item licenses-obligation">
           {obligations ? (

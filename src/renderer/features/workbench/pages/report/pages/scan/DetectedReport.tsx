@@ -1,24 +1,32 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Chart, registerables } from 'chart.js';
 import { Card } from '@mui/material';
-import obligationsService from "@api/services/obligations.service";
+import obligationsService from '@api/services/obligations.service';
+import { projectService } from '@api/services/project.service';
+import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
+import { Link } from 'react-router-dom';
 import LicensesChart from '../../components/LicensesChart';
 import LicensesTable from '../../components/LicensesTable';
 import MatchesForLicense from '../../components/MatchesForLicense';
 import MatchesChart from '../../components/MatchesChart';
 import LicensesObligations from '../../components/LicensesObligations';
-import VulnerabilitiesCard from "../../components/VulnerabilitiesCard";
+import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 
 Chart.register(...registerables);
 
 const DetectedReport = ({ data }) => {
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
   const [obligations, setObligations] = useState(null);
+  const [blocked, setBlocked] = useState<boolean>(false);
 
   const init = async () => {
     const licenses = data.licenses.map((license) => license.label);
     const obligations = await obligationsService.getObligations(licenses);
     setObligations(obligations);
+
+    // api key validation TODO: move to store
+    const apiKey = await projectService.getApiKey();
+    setBlocked(!apiKey);
   };
 
   const onLicenseSelected = (license: string) => {
@@ -63,10 +71,15 @@ const DetectedReport = ({ data }) => {
           <MatchesChart data={data.summary} />
         </Card>
 
-        <Card className="report-item vulnerabilities">
-          <div className="report-title">Vulnerabilities</div>
-          <VulnerabilitiesCard data={data.vulnerabilities} />
-        </Card>
+        <Link to="../../vulnerabilities" className="w-100">
+          <Card className="report-item vulnerabilities">
+            <div className="report-title d-flex space-between align-center">
+              <span>Vulnerabilities</span>
+              <ArrowForwardOutlinedIcon fontSize="inherit" />
+            </div>
+            <VulnerabilitiesCard data={data.vulnerabilities} blocked={blocked} />
+          </Card>
+        </Link>
 
         <Card className="report-item licenses-obligation">
           {obligations ? (

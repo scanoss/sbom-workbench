@@ -45,7 +45,7 @@
     margin-bottom: 16px;
 
     &.detected {
-      grid-template-rows: 350px 150px 150px auto auto;
+      grid-template-rows: 350px 150px minmax(150px, auto) auto auto;
 
       grid-template-areas:
         'A B'
@@ -100,7 +100,7 @@
     }
 
     .report-item {
-      padding: 16px;
+      padding: 24px;
 
       .report-title {
         color: #27272a;
@@ -363,57 +363,70 @@
   }
 }
 
+.vulnerabilities {
+  .MuiSvgIcon-root {
+    opacity: 0.5;
+    transition: all 200ms ease;
+  }
+
+  &:hover .MuiSvgIcon-root {
+    transform: translateX(3px);
+    opacity: 1;
+  }
+}
+
 #VulnerabilitiesCard {
   margin-top: 15px;
-
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: flex-end;
-  gap: 20px;
 
   section {
     display: flex;
-    justify-content: center;
     width: 100%;
+    gap: 20px;
+  }
+
+  &.blocked {
+    section {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .vulnerability-number {
+      filter: blur(8px);
+    }
   }
 
   .vulnerability-container {
     display: flex;
     flex-direction: column;
     width: fit-content;
-    align-items: center;
-    margin-right: 1vw;
+    min-width: 80px;
 
     .vulnerability-number {
-      color: #27272a;
-      font-size: 24px;
+      font-weight: 500;
+      font-size: 62px;
+      line-height: 62px;
     }
 
     .vulnerability-label {
-      width: fit-content;
-      border-radius: 4px;
-      padding: 2px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: black;
     }
 
-    .critical-label {
-      background-color: #ef4444;
-      color: #ffffff;
+    &.critical .vulnerability-number {
+      color: #ef4444;
     }
-
-    .high {
-      background-color: #fdba74;
+    &.high .vulnerability-number {
       color: #c2410c;
     }
-
-    .moderate {
-      background-color: #fde047;
-      color: #a16207;
+    &.medium .vulnerability-number {
+      color: #fde047;
     }
-
-    .low {
-      background-color: #c7c7cc;
-      color: #454547;
+    &.low .vulnerability-number {
+      color: #c7c7cc;
     }
   }
 }
