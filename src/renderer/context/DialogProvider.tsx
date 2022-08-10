@@ -147,7 +147,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         message,
       });
       resolve({
-        present: () => setProgressDialog((dialog) => ({ ...dialog, open: true, loader: true })),
+        present: ({ message } = {}) => setProgressDialog((dialog) => ({ ...dialog, open: true, loader: true, ...( message ? { message } : {} )})),
         finish: ({ message }) => setProgressDialog((dialog) => ({ ...dialog, message, loader: false })),
         dismiss: (props) => {
           return new Promise((resolve) => {

@@ -14,7 +14,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': ['off'],
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': ['off'],
-    'prettier/prettier': ['warn', { printWidth: 120 }],
+    'prettier/prettier': ['off', { printWidth: 120 }],
     'no-nested-ternary': ['off'],
     'jsx-a11y/anchor-is-valid': ['off'],
     'no-shadow': 'off',
@@ -28,7 +28,9 @@ module.exports = {
     'react/no-array-index-key': ['warn'],
     'import/no-cycle': ['warn'],
     'no-empty-pattern': ['off'],
-    "react-hooks/exhaustive-deps": "warn"
+    'react-hooks/exhaustive-deps': 'warn',
+    "no-plusplus": ["warn", { "allowForLoopAfterthoughts": true }]
+
   },
   parserOptions: {
     ecmaVersion: 2020,
