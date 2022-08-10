@@ -3,6 +3,7 @@ import { Project } from '../../workspace/Project';
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
 import {modelProvider} from "../../services/ModelProvider";
 import {IpcChannels} from '../../../api/ipc-channels';
+import {Vulnerability} from "../../model/entity/Vulnerability";
 
 export class VulnerabilitiesTask implements ITask<void, void> {
   private project: Project;
@@ -17,11 +18,11 @@ export class VulnerabilitiesTask implements ITask<void, void> {
   const dependencyComponents = await modelProvider.model.dependency.getAll(null);
   const components = this.groupComponentByPurlVersion(detectedComponents, dependencyComponents);
   // TODO: here we should call to gRPC service with all components
-  const vulnerabilities =  await this.getVulnerabilities();
+  const response =  await this.getVulnerabilities();
 
-  const v = this.groupVulnerabilitiesByCVE(vulnerabilities);
-  await modelProvider.model.vulnerability.insertBatch(Object.values(v));
-  await modelProvider.model.vulnerability.insertComponentVulnerabilityFromGRPC(vulnerabilities.purls);
+  const vulnerabilities = this.groupVulnerabilitiesByCVE(response);
+  await modelProvider.model.vulnerability.insertAll(vulnerabilities);
+  await modelProvider.model.vulnerability.insertComponentVulnerabilityFromGRPC(response.purls);
   await this.project.save();
   }
 
@@ -37,14 +38,14 @@ export class VulnerabilitiesTask implements ITask<void, void> {
     return response;
   }
 
-  private groupVulnerabilitiesByCVE(vulnerabilities: any){
-    const response:any = {};
+  private groupVulnerabilitiesByCVE(vulnerabilities: any): Array<Vulnerability> {
+    const vul:Record<string, Vulnerability> = {};
     vulnerabilities.purls.forEach((p)=>{
       p.vulnerabilities.forEach((v)=>{
-        if(!response[v.cve]) response[v.cve] = v;
+        if(!vul[v.cve]) vul[v.cve] = Object.assign(new Vulnerability(),v);
       });
     });
-  return response;
+   return Object.values(vul);
   }
 
   private async getVulnerabilities() {
