@@ -105,6 +105,7 @@ export class Project {
 
   public save(): void {
     this.metadata.save();
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     const a = {
       filesToScan: self.filesToScan,
