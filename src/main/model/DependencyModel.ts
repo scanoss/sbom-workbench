@@ -3,6 +3,7 @@ import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Model } from './Model';
 import { Querys } from './querys_db';
 import { Dependency } from '../../api/types';
+import { Dependency as Dep } from './entity/Dependency'
 import { NodeStatus } from "../workspace/tree/Node";
 
 const query = new Querys();
@@ -19,40 +20,33 @@ export class DependencyModel extends Model {
     super(path);
   }
 
-  public async insert(filesDependencies: any) {
+  public async insertAll(dependencies: Array<Dep>) {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
         db.serialize(() => {
           db.run('begin transaction');
-          filesDependencies.forEach((file) => {
-            file.dependenciesList.forEach((dependency) => {
+          dependencies.forEach((d) => {
               db.run(
                 query.SQL_DEPENDENCIES_INSERT,
-                file.fileId,
-                dependency.purl ? decodeURIComponent(dependency.purl) : null,
-                dependency.version ? dependency.version : null,
-                dependency.scope ? dependency.scope : null,
-                dependency.licensesList.length > 0 &&
-                  dependency.licensesList[0] !== ''
-                  ? dependency.licensesList.join(',')
-                  : null,
-                dependency.component,
-                dependency.version ? dependency.version : null,
-                dependency.licensesList.length > 0 &&
-                  dependency.licensesList[0] !== ''
-                  ? dependency.licensesList.join(',')
-                  : null
+                d.fileId,
+                d.purl ? decodeURIComponent(d.purl) : null,
+                d.version ? d.version : null,
+                d.scope ? d.scope : null,
+                d.licenses.length > 0  ? d.licenses.join(',') : null,
+                d.component,
+                d.version ? d.version : null,
+                d.originalLicense.length > 0 ? d.originalLicense.join(',') :null
               );
             });
-          });
           db.run('commit', (err: any) => {
             db.close();
             if (err) throw err;
             resolve(true);
           });
         });
-      } catch (err) {
+    }
+    catch (err) {
         reject(err);
       }
     });
