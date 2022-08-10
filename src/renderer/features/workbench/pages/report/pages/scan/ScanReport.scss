@@ -71,7 +71,7 @@
     }
 
     &.identified {
-      grid-template-rows: auto auto 400px 150px auto;
+      grid-template-rows: auto auto 400px minmax(150px, auto) auto;
       grid-template-areas:
         'A A'
         'B B'
@@ -364,12 +364,12 @@
 }
 
 .vulnerabilities {
-  .MuiSvgIcon-root {
+  .report-title .MuiSvgIcon-root {
     opacity: 0.5;
     transition: all 200ms ease;
   }
 
-  &:hover .MuiSvgIcon-root {
+  &:hover .report-title .MuiSvgIcon-root {
     transform: translateX(3px);
     opacity: 1;
   }
