@@ -1,10 +1,10 @@
 import log from 'electron-log';
 import { FileDTO } from '@api/dto';
+import * as util from 'util';
 import { Querys } from './querys_db';
 import { InventoryModel } from './InventoryModel';
 import { Model } from './Model';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
-import * as util from 'util';
 
 const query = new Querys();
 
