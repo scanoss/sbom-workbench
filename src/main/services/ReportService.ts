@@ -105,7 +105,7 @@ class ReportService {
     };
     let licenses: LicenseEntry[] = [];
     const crypto: CryptoEntry[] = [{ label: 'None', files: [], value: 0 }];
-    const vulnerabilities = { critical: 0, high: 0, low: 0, moderate: 0 };
+
 
     try {
       const a = await workspace.getOpenedProjects()[0].getResults();
@@ -171,42 +171,30 @@ class ReportService {
 
               crypto[index].value = crypto[index].files.length;
             }
-
-            // Vulnerabilities
-            if (result.vulnerabilities !== undefined) {
-              let i = 0;
-              for (i = 0; i < result.vulnerabilities.length; i++) {
-                const v = result.vulnerabilities[i];
-
-                if (v.severity === 'CRITICAL') {
-                  if (!vulnerabilitiesLists.critical.some((vl) => vl.ID === v.ID))
-                    vulnerabilitiesLists.critical.push(v);
-                } else if (v.severity === 'HIGH') {
-                  if (!vulnerabilitiesLists.high.some((vl) => vl.ID === v.ID)) vulnerabilitiesLists.high.push(v);
-                } else if (v.severity === 'MODERATE') {
-                  if (!vulnerabilitiesLists.moderate.some((vl) => vl.ID === v.ID))
-                    vulnerabilitiesLists.moderate.push(v);
-                } else if (v.severity === 'LOW') {
-                  if (!vulnerabilitiesLists.low.some((vl) => vl.ID === v.ID)) vulnerabilitiesLists.low.push(v);
-                }
-              }
-            }
           }
         }
       }
-      vulnerabilities.critical = vulnerabilitiesLists.critical.length;
-      vulnerabilities.high = vulnerabilitiesLists.high.length;
-      vulnerabilities.moderate = vulnerabilitiesLists.moderate.length;
-      vulnerabilities.low = vulnerabilitiesLists.low.length;
+
+      const vulnerabilities = await modelProvider.model.vulnerability.getDetectedReport();
+      const vulnerabilityReport = { critical: 0, high: 0, low: 0, moderate: 0,...this.getVulnerabilitiesReport(vulnerabilities) };
+
       const dependencies = await modelProvider.model.dependency.getAll(null);
       licenses = await this.mergeLicenseData(licenses, dependencies);
       if (licenses) this.checkForIncompatibilities(licenses);
 
-      return { licenses, crypto, vulnerabilities };
+      return { licenses, crypto, vulnerabilities: vulnerabilityReport };
     } catch (e) {
       console.log('Catch an error: ', e);
       return { status: 'fail' };
     }
+  }
+
+  private getVulnerabilitiesReport(vulnerabilities: any){
+    const vulnerabilityReportMapper : Record<string,number>  = vulnerabilities.reduce((acc, curr) => {
+      if (!acc[curr.severity.toLowerCase()]) acc[curr.severity.toLowerCase()] = curr.count;
+      return acc;
+    }, {});
+    return vulnerabilityReportMapper;
   }
 
   private checkForIncompatibilities(licenses: LicenseEntry[]) {
