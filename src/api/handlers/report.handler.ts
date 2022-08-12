@@ -29,7 +29,7 @@ ipcMain.handle(IpcChannels.REPORT_DETECTED, async (event, arg: string) => {
     const data = await reportService.getDetected();
     return {
       status: 'ok',
-      message: 'SPDX export successfully',
+      message: 'detected report successfully retrieved',
       data,
     };
   } catch (e) {
