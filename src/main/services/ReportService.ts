@@ -97,89 +97,23 @@ class ReportService {
   }
 
   public async getDetected() {
-    const vulnerabilitiesLists = {
-      critical: [],
-      high: [],
-      moderate: [],
-      low: [],
-    };
-    let licenses: LicenseEntry[] = [];
-    const crypto: CryptoEntry[] = [{ label: 'None', files: [], value: 0 }];
-
-
     try {
-      const a = await workspace.getOpenedProjects()[0].getResults();
-      for (const [key, results] of Object.entries<any[]>(a)) {
-        for (const result of results) {
-          if (result.id !== 'none') {
-            if (result.licenses !== undefined && result.licenses[0] !== undefined) {
-              if (!licenses.some((l) => l.label === result.licenses[0].name)) {
-                const newLicense = {
-                  label: '',
-                  components: [],
-                  value: 1,
-                  incompatibles: [],
-                  has_incompatibles: [],
-                  patent_hints: false,
-                  copyleft: false,
-                };
-                newLicense.label = result.licenses[0].name;
-                newLicense.patent_hints = result.licenses[0].patent_hints === 'yes';
-                newLicense.copyleft = result.licenses[0].copyleft === 'yes';
+    const results = await modelProvider.model.result.getDetectedReport();
+    let licenses = this.getLicenseReportFromResults(results);
+    const crypto = await this.getCryptoFromResults();
 
-                newLicense.components.push({
-                  name: result.component,
-                  vendor: result.vendor,
-                  version: result.version,
-                  purl: result.purl[0],
-                });
-
-                if (result.licenses[0].incompatible_with)
-                  newLicense.incompatibles = result.licenses[0].incompatible_with.split(', ');
-                licenses.push(newLicense);
-              } else {
-                const index = licenses.findIndex((l) => l.label === result.licenses[0].name);
-                if (index >= 0) {
-                  if (!licenses[index].components.some((c) => c.name && c.name === result.component))
-                    licenses[index].components.push({
-                      name: result.component,
-                      vendor: result.vendor,
-                      version: result.version,
-                      purl: result.purl[0],
-                    });
-                  licenses[index].value = licenses[index].components.length;
-                }
-              }
-            }
-            // Crypto
-            if (result.cryptography !== undefined && result.cryptography[0] !== undefined) {
-              if (!crypto.some((l) => l.label === result.cryptography[0].algorithm)) {
-                const newCrypto = { label: '', files: [], value: 1 };
-                newCrypto.label = result.cryptography[0].algorithm;
-                newCrypto.files.push(result.file);
-                crypto.push(newCrypto);
-              } else {
-                const index = crypto.findIndex((l) => l.label === result.cryptography[0].algorithm);
-                if (index >= 0) {
-                  crypto[index].files.push(result.file);
-                  crypto[index].value = crypto[index].files.length;
-                }
-              }
-            } else {
-              const index = crypto.findIndex((l) => l.label === 'None');
-              crypto[index].files.push(result.file);
-
-              crypto[index].value = crypto[index].files.length;
-            }
-          }
-        }
-      }
-
-      const vulnerabilities = await modelProvider.model.vulnerability.getDetectedReport();
-      const vulnerabilityReport = { critical: 0, high: 0, low: 0, moderate: 0,...this.getVulnerabilitiesReport(vulnerabilities) };
+      const vulnerabilities =
+        await modelProvider.model.vulnerability.getDetectedReport();
+      const vulnerabilityReport = {
+        critical: 0,
+        high: 0,
+        low: 0,
+        moderate: 0,
+        ...this.getVulnerabilitiesReport(vulnerabilities),
+      };
 
       const dependencies = await modelProvider.model.dependency.getAll(null);
-      licenses = await this.mergeLicenseData(licenses, dependencies);
+      licenses = this.mergeLicenseData(licenses, dependencies);
       if (licenses) this.checkForIncompatibilities(licenses);
 
       return { licenses, crypto, vulnerabilities: vulnerabilityReport };
@@ -189,11 +123,93 @@ class ReportService {
     }
   }
 
-  private getVulnerabilitiesReport(vulnerabilities: any){
-    const vulnerabilityReportMapper : Record<string,number>  = vulnerabilities.reduce((acc, curr) => {
-      if (!acc[curr.severity.toLowerCase()]) acc[curr.severity.toLowerCase()] = curr.count;
+  private async getCryptoFromResults(){
+    const crypto: CryptoEntry[] = [{ label: 'None', files: [], value: 0 }];
+    const a = await workspace.getOpenedProjects()[0].getResults();
+    for (const [key, results] of Object.entries<any[]>(a)) {
+      for (const result of results) {
+        if (result.id !== 'none') {
+          // Crypto
+          if (
+            result.cryptography !== undefined &&
+            result.cryptography[0] !== undefined
+          ) {
+            if (
+              !crypto.some(
+                (l) => l.label === result.cryptography[0].algorithm
+              )
+            ) {
+              const newCrypto = {label: '', files: [], value: 1};
+              newCrypto.label = result.cryptography[0].algorithm;
+              newCrypto.files.push(result.file);
+              crypto.push(newCrypto);
+            } else {
+              const index = crypto.findIndex(
+                (l) => l.label === result.cryptography[0].algorithm
+              );
+              if (index >= 0) {
+                crypto[index].files.push(result.file);
+                crypto[index].value = crypto[index].files.length;
+              }
+            }
+          } else {
+            const index = crypto.findIndex((l) => l.label === 'None');
+            crypto[index].files.push(result.file);
+
+            crypto[index].value = crypto[index].files.length;
+          }
+        }
+      }
+    }
+  }
+
+  private getLicenseReportFromResults(results: any): Array<LicenseEntry> {
+    const licenses: Record<string,LicenseEntry> = results.reduce((acc, curr) => {
+      const key = curr.spdxid;
+      if (!acc[key]) {
+        acc[key] = {
+          label: key,
+          value: 0,
+          incompatibles: curr?.incompatible_with
+            ? curr.incompatible_with.split(',')
+            : [],
+          has_incompatibles: [],
+          patent_hints: curr?.patent_hints ? curr.patent_hints : false,
+          copyleft: curr?.copyleft ? curr.copyleft : false,
+          components: [
+            {
+              name: curr.name,
+              vendor: curr.vendor,
+              version: curr.version,
+              purl: curr.purl,
+            },
+          ],
+        };
+      } else {
+        const componentIndex = acc[key].components.findIndex(
+          (c) => c.purl === curr.purl && c.version === curr.version
+        );
+        if (componentIndex < 0)
+          acc[key].components.push({
+            name: curr.name,
+            vendor: curr.vendor,
+            version: curr.version,
+            purl: curr.purl,
+          });
+      }
       return acc;
-    }, {});
+    },{});
+    Object.entries(licenses).forEach(([key, value]) => { value.value =  value.components.length });
+    return Object.values(licenses);
+  }
+
+  private getVulnerabilitiesReport(vulnerabilities: any) {
+    const vulnerabilityReportMapper: Record<string, number> =
+      vulnerabilities.reduce((acc, curr) => {
+        if (!acc[curr.severity.toLowerCase()])
+          acc[curr.severity.toLowerCase()] = curr.count;
+        return acc;
+      }, {});
     return vulnerabilityReportMapper;
   }
 
@@ -208,7 +224,10 @@ class ReportService {
     }
   }
 
-  private async mergeLicenseData(licenses: LicenseEntry[], dependencies: Array<any>): Promise<Array<LicenseEntry>> {
+  private mergeLicenseData(
+    licenses: LicenseEntry[],
+    dependencies: Array<any>
+  ): Array<LicenseEntry> {
     const licenseMapper = licenses.reduce((acc, curr) => {
       if (!acc[curr.label]) acc[curr.label] = curr;
       return acc;

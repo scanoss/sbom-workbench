@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 
 import log from 'electron-log';
+import * as util from 'util';
 import { Querys } from './querys_db';
 import { Model } from './Model';
 import { utilModel } from './UtilModel';
@@ -351,6 +352,15 @@ export class ResultModel extends Model {
         reject(error);
       }
     });
+  }
+
+  public async getDetectedReport() {
+   const db = await this.openDb();
+   const call = util.promisify(db.all.bind(db));
+   const response = await call(`SELECT cv.purl,cv.version,cv.name, r.vendor, rl.spdxid,rl.patent_hints,rl.copyLeft,rl.incompatible_with FROM component_versions cv
+                                INNER JOIN results r ON cv.purl = r.purl AND cv.version = r.version
+                                INNER JOIN result_license rl ON rl.resultId = r.id;`);
+   return response;
   }
 
   public getEntityMapper(): Record<string, string> {
