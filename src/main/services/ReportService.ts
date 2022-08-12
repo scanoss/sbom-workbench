@@ -90,10 +90,17 @@ class ReportService {
       }
     });
 
-    // TODO: get vulnerabilities
-    const vulnerabilities = { critical: 0, high: 0, low: 0, moderate: 0 };
 
-    return { licenses, vulnerabilities };
+    const vulnerabilities = await modelProvider.model.vulnerability.getIdentifiedReport();
+    const vulnerabilityReport = {
+      critical: 0,
+      high: 0,
+      low: 0,
+      moderate: 0,
+      ...this.getVulnerabilitiesReport(vulnerabilities),
+    };
+
+    return { licenses, vulnerabilities: vulnerabilityReport };
   }
 
   public async getDetected() {
