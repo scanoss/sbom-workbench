@@ -1,3 +1,4 @@
+import log from 'electron-log';
 import { ITask } from '../../Task';
 import { modelProvider } from '../../../services/ModelProvider';
 import { Indexer } from '../../../modules/searchEngine/indexer/Indexer';
@@ -16,6 +17,7 @@ export class IndexTask implements ITask<Electron.WebContents, any> {
 
 
   public async run(): Promise<any> {
+    log.info('[ IndexTask init ]');
     const project = workspace.getOpenProject();
     if (!project) throw new Error('Not project opened');
     const f = this.project.getTree().getRootFolder().getFiles(new BlackListKeyWordIndex());

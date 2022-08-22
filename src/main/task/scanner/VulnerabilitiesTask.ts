@@ -1,3 +1,4 @@
+import log from 'electron-log';
 import { ITask } from '../Task';
 import { Project } from '../../workspace/Project';
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
@@ -13,6 +14,7 @@ export class VulnerabilitiesTask implements ITask<void, void> {
   }
 
   public async run(params: void): Promise<void> {
+    log.info('[ VulnerabilitiesTask init ]');
     this.updateStatus();
     const detectedComponents = await modelProvider.model.component.getAll(null);
     const dependencyComponents = await modelProvider.model.dependency.getAll(
@@ -30,7 +32,7 @@ export class VulnerabilitiesTask implements ITask<void, void> {
     await modelProvider.model.vulnerability.insertComponentVulnerabilityFromGRPC(
       response.purls
     );
-    await this.project.save();
+    this.project.save();
   }
 
   private groupComponentByPurlVersion(
