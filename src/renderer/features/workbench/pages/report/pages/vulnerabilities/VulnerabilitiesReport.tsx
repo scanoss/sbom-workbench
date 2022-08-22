@@ -21,6 +21,8 @@ import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 
 import TableCellActions from '@components/TableCellActions/TableCellActions';
+import { vulnerabilityService } from '@api/services/vulnerability.service';
+import { SourceType } from '@api/dto';
 
 // interfaces & types
 interface IVulnerabilitiesFilter {
@@ -36,6 +38,10 @@ const VulnerabilitiesReport = () => {
   const [filter, setFilter] = useState<IVulnerabilitiesFilter>(null);
 
   const init = async () => {
+
+    const response = await vulnerabilityService.getAll({ type: SourceType.detected });
+    console.log("VULNERABILITIES RESPONSE", response);
+
     data.current = Array(20)
       .fill(null)
       .map((i, index) => ({
