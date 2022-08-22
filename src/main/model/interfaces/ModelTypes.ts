@@ -1,7 +1,7 @@
-import {Vulnerability} from "../entity/Vulnerability";
+import { Vulnerability } from "../entity/Vulnerability";
 
 
-export interface ComponentVulnerability{
-  purl:string;
+export interface ComponentVulnerability {
+  purl: string;
   vulnerabilities: Array<Vulnerability>;
 }
