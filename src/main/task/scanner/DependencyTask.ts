@@ -16,6 +16,7 @@ export class DependencyTask implements ITask<void, void> {
   }
 
   public async run(params: void): Promise<void> {
+    log.info('[ DependencyTask init ]');
     broadcastManager.get().send(IpcChannels.SCANNER_UPDATE_STATUS, {
       stage: {
         stageName: `Analyzing dependencies`,

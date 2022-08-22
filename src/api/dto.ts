@@ -69,3 +69,12 @@ export interface NewExportDTO {
   source: ExportSource;
   path: string;
 }
+
+export enum SourceType {
+  detected,
+  identified,
+}
+
+export interface VulnerabilitiesGetAllDTO {
+  type: SourceType,
+}

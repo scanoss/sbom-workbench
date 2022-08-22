@@ -52,15 +52,7 @@ export abstract class BaseScannerTask implements ITask<void, void> {
     });
 
     this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
-      await this.done(resultPath);
-      this.project.metadata.setScannerState(ScanState.FINISHED);
-      this.project.metadata.save();
-      if (AppConfig.FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN) {
-        const autoAccept = new AutoAccept();
-        await autoAccept.run();
-      }
-
-      this.project.save();
+      log.info(`%cScannerEvents.SCAN_DONE`, 'color: green');
     });
 
     this.scanner.on(ScannerEvents.SCANNER_LOG, (message, level) => {
@@ -74,11 +66,20 @@ export abstract class BaseScannerTask implements ITask<void, void> {
     });
   }
 
-  public async done(resultPath: string) {
+  public async done() {
+    const resultPath = `${this.project.getMyPath()}/result.json`;
     await fileService.insert(this.project.getTree().getRootFolder().getFiles());
     const files = await fileHelper.getPathFileId();
     await resultService.insertFromFile(resultPath, files);
     await componentService.importComponents();
+
+    this.project.metadata.setScannerState(ScanState.FINISHED);
+    this.project.metadata.save();
+
+    if (AppConfig.FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN) {
+      const autoAccept = new AutoAccept();
+      await autoAccept.run();
+    }
   }
 
   private setScannerConfig() {
@@ -103,8 +104,10 @@ export abstract class BaseScannerTask implements ITask<void, void> {
   }
 
   public async run(): Promise<void> {
+    log.info('[ BaseScannerTask init scanner]');
     await this.scan();
-    await this.project.save();
+    await this.done();
+    this.project.save();
   }
 
   private async scan() {
