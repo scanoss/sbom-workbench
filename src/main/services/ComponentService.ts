@@ -1,18 +1,34 @@
 import log from 'electron-log';
-import { Component, ComponentGroup, IWorkbenchFilterParams, NewComponentDTO } from '../../api/types';
+import {
+  Component,
+  ComponentGroup,
+  IWorkbenchFilterParams,
+  NewComponentDTO,
+} from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
 import { ComponentAdapter } from '../adapters/ComponentAdapter';
-import { componentSource } from '../model/interfaces/component/INewComponent';
+import { AddVulneravilityTask } from '../task/vulnerability/AddVulneravilityTask';
+import {
+  componentSource,
+  ComponentVersion,
+} from '../model/entity/ComponentVersion';
 
 class ComponentService {
-  public async getComponentFiles(data: Partial<Component>, params: IWorkbenchFilterParams): Promise<any> {
+  public async getComponentFiles(
+    data: Partial<Component>,
+    params: IWorkbenchFilterParams
+  ): Promise<any> {
     try {
       const filter = workspace.getOpenedProjects()[0].getFilter(params);
-      const queryBuilder = QueryBuilderCreator.create({ purl: data.purl, version: data.version, ...filter });
+      const queryBuilder = QueryBuilderCreator.create({
+        purl: data.purl,
+        version: data.version,
+        ...filter,
+      });
       let files: any = await modelProvider.model.result.getAll(queryBuilder);
       files = new ComponentAdapter().componentFileAdapter(files);
       const inventories: any = await modelProvider.model.inventory.getAll();
@@ -27,7 +43,9 @@ class ComponentService {
       for (let i = 0; i < files.length; i += 1) {
         if (files[i].inventoryid) {
           files[i].inventory = index[files[i].inventoryid];
-          files[i].component = components.find((component: any) => files[i].inventory.cvid === component.compid);
+          files[i].component = components.find(
+            (component: any) => files[i].inventory.cvid === component.compid
+          );
         }
       }
       return files;
@@ -41,9 +59,14 @@ class ComponentService {
     try {
       const filter = workspace.getOpenedProjects()[0].getFilter(params);
       const queryBuilder: QueryBuilder = QueryBuilderCreator.create(filter);
-      const queryBuilderSummary: QueryBuilder = QueryBuilderCreator.create({ ...filter, status: null }); // Keep summary independent from summary
+      const queryBuilderSummary: QueryBuilder = QueryBuilderCreator.create({
+        ...filter,
+        status: null,
+      }); // Keep summary independent from summary
       let comp = await modelProvider.model.component.getAll(queryBuilder);
-      const summary = await modelProvider.model.component.summary(queryBuilderSummary);
+      const summary = await modelProvider.model.component.summary(
+        queryBuilderSummary
+      );
       comp = componentHelper.addSummary(comp, summary);
       const compPurl: any = this.groupComponentsByPurl(comp);
       comp = await this.mergeComponentByPurl(compPurl);
@@ -55,7 +78,10 @@ class ComponentService {
     }
   }
 
-  public async get(component: Partial<ComponentGroup>, params: IWorkbenchFilterParams) {
+  public async get(
+    component: Partial<ComponentGroup>,
+    params: IWorkbenchFilterParams
+  ) {
     try {
       const p = workspace.getOpenedProjects()[0];
       const workbenchFilter = p.getFilter(params);
@@ -91,7 +117,9 @@ class ComponentService {
       aux.versions = [];
       aux.totalFiles = 0;
       for (const iterator of value) {
-        aux.identifiedAs = overrideComponents[iterator.purl] ? overrideComponents[iterator.purl] : [];
+        aux.identifiedAs = overrideComponents[iterator.purl]
+          ? overrideComponents[iterator.purl]
+          : [];
         aux.name = iterator.name;
         aux.purl = iterator.purl;
         aux.url = iterator.url;
@@ -101,9 +129,15 @@ class ComponentService {
           aux.summary.ignored += iterator.summary.ignored;
           aux.summary.pending += iterator.summary.pending;
           aux.summary.identified += iterator.summary.identified;
-          aux.totalFiles += iterator.summary.ignored + iterator.summary.pending + iterator.summary.identified;
+          aux.totalFiles +=
+            iterator.summary.ignored +
+            iterator.summary.pending +
+            iterator.summary.identified;
           version.summary = iterator.summary;
-          version.files = iterator.summary.ignored + iterator.summary?.pending + iterator.summary.identified;
+          version.files =
+            iterator.summary.ignored +
+            iterator.summary?.pending +
+            iterator.summary.identified;
         }
         version.version = iterator.version;
         version.licenses = [];
@@ -115,7 +149,9 @@ class ComponentService {
       result.push(aux);
     }
     result.sort((a, b) => a.name.localeCompare(b.name));
-    result.forEach((comp) => comp.versions.sort((a, b) => b.version.localeCompare(a.version)));
+    result.forEach((comp) =>
+      comp.versions.sort((a, b) => b.version.localeCompare(a.version))
+    );
     return result;
   }
 
@@ -124,12 +160,18 @@ class ComponentService {
       const components: Array<Partial<Component>> =
         await modelProvider.model.component.getUniqueComponentsFromResults();
       await modelProvider.model.component.import(components);
-      const data = await modelProvider.model.component.getLicensesAttachedToComponentsFromResults();
+      const data =
+        await modelProvider.model.component.getLicensesAttachedToComponentsFromResults();
       const componentLicenses = new ComponentAdapter().componentLicenses(data);
-      await modelProvider.model.license.bulkAttachComponentLicense(componentLicenses);
+      await modelProvider.model.license.bulkAttachComponentLicense(
+        componentLicenses
+      );
       // Add most reliable license to each component
-      const componentReliableLicense = await modelProvider.model.component.getMostReliableLicensePerComponent();
-      await modelProvider.model.component.updateMostReliableLicense(componentReliableLicense);
+      const componentReliableLicense =
+        await modelProvider.model.component.getMostReliableLicensePerComponent();
+      await modelProvider.model.component.updateMostReliableLicense(
+        componentReliableLicense
+      );
       return true;
     } catch (error: any) {
       return error;
@@ -138,12 +180,16 @@ class ComponentService {
 
   private async getOverrideComponents() {
     try {
-      const overrideComponents = await modelProvider.model.component.getOverrideComponents();
+      const overrideComponents =
+        await modelProvider.model.component.getOverrideComponents();
       let result: any = {};
       if (overrideComponents.length > 0) {
         result = overrideComponents.reduce((acc, curr) => {
           if (!acc[curr.matchedPurl]) acc[curr.matchedPurl] = [];
-          acc[curr.matchedPurl].push({ purl: curr.overridePurl, name: curr.overrideName });
+          acc[curr.matchedPurl].push({
+            purl: curr.overridePurl,
+            name: curr.overrideName,
+          });
           return acc;
         }, {});
       }
@@ -154,23 +200,41 @@ class ComponentService {
     }
   }
 
-  public async create(newComp: NewComponentDTO): Promise<Partial<ComponentGroup>> {
-    const promises = newComp.versions.map((v) =>
-      modelProvider.model.component.create({
-        ...newComp,
-        version: v.version,
-        licenses: v.licenses,
-        source: componentSource.MANUAL,
-      })
-    );
+  public async create(
+    newComp: NewComponentDTO
+  ): Promise<Partial<ComponentGroup>> {
+    const promises = newComp.versions.map((v) => {
+      const component = new ComponentVersion();
+      Object.assign(component, newComp);
+      component.version = v.version;
+      component.setLicenseIds(v.licenses);
+      component.source = componentSource.MANUAL;
+      return modelProvider.model.component.create(component);
+    });
     const results = await Promise.all(promises.map((p) => p.catch((e) => e)));
-    const validComponents = results.filter((result) => !(result instanceof Error));
+    const validComponents = results.filter(
+      (result) => !(result instanceof Error)
+    );
     if (results.length - validComponents.length === newComp.versions.length)
       throw new Error('Component already exists');
-    const component = await modelProvider.model.component.getAll(QueryBuilderCreator.create({ purl: newComp.purl }));
+    const component = await modelProvider.model.component.getAll(
+      QueryBuilderCreator.create({ purl: newComp.purl })
+    );
     const compPurl: any = this.groupComponentsByPurl(component);
     const response = await this.mergeComponentByPurl(compPurl);
+
+    // TODO: Uncomment code when gRPC service is integrated
+    // Adds component's vulnerabilities
+    const addVulnerability = new AddVulneravilityTask();
+    await addVulnerability.run(this.adaptToVulnerabilityTask(newComp));
     return response[0];
+  }
+
+  private adaptToVulnerabilityTask(component: NewComponentDTO): Array<string> {
+    const response = component.versions.map(
+      (v) => `${component.purl}@${v.version}`
+    );
+    return response;
   }
 }
 

@@ -9,6 +9,7 @@ import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { IComponentLicenseReliable } from './interfaces/component/IComponentLicenseReliable';
 import { INewComponent } from './interfaces/component/INewComponent';
+import { ComponentVersion } from './entity/ComponentVersion';
 
 const query = new Querys();
 
@@ -50,17 +51,24 @@ export class ComponentModel extends Model {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.get(query.SQL_GET_COMPONENT_BY_PURL_VERSION, data.purl, data.version, async (err: any, component: any) => {
-          db.close();
-          if (err) throw err;
-          // Attach license to a component
-          componentHelper.processComponent(component);
-          const licenses = await this.getAllLicensesFromComponentId(component.compid);
-          component.licenses = licenses;
-          const summary = await this.summaryByPurlVersion(component);
-          component.summary = summary;
-          resolve(component);
-        });
+        db.get(
+          query.SQL_GET_COMPONENT_BY_PURL_VERSION,
+          data.purl,
+          data.version,
+          async (err: any, component: any) => {
+            db.close();
+            if (err) throw err;
+            // Attach license to a component
+            componentHelper.processComponent(component);
+            const licenses = await this.getAllLicensesFromComponentId(
+              component.compid
+            );
+            component.licenses = licenses;
+            const summary = await this.summaryByPurlVersion(component);
+            component.summary = summary;
+            resolve(component);
+          }
+        );
       } catch (error) {
         log.error(error);
         reject(error);
@@ -69,7 +77,7 @@ export class ComponentModel extends Model {
   }
 
   // CREATE COMPONENT
-  public async create(component: INewComponent): Promise<number> {
+  public async create(component: ComponentVersion): Promise<ComponentVersion> {
     const db = await this.openDb();
     const call = util.promisify((callback) => {
       db.run(
@@ -82,17 +90,26 @@ export class ComponentModel extends Model {
         component.source,
         function (this: any, err: any) {
           if (err) callback(err, null);
-          else callback(null, this.lastID);
+          else {
+            component.id = this.lastID;
+            callback(null, component);
+          }
         }
       );
     });
-    const compid = await call();
+    const newComponent = await call();
     db.close();
-    if (compid) {
-      const licenses = component.licenses.map((l) => this.license.licenseAttach({ compid, license_id: l }));
-      await Promise.all(licenses);
-    }
-    return compid as number;
+    await this.attachLicenses(newComponent as ComponentVersion);
+    return newComponent as ComponentVersion;
+  }
+
+  private async attachLicenses(component: ComponentVersion): Promise<void> {
+    const licenses = component
+      .getLicenseIds()
+      .map((l) =>
+        this.license.licenseAttach({ compid: component.id, license_id: l })
+      );
+    await Promise.all(licenses);
   }
 
   // GET COMPONENT VERSIONS
@@ -102,13 +119,19 @@ export class ComponentModel extends Model {
       try {
         const db = await this.openDb();
         db.serialize(() => {
-          db.get(query.SQL_GET_COMPONENT_BY_ID, `${id}`, async function (err: any, data: any) {
-            db.close();
-            if (err) throw err;
-            const licenses = await self.getAllLicensesFromComponentId(data.compid);
-            data.licenses = licenses;
-            resolve(data);
-          });
+          db.get(
+            query.SQL_GET_COMPONENT_BY_ID,
+            `${id}`,
+            async function (err: any, data: any) {
+              db.close();
+              if (err) throw err;
+              const licenses = await self.getAllLicensesFromComponentId(
+                data.compid
+              );
+              data.licenses = licenses;
+              resolve(data);
+            }
+          );
         });
       } catch (error) {
         log.error(error);
@@ -123,11 +146,15 @@ export class ComponentModel extends Model {
       try {
         const db = await this.openDb();
         db.serialize(() => {
-          db.all(query.SQL_GET_LICENSES_BY_COMPONENT_ID, `${id}`, (err: any, data: any) => {
-            db.close();
-            if (err) throw err;
-            else resolve(data);
-          });
+          db.all(
+            query.SQL_GET_LICENSES_BY_COMPONENT_ID,
+            `${id}`,
+            (err: any, data: any) => {
+              db.close();
+              if (err) throw err;
+              else resolve(data);
+            }
+          );
         });
       } catch (error) {
         log.error(error);
@@ -257,11 +284,16 @@ export class ComponentModel extends Model {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.get(query.SQL_GET_SUMMARY_BY_PURL_VERSION, data.purl, data.version, (err: any, summary: any) => {
-          db.close();
-          if (err) throw err;
-          else resolve(summary);
-        });
+        db.get(
+          query.SQL_GET_SUMMARY_BY_PURL_VERSION,
+          data.purl,
+          data.version,
+          (err: any, summary: any) => {
+            db.close();
+            if (err) throw err;
+            else resolve(summary);
+          }
+        );
       } catch (error) {
         log.error(error);
         reject(error);
@@ -273,16 +305,20 @@ export class ComponentModel extends Model {
     return new Promise(async (resolve, reject) => {
       try {
         const db = await this.openDb();
-        db.get(query.SQL_GET_SUMMARY_BY_PURL, data.purl, (err: any, summary: any) => {
-          db.close();
-          if (err)
-            resolve({
-              identified: 0,
-              pending: 0,
-              ignored: 0,
-            });
-          else resolve(summary);
-        });
+        db.get(
+          query.SQL_GET_SUMMARY_BY_PURL,
+          data.purl,
+          (err: any, summary: any) => {
+            db.close();
+            if (err)
+              resolve({
+                identified: 0,
+                pending: 0,
+                ignored: 0,
+              });
+            else resolve(summary);
+          }
+        );
       } catch (error) {
         log.error(error);
         reject(error);
@@ -322,7 +358,9 @@ export class ComponentModel extends Model {
           (err: any, data: any) => {
             db.close();
             if (err) throw err;
-            const ids: number[] = data.map((item: Record<string, number>) => item.id);
+            const ids: number[] = data.map(
+              (item: Record<string, number>) => item.id
+            );
             resolve(ids);
           }
         );
@@ -386,16 +424,24 @@ export class ComponentModel extends Model {
   public getAll(queryBuilder?: QueryBuilder) {
     return new Promise<any>(async (resolve, reject) => {
       try {
-        const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_COMPONENTS, this.getEntityMapper());
+        const SQLquery = this.getSQL(
+          queryBuilder,
+          query.SQL_GET_ALL_COMPONENTS,
+          this.getEntityMapper()
+        );
         const db = await this.openDb();
-        db.all(SQLquery.SQL, ...SQLquery.params, async (err: any, data: any) => {
-          db.close();
-          if (err) throw err;
-          else {
-            const comp = componentHelper.processComponent(data);
-            resolve(comp);
+        db.all(
+          SQLquery.SQL,
+          ...SQLquery.params,
+          async (err: any, data: any) => {
+            db.close();
+            if (err) throw err;
+            else {
+              const comp = componentHelper.processComponent(data);
+              resolve(comp);
+            }
           }
-        });
+        );
       } catch (error) {
         log.error(error);
         reject(error);
@@ -406,38 +452,21 @@ export class ComponentModel extends Model {
   public summary(queryBuilder?: QueryBuilder) {
     return new Promise<any>(async (resolve, reject) => {
       try {
-        const SQLquery = this.getSQL(queryBuilder, query.SQL_COMPONENTS_SUMMARY, this.getEntityMapper());
-        const db = await this.openDb();
-        db.all(SQLquery.SQL, ...SQLquery.params, async (err: any, data: any) => {
-          db.close();
-          if (err) throw err;
-          else {
-            resolve(data);
-          }
-        });
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
-  public getMostReliableLicensePerComponent(): Promise<Array<IComponentLicenseReliable>> {
-    return new Promise<Array<IComponentLicenseReliable>>(async (resolve, reject) => {
-      try {
+        const SQLquery = this.getSQL(
+          queryBuilder,
+          query.SQL_COMPONENTS_SUMMARY,
+          this.getEntityMapper()
+        );
         const db = await this.openDb();
         db.all(
-          `SELECT * FROM (SELECT cv.id AS cvid,rl.source,rl.spdxid AS reliableLicense,(CASE WHEN rl.source ='component_declared' THEN 1 WHEN rl.source = 'file_header' THEN 2 ELSE 3 END) ranking FROM results r LEFT JOIN component_versions cv
-            ON cv.purl=r.purl  AND cv.version= r.version LEFT JOIN result_license rl
-            ON r.id = rl.resultId
-            GROUP BY cvid, rl.source,rl.spdxid
-            HAVING rl.source LIKE 'component_declared' OR rl.source='file_header' OR rl.source = 'file_spdx_tag'
-            ORDER BY ranking )AS compLicense
-            GROUP BY cvid;`,
-          (err: any, data: Array<IComponentLicenseReliable>) => {
+          SQLquery.SQL,
+          ...SQLquery.params,
+          async (err: any, data: any) => {
             db.close();
             if (err) throw err;
-            resolve(data);
+            else {
+              resolve(data);
+            }
           }
         );
       } catch (error) {
@@ -447,7 +476,38 @@ export class ComponentModel extends Model {
     });
   }
 
-  public updateMostReliableLicense(reliableLicenses: Array<IComponentLicenseReliable>): Promise<void> {
+  public getMostReliableLicensePerComponent(): Promise<
+    Array<IComponentLicenseReliable>
+  > {
+    return new Promise<Array<IComponentLicenseReliable>>(
+      async (resolve, reject) => {
+        try {
+          const db = await this.openDb();
+          db.all(
+            `SELECT * FROM (SELECT cv.id AS cvid,rl.source,rl.spdxid AS reliableLicense,(CASE WHEN rl.source ='component_declared' THEN 1 WHEN rl.source = 'file_header' THEN 2 ELSE 3 END) ranking FROM results r LEFT JOIN component_versions cv
+            ON cv.purl=r.purl  AND cv.version= r.version LEFT JOIN result_license rl
+            ON r.id = rl.resultId
+            GROUP BY cvid, rl.source,rl.spdxid
+            HAVING rl.source LIKE 'component_declared' OR rl.source='file_header' OR rl.source = 'file_spdx_tag'
+            ORDER BY ranking )AS compLicense
+            GROUP BY cvid;`,
+            (err: any, data: Array<IComponentLicenseReliable>) => {
+              db.close();
+              if (err) throw err;
+              resolve(data);
+            }
+          );
+        } catch (error) {
+          log.error(error);
+          reject(error);
+        }
+      }
+    );
+  }
+
+  public updateMostReliableLicense(
+    reliableLicenses: Array<IComponentLicenseReliable>
+  ): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       try {
         const db = await this.openDb();

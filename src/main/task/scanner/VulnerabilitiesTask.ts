@@ -5,6 +5,7 @@ import { broadcastManager } from '../../broadcastManager/BroadcastManager';
 import { modelProvider } from '../../services/ModelProvider';
 import { IpcChannels } from '../../../api/ipc-channels';
 import { Vulnerability } from '../../model/entity/Vulnerability';
+import { AddVulneravilityTask } from '../vulnerability/AddVulneravilityTask';
 
 export class VulnerabilitiesTask implements ITask<void, void> {
   private project: Project;
@@ -24,14 +25,8 @@ export class VulnerabilitiesTask implements ITask<void, void> {
       detectedComponents,
       dependencyComponents
     );
-    // TODO: here we should call to gRPC service with all components
-    const response = await this.getVulnerabilities();
-
-    const vulnerabilities = this.groupVulnerabilitiesByCVE(response);
-    await modelProvider.model.vulnerability.insertAll(vulnerabilities);
-    await modelProvider.model.vulnerability.insertComponentVulnerabilityFromGRPC(
-      response.purls
-    );
+    const addVulnerability = new AddVulneravilityTask();
+    await addVulnerability.run(components);
     this.project.save();
   }
 
@@ -48,79 +43,6 @@ export class VulnerabilitiesTask implements ITask<void, void> {
     });
     const response = Array.from(componentSet);
     return response;
-  }
-
-  private groupVulnerabilitiesByCVE(
-    vulnerabilities: any
-  ): Array<Vulnerability> {
-    const vul: Record<string, Vulnerability> = {};
-    vulnerabilities.purls.forEach((p) => {
-      p.vulnerabilities.forEach((v) => {
-        if (!vul[v.cve]) vul[v.cve] = Object.assign(new Vulnerability(), v);
-      });
-    });
-    return Object.values(vul);
-  }
-
-  private async getVulnerabilities() {
-    return {
-      purls: [
-        {
-          purl: 'pkg:github/scanoss/minr@1.18',
-          vulnerabilities: [
-            {
-              id: '',
-              cve: 'CVE-2018-8088',
-              url: 'url1',
-              summary: '',
-              severity: 'CRITICAL',
-              introduced: 'a',
-              reported: 'a',
-              patched: 'a',
-              source: 'a',
-            },
-            {
-              id: '',
-              cve: 'CVE-2018-8090',
-              url: 'b',
-              summary: 'b',
-              severity: 'CRITICAL',
-              introduced: 'b',
-              reported: 'b',
-              patched: 'b',
-              source: 'b',
-            },
-          ],
-        },
-        {
-          purl: 'pkg:github/scanoss/minr@2.0.6',
-          vulnerabilities: [
-            {
-              id: '',
-              cve: 'CVE-2018-8088',
-              url: 'url1',
-              summary: 'c',
-              severity: 'CRITICAL',
-              introduced: '',
-              reported: '',
-              patched: '',
-              source: '',
-            },
-            {
-              id: '',
-              cve: 'CVE-2018-8089',
-              url: '',
-              summary: '',
-              severity: 'CRITICAL',
-              introduced: '',
-              reported: '',
-              patched: '',
-              source: '',
-            },
-          ],
-        },
-      ],
-    };
   }
 
   private updateStatus() {
