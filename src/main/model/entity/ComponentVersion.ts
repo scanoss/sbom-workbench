@@ -11,11 +11,13 @@ export class ComponentVersion {
 
   url?: string;
 
-  source: componentSource;
+  source: ComponentSource;
 
   purl: string;
 
-  relialableLicense?: string;
+  reliableLicense?: string;
+
+  // licenses: Array<License>
 
   public setLicenseIds(licensesIds: Array<number>) {
     this.licenseIds = licensesIds;
@@ -26,7 +28,7 @@ export class ComponentVersion {
   }
 }
 
-export enum componentSource {
+export enum ComponentSource {
   ENGINE = 'engine',
   MANUAL = 'manual',
 }

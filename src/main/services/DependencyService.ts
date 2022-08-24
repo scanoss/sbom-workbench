@@ -8,7 +8,7 @@ import { licenseHelper } from '../helpers/LicenseHelper';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { modelProvider } from './ModelProvider';
 import {
-  componentSource,
+  ComponentSource,
   ComponentVersion,
 } from '../model/entity/ComponentVersion';
 
@@ -90,7 +90,7 @@ class DependencyService {
         newComponent.version = params.version;
         newComponent.purl = params.purl;
         newComponent.url = null;
-        newComponent.source = componentSource.MANUAL;
+        newComponent.source = ComponentSource.MANUAL;
         newComponent.setLicenseIds([lic.id]);
         const component = await modelProvider.model.component.create(
           newComponent

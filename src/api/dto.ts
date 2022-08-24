@@ -71,8 +71,8 @@ export interface NewExportDTO {
 }
 
 export enum SourceType {
-  detected,
-  identified,
+  detected = 'detected',
+  identified = 'identified',
 }
 
 export interface VulnerabilitiesGetAllDTO {
