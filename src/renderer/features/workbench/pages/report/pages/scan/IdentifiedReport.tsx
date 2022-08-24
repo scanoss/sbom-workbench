@@ -6,6 +6,7 @@ import { Button, Card } from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
 import { projectService } from '@api/services/project.service';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
+import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
 import LicensesChart from '../../components/LicensesChart';
 import IdentificationProgress from '../../components/IdentificationProgress';
 import LicensesTable from '../../components/LicensesTable';
@@ -101,15 +102,15 @@ const IdentifiedReport = ({ data }) => {
           )}
         </Card>
 
-        <Link to="../../vulnerabilities" className="w-100">
-          <Card className="report-item vulnerabilities">
+        <ConditionalLink to="../../vulnerabilities?type=identified" disabled={blocked} className="w-100">
+          <Card className={`report-item vulnerabilities ${blocked ? 'blocked' : 'no-blocked'}`}>
             <div className="report-title d-flex space-between align-center">
               <span>Vulnerabilities</span>
               <ArrowForwardOutlinedIcon fontSize="inherit" />
             </div>
             <VulnerabilitiesCard data={data.vulnerabilities} blocked={blocked} />
           </Card>
-        </Link>
+        </ConditionalLink>
 
         <Card className="report-item licenses-obligation">
           {obligations ? (

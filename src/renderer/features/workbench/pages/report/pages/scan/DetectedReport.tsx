@@ -5,6 +5,7 @@ import obligationsService from '@api/services/obligations.service';
 import { projectService } from '@api/services/project.service';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import { Link } from 'react-router-dom';
+import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
 import LicensesChart from '../../components/LicensesChart';
 import LicensesTable from '../../components/LicensesTable';
 import MatchesForLicense from '../../components/MatchesForLicense';
@@ -71,15 +72,15 @@ const DetectedReport = ({ data }) => {
           <MatchesChart data={data.summary} />
         </Card>
 
-        <Link to="../../vulnerabilities" className="w-100">
-          <Card className="report-item vulnerabilities">
+        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={blocked} className="w-100">
+          <Card className={`report-item vulnerabilities ${blocked ? 'blocked' : 'no-blocked'}`}>
             <div className="report-title d-flex space-between align-center">
               <span>Vulnerabilities</span>
               <ArrowForwardOutlinedIcon fontSize="inherit" />
             </div>
             <VulnerabilitiesCard data={data.vulnerabilities} blocked={blocked} />
           </Card>
-        </Link>
+        </ConditionalLink>
 
         <Card className="report-item licenses-obligation">
           {obligations ? (

@@ -13,7 +13,7 @@ import { modelProvider } from './ModelProvider';
 import { ComponentAdapter } from '../adapters/ComponentAdapter';
 import { AddVulneravilityTask } from '../task/vulnerability/AddVulneravilityTask';
 import {
-  componentSource,
+  ComponentSource,
   ComponentVersion,
 } from '../model/entity/ComponentVersion';
 
@@ -208,7 +208,7 @@ class ComponentService {
       Object.assign(component, newComp);
       component.version = v.version;
       component.setLicenseIds(v.licenses);
-      component.source = componentSource.MANUAL;
+      component.source = ComponentSource.MANUAL;
       return modelProvider.model.component.create(component);
     });
     const results = await Promise.all(promises.map((p) => p.catch((e) => e)));

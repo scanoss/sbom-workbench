@@ -5,24 +5,25 @@ import {
   Checkbox,
   Chip,
   IconButton,
-  Paper,
+  Paper, Popover,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
+  TextField, Typography,
 } from '@mui/material';
 
 // icons
 import SearchIcon from '@mui/icons-material/Search';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
-import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 
 import TableCellActions from '@components/TableCellActions/TableCellActions';
 import { vulnerabilityService } from '@api/services/vulnerability.service';
 import { SourceType } from '@api/dto';
+import useSearchParams from '@hooks/useSearchParams';
+import { ComponentVulnerability } from '../../../../../../../main/model/entity/ComponentVulnerability'; // TODO: use alias?
 
 // interfaces & types
 interface IVulnerabilitiesFilter {
@@ -31,43 +32,40 @@ interface IVulnerabilitiesFilter {
 }
 
 const VulnerabilitiesReport = () => {
-  const data = useRef<any[]>(null);
+  const type = useSearchParams().get('type');
+  const data = useRef<ComponentVulnerability[]>(null);
 
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<ComponentVulnerability[]>([]);
   const [components, setComponent] = useState<any[]>([]);
   const [filter, setFilter] = useState<IVulnerabilitiesFilter>(null);
+  const [popoverContent, setPopoverContent] = useState<string>(null);
+
+  const [anchorElPopover, setAnchorElPopover] = React.useState<HTMLButtonElement | null>(null);
+  const open = Boolean(anchorElPopover);
 
   const init = async () => {
+    const source = type === SourceType.identified ? SourceType.identified : SourceType.detected;
+    const response = await vulnerabilityService.getAll({ type: source });
+    data.current = response;
 
-    const response = await vulnerabilityService.getAll({ type: SourceType.detected });
-    console.log("VULNERABILITIES RESPONSE", response);
-
-    data.current = Array(20)
-      .fill(null)
-      .map((i, index) => ({
-        component: `Angular-${index}`,
-        severity: 'medium',
-        cve: `CVE-2014-8181${index}`,
-        source: 'Nvd',
-        introduced: '3.2.7',
-        reported: 'May 10, 2022',
-        patched: '3.2.8',
-      }));
+    console.log(response)
 
     setItems(data.current);
-    setComponent(Array.from(new Set(data.current.map((item) => item.component))));
+    setComponent(Array.from(new Set(data.current.map((item) => item.componentVersion.name))));
   };
 
-  const filterItems = (items) => {
+  const filterItems = (items: ComponentVulnerability[]) => {
     return filter
       ? items
-          .filter((item) => !filter.component || item.component === filter.component)
-          .filter((item) => !filter.severity || filter.severity.length === 0 || filter.severity.includes(item.severity))
+          .filter((item) => !filter.component || item.componentVersion.name === filter.component)
+          .filter((item) => !filter.severity || filter.severity.length === 0 || filter.severity.includes(item.vulnerability.severity?.toLowerCase()))
       : items;
   };
 
-  const onSeeDescriptionClickHandler = (_e, item) => {};
-  const onCopyCVEClickHandler = (_e, item) => {};
+  const onSeeDescriptionClickHandler = (e, item: ComponentVulnerability) => {
+    setPopoverContent(item.vulnerability.summary);
+    setAnchorElPopover(e.currentTarget);
+  };
 
   const onFilterHandler = (newFilter: IVulnerabilitiesFilter) => {
     setFilter({ ...filter, ...newFilter });
@@ -87,7 +85,7 @@ const VulnerabilitiesReport = () => {
     <>
       <section id="VulnerabilitiesReportPage" className="app-page">
         <header className="app-header">
-          <h1 className="header-title">Detected Vulnerabilities</h1>
+          <h1 className="header-title">{ type === SourceType.detected ? 'Detected' : 'Identified'} Vulnerabilities</h1>
           <section className="subheader">
             <form className="default-form">
               <div className="form-row filter">
@@ -177,16 +175,16 @@ const VulnerabilitiesReport = () => {
               </TableHead>
               <TableBody>
                 {items?.map((item) => (
-                  <TableRow key={item.cve}>
-                    <TableCell>{item.component}</TableCell>
+                  <TableRow key={item.purl + item.version + item.vulnerability.cve}>
+                    <TableCell>{item.componentVersion.name}</TableCell>
                     <TableCell>
-                      <span className={`tag tag-${item.severity}`}>{item.severity}</span>
+                      <span className={`tag tag-${item.vulnerability.severity?.toLowerCase()}`}>{item.vulnerability.severity}</span>
                     </TableCell>
-                    <TableCell>{item.cve}</TableCell>
-                    <TableCell>{item.source}</TableCell>
-                    <TableCell>{item.introduced}</TableCell>
-                    <TableCell>{item.reported}</TableCell>
-                    <TableCell>{item.patched}</TableCell>
+                    <TableCell>{item.vulnerability.cve}</TableCell>
+                    <TableCell>{item.vulnerability.source}</TableCell>
+                    <TableCell>{item.vulnerability.introduced}</TableCell>
+                    <TableCell>{item.vulnerability.reported}</TableCell>
+                    <TableCell>{item.vulnerability.patched}</TableCell>
                     <TableCellActions>
                       <IconButton
                         title="See description"
@@ -196,14 +194,6 @@ const VulnerabilitiesReport = () => {
                       >
                         <ReceiptLongOutlinedIcon fontSize="inherit" />
                       </IconButton>
-                      <IconButton
-                        title="Copy CVE"
-                        aria-label="copy cve"
-                        size="small"
-                        onClick={(e) => onCopyCVEClickHandler(e, item)}
-                      >
-                        <ContentCopyOutlinedIcon fontSize="inherit" />
-                      </IconButton>
                     </TableCellActions>
                   </TableRow>
                 ))}
@@ -212,6 +202,18 @@ const VulnerabilitiesReport = () => {
           </TableContainer>
         </main>
       </section>
+
+      <Popover
+        open={open}
+        anchorEl={anchorElPopover}
+        onClose={() => setAnchorElPopover(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <Typography sx={{ p: 2, maxWidth: 300 }}>{popoverContent}</Typography>
+      </Popover>
     </>
   );
 };

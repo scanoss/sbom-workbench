@@ -369,7 +369,7 @@
     transition: all 200ms ease;
   }
 
-  &:hover .report-title .MuiSvgIcon-root {
+  &:not(.blocked):hover .report-title .MuiSvgIcon-root {
     transform: translateX(3px);
     opacity: 1;
   }
