@@ -3,8 +3,8 @@ import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Model } from './Model';
 import { Querys } from './querys_db';
 import { Dependency } from '../../api/types';
-import { Dependency as Dep } from './entity/Dependency'
-import { NodeStatus } from "../workspace/tree/Node";
+import { Dependency as Dep } from './entity/Dependency';
+import { NodeStatus } from '../workspace/tree/Node';
 
 const query = new Querys();
 
@@ -27,26 +27,25 @@ export class DependencyModel extends Model {
         db.serialize(() => {
           db.run('begin transaction');
           dependencies.forEach((d) => {
-              db.run(
-                query.SQL_DEPENDENCIES_INSERT,
-                d.fileId,
-                d.purl ? decodeURIComponent(d.purl) : null,
-                d.version ? d.version : null,
-                d.scope ? d.scope : null,
-                d.licenses.length > 0  ? d.licenses.join(',') : null,
-                d.component,
-                d.version ? d.version : null,
-                d.originalLicense.length > 0 ? d.originalLicense.join(',') :null
-              );
-            });
+            db.run(
+              query.SQL_DEPENDENCIES_INSERT,
+              d.fileId,
+              d.purl ? decodeURIComponent(d.purl) : null,
+              d.version ? d.version : null,
+              d.scope ? d.scope : null,
+              d.licenses.length > 0 ? d.licenses.join(',') : null,
+              d.component,
+              d.version ? d.version : null,
+              d.originalLicense.length > 0 ? d.originalLicense.join(',') : null
+            );
+          });
           db.run('commit', (err: any) => {
             db.close();
             if (err) throw err;
             resolve(true);
           });
         });
-    }
-    catch (err) {
+      } catch (err) {
         reject(err);
       }
     });
@@ -65,10 +64,10 @@ export class DependencyModel extends Model {
           db.close();
           if (err) throw err;
           dep.forEach((d) => {
-            if (d.licenses) d.licenses = d.licenses.split(',');
+            if (d.licenses) d.licenses = d.licenses.split(/;|\//g);
             else d.licenses = [];
             if (d.originalLicense)
-              d.originalLicense = d.originalLicense.split(',');
+              d.originalLicense = d.originalLicense.split(/;|\//g);
           });
           resolve(dep);
         });
@@ -84,7 +83,8 @@ export class DependencyModel extends Model {
       try {
         const db = await this.openDb();
         db.run(
-          `UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?;`,...dependency,
+          `UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?;`,
+          ...dependency,
           async (err: any, _dep: any) => {
             db.close();
             if (err) throw err;
@@ -141,12 +141,14 @@ export class DependencyModel extends Model {
     );
   }
 
-  public getStatus(){
+  public getStatus() {
     return new Promise<Array<Record<string, NodeStatus>>>(
       async (resolve, reject) => {
         try {
           const db = await this.openDb();
-          db.all(query.SQL_DEPENDENCY_STATUS, async (err: any, dep: Array<Record<string, NodeStatus>>) => {
+          db.all(
+            query.SQL_DEPENDENCY_STATUS,
+            async (err: any, dep: Array<Record<string, NodeStatus>>) => {
               db.close();
               if (err) throw err;
               resolve(dep);
