@@ -14,7 +14,7 @@ export class VulnerabilitiesTask implements ITask<void, void> {
     this.project = project;
   }
 
-  public async run(params: void): Promise<void> {
+  public async run(): Promise<void> {
     log.info('[ VulnerabilitiesTask init ]');
     this.updateStatus();
     const detectedComponents = await modelProvider.model.component.getAll(null);
