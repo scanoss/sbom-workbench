@@ -8,7 +8,7 @@ import { Tree } from '../../workspace/tree/Tree';
 import { QueryBuilderCreator } from '../../model/queryBuilder/QueryBuilderCreator';
 
 export async function migration120(projectPath: string): Promise<void> {
-  log.info('Migration 1.2.0 In progress...');
+  log.info('%cMigration 1.2.0 In progress...', 'color:green');
   await indexMigration(projectPath);
 }
 
@@ -18,13 +18,18 @@ async function indexMigration(projectPath: string) {
   if (metadata.scan_root) {
     // Avoids create index on imported projects
     await modelProvider.init(projectPath);
-    const project = await fs.promises.readFile(`${projectPath}/tree.json`, 'utf8');
+    const project = await fs.promises.readFile(
+      `${projectPath}/tree.json`,
+      'utf8'
+    );
     const a = JSON.parse(project);
     const tree = new Tree(metadata.scan_root, projectPath);
     tree.loadTree(a.tree.rootFolder);
     const f = tree.getRootFolder().getFiles(new BlackListKeyWordIndex());
     const paths = f.map((fi) => fi.path);
-    const files = await modelProvider.model.file.getAll(QueryBuilderCreator.create(paths));
+    const files = await modelProvider.model.file.getAll(
+      QueryBuilderCreator.create(paths)
+    );
     const indexer = new Indexer();
     const filesToIndex = fileAdapter(files, metadata.scan_root);
     const index = indexer.index(filesToIndex);

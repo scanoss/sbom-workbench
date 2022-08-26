@@ -1,6 +1,6 @@
-import { IpcChannels } from "../../api/ipc-channels";
+import { IpcChannels } from '../../api/ipc-channels';
 import { SemVerCompareVersion } from '../helpers/SemVer';
-import { broadcastManager } from "../broadcastManager/BroadcastManager";
+import { broadcastManager } from '../broadcastManager/BroadcastManager';
 import { app } from 'electron';
 import packageJson from '../../../release/app/package.json';
 
@@ -19,7 +19,13 @@ export abstract class Migration {
     let latestVersion = myVersion;
     if (SemVerCompareVersion(myVersion, oldestCompatibleVersion) === -1)
       throw new Error(`Cannot upgrade version ${myVersion}`); // myVersion < oldCom....
-    broadcastManager.get().send(IpcChannels.MIGRATION_INIT, { data: `Migrating project to v${app.isPackaged ? app.getVersion() : packageJson.version}` });
+    broadcastManager
+      .get()
+      ?.send(IpcChannels.MIGRATION_INIT, {
+        data: `Migrating project to v${
+          app.isPackaged ? app.getVersion() : packageJson.version
+        }`,
+      });
     for (const scriptsVersion in scripts) {
       const values = scripts[scriptsVersion];
       if (SemVerCompareVersion(myVersion, scriptsVersion) < 0) {
@@ -34,7 +40,10 @@ export abstract class Migration {
     return latestVersion;
   }
 
-  public abstract getScripts(): Record<string, Array<(path: string) => Promise<any>>>;
+  public abstract getScripts(): Record<
+    string,
+    Array<(path: string) => Promise<any>>
+  >;
 
   public abstract getPath(): string;
 
