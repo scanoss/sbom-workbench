@@ -8,8 +8,13 @@ import { BaseScannerTask } from './BaseScannerTask';
 import { Project } from '../../workspace/Project';
 
 export class ReScanTask extends BaseScannerTask {
-  public async done(resultPath: string) {
-    await rescanService.reScan(this.project.getTree().getRootFolder().getFiles(), resultPath, this.project.getMyPath());
+  public async done() {
+    const resultPath = `${this.project.getMyPath()}/result.json`;
+    await rescanService.reScan(
+      this.project.getTree().getRootFolder().getFiles(),
+      resultPath,
+      this.project.getMyPath()
+    );
     const results = await rescanService.getNewResults();
     this.project.getTree().sync(results);
     log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');

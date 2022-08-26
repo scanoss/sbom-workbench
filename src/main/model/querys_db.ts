@@ -71,18 +71,22 @@ export class Querys {
   SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH = `UPDATE results SET source=?,idtype='file' WHERE file_path=?`;
 
   // SQL NEW INVENTORY
-  SQL_SCAN_INVENTORY_INSERT = 'INSERT INTO inventories (cvid,usage, notes, url, spdxid, source) VALUES (?,?,?,?,?,?);';
+  SQL_SCAN_INVENTORY_INSERT =
+    'INSERT INTO inventories (cvid,usage, notes, url, spdxid, source) VALUES (?,?,?,?,?,?);';
 
-  SQL_INSERT_FILE_INVENTORIES = 'INSERT into file_inventories (fileId,inventoryid) VALUES (?,?);';
+  SQL_INSERT_FILE_INVENTORIES =
+    'INSERT into file_inventories (fileId,inventoryid) VALUES (?,?);';
 
   // SQL INSERT FILE INVENTORIES
-  SQL_INSERT_FILE_INVENTORIES_BATCH = 'INSERT into file_inventories (fileId,inventoryid) VALUES ?;';
+  SQL_INSERT_FILE_INVENTORIES_BATCH =
+    'INSERT into file_inventories (fileId,inventoryid) VALUES ?;';
 
   // SQL DELETE FILE INVENTORY
   SQL_DELETE_FILE_INVENTORIES = 'DELETE FROM file_inventories WHERE fileId IN ';
 
   //  UPDATE INVENTORY
-  SQL_UPDATE_INVENTORY = 'UPDATE inventories SET cvid=?, usage=?, notes=?, url=?, spdxid=? WHERE id=?;';
+  SQL_UPDATE_INVENTORY =
+    'UPDATE inventories SET cvid=?, usage=?, notes=?, url=?, spdxid=? WHERE id=?;';
 
   SQL_SELECT_INVENTORY_COMPONENTS = `SELECT DISTINCT i.cvid,i.id,r.vendor,i.usage,cv.purl,i.notes,i.url,i.spdxid,cv.version,cv.name FROM inventories i
   INNER JOIN component_versions cv ON cv.id=i.cvid AND i.source="detected"
@@ -91,10 +95,12 @@ export class Querys {
   SQL_COMPDB_COMP_VERSION_UPDATE =
     'UPDATE component_versions  SET name=?,version=?, description=?, url=?,purl=? where id=?;';
 
-  SQL_FILES_UPDATE_IDENTIFIED = 'UPDATE files SET identified=1 WHERE fileId IN ';
+  SQL_FILES_UPDATE_IDENTIFIED =
+    'UPDATE files SET identified=1 WHERE fileId IN ';
 
   // SQL INSERT INTO LICENSES
-  SQL_CREATE_LICENSE = 'INSERT OR IGNORE INTO licenses (spdxid,name,fulltext,url,official) VALUES(?,?,?,?,?);';
+  SQL_CREATE_LICENSE =
+    'INSERT OR IGNORE INTO licenses (spdxid,name,fulltext,url,official) VALUES(?,?,?,?,?);';
 
   // SQL INSERT INTO  COMPONENT VERSIONS
 
@@ -104,7 +110,8 @@ export class Querys {
   COMPDB_SQL_COMP_VERSION_CREATE = `INSERT INTO component_versions (name,version, description, url,purl,source) VALUES (?,?,?,?,?,?);`;
 
   // ATTACH A COMPONENT TO A LICENSE
-  SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID = 'INSERT or IGNORE INTO license_component_version (cvid,licid) values (?,?)';
+  SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID =
+    'INSERT or IGNORE INTO license_component_version (cvid,licid) values (?,?)';
 
   SQL_ATTACH_LICENSE_BY_PURL_NAME =
     'INSERT or IGNORE INTO license_component_version (cvid,licid) values ((SELECT id FROM component_versions where purl=? and version=?),(SELECT id FROM licenses where name=?));';
@@ -136,7 +143,8 @@ export class Querys {
     'SELECT DISTINCT f.fileId AS id,f.path,f.identified,f.ignored FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN files f ON f.fileId=fi.fileId  WHERE i.id=?;';
 
   // SQL_GET_COMPONENTS TABLE
-  SQL_GET_COMPONENT = 'SELECT id,name,version,description,url,purl from component_versions where purl like ?';
+  SQL_GET_COMPONENT =
+    'SELECT id,name,version,description,url,purl from component_versions where purl like ?';
 
   SQL_GET_COMPONENT_BY_ID =
     'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.id=?;';
@@ -144,7 +152,8 @@ export class Querys {
   SQL_GET_LICENSES_BY_COMPONENT_ID =
     'SELECT l.id,l.name,l.spdxid FROM licenses l where l.id in (SELECT lcv.licid from license_component_version lcv where lcv.cvid=?);';
 
-  SQL_GET_COMPID_FROM_PURL = 'SELECT id from component_versions where purl like ? and version like ?;';
+  SQL_GET_COMPID_FROM_PURL =
+    'SELECT id from component_versions where purl like ? and version like ?;';
 
   SQL_GET_COMPONENT_BY_PURL_VERSION =
     'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version,r.purl FROM component_versions cv LEFT JOIN results r ON cv.purl=r.purl AND cv.version=r.version WHERE cv.purl=? and cv.version=?;';
@@ -153,13 +162,15 @@ export class Querys {
   SQL_SELECT_LICENSE = 'SELECT id, spdxid, name, url FROM licenses WHERE ';
 
   // GET LICENSES
-  SQL_SELECT_ALL_LICENSES = 'SELECT id, spdxid, name, url, official FROM licenses ORDER BY name ASC;';
+  SQL_SELECT_ALL_LICENSES =
+    'SELECT id, spdxid, name, url, official FROM licenses ORDER BY name ASC;';
 
   // GET ALL THE INVENTORIES
   SQL_GET_ALL_INVENTORIES = `SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i
   LEFT JOIN licenses l ON i.spdxid=l.spdxid;`;
 
-  SQL_UPDATE_IGNORED_FILES = 'UPDATE files SET ignored=1,identified=0 WHERE fileId IN ';
+  SQL_UPDATE_IGNORED_FILES =
+    'UPDATE files SET ignored=1,identified=0 WHERE fileId IN ';
 
   SQL_FILE_RESTORE = `UPDATE files SET ignored=0,identified=0 WHERE fileId IN `;
 
@@ -197,7 +208,8 @@ LEFT JOIN licenses lic ON lic.spdxid=rl.spdxid
 LEFT JOIN dependencies dep ON dep.fileId = f.fileId
 WHERE f.fileId IN (SELECT fileId FROM results) OR f.fileId IN (SELECT fileId FROM dependencies);`;
 
-  SQL_GET_SUMMARY_BY_PURL_VERSION = 'SELECT identified,pending,ignored FROM summary WHERE purl=? AND version=?;';
+  SQL_GET_SUMMARY_BY_PURL_VERSION =
+    'SELECT identified,pending,ignored FROM summary WHERE purl=? AND version=?;';
 
   SQL_GET_SUMMARY_BY_PURL =
     'SELECT SUM(identified) AS identified,SUM(pending) AS pending,SUM(ignored) AS ignored FROM summary WHERE purl=? GROUP BY purl;';
@@ -272,4 +284,37 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   INNER JOIN files f ON f.fileId =  d.fileId
   LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version
   LEFT JOIN inventories i ON cv.id = i.cvid AND i.source='declared' AND instr(d.licenses, i.spdxid)>0;`;
+
+  // VULNERABILITIES
+
+  SQL_GET_ALL_IDENTIFIED_VULNERABILITIES = `SELECT * FROM vulnerability v
+  INNER JOIN component_vulnerability compv ON v.cve = compv.cve
+  INNER JOIN component_versions cv ON (cv.purl = compv.purl AND cv.version = compv.version)
+  WHERE cv.id IN (SELECT cvid FROM inventories)`;
+
+  SQL_GET_ALL_VULNERABILITIES_DETECTED = `SELECT * FROM vulnerability v
+  INNER JOIN component_vulnerability compv ON v.cve = compv.cve
+  WHERE (compv.version,compv.purl) IN (SELECT version,purl FROM component_versions cv WHERE cv.source='engine')
+  OR (compv.version,compv.purl) IN (SELECT version,purl FROM dependencies)`;
+
+  SQL_GET_COMPONENT_VERSIONS_FOR_VULNERABILITIES = `SELECT DISTINCT (CASE WHEN component.name IS NOT NULL THEN component.name ELSE component.component END) as name,
+(CASE WHEN component.purl IS NOT NULL THEN component.purl ELSE component.depPurl END) as purl,
+(CASE WHEN component.version IS NOT NULL THEN component.version ELSE component.depVersion END) as version
+  FROM (
+    SELECT cv.purl, dep.purl AS depPurl, cv.name , dep.component , cv.version, dep.version AS depVersion FROM  component_vulnerability compv
+  LEFT JOIN component_versions cv ON (compv.purl = cv.purl AND compv.version)
+  LEFT JOIN dependencies dep ON dep.purl = compv.purl AND dep.version = compv.version) as component
+  WHERE purl||'@'||version IN (#COMPONENTS);`;
+
+  SQL_GET_VULNERABILITIES_IDENTIFIED_REPORT = `SELECT v.severity, count(v.severity) as count FROM vulnerability v
+  INNER JOIN component_vulnerability compv ON v.cve = compv.cve
+  INNER JOIN component_versions cv ON (cv.purl = compv.purl AND cv.version = compv.version)
+  WHERE cv.id IN (SELECT cvid FROM inventories)
+  GROUP BY v.severity;`;
+
+  SQL_GET_VULNERABILITIES_DETECTED_REPORT = `SELECT v.severity, count(v.severity) as count FROM vulnerability v
+  INNER JOIN component_vulnerability compv ON v.cve = compv.cve
+  WHERE (compv.version,compv.purl) IN (SELECT version,purl FROM component_versions cv WHERE cv.source='engine')
+  OR (compv.version,compv.purl) IN (SELECT version,purl FROM dependencies)
+  GROUP BY v.severity;`;
 }

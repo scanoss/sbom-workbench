@@ -1,4 +1,3 @@
-import { Folder } from '@material-ui/icons';
 import { QueryBuilder } from './QueryBuilder';
 
 export class QueryBuilderAND extends QueryBuilder {
@@ -10,7 +9,9 @@ export class QueryBuilderAND extends QueryBuilder {
   }
 
   public getSQL(entityMapper: Record<string, string>): string {
-    const partialSQL = this.builders.map((e) => e.getSQL(entityMapper)).join(' AND ');
+    const partialSQL = this.builders
+      .map((e) => e.getSQL(entityMapper))
+      .join(' AND ');
     return partialSQL;
   }
 

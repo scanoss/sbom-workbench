@@ -17,7 +17,7 @@ export class ComponentVersion {
 
   reliableLicense?: string;
 
-  // licenses: Array<License>
+  // TODO:licenses: Array<License>
 
   public setLicenseIds(licensesIds: Array<number>) {
     this.licenseIds = licensesIds;
