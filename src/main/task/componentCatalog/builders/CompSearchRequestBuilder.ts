@@ -1,5 +1,5 @@
 import { ISearchComponent } from '../iComponentCatalog/ISearchComponent';
-import * as ComponentMessages from '../grpc/scanoss/api/components/v2/scanoss-components_pb.js';
+import * as ComponentMessages from '../../grpc/scanoss/api/components/v2/scanoss-components_pb';
 
 export class CompSearchRequestBuilder {
   public static build(raw: ISearchComponent): ComponentMessages.CompSearchRequest {

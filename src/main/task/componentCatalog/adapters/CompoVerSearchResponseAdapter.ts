@@ -1,4 +1,4 @@
-import * as ComponentMessages from '../grpc/scanoss/api/components/v2/scanoss-components_pb';
+import * as ComponentMessages from '../../grpc/scanoss/api/components/v2/scanoss-components_pb';
 import { IComponentVersionResult, ILicense, IVersion } from '../iComponentCatalog/IComponentVersionResult';
 
 export class CompoVerSearchResponseAdapter {

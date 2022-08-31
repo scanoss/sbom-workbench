@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/extensions
-import { ISearchComponentVersion } from '../iComponentCatalog/ISearchgRPCComponentVersion';
-import * as ComponentMessages from '../grpc/scanoss/api/components/v2/scanoss-components_pb';
+import { ISearchComponentVersion } from '../iComponentCatalog/ISearchComponentVersion';
+import * as ComponentMessages from '../../grpc/scanoss/api/components/v2/scanoss-components_pb';
 
 export class CompVerSearchRequestBuilder {
   public static build(raw: ISearchComponentVersion) {
