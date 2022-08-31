@@ -1,5 +1,5 @@
 import { IComponentResult } from '../iComponentCatalog/IComponentResult';
-import * as ComponentMessages from '../grpc/scanoss/api/components/v2/scanoss-components_pb';
+import * as ComponentMessages from '../../grpc/scanoss/api/components/v2/scanoss-components_pb';
 
 export class CompSearchResponseAdapter {
   public static convert(response: ComponentMessages.CompSearchResponse): Array<IComponentResult> {

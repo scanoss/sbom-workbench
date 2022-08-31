@@ -1,15 +1,16 @@
 import { ITask } from '../Task';
 import { ISearchComponent } from './iComponentCatalog/ISearchComponent';
 import { IComponentResult } from './iComponentCatalog/IComponentResult';
-import { gRPCConnectionService } from './gRPCConnection/GRPCConnection';
-import * as ComponentMessages from './grpc/scanoss/api/components/v2/scanoss-components_pb';
+import { gRPCConnections } from '../grpc/gRPCConnection/gRPCConnection';
+import * as ComponentMessages from '../grpc/scanoss/api/components/v2/scanoss-components_pb';
 import { CompSearchRequestBuilder } from './builders/CompSearchRequestBuilder';
 import { CompSearchResponseAdapter } from './adapters/CompSearchResponseAdapter';
-import { StatusCode } from './grpc/scanoss/api/common/v2/scanoss-common_pb';
+import { StatusCode } from '../grpc/scanoss/api/common/v2/scanoss-common_pb';
+import { ComponentsClient } from "../grpc/scanoss/api/components/v2/scanoss-components_grpc_pb";
 
 export class SearchComponentTask implements ITask<ISearchComponent, Array<IComponentResult>> {
   public async run(params: ISearchComponent): Promise<Array<IComponentResult>> {
-    const client = gRPCConnectionService.get();
+    const client = gRPCConnections.getComponentCatalogStub() as ComponentsClient;
     const req = CompSearchRequestBuilder.build(params);
 
     const pSearchComponents = new Promise((resolve, reject) => {
