@@ -297,13 +297,16 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   WHERE (compv.version,compv.purl) IN (SELECT version,purl FROM component_versions cv WHERE cv.source='engine')
   OR (compv.version,compv.purl) IN (SELECT version,purl FROM dependencies)`;
 
-  SQL_GET_COMPONENT_VERSIONS_FOR_VULNERABILITIES = `SELECT DISTINCT (CASE WHEN component.name IS NOT NULL THEN component.name ELSE component.component END) as name,
-(CASE WHEN component.purl IS NOT NULL THEN component.purl ELSE component.depPurl END) as purl,
-(CASE WHEN component.version IS NOT NULL THEN component.version ELSE component.depVersion END) as version
+  SQL_GET_COMPONENT_VERSIONS_FOR_VULNERABILITIES = `
+  SELECT * FROM
+  (SELECT DISTINCT
+  (CASE WHEN component.name IS NOT NULL THEN component.name ELSE component.component END) as name,
+  (CASE WHEN component.purl IS NOT NULL THEN component.purl ELSE component.depPurl END) as purl,
+  (CASE WHEN component.version IS NOT NULL THEN component.version ELSE component.depVersion END) as version
   FROM (
     SELECT cv.purl, dep.purl AS depPurl, cv.name , dep.component , cv.version, dep.version AS depVersion FROM  component_vulnerability compv
-  LEFT JOIN component_versions cv ON (compv.purl = cv.purl AND compv.version)
-  LEFT JOIN dependencies dep ON dep.purl = compv.purl AND dep.version = compv.version) as component
+    LEFT JOIN component_versions cv ON (compv.purl = cv.purl AND compv.version)
+    LEFT JOIN dependencies dep ON dep.purl = compv.purl AND dep.version = compv.version) as component)
   WHERE purl||'@'||version IN (#COMPONENTS);`;
 
   SQL_GET_VULNERABILITIES_IDENTIFIED_REPORT = `SELECT v.severity, count(v.severity) as count FROM vulnerability v
