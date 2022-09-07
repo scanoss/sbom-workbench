@@ -180,7 +180,12 @@ const VulnerabilitiesReport = () => {
                     <TableCell>
                       <span className={`tag tag-${item.vulnerability.severity?.toLowerCase()}`}>{item.vulnerability.severity}</span>
                     </TableCell>
-                    <TableCell>{item.vulnerability.cve}</TableCell>
+                    <TableCell><a
+                                  href={`https://nvd.nist.gov/vuln/detail/${item.vulnerability.cve}`}
+                                  target="_blank" rel="noreferrer">
+                                    {item.vulnerability.cve}
+                                  </a>
+                    </TableCell>
                     <TableCell>{item.vulnerability.source}</TableCell>
                     <TableCell>{item.vulnerability.introduced}</TableCell>
                     <TableCell>{item.vulnerability.reported}</TableCell>
