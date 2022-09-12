@@ -8,6 +8,8 @@ import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPat
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
 import { ScannerPipelineTask } from '../../main/task/scanner/ScannerPipelineTask';
 import { Scanner } from '../../main/task/scanner/types';
+import ScannerSource = Scanner.ScannerSource;
+import ScannerType = Scanner.ScannerType;
 
 ipcMain.handle(IpcChannels.WORKSPACE_PROJECT_LIST, async (_event) => {
   try {
@@ -40,7 +42,9 @@ ipcMain.handle(IpcChannels.WORKSPACE_CREATE_PROJECT, async (_event, project: INe
   try {
     const scanner = new ScannerPipelineTask();
     await scanner.run({
-      type: Scanner.ScannerType.SCAN,
+      mode: Scanner.ScannerMode.SCAN,
+      source: ScannerSource.CODE,
+      type: [ScannerType.CODE, ScannerType.DEPENDENCIES, ScannerType.VULNERABILITIES],
       project,
     });
     return Response.ok();

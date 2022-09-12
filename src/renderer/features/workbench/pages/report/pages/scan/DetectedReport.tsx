@@ -6,28 +6,30 @@ import { projectService } from '@api/services/project.service';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import { Link } from 'react-router-dom';
 import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
+import { useSelector } from 'react-redux';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import LicensesChart from '../../components/LicensesChart';
 import LicensesTable from '../../components/LicensesTable';
 import MatchesForLicense from '../../components/MatchesForLicense';
 import MatchesChart from '../../components/MatchesChart';
 import LicensesObligations from '../../components/LicensesObligations';
 import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
+import { Scanner } from '../../../../../../../main/task/scanner/types';
 
 Chart.register(...registerables);
 
 const DetectedReport = ({ data }) => {
+  const { projectScannerConfig } = useSelector(selectWorkbench);
+
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
   const [obligations, setObligations] = useState(null);
-  const [blocked, setBlocked] = useState<boolean>(false);
+
+  const blocked = !projectScannerConfig?.type?.includes(Scanner.ScannerType.VULNERABILITIES)
 
   const init = async () => {
     const licenses = data.licenses.map((license) => license.label);
     const obligations = await obligationsService.getObligations(licenses);
     setObligations(obligations);
-
-    // api key validation TODO: move to store
-    const apiKey = await projectService.getApiKey();
-    setBlocked(!apiKey);
   };
 
   const onLicenseSelected = (license: string) => {

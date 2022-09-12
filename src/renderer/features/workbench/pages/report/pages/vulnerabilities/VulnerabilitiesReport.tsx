@@ -4,7 +4,7 @@ import {
   Autocomplete,
   Checkbox,
   Chip,
-  IconButton,
+  IconButton, Link, ListItemText,
   Paper, Popover,
   Table,
   TableBody,
@@ -18,6 +18,7 @@ import {
 // icons
 import SearchIcon from '@mui/icons-material/Search';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
+import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 
 import TableCellActions from '@components/TableCellActions/TableCellActions';
 import { vulnerabilityService } from '@api/services/vulnerability.service';
@@ -176,29 +177,37 @@ const VulnerabilitiesReport = () => {
               <TableBody>
                 {items?.map((item) => (
                   <TableRow key={item.purl + item.version + item.vulnerability.cve}>
-                    <TableCell>{item.componentVersion.name}</TableCell>
+                    <TableCell className="pb-0 pt-0">
+                      <ListItemText
+                        primary={item.componentVersion.name}
+                        secondary={item.componentVersion.purl}
+                      />
+                    </TableCell>
                     <TableCell>
                       <span className={`tag tag-${item.vulnerability.severity?.toLowerCase()}`}>{item.vulnerability.severity}</span>
                     </TableCell>
-                    <TableCell><a
+                    <TableCell><Link
+                                  className="d-flex align-center"
                                   href={`https://nvd.nist.gov/vuln/detail/${item.vulnerability.cve}`}
                                   target="_blank" rel="noreferrer">
-                                    {item.vulnerability.cve}
-                                  </a>
+                                    {item.vulnerability.cve}  <OpenInNewOutlinedIcon className="external-link" fontSize="small" />
+                                  </Link>
                     </TableCell>
                     <TableCell>{item.vulnerability.source}</TableCell>
                     <TableCell>{item.vulnerability.introduced}</TableCell>
                     <TableCell>{item.vulnerability.reported}</TableCell>
                     <TableCell>{item.vulnerability.patched}</TableCell>
                     <TableCellActions>
-                      <IconButton
-                        title="See description"
-                        aria-label="see description"
-                        size="small"
-                        onClick={(e) => onSeeDescriptionClickHandler(e, item)}
-                      >
-                        <ReceiptLongOutlinedIcon fontSize="inherit" />
-                      </IconButton>
+                      {item.vulnerability.summary &&
+                        <IconButton
+                          title="See description"
+                          aria-label="see description"
+                          size="small"
+                          onClick={(e) => onSeeDescriptionClickHandler(e, item)}
+                        >
+                          <ReceiptLongOutlinedIcon fontSize="inherit"/>
+                        </IconButton>
+                      }
                     </TableCellActions>
                   </TableRow>
                 ))}

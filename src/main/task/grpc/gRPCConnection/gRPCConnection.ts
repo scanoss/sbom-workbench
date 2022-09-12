@@ -42,13 +42,13 @@ class GRPCConnection {
 
   public getComponentCatalogStub(): grpc.Client {
     if (!this.componentCatalogClient)
-      this.componentCatalogClient = new ComponentsClient(this.getEndpoint(),this.getCredentials());
+      this.componentCatalogClient = new ComponentsClient(this.getEndpoint(), this.getCredentials());
     return this.componentCatalogClient;
   }
 
   public getVulnerabilityStub(): grpc.Client {
     if (!this.vulnerabilityClient)
-      this.vulnerabilityClient = new VulnerabilitiesClient("ns3029088.ip-51-255-68.eu:50051",this.getInsecureCredentials());
+      this.vulnerabilityClient = new VulnerabilitiesClient("ns3029088.ip-51-255-68.eu:50051", this.getInsecureCredentials());
     return this.vulnerabilityClient;
   }
 
@@ -56,5 +56,3 @@ class GRPCConnection {
 
 
 export const gRPCConnections = new GRPCConnection();
-
-

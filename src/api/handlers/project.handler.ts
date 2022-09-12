@@ -23,6 +23,7 @@ ipcMain.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, arg: any) => {
     dependencies: Array.from(await dependencyService.getDependenciesFiles()),
     uuid: p.getUUID(),
     source: p.getDto().source,
+    metadata: p.metadata,
   };
   return {
     status: 'ok',
@@ -51,7 +52,7 @@ ipcMain.handle(IpcChannels.PROJECT_RESUME_SCAN, async (event, projectPath: strin
   try {
     const scanner = new ScannerPipelineTask();
     await scanner.run({
-      type: Scanner.ScannerType.RESUME,
+      mode: Scanner.ScannerMode.RESUME,
       projectPath,
     });
     return Response.ok();
@@ -65,7 +66,7 @@ ipcMain.handle(IpcChannels.PROJECT_RESCAN, async (event, projectPath: string) =>
   try {
     const scanner = new ScannerPipelineTask();
     await scanner.run({
-      type: Scanner.ScannerType.RESCAN,
+      mode: Scanner.ScannerMode.RESCAN,
       projectPath,
     });
 

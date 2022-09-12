@@ -18,8 +18,8 @@ const VulnerabilitiesCard = ({ data, blocked }) => {
           <span className="vulnerability-label">High</span>
         </div>
         <div className="vulnerability-container medium">
-          <span className="vulnerability-number">{!blocked ? data?.moderate : 23}</span>
-          <span className="vulnerability-label">Moderate</span>
+          <span className="vulnerability-number">{!blocked ? data?.medium : 23}</span>
+          <span className="vulnerability-label">Medium</span>
         </div>
         <div className="vulnerability-container low">
           <span className="vulnerability-number">{!blocked ? data?.low : 16}</span>
