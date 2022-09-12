@@ -5,6 +5,7 @@ import { Project } from './Project';
 import { INewProject, IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../../../assets/data/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
+import { Scanner } from '../task/scanner/types';
 
 class Workspace {
   private projectList: Array<Project>;
@@ -147,17 +148,19 @@ class Workspace {
     return licenses;
   }
 
-  public async createProject(project: INewProject): Promise<Project> {
-    const p: Project = new Project(project.name);
-    p.setScanPath(project.scan_root);
-    p.setLicense(project.default_license);
+  public async createProject(scannerConfig: Scanner.ScannerConfig): Promise<Project> {
+    const { project } = scannerConfig;
+    const newProject: Project = new Project(project.name);
+    newProject.setScannerConfig(scannerConfig);
+    newProject.setScanPath(project.scan_root);
+    newProject.setLicense(project.default_license);
     if (project.api) {
-      p.setApi(project.api);
-      p.setApiKey(project.api_key ? project.api_key : '');
+      newProject.setApi(project.api);
+      newProject.setApiKey(project.api_key ? project.api_key : '');
     }
-    if (project.token) p.setToken(project.token);
-    await this.addProject(p);
-    return p;
+    if (project.token) newProject.setToken(project.token);
+    await this.addProject(newProject);
+    return newProject;
   }
 
   public getProject(filter: ProjectFilter) {

@@ -10,6 +10,7 @@ import { Tree } from './tree/Tree';
 import { modelProvider } from '../services/ModelProvider';
 import { TreeViewModeCreator } from './tree/treeViewModes/TreeViewModeCreator';
 import { IpcChannels } from '../../api/ipc-channels';
+import * as ScannerCFG from '../task/scanner/types';
 
 export class Project {
   work_root: string;
@@ -128,6 +129,10 @@ export class Project {
 
   public setMetadata(mt: Metadata) {
     this.metadata = mt;
+  }
+
+  public setScannerConfig(value: ScannerCFG.Scanner.ScannerConfig) {
+    this.metadata.setScannerConfig(value);
   }
 
   public setScanPath(name: string) {

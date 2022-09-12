@@ -7,6 +7,8 @@ import obligationsService from '@api/services/obligations.service';
 import { projectService } from '@api/services/project.service';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
+import { useSelector } from 'react-redux';
+import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import LicensesChart from '../../components/LicensesChart';
 import IdentificationProgress from '../../components/IdentificationProgress';
 import LicensesTable from '../../components/LicensesTable';
@@ -14,14 +16,17 @@ import MatchesForLicense from '../../components/MatchesForLicense';
 import LicensesObligations from '../../components/LicensesObligations';
 import OssVsOriginalProgressBar from '../../components/OssVsOriginalProgressBar';
 import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
+import { Scanner } from '../../../../../../../main/task/scanner/types';
 
 Chart.register(...registerables);
 
 const IdentifiedReport = ({ data }) => {
+  const { projectScannerConfig } = useSelector(selectWorkbench);
   const navigate = useNavigate();
+
   const [obligations, setObligations] = useState(null);
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
-  const [blocked, setBlocked] = useState<boolean>(false);
+  const blocked = !projectScannerConfig?.type?.includes(Scanner.ScannerType.VULNERABILITIES)
 
   const isEmpty = data.summary.identified.scan === 0 && data.summary.original === 0 && data.licenses.length === 0;
 
@@ -29,10 +34,6 @@ const IdentifiedReport = ({ data }) => {
     const licenses = data.licenses.map((license) => license.label);
     const obligations = await obligationsService.getObligations(licenses);
     setObligations(obligations);
-
-    // api key validation TODO: move to store
-    const apiKey = await projectService.getApiKey();
-    setBlocked(!apiKey);
   };
 
   const onLicenseSelected = (license: string) => {

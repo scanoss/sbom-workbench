@@ -3,6 +3,7 @@ import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '@sha
 import { loadProject, setTree } from './workbenchThunks';
 import { RootState } from '../rootReducer';
 import { ISummary } from "../../../main/services/ReportService";
+import { Scanner } from '../../../main/task/scanner/types';
 
 export interface WorkbenchState {
   path: string;
@@ -11,6 +12,7 @@ export interface WorkbenchState {
   tree: any[]; // TODO: define type
   summary: ISummary; // TODO: define type
   progress: number;
+  projectScannerConfig: Scanner.ScannerConfig;
   dependencies: string[]; // TODO: move to dependency store
   file: string | null;
   history: {
@@ -30,6 +32,7 @@ const initialState: WorkbenchState = {
   tree: null,
   summary: null,
   progress: 0,
+  projectScannerConfig: null,
   dependencies: [],
   file: null,
   loading: false,
@@ -82,7 +85,7 @@ export const workbenchSlice = createSlice({
       state.loading = true;
     });
     builder.addCase(loadProject.fulfilled, (state, action) => {
-      const { name, imported, fileTree, dependencies, scanRoot } = action.payload;
+      const { name, imported, fileTree, dependencies, scanRoot, config } = action.payload;
 
       state.path = scanRoot;
       state.name = name;
@@ -91,6 +94,7 @@ export const workbenchSlice = createSlice({
       state.imported = imported;
       state.tree = convertTreeToNode(fileTree, [fileTree]);
       state.dependencies = dependencies;
+      state.projectScannerConfig = config;
     });
     builder.addCase(setTree.fulfilled, (state, action) => {
       state.tree = action.payload;

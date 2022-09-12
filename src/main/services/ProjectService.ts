@@ -4,10 +4,11 @@ import { Project } from '../workspace/Project';
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
 import { treeService } from './TreeService';
+import { Scanner } from '../task/scanner/types';
 
 class ProjectService {
-  public async create(project: INewProject, event: Electron.WebContents = null): Promise<Project> {
-    const p = await workspace.createProject(project);
+  public async create(scannerConfig: Scanner.ScannerConfig, event: Electron.WebContents = null): Promise<Project> {
+    const p = await workspace.createProject(scannerConfig);
     await modelProvider.init(p.getMyPath());
     const tree = treeService.init(p.getMyPath(), p.metadata.getScanRoot());
     const summary = tree.getSummarize();
