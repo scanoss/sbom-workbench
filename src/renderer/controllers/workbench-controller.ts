@@ -4,6 +4,7 @@ import { ComponentGroup, ComponentSource, IWorkbenchFilterParams } from '@api/ty
 import { sortComponents } from '@shared/utils/scan-util';
 import { IpcChannels } from '@api/ipc-channels';
 import AppConfig from '../../config/AppConfigModule';
+import { Scanner } from '../../main/task/scanner/types';
 
 
 export interface ScanResult {
@@ -13,6 +14,7 @@ export interface ScanResult {
   projectRoot: string;
   fileTree: any;
   dependencies: Array<string>;
+  config: Scanner.ScannerConfig;
 }
 
 class WorkbenchController {
@@ -83,15 +85,14 @@ class WorkbenchController {
     const { dependencies } = data;
     const imported = data.source === 'IMPORTED';
 
-    // TODO: get from scan result
-    const name = work.split(window.path.sep)[work.split(window.path.sep).length - 1];
     return {
-      name,
+      name: data.metadata.name,
       imported,
       scanRoot: data.scan_root,
       projectRoot: work,
       fileTree: tree,
       dependencies,
+      config: data.metadata.scannerConfig,
     };
   }
 }

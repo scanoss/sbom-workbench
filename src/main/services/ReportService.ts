@@ -96,7 +96,7 @@ class ReportService {
       critical: 0,
       high: 0,
       low: 0,
-      moderate: 0,
+      medium: 0,
       ...this.getVulnerabilitiesReport(vulnerabilities),
     };
 
@@ -115,7 +115,7 @@ class ReportService {
         critical: 0,
         high: 0,
         low: 0,
-        moderate: 0,
+        medium: 0,
         ...this.getVulnerabilitiesReport(vulnerabilities),
       };
 

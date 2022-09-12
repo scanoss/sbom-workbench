@@ -1,4 +1,5 @@
 import { NodeStatus } from '../main/workspace/tree/Node';
+import { Scanner } from '../main/task/scanner/types';
 
 export enum ScanState {
   CREATED = 'CREATED',
@@ -107,6 +108,7 @@ export interface IProject extends INewProject {
   files: number;
   uuid: string;
   source: string;
+  scannerConfig: Scanner.ScannerConfig;
 }
 
 export interface Files {

@@ -60,7 +60,6 @@ export class DependencyTask implements ITask<void, void> {
       );
       this.project.tree.addDependencies(dependencies);
       await dependencyService.insert(dependencies);
-      this.project.save();
     } catch (e) {
       log.error(e);
     }

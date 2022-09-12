@@ -28,6 +28,7 @@ export class IndexTask implements ITask<Electron.WebContents, any> {
     const index = indexer.index(filesToIndex);
     const projectPath = this.project.metadata.getMyPath();
     await indexer.saveIndex(index, `${projectPath}/dictionary/`);
+    this.project.save();
   }
 
   private fileAdapter(modelFiles: any): Array<IIndexer> {

@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { app } from 'electron';
 import { IProject, ScanState } from '../../api/types';
 import packageJson from '../../../release/app/package.json';
+import { Scanner } from '../task/scanner/types';
+import * as ScannerCFG from '../task/scanner/types';
 
 export class Metadata {
   private appVersion: string;
@@ -30,6 +32,8 @@ export class Metadata {
   private default_license: string;
 
   private source: string;
+
+  private scannerConfig: Scanner.ScannerConfig;
 
   constructor(name: string) {
     this.name = name;
@@ -148,6 +152,14 @@ export class Metadata {
     return this.token;
   }
 
+  public getScannerConfig(): ScannerCFG.Scanner.ScannerConfig {
+    return this.scannerConfig;
+  }
+
+  public setScannerConfig(value: ScannerCFG.Scanner.ScannerConfig) {
+    this.scannerConfig = value;
+  }
+
   public getDto(): IProject {
     const Ip: IProject = {
       appVersion: this.appVersion,
@@ -163,6 +175,7 @@ export class Metadata {
       default_license: this.default_license,
       api_key: this.apiKey,
       source: this.source,
+      scannerConfig: this.scannerConfig,
     };
     return Ip;
   }

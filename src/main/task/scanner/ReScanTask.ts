@@ -17,6 +17,7 @@ export class ReScanTask extends BaseScannerTask {
     );
     const results = await rescanService.getNewResults();
     this.project.getTree().sync(results);
+    this.project.metadata.setScannerState(ScanState.FINISHED);
     log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
     this.project.save();
   }
