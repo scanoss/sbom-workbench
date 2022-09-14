@@ -168,9 +168,8 @@ const VulnerabilitiesReport = () => {
                   <TableCell>Severity</TableCell>
                   <TableCell>CVE</TableCell>
                   <TableCell>Source</TableCell>
-                  <TableCell>Introduced</TableCell>
-                  <TableCell>Reported</TableCell>
-                  <TableCell>Patched</TableCell>
+                  <TableCell>Published</TableCell>
+                  <TableCell>Modified</TableCell>
                   <TableCell width={70} />
                 </TableRow>
               </TableHead>
@@ -194,9 +193,8 @@ const VulnerabilitiesReport = () => {
                                   </Link>
                     </TableCell>
                     <TableCell>{item.vulnerability.source}</TableCell>
-                    <TableCell>{item.vulnerability.introduced}</TableCell>
-                    <TableCell>{item.vulnerability.reported}</TableCell>
-                    <TableCell>{item.vulnerability.patched}</TableCell>
+                    <TableCell>{item.vulnerability.published}</TableCell>
+                    <TableCell>{item.vulnerability.modified}</TableCell>
                     <TableCellActions>
                       {item.vulnerability.summary &&
                         <IconButton

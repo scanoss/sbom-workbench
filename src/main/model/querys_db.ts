@@ -34,10 +34,9 @@ export class Querys {
     cve varchar(30) NOT NULL CONSTRAINT PK_VULNERABILTY PRIMARY KEY,
     source varchar(35) NOT NULL,
     severity varchar(30) NOT NULL,
-    introduced varchar(35) NOT NULL,
-    reported varchar(30) NOT NULL,
-    patched varchar(35) NOT NULL,
-    summary varchar(45) NOT NULL
+    published varchar(35) NOT NULL,
+    modified varchar(35) NOT NULL,
+    summary varchar(500) NOT NULL
     );`;
 
   COMPONENT_VULNERABILITY = `CREATE TABLE IF NOT EXISTS component_vulnerability (

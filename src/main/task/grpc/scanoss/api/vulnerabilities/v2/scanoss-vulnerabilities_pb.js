@@ -1058,10 +1058,9 @@ proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.toObj
     url: jspb.Message.getFieldWithDefault(msg, 3, ""),
     summary: jspb.Message.getFieldWithDefault(msg, 4, ""),
     severity: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    introduced: jspb.Message.getFieldWithDefault(msg, 6, ""),
-    reported: jspb.Message.getFieldWithDefault(msg, 7, ""),
-    patched: jspb.Message.getFieldWithDefault(msg, 8, ""),
-    source: jspb.Message.getFieldWithDefault(msg, 9, "")
+    published: jspb.Message.getFieldWithDefault(msg, 6, ""),
+    modified: jspb.Message.getFieldWithDefault(msg, 7, ""),
+    source: jspb.Message.getFieldWithDefault(msg, 8, "")
   };
 
   if (includeInstance) {
@@ -1120,17 +1119,13 @@ proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.deser
       break;
     case 6:
       var value = /** @type {string} */ (reader.readString());
-      msg.setIntroduced(value);
+      msg.setPublished(value);
       break;
     case 7:
       var value = /** @type {string} */ (reader.readString());
-      msg.setReported(value);
+      msg.setModified(value);
       break;
     case 8:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setPatched(value);
-      break;
-    case 9:
       var value = /** @type {string} */ (reader.readString());
       msg.setSource(value);
       break;
@@ -1198,31 +1193,24 @@ proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.seria
       f
     );
   }
-  f = message.getIntroduced();
+  f = message.getPublished();
   if (f.length > 0) {
     writer.writeString(
       6,
       f
     );
   }
-  f = message.getReported();
+  f = message.getModified();
   if (f.length > 0) {
     writer.writeString(
       7,
       f
     );
   }
-  f = message.getPatched();
-  if (f.length > 0) {
-    writer.writeString(
-      8,
-      f
-    );
-  }
   f = message.getSource();
   if (f.length > 0) {
     writer.writeString(
-      9,
+      8,
       f
     );
   }
@@ -1320,10 +1308,10 @@ proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.proto
 
 
 /**
- * optional string introduced = 6;
+ * optional string published = 6;
  * @return {string}
  */
-proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.getIntroduced = function() {
+proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.getPublished = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
 };
 
@@ -1332,16 +1320,16 @@ proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.proto
  * @param {string} value
  * @return {!proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities} returns this
  */
-proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.setIntroduced = function(value) {
+proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.setPublished = function(value) {
   return jspb.Message.setProto3StringField(this, 6, value);
 };
 
 
 /**
- * optional string reported = 7;
+ * optional string modified = 7;
  * @return {string}
  */
-proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.getReported = function() {
+proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.getModified = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
 };
 
@@ -1350,16 +1338,16 @@ proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.proto
  * @param {string} value
  * @return {!proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities} returns this
  */
-proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.setReported = function(value) {
+proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.setModified = function(value) {
   return jspb.Message.setProto3StringField(this, 7, value);
 };
 
 
 /**
- * optional string patched = 8;
+ * optional string source = 8;
  * @return {string}
  */
-proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.getPatched = function() {
+proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.getSource = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
 };
 
@@ -1368,26 +1356,8 @@ proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.proto
  * @param {string} value
  * @return {!proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities} returns this
  */
-proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.setPatched = function(value) {
-  return jspb.Message.setProto3StringField(this, 8, value);
-};
-
-
-/**
- * optional string source = 9;
- * @return {string}
- */
-proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.getSource = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities} returns this
- */
 proto.scanoss.api.vulnerabilities.v2.VulnerabilityResponse.Vulnerabilities.prototype.setSource = function(value) {
-  return jspb.Message.setProto3StringField(this, 9, value);
+  return jspb.Message.setProto3StringField(this, 8, value);
 };
 
 
