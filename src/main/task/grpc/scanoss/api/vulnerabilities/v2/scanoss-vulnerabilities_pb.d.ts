@@ -147,14 +147,11 @@ export namespace VulnerabilityResponse {
     getSeverity(): string;
     setSeverity(value: string): void;
 
-    getIntroduced(): string;
-    setIntroduced(value: string): void;
+    getPublished(): string;
+    setPublished(value: string): void;
 
-    getReported(): string;
-    setReported(value: string): void;
-
-    getPatched(): string;
-    setPatched(value: string): void;
+    getModified(): string;
+    setModified(value: string): void;
 
     getSource(): string;
     setSource(value: string): void;
@@ -176,9 +173,8 @@ export namespace VulnerabilityResponse {
       url: string,
       summary: string,
       severity: string,
-      introduced: string,
-      reported: string,
-      patched: string,
+      published: string,
+      modified: string,
       source: string,
     }
   }
