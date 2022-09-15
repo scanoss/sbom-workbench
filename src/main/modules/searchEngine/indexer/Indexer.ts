@@ -17,7 +17,7 @@ export class Indexer {
           this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
             stage: {
               stageName: `Creating search index`,
-              stageStep: 5,
+              stageStep: 4,
             },
             processed: i*100/files.length,
           });

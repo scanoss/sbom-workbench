@@ -44,7 +44,7 @@ ipcMain.handle(IpcChannels.WORKSPACE_CREATE_PROJECT, async (_event, project: INe
     await scanner.run({
       mode: Scanner.ScannerMode.SCAN,
       source: ScannerSource.CODE,
-      type: [ScannerType.CODE, ScannerType.DEPENDENCIES, ScannerType.VULNERABILITIES],
+      type: [ScannerType.CODE, ScannerType.DEPENDENCIES],
       project,
     });
     return Response.ok();

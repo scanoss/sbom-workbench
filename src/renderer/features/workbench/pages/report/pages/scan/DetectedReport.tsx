@@ -74,7 +74,7 @@ const DetectedReport = ({ data }) => {
           <MatchesChart data={data.summary} />
         </Card>
 
-        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={blocked} className="w-100">
+        {/* <ConditionalLink to="../../vulnerabilities?type=detected" disabled={blocked} className="w-100">
           <Card className={`report-item vulnerabilities ${blocked ? 'blocked' : 'no-blocked'}`}>
             <div className="report-title d-flex space-between align-center">
               <span>Vulnerabilities</span>
@@ -82,7 +82,7 @@ const DetectedReport = ({ data }) => {
             </div>
             <VulnerabilitiesCard data={data.vulnerabilities} blocked={blocked} />
           </Card>
-        </ConditionalLink>
+          </ConditionalLink> */}
 
         <Card className="report-item licenses-obligation">
           {obligations ? (
