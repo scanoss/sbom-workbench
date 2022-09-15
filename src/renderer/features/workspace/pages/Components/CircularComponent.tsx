@@ -108,7 +108,7 @@ const CircularComponent = ({ stage, progress, pauseScan }: CircularComponentProp
             {variant === 'determinate' ? '%' : ''}
           </span>
           <span className={classes.stage}>{stage.stageName.toUpperCase()}</span>
-          <span className={classes.stageStep}>STAGE {stage.stageStep}/5</span>
+          <span className={classes.stageStep}>STAGE {stage.stageStep}/4</span>
         </div>
         <div className={classes.pauseContainer}>
           <Button disabled={stage.stageStep !== 2} startIcon={<PauseIcon />} onClick={pauseScan}>

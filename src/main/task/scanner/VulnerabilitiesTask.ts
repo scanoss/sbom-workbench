@@ -6,6 +6,7 @@ import { modelProvider } from '../../services/ModelProvider';
 import { IpcChannels } from '../../../api/ipc-channels';
 import { Vulnerability } from '../../model/entity/Vulnerability';
 import { AddVulneravilityTask } from '../vulnerability/AddVulneravilityTask';
+import AppConfig from '../../../config/AppConfigModule';
 
 export class VulnerabilitiesTask implements ITask<void, void> {
   private project: Project;
@@ -15,6 +16,8 @@ export class VulnerabilitiesTask implements ITask<void, void> {
   }
 
   public async run(): Promise<void> {
+    if (!AppConfig.FF_ENABLE_SCAN_VULNERABILITY) return;
+
     log.info('[ VulnerabilitiesTask init ]');
 
     this.updateStatus();
