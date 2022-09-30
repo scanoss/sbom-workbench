@@ -4,6 +4,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable max-classes-per-file */
 
+import log from 'electron-log';
 import * as fs from 'fs';
 import { isBinaryFileSync } from 'isbinaryfile';
 
@@ -168,19 +169,24 @@ export class BannedList {
   }
 
   evaluate(path: string): boolean {
-    const pathStat = fs.lstatSync(path);
+    try {
+      const pathStat = fs.lstatSync(path);
 
-    let i: number;
-    for (i = 0; i < this.filters.length; i += 1) {
-      const evaluation = this.filters[i].evaluate(path);
+      let i: number;
+      for (i = 0; i < this.filters.length; i += 1) {
+        const evaluation = this.filters[i].evaluate(path);
 
-      if (this.filters[i].scope === 'FOLDER' && pathStat.isDirectory() && !evaluation) return false;
+        if (this.filters[i].scope === 'FOLDER' && pathStat.isDirectory() && !evaluation) return false;
 
-      if (this.filters[i].scope === 'FILE' && pathStat.isFile() && !evaluation) return false;
+        if (this.filters[i].scope === 'FILE' && pathStat.isFile() && !evaluation) return false;
 
-      if (this.filters[i].scope === 'ALL' && !evaluation) return false;
+        if (this.filters[i].scope === 'ALL' && !evaluation) return false;
+      }
+      return true;
+    } catch (e) {
+      log.info(`%c[ FILTERING ]: Error: ${e.toString()}`, 'color: green');
+      return false;
     }
-    return true;
   }
 
   save(path: string) {
