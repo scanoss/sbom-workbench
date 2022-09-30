@@ -196,6 +196,7 @@ const defaultBannedList = {
     { condition: '=', value: '.cover', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.gem', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.lst', ftype: 'EXTENSION', scope: 'FILE' },
+    { condition: '=', value: '.asar', ftype: 'EXTENSION', scope: 'FILE' },
   ],
 };
 export { defaultBannedList };
