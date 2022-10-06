@@ -1,0 +1,23 @@
+{
+  "MarkOriginalFiles_one": "Estás seguro que quieres marcar {{count}} archivo como original?",
+  "MarkOriginalFiles_other": "Estás seguro que quieres marcar {{count}} archivos como originales?",
+  "RestoreFiles_one": "Estás seguro que quieres restaurar {{count}} archivo?",
+  "RestoreFiles_other": "Estás seguro que quieres restaurar {{count}} archivos?",
+  "AddComponentToCatalog": "Quieres añadir <strong>{{component}}</strong> a tu catálogo?",
+  "AcceptDependency": "Aceptar <strong>{{dependency}}</strong>",
+  "PauseScannerQuestion": "Estás seguro que quieres pausar el escaner?",
+  "ScanPaused": "Escaneo pausado",
+  "PleaseTryAgainLater": "Por favor, intente nuevamente más tarde.",
+  "ProjectSannedPreviousVersionQuestion": "Este proyecto se escaneó con una versión anterior que ya no es compatible. ¿Te gustaría eliminarlo y escanearlo de nuevo?",
+  "AlreadyIdentifyFilesInFolder": "Ya ha identificado archivos en esta carpeta. ¿Desea sobrescribirlos o conservarlos?",
+  "ActionWillBeExecutedOnAllFiles": "Esta acción se ejecutará en todos los archivos dentro de esta carpeta. ¿Está seguro?",
+  "ActionWillBeExecutedOnAllFilteredFiles": "Esta acción se ejecutará en todos los archivos filtrados dentro de esta carpeta. ¿Está seguro?",
+  "AllValidDependenciesWillBeAccepted": "Se aceptarán todas las dependencias pendientes válidas.",
+  "AllValidDependenciesWillBeAcceptedSubtitle": "No se aceptarán aquellas dependencias que carezcan de los datos de versión o licencia.",
+  "AllPendingDependenciesWillBeDismissed": "Se descartarán todas las dependencias pendientes.",
+  "AllAcceptedOrDismissedDependenciesWillBeRestored": "Se restaurarán todas las dependencias aceptadas o descartadas.",
+  "YouHaveAlreadyWorkQuestion": "Ya ha trabajado con algunos de estos archivos. ¿Desea sobrescribirlos o conservarlos?",
+  "ActionWillBeExecutedOnAllSelectedQuestion": "Esta acción se ejecutará en todos los archivos seleccionados. ¿Está seguro?",
+  "DeleteQuestion": "Estás seguro que quieres borrar este proyecto?",
+  "RescanQuestion": "Estás seguro que quieres rescanear este proyecto?"
+}

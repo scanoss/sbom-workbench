@@ -3,18 +3,17 @@ import { Chart } from 'chart.js'
 
 const ProgressChart = ({ progress }) => {
   const chartRef = React.createRef<any>();
-  const data = [
-   // progress.totalFiles - progress.includedFiles - progress.scannedFiles },
-  ];const dataInv = [];
-  if(progress) {;
-  data[0] =  { label: 'Included', value: progress.includedFiles };
-  data[1] =  { label: 'Filtered', value: progress.filteredFiles };
-  data[2] = { label: 'User excluded', value: progress.totalFiles - progress.includedFiles - progress.filteredFiles }
+  const data = [];
+  const dataInv = [];
+  if(progress) {
+    data[0] =  { label: 'Included', value: progress.includedFiles };
+    data[1] =  { label: 'Filtered', value: progress.filteredFiles };
+    data[2] = { label: 'User excluded', value: progress.totalFiles - progress.includedFiles - progress.filteredFiles }
 
 
-dataInv[0] = { label: 'Pending', value: progress.pendingFiles };
-dataInv[1] = { label: 'Identified', value: progress.identifiedFiles };
-  dataInv[2] = { label: 'Ignored', value: progress.ignoredFiles };
+    dataInv[0] = { label: 'Pending', value: progress.pendingFiles };
+    dataInv[1] = { label: 'Identified', value: progress.identifiedFiles };
+    dataInv[2] = { label: 'Ignored', value: progress.ignoredFiles };
   }
 
   useEffect(() => {

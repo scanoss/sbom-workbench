@@ -26,6 +26,7 @@ import { projectService } from '@api/services/project.service';
 import { FileStatusType, FileTreeViewMode, FileUsageType } from '@api/types';
 import { setFilter, resetFilter, selectNavigationState } from '@store/navigation-store/navigationSlice';
 import SearchBox from '@components/SearchBox/SearchBox';
+import { Trans, useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
   info: {
@@ -39,6 +40,7 @@ const WorkbenchFilters = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { filter, isFilterActive } = useSelector(selectNavigationState);
+  const { t } = useTranslation();
 
   const [open, setOpen] = useState<boolean>(false);
   const [fileTreeViewMode, setFileTreeViewMode] = useState<boolean>(false);
@@ -80,11 +82,18 @@ const WorkbenchFilters = () => {
       <Box id="WorkbenchFilters" boxShadow={0} className={`workbench-filters ${open ? 'no-collapsed' : 'collapsed'}`}>
         <header className="workbench-filters-header">
           <h4 className="mr-1 mb-2 mt-0 d-flex align-end">
-            Filters
+            {t('Title:Filters')}
             <Tooltip
               classes={{ tooltip: classes.info }}
               title={
-                <>
+                <Trans
+                  i18nKey="Tooltip:FilterUsageHelp"
+                  components={{
+                    0: <p className="mt-1 mb-1" />,
+                    1: <p/>,
+                    2: <small />
+                  }}
+                  >
                   <p className="mt-1 mb-1">Use filters to modify displayed results.</p>
                   <p>
                     <small>
@@ -104,7 +113,7 @@ const WorkbenchFilters = () => {
                       Filter by the path of each file.
                     </small>
                   </p>
-                </>
+                </Trans>
               }
               placement="bottom"
               arrow
@@ -115,7 +124,7 @@ const WorkbenchFilters = () => {
             </Tooltip>
           </h4>
           {isFilterActive && (
-            <Tooltip title="Clear filters">
+            <Tooltip title={t('Tooltip:ClearFilters')}>
               <IconButton size="small" aria-label="clear" className="btn-clean" onClick={handleReset}>
                 <DeleteIcon fontSize="inherit" />
               </IconButton>
@@ -128,7 +137,7 @@ const WorkbenchFilters = () => {
               component="fieldset"
               className={`workbench-filters-group usage ${filter?.usage ? 'active' : ''}`}
             >
-              <FormLabel component="span">Usage</FormLabel>
+              <FormLabel component="span">{t('Title:Usage')}</FormLabel>
               <RadioGroup
                 aria-label="usage"
                 name="usage"
@@ -137,9 +146,9 @@ const WorkbenchFilters = () => {
                 onClick={(event: any) => event.target.value && handleClick('usage', event.target.value)}
                 className="flex-row ml-2"
               >
-                <FormControlElement value="all" label="All" className="d-none" />
-                <FormControlElement value={FileUsageType.FILE} label={FileUsageType.FILE} />
-                <FormControlElement value={FileUsageType.SNIPPET} label={FileUsageType.SNIPPET} />
+                <FormControlElement value="all" label={t('Title:All')} className="d-none" />
+                <FormControlElement value={FileUsageType.FILE} label={t(FileUsageType.FILE)} />
+                <FormControlElement value={FileUsageType.SNIPPET} label={t(FileUsageType.SNIPPET)} />
               </RadioGroup>
             </FormControl>
 
@@ -149,7 +158,7 @@ const WorkbenchFilters = () => {
               component="fieldset"
               className={`workbench-filters-group usage ${filter?.status ? 'active' : ''}`}
             >
-              <FormLabel component="span">Status</FormLabel>
+              <FormLabel component="span">{t('Title:Status')}</FormLabel>
               <RadioGroup
                 aria-label="status"
                 name="usage"
@@ -162,27 +171,27 @@ const WorkbenchFilters = () => {
                 <FormControlElement
                   className={FileStatusType.PENDING}
                   value={FileStatusType.PENDING}
-                  label={FileStatusType.PENDING}
+                  label={t(FileStatusType.PENDING)}
                 />
                 <FormControlElement
                   className={FileStatusType.IDENTIFIED}
                   value={FileStatusType.IDENTIFIED}
-                  label={FileStatusType.IDENTIFIED}
+                  label={t(FileStatusType.IDENTIFIED)}
                 />
                 <FormControlElement
                   className={FileStatusType.ORIGINAL}
                   value={FileStatusType.ORIGINAL}
-                  label={FileStatusType.ORIGINAL}
+                  label={t(FileStatusType.ORIGINAL)}
                 />
                 <FormControlElement
                   className={FileStatusType.NOMATCH}
                   value={FileStatusType.NOMATCH}
-                  label="No Match"
+                  label={t('NoMatch')}
                 />
                 <FormControlElement
                   className={FileStatusType.FILTERED}
                   value={FileStatusType.FILTERED}
-                  label="Ignored"
+                  label={t('Ignored')}
                 />
               </RadioGroup>
             </FormControl>
@@ -195,7 +204,7 @@ const WorkbenchFilters = () => {
                 placement={open ? 'right' : 'bottom'}
                 title={
                   <>
-                    <p className="mt-1 mb-1">Show only filtered matches in filetree</p>
+                    <p className="mt-1 mb-1">{t('Tooltip:ShowOnlyFilteredMatches')}</p>
                   </>
                 }
                 disableHoverListener={open}
@@ -212,7 +221,7 @@ const WorkbenchFilters = () => {
                       color="primary"
                     />
                   }
-                  label={open ? <small>Show only filtered matches in filetree</small> : ''}
+                  label={open ? <small>{t('ShowOnlyFilteredMatches')}</small> : ''}
                 />
               </Tooltip>
             </FormGroup>
@@ -229,7 +238,7 @@ const WorkbenchFilters = () => {
 
         <SearchBox
           value={filter?.filename || ''}
-          placeholder="Filter by path (e.g. *.js)"
+          placeholder={t('FilterByPathEG')}
           onChange={(e) => handleFilenameChange(e)}
         />
       </Box>

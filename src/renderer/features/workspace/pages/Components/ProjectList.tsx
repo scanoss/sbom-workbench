@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import {
   IconButton,
@@ -19,6 +20,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import WarningOutlinedIcon from '@mui/icons-material/WarningOutlined';
 import GetAppOutlined from '@mui/icons-material/GetAppOutlined';
 import { IProject, ScanState } from '@api/types';
+import { Trans, useTranslation } from 'react-i18next';
 import AppConfig from '../../../../../config/AppConfigModule';
 
 const filter = (items, query) => {
@@ -65,6 +67,7 @@ interface ProjectListProps {
 
 const ProjectList = (props: ProjectListProps) => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const { projects, searchQuery } = props;
   const filterProjects = filter(projects, searchQuery);
@@ -76,9 +79,9 @@ const ProjectList = (props: ProjectListProps) => {
           <Table className="projects-table" aria-label="projects table">
             <TableHead>
               <TableRow>
-                <TableCell width="50%">NAME</TableCell>
-                <TableCell>DATE</TableCell>
-                <TableCell>TOTAL FILES</TableCell>
+                <TableCell width="50%">{t('Table:Header:Name')}</TableCell>
+                <TableCell>{t('Table:Header:Date')}</TableCell>
+                <TableCell>{t('Table:Header:TotalFiles')}</TableCell>
                 <TableCell width={30} />
               </TableRow>
             </TableHead>
@@ -99,7 +102,7 @@ const ProjectList = (props: ProjectListProps) => {
                         {isProjectDeprecated(project) && (
                           <Tooltip
                             classes={{ tooltip: classes.md }}
-                            title="This project was scanned with a previous version that is no longer supported."
+                            title={t('Tooltip:ProjectDeprecated')}
                           >
                             <WarningOutlinedIcon fontSize="inherit" className="icon mr-1" />
                           </Tooltip>
@@ -108,9 +111,9 @@ const ProjectList = (props: ProjectListProps) => {
                         {isProjectImported(project) && (
                           <Tooltip
                             classes={{ tooltip: classes.md }}
-                            title="This project was imported. You will not be able to see the original source code."
+                            title={t('Tooltip:ProjectImported')}
                           >
-                            <Chip label="IMPORTED" size="small" variant="outlined" className="ml-1" />
+                            <Chip label={t('Common:IMPORTED')} size="small" variant="outlined" className="ml-1" />
                           </Tooltip>
                         )}
                       </div>
@@ -120,7 +123,7 @@ const ProjectList = (props: ProjectListProps) => {
                     <TableCell className="row-actions">
                       <div className="btn-actions">
                         {!isProjectFinished(project) && !isProjectDeprecated(project) && (
-                          <Tooltip title="Resume scan">
+                          <Tooltip title={t('Tooltip:ResumeScan')}>
                             <IconButton
                               aria-label="restore"
                               className="btn-restore"
@@ -137,7 +140,7 @@ const ProjectList = (props: ProjectListProps) => {
 
                         {isProjectFinished(project) && !isProjectDeprecated(project) && (
                           <>
-                            <Tooltip title="Export project">
+                            <Tooltip title={t('Tooltip:ExportProject')}>
                               <IconButton
                                 aria-label="export"
                                 className="btn-export"
@@ -151,7 +154,7 @@ const ProjectList = (props: ProjectListProps) => {
                               </IconButton>
                             </Tooltip>
 
-                            <Tooltip title="Rescan">
+                            <Tooltip title={t('Tooltip:Rescan')}>
                               <IconButton
                                 aria-label="rescan"
                                 className="btn-rescan"
@@ -168,7 +171,7 @@ const ProjectList = (props: ProjectListProps) => {
                           </>
                         )}
 
-                        <Tooltip title="Remove project">
+                        <Tooltip title={t('Tooltip:RemoveProject')}>
                           <IconButton
                             aria-label="delete"
                             className="btn-delete"
@@ -189,7 +192,13 @@ const ProjectList = (props: ProjectListProps) => {
                 <TableRow>
                   <TableCell colSpan={4}>
                     <p className="text-center">
-                      Not projects found with <strong>{searchQuery}</strong>
+                      <Trans
+                        i18nKey="Common:NoProjectsFoundWith"
+                        components={{
+                          strong: <strong/>,
+                        }}
+                        values={{ searchQuery }}
+                      />
                     </p>
                   </TableCell>
                 </TableRow>
@@ -198,22 +207,19 @@ const ProjectList = (props: ProjectListProps) => {
           </Table>
         </TableContainer>
       ) : !projects ? (
-        <p>Loading projects...</p>
+        <p>{t('Common:LoadingProjects')}</p>
       ) : (
         <div className="empty-container">
           <div className="empty-list">
-            <h3>No projects found</h3>
+            <h3>{t('Common:NoProjectsFound')}</h3>
             <p>
-              You can start by&nbsp;
-              <Link onClick={() => props.onProjectCreate()} underline="hover">
-                scanning a new project
-              </Link>
-              <br />
-              or{' '}
-              <Link onClick={() => props.onProjectImport()} underline="hover">
-                importing a project
-              </Link>
-              .
+              <Trans
+                i18nKey="Common:StartNewProject"
+                components={{
+                  link1: <Link onClick={() => props.onProjectCreate()} underline="hover" />,
+                  link2: <Link onClick={() => props.onProjectImport()} underline="hover" />
+                }}
+                />
             </p>
           </div>
         </div>

@@ -20,6 +20,7 @@ import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { inventoryService } from '@api/services/inventory.service';
 import { InventorySourceType } from '@api/types';
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -72,8 +73,10 @@ interface IPreLoadInventoryDialog {
 }
 
 export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
-  const { open, folder, overwrite, onClose, onCancel } = props;
   const classes = useStyles();
+  const { t } = useTranslation();
+
+  const { open, folder, overwrite, onClose, onCancel } = props;
 
   const { isFilterActive } = useSelector(selectNavigationState);
   const { dependencies } = useSelector(selectWorkbench);
@@ -153,7 +156,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
       className={`${classes.size} dialog`}
     >
       <header className="dialog-title">
-        <span>Accept All</span>
+        <span>{t('Title:AcceptAll')}</span>
         <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
           <CloseIcon />
         </IconButton>
@@ -162,7 +165,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
       <DialogContent>
         {isFilterActive && (
           <Alert className="mt-1 mb-1" severity="info">
-            This action will be applied based on your current filter criteria.
+            {t('ActionCurrentFilterCriteria')}
           </Alert>
         )}
         <FormControlLabel control={<Checkbox checked={AllChecked()} onClick={() => selectAll()} />} label="All" />
@@ -257,16 +260,14 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
               <>
                 <hr className="divider-no-license" />
                 <Alert severity="warning">
-                  {inventoryNoLicenseCount} component(s) will not be identified as they do not have a license declared
-                  with the component. Please, identify them manually.
+                  {t('NComponentWillNotIdentified', { count: inventoryNoLicenseCount })}.
                 </Alert>
               </>
             )}
             {dependenciesInFolder.length > 0 && (
               <>
                 <Alert severity="warning" className="mt-1 word-break">
-                  Dependencies declared in <strong>{dependenciesInFolder.join(', ').slice(0, 150)}</strong> will not be
-                  accepted. Please, identify them manually.
+                  {t('DependenciesDeclaredIdentifyManual')}
                 </Alert>
               </>
             )}
@@ -275,7 +276,7 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
         <hr className="divider" />
         <div className="dialog-form-field">
           <label className="dialog-form-field-label">
-            Notes <span className="optional">- Optional</span>
+            {t('Title:Notes')} <span className="optional">- {t('Optional')}</span>
           </label>
           <Paper className="dialog-form-field-control">
             <TextareaAutosize name="notes" cols={30} minRows={6} />
@@ -283,9 +284,9 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
         </div>
         <form onSubmit={onSubmit}>
           <div className="button-container">
-            <Button color="inherit" tabIndex={-1} onClick={onCancel}>Cancel</Button>
+            <Button color="inherit" tabIndex={-1} onClick={onCancel}>{t('Button:Cancel')}</Button>
             <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
-              Identify
+              {t('Button:Identify')}
             </Button>
           </div>
         </form>

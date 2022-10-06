@@ -11,6 +11,7 @@ import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { DIALOG_ACTIONS, InventoryForm } from '@context/types';
 import { useDispatch } from 'react-redux';
 import { deleteInventory, detachFile, updateInventory } from '@store/inventory-store/inventoryThunks';
+import { useTranslation } from 'react-i18next';
 import Label from '../../../../components/Label/Label';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import { FileList } from './components/FileList';
@@ -19,6 +20,7 @@ export const InventoryDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams<any>();
+  const { t } = useTranslation();
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -102,25 +104,25 @@ export const InventoryDetail = () => {
 
           <div className="d-flex">
             <div className="info">
-              <Label label="COMPONENT" textColor="gray" />
+              <Label label={t('Title:Component').toUpperCase()} textColor="gray" />
               <h4>{inventory?.component.name}</h4>
             </div>
             <div className="info">
-              <Label label="VERSION" textColor="gray" />
+              <Label label={t('Title:Version').toUpperCase()} textColor="gray" />
               <h4>{inventory?.component.version}</h4>
             </div>
             <div className="info">
-              <Label label="LICENSE" textColor="gray" />
+              <Label label={t('Title:License').toUpperCase()} textColor="gray" />
               <h4>{inventory?.license_name}</h4>
             </div>
           </div>
           <div className="d-flex">
             <div className="info">
-              <Label label="USAGE" textColor="gray" />
+              <Label label={t('Title:Usage').toUpperCase()} textColor="gray" />
               <h4>{inventory?.usage}</h4>
             </div>
             <div className="info">
-              <Label label="NOTES" textColor="gray" />
+              <Label label={t('Title:Notes').toUpperCase()} textColor="gray" />
               <span className="notes">{inventory?.notes}</span>
             </div>
           </div>

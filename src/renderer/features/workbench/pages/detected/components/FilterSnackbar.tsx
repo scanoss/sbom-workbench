@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { useSelector } from 'react-redux';
 import FilterIcon from '@assets/imgs/filter-icon.svg';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -31,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
 const FilterSnackbar = () => {
   const classes = useStyles();
   const curLoc = useLocation();
+  const { t } = useTranslation();
 
   const { isFilterActive } = useSelector(selectNavigationState);
 
@@ -45,7 +47,7 @@ const FilterSnackbar = () => {
         className={classes.alert}
         icon={<img alt="filter icon" src={FilterIcon} />}
       >
-        The workspace context is reduced because there are active filters
+        {t('WorkspaceIsReduced')}
       </Alert>
     </Snackbar>
   );

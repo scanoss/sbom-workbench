@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import useBatch from '@hooks/useBatch';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { useTranslation } from 'react-i18next';
 import TreeNode from '../TreeNode/TreeNode';
 
 const useStyles = makeStyles((theme) => ({
@@ -83,6 +84,7 @@ const SearchPanel = () => {
   const classes = useStyles();
   const searchQuery = useRef(null);
   const { summary } = useSelector(selectWorkbench);
+  const { t } = useTranslation();
 
   const dispatch = useDispatch();
   const batch = useBatch();
@@ -152,10 +154,10 @@ const SearchPanel = () => {
 
   const onActionMenuHandler = (e, params) => {
     switch (params) {
-      case 'action-identifyAll':
+      case 'Action:IdentifySelectedAs':
         batch.identifyAll(getFilesSelected());
         break;
-      case 'action-markAllAsOriginal':
+      case 'Action:MarkSelectedAsOriginal':
         batch.ignoreAll(getFilesSelected());
         break;
       default:
@@ -166,14 +168,12 @@ const SearchPanel = () => {
   const onMenuActionHandler = () => {
     const menu = [
       {
-        label: 'Identify selected files as...',
-        actionId: 'action-identifyAll',
-        // click: () => batch.identifyAll(getFilesSelected()),
+        label: t('AppMenu:IdentifySelectedAs'),
+        actionId: 'Action:IdentifySelectedAs',
       },
       {
-        label: 'Mark selected files as original',
-        actionId: 'action-markAllAsOriginal',
-        // click: () => batch.ignoreAll(getFilesSelected()),
+        label: t('AppMenu:MarkSelectedAsOriginal'),
+        actionId: 'Action:MarkSelectedAsOriginal',
       },
     ];
 
@@ -217,7 +217,7 @@ const SearchPanel = () => {
     <div className="panel panel-left search-panel-container">
       <header className="panel-header border-bottom p-3 pr-2 pb-1">
         <div className="panel-title">
-          <h4>Keyword Search</h4>
+          <h4>{t('Title:KeywordSearch')}</h4>
         </div>
         <div className="search-panel mt-3">
           <div className="search-panel-input d-flex align-center">
@@ -252,7 +252,7 @@ const SearchPanel = () => {
                   variant="standard"
                   InputProps={{
                     ...params.InputProps,
-                    placeholder: value.length === 0 ? 'Search by keywords' : '',
+                    placeholder: value.length === 0 ? t('SearchByKeywords') : '',
                     disableUnderline: true,
                   }}
                 />
@@ -276,7 +276,7 @@ const SearchPanel = () => {
           columns={[
             {
               field: 'filename',
-              headerName: `${selected.length} files selected`,
+              headerName: t('NFilesSelected', { count: selected.length}),
               editable: false,
               sortable: false,
               flex: 1,
@@ -287,7 +287,7 @@ const SearchPanel = () => {
           localeText={{
             MuiTablePagination: {
               labelDisplayedRows: ({ from, to, count }) =>
-                `${from} - ${to} of ${
+                `${from} - ${to} ${t('of')} ${
                   count >= (serverPage.current + 1) * AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT ? `+${count}` : count
                 }`,
             },

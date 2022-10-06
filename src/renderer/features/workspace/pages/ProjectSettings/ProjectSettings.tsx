@@ -26,14 +26,11 @@ import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import AppConfig from '@config/AppConfigModule';
 import { useDispatch, useSelector } from 'react-redux';
 import FormGroup from '@mui/material/FormGroup';
-import {
-  selectWorkspaceState,
-  setNewProject,
-  setScanPath,
-} from '@store/workspace-store/workspaceSlice';
 import { Scanner } from '../../../../../main/task/scanner/types';
 import ScannerType = Scanner.ScannerType;
 import ScannerSource = Scanner.ScannerSource;
+import { selectWorkspaceState, setNewProject, setScanPath } from '@store/workspace-store/workspaceSlice';
+import { Trans, useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -64,6 +61,8 @@ const ProjectSettings = () => {
   const classes = useStyles();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
+
 
   const { projects, scanPath } = useSelector(selectWorkspaceState);
 
@@ -194,7 +193,7 @@ const ProjectSettings = () => {
               >
                 <ArrowBackIcon />
               </IconButton>
-              Project Settings
+              {t('Title:ProjectSettings')}
             </h4>
             <h1 className="mt-0 mb-0">{scanPath.path}</h1>
           </div>
@@ -204,7 +203,7 @@ const ProjectSettings = () => {
             <div className="project-form-container mt-1">
               <div className="project-license-container">
                 <div className="input-container">
-                  <label className="input-label">Project Name</label>
+                  <label className="input-label">{t('Title:ProjectName')}</label>
                   <Paper className="input-text-container project-name-container">
                     <TextField
                       spellCheck={false}
@@ -221,26 +220,21 @@ const ProjectSettings = () => {
                     />
                   </Paper>
                   <div className="error-message">
-                    {projectNameExists && 'The project name already exists '}
-                    {!projectValidName && 'The project name is invalid'}
+                    {projectNameExists && t('Common:ProjectNameAlreadyExists')}
+                    {!projectValidName && t('Common:ProjectNameInvalid')}
                   </div>
                 </div>
 
                 <div className="input-container input-container-license mt-1 mb-3">
                   <div className="input-label-add-container">
                     <label className="input-label">
-                      License
-                      <Tooltip title="Add new license">
-                        <IconButton
-                          tabIndex={-1}
-                          color="inherit"
-                          size="small"
-                          onClick={openLicenseDialog}
-                        >
+                      {t('Title:License')}
+                      <Tooltip title= {t('Tooltip:AddNewLicense')}>
+                        <IconButton tabIndex={-1} color="inherit" size="small" onClick={openLicenseDialog}>
                           <Add fontSize="inherit" />
                         </IconButton>
                       </Tooltip>
-                      <span className="optional">- Optional</span>
+                      <span className="optional">- {t('Common:Optional')}</span>
                     </label>
                   </div>
                   <Paper className="input-text-container license-input-container">
@@ -310,13 +304,13 @@ const ProjectSettings = () => {
                   {AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS && (
                     <>
                       <div className="api-conections-label-container mb-3">
-                        <label className="input-label">API Connections</label>
+                        <label className="input-label">{t('Title:APIConnections')}</label>
                       </div>
                       <div className="label-input-container">
                         <div className="label-icon">
                           <label className="input-label h3">
-                            Knowledgebase API
-                            <span className="optional"> - Optional</span>
+                            {t('Title:KnowledgebaseAPI')}
+                            <span className="optional"> - {t('Common:Optional')}</span>
                           </label>
                         </div>
                         <Paper>
@@ -337,6 +331,7 @@ const ProjectSettings = () => {
                               <span className="item-default">
                                 Use default settings
                               </span>
+                              <span className="item-default">{t('Common:UseDefaultSettings')}</span>
                             </MenuItem>
                             ;
                             {apis.map((api) => (
@@ -360,13 +355,14 @@ const ProjectSettings = () => {
                       <label className="input-label h3">
                         SBOM Ledger Token{' '}
                         <span className="optional">- Optional</span>
+                        {t('Title:SBOMLedgerToken')} <span className="optional">- {t('Common:Optional')}</span>
                       </label>
                     </div>
                     <Paper>
                       <TextField
                         size="small"
                         name="token"
-                        placeholder="Use default settings"
+                        placeholder={t('Common:UseDefaultSettings')}
                         fullWidth
                         onChange={(e) =>
                           setProjectSettings({
@@ -405,7 +401,7 @@ const ProjectSettings = () => {
                 type="submit"
                 disabled={!projectValidName || projectNameExists}
               >
-                Continue
+                {t('Button:Continue')}
               </Button>
             </div>
           </form>

@@ -14,6 +14,7 @@ import {
   TableRow,
   TextField, Typography,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 // icons
 import SearchIcon from '@mui/icons-material/Search';
@@ -33,6 +34,7 @@ interface IVulnerabilitiesFilter {
 }
 
 const VulnerabilitiesReport = () => {
+  const { t } = useTranslation();
   const type = useSearchParams().get('type');
   const data = useRef<ComponentVulnerability[]>(null);
 
@@ -84,12 +86,12 @@ const VulnerabilitiesReport = () => {
     <>
       <section id="VulnerabilitiesReportPage" className="app-page">
         <header className="app-header">
-          <h1 className="header-title">{ type === SourceType.detected ? 'Detected' : 'Identified'} Vulnerabilities</h1>
+          <h1 className="header-title">{ type === SourceType.detected ? t('Title:DetectedVulnerabilities') : t('Title:IdentifiedVulnerabilities') }</h1>
           <section className="subheader">
             <form className="default-form">
               <div className="form-row filter">
                 <div className="form-group">
-                  <label>Component</label>
+                  <label>{t('Title:Component')}</label>
                   <Paper>
                     <Autocomplete
                       id="input-component"
@@ -110,7 +112,7 @@ const VulnerabilitiesReport = () => {
                 </div>
 
                 <div className="form-group filter-severity">
-                  <label>Severity</label>
+                  <label>{t('Title:Severity')}</label>
                   <Paper>
                     <Autocomplete
                       options={['critical', 'high', 'medium', 'low']}
@@ -162,12 +164,12 @@ const VulnerabilitiesReport = () => {
             <Table stickyHeader aria-label="vulnerabilities table">
               <TableHead>
                 <TableRow>
-                  <TableCell>Component</TableCell>
-                  <TableCell>Severity</TableCell>
-                  <TableCell>CVE</TableCell>
-                  <TableCell>Source</TableCell>
-                  <TableCell>Published</TableCell>
-                  <TableCell>Modified</TableCell>
+                  <TableCell>{t('Table:Header:Component')}</TableCell>
+                  <TableCell>{t('Table:Header:Severity')}</TableCell>
+                  <TableCell>{t('Table:Header:CVE')}</TableCell>
+                  <TableCell>{t('Table:Header:Source')}</TableCell>
+                  <TableCell>{t('Table:Header:Published')}</TableCell>
+                  <TableCell>{t('Table:Header:Modified')}</TableCell>
                   <TableCell width={70} />
                 </TableRow>
               </TableHead>
@@ -196,7 +198,7 @@ const VulnerabilitiesReport = () => {
                     <TableCellActions>
                       {item.vulnerability.summary &&
                         <IconButton
-                          title="See description"
+                          title={t('Tooltip:SeeDescription')}
                           aria-label="see description"
                           size="small"
                           onClick={(e) => onSeeDescriptionClickHandler(e, item)}

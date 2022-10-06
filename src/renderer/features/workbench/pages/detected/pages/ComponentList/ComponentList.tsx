@@ -8,6 +8,7 @@ import usePagination from '@hooks/usePagination';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetFilter, selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { selectComponentState, setComponent } from '@store/component-store/componentSlice';
+import { useTranslation } from 'react-i18next';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import EmptyResult from './components/EmptyResult/EmptyResult';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
@@ -33,6 +34,7 @@ export const ComponentList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { limit, onScroll } = usePagination(20);
 
   const { components } = useSelector(selectComponentState);
@@ -71,20 +73,21 @@ export const ComponentList = () => {
             <>
               <EmptyResult>
                 {searchQuery ? (
-                  <>Not results found with &quot;{searchQuery}&quot;</>
+                  <>{t('NotResultsFoundWith', { searchQuery })}</>
                 ) : isFilterActive ? (
                   <>
-                    <div className="mb-3">No components found matching the current filter criteria</div>
+                    <div className="mb-3">{t('NoComponentsFoundMatching')}</div>
                     <Button
+                      className="text-uppercase"
                       size="small"
                       startIcon={<DeleteForeverOutlinedIcon />}
                       onClick={() => dispatch(resetFilter())}
                     >
-                      CLEAR FILTERS
+                     {t('Button:ClearFilters')}
                     </Button>
                   </>
                 ) : (
-                  <>No components were detected</>
+                  <>{t('NoComponentsWereDetected')}</>
                 )}
               </EmptyResult>
             </>
@@ -93,7 +96,7 @@ export const ComponentList = () => {
           {filterItems?.length > limit && (
             <Alert className="mb-3" severity="info">
               <strong>
-                Showing {limit} of {filterItems.length} components.
+                {t('ShowingLimitOfTotalComponents', { limit, total: filterItems.length})}
               </strong>
             </Alert>
           )}

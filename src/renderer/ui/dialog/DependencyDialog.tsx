@@ -13,6 +13,7 @@ import { licenseService } from '@api/services/license.service';
 import { DialogContext } from '@context/DialogProvider';
 import { NewDependencyDTO } from '@api/dto';
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -48,6 +49,7 @@ interface DependencyDialogProps {
 const DependencyDialog = (props: DependencyDialogProps) => {
   const classes = useStyles();
   const dialogCtrl = useContext<any>(DialogContext);
+  const { t } = useTranslation();
 
   const { open, dependency, onClose, onCancel } = props;
   const [form, setForm] = useState<Partial<NewDependencyDTO>>({});
@@ -112,9 +114,9 @@ const DependencyDialog = (props: DependencyDialogProps) => {
       onClose={onCancel}
     >
       <header className="dialog-title">
-        <span>
-          Accept <b>{decodeURIComponent(dependency.component?.name || dependency.componentName || dependency.purl)}</b>
-        </span>
+        <span dangerouslySetInnerHTML={
+          { __html: t('Dialog:AcceptDependency', { dependency: decodeURIComponent(dependency.component?.name || dependency.componentName || dependency.purl), interpolation: { escapeValue: false } }) }
+          } />
         <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
           <CloseIcon />
         </IconButton>
@@ -124,8 +126,8 @@ const DependencyDialog = (props: DependencyDialogProps) => {
         <div className="dialog-content">
           <div className="dialog-form-field">
             <div className="dialog-form-field-label">
-              <label>License</label>
-              <Tooltip title="Add new license">
+              <label>{t('Title:License')}</label>
+              <Tooltip title={t('Tooltip:AddNewLicense')}>
                 <IconButton color="inherit" size="small" onClick={openLicenseDialog}>
                   <AddIcon fontSize="inherit" />
                 </IconButton>
@@ -178,7 +180,7 @@ const DependencyDialog = (props: DependencyDialogProps) => {
           </div>
 
           <div className="dialog-form-field d-flex flex-column space-between">
-            <label className="dialog-form-field-label">Version</label>
+            <label className="dialog-form-field-label">{t('Title:Version')}</label>
             <Paper className="dialog-form-field-control">
               <TextField
                 name="version"
@@ -195,10 +197,10 @@ const DependencyDialog = (props: DependencyDialogProps) => {
 
         <DialogActions>
           <Button color="inherit" tabIndex={-1} onClick={onCancel}>
-            Cancel
+            {t('Button:Cancel')}
           </Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
-            Accept
+            {t('Button:Accept')}
           </Button>
         </DialogActions>
       </form>

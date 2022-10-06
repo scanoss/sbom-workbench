@@ -27,6 +27,7 @@ export interface IWorkspaceCfg {
   TOKEN: string;
   SCAN_MODE: string;
   VERSION: string;
+  LNG: string;
 }
 
 export interface Node {

@@ -10,12 +10,14 @@ import SearchBox from '@components/SearchBox/SearchBox';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProjects } from '@store/workspace-store/workspaceThunks';
 import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
+import { useTranslation } from 'react-i18next';
 import ProjectList from '../Components/ProjectList';
 import AddProjectButton from '../Components/AddProjectButton/AddProjectButton';
 
 const Workspace = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const { projects } = useSelector(selectWorkspaceState);
 
@@ -39,10 +41,10 @@ const Workspace = () => {
       navigate('/workbench/detected');
     } else {
       const { action } = await dialogCtrl.openAlertDialog(
-        'This project was scanned with a previous version that is no longer supported. Would you like to delete it and scan it again?',
+        t('Dialog:ProjectSannedPreviousVersionQuestion'),
         [
-          { label: 'Cancel', role: 'cancel' },
-          { label: 'Delete & Scan', action: 'delete', role: 'delete' },
+          { label: t('Button:Cancel'), role: 'cancel' },
+          { label: t('Button:Delete&Scan'), action: 'delete', role: 'delete' },
         ]
       );
 
@@ -68,8 +70,8 @@ const Workspace = () => {
   };
 
   const onTrashHandler = async (project: IProject) => {
-    const { action } = await dialogCtrl.openConfirmDialog('Are you sure you want to delete this project?', {
-      label: 'Delete',
+    const { action } = await dialogCtrl.openConfirmDialog(t('Dialog:DeleteQuestion'), {
+      label: t('Button:Delete'),
       role: 'delete',
     });
     if (action === DIALOG_ACTIONS.OK) {
@@ -79,8 +81,8 @@ const Workspace = () => {
   };
 
   const onRescanHandler = async (project: IProject) => {
-    const { action } = await dialogCtrl.openConfirmDialog('Are you sure you want to rescan this project?', {
-      label: 'OK',
+    const { action } = await dialogCtrl.openConfirmDialog(t('Dialog:RescanQuestion'), {
+      label: t('Button:OK'),
       role: 'accept',
     });
     if (action === DIALOG_ACTIONS.OK) {
@@ -108,7 +110,7 @@ const Workspace = () => {
     <>
       <section id="Workspace" className="app-page">
         <header className="app-header">
-          <h1 className="header-title">Projects</h1>
+          <h1 className="header-title">{t('Title:Projects')}</h1>
           <section className="subheader">
             <div className="search-box">
               {projects && projects.length > 0 && (

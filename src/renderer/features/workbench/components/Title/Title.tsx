@@ -2,7 +2,7 @@
 import React from 'react';
 
 interface TitleType {
-  title: unknown;
+  title: string;
 }
 
 const Title = ({ title }: TitleType) => {

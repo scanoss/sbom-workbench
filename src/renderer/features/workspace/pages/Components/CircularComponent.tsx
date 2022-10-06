@@ -3,6 +3,7 @@ import { CircularProgress, Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import PauseIcon from '@mui/icons-material/Pause';
 import { ScannerStage } from '@api/types';
+import { useTranslation } from 'react-i18next';
 
 interface CircularComponentProps {
   stage: {
@@ -87,6 +88,8 @@ const CircularComponent = ({
   pauseScan,
 }: CircularComponentProps) => {
   const classes = useStyles();
+  const { t } = useTranslation();
+
   const variant =
     stage.stageName === ScannerStage.UNZIP ||
     stage.stageName === ScannerStage.INDEX ||
@@ -129,10 +132,8 @@ const CircularComponent = ({
             {!noProgress ? Math.round(progress) : <>-</>}
             {variant === 'determinate' ? '%' : ''}
           </span>
-          <span className={classes.stage}>
-            {stage.stageLabel?.toUpperCase()}
-          </span>
-          <span className={classes.stageStep}>STAGE {stage.stageStep}</span>
+          <span className={`${classes.stage} text-uppercase`}>{t(`Title:${stage.stageLabel}`)}</span>
+          <span className={`${classes.stageStep} text-uppercase`}>{t('Title:Stage')} {stage.stageStep}</span>
         </div>
         <div className={classes.pauseContainer}>
           <Button
@@ -140,7 +141,7 @@ const CircularComponent = ({
             startIcon={<PauseIcon />}
             onClick={pauseScan}
           >
-            <span className={classes.pause}>PAUSE</span>
+            <span className={classes.pause}>{t('Button:Pause')}</span>
           </Button>
         </div>
       </div>

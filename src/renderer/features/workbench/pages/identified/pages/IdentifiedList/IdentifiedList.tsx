@@ -5,11 +5,12 @@ import Alert from '@mui/material/Alert';
 import { componentService } from '@api/services/component.service';
 import { inventoryService } from '@api/services/inventory.service';
 import { useDispatch } from 'react-redux';
-import RecognizedCard from '../../../../components/RecognizedCard/RecognizedCard';
-import usePagination from '../../../../../../hooks/usePagination';
-import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
-import SearchBox from '../../../../../../components/SearchBox/SearchBox';
+import { useTranslation } from 'react-i18next';
 import { setComponent } from '@store/component-store/componentSlice';
+import usePagination from '@hooks/usePagination';
+import SearchBox from '@components/SearchBox/SearchBox';
+import RecognizedCard from '../../../../components/RecognizedCard/RecognizedCard';
+import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 
 const filter = (items, query) => {
   if (!items) {
@@ -49,6 +50,7 @@ export const IdentifiedList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { limit, onScroll } = usePagination();
+  const { t } = useTranslation();
 
   const [inventoryList, setInventoryList] = useState<any>([]);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
@@ -96,20 +98,14 @@ export const IdentifiedList = () => {
             </section>
           ) : (
             <p>
-              {searchQuery ? (
-                <>
-                  Not results found with <strong>{searchQuery} </strong>
-                </>
-              ) : (
-                <> No components were identified</>
-              )}
+              {searchQuery ? t('NotResultsFoundWith', { searchQuery }) : t('NoComponentsIdentified')}
             </p>
           )}
 
           {filterItems?.length > limit && (
             <Alert className="my-5" severity="info">
               <strong>
-                Showing {limit} of {filterItems.length} components
+                {t('ShowingLimitOfTotalComponents', { limit, total: filterItems.length})}
               </strong>
             </Alert>
           )}

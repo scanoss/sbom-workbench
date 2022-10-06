@@ -1,11 +1,14 @@
 import React from 'react';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import { useTranslation } from 'react-i18next';
 
-const NoLocalFile = () => (
+const NoLocalFile = () => {
+  const { t } = useTranslation();
+
   <div id="NoLocalFile">
     <InsertDriveFileOutlinedIcon style={{fontSize: 36}} />
-    <p><small>This project was imported.<br></br>Source file can't be displayed.</small></p>
+    <p><small>{t('ProjectImportedHint')}</small></p>
   </div>
-);
+};
 
 export default NoLocalFile;

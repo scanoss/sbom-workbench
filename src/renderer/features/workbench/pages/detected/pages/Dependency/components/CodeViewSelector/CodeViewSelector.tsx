@@ -3,6 +3,7 @@ import { ButtonGroup, Button, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,11 +27,12 @@ export enum CodeViewSelectorMode {
 
 const CodeViewSelector = ({ active, setView }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   return (
     <div className={classes.root}>
       <ButtonGroup variant="contained" size="small" aria-label="file view selector">
-        <Tooltip title="Raw view" arrow>
+        <Tooltip title={t('Tooltip:RawView')} arrow>
           <Button
             className={classes.button}
             onClick={() => setView(CodeViewSelectorMode.CODE)}
@@ -40,7 +42,7 @@ const CodeViewSelector = ({ active, setView }) => {
             <CodeOutlinedIcon fontSize="inherit" />
           </Button>
         </Tooltip>
-        <Tooltip title="Dependency view" arrow>
+        <Tooltip title={t('Tooltip:DependencyView')} arrow>
           <Button
             className={classes.button}
             onClick={() => setView(CodeViewSelectorMode.GRAPH)}

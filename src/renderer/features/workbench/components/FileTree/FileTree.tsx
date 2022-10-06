@@ -9,6 +9,7 @@ import { collapseTree, expandTree, selectWorkbench, updateTree } from '@store/wo
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { CircularProgress } from '@mui/material';
 import { IpcChannels } from '@api/ipc-channels';
+import { useTranslation } from 'react-i18next';
 
 const { Expandable } = Renderers;
 
@@ -36,6 +37,7 @@ const FileTree = () => {
   const navigate = useNavigate();
   const contextual = useContextual();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const { tree } = useSelector(selectWorkbench);
   const state = useSelector(selectNavigationState);
@@ -45,40 +47,40 @@ const FileTree = () => {
     const { current: node } = selectedNode;
 
     switch (params) {
-      case 'action-restore':
+      case 'Action:RestoreFile':
         contextual.restore(node);
         break;
-      case 'action-original':
+      case 'Action:MarkFileAsOriginal':
         contextual.ignore(node);
         break;
-      case 'action-aceptAll':
+      case 'Action:AcceptAll':
         contextual.acceptAll(node);
         break;
-      case 'action-identifyAllAs':
+      case 'Action:IdentifyAllAs':
         contextual.identifyAll(node);
         break;
-      case 'action-markAllAsOriginal':
+      case 'Action:MarkAllAsOriginal':
         contextual.ignoreAll(node);
         break;
-      case 'action-restoreAll':
+      case 'Action:RestoreAll':
         contextual.restoreAll(node);
         break;
-      case 'action-expandAll':
+      case 'Action:ExpandAll':
         onExpandAll(node);
         break;
-      case 'action-expandAllToMatches':
+      case 'Action:ExpandToMatches':
         onExpandAll(node, true);
         break;
-      case 'action-colapseAll':
+      case 'Action:CollapseAll':
         onCollapseAll(node);
         break;
-      case 'action-AceptAllDependencies':
+      case 'Action:AcceptAllDependencies':
         contextual.acceptAllDependencies(node);
         break;
-      case 'action-dismissAllDependencies':
+      case 'Action:DismissAllDependencies':
         contextual.rejectAllDependencies(node);
         break;
-      case 'action-restorellDependencies':
+      case 'Action:RestorellDependencies':
         contextual.restoreAllDependencies(node);
         break;
       default:
@@ -120,18 +122,18 @@ const FileTree = () => {
     if (node.isDependencyFile) {
       menu = [
         {
-          label: 'Accept all dependencies',
-          actionId: 'action-AceptAllDependencies',
+          label: t('AppMenu:AcceptAllDependencies'),
+          actionId: 'Action:AcceptAllDependencies',
           enabled: node.status === 'PENDING',
         },
         {
-          label: 'Dismiss all dependencies',
-          actionId: 'action-dismissAllDependencies',
+          label:  t('AppMenu:DismissAllDependencies'),
+          actionId: 'Action:DismissAllDependencies',
           enabled: node.status === 'PENDING',
         },
         {
-          label: 'Restore all dependencies',
-          actionId: 'action-restorellDependencies',
+          label: t('AppMenu:RestoreAllDependencies'),
+          actionId: 'Action:RestorellDependencies',
           // enabled: node.status === 'PENDING',
         },
       ];
@@ -139,56 +141,53 @@ const FileTree = () => {
       menu = !node.children
         ? [
             {
-              label: 'Mark file as original',
-
-              // click: () => contextual.ignore(node),
-              actionId: 'action-original',
-              // enabled: !onlyRestore && node.status !== 'FILTERED' && node.status !== 'NO-MATCH',
+              label: t('AppMenu:MarkFileAsOriginal'),
+              actionId: 'Action:MarkFileAsOriginal',
               enabled: node.status !== 'FILTERED' && node.status !== 'NO-MATCH' && !node.isDependencyFile, // TODO: CHECK WITH FRANCO
             },
             {
-              label: 'Restore file',
-              actionId: 'action-restore',
+              label: t('AppMenu:RestoreFile'),
+              actionId: 'Action:RestoreFile',
               enabled: node.status === 'IDENTIFIED' || node.status === 'IGNORED',
             },
           ]
         : [
             {
-              label: !state.isFilterActive ? 'Accept all' : 'Accept all filtered files',
-              actionId: 'action-aceptAll',
+              label: t('AppMenu:AcceptAll', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
+              actionId: 'Action:AcceptAll',
               enabled: !onlyRestore,
             },
             { type: 'separator' },
             {
-              label: !state.isFilterActive ? 'Identify all files as...' : 'Identify all filtered files as...',
-              actionId: 'action-identifyAllAs',
+              label: t('AppMenu:IdentifyAllAs', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
+              actionId: 'Action:IdentifyAllAs',
               enabled: !onlyRestore,
             },
             {
-              label: !state.isFilterActive ? 'Mark all files as original' : 'Mark all filtered files as original',
-              actionId: 'action-markAllAsOriginal',
+              label: t('AppMenu:MarkAllAsOriginal', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
+              actionId: 'Action:MarkAllAsOriginal',
               enabled: !onlyRestore,
             },
             {
-              label: !state.isFilterActive ? 'Restore all files' : 'Restore all filtered files',
-              actionId: 'action-restoreAll',
+              label: t('AppMenu:RestoreAll', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
+              actionId: 'Action:RestoreAll',
               enabled: node.hasIgnoredProgress || node.hasIdentifiedProgress,
             },
             { type: 'separator' },
             {
-              label: 'Expand/Collapse',
+              label: t('AppMenu:ExpandCollapse'),
               submenu: [
                 {
-                  label: 'Expand all',
-                  actionId: 'action-expandAll',
+                  label: t('AppMenu:ExpandAll'),
+                  actionId: 'Action:ExpandAll',
                 },
                 {
-                  label: 'Expand to matches',
-                  actionId: 'action-expandAllToMatches',
+                  label: t('AppMenu:ExpandToMatches'),
+                  actionId: 'Action:ExpandToMatches',
                 },
                 {
-                  label: 'Collapse all',
-                  actionId: 'action-colapseAll',
+                  label: t('AppMenu:CollapseAll'),
+                  actionId: 'Action:CollapseAll',
                 },
               ],
             },

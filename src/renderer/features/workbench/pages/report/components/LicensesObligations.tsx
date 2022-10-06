@@ -8,6 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles({
   table: {
@@ -20,6 +21,7 @@ const useStyles = makeStyles({
 
 const LicensesObligations = ({ data }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
   const [licenseHash, setLicenseHash] = useState({});
 
   const init = () => {
@@ -39,11 +41,9 @@ const LicensesObligations = ({ data }) => {
         <Table className={classes.table}>
           <TableHead>
             <TableRow>
-              <TableCell className="" align="left">
-                LICENSE
-              </TableCell>
-              <TableCell>COPYLEFT</TableCell>
-              <TableCell>INCOMPATIBLE LICENSES</TableCell>
+              <TableCell align="left">{t('Table:Header:License')}</TableCell>
+              <TableCell>{t('Table:Header:Copyleft')}</TableCell>
+              <TableCell>{t('Table:Header:IncompatibleLicenses')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody className="selectable">

@@ -2,8 +2,9 @@ import React from 'react';
 import { Card, CardContent, Tooltip, ButtonBase } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { ComponentGroup } from '@api/types';
-import IconComponent from '../IconComponent/IconComponent';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { useTranslation } from 'react-i18next';
+import IconComponent from '../IconComponent/IconComponent';
 
 interface ComponentCardProps {
   component: ComponentGroup;
@@ -91,6 +92,10 @@ const ComponentInfo = ({ name }) =>
     <h6>{name}</h6>
   );
 
-const VersionInfo = ({ multiple, versions }) => <p>{multiple ? `${versions.length} versions` : versions[0].version}</p>;
+const VersionInfo = ({ multiple, versions }) => {
+  const { t } = useTranslation();
+
+  return <p>{multiple ? t('CountVersions', { count: versions.length}) : versions[0].version}</p>;
+}
 
 export default ComponentCard;

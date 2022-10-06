@@ -3,8 +3,11 @@ import { Button, ButtonGroup, Grow, MenuItem, MenuList, Paper, Popper } from '@m
 import { ClickAwayListener } from '@mui/base';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import AddIcon from '@mui/icons-material/Add';
+import { useTranslation } from 'react-i18next';
 
 const AddProjectButton = ({ onNewProject, onImportProject }) => {
+  const { t } = useTranslation();
+
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
 
@@ -24,7 +27,7 @@ const AddProjectButton = ({ onNewProject, onImportProject }) => {
     <>
       <ButtonGroup variant="contained" ref={anchorRef} aria-label="Add new project">
         <Button startIcon={<AddIcon />} onClick={onNewProject}>
-          New project
+          {t('Button:NewProject')}
         </Button>
         <Button
           size="small"
@@ -54,7 +57,7 @@ const AddProjectButton = ({ onNewProject, onImportProject }) => {
                       onImportProject();
                     }}
                   >
-                    Import project
+                    {t('Button:ImportProject')}
                   </MenuItem>
                 </MenuList>
               </ClickAwayListener>

@@ -8,6 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Grow } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 const ActionButton = ({
   tab,
@@ -17,6 +18,8 @@ const ActionButton = ({
   onDetachAllPressed,
   onRestoreAllPressed,
 }) => {
+  const { t } = useTranslation();
+
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
 
@@ -47,7 +50,7 @@ const ActionButton = ({
             color="secondary"
           >
             <Button variant="contained" onClick={onIdentifyAllPressed}>
-              Identify All ({files.pending.length})
+              {t('Button:IdentifyAllWithCount', { count: files.pending.length})}
             </Button>
             <Button color="secondary" onClick={handleToggle}>
               <ArrowDropDownIcon fontSize="inherit" />
@@ -71,7 +74,7 @@ const ActionButton = ({
                           onIgnoreAllPressed();
                         }}
                       >
-                        Mark all as original ({files.pending.length})
+                        {t('Button:MarkAllAsOriginalWithCount', { count: files.pending.length})}
                       </MenuItem>
                     </MenuList>
                   </ClickAwayListener>
@@ -89,7 +92,7 @@ const ActionButton = ({
           color="secondary"
           onClick={onDetachAllPressed}
         >
-          Restore All ({files.identified.length})
+          {t('Button:RestoreAllWithCount', { count: files.identified.length})}
         </Button>
       )}
       {tab === 2 && (
@@ -100,7 +103,7 @@ const ActionButton = ({
           color="secondary"
           onClick={onRestoreAllPressed}
         >
-          Restore All ({files.ignored.length})
+          {t('Button:RestoreAllWithCount', { count: files.ignored.length})}
         </Button>
       )}
     </>

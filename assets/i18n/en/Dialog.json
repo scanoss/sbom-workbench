@@ -1,0 +1,23 @@
+{
+  "MarkOriginalFiles_one": "Are you sure you want to mark as original {{count}} file?",
+  "MarkOriginalFiles_other": "Are you sure you want to mark as original {{count}} files?",
+  "RestoreFiles_one": "Are you sure you want to restore {{count}} file?",
+  "RestoreFiles_other": "Are you sure you want to restore {{count}} files?",
+  "AddComponentToCatalog": "Do you want to add <strong>{{component}}</strong> to your catalog?",
+  "AcceptDependency": "Accept <strong>{{dependency}}</strong>",
+  "PauseScannerQuestion": "Are you sure you want to pause the scanner?",
+  "ScanPaused": "Scan Paused",
+  "PleaseTryAgainLater": "Please try again later.",
+  "ProjectSannedPreviousVersionQuestion": "'This project was scanned with a previous version that is no longer supported. Would you like to delete it and scan it again?",
+  "AlreadyIdentifyFilesInFolder": "You have already identified files in this folder. Do you want to overwrite or keep them?",
+  "ActionWillBeExecutedOnAllFiles": "This action will be executed on all files within this folder. Are you sure?",
+  "ActionWillBeExecutedOnAllFilteredFiles": "This action will be executed on all filtered files within this folder. Are you sure?",
+  "AllValidDependenciesWillBeAccepted": "All valid pending dependencies will be accepted.",
+  "AllValidDependenciesWillBeAcceptedSubtitle": "Those dependencies that lack the version or license details will not be accepted.",
+  "AllPendingDependenciesWillBeDismissed": "All pending dependencies will be dismissed.",
+  "AllAcceptedOrDismissedDependenciesWillBeRestored": "All accepted or dismissed dependencies will be restored.",
+  "YouHaveAlreadyWorkQuestion": "You have already worked with some of these files. Do you want to overwrite or keep them?",
+  "ActionWillBeExecutedOnAllSelectedQuestion": "This action will be executed on all selected files. Are you sure",
+  "DeleteQuestion": "Are you sure you want to delete this project?",
+  "RescanQuestion": "Are you sure you want to rescan this project?"
+}

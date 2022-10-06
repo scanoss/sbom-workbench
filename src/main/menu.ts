@@ -1,5 +1,6 @@
 import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions } from 'electron';
 import path from 'path';
+import i18next from 'i18next';
 import { IpcChannels } from '../api/ipc-channels';
 import AppConfig from '../config/AppConfigModule';
 import {resolveHtmlPath} from "./util";
@@ -63,27 +64,27 @@ export default class MenuBuilder {
       label: 'Scanoss',
       submenu: [
         {
-          label: '&New project',
+          label: i18next.t('AppMenu:NewProject'),
           accelerator: 'Command+N',
           click: () => {
             this.mainWindow.webContents.send(IpcChannels.MENU_NEW_PROJECT);
           },
         },
         {
-          label: '&Import project',
+          label: i18next.t('AppMenu:ImportProject'),
           click: () => {
             this.mainWindow.webContents.send(IpcChannels.MENU_IMPORT_PROJECT);
           },
         },
         {
-          label: '&Settings',
+          label: i18next.t('AppMenu:Settings'),
           accelerator: 'Command+,',
           click: () => {
             this.mainWindow.webContents.send(IpcChannels.MENU_OPEN_SETTINGS);
           },
         },
         {
-          label: 'Quit',
+          label: i18next.t('AppMenu:Quit'),
           accelerator: 'Command+Q',
           click: () => {
             app.quit();
@@ -92,29 +93,29 @@ export default class MenuBuilder {
       ],
     };
     const subMenuEdit: MenuItemConstructorOptions = {
-      label: '&Edit',
+      label: i18next.t('AppMenu:Edit'),
       submenu: [{ role: 'cut' }, { role: 'copy' }, { role: 'paste' }],
     };
 
     const subMenuViewDev: MenuItemConstructorOptions = {
-      label: 'View',
+      label: i18next.t('AppMenu:View'),
       submenu: [
         {
-          label: 'Reload',
+          label: i18next.t('AppMenu:Reload'),
           accelerator: 'Command+R',
           click: () => {
             this.mainWindow.webContents.reload();
           },
         },
         {
-          label: 'Toggle Full Screen',
+          label: i18next.t('AppMenu:ToggleFullScreen'),
           accelerator: 'Ctrl+Command+F',
           click: () => {
             this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
           },
         },
         {
-          label: 'Toggle Developer Tools',
+          label: i18next.t('AppMenu:ToggleDeveloperTools'),
           accelerator: 'Alt+Command+I',
           click: () => {
             this.mainWindow.webContents.toggleDevTools();
@@ -123,10 +124,10 @@ export default class MenuBuilder {
       ],
     };
     const subMenuViewProd: MenuItemConstructorOptions = {
-      label: 'View',
+      label: i18next.t('AppMenu:View'),
       submenu: [
         {
-          label: 'Toggle Full Screen',
+          label: i18next.t('AppMenu:ToggleFullScreen'),
           accelerator: 'Ctrl+Command+F',
           click: () => {
             this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
@@ -148,10 +149,10 @@ export default class MenuBuilder {
       ],
     };
     const subMenuHelp: MenuItemConstructorOptions = {
-      label: 'Help',
+      label:  i18next.t('AppMenu:Help'),
       submenu: [
         {
-          label: 'About',
+          label: i18next.t('AppMenu:About'),
           click: () => {
             this.buildAboutDialog();
           },
@@ -168,30 +169,30 @@ export default class MenuBuilder {
   buildDefaultTemplate(): MenuItemConstructorOptions[] {
     const templateDefault = [
       {
-        label: '&File',
+        label: i18next.t('AppMenu:File'),
         submenu: [
           {
-            label: '&New project',
+            label: i18next.t('AppMenu:NewProject'),
             accelerator: 'Ctrl+N',
             click: () => {
               this.mainWindow.webContents.send(IpcChannels.MENU_NEW_PROJECT);
             },
           },
           {
-            label: '&Import project',
+            label: i18next.t('AppMenu:ImportProject'),
             click: () => {
               this.mainWindow.webContents.send(IpcChannels.MENU_IMPORT_PROJECT);
             },
           },
           {
-            label: '&Settings',
+            label: i18next.t('AppMenu:Settings'),
             accelerator: 'Ctrl+Alt+S',
             click: () => {
               this.mainWindow.webContents.send(IpcChannels.MENU_OPEN_SETTINGS);
             },
           },
           {
-            label: '&Close',
+            label: i18next.t('AppMenu:Close'),
             accelerator: 'Ctrl+W',
             click: () => {
               this.mainWindow.close();
@@ -200,7 +201,7 @@ export default class MenuBuilder {
         ],
       },
       {
-        label: '&Edit',
+        label:  i18next.t('AppMenu:Edit'),
         submenu: [
           /* {role: 'undo'},
           {role: 'redo'},
@@ -214,26 +215,26 @@ export default class MenuBuilder {
         ],
       },
       {
-        label: '&View',
+        label: i18next.t('AppMenu:View'),
         submenu:
           process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
             ? [
                 {
-                  label: '&Reload',
+                  label: i18next.t('AppMenu:Reload'),
                   accelerator: 'Ctrl+R',
                   click: () => {
                     this.mainWindow.webContents.reload();
                   },
                 },
                 {
-                  label: 'Toggle &Full Screen',
+                  label:  i18next.t('AppMenu:ToggleFullScreen'),
                   accelerator: 'F11',
                   click: () => {
                     this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
                   },
                 },
                 {
-                  label: 'Toggle &Developer Tools',
+                  label: i18next.t('AppMenu:ToggleDeveloperTools'),
                   accelerator: 'Alt+Ctrl+I',
                   click: () => {
                     this.mainWindow.webContents.toggleDevTools();
@@ -242,7 +243,7 @@ export default class MenuBuilder {
               ]
             : [
                 {
-                  label: 'Toggle &Full Screen',
+                  label:  i18next.t('AppMenu:ToggleFullScreen'),
                   accelerator: 'F11',
                   click: () => {
                     this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
@@ -251,10 +252,10 @@ export default class MenuBuilder {
               ],
       },
       {
-        label: 'Help',
+        label:  i18next.t('AppMenu:Help'),
         submenu: [
           {
-            label: 'About',
+            label: i18next.t('AppMenu:About'),
             click: () => {
               this.buildAboutDialog();
             },

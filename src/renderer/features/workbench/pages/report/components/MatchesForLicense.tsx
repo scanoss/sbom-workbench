@@ -6,6 +6,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import { useTranslation } from 'react-i18next';
 import IconComponent from "../../../components/IconComponent/IconComponent";
 
 const useStyles = makeStyles({
@@ -19,6 +20,7 @@ const useStyles = makeStyles({
 
 export default function MatchesForLicense({ data }) {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -26,9 +28,9 @@ export default function MatchesForLicense({ data }) {
         <Table stickyHeader className={classes.table}>
           <TableHead>
             <TableRow>
-              <TableCell align="left">Component</TableCell>
-              <TableCell>Vendor</TableCell>
-              <TableCell align="right">Version</TableCell>
+              <TableCell align="left">{t('Table:Header:Component')}</TableCell>
+              <TableCell>{t('Table:Header:Vendor')}</TableCell>
+              <TableCell align="right">{t('Table:Header:Version')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody className="selectable">

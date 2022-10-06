@@ -1,13 +1,14 @@
+import React from 'react';
 import {
   Card,
   CardContent,
   Typography,
   ButtonBase, Chip, CardActions, Button
 } from '@mui/material';
-import React from 'react';
-import { Inventory } from '../../../../../api/types';
-import Label from '../Label/Label';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Inventory } from '@api/types';
+import { useTranslation } from 'react-i18next';
+import Label from '../Label/Label';
 
 interface InventoryCardProps {
   inventory: Inventory;
@@ -15,6 +16,7 @@ interface InventoryCardProps {
 }
 
 const InventoryCard = ({ inventory, onSelect }: InventoryCardProps) => {
+  const { t } = useTranslation();
   return (
     <>
       <Card className="inventory-card" elevation={1}>
@@ -23,19 +25,19 @@ const InventoryCard = ({ inventory, onSelect }: InventoryCardProps) => {
             <header className="header">
               <section className="info">
                 <div>
-                  <Label label="USAGE" textColor="gray" />
+                  <Label label={t('Title:Usage').toUpperCase()} textColor="gray" />
                   <Typography component="p">{inventory.usage}</Typography>
                 </div>
                 <div>
-                  <Label label="VERSION" textColor="gray" />
+                  <Label label={t('Title:version').toUpperCase()} textColor="gray" />
                   <Typography component="p">{inventory.component.version}</Typography>
                 </div>
                 <div>
-                  <Label label="LICENSE" textColor="gray" />
+                  <Label label={t('Title:License').toUpperCase()} textColor="gray" />
                   <Typography component="p">{inventory.license_name}</Typography>
                 </div>
               </section>
-              <Chip className="identified" variant="outlined" label="Identified Group" />
+              <Chip className="identified" variant="outlined" label={t('Title:IdentifiedGroup')} />
             </header>
 
             <Typography paragraph className="notes">
@@ -43,7 +45,7 @@ const InventoryCard = ({ inventory, onSelect }: InventoryCardProps) => {
             </Typography>
 
             <footer>
-              <div className="link">View files   <ArrowForwardIcon /></div>
+              <div className="link">{t('Title:Viewfiles')} <ArrowForwardIcon /></div>
             </footer>
           </CardContent>
         </ButtonBase>

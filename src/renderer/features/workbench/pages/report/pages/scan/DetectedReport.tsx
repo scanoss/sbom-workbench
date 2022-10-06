@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
 import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { useTranslation } from 'react-i18next';
 import LicensesChart from '../../components/LicensesChart';
 import LicensesTable from '../../components/LicensesTable';
 import MatchesForLicense from '../../components/MatchesForLicense';
@@ -20,6 +21,7 @@ Chart.register(...registerables);
 
 const DetectedReport = ({ data }) => {
   const { projectScannerConfig } = useSelector(selectWorkbench);
+  const { t } = useTranslation();
 
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
   const [obligations, setObligations] = useState(null);
@@ -45,7 +47,7 @@ const DetectedReport = ({ data }) => {
     <>
       <section className="report-layout detected">
         <Card className="report-item licenses">
-          <div className="report-title">Licenses</div>
+          <div className="report-title">{t('Title:Licenses')}</div>
           {data.licenses.length > 0 ? (
             <div className="report-full">
               <LicensesChart data={data.licenses} />
@@ -56,28 +58,28 @@ const DetectedReport = ({ data }) => {
               />
             </div>
           ) : (
-            <p className="report-empty">No licenses found</p>
+            <p className="report-empty">{t('NoLicensesFound')}</p>
           )}
         </Card>
 
         <Card className="report-item matches-for-license">
-          <div className="report-title">Matches for {matchedLicenseSelected?.label}</div>
+          <div className="report-title">{t('Title:MatchesForLabel', { label: matchedLicenseSelected?.label })}</div>
           {data.licenses.length > 0 ? (
             <MatchesForLicense data={matchedLicenseSelected} />
           ) : (
-            <p className="report-empty">No matches found</p>
+            <p className="report-empty">{t('Title:NoMatchesFound')}</p>
           )}
         </Card>
 
         <Card className="report-item matches">
-          <div className="report-title">Matches</div>
+          <div className="report-title">{t('Title:Matches')}</div>
           <MatchesChart data={data.summary} />
         </Card>
 
         <ConditionalLink to="../../vulnerabilities?type=detected" disabled={blocked} className="w-100">
           <Card className={`report-item vulnerabilities ${blocked ? 'blocked' : 'no-blocked'}`}>
             <div className="report-title d-flex space-between align-center">
-              <span>Vulnerabilities</span>
+              <span>{t('Title:Vulnerabilities')}</span>
               <ArrowForwardOutlinedIcon fontSize="inherit" />
             </div>
             <VulnerabilitiesCard data={data.vulnerabilities} blocked={blocked} />
@@ -88,7 +90,7 @@ const DetectedReport = ({ data }) => {
           {obligations ? (
             <LicensesObligations data={obligations} />
           ) : (
-            <p className="text-center mb-0 mt-0">Loading obligations info...</p>
+            <p className="text-center mb-0 mt-0">{t('LoadingObligationsInfo')}</p>
           )}
         </Card>
       </section>
