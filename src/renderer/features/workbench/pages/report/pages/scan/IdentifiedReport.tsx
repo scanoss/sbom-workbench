@@ -103,7 +103,7 @@ const IdentifiedReport = ({ data }) => {
           )}
         </Card>
 
-        {/* <ConditionalLink to="../../vulnerabilities?type=identified" disabled={blocked} className="w-100">
+        <ConditionalLink to="../../vulnerabilities?type=identified" disabled={blocked} className="w-100">
           <Card className={`report-item vulnerabilities ${blocked ? 'blocked' : 'no-blocked'}`}>
             <div className="report-title d-flex space-between align-center">
               <span>Vulnerabilities</span>
@@ -111,7 +111,7 @@ const IdentifiedReport = ({ data }) => {
             </div>
             <VulnerabilitiesCard data={data.vulnerabilities} blocked={blocked} />
           </Card>
-          </ConditionalLink> */}
+        </ConditionalLink>
 
         <Card className="report-item licenses-obligation">
           {obligations ? (
