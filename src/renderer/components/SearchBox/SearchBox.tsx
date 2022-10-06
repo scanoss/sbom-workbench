@@ -3,6 +3,7 @@ import { Paper, IconButton, InputBase } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
+import { AppI18n } from '@shared/i18n';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -21,14 +22,15 @@ const useStyles = makeStyles((theme) => ({
 
 export interface SearchBoxProps {
   value?: string;
-  placeholder: string;
-  responseDelay: number;
-  disabled: boolean;
+  placeholder?: string;
+  responseDelay?: number;
+  disabled?: boolean;
   onChange: (value: string) => void;
 }
 
 const SearchBox = ({ value, placeholder, responseDelay, disabled, onChange }: SearchBoxProps) => {
   const classes = useStyles();
+
   const [query, setQuery] = useState('');
 
   useEffect(() => {
@@ -49,7 +51,7 @@ const SearchBox = ({ value, placeholder, responseDelay, disabled, onChange }: Se
         value={query}
         onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
         onChange={(e: any) => setQuery(e.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholder || 'Search...'}
         inputProps={{ 'aria-label': placeholder, spellCheck: 'false' }}
       />
       {query && (
@@ -61,6 +63,6 @@ const SearchBox = ({ value, placeholder, responseDelay, disabled, onChange }: Se
   );
 };
 
-SearchBox.defaultProps = { value: '', placeholder: 'Search...', responseDelay: 300, disabled: false };
+SearchBox.defaultProps = { value: '', placeholder: null, responseDelay: 300, disabled: false };
 
 export default SearchBox;

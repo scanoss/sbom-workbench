@@ -6,6 +6,7 @@ import { RestoreOutlined } from '@mui/icons-material';
 import { List, AutoSizer } from 'react-virtualized';
 import WarningOutlinedIcon from '@mui/icons-material/WarningOutlined';
 import { Dependency } from '@api/types';
+import { useTranslation } from 'react-i18next';
 import IconComponent from '../../../../../../components/IconComponent/IconComponent';
 
 interface DependencyTreeProps {
@@ -21,6 +22,8 @@ const DependencyTree = ({
   onDependencyReject,
   onDependencyRestore,
 }: DependencyTreeProps) => {
+  const { t } = useTranslation();
+
   return (
     <Card elevation={1} id="DependencyTree" className="dependencies-tree">
       <AutoSizer style={{ width: '100%', maxHeight: '100%' }}>
@@ -55,14 +58,14 @@ const DependencyTree = ({
                     <div className="info-container version">
                       {item.version ? (
                         <>
-                          <Typography variant="subtitle1">Version</Typography>
+                          <Typography variant="subtitle1">{t('Table:Version')}</Typography>
                           <div className="pill-version">
                             <small>{item.version}</small>
                           </div>
                         </>
                       ) : (
-                        <div title="No version found" className="d-flex align-center">
-                          <Typography variant="subtitle1">Version</Typography>
+                        <div title={t('Tooltip:NoVersionFound')} className="d-flex align-center">
+                          <Typography variant="subtitle1">{t('Table:Version')}</Typography>
                           <WarningOutlinedIcon fontSize="inherit" className="icon ml-1" />
                         </div>
                       )}
@@ -71,14 +74,14 @@ const DependencyTree = ({
                     <div className="info-container license">
                       {item.licenses && item.licenses.length > 0 ? (
                         <>
-                          <Typography variant="subtitle1">License</Typography>
+                          <Typography variant="subtitle1">{t('Table:License')}</Typography>
                           <div className="pill-license">
                             <small>{item.licenses[0]}</small>
                           </div>
                         </>
                       ) : (
-                        <div title="No license found" className="d-flex align-center">
-                          <Typography variant="subtitle1">License</Typography>
+                        <div title={t('Tooltip:NoLicenseFound')} className="d-flex align-center">
+                          <Typography variant="subtitle1">{t('Table:License')}</Typography>
                           <WarningOutlinedIcon fontSize="inherit" className="icon ml-1" />
                         </div>
                       )}
@@ -87,17 +90,17 @@ const DependencyTree = ({
                     <div className="item-action-buttons">
                       {item.status === 'pending' && (
                         <>
-                          <IconButton title="Accept" onClick={() => onDependencyAccept(item)} size="large">
+                          <IconButton title={t('Tooltip:Accept')} onClick={() => onDependencyAccept(item)} size="large">
                             <CheckIcon className="icon check" fontSize="inherit" />
                           </IconButton>
-                          <IconButton title="Dismiss" onClick={() => onDependencyReject(item)} size="large">
+                          <IconButton title={t('Tooltip:Dismiss')} onClick={() => onDependencyReject(item)} size="large">
                             <BanIcon className="icon ban" fontSize="inherit" />
                           </IconButton>
                         </>
                       )}
                       {(item.status === 'original' || item.status === 'identified') && (
                         <>
-                          <IconButton title="Restore" onClick={() => onDependencyRestore(item)} size="large">
+                          <IconButton title={t('Tooltip:Restore')} onClick={() => onDependencyRestore(item)} size="large">
                             <RestoreOutlined className="icon" fontSize="inherit" />
                           </IconButton>
                         </>

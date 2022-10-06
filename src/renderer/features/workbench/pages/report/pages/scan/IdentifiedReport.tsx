@@ -1,13 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { Chart, registerables } from 'chart.js';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { Button, Card } from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
-import { projectService } from '@api/services/project.service';
-import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
-import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import LicensesChart from '../../components/LicensesChart';
 import IdentificationProgress from '../../components/IdentificationProgress';
@@ -23,6 +22,7 @@ Chart.register(...registerables);
 const IdentifiedReport = ({ data }) => {
   const { projectScannerConfig } = useSelector(selectWorkbench);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [obligations, setObligations] = useState(null);
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
@@ -52,13 +52,10 @@ const IdentifiedReport = ({ data }) => {
         <div className="empty-container">
           <div className="report-message">
             <InsertDriveFileOutlinedIcon fontSize="inherit" color="primary" style={{ fontSize: '100px' }} />
-            <h2 className="mb-1">Nothing identified yet</h2>
-            <h5 className="mt-1 text-center">
-              Verify the scanner output before including them in your SBOM in order to confirm detections or even
-              include your own manual identifications.
-            </h5>
+            <h2 className="mb-1">{t('NothingIdentifiedYet')}</h2>
+            <h5 className="mt-1 text-center">{t('NothingIdentifiedYetSubtitle')}</h5>
             <Button variant="contained" color="primary" onClick={() => navigate('/workbench/detected')}>
-              Start Identification
+              {t('Button:StartIdentification')}
             </Button>
           </div>
         </div>
@@ -70,16 +67,16 @@ const IdentifiedReport = ({ data }) => {
     <>
       <section className="report-layout identified">
         <Card className="report-item identification-progress">
-          <div className="report-title">Identification Progress</div>
+          <div className="report-title">{t('Title:IdentificationProgress')}</div>
           <IdentificationProgress data={data.summary} />
         </Card>
         <Card className="report-item oss-original">
-          <div className="report-title">OSS vs Original</div>
+          <div className="report-title">{t('Title:OSSvsOriginal')}</div>
           <OssVsOriginalProgressBar data={data.summary} />
         </Card>
 
         <Card className="report-item licenses">
-          <div className="report-title">Licenses</div>
+          <div className="report-title">{t('Title:Licenses')}</div>
           {data.licenses.length > 0 ? (
             <div className="report-full">
               <LicensesChart data={data.licenses} />
@@ -90,23 +87,23 @@ const IdentifiedReport = ({ data }) => {
               />
             </div>
           ) : (
-            <p className="report-empty">No licenses found</p>
+            <p className="report-empty">{t('NoLicensesFound')}</p>
           )}
         </Card>
 
         <Card className="report-item matches-for-license">
-          <div className="report-title">Matches for {matchedLicenseSelected?.label}</div>
+          <div className="report-title">{t('Title:MatchesForLabel', { label: matchedLicenseSelected?.label })}</div>
           {data.licenses.length > 0 ? (
             <MatchesForLicense data={matchedLicenseSelected} />
           ) : (
-            <p className="report-empty">No matches found</p>
+            <p className="report-empty">{t('Title:NoMatchesFound')}</p>
           )}
         </Card>
 
         <ConditionalLink to="../../vulnerabilities?type=identified" disabled={blocked} className="w-100">
           <Card className={`report-item vulnerabilities ${blocked ? 'blocked' : 'no-blocked'}`}>
             <div className="report-title d-flex space-between align-center">
-              <span>Vulnerabilities</span>
+              <span>{t('Title:Vulnerabilities')}</span>
               <ArrowForwardOutlinedIcon fontSize="inherit" />
             </div>
             <VulnerabilitiesCard data={data.vulnerabilities} blocked={blocked} />
@@ -117,7 +114,7 @@ const IdentifiedReport = ({ data }) => {
           {obligations ? (
             <LicensesObligations data={obligations} />
           ) : (
-            <p className="text-center mb-0 mt-0">Loading obligations info...</p>
+            <p className="text-center mb-0 mt-0">{t('LoadingObligationsInfo')}</p>
           )}
         </Card>
       </section>

@@ -18,6 +18,7 @@ import { selectComponentState } from '@store/component-store/componentSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { makeStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -64,6 +65,7 @@ interface InventoryDialogProps {
 export const InventoryDialog = (props: InventoryDialogProps) => {
   const classes = useStyles();
   const dialogCtrl = useContext<any>(DialogContext);
+  const { t } = useTranslation();
 
   const { recents } = useSelector(selectComponentState);
   const { isFilterActive } = useSelector(selectNavigationState);
@@ -126,7 +128,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     const license = licenses.find((item) => item.spdxid === form.spdxid);
     const response = await dialogCtrl.openComponentDialog(
       { name: form.component, purl: form.purl, url: form.url, license_name: license?.name },
-      'Add Version'
+      t('AddVersion')
     );
     if (response && response.action === ResponseStatus.OK) {
       addCustomComponentVersion(response.data);
@@ -290,7 +292,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       onClose={onCancel}
     >
       <header className="dialog-title">
-        <span>{!form.id ? 'Identify Component' : 'Edit Identification'}</span>
+        <span>{!form.id ? t('Title:IdentifyComponent') : t('Title:EditIdentification')}</span>
         <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
           <CloseIcon />
         </IconButton>
@@ -300,15 +302,15 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         <div className="dialog-content">
           {isFilterActive && (
             <Alert className="" severity="info">
-              This action will be applied based on your current filter criteria.
+              {t('ActionCurrentFilterCriteria')}
             </Alert>
           )}
           <div className={`${classes.componentVersion} dialog-row`}>
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
-                <label>Component</label>
+                <label>{t('Title:Component')}</label>
                 <IconButton
-                  title="Search for components online"
+                  title={t('Tooltip:SearchForComponentsOnline')}
                   tabIndex={-1}
                   color="inherit"
                   size="small"
@@ -317,7 +319,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   <SearchIcon fontSize="inherit" />
                 </IconButton>
                 <IconButton
-                  title="Add new custom component"
+                  title={t('Tooltip:AddNewCustomComponent')}
                   tabIndex={-1}
                   color="inherit"
                   size="small"
@@ -344,7 +346,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       filtered.push({
                         inputValue,
                         search: true,
-                        name: `Search "${inputValue}" online`,
+                        name: t('SearchValueOnline', { value: inputValue}),
                       });
                     }
 
@@ -391,7 +393,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               <div className="dialog-form-field-label">
                 <label>Version</label>
                 <IconButton
-                  title="Add new version"
+                  title={t('Tooltip:AddNewVersion')}
                   tabIndex={-1}
                   color="inherit"
                   size="small"
@@ -428,9 +430,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <div className="dialog-row">
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
-                <label>License</label>
+                <label>{t('Title:License')}</label>
                 <IconButton
-                  title="Add new license"
+                  title={t('Tooltip:AddNewLicense')}
                   tabIndex={-1}
                   color="inherit"
                   size="small"
@@ -489,7 +491,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <div className="dialog-row">
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">
-                URL <span className="optional">- Optional</span>
+                {t('Title:UR')}L <span className="optional">- {t('Optional')}</span>
               </label>
               <Paper className="dialog-form-field-control">
                 <TextField
@@ -506,7 +508,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
           <div className="dialog-row">
             <div className="dialog-form-field">
-              <label className="dialog-form-field-label">PURL</label>
+              <label className="dialog-form-field-label">{t('Title:PURL')}</label>
               <Paper className="dialog-form-field-control">
                 <TextField
                   name="purl"
@@ -523,7 +525,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
           <div className={`${classes.usageNotes} dialog-row`}>
             <div className="dialog-form-field">
-              <label className="dialog-form-field-label">Usage</label>
+              <label className="dialog-form-field-label">{t('Title:Usage')}</label>
               <Paper className="dialog-form-field-control">
                 <Select
                   name="usage"
@@ -533,16 +535,16 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   disableUnderline
                   onChange={(e) => inputHandler(e)}
                 >
-                  <MenuItem value="file">File</MenuItem>
-                  <MenuItem value="snippet">Snippet</MenuItem>
-                  <MenuItem value="pre-requisite">Pre-requisite</MenuItem>
+                  <MenuItem value="file">{t('File')}</MenuItem>
+                  <MenuItem value="snippet">{t('Snippet')}</MenuItem>
+                  <MenuItem value="pre-requisite">{t('PreRequisite')}</MenuItem>
                 </Select>
               </Paper>
             </div>
 
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">
-                Notes <span className="optional">- Optional</span>
+                {t('Title:Notes')} <span className="optional">- {t('Optional')}</span>
               </label>
               <Paper className="dialog-form-field-control">
                 <TextField
@@ -560,10 +562,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
         </div>
         <DialogActions>
           <Button tabIndex={-1} onClick={onCancel} color="inherit">
-            Cancel
+            {t('Button:Cancel')}
           </Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
-            Identify
+            {t('Button:Identify')}
           </Button>
         </DialogActions>
       </form>

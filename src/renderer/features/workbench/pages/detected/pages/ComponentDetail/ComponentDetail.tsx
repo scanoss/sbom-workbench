@@ -11,6 +11,7 @@ import { createInventory, detachFile, ignoreFile, restoreFile } from '@store/inv
 import { selectNavigationState, setVersion } from '@store/navigation-store/navigationSlice';
 import { selectComponentState } from '@store/component-store/componentSlice';
 import { selectWorkbench, setHistory } from '@store/workbench-store/workbenchSlice';
+import { useTranslation } from 'react-i18next';
 import { FileList } from '../ComponentList/components/FileList';
 import { ComponentInfo } from '../../../../components/ComponentInfo/ComponentInfo';
 import { IdentifiedList } from '../ComponentList/components/IdentifiedList';
@@ -30,6 +31,7 @@ const TABS = {
 export const ComponentDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -98,7 +100,6 @@ export const ComponentDetail = () => {
 
   const onIdentifyAllPressed = async () => {
     const selFiles = filterFiles.pending.map((file) => file.id);
-    console.log(component);
     const inv: Partial<Inventory> = {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -119,10 +120,9 @@ export const ComponentDetail = () => {
 
   const onIgnoreAllPressed = async () => {
     const { action } = await dialogCtrl.openConfirmDialog(
-      `Are you sure you want to ignore ${filterFiles.pending.length} ${
-        filterFiles.pending.length === 1 ? 'file' : 'files'
-      }?`
+      t('Dialog:MarkOriginalFiles', { count: filterFiles.pending.length})
     );
+
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.pending.map((file) => file.id);
       dispatch(ignoreFile(selFiles));
@@ -131,9 +131,7 @@ export const ComponentDetail = () => {
 
   const onRestoreAllPressed = async () => {
     const { action } = await dialogCtrl.openConfirmDialog(
-      `Are you sure you want to restore ${filterFiles.ignored.length} ${
-        filterFiles.ignored.length === 1 ? 'file' : 'files'
-      }?`
+      t('Dialog:RestoreFiles', { count: filterFiles.ignored.length})
     );
 
     if (action === DIALOG_ACTIONS.OK) {
@@ -144,10 +142,9 @@ export const ComponentDetail = () => {
 
   const onDetachAllPressed = async () => {
     const { action } = await dialogCtrl.openConfirmDialog(
-      `Are you sure you want to restore ${filterFiles.identified.length} ${
-        filterFiles.identified.length === 1 ? 'file' : 'files'
-      }?`
+      t('Dialog:RestoreFiles', { count: filterFiles.identified.length})
     );
+
     if (action === DIALOG_ACTIONS.OK) {
       const selFiles = filterFiles.identified.map((file) => file.id);
       dispatch(detachFile(selFiles));
@@ -225,7 +222,7 @@ export const ComponentDetail = () => {
         return (
           <FileList
             files={filterFiles.pending}
-            emptyMessage={searchQuery ? `No pending files found with "${searchQuery}"` : 'No pending files'}
+            emptyMessage={searchQuery ? t('NoPendingFilesWith', { searchQuery }) :  t('NoPendingFiles')}
             onAction={onAction}
           />
         );
@@ -233,7 +230,7 @@ export const ComponentDetail = () => {
         return (
           <IdentifiedList
             files={filterFiles.identified}
-            emptyMessage={searchQuery ? `No identified files found with "${searchQuery}"` : 'No identified files'}
+            emptyMessage={searchQuery ? t('NoIdentifiedFilesWith', { searchQuery }) :  t('NoIdentifiedFiles')}
             onAction={onAction}
           />
         );
@@ -241,7 +238,7 @@ export const ComponentDetail = () => {
         return (
           <FileList
             files={filterFiles.ignored}
-            emptyMessage={searchQuery ? `No original files found with "${searchQuery}"` : 'No original files'}
+            emptyMessage={searchQuery ? t('NoOriginalFilesWith', { searchQuery }) :  t('NoOriginalFiles')}
             onAction={onAction}
           />
         );

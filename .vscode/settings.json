@@ -4,7 +4,7 @@
     ".prettierrc": "jsonc",
     ".eslintignore": "ignore"
   },
-  
+
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -26,5 +26,6 @@
     "test/**/__snapshots__": true,
     "package-lock.json": true,
     "*.{css,sass,scss}.d.ts": true
-  }
+  },
+  "i18next.i18nPaths": "c:/Users/TUDAI/Documents/scanoss/audit-workbench/assets/i18n,c:/Users/TUDAI/Documents/scanoss/audit-workbench/src/shared/i18n,c:/Users/TUDAI/Documents/scanoss/audit-workbench/release/build/win-unpacked/locales,c:/Users/TUDAI/Documents/scanoss/audit-workbench/release/build/win-unpacked/resources/assets/i18n"
 }

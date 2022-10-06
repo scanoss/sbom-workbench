@@ -6,6 +6,7 @@ import { IProject } from '@api/types';
 import { workspaceService } from '@api/services/workspace.service';
 import { IpcChannels } from '@api/ipc-channels';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { setScanPath } from '@store/workspace-store/workspaceSlice';
 import { DialogContext, IDialogContext } from './DialogProvider';
 import { dialogController } from '../controllers/dialog-controller';
@@ -21,6 +22,7 @@ export const AppContext = React.createContext<IAppContext | null>(null);
 const AppProvider = ({ children }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const newProject = async () => {
@@ -90,16 +92,17 @@ const AppProvider = ({ children }) => {
               <span>SUCCESSFUL EXPORT</span>
               <div>
                 <Button
-                  className="mr-3"
+                  className="mr-3 text-uppercase"
                   size="small"
                   variant="text"
                   color="primary"
                   style={{ padding: 0, lineHeight: 1, minWidth: 0 }}
                   onClick={() => dismiss()}
                 >
-                  CLOSE
+                  {t('Button:Close')}
                 </Button>
                 <Button
+                  className="text-uppercase"
                   size="small"
                   variant="text"
                   color="primary"
@@ -109,7 +112,7 @@ const AppProvider = ({ children }) => {
                     window.shell.showItemInFolder(path);
                   }}
                 >
-                  OPEN
+                  {t('Button:Open')}
                 </Button>
               </div>
             </footer>

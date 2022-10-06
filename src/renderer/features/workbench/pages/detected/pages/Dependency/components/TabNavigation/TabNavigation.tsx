@@ -1,5 +1,6 @@
-import { Paper, Tab, Tabs } from '@mui/material';
 import React from 'react';
+import { Paper, Tab, Tabs } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 export enum DependencyStatus {
   IDENTIFIED = 'identified',
@@ -8,6 +9,7 @@ export enum DependencyStatus {
 }
 
 const TabNavigation = ({ tab, onChange }) => {
+  const { t } = useTranslation();
   return (
     <div className="tabs d-flex">
       <Paper square>
@@ -17,10 +19,10 @@ const TabNavigation = ({ tab, onChange }) => {
           TabIndicatorProps={{ style: { display: 'none' } }}
           onChange={(tab, value) => onChange(value)}
         >
-          <Tab label="All" value={null} />
-          <Tab label="Pending" value={DependencyStatus.PENDING} className={`has-bullet ${DependencyStatus.PENDING}`} />
-          <Tab label="Identified" value={DependencyStatus.IDENTIFIED} className={`has-bullet ${DependencyStatus.IDENTIFIED}`} />
-          <Tab label="Dismissed" value={DependencyStatus.ORIGINAL} className={`has-bullet ${DependencyStatus.ORIGINAL}`} />
+          <Tab label={t('Title:All')} value={null} />
+          <Tab label={t('Title:Pending')} value={DependencyStatus.PENDING} className={`has-bullet ${DependencyStatus.PENDING}`} />
+          <Tab label={t('Title:Identified')} value={DependencyStatus.IDENTIFIED} className={`has-bullet ${DependencyStatus.IDENTIFIED}`} />
+          <Tab label={t('Title:Dismissed')} value={DependencyStatus.ORIGINAL} className={`has-bullet ${DependencyStatus.ORIGINAL}`} />
         </Tabs>
       </Paper>
     </div>

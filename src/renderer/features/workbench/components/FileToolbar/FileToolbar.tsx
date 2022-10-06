@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {IconButton, ListItemText} from "@mui/material";
+import { useTranslation } from 'react-i18next';
 import CodeViewerManagerInstance from '../../pages/detected/pages/Editor/CodeViewerManager';
 
 
@@ -27,28 +28,30 @@ interface IAction {
 }
 
 const FileToolbar = ({ id, label, fullpath, file, actions }: FileToolbarProps) => {
+  const { t } = useTranslation();
+
   const ACTIONS: IAction[] = [
     {
       id: ToolbarActions.FIND,
-      hint: 'Find in file',
+      hint: t('Tooltip:FindInFile'),
       icon: <i className="ri-file-search-line" />,
       run: () => CodeViewerManagerInstance.get(id)?.getAction('actions.find').run(),
     },
     {
       id: ToolbarActions.COPY_PATH,
-      hint: 'Copy file path',
+      hint: t('Title:CopyFilePath'),
       icon: <i className="ri-file-copy-line" />,
       run: () => navigator.clipboard.writeText(fullpath),
     },
     {
       id: ToolbarActions.OPEN,
-      hint: 'Open file in folder',
+      hint: t('Tooltip:OpenFileInFolder'),
       icon: <i className="ri-share-box-line" />,
       run: () => window.shell.showItemInFolder(fullpath),
     },
     {
       id: ToolbarActions.OPEN_IN_BROWSER,
-      hint: 'Open file in browser',
+      hint: t('Tooltip:OpenFileInBrowser'),
       icon: <i className="ri-share-box-line" />,
       run: () => window.shell.openExternal(fullpath),
     },

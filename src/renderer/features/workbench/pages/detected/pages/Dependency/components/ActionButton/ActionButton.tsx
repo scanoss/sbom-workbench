@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, ButtonGroup, Menu, MenuItem } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { useTranslation } from 'react-i18next';
 
 const ActionButton = ({
   count,
@@ -13,6 +14,8 @@ const ActionButton = ({
   onDismissAll: () => void;
   onRestoreAll: () => void;
 }) => {
+  const { t } = useTranslation();
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -33,7 +36,7 @@ const ActionButton = ({
         color="secondary"
       >
         <Button disabled={count[0] === 0} size="small" variant="contained" color="secondary" onClick={onAcceptAll}>
-          Accept All ({count[0]})
+          {t('Button:AcceptAllWithCount', {count: count[0]})}
         </Button>
         <Button color="secondary" size="small" onClick={handleOpen}>
           <ArrowDropDownIcon />
@@ -44,10 +47,10 @@ const ActionButton = ({
           onClose={handleClose}
         >
           <MenuItem disabled={count[1] === 0} onClick={() => { handleClose(); onDismissAll();}}>
-            Dismiss all pending ({count[1]})
+            {t('Button:DismissAllPendingWithCount', {count: count[1]})}
           </MenuItem>
           <MenuItem disabled={count[2] === 0}  onClick={() => { handleClose(); onRestoreAll();}}>
-            Restore all ({count[2]})
+            {t('Button:RestoreAllWithCount', {count: count[2]})}
           </MenuItem>
         </Menu>
       </ButtonGroup>

@@ -10,6 +10,7 @@ import { exportService } from '@api/services/export.service';
 import AppConfig from '@config/AppConfigModule';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import { getFormatFilesAttributes } from '@shared/utils/file-utils';
+import { useTranslation } from 'react-i18next';
 import { dialogController } from '../../../../../../controllers/dialog-controller';
 import IdentifiedReport from './IdentifiedReport';
 import DetectedReport from './DetectedReport';
@@ -25,23 +26,24 @@ const useStyles = makeStyles({
 
 const Nav = () => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   return (
     <section className="nav">
       <NavLink to="detected" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} tabIndex={-1}>
         <Tooltip
-          title="Potential Bill of Materials based on automatic detection"
+          title={t('Tooltip:SBOMDetectedHelp')}
           classes={{ tooltip: classes.tooltip }}
         >
-          <Button size="large">Detected</Button>
+          <Button size="large">{t('Button:Detected')}</Button>
         </Tooltip>
       </NavLink>
       <NavLink to="identified" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} tabIndex={-1}>
         <Tooltip
-          title="Actual Bill of Materials based on confirmed identifications"
+          title={t('Tooltip:SBOMIdentifiedHelp')}
           classes={{ tooltip: classes.tooltip }}
         >
-          <Button size="large">Identified</Button>
+          <Button size="large">{t('Button:Identified')}</Button>
         </Tooltip>
       </NavLink>
     </section>
@@ -51,6 +53,7 @@ const Nav = () => {
 const Export = ({ empty }) => {
   const { pathname } = useLocation();
   const { path: projectPath, name } = useSelector(selectWorkbench);
+  const { t } = useTranslation();
 
   const source: ExportSource = pathname.startsWith('/workbench/report/detected')
     ? ExportSource.DETECTED
@@ -59,27 +62,27 @@ const Export = ({ empty }) => {
   const exportLabels = {
     WFP: {
       label: 'WFP',
-      hint: 'Export the Winnowing Fingerprint data of the scanned project',
+      hint: t('Tooltip:ExportHintWFP'),
       sources: [ExportSource.DETECTED],
     },
     RAW: {
       label: 'RAW',
-      hint: 'Export the raw JSON responses from the SCANOSS Platform',
+      hint: t('Tooltip:ExportHintRAW'),
       sources: [ExportSource.DETECTED],
     },
     CSV: {
       label: 'CSV',
-      hint: 'Export Comma Separate Value report',
+      hint: t('Tooltip:ExportHintCSV'),
       sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
     },
     SPDXLITEJSON: {
       label: 'SPDX Lite',
-      hint: 'Export an SPDX compliant SBOM report',
+      hint: t('Tooltip:ExportHintSPDXLite'),
       sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
     },
     HTMLSUMMARY: {
       label: 'HTML Summary',
-      hint: 'Export a HTML summary of the Identification report',
+      hint: t('Tooltip:ExportHintHTML'),
       sources: [ExportSource.IDENTIFIED],
     },
   };
@@ -126,7 +129,7 @@ const Export = ({ empty }) => {
             color="primary"
             disabled
           >
-            Export
+            {t('Button:Export')}
           </Button>
         ))}
 
@@ -140,7 +143,7 @@ const Export = ({ empty }) => {
           onClick={() => onExport(AppConfig.FF_EXPORT_FORMAT_OPTIONS[0] as ExportFormat)}
           disabled={!exportLabels[AppConfig.FF_EXPORT_FORMAT_OPTIONS[0]].sources.includes(source)}
         >
-          Export {exportLabels[AppConfig.FF_EXPORT_FORMAT_OPTIONS[0]].label}
+          {t('Button:ExportWithLabel', { label: exportLabels[AppConfig.FF_EXPORT_FORMAT_OPTIONS[0]].label})}
         </Button>
       )}
 
@@ -155,7 +158,7 @@ const Export = ({ empty }) => {
             color="primary"
             onClick={onExportClicked}
           >
-            Export
+            {t('Button:Export')}
           </Button>
           <Menu anchorEl={anchorEl} keepMounted open={open} onClose={handleClose} TransitionComponent={Fade}>
             {AppConfig.FF_EXPORT_FORMAT_OPTIONS.map(

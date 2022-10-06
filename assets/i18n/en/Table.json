@@ -1,0 +1,22 @@
+{
+  "Header": {
+    "Name": "Name",
+    "Date": "Date",
+    "TotalFiles": "Total Files",
+    "Component": "Component",
+    "Severity": "Severity",
+    "CVE": "CVE",
+    "Source": "Source",
+    "Published": "Published",
+    "Modified": "Modified",
+    "Vendor": "Vendor",
+    "Version": "Version",
+    "License": "License",
+    "Copyleft": "Copyleft",
+    "IncompatibleLicenses": "Incompatible Licenses",
+    "PURL": "PURL",
+    "URL": "URL"
+  },
+  "Version": "Version",
+  "License": "License"
+}

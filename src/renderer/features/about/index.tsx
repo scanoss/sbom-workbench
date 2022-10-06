@@ -3,10 +3,12 @@ import React, { useEffect, useState } from 'react';
 import AppConfig from '@config/AppConfigModule';
 import icon from '@assets/icon.png';
 import { IAppInfo } from '@api/dto';
+import { useTranslation } from 'react-i18next';
 import LicensesText from './LicensesText';
 
 const AboutModule = () => {
   const [appInfo, setAppInfo] = useState<IAppInfo>(null);
+  const { t } = useTranslation();
 
   const onInit = async (): Promise<void> => {
     const info = await window.app.getInfo();
@@ -102,7 +104,7 @@ const AboutModule = () => {
           type="button"
           onClick={close}
         >
-          OK
+          {t('Button:OK')}
         </button>
       </footer>
     </div>

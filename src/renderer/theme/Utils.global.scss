@@ -55,7 +55,7 @@
   $i: 0;
   @while $i <= $max {
     #{$className + $i} {
-      #{$styleName}: #{$i*$offset}px !important;
+      #{$styleName}: #{$i * $offset}px !important;
     }
     $i: $i + 1;
   }
@@ -104,4 +104,8 @@
 
 .border-bottom {
   border-bottom: 1px solid rgba(224, 224, 224, 1);
+}
+
+.text-uppercase {
+  text-transform: uppercase;
 }

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js';
+import { useTranslation } from 'react-i18next';
 
 const OssVsOriginalProgressBar = ({ data }) => {
+  const { t } = useTranslation();
   const chartRef = React.createRef<any>();
   const [matchedFiles, setMatchedFiles] = useState<number>(0);
   const totalFiles = data.pending + data.summary.noMatchFiles + data.identified.total + data.original;
@@ -18,21 +20,21 @@ const OssVsOriginalProgressBar = ({ data }) => {
         labels: [``],
         datasets: [
           {
-            label: 'OSS',
+            label: t('Title:OSS'),
             data: [data.identified.total],
             borderWidth: 0,
             backgroundColor: ['#22C55E'],
             barThickness: 34,
           },
           {
-            label: 'Pending',
+            label: t('Title:Pending'),
             data: [data.pending],
             borderWidth: 0,
             backgroundColor: ['#F97316'],
             barThickness: 34,
           },
           {
-            label: 'Original',
+            label: t('Title:Original'),
             data: [originalFiles],
             borderWidth: 0,
             backgroundColor: ['#A1A1AA'],
@@ -95,7 +97,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
     <div id="OssProgress">
       <div className="identification-canvas-container">
         {Number.isNaN(matchedFiles) ? (
-          <span className="label-not-found">No matches found</span>
+          <span className="label-not-found">{t('Title:NoMatchesFound')}</span>
         ) : (
           <>
             <span className="label">{Math.floor(percentage)}%</span>
@@ -106,9 +108,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
         )}
       </div>
       <div className="total-files-container">
-        <span className="total-files-label">
-          <strong>{totalFiles}</strong> total files
-        </span>
+        <span className="total-files-label">{t('NTotalFiles', { count: totalFiles})}</span>
       </div>
     </div>
   );

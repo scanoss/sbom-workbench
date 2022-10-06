@@ -19,6 +19,7 @@ import { projectService } from '@api/services/project.service';
 import AppConfig from '@config/AppConfigModule';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import {ComponentResultDTO, SearchComponentDTO} from "@api/dto";
+import { Trans, useTranslation } from 'react-i18next';
 import IconComponent from '../../features/workbench/components/IconComponent/IconComponent';
 import {IComponentResult} from "../../../main/task/componentCatalog/iComponentCatalog/IComponentResult";
 
@@ -31,6 +32,8 @@ interface ComponentSearcherDialogProps {
 
 const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
   const dispatch = useDispatch<AppDispatch>();
+  const { t } = useTranslation();
+
   const { open, query, onClose, onCancel } = props;
   const { data, error, loading, execute } = useApi<ComponentResultDTO[]>();
   const dialogCtrl = useContext<any>(DialogContext);
@@ -80,13 +83,12 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
 
   const handleClose = async (e) => {
     e.preventDefault();
-    console.log(componentSelected?.purl);
 
-    const dialog = await dialogCtrl.createProgressDialog('IMPORTING COMPONENT');
+    const dialog = await dialogCtrl.createProgressDialog(t('ImportingComponent'));
     try {
       const dialogResponse = await dialogCtrl.openConfirmDialog(
-        `<h3 class='mt-0 mb-0'>Import Component</h3><p>Do you want to add <b>${componentSelected.component}</b> to your catalog?</p>`,
-        { label: 'Add to catalog', role: 'accept' },
+        `<p class='mt-0 mb-0'>${t('Dialog:AddComponentToCatalog', {component: componentSelected.component, interpolation: {escapeValue: false}})}</p>`,
+        { label: t('Button:AddToTheCatalog'), role: 'accept' },
         false
       );
       if (dialogResponse.action === DIALOG_ACTIONS.OK) {
@@ -97,7 +99,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
       }
     } catch (error: any) {
       dialog.dismiss();
-      await dialogCtrl.openConfirmDialog(error.message, { label: 'Accept', role: 'accept' }, true);
+      await dialogCtrl.openConfirmDialog(error.message, { label: t('Button:Accept'), role: 'accept' }, true);
       console.log('error', error);
     }
   };
@@ -114,9 +116,9 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
       <>
         {loading ? (
           <>
-            <CircularProgress size={18} className="mr-2" /> Searching...
+            <CircularProgress size={18} className="mr-2" /> {t('SearchingDots')}
           </>
-        ) : results === null ? '' : 'No results found'}
+        ) : results === null ? '' : t('NoResultsFound')}
       </>
     );
   };
@@ -141,7 +143,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
       onClose={onCancel}
     >
       <header className="dialog-title">
-        <span>Online Component Search</span>
+        <span>{t('Title:OnlineComponentSearch')}</span>
         <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
           <CloseIcon />
         </IconButton>
@@ -151,10 +153,15 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
         <form onSubmit={handleSearch} className="mb-3">
           {disabled && (
             <Alert icon={<WarningAmberOutlinedIcon fontSize="inherit" />} severity="error" className="alert">
-              You need to provide an API key in the settings to search components online.{' '}
-              <Link color="inherit" href={`${AppConfig.SCANOSS_WEBSITE_URL}/pricing`} target="_blank" rel="noreferrer">
-                Get yours now.
-              </Link>
+              <Trans i18nKey="NeedApiKeyComponents" components={{
+                1: <Link
+                    color="inherit"
+                    href={`${AppConfig.SCANOSS_WEBSITE_URL}/pricing`}
+                    target="_blank"
+                    rel="noreferrer"
+                  />
+                }}
+               />
             </Alert>
           )}
 
@@ -162,7 +169,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
             {!advancedSearch ? (
               <div className="dialog-form-field">
                 <div className="dialog-form-field-label">
-                  <label>Search</label>
+                  <label>{t('Search')}</label>
                 </div>
                 <Paper className="dialog-form-field-control w-100 mr-4">
                   <TextField
@@ -180,7 +187,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
               <>
                 <div className="dialog-form-field">
                   <div className="dialog-form-field-label">
-                    <label>Name</label>
+                    <label>{t('Title:Name')}</label>
                   </div>
                   <Paper className="dialog-form-field-control w-100 mr-4">
                     <TextField
@@ -195,7 +202,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                 </div>
                 <div className="dialog-form-field">
                   <div className="dialog-form-field-label">
-                    <label>Vendor</label>
+                    <label>{t('Title:Vendor')}</label>
                   </div>
                   <Paper>
                     <TextField
@@ -212,7 +219,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
             )}
             <div className="dialog-form-field package">
               <div className="dialog-form-field-label">
-                <label>Package</label>
+                <label>{t('Title:Package')}</label>
               </div>
               <Paper className="dialog-form-field-control">
                 <Autocomplete
@@ -251,7 +258,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
               size="small"
               onClick={() => setAdvancedSearch(!advancedSearch)}
             >
-              {advancedSearch ? 'Standard search' : 'Advanced search'}
+              {advancedSearch ? t('Button:StandarSearch') : t('Button:AdvancedSearch')}
             </Button>
           </div>
         </form>
@@ -262,6 +269,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
           columns={[
             {
               field: 'component',
+              headerName: t('Table:Header:Component'),
               width: 170,
               sortable: false,
               renderCell: ({ row }) => (
@@ -271,9 +279,10 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                 </div>
               ),
             },
-            { field: 'purl', flex: 1, sortable: false },
+            { field: 'purl', headerName: t('Table:Header:PURL'), flex: 1, sortable: false },
             {
               field: 'url',
+              headerName: t('Table:Header:URL'),
               flex: 1,
               sortable: false,
               renderCell: ({ row }) =>
@@ -306,10 +315,10 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
       <form onSubmit={handleClose}>
         <DialogActions>
           <Button tabIndex={-1} onClick={onCancel} color="inherit">
-            Cancel
+           {t('Button:Cancel')}
           </Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!componentSelected}>
-            Add to the catalog
+          {t('Button:AddToTheCatalog')}
           </Button>
         </DialogActions>
       </form>

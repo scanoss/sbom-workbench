@@ -35,7 +35,6 @@
 @import './features/workbench/pages/detected/pages/ComponentDetail/ComponentDetail';
 @import './features/workbench/pages/identified/pages/InventoryDetail/InventoryDetail.scss';
 @import './features/workbench/components/AppBar/AppBar';
-@import './features/workbench/components/CodeEditor/CodeEditor';
 @import './features/workbench/components/FileTree/FileTree';
 @import './features/workbench/components/ComponentCard/ComponentCard';
 @import './features/workbench/components/IconComponent/IconComponent';
@@ -53,7 +52,6 @@
 @import './features/workbench/pages/detected/pages/Dependency/components/DependencyTree/DependencyTree';
 @import './ui/dialog/PreLoadInventoryDialog';
 @import './ui/dialog/ComponentSearcherDialog';
-@import './components/NotificationCenter/NotificationCenter';
 @import './features/workbench/components/WorkbenchFilters/WorkbenchFilters';
 @import './features/workbench/pages/report/pages/vulnerabilities/VulnerabilitiesReport';
 

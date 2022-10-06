@@ -1,7 +1,8 @@
+import React from 'react';
 import { Button } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import React from 'react';
-import usePagination from '../../../../../../../hooks/usePagination';
+import { useTranslation } from 'react-i18next';
+import usePagination from '@hooks/usePagination';
 import MatchCard, { MATCH_CARD_ACTIONS } from '../../../../../components/MatchCard/MatchCard';
 
 export interface FileListProps {
@@ -12,6 +13,7 @@ export interface FileListProps {
 }
 
 export const FileList = ({ files, filter, emptyMessage, onAction }: FileListProps) => {
+  const { t } = useTranslation();
   const { limit, paginate } = usePagination(250);
 
   const filteredFiles = files.filter((file) => !filter || file.status === filter);
@@ -40,8 +42,8 @@ export const FileList = ({ files, filter, emptyMessage, onAction }: FileListProp
           className="mt-3 mb-1"
           severity="info"
           action={
-            <Button color="inherit" size="small" onClick={paginate}>
-              SHOW MORE
+            <Button className="text-uppercase" color="inherit" size="small" onClick={paginate}>
+              {t('Button:ShowMore')}
             </Button>
           }
         >
@@ -53,5 +55,7 @@ export const FileList = ({ files, filter, emptyMessage, onAction }: FileListProp
     </>
   );
 };
+
+FileList.defaultProps = { emptyMessage: null, filter: null }
 
 export default FileList;

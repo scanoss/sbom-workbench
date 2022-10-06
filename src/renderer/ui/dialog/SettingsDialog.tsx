@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Dialog, DialogActions, IconButton, InputBase, Paper, Tooltip } from '@mui/material';
+import { Button, Dialog, DialogActions, IconButton, InputBase, MenuItem, Paper, Select, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import TextField from '@mui/material/TextField';
 import AddIcon from '@mui/icons-material/Add';
@@ -10,6 +10,7 @@ import { IWorkspaceCfg } from '@api/types';
 import { userSettingService } from '@api/services/userSetting.service';
 import AppConfig from '@config/AppConfigModule';
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from 'react-i18next';
 
 const filter = createFilterOptions();
 
@@ -43,6 +44,8 @@ interface NewEndpointDialogProps {
 }
 
 const NewEndpointDialog = (props: NewEndpointDialogProps) => {
+  const { t } = useTranslation();
+
   const { open, onClose, onCancel, defaultData } = props;
 
   const initial = {
@@ -89,7 +92,7 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
           </div>
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">
-              API KEY <span className="optional">- Optional</span>
+              API KEY <span className="optional">- {t('Optional')}</span>
             </label>
             <Paper className="dialog-form-field-control">
               <TextField
@@ -104,10 +107,10 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
         </div>
         <DialogActions>
           <Button color="inherit" tabIndex={-1} onClick={onCancel}>
-            Cancel
+            {t('Button:Cancel')}
           </Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
-            Add
+            {t('Button:Add')}
           </Button>
         </DialogActions>
       </form>
@@ -122,9 +125,12 @@ interface SettingDialogProps {
 }
 
 const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
+  const { t, i18n } = useTranslation()
+
   const [selectedApi, setSelectedApi] = useState(null);
   const [apis, setApis] = useState([]);
   const [sbomLedgerToken, setSbomLedgerToken] = useState(null);
+  const [language, setLanguage] = useState<string>('en');
   const [apiDialog, setApiDialog] = useState({
     open: false,
     data: null,
@@ -137,6 +143,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
       DEFAULT_API_INDEX: selectedApi ? apis.findIndex((api) => api === selectedApi) : -1,
       APIS: apis,
       TOKEN: sbomLedgerToken || null,
+      LNG: language || 'en',
     };
 
     await userSettingService.set(config);
@@ -144,7 +151,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
   };
 
   const setDefault = (config: Partial<IWorkspaceCfg>) => {
-    const { DEFAULT_API_INDEX, APIS, TOKEN } = config;
+    const { DEFAULT_API_INDEX, APIS, TOKEN, LNG } = config;
 
     const urlsDefault = APIS || [];
     const selectedUrlDefault = APIS && APIS[DEFAULT_API_INDEX] ? APIS[DEFAULT_API_INDEX] : null;
@@ -152,6 +159,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
     setSbomLedgerToken(TOKEN);
     setApis(urlsDefault);
     setSelectedApi(selectedUrlDefault);
+    setLanguage(LNG);
   };
 
   const fetchConfig = async () => {
@@ -216,7 +224,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
         onClose={onCancel}
       >
         <header className="dialog-title">
-          <span>Settings</span>
+          <span>{t('Title:Settings')}</span>
           <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
             <CloseIcon />
           </IconButton>
@@ -228,13 +236,13 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
               <>
                 <div className="dialog-form-field">
                   <label className="dialog-form-field-label">
-                    <b>API Connections</b>
+                    <b>{t('Title:APIConnections')}</b>
                   </label>
                 </div>
                 <div className="dialog-form-field">
                   <div className="dialog-form-field-label">
-                    <label>Knowledgebase API</label>
-                    <Tooltip title="Add new endpoint" onClick={onNewEndpointHandler}>
+                    <label>{t('Title:KnowledgebaseAPI')}</label>
+                    <Tooltip title={t('Tooltip:AddNewEndpoint')} onClick={onNewEndpointHandler}>
                       <IconButton tabIndex={-1} color="inherit" size="small">
                         <AddIcon fontSize="inherit" />
                       </IconButton>
@@ -267,7 +275,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                           filtered.push({
                             inputValue,
                             new: true,
-                            URL: `Click or enter to add "${inputValue}"`,
+                            URL: t('ClickOrEnterToAddValue', { value: inputValue }),
                           });
                         }
 
@@ -325,9 +333,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                     />
                   </Paper>
                   <p className="dialog-form-field-hint">
-                    This value is optional for dedicated SCANOSS server instances. When this value is empty, scans will
-                    be launched against our free of charge public service. If you are interested in a dedicated instance
-                    with guaranteed availability and throughput please contact us at sales@scanoss.com.
+                    {t('SettingsApiKeyHint')}
                   </p>
                 </div>
               </>
@@ -336,7 +342,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
               className={AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS ? 'dialog-form-field mt-7' : 'dialog-form-field'}
             >
               <label className="dialog-form-field-label">
-                SBOM Ledger Token <span className="optional">- Optional</span>
+                {t('Title:SBOMLedgerToken')} <span className="optional">- {t('Optional')}</span>
               </label>
               <Paper className="dialog-form-field-control">
                 <TextField
@@ -347,13 +353,31 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                 />
               </Paper>
             </div>
+            <div className="dialog-form-field">
+              <label className="dialog-form-field-label">
+                <b>Language</b>
+              </label>
+              <Paper className="dialog-form-field-control">
+                <Select
+                  name="usage"
+                  size="small"
+                  fullWidth
+                  disableUnderline
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as string)}
+                >
+                  <MenuItem value="en">English</MenuItem>
+                  <MenuItem value="es">Español</MenuItem>
+                </Select>
+              </Paper>
+            </div>
           </div>
           <DialogActions>
             <Button tabIndex={-1} color="inherit" onClick={onCancel}>
-              Cancel
+              {t('Button:Cancel')}
             </Button>
             <Button type="submit" variant="contained" color="secondary">
-              Save
+              {t('Button:Save')}
             </Button>
           </DialogActions>
         </form>

@@ -11,7 +11,7 @@
 import path from 'path';
 import * as os from 'os';
 
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import AppConfig from '../config/AppConfigModule';
@@ -20,6 +20,7 @@ import { resolveHtmlPath } from './util';
 import { workspace } from './workspace/Workspace';
 import { userSettingService } from './services/UserSettingService';
 import { WorkspaceMigration } from './migration/WorkspaceMigration';
+import { AppI18n } from '../shared/i18n';
 
 // handlers
 import '../api/handlers/inventory.handler';
@@ -36,6 +37,8 @@ import '../api/handlers/userSetting.handler';
 import '../api/handlers/app.handler';
 import '../api/handlers/search.handler';
 import '../api/handlers/vulnerability.handler';
+
+
 
 import { broadcastManager } from './broadcastManager/BroadcastManager';
 
@@ -119,6 +122,34 @@ const createWindow = async () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+
+  // TODO: remove from here
+  const root = `${os.homedir()}/${AppConfig.DEFAULT_WORKSPACE_NAME}`;
+  await workspace.read(root);
+  await userSettingService.read(root);
+  await userSettingService.update();
+
+  AppI18n.setLng(userSettingService.get().LNG);
+  AppI18n.init();
+
+  AppI18n.getI18n().on('languageChanged', async (e) => {
+    console.log('languageChanged', e);
+    const { response } = await dialog.showMessageBox(
+      BrowserWindow.getFocusedWindow(),
+      {
+        buttons: ["Restart later", "Restart now"],
+        message: "Yo need restart the application to change the language. Do you?"
+       },
+      );
+
+    if (response === 1) {
+      app.relaunch()
+      app.exit();
+    }
+
+  });
+
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();

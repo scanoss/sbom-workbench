@@ -16,6 +16,7 @@ import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import * as FileUtils from '@shared/utils/file-utils';
 import * as SearchUtils from '@shared/utils/search-utils';
 import useSearchParams from '@hooks/useSearchParams';
+import { useTranslation } from 'react-i18next';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
 import FileToolbar, { ToolbarActions } from '../../../../components/FileToolbar/FileToolbar';
@@ -31,9 +32,11 @@ export interface FileContent {
   error: boolean;
 }
 
-export const Editor = () => {
+const Editor = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
+
   const highlightParam = useSearchParams().get('highlight');
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
@@ -266,14 +269,14 @@ export const Editor = () => {
             <div className="info-files">
               <FileToolbar
                 id={CodeViewerManager.LEFT}
-                label="Source File"
+                label={t('Title:SourceFile')}
                 fullpath={`${scanBasePath}${file}`}
                 file={file}
               />
               {matchInfo && currentMatch && currentMatch.file ? (
                 <FileToolbar
                   id={isDiffView ? CodeViewerManager.RIGHT : CodeViewerManager.LEFT}
-                  label="Component File"
+                  label={t('Title:ComponentFile')}
                   fullpath={FileUtils.getFileURL(currentMatch)}
                   file={currentMatch.file}
                   actions={
@@ -308,13 +311,13 @@ export const Editor = () => {
               value={
                 localFileContent?.content ||
                 remoteFileContent?.content ||
-                (imported ? "// This project was imported. Source file can't be displayed." : '')
+                (imported ? t('ProjectImportedCantDisplay') : '')
               }
               highlight={currentMatch?.lines || null}
               highlights={highlight || null}
             />
           ) : (
-            <div className="file-loader">Loading local file</div>
+            <div className="file-loader">{t('LoadingLocalFile')}</div>
           )}
         </div>
 
@@ -329,7 +332,7 @@ export const Editor = () => {
                 highlights={highlight || null}
               />
             ) : (
-              <div className="file-loader">Loading remote file</div>
+              <div className="file-loader">{t('LoadingRemoteFile')}</div>
             )}
           </div>
         )}

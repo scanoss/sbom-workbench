@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Chart } from 'chart.js';
 import { Button, Tooltip } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { exportService } from '../../../../../../api/services/export.service';
-import { HashType } from '../../../../../../api/types';
-import { projectService } from '../../../../../../api/services/project.service';
+import { useTranslation } from 'react-i18next';
+import { Chart } from 'chart.js';
+
+import { projectService } from '@api/services/project.service';
+import { exportService } from '@api/services/export.service';
+import { HashType } from '@api/types';
 
 const LicensesChart = ({ data }) => {
   const chartRef = React.createRef<any>();
+  const { t } = useTranslation();
+
   const [percentage, setPercentage] = useState<number>(0);
   const [token, setToken] = useState<string>('');
 
@@ -32,14 +36,14 @@ const LicensesChart = ({ data }) => {
         labels: [``],
         datasets: [
           {
-            label: 'Identified',
+            label: t('Title:Identified'),
             data: [data?.identified.scan + data?.original],
             borderWidth: 0,
             backgroundColor: ['#22C55E'],
             barThickness: 34,
           },
           {
-            label: 'Pending',
+            label: t('Title:Pending'),
             data: [data.pending],
             borderWidth: 0,
             backgroundColor: ['#F97316'],
@@ -91,7 +95,7 @@ const LicensesChart = ({ data }) => {
     <div id="IdentificationProgress">
       <div className="identification-canvas-container">
         {Number.isNaN(percentage) ? (
-          <span className="label-not-found">No matches found</span>
+          <span className="label-not-found">{t('Title:NoMatchesFound')}</span>
         ) : (
           <>
             <span className="label">{percentage}%</span>
@@ -103,13 +107,13 @@ const LicensesChart = ({ data }) => {
       </div>
       <div className="total-files-container">
         <span className="total-files-label">
-          <strong>{data.summary.matchFiles}</strong> detected files
+          {t('NDetectedFiles', { count: data.summary.matchFiles })}
         </span>
       </div>
       <div className={token ? 'notarize-container' : 'hide'}>
         {percentage < 100 || !token.length ? (
           <>
-            <Tooltip title="Identification progress is not 100% or your token is not defined">
+            <Tooltip title={t('Tooltip:IdentificationProgressIsNot100')}>
               <span>
                 <Button
                   disabled
@@ -119,7 +123,7 @@ const LicensesChart = ({ data }) => {
                   type="button"
                   onClick={notarizeSBOM}
                 >
-                  Post to SBOM ledger
+                 {t('Button:PostToSbomLedger')}
                 </Button>
               </span>
             </Tooltip>
@@ -132,7 +136,7 @@ const LicensesChart = ({ data }) => {
             type="button"
             onClick={notarizeSBOM}
           >
-            Post to SBOM ledger
+            {t('Button:PostToSbomLedger')}
           </Button>
         )}
       </div>

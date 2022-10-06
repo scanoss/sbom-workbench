@@ -4,28 +4,30 @@ import { executeBatch } from '@store/inventory-store/inventoryThunks';
 import { InventoryAction, InventorySourceType } from '@api/types';
 import { useDispatch } from 'react-redux';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import { useTranslation } from 'react-i18next';
 
 const useBatch = () => {
   const dispatch = useDispatch();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
+  const { t } = useTranslation();
 
   const showOverwrite = (data: any[]) => data.some((e) => e.status === 'identified' || e.status === 'ignored');
 
   const showOverwriteDialog = async (): Promise<DialogResponse> => {
     return dialogCtrl.openAlertDialog(
-      'You have already worked with some of these files. Do you want to overwrite or keep them?',
+      t('Dialog:YouHaveAlreadyWorkQuestion'),
       [
-        { label: 'CANCEL', action: 'cancel', role: 'cancel', class: 'mr-auto' },
-        { label: 'KEEP', action: 'keep', role: 'action' },
-        { label: 'OVERWRITE', action: 'overwrite', role: 'action' },
+        { label: t('Button:Cancel'), action: 'cancel', role: 'cancel', class: 'mr-auto' },
+        { label: t('Button:Keep'), action: 'keep', role: 'action' },
+        { label: t('Button:Overwrite'), action: 'overwrite', role: 'action' },
       ]
     );
   };
 
   const showConfirmDialog = async (): Promise<DialogResponse> => {
-    return dialogCtrl.openAlertDialog('This action will be executed on all selected files. Are you sure?', [
-      { label: 'Cancel', action: 'cancel', role: 'cancel' },
-      { label: 'Yes', role: 'success' },
+    return dialogCtrl.openAlertDialog(t('Dialog:ActionWillBeExecutedOnAllSelectedQuestion'), [
+      { label: t('Button:Cancel'), action: 'cancel', role: 'cancel' },
+      { label: t('Button:Yes'), role: 'success' },
     ]);
   };
 

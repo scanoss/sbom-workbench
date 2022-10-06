@@ -13,6 +13,7 @@ import { componentService } from '@api/services/component.service';
 import { licenseService } from '@api/services/license.service';
 import { DialogContext } from '@context/DialogProvider';
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -37,6 +38,8 @@ interface ComponentDialogProps {
 
 export const ComponentDialog = (props: ComponentDialogProps) => {
   const classes = useStyles();
+  const { t } = useTranslation();
+
   const { open, onClose, onCancel, component, label } = props;
   const [form, setForm] = useState<
     Partial<{
@@ -95,7 +98,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
       onClose({ action: DIALOG_ACTIONS.OK, data: { component: response, created: dto } });
     } catch (error: any) {
       console.log('error', error);
-      await dialogCtrl.openConfirmDialog(error.message, { label: 'Accept', role: 'accept' }, true);
+      await dialogCtrl.openConfirmDialog(error.message, { label: t('Button:Accept'), role: 'accept' }, true);
     }
   };
 
@@ -133,7 +136,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
         <div className="dialog-content">
           <div className={`dialog-row ${classes.componentVersion} `}>
             <div className="dialog-form-field">
-              <label className="dialog-form-field-label">Component</label>
+              <label className="dialog-form-field-label">{t('Title:Component')}</label>
               <Paper className="dialog-form-field-control">
                 <TextField
                   name="name"
@@ -149,7 +152,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
             </div>
 
             <div className="dialog-form-field">
-              <label className="dialog-form-field-label">Version</label>
+              <label className="dialog-form-field-label">{t('Title:Version')}</label>
               <Paper className="dialog-form-field-control">
                 <TextField
                   name="version"
@@ -165,8 +168,8 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
 
           <div className="dialog-form-field">
             <div className="dialog-form-field-label">
-              <label>License</label>
-              <Tooltip title="Add new license">
+              <label>{t('Title:License')}</label>
+              <Tooltip title={t('Tooltip:AddNewLicense')}>
                 <IconButton tabIndex={-1} color="inherit" size="small" onClick={openLicenseDialog}>
                   <AddIcon fontSize="inherit" />
                 </IconButton>
@@ -202,7 +205,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
           {!readOnly && (
             <>
               <div className="dialog-form-field">
-                <label className="dialog-form-field-label">PURL</label>
+                <label className="dialog-form-field-label">{t('Title:PURL')}</label>
                 <Paper className="dialog-form-field-control">
                   <TextField
                     name="purl"
@@ -217,7 +220,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
 
               <div className="dialog-form-field">
                 <label className="dialog-form-field-label">
-                  URL <span className="optional">- Optional</span>
+                  {t('Title:URL')} <span className="optional">- {t('Optional')}</span>
                 </label>
                 <Paper className="dialog-form-field-control">
                   <TextField
@@ -234,9 +237,9 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
         </div>
 
         <DialogActions>
-          <Button tabIndex={-1} color="inherit" onClick={onCancel}>Cancel</Button>
+          <Button tabIndex={-1} color="inherit" onClick={onCancel}>{t('Button:Cancel')}</Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
-            Create
+            {t('Button:Create')}
           </Button>
         </DialogActions>
       </form>

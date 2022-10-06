@@ -10,6 +10,8 @@ import AppProvider from '@context/AppProvider';
 import store from '@store/store';
 import { createTheme, ThemeProvider, StyledEngineProvider, Theme } from '@mui/material/styles';
 
+import { AppI18n } from '@shared/i18n';
+import { userSettingService } from '@api/services/userSetting.service';
 import WorkbenchModule from './features/workbench';
 import WorkspaceModule from './features/workspace';
 import AboutModule from './features/about';
@@ -28,30 +30,37 @@ export default class App {
    * @returns {JSX.Element}
    */
   public async setup(): Promise<void | Element | React.Component> {
+    const { LNG } = await userSettingService.get();
+
+    AppI18n.setLng(LNG);
+    AppI18n.init();
+
     this.setTitle();
     const theme = this.loadTheme();
 
     const app = (
-      <StyledEngineProvider injectFirst>
-        <ThemeProvider theme={theme}>
-          <HashRouter>
-            <Provider store={store}>
-              <DialogProvider>
-                <AppProvider>
-                  <WorkbenchProvider>
-                    <Routes>
-                      <Route index element={<WorkspaceModule />} />
-                      <Route path="/workspace/*" element={<WorkspaceModule />} />
-                      <Route path="/workbench/*" element={<WorkbenchModule />} />
-                      <Route path="/about" element={<AboutModule />} />
-                    </Routes>
-                  </WorkbenchProvider>
-                </AppProvider>
-              </DialogProvider>
-            </Provider>
-          </HashRouter>
-        </ThemeProvider>
-      </StyledEngineProvider>
+        <StyledEngineProvider injectFirst>
+          <ThemeProvider theme={theme}>
+            <HashRouter>
+              <Provider store={store}>
+                <DialogProvider>
+                  <AppProvider>
+                    <WorkbenchProvider>
+                    <React.Suspense fallback="">
+                        <Routes>
+                          <Route index element={<WorkspaceModule />} />
+                          <Route path="/workspace/*" element={<WorkspaceModule />} />
+                          <Route path="/workbench/*" element={<WorkbenchModule />} />
+                          <Route path="/about" element={<AboutModule />} />
+                        </Routes>
+                      </React.Suspense>
+                    </WorkbenchProvider>
+                  </AppProvider>
+                </DialogProvider>
+              </Provider>
+            </HashRouter>
+          </ThemeProvider>
+        </StyledEngineProvider>
     );
 
     this.setupAppMenuListeners();

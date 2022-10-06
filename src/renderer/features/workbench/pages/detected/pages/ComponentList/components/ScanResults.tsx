@@ -1,16 +1,20 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useState, useEffect } from 'react';
-import ClearIcon from '@mui/icons-material/Clear';
 import { Button, Card, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { report } from '@api/services/report.service';
 import MatchesChart from '../../../../report/components/MatchesChart';
 import VulnerabilitiesCard from '../../../../report/components/VulnerabilitiesCard';
 import LicensesChart from '../../../../report/components/LicensesChart';
 import LicensesTable from '../../../../report/components/LicensesTable';
-import { report } from '../../../../../api/services/report.service';
 
 const ScanResults = ({ name }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const [licenses, setLicenses] = useState<any[]>([]);
   const [vulnerabilites, setVulnerabilites] = useState<any[]>([]);
   const [progress, setProgress] = useState<any>(null);
@@ -28,7 +32,7 @@ const ScanResults = ({ name }) => {
     localStorage.setItem(name, !displayed);
   };
 
-  useEffect(init, []);
+  useEffect(() => { init() }, []);
   return (
     <div>
       {displayed ? (
@@ -38,7 +42,7 @@ const ScanResults = ({ name }) => {
               <h1 className="header-title">Scan Results</h1>
             </div>
             <Button variant="outlined" color="primary" onClick={() => navigate('/report')}>
-              More details
+             {t('Button:MoreDetails')}
             </Button>
           </header>
           <div className="div-charts-home">

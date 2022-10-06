@@ -1,17 +1,14 @@
 import {
   Button,
   Divider,
-  Fade,
   IconButton,
   LinearProgress,
-  Menu,
-  MenuItem,
   Toolbar,
   Tooltip,
   Typography,
 } from '@mui/material';
 
-import React, { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import InsertChartOutlinedTwoToneIcon from '@mui/icons-material/InsertChartOutlinedTwoTone';
@@ -24,15 +21,9 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
-import GetAppIcon from '@mui/icons-material/GetApp';
 import { useSelector } from 'react-redux';
-import { exportService } from '@api/services/export.service';
-import { ExportFormat, ExportSource, IProject } from '@api/types';
-import { workspaceService } from '@api/services/workspace.service';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
-import { DialogContext, IDialogContext } from '@context/DialogProvider';
-import { dialogController } from '../../../../controllers/dialog-controller';
-import AppConfig from '../../../../../config/AppConfigModule';
+import { useTranslation } from 'react-i18next';
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -50,6 +41,8 @@ const Navigation = () => {
 };
 
 const AppMenu = () => {
+  const { t } = useTranslation();
+
   return (
     <section id="AppMenu">
       <NavLink
@@ -57,7 +50,7 @@ const AppMenu = () => {
         className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
         tabIndex={-1}
       >
-        <Tooltip title="Detected components" enterDelay={650}>
+        <Tooltip title={t('Tooltip:DetectedComponents')} enterDelay={650}>
           <Button color="inherit">
             <GavelIcon />
           </Button>
@@ -68,7 +61,7 @@ const AppMenu = () => {
         className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
         tabIndex={-1}
       >
-        <Tooltip title="Search keywords" enterDelay={650}>
+        <Tooltip title={t('Tooltip:SearchKeywords')} enterDelay={650}>
           <Button color="inherit">
             <SearchIcon />
           </Button>
@@ -79,7 +72,7 @@ const AppMenu = () => {
         className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
         tabIndex={-1}
       >
-        <Tooltip title="Identified components" enterDelay={650}>
+        <Tooltip title={t('Tooltip:IdentifiedComponents')} enterDelay={650}>
           <Button color="inherit">
             <CheckCircleOutlineOutlinedIcon />
           </Button>
@@ -90,7 +83,7 @@ const AppMenu = () => {
         className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
         tabIndex={-1}
       >
-        <Tooltip title="Reports" enterDelay={650}>
+        <Tooltip title={t('Tooltip:Reports')} enterDelay={650}>
           <Button color="inherit">
             <InsertChartOutlinedTwoToneIcon />
           </Button>
@@ -101,6 +94,8 @@ const AppMenu = () => {
 };
 
 const AppProgress = ({ summary, progress }) => {
+  const { t } = useTranslation();
+
   return (
     <section id="AppProgress">
       <Tooltip
@@ -109,7 +104,7 @@ const AppProgress = ({ summary, progress }) => {
           <div id="ProgressTooltip">
             <header>
               <Typography className="title d-flex space-between">
-                <span>Detected files</span>
+                <span>{t('Tooltip:DetectedFiles')}</span>
                 <span>{summary?.summary.matchFiles}</span>
               </Typography>
               <hr />
@@ -118,17 +113,17 @@ const AppProgress = ({ summary, progress }) => {
             <section className="d-flex space-between mt-1">
               <div className="mr-4">
                 <Typography className="has-status-bullet pending">{summary?.pending}</Typography>
-                <p className="m-0">PENDING</p>
+                <p className="m-0 text-uppercase">{t('Title:Pending')}</p>
               </div>
 
               <div className="mr-3">
                 <Typography className="has-status-bullet identified">{summary?.identified.scan}</Typography>
-                <p className="m-0">IDENTIFIED</p>
+                <p className="m-0 text-uppercase">{t('Title:Identified')}</p>
               </div>
 
               <div>
                 <Typography className="has-status-bullet ignored">{summary?.original}</Typography>
-                <p className="m-0">ORIGINAL</p>
+                <p className="m-0 text-uppercase">{t('Title:Originals')}</p>
               </div>
             </section>
           </div>
@@ -146,15 +141,16 @@ const AppProgress = ({ summary, progress }) => {
 const AppTitle = ({ title }) => {
   const curLoc = useLocation();
   const [section, setSection] = useState('');
+  const { t } = useTranslation();
 
   const max = 15;
 
   // FIXME: create app.routes.ts and set data for each route
   const routes = [
-    { path: '/workbench/detected/file', title: 'Matches' },
-    { path: '/workbench/detected', title: 'Detected components' },
-    { path: '/workbench/identified', title: 'Identified components' },
-    { path: '/workbench/report', title: 'Reports' },
+    { path: '/workbench/detected/file', title: t('Title:Matches') },
+    { path: '/workbench/detected', title: t('Title:DetectedComponents') },
+    { path: '/workbench/identified', title: t('Title:IdentifiedComponents') },
+    { path: '/workbench/report', title: t('Title:Reports') },
   ];
 
   useEffect(() => {
@@ -191,6 +187,7 @@ const AppTitle = ({ title }) => {
 
 const AppBar = ({ exp }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const state = useSelector(selectWorkbench);
 
   const onBackPressed = () =>  navigate('/workspace');
@@ -200,7 +197,7 @@ const AppBar = ({ exp }) => {
       <MaterialAppBar id="AppBar" elevation={1}>
         <Toolbar>
           <div className="slot start">
-            <Tooltip title="Back to projects">
+            <Tooltip title={t('Tooltip:BackToProjects')}>
               <IconButton onClick={onBackPressed} edge="start" color="inherit" aria-label="menu" size="large">
                 <HomeOutlinedIcon />
               </IconButton>

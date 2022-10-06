@@ -4,6 +4,7 @@ import { makeStyles } from '@mui/styles';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -48,6 +49,8 @@ interface ConfirmDialogProps {
 
 export const ConfirmDialog = (props: ConfirmDialogProps) => {
   const classes = useStyles();
+  const { t } = useTranslation();
+
   const { open, message, button, hideDeleteButton, onClose } = props;
 
   const handleCancel = () => onClose({ action: DIALOG_ACTIONS.CANCEL });
@@ -78,7 +81,7 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
       <DialogActions className={classes.actions}>
         {!hideDeleteButton && (
           <Button color="inherit" onClick={handleCancel}>
-            Cancel
+           {t('Button:Cancel')}
           </Button>
         )}
         <Button

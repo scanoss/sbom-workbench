@@ -6,8 +6,9 @@ import { License } from '@api/types';
 import { licenseService } from '@api/services/license.service';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { DialogContext } from '@context/DialogProvider';
-import { licenseHelper } from '../../../main/helpers/LicenseHelper';
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from 'react-i18next';
+import { licenseHelper } from '../../../main/helpers/LicenseHelper';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -26,6 +27,8 @@ interface LicenseDialogProps {
 
 export const LicenseDialog = (props: LicenseDialogProps) => {
   const classes = useStyles();
+  const { t } = useTranslation();
+
   const { open, onClose, onCancel, save } = props;
   const [form, setForm] = useState<Partial<License>>({});
   const dialogCtrl = useContext<any>(DialogContext);
@@ -74,7 +77,7 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
       onClose={onCancel}
     >
       <header className="dialog-title">
-        <span>Create License</span>
+        <span>{t('Title:CreateLicense')}</span>
         <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
           <CloseIcon />
         </IconButton>
@@ -83,7 +86,7 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
       <form onSubmit={handleClose}>
         <div className="dialog-content">
           <div className="dialog-form-field">
-            <label className="dialog-form-field-label">Name</label>
+            <label className="dialog-form-field-label">{t('Title:Name')}</label>
             <Paper className="dialog-form-field-control">
               <TextField
                 name="name"
@@ -99,7 +102,7 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
             </p>
           </div>
           <div className="dialog-form-field">
-            <label className="dialog-form-field-label">Full text</label>
+            <label className="dialog-form-field-label">{t('Title:FullText')}</label>
             <Paper className="dialog-form-field-control">
               <TextField
                 name="fulltext"
@@ -114,7 +117,7 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
           </div>
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">
-              URL <span className="optional">- Optional</span>
+              {t('Title:URL')} <span className="optional">- {t('Optional')}</span>
             </label>
             <Paper className="dialog-form-field-control">
               <TextField name="url" size="small" fullWidth value={form?.url} onChange={(e) => inputHandler(e)} />
@@ -122,9 +125,9 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
           </div>
         </div>
         <DialogActions>
-          <Button tabIndex={-1} color="inherit" onClick={onCancel}>Cancel</Button>
+          <Button tabIndex={-1} color="inherit" onClick={onCancel}>{t('Button:Cancel')}</Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
-            Create
+            {t('Button:Create')}
           </Button>
         </DialogActions>
       </form>

@@ -1,5 +1,6 @@
-import Alert from '@mui/material/Alert';
 import React from 'react';
+import Alert from '@mui/material/Alert';
+import { Trans } from 'react-i18next';
 import MatchCard, { MATCH_CARD_ACTIONS } from '../../../../../components/MatchCard/MatchCard';
 
 const MAX_FILES = 250;
@@ -32,11 +33,16 @@ export const FileList = ({ files, filter, onAction }: FileListProps) => {
 
       {filteredFiles.length > MAX_FILES && (
         <Alert className="my-5" severity="info">
-          <strong>{filteredFiles.length - MAX_FILES}</strong> files more...
+          <Trans i18nKey="NFilesMore" values={{ count: filteredFiles.length - MAX_FILES }} components={{ strong: <strong /> }} />
         </Alert>
       )}
     </>
   );
 };
+
+
+FileList.defaultProps = {
+  filter: null,
+}
 
 export default FileList;

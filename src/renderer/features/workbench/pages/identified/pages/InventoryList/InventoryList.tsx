@@ -5,6 +5,7 @@ import { inventoryService } from '@api/services/inventory.service';
 import { Inventory } from '@api/types';
 import { useSelector } from 'react-redux';
 import { selectComponentState } from '@store/component-store/componentSlice';
+import { useTranslation } from 'react-i18next';
 import InventoryCard from '../../../../components/InventoryCard/InventoryCard';
 import { ComponentInfo } from '../../../../components/ComponentInfo/ComponentInfo';
 
@@ -19,6 +20,8 @@ const style = {
 export const InventoryList = () => {
   const navigate = useNavigate();
   const { component } = useSelector(selectComponentState);
+  const { t } = useTranslation();
+
   const [inventories, setInventories] = useState<Inventory[]>(null);
 
   const onInit = async () => {
@@ -47,7 +50,7 @@ export const InventoryList = () => {
 
   const EmptyList = () => (
     <p>
-      No groups identified for <b>this component</b>.
+      {t('NoGroupComponent')}
     </p>
   );
 

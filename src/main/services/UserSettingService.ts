@@ -5,6 +5,7 @@ import { wsUtils } from '../workspace/WsUtils/WsUtils';
 
 import packageJson from '../../../release/app/package.json';
 import AppConfig from '../../config/AppConfigModule';
+import { AppI18n } from '../../shared/i18n';
 
 class UserSettingService {
   private myPath: string;
@@ -25,6 +26,7 @@ class UserSettingService {
     ],
     SCAN_MODE: 'FULL_SCAN',
     VERSION: app.isPackaged === true ? app.getVersion() : packageJson.version,
+    LNG: 'en',
   };
 
   constructor() {
@@ -33,7 +35,11 @@ class UserSettingService {
   }
 
   public set(setting: Partial<IWorkspaceCfg>) {
+    if (setting.LNG !== this.store.LNG)
+      AppI18n.getI18n().changeLanguage(setting.LNG);
+
     this.store = { ...this.store, ...setting };
+
     return this.store;
   }
 

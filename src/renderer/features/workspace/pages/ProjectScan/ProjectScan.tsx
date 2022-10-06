@@ -6,10 +6,8 @@ import { IpcChannels } from '@api/ipc-channels';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { projectService } from '@api/services/project.service';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  selectWorkspaceState,
-  setScanPath,
-} from '@store/workspace-store/workspaceSlice';
+import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
+import { useTranslation } from 'react-i18next';
 import * as controller from '../../../../controllers/home-controller';
 import CircularComponent from '../Components/CircularComponent';
 
@@ -17,6 +15,7 @@ const ProjectScan = () => {
   const navigate = useNavigate();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const { scanPath, newProject } = useSelector(selectWorkspaceState);
 
@@ -54,17 +53,15 @@ const ProjectScan = () => {
   };
 
   const handlerScannerError = async (e, err) => {
-    const errorMessage = `<strong>Scan Paused</strong>
+    const errorMessage = `<strong>${t('Dialog:ScanPaused')}</strong>
 
-    <span style="font-style: italic;">${err.name || ''} ${err.message || ''} ${
-      err.code || ''
-    }</span>
-    Please try again later.`;
+    <span style="font-style: italic;">${err.name || ''} ${err.message || ''} ${err.code || ''}</span>
+    ${t('Dialog:PleaseTryAgainLater')}`;
 
     await dialogCtrl.openConfirmDialog(
       `${errorMessage}`,
       {
-        label: 'OK',
+        label: t('Button:OK'),
         role: 'accept',
       },
       true
@@ -74,9 +71,9 @@ const ProjectScan = () => {
 
   const onPauseHandler = async () => {
     const { action } = await dialogCtrl.openConfirmDialog(
-      `Are you sure you want to pause the scanner?`,
+     t('Dialog:PauseScannerQuestion'),
       {
-        label: 'OK',
+        label: t('Button:OK'),
         role: 'accept',
       },
       false
@@ -144,7 +141,7 @@ const ProjectScan = () => {
               >
                 <ArrowBackIcon />
               </IconButton>
-              SCANNING
+              <span className="text-uppercase">{t('Title:Scanning')}</span>
             </h4>
             <h1>{scanPath.projectName}</h1>
           </div>

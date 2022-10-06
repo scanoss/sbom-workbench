@@ -17,6 +17,7 @@ import {
   restoreAll
 } from '@store/dependency-store/dependencyThunks';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
+import { Trans, useTranslation } from 'react-i18next';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import CodeViewSelector, { CodeViewSelectorMode } from './components/CodeViewSelector/CodeViewSelector';
@@ -43,6 +44,7 @@ const MemoCodeViewer = React.memo(CodeViewer);
 
 const DependencyViewer = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -84,15 +86,15 @@ const DependencyViewer = () => {
   };
 
   const onAcceptAllHandler = async () => {
-    const message = `All valid pending dependencies will be accepted.
+    const message = `${t('AllValidDependenciesAccepted')}
       <div class="custom-alert mt-3">
         <div class="MuiAlert-icon"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.99L19.53 19H4.47L12 5.99M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"></path></svg></div>
-        <div class="MuiAlert-message">Those dependencies that lack the version or license details will not be accepted.</div>
+        <div class="MuiAlert-message">${t('AllValidDependenciesAcceptedSubtitle')}</div>
       </div>`;
 
     const { action } = await dialogCtrl.openAlertDialog(message, [
-      { label: 'Cancel', role: 'cancel' },
-      { label: 'Accept All', action: 'accept', role: 'accept' },
+      { label: t('Button:Cancel'), role: 'cancel' },
+      { label: t('Button:AcceptAll'), action: 'accept', role: 'accept' },
     ]);
 
     if (action !== DIALOG_ACTIONS.CANCEL) {
@@ -101,10 +103,10 @@ const DependencyViewer = () => {
   };
 
   const onDismissAllHandler = async () => {
-    const message = `All pending dependencies will be dismissed.`;
+    const message = t('AllPendingDependenciesDismissed');
     const { action } = await dialogCtrl.openAlertDialog(message, [
-      { label: 'Cancel', role: 'cancel' },
-      { label: 'Dismiss All', action: 'accept', role: 'accept' },
+      { label: t('Button:Cancel'), role: 'cancel' },
+      { label: t('Button:DismissAll'), action: 'accept', role: 'accept' },
     ]);
 
     if (action !== DIALOG_ACTIONS.CANCEL) {
@@ -113,10 +115,10 @@ const DependencyViewer = () => {
   };
 
   const onRestoreAllHandler = async () => {
-    const message = `All accepted or dismissed dependencies will be restored.`;
+    const message = t('AllAcceptedOrDimissedRestored');
     const { action } = await dialogCtrl.openAlertDialog(message, [
-      { label: 'Cancel', role: 'cancel' },
-      { label: 'Restore All', action: 'accept', role: 'accept' },
+      { label: t('Button:Cancel'), role: 'cancel' },
+      { label:  t('Button:RestoreAll'), action: 'accept', role: 'accept' },
     ]);
 
     if (action !== DIALOG_ACTIONS.CANCEL) {
@@ -152,7 +154,7 @@ const DependencyViewer = () => {
             <CodeViewSelector active={view} setView={setView} />
           </div>
           <div className="d-flex align-center mb-2">
-            <h3 className="mt-0 mb-0">Declared Dependencies</h3>
+            <h3 className="mt-0 mb-0">{t('Title:DeclaredDependencies')}</h3>
           </div>
 
           <div className="search-box">
@@ -163,15 +165,21 @@ const DependencyViewer = () => {
           </div>
 
           <section className="subheader">
-            <TabNavigation tab={statusFilter} onChange={(status) => setStatusFilter(status)} />
+            <TabNavigation
+              tab={statusFilter}
+              onChange={(status) => setStatusFilter(status)}
+            />
             <ActionButton
-              count={[validItems.length, pendingItems.length, workedItems.length]}
+              count={[
+                validItems.length,
+                pendingItems.length,
+                workedItems.length,
+              ]}
               onAcceptAll={onAcceptAllHandler}
               onDismissAll={onDismissAllHandler}
               onRestoreAll={onRestoreAllHandler}
             />
           </section>
-
         </header>
         <main className="editors editors-full app-content">
           <div className="">
@@ -189,11 +197,17 @@ const DependencyViewer = () => {
                     <div className="dependencies-tree-header mt-1 mb-2">
                       <div className="dependencies-tree-header-title">
                         <Typography variant="subtitle2">
-                          Showing{' '}
-                          <b>
-                            {items.length} of {dependencies.length}
-                          </b>{' '}
-                          {dependencies.length > 1 ? 'dependencies' : 'dependency'} found in <b>{file}</b>
+                          <Trans
+                            i18nKey="ShowingDependenciesWithCount"
+                            values={{
+                              items: items.length,
+                              count: dependencies.length,
+                              file
+                            }}
+                            components= {{
+                              strong: <strong />
+                            }}
+                            />
                         </Typography>
                       </div>
                     </div>
