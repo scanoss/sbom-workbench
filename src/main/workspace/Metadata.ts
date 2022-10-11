@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { app } from 'electron';
 import { IProject, ScanState } from '../../api/types';
@@ -37,13 +37,16 @@ export class Metadata {
 
   constructor(name: string) {
     this.name = name;
-    this.appVersion = app.isPackaged === true ? app.getVersion() : packageJson.version;
+    this.appVersion =
+      app.isPackaged === true ? app.getVersion() : packageJson.version;
     this.date = new Date().toISOString();
     this.uuid = uuidv4();
   }
 
   public static async readFromPath(pathToProject: string): Promise<Metadata> {
-    const data: Metadata = JSON.parse(await fs.promises.readFile(`${pathToProject}/metadata.json`, 'utf8'));
+    const data: Metadata = JSON.parse(
+      await fs.promises.readFile(`${pathToProject}/metadata.json`, 'utf8')
+    );
     return Object.assign(Object.create(Metadata.prototype), data);
   }
 
@@ -64,7 +67,7 @@ export class Metadata {
     this.name = name;
   }
 
-  public setDate(date: string){
+  public setDate(date: string) {
     this.date = date;
   }
 

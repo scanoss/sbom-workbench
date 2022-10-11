@@ -3,7 +3,7 @@ import { workspaceService } from '@api/services/workspace.service';
 import { INewProject } from '@api/types';
 
 export const scan = async (project: INewProject) => {
-  await workspaceService.createProject(project);
+  await projectService.create(project);
 };
 
 export const resume = async (path: string) => {
