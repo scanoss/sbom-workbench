@@ -12,48 +12,43 @@ import { ReScanTask } from './ReScanTask';
 import { Project } from '../../workspace/Project';
 import { ProjectFilterPath } from '../../workspace/filters/ProjectFilterPath';
 import { Scanner } from './types';
-import { ResumeScanTask } from "./ResumeScanTask";
+import { ResumeScanTask } from './ResumeScanTask';
 import ScannerType = Scanner.ScannerType;
 import { userSettingService } from '../../services/UserSettingService';
 
-export class ScannerPipelineTask implements ITask<Scanner.ScannerConfig, boolean> {
-  public async run(params: Scanner.ScannerConfig): Promise<boolean> {
-    await workspace.closeAllProjects();
+export class ScannerPipelineTask implements ITask<Project, boolean> {
+  public async run(project: Project): Promise<boolean> {
+    const { metadata } = project;
 
-    // initialize project
-    const project: Project =
-      params.mode === Scanner.ScannerMode.SCAN
-        ? await projectService.create(params)
-        : await workspace.getProject(new ProjectFilterPath(params.projectPath));
+    console.log(project.metadata.getScannerConfig().mode);
 
     // load params
-    params.type = params.mode === Scanner.ScannerMode.SCAN
-      ? params.type
-      : project.metadata.getScannerConfig().type;
-
-    // TODO: move this permission check from task
-    this.checkTypes(params, project);
+    /*   params.type =
+      params.mode === Scanner.ScannerMode.SCAN
+        ? params.type
+        : params.project.metadata.getScannerConfig().type;*/
 
     // scan
     const scanTask: BaseScannerTask =
-      params.mode === Scanner.ScannerMode.SCAN
-        ? new ScanTask() :
-          params.mode === Scanner.ScannerMode.RESUME
-            ? new ResumeScanTask()
-            : new ReScanTask();
+      metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
+        ? new ScanTask()
+        : metadata.getScannerConfig().mode === Scanner.ScannerMode.RESUME
+        ? new ResumeScanTask()
+        : new ReScanTask();
 
-
-    if (params.type.includes(ScannerType.CODE)) {
+    if (metadata.getScannerConfig().type.includes(ScannerType.CODE)) {
       await scanTask.set(project);
       await scanTask.init();
       await scanTask.run();
     }
 
     // dependencies
-    if (params.type.includes(ScannerType.DEPENDENCIES)) await new DependencyTask(project).run();
+    if (metadata.getScannerConfig().type.includes(ScannerType.DEPENDENCIES))
+      await new DependencyTask(project).run();
 
     // vulnerabilities
-    if (params.type.includes(ScannerType.VULNERABILITIES)) await new VulnerabilitiesTask(project).run();
+    if (metadata.getScannerConfig().type.includes(ScannerType.VULNERABILITIES))
+      await new VulnerabilitiesTask(project).run();
 
     // search index
     await new IndexTask(project).run();
@@ -62,7 +57,7 @@ export class ScannerPipelineTask implements ITask<Scanner.ScannerConfig, boolean
 
     broadcastManager.get().send(IpcChannels.SCANNER_FINISH_SCAN, {
       success: true,
-      resultsPath: project.metadata.getMyPath(),
+      resultsPath: metadata.getMyPath(),
     });
 
     return true;
@@ -73,7 +68,9 @@ export class ScannerPipelineTask implements ITask<Scanner.ScannerConfig, boolean
     const hasApiKey = project.getApiKey() || APIS[DEFAULT_API_INDEX]?.API_KEY;
 
     if (!hasApiKey) {
-      params.type = params.type.filter(e => e !== ScannerType.VULNERABILITIES)
+      params.type = params.type.filter(
+        (e) => e !== ScannerType.VULNERABILITIES
+      );
     }
   }
 }

@@ -26,21 +26,33 @@ class Workspace {
     const projectArray: Promise<Project>[] = projectPaths.map((projectPath) =>
       Project.readFromPath(projectPath)
         .then((p) => {
-          log.info(`%c[ WORKSPACE ]: Successfully read project ${projectPath}`, 'color: green');
+          log.info(
+            `%c[ WORKSPACE ]: Successfully read project ${projectPath}`,
+            'color: green'
+          );
           return p;
         })
         .catch((e) => {
-          log.info(`%c[ WORKSPACE ]: Cannot read project ${projectPath}`, 'color: green');
+          log.info(
+            `%c[ WORKSPACE ]: Cannot read project ${projectPath}`,
+            'color: green'
+          );
           throw e;
         })
     );
-    let projectsReaded = (await Promise.allSettled(projectArray)) as PromiseSettledResult<Project>[];
+    let projectsReaded = (await Promise.allSettled(
+      projectArray
+    )) as PromiseSettledResult<Project>[];
     projectsReaded = projectsReaded.filter((p) => p.status === 'fulfilled');
-    this.projectList = projectsReaded.map((p) => (p as PromiseFulfilledResult<Project>).value);
+    this.projectList = projectsReaded.map(
+      (p) => (p as PromiseFulfilledResult<Project>).value
+    );
   }
 
   public getProjectsDtos(): Array<IProject> {
-    const projectsDtos: Array<IProject> = this.projectList.map((p) => p.getDto());
+    const projectsDtos: Array<IProject> = this.projectList.map((p) =>
+      p.getDto()
+    );
     return projectsDtos;
   }
 
@@ -65,11 +77,16 @@ class Workspace {
   }
 
   public async removeProject(p: Project) {
-    log.info(`%c[ WORKSPACE ]: Removing project ${p.getProjectName()}`, 'color: green');
+    log.info(
+      `%c[ WORKSPACE ]: Removing project ${p.getProjectName()}`,
+      'color: green'
+    );
     for (let i = 0; i < this.projectList.length; i += 1)
       if (this.projectList[i].getProjectName() === p.getProjectName()) {
         // eslint-disable-next-line no-await-in-loop
-        await fs.promises.rmdir(this.projectList[i].getMyPath(), { recursive: true });
+        await fs.promises.rmdir(this.projectList[i].getMyPath(), {
+          recursive: true,
+        });
         this.projectList.splice(i, 1);
         return true;
       }
@@ -92,7 +109,10 @@ class Workspace {
 
     // eslint-disable-next-line no-restricted-syntax
     const p: Project = this.getProject(filter);
-    log.info(`%c[ WORKSPACE ]: Opening project ${filter.getParam()}`, 'color: green');
+    log.info(
+      `%c[ WORKSPACE ]: Opening project ${filter.getParam()}`,
+      'color: green'
+    );
     await p.upgrade();
     await p.open();
     return p;
@@ -105,20 +125,29 @@ class Workspace {
   public async closeAllProjects() {
     log.info(`%c[ WORKSPACE ]: Closing all opened projects`, 'color: green');
     // eslint-disable-next-line no-restricted-syntax
-    for (const p of this.projectList) if (p.getState() === ProjectState.OPENED) await p.close();
+    for (const p of this.projectList)
+      if (p.getState() === ProjectState.OPENED) await p.close();
   }
 
   public async addProject(p: Project) {
     if (this.existProject(p.getProjectName())) {
-      log.info(`%c[ WORKSPACE ]: Project already exist and will be replaced`, 'color: green');
+      log.info(
+        `%c[ WORKSPACE ]: Project already exist and will be replaced`,
+        'color: green'
+      );
       await this.removeProject(p);
     }
-    log.info(`%c[ WORKSPACE ]: Adding project ${p.getProjectName()} to workspace`, 'color: green');
+    log.info(
+      `%c[ WORKSPACE ]: Adding project ${p.getProjectName()} to workspace`,
+      'color: green'
+    );
     const pDirectory = `${this.wsPath}/${p.getProjectName()}`;
 
     if (!fs.existsSync(`${pDirectory}`)) await fs.promises.mkdir(pDirectory);
     const files = await fs.promises.readdir(pDirectory);
-    const unlinkPromises = files.map((filename) => fs.promises.unlink(`${pDirectory}/${filename}`));
+    const unlinkPromises = files.map((filename) =>
+      fs.promises.unlink(`${pDirectory}/${filename}`)
+    );
     await Promise.all(unlinkPromises);
 
     p.setMyPath(pDirectory);
@@ -132,15 +161,22 @@ class Workspace {
   }
 
   private async getAllProjectsPaths() {
-    const workspaceStuff = await fs.promises.readdir(this.wsPath, { withFileTypes: true }).catch((e) => {
-      log.info(`%c[ WORKSPACE ]: Cannot read the workspace directory ${this.wsPath}`, 'color: green');
-      log.error(e);
-      throw e;
-    });
+    const workspaceStuff = await fs.promises
+      .readdir(this.wsPath, { withFileTypes: true })
+      .catch((e) => {
+        log.info(
+          `%c[ WORKSPACE ]: Cannot read the workspace directory ${this.wsPath}`,
+          'color: green'
+        );
+        log.error(e);
+        throw e;
+      });
     const projectsDirEnt = workspaceStuff.filter((dirent) => {
       return !dirent.isSymbolicLink() && !dirent.isFile();
     });
-    const projectPaths = projectsDirEnt.map((dirent) => `${this.wsPath}/${dirent.name}`);
+    const projectPaths = projectsDirEnt.map(
+      (dirent) => `${this.wsPath}/${dirent.name}`
+    );
     return projectPaths;
   }
 
@@ -148,9 +184,13 @@ class Workspace {
     return licenses;
   }
 
-  public async createProject(scannerConfig: Scanner.ScannerConfig): Promise<Project> {
+  public async createProject(
+    scannerConfig: Scanner.ScannerConfig
+  ): Promise<Project> {
     const { project } = scannerConfig;
     const newProject: Project = new Project(project.name);
+    // TODO: Remove this line when ScannerConfig remove the project
+    delete scannerConfig.project;
     newProject.setScannerConfig(scannerConfig);
     newProject.setScanPath(project.scan_root);
     newProject.setLicense(project.default_license);

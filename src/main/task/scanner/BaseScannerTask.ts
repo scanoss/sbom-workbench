@@ -1,4 +1,11 @@
-import { Scanner, SbomMode, ScannerCfg, ScannerEvents, ScannerInput, WinnowingMode } from 'scanoss';
+import {
+  Scanner,
+  SbomMode,
+  ScannerCfg,
+  ScannerEvents,
+  ScannerInput,
+  WinnowingMode,
+} from 'scanoss';
 import fs from 'fs';
 import log from 'electron-log';
 import { ScanState } from '../../../api/types';
@@ -34,26 +41,38 @@ export abstract class BaseScannerTask implements ITask<void, void> {
       this.project.processedFiles += response.getNumberOfFilesScanned();
       const filesScanned = response.getFilesScanned();
       // eslint-disable-next-line no-restricted-syntax
-      for (const file of filesScanned) delete this.project.filesToScan[`${this.project.getScanRoot()}${file}`];
+      for (const file of filesScanned)
+        delete this.project.filesToScan[`${this.project.getScanRoot()}${file}`];
       this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
         stage: {
           stageName: ScanState.SCANNING,
           stageStep: 2,
         },
-        processed: (100 * this.project.processedFiles) / this.project.filesSummary.include,
+        processed:
+          (100 * this.project.processedFiles) /
+          this.project.filesSummary.include,
       });
       await this.project.save();
     });
 
-    this.scanner.on(ScannerEvents.RESULTS_APPENDED, (response, filesNotScanned) => {
-      this.project.tree.attachResults(response.getServerResponse());
-      Object.assign(this.project.filesNotScanned, this.project.filesNotScanned);
-      this.project.save();
-    });
+    this.scanner.on(
+      ScannerEvents.RESULTS_APPENDED,
+      (response, filesNotScanned) => {
+        this.project.tree.attachResults(response.getServerResponse());
+        Object.assign(
+          this.project.filesNotScanned,
+          this.project.filesNotScanned
+        );
+        this.project.save();
+      }
+    );
 
-    this.scanner.on(ScannerEvents.SCAN_DONE, async (resultPath, filesNotScanned) => {
-      log.info(`%cScannerEvents.SCAN_DONE`, 'color: green');
-    });
+    this.scanner.on(
+      ScannerEvents.SCAN_DONE,
+      async (resultPath, filesNotScanned) => {
+        log.info(`%cScannerEvents.SCAN_DONE`, 'color: green');
+      }
+    );
 
     this.scanner.on(ScannerEvents.SCANNER_LOG, (message, level) => {
       log.info(`%c${message}`, 'color: green');
@@ -122,7 +141,9 @@ export abstract class BaseScannerTask implements ITask<void, void> {
     await this.scanner.scan(scanIn);
   }
 
-  protected adapterToScannerInput(filesToScan: Record<string, string>): Array<ScannerInput> {
+  protected adapterToScannerInput(
+    filesToScan: Record<string, string>
+  ): Array<ScannerInput> {
     const fullScanList: Array<string> = [];
     const quickScanList: Array<string> = [];
 
