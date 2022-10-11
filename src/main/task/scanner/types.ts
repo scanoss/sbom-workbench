@@ -1,4 +1,5 @@
 import { INewProject } from '@api/types';
+import { Project } from '../../workspace/Project';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Scanner {
@@ -22,9 +23,8 @@ export namespace Scanner {
 
   export interface ScannerConfig {
     mode: ScannerMode;
-    type?: ScannerType[],
-    source?: ScannerSource,
+    type?: ScannerType[];
+    source?: ScannerSource;
     project?: INewProject;
-    projectPath?: string; // TODO: Remove projectPath for re-scan
   }
 }

@@ -16,7 +16,13 @@ class UserSettingService {
   private defaultStore: IWorkspaceCfg = {
     TOKEN: '',
     DEFAULT_API_INDEX: 0,
-    APIS: [{ URL: `${AppConfig.API_URL}/scan/direct`, API_KEY:`${AppConfig.API_KEY}` , DESCRIPTION: '' }],
+    APIS: [
+      {
+        URL: `${AppConfig.API_URL}/scan/direct`,
+        API_KEY: `${AppConfig.API_KEY}`,
+        DESCRIPTION: '',
+      },
+    ],
     SCAN_MODE: 'FULL_SCAN',
     VERSION: app.isPackaged === true ? app.getVersion() : packageJson.version,
   };
@@ -50,24 +56,35 @@ class UserSettingService {
 
   public async read(path: string) {
     this.setMyPath(path);
-    if (!(await wsUtils.fileExist(`${this.myPath}/${this.name}`))) await this.save();
-    const setting = await fs.promises.readFile(`${this.myPath}/${this.name}`, 'utf8');
+    if (!(await wsUtils.fileExist(`${this.myPath}/${this.name}`)))
+      await this.save();
+    const setting = await fs.promises.readFile(
+      `${this.myPath}/${this.name}`,
+      'utf8'
+    );
     this.store = JSON.parse(setting);
   }
 
   public async update(): Promise<void> {
-    this.store.APIS[0] = { URL: `${AppConfig.API_URL}/scan/direct`, API_KEY:`${AppConfig.API_KEY}`, DESCRIPTION: '' };
+    this.store.APIS[0] = {
+      URL: `${AppConfig.API_URL}/scan/direct`,
+      API_KEY: `${AppConfig.API_KEY}`,
+      DESCRIPTION: '',
+    };
     await this.save();
   }
 
   public async save() {
-    await fs.promises.writeFile(`${this.myPath}/${this.name}`, JSON.stringify(this.store, undefined, 2), 'utf8');
+    await fs.promises.writeFile(
+      `${this.myPath}/${this.name}`,
+      JSON.stringify(this.store, undefined, 2),
+      'utf8'
+    );
   }
 
   public setMyPath(path: string) {
     this.myPath = path;
   }
-
 }
 
 export const userSettingService = new UserSettingService();
