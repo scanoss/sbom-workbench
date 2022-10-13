@@ -40,17 +40,9 @@ class ProjectService {
   ): Promise<Project> {
     const p = await workspace.createProject(scannerConfig);
     await modelProvider.init(p.getMyPath());
-    const tree = treeService.init(p.getMyPath(), p.metadata.getScanRoot());
-    const summary = tree.getSummarize();
     log.transports.file.resolvePath = () =>
       `${p.metadata.getMyPath()}/project.log`;
     p.state = ProjectState.OPENED;
-    p.filesToScan = summary.files;
-    p.filesSummary = summary;
-    p.filesNotScanned = {};
-    p.processedFiles = 0;
-    p.metadata.setFileCounter(summary.include);
-    p.setTree(tree);
     p.save();
     return p;
   }
@@ -60,7 +52,9 @@ class ProjectService {
     event: Electron.WebContents = null
   ): Promise<Project> {
     await workspace.closeAllProjects();
+    // TODO: Add scannerConfig into INewProject
     const scannerConfig = {
+      unzip: false,
       mode: Scanner.ScannerMode.SCAN,
       source: ScannerSource.CODE,
       type: [
