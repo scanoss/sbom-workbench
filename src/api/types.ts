@@ -80,7 +80,7 @@ export interface NewComponentDTO {
   }[];
   purl: string;
   url: string;
-  description? :string;
+  description?: string;
 }
 
 export interface ItemInclude {
@@ -181,7 +181,7 @@ export interface IBatchInventory {
   action: InventoryAction;
   overwrite: boolean;
   source: {
-    type: InventorySourceType ;
+    type: InventorySourceType;
     input: any;
   };
   data?: {
@@ -245,7 +245,10 @@ export interface Dependency {
   scope: string;
   componentName: string;
   component: Component;
-  status: FileStatusType.IDENTIFIED | FileStatusType.ORIGINAL | FileStatusType.PENDING;
+  status:
+    | FileStatusType.IDENTIFIED
+    | FileStatusType.ORIGINAL
+    | FileStatusType.PENDING;
   inventory: Inventory;
   valid: boolean;
   originalVersion: string;

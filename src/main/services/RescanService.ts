@@ -5,10 +5,14 @@ import { NodeStatus } from '../workspace/tree/Node';
 import { componentService } from './ComponentService';
 import { dependencyService } from './DependencyService';
 import { modelProvider } from './ModelProvider';
-import { IInsertResult } from "../model/interfaces/IInsertResult";
+import { IInsertResult } from '../model/interfaces/IInsertResult';
 
 class RescanService {
-  public async reScan(files: Array<any>, resultPath: string, projectPath: string): Promise<void> {
+  public async reScan(
+    files: Array<any>,
+    resultPath: string,
+    projectPath: string
+  ): Promise<void> {
     try {
       const aux = utilHelper.convertsArrayOfStringToString(files, 'path');
 
@@ -34,11 +38,18 @@ class RescanService {
         return previousValue;
       }, []);
 
-      const resultLicenses:IInsertResult = await modelProvider.model.result.insertFromFileReScan(resultPath, filesToUpdate);
-      if(resultLicenses) await modelProvider.model.result.insertResultLicense(resultLicenses);
+      const resultLicenses: IInsertResult =
+        await modelProvider.model.result.insertFromFileReScan(
+          resultPath,
+          filesToUpdate
+        );
+      if (resultLicenses)
+        await modelProvider.model.result.insertResultLicense(resultLicenses);
       const dirtyFiles = await modelProvider.model.file.getDirty();
       if (dirtyFiles.length > 0) {
-        await modelProvider.model.inventory.deleteDirtyFileInventories(dirtyFiles);
+        await modelProvider.model.inventory.deleteDirtyFileInventories(
+          dirtyFiles
+        );
       }
       await modelProvider.model.result.deleteDirty();
       await modelProvider.model.file.deleteDirty();
@@ -46,31 +57,42 @@ class RescanService {
       await componentService.importComponents();
 
       // DEPENDENCIES
-      const dependencies = JSON.parse(await fs.promises.readFile(`${projectPath}/dependencies.json`, 'utf-8'));
+      const dependencies = JSON.parse(
+        await fs.promises.readFile(`${projectPath}/dependencies.json`, 'utf-8')
+      );
       // Insert new dependencies
       await dependencyService.insert(dependencies);
 
       // delete dirty dependencies
-      await modelProvider.model.dependency.deleteDirty(this.dirtyModelDependencyAdapter(dependencies));
+      await modelProvider.model.dependency.deleteDirty(
+        this.dirtyModelDependencyAdapter(dependencies)
+      );
 
       // Delete dirty dependencies inventories
       await modelProvider.model.inventory.deleteDirtyDependencyInventories();
 
-      const notValidDetecteComponents: number[] = await modelProvider.model.component.getNotValid();
+      const notValidDetecteComponents: number[] =
+        await modelProvider.model.component.getNotValid();
 
       if (notValidDetecteComponents.length > 0) {
-        await modelProvider.model.component.deleteByID(notValidDetecteComponents);
+        await modelProvider.model.component.deleteByID(
+          notValidDetecteComponents
+        );
       }
 
-      const emptyInv: any = await modelProvider.model.inventory.emptyInventory();
+      const emptyInv: any =
+        await modelProvider.model.inventory.emptyInventory();
       if (emptyInv) {
         const result = emptyInv.map((item: Record<string, number>) => item.id);
         await modelProvider.model.inventory.deleteAllEmpty(result);
       }
 
       // Updates most reliable license for each component
-      const mostReliableLicensePerComponent = await modelProvider.model.component.getMostReliableLicensePerComponent();
-      await modelProvider.model.component.updateMostReliableLicense(mostReliableLicensePerComponent);
+      const mostReliableLicensePerComponent =
+        await modelProvider.model.component.getMostReliableLicensePerComponent();
+      await modelProvider.model.component.updateMostReliableLicense(
+        mostReliableLicensePerComponent
+      );
     } catch (err: any) {
       throw new Error('[ RESCAN DB ] Unable to insert new results');
     }
@@ -85,7 +107,10 @@ class RescanService {
       } else if (result.original === NodeStatus.NOMATCH) {
         result[result.path] = NodeStatus.NOMATCH;
         result.status = NodeStatus.NOMATCH;
-      } else if (result.original === NodeStatus.FILTERED && result.identified === 1) {
+      } else if (
+        result.original === NodeStatus.FILTERED &&
+        result.identified === 1
+      ) {
         result[result.path] = NodeStatus.FILTERED;
         result.status = NodeStatus.IDENTIFIED;
       } else if (result.original === NodeStatus.FILTERED) {
@@ -102,15 +127,20 @@ class RescanService {
         result.status = NodeStatus.PENDING;
       }
       // Set the original status of a file
-      if (result.original === NodeStatus.NOMATCH) result.original = NodeStatus.NOMATCH;
-      else if (result.original === NodeStatus.MATCH) result.original = NodeStatus.MATCH;
-      else if (result.original === NodeStatus.FILTERED) result.original = NodeStatus.FILTERED;
+      if (result.original === NodeStatus.NOMATCH)
+        result.original = NodeStatus.NOMATCH;
+      else if (result.original === NodeStatus.MATCH)
+        result.original = NodeStatus.MATCH;
+      else if (result.original === NodeStatus.FILTERED)
+        result.original = NodeStatus.FILTERED;
     });
 
     return results;
   }
 
-  private dirtyModelDependencyAdapter(dep: IDependencyResponse): Record<string, string> {
+  private dirtyModelDependencyAdapter(
+    dep: IDependencyResponse
+  ): Record<string, string> {
     const dependencies = {
       paths: [],
       purls: [],
