@@ -45,21 +45,24 @@ export class Tree {
   }
 
   public build(): Node {
-    this.buildTreeRec(this.rootPath, this.rootFolder);
+    this.buildTreeRec(this.rootPath, this.rootFolder, this.rootPath);
     return this.rootFolder;
   }
 
-  private buildTreeRec(path: string, root: Folder): Node {
+  public buildTreeRec(path: string, root: Folder, rootPath: string): Node {
     const dirEntries = fs
       .readdirSync(path, { withFileTypes: true }) // Returns a list of files and folders
       .sort(this.dirFirstFileAfter)
       .filter((dirent: any) => !dirent.isSymbolicLink());
-
     for (const dirEntry of dirEntries) {
-      const relativePath = `${path}/${dirEntry.name}`.replace(this.rootPath, '');
+      const relativePath = `${path}/${dirEntry.name}`.replace(rootPath, '');
       if (dirEntry.isDirectory()) {
         const f: Folder = new Folder(relativePath, dirEntry.name);
-        const subTree = this.buildTreeRec(`${path}/${dirEntry.name}`, f);
+        const subTree = this.buildTreeRec(
+          `${path}/${dirEntry.name}`,
+          f,
+          rootPath
+        );
         root.addChild(subTree);
       } else root.addChild(new File(relativePath, dirEntry.name));
     }
@@ -77,7 +80,10 @@ export class Tree {
     Object.entries(results).forEach(([key, value]: [string, any]) => {
       for (let i = 0; i < value.length; i += 1) {
         if (value[i].purl !== undefined) {
-          this.rootFolder.attachResults({ purl: value[i].purl[0], version: value[i].version }, key);
+          this.rootFolder.attachResults(
+            { purl: value[i].purl[0], version: value[i].version },
+            key
+          );
         }
       }
     });
@@ -96,7 +102,10 @@ export class Tree {
       return Object.assign(Object.create(File.prototype), data);
     }
     const children = data.children.map((child: any) => this.deserialize(child));
-    return Object.assign(Object.create(Folder.prototype), { ...data, children });
+    return Object.assign(Object.create(Folder.prototype), {
+      ...data,
+      children,
+    });
   }
 
   public getRootFolder(): Folder {
@@ -131,7 +140,32 @@ export class Tree {
 
   private scanMode(filePath: string) {
     // eslint-disable-next-line prettier/prettier
-    const skipExtentions = new Set ([".exe", ".zip", ".tar", ".tgz", ".gz", ".rar", ".jar", ".war", ".ear", ".class", ".pyc", ".o", ".a", ".so", ".obj", ".dll", ".lib", ".out", ".app", ".doc", ".docx", ".xls", ".xlsx", ".ppt" ]);
+    const skipExtentions = new Set([
+      '.exe',
+      '.zip',
+      '.tar',
+      '.tgz',
+      '.gz',
+      '.rar',
+      '.jar',
+      '.war',
+      '.ear',
+      '.class',
+      '.pyc',
+      '.o',
+      '.a',
+      '.so',
+      '.obj',
+      '.dll',
+      '.lib',
+      '.out',
+      '.app',
+      '.doc',
+      '.docx',
+      '.xls',
+      '.xlsx',
+      '.ppt',
+    ]);
     const skipStartWith = ['{', '[', '<?xml', '<html', '<ac3d', '<!doc'];
     const MIN_FILE_SIZE = 256;
 
@@ -163,7 +197,10 @@ export class Tree {
   public setFilter() {
     const bannedList = new Filtering.BannedList('NoFilter');
     if (!fs.existsSync(`${this.projectPath}/filter.json`))
-      fs.writeFileSync(`${this.projectPath}/filter.json`, JSON.stringify(defaultBannedList).toString());
+      fs.writeFileSync(
+        `${this.projectPath}/filter.json`,
+        JSON.stringify(defaultBannedList).toString()
+      );
     bannedList.load(`${this.projectPath}/filter.json`);
 
     log.info(`%c[ PROJECT ]: Building tree`, 'color: green');
@@ -171,7 +208,11 @@ export class Tree {
     this.applyFilters(this.rootPath, this.getRootFolder(), bannedList);
   }
 
-  public applyFilters(scanRoot: string, node: Node, bannedList: Filtering.BannedList) {
+  public applyFilters(
+    scanRoot: string,
+    node: Node,
+    bannedList: Filtering.BannedList
+  ) {
     let i = 0;
     if (node.getType() === 'file') {
       this.filesIndexed += 1;
@@ -195,7 +236,8 @@ export class Tree {
     } else if (node.getType() === 'folder') {
       if (bannedList.evaluate(scanRoot + node.getValue())) {
         node.setAction('scan');
-        for (i = 0; i < node.getChildrenCount(); i += 1) this.applyFilters(scanRoot, node.getChild(i), bannedList);
+        for (i = 0; i < node.getChildrenCount(); i += 1)
+          this.applyFilters(scanRoot, node.getChild(i), bannedList);
       } else {
         node.setAction('filter');
         node.setClassNameDeep('filter-item');
