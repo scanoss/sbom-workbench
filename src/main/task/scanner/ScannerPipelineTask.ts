@@ -15,18 +15,14 @@ import { Scanner } from './types';
 import { ResumeScanTask } from './ResumeScanTask';
 import ScannerType = Scanner.ScannerType;
 import { userSettingService } from '../../services/UserSettingService';
+import { DecompressTask } from '../decompress/DecompressTask';
 
 export class ScannerPipelineTask implements ITask<Project, boolean> {
   public async run(project: Project): Promise<boolean> {
     const { metadata } = project;
 
-    console.log(project.metadata.getScannerConfig().mode);
-
-    // load params
-    /*   params.type =
-      params.mode === Scanner.ScannerMode.SCAN
-        ? params.type
-        : params.project.metadata.getScannerConfig().type;*/
+    // TODO: Add new scanner type
+    await new DecompressTask().run(project);
 
     // scan
     const scanTask: BaseScannerTask =
