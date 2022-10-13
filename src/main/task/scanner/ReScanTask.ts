@@ -24,14 +24,14 @@ export class ReScanTask extends BaseScannerTask {
 
   public async set(p: Project): Promise<void> {
     await p.upgrade();
-    const tree = treeService.init(p.getMyPath(), p.metadata.getScanRoot());
+    /* const tree = treeService.init(p.getMyPath(), p.metadata.getScanRoot());
     p.setTree(tree);
     const summary = tree.getSummarize();
     p.filesToScan = summary.files;
     p.filesSummary = summary;
     p.filesNotScanned = {};
     p.processedFiles = 0;
-    p.metadata.setFileCounter(summary.include);
+    p.metadata.setFileCounter(summary.include);*/
     p.metadata.setScannerState(ScanState.RESCANNING);
     await modelProvider.init(p.getMyPath());
     await licenseService.import();

@@ -23,6 +23,7 @@ export namespace Scanner {
 
   export interface ScannerConfig {
     mode: ScannerMode;
+    unzip?: boolean;
     type?: ScannerType[];
     source?: ScannerSource;
     project?: INewProject;
