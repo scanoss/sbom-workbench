@@ -16,13 +16,20 @@ import { ResumeScanTask } from './ResumeScanTask';
 import ScannerType = Scanner.ScannerType;
 import { userSettingService } from '../../services/UserSettingService';
 import { DecompressTask } from '../decompress/DecompressTask';
+import { IndexTreeTask } from '../IndexTreeTask/IndexTreeTask';
 
 export class ScannerPipelineTask implements ITask<Project, boolean> {
   public async run(project: Project): Promise<boolean> {
     const { metadata } = project;
 
-    // TODO: Add new scanner type
-    await new DecompressTask().run(project);
+    if (metadata.getScannerConfig()?.unzip)
+      await new DecompressTask().run(project);
+
+    if (
+      metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN ||
+      metadata.getScannerConfig().mode === Scanner.ScannerMode.RESCAN
+    )
+      await new IndexTreeTask().run(project);
 
     // scan
     const scanTask: BaseScannerTask =
