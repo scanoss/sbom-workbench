@@ -1,5 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { TextField, Button, IconButton, InputBase, Paper, Tooltip, Select, MenuItem } from '@mui/material';
+import {
+  Button,
+  IconButton,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Tooltip,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SearchIcon from '@mui/icons-material/Search';
@@ -14,7 +22,14 @@ import { ResponseStatus } from '@api/Response';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import AppConfig from '@config/AppConfigModule';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectWorkspaceState, setNewProject, setScanPath } from '@store/workspace-store/workspaceSlice';
+import {
+  selectWorkspaceState,
+  setNewProject,
+  setScanPath,
+} from '@store/workspace-store/workspaceSlice';
+import { Scanner } from '../../../../../main/task/scanner/types';
+import ScannerType = Scanner.ScannerType;
+import ScannerSource = Scanner.ScannerSource;
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -61,6 +76,16 @@ const ProjectSettings = () => {
     api: null,
     token: null,
     source: null,
+    scannerConfig: {
+      mode: Scanner.ScannerMode.SCAN,
+      source: ScannerSource.CODE,
+      type: [
+        ScannerType.CODE,
+        ScannerType.DEPENDENCIES,
+        ScannerType.VULNERABILITIES,
+        ScannerType.UNZIP,
+      ],
+    },
   });
 
   const [projectValidName, setProjectValidName] = useState(false);
@@ -78,7 +103,9 @@ const ProjectSettings = () => {
     setApis(apiUrlKey.APIS);
 
     const { path } = scanPath;
-    const projectName = path.split(window.path.sep)[path.split(window.path.sep).length - 1];
+    const projectName = path.split(window.path.sep)[
+      path.split(window.path.sep).length - 1
+    ];
     setProjectSettings({
       ...projectSettings,
       scan_root: path,
@@ -88,11 +115,14 @@ const ProjectSettings = () => {
 
   useEffect(() => {
     const found = projects.find(
-      (project) => project.name.trim().toLowerCase() === projectSettings.name.trim().toLowerCase()
+      (project) =>
+        project.name.trim().toLowerCase() ===
+        projectSettings.name.trim().toLowerCase()
     );
 
     // eslint-disable-next-line no-control-regex
-    const re = /^[^\s^\x00-\x1f\\?*:"";<>|/.][^\x00-\x1f\\?*:"";<>|/]*[^\s^\x00-\x1f\\?*:"";<>|/.]+$/;
+    const re =
+      /^[^\s^\x00-\x1f\\?*:"";<>|/.][^\x00-\x1f\\?*:"";<>|/]*[^\s^\x00-\x1f\\?*:"";<>|/.]+$/;
 
     if (found) {
       setProjectNameExists(true);
@@ -142,7 +172,12 @@ const ProjectSettings = () => {
         <header className="app-header">
           <div>
             <h4 className="header-subtitle back">
-              <IconButton tabIndex={-1} onClick={() => navigate(-1)} component="span" size="large">
+              <IconButton
+                tabIndex={-1}
+                onClick={() => navigate(-1)}
+                component="span"
+                size="large"
+              >
                 <ArrowBackIcon />
               </IconButton>
               Project Settings
@@ -181,7 +216,12 @@ const ProjectSettings = () => {
                     <label className="input-label">
                       License
                       <Tooltip title="Add new license">
-                        <IconButton tabIndex={-1} color="inherit" size="small" onClick={openLicenseDialog}>
+                        <IconButton
+                          tabIndex={-1}
+                          color="inherit"
+                          size="small"
+                          onClick={openLicenseDialog}
+                        >
                           <Add fontSize="inherit" />
                         </IconButton>
                       </Tooltip>
@@ -200,15 +240,23 @@ const ProjectSettings = () => {
                       fullWidth
                       value={
                         licenses && projectSettings.default_license
-                          ? licenses?.find((license) => license?.spdxid === projectSettings?.default_license)
+                          ? licenses?.find(
+                              (license) =>
+                                license?.spdxid ===
+                                projectSettings?.default_license
+                            )
                           : ''
                       }
                       selectOnFocus
                       clearOnBlur
                       handleHomeEndKeys
                       options={licenses}
-                      isOptionEqualToValue={(option: any) => option.spdxid === projectSettings.default_license}
-                      getOptionLabel={(option: any) => option.name || option.spdxid || ''}
+                      isOptionEqualToValue={(option: any) =>
+                        option.spdxid === projectSettings.default_license
+                      }
+                      getOptionLabel={(option: any) =>
+                        option.name || option.spdxid || ''
+                      }
                       renderOption={(props, option, { selected }) => (
                         <li {...props}>
                           <div className={classes.option}>
@@ -220,8 +268,12 @@ const ProjectSettings = () => {
                       filterOptions={(options, params) => {
                         return options.filter(
                           (option) =>
-                            option.name.toLowerCase().includes(params.inputValue.toLowerCase()) ||
-                            option.spdxid.toLowerCase().includes(params.inputValue.toLowerCase())
+                            option.name
+                              .toLowerCase()
+                              .includes(params.inputValue.toLowerCase()) ||
+                            option.spdxid
+                              .toLowerCase()
+                              .includes(params.inputValue.toLowerCase())
                         );
                       }}
                       renderInput={(params) => (
@@ -267,13 +319,20 @@ const ProjectSettings = () => {
                             disableUnderline
                           >
                             <MenuItem value={0}>
-                              <span className="item-default">Use default settings</span>
+                              <span className="item-default">
+                                Use default settings
+                              </span>
                             </MenuItem>
                             ;
                             {apis.map((api) => (
                               <MenuItem value={api} key={api.key}>
                                 <span>API URL: {api.URL}</span>
-                                {api.API_KEY && <span className="api_key"> - API KEY: {api.API_KEY}</span>}
+                                {api.API_KEY && (
+                                  <span className="api_key">
+                                    {' '}
+                                    - API KEY: {api.API_KEY}
+                                  </span>
+                                )}
                               </MenuItem>
                             ))}
                           </Select>
@@ -284,7 +343,8 @@ const ProjectSettings = () => {
                   <div className="label-input-container mt-5">
                     <div className="label-icon">
                       <label className="input-label h3">
-                        SBOM Ledger Token <span className="optional">- Optional</span>
+                        SBOM Ledger Token{' '}
+                        <span className="optional">- Optional</span>
                       </label>
                     </div>
                     <Paper>
