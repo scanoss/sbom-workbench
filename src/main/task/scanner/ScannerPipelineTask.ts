@@ -1,28 +1,25 @@
 import { ITask } from '../Task';
 import { ScanTask } from './ScanTask';
-import { workspace } from '../../workspace/Workspace';
 import { DependencyTask } from './DependencyTask';
 import { VulnerabilitiesTask } from './VulnerabilitiesTask';
 import { IndexTask } from '../search/indexTask/IndexTask';
-import { projectService } from '../../services/ProjectService';
 import { IpcChannels } from '../../../api/ipc-channels';
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
 import { BaseScannerTask } from './BaseScannerTask';
 import { ReScanTask } from './ReScanTask';
 import { Project } from '../../workspace/Project';
-import { ProjectFilterPath } from '../../workspace/filters/ProjectFilterPath';
 import { Scanner } from './types';
 import { ResumeScanTask } from './ResumeScanTask';
-import ScannerType = Scanner.ScannerType;
 import { userSettingService } from '../../services/UserSettingService';
 import { DecompressTask } from '../decompress/DecompressTask';
 import { IndexTreeTask } from '../IndexTreeTask/IndexTreeTask';
+import ScannerType = Scanner.ScannerType;
 
 export class ScannerPipelineTask implements ITask<Project, boolean> {
   public async run(project: Project): Promise<boolean> {
     const { metadata } = project;
 
-    if (metadata.getScannerConfig()?.unzip)
+    if (metadata.getScannerConfig().type.includes(ScannerType.UNZIP))
       await new DecompressTask().run(project);
 
     if (
