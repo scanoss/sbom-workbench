@@ -13,6 +13,7 @@ export namespace Scanner {
     CODE,
     DEPENDENCIES,
     VULNERABILITIES,
+    UNZIP,
   }
 
   export enum ScannerSource {
@@ -22,8 +23,7 @@ export namespace Scanner {
   }
 
   export interface ScannerConfig {
-    mode: ScannerMode;
-    unzip?: boolean;
+    mode?: ScannerMode;
     type?: ScannerType[];
     source?: ScannerSource;
     project?: INewProject;

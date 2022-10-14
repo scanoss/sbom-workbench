@@ -184,21 +184,16 @@ class Workspace {
     return licenses;
   }
 
-  public async createProject(
-    scannerConfig: Scanner.ScannerConfig
-  ): Promise<Project> {
-    const { project } = scannerConfig;
-    const newProject: Project = new Project(project.name);
-    // TODO: Remove this line when ScannerConfig remove the project
-    delete scannerConfig.project;
-    newProject.setScannerConfig(scannerConfig);
-    newProject.setScanPath(project.scan_root);
-    newProject.setLicense(project.default_license);
-    if (project.api) {
-      newProject.setApi(project.api);
-      newProject.setApiKey(project.api_key ? project.api_key : '');
+  public async createProject(projectDTO: INewProject): Promise<Project> {
+    const newProject: Project = new Project(projectDTO.name);
+    newProject.setScannerConfig(projectDTO.scannerConfig);
+    newProject.setScanPath(projectDTO.scan_root);
+    newProject.setLicense(projectDTO.default_license);
+    if (projectDTO.api) {
+      newProject.setApi(projectDTO.api);
+      newProject.setApiKey(projectDTO.api_key ? projectDTO.api_key : '');
     }
-    if (project.token) newProject.setToken(project.token);
+    if (projectDTO.token) newProject.setToken(projectDTO.token);
     await this.addProject(newProject);
     return newProject;
   }
