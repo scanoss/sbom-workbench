@@ -1,20 +1,31 @@
 import { DecompressionManager } from 'scanoss';
 import path from 'path';
 import fs from 'fs';
-import { ITask } from '../Task';
 import { Project } from '../../workspace/Project';
+import { Scanner } from '../scanner/types';
 
-export class DecompressTask implements ITask<Project, boolean> {
+export class DecompressTask implements Scanner.IPipelineTask {
+  private project: Project;
+
   private decompressionManager: DecompressionManager;
 
-  constructor() {
+  constructor(project: Project) {
+    this.project = project;
     this.decompressionManager = new DecompressionManager();
   }
 
-  public async run(project: Project): Promise<boolean> {
+  getName(): string {
+    return 'Decompressing';
+  }
+
+  isCritical(): boolean {
+    return false;
+  }
+
+  public async run(): Promise<boolean> {
     try {
       const filesToDecompress = this.getFilesToDecompress(
-        project.getScanRoot(),
+        this.project.getScanRoot(),
         this.decompressionManager.getSupportedFormats()
       );
       await this.decompressionManager.decompress(filesToDecompress);

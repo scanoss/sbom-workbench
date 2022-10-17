@@ -18,15 +18,19 @@ import { componentService } from '../../services/ComponentService';
 import { userSettingService } from '../../services/UserSettingService';
 import AppConfig from '../../../config/AppConfigModule';
 import { AutoAccept } from '../inventory/AutoAccept';
-import { ITask } from '../Task';
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
+import { Scanner as ScannerModule } from "./types";
 
-export abstract class BaseScannerTask implements ITask<void, void> {
+export abstract class BaseScannerTask implements ScannerModule.IPipelineTask {
   protected scanner: Scanner;
 
   protected scannerState: ScanState;
 
   protected project: Project;
+
+  abstract getName(): string;
+
+  abstract isCritical(): boolean;
 
   protected sendToUI(eventName, data: any) {
     broadcastManager.get().send(eventName, data);
@@ -122,21 +126,15 @@ export abstract class BaseScannerTask implements ITask<void, void> {
     this.scanner.setWorkDirectory(this.project.getMyPath());
   }
 
-  public async run(): Promise<void> {
+  public async run(): Promise<boolean> {
     log.info('[ BaseScannerTask init scanner]');
     await this.scan();
     await this.done();
     this.project.save();
+    return true;
   }
 
   private async scan() {
-    this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
-      stage: {
-        stageName: this.project.metadata.getScannerState(),
-        stageStep: 2,
-      },
-      processed: 0,
-    });
     const scanIn = this.adapterToScannerInput(this.project.filesToScan);
     await this.scanner.scan(scanIn);
   }
