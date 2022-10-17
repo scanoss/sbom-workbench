@@ -1,21 +1,36 @@
-import { ITask } from '../Task';
 import { Project } from '../../workspace/Project';
 import { treeService } from '../../services/TreeService';
+import { Scanner } from '../scanner/types';
+import { ScannerStage } from '../../../api/types';
 
-export class IndexTreeTask implements ITask<Project, void> {
-  run(project: Project): Promise<void> {
+export class IndexTreeTask implements Scanner.IPipelineTask {
+  private project: Project;
+
+  constructor(project: Project) {
+    this.project = project;
+  }
+
+  public getStageProperties(): Scanner.StageProperties {
+    return {
+      name: ScannerStage.INDEX,
+      label: 'Indexing',
+      isCritical: true,
+    };
+  }
+
+  run(): Promise<boolean> {
     const tree = treeService.init(
-      project.getMyPath(),
-      project.metadata.getScanRoot()
+      this.project.getMyPath(),
+      this.project.metadata.getScanRoot()
     );
     const summary = tree.getSummarize();
-    project.filesToScan = summary.files;
-    project.filesSummary = summary;
-    project.filesNotScanned = {};
-    project.processedFiles = 0;
-    project.metadata.setFileCounter(summary.include);
-    project.setTree(tree);
-    project.save();
+    this.project.filesToScan = summary.files;
+    this.project.filesSummary = summary;
+    this.project.filesNotScanned = {};
+    this.project.processedFiles = 0;
+    this.project.metadata.setFileCounter(summary.include);
+    this.project.setTree(tree);
+    this.project.save();
     return Promise.resolve(undefined);
   }
 }

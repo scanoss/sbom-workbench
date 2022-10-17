@@ -1,33 +1,34 @@
 import { DependencyScanner } from 'scanoss';
 import fs from 'fs';
 import log from 'electron-log';
-import { IpcChannels } from '../../../api/ipc-channels';
 import { BlackListDependencies } from '../../workspace/tree/blackList/BlackListDependencies';
-import { ITask } from '../Task';
-import { broadcastManager } from '../../broadcastManager/BroadcastManager';
 import { Project } from '../../workspace/Project';
 import { dependencyService } from '../../services/DependencyService';
+import { Scanner } from './types';
+import { ScannerStage } from '../../../api/types';
 
-export class DependencyTask implements ITask<void, void> {
+export class DependencyTask implements Scanner.IPipelineTask {
   private project: Project;
 
   constructor(project: Project) {
     this.project = project;
   }
 
-  public async run(params: void): Promise<void> {
+  public getStageProperties(): Scanner.StageProperties {
+    return {
+      name: ScannerStage.DEPENDENCY,
+      label: 'Analyzing Dependencies',
+      isCritical: false,
+    };
+  }
+
+  public async run(): Promise<boolean> {
     log.info('[ DependencyTask init ]');
-    broadcastManager.get().send(IpcChannels.SCANNER_UPDATE_STATUS, {
-      stage: {
-        stageName: `Analyzing dependencies`,
-        stageStep: 3,
-      },
-      processed: 0,
-    });
 
     await this.scanDependencies();
     await this.addDependencies();
     await this.project.save();
+    return true;
   }
 
   private async scanDependencies() {
@@ -56,7 +57,10 @@ export class DependencyTask implements ITask<void, void> {
   private async addDependencies() {
     try {
       const dependencies = JSON.parse(
-        await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8')
+        await fs.promises.readFile(
+          `${this.project.metadata.getMyPath()}/dependencies.json`,
+          'utf8'
+        )
       );
       this.project.tree.addDependencies(dependencies);
       await dependencyService.insert(dependencies);

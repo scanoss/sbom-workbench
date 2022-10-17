@@ -4,23 +4,31 @@ import { Project } from '../../workspace/Project';
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
 import { modelProvider } from '../../services/ModelProvider';
 import { IpcChannels } from '../../../api/ipc-channels';
-import { Vulnerability } from '../../model/entity/Vulnerability';
 import { AddVulneravilityTask } from '../vulnerability/AddVulneravilityTask';
 import AppConfig from '../../../config/AppConfigModule';
+import { Scanner } from './types';
+import { ScannerStage } from '../../../api/types';
 
-export class VulnerabilitiesTask implements ITask<void, void> {
+export class VulnerabilitiesTask implements Scanner.IPipelineTask {
   private project: Project;
 
   constructor(project: Project) {
     this.project = project;
   }
 
-  public async run(): Promise<void> {
-    if (!AppConfig.FF_ENABLE_SCAN_VULNERABILITY) return;
+  public getStageProperties(): Scanner.StageProperties {
+    return {
+      name: ScannerStage.VULNERABILITY,
+      label: 'Searching Vulnerabilities',
+      isCritical: false,
+    };
+  }
+
+  public async run(): Promise<boolean> {
+    if (!AppConfig.FF_ENABLE_SCAN_VULNERABILITY) return false;
 
     log.info('[ VulnerabilitiesTask init ]');
 
-    this.updateStatus();
     const detectedComponents = await modelProvider.model.component.getAll(null);
     const dependencyComponents = await modelProvider.model.dependency.getAll(
       null
@@ -32,6 +40,7 @@ export class VulnerabilitiesTask implements ITask<void, void> {
     const addVulnerability = new AddVulneravilityTask();
     await addVulnerability.run(components);
     this.project.save();
+    return true;
   }
 
   private groupComponentByPurlVersion(
@@ -47,15 +56,5 @@ export class VulnerabilitiesTask implements ITask<void, void> {
     });
     const response = Array.from(componentSet);
     return response;
-  }
-
-  private updateStatus() {
-    broadcastManager.get().send(IpcChannels.SCANNER_UPDATE_STATUS, {
-      stage: {
-        stageName: `Searching vulnerabilities`,
-        stageStep: 4,
-      },
-      processed: 0,
-    });
   }
 }
