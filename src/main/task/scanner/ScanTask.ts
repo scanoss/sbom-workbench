@@ -5,6 +5,14 @@ import { modelProvider } from '../../services/ModelProvider';
 import { licenseService } from '../../services/LicenseService';
 
 export class ScanTask extends BaseScannerTask {
+  getName(): string {
+    return this.project.metadata.getScannerState()
+  }
+
+  isCritical(): boolean {
+    return false;
+  }
+
   public async set(project: Project): Promise<void> {
     this.project = project;
     await modelProvider.init(this.project.getMyPath());

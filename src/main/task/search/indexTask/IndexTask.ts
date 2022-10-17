@@ -1,5 +1,5 @@
 import log from 'electron-log';
-import { ITask } from '../../Task';
+import { Scanner } from 'main/task/scanner/types';
 import { modelProvider } from '../../../services/ModelProvider';
 import { Indexer } from '../../../modules/searchEngine/indexer/Indexer';
 import { IIndexer } from '../../../modules/searchEngine/indexer/IIndexer';
@@ -8,15 +8,23 @@ import { BlackListKeyWordIndex } from '../../../workspace/tree/blackList/BlackLi
 import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCreator';
 import {Project} from "../../../workspace/Project";
 
-export class IndexTask implements ITask<Electron.WebContents, any> {
+export class IndexTask implements Scanner.IPipelineTask {
   private project: Project;
 
   constructor(project: Project) {
     this.project = project;
   }
 
+  getName(): string {
+    return 'Creating search index';
+  }
 
-  public async run(): Promise<any> {
+  isCritical(): boolean {
+   return false;
+  }
+
+
+  public async run(): Promise<boolean> {
     log.info('[ IndexTask init ]');
     const project = workspace.getOpenProject();
     if (!project) throw new Error('Not project opened');
@@ -29,6 +37,7 @@ export class IndexTask implements ITask<Electron.WebContents, any> {
     const projectPath = this.project.metadata.getMyPath();
     await indexer.saveIndex(index, `${projectPath}/dictionary/`);
     this.project.save();
+    return true;
   }
 
   private fileAdapter(modelFiles: any): Array<IIndexer> {
