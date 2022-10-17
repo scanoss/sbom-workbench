@@ -15,10 +15,6 @@ export class Indexer {
       try {
         if (i % 100 === 0) {
           this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
-            stage: {
-              stageName: `Creating search index`,
-              stageStep: 5,
-            },
             processed: i*100/files.length,
           });
         }

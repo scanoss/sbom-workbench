@@ -1,34 +1,48 @@
 import log from 'electron-log';
-import { ITask } from '../../Task';
+import { Scanner } from 'main/task/scanner/types';
 import { modelProvider } from '../../../services/ModelProvider';
 import { Indexer } from '../../../modules/searchEngine/indexer/Indexer';
 import { IIndexer } from '../../../modules/searchEngine/indexer/IIndexer';
 import { workspace } from '../../../workspace/Workspace';
 import { BlackListKeyWordIndex } from '../../../workspace/tree/blackList/BlackListKeyWordIndex';
 import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCreator';
-import {Project} from "../../../workspace/Project";
+import { Project } from '../../../workspace/Project';
+import { ScannerStage } from '../../../../api/types';
 
-export class IndexTask implements ITask<Electron.WebContents, any> {
+export class IndexTask implements Scanner.IPipelineTask {
   private project: Project;
 
   constructor(project: Project) {
     this.project = project;
   }
 
+  public getStageProperties(): Scanner.StageProperties {
+    return {
+      name: ScannerStage.SEARCH_INDEX,
+      label: 'Creating search index',
+      isCritical: false,
+    };
+  }
 
-  public async run(): Promise<any> {
+  public async run(): Promise<boolean> {
     log.info('[ IndexTask init ]');
     const project = workspace.getOpenProject();
     if (!project) throw new Error('Not project opened');
-    const f = this.project.getTree().getRootFolder().getFiles(new BlackListKeyWordIndex());
+    const f = this.project
+      .getTree()
+      .getRootFolder()
+      .getFiles(new BlackListKeyWordIndex());
     const paths = f.map((fi) => fi.path);
-    const files = await modelProvider.model.file.getAll(QueryBuilderCreator.create(paths));
+    const files = await modelProvider.model.file.getAll(
+      QueryBuilderCreator.create(paths)
+    );
     const indexer = new Indexer();
     const filesToIndex = this.fileAdapter(files);
     const index = indexer.index(filesToIndex);
     const projectPath = this.project.metadata.getMyPath();
     await indexer.saveIndex(index, `${projectPath}/dictionary/`);
     this.project.save();
+    return true;
   }
 
   private fileAdapter(modelFiles: any): Array<IIndexer> {

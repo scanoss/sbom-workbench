@@ -256,3 +256,14 @@ export interface Dependency {
   originalVersion: string;
   originalLicense: string[];
 }
+
+export enum ScannerStage {
+  UNZIP,
+  INDEX,
+  SCAN,
+  RESCAN,
+  RESUME,
+  DEPENDENCY,
+  VULNERABILITY,
+  SEARCH_INDEX,
+}

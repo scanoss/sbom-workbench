@@ -2,10 +2,12 @@ import React from 'react';
 import { CircularProgress, Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import PauseIcon from '@mui/icons-material/Pause';
+import { ScannerStage } from '@api/types';
 
 interface CircularComponentProps {
   stage: {
-    stageName: string;
+    stageName: ScannerStage;
+    stageLabel: string;
     stageStep: number;
   };
   progress: number;
@@ -76,12 +78,32 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 'bold',
     fontSize: '0.8em',
     marginTop: '2px',
-  }
+  },
 }));
 
-const CircularComponent = ({ stage, progress, pauseScan }: CircularComponentProps) => {
+const CircularComponent = ({
+  stage,
+  progress,
+  pauseScan,
+}: CircularComponentProps) => {
   const classes = useStyles();
-  const variant = stage.stageName === 'preparing' || stage.stageName === 'indexing' || stage.stageStep === 3 ? 'indeterminate' : 'determinate';
+  const variant =
+    stage.stageName === ScannerStage.UNZIP ||
+    stage.stageName === ScannerStage.INDEX ||
+    stage.stageName === ScannerStage.VULNERABILITY ||
+    stage.stageName === ScannerStage.DEPENDENCY
+      ? 'indeterminate'
+      : 'determinate';
+
+  const noProgress =
+    stage.stageName === ScannerStage.DEPENDENCY ||
+    stage.stageName === ScannerStage.VULNERABILITY ||
+    stage.stageName === ScannerStage.UNZIP;
+
+  const resumeEnable =
+    stage.stageName === ScannerStage.SCAN ||
+    stage.stageName === ScannerStage.RESUME ||
+    stage.stageName === ScannerStage.RESCAN;
 
   return (
     <div className={classes.parentBox}>
@@ -104,14 +126,20 @@ const CircularComponent = ({ stage, progress, pauseScan }: CircularComponentProp
       <div className={classes.typographyContainer}>
         <div className={classes.numberStageContainer}>
           <span className={classes.number}>
-            {stage.stageStep !== 3 ? Math.round(progress) : <>-</>}
+            {!noProgress ? Math.round(progress) : <>-</>}
             {variant === 'determinate' ? '%' : ''}
           </span>
-          <span className={classes.stage}>{stage.stageName.toUpperCase()}</span>
-          <span className={classes.stageStep}>STAGE {stage.stageStep}/5</span>
+          <span className={classes.stage}>
+            {stage.stageLabel?.toUpperCase()}
+          </span>
+          <span className={classes.stageStep}>STAGE {stage.stageStep}</span>
         </div>
         <div className={classes.pauseContainer}>
-          <Button disabled={stage.stageStep !== 2} startIcon={<PauseIcon />} onClick={pauseScan}>
+          <Button
+            disabled={!resumeEnable}
+            startIcon={<PauseIcon />}
+            onClick={pauseScan}
+          >
             <span className={classes.pause}>PAUSE</span>
           </Button>
         </div>

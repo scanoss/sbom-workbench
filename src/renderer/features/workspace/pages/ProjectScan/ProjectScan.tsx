@@ -6,7 +6,10 @@ import { IpcChannels } from '@api/ipc-channels';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { projectService } from '@api/services/project.service';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
+import {
+  selectWorkspaceState,
+  setScanPath,
+} from '@store/workspace-store/workspaceSlice';
 import * as controller from '../../../../controllers/home-controller';
 import CircularComponent from '../Components/CircularComponent';
 
@@ -18,7 +21,11 @@ const ProjectScan = () => {
   const { scanPath, newProject } = useSelector(selectWorkspaceState);
 
   const [progress, setProgress] = useState<number>(0);
-  const [stage, setStage] = useState<any>({ stageName: 'indexing', stageStep: 1 });
+  const [stage, setStage] = useState<any>({
+    stageName: 'preparing',
+    stageLabel: 'preparing',
+    stageStep: '-',
+  });
 
   const init = async () => {
     try {
@@ -39,13 +46,19 @@ const ProjectScan = () => {
 
   const handlerScannerStatus = (e, args) => {
     setProgress(args.processed);
-    setStage(args.stage);
+  };
+
+  const handlerScannerStage = (e, args) => {
+    setStage(args);
+    setProgress(0);
   };
 
   const handlerScannerError = async (e, err) => {
     const errorMessage = `<strong>Scan Paused</strong>
 
-    <span style="font-style: italic;">${err.name || ''} ${err.message || ''} ${err.code || ''}</span>
+    <span style="font-style: italic;">${err.name || ''} ${err.message || ''} ${
+      err.code || ''
+    }</span>
     Please try again later.`;
 
     await dialogCtrl.openConfirmDialog(
@@ -84,9 +97,30 @@ const ProjectScan = () => {
 
   const setupListeners = (): (() => void) => {
     const subscriptions = [];
-    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.SCANNER_UPDATE_STATUS, handlerScannerStatus));
-    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.SCANNER_FINISH_SCAN, handlerScannerFinish));
-    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.SCANNER_ERROR_STATUS, handlerScannerError));
+    subscriptions.push(
+      window.electron.ipcRenderer.on(
+        IpcChannels.SCANNER_UPDATE_STATUS,
+        handlerScannerStatus
+      )
+    );
+    subscriptions.push(
+      window.electron.ipcRenderer.on(
+        IpcChannels.SCANNER_FINISH_SCAN,
+        handlerScannerFinish
+      )
+    );
+    subscriptions.push(
+      window.electron.ipcRenderer.on(
+        IpcChannels.SCANNER_ERROR_STATUS,
+        handlerScannerError
+      )
+    );
+    subscriptions.push(
+      window.electron.ipcRenderer.on(
+        IpcChannels.SCANNER_UPDATE_STAGE,
+        handlerScannerStage
+      )
+    );
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
 
@@ -103,7 +137,11 @@ const ProjectScan = () => {
         <header className="app-header">
           <div>
             <h4 className="header-subtitle back">
-              <IconButton onClick={onPauseHandler} component="span" size="large">
+              <IconButton
+                onClick={onPauseHandler}
+                component="span"
+                size="large"
+              >
                 <ArrowBackIcon />
               </IconButton>
               SCANNING
@@ -114,7 +152,11 @@ const ProjectScan = () => {
         <main className="app-content">
           <div className="progressbar">
             <div className="circular-progress-container">
-              <CircularComponent stage={stage} progress={progress} pauseScan={() => onPauseHandler()} />
+              <CircularComponent
+                stage={stage}
+                progress={progress}
+                pauseScan={() => onPauseHandler()}
+              />
             </div>
           </div>
         </main>

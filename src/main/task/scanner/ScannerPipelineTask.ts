@@ -1,3 +1,4 @@
+import log from 'electron-log';
 import { ITask } from '../Task';
 import { ScanTask } from './ScanTask';
 import { DependencyTask } from './DependencyTask';
@@ -10,48 +11,59 @@ import { ReScanTask } from './ReScanTask';
 import { Project } from '../../workspace/Project';
 import { Scanner } from './types';
 import { ResumeScanTask } from './ResumeScanTask';
-import { userSettingService } from '../../services/UserSettingService';
 import { DecompressTask } from '../decompress/DecompressTask';
 import { IndexTreeTask } from '../IndexTreeTask/IndexTreeTask';
 import ScannerType = Scanner.ScannerType;
 
 export class ScannerPipelineTask implements ITask<Project, boolean> {
+  private queue: Array<Scanner.IPipelineTask>;
+
+  public constructor() {
+    this.queue = [];
+  }
+
   public async run(project: Project): Promise<boolean> {
     const { metadata } = project;
 
+    // decompress
     if (metadata.getScannerConfig().type.includes(ScannerType.UNZIP))
-      await new DecompressTask().run(project);
+      this.queue.push(new DecompressTask(project));
 
+    // index
     if (
       metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN ||
       metadata.getScannerConfig().mode === Scanner.ScannerMode.RESCAN
     )
-      await new IndexTreeTask().run(project);
+      this.queue.push(new IndexTreeTask(project));
 
     // scan
     const scanTask: BaseScannerTask =
       metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
-        ? new ScanTask()
+        ? new ScanTask(project)
         : metadata.getScannerConfig().mode === Scanner.ScannerMode.RESUME
-        ? new ResumeScanTask()
-        : new ReScanTask();
+        ? new ResumeScanTask(project)
+        : new ReScanTask(project);
 
     if (metadata.getScannerConfig().type.includes(ScannerType.CODE)) {
-      await scanTask.set(project);
-      await scanTask.init();
-      await scanTask.run();
+      await scanTask.set();
+      // await scanTask.init();
+      this.queue.push(scanTask);
     }
 
     // dependencies
     if (metadata.getScannerConfig().type.includes(ScannerType.DEPENDENCIES))
-      await new DependencyTask(project).run();
+      this.queue.push(new DependencyTask(project));
 
     // vulnerabilities
     if (metadata.getScannerConfig().type.includes(ScannerType.VULNERABILITIES))
-      await new VulnerabilitiesTask(project).run();
+      this.queue.push(new VulnerabilitiesTask(project));
 
     // search index
-    await new IndexTask(project).run();
+    this.queue.push(new IndexTask(project));
+
+    for await (const [index, task] of this.queue.entries()) {
+      await this.executeTask(task, index);
+    }
 
     await project.close();
 
@@ -63,14 +75,18 @@ export class ScannerPipelineTask implements ITask<Project, boolean> {
     return true;
   }
 
-  private checkTypes(params: Scanner.ScannerConfig, project: Project) {
-    const { APIS, DEFAULT_API_INDEX } = userSettingService.get();
-    const hasApiKey = project.getApiKey() || APIS[DEFAULT_API_INDEX]?.API_KEY;
+  private async executeTask(task: Scanner.IPipelineTask, stageStep = 1) {
+    try {
+      broadcastManager.get().send(IpcChannels.SCANNER_UPDATE_STAGE, {
+        stageName: task.getStageProperties().name,
+        stageLabel: task.getStageProperties().label,
+        stageStep: `${stageStep + 1}/${this.queue.length}`,
+      });
+      await task.run();
+    } catch (e) {
+      if (task.getStageProperties().isCritical) throw e;
 
-    if (!hasApiKey) {
-      params.type = params.type.filter(
-        (e) => e !== ScannerType.VULNERABILITIES
-      );
+      log.error('[ IndexTask init ]');
     }
   }
 }
