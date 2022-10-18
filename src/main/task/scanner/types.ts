@@ -1,5 +1,5 @@
-import { Project } from "main/workspace/Project";
-import { ITask } from "../Task";
+import { ScannerStage } from '../../../api/types';
+import { ITask } from '../Task';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Scanner {
@@ -28,8 +28,13 @@ export namespace Scanner {
     source?: ScannerSource;
   }
 
+  export interface StageProperties {
+    name: ScannerStage;
+    label: string;
+    isCritical: boolean;
+  }
+
   export interface IPipelineTask extends ITask<void, boolean> {
-    getName(): string;
-    isCritical(): boolean;
+    getStageProperties(): StageProperties;
   }
 }

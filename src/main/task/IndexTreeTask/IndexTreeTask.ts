@@ -1,6 +1,7 @@
 import { Project } from '../../workspace/Project';
 import { treeService } from '../../services/TreeService';
 import { Scanner } from '../scanner/types';
+import { ScannerStage } from '../../../api/types';
 
 export class IndexTreeTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -9,12 +10,12 @@ export class IndexTreeTask implements Scanner.IPipelineTask {
     this.project = project;
   }
 
-  getName(): string {
-    return 'Indexing';
-  }
-
-  isCritical(): boolean {
-    return true;
+  public getStageProperties(): Scanner.StageProperties {
+    return {
+      name: ScannerStage.INDEX,
+      label: 'Indexing',
+      isCritical: true,
+    };
   }
 
   run(): Promise<boolean> {

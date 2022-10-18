@@ -5,6 +5,7 @@ import { BlackListDependencies } from '../../workspace/tree/blackList/BlackListD
 import { Project } from '../../workspace/Project';
 import { dependencyService } from '../../services/DependencyService';
 import { Scanner } from './types';
+import { ScannerStage } from '../../../api/types';
 
 export class DependencyTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -13,12 +14,12 @@ export class DependencyTask implements Scanner.IPipelineTask {
     this.project = project;
   }
 
-  getName(): string {
-    return 'Analyzing dependencies';
-  }
-
-  isCritical(): boolean {
-    return false;
+  public getStageProperties(): Scanner.StageProperties {
+    return {
+      name: ScannerStage.DEPENDENCY,
+      label: 'Analyzing Dependencies',
+      isCritical: false,
+    };
   }
 
   public async run(): Promise<boolean> {
@@ -56,7 +57,10 @@ export class DependencyTask implements Scanner.IPipelineTask {
   private async addDependencies() {
     try {
       const dependencies = JSON.parse(
-        await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8')
+        await fs.promises.readFile(
+          `${this.project.metadata.getMyPath()}/dependencies.json`,
+          'utf8'
+        )
       );
       this.project.tree.addDependencies(dependencies);
       await dependencyService.insert(dependencies);

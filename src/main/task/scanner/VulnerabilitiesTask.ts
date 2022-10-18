@@ -7,6 +7,7 @@ import { IpcChannels } from '../../../api/ipc-channels';
 import { AddVulneravilityTask } from '../vulnerability/AddVulneravilityTask';
 import AppConfig from '../../../config/AppConfigModule';
 import { Scanner } from './types';
+import { ScannerStage } from '../../../api/types';
 
 export class VulnerabilitiesTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -15,12 +16,12 @@ export class VulnerabilitiesTask implements Scanner.IPipelineTask {
     this.project = project;
   }
 
-  getName(): string {
-    throw new Error('Method not implemented.');
-  }
-
-  isCritical(): boolean {
-    throw new Error('Method not implemented.');
+  public getStageProperties(): Scanner.StageProperties {
+    return {
+      name: ScannerStage.VULNERABILITY,
+      label: 'Searching Vulnerabilities',
+      isCritical: false,
+    };
   }
 
   public async run(): Promise<boolean> {
@@ -56,5 +57,4 @@ export class VulnerabilitiesTask implements Scanner.IPipelineTask {
     const response = Array.from(componentSet);
     return response;
   }
-
 }

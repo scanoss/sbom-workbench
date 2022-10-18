@@ -6,7 +6,8 @@ import { IIndexer } from '../../../modules/searchEngine/indexer/IIndexer';
 import { workspace } from '../../../workspace/Workspace';
 import { BlackListKeyWordIndex } from '../../../workspace/tree/blackList/BlackListKeyWordIndex';
 import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCreator';
-import {Project} from "../../../workspace/Project";
+import { Project } from '../../../workspace/Project';
+import { ScannerStage } from '../../../../api/types';
 
 export class IndexTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -15,22 +16,26 @@ export class IndexTask implements Scanner.IPipelineTask {
     this.project = project;
   }
 
-  getName(): string {
-    return 'Creating search index';
+  public getStageProperties(): Scanner.StageProperties {
+    return {
+      name: ScannerStage.SEARCH_INDEX,
+      label: 'Creating search index',
+      isCritical: false,
+    };
   }
-
-  isCritical(): boolean {
-   return false;
-  }
-
 
   public async run(): Promise<boolean> {
     log.info('[ IndexTask init ]');
     const project = workspace.getOpenProject();
     if (!project) throw new Error('Not project opened');
-    const f = this.project.getTree().getRootFolder().getFiles(new BlackListKeyWordIndex());
+    const f = this.project
+      .getTree()
+      .getRootFolder()
+      .getFiles(new BlackListKeyWordIndex());
     const paths = f.map((fi) => fi.path);
-    const files = await modelProvider.model.file.getAll(QueryBuilderCreator.create(paths));
+    const files = await modelProvider.model.file.getAll(
+      QueryBuilderCreator.create(paths)
+    );
     const indexer = new Indexer();
     const filesToIndex = this.fileAdapter(files);
     const index = indexer.index(filesToIndex);
