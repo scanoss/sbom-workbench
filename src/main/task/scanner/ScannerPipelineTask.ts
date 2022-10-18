@@ -1,4 +1,4 @@
-import { log } from 'electron-log';
+import log from 'electron-log';
 import { ITask } from '../Task';
 import { ScanTask } from './ScanTask';
 import { DependencyTask } from './DependencyTask';
@@ -16,7 +16,6 @@ import { IndexTreeTask } from '../IndexTreeTask/IndexTreeTask';
 import ScannerType = Scanner.ScannerType;
 
 export class ScannerPipelineTask implements ITask<Project, boolean> {
-
   private queue: Array<Scanner.IPipelineTask>;
 
   public constructor() {
@@ -28,7 +27,7 @@ export class ScannerPipelineTask implements ITask<Project, boolean> {
 
     // decompress
     if (metadata.getScannerConfig().type.includes(ScannerType.UNZIP))
-       this.queue.push(new DecompressTask(project));
+      this.queue.push(new DecompressTask(project));
 
     // index
     if (
@@ -40,14 +39,14 @@ export class ScannerPipelineTask implements ITask<Project, boolean> {
     // scan
     const scanTask: BaseScannerTask =
       metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
-        ? new ScanTask()
+        ? new ScanTask(project)
         : metadata.getScannerConfig().mode === Scanner.ScannerMode.RESUME
-        ? new ResumeScanTask()
-        : new ReScanTask();
+        ? new ResumeScanTask(project)
+        : new ReScanTask(project);
 
     if (metadata.getScannerConfig().type.includes(ScannerType.CODE)) {
-      await scanTask.set(project);
-      await scanTask.init();
+      await scanTask.set();
+      // await scanTask.init();
       this.queue.push(scanTask);
     }
 
@@ -78,20 +77,16 @@ export class ScannerPipelineTask implements ITask<Project, boolean> {
 
   private async executeTask(task: Scanner.IPipelineTask, stageStep = 1) {
     try {
-      broadcastManager.get().send(IpcChannels.SCANNER_UPDATE_STATUS, {
-        stageName: task.getName(),
-        stageStep: `${stageStep}/${this.queue.length}`,
+      broadcastManager.get().send(IpcChannels.SCANNER_UPDATE_STAGE, {
+        stageName: task.getStageProperties().name,
+        stageLabel: task.getStageProperties().label,
+        stageStep: `${stageStep + 1}/${this.queue.length}`,
       });
-
       await task.run();
-    } catch(e) {
-      if (task.isCritical)
-        throw e;
+    } catch (e) {
+      if (task.getStageProperties().isCritical) throw e;
 
-        log.error('[ IndexTask init ]');
-
-    };
-
+      log.error('[ IndexTask init ]');
+    }
   }
-
 }

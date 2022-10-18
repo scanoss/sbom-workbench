@@ -19,7 +19,7 @@ import { userSettingService } from '../../services/UserSettingService';
 import AppConfig from '../../../config/AppConfigModule';
 import { AutoAccept } from '../inventory/AutoAccept';
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
-import { Scanner as ScannerModule } from "./types";
+import { Scanner as ScannerModule } from './types';
 
 export abstract class BaseScannerTask implements ScannerModule.IPipelineTask {
   protected scanner: Scanner;
@@ -28,15 +28,17 @@ export abstract class BaseScannerTask implements ScannerModule.IPipelineTask {
 
   protected project: Project;
 
-  abstract getName(): string;
+  public abstract getStageProperties(): ScannerModule.StageProperties;
 
-  abstract isCritical(): boolean;
+  constructor(project: Project) {
+    this.project = project;
+  }
 
   protected sendToUI(eventName, data: any) {
     broadcastManager.get().send(eventName, data);
   }
 
-  public abstract set(project: Project | string): Promise<void>;
+  public abstract set(): Promise<void>;
 
   public async init() {
     this.setScannerConfig();
@@ -48,10 +50,10 @@ export abstract class BaseScannerTask implements ScannerModule.IPipelineTask {
       for (const file of filesScanned)
         delete this.project.filesToScan[`${this.project.getScanRoot()}${file}`];
       this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
-        stage: {
+        /*  stage: {
           stageName: ScanState.SCANNING,
           stageStep: 2,
-        },
+        },*/
         processed:
           (100 * this.project.processedFiles) /
           this.project.filesSummary.include,
@@ -128,6 +130,7 @@ export abstract class BaseScannerTask implements ScannerModule.IPipelineTask {
 
   public async run(): Promise<boolean> {
     log.info('[ BaseScannerTask init scanner]');
+    await this.init();
     await this.scan();
     await this.done();
     this.project.save();

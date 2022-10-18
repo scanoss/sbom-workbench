@@ -1,23 +1,25 @@
-import { ScanState } from '../../../api/types';
+import { ScannerStage, ScanState } from '../../../api/types';
 import { BaseScannerTask } from './BaseScannerTask';
 import { Project } from '../../workspace/Project';
 import { modelProvider } from '../../services/ModelProvider';
 import { licenseService } from '../../services/LicenseService';
+import { Scanner } from './types';
 
 export class ScanTask extends BaseScannerTask {
-  getName(): string {
-    return this.project.metadata.getScannerState()
+  public getStageProperties(): Scanner.StageProperties {
+    return {
+      name: ScannerStage.SCAN,
+      label: 'Scanning',
+      isCritical: false,
+    };
   }
 
-  isCritical(): boolean {
-    return false;
-  }
+  public async set(): Promise<void> {
+    //this.project = project;
 
-  public async set(project: Project): Promise<void> {
-    this.project = project;
     await modelProvider.init(this.project.getMyPath());
     await licenseService.import();
-    project.metadata.setScannerState(ScanState.SCANNING);
-    project.save();
+    this.project.metadata.setScannerState(ScanState.SCANNING);
+    //this.project.save();
   }
 }

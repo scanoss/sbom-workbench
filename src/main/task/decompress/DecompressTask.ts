@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { Project } from '../../workspace/Project';
 import { Scanner } from '../scanner/types';
+import { ScannerStage } from '../../../api/types';
 
 export class DecompressTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -14,12 +15,12 @@ export class DecompressTask implements Scanner.IPipelineTask {
     this.decompressionManager = new DecompressionManager();
   }
 
-  getName(): string {
-    return 'Decompressing';
-  }
-
-  isCritical(): boolean {
-    return false;
+  public getStageProperties(): Scanner.StageProperties {
+    return {
+      name: ScannerStage.UNZIP,
+      label: 'Decompressing files',
+      isCritical: false,
+    };
   }
 
   public async run(): Promise<boolean> {
