@@ -45,8 +45,6 @@ export class ScannerPipelineTask implements ITask<Project, boolean> {
         : new ReScanTask(project);
 
     if (metadata.getScannerConfig().type.includes(ScannerType.CODE)) {
-      await scanTask.set();
-      // await scanTask.init();
       this.queue.push(scanTask);
     }
 
@@ -83,10 +81,19 @@ export class ScannerPipelineTask implements ITask<Project, boolean> {
         stageStep: `${stageStep + 1}/${this.queue.length}`,
       });
       await task.run();
-    } catch (e) {
-      if (task.getStageProperties().isCritical) throw e;
-
-      log.error('[ IndexTask init ]');
+    } catch (e: any) {
+      if (task.getStageProperties().isCritical) {
+        log.error(
+          '[SCANNER PIPELINE ERROR]',
+          `Stage: ${task.getStageProperties().label} error: ${e.message}`
+        );
+        broadcastManager.get().send(IpcChannels.SCANNER_ERROR_STATUS, {
+          name: `Error: ${
+            task.getStageProperties().label
+          }, see logs for more details.`,
+        });
+        throw e;
+      }
     }
   }
 }
