@@ -50,10 +50,6 @@ export abstract class BaseScannerTask implements ScannerModule.IPipelineTask {
       for (const file of filesScanned)
         delete this.project.filesToScan[`${this.project.getScanRoot()}${file}`];
       this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
-        /*  stage: {
-          stageName: ScanState.SCANNING,
-          stageStep: 2,
-        },*/
         processed:
           (100 * this.project.processedFiles) /
           this.project.filesSummary.include,
@@ -130,6 +126,7 @@ export abstract class BaseScannerTask implements ScannerModule.IPipelineTask {
 
   public async run(): Promise<boolean> {
     log.info('[ BaseScannerTask init scanner]');
+    await this.set();
     await this.init();
     await this.scan();
     await this.done();

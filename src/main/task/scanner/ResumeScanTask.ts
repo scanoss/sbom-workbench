@@ -1,5 +1,4 @@
 import { ScannerStage, ScanState } from '../../../api/types';
-import { Project } from '../../workspace/Project';
 import { BaseScannerTask } from './BaseScannerTask';
 import { Scanner } from './types';
 
@@ -8,7 +7,7 @@ export class ResumeScanTask extends BaseScannerTask {
     return {
       name: ScannerStage.RESUME,
       label: 'Scanning',
-      isCritical: false,
+      isCritical: true,
     };
   }
 
@@ -17,6 +16,5 @@ export class ResumeScanTask extends BaseScannerTask {
     const scanState: ScanState = this.project.metadata.getScannerState();
     if (scanState !== ScanState.SCANNING && scanState !== ScanState.RESCANNING)
       throw new Error('Cannot resume project');
-    //this.project = p;
   }
 }
