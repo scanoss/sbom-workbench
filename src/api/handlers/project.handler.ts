@@ -175,7 +175,7 @@ ipcMain.handle(
       await projectService.createProject(projectDTO);
       return Response.ok();
     } catch (error: any) {
-      log.error(error);
+      log.error('[CREATE PROJECT]', error);
       return Response.fail({ message: error.message });
     }
   }

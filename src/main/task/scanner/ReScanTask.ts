@@ -3,9 +3,7 @@ import { ScannerStage, ScanState } from '../../../api/types';
 import { licenseService } from '../../services/LicenseService';
 import { modelProvider } from '../../services/ModelProvider';
 import { rescanService } from '../../services/RescanService';
-import { treeService } from '../../services/TreeService';
 import { BaseScannerTask } from './BaseScannerTask';
-import { Project } from '../../workspace/Project';
 import { Scanner } from './types';
 
 export class ReScanTask extends BaseScannerTask {
@@ -13,13 +11,12 @@ export class ReScanTask extends BaseScannerTask {
     return {
       name: ScannerStage.RESCAN,
       label: 'Rescanning',
-      isCritical: false,
+      isCritical: true,
     };
   }
 
   public async done() {
     await this.project.open();
-    console.log(this.project.getTree().getRootFolder());
     const resultPath = `${this.project.getMyPath()}/result.json`;
     await rescanService.reScan(
       this.project.getTree().getRootFolder().getFiles(),
@@ -39,7 +36,5 @@ export class ReScanTask extends BaseScannerTask {
     await modelProvider.init(this.project.getMyPath());
     await licenseService.import();
     this.project.save();
-    // await this.project.open();
-    //this.project = p;
   }
 }

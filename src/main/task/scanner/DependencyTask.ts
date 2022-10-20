@@ -24,7 +24,6 @@ export class DependencyTask implements Scanner.IPipelineTask {
 
   public async run(): Promise<boolean> {
     log.info('[ DependencyTask init ]');
-
     await this.scanDependencies();
     await this.addDependencies();
     await this.project.save();
