@@ -1,6 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
   Button,
+  Checkbox,
+  FormControlLabel,
+  FormHelperText,
   IconButton,
   MenuItem,
   Paper,
@@ -22,6 +25,7 @@ import { ResponseStatus } from '@api/Response';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import AppConfig from '@config/AppConfigModule';
 import { useDispatch, useSelector } from 'react-redux';
+import FormGroup from '@mui/material/FormGroup';
 import {
   selectWorkspaceState,
   setNewProject,
@@ -83,7 +87,6 @@ const ProjectSettings = () => {
         ScannerType.CODE,
         ScannerType.DEPENDENCIES,
         ScannerType.VULNERABILITIES,
-        ScannerType.UNZIP,
       ],
     },
   });
@@ -166,6 +169,18 @@ const ProjectSettings = () => {
     }
   };
 
+  const onDecompress = (checked: boolean) => {
+    const newType = projectSettings.scannerConfig.type.filter((t) => t !== ScannerType.UNZIP);
+    if (checked) newType.push(ScannerType.UNZIP);
+    setProjectSettings({
+      ...projectSettings,
+      scannerConfig: {
+        ...projectSettings.scannerConfig,
+        type: newType
+      }
+    })
+  };
+
   return (
     <>
       <section id="ProjectSettings" className="app-page">
@@ -211,6 +226,7 @@ const ProjectSettings = () => {
                     {!projectValidName && 'The project name is invalid'}
                   </div>
                 </div>
+
                 <div className="input-container input-container-license mb-3">
                   <div className="input-label-add-container">
                     <label className="input-label">
@@ -290,7 +306,7 @@ const ProjectSettings = () => {
                   </Paper>
                 </div>
               </div>
-              <div className="api-conections-container">
+              <div className="api-conections-container mt-5">
                 <div className="api-subcontainer">
                   {AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS && (
                     <>
@@ -363,6 +379,23 @@ const ProjectSettings = () => {
                     </Paper>
                   </div>
                 </div>
+              </div>
+              <div className="mt-5">
+                <label className="input-label">Scanner Settings</label>
+                <FormGroup>
+                  <FormControlLabel
+                    control={<Checkbox />}
+                    label="Decompress archives and scan inner files"
+                    onChange={(event, checked) => onDecompress(checked)}
+                  />
+                </FormGroup>
+                {projectSettings.scannerConfig.type.some(
+                  (item) => item === ScannerType.UNZIP
+                ) && (
+                  <FormHelperText>
+                    This option will decompress archives into project folder
+                  </FormHelperText>
+                )}
               </div>
             </div>
             <div className="button-container">
