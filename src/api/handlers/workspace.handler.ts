@@ -37,26 +37,6 @@ ipcMain.handle(
   }
 );
 
-/**
- * This service creates a new project and launch automatically the scanner.
- * In future versions, the scanner will be launched by the user.
- */
-ipcMain.handle(IpcChannels.WORKSPACE_CREATE_PROJECT, async (_event, project: INewProject) => {
-  try {
-    const scanner = new ScannerPipelineTask();
-    await scanner.run({
-      mode: Scanner.ScannerMode.SCAN,
-      source: ScannerSource.CODE,
-      type: [ScannerType.CODE, ScannerType.DEPENDENCIES, ScannerType.VULNERABILITIES],
-      project,
-    });
-    return Response.ok();
-  } catch (error: any) {
-    log.error(error);
-    return Response.fail({ message: error.message });
-  }
-});
-
 ipcMain.handle(IpcChannels.UTILS_GET_PROJECT_DTO, async (_event) => {
   try {
     const path: IProject = workspace.getOpenedProjects()[0].getDto();
