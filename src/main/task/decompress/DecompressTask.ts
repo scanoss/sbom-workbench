@@ -30,7 +30,6 @@ export class DecompressTask implements Scanner.IPipelineTask {
         this.decompressionManager.getSupportedFormats()
       );
       await this.decompressionManager.decompress(filesToDecompress);
-      await new Promise((resolve) => setTimeout(resolve, 3000));
       return true;
     } catch (error: any) {
       console.log(error);
@@ -61,7 +60,7 @@ export class DecompressTask implements Scanner.IPipelineTask {
         results = results.concat(
           this.getFilesToDecompress(filename, extensions)
         ); //  recurse
-      } else if (extensions.includes(path.extname(filename))) {
+      } else if (extensions.some((format) => filename.endsWith(format))) {
         results.push(filename);
       }
     }

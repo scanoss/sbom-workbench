@@ -217,6 +217,9 @@ export default class Folder extends Node {
     for (const child of this.children) {
       child.addDependency(path);
     }
+    this.updateStatusFlags();
+    this.status = this.getStatusClassName();
+    this.setStatusOnClassnameAs(this.status);
   }
 
   public filter(paths: Record<string, number>): boolean {
