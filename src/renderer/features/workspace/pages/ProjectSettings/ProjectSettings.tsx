@@ -124,8 +124,7 @@ const ProjectSettings = () => {
     );
 
     // eslint-disable-next-line no-control-regex
-    const re =
-      /^[^\s^\x00-\x1f\\?*:"";<>|/.][^\x00-\x1f\\?*:"";<>|/]*[^\s^\x00-\x1f\\?*:"";<>|/.]+$/;
+    const re = /^[^\s^\x00-\x1f\\?*:"";<>|/.][^\x00-\x1f\\?*:"";<>|/]*[^\s^\x00-\x1f\\?*:"";<>|/.]+$/;
 
     if (found) {
       setProjectNameExists(true);
@@ -227,7 +226,7 @@ const ProjectSettings = () => {
                   </div>
                 </div>
 
-                <div className="input-container input-container-license mb-3">
+                <div className="input-container input-container-license mt-1 mb-3">
                   <div className="input-label-add-container">
                     <label className="input-label">
                       License
