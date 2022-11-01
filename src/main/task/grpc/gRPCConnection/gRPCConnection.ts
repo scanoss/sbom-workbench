@@ -48,7 +48,7 @@ class GRPCConnection {
 
   public getVulnerabilityStub(): grpc.Client {
     if (!this.vulnerabilityClient)
-      this.vulnerabilityClient = new VulnerabilitiesClient("ns3029088.ip-51-255-68.eu:50051", this.getInsecureCredentials());
+      this.vulnerabilityClient = new VulnerabilitiesClient(this.getEndpoint(), this.getCredentials());
     return this.vulnerabilityClient;
   }
 
