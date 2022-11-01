@@ -6,33 +6,32 @@ import { modelProvider } from './ModelProvider';
 import { Scanner } from '../task/scanner/types';
 import { userSettingService } from './UserSettingService';
 import { ProjectFilterPath } from '../workspace/filters/ProjectFilterPath';
-import { ScannerPipelineTask } from '../task/scanner/ScannerPipelineTask';
+import { CodeScannerPipelineTask } from '../task/scanner/scannerPipeline/CodeScannerPipelineTask';
 import ScannerConfig = Scanner.ScannerConfig;
 import ScannerType = Scanner.ScannerType;
 import ScannerSource = Scanner.ScannerSource;
 import ScannerMode = Scanner.ScannerMode;
+import {ScannerPipelineFactory} from "../task/scanner/scannerPipelineFactory/ScannerPipelineFactory";
 
 class ProjectService {
   public async createProject(projectDTO: INewProject) {
     const p = await this.create(projectDTO);
-    const scanner = new ScannerPipelineTask();
-    await scanner.run(p);
+    await ScannerPipelineFactory.getScannerPipeline(projectDTO.scannerConfig.source).run(p);
   }
 
   public async reScan(projectPath: string) {
     await workspace.closeAllProjects();
     const p = await workspace.getProject(new ProjectFilterPath(projectPath));
     p.metadata.getScannerConfig().mode = Scanner.ScannerMode.RESCAN;
-    const scanner = new ScannerPipelineTask();
-    await scanner.run(p);
+    await ScannerPipelineFactory.getScannerPipeline(p.metadata.getScannerConfig().source).run(p);
   }
 
   public async resume(projectPath: string) {
     await workspace.closeAllProjects();
     const p = await workspace.getProject(new ProjectFilterPath(projectPath));
-    const scanner = new ScannerPipelineTask();
+    const scanner = new CodeScannerPipelineTask();
     p.metadata.getScannerConfig().mode = Scanner.ScannerMode.RESUME;
-    await scanner.run(p);
+    await ScannerPipelineFactory.getScannerPipeline(p.metadata.getScannerConfig().source).run(p);
   }
 
   private async createNewProject(projectDTO: INewProject): Promise<Project> {
