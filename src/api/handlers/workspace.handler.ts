@@ -6,7 +6,7 @@ import { Response } from '../Response';
 import { INewProject, IProject, License } from '../types';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
-import { ScannerPipelineTask } from '../../main/task/scanner/ScannerPipelineTask';
+import { CodeScannerPipelineTask } from '../../main/task/scanner/scannerPipeline/CodeScannerPipelineTask';
 import { Scanner } from '../../main/task/scanner/types';
 import ScannerSource = Scanner.ScannerSource;
 import ScannerType = Scanner.ScannerType;
