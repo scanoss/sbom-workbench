@@ -9,7 +9,7 @@ import { Project } from '../../main/workspace/Project';
 import { workspace } from '../../main/workspace/Workspace';
 import { dependencyService } from '../../main/services/DependencyService';
 import { searcher } from '../../main/modules/searchEngine/searcher/Searcher';
-import { ScannerPipelineTask } from '../../main/task/scanner/ScannerPipelineTask';
+import { CodeScannerPipelineTask } from '../../main/task/scanner/scannerPipeline/CodeScannerPipelineTask';
 import { Scanner } from '../../main/task/scanner/types';
 import ScannerSource = Scanner.ScannerSource;
 import ScannerType = Scanner.ScannerType;
