@@ -44,36 +44,40 @@ export class Tree {
     broadcastManager.get().send(eventName, data);
   }
 
-  public build(): Node {
-    this.buildTreeRec(this.rootPath, this.rootFolder, this.rootPath);
+  public build(files: Array<string>) {
+    const addedNodes = {};
+    files.forEach((f) => {
+      const splitPath = f.split("/");
+      splitPath.shift();
+      this.recursive(splitPath, this.rootFolder, addedNodes);
+    });
     return this.rootFolder;
+
   }
 
-  public buildTreeRec(path: string, root: Folder, rootPath: string): Node {
-    const dirEntries = fs
-      .readdirSync(path, { withFileTypes: true }) // Returns a list of files and folders
-      .sort(this.dirFirstFileAfter)
-      .filter((dirent: any) => !dirent.isSymbolicLink());
-    for (const dirEntry of dirEntries) {
-      const relativePath = `${path}/${dirEntry.name}`.replace(rootPath, '');
-      if (dirEntry.isDirectory()) {
-        const f: Folder = new Folder(relativePath, dirEntry.name);
-        const subTree = this.buildTreeRec(
-          `${path}/${dirEntry.name}`,
-          f,
-          rootPath
-        );
-        root.addChild(subTree);
-      } else root.addChild(new File(relativePath, dirEntry.name));
+ private recursive(splitPath: Array<string>, node: Folder, addedNodes : Record<string, Folder>): Node{
+    const nodePath = `${node.getPath()}/${  splitPath[0]}`;
+    // File
+    if (splitPath.length === 1) {
+      const file = new File(nodePath, splitPath[0]);
+      node.addChild(file);
+      return file;
     }
-    return root;
-  }
-
-  // This is a sorter that will sort folders before files in alphabetical order.
-  private dirFirstFileAfter(a: any, b: any) {
-    if (!a.isDirectory() && b.isDirectory()) return 1;
-    if (a.isDirectory() && !b.isDirectory()) return -1;
-    return 0;
+    // Folder
+    const treeNode = addedNodes[nodePath];
+    if(treeNode!== undefined){
+      // eslint-disable-next-line no-param-reassign
+      node = treeNode;
+    }else{
+      const f = new Folder(nodePath, splitPath[0]);
+      addedNodes[nodePath] = f;
+      node.addChild(f);
+      // eslint-disable-next-line no-param-reassign
+      node = f;
+    }
+    splitPath.shift();
+    this.recursive(splitPath, node,addedNodes);
+    return node;
   }
 
   public attachResults(results: any): void {

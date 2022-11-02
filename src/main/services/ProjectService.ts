@@ -1,17 +1,16 @@
 import log from 'electron-log';
-import { INewProject, ProjectState } from '../../api/types';
-import { Project } from '../workspace/Project';
-import { workspace } from '../workspace/Workspace';
-import { modelProvider } from './ModelProvider';
-import { Scanner } from '../task/scanner/types';
-import { userSettingService } from './UserSettingService';
-import { ProjectFilterPath } from '../workspace/filters/ProjectFilterPath';
-import { CodeScannerPipelineTask } from '../task/scanner/scannerPipeline/CodeScannerPipelineTask';
-import ScannerConfig = Scanner.ScannerConfig;
-import ScannerType = Scanner.ScannerType;
-import ScannerSource = Scanner.ScannerSource;
-import ScannerMode = Scanner.ScannerMode;
+import {INewProject, ProjectState} from '../../api/types';
+import {Project} from '../workspace/Project';
+import {workspace} from '../workspace/Workspace';
+import {modelProvider} from './ModelProvider';
+import {Scanner} from '../task/scanner/types';
+import {userSettingService} from './UserSettingService';
+import {ProjectFilterPath} from '../workspace/filters/ProjectFilterPath';
+import {CodeScannerPipelineTask} from '../task/scanner/scannerPipeline/CodeScannerPipelineTask';
 import {ScannerPipelineFactory} from "../task/scanner/scannerPipelineFactory/ScannerPipelineFactory";
+import ScannerType = Scanner.ScannerType;
+import ScannerMode = Scanner.ScannerMode;
+import ScannerSource = Scanner.ScannerSource;
 
 class ProjectService {
   public async createProject(projectDTO: INewProject) {
