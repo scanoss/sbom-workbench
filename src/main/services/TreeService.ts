@@ -8,19 +8,6 @@ import { FilterTrue } from '../batch/Filter/FilterTrue';
 import { modelProvider } from './ModelProvider';
 
 class TreeService {
-  public init(projectPath: string, scanRoot: string): Tree {
-    try {
-      const tree = new Tree(scanRoot, projectPath);
-      tree.build();
-      tree.setFilter();
-      tree.summarize();
-      return tree;
-    } catch (e: any) {
-      log.error(e);
-      throw e;
-    }
-  }
-
   private updateStatus(paths: Array<string>, status: NodeStatus) {
     try {
       const project = workspace.getOpenedProjects()[0];
@@ -141,6 +128,7 @@ class TreeService {
       throw e;
     }
   }
+
 }
 
 export const treeService = new TreeService();
