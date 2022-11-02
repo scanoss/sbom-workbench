@@ -1,14 +1,19 @@
+import fs from "fs";
 import { Project } from '../../workspace/Project';
-import { treeService } from '../../services/TreeService';
 import { Scanner } from '../scanner/types';
 import { ScannerStage } from '../../../api/types';
+import {Tree} from "../../workspace/tree/Tree";
+import Folder from "../../workspace/tree/Folder";
 
-export class IndexTreeTask implements Scanner.IPipelineTask {
-  private project: Project;
+export abstract class IndexTreeTask implements Scanner.IPipelineTask {
+  protected project: Project;
 
   constructor(project: Project) {
     this.project = project;
   }
+
+  public abstract run(): Promise<boolean>;
+  public abstract buildTree(files: Array<string>);
 
   public getStageProperties(): Scanner.StageProperties {
     return {
@@ -18,11 +23,8 @@ export class IndexTreeTask implements Scanner.IPipelineTask {
     };
   }
 
-  run(): Promise<boolean> {
-    const tree = treeService.init(
-      this.project.getMyPath(),
-      this.project.metadata.getScanRoot()
-    );
+  public async setTreeSummary(tree: Tree){
+    tree.summarize();
     const summary = tree.getSummarize();
     this.project.filesToScan = summary.files;
     this.project.filesSummary = summary;
@@ -31,6 +33,9 @@ export class IndexTreeTask implements Scanner.IPipelineTask {
     this.project.metadata.setFileCounter(summary.include);
     this.project.setTree(tree);
     this.project.save();
-    return Promise.resolve(undefined);
   }
+
+
+
+
 }

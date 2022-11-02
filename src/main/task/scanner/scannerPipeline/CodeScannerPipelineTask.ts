@@ -14,6 +14,9 @@ import { DecompressTask } from '../../decompress/DecompressTask';
 import { IndexTreeTask } from '../../IndexTreeTask/IndexTreeTask';
 import ScannerType = Scanner.ScannerType;
 import {ScannerPipeline} from "./ScannerPipeline";
+import {CodeIndexTreeTask} from "../../IndexTreeTask/CodeIndexTreeTask";
+import {WFPScannerPipeLineTask} from "./WFPScannerPipeLineTask";
+import {WFPIndexTreeTask} from "../../IndexTreeTask/WFPIndexTreeTask";
 
 export class CodeScannerPipelineTask extends ScannerPipeline{
   public async run(project: Project): Promise<boolean> {
@@ -28,7 +31,7 @@ export class CodeScannerPipelineTask extends ScannerPipeline{
       metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN ||
       metadata.getScannerConfig().mode === Scanner.ScannerMode.RESCAN
     )
-      this.queue.push(new IndexTreeTask(project));
+      this.queue.push(new CodeIndexTreeTask(project));
 
     // scan
     const scanTask: BaseScannerTask =
@@ -57,12 +60,7 @@ export class CodeScannerPipelineTask extends ScannerPipeline{
       await this.executeTask(task, index);
     }
 
-    await project.close();
-
-    broadcastManager.get().send(IpcChannels.SCANNER_FINISH_SCAN, {
-      success: true,
-      resultsPath: metadata.getMyPath(),
-    });
+    await this.done(project);
 
     return true;
   }
