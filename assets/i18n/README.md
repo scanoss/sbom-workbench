@@ -1,6 +1,6 @@
 # [SCANOSS AUDIT WORKBENCH](https://scanoss.com/product)
 
-## Internacionalization (i18n)
+## Internationalization (i18n)
 
 SCANOSS Audit Workbench is multi-language enabled, which means that you can display the user interface (UI) in different languages. This is done using the internationalization-framework i18next. See [official documentation](https://www.i18next.com) for more details.
 
@@ -22,7 +22,7 @@ The following steps must be followed to add a new language. For example let's ad
 
   <p><img src="../../.erb/img/workbench_1.c77c359.png" align="center" style="margin-left: 50px" width="200" /></p>
 
-3. <b>Reeplace all values into the trasnlation files.</b> Each file represents a namespace that has to be translated:
+3. <b>Reeplace all values into the translation files.</b> Each file represents a namespace that has to be translated:
 
 `Button.json`
 
@@ -32,7 +32,6 @@ The following steps must be followed to add a new language. For example let's ad
   "ImportProject": "Importer un projet",
   "Continue": "Continuer",
   "Save": "Sauver"
-  // ...
 }
 ```
 
