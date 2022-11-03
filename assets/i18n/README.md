@@ -19,7 +19,11 @@ The following steps must be followed to add a new language. For example let's ad
 2. <b>Clone `assets/i18n/en` folder and rename into the new lenguage code:</b>
 
 <div align="center">
-  <img src="../erb/img/workbench_1.c77c359.png" align="center" width="100%" />
+  <img src="../.erb/img/workbench_1.c77c359.png" align="center" width="100%" />
+</div>
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/scanoss/audit-workbench/i18n-test/.erb/img/workbench_1.c77c359.png" align="center" />
 </div>
 
 3.
