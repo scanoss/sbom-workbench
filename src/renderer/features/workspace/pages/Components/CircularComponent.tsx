@@ -132,7 +132,7 @@ const CircularComponent = ({
             {!noProgress ? Math.round(progress) : <>-</>}
             {variant === 'determinate' ? '%' : ''}
           </span>
-          <span className={`${classes.stage} text-uppercase`}>{t(`Title:${stage.stageLabel}`)}</span>
+          <span className={`${classes.stage} text-uppercase`}>{stage.stageLabel}</span>
           <span className={`${classes.stageStep} text-uppercase`}>{t('Title:Stage')} {stage.stageStep}</span>
         </div>
         <div className={classes.pauseContainer}>
@@ -141,7 +141,7 @@ const CircularComponent = ({
             startIcon={<PauseIcon />}
             onClick={pauseScan}
           >
-            <span className={classes.pause}>{t('Button:Pause')}</span>
+            <span className={classes.pause}>{t('Button:PAUSE')}</span>
           </Button>
         </div>
       </div>

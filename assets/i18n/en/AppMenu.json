@@ -30,5 +30,6 @@
   "ExpandToMatches": "Expand to matches",
   "CollapseAll": "Collapse all",
   "IdentifySelectedAs": "Identify selected files as...",
-  "MarkSelectedAsOriginal": "Mark selected files as original"
+  "MarkSelectedAsOriginal": "Mark selected files as original",
+  "OpenTranslationManagement": "Open Translation Management"
 }

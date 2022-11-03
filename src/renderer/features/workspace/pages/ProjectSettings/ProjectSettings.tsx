@@ -18,6 +18,8 @@ import { useNavigate } from 'react-router-dom';
 import Autocomplete from '@mui/material/Autocomplete';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Add } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { selectWorkspaceState, setNewProject, setScanPath } from '@store/workspace-store/workspaceSlice';
 import { INewProject } from '@api/types';
 import { userSettingService } from '@api/services/userSetting.service';
 import { workspaceService } from '@api/services/workspace.service';
@@ -29,8 +31,6 @@ import FormGroup from '@mui/material/FormGroup';
 import { Scanner } from '../../../../../main/task/scanner/types';
 import ScannerType = Scanner.ScannerType;
 import ScannerSource = Scanner.ScannerSource;
-import { selectWorkspaceState, setNewProject, setScanPath } from '@store/workspace-store/workspaceSlice';
-import { Trans, useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -353,8 +353,6 @@ const ProjectSettings = () => {
                   <div className="label-input-container mt-5">
                     <div className="label-icon">
                       <label className="input-label h3">
-                        SBOM Ledger Token{' '}
-                        <span className="optional">- Optional</span>
                         {t('Title:SBOMLedgerToken')} <span className="optional">- {t('Common:Optional')}</span>
                       </label>
                     </div>

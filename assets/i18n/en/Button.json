@@ -36,5 +36,7 @@
   "Delete": "Delete",
   "Keep": "Keep",
   "Overwrite": "Overwrite",
-  "Yes": "Yes"
+  "Yes": "Yes",
+  "RestartLater": "Restart later",
+  "RestartNow": "Restart now"
 }

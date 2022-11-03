@@ -115,6 +115,12 @@ export default class MenuBuilder {
           },
         },
         {
+          label: i18next.t('AppMenu:OpenTranslationManagement'),
+          click: () => {
+            this.mainWindow.webContents.send(IpcChannels.MENU_OPEN_TRANSLATION_MANAGER);
+          },
+        },
+        {
           label: i18next.t('AppMenu:ToggleDeveloperTools'),
           accelerator: 'Alt+Command+I',
           click: () => {
@@ -224,6 +230,12 @@ export default class MenuBuilder {
                   accelerator: 'Ctrl+R',
                   click: () => {
                     this.mainWindow.webContents.reload();
+                  },
+                },
+                {
+                  label: i18next.t('AppMenu:OpenTranslationManagement'),
+                  click: () => {
+                    this.mainWindow.webContents.send(IpcChannels.MENU_OPEN_TRANSLATION_MANAGER);
                   },
                 },
                 {

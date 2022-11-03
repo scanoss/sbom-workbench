@@ -52,5 +52,10 @@
   "FullText": "Full text",
   "Stage": "Stage",
   "Scanning": "Scanning",
-  "Original": "Original"
+  "Original": "Original",
+  "Rescanning": "Rescanning",
+  "AnalyzingDependencies": "Analyzing Dependencies",
+  "SearchingVulnerabilities": "Searching Vulnerabilities",
+  "CreatingSearchIndex": "Creating Search Index",
+  "Indexing": "Indexing"
 }

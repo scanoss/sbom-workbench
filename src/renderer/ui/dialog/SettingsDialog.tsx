@@ -11,6 +11,8 @@ import { userSettingService } from '@api/services/userSetting.service';
 import AppConfig from '@config/AppConfigModule';
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from 'react-i18next';
+import { AppI18n } from '@shared/i18n';
+
 
 const filter = createFilterOptions();
 
@@ -366,8 +368,10 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   value={language}
                   onChange={(e) => setLanguage(e.target.value as string)}
                 >
-                  <MenuItem value="en">English</MenuItem>
-                  <MenuItem value="es">Español</MenuItem>
+
+                  {AppI18n.getLanguages().map( (item) =>
+                    <MenuItem key={item.key} value={item.key}>{item.value}</MenuItem>
+                  )}
                 </Select>
               </Paper>
             </div>

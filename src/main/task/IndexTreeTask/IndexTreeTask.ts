@@ -1,3 +1,4 @@
+import i18next from 'i18next';
 import { Project } from '../../workspace/Project';
 import { treeService } from '../../services/TreeService';
 import { Scanner } from '../scanner/types';
@@ -13,7 +14,7 @@ export class IndexTreeTask implements Scanner.IPipelineTask {
   public getStageProperties(): Scanner.StageProperties {
     return {
       name: ScannerStage.INDEX,
-      label: 'Indexing',
+      label: i18next.t('Title:Indexing'),
       isCritical: true,
     };
   }
