@@ -57,4 +57,4 @@ Once you have the application running in development mode, you can gradually cha
 
 ### Contributing
 
-You can help in SCANOSS translations submitting PR directly changing all files described in this guide. For more information see the [Code of Conduct](../../CODE_OF_CONDUCT.md).
+You can help in SCANOSS translations submitting PR directly changing all files described in this guide. For more information see the [Contributing Guide](../../CONTRIBUTING.md) and [Code of Conduct](../../CODE_OF_CONDUCT.md).

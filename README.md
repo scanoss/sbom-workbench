@@ -60,6 +60,10 @@ npm run package
 
 SCANOSS Audit Workbench is multi-language enabled. To contribute a new language please see our [internationalization documentation](assets/i18n/README.md).
 
+## Contributing
+
+SCANOSS Audit Workbench is an open source project, and we love to receive contributions from our community. There are many ways to contribute. For more information see the [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## Docs
 
 This project was made using Electron React Boilerplate
