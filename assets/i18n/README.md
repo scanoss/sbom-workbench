@@ -4,6 +4,13 @@
 
 SCANOSS Audit Workbench is multi-language enabled, which means that you can display the user interface (UI) in different languages. This is done using the internationalization-framework i18next. See [official documentation](https://www.i18next.com) for more details.
 
+There are currently 2 languages:
+
+| Language    | Language Code |
+| ----------- | ------------- |
+| **English** | en            |
+| **Spanish** | es            |
+
 ### Contributing a new lenguage
 
 The following steps must be followed to add a new language. For example let's add a translation for the French language:
@@ -35,6 +42,8 @@ The following steps must be followed to add a new language. For example let's ad
 }
 ```
 
+4. <b>Add the new language to the table in this readme</b>
+
 ### Keep overview over my translation progress
 
 You can see the progress of your translation as you are doing it. For this you need to start the application in development mode. See [installation and starting guide](https://github.com/scanoss/audit-workbench#scanoss-audit-workbench).
@@ -46,6 +55,6 @@ Once you have the application running in development mode, you can gradually cha
 3. Reload app (View -> Reload)
 4. Open Translation Management to shows an overview of your translations in a nice UI. Check which keys are not yet translated. (View -> Open Translation Management)
 
-### Contribute in SCANOSS Audit Workbench i18n
+### Contributing
 
-You can help in SCANOSS translations submitting PR directly changing all files described in this guide.
+You can help in SCANOSS translations submitting PR directly changing all files described in this guide. For more information see the [Code of Conduct](../../CODE_OF_CONDUCT.md).
