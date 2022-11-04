@@ -1,4 +1,5 @@
 # [SCANOSS AUDIT WORKBENCH](https://scanoss.com/product)
+
 <div>
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/scanoss/audit-workbench)
@@ -16,28 +17,26 @@ Auditing your source code for license compliance has never been easier. Simply s
   <img src=".erb/img/workbench_1.c77c358.png" align="center" width="70%" />
 </div>
 
-
-
 ## Prerequisites
+
 - Node.js v14+
 - NPM (Node Packages Manager)
 
 We strongly recommend handling your node versions using [nvm](https://github.com/nvm-sh/nvm)
 
-## Install 
+## Install
 
 ```bash
 npm install
 ```
 
 ### Troubleshooting
-SCANOSS Audit Workbench uses [node-gyp](https://www.npmjs.com/package/node-gyp) to compile SQLite3 native module. 
-This module uses "node-pre-gyp" to download the prebuilt binary for your platform instead you need build from source. 
+
+SCANOSS Audit Workbench uses [node-gyp](https://www.npmjs.com/package/node-gyp) to compile SQLite3 native module.
+This module uses "node-pre-gyp" to download the prebuilt binary for your platform instead you need build from source.
 In case it does not exist for your platform, node-gyp going to build it.
 
 Depending on your operating system, you will need prepare the correct environment to run node-gyp: See [https://github.com/nodejs/node-gyp#installation](https://github.com/nodejs/node-gyp#installation)
-
-
 
 ## Starting Development
 
@@ -57,9 +56,12 @@ To package apps for the local platform:
 npm run package
 ```
 
+## Multi-language (i18n)
+
+SCANOSS Audit Workbench is multi-language enabled. To contribute a new language please see our [internationalization documentation](assets/i18n/README.md).
+
 ## Docs
+
 This project was made using Electron React Boilerplate
 
 See [docs and guides here](https://electron-react-boilerplate.js.org/docs/installation)
-
-

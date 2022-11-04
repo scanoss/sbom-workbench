@@ -1,4 +1,5 @@
 import log from 'electron-log';
+import i18next from 'i18next';
 import { ITask } from '../Task';
 import { Project } from '../../workspace/Project';
 import { broadcastManager } from '../../broadcastManager/BroadcastManager';
@@ -19,7 +20,7 @@ export class VulnerabilitiesTask implements Scanner.IPipelineTask {
   public getStageProperties(): Scanner.StageProperties {
     return {
       name: ScannerStage.VULNERABILITY,
-      label: 'Searching Vulnerabilities',
+      label: i18next.t('Title:SearchingVulnerabilities'),
       isCritical: false,
     };
   }

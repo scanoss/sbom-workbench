@@ -2,6 +2,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import i18next from 'i18next'
+import { showTranslations } from 'translation-check'
 
 import AppConfig from '@config/AppConfigModule';
 import { DialogProvider } from '@context/DialogProvider';
@@ -11,11 +13,11 @@ import store from '@store/store';
 import { createTheme, ThemeProvider, StyledEngineProvider, Theme } from '@mui/material/styles';
 
 import { AppI18n } from '@shared/i18n';
+import { IpcChannels } from '@api/ipc-channels';
 import { userSettingService } from '@api/services/userSetting.service';
 import WorkbenchModule from './features/workbench';
 import WorkspaceModule from './features/workspace';
 import AboutModule from './features/about';
-
 import './App.global.scss';
 
 declare module '@mui/styles/defaultTheme' {
@@ -75,10 +77,9 @@ export default class App {
   }
 
   setupAppMenuListeners() {
-    /* window.electron.ipcRenderer.on(IpcEvents.MENU_OPEN_SETTINGS, async (event) => {
-      console.log('menu open', event);
-      // window.location.hash = '/workbench/detected';
-    }); */
+    window.electron.ipcRenderer.on(IpcChannels.MENU_OPEN_TRANSLATION_MANAGER, async (event) => {
+     showTranslations(i18next);
+    });
   }
 
   private loadTheme(): Theme {

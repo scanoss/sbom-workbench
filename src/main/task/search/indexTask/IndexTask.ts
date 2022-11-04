@@ -1,5 +1,6 @@
 import log from 'electron-log';
 import { Scanner } from 'main/task/scanner/types';
+import i18next from 'i18next';
 import { modelProvider } from '../../../services/ModelProvider';
 import { Indexer } from '../../../modules/searchEngine/indexer/Indexer';
 import { IIndexer } from '../../../modules/searchEngine/indexer/IIndexer';
@@ -19,7 +20,7 @@ export class IndexTask implements Scanner.IPipelineTask {
   public getStageProperties(): Scanner.StageProperties {
     return {
       name: ScannerStage.SEARCH_INDEX,
-      label: 'Creating search index',
+      label: i18next.t('Title:CreatingSearchIndex'),
       isCritical: false,
     };
   }

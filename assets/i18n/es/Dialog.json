@@ -19,5 +19,7 @@
   "YouHaveAlreadyWorkQuestion": "Ya ha trabajado con algunos de estos archivos. ¿Desea sobrescribirlos o conservarlos?",
   "ActionWillBeExecutedOnAllSelectedQuestion": "Esta acción se ejecutará en todos los archivos seleccionados. ¿Está seguro?",
   "DeleteQuestion": "Estás seguro que quieres borrar este proyecto?",
-  "RescanQuestion": "Estás seguro que quieres rescanear este proyecto?"
+  "RescanQuestion": "Estás seguro que quieres rescanear este proyecto?",
+  "YouNeedRestartQuestion": "Es necesario reiniciar la aplicación para cambiar el idioma. ¿Quieres hacerlo?"
+
 }

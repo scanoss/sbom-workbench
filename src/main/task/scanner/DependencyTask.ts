@@ -1,6 +1,7 @@
 import { DependencyScanner } from 'scanoss';
 import fs from 'fs';
 import log from 'electron-log';
+import i18next from 'i18next';
 import { BlackListDependencies } from '../../workspace/tree/blackList/BlackListDependencies';
 import { Project } from '../../workspace/Project';
 import { dependencyService } from '../../services/DependencyService';
@@ -17,7 +18,7 @@ export class DependencyTask implements Scanner.IPipelineTask {
   public getStageProperties(): Scanner.StageProperties {
     return {
       name: ScannerStage.DEPENDENCY,
-      label: 'Analyzing Dependencies',
+      label: i18next.t('Title:AnalyzingDependencies'),
       isCritical: false,
     };
   }

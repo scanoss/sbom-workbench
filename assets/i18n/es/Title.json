@@ -14,6 +14,7 @@
   "Identified": "Identificados",
   "Originals": "Originales",
   "Detected": "Detectados",
+  "Dismissed": "Descartado",
   "Usage": "Uso",
   "All": "Todos",
   "SourceFile": "Archivo fuente",
@@ -51,7 +52,11 @@
   "FullText": "Texto completo",
   "Stage": "Etapa",
   "Scanning": "Escaneando",
-  "Original": "Originales"
-
+  "Original": "Originales",
+  "Rescanning": "Rescaneando",
+  "AnalyzingDependencies": "Analizando dependencias",
+  "SearchingVulnerabilities": "Buscando vulnerabilidades",
+  "CreatingSearchIndex": "Creando índice de búsqueda",
+  "Indexing": "Indexando"
 }
 

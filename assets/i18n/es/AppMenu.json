@@ -30,6 +30,7 @@
   "ExpandToMatches": "Expandir los match",
   "CollapseAll": "Colapsar todo",
   "IdentifySelectedAs": "Identificar archivos seleccionados como...",
-  "MarkSelectedAsOriginal": "Marcar archivos seleccionados como originales"
+  "MarkSelectedAsOriginal": "Marcar archivos seleccionados como originales",
+  "OpenTranslationManagement": "Abrir gestor de tracucciones"
 }
 

@@ -72,6 +72,7 @@
   "Snippet": "Snippet",
   "PreRequisite:": "Pre-requisito",
   "NComponentWillNotIdentified_one": "no se identificará un componente ya que no tiene una licencia declarada. Por favor, identifícalo manualmente.",
+  "NComponentWillNotIdentified_many": "No se identificarán {{count}} componentes ya que no tienen una licencia declarada. Por favor, identifícalos manualmente.",
   "NComponentWillNotIdentified_other": "No se identificarán {{count}} componentes ya que no tienen una licencia declarada. Por favor, identifícalos manualmente.",
   "DependenciesDeclaredIdentifyManual": "No se aceptarán las dependencias declaradas en los archivos de gestores de paquetes. Por favor, identifícalos manualmente.",
   "ClickOrEnterToAddValue": "Click o enter para añadir \"{{value}}\"",

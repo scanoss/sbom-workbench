@@ -14,13 +14,14 @@ import * as os from 'os';
 import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import i18next from 'i18next';
 import AppConfig from '../config/AppConfigModule';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { workspace } from './workspace/Workspace';
 import { userSettingService } from './services/UserSettingService';
 import { WorkspaceMigration } from './migration/WorkspaceMigration';
-import { AppI18n } from '../shared/i18n';
+import { AppI18n, AppI18nContext } from '../shared/i18n';
 
 // handlers
 import '../api/handlers/inventory.handler';
@@ -95,6 +96,8 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+
+
   mainWindow = new BrowserWindow({
     show: false,
     width: 1300,
@@ -123,39 +126,39 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
+   // TODO: remove from here
+   const root = `${os.homedir()}/${AppConfig.DEFAULT_WORKSPACE_NAME}`;
+   await workspace.read(root);
+   await userSettingService.read(root);
+   await userSettingService.update();
 
-  // TODO: remove from here
-  const root = `${os.homedir()}/${AppConfig.DEFAULT_WORKSPACE_NAME}`;
-  await workspace.read(root);
-  await userSettingService.read(root);
-  await userSettingService.update();
+   AppI18n.setLng(userSettingService.get().LNG);
+   AppI18n.init(AppI18nContext.MAIN);
 
-  AppI18n.setLng(userSettingService.get().LNG);
-  AppI18n.init();
-
-  AppI18n.getI18n().on('languageChanged', async (e) => {
-    console.log('languageChanged', e);
-    const { response } = await dialog.showMessageBox(
-      BrowserWindow.getFocusedWindow(),
-      {
-        buttons: ["Restart later", "Restart now"],
-        message: "Yo need restart the application to change the language. Do you?"
+   AppI18n.getI18n().on('languageChanged', async (e) => {
+     console.log('languageChanged', e);
+     const { response } = await dialog.showMessageBox(
+       BrowserWindow.getFocusedWindow(),
+       {
+         buttons: ["Button:RestartLater", "Button:RestartNow"],
+         message: i18next.t("Dialog:YouNeedRestartQuestion")
        },
-      );
+     );
 
-    if (response === 1) {
-      app.relaunch()
-      app.exit();
-    }
-
-  });
-
+     if (response === 1) {
+       app.relaunch()
+       app.exit();
+     }
+   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
 
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
+    // allow locize plugin open new window
+    if (edata.url.endsWith('mini.locize.com/')) return { action: 'allow' };
+
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });

@@ -1,3 +1,4 @@
+import i18next from 'i18next';
 import { ScannerStage, ScanState } from '../../../api/types';
 import { BaseScannerTask } from './BaseScannerTask';
 import { modelProvider } from '../../services/ModelProvider';
@@ -8,7 +9,7 @@ export class ScanTask extends BaseScannerTask {
   public getStageProperties(): Scanner.StageProperties {
     return {
       name: ScannerStage.SCAN,
-      label: 'Scanning',
+      label: i18next.t('Title:Scanning'),
       isCritical: true,
     };
   }

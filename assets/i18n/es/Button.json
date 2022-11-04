@@ -36,6 +36,8 @@
   "Delete": "Borrar",
   "Keep": "Mantener",
   "Overwrite": "Sobreescribir",
-  "Yes": "Si"
+  "Yes": "Si",
+  "RestartLater": "Reiniciar más tarde",
+  "RestartNow": "Reiniciar ahora"
   }
 

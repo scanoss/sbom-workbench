@@ -1,6 +1,7 @@
 import { Button } from '@mui/material';
 import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { fetchProjects } from '@store/workspace-store/workspaceThunks';
 import { IProject } from '@api/types';
 import { workspaceService } from '@api/services/workspace.service';
@@ -137,6 +138,7 @@ const AppProvider = ({ children }) => {
     const subscriptions = [];
     subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_NEW_PROJECT, newProject));
     subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_IMPORT_PROJECT, importProject));
+
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
 
