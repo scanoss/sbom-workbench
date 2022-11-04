@@ -8,6 +8,7 @@ import { Button, Card } from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
 import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import LicensesChart from '../../components/LicensesChart';
 import IdentificationProgress from '../../components/IdentificationProgress';
 import LicensesTable from '../../components/LicensesTable';
@@ -16,6 +17,7 @@ import LicensesObligations from '../../components/LicensesObligations';
 import OssVsOriginalProgressBar from '../../components/OssVsOriginalProgressBar';
 import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 import { Scanner } from '../../../../../../../main/task/scanner/types';
+
 
 Chart.register(...registerables);
 

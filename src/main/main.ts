@@ -140,7 +140,7 @@ const createWindow = async () => {
      const { response } = await dialog.showMessageBox(
        BrowserWindow.getFocusedWindow(),
        {
-         buttons: ["Button:RestartLater", "Button:RestartNow"],
+         buttons: [i18next.t('Button:RestartLater'), i18next.t('Button:RestartNow')],
          message: i18next.t("Dialog:YouNeedRestartQuestion")
        },
      );

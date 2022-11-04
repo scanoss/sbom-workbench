@@ -20,5 +20,8 @@
   "ActionWillBeExecutedOnAllSelectedQuestion": "This action will be executed on all selected files. Are you sure",
   "DeleteQuestion": "Are you sure you want to delete this project?",
   "RescanQuestion": "Are you sure you want to rescan this project?",
-  "YouNeedRestartQuestion": "You need restart the application to change the language. Do you?"
+  "YouNeedRestartQuestion": "You need restart the application to change the language. Do you?",
+  "ExportingProject": "Exporting Project",
+  "SuccesfulImport": "Succesful Import",
+  "ImportingProject": "Importing Project"
 }

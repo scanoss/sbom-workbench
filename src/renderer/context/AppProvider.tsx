@@ -44,13 +44,13 @@ const AppProvider = ({ children }) => {
     });
 
     if (!paths || paths.length === 0) return;
-    const dialog = await dialogCtrl.createProgressDialog('IMPORTING PROJECT');
+    const dialog = await dialogCtrl.createProgressDialog(t('Dialog:ImportingProject').toUpperCase());
     dialog.present();
 
     try {
       await workspaceService.importProject(paths[0]);
       setTimeout(async () => {
-        dialog.finish({ message: 'SUCCESSFUL IMPORT' });
+        dialog.finish({ message: t('Dialog:SuccesfulImport').toUpperCase() });
         dialog.dismiss({ delay: 1500 });
         dispatch(fetchProjects());
       }, 2000);
@@ -76,7 +76,7 @@ const AppProvider = ({ children }) => {
     });
 
     if (!path) return;
-    const dialog = await dialogCtrl.createProgressDialog('EXPORTING PROJECT');
+    const dialog = await dialogCtrl.createProgressDialog(t('Dialog:ExportingProject').toUpperCase());
     dialog.present();
 
     try {
