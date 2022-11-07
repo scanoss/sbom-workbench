@@ -66,7 +66,7 @@ async function updateFlagsOnTree(projectPath: string) {
   const a = JSON.parse(project);
   const m = await fs.promises.readFile(`${projectPath}/metadata.json`, 'utf8');
   const metadata = JSON.parse(m);
-  const tree = new Tree(metadata.scan_root, projectPath);
+  const tree = new Tree(metadata.name, projectPath,metadata.scan_root);
   tree.loadTree(a.tree.rootFolder);
   const rootFolder = tree.getRootFolder();
   addProgressFlags(rootFolder);
@@ -82,7 +82,7 @@ async function updateDependenciesOnTree(projectPath: string, dependencies) {
   const a = JSON.parse(project);
   const m = await fs.promises.readFile(`${projectPath}/metadata.json`, 'utf8');
   const metadata = JSON.parse(m);
-  const tree = new Tree(metadata.scan_root, projectPath);
+  const tree = new Tree(metadata.name, projectPath,metadata.scan_root);
   tree.loadTree(a.tree.rootFolder);
   tree.addDependencies(dependencies);
   a.tree = tree;

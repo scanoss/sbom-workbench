@@ -30,10 +30,9 @@ export class Tree {
 
   private summary;
 
-  constructor(path: string, projectPath: string) {
-    const pathParts = path.split(pathLib.sep);
-    this.rootName = pathParts[pathParts.length - 1];
-    this.rootPath = path;
+  constructor(rootName: string, projectPath: string, scanRoot?:string ) {
+    this.rootName = rootName;
+    this.rootPath = scanRoot;
     this.rootFolder = new Folder('', this.rootName);
     this.fileTreeViewMode = new TreeViewDefault();
     this.summary = {};

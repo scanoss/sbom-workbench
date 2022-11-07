@@ -10,7 +10,6 @@ import {CodeScannerPipelineTask} from '../task/scanner/scannerPipeline/CodeScann
 import {ScannerPipelineFactory} from "../task/scanner/scannerPipelineFactory/ScannerPipelineFactory";
 import ScannerType = Scanner.ScannerType;
 import ScannerMode = Scanner.ScannerMode;
-import ScannerSource = Scanner.ScannerSource;
 
 class ProjectService {
   public async createProject(projectDTO: INewProject) {
