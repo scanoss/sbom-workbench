@@ -7,7 +7,8 @@ export class CodeIndexTreeTask  extends IndexTreeTask{
 
   public async run(params: void):Promise<boolean>{
     const files = this.getProjectFiles(this.project.getScanRoot(),this.project.getScanRoot());
-    await this.buildTree(files);
+    const tree = await this.buildTree(files);
+    await this.setTreeSummary(tree);
     return true;
   }
 
@@ -39,11 +40,23 @@ export class CodeIndexTreeTask  extends IndexTreeTask{
     return 0;
   }
 
-  public async buildTree(files: Array<string>){
-    const tree = new Tree(this.project.metadata.getScanRoot(),this.project.getMyPath());
+  public async buildTree(files: Array<string>): Promise<Tree> {
+    const tree = new Tree(this.project.metadata.getName(),this.project.getMyPath(),this.project.metadata.getScanRoot());
     tree.build(files);
     tree.setFilter();
-    await this.setTreeSummary(tree);
+    return tree;
+  }
+
+  public async setTreeSummary(tree: Tree){
+    tree.summarize();
+    const summary = tree.getSummarize();
+    this.project.filesToScan = summary.files;
+    this.project.filesSummary = summary;
+    this.project.filesNotScanned = {};
+    this.project.processedFiles = 0;
+    this.project.metadata.setFileCounter(summary.include);
+    this.project.setTree(tree);
+    this.project.save();
   }
 
 }

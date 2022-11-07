@@ -100,7 +100,7 @@ export class Project {
     this.filesSummary = a.filesSummary;
     await modelProvider.init(this.metadata.getMyPath());
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
-    this.tree = new Tree(a.tree.rootFolder.label, this.metadata.getMyPath());
+    this.tree = new Tree(a.tree.rootFolder.label, this.metadata.getMyPath(),a.tree.rootFolder.label);
     this.tree.loadTree(a.tree.rootFolder);
     return true;
   }

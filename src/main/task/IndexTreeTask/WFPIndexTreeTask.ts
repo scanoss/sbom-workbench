@@ -4,9 +4,13 @@ import {Tree} from "../../workspace/tree/Tree";
 
 export class WFPIndexTreeTask extends IndexTreeTask {
 
+  filesToScan: Array<string>;
+
   public async run(): Promise<boolean> {
     const files = this.getFiles();
-    await this.buildTree(files);
+    this.filesToScan = files;
+    const tree =  await this.buildTree(files);
+    await this.setTreeSummary(tree);
     return true;
   }
 
@@ -24,15 +28,27 @@ export class WFPIndexTreeTask extends IndexTreeTask {
 
 
   private getWFPContent(){
+    console.log(this.project.getScanRoot());
     const wfp = fs.readFileSync(this.project.getScanRoot(),
       {encoding:'utf8'});
     return wfp;
   }
 
-  public async buildTree(files: Array<string>){
-    const tree = new Tree(this.project.metadata.getScanRoot(),this.project.getMyPath());
+  public async buildTree(files: Array<string>): Promise<Tree>{
+    const tree = new Tree(this.project.metadata.getName(),this.project.getMyPath());
     tree.build(files);
-    await this.setTreeSummary(tree);
+    return tree;
+ }
+
+  public async setTreeSummary(tree: Tree){
+    this.project.filesToScan = this.filesToScan;
+    this.project.filesSummary = { total: this.filesToScan.length, include: this.filesToScan.length, filter: 0, files: {} };
+    this.project.filesNotScanned = {};
+    this.project.processedFiles = 0;
+    this.project.filesSummary.include = this.filesToScan.length;
+    this.project.metadata.setFileCounter(this.filesToScan.length);
+    this.project.setTree(tree);
+    this.project.save();
   }
 
 }

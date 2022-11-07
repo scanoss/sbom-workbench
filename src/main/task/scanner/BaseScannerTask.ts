@@ -103,7 +103,7 @@ export abstract class BaseScannerTask implements ScannerModule.IPipelineTask {
     }
   }
 
-  private setScannerConfig() {
+  protected setScannerConfig() {
     const scannerCfg: ScannerCfg = new ScannerCfg();
     const { DEFAULT_API_INDEX, APIS } = userSettingService.get();
 
