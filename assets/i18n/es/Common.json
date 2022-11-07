@@ -1,5 +1,5 @@
 {
-  "Search": "Buscar",
+  "Search": "Buscar...",
   "IMPORTED": "IMPORTADO",
   "NoProjectsFound": "No se encontraron proyectos",
   "NoProjectsFoundWith": "No se encontraron proyectos con <strong>{{searchQuery}}</strong>",
@@ -8,7 +8,7 @@
   "ProjectNameAlreadyExists": "El nombre del proyecto ya existe",
   "ProjectNameInvalid": "El nombre del proyecto no es correcto",
   "Optional": "Opcional",
-  "UseDefaultSettings": "Usar configuaración por defecto",
+  "UseDefaultSettings": "Usar configuración por defecto",
   "NotResultsFoundWith": "No se encontraron resultados con \"{{searchQuery}}\"",
   "NoComponentsFoundMatching": "No se encontraron componentes acorde a los criterios de búsqueda",
   "NoComponentsWereDetected": "No se detectaron componentes",
@@ -77,5 +77,8 @@
   "DependenciesDeclaredIdentifyManual": "No se aceptarán las dependencias declaradas en los ficheros de gestores de paquetes. Por favor, identifícalos manualmente.",
   "ClickOrEnterToAddValue": "Click o enter para añadir \"{{value}}\"",
   "SettingsApiKeyHint": "Este valor es opcional para instancias de servidor SCANOSS dedicadas. Cuando este valor esté vacío, se iniciarán escaneos contra nuestro servicio público gratuito. Si está interesado en una instancia dedicada con disponibilidad y rendimiento garantizados, contáctenos en sales@scanoss.com.",
-  "WorkspaceIsReduced": "El contexto del espacio de trabajo se reduce porque hay filtros activos"
+  "WorkspaceIsReduced": "El contexto del espacio de trabajo se reduce porque hay filtros activos",
+  "DecompressArchivesLabel": "Descomprimir ficheros y analizarlo internamente",
+  "DecompressArchivesHint": "Esta opción va a descomprimir los ficheros dentro de la carpeta del proyecto",
+  "FileNotLoad": "El fichero no pudo ser cargado"
 }

@@ -3,7 +3,7 @@ import { Paper, IconButton, InputBase } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
-import { AppI18n } from '@shared/i18n';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,6 +30,7 @@ export interface SearchBoxProps {
 
 const SearchBox = ({ value, placeholder, responseDelay, disabled, onChange }: SearchBoxProps) => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const [query, setQuery] = useState('');
 
@@ -51,7 +52,7 @@ const SearchBox = ({ value, placeholder, responseDelay, disabled, onChange }: Se
         value={query}
         onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
         onChange={(e: any) => setQuery(e.target.value)}
-        placeholder={placeholder || 'Search...'}
+        placeholder={placeholder || t('Search')}
         inputProps={{ 'aria-label': placeholder, spellCheck: 'false' }}
       />
       {query && (

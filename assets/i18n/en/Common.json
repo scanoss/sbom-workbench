@@ -1,5 +1,5 @@
 {
-  "Search": "Search",
+  "Search": "Search...",
   "IMPORTED": "IMPORTED",
   "NoProjectsFound": "No projects found",
   "NoProjectsFoundWith": "No projects found with <strong>{{searchQuery}}</strong>",
@@ -76,5 +76,8 @@
   "DependenciesDeclaredIdentifyManual": "Dependencies declared in páckages manager files will not be accepted. Please, identify them manually.",
   "ClickOrEnterToAddValue": "Click or enter to add \"{{value}}\"",
   "SettingsApiKeyHint": "This value is optional for dedicated SCANOSS server instances. When this value is empty, scans will be launched against our free of charge public service. If you are interested in a dedicated instance with guaranteed availability and throughput please contact us at sales@scanoss.com.",
-  "WorkspaceIsReduced": "The workspace context is reduced because there are active filters"
+  "WorkspaceIsReduced": "The workspace context is reduced because there are active filters",
+  "DecompressArchivesLabel": "Decompress archives and scan inner files",
+  "DecompressArchivesHint": "This option will decompress archives into project folder",
+  "FileNotLoad": "File could not be loaded"
 }

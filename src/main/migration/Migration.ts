@@ -1,7 +1,7 @@
+import { app } from 'electron';
 import { IpcChannels } from '../../api/ipc-channels';
 import { SemVerCompareVersion } from '../helpers/SemVer';
 import { broadcastManager } from '../broadcastManager/BroadcastManager';
-import { app } from 'electron';
 import packageJson from '../../../release/app/package.json';
 
 /* eslint-disable guard-for-in */
@@ -36,7 +36,7 @@ export abstract class Migration {
         latestVersion = scriptsVersion;
       }
     }
-    broadcastManager.get().send(IpcChannels.MIGRATION_FINISH);
+    broadcastManager.get()?.send(IpcChannels.MIGRATION_FINISH);
     return latestVersion;
   }
 

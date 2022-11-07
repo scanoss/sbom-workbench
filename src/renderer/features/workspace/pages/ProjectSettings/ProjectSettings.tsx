@@ -328,9 +328,6 @@ const ProjectSettings = () => {
                             disableUnderline
                           >
                             <MenuItem value={0}>
-                              <span className="item-default">
-                                Use default settings
-                              </span>
                               <span className="item-default">{t('Common:UseDefaultSettings')}</span>
                             </MenuItem>
                             ;
@@ -374,11 +371,11 @@ const ProjectSettings = () => {
                 </div>
               </div>
               <div className="mt-5">
-                <label className="input-label">Scanner Settings</label>
+                <label className="input-label">{t('Title:ScannerSettings')}</label>
                 <FormGroup>
                   <FormControlLabel
                     control={<Checkbox />}
-                    label="Decompress archives and scan inner files"
+                    label={t('DecompressArchivesLabel')}
                     onChange={(event, checked) => onDecompress(checked)}
                   />
                 </FormGroup>
@@ -386,7 +383,7 @@ const ProjectSettings = () => {
                   (item) => item === ScannerType.UNZIP
                 ) && (
                   <FormHelperText>
-                    This option will decompress archives into project folder
+                    {t('DecompressArchivesHint')}
                   </FormHelperText>
                 )}
               </div>

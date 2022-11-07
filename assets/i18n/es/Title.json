@@ -57,5 +57,7 @@
   "AnalyzingDependencies": "Analizando dependencias",
   "SearchingVulnerabilities": "Buscando vulnerabilidades",
   "CreatingSearchIndex": "Creando índice de búsqueda",
-  "Indexing": "Indexando"
+  "Indexing": "Indexando",
+  "Language": "Idioma",
+  "ScannerSettings": "Configuración del escáner"
 }

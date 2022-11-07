@@ -75,12 +75,12 @@ export enum AppI18nContext {
     // .use(rsb)
 
     i18next.init({
-      debug: true,
+      debug: false,
       lng: this.lng,
       fallbackLng: 'en',
       initImmediate: false,
       saveMissing: true,
-      ns: ['AppMenu', 'Common', 'Title', 'Table',  'Tooltip', 'Dialog'],
+      ns: ['AppMenu', 'Common', 'Title', 'Table',  'Tooltip', 'Dialog', 'Button'],
       defaultNS: 'Common',
 
       resources: this.getResources(),

@@ -357,7 +357,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
             </div>
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">
-                <b>Language</b>
+                <b>{t('Title:Language')}</b>
               </label>
               <Paper className="dialog-form-field-control">
                 <Select

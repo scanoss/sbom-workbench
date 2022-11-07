@@ -317,7 +317,7 @@ const Editor = () => {
               highlights={highlight || null}
             />
           ) : (
-            <div className="file-loader">{t('LoadingLocalFile')}</div>
+            <div className="file-loader">{localFileContent?.error ? t('FileNotLoad') : t('LoadingLocalFile')}</div>
           )}
         </div>
 
@@ -332,7 +332,7 @@ const Editor = () => {
                 highlights={highlight || null}
               />
             ) : (
-              <div className="file-loader">{t('LoadingRemoteFile')}</div>
+              <div className="file-loader">{remoteFileContent?.error ? "se shompio" : t('LoadingRemoteFile')}</div>
             )}
           </div>
         )}
