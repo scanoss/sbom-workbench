@@ -13,7 +13,7 @@ export abstract class IndexTreeTask implements Scanner.IPipelineTask {
   }
 
   public abstract run(): Promise<boolean>;
-  public abstract buildTree(files: Array<string>);
+  public abstract buildTree(files: Array<string>):Promise<Tree>;
 
   public getStageProperties(): Scanner.StageProperties {
     return {
@@ -23,18 +23,7 @@ export abstract class IndexTreeTask implements Scanner.IPipelineTask {
     };
   }
 
-  public async setTreeSummary(tree: Tree){
-    tree.summarize();
-    const summary = tree.getSummarize();
-    this.project.filesToScan = summary.files;
-    this.project.filesSummary = summary;
-    this.project.filesNotScanned = {};
-    this.project.processedFiles = 0;
-    this.project.metadata.setFileCounter(summary.include);
-    this.project.setTree(tree);
-    this.project.save();
-  }
-
+  public abstract setTreeSummary(tree: Tree);
 
 
 

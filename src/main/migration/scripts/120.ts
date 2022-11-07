@@ -23,7 +23,7 @@ async function indexMigration(projectPath: string) {
       'utf8'
     );
     const a = JSON.parse(project);
-    const tree = new Tree(metadata.scan_root, projectPath);
+    const tree = new Tree(metadata.name, projectPath,metadata.scan_root);
     tree.loadTree(a.tree.rootFolder);
     const f = tree.getRootFolder().getFiles(new BlackListKeyWordIndex());
     const paths = f.map((fi) => fi.path);
