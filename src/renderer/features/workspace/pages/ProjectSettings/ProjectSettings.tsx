@@ -81,7 +81,7 @@ const ProjectSettings = () => {
     source: null,
     scannerConfig: {
       mode: Scanner.ScannerMode.SCAN,
-      source: ScannerSource.CODE,
+      source: scanPath?.source || ScannerSource.CODE,
       type: [
         ScannerType.CODE,
         ScannerType.DEPENDENCIES,
@@ -105,9 +105,11 @@ const ProjectSettings = () => {
     setApis(apiUrlKey.APIS);
 
     const { path } = scanPath;
-    const projectName = path.split(window.path.sep)[
-      path.split(window.path.sep).length - 1
-    ];
+    let projectName: string = path.split(window.path.sep)[path.split(window.path.sep).length - 1]
+
+    if (projectName.endsWith('.wfp'))
+      projectName = projectName.replace('.wfp', '');
+
     setProjectSettings({
       ...projectSettings,
       scan_root: path,
@@ -375,6 +377,7 @@ const ProjectSettings = () => {
                 <FormGroup>
                   <FormControlLabel
                     control={<Checkbox />}
+                    disabled={scanPath?.source !== Scanner.ScannerSource.CODE}
                     label={t('DecompressArchivesLabel')}
                     onChange={(event, checked) => onDecompress(checked)}
                   />

@@ -38,5 +38,6 @@
   "Overwrite": "Overwrite",
   "Yes": "Yes",
   "RestartLater": "Restart later",
-  "RestartNow": "Restart now"
+  "RestartNow": "Restart now",
+  "NewFromWFPFile": "New from WFP"
 }

@@ -9,11 +9,13 @@ import { IpcChannels } from '@api/ipc-channels';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { setScanPath } from '@store/workspace-store/workspaceSlice';
+import { Scanner } from 'main/task/scanner/types';
 import { DialogContext, IDialogContext } from './DialogProvider';
 import { dialogController } from '../controllers/dialog-controller';
 
 export interface IAppContext {
   newProject: () => void;
+  newProjectFromWFP: () => void;
   exportProject: (project: IProject) => void;
   importProject: () => void;
 }
@@ -33,6 +35,18 @@ const AppProvider = ({ children }) => {
 
     if (paths && paths.length > 0) {
       dispatch(setScanPath({ path: paths[0], action: 'scan' }));
+      navigate('/workspace/new/settings');
+    }
+  };
+
+  const newProjectFromWFP = async () => {
+    const paths = await dialogController.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'WFP files', extensions: ['wfp'] }],
+    });
+
+    if (paths && paths.length > 0) {
+      dispatch(setScanPath({ path: paths[0], action: 'scan', source: Scanner.ScannerSource.WFP }));
       navigate('/workspace/new/settings');
     }
   };
@@ -148,6 +162,7 @@ const AppProvider = ({ children }) => {
     <AppContext.Provider
       value={{
         newProject,
+        newProjectFromWFP,
         exportProject,
         importProject,
       }}
