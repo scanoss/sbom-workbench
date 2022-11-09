@@ -1,4 +1,5 @@
 import { Inventory } from '@api/types';
+import { Scanner } from '../../main/task/scanner/types';
 
 export enum DIALOG_ACTIONS {
   OK = 'ok',
@@ -36,5 +37,6 @@ export interface IScan {
   projectName?: string;
   path: string;
   action: string;
+  source?: Scanner.ScannerSource,
 }
 

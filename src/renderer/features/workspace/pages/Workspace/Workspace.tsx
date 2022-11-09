@@ -22,7 +22,7 @@ const Workspace = () => {
 
   const { projects } = useSelector(selectWorkspaceState);
 
-  const { newProject, exportProject, importProject } = useContext(AppContext) as IAppContext;
+  const { newProject, exportProject, importProject, newProjectFromWFP } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -69,6 +69,11 @@ const Workspace = () => {
   const onImportProjectHandler = () => {
     importProject();
   };
+
+  const onNewProjectFromWFPHandler = () => {
+    newProjectFromWFP();
+  };
+
 
   const onTrashHandler = async (project: IProject) => {
     const { action } = await dialogCtrl.openConfirmDialog(t('Dialog:DeleteQuestion'), {
@@ -118,7 +123,11 @@ const Workspace = () => {
                 <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
               )}
             </div>
-            <AddProjectButton onNewProject={onNewProjectHandler} onImportProject={onImportProjectHandler} />
+            <AddProjectButton
+              onNewProject={onNewProjectHandler}
+              onImportProject={onImportProjectHandler}
+              onNewProjectFromWFP={onNewProjectFromWFPHandler}
+              />
           </section>
         </header>
         <main className="app-content">
