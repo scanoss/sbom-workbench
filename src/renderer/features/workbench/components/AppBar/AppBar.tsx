@@ -41,6 +41,7 @@ const Navigation = () => {
 };
 
 const AppMenu = () => {
+  const { wfp } = useSelector(selectWorkbench);
   const { t } = useTranslation();
 
   return (
@@ -56,9 +57,10 @@ const AppMenu = () => {
           </Button>
         </Tooltip>
       </NavLink>
+
       <NavLink
         to="/workbench/search"
-        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+        className={({ isActive }) => `nav-link ${wfp ? 'disabled' : ''} ${isActive ? 'active' : ''}`}
         tabIndex={-1}
       >
         <Tooltip title={t('Tooltip:SearchKeywords')} enterDelay={650}>
@@ -67,6 +69,7 @@ const AppMenu = () => {
           </Button>
         </Tooltip>
       </NavLink>
+
       <NavLink
         to="/workbench/identified"
         className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
