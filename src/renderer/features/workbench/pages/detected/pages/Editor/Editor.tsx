@@ -41,7 +41,7 @@ const Editor = () => {
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { path: scanBasePath, imported, summary } = useSelector(selectWorkbench);
+  const { path: scanBasePath, imported, summary, wfp } = useSelector(selectWorkbench);
   const { node } = useSelector(selectNavigationState);
 
   const file = node?.type === 'file' ? node.path : null;
@@ -84,6 +84,7 @@ const Editor = () => {
     try {
       setRemoteFileContent({ content: null, error: false });
       const content = await workbenchController.fetchRemoteFile(path);
+      console.log(content);
       setRemoteFileContent({ content, error: false });
     } catch (error) {
       setRemoteFileContent({ content: null, error: true });
@@ -179,7 +180,7 @@ const Editor = () => {
     if (currentMatch) {
       const diff = currentMatch?.type !== 'file';
       setIsDiffView(diff);
-      if (diff || imported) loadRemoteFile(currentMatch.md5_file);
+      if (diff || imported || wfp) loadRemoteFile(currentMatch.md5_file);
     }
   }, [currentMatch]);
 
@@ -317,7 +318,8 @@ const Editor = () => {
               highlights={highlight || null}
             />
           ) : (
-            <div className="file-loader">{localFileContent?.error ? t('FileNotLoad') : t('LoadingLocalFile')}</div>
+            <div className="file-loader">{
+                localFileContent?.error && !imported && !wfp ? t('FileNotLoad') : !imported && !wfp ? t('LoadingLocalFile') : t('LoadingRemoteFile')}</div>
           )}
         </div>
 
@@ -332,7 +334,7 @@ const Editor = () => {
                 highlights={highlight || null}
               />
             ) : (
-              <div className="file-loader">{remoteFileContent?.error ? "se shompio" : t('LoadingRemoteFile')}</div>
+              <div className="file-loader">{remoteFileContent?.error ? t('FileNotLoad') : t('LoadingRemoteFile')}</div>
             )}
           </div>
         )}

@@ -1,6 +1,6 @@
 #AppBar {
   background-color: white;
-  color: #A1A1AA;
+  color: #a1a1aa;
 
   .MuiToolbar-root {
     display: grid;
@@ -36,7 +36,7 @@
     justify-content: center;
     align-items: center;
 
-    color: #A1A1AA;
+    color: #a1a1aa;
     font-size: 16px;
     font-weight: 400;
 
@@ -57,12 +57,17 @@
       min-width: 56px;
       height: 48px;
       margin: 0 2px;
-      color: #A1A1AA;
+      color: #a1a1aa;
     }
 
     .active .MuiButtonBase-root {
       color: var(--color-primary);
-      background-color: #F4F4F5
+      background-color: #f4f4f5;
+    }
+
+    .disabled {
+      opacity: 0.5;
+      pointer-events: none;
     }
   }
 
@@ -84,18 +89,16 @@
     }
   }
 
-  .notarize-container{
+  .notarize-container {
     margin-left: 10px;
   }
-
 }
 
 #ProgressTooltip {
   header .title {
     margin-top: 4px;
-    font-size: .9rem;
+    font-size: 0.9rem;
     font-weight: 600;
     line-height: 1.2;
   }
-
 }

@@ -9,6 +9,7 @@ export interface WorkbenchState {
   path: string;
   name: string;
   imported: boolean;
+  wfp: boolean;
   tree: any[]; // TODO: define type
   summary: ISummary; // TODO: define type
   progress: number;
@@ -29,6 +30,7 @@ const initialState: WorkbenchState = {
   path: null,
   name: null,
   imported: false,
+  wfp: false,
   tree: null,
   summary: null,
   progress: 0,
@@ -92,6 +94,7 @@ export const workbenchSlice = createSlice({
       state.loading = false;
       state.loaded = true;
       state.imported = imported;
+      state.wfp = config.source === Scanner.ScannerSource.WFP
       state.tree = convertTreeToNode(fileTree, [fileTree]);
       state.dependencies = dependencies;
       state.projectScannerConfig = config;
