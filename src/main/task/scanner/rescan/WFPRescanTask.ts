@@ -1,4 +1,3 @@
-import { ScannerInput } from "scanoss";
 import { rescanService } from "../../../services/RescanService";
 import { RescanTask } from "./RescanTask";
 import { WFPDispatcher } from "../dispatcher/WFPDispatcher";

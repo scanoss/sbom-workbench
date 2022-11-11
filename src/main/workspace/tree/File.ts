@@ -171,4 +171,7 @@ export default class File extends Node {
   public containsFile(filename: string): boolean {
     return this.getName() === filename;
   }
+
+  public order():void{
+  }
 }
