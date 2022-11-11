@@ -34,6 +34,15 @@ export default class Folder extends Node {
     this.hasIgnoredProgress = false;
   }
 
+  public order(): void {
+    this.children.sort( (a:Node, b:Node)=>{
+      if(a.getType()!=="folder" && b.getType()==="folder") return 1;
+      if(a.getType()==="folder" && b.getType()!=="folder") return -1;
+      return a.getPath().localeCompare(b.getPath());
+    })
+    this.children.forEach((c)=> c.order());
+  }
+
   public addChild(node: Node): void {
     this.children.push(node);
   }

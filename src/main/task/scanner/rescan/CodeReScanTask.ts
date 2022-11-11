@@ -2,7 +2,7 @@ import { rescanService } from '../../../services/RescanService';
 import { RescanTask } from "./RescanTask";
 import { CodeDispatcher } from "../dispatcher/CodeDispatcher";
 import { CodeScannerInputAdapter } from "../adapter/CodeScannerInputAdapter";
-import {Project} from "../../../workspace/Project";
+import { Project } from "../../../workspace/Project";
 
 export class CodeReScanTask extends RescanTask<CodeDispatcher,CodeScannerInputAdapter> {
 
@@ -12,11 +12,7 @@ export class CodeReScanTask extends RescanTask<CodeDispatcher,CodeScannerInputAd
 
   public async reScan(): Promise<void> {
     const resultPath = `${this.project.getMyPath()}/result.json`;
-    await rescanService.reScan(
-      this.project.getTree().getRootFolder().getFiles(),
-      resultPath,
-      this.project.getMyPath()
-    );
+    await rescanService.reScan(this.project.getTree().getRootFolder().getFiles(), resultPath, this.project.getMyPath());
   }
 
 }

@@ -54,6 +54,13 @@ export class Tree {
 
   }
 
+  /**
+   * @brief order file tree by folder and files
+   * */
+  public orderTree(): void{
+    this.rootFolder.order();
+  }
+
  private recursive(splitPath: Array<string>, node: Folder, addedNodes : Record<string, Folder>): Node{
     const nodePath = `${node.getPath()}/${  splitPath[0]}`;
     // File
