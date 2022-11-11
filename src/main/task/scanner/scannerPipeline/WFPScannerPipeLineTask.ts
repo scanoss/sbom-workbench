@@ -3,9 +3,14 @@ import { Project } from "../../../workspace/Project";
 import { Scanner } from "../types";
 import { WFPIndexTreeTask } from "../../IndexTreeTask/WFPIndexTreeTask";
 import { BaseScannerTask } from "../BaseScannerTask";
-import { WFPScanTask } from "../WFPScanTask";
-import { VulnerabilitiesTask } from "../VulnerabilitiesTask";
+import { WFPScanTask } from "../scan/WFPScanTask";
+import { VulnerabilitiesTask } from "../vulnerability/VulnerabilitiesTask";
 import ScannerType = Scanner.ScannerType;
+import { WFPRescanTask } from "../rescan/WFPRescanTask";
+import { WFPDispatcher } from "../dispatcher/WFPDispatcher";
+import { WFPScannerInputAdapter } from "../adapter/WFPScannerInputAdapter";
+import { IDispatch } from "../dispatcher/IDispatch";
+import { IScannerInputAdapter } from "../adapter/IScannerInputAdapter";
 
 export class WFPScannerPipeLineTask extends ScannerPipeline {
 
@@ -20,7 +25,13 @@ export class WFPScannerPipeLineTask extends ScannerPipeline {
       this.queue.push(new WFPIndexTreeTask(project));
 
     // scan
-    const scanTask: BaseScannerTask = new WFPScanTask(project);
+    const scanTask :BaseScannerTask<IDispatch, IScannerInputAdapter> =
+      metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
+        ? new WFPScanTask(project)
+   /*     : metadata.getScannerConfig().mode === Scanner.ScannerMode.RESUME
+          ? new ResumeScanTask(project, new WFPDispatcher(),new WFPScannerInputAdapter())*/
+          : new WFPRescanTask(project,new WFPDispatcher(),new WFPScannerInputAdapter());
+
     this.queue.push(scanTask);
 
     // vulnerabilities

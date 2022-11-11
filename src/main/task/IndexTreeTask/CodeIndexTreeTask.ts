@@ -1,14 +1,14 @@
 import fs from "fs";
 import { IndexTreeTask } from "./IndexTreeTask";
 import Folder from "../../workspace/tree/Folder";
-import {Tree} from "../../workspace/tree/Tree";
+import { Tree } from "../../workspace/tree/Tree";
 
 export class CodeIndexTreeTask  extends IndexTreeTask{
 
-  public async run(params: void):Promise<boolean>{
+  public async run(params: void):Promise<boolean> {
     const files = this.getProjectFiles(this.project.getScanRoot(),this.project.getScanRoot());
     const tree = await this.buildTree(files);
-    await this.setTreeSummary(tree);
+    this.setTreeSummary(tree);
     return true;
   }
 
@@ -47,7 +47,7 @@ export class CodeIndexTreeTask  extends IndexTreeTask{
     return tree;
   }
 
-  public async setTreeSummary(tree: Tree){
+  public setTreeSummary(tree: Tree):void {
     tree.summarize();
     const summary = tree.getSummarize();
     this.project.filesToScan = summary.files;
