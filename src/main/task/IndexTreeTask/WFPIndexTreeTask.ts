@@ -9,7 +9,7 @@ export class WFPIndexTreeTask extends IndexTreeTask {
   public async run(): Promise<boolean> {
     const files = this.getFiles();
     this.filesToScan = files;
-    const tree =  await this.buildTree(files);
+    const tree =  await this.buildTree(this.filesToScan);
     await this.setTreeSummary(tree);
     return true;
   }
@@ -33,9 +33,15 @@ export class WFPIndexTreeTask extends IndexTreeTask {
     return wfp;
   }
 
+  /**
+   * @brief build tree from array of paths
+   * @param files array of paths
+   * @return Tree return a tree
+   * */
   public async buildTree(files: Array<string>): Promise<Tree> {
     const tree = new Tree(this.project.metadata.getName(),this.project.getMyPath());
     tree.build(files);
+    tree.orderTree();
     return tree;
  }
 
