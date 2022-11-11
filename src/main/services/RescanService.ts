@@ -98,6 +98,80 @@ class RescanService {
     }
   }
 
+  public async reScanWFP(
+    files: Array<any>,
+    resultPath: string
+  ): Promise<void> {
+    try {
+      const aux = utilHelper.convertsArrayOfStringToString(files, 'path');
+      // UPDATING FILES
+      await modelProvider.model.file.setDirty(1);
+      await modelProvider.model.file.setDirty(0, aux);
+      const filesDb = await modelProvider.model.file.getAll(null);
+
+      const newFilesDb = [];
+      files.forEach((f) => {
+        const aux = filesDb.find((o) => o.path === f.path);
+        if (aux === undefined) newFilesDb.push(f);
+      });
+      if (filesDb.length > 0) {
+        await modelProvider.model.file.insertFiles(newFilesDb);
+      }
+
+      await modelProvider.model.result.updateDirty(1);
+
+      const cleanFiles = await modelProvider.model.file.getClean();
+      const filesToUpdate = cleanFiles.reduce((previousValue, currentValue) => {
+        previousValue[currentValue.path] = currentValue.fileId;
+        return previousValue;
+      }, []);
+
+      const resultLicenses: IInsertResult =
+        await modelProvider.model.result.insertFromFileReScan(
+          resultPath,
+          filesToUpdate
+        );
+      if (resultLicenses)
+        await modelProvider.model.result.insertResultLicense(resultLicenses);
+      const dirtyFiles = await modelProvider.model.file.getDirty();
+      if (dirtyFiles.length > 0) {
+        await modelProvider.model.inventory.deleteDirtyFileInventories(
+          dirtyFiles
+        );
+      }
+      await modelProvider.model.result.deleteDirty();
+      await modelProvider.model.file.deleteDirty();
+      await modelProvider.model.component.updateOrphanToManual();
+      await componentService.importComponents();
+
+
+      const notValidDetecteComponents: number[] =
+        await modelProvider.model.component.getNotValid();
+
+      if (notValidDetecteComponents.length > 0) {
+        await modelProvider.model.component.deleteByID(
+          notValidDetecteComponents
+        );
+      }
+
+      const emptyInv: any =
+        await modelProvider.model.inventory.emptyInventory();
+      if (emptyInv) {
+        const result = emptyInv.map((item: Record<string, number>) => item.id);
+        await modelProvider.model.inventory.deleteAllEmpty(result);
+      }
+
+      // Updates most reliable license for each component
+      const mostReliableLicensePerComponent =
+        await modelProvider.model.component.getMostReliableLicensePerComponent();
+      await modelProvider.model.component.updateMostReliableLicense(
+        mostReliableLicensePerComponent
+      );
+    } catch (err: any) {
+      throw new Error('[ RESCAN DB ] Unable to insert new results');
+    }
+  }
+
   public async getNewResults(): Promise<Array<any>> {
     const results: Array<any> = await modelProvider.model.file.getFilesRescan();
     results.forEach((result) => {
