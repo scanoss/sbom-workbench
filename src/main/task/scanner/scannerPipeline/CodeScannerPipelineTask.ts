@@ -1,16 +1,20 @@
-import { ScanTask } from '../ScanTask';
-import { DependencyTask } from '../DependencyTask';
-import { VulnerabilitiesTask } from '../VulnerabilitiesTask';
+import { CodeScanTask } from '../scan/CodeScanTask';
+import { DependencyTask } from '../dependency/DependencyTask';
+import { VulnerabilitiesTask } from '../vulnerability/VulnerabilitiesTask';
 import { IndexTask } from '../../search/indexTask/IndexTask';
 import { BaseScannerTask } from '../BaseScannerTask';
-import { ReScanTask } from '../ReScanTask';
+import { CodeReScanTask } from '../rescan/CodeReScanTask';
 import { Project } from '../../../workspace/Project';
 import { Scanner } from '../types';
-import { ResumeScanTask } from '../ResumeScanTask';
+import { ResumeScanTask } from '../resume/ResumeScanTask';
 import { DecompressTask } from '../../decompress/DecompressTask';
 import ScannerType = Scanner.ScannerType;
 import {ScannerPipeline} from "./ScannerPipeline";
 import {CodeIndexTreeTask} from "../../IndexTreeTask/CodeIndexTreeTask";
+import {CodeDispatcher} from "../dispatcher/CodeDispatcher";
+import {CodeScannerInputAdapter} from "../adapter/CodeScannerInputAdapter";
+import {IScannerInputAdapter} from "../adapter/IScannerInputAdapter";
+import {IDispatch} from "../dispatcher/IDispatch";
 
 export class CodeScannerPipelineTask extends ScannerPipeline{
   public async run(project: Project): Promise<boolean> {
@@ -28,12 +32,12 @@ export class CodeScannerPipelineTask extends ScannerPipeline{
       this.queue.push(new CodeIndexTreeTask(project));
 
     // scan
-    const scanTask: BaseScannerTask =
+    const scanTask: BaseScannerTask<IDispatch,IScannerInputAdapter> =
       metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
-        ? new ScanTask(project)
+        ? new CodeScanTask(project)
         : metadata.getScannerConfig().mode === Scanner.ScannerMode.RESUME
         ? new ResumeScanTask(project)
-        : new ReScanTask(project);
+        : new CodeReScanTask(project, new CodeDispatcher(),new CodeScannerInputAdapter());
 
     if (metadata.getScannerConfig().type.includes(ScannerType.CODE)) {
       this.queue.push(scanTask);

@@ -1,10 +1,9 @@
 import i18next from 'i18next';
-import fs from "fs";
 import { Project } from '../../workspace/Project';
 import { Scanner } from '../scanner/types';
 import { ScannerStage } from '../../../api/types';
-import {Tree} from "../../workspace/tree/Tree";
-import Folder from "../../workspace/tree/Folder";
+import { Tree } from "../../workspace/tree/Tree";
+
 
 export abstract class IndexTreeTask implements Scanner.IPipelineTask {
   protected project: Project;
