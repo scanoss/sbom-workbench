@@ -20,12 +20,14 @@ import { useTranslation } from 'react-i18next';
 import SearchIcon from '@mui/icons-material/Search';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import TableCellActions from '@components/TableCellActions/TableCellActions';
 import { vulnerabilityService } from '@api/services/vulnerability.service';
 import { SourceType } from '@api/dto';
 import useSearchParams from '@hooks/useSearchParams';
-import { ComponentVulnerability } from '../../../../../../../main/model/entity/ComponentVulnerability'; // TODO: use alias?
+import { useNavigate } from 'react-router-dom'; // TODO: use alias?
+import { ComponentVulnerability } from '../../../../../../../main/model/entity/ComponentVulnerability';
 
 // interfaces & types
 interface IVulnerabilitiesFilter {
@@ -35,6 +37,7 @@ interface IVulnerabilitiesFilter {
 
 const VulnerabilitiesReport = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const type = useSearchParams().get('type');
   const data = useRef<ComponentVulnerability[]>(null);
 
@@ -86,7 +89,13 @@ const VulnerabilitiesReport = () => {
     <>
       <section id="VulnerabilitiesReportPage" className="app-page">
         <header className="app-header">
-          <h1 className="header-title">{ type === SourceType.detected ? t('Title:DetectedVulnerabilities') : t('Title:IdentifiedVulnerabilities') }</h1>
+          <h4 className="header-subtitle back">
+            <IconButton onClick={() => navigate(-1)} component="span">
+              <ArrowBackIcon />
+            </IconButton>
+            Reports
+          </h4>
+          <h1 className="header-title">{type === SourceType.detected ? t('Title:DetectedVulnerabilities') : t('Title:IdentifiedVulnerabilities')}</h1>
           <section className="subheader">
             <form className="default-form">
               <div className="form-row filter">

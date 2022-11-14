@@ -178,17 +178,20 @@ export class Tree {
     ]);
     const skipStartWith = ['{', '[', '<?xml', '<html', '<ac3d', '<!doc'];
     const MIN_FILE_SIZE = 256;
+    const MAX_FILE_SIZE = 256 * 1024 * 1024;
+
 
     // Filter by extension
     const ext = pathLib.extname(filePath);
     if (skipExtentions.has(ext)) {
       return 'MD5_SCAN';
     }
-    // Filter by min size
+    // Filter by  size
     const fileSize = fs.statSync(filePath).size;
-    if (fileSize < MIN_FILE_SIZE) {
+    if (fileSize < MIN_FILE_SIZE || fileSize >= MAX_FILE_SIZE) {
       return 'MD5_SCAN';
     }
+
     // if start with pattern
     const file = fs.readFileSync(filePath, 'utf8');
     for (const skip of skipStartWith) {
@@ -223,6 +226,7 @@ export class Tree {
     node: Node,
     bannedList: Filtering.BannedList
   ) {
+    console.log("file", scanRoot + node.getValue());
     let i = 0;
     if (node.getType() === 'file') {
       this.filesIndexed += 1;

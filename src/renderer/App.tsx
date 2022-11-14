@@ -72,8 +72,9 @@ export default class App {
     root.render(app);
   }
 
-  private setTitle() {
-    document.title = AppConfig.APP_NAME;
+  private async setTitle() {
+    const appInfo = await window.app.getInfo()
+    document.title = `${AppConfig.APP_NAME} (${appInfo.version})`;
   }
 
   setupAppMenuListeners() {

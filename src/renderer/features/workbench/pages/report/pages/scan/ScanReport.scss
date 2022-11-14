@@ -364,12 +364,18 @@
 }
 
 .vulnerabilities {
-  .report-title .MuiSvgIcon-root {
+  .report-title .action {
+    display: flex;
+    align-items: center;
     opacity: 0.5;
     transition: all 200ms ease;
+    span {
+      font-size: 10px;
+      text-transform: uppercase;
+    }
   }
 
-  &:not(.blocked):hover .report-title .MuiSvgIcon-root {
+  &:not(.blocked):hover .report-title .action {
     transform: translateX(3px);
     opacity: 1;
   }
