@@ -7,8 +7,6 @@ import { WFPScanTask } from "../scan/WFPScanTask";
 import { VulnerabilitiesTask } from "../vulnerability/VulnerabilitiesTask";
 import ScannerType = Scanner.ScannerType;
 import { WFPRescanTask } from "../rescan/WFPRescanTask";
-import { WFPDispatcher } from "../dispatcher/WFPDispatcher";
-import { WFPScannerInputAdapter } from "../adapter/WFPScannerInputAdapter";
 import { IDispatch } from "../dispatcher/IDispatch";
 import { IScannerInputAdapter } from "../adapter/IScannerInputAdapter";
 
@@ -29,8 +27,8 @@ export class WFPScannerPipeLineTask extends ScannerPipeline {
       metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
         ? new WFPScanTask(project)
    /*     : metadata.getScannerConfig().mode === Scanner.ScannerMode.RESUME
-          ? new ResumeScanTask(project, new WFPDispatcher(),new WFPScannerInputAdapter())*/
-          : new WFPRescanTask(project,new WFPDispatcher(),new WFPScannerInputAdapter());
+          ? new ResumeScanTask(project, new WFPDispatcher(),new WFPScannerInputAdapter()) */
+          : new WFPRescanTask(project);
 
     this.queue.push(scanTask);
 

@@ -106,7 +106,10 @@ const IdentifiedReport = ({ data }) => {
           <Card className={`report-item vulnerabilities ${blocked ? 'blocked' : 'no-blocked'}`}>
             <div className="report-title d-flex space-between align-center">
               <span>{t('Title:Vulnerabilities')}</span>
-              <ArrowForwardOutlinedIcon fontSize="inherit" />
+              <div className="action">
+                <span className="mr-1">{t('Button:MoreDetails')}</span>
+                <ArrowForwardOutlinedIcon fontSize="inherit" />
+              </div>
             </div>
             <VulnerabilitiesCard data={data.vulnerabilities} blocked={blocked} />
           </Card>

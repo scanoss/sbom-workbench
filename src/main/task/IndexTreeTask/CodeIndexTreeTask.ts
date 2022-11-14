@@ -18,6 +18,7 @@ export class CodeIndexTreeTask  extends IndexTreeTask{
       .readdirSync(dir, { withFileTypes: true }) // Returns a list of files and folders
       .sort(this.dirFirstFileAfter)
       .filter((dirent: any) => !dirent.isSymbolicLink());
+
     for (const dirEntry of dirEntries) {
       const relativePath = `${dir}/${dirEntry.name}`.replace(rootPath, '');
       if (dirEntry.isDirectory()) {
