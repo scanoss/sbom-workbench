@@ -132,8 +132,8 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
       scannerCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
       scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
     }
-
-    scannerCfg.CONCURRENCY_LIMIT = 20;
+    scannerCfg.MAX_RESPONSES_IN_BUFFER = 500;
+    scannerCfg.CONCURRENCY_LIMIT = 10;
     scannerCfg.DISPATCHER_QUEUE_SIZE_MAX_LIMIT = 500;
     scannerCfg.DISPATCHER_QUEUE_SIZE_MIN_LIMIT = 450;
 

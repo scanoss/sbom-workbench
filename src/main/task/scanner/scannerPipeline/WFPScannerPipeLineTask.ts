@@ -9,6 +9,7 @@ import ScannerType = Scanner.ScannerType;
 import { WFPRescanTask } from "../rescan/WFPRescanTask";
 import { IDispatch } from "../dispatcher/IDispatch";
 import { IScannerInputAdapter } from "../adapter/IScannerInputAdapter";
+import {WFPResumeTask} from "../resume/WFPResumeTask";
 
 export class WFPScannerPipeLineTask extends ScannerPipeline {
 
@@ -26,8 +27,8 @@ export class WFPScannerPipeLineTask extends ScannerPipeline {
     const scanTask :BaseScannerTask<IDispatch, IScannerInputAdapter> =
       metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
         ? new WFPScanTask(project)
-   /*     : metadata.getScannerConfig().mode === Scanner.ScannerMode.RESUME
-          ? new ResumeScanTask(project, new WFPDispatcher(),new WFPScannerInputAdapter()) */
+        : metadata.getScannerConfig().mode === Scanner.ScannerMode.RESUME
+          ? new WFPResumeTask(project)
           : new WFPRescanTask(project);
 
     this.queue.push(scanTask);
