@@ -178,7 +178,7 @@ export class Tree {
     ]);
     const skipStartWith = ['{', '[', '<?xml', '<html', '<ac3d', '<!doc'];
     const MIN_FILE_SIZE = 256;
-    const MAX_FILE_SIZE = 256 * 1024 * 1024;
+    const MAX_FILE_SIZE = 32 * 1024 * 1024;
 
 
     // Filter by extension

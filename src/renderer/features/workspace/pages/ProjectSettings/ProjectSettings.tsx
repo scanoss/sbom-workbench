@@ -377,7 +377,7 @@ const ProjectSettings = () => {
                 <FormGroup>
                   <FormControlLabel
                     control={<Checkbox />}
-                    disabled={scanPath?.source !== Scanner.ScannerSource.CODE}
+                    disabled={scanPath?.source === Scanner.ScannerSource.WFP}
                     label={t('DecompressArchivesLabel')}
                     onChange={(event, checked) => onDecompress(checked)}
                   />
