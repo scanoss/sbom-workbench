@@ -1,14 +1,24 @@
 import sqlite3 from 'sqlite3';
 import log from 'electron-log';
-import { modelProvider } from '../../services/ModelProvider';
-import { AddVulneravilityTask } from '../../task/vulnerability/AddVulneravilityTask';
-import { Querys } from '../../model/querys_db';
+import {modelProvider} from '../../services/ModelProvider';
+import {Querys} from '../../model/querys_db';
+import fs from "fs";
+import {Scanner} from "../../task/scanner/types";
+import ScannerType = Scanner.ScannerType;
 
 export async function migration140(projectPath: string): Promise<void> {
   log.info('%cMigration 1.4.0 In progress...', 'color:green');
   await modelProvider.init(projectPath);
+  await metadataMigration(projectPath);
   await createVulnerabilityTable(projectPath);
-  await importVulnerabilities(projectPath);
+}
+
+async function metadataMigration(projectPath: string) {
+  const m = await fs.promises.readFile(`${projectPath}/metadata.json`, 'utf8');
+  const metadata = JSON.parse(m);
+
+  metadata.scannerConfig = { mode: Scanner.ScannerMode.SCAN, source: metadata.source === "IMPORTED" ? Scanner.ScannerSource.IMPORTED : Scanner.ScannerSource.CODE , type: [Scanner.ScannerType.CODE,ScannerType.DEPENDENCIES, Scanner.ScannerType.VULNERABILITIES]};
+  await  fs.promises.writeFile(`${projectPath}/metadata.json`,JSON.stringify(metadata),'utf-8');
 }
 
 async function createVulnerabilityTable(projectPath: string): Promise<void> {
@@ -31,30 +41,3 @@ async function createVulnerabilityTable(projectPath: string): Promise<void> {
   });
 }
 
-async function importVulnerabilities(projectPath: string) {
-  const detectedComponents = await modelProvider.model.component.getAll(null);
-  const dependencyComponents = await modelProvider.model.dependency.getAll(
-    null
-  );
-  const components = groupComponentByPurlVersion(
-    detectedComponents,
-    dependencyComponents
-  );
-  const addVulnerability = new AddVulneravilityTask();
-  await addVulnerability.run(components);
-}
-
-function groupComponentByPurlVersion(
-  components: any,
-  dependencyComponents: any
-): Array<string> {
-  const allComponents = components.concat(dependencyComponents);
-  const componentSet = new Set<string>();
-  allComponents.forEach((c) => {
-    if (c.purl && c.version) {
-      componentSet.add(`${c.purl}@${c.version}`);
-    }
-  });
-  const response = Array.from(componentSet);
-  return response;
-}
