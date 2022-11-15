@@ -47,11 +47,13 @@ export class Tree {
     const addedNodes = {};
     files.forEach((f) => {
       const splitPath = f.split("/");
-      splitPath.shift();
-      this.recursive(splitPath, this.rootFolder, addedNodes);
+      if(splitPath.length>1) {
+        if(splitPath[0]==="") splitPath.shift();
+        this.recursive(splitPath, this.rootFolder, addedNodes);
+      }else
+        this.recursive([f],this.rootFolder,addedNodes);
     });
     return this.rootFolder;
-
   }
 
   /**
@@ -62,7 +64,9 @@ export class Tree {
   }
 
  private recursive(splitPath: Array<string>, node: Folder, addedNodes : Record<string, Folder>): Node{
-    const nodePath = `${node.getPath()}/${  splitPath[0]}`;
+
+    // TODO: Change by node.getPath() ? `${node.getPath()}/${splitPath[0]}` : splitPath[0];
+    const nodePath = `${node.getPath()}/${splitPath[0]}`;
     // File
     if (splitPath.length === 1) {
       const file = new File(nodePath, splitPath[0]);
