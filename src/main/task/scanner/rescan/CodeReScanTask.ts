@@ -3,6 +3,8 @@ import { RescanTask } from "./RescanTask";
 import { CodeDispatcher } from "../dispatcher/CodeDispatcher";
 import { CodeScannerInputAdapter } from "../adapter/CodeScannerInputAdapter";
 import { Project } from "../../../workspace/Project";
+import {utilModel} from "../../../model/UtilModel";
+import fs from "fs";
 
 export class CodeReScanTask extends RescanTask<CodeDispatcher,CodeScannerInputAdapter> {
 
@@ -12,6 +14,14 @@ export class CodeReScanTask extends RescanTask<CodeDispatcher,CodeScannerInputAd
 
   public async reScan(): Promise<void> {
     const resultPath = `${this.project.getMyPath()}/result.json`;
+    const result: Record<any, any> = await utilModel.readFile(resultPath);
+    for (const [key, value] of Object.entries(result)) {
+      if(!key.startsWith("/")) {
+        result[`/${key}`] = value;
+        delete result[key];
+      }
+    }
+    await fs.promises.writeFile(resultPath,JSON.stringify(result,null,2));
     await rescanService.reScan(this.project.getTree().getRootFolder().getFiles(), resultPath, this.project.getMyPath());
   }
 

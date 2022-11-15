@@ -37,7 +37,7 @@ export class CodeScannerPipelineTask extends ScannerPipeline{
         ? new CodeScanTask(project)
         : metadata.getScannerConfig().mode === Scanner.ScannerMode.RESUME
         ? new ResumeScanTask(project)
-        : new CodeReScanTask(project, new CodeDispatcher(),new CodeScannerInputAdapter());
+        : new CodeReScanTask(project);
 
     if (metadata.getScannerConfig().type.includes(ScannerType.CODE)) {
       this.queue.push(scanTask);
