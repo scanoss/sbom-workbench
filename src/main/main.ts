@@ -136,7 +136,6 @@ const createWindow = async () => {
    AppI18n.init(AppI18nContext.MAIN);
 
    AppI18n.getI18n().on('languageChanged', async (e) => {
-     console.log('languageChanged', e);
      const { response } = await dialog.showMessageBox(
        BrowserWindow.getFocusedWindow(),
        {

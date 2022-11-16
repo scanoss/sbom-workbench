@@ -1,10 +1,11 @@
 import sqlite3 from 'sqlite3';
 import log from 'electron-log';
+import fs from "fs";
 import {modelProvider} from '../../services/ModelProvider';
 import {Querys} from '../../model/querys_db';
-import fs from "fs";
 import {Scanner} from "../../task/scanner/types";
 import ScannerType = Scanner.ScannerType;
+import { userSettingService } from '../../services/UserSettingService';
 
 export async function migration140(projectPath: string): Promise<void> {
   log.info('%cMigration 1.4.0 In progress...', 'color:green');
@@ -12,6 +13,13 @@ export async function migration140(projectPath: string): Promise<void> {
   await metadataMigration(projectPath);
   await createVulnerabilityTable(projectPath);
 }
+
+export async function wsMigration140(): Promise<void> {
+  userSettingService.setSetting('LNG', 'en');
+  userSettingService.setSetting('VERSION', '1.4.0');
+  await userSettingService.save();
+}
+
 
 async function metadataMigration(projectPath: string) {
   const m = await fs.promises.readFile(`${projectPath}/metadata.json`, 'utf8');
