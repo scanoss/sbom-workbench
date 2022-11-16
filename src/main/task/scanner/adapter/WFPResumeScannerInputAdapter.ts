@@ -6,7 +6,7 @@ export class WFPResumeScannerInputAdapter implements IScannerInputAdapter {
   adapterToScannerInput(project: Project, filesToScan: Record<string, string>): Array<ScannerInput> {
     // @Override
     const scannerInput:Array<ScannerInput> =[{
-      fileList: project.filesToScan,
+      fileList: Object.keys(project.filesToScan),
       wfpPath:  project.getScanRoot(),
     }];
     return scannerInput;
