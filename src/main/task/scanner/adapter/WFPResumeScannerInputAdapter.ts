@@ -4,9 +4,14 @@ import { Project } from "../../../workspace/Project";
 
 export class WFPResumeScannerInputAdapter implements IScannerInputAdapter {
   adapterToScannerInput(project: Project, filesToScan: Record<string, string>): Array<ScannerInput> {
+
+    const pendingFiles = Object.keys(project.filesToScan);
+    const totalFiles = project.getTree().getRootFolder().getFiles().map((fileItem) => fileItem.path);
+    const scannedFiles = totalFiles.filter((path) =>  !pendingFiles.includes(path) );
+
     // @Override
     const scannerInput:Array<ScannerInput> =[{
-      fileList: Object.keys(project.filesToScan),
+      fileList: scannedFiles,
       wfpPath:  project.getScanRoot(),
     }];
     return scannerInput;

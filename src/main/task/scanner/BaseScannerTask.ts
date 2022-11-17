@@ -50,24 +50,31 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
   public  init() {
     this.setScannerConfig();
     this.cleanWorkDirectory();
+    let {processedFiles} = this.project;
+
     this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (response) => {
-      this.project.processedFiles += response.getNumberOfFilesScanned();
-      const filesScanned = response.getFilesScanned();
-      // eslint-disable-next-line no-restricted-syntax
-      for (const file of filesScanned)
-        this.dispatcher.dispatch(this.project,file);
+
+      processedFiles += response.getNumberOfFilesScanned();
+
       this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
         processed:
-          (100 * this.project.processedFiles) /
+          (100 * processedFiles) /
           this.project.filesSummary.include,
       });
-      await this.project.save();
+
     });
 
     this.scanner.on(
       ScannerEvents.RESULTS_APPENDED,
       (response, filesNotScanned) => {
+
+        this.project.processedFiles += response.getNumberOfFilesScanned();
+
+        for (const file of response.getFilesScanned())
+          this.dispatcher.dispatch(this.project,file);
+
         this.project.tree.attachResults(response.getServerResponse());
+        response.getFilesScanned()
         Object.assign(
           this.project.filesNotScanned,
           this.project.filesNotScanned
