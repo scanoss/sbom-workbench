@@ -11,7 +11,4 @@ export class WFPScannerInputAdapter implements IScannerInputAdapter {
     }];
     return scannerInput;
   }
-
-
-
 }
