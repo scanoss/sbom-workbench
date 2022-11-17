@@ -96,7 +96,7 @@ export class Tree {
         if (value[i].purl !== undefined) {
           this.rootFolder.attachResults(
             { purl: value[i].purl[0], version: value[i].version },
-            key
+            key.startsWith('/') ? key : `/${key}`
           );
         }
       }
