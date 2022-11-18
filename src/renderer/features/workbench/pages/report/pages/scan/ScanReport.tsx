@@ -55,7 +55,7 @@ const Export = ({ empty }) => {
   const { path: projectPath, name } = useSelector(selectWorkbench);
   const { t } = useTranslation();
 
-  const source: ExportSource = pathname.startsWith('/workbench/report/detected')
+  const source: ExportSource = pathname.startsWith('/workbench/report/scan/detected')
     ? ExportSource.DETECTED
     : ExportSource.IDENTIFIED;
 

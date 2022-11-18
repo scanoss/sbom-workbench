@@ -84,7 +84,6 @@ const Editor = () => {
     try {
       setRemoteFileContent({ content: null, error: false });
       const content = await workbenchController.fetchRemoteFile(path);
-      console.log(content);
       setRemoteFileContent({ content, error: false });
     } catch (error) {
       setRemoteFileContent({ content: null, error: true });
@@ -305,7 +304,7 @@ const Editor = () => {
         <div className="editor">
           {/* TODO: we need to remove this IF statement. Should we keep editor instance to better performance and UX.
               Problem: editors not re-layout on changing file */}
-          {localFileContent?.content || remoteFileContent?.content || imported ? (
+          {localFileContent?.content || (remoteFileContent?.content && !isDiffView) || imported ? (
             <MemoCodeViewer
               id={CodeViewerManager.LEFT}
               language={getExtension(file)}
@@ -319,7 +318,7 @@ const Editor = () => {
             />
           ) : (
             <div className="file-loader">{
-                localFileContent?.error && !imported && !wfp ? t('FileNotLoad') : !imported && !wfp ? t('LoadingLocalFile') : t('LoadingRemoteFile')}</div>
+              (localFileContent?.error && isDiffView) || ( localFileContent?.error && !imported && !wfp) ? t('FileNotLoad') : !imported && !wfp ? t('LoadingLocalFile') : t('LoadingRemoteFile')}</div>
           )}
         </div>
 
@@ -329,7 +328,7 @@ const Editor = () => {
               <MemoCodeViewer
                 id={CodeViewerManager.RIGHT}
                 language={getExtension(file)}
-                value={remoteFileContent.content || 't'}
+                value={remoteFileContent.content || ''}
                 highlight={currentMatch.oss_lines || null}
                 highlights={highlight || null}
               />
