@@ -7,15 +7,7 @@ import {
   ProjectState,
 } from '../types';
 import { BaseService } from './base.service';
-import { Scanner } from '../../main/task/scanner/types';
-import ScannerConfig = Scanner.ScannerConfig;
-import { userSettingService } from '../../main/services/UserSettingService';
-import ScannerType = Scanner.ScannerType;
-import { Project } from '../../main/workspace/Project';
-import { workspace } from '../../main/workspace/Workspace';
-import { modelProvider } from '../../main/services/ModelProvider';
-import { treeService } from '../../main/services/TreeService';
-import log from 'electron-log';
+
 
 class ProjectService extends BaseService {
   public async get(args: Partial<IProject>): Promise<any> {
