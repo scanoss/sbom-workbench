@@ -8,7 +8,6 @@ export class WFPIndexTreeTask extends IndexTreeTask {
 
   public async run(): Promise<boolean> {
     const files = this.getFiles();
-    console.log(files);
     this.filesToScan = files;
     const tree =  await this.buildTree(this.filesToScan);
     await this.setTreeSummary(tree);
