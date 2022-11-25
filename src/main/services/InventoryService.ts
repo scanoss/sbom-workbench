@@ -4,7 +4,6 @@ import { Inventory, Component, IBatchInventory, IWorkbenchFilter } from '../../a
 import { inventoryHelper } from '../helpers/InventoryHelper';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 
-
 class InventoryService  {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
     try {

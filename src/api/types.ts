@@ -271,3 +271,24 @@ export enum ScannerStage {
   VULNERABILITY,
   SEARCH_INDEX,
 }
+
+export interface InventoryExtraction {
+  externalFiles: Array<ExternalFile>;
+  purl: string;
+  name: string;
+  url: string;
+  version: string;
+  spdxid: string;
+  licenseName: string;
+  usage: string;
+  notes: string;
+}
+
+export interface InventoryKnowledgeExtraction {
+  [key: string]: Array<InventoryExtraction>
+}
+
+export interface ExternalFile {
+  projectName: string;
+  path: string;
+}
