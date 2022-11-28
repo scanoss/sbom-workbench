@@ -168,10 +168,6 @@ const FileTree = () => {
               enabled: !onlyRestore,
             },
             {
-              label: t('AppMenu:ImportFrom'),
-              actionId: 'Action:ImportFrom',
-            },
-            {
               label: t('AppMenu:MarkAllAsOriginal', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
               actionId: 'Action:MarkAllAsOriginal',
               enabled: !onlyRestore,
@@ -180,6 +176,11 @@ const FileTree = () => {
               label: t('AppMenu:RestoreAll', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
               actionId: 'Action:RestoreAll',
               enabled: node.hasIgnoredProgress || node.hasIdentifiedProgress,
+            },
+            { type: 'separator' },
+            {
+              label: t('AppMenu:ImportFrom'),
+              actionId: 'Action:ImportFrom',
             },
             { type: 'separator' },
             {

@@ -184,6 +184,15 @@ const useContextual = () => {
     }
   };
 
+  const importFrom = async (node: any) => {
+    // TODO: remove duplicated code
+    const { action } = await dialogCtrl.openProjectSelectorDialog({ folder: node.value });
+
+    if (action !== DIALOG_ACTIONS.CANCEL) {
+      // dispatch(restoreAllDep({ path: node.value }));
+    }
+  };
+
   return {
     acceptAll,
     identifyAll,
@@ -191,6 +200,7 @@ const useContextual = () => {
     restoreAll,
     restore,
     ignore,
+    importFrom,
     acceptAllDependencies,
     rejectAllDependencies,
     restoreAllDependencies,

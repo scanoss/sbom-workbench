@@ -35,6 +35,8 @@
   "SearchByKeywords": "Buscar por palabras clave",
   "NFilesSelected_one": "{{count}} fichero seleccionado",
   "NFilesSelected_other": "{{count}} ficheros seleccionados",
+  "NProjectsSelected_one": "{{count}} proyecto seleccionado",
+  "NProjectsSelected_other": "{{count}} proyectos seleccionados",
   "of": "de",
   "file": "fichero",
   "snippet": "snippet",
