@@ -1,5 +1,5 @@
 import log from 'electron-log';
-import {INewProject, ProjectState} from '../../api/types';
+import {ExtractFromProjectDTO, INewProject, InventoryKnowledgeExtraction, ProjectState} from '../../api/types';
 import {Project} from '../workspace/Project';
 import {workspace} from '../workspace/Workspace';
 import {modelProvider} from './ModelProvider';
@@ -10,6 +10,7 @@ import {CodeScannerPipelineTask} from '../task/scanner/scannerPipeline/CodeScann
 import {ScannerPipelineFactory} from "../task/scanner/scannerPipelineFactory/ScannerPipelineFactory";
 import ScannerType = Scanner.ScannerType;
 import ScannerMode = Scanner.ScannerMode;
+import {ProjectKnowledgeExtractor} from "../modules/projectKnowledge/ProjectKnowledgeExtractor";
 
 class ProjectService {
   public async createProject(projectDTO: INewProject) {
@@ -63,6 +64,13 @@ class ProjectService {
       );
     }
   }
+
+  public async extractProjectKnowledgeInventoryData(param: ExtractFromProjectDTO): Promise<InventoryKnowledgeExtraction>{
+    const projectKnowledgeExtractor = new ProjectKnowledgeExtractor(param);
+    const inventoryKnowledgeData = await projectKnowledgeExtractor.extractInventoryData();
+    return inventoryKnowledgeData;
+  }
+
 }
 
 export const projectService = new ProjectService();

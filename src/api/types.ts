@@ -289,3 +289,10 @@ export interface ExternalFile {
   projectName: string;
   path: string;
 }
+
+export interface ExtractFromProjectDTO {
+  source: IProject[];
+  target: IProject;
+  folder: string;
+  md5File?: string;
+}

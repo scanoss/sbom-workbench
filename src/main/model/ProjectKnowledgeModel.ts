@@ -20,23 +20,16 @@ export class ProjectKnowledgeModel {
     return db;
   }
 
-
-  public async extractProjectInventoryData(projectPath: string){
+  public async extractProjectInventoryData(projectPath: string,filesToProcess:Array<string>, md5File = null){
     const queries = new Querys();
     const db = await this.openDb();
     const call = await this.attach(db,projectPath);
-    const query =  `${queries.SQL_GET_KNOWLEDGE_INVENTORIES};`;
-    const inventories = await this.getInventories(db,query);
-    await call(`DETACH DATABASE aux`);
-    db.close();
-    return inventories;
-  }
-
-  public async extractProjectInventoryDataFile(projectPath: string, file :string){
-    const queries = new Querys();
-    const db = await this.openDb();
-    const call = await this.attach(db,projectPath);
-    const query =  `${queries.SQL_GET_KNOWLEDGE_INVENTORIES} AND fdb.md5_file='${file}';`;
+    let query;
+    const files = filesToProcess.map(function(file) { return `'${  file  }'`; }).join(", ");
+    if(md5File)
+       query =  `${queries.SQL_GET_KNOWLEDGE_INVENTORIES} AND fdb.md5_file='${md5File}' AND targetFiles IN (${files}) ;`;
+    else
+      query = `${queries.SQL_GET_KNOWLEDGE_INVENTORIES} AND targetFiles IN (${files});`;
     const inventories = await this.getInventories(db,query);
     await call(`DETACH DATABASE aux`);
     db.close();
