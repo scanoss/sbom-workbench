@@ -318,7 +318,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
            {t('Button:Cancel')}
           </Button>
           <Button type="submit" variant="contained" color="secondary" disabled={!componentSelected}>
-          {t('Button:AddToTheCatalog')}
+           {t('Button:AddToTheCatalog')}
           </Button>
         </DialogActions>
       </form>

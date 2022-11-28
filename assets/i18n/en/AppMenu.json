@@ -31,5 +31,6 @@
   "CollapseAll": "Collapse all",
   "IdentifySelectedAs": "Identify selected files as...",
   "MarkSelectedAsOriginal": "Mark selected files as original",
-  "OpenTranslationManagement": "Open Translation Management"
+  "OpenTranslationManagement": "Open Translation Management",
+  "ImportFrom": "Import identifications from..."
 }

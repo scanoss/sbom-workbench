@@ -102,9 +102,7 @@ class ProjectService extends BaseService {
   }
 
   public async getApiKey(): Promise<string> {
-    const response = await window.electron.ipcRenderer.invoke(
-      IpcChannels.GET_API_KEY
-    );
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.GET_API_KEY);
     return this.response(response);
   }
 
