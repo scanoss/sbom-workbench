@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, current, PayloadAction } from '@reduxjs/toolkit';
 import { INewProject, IProject } from '@api/types';
 import { fetchProjects } from '@store/workspace-store/workspaceThunks';
 import { RootState } from '@store/rootReducer';
@@ -7,6 +7,7 @@ import { IScan } from '@context/types';
 export interface WorkspaceState {
   loading: boolean;
   projects: IProject[];
+  currentProject: IProject;
   newProject: INewProject;
   scanPath: IScan;
 }
@@ -14,6 +15,7 @@ export interface WorkspaceState {
 const initialState: WorkspaceState = {
   loading: false,
   projects: null,
+  currentProject: null,
   newProject: null,
   scanPath: null,
 };
@@ -27,6 +29,7 @@ export const workspaceSlice = createSlice({
     },
     setScanPath: (state, action: PayloadAction<IScan>) => {
       state.scanPath = action.payload;
+      state.currentProject = current(state).projects.find((p) => p.work_root === action.payload.path);
     },
   },
   extraReducers: {

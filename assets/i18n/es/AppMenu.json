@@ -31,5 +31,6 @@
   "CollapseAll": "Colapsar todo",
   "IdentifySelectedAs": "Identificar ficheros seleccionados como...",
   "MarkSelectedAsOriginal": "Marcar ficheros seleccionados como originales",
-  "OpenTranslationManagement": "Abrir gestor de traducciones"
+  "OpenTranslationManagement": "Abrir gestor de traducciones",
+  "ImportFrom": "Importar identificaciones desde..."
 }
