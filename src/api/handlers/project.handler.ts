@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import log from 'electron-log';
-import { FileTreeViewMode, INewProject, IWorkbenchFilter } from '../types';
+import {ExtractFromProjectDTO, FileTreeViewMode, INewProject, IWorkbenchFilter} from '../types';
 import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
 import { userSettingService } from '../../main/services/UserSettingService';
@@ -9,10 +9,6 @@ import { Project } from '../../main/workspace/Project';
 import { workspace } from '../../main/workspace/Workspace';
 import { dependencyService } from '../../main/services/DependencyService';
 import { searcher } from '../../main/modules/searchEngine/searcher/Searcher';
-import { CodeScannerPipelineTask } from '../../main/task/scanner/scannerPipeline/CodeScannerPipelineTask';
-import { Scanner } from '../../main/task/scanner/types';
-import ScannerSource = Scanner.ScannerSource;
-import ScannerType = Scanner.ScannerType;
 import { projectService } from '../../main/services/ProjectService';
 
 ipcMain.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, arg: any) => {
@@ -180,3 +176,15 @@ ipcMain.handle(
     }
   }
 );
+
+ipcMain.handle(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, async (_event, param: ExtractFromProjectDTO) => {
+  try {
+    const inventoryKnowledgeExtraction = projectService.extractProjectKnowledgeInventoryData(param);
+    return Response.ok({
+      message: 'Api Key loaded successfully',
+      data: inventoryKnowledgeExtraction,
+    });
+  } catch (e: any) {
+    return Response.fail({ message: e.message });
+  }
+});

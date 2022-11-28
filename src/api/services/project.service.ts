@@ -1,10 +1,10 @@
 import { IpcChannels } from '../ipc-channels';
 import {
+  ExtractFromProjectDTO,
   FileTreeViewMode,
-  INewProject,
+  INewProject, InventoryKnowledgeExtraction,
   IProject,
   IWorkbenchFilter,
-  ProjectState,
 } from '../types';
 import { BaseService } from './base.service';
 
@@ -106,6 +106,11 @@ class ProjectService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.GET_API_KEY
     );
+    return this.response(response);
+  }
+
+  public async extractInventoryKnowledge(param: ExtractFromProjectDTO): Promise<InventoryKnowledgeExtraction>{
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, param);
     return this.response(response);
   }
 }
