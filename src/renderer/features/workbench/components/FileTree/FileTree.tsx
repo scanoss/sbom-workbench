@@ -83,6 +83,10 @@ const FileTree = () => {
       case 'Action:RestorellDependencies':
         contextual.restoreAllDependencies(node);
         break;
+      case 'Action:ImportFrom':
+        contextual.importFrom(node);
+        break;
+
       default:
         break;
     }
@@ -162,6 +166,10 @@ const FileTree = () => {
               label: t('AppMenu:IdentifyAllAs', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
               actionId: 'Action:IdentifyAllAs',
               enabled: !onlyRestore,
+            },
+            {
+              label: t('AppMenu:ImportFrom'),
+              actionId: 'Action:ImportFrom',
             },
             {
               label: t('AppMenu:MarkAllAsOriginal', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
