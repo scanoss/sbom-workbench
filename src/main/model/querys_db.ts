@@ -320,7 +320,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   OR (compv.version,compv.purl) IN (SELECT version,purl FROM dependencies)
   GROUP BY v.severity;`;
 
-  SQL_GET_KNOWLEDGE_INVENTORIES = `SELECT fdb.md5_file, fdb.purl, fdb.version, fdb.url, fdb.name, fdb.spdxid AS inventoryLicense, fdb.usage, fdb.notes, fdb.licenseName,fdb.path FROM (SELECT r.md5_file FROM files f INNER JOIN results r ON r.fileId = f.fileId) as local,
+  SQL_GET_KNOWLEDGE_INVENTORIES = `SELECT fdb.md5_file, fdb.purl, fdb.version, fdb.url, fdb.name, fdb.spdxid AS inventoryLicense, fdb.usage, fdb.notes, fdb.licenseName,fdb.path, target.path as targetFiles FROM (SELECT r.md5_file, f.path FROM files f INNER JOIN results r ON r.fileId = f.fileId) as target,
     (SELECT aux.results.md5_file, aux.component_versions.purl, aux.component_versions.version, aux.component_versions.url, aux.component_versions.name,
      aux.inventories.spdxid, aux.inventories.usage, aux.inventories.notes, aux.licenses.name as licenseName, aux.files.path
     FROM  aux.results
@@ -329,5 +329,5 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     INNER JOIN aux.inventories ON aux.file_inventories.inventoryid = aux.inventories.id
     INNER JOIN aux.component_versions ON aux.component_versions.id = aux.inventories.cvid
     INNER JOIN aux.licenses ON aux.licenses.spdxid = aux.inventories.spdxid ) as fdb
-    WHERE local.md5_file = fdb.md5_file`;
+    WHERE target.md5_file = fdb.md5_file`;
 }

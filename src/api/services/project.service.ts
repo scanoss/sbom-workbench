@@ -1,21 +1,12 @@
 import { IpcChannels } from '../ipc-channels';
 import {
+  ExtractFromProjectDTO,
   FileTreeViewMode,
-  INewProject,
+  INewProject, InventoryKnowledgeExtraction,
   IProject,
   IWorkbenchFilter,
-  ProjectState,
 } from '../types';
 import { BaseService } from './base.service';
-import { Scanner } from '../../main/task/scanner/types';
-import ScannerConfig = Scanner.ScannerConfig;
-import { userSettingService } from '../../main/services/UserSettingService';
-import ScannerType = Scanner.ScannerType;
-import { Project } from '../../main/workspace/Project';
-import { workspace } from '../../main/workspace/Workspace';
-import { modelProvider } from '../../main/services/ModelProvider';
-import { treeService } from '../../main/services/TreeService';
-import log from 'electron-log';
 
 class ProjectService extends BaseService {
   public async get(args: Partial<IProject>): Promise<any> {
@@ -114,6 +105,11 @@ class ProjectService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.GET_API_KEY
     );
+    return this.response(response);
+  }
+
+  public async extractInventoryKnowledge(param: ExtractFromProjectDTO): Promise<InventoryKnowledgeExtraction>{
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, param);
     return this.response(response);
   }
 }
