@@ -2,7 +2,7 @@ import log from 'electron-log';
 import { modelProvider } from './ModelProvider';
 import { Inventory, Component, IBatchInventory, IWorkbenchFilter } from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
-import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
+import { QueryBuilderCreator } from "../model/queryBuilder/QueryBuilderCreator";
 
 class InventoryService  {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
@@ -199,7 +199,6 @@ class InventoryService  {
       return err;
     }
   }
-
 
 }
 
