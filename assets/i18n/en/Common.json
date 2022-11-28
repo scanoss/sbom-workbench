@@ -35,6 +35,8 @@
   "SearchByKeywords": "Search by keywords",
   "NFilesSelected_one": "{{count}} file selected",
   "NFilesSelected_other": "{{count}} files selected",
+  "NProjectsSelected_one": "{{count}} project selected",
+  "NProjectsSelected_other": "{{count}} projects selected",
   "of": "of",
   "file": "file",
   "snippet": "snippet",

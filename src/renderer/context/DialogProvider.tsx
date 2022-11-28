@@ -14,6 +14,7 @@ import { PreLoadInventoryDialog } from '../ui/dialog/PreLoadInventoryDialog';
 import { ProgressDialog } from '../ui/dialog/ProgressDialog';
 import DependencyDialog from '../ui/dialog/DependencyDialog';
 import ComponentSearcherDialog from '../ui/dialog/ComponentSearcherDialog';
+import { ProjectSelectorDialog } from '../ui/dialog/ProjectSelectorDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
@@ -27,6 +28,7 @@ export interface IDialogContext {
   openPreLoadInventoryDialog: (folder: string, overwrite: boolean) => Promise<boolean>;
   createProgressDialog: (message: ReactNode) => Promise<LoaderController>;
   openDependencyDialog: (dependency: Dependency) => Promise<DialogResponse>;
+  openProjectSelectorDialog: (params?: { folder?: string, md5File?: string}) => Promise<DialogResponse>;
 }
 
 export const DialogContext = React.createContext<IDialogContext | null>(null);
@@ -290,6 +292,30 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     });
   };
 
+  const [projectSelectorDialog, setProjectSelectorDialog] = useState<{
+    open: boolean;
+    params: { folder?: string, md5File?: string }
+    onClose?: (response: DialogResponse) => void;
+    onCancel?: () => void;
+  }>({ open: false, params: {} });
+
+  const openProjectSelectorDialog = (params?: { folder?: string, md5File?: string }): Promise<DialogResponse> => {
+    return new Promise<DialogResponse>((resolve) => {
+      setProjectSelectorDialog({
+        open: true,
+        params,
+        onCancel: () => {
+          setProjectSelectorDialog((dialog) => ({ ...dialog, open: false }));
+          resolve({ action: DIALOG_ACTIONS.CANCEL });
+        },
+        onClose: (response: DialogResponse) => {
+          setProjectSelectorDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(response);
+        },
+      });
+    });
+  };
+
   const handleOpenSettings = () => {
     openSettings();
   };
@@ -317,6 +343,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         openPreLoadInventoryDialog,
         createProgressDialog,
         openDependencyDialog,
+        openProjectSelectorDialog,
       }}
     >
       {children}
@@ -389,7 +416,16 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
           open={componentSearcherDialog.open}
           query={componentSearcherDialog.query}
           onCancel={() => componentSearcherDialog.onCancel && componentSearcherDialog.onCancel()}
-          onClose={(dep) => componentSearcherDialog.onClose && componentSearcherDialog.onClose(dep)}
+          onClose={(response: DialogResponse) => componentSearcherDialog.onClose && componentSearcherDialog.onClose(response)}
+        />
+      )}
+
+      {projectSelectorDialog.open && (
+        <ProjectSelectorDialog
+          open={projectSelectorDialog.open}
+          params={projectSelectorDialog.params}
+          onCancel={() => projectSelectorDialog.onCancel && projectSelectorDialog.onCancel()}
+          onClose={(response: DialogResponse) => projectSelectorDialog.onClose && projectSelectorDialog.onClose(response)}
         />
       )}
 

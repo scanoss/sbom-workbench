@@ -1,6 +1,12 @@
 import { ipcMain } from 'electron';
 import log from 'electron-log';
-import {ExtractFromProjectDTO, FileTreeViewMode, INewProject, IWorkbenchFilter} from '../types';
+import {
+  ExtractFromProjectDTO,
+  FileTreeViewMode,
+  INewProject,
+  InventoryKnowledgeExtraction,
+  IWorkbenchFilter
+} from '../types';
 import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
 import { userSettingService } from '../../main/services/UserSettingService';
@@ -179,12 +185,13 @@ ipcMain.handle(
 
 ipcMain.handle(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, async (_event, param: ExtractFromProjectDTO) => {
   try {
-    const inventoryKnowledgeExtraction = projectService.extractProjectKnowledgeInventoryData(param);
+    const inventoryKnowledgeExtraction: InventoryKnowledgeExtraction = await projectService.extractProjectKnowledgeInventoryData(param);
     return Response.ok({
-      message: 'Api Key loaded successfully',
+      message: 'Project extraction successfully',
       data: inventoryKnowledgeExtraction,
     });
-  } catch (e: any) {
-    return Response.fail({ message: e.message });
+  } catch (error: any) {
+    log.error('[PROJECT_EXTRACT_INVENTORY_KNOWLEDGE]', error);
+    return Response.fail({ message: error.message });
   }
 });
