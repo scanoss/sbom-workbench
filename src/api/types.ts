@@ -282,7 +282,10 @@ export interface InventoryExtraction {
 }
 
 export interface InventoryKnowledgeExtraction {
-  [key: string]: Array<InventoryExtraction>
+  [key: string]: {
+    inventories: Array<InventoryExtraction>;
+    localFiles: Array<string>;
+  }
 }
 
 export interface ExternalFile {

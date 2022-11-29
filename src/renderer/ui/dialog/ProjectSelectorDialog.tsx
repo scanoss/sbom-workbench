@@ -53,7 +53,6 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
 
   const { projects, currentProject } = useSelector(selectWorkspaceState);
   const { isFilterActive } = useSelector(selectNavigationState);
-
   const [items, setItems] = useState<IProject[]>(
     projects
       .filter((item) => item.uuid !== currentProject.uuid)
@@ -129,7 +128,6 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
                     flex: 1,
                   },
                 ]}
-
                 rowHeight={23}
                 disableColumnMenu
                 rowsPerPageOptions={[100]}
@@ -150,6 +148,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
                   <Table stickyHeader aria-label="results table">
                     <TableHead>
                       <TableRow>
+                        <TableCell>{t('Table:Header:Local File')}</TableCell>
                         <TableCell>{t('Table:Header:MD5')}</TableCell>
                         <TableCell>{t('Table:Header:Component')}</TableCell>
                         <TableCell>{t('Table:Header:Purl')}</TableCell>
@@ -159,9 +158,11 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {Object.keys(results).map((key) => (
-                        results[key].map( inv => (
+                       {results && Object.keys(results).map((key) => (
+                        results[key].inventories.map( inv => (
                           <TableRow key={key}>
+                            <TableCell>{results[key].localFiles.map(function (f) {
+                              return f; }).join(", ")}</TableCell>
                             <TableCell>{key}</TableCell>
                             <TableCell>{inv.name}</TableCell>
                             <TableCell>{inv.purl}</TableCell>
