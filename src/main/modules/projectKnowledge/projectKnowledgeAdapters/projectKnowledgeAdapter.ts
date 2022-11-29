@@ -1,23 +1,27 @@
 import { ExternalFile, InventoryExtraction, InventoryKnowledgeExtraction } from "../../../../api/types";
 
 export function inventoryToInventoryKnowledgeExtraction(inputData: any): InventoryKnowledgeExtraction{
-  const inventoryMapper= new Map<string, Array<InventoryExtraction>>();
+  const inventoryMapper= new Map<string,{
+    inventories: Array<InventoryExtraction>,
+    localFiles: Array<string>
+  }>();
   inputData.forEach((i)=>{
     i.inventories.forEach((inv)=>{
       if(!inventoryMapper.has(inv.md5_file)) {
-        inventoryMapper.set(inv.md5_file,[inventoryExtraction(i,inv)]);
+        inventoryMapper.set(inv.md5_file, { inventories: [inventoryExtraction(i,inv)], localFiles:[inv.targetFiles] });
       }else{
         const extractedInventories = inventoryMapper.get(inv.md5_file);
-        const index = isSameComponent(extractedInventories,inv); // If the component is the same
+        const index = isSameComponent(extractedInventories.inventories,inv); // If the component is the same
         if(index >= 0) {
-        if(!isSameProject(extractedInventories[index].externalFiles,i.projectName, inv.path))  // Check if not the same project
-          extractedInventories[index].externalFiles.push({
+        if(!isSameProject(extractedInventories.inventories[index].externalFiles,i.projectName, inv.path))  // Check if not the same project
+          extractedInventories.inventories[index].externalFiles.push({
             projectName: i.projectName,
             path: inv.path
           });
         }
         else
-          extractedInventories.push(inventoryExtraction(i,inv));
+          extractedInventories.inventories.push(inventoryExtraction(i,inv));
+        if(!extractedInventories.localFiles.includes(inv.targetFiles)) extractedInventories.localFiles.push(inv.targetFiles);
       }
     });
   });
