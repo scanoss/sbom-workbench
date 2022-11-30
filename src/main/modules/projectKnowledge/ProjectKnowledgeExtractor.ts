@@ -1,9 +1,9 @@
-import { InventoryKnowledgeExtraction, ExtractFromProjectDTO } from "../../../api/types";
+import {ExtractFromProjectDTO, FileStatusType, InventoryKnowledgeExtraction} from "../../../api/types";
 import {ProjectKnowledgeModel} from "../../model/ProjectKnowledgeModel";
-import { inventoryToInventoryKnowledgeExtraction } from "./projectKnowledgeAdapters/projectKnowledgeAdapter";
-import { QueryBuilderCreator } from "../../model/queryBuilder/QueryBuilderCreator";
-import { modelProvider } from "../../services/ModelProvider";
-import { workspace } from "../../workspace/Workspace";
+import {inventoryToInventoryKnowledgeExtraction} from "./projectKnowledgeAdapters/projectKnowledgeAdapter";
+import {QueryBuilderCreator} from "../../model/queryBuilder/QueryBuilderCreator";
+import {modelProvider} from "../../services/ModelProvider";
+import {workspace} from "../../workspace/Workspace";
 
 
 export class ProjectKnowledgeExtractor {
@@ -44,7 +44,8 @@ export class ProjectKnowledgeExtractor {
     const globalFilter = workspace.getOpenProject().getGlobalFilter();
     let filesToProcess = await modelProvider.model.result.getAll(QueryBuilderCreator.create({
       ...globalFilter,
-      path: this.projectKnowledgeExtractor.folder
+      path: this.projectKnowledgeExtractor.folder,
+      status: this.projectKnowledgeExtractor.override ? globalFilter.status : FileStatusType.PENDING,
     }));
     filesToProcess = filesToProcess.map((f) => f.path);
     return filesToProcess;
