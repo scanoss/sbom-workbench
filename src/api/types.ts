@@ -78,6 +78,7 @@ export interface License {
 }
 
 export interface NewComponentDTO {
+  id?: number;
   name: string;
   versions: {
     version: string;
@@ -184,9 +185,9 @@ export enum InventorySourceType {
 }
 
 export interface IBatchInventory {
-  action: InventoryAction;
+  action?: InventoryAction;
   overwrite: boolean;
-  source: {
+  source?: {
     type: InventorySourceType;
     input: any;
   };
@@ -297,8 +298,16 @@ export interface ExternalFile {
 }
 
 export interface ExtractFromProjectDTO {
+  override: boolean;
   source: IProject[];
   target: IProject;
   folder: string;
   md5File?: string;
+}
+
+export interface ReuseIdentificationTaskDTO {
+  inventoryKnowledgeExtraction: InventoryKnowledgeExtraction;
+  overwrite: boolean;
+  path: string;
+  type: InventorySourceType;
 }
