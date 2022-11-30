@@ -1,6 +1,6 @@
 import log from 'electron-log';
 import { modelProvider } from './ModelProvider';
-import { Inventory, Component, IBatchInventory, IWorkbenchFilter } from '../../api/types';
+import { Component, IBatchInventory, Inventory, IWorkbenchFilter } from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
 import { QueryBuilderCreator } from "../model/queryBuilder/QueryBuilderCreator";
 

@@ -45,6 +45,7 @@ export interface LicenseDTO {
 }
 
 export interface NewLicenseDTO {
+  id?: number;
   name: string;
   fulltext: string;
   url?: string;

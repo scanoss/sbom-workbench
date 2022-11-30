@@ -67,6 +67,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
     const projectsSelected = items.filter((r) => set.has(r.uuid));
 
     const response = await projectService.extractInventoryKnowledge({
+      override: true,
       folder: params?.folder,
       md5File: params?.md5File,
       source: [...projectsSelected],
