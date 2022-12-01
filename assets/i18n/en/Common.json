@@ -22,7 +22,8 @@
   "NoOriginalFilesWith": "No original files found with \"{searchQuery}}\"",
   "LoadingLocalFile": "Loading local file",
   "LoadingRemoteFile": "Loading remote file",
-  "ProjectImportedCantDisplay": "// This project was imported. Source file can't be displayed.",
+  "ProjectImportedCantDisplay": "This project was imported. Source file can't be displayed.",
+  "ProjectWFPCantDisplay": "This project was created from a WFP. Source file can't be displayed.",
   "AllValidDependenciesAccepted": "All valid pending dependencies will be accepted.",
   "AllValidDependenciesAcceptedSubtitle": "Those dependencies that lack the version or license details will not be accepted.",
   "AllPendingDependenciesDismissed": "All pending dependencies will be dismissed.",
@@ -79,5 +80,6 @@
   "WorkspaceIsReduced": "The workspace context is reduced because there are active filters",
   "DecompressArchivesLabel": "Decompress archives and scan inner files",
   "DecompressArchivesHint": "This option will decompress archives into project folder",
-  "FileNotLoad": "File could not be loaded"
+  "FileNotLoad": "File could not be loaded",
+  "FileTypeNotSupported": "File type not supported for viewing"
 }

@@ -22,7 +22,8 @@
   "NoOriginalFilesWith": "No se encontraron ficheros originales con \"{searchQuery}}\"",
   "LoadingLocalFile": "Cargando fichero local",
   "LoadingRemoteFile": "Cargando fichero remoto",
-  "ProjectImportedCantDisplay": "// Este proyecto fue importado. El fichero de origen no se puede mostrar.",
+  "ProjectImportedCantDisplay": "Este proyecto fue importado. El fichero de origen no se puede mostrar.",
+  "ProjectWFPCantDisplay": "Este proyecto fue creado desde un WFP. El fichero de origen no se puede mostrar.",
   "AllValidDependenciesAccepted": "Todas las dependencias pendientes válidas serán aceptadas",
   "AllValidDependenciesAcceptedSubtitle": "Todas las dependencias que carezcan de versión o detalles de licencia no serán aceptadas.",
   "AllPendingDependenciesDismissed": "Todas las dependencias pendientes serán descartadas.",
@@ -80,5 +81,6 @@
   "WorkspaceIsReduced": "El contexto del espacio de trabajo se reduce porque hay filtros activos",
   "DecompressArchivesLabel": "Descomprimir ficheros y analizarlo internamente",
   "DecompressArchivesHint": "Esta opción va a descomprimir los ficheros dentro de la carpeta del proyecto",
-  "FileNotLoad": "El fichero no pudo ser cargado"
+  "FileNotLoad": "El fichero no pudo ser cargado",
+  "FileTypeNotSupported": "Tipo de fichero no soportado para visualización"
 }

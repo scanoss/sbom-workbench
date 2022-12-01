@@ -72,11 +72,16 @@ const Editor = () => {
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false });
+
+      if (wfp) throw new Error(t('ProjectWFPCantDisplay'));
+      if (imported) throw new Error(t('ProjectImportedCantDisplay'));
+
       const content = await workbenchController.fetchLocalFile(`${scanBasePath}/${path}`);
-      if (content === FileType.BINARY) throw new Error(FileType.BINARY);
+      if (content === FileType.BINARY) throw new Error(t('FileTypeNotSupported'));
+
       setLocalFileContent({ content, error: false });
-    } catch (error) {
-      setLocalFileContent({ content: null, error: true });
+    } catch (error: any) {
+      setLocalFileContent({ content: error.message || t('FileNotLoad'), error: true });
     }
   };
 
@@ -177,9 +182,9 @@ const Editor = () => {
 
   useEffect(() => {
     if (currentMatch) {
-      const diff = currentMatch?.type !== 'file';
+      const diff = currentMatch?.type !== 'file' || wfp || imported;
       setIsDiffView(diff);
-      if (diff || imported || wfp) loadRemoteFile(currentMatch.md5_file);
+      if (diff) loadRemoteFile(currentMatch.md5_file);
     }
   }, [currentMatch]);
 
@@ -304,27 +309,22 @@ const Editor = () => {
         <div className="editor">
           {/* TODO: we need to remove this IF statement. Should we keep editor instance to better performance and UX.
               Problem: editors not re-layout on changing file */}
-          {localFileContent?.content || (remoteFileContent?.content && !isDiffView) || imported ? (
+          { !localFileContent?.error && localFileContent?.content ? (
             <MemoCodeViewer
               id={CodeViewerManager.LEFT}
               language={getExtension(file)}
-              value={
-                localFileContent?.content ||
-                remoteFileContent?.content ||
-                (imported ? t('ProjectImportedCantDisplay') : '')
-              }
+              value={ localFileContent?.content  || ''}
               highlight={currentMatch?.lines || null}
               highlights={highlight || null}
             />
           ) : (
-            <div className="file-loader">{
-              (localFileContent?.error && isDiffView) || ( localFileContent?.error && !imported && !wfp) ? t('FileNotLoad') : !imported && !wfp ? t('LoadingLocalFile') : t('LoadingRemoteFile')}</div>
+            <div className="file-loader">{localFileContent?.content ||  t('LoadingLocalFile')}</div>
           )}
         </div>
 
-        {isDiffView && currentMatch && (
+        { isDiffView && currentMatch && (
           <div className="editor">
-            {remoteFileContent?.content ? (
+            {!remoteFileContent?.error && remoteFileContent?.content ? (
               <MemoCodeViewer
                 id={CodeViewerManager.RIGHT}
                 language={getExtension(file)}

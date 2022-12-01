@@ -7,7 +7,6 @@
   }
 
   .app-content {
-
   }
 }
 
@@ -24,7 +23,7 @@
   margin-bottom: 10px;
 
   .content {
-   // display: flex;
+    // display: flex;
     justify-content: space-between;
     flex-direction: row;
     padding: 0;
@@ -32,7 +31,6 @@
     align-items: center;
 
     @media screen and (max-width: $default-width) {
-
     }
   }
 }
@@ -52,7 +50,7 @@
   padding-top: 1px;
 
   @media screen and (max-width: 1100px) {
-   grid-template-columns: 100%;
+    grid-template-columns: 100%;
     .match-card {
       margin: 0;
     }
@@ -61,7 +59,7 @@
 .info-files {
   margin-top: 10px;
   display: grid;
-  grid-template-columns: calc(50% - 10px) 50%;;
+  grid-template-columns: calc(50% - 10px) 50%;
   grid-gap: 10px;
 }
 
@@ -88,6 +86,8 @@
 
     .file-loader {
       margin: auto;
+      padding: 50px;
+      text-align: center;
       font-size: 12px;
       color: #d9d7d7;
     }
@@ -111,7 +111,8 @@
       z-index: 6;
     }
 
-    .monaco-editor, .monaco-editor .overflow-guard {
+    .monaco-editor,
+    .monaco-editor .overflow-guard {
       border-radius: 4px;
     }
   }
@@ -133,6 +134,3 @@
     }
   }
 }
-
-
-
