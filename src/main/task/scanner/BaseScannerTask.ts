@@ -130,7 +130,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
 
   protected setScannerConfig() {
     const scannerCfg: ScannerCfg = new ScannerCfg();
-    const { DEFAULT_API_INDEX, APIS } = userSettingService.get();
+    const { DEFAULT_API_INDEX, APIS, CA_CERT, PROXY, IGNORE_CERT_ERRORS } = userSettingService.get();
 
     if (this.project.getApi()) {
       scannerCfg.API_URL = this.project.getApi();
@@ -143,6 +143,9 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
     scannerCfg.CONCURRENCY_LIMIT = 10;
     scannerCfg.DISPATCHER_QUEUE_SIZE_MAX_LIMIT = 500;
     scannerCfg.DISPATCHER_QUEUE_SIZE_MIN_LIMIT = 450;
+    scannerCfg.PROXY = PROXY || null;
+    scannerCfg.IGNORE_CERT_ERRORS = IGNORE_CERT_ERRORS !== undefined ? IGNORE_CERT_ERRORS : false;
+    scannerCfg.CERT_PATH = CA_CERT !== undefined ? CA_CERT : null;
 
     this.scanner = new Scanner(scannerCfg);
     this.project.scanner = this.scanner;

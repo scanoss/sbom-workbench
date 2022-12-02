@@ -230,7 +230,6 @@ export class Tree {
     node: Node,
     bannedList: Filtering.BannedList
   ) {
-    console.log("file", scanRoot + node.getValue());
     let i = 0;
     if (node.getType() === 'file') {
       this.filesIndexed += 1;
