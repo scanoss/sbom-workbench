@@ -145,7 +145,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
     scannerCfg.DISPATCHER_QUEUE_SIZE_MIN_LIMIT = 450;
     scannerCfg.PROXY = PROXY || null;
     scannerCfg.IGNORE_CERT_ERRORS = IGNORE_CERT_ERRORS !== undefined ? IGNORE_CERT_ERRORS : false;
-    scannerCfg.CERT_PATH = CA_CERT !== undefined ? CA_CERT : null;
+    scannerCfg.CA_CERT = CA_CERT !== undefined ? CA_CERT : null;
 
     this.scanner = new Scanner(scannerCfg);
     this.project.scanner = this.scanner;
