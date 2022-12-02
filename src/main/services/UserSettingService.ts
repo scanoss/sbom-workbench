@@ -27,6 +27,9 @@ class UserSettingService {
     SCAN_MODE: 'FULL_SCAN',
     VERSION: app.isPackaged === true ? app.getVersion() : packageJson.version,
     LNG: 'en',
+    PROXY: '',
+    CA_CERT: '',
+    IGNORE_CERT_ERRORS: false,
   };
 
   constructor() {

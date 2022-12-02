@@ -17,6 +17,9 @@ export async function migration140(projectPath: string): Promise<void> {
 export async function wsMigration140(): Promise<void> {
   userSettingService.setSetting('LNG', 'en');
   userSettingService.setSetting('VERSION', '1.4.0');
+  userSettingService.setSetting('PROXY', '');
+  userSettingService.setSetting('CA_CERT','');
+  userSettingService.setSetting('IGNORE_CERT_ERRORS','false');
   await userSettingService.save();
 }
 
