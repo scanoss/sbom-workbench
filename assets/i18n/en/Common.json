@@ -22,7 +22,7 @@
   "NoOriginalFilesWith": "No original files found with \"{searchQuery}}\"",
   "LoadingLocalFile": "Loading local file",
   "LoadingRemoteFile": "Loading remote file",
-  "ProjectImportedCantDisplay": "Project imported. Local source file cannot be displayed",
+  "ProjectImportedCantDisplay": "Imported Project! Local source file not available.",
   "ProjectWFPCantDisplay": "Project created from WFP. Local source file cannot be displayed",
   "AllValidDependenciesAccepted": "All valid pending dependencies will be accepted.",
   "AllValidDependenciesAcceptedSubtitle": "Those dependencies that lack the version or license details will not be accepted.",
@@ -81,6 +81,6 @@
   "DecompressArchivesLabel": "Decompress archives and scan inner files",
   "DecompressArchivesHint": "This option will decompress archives into project folder",
   "FileNotLoad": "File could not be loaded",
-  "RemoteFileNotLoad" : "Remote component file cannot be loaded",
+  "RemoteFileNotLoad" : "Remote source file could not be loaded",
   "FileTypeNotSupported": "File type not supported for viewing"
 }

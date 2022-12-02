@@ -30,6 +30,7 @@ const MemoCodeViewer = React.memo(CodeViewer);
 export interface FileContent {
   content: string | null;
   error: boolean;
+  loading: boolean;
 }
 
 const Editor = () => {
@@ -58,8 +59,8 @@ const Editor = () => {
     setMatchInfo(null);
     setInventories(null);
     setIsDiffView(false);
-    setLocalFileContent({ content: null, error: false });
-    setRemoteFileContent({ content: null, error: false });
+    setLocalFileContent({ content: null, error: false, loading: false });
+    setRemoteFileContent({ content: null, error: false, loading: false });
 
     getInventories();
     getResults();
@@ -71,7 +72,7 @@ const Editor = () => {
 
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
-      setLocalFileContent({ content: null, error: false });
+      setLocalFileContent({ content: null, error: false, loading: true });
 
       if (wfp) throw new Error(t('ProjectWFPCantDisplay'));
       if (imported) throw new Error(t('ProjectImportedCantDisplay'));
@@ -79,19 +80,19 @@ const Editor = () => {
       const content = await workbenchController.fetchLocalFile(`${scanBasePath}/${path}`);
       if (content === FileType.BINARY) throw new Error(t('FileTypeNotSupported'));
 
-      setLocalFileContent({ content, error: false });
+      setLocalFileContent({ content, error: false,  loading: false });
     } catch (error: any) {
-      setLocalFileContent({ content: error.message || t('FileNotLoad'), error: true });
+      setLocalFileContent({ content: error.message || t('FileNotLoad'), error: true,  loading: false });
     }
   };
 
   const loadRemoteFile = async (path: string): Promise<void> => {
     try {
-      setRemoteFileContent({ content: null, error: false });
+      setRemoteFileContent({ content: null, error: false, loading: true });
       const content = await workbenchController.fetchRemoteFile(path);
-      setRemoteFileContent({ content, error: false });
+      setRemoteFileContent({ content, error: false, loading: false });
     } catch (error) {
-      setRemoteFileContent({ content: null, error: true });
+      setRemoteFileContent({ content: null, error: true, loading: false });
     }
   };
 
@@ -308,7 +309,7 @@ const Editor = () => {
         ${isDiffView ? 'diff-view' : ''}
         `}
       >
-        { !wfp && !imported && (
+        { (!wfp && !imported) && (
           <div className="editor">
             {/* TODO: we need to remove this IF statement. Should we keep editor instance to better performance and UX.
                 Problem: editors not re-layout on changing file */}
@@ -326,6 +327,12 @@ const Editor = () => {
           </div>
         )}
 
+        { (imported || wfp) && !currentMatch && !localFileContent?.loading &&
+          <div className="editor">
+            <div className="file-loader"> {t(wfp ? 'ProjectWFPCantDisplay' : 'ProjectImportedCantDisplay')} </div>
+          </div>
+        }
+
         { (isDiffView || wfp || imported) && currentMatch && (
           <div className="editor">
             {!remoteFileContent?.error && remoteFileContent?.content ? (
@@ -338,7 +345,7 @@ const Editor = () => {
               />
             ) : (
               <div className="file-loader">
-                { remoteFileContent?.error || (localFileContent?.error && (wfp || imported))
+                { !remoteFileContent.loading && (remoteFileContent?.error || (localFileContent?.error && (wfp || imported)))
                   ?
                     <>
                       { localFileContent?.error && (wfp || imported) && <span>{t(wfp ? 'ProjectWFPCantDisplay' : 'ProjectImportedCantDisplay')}<br/></span> }
