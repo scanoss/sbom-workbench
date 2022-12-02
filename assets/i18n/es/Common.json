@@ -82,5 +82,6 @@
   "DecompressArchivesLabel": "Descomprimir ficheros y analizarlo internamente",
   "DecompressArchivesHint": "Esta opción va a descomprimir los ficheros dentro de la carpeta del proyecto",
   "FileNotLoad": "El fichero no pudo ser cargado",
+  "RemoteFileNotLoad" : "Fichero remoto del componente no pudo ser cargado",
   "FileTypeNotSupported": "Tipo de fichero no soportado para visualización"
 }
