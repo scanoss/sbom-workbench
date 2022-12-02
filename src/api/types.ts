@@ -28,6 +28,9 @@ export interface IWorkspaceCfg {
   SCAN_MODE: string;
   VERSION: string;
   LNG: string;
+  PROXY: string;
+  CA_CERT: string;
+  IGNORE_CERT_ERRORS: boolean;
 }
 
 export interface Node {

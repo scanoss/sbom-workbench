@@ -1,5 +1,5 @@
 import { Migration } from './Migration';
-import {wsMigration140 } from './scripts/140';
+import { wsMigration140 } from './scripts/140';
 
 export class WorkspaceMigration extends Migration {
   private scripts: Record<string, Array<(data: string) => void>>;
