@@ -16,7 +16,6 @@ export class Accept extends Batch {
   }
 
   public async execute() {
-    try {
       if (this.getOverWrite()) {
         await new Restore(this.getParams()).execute();
       }
@@ -34,10 +33,7 @@ export class Accept extends Batch {
         await this.updateTree(ids, NodeStatus.IDENTIFIED);
         return inv;
       }
-      throw new Error('inventory accept failed');
-    } catch (e: any) {
-      return e;
-    }
+      return null;
   }
 
   private getFilesToUpdateFromInventories(inventories: Array<Inventory>) {

@@ -305,6 +305,6 @@ export interface ExtractFromProjectDTO {
 export interface ReuseIdentificationTaskDTO {
   inventoryKnowledgeExtraction: InventoryKnowledgeExtraction;
   overwrite: boolean;
-  path: string;
+  path?: string;
   type: InventorySourceType;
 }

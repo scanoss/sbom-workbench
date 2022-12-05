@@ -3,9 +3,9 @@ import log from 'electron-log';
 import {
   ExtractFromProjectDTO,
   FileTreeViewMode,
-  INewProject,
+  INewProject, Inventory,
   InventoryKnowledgeExtraction,
-  IWorkbenchFilter
+  IWorkbenchFilter, ReuseIdentificationTaskDTO
 } from '../types';
 import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
@@ -189,6 +189,19 @@ ipcMain.handle(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, async (_event, p
     return Response.ok({
       message: 'Project extraction successfully',
       data: inventoryKnowledgeExtraction,
+    });
+  } catch (error: any) {
+    log.error('[PROJECT_EXTRACT_INVENTORY_KNOWLEDGE]', error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+ipcMain.handle(IpcChannels.PROJECT_ACCEPT_INVENTORY_KNOWLEDGE, async (_event, param: ReuseIdentificationTaskDTO) => {
+  try {
+    const inventories: Array<Inventory> = await projectService.acceptInventoryKnowledge(param);
+    return Response.ok({
+      message: 'Project extraction successfully',
+      data: inventories,
     });
   } catch (error: any) {
     log.error('[PROJECT_EXTRACT_INVENTORY_KNOWLEDGE]', error);

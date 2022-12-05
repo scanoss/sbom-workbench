@@ -2,9 +2,9 @@ import { IpcChannels } from '../ipc-channels';
 import {
   ExtractFromProjectDTO,
   FileTreeViewMode,
-  INewProject, InventoryKnowledgeExtraction,
+  INewProject, Inventory, InventoryKnowledgeExtraction,
   IProject,
-  IWorkbenchFilter,
+  IWorkbenchFilter, ReuseIdentificationTaskDTO
 } from '../types';
 import { BaseService } from './base.service';
 
@@ -110,6 +110,12 @@ class ProjectService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, param);
     return this.response(response);
   }
-}
 
+  public async acceptInventoryKnowledge(param: ReuseIdentificationTaskDTO): Promise<Inventory>{
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_ACCEPT_INVENTORY_KNOWLEDGE, param);
+    return this.response(response);
+  }
+
+}
 export const projectService = new ProjectService();
+

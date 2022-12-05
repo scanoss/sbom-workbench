@@ -1,5 +1,11 @@
 import log from 'electron-log';
-import {ExtractFromProjectDTO, INewProject, InventoryKnowledgeExtraction, ProjectState} from '../../api/types';
+import {
+  ExtractFromProjectDTO,
+  INewProject, Inventory,
+  InventoryKnowledgeExtraction,
+  ProjectState,
+  ReuseIdentificationTaskDTO
+} from '../../api/types';
 import {Project} from '../workspace/Project';
 import {workspace} from '../workspace/Workspace';
 import {modelProvider} from './ModelProvider';
@@ -11,6 +17,7 @@ import {ScannerPipelineFactory} from "../task/scanner/scannerPipelineFactory/Sca
 import ScannerType = Scanner.ScannerType;
 import ScannerMode = Scanner.ScannerMode;
 import {ProjectKnowledgeExtractor} from "../modules/projectKnowledge/ProjectKnowledgeExtractor";
+import { ReuseIdentificationTask } from '../task/reuseIdentification/ReuseIdentificationTask';
 
 class ProjectService {
   public async createProject(projectDTO: INewProject) {
@@ -70,6 +77,12 @@ class ProjectService {
     const inventoryKnowledgeData = await projectKnowledgeExtractor.extractInventoryData();
     return inventoryKnowledgeData;
   }
+
+  public async acceptInventoryKnowledge(param: ReuseIdentificationTaskDTO): Promise<Array<Inventory>>{
+   const inventories =  await new ReuseIdentificationTask(param).run();
+  return inventories ;
+  }
+
 
 }
 
