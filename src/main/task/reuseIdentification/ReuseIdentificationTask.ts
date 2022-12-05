@@ -1,23 +1,24 @@
-import { ITask } from "../Task";
+import { ITask } from '../Task';
 import {
-  Component, FileStatusType,
+  Component,
+  FileStatusType,
   Inventory,
   InventoryAction,
   InventoryKnowledgeExtraction,
   InventorySourceType,
   NewComponentDTO,
   ReuseIdentificationTaskDTO
-} from "../../../api/types";
-import { modelProvider } from "../../services/ModelProvider";
-import { ComponentSource, ComponentVersion } from "../../model/entity/ComponentVersion";
-import { QueryBuilderMD5FileIn } from "../../model/queryBuilder/QueryBuilderMD5FileIn";
-import { Accept } from "../../batch/Accept";
-import { QueryBuilderCreator } from "../../model/queryBuilder/QueryBuilderCreator";
+} from '../../../api/types';
+import { modelProvider } from '../../services/ModelProvider';
+import { ComponentSource, ComponentVersion } from '../../model/entity/ComponentVersion';
+import { QueryBuilderMD5FileIn } from '../../model/queryBuilder/QueryBuilderMD5FileIn';
+import { Accept } from '../../batch/Accept';
+import { QueryBuilderCreator } from '../../model/queryBuilder/QueryBuilderCreator';
 
 /**
  * @brief used to create new inventories from inventories extracted from another projects
  * */
-export class ReuseIdentificationTask implements ITask<void, void> {
+export class ReuseIdentificationTask implements ITask<void, Array<Inventory>> {
 
   private readonly reuseIdentification : ReuseIdentificationTaskDTO;
 
@@ -36,7 +37,8 @@ export class ReuseIdentificationTask implements ITask<void, void> {
   // Creates new inventories from inventory knowledge extraction
     const componentMapper  = this.getReuseIdentificationComponentsMapper(reuseIdentificationComponents);
     const fileMapper = await  this.getFileMapper(this.reuseIdentification.inventoryKnowledgeExtraction);
-    await this.createNewInventories(fileMapper,componentMapper);
+    const inventories =  await this.createNewInventories(fileMapper,componentMapper);
+    return inventories;
   }
 
   /**
@@ -67,8 +69,11 @@ export class ReuseIdentificationTask implements ITask<void, void> {
   private async getFileMapper(reuseIdentification: InventoryKnowledgeExtraction): Promise<Map<string,Array<number>>> {
     const md5Files = Object.keys(reuseIdentification);
     let queryBuilder = null;
-    if(this.reuseIdentification.overwrite) queryBuilder = new QueryBuilderMD5FileIn(md5Files);
-    else queryBuilder = QueryBuilderCreator.create({ md5: md5Files, status: FileStatusType.PENDING}) // Get only those files which status is pending
+    if(this.reuseIdentification.overwrite) {
+      if (this.reuseIdentification.type !== InventorySourceType.PATH) queryBuilder = new QueryBuilderMD5FileIn(md5Files);
+      else queryBuilder = QueryBuilderCreator.create({ path: this.reuseIdentification.path })
+    } else if (this.reuseIdentification.type !== InventorySourceType.PATH) queryBuilder = QueryBuilderCreator.create({ md5: md5Files, status: FileStatusType.PENDING}) // Get only those files which status is pending
+      else  queryBuilder = QueryBuilderCreator.create({ path: this.reuseIdentification.path,status: FileStatusType.PENDING })
     const files = await modelProvider.model.file.getAll(queryBuilder);
     const fileMapper = new Map<string,Array<number>>();
     files.forEach((f)=>  {
