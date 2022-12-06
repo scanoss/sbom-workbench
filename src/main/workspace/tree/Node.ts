@@ -133,6 +133,10 @@ export default abstract class Node {
 
   public abstract setStatus(path: string, status: NodeStatus): boolean;
 
+  public abstract updateStatusFlags(): void;
+
+  public abstract updateFlags(): void;
+
   public abstract getStatusByPath(path: string): NodeStatus;
 
   public abstract setOriginal(status: NodeStatus): void;
@@ -168,6 +172,12 @@ export default abstract class Node {
   public abstract isDependency(): boolean;
 
   public abstract order(): void;
+
+  public abstract someFiltered(): boolean;
+
+  public abstract someNoMatch(): boolean;
+
+  public abstract identifiedProgress(): boolean;
 
   // Only looks for a specific filename one depth level. WARNING: It does not verify in subfolders!
   public abstract containsFile(filename: string): boolean;

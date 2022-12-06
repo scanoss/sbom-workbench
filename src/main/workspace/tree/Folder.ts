@@ -14,6 +14,10 @@ export default class Folder extends Node {
 
   hasFiltered: boolean;
 
+  someFilteredChild: boolean;
+
+  someNoMatchChild :boolean;
+
   private hasIdentifiedProgress: boolean;
 
   private hasPendingProgress: boolean;
@@ -32,6 +36,8 @@ export default class Folder extends Node {
     this.hasIdentifiedProgress = false;
     this.hasPendingProgress = false;
     this.hasIgnoredProgress = false;
+    this.someFilteredChild = false;
+    this.someNoMatchChild = false;
   }
 
   public order(): void {
@@ -94,7 +100,7 @@ export default class Folder extends Node {
       if (status === NodeStatus.IGNORED) this.hasIgnored = true;
       if (status === NodeStatus.NOMATCH) this.hasNoMatch = true;
       if (status === NodeStatus.FILTERED) this.hasFiltered = true;
-      if (status === NodeStatus.IDENTIFIED && !child.isDependency()) this.hasIdentifiedProgress = true;
+      if (child.identifiedProgress() && !child.isDependency()) this.hasIdentifiedProgress = true;
       if (status === NodeStatus.PENDING && !child.isDependency()) this.hasPendingProgress = true;
       if (status === NodeStatus.IGNORED && !child.isDependency()) this.hasIgnoredProgress = true;
       if (
@@ -109,6 +115,26 @@ export default class Folder extends Node {
       )
         break;
     }
+  }
+
+public updateFlags() {
+  this.children.forEach((c)=>{
+    c.updateFlags();
+    if(c.someFiltered()) this.someFilteredChild = c.someFiltered();
+    if(c.someNoMatch()) this.someNoMatchChild = c.someNoMatch();
+  });
+}
+
+  public someFiltered():boolean{
+    return this.someFilteredChild;
+  }
+
+  public someNoMatch():boolean{
+    return this.someNoMatchChild;
+  }
+
+  public identifiedProgress():boolean {
+    return this.hasIdentifiedProgress;
   }
 
   public setStatus(path: string, status: NodeStatus): boolean {
