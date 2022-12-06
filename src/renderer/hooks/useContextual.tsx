@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { fileService } from '@api/services/file.service';
 import { resultService } from '@api/services/results.service';
-import { InventoryAction, InventorySourceType } from '@api/types';
+import { FileStatusType, InventoryAction, InventorySourceType } from '@api/types';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,7 +10,7 @@ import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import {
   acceptAll as acceptAllDep,
   rejectAll,
-  restoreAll as restoreAllDep,
+  restoreAll as restoreAllDep
 } from '@store/dependency-store/dependencyThunks';
 import { useTranslation } from 'react-i18next';
 
@@ -85,6 +85,7 @@ const useContextual = () => {
           executeBatch({
             action: InventoryAction.IDENTIFY,
             overwrite: action === 'overwrite',
+            fileStatusType: FileStatusType.PENDING,
             source: {
               type: InventorySourceType.PATH,
               input: node.value,
@@ -105,6 +106,7 @@ const useContextual = () => {
         executeBatch({
           overwrite: action === 'overwrite',
           action: InventoryAction.IGNORE,
+          fileStatusType: FileStatusType.PENDING,
           source: {
             type: InventorySourceType.PATH,
             input: node.value,

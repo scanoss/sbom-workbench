@@ -13,11 +13,16 @@ export class Ignore extends Batch {
   constructor(params: IBatchInventory) {
     super(params);
     const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
+    let status = null;
+    if(params.fileStatusType === FileStatusType.PENDING ) status = FileStatusType.PENDING;
+    if(params.fileStatusType === FileStatusType.FILTERED ) status = FileStatusType.FILTERED;
+    if(params.fileStatusType === FileStatusType.NOMATCH ) status = FileStatusType.NOMATCH;
+    if(filter.status) status = filter.status;
     this.queryBuilder = QueryBuilderCreator.create({
       ...filter,
       path: this.getFolder(),
-      status: FileStatusType.PENDING,
-      source: ComponentSource.ENGINE,
+      status,
+      source: status === FileStatusType.PENDING ? ComponentSource.ENGINE : null,
     });
   }
 
