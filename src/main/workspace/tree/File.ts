@@ -44,6 +44,18 @@ export default class File extends Node {
     return false;
   }
 
+  public someFiltered(): boolean {
+    return this.getAction() === 'filter';
+  }
+
+  public identifiedProgress(): boolean {
+    return this.status === NodeStatus.IDENTIFIED;
+  }
+
+  public someNoMatch(): boolean {
+    return (this.original === 'NO-MATCH' && this.getAction() === 'scan');
+  }
+
   public restoreStatus(path: string) {
     if (this.getPath() !== path) return;
     if (this.getAction() === 'filter') {
@@ -174,4 +186,12 @@ export default class File extends Node {
 
   public order():void{
   }
+
+  public updateStatusFlags() {
+  }
+
+  public updateFlags() {
+  }
+
+
 }

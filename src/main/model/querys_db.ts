@@ -261,7 +261,7 @@ WHERE f.fileId IN (SELECT fileId FROM results) OR f.fileId IN (SELECT fileId FRO
   LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version
   LEFT JOIN inventories i ON cv.id = i.cvid  AND instr(d.licenses, i.spdxid)>0 #FILTER;`;
 
-  SQL_GET_ALL_FILES = `SELECT f.path,f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending FROM files f  #FILTER;`;
+  SQL_GET_ALL_FILES = `SELECT f.path,f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending, f.type FROM files f  #FILTER;`;
 
   SQL_GET_ALL_RESULTS = `SELECT f.fileId AS id,f.type AS filter,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.component AS componentName, r.url,comp.purl,comp.version, rl.spdxid
   FROM files f LEFT JOIN results r ON r.fileId=f.fileId LEFT JOIN component_versions comp ON

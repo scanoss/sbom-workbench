@@ -42,8 +42,17 @@ export abstract class Batch {
     try {
       if (this.params.source.type === InventorySourceType.PATH) {
         const aux = await this.getFilesInFolder(builder);
-        if (filter) return utilHelper.getArrayFromObjectFilter(aux, value, filter);
-        return utilHelper.getArrayFromObject(aux, value);
+        const uniqueIds = new Set<number>();
+        const files = aux.filter(element => {
+          const isDuplicate = uniqueIds.has(element.id);
+          if (!isDuplicate) {
+            uniqueIds.add(element.id);
+            return true;
+          }
+          return false;
+        });
+        if (filter) return utilHelper.getArrayFromObjectFilter(files, value, filter);
+        return utilHelper.getArrayFromObject(files, value);
       }
       const files = await modelProvider.model.file.getAll(new QueryBuilderFileIdIn(this.params.source.input)); // TODO:FIXME: repeated files in getAll files
       // If not Overwrite, keep ignored and identified files
