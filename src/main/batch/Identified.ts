@@ -1,4 +1,4 @@
-import { ComponentSource, IBatchInventory, Inventory } from '../../api/types';
+import { ComponentSource, FileStatusType, IBatchInventory, Inventory } from '../../api/types';
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { inventoryService } from '../services/InventoryService';
@@ -13,13 +13,20 @@ export class Identified extends Batch {
   private queryBuilder: QueryBuilder;
 
   constructor(params: IBatchInventory, inventory: Partial<Inventory>) {
+
     super(params);
     this.inventory = inventory;
     const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
+    let status = null;
+    if(params.fileStatusType === FileStatusType.PENDING ) status = FileStatusType.PENDING;
+    if(params.fileStatusType === FileStatusType.FILTERED ) status = FileStatusType.FILTERED;
+    if(params.fileStatusType === FileStatusType.NOMATCH ) status = FileStatusType.NOMATCH;
+    if(filter.status) status = filter.status;
     this.queryBuilder = QueryBuilderCreator.create({
       ...filter,
       path: this.getFolder(),
-      source: ComponentSource.ENGINE,
+      source: status === FileStatusType.PENDING ? ComponentSource.ENGINE : null,
+      status,
     });
   }
 
