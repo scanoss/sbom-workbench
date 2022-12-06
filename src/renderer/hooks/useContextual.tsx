@@ -13,6 +13,7 @@ import {
   restoreAll as restoreAllDep
 } from '@store/dependency-store/dependencyThunks';
 import { useTranslation } from 'react-i18next';
+import { NodeStatus } from '../../main/workspace/tree/Node';
 
 const useContextual = () => {
   const dispatch = useDispatch();
@@ -22,6 +23,17 @@ const useContextual = () => {
   const { isFilterActive } = useSelector(selectNavigationState);
 
   const showOverwrite = (node: any) => node.hasIdentifiedProgress || node.hasIgnoredProgress;
+
+  const showOverwriteOnIgnoreIdentify = (node : any, fileStatusType: FileStatusType) => {
+    if(fileStatusType === FileStatusType.PENDING)
+      return (node.children.some(e=> e.action === 'scan' && e.original === "MATCH" && (e.status === NodeStatus.IDENTIFIED || e.status === NodeStatus.IGNORED )));
+    if(fileStatusType === FileStatusType.FILTERED)
+      return (node.children.some(e=> e.action === 'filter' && (e.status === NodeStatus.IDENTIFIED || e.status === NodeStatus.IGNORED )));
+    if(fileStatusType === FileStatusType.NOMATCH)
+      return (node.children.some(e=> e.action === 'scan' && e.original === "NO-MATCH"  && ( e.status === NodeStatus.IDENTIFIED || e.status === NodeStatus.IGNORED )));
+
+    return false;
+  };
 
   const showOverwriteDialog = async (): Promise<DialogResponse> => {
     return dialogCtrl.openAlertDialog(
@@ -76,16 +88,16 @@ const useContextual = () => {
     }
   };
 
-  const identifyAll = async (node: any) => {
+  const identifyAll = async (node: any, fileStatusType: FileStatusType) => {
     const inventory = await dialogCtrl.openInventory({ usage: 'file' });
     if (inventory) {
-      const { action } = showOverwrite(node) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
+      const { action } = showOverwriteOnIgnoreIdentify(node,fileStatusType) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
       if (inventory && action !== DIALOG_ACTIONS.CANCEL) {
         dispatch(
           executeBatch({
             action: InventoryAction.IDENTIFY,
             overwrite: action === 'overwrite',
-            fileStatusType: FileStatusType.PENDING,
+            fileStatusType,
             source: {
               type: InventorySourceType.PATH,
               input: node.value,
@@ -99,14 +111,14 @@ const useContextual = () => {
     }
   };
 
-  const ignoreAll = async (node: any) => {
+  const ignoreAll = async (node: any, fileStatusType: FileStatusType) => {
     const { action } = showOverwrite(node) ? await showOverwriteDialog() : await showConfirmDialog();
     if (action !== DIALOG_ACTIONS.CANCEL) {
       dispatch(
         executeBatch({
           overwrite: action === 'overwrite',
           action: InventoryAction.IGNORE,
-          fileStatusType: FileStatusType.PENDING,
+          fileStatusType,
           source: {
             type: InventorySourceType.PATH,
             input: node.value,
