@@ -186,6 +186,7 @@ export enum InventorySourceType {
 export interface IBatchInventory {
   action: InventoryAction;
   overwrite: boolean;
+  fileStatusType?: FileStatusType;
   source: {
     type: InventorySourceType;
     input: any;
