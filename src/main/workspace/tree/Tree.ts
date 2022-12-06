@@ -278,4 +278,8 @@ export class Tree {
   public getRootPath(): string {
     return this.rootPath;
   }
+
+  public  updateFlags(){
+    this.rootFolder.updateFlags();
+  }
 }

@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Tree, { renderers as Renderers } from 'react-virtualized-tree';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +10,7 @@ import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { CircularProgress } from '@mui/material';
 import { IpcChannels } from '@api/ipc-channels';
 import { useTranslation } from 'react-i18next';
+import { FileStatusType } from '@api/types';
 
 const { Expandable } = Renderers;
 
@@ -44,6 +45,7 @@ const FileTree = () => {
   const selectedNode = React.useRef<any>(null);
 
   const onActionMenuHandler = (e, params) => {
+    console.log(params);
     const { current: node } = selectedNode;
 
     switch (params) {
@@ -57,10 +59,22 @@ const FileTree = () => {
         contextual.acceptAll(node);
         break;
       case 'Action:IdentifyAllAs':
-        contextual.identifyAll(node);
+        contextual.identifyAll(node,FileStatusType.PENDING);
+        break;
+      case 'Action:IdentifyNonDetected':
+        contextual.identifyAll(node,FileStatusType.NOMATCH);
+        break;
+      case 'Action:IdentifyFiltered':
+        contextual.identifyAll(node,FileStatusType.FILTERED);
         break;
       case 'Action:MarkAllAsOriginal':
-        contextual.ignoreAll(node);
+        contextual.ignoreAll(node,FileStatusType.PENDING);
+        break;
+      case 'Action:MarkNonDetectedAsOriginal':
+        contextual.ignoreAll(node,FileStatusType.NOMATCH);
+        break;
+      case 'Action:MarkFilteredAsOriginal':
+        contextual.ignoreAll(node,FileStatusType.FILTERED);
         break;
       case 'Action:RestoreAll':
         contextual.restoreAll(node);
@@ -103,6 +117,9 @@ const FileTree = () => {
   const onCollapseAll = (node: any) => {
     dispatch(collapseTree(node));
   };
+
+
+
 
   const onSelectNode = async (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
     const { children, value } = node;
@@ -164,13 +181,46 @@ const FileTree = () => {
             { type: 'separator' },
             {
               label: t('AppMenu:IdentifyAllAs', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
-              actionId: 'Action:IdentifyAllAs',
-              enabled: !onlyRestore,
+              submenu: [
+                {
+                  label: t('AppMenu:IdentifyDetected'),
+                  actionId: 'Action:IdentifyAllAs',
+                  enabled: node.children.some(e=> e.action === 'scan' && e.original === "MATCH"),
+                },
+                {
+                  label: t('AppMenu:IdentifyNonDetected'),
+                  actionId: 'Action:IdentifyNonDetected',
+                  enabled: node.someNoMatchChild,
+                },
+                {
+                  label: t('AppMenu:IdentifyFiltered'),
+                  actionId: 'Action:IdentifyFiltered',
+                  enabled: node.someFilteredChild || (state?.filter?.status === FileStatusType.FILTERED),
+
+                }
+              ],
+              enabled: !node.value.toString().startsWith('/.'),
             },
             {
               label: t('AppMenu:MarkAllAsOriginal', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
-              actionId: 'Action:MarkAllAsOriginal',
-              enabled: !onlyRestore,
+              submenu: [
+                {
+                  label: t('AppMenu:MarkDetectedAsOriginal'),
+                  actionId: 'Action:MarkAllAsOriginal',
+                  enabled: (node.children.some(e=> e.action === 'scan' && e.original === "MATCH") || (state?.filter?.status === FileStatusType.PENDING)),
+                },
+                {
+                  label: t('AppMenu:MarkNonDetectedAsOriginal'),
+                  actionId: 'Action:MarkNonDetectedAsOriginal',
+                  enabled: node.someNoMatchChild,
+                },
+                {
+                  label: t('AppMenu:MarkFilteredAsOriginal'),
+                  actionId: 'Action:MarkFilteredAsOriginal',
+                  enabled: node.someFilteredChild || (state?.filter?.status === FileStatusType.FILTERED),
+                }
+              ],
+              enabled: !node.value.toString().startsWith('/.') ,
             },
             {
               label: t('AppMenu:RestoreAll', { context: state.isFilterActive ? 'filter' : 'nofilter' }),

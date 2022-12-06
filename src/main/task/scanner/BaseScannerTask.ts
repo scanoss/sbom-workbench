@@ -121,6 +121,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
 
     this.project.metadata.setScannerState(ScanState.FINISHED);
     this.project.metadata.save();
+    this.project.getTree().updateFlags();
 
     if (AppConfig.FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN) {
       const autoAccept = new AutoAccept();
