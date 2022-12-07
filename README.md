@@ -71,6 +71,11 @@ If your network is using a proxy with SSL interception you can include your cert
 
 `  "CA_CERT": "<certificate_path>"`
 
+
+You can disable any SSL errors, to do so you can change this option to true
+
+`"IGNORE_CERT_ERRORS:"true"`
+
 ## Contributing
 
 SCANOSS Audit Workbench is an open source project, and we love to receive contributions from our community. There are many ways to contribute. For more information see the [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
