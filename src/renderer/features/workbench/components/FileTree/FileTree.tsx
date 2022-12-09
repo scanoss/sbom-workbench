@@ -133,6 +133,7 @@ const FileTree = () => {
   };
 
   const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
+    console.log(state?.filter?.status);
     const onlyRestore = !node.hasPendingProgress;
     selectedNode.current = node;
     let menu = [];
@@ -181,17 +182,17 @@ const FileTree = () => {
                 {
                   label: t('AppMenu:IdentifyDetected'),
                   actionId: 'Action:IdentifyAllAs',
-                  enabled: node.children.some(e=> e.action === 'scan' && e.original === "MATCH"),
+                  enabled: node.someMatchChild && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.NOMATCH &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
                 },
                 {
                   label: t('AppMenu:IdentifyNonDetected'),
                   actionId: 'Action:IdentifyNonDetected',
-                  enabled: node.someNoMatchChild,
+                  enabled: (node.someNoMatchChild || (node.someNoMatchChild && state?.filter?.status === FileStatusType.NOMATCH)) && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.PENDING &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
                 },
                 {
                   label: t('AppMenu:IdentifyFiltered'),
                   actionId: 'Action:IdentifyFiltered',
-                  enabled: node.someFilteredChild || (state?.filter?.status === FileStatusType.FILTERED),
+                  enabled: (node.someFilteredChild || (node.someFilteredChild && state?.filter?.status === FileStatusType.FILTERED)) && (state?.filter?.status !== FileStatusType.NOMATCH && state?.filter?.status !== FileStatusType.PENDING &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
 
                 }
               ],
@@ -203,17 +204,18 @@ const FileTree = () => {
                 {
                   label: t('AppMenu:MarkDetectedAsOriginal'),
                   actionId: 'Action:MarkAllAsOriginal',
-                  enabled: (node.children.some(e=> e.action === 'scan' && e.original === "MATCH") || (state?.filter?.status === FileStatusType.PENDING)),
+                  enabled: node.someMatchChild && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.NOMATCH &&  state?.filter?.status !== FileStatusType.IDENTIFIED),
                 },
                 {
                   label: t('AppMenu:MarkNonDetectedAsOriginal'),
                   actionId: 'Action:MarkNonDetectedAsOriginal',
-                  enabled: node.someNoMatchChild,
+                  enabled: (node.someNoMatchChild || (node.someNoMatchChild && (state?.filter?.status === FileStatusType.NOMATCH && state?.filter?.status === FileStatusType.ORIGINAL))) && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.PENDING &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
                 },
                 {
                   label: t('AppMenu:MarkFilteredAsOriginal'),
                   actionId: 'Action:MarkFilteredAsOriginal',
-                  enabled: node.someFilteredChild || (state?.filter?.status === FileStatusType.FILTERED),
+                  enabled: (node.someFilteredChild || (node.someFilteredChild && (state?.filter?.status === FileStatusType.FILTERED || state?.filter?.status === FileStatusType.ORIGINAL))) && (state?.filter?.status !== FileStatusType.NOMATCH && state?.filter?.status !== FileStatusType.PENDING && state?.filter?.status !== FileStatusType.IDENTIFIED ),
+
                 }
               ],
               enabled: !node.value.toString().startsWith('/.') ,
