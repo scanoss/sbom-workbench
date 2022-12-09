@@ -18,6 +18,8 @@ export default class Folder extends Node {
 
   someNoMatchChild :boolean;
 
+  someMatchChild: boolean;
+
   private hasIdentifiedProgress: boolean;
 
   private hasPendingProgress: boolean;
@@ -38,6 +40,7 @@ export default class Folder extends Node {
     this.hasIgnoredProgress = false;
     this.someFilteredChild = false;
     this.someNoMatchChild = false;
+    this.someMatchChild = false;
   }
 
   public order(): void {
@@ -117,12 +120,21 @@ export default class Folder extends Node {
     }
   }
 
-public updateFlags() {
-  this.children.forEach((c)=>{
+public updateFlags() : void {
+ for(let i = 0  ; i < this.children.length ; i +=1){
+   const c = this.children[i];
     c.updateFlags();
-    if(c.someFiltered()) this.someFilteredChild = c.someFiltered();
-    if(c.someNoMatch()) this.someNoMatchChild = c.someNoMatch();
-  });
+    const someMatch = c.someMatch();
+    const someFiltered = c.someFiltered();
+    const someNoMatch = c.someNoMatch();
+    if(someFiltered) this.someFilteredChild = someFiltered;
+    if(someNoMatch) this.someNoMatchChild = someNoMatch;
+    if(someMatch) this.someMatchChild = someMatch;
+  }
+}
+
+public someMatch(): boolean {
+  return this.someMatchChild;
 }
 
   public someFiltered():boolean{

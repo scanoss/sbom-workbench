@@ -177,6 +177,8 @@ export default abstract class Node {
 
   public abstract someNoMatch(): boolean;
 
+  public abstract someMatch(): boolean;
+
   public abstract identifiedProgress(): boolean;
 
   // Only looks for a specific filename one depth level. WARNING: It does not verify in subfolders!
