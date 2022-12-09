@@ -59,22 +59,22 @@ const FileTree = () => {
         contextual.acceptAll(node);
         break;
       case 'Action:IdentifyAllAs':
-        contextual.identifyAll(node,FileStatusType.PENDING);
+        contextual.identifyAll(node, FileStatusType.PENDING);
         break;
-      case 'Action:IdentifyNonDetected':
-        contextual.identifyAll(node,FileStatusType.NOMATCH);
+      case 'Action:IdentifyNoMatch':
+        contextual.identifyAll(node, FileStatusType.NOMATCH);
         break;
-      case 'Action:IdentifyFiltered':
-        contextual.identifyAll(node,FileStatusType.FILTERED);
+      case 'Action:IdentifyIgnored':
+        contextual.identifyAll(node, FileStatusType.FILTERED);
         break;
       case 'Action:MarkAllAsOriginal':
-        contextual.ignoreAll(node,FileStatusType.PENDING);
+        contextual.ignoreAll(node, FileStatusType.PENDING);
         break;
-      case 'Action:MarkNonDetectedAsOriginal':
-        contextual.ignoreAll(node,FileStatusType.NOMATCH);
+      case 'Action:MarkNoMatchAsOriginal':
+        contextual.ignoreAll(node, FileStatusType.NOMATCH);
         break;
-      case 'Action:MarkFilteredAsOriginal':
-        contextual.ignoreAll(node,FileStatusType.FILTERED);
+      case 'Action:MarkIgnoredAsOriginal':
+        contextual.ignoreAll(node, FileStatusType.FILTERED);
         break;
       case 'Action:RestoreAll':
         contextual.restoreAll(node);
@@ -189,13 +189,13 @@ const FileTree = () => {
                   enabled: node.someMatchChild && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.NOMATCH &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
                 },
                 {
-                  label: t('AppMenu:IdentifyNonDetected'),
-                  actionId: 'Action:IdentifyNonDetected',
+                  label: t('AppMenu:IdentifyNoMatch'),
+                  actionId: 'Action:IdentifyNoMatch',
                   enabled: (node.someNoMatchChild || (node.someNoMatchChild && state?.filter?.status === FileStatusType.NOMATCH)) && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.PENDING &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
                 },
                 {
-                  label: t('AppMenu:IdentifyFiltered'),
-                  actionId: 'Action:IdentifyFiltered',
+                  label: t('AppMenu:IdentifyIgnored'),
+                  actionId: 'Action:IdentifyIgnored',
                   enabled: (node.someFilteredChild || (node.someFilteredChild && state?.filter?.status === FileStatusType.FILTERED)) && (state?.filter?.status !== FileStatusType.NOMATCH && state?.filter?.status !== FileStatusType.PENDING &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
 
                 }
@@ -211,13 +211,13 @@ const FileTree = () => {
                   enabled: node.someMatchChild && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.NOMATCH &&  state?.filter?.status !== FileStatusType.IDENTIFIED),
                 },
                 {
-                  label: t('AppMenu:MarkNonDetectedAsOriginal'),
-                  actionId: 'Action:MarkNonDetectedAsOriginal',
+                  label: t('AppMenu:MarkNoMatchAsOriginal'),
+                  actionId: 'Action:MarkNoMatchAsOriginal',
                   enabled: (node.someNoMatchChild || (node.someNoMatchChild && (state?.filter?.status === FileStatusType.NOMATCH && state?.filter?.status === FileStatusType.ORIGINAL))) && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.PENDING &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
                 },
                 {
-                  label: t('AppMenu:MarkFilteredAsOriginal'),
-                  actionId: 'Action:MarkFilteredAsOriginal',
+                  label: t('AppMenu:MarkIgnoredAsOriginal'),
+                  actionId: 'Action:MarkIgnoredAsOriginal',
                   enabled: (node.someFilteredChild || (node.someFilteredChild && (state?.filter?.status === FileStatusType.FILTERED || state?.filter?.status === FileStatusType.ORIGINAL))) && (state?.filter?.status !== FileStatusType.NOMATCH && state?.filter?.status !== FileStatusType.PENDING && state?.filter?.status !== FileStatusType.IDENTIFIED ),
 
                 }
