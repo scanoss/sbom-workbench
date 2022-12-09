@@ -56,6 +56,10 @@ export default class File extends Node {
     return (this.original === 'NO-MATCH' && this.getAction() === 'scan');
   }
 
+  public someMatch(): boolean {
+    return (this.original === 'MATCH' && this.getAction() === 'scan');
+  }
+
   public restoreStatus(path: string) {
     if (this.getPath() !== path) return;
     if (this.getAction() === 'filter') {
