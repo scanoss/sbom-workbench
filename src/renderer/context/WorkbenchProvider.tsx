@@ -65,7 +65,7 @@ export const WorkbenchProvider: React.FC<any> = ({ children }) => {
         return;
       }
 
-      const [type, path]: any[] = decodeURIComponent(param).split('|');
+      const [type, path]: any[] = param.split('|');
       if (path) {
         setNode({ type, path });
       }
