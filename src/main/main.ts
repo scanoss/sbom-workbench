@@ -126,12 +126,6 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-   // TODO: remove from here
-   const root = `${os.homedir()}/${AppConfig.DEFAULT_WORKSPACE_NAME}`;
-   await workspace.read(root);
-   await userSettingService.read(root);
-   await userSettingService.update();
-
    AppI18n.setLng(userSettingService.get().LNG);
    AppI18n.init(AppI18nContext.MAIN);
 
@@ -181,8 +175,8 @@ app.on('window-all-closed', () => {
 
 app
   .whenReady()
-  .then(() => {
-    init();
+  .then(async () => {
+    await init();
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
@@ -197,5 +191,4 @@ async function init() {
   await workspace.read(root);
   await userSettingService.read(root);
   await userSettingService.update();
-  new WorkspaceMigration(userSettingService.get().VERSION, root).up();
 }
