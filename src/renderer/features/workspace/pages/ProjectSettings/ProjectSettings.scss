@@ -1,7 +1,6 @@
 #ProjectSettings {
   .app-content {
     form {
-      height: 80vh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -86,6 +85,8 @@
   }
 
   .button-container {
+    padding-top: 14em;
+    padding-bottom: 1em;
     display: flex;
     justify-content: flex-end;
 
