@@ -26,7 +26,7 @@ ipcMain.handle(
       const data = await componentService.getComponentFiles(component, params);
       return Response.ok({ message: 'Component files succesfully retrieved', data });
     } catch (error: any) {
-      log.error('[COMPONENT GET FILES]: ', error);
+      log.error('[COMPONENT GET FILES]: ', error, params);
       return Response.fail({ message: error.message });
     }
   }
@@ -37,7 +37,7 @@ ipcMain.handle(IpcChannels.COMPONENT_GET_ALL, async (_event, params: IWorkbenchF
     const data = await componentService.getAll(params);
     return Response.ok({ message: 'All components succesfully retrieved', data });
   } catch (error: any) {
-    log.error('[COMPONENT GET ALL]: ', error);
+    log.error('[COMPONENT GET ALL]: ', error, params);
     return Response.fail({ message: error.message });
   }
 });
@@ -60,7 +60,7 @@ ipcMain.handle(IpcChannels.COMPONENT_GET_GLOBAL_COMPONENTS, async (_event, param
     const components = await new SearchComponentTask().run(params);
     return Response.ok({ message: 'Component retrieve successfully', data: components });
   } catch (error: any) {
-    log.error('[GET GLOBAL COMPONENTS]: ', error);
+    log.error('[GET GLOBAL COMPONENTS]: ', error, params);
     return Response.fail({ message: error.message });
   }
 });
@@ -70,7 +70,7 @@ ipcMain.handle(IpcChannels.COMPONENT_GET_GLOBAL_COMPONENT_VERSION, async (_event
     const componentVersions = await new SearchComponentVersionTask().run(params);
     return Response.ok({ message: 'Component retrieve successfully', data: componentVersions });
   } catch (error: any) {
-    log.error('[GET GLOBAL COMPONENT VERSION]: ', error);
+    log.error('[GET GLOBAL COMPONENT VERSION]: ', error, params);
     return Response.fail({ message: error.message });
   }
 });

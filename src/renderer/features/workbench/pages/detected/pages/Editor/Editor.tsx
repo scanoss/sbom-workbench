@@ -138,14 +138,14 @@ const Editor = () => {
       usage: 'file',
     });
     if (response) {
-      const f = await fileService.get({ path: file });
-      if (!f) return;
-      await dispatch(
-        createInventory({
-          ...response,
-          files: [f.fileId],
-        })
-      );
+        const f = await fileService.get({ path: file });
+        if (!f) return;
+        await dispatch(
+          createInventory({
+            ...response,
+            files: [f.fileId],
+          })
+        );
     }
   };
 
