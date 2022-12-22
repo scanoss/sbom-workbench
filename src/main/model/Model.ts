@@ -5,6 +5,7 @@ import log from 'electron-log';
 import sqlite3 from 'sqlite3';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Querys } from './querys_db';
+import util from 'util';
 
 
 const query = new Querys();
@@ -12,14 +13,12 @@ const query = new Querys();
 export class Model {
   private dbPath: string;
 
-  public static readonly entityMapper = null;
+  public static readonly entityMapper = {};
 
   constructor(path: string) {
     this.dbPath = `${path}/scan_db`;
   }
-
-  // CALL THIS FUCTION TO INIT THE DB
-  async init() {
+  public async init() {
     try {
       const success = await this.scanCreateDb();
       if (success) return true;
@@ -65,21 +64,12 @@ export class Model {
       );
     });
   }
-
-  private createViews() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(function () {
-          db.run("begin transaction");
-          db.run(
-            'CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url,source,reliableLicense) AS SELECT DISTINCT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url,comp.source,comp.reliableLicense FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;'
-          );
-          db.run(
-            'CREATE VIEW IF NOT EXISTS license_view (cvid,name,spdxid,url,license_id) AS SELECT lcv.cvid,lic.name,lic.spdxid,lic.url,lic.id FROM license_component_version AS lcv LEFT JOIN licenses AS lic ON lcv.licid=lic.id;'
-          );
-
-          db.run(`
+  private async createViews(): Promise<void> {
+    const db = await this.openDb();
+    const call = util.promisify(db.run.bind(db));
+    await call('CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url,source,reliableLicense) AS SELECT DISTINCT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url,comp.source,comp.reliableLicense FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;');
+    await call('CREATE VIEW IF NOT EXISTS license_view (cvid,name,spdxid,url,license_id) AS SELECT lcv.cvid,lic.name,lic.spdxid,lic.url,lic.id FROM license_component_version AS lcv LEFT JOIN licenses AS lic ON lcv.licid=lic.id;');
+    await call(`
           CREATE VIEW IF NOT EXISTS summary AS SELECT cv.id AS compid,cv.purl,cv.version,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
           SUM(f.identified=0 AND f.ignored=0) AS pending
           FROM files f INNER JOIN Results r ON r.fileId=f.fileId
@@ -88,22 +78,11 @@ export class Model {
           GROUP BY r.purl, r.version
           ORDER BY cv.id ASC;
           `);
-          db.run('commit',(err)=>{
-            db.close();
-            if(err)resolve(false)
-            else resolve(true);
-          });
-        });
-      } catch (error) {
-        log.error(error);
-      }
-    });
+    db.close();
   }
-
   public getEntityMapper():Record<string,string>{
     return Model.entityMapper;
   }
-
   public getSQL(queryBuilder:QueryBuilder , SQLquery:string, entityMapper:Record<string,string>){
     let SQL = SQLquery;
     const filter = queryBuilder?.getSQL(entityMapper)

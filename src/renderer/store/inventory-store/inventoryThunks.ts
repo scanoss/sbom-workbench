@@ -39,8 +39,8 @@ export const detachFile = createAsyncThunk('inventory/detach', async (files: num
 });
 
 export const ignoreFile = createAsyncThunk('inventory/ignore', async (files: number[], { dispatch }) => {
-  const response = await fileService.ignored(files);
-  return response;
+    const response = await fileService.ignored(files);
+    return response;
 });
 
 export const restoreFile = createAsyncThunk('inventory/restore', async (files: number[], { dispatch }) => {

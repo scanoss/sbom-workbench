@@ -56,50 +56,52 @@ export class ResultModel extends Model {
       }
     });
   }
-
-  // INSERT RESULTS FROM FILE
-  public insertFromFile(resultPath: string, files: any): Promise<IInsertResult> {
-    return new Promise<IInsertResult>(async (resolve) => {
-      try {
+    public async insertFromFile(resultPath: string, files: any): Promise<IInsertResult> {
         const resultLicense: any = {};
-        const self = this;
         const result: Record<any, any> = await utilModel.readFile(resultPath);
         const db = await this.openDb();
-        db.serialize(async () => {
-          db.run('begin transaction');
-          let data: any;
+        const promises = [];
+        const call = util.promisify(db.run.bind(db));
+        let resultId = 1;
+        let data: any;
           for (const [key, value] of Object.entries(result)) {
             for (let i = 0; i < value.length; i += 1) {
               const filePath = key;
               data = value[i];
               if (data.id !== 'none') {
-                const resultId = await self.insertResultBulk(db, data, files[filePath]);
+                promises.push(call( query.SQL_INSERT_RESULTS,
+                  data.file_hash,
+                  data.vendor,
+                  data.component,
+                  data.version,
+                  data.latest,
+                  data.url,
+                  data.lines,
+                  data.oss_lines,
+                  data.matched,
+                  data.file,
+                  data.id,
+                  data.url_hash,
+                  data.purl ? data.purl[0] : ' ',
+                  files[filePath],
+                  data.file_url,
+                  'engine'));
                 resultLicense[resultId] = data.licenses;
+                resultId +=1;
               }
             }
           }
-          db.run('commit', async (err: any) => {
-            if (err) throw err;
-            db.close();
-            resolve(resultLicense);
-          });
-        });
-      } catch (error) {
-        log.error(error);
-        resolve(null);
-      }
-    });
+          await Promise.all(promises);
+          db.close();
+          return resultLicense;
   }
-
-  public insertResultLicense(data: IInsertResult) {
-    return new Promise<void>(async (resolve) => {
-      const db = await this.openDb();
-      db.serialize(async () => {
-        db.run('begin transaction');
+  public async insertResultLicense(data: IInsertResult):Promise<void> {
+    const db = await this.openDb();
+    const promises = [];
+    const call = util.promisify(db.run.bind(db));
         for (const [resultId, value] of Object.entries<Array<IResultLicense>>(data)) {
           for (let i = 0; i < value.length; i += 1) {
-            db.run(
-              'INSERT OR IGNORE INTO result_license (spdxid,source,resultId,patent_hints,copyLeft,osadl_updated,incompatible_with,checklist_url) VALUES (?,?,?,?,?,?,?,?);',
+            promises.push(call('INSERT OR IGNORE INTO result_license (spdxid,source,resultId,patent_hints,copyLeft,osadl_updated,incompatible_with,checklist_url) VALUES (?,?,?,?,?,?,?,?);',
               value[i].name,
               value[i].source,
               resultId,
@@ -107,71 +109,31 @@ export class ResultModel extends Model {
               value[i].copyleft ? value[i].copyleft : null,
               value[i].osadl_updated ? value[i].osadl_updated : null,
               value[i].incompatible_with ? value[i].incompatible_with : null,
-              value[i].checklist_url ? value[i].checklist_url : null
-            );
+              value[i].checklist_url ? value[i].checklist_url : null));
           }
         }
-        db.run('commit', (error: Error) => {
-          db.close();
-          resolve();
-        });
-      });
-    });
+      await Promise.all(promises);
+      db.close();
   }
-
-  async count() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.get('SELECT COUNT(*)as count FROM results;', function (err: any, result: any) {
-          if (err) throw err;
-          db.close();
-          resolve(result.count);
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
+ public async count(): Promise<number> {
+   const db = await this.openDb();
+   const call = util.promisify(db.get.bind(db));
+   const result = await call('SELECT COUNT(*)as count FROM results;');
+   db.close();
+   return result.count;
+ }
+  public async updateDirty(value: number):Promise<void> {
+    const db = await this.openDb();
+    const call = util.promisify(db.run.bind(db));
+    await call(`UPDATE results SET dirty=${value} WHERE id IN (SELECT id FROM results);`);
+    db.close();
   }
-
-  async updateDirty(value: number) {
-    return new Promise<void>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(() => {
-          db.run('begin transaction');
-          db.run(`UPDATE results SET dirty=${value} WHERE id IN (SELECT id FROM results);`);
-          db.run('commit', (err: any) => {
-            db.close();
-            if (err) throw err;
-            resolve();
-          });
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
+  public async deleteDirty(): Promise<void> {
+    const db = await this.openDb();
+    const call = util.promisify(db.run.bind(db));
+    await call(`DELETE FROM results WHERE dirty=1;`);
+    db.close();
   }
-
-  async deleteDirty() {
-    return new Promise<void>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(() => {
-          db.run('begin transaction');
-          db.run(`DELETE FROM results WHERE dirty=1;`);
-          db.run('commit', (err: any) => {
-            db.close();
-            if (err) throw err;
-            resolve();
-          });
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
   private insertResultBulk(db: any, data: any, fileId: number): Promise<number> {
     return new Promise<number>((resolve) => {
       db.run(
@@ -235,131 +197,45 @@ export class ResultModel extends Model {
       });
     });
   }
-
-  // CONVERT ARRAY TO RESULTS FORMAT
-  convertToResultsFormat(input: any) {
-    return new Promise((resolve, reject) => {
-      if (input === undefined || input.length === 0) {
-        reject(new Error('input is empty'));
-      }
-      const formattedData = {};
-      for (let i = 0; i < input.length; i += 1) {
-        for (const obj of input[i]) {
-          const newKey = obj.path;
-          formattedData[newKey] = [];
-          delete obj.path;
-          formattedData[newKey].push(obj);
-        }
-      }
-      resolve(formattedData);
-    });
-  }
-
-  // GET RESULT
   public async getFromPath(path: string) {
     const db = await this.openDb();
-    return new Promise<any>(async (resolve) => {
-      db.all(query.SQL_SCAN_SELECT_FILE_RESULTS, path, (err: any, data: any) => {
-        db.close();
-        if (err) resolve([]);
-        else resolve(data);
-      });
-    });
+    const call = util.promisify(db.all.bind(db));
+    const results = await call(query.SQL_SCAN_SELECT_FILE_RESULTS, path);
+    db.close();
+    if(results) return results;
+    return [];
   }
-
-  public async getNotOriginal(ids: number[]) {
-    return new Promise<any>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        const queryGetNotOriginal = `SELECT * FROM results WHERE id in (${ids.toString()}) AND source!='engine';`;
-        db.get(queryGetNotOriginal, (err: any, data: any) => {
-          db.close();
-          if (err) throw new Error('Unable to get result by id');
-          else resolve(data);
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
   public async getSummaryByids(ids: number[]) {
-    return new Promise<Array<any>>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        db.serialize(() => {
-          const sqlQuerySummary = query.SQL_GET_SUMMARY_BY_RESULT_ID.replace('#values', `(${ids.toString()})`);
-          db.all(sqlQuerySummary, (err: any, data: any) => {
-            db.close();
-            if (err) throw err;
-            else resolve(data);
-          });
-        });
-      } catch (error) {
-        log.error(error);
-        reject(new Error('Unable to retrieve results'));
-      }
-    });
+    const sql = query.SQL_GET_SUMMARY_BY_RESULT_ID.replace('#values', `(${ids.toString()})`);
+    const db = await this.openDb();
+    const call = util.promisify(db.all.bind(db));
+    const summary = await call(sql);
+    db.close();
+    return summary;
   }
-
-  public async updateFiltered(path: string) {
-    return new Promise<any>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        const SQLquery = `UPDATE results SET dirty=0 WHERE file_path IN (${path}) AND identified=1 OR ignored=1;`;
-        db.run(SQLquery, (err: any) => {
-          if (err) throw err;
-          db.close();
-          resolve(true);
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
+  public async getResultsPreLoadInventory(queryBuilder: QueryBuilder) {
+    const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_RESULTS_PRELOADINVENTORY, this.getEntityMapper());
+    const db = await this.openDb();
+    const call = util.promisify(db.all.bind(db));
+    const results = await call(SQLquery.SQL, ...SQLquery.params);
+    db.close();
+    return results;
   }
-
-  public getResultsPreLoadInventory(queryBuilder: QueryBuilder) {
-    return new Promise<any>(async (resolve, reject) => {
-      try {
-        const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_RESULTS_PRELOADINVENTORY, this.getEntityMapper());
-        const db = await this.openDb();
-        db.all(SQLquery.SQL, ...SQLquery.params, async (err: any, data: any) => {
-          db.close();
-          if (err) throw err;
-          else {
-            resolve(data);
-          }
-        });
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
-  }
-
   public async getAll(queryBuilder: QueryBuilder) {
-    return new Promise<any>(async (resolve, reject) => {
-      try {
-        const db = await this.openDb();
-        const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_RESULTS, this.getEntityMapper());
-        db.all(SQLquery.SQL, ...SQLquery.params, (err: any, data: any) => {
-          db.close();
-          if (err) throw err;
-          resolve(data);
-        });
-      } catch (error) {
-        log.error(error);
-        reject(error);
-      }
-    });
+    const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_RESULTS, this.getEntityMapper());
+    const db = await this.openDb();
+    const call = util.promisify(db.all.bind(db));
+    const results = await call(SQLquery.SQL, ...SQLquery.params);
+    db.close();
+    return results;
   }
-
   public async getDetectedReport() {
    const db = await this.openDb();
    const call = util.promisify(db.all.bind(db));
    const response = await call(`SELECT cv.purl,cv.version,cv.name, r.vendor, rl.spdxid,rl.patent_hints,rl.copyLeft,rl.incompatible_with FROM component_versions cv
                                 INNER JOIN results r ON cv.purl = r.purl AND cv.version = r.version
                                 INNER JOIN result_license rl ON rl.resultId = r.id;`);
+   db.close();
    return response;
   }
 
@@ -369,6 +245,7 @@ export class ResultModel extends Model {
     const response = await call(`SELECT cv.purl,cv.version,cv.name, r.vendor, rl.spdxid,rl.patent_hints,rl.copyLeft,rl.incompatible_with FROM component_versions cv
                                 INNER JOIN results r ON cv.purl = r.purl AND cv.version = r.version
                                 INNER JOIN result_license rl ON rl.resultId = r.id;`);
+    db.close();
     return response;
   }
 

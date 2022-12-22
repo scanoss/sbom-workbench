@@ -11,7 +11,7 @@ ipcMain.handle(IpcChannels.DEPENDENCY_GET_ALL, async (event, params: { path: str
     const dependencies = await dependencyService.getAll(params);
     return Response.ok({ message: 'Component created successfully', data: dependencies });
   } catch (error: any) {
-    log.error('[DEPENDENCY GET ALL]: ', error);
+    log.error('[DEPENDENCY GET ALL]: ', error, params);
     return Response.fail({ message: error.message });
   }
 });
@@ -22,7 +22,7 @@ ipcMain.handle(IpcChannels.DEPENDENCY_ACCEPT, async (event, params: NewDependenc
     treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: dependency });
   } catch (error: any) {
-    log.error('[DEPENDENCY ACCEPT]: ', error);
+    log.error('[DEPENDENCY ACCEPT]: ', error, params);
     return Response.fail({ message: error.message });
   }
 });
@@ -33,7 +33,7 @@ ipcMain.handle(IpcChannels.DEPENDENCY_RESTORE, async (_event, dependencyId: numb
     treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: dependency });
   } catch (error: any) {
-    log.error('[DEPENDENCY RESTORE]: ', error);
+    log.error('[DEPENDENCY RESTORE]: ', error, dependencyId);
     return Response.fail({ message: error.message });
   }
 });
@@ -46,7 +46,7 @@ ipcMain.handle(IpcChannels.DEPENDENCY_RESTORE_ALL, async (_event, params: Restor
     treeService.updateDependencyStatusOnTree();
     return Response.ok({ message: 'Component created successfully', data: response });
   } catch (error: any) {
-    log.error('[DEPENDENCY RESTORE ALL]: ', error);
+    log.error('[DEPENDENCY RESTORE ALL]: ', error, params);
     return Response.fail({ message: error.message });
   }
 });

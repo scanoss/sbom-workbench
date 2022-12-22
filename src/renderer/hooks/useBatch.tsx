@@ -42,7 +42,7 @@ const useBatch = () => {
             overwrite: action === 'overwrite',
             source: {
               type: InventorySourceType.FILE,
-              input: files.map((f) => f.id),
+               input: files.map((f) => f.id),
             },
             data: {
               inventory,

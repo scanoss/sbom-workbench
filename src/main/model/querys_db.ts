@@ -66,9 +66,6 @@ export class Querys {
   // SQL INSERT RESULTS
   SQL_INSERT_RESULTS =
     'INSERT or IGNORE INTO results (md5_file,vendor,component,version,latest_version,url,lines,oss_lines,matched,filename,idtype,md5_comp,purl,fileId,file_url,source) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
-
-  SQL_UPDATE_RESULTS_IDTYPE_FROM_PATH = `UPDATE results SET source=?,idtype='file' WHERE file_path=?`;
-
   // SQL NEW INVENTORY
   SQL_SCAN_INVENTORY_INSERT =
     'INSERT INTO inventories (cvid,usage, notes, url, spdxid, source) VALUES (?,?,?,?,?,?);';
@@ -134,25 +131,14 @@ export class Querys {
 
   SQL_SCAN_SELECT_FILE_RESULTS = `SELECT r.vendor,r.id AS resultId,f.fileId AS id,f.path AS file_path, r.url,r.lines, r.oss_lines, r.matched, r.filename as file, r.idtype as type, r.md5_file, r.md5_comp as url_hash,r.purl, r.version,r.latest_version as latest, f.identified, f.ignored, r.file_url,rl.spdxid,rl.source FROM files f INNER JOIN results r  ON r.fileId=f.fileId LEFT JOIN result_license rl ON r.id=rl.resultId  WHERE f.path=? ORDER BY f.path;`;
 
-  // GET ALL THE INVENTORIES ATTACHED TO A FILE BY PATH
-  SQL_SELECT_ALL_INVENTORIES_FROM_FILE =
-    'SELECT i.id,i.usage,i.notes,i.purl,i.version,i.spdxid,i.url FROM inventories i, file_inventories fi WHERE i.id=fi.inventoryid and fi.resultid=?;';
-
   SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID =
     'SELECT DISTINCT f.fileId AS id,f.path,f.identified,f.ignored FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN files f ON f.fileId=fi.fileId  WHERE i.id=?;';
-
-  // SQL_GET_COMPONENTS TABLE
-  SQL_GET_COMPONENT =
-    'SELECT id,name,version,description,url,purl from component_versions where purl like ?';
 
   SQL_GET_COMPONENT_BY_ID =
     'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version from component_versions cv where cv.id=?;';
 
   SQL_GET_LICENSES_BY_COMPONENT_ID =
     'SELECT l.id,l.name,l.spdxid FROM licenses l where l.id in (SELECT lcv.licid from license_component_version lcv where lcv.cvid=?);';
-
-  SQL_GET_COMPID_FROM_PURL =
-    'SELECT id from component_versions where purl like ? and version like ?;';
 
   SQL_GET_COMPONENT_BY_PURL_VERSION =
     'SELECT cv.name as name,cv.id as compid,cv.purl,cv.url,cv.version,r.purl FROM component_versions cv LEFT JOIN results r ON cv.purl=r.purl AND cv.version=r.version WHERE cv.purl=? and cv.version=?;';
@@ -219,29 +205,12 @@ WHERE f.fileId IN (SELECT fileId FROM results) OR f.fileId IN (SELECT fileId FRO
 
   SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION =
     'UPDATE files SET identified=0 WHERE fileId IN (SELECT fileId FROM file_inventories WHERE inventoryid=?)';
-
-  SQL_GET_RESULTS_SUMMARY = `
-  SELECT filesIdentified.identified,filesPending.pending,filesOriginal.original,filesNoMatch.noMatch,filesFiltered.filtered,filesMatch.match,totalFiles.totalFiles, scannedFiles.scannedFiles,detectedIdentifiedFiles.detectedIdentifiedFiles FROM (
-  (SELECT COUNT(*) AS identified FROM files f WHERE f.identified=1) AS filesIdentified,
-  (SELECT COUNT(*) AS pending FROM files f WHERE f.identified=0 AND f.ignored=0 AND f.type="MATCH") AS filesPending,
-  (SELECT COUNT(*) AS original FROM files f WHERE f.ignored=1) AS filesOriginal,
-  (SELECT COUNT(*) AS noMatch FROM files f WHERE f.type='NO-MATCH') AS filesNoMatch,
-  (SELECT COUNT(*) AS filtered FROM files f WHERE f.type='FILTERED') AS filesFiltered,
-  (SELECT COUNT(*) AS match FROM files f WHERE f.type='MATCH') AS filesMatch,
-  (SELECT COUNT(*) AS totalFiles FROM files) AS totalFiles,
-  (SELECT COUNT(*) AS scannedFiles FROM files f WHERE f.type!="FILTERED" ) AS scannedFiles,
-  (SELECT COUNT(*) AS detectedIdentifiedFiles FROM files f WHERE f.type="MATCH" AND f.identified=1) AS detectedIdentifiedFiles
-   );`;
-
   SQL_GET_SUMMARY_BY_RESULT_ID = `SELECT f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending FROM files f  WHERE fileId IN #values GROUP BY f.path;`;
-
   SQL_GET_RESULTS_RESCAN = `SELECT r.idtype,f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending, source AS original FROM files f INNER JOIN results r ON f.fileId=r.fileId;`;
-
   SQL_COMPONENTS_SUMMARY = `SELECT comp.purl,comp.id,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
   SUM(f.identified=0 AND f.ignored=0) AS pending FROM files f LEFT JOIN results r ON f.fileId=r.fileId
   INNER JOIN component_versions comp ON r.purl=comp.purl AND r.version=comp.version #FILTER
   GROUP BY r.purl, r.version;`;
-
   SQL_GET_ALL_COMPONENTS = `SELECT DISTINCT vendor.vendor,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id,comp.source,comp.reliableLicense
   FROM
   (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id, comp.source, comp.reliableLicense FROM components AS comp

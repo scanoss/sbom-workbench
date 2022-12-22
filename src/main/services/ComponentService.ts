@@ -62,7 +62,7 @@ class ComponentService {
       const queryBuilderSummary: QueryBuilder = QueryBuilderCreator.create({
         ...filter,
         status: null,
-      }); // Keep summary independent from summary
+      }); // Keep summary independent of summary
       let comp = await modelProvider.model.component.getAll(queryBuilder);
       const summary = await modelProvider.model.component.summary(
         queryBuilderSummary
@@ -157,8 +157,7 @@ class ComponentService {
 
   public async importComponents() {
     try {
-      const components: Array<Partial<Component>> =
-        await modelProvider.model.component.getUniqueComponentsFromResults();
+      const components: Array<Partial<Component>> = await modelProvider.model.component.getUniqueComponentsFromResults();
       await modelProvider.model.component.import(components);
       const data =
         await modelProvider.model.component.getLicensesAttachedToComponentsFromResults();

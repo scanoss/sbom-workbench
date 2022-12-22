@@ -9,85 +9,83 @@ import { treeService } from '../../main/services/TreeService';
 import { NodeStatus } from '../../main/workspace/tree/Node';
 import { workspace } from '../../main/workspace/Workspace';
 import { modelProvider } from '../../main/services/ModelProvider';
+import { Response } from '../../api/Response';
 
-ipcMain.handle(IpcChannels.INVENTORY_GET_ALL, async (_event, invget: Partial<Inventory>) => {
-  let inv: any;
+ipcMain.handle(IpcChannels.INVENTORY_GET_ALL, async (_event, params: Partial<Inventory>) => {
   try {
-    inv = await inventoryService.getAll(invget);
-    return { status: 'ok', message: inv, data: inv };
-  } catch (e) {
-    log.error('[INVENTORY GET ALL]: ', e);
-    return { status: 'fail' };
+    const inventories = await inventoryService.getAll(params);
+    return Response.ok({ message: 'Inventory Get All', data: inventories });
+  } catch (error: any) {
+    log.error('[ INVENTORY GET ALL ]: ', e, params);
+    Response.fail({ message: error.message });
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_GET, async (_event, inv: Partial<Inventory>) => {
+ipcMain.handle(IpcChannels.INVENTORY_GET, async (_event, param: Partial<Inventory>) => {
   try {
-    const inventory: Inventory = await inventoryService.get(inv);
-    return { status: 'ok', message: 'Inventory retrieve successfully', data: inventory };
-  } catch (e) {
-    log.error('[INVENTORY GET]: ', e);
-    return { status: 'fail' };
+    const inventory: Inventory = await inventoryService.get(param);
+    return Response.ok({ message: 'Inventory Get', data: inventory });
+  } catch (error: any) {
+    log.error('[ INVENTORY GET ]: ', e, param);
+    Response.fail({ message: error.message });
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_CREATE, async (event, arg: Inventory) => {
+ipcMain.handle(IpcChannels.INVENTORY_CREATE, async (event, param: Inventory) => {
   try {
-    const inv = await inventoryService.create(arg);
-    treeService.updateTree(arg.files, NodeStatus.IDENTIFIED);
-    return { status: 'ok', message: 'Inventory created', data: inv };
-  } catch (e) {
-    log.error('[INVENTORY CREATE]: ', e);
-    return { status: 'fail' };
+    const inventory = await inventoryService.create(param);
+    treeService.updateTree(param.files, NodeStatus.IDENTIFIED);
+    return Response.ok({ message: 'Inventory Create', data: inventory });
+  } catch (error: any) {
+    log.error('[ INVENTORY CREATE ]: ', e, param);
+    Response.fail({ message: error.message });
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_ATTACH_FILE, async (_event, arg: Partial<Inventory>) => {
+ipcMain.handle(IpcChannels.INVENTORY_ATTACH_FILE, async (_event, param: Partial<Inventory>) => {
   try {
-    const success = await inventoryService.attach(arg);
-    return { status: 'ok', message: 'File attached to inventory successfully', success };
-  } catch (e) {
-    log.error('[INVENTORY ATTACH FILE]: ', e);
-    return { status: 'fail' };
+    const success = await inventoryService.attach(param);
+    return Response.ok({ message: 'Inventory Attach', data: success });
+  } catch (error: any) {
+    log.error('[ INVENTORY ATTACH ]: ', e, param);
+    Response.fail({ message: error.message });
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_DETACH_FILE, async (_event, inv: Partial<Inventory>) => {
+ipcMain.handle(IpcChannels.INVENTORY_DETACH_FILE, async (_event, param: Partial<Inventory>) => {
   try {
-    const success: boolean = await inventoryService.detach(inv);
-    treeService.retoreStatus(inv.files);
-    return { status: 'ok', message: 'File detached to inventory successfully', success };
-  } catch (e) {
-    log.error('[INVENTORY DETACH FILE]: ', e);
-    return { status: 'fail' };
+    const success: boolean = await inventoryService.detach(param);
+    treeService.retoreStatus(param.files);
+    return Response.ok({ message: 'Inventory detach', data: success });
+  } catch (error: any) {
+    log.error('[ INVENTORY DETACH ]: ', e, param);
+    Response.fail({ message: error.message });
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_DELETE, async (_event, arg: Partial<Inventory>) => {
+ipcMain.handle(IpcChannels.INVENTORY_DELETE, async (_event, param: Partial<Inventory>) => {
   try {
-    const inventoryFiles= await inventoryService.get(arg);
+    const inventoryFiles= await inventoryService.get(param);
     const files = inventoryFiles.files.reduce((acc, file) => {
       acc.push(file.id);
       return acc;
     }, []);
     treeService.updateTree(files, NodeStatus.PENDING);
-    const success = await modelProvider.model.inventory.delete(arg);
-    if (success) return { status: 'ok', message: 'Inventory deleted successfully', success };
-    return { status: 'error', message: 'Inventory was not deleted successfully', success };
-  } catch (e) {
-    log.error('[INVENTORY DELETE]: ', e);
-    return { status: 'fail' };
+    const success = await modelProvider.model.inventory.delete(param);
+    return Response.ok({ message: 'Inventory Delete', data: success });
+  } catch (error: any) {
+    log.error('[ INVENTORY DELETE ]: ', error, param);
+    Response.fail({ message: error.message });
   }
 });
 
 ipcMain.handle(IpcChannels.INVENTORY_FROM_COMPONENT, async (_event) => {
   try {
     const data = await modelProvider.model.inventory.getFromComponent();
-    if (data) return { status: 'ok', message: 'Inventories from component', data };
-    return { status: 'error', message: 'Inventory from component was not successfully retrieve', data };
-  } catch (e) {
-    log.error('[INVENTORY FROM COMPONENT]: ', e);
-    return { status: 'fail' };
+    return Response.ok({ message: 'Inventories from component', data });
+  } catch (error: any) {
+    log.error('[ INVENTORY DELETE ]: ', error);
+    Response.fail({ message: error.message });
   }
 });
 
@@ -96,31 +94,30 @@ ipcMain.handle(IpcChannels.INVENTORY_BATCH, async (_event, params: IBatchInvento
     const factory = new BatchFactory();
     const bachAction: Batch = factory.create(params);
     const success = await bachAction.execute();
-    if (success) return { status: 'ok', message: 'Inventory batch successfully', success };
-    return { status: 'fail', message: 'Inventory batch error' };
-  } catch (e) {
-    log.error('[INVENTORY BATCH]: ', e);
-    return { status: 'fail' };
+    return Response.ok({ message: 'Inventory batch', data: success });
+  } catch (error: any) {
+    log.error('[ INVENTORY BATCH ]: ', e, params);
+    Response.fail({ message: error.message });
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_ACCEPT_PRE_LOAD, async (_event, data: Partial<IBatchInventory>) => {
+ipcMain.handle(IpcChannels.INVENTORY_ACCEPT_PRE_LOAD, async (_event, param: Partial<IBatchInventory>) => {
   try {
     const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
-    const inventories: Array<Partial<Inventory>> = await inventoryService.preLoadInventoriesAcceptAll(data, filter);
-    return { status: 'ok', message: 'Inventory folder successfully', data: inventories };
-  } catch (e) {
-    log.error('[INVENTORY ACCEPT PRELOAD]: ',e);
-    return { status: 'fail' };
+    const inventories: Array<Partial<Inventory>> = await inventoryService.preLoadInventoriesAcceptAll(param, filter);
+    return Response.ok({ message: 'Inventory accept preload', data: inventories });
+  } catch (error: any) {
+    log.error('[ INVENTORY ACCEPT PRELOAD ]: ',error, param);
+    Response.fail({ message: error.message });
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_UPDATE, async (_event, inventory: Inventory) => {
+ipcMain.handle(IpcChannels.INVENTORY_UPDATE, async (_event, param: Inventory) => {
   try {
-    const inv = await inventoryService.update(inventory);
-    return { status: 'ok', message: 'Inventory succesfully updated', data: inv };
-  } catch (e) {
-    log.error('[INVENTORY UPDATE]: ', e);
-    return { status: 'fail' };
+    const inventory = await inventoryService.update(param);
+    return Response.ok({ message: 'Inventory accept preload', data: inventory });
+  } catch (error: any) {
+    log.error('[ INVENTORY UPDATE ]: ',error, param);
+    Response.fail({ message: error.message });
   }
 });
