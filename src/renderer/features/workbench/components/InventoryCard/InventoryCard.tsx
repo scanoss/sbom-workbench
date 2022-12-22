@@ -45,7 +45,7 @@ const InventoryCard = ({ inventory, onSelect }: InventoryCardProps) => {
             </Typography>
 
             <footer>
-              <div className="link">{t('Title:Viewfiles')} <ArrowForwardIcon /></div>
+              <div className="link">{t('Title:ViewFiles')} <ArrowForwardIcon /></div>
             </footer>
           </CardContent>
         </ButtonBase>

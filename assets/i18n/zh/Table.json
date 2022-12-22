@@ -1,0 +1,22 @@
+{
+  "Header": {
+    "Name": "名称",
+    "Date": "日期",
+    "TotalFiles": "全部文件",
+    "Component": "组件",
+    "Severity": "严重程度",
+    "CVE": "CVE",
+    "Source": "来源",
+    "Published": "已发布",
+    "Modified": "已修改",
+    "Vendor": "提供者",
+    "Version": "版本",
+    "License": "许可证",
+    "Copyleft": "Copyleft",
+    "IncompatibleLicenses": "不兼容的许可证",
+    "PURL": "PURL",
+    "URL": "URL"
+  },
+  "Version": "版本",
+  "License": "许可证"
+}

@@ -10,6 +10,7 @@ There are currently 2 languages:
 | ----------- | ------------- |
 | **English** | [en](./en/)   |
 | **Spanish** | [es](./es/)   |
+| **Chinese** | [zh](./zh/)   |
 
 ### Contributing a new lenguage
 

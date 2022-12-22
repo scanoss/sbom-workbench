@@ -29,7 +29,7 @@ export const InventoryDetail = () => {
 
   const getInventory = async () => {
     try {
-      const inv = await inventoryService.get({ id });
+      const inv = await inventoryService.get({ id: +id });
       setInventory(inv);
       setFiles(mapFiles(inv.files));
     } catch (error) {

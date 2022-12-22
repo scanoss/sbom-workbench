@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { IpcChannels } from '@api/ipc-channels';
 import { Dependency, Inventory, NewComponentDTO } from '@api/types';
+import { useTranslation } from 'react-i18next';
 import { InventoryDialog } from '../ui/dialog/InventoryDialog';
 import { InventorySelectorDialog } from '../features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse, LoaderController } from './types';
@@ -31,6 +32,8 @@ export interface IDialogContext {
 export const DialogContext = React.createContext<IDialogContext | null>(null);
 
 export const DialogProvider: React.FC<any> = ({ children }) => {
+  const { t } = useTranslation();
+
   const [inventoryDialog, setInventoryDialog] = useState<{
     open: boolean;
     inventory: Partial<InventoryForm>;
@@ -204,7 +207,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     onClose?: (response: DialogResponse) => void;
   }>({ open: false, component: {} });
 
-  const openComponentDialog = (component: Partial<NewComponentDTO> = {}, label = 'Create Component') => {
+  const openComponentDialog = (component: Partial<NewComponentDTO> = {}, label = t('Title:CreateComponent')) => {
     return new Promise<DialogResponse>((resolve) => {
       setComponentDialog({
         open: true,

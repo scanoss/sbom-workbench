@@ -39,7 +39,7 @@ const FileToolbar = ({ id, label, fullpath, file, actions }: FileToolbarProps) =
     },
     {
       id: ToolbarActions.COPY_PATH,
-      hint: t('Title:CopyFilePath'),
+      hint: t('Tooltip:CopyFilePath'),
       icon: <i className="ri-file-copy-line" />,
       run: () => navigator.clipboard.writeText(fullpath),
     },
