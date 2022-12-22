@@ -391,7 +391,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
-                <label>Version</label>
+                <label>{t('Title:Version')}</label>
                 <IconButton
                   title={t('Tooltip:AddNewVersion')}
                   tabIndex={-1}

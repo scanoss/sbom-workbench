@@ -7,6 +7,7 @@
   "SBOMLedgerToken": "SBOM Ledger Token",
   "KnowledgebaseAPI": "Knowledgebase API",
   "version": "version",
+  "Version": "Version",
   "AllVersions": "All versions",
   "PURL": "PURL",
   "URL": "URL",
@@ -59,5 +60,8 @@
   "CreatingSearchIndex": "Creating Search Index",
   "Indexing": "Indexing",
   "Language": "Language",
-  "ScannerSettings": "Scanner Settings"
+  "ScannerSettings": "Scanner Settings",
+  "Status": "Status",
+  "OnlineComponentSearch": "Online Component Search",
+  "CreateComponent": "Create Component"
 }
