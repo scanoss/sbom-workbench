@@ -1,7 +1,8 @@
 #ProjectSettings {
   .app-content {
     form {
-      height: 80vh;
+      min-height: 80vh;
+      margin-bottom: 1rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -62,7 +63,6 @@
           flex-direction: column;
 
           .api-conections-label-container {
-
             .api-conections-label {
               font-size: 20px;
             }
@@ -72,7 +72,8 @@
     }
   }
 
-  .input-container-license, .api-subcontainer {
+  .input-container-license,
+  .api-subcontainer {
     max-width: 500px;
   }
 
@@ -103,7 +104,6 @@
   }
 
   .error {
-
   }
 
   .input-label {
