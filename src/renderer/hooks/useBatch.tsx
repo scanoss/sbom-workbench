@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
 import { executeBatch } from '@store/inventory-store/inventoryThunks';
-import { InventoryAction, InventorySourceType } from '@api/types';
+import { Inventory, InventoryAction, InventorySourceType, ReuseIdentificationTaskDTO } from '@api/types';
 import { useDispatch } from 'react-redux';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { useTranslation } from 'react-i18next';

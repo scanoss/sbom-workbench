@@ -45,7 +45,7 @@ export class ProjectKnowledgeExtractor {
     let filesToProcess = await modelProvider.model.result.getAll(QueryBuilderCreator.create({
       ...globalFilter,
       path: this.projectKnowledgeExtractor.folder,
-      status: this.projectKnowledgeExtractor.override ? globalFilter.status : FileStatusType.PENDING,
+      status: this.projectKnowledgeExtractor.override ? globalFilter?.status : FileStatusType.PENDING,
     }));
     filesToProcess = filesToProcess.map((f) => f.path);
     return filesToProcess;
