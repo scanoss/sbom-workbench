@@ -109,6 +109,7 @@ class ProjectService extends BaseService {
 
   public async extractInventoryKnowledge(param: ExtractFromProjectDTO): Promise<InventoryKnowledgeExtraction>{
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, param);
+    console.log(param, response);
     return this.response(response);
   }
 

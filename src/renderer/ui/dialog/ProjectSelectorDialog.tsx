@@ -1,27 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Button,
   Dialog,
-  DialogContent, Grid,
+  DialogContent,
+  Grid,
   IconButton,
-  Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
+  Paper,
+  Step,
+  StepLabel,
+  Stepper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Alert from '@mui/material/Alert';
 import { useSelector } from 'react-redux';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
-import CloseIcon from "@mui/icons-material/Close";
+import CloseIcon from '@mui/icons-material/Close';
 import { useTranslation } from 'react-i18next';
 import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 import { DataGrid } from '@mui/x-data-grid';
-import { InventoryKnowledgeExtraction, IProject } from '@api/types';
+import {
+  InventoryKnowledgeExtraction,
+  InventorySourceType,
+  IProject,
+} from '@api/types';
 import { projectService } from '@api/services/project.service';
-
+import { DialogContext } from '@context/DialogProvider';
+import IconComponent from '../../features/workbench/components/IconComponent/IconComponent';
 
 const useStyles = makeStyles((theme) => ({
   size: {
     '& .MuiDialog-paperWidthMd': {
-      width: '900px',
+      width: '700px',
     },
   },
   selector: {
@@ -29,13 +44,47 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'space-between',
     '& .form-group': {
       width: 400,
-    }
+    },
   },
   left: {
-    height: 400,
-    background: 'white',
+    height: 300,
   },
-  dataGrid: {}
+  dataGrid: {
+    border: 0,
+
+    '& .MuiDataGrid-row': {
+      background: 'white',
+      margin: '2px 0',
+      border: 0,
+    },
+
+    '& .MuiDataGrid-cell': {
+      border: 0,
+      outline: '0 !important',
+    },
+
+    '& .MuiDataGrid-columnHeaders': {
+      border: 0,
+      outline: '0 !important',
+    },
+  },
+  dataResults: {
+    '& .component-name-cell': {
+      display: 'flex',
+      alignItems: 'center',
+      fontWeight: 500,
+      color: '#3B82F6',
+      fontSize: 'inherit',
+
+      '& h3': {
+        margin: 0,
+      }
+    },
+    '& .MuiTableCell-root': {
+      fontSize: 14,
+      fontWeight: 500,
+    }
+  }
 }));
 
 interface IProjectSelectorDialog {
@@ -47,9 +96,14 @@ interface IProjectSelectorDialog {
 
 export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
   const classes = useStyles();
+  const dialogCtrl = useContext<any>(DialogContext);
   const { t } = useTranslation();
 
   const { open,  params, onClose, onCancel } = props;
+
+  const steps = ['Select projects', 'Import identifications'];
+  const [activeStep, setActiveStep] = React.useState(0);
+
 
   const { projects, currentProject } = useSelector(selectWorkspaceState);
   const { isFilterActive } = useSelector(selectNavigationState);
@@ -74,15 +128,39 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
       target: {...currentProject},
     });
 
-    setResults(response);
+    setResults(response)
   }
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
+    const dialog = await dialogCtrl.createProgressDialog(t('ImportingIdentifications'));
+    try {
+      dialog.present();
+      const response = await projectService.acceptInventoryKnowledge({
+        inventoryKnowledgeExtraction: results,
+        overwrite: false,
+        type:InventorySourceType.PATH,
+        path: params?.folder
+      })
+    } catch (e) {
+      console.log(e);
+    } finally {
+      dialog.dismiss();
+      onClose({ response });
+    }
   };
 
   const onSelectionHandler = (data, details) => {
     setSelected(data);
+  };
+
+  const handleNext = async () => {
+    await onPreviewHandler();
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
   const isValid = () => {
@@ -114,48 +192,61 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
           </Alert>
         )}
 
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <div className={`${classes.left}`}>
-              <DataGrid
-                className={classes.dataGrid}
-                rows={items}
-                columns={[
-                  {
-                    field: 'name',
-                    headerName: t('NProjectsSelected', { count: selected.length}),
-                    editable: false,
-                    sortable: false,
-                    flex: 1,
-                  },
-                ]}
-                rowHeight={23}
-                disableColumnMenu
-                rowsPerPageOptions={[100]}
-                hideFooter
-                checkboxSelection
-                headerHeight={41}
-                onSelectionModelChange={onSelectionHandler}
-              />
-            </div>
+        <Stepper className="mb-5" activeStep={activeStep}>
+          {steps.map((label, index) => {
+            const stepProps: { completed?: boolean } = {};
+            const labelProps: {
+              optional?: React.ReactNode;
+            } = {};
 
-            <Button variant="contained" color="secondary" onClick={onPreviewHandler} >
-              {t('Button:Preview')}
-            </Button>
-          </Grid>
-          <Grid item xs={8}>
+            return (
+              <Step key={label} {...stepProps}>
+                <StepLabel {...labelProps}>{label}</StepLabel>
+              </Step>
+            );
+          })}
+        </Stepper>
+
+
+        {activeStep === 0 && (
+          <Grid >
+          <div className={`${classes.left}`}>
+            <DataGrid
+              className={classes.dataGrid}
+              rows={items}
+              columns={[
+                {
+                  field: 'name',
+                  headerName: t('NProjectsSelected', { count: selected.length}),
+                  editable: false,
+                  sortable: false,
+                  flex: 1,
+                },
+              ]}
+              rowHeight={40}
+              disableColumnMenu
+              rowsPerPageOptions={[100]}
+              hideFooter
+              checkboxSelection
+              headerHeight={41}
+              onSelectionModelChange={onSelectionHandler}
+            />
+          </div>
+        </Grid>
+        )}
+
+        {activeStep === 1 && (
+          <Grid >
               <div className="list-container">
                 <TableContainer className="results-table selectable" component={Paper}>
-                  <Table stickyHeader aria-label="results table">
+                  <Table className={classes.dataResults} stickyHeader size="small" aria-label="results table">
                     <TableHead>
                       <TableRow>
-                        <TableCell>{t('Table:Header:Local File')}</TableCell>
-                        <TableCell>{t('Table:Header:MD5')}</TableCell>
+                        <TableCell>{t('Table:Header:LocalFile')}</TableCell>
                         <TableCell>{t('Table:Header:Component')}</TableCell>
                         <TableCell>{t('Table:Header:Purl')}</TableCell>
                         <TableCell>{t('Table:Header:Version')}</TableCell>
                         <TableCell>{t('Table:Header:License')}</TableCell>
-                        <TableCell width={70} />
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -164,8 +255,12 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
                           <TableRow key={key}>
                             <TableCell>{results[key].localFiles.map(function (f) {
                               return f; }).join(", ")}</TableCell>
-                            <TableCell>{key}</TableCell>
-                            <TableCell>{inv.name}</TableCell>
+                            <TableCell>
+                              <div className="component-name-cell" title={inv.name}>
+                                <IconComponent name={inv.name} size={24} />
+                                <h3>{inv.name}</h3>
+                              </div>
+                            </TableCell>
                             <TableCell>{inv.purl}</TableCell>
                             <TableCell>{inv.version}</TableCell>
                             <TableCell>{inv.licenseName}</TableCell>
@@ -177,16 +272,27 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
                 </TableContainer>
               </div>
           </Grid>
-        </Grid>
+        )}
 
         <hr className="divider" />
 
         <form onSubmit={onSubmit}>
           <div className="button-container">
-            <Button color="inherit" tabIndex={-1} onClick={onCancel}>{t('Button:Cancel')}</Button>
-            <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
-              {t('Button:Import')}
-            </Button>
+
+            { activeStep === 0 && (
+              <Button type="button" variant="contained" color="secondary" onClick={handleNext}>
+                {t('Button:Next')}
+              </Button>
+            )}
+
+            { activeStep === 1 && (
+              <>
+                <Button color="inherit" tabIndex={-1} onClick={handleBack}>{t('Button:Back')}</Button>
+                <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
+                  {t('Button:Import')}
+                </Button>
+              </>
+              )}
           </div>
         </form>
       </DialogContent>

@@ -30,14 +30,14 @@ export class ReuseIdentificationTask implements ITask<void, Array<Inventory>> {
     // Import new data
     const uniqueComponents = this.getUniqueComponentsFromReuseIdentification(this.reuseIdentification.inventoryKnowledgeExtraction);
     const licenseMapper = await this.createNewLicenses(uniqueComponents);
-    const reuseIdentificationComponents = await this.getReuseIdentificationComponents(uniqueComponents,licenseMapper);
+    const reuseIdentificationComponents = await this.getReuseIdentificationComponents(uniqueComponents, licenseMapper);
     const newComponents = await this.createNewComponents(reuseIdentificationComponents.newComponents);
     reuseIdentificationComponents.newComponents = newComponents;
 
-  // Creates new inventories from inventory knowledge extraction
+    // Creates new inventories from inventory knowledge extraction
     const componentMapper  = this.getReuseIdentificationComponentsMapper(reuseIdentificationComponents);
     const fileMapper = await  this.getFileMapper(this.reuseIdentification.inventoryKnowledgeExtraction);
-    const inventories =  await this.createNewInventories(fileMapper,componentMapper);
+    const inventories =  await this.createNewInventories(fileMapper, componentMapper);
     return inventories;
   }
 
@@ -57,7 +57,7 @@ export class ReuseIdentificationTask implements ITask<void, Array<Inventory>> {
     const newInventories = await new Accept({ action:InventoryAction.ACCEPT, overwrite: this.reuseIdentification.overwrite,  source: {
          type: this.reuseIdentification.type,
          input: this.reuseIdentification.type === InventorySourceType.PATH ? this.reuseIdentification.path : fileMapper.get(Object.keys(this.reuseIdentification.inventoryKnowledgeExtraction)[0]),
-       }},inventories,null).execute();
+       }}, inventories,null).execute();
     return newInventories;
   }
 
