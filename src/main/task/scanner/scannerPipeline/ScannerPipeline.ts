@@ -31,7 +31,8 @@ export abstract class ScannerPipeline implements ITask<Project, boolean> {
         broadcastManager.get().send(IpcChannels.SCANNER_ERROR_STATUS, {
           name: `Error: ${
             task.getStageProperties().label
-          }, see logs for more details.`,
+          }`,
+          cause: e
         });
         throw e;
       }

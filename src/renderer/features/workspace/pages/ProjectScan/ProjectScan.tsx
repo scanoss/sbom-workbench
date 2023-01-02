@@ -53,10 +53,14 @@ const ProjectScan = () => {
   };
 
   const handlerScannerError = async (e, err) => {
+    const cause = (err.cause.message || err.cause || '').replace(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/gm,  m => {
+      return `<a href="${m}" target='_blank'>${m}</a>`;
+    })
+
     const errorMessage = `<strong>${t('Dialog:ScanPaused')}</strong>
 
     <span style="font-style: italic;">${err.name || ''} ${err.message || ''} ${err.code || ''}</span>
-    ${t('Dialog:PleaseTryAgainLater')}`;
+    <pre style="margin-bottom: 0"><small style="-webkit-user-select: all !important">Reason: ${cause}</small></pre>`;
 
     await dialogCtrl.openConfirmDialog(
       `${errorMessage}`,

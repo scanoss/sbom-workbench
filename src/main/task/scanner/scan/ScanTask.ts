@@ -8,7 +8,7 @@ import { IDispatch } from "../dispatcher/IDispatch";
 import { IScannerInputAdapter } from "../adapter/IScannerInputAdapter";
 
 
-export abstract class ScanTask <TDispatcher extends IDispatch, TInputScannerAdapter extends IScannerInputAdapter> extends BaseScannerTask <TDispatcher, TInputScannerAdapter>  {
+export abstract class ScanTask<TDispatcher extends IDispatch, TInputScannerAdapter extends IScannerInputAdapter> extends BaseScannerTask <TDispatcher, TInputScannerAdapter>  {
 
   public getStageProperties(): Scanner.StageProperties {
     return {
