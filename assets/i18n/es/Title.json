@@ -63,5 +63,9 @@
   "ScannerSettings": "Configuración del escáner",
   "Status": "Estado",
   "OnlineComponentSearch": "Búsqueda de componentes online",
-  "CreateComponent": "Crear componente"
+  "CreateComponent": "Crear componente",
+  "SelectProjects": "Seleccionar proyectos",
+  "PreviewIdentifications": "Previsualizar identificaciones",
+  "ImportingIdentifications": "Importar identificaciones",
+  "ImportFromProjects": "Importar desde proyectos"
 }

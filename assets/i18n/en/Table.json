@@ -15,7 +15,8 @@
     "Copyleft": "Copyleft",
     "IncompatibleLicenses": "Incompatible Licenses",
     "PURL": "PURL",
-    "URL": "URL"
+    "URL": "URL",
+    "LocalFile": "Local File"
   },
   "Version": "Version",
   "License": "License"

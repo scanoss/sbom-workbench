@@ -1,27 +1,27 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Button,
   Dialog,
-  DialogContent,
+  DialogContent, FormControlLabel,
   Grid,
   IconButton,
   Paper,
   Step,
   StepLabel,
-  Stepper,
+  Stepper, Switch,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
+  TableRow
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Alert from '@mui/material/Alert';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import CloseIcon from '@mui/icons-material/Close';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 import { DataGrid } from '@mui/x-data-grid';
 import {
@@ -31,13 +31,18 @@ import {
 } from '@api/types';
 import { projectService } from '@api/services/project.service';
 import { DialogContext } from '@context/DialogProvider';
+import { acceptInventoryKnowledge } from '@store/inventory-store/inventoryThunks';
 import IconComponent from '../../features/workbench/components/IconComponent/IconComponent';
 
 const useStyles = makeStyles((theme) => ({
   size: {
     '& .MuiDialog-paperWidthMd': {
-      width: '700px',
+      width: 700,
     },
+
+    '& .MuiGrid-root': {
+      height: 280
+    }
   },
   selector: {
     width: '100%',
@@ -47,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   left: {
-    height: 300,
+    height: '100%',
   },
   dataGrid: {
     border: 0,
@@ -69,6 +74,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   dataResults: {
+    maxHeight: 250,
+
     '& .component-name-cell': {
       display: 'flex',
       alignItems: 'center',
@@ -78,6 +85,7 @@ const useStyles = makeStyles((theme) => ({
 
       '& h3': {
         margin: 0,
+        marginLeft: 3
       }
     },
     '& .MuiTableCell-root': {
@@ -97,12 +105,14 @@ interface IProjectSelectorDialog {
 export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
   const classes = useStyles();
   const dialogCtrl = useContext<any>(DialogContext);
+  const dispatch = useDispatch();
   const { t } = useTranslation();
 
   const { open,  params, onClose, onCancel } = props;
 
-  const steps = ['Select projects', 'Import identifications'];
+  const steps = [t('Title:SelectProjects'), t('Title:PreviewIdentifications')];
   const [activeStep, setActiveStep] = React.useState(0);
+  const [override, setOverride] = React.useState<boolean>(true);
 
 
   const { projects, currentProject } = useSelector(selectWorkspaceState);
@@ -116,12 +126,12 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
   const [results, setResults] = useState<InventoryKnowledgeExtraction>(null)
   const [selected, setSelected] = React.useState<string[]>([]);
 
-  const onPreviewHandler = async () => {
+  const preview = async () => {
     const set = new Set(selected);
     const projectsSelected = items.filter((r) => set.has(r.uuid));
 
     const response = await projectService.extractInventoryKnowledge({
-      override: true,
+      override,
       folder: params?.folder,
       md5File: params?.md5File,
       source: [...projectsSelected],
@@ -133,20 +143,20 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    const dialog = await dialogCtrl.createProgressDialog(t('ImportingIdentifications'));
+    const dialog = await dialogCtrl.createProgressDialog(t('Title:ImportingIdentifications'));
     try {
       dialog.present();
-      const response = await projectService.acceptInventoryKnowledge({
+      await dispatch(acceptInventoryKnowledge({
         inventoryKnowledgeExtraction: results,
-        overwrite: false,
-        type:InventorySourceType.PATH,
+        overwrite: override,
+        type: InventorySourceType.PATH,
         path: params?.folder
-      })
+      }))
+      onClose({ });
     } catch (e) {
       console.log(e);
     } finally {
       dialog.dismiss();
-      onClose({ response });
     }
   };
 
@@ -155,7 +165,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
   };
 
   const handleNext = async () => {
-    await onPreviewHandler();
+    await preview();
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
@@ -164,9 +174,12 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
   };
 
   const isValid = () => {
-    // return checked.length > 0;
-    return true;
+    return results && Object.keys(results).length;
   };
+
+  useEffect(() => {
+    if (activeStep !== 0 ) preview()
+  }, [override])
 
   return (
     <Dialog
@@ -187,7 +200,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
 
       <DialogContent>
         {isFilterActive && (
-          <Alert className="mt-1 mb-1" severity="info">
+          <Alert className="mt-1 mb-3" severity="info">
             {t('ActionCurrentFilterCriteria')}
           </Alert>
         )}
@@ -229,6 +242,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
               hideFooter
               checkboxSelection
               headerHeight={41}
+              selectionModel={selected}
               onSelectionModelChange={onSelectionHandler}
             />
           </div>
@@ -238,19 +252,37 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
         {activeStep === 1 && (
           <Grid >
               <div className="list-container">
-                <TableContainer className="results-table selectable" component={Paper}>
-                  <Table className={classes.dataResults} stickyHeader size="small" aria-label="results table">
+
+                <header className="d-flex space-between mt-1">
+                  <div className="ml-2 font-medium">{t('NProjectsSelected', { count: selected.length})}</div>
+                  <FormControlLabel
+                    className="override-toggle-switch ml-1 mb-2"
+                    control={
+                      <Switch
+                        onChange={(e) => setOverride(e.target.checked)}
+                        disabled={isFilterActive}
+                        checked={override}
+                        size="small"
+                        color="primary"
+                      />
+                    }
+                    label={<small>{t('OverridePreviousWork')}</small>}
+                  />
+                </header>
+
+                <TableContainer className={classes.dataResults} component={Paper}>
+                  <Table stickyHeader size="small" aria-label="results table">
                     <TableHead>
                       <TableRow>
                         <TableCell>{t('Table:Header:LocalFile')}</TableCell>
                         <TableCell>{t('Table:Header:Component')}</TableCell>
-                        <TableCell>{t('Table:Header:Purl')}</TableCell>
+                        <TableCell>{t('Table:Header:PURL')}</TableCell>
                         <TableCell>{t('Table:Header:Version')}</TableCell>
                         <TableCell>{t('Table:Header:License')}</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                       {results && Object.keys(results).map((key) => (
+                       {isValid() ? Object.keys(results).map((key) => (
                         results[key].inventories.map( inv => (
                           <TableRow key={key}>
                             <TableCell>{results[key].localFiles.map(function (f) {
@@ -266,7 +298,15 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
                             <TableCell>{inv.licenseName}</TableCell>
                           </TableRow>
                         ))
-                      ))}
+                      )) : (
+                          <TableRow>
+                            <TableCell colSpan={5}>
+                              <p className="text-center">
+                                {t('Title:NoMatchFound')}
+                              </p>
+                            </TableCell>
+                          </TableRow>
+                       )}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -277,23 +317,23 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
         <hr className="divider" />
 
         <form onSubmit={onSubmit}>
-          <div className="button-container">
 
             { activeStep === 0 && (
-              <Button type="button" variant="contained" color="secondary" onClick={handleNext}>
-                {t('Button:Next')}
-              </Button>
+              <div className="button-container">
+                <Button type="button" variant="contained" color="secondary" onClick={handleNext}>
+                  {t('Button:Next')}
+                </Button>
+              </div>
             )}
 
             { activeStep === 1 && (
-              <>
-                <Button color="inherit" tabIndex={-1} onClick={handleBack}>{t('Button:Back')}</Button>
-                <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
-                  {t('Button:Import')}
-                </Button>
-              </>
+              <div className="button-container space-between">
+                  <Button className="ml-0" color="inherit" tabIndex={-1} onClick={handleBack}>{t('Button:Back')}</Button>
+                  <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
+                    {t('Button:Import')}
+                  </Button>
+              </div>
               )}
-          </div>
         </form>
       </DialogContent>
     </Dialog>

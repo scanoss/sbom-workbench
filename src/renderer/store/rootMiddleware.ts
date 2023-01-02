@@ -1,5 +1,6 @@
 import { createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
 import {
+  acceptInventoryKnowledge,
   attachFile,
   createInventory,
   deleteInventory,
@@ -7,7 +8,7 @@ import {
   executeBatch,
   ignoreFile,
   restoreFile,
-  updateInventory,
+  updateInventory
 } from '@store/inventory-store/inventoryThunks';
 import { RootState } from '@store/rootReducer';
 import { fetchComponent, fetchComponents } from '@store/component-store/componentThunks';
@@ -31,6 +32,7 @@ rootMiddleware.startListening({
     ignoreFile.fulfilled,
     restoreFile.fulfilled,
     executeBatch.fulfilled,
+    acceptInventoryKnowledge.fulfilled,
     load // this is a workaround for the fact that still has setFilter on WorkbenchContext
   ),
   effect: async (action, listenerApi) => {
