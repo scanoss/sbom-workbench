@@ -63,5 +63,9 @@
   "ScannerSettings": "Scanner Settings",
   "Status": "Status",
   "OnlineComponentSearch": "Online Component Search",
-  "CreateComponent": "Create Component"
+  "CreateComponent": "Create Component",
+  "SelectProjects": "Select Projects",
+  "PreviewIdentifications": "Preview Identifications",
+  "ImportingIdentifications": "Importing Identifications",
+  "ImportFromProjects": "Import from Projects"
 }

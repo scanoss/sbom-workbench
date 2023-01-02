@@ -84,5 +84,6 @@
   "DecompressArchivesHint": "This option will decompress archives into project folder",
   "FileNotLoad": "File could not be loaded",
   "RemoteFileNotLoad" : "Remote source file could not be loaded",
-  "FileTypeNotSupported": "File type not supported for viewing"
+  "FileTypeNotSupported": "File type not supported for viewing",
+  "OverridePreviousWork": "Override previous work"
 }

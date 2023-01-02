@@ -1,7 +1,14 @@
-import { IBatchInventory, Inventory, InventoryAction } from '@api/types';
+import {
+  IBatchInventory,
+  Inventory,
+  InventoryAction,
+  InventorySourceType,
+  ReuseIdentificationTaskDTO
+} from '@api/types';
 import { inventoryService } from '@api/services/inventory.service';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { fileService } from '@api/services/file.service';
+import { projectService } from '@api/services/project.service';
 
 export const createInventory = createAsyncThunk('inventory/create', async (inventory: Inventory, { dispatch }) => {
   const response = await inventoryService.create(inventory);
@@ -40,6 +47,11 @@ export const restoreFile = createAsyncThunk('inventory/restore', async (files: n
   const response = await inventoryService.detach({ files });
   return response;
 });
+
+export const acceptInventoryKnowledge = createAsyncThunk('inventory/acceptInventoryKnowledge', async (params: ReuseIdentificationTaskDTO, { dispatch }) => {
+ const response =  await projectService.acceptInventoryKnowledge(params)
+  return response;
+})
 
 export const executeBatch = createAsyncThunk(
   'inventory/executeBatch',
