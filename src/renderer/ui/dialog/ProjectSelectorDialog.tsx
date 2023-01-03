@@ -260,7 +260,6 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
                     control={
                       <Switch
                         onChange={(e) => setOverride(e.target.checked)}
-                        disabled={isFilterActive}
                         checked={override}
                         size="small"
                         color="primary"
