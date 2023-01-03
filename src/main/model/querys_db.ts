@@ -213,11 +213,11 @@ WHERE f.fileId IN (SELECT fileId FROM results) OR f.fileId IN (SELECT fileId FRO
   GROUP BY r.purl, r.version;`;
   SQL_GET_ALL_COMPONENTS = `SELECT DISTINCT vendor.vendor,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id,comp.source,comp.reliableLicense
   FROM
-  (SELECT DISTINCT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id, comp.source, comp.reliableLicense FROM components AS comp
+  (SELECT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id, comp.source, comp.reliableLicense FROM components AS comp
   LEFT JOIN results r ON r.purl=comp.purl AND r.version = comp.version LEFT JOIN files f ON f.fileId=r.fileId
   LEFT JOIN license_view lic ON comp.id=lic.cvid
   #FILTER ) AS comp LEFT JOIN
-  (SELECT DISTINCT r.vendor,r.purl FROM results r) AS vendor ON comp.purl=vendor.purl;`;
+  (SELECT DISTINCT r.vendor,r.purl ,r.version FROM results r) AS vendor ON comp.purl = vendor.purl AND comp.version = vendor.version;`;
 
   SQL_GET_OVERRIDE_COMPONENTS = `SELECT DISTINCT cv.purl AS overridePurl,cv.name AS overrideName,r.component,i.id,r.purl AS matchedPurl FROM results r
   INNER JOIN files f ON r.fileId=f.fileId INNER JOIN file_inventories fi ON fi.fileId=f.fileId
