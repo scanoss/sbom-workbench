@@ -42,11 +42,16 @@ export class ProjectKnowledgeExtractor {
    * */
   private async getFilesToProcess(): Promise<Array<string>> {
     const globalFilter = workspace.getOpenProject().getGlobalFilter();
-    let filesToProcess = await modelProvider.model.result.getAll(QueryBuilderCreator.create({
-      ...globalFilter,
-      path: this.projectKnowledgeExtractor.folder,
-      status: this.projectKnowledgeExtractor.override ? globalFilter?.status : FileStatusType.PENDING,
-    }));
+
+
+    let filesToProcess = !this.projectKnowledgeExtractor.override && (globalFilter?.status === FileStatusType.IDENTIFIED || globalFilter?.status === FileStatusType.ORIGINAL)
+      ? []
+      : await modelProvider.model.result.getAll(QueryBuilderCreator.create({
+        ...globalFilter,
+        path: this.projectKnowledgeExtractor.folder,
+        status: this.projectKnowledgeExtractor.override ? globalFilter?.status : FileStatusType.PENDING,
+      }));
+
     filesToProcess = filesToProcess.map((f) => f.path);
     return filesToProcess;
   }
