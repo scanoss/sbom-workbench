@@ -22,7 +22,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import {
   InventoryKnowledgeExtraction,
   InventorySourceType,
-  IProject,
+  IProject, ScanState
 } from '@api/types';
 import { projectService } from '@api/services/project.service';
 import { DialogContext } from '@context/DialogProvider';
@@ -154,7 +154,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
   const { isFilterActive } = useSelector(selectNavigationState);
   const projectsList = useRef<IProject[]>(
     projects
-      .filter((item) => item.uuid !== currentProject?.uuid)
+      .filter((item) => item.uuid !== currentProject?.uuid && item.scannerState === ScanState.FINISHED)
       .map((item) => ({...item, id: item.uuid}))
       .sort((a, b) => a.name - b.name)
   );

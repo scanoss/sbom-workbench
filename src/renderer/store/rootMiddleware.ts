@@ -1,4 +1,4 @@
-import { createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
+import { createListenerMiddleware, current, isAnyOf } from '@reduxjs/toolkit';
 import {
   acceptInventoryKnowledge,
   attachFile,
@@ -18,6 +18,7 @@ import * as component from '@store/component-store/componentSlice';
 import * as navigation from '@store/navigation-store/navigationSlice';
 import { loadProject } from '@store/workbench-store/workbenchThunks';
 import { accept, getAll, reject, rejectAll, restore } from '@store/dependency-store/dependencyThunks';
+import { setCurrentProject } from './workspace-store/workspaceSlice';
 
 export const rootMiddleware = createListenerMiddleware();
 
@@ -47,6 +48,17 @@ rootMiddleware.startListening({
     }
   },
 });
+
+rootMiddleware.startListening({
+  matcher: isAnyOf(loadProject.fulfilled),
+  effect: async (action, listenerApi) => {
+    const state = listenerApi.getState() as RootState;
+    const currentProject = state.workspace.projects.find((p) => p.work_root === action.payload.projectRoot);
+    listenerApi.dispatch(setCurrentProject(currentProject));
+
+    console.log(action, state, currentProject);
+  }
+})
 
 rootMiddleware.startListening({
   matcher: isAnyOf(
