@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
-  Button,
+  Button, CircularProgress,
   Dialog,
   DialogContent, FormControlLabel,
   Grid,
@@ -8,20 +8,15 @@ import {
   Paper,
   Step,
   StepLabel,
-  Stepper, Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow
+  Stepper,
+  Switch
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Alert from '@mui/material/Alert';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import CloseIcon from '@mui/icons-material/Close';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 import { DataGrid } from '@mui/x-data-grid';
 import {
@@ -32,7 +27,16 @@ import {
 import { projectService } from '@api/services/project.service';
 import { DialogContext } from '@context/DialogProvider';
 import { acceptInventoryKnowledge } from '@store/inventory-store/inventoryThunks';
+import useApi from '@hooks/useApi';
+import {
+  AutoSizer,
+  Column,
+  Table,
+  TableHeaderProps,
+} from 'react-virtualized';
 import IconComponent from '../../features/workbench/components/IconComponent/IconComponent';
+
+
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -54,6 +58,25 @@ const useStyles = makeStyles((theme) => ({
   left: {
     height: '100%',
   },
+
+  headerColumn: {
+    fontWeight: 600,
+    fontSize: '0.875rem',
+    lineHeight: '1.5rem',
+    color: 'rgba(0, 0, 0, 0.87)',
+    textTransform: 'capitalize',
+    height: '100%',
+    alignItems: 'center',
+    display: 'flex',
+  },
+
+  row: {
+    fontWeight: 400,
+    fontSize: '0.75rem',
+    borderBottom: '1px solid rgba(224, 224, 224, 1)',
+    color: 'rgba(0, 0, 0, 0.87)',
+  },
+
   dataGrid: {
     border: 0,
 
@@ -72,9 +95,20 @@ const useStyles = makeStyles((theme) => ({
       border: 0,
       outline: '0 !important',
     },
+
   },
   dataResults: {
     maxHeight: 250,
+
+    '& .file-cell': {
+      width: 300,
+      display: 'flex',
+    },
+
+    '& .file': {
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+    },
 
     '& .component-name-cell': {
       display: 'flex',
@@ -107,6 +141,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
   const dialogCtrl = useContext<any>(DialogContext);
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  const { data, error, loading, execute } = useApi<InventoryKnowledgeExtraction>();
 
   const { open,  params, onClose, onCancel } = props;
 
@@ -117,28 +152,27 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
 
   const { projects, currentProject } = useSelector(selectWorkspaceState);
   const { isFilterActive } = useSelector(selectNavigationState);
-  const [items, setItems] = useState<IProject[]>(
+  const projectsList = useRef<IProject[]>(
     projects
-      .filter((item) => item.uuid !== currentProject.uuid)
+      .filter((item) => item.uuid !== currentProject?.uuid)
       .map((item) => ({...item, id: item.uuid}))
       .sort((a, b) => a.name - b.name)
   );
-  const [results, setResults] = useState<InventoryKnowledgeExtraction>(null)
+
   const [selected, setSelected] = React.useState<string[]>([]);
+  const [items, setItems] = React.useState<any[]>([]);
 
   const preview = async () => {
     const set = new Set(selected);
-    const projectsSelected = items.filter((r) => set.has(r.uuid));
+    const projectsSelected = projectsList.current.filter((r) => set.has(r.uuid));
 
-    const response = await projectService.extractInventoryKnowledge({
+    await execute( () => projectService.extractInventoryKnowledge({
       override,
       folder: params?.folder,
       md5File: params?.md5File,
       source: [...projectsSelected],
       target: {...currentProject},
-    });
-
-    setResults(response)
+    }))
   }
 
   const onSubmit = async (e) => {
@@ -147,7 +181,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
     try {
       dialog.present();
       await dispatch(acceptInventoryKnowledge({
-        inventoryKnowledgeExtraction: results,
+        inventoryKnowledgeExtraction: data,
         overwrite: override,
         type: InventorySourceType.PATH,
         path: params?.folder
@@ -174,8 +208,21 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
   };
 
   const isValid = () => {
-    return results && Object.keys(results).length;
+    return data && Object.keys(data).length && !loading;
   };
+
+  useEffect(() => {
+    const newItems = [];
+    if (data) {
+      Object.keys(data).forEach(key => {
+        data[key].inventories.forEach(inv => {
+          newItems.push({key, files: data[key].localFiles.join(', '), ...inv})
+        });
+      });
+    }
+    setItems(newItems);
+
+  }, [data]);
 
   useEffect(() => {
     if (activeStep !== 0 ) preview()
@@ -226,7 +273,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
           <div className={`${classes.left}`}>
             <DataGrid
               className={classes.dataGrid}
-              rows={items}
+              rows={projectsList.current}
               columns={[
                 {
                   field: 'name',
@@ -255,60 +302,53 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
 
                 <header className="d-flex space-between mt-1">
                   <div className="ml-2 font-medium">{t('NProjectsSelected', { count: selected.length})}</div>
-                  <FormControlLabel
-                    className="override-toggle-switch ml-1 mb-2"
-                    control={
-                      <Switch
-                        onChange={(e) => setOverride(e.target.checked)}
-                        checked={override}
-                        size="small"
-                        color="primary"
-                      />
-                    }
-                    label={<small>{t('OverridePreviousWork')}</small>}
-                  />
+
+                  <div>
+                    <FormControlLabel
+                      className="override-toggle-switch ml-1 mb-2"
+                      control={
+                        <Switch
+                          onChange={(e) => setOverride(e.target.checked)}
+                          checked={override}
+                          size="small"
+                          color="primary"
+                        />
+                      }
+                      label={<small>{t('OverridePreviousWork')}</small>}
+                    />
+                  </div>
                 </header>
 
-                <TableContainer className={classes.dataResults} component={Paper}>
-                  <Table stickyHeader size="small" aria-label="results table">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>{t('Table:Header:LocalFile')}</TableCell>
-                        <TableCell>{t('Table:Header:Component')}</TableCell>
-                        <TableCell>{t('Table:Header:PURL')}</TableCell>
-                        <TableCell>{t('Table:Header:Version')}</TableCell>
-                        <TableCell>{t('Table:Header:License')}</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                       {isValid() ? Object.keys(results).map((key) => (
-                        results[key].inventories.map( inv => (
-                          <TableRow key={key}>
-                            <TableCell>{results[key].localFiles.map(function (f) {
-                              return f; }).join(", ")}</TableCell>
-                            <TableCell>
-                              <div className="component-name-cell" title={inv.name}>
-                                <IconComponent name={inv.name} size={24} />
-                                <h3>{inv.name}</h3>
-                              </div>
-                            </TableCell>
-                            <TableCell>{inv.purl}</TableCell>
-                            <TableCell>{inv.version}</TableCell>
-                            <TableCell>{inv.licenseName}</TableCell>
-                          </TableRow>
-                        ))
-                      )) : (
-                          <TableRow>
-                            <TableCell colSpan={5}>
-                              <p className="text-center">
-                                {t('Title:NoMatchFound')}
-                              </p>
-                            </TableCell>
-                          </TableRow>
-                       )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                <Paper style={{ height: 250, width: '100%', overflow: 'hidden' }}>
+                  <>
+                  <AutoSizer>
+                  {({ height, width }) => (
+                    <Table
+                      height={height}
+                      width={width}
+                      rowHeight={28}
+                      headerHeight={40}
+                      rowCount={items.length}
+                      rowGetter={({index}) => items[index]}
+                      headerClassName={classes.headerColumn}
+                      rowClassName={classes.row}
+                    >
+                      <Column label={t('Table:Header:LocalFile')} dataKey="files" width={250} flexGrow={0} flexShrink={0} />
+                      <Column label={t('Table:Header:Component')} dataKey="name" width={100} flexGrow={0} flexShrink={0} />
+                      <Column label={t('Table:Header:PURL')} dataKey="purl" />
+                      <Column label={t('Table:Header:Version')} dataKey="version" width={70} flexGrow={0} flexShrink={0}/>
+                      <Column label={t('Table:Header:License')} dataKey="spdxid"  width={70} flexGrow={0} flexShrink={0} />
+                    </Table>
+                  )}
+                  </AutoSizer>
+
+                  {items.length === 0 &&
+                      <div className="text-center mt-10 pt-10">
+                        {t('Title:NoMatchFound')}
+                      </div>
+                  }
+                  </>
+                </Paper>
               </div>
           </Grid>
         )}
@@ -319,7 +359,8 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
 
             { activeStep === 0 && (
               <div className="button-container">
-                <Button type="button" variant="contained" color="secondary" onClick={handleNext}>
+                <Button type="button" variant="contained" color="secondary" onClick={handleNext} disabled={loading || selected.length === 0}>
+                  { loading && <CircularProgress className="mr-2" size={18} /> }
                   {t('Button:Next')}
                 </Button>
               </div>
