@@ -29,7 +29,9 @@ export const workspaceSlice = createSlice({
     },
     setScanPath: (state, action: PayloadAction<IScan>) => {
       state.scanPath = action.payload;
-      state.currentProject = current(state).projects.find((p) => p.work_root === action.payload.path);
+    },
+    setCurrentProject: (state, action: PayloadAction<IProject>) => {
+      state.currentProject = action.payload
     },
   },
   extraReducers: {
@@ -44,7 +46,7 @@ export const workspaceSlice = createSlice({
 });
 
 // actions
-export const { setNewProject, setScanPath } = workspaceSlice.actions;
+export const { setNewProject, setScanPath, setCurrentProject } = workspaceSlice.actions;
 
 // selectors
 export const selectWorkspaceState = (state: RootState) => state.workspace;
