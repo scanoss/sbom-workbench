@@ -62,6 +62,7 @@ export default class File extends Node {
 
   public restoreStatus(path: string) {
     if (this.getPath() !== path) return;
+    if(this.isDependencyFile) return;
     if (this.getAction() === 'filter') {
       this.status = NodeStatus.FILTERED;
       this.setStatusOnClassnameAs(this.status);
