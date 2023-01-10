@@ -1,13 +1,10 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import * as fs from 'fs';
 import log from 'electron-log';
 import { Project } from './Project';
 import { INewProject, IProject, License, ProjectState } from '../../api/types';
-import { licenses } from '../../../assets/data/licenses';
+import { License as LicenseModel } from '../model/entity/License';
 import { ProjectFilter } from './filters/ProjectFilter';
-import { Scanner } from '../task/scanner/types';
-import { WorkspaceMigration } from '../migration/WorkspaceMigration';
-import { userSettingService } from '../services/UserSettingService';
+import { modelProvider } from '../services/ModelProvider';
 
 class Workspace {
   private projectList: Array<Project>;
@@ -20,7 +17,8 @@ class Workspace {
 
   public async read(workspacePath: string) {
     this.wsPath = workspacePath;
-    await this.initWorkspaceFileSystem();
+    this.initWorkspaceFileSystem();
+    await modelProvider.initWorkspaceModel(workspacePath);
     log.transports.file.resolvePath = () => `${this.wsPath}/ws.log`;
     // if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes
     log.info(`%c[ WORKSPACE ]: Reading projects....`, 'color: green');
@@ -158,7 +156,7 @@ class Workspace {
     return this.projectList.length - 1;
   }
 
-  private async initWorkspaceFileSystem() {
+  private initWorkspaceFileSystem() {
     if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
   }
 
@@ -182,8 +180,10 @@ class Workspace {
     return projectPaths;
   }
 
-  public getLicenses(): Array<License> {
-    return licenses;
+  public async getLicenses(): Promise<Array<License>> {
+    const licenses  = await LicenseModel.findAll();
+    const licensesDTO = licenses.map((l) => ({...{id:l.id, name:l.name, url:l.url, fulltext:l.spdxid, spdxid:l.spdxid} as  License}) )
+    return licensesDTO;
   }
 
   public async createProject(projectDTO: INewProject): Promise<Project> {

@@ -99,6 +99,7 @@ const ProjectSettings = () => {
 
   const init = async () => {
     const data = await workspaceService.getLicenses();
+    console.log(data);
     setLicenses(data);
 
     const apiUrlKey = await userSettingService.get();
