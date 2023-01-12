@@ -11,13 +11,16 @@ export class ProjectKnowledgeModel {
   }
 
   private async openDb(): Promise<sqlite3.database> {
-    const db: sqlite3.database = new sqlite3.Database(this.sourceProject,
-      sqlite3.OPEN_READWRITE);
-    const call = util.promisify(db.run.bind(db));
-    await call.bind("PRAGMA journal_mode = WAL;");
-    await call.bind("PRAGMA synchronous = OFF");
-    await call.bind("PRAGMA foreign_keys = ON;")
-    return db;
+    return new Promise((resolve, reject) => {
+      const conn =  new sqlite3.Database(this.sourceProject,
+        sqlite3.OPEN_READWRITE,function(err){
+          if(err)reject(err);
+          conn.run("PRAGMA journal_mode = WAL;");
+          conn.run("PRAGMA synchronous = OFF");
+          conn.run("PRAGMA foreign_keys = ON;");
+          resolve(conn);
+        });
+    });
   }
 
   public async extractProjectInventoryData(projectPath: string,filesToProcess:Array<string>, md5File = null){
