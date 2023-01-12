@@ -37,7 +37,7 @@ rootMiddleware.startListening({
     load // this is a workaround for the fact that still has setFilter on WorkbenchContext
   ),
   effect: async (action, listenerApi) => {
-    const state = listenerApi.getState() as RootState;
+    const state: RootState = listenerApi.getState() as RootState;
 
     const summary = await reportService.getSummary();
     listenerApi.dispatch(setProgress(summary));
@@ -55,8 +55,6 @@ rootMiddleware.startListening({
     const state = listenerApi.getState() as RootState;
     const currentProject = state.workspace.projects.find((p) => p.work_root === action.payload.projectRoot);
     listenerApi.dispatch(setCurrentProject(currentProject));
-
-    console.log(action, state, currentProject);
   }
 })
 
