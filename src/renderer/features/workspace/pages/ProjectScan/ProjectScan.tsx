@@ -8,6 +8,7 @@ import { projectService } from '@api/services/project.service';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
 import { useTranslation } from 'react-i18next';
+import { fetchProjects } from '@store/workspace-store/workspaceThunks';
 import * as controller from '../../../../controllers/home-controller';
 import CircularComponent from '../Components/CircularComponent';
 
@@ -90,7 +91,8 @@ const ProjectScan = () => {
     // window.electron.ipcRenderer.send(IpcEvents.PROJECT_STOP);
   };
 
-  const handlerScannerFinish = (e, args) => {
+  const handlerScannerFinish = async (e, args) => {
+    await dispatch(fetchProjects());
     if (args.success) {
       onShowScan(args.resultsPath);
     }

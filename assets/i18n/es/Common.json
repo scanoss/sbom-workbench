@@ -86,5 +86,6 @@
   "FileNotLoad": "El fichero no pudo ser cargado",
   "RemoteFileNotLoad" : "Fichero remoto del componente no pudo ser cargado",
   "FileTypeNotSupported": "Tipo de fichero no soportado para visualización",
-  "OverridePreviousWork": "Sobreescribir trabajo previo"
+  "OverridePreviousWork": "Sobreescribir trabajo previo",
+  "ChooseProjectToImport": "Seleccione un proyecto"
 }

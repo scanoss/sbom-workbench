@@ -57,6 +57,7 @@ const useStyles = makeStyles((theme) => ({
   },
   left: {
     height: '100%',
+    marginBottom: -5,
   },
 
   headerColumn: {
@@ -145,7 +146,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
 
   const { open,  params, onClose, onCancel } = props;
 
-  const steps = [t('Title:SelectProjects'), t('Title:PreviewIdentifications')];
+  const steps = [t('Title:SelectProject'), t('Title:PreviewIdentifications')];
   const [activeStep, setActiveStep] = React.useState(0);
   const [override, setOverride] = React.useState<boolean>(true);
 
@@ -159,18 +160,15 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
       .sort((a, b) => a.name - b.name)
   );
 
-  const [selected, setSelected] = React.useState<string[]>([]);
+  const [selected, setSelected] = React.useState<IProject[]>([]);
   const [items, setItems] = React.useState<any[]>([]);
 
   const preview = async () => {
-    const set = new Set(selected);
-    const projectsSelected = projectsList.current.filter((r) => set.has(r.uuid));
-
     await execute( () => projectService.extractInventoryKnowledge({
       override,
       folder: params?.folder,
       md5File: params?.md5File,
-      source: [...projectsSelected],
+      source: [...selected],
       target: {...currentProject},
     }))
   }
@@ -195,7 +193,9 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
   };
 
   const onSelectionHandler = (data, details) => {
-    setSelected(data);
+    const set = new Set(data);
+    const projectsSelected = projectsList.current.filter((r) => set.has(r.uuid));
+    setSelected(projectsSelected);
   };
 
   const handleNext = async () => {
@@ -277,7 +277,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
               columns={[
                 {
                   field: 'name',
-                  headerName: t('NProjectsSelected', { count: selected.length}),
+                  headerName:  t('ChooseProjectToImport'), /* t('NProjectsSelected', { count: selected.length}) */
                   editable: false,
                   sortable: false,
                   flex: 1,
@@ -287,9 +287,9 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
               disableColumnMenu
               rowsPerPageOptions={[100]}
               hideFooter
-              checkboxSelection
+              checkboxSelection={false}
               headerHeight={41}
-              selectionModel={selected}
+              selectionModel={selected.map(r => r.uuid)}
               onSelectionModelChange={onSelectionHandler}
             />
           </div>
@@ -301,8 +301,8 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
               <div className="list-container">
 
                 <header className="d-flex space-between mt-1">
-                  <div className="ml-2 font-medium">{t('NProjectsSelected', { count: selected.length})}</div>
-
+                  {/* <div className="ml-2 font-medium">{t('NProjectsSelected', { count: selected.length})}</div> */}
+                  <div className="ml-2 font-medium"><small>Matches from <span className="color-primary">{selected[0].name}</span></small></div>
                   <div>
                     <FormControlLabel
                       className="override-toggle-switch ml-1 mb-2"
@@ -356,25 +356,31 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
         <hr className="divider" />
 
         <form onSubmit={onSubmit}>
-
-            { activeStep === 0 && (
-              <div className="button-container">
-                <Button type="button" variant="contained" color="secondary" onClick={handleNext} disabled={loading || selected.length === 0}>
-                  { loading && <CircularProgress className="mr-2" size={18} /> }
-                  {t('Button:Next')}
-                </Button>
-              </div>
-            )}
-
-            { activeStep === 1 && (
               <div className="button-container space-between">
-                  <Button className="ml-0" color="inherit" tabIndex={-1} onClick={handleBack}>{t('Button:Back')}</Button>
-                  <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
-                    {t('Button:Import')}
-                  </Button>
+                <Button className="ml-0"  color="inherit" tabIndex={-1} onClick={onCancel}>
+                  {t('Button:Cancel')}
+                </Button>
+
+                <div>
+                  { activeStep === 0 && (
+                    <Button type="button" variant="contained" color="secondary" onClick={handleNext} disabled={loading || selected.length === 0}>
+                      { loading && <CircularProgress className="mr-2" size={18} /> }
+                      {t('Button:Next')}
+                    </Button>
+                  )}
+
+                  { activeStep === 1 && (
+                    <>
+                      <Button className="ml-0" color="inherit" tabIndex={-1} onClick={handleBack}>{t('Button:Back')}</Button>
+                      <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
+                        {t('Button:Import')}
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
-              )}
         </form>
+
       </DialogContent>
     </Dialog>
   );
