@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+      "experimentalDecorators": true,
     "incremental": true,
     "target": "es2021",
     "module": "commonjs",
@@ -33,7 +34,7 @@
     },
      /* Module Resolution Options */
      "noImplicitAny": false,
-     "strictNullChecks": false,
+     "strictNullChecks": false
   },
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
 }

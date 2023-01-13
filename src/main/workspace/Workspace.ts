@@ -1,15 +1,23 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import * as fs from 'fs';
 import log from 'electron-log';
+import { Sequelize } from 'sequelize-typescript';
+import { app } from 'electron';
+import path from 'path';
 import { Project } from './Project';
 import { INewProject, IProject, License, ProjectState } from '../../api/types';
-import { licenses } from '../../../assets/data/licenses';
+import { License as LicenseModel } from '../model/ORModel/License';
 import { ProjectFilter } from './filters/ProjectFilter';
-import { Scanner } from '../task/scanner/types';
-import { WorkspaceMigration } from '../migration/WorkspaceMigration';
-import { userSettingService } from '../services/UserSettingService';
+import { modelProvider } from '../services/ModelProvider';
+import { toEntity } from '../adapters/modelAdapter'
+import { Model } from '../model/Model';
+import { Version } from '../model/ORModel/Version';
+import { Component } from '../model/ORModel/Component';
+import { LicenseVersion } from '../model/ORModel/LicenseVersion';
 
 class Workspace {
+
+  private  readonly  WORKSPACE_MODEL: string = 'workspace.sqlite3';
+
   private projectList: Array<Project>;
 
   private wsPath: string;
@@ -18,9 +26,13 @@ class Workspace {
     this.projectList = [];
   }
 
-  public async read(workspacePath: string) {
-    this.wsPath = workspacePath;
-    await this.initWorkspaceFileSystem();
+  public async init(workspacePath: string) {
+    this.wsPath =  workspacePath;
+    this.initWorkspaceFileSystem();
+    await this.initWorkspaceModel();
+  }
+
+  public async read() {
     log.transports.file.resolvePath = () => `${this.wsPath}/ws.log`;
     // if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes
     log.info(`%c[ WORKSPACE ]: Reading projects....`, 'color: green');
@@ -158,8 +170,39 @@ class Workspace {
     return this.projectList.length - 1;
   }
 
-  private async initWorkspaceFileSystem() {
+  private initWorkspaceFileSystem() {
     if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
+  }
+
+  private async initWorkspaceModel(): Promise<void>{
+    if (!fs.existsSync(`${this.wsPath}/${this.WORKSPACE_MODEL}`)){
+      await new Model().createDb(`${this.wsPath}/${this.WORKSPACE_MODEL}`);
+      const sequelize = await this.initORM();
+      await sequelize.sync({force: false});
+      await this.importGlobalLicenses();
+      modelProvider.workspaceModel = sequelize;
+      return;
+    }
+    await this.initORM();
+  }
+
+  private async initORM(): Promise<Sequelize> {
+    const sequelize = new Sequelize({
+      database: this.WORKSPACE_MODEL,
+      dialect: 'sqlite',
+      logging: false,
+      storage: `${this.wsPath}/${this.WORKSPACE_MODEL}`,
+    });
+    await sequelize.addModels([LicenseModel,Version,Component,LicenseVersion]);
+    return sequelize;
+  }
+
+  private async importGlobalLicenses() {
+      const RESOURCES_PATH = app.isPackaged
+        ? path.join(process.resourcesPath, 'assets/data/licenses.json')
+        : path.join(__dirname, '../../../assets/data/licenses.json');
+      const licenses = await fs.promises.readFile(RESOURCES_PATH, 'utf-8');
+      await LicenseModel.bulkCreate(JSON.parse(licenses));
   }
 
   private async getAllProjectsPaths() {
@@ -182,8 +225,9 @@ class Workspace {
     return projectPaths;
   }
 
-  public getLicenses(): Array<License> {
-    return licenses;
+  public async getLicenses(): Promise<Array<License>> {
+    const licenses  = await LicenseModel.findAll();
+    return toEntity<Array<License>>(licenses);
   }
 
   public async createProject(projectDTO: INewProject): Promise<Project> {

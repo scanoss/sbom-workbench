@@ -65,7 +65,6 @@ class UserSettingService {
   public getDefault(): IWorkspaceCfg {
     return this.defaultStore;
   }
-
   public async read(path: string) {
     try {
       this.setMyPath(path);

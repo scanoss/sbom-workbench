@@ -3,9 +3,9 @@
 /* eslint-disable func-names */
 import log from 'electron-log';
 import sqlite3 from 'sqlite3';
+import util from 'util';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Querys } from './querys_db';
-import util from 'util';
 
 
 const query = new Querys();
@@ -15,32 +15,36 @@ export class Model {
 
   public static readonly entityMapper = {};
 
-  constructor(path: string) {
-    this.dbPath = `${path}/scan_db`;
-  }
-  public async init() {
-    try {
-      const success = await this.scanCreateDb();
-      if (success) return true;
-    } catch (error) {
-      return error;
-    }
-    return false;
+
+
+  public async init(path:string): Promise<void> {
+    this.dbPath = path;
+    await this.createDb(path);
+    await this.createTables();
+    await this.createViews();
   }
 
+  private async createTables(){
+    const db = await this.openDb();
+    await new Promise<void>( (resolve, reject) => {
+      db.exec(query.SQL_DB_TABLES, async () => {
+        db.close();
+        resolve();
+      });
+    });
+  }
+
+
+
   // CREATE A NEW SCAN DB
-  private scanCreateDb() {
-    return new Promise((resolve, reject) => {
-      const db = new sqlite3.Database(this.dbPath, (err: any) => {
-        if (err) {
+  public createDb(path: string) {
+    return new Promise<void>((resolve, reject) => {
+      const db = new sqlite3.Database(path, (err: any) => {
+        if (err) {// TODO: Check if it is necessary the return statment
           reject(new Error('Unable to create DB'));
-        } else {
-          db.exec(query.SQL_DB_TABLES,async () => {
-            db.close();
-            await this.createViews();
-            resolve(true);
-          });
+          return;
         }
+        resolve();
       });
     });
   }
@@ -64,6 +68,7 @@ export class Model {
       );
     });
   }
+
   private async createViews(): Promise<void> {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
@@ -80,9 +85,11 @@ export class Model {
           `);
     db.close();
   }
+
   public getEntityMapper():Record<string,string>{
     return Model.entityMapper;
   }
+
   public getSQL(queryBuilder:QueryBuilder , SQLquery:string, entityMapper:Record<string,string>){
     let SQL = SQLquery;
     const filter = queryBuilder?.getSQL(entityMapper)

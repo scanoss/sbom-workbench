@@ -188,7 +188,8 @@ app
 
 async function init() {
   const root = `${os.homedir()}/${AppConfig.DEFAULT_WORKSPACE_NAME}`;
-  await workspace.read(root);
+  await workspace.init(root);
+  await workspace.read();
   await userSettingService.read(root);
   await userSettingService.update();
 }
