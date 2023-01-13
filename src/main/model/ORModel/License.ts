@@ -1,9 +1,10 @@
 import { Table, Column, Model, DataType, BelongsToMany } from 'sequelize-typescript';
+import { License as LicenseEntity } from '@api/types'
 import { Version } from './Version';
 import { LicenseVersion } from './LicenseVersion';
 
 @Table({tableName:'License', modelName:'License'})
-export class License extends Model {
+export class License  extends Model implements LicenseEntity {
 
   @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})
   id: number;
@@ -22,7 +23,5 @@ export class License extends Model {
 
   @BelongsToMany(() => Version, () => LicenseVersion)
   versions: Version[];
-
-
 
 }

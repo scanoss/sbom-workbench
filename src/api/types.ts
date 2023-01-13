@@ -70,7 +70,7 @@ export interface Component {
 }
 
 export interface License {
-  id?: number;
+  id: number;
   name: string;
   spdxid: string;
   url: string;

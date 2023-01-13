@@ -4,7 +4,7 @@ import { License } from './License';
 import { LicenseVersion } from './LicenseVersion';
 
 @Table({tableName:'Version', modelName:'Version'})
-export class Version  extends Model{
+export class Version  extends Model {
 
   @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})
   id: number;
