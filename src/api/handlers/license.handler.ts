@@ -4,6 +4,7 @@ import { NewLicenseDTO } from '../dto';
 import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
 import { licenseService } from '../../main/services/LicenseService';
+import { workspaceService } from "../../main/services/WorkspaceService";
 
 ipcMain.handle(IpcChannels.LICENSE_GET_ALL, async (_event) => {
   try {
@@ -27,7 +28,9 @@ ipcMain.handle(IpcChannels.LICENSE_GET, async (_event, id: number) => {
 
 ipcMain.handle(IpcChannels.LICENSE_CREATE, async (_event, newLicense: NewLicenseDTO) => {
   try {
+    // TODO: Use Promise.all() run both queries in parallel
     const license = await licenseService.create(newLicense);
+    if (newLicense.isGlobal) await workspaceService.createLicense(newLicense);
     return Response.ok({ message: 'License created successfully', data: license });
   } catch (error: any) {
     log.error('[CREATE LICENSE]', error);
