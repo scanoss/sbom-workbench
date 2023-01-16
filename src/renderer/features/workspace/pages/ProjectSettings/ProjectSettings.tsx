@@ -98,7 +98,7 @@ const ProjectSettings = () => {
   }, []);
 
   const init = async () => {
-    const data = await workspaceService.getLicenses();
+    const data = await workspaceService.getAllLicenses();
     console.log(data);
     setLicenses(data);
 

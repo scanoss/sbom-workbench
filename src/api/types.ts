@@ -52,6 +52,24 @@ export interface Inventory {
   files: any[];
 }
 
+export interface GlobalComponent {
+  id: number;
+  purl: string;
+  name: string;
+  versions: Array<Version>;
+
+}
+
+export interface Version {
+  id: number;
+  url: string;
+  version: string;
+  licenses: Array<License>;
+
+}
+
+
+
 export interface Component {
   compid?: number;
   purl: string;
@@ -69,7 +87,7 @@ export interface Component {
   source: string;
 }
 
-export interface License {
+export interface  License {
   id: number;
   name: string;
   spdxid: string;
@@ -77,7 +95,7 @@ export interface License {
   fulltext: string;
 }
 
-export interface NewComponentDTO {
+export interface NewComponentDTO { // TODO: Move to .dto
   id?: number;
   name: string;
   versions: {
