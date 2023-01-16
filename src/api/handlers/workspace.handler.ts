@@ -1,6 +1,5 @@
 import { ipcMain } from 'electron';
 import log from 'electron-log';
-import { NewGlobalComponentDTO } from '@api/dto';
 import { IpcChannels } from '../ipc-channels';
 import { workspace } from '../../main/workspace/Workspace';
 import { Response } from '../Response';
@@ -8,6 +7,7 @@ import { IProject } from '../types';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
 import { workspaceService } from '../../main/services/WorkspaceService';
+import { NewLicenseDTO, NewGlobalComponentDTO  } from "../dto";
 
 ipcMain.handle(IpcChannels.WORKSPACE_PROJECT_LIST, async (_event) => {
   try {
@@ -48,12 +48,39 @@ ipcMain.handle(IpcChannels.UTILS_GET_PROJECT_DTO, async (_event) => {
   }
 });
 
+ipcMain.handle(IpcChannels.WORKSPACE_CREATE_LICENSE, async (_event, newLicense: NewLicenseDTO) => {
+  try {
+    const licenseCreated = await workspaceService.createLicense(newLicense)
+    return Response.ok({
+      message: 'License created successfully',
+      data: licenseCreated,
+    });
+  } catch (e: any) {
+    log.log('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
+
 ipcMain.handle(IpcChannels.WORKSPACE_GET_ALL_LICENSES, async (_event) => {
   try {
-    const licenses = await workspace.getLicenses();
+    const licenses = await workspaceService.getAllLicenses();
     return Response.ok({
-      message: 'Project path successfully retrieved',
+      message: 'Licenses successfully retrieved',
       data: licenses,
+    });
+  } catch (e: any) {
+    log.log('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
+
+
+ipcMain.handle(IpcChannels.WORKSPACE_DELETE_LICENSE, async (_event, id: number) => {
+  try {
+    const deletedLicense = await workspaceService.deleteLicense(id);
+    return Response.ok({
+      message: 'License deleted successfully',
+      data: deletedLicense,
     });
   } catch (e: any) {
     log.log('Catch an error: ', e);
@@ -121,7 +148,7 @@ ipcMain.handle(IpcChannels.WORKSPACE_DELETE_COMPONENT, async (_event, id: number
   try {
     const deletedComponent = await workspaceService.deleteComponent(id);
     return Response.ok({
-      message: 'Create global component',
+      message: 'Delete global component',
       data: deletedComponent,
     });
   } catch (e: any) {
