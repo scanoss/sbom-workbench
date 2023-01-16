@@ -1,6 +1,7 @@
+import { NewLicenseDTO } from '@api/dto';
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
-import { INewProject, IProject, License } from '../types';
+import { GlobalComponent, INewProject, IProject, License, NewComponentDTO } from '../types';
 
 class WorkspaceService extends BaseService {
   public async getAllProjects(): Promise<IProject[]> {
@@ -25,10 +26,41 @@ class WorkspaceService extends BaseService {
     return this.response(response);
   }
 
-  public async getLicenses(): Promise<Array<License>> {
+  public async getAllLicenses(): Promise<Array<License>> {
     const response = await window.electron.ipcRenderer.invoke(
-      IpcChannels.GET_LICENSES
+      IpcChannels.WORKSPACE_GET_ALL_LICENSES
     );
+    return this.response(response);
+  }
+
+  public async createLicense(newLicenseDTO: NewLicenseDTO): Promise<License> {
+    const response = await window.electron.ipcRenderer.invoke(
+      IpcChannels.WORKSPACE_CREATE_LICENSE, newLicenseDTO
+    );
+    return this.response(response);
+  }
+
+  public async deleteLicense(id: number): Promise<License> {
+    const response = await window.electron.ipcRenderer.invoke(
+      IpcChannels.WORKSPACE_DELETE_LICENSE, id);
+    return this.response(response);
+  }
+
+  public async getAllComponents(): Promise<Array<GlobalComponent>> {
+    const response = await window.electron.ipcRenderer.invoke(
+      IpcChannels.WORKSPACE_GET_ALL_COMPONENTS);
+    return this.response(response);
+  }
+
+  public async createComponent(newComponentDTO: NewComponentDTO): Promise<GlobalComponent> {
+    const response = await window.electron.ipcRenderer.invoke(
+      IpcChannels.WORKSPACE_CREATE_COMPONENT, newComponentDTO);
+    return this.response(response);
+  }
+
+  public async deleteComponent(): Promise<GlobalComponent> {
+    const response = await window.electron.ipcRenderer.invoke(
+      IpcChannels.WORKSPACE_DELETE_COMPONENT);
     return this.response(response);
   }
 

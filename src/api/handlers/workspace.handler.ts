@@ -50,7 +50,7 @@ ipcMain.handle(IpcChannels.UTILS_GET_PROJECT_DTO, async (_event) => {
   }
 });
 
-ipcMain.handle(IpcChannels.GET_LICENSES, async (_event) => {
+ipcMain.handle(IpcChannels.WORKSPACE_GET_ALL_LICENSES, async (_event) => {
   try {
     const licenses = await workspace.getLicenses();
     return Response.ok({
