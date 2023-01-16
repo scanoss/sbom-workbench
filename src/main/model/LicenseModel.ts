@@ -113,6 +113,10 @@ export class LicenseModel extends Model {
           if (!acc[act.spdxid]) acc[act.spdxid] = act.id;
           return acc;
         }, {});
+        /*
+        * spdxid: license}
+        * */
+
         const db = await this.openDb();
         db.serialize(async () => {
           db.run('begin transaction');

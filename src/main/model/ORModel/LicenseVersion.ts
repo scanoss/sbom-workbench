@@ -6,11 +6,11 @@ import { License } from './License';
 export class LicenseVersion extends Model{
 
   @ForeignKey(() => License)
-  @Column({type:DataType.INTEGER})
+  @Column({type:DataType.INTEGER, onDelete:'CASCADE', onUpdate:"CASCADE"})
   licenseId: number;
 
   @ForeignKey(() => Version)
-  @Column({type:DataType.INTEGER})
+  @Column({type:DataType.INTEGER, onDelete:'CASCADE', onUpdate:"CASCADE"})
   versionId: number;
 
 }

@@ -81,3 +81,27 @@ export enum SourceType {
 export interface VulnerabilitiesGetAllDTO {
   type: SourceType,
 }
+
+export interface NewComponentDTO {
+  id?: number;
+  name: string;
+  versions: {
+    version: string;
+    licenses?: Array<number>;
+  }[];
+  purl: string;
+  url: string;
+  description?: string;
+}
+
+export interface NewGlobalComponentDTO {
+  id?: number;
+  name: string;
+  versions: {
+    url: string;
+    version: string;
+    licenses?: Array<number>;
+  }[];
+  purl: string;
+
+}

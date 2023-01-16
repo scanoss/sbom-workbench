@@ -1,7 +1,7 @@
-import { NewLicenseDTO } from '@api/dto';
+import { NewGlobalComponentDTO, NewLicenseDTO } from '@api/dto';
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
-import { GlobalComponent, INewProject, IProject, License, NewComponentDTO } from '../types';
+import { GlobalComponent, IProject, License } from '../types';
 
 class WorkspaceService extends BaseService {
   public async getAllProjects(): Promise<IProject[]> {
@@ -52,15 +52,15 @@ class WorkspaceService extends BaseService {
     return this.response(response);
   }
 
-  public async createComponent(newComponentDTO: NewComponentDTO): Promise<GlobalComponent> {
+  public async createComponent(newComponentDTO: NewGlobalComponentDTO): Promise<GlobalComponent> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.WORKSPACE_CREATE_COMPONENT, newComponentDTO);
     return this.response(response);
   }
 
-  public async deleteComponent(): Promise<GlobalComponent> {
+  public async deleteComponent(id: number): Promise<GlobalComponent> {
     const response = await window.electron.ipcRenderer.invoke(
-      IpcChannels.WORKSPACE_DELETE_COMPONENT);
+      IpcChannels.WORKSPACE_DELETE_COMPONENT, id);
     return this.response(response);
   }
 
@@ -84,5 +84,5 @@ class WorkspaceService extends BaseService {
     return this.response(response);
   }
 }
-
 export const workspaceService = new WorkspaceService();
+
