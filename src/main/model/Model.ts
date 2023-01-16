@@ -15,11 +15,14 @@ export class Model {
 
   public static readonly entityMapper = {};
 
-
-
-  public async init(path:string): Promise<void> {
+  constructor(path?:string) {
     this.dbPath = path;
-    await this.createDb(path);
+  }
+
+
+
+  public async init(): Promise<void> {
+    await this.createDb(this.dbPath);
     await this.createTables();
     await this.createViews();
   }
@@ -33,8 +36,6 @@ export class Model {
       });
     });
   }
-
-
 
   // CREATE A NEW SCAN DB
   public createDb(path: string) {

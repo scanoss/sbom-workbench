@@ -30,7 +30,7 @@ class ModelProvider {
 
   public set workspaceModel(value: Sequelize) {
     // eslint-disable-next-line no-underscore-dangle
-    this._workspaceModel= value;
+    this._workspaceModel = value;
   }
 
   public set model(value: ScanModel) {
@@ -39,8 +39,8 @@ class ModelProvider {
   }
 
   public async init(projectPath: string) {
-    await new Model().init(`${projectPath}/${this.PROJECT_MODEL}`);
-    const model = new ScanModel(projectPath);
+    await new Model(`${projectPath}/${this.PROJECT_MODEL}`).init();
+    const model = new ScanModel(`${projectPath}/${this.PROJECT_MODEL}`);
     this.model = model;
   }
 }

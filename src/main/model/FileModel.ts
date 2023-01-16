@@ -5,6 +5,7 @@ import { Querys } from './querys_db';
 import { InventoryModel } from './InventoryModel';
 import { Model } from './Model';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
+
 const { promisify } = require('util');
 
 const query = new Querys();
@@ -90,12 +91,14 @@ export class FileModel extends Model {
     if (dirtyFiles) return dirtyFiles.map((item: any) => item.id);
     return [];
   }
+
   public async deleteDirty() {
     const db = await this.openDb();
     const call = promisify(db.run.bind(db));
     await call(`DELETE FROM files WHERE dirty=1;`);
     db.close();
   }
+
   public async getClean() {
     const db = await this.openDb();
     const call = promisify(db.all.bind(db));
@@ -103,6 +106,7 @@ export class FileModel extends Model {
     db.close();
     return files;
   }
+
   public async getFilesRescan() {
     const db = await this.openDb();
     const call = promisify(db.all.bind(db));
@@ -128,6 +132,7 @@ export class FileModel extends Model {
     await call(sql);
     db.close();
   }
+
   public async updateFileType(fileIds: number[], fileType: string) {
     const db = await this.openDb();
     const call = promisify(db.run.bind(db));

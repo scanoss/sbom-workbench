@@ -1,15 +1,13 @@
 import { ipcMain } from 'electron';
 import log from 'electron-log';
+import { NewGlobalComponentDTO } from '@api/dto';
 import { IpcChannels } from '../ipc-channels';
 import { workspace } from '../../main/workspace/Workspace';
 import { Response } from '../Response';
-import { INewProject, IProject, License } from '../types';
+import { IProject } from '../types';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
-import { CodeScannerPipelineTask } from '../../main/task/scanner/scannerPipeline/CodeScannerPipelineTask';
-import { Scanner } from '../../main/task/scanner/types';
-import ScannerSource = Scanner.ScannerSource;
-import ScannerType = Scanner.ScannerType;
+import { workspaceService } from '../../main/services/WorkspaceService';
 
 ipcMain.handle(IpcChannels.WORKSPACE_PROJECT_LIST, async (_event) => {
   try {
@@ -94,3 +92,40 @@ ipcMain.handle(
     }
   }
 );
+ipcMain.handle(IpcChannels.WORKSPACE_GET_ALL_COMPONENTS, async (_event) => {
+  try {
+    const components = await workspaceService.getAllComponents();
+    return Response.ok({
+      message: 'Get All global components',
+      data: components,
+    });
+  } catch (e: any) {
+    log.log('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
+ipcMain.handle(IpcChannels.WORKSPACE_CREATE_COMPONENT, async (_event,newComponentDTO: NewGlobalComponentDTO) => {
+  try {
+    const component = await workspaceService.createComponent(newComponentDTO);
+    return Response.ok({
+      message: 'Create global component',
+      data: component,
+    });
+  } catch (e: any) {
+    log.log('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
+
+ipcMain.handle(IpcChannels.WORKSPACE_DELETE_COMPONENT, async (_event, id: number) => {
+  try {
+    const deletedComponent = await workspaceService.deleteComponent(id);
+    return Response.ok({
+      message: 'Create global component',
+      data: deletedComponent,
+    });
+  } catch (e: any) {
+    log.log('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});

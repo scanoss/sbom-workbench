@@ -8,12 +8,19 @@ import {VulnerabilityModel} from "./VulnerabilityModel";
 
 export class ScanModel {
   component: ComponentModel;
+
   file: FileModel;
+
   inventory: InventoryModel;
+
   license: LicenseModel;
+
   result: ResultModel;
+
   lastID: any;
+
   dependency: DependencyModel;
+
   vulnerability: VulnerabilityModel;
 
   constructor(path: string) {
