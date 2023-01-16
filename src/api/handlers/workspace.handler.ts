@@ -10,6 +10,8 @@ import { CodeScannerPipelineTask } from '../../main/task/scanner/scannerPipeline
 import { Scanner } from '../../main/task/scanner/types';
 import ScannerSource = Scanner.ScannerSource;
 import ScannerType = Scanner.ScannerType;
+import { workspaceService } from '../../main/services/WorkspaceService';
+import { NewLicenseDTO } from "../dto";
 
 ipcMain.handle(IpcChannels.WORKSPACE_PROJECT_LIST, async (_event) => {
   try {
@@ -50,12 +52,39 @@ ipcMain.handle(IpcChannels.UTILS_GET_PROJECT_DTO, async (_event) => {
   }
 });
 
+ipcMain.handle(IpcChannels.WORKSPACE_CREATE_LICENSE, async (_event, newLicense: NewLicenseDTO) => {
+  try {
+    const licenseCreated = await workspaceService.createLicense(newLicense)
+    return Response.ok({
+      message: 'License created successfully',
+      data: licenseCreated,
+    });
+  } catch (e: any) {
+    log.log('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
+
 ipcMain.handle(IpcChannels.WORKSPACE_GET_ALL_LICENSES, async (_event) => {
   try {
-    const licenses = await workspace.getLicenses();
+    const licenses = await workspaceService.getAllLicenses();
     return Response.ok({
-      message: 'Project path successfully retrieved',
+      message: 'Licenses successfully retrieved',
       data: licenses,
+    });
+  } catch (e: any) {
+    log.log('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
+
+
+ipcMain.handle(IpcChannels.WORKSPACE_DELETE_LICENSE, async (_event, id: number) => {
+  try {
+    const deletedLicense = await workspaceService.deleteLicense(id);
+    return Response.ok({
+      message: 'License deleted successfully',
+      data: deletedLicense,
     });
   } catch (e: any) {
     log.log('Catch an error: ', e);
