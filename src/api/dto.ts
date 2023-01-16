@@ -50,8 +50,7 @@ export interface NewLicenseDTO {
   fulltext: string;
   url?: string;
   spdxid?: string;
-
-  is
+  isGlobal?: boolean;
 }
 
 export interface IAppInfo {

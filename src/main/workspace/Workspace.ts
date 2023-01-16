@@ -225,10 +225,6 @@ class Workspace {
     return projectPaths;
   }
 
-  public async getLicenses(): Promise<Array<License>> {
-    const licenses  = await LicenseModel.findAll();
-    return toEntity<Array<License>>(licenses);
-  }
 
   public async createProject(projectDTO: INewProject): Promise<Project> {
     const newProject: Project = new Project(projectDTO.name);
