@@ -4,6 +4,8 @@ import { Querys } from './querys_db';
 import { Model } from './Model';
 import { License } from '../../api/types';
 import { IComponentLicense } from './interfaces/component/IComponentLicense';
+import { License as LicenseORM } from './ORModel/License';
+import { toEntity } from '../adapters/modelAdapter';
 
 const query = new Querys();
 
@@ -15,10 +17,8 @@ export class LicenseModel extends Model {
   public bulkCreate(db: any, license: Partial<License>) {
     return new Promise<number>((resolve, reject) => {
       try {
-        license.fulltext = 'AUTOMATIC IMPORT';
-        license.url = 'AUTOMATIC IMPORT';
         db.serialize(async function () {
-          db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.spdxid, license.fulltext, license.url, 1);
+          db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 1);
           db.get(`${query.SQL_SELECT_LICENSE}spdxid=?;`, license.spdxid, (err: any, data: any) => {
             if (err) throw err;
             resolve(data.id);
@@ -108,15 +108,13 @@ export class LicenseModel extends Model {
   public async bulkAttachComponentLicense(data: Array<IComponentLicense>) {
     return new Promise<void>(async (resolve, reject) => {
       try {
-        let licenses: any = await this.getAll();
+        let licenses: any = await LicenseORM.findAll();
+        licenses = toEntity<Array<License>>(licenses);
         licenses = licenses.reduce((acc, act) => {
-          if (!acc[act.spdxid]) acc[act.spdxid] = act.id;
+          const { spdxid, fulltext, url , name } = act;
+          if (!acc[act.spdxid]) acc[act.spdxid] = {spdxid,fulltext,url,name};
           return acc;
         }, {});
-        /*
-        * spdxid: license}
-        * */
-
         const db = await this.openDb();
         db.serialize(async () => {
           db.run('begin transaction');
@@ -125,15 +123,27 @@ export class LicenseModel extends Model {
               for (let i = 0; i < component.license.length; i += 1) {
                 let licenseId = null;
                 if (licenses[component.license[i]] !== undefined) {
-                  licenseId = licenses[component.license[i]];
+                    if(licenses[component.license[i]].id !== undefined) licenseId = licenses[component.license[i]].id;
+                    else {
+                    licenseId =  await this.bulkCreate(db, {
+                        spdxid: licenses[component.license[i]].spdxid,
+                        url: licenses[component.license[i]].url,
+                        name: licenses[component.license[i]].name,
+                        fulltext:licenses[component.license[i]].fulltext
+                      });
+                      licenses[component.license[i]].id = licenseId;
+                    }
                 } else {
-                  licenseId = await this.bulkCreate(db, {
+                  const newLicense = {
+                    id: null,
                     spdxid: component.license[i],
-                  });
-                  licenses = {
-                    ...licenses,
-                    [component.license[i]]: licenseId,
+                    name:  component.license[i],
+                    fulltext : 'AUTOMATIC IMPORT',
+                    url : 'AUTOMATIC IMPORT',
                   };
+                  licenseId = await this.bulkCreate(db, newLicense);
+                  newLicense.id = licenseId;
+                  licenses = { ...licenses, newLicense };
                 }
                 await this.bulkAttachLicensebyId(db, { compid: component.id, license_id: licenseId });
               }

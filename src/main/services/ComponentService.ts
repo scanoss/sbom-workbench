@@ -3,7 +3,6 @@ import {
   Component,
   ComponentGroup,
   IWorkbenchFilterParams,
-  NewComponentDTO,
 } from '../../api/types';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
@@ -16,6 +15,7 @@ import {
   ComponentSource,
   ComponentVersion,
 } from '../model/entity/ComponentVersion';
+import { NewComponentDTO } from '../../api/dto';
 
 class ComponentService {
   public async getComponentFiles(
