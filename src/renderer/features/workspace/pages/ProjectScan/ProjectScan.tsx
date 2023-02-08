@@ -61,7 +61,7 @@ const ProjectScan = () => {
     const errorMessage = `<strong>${t('Dialog:ScanPaused')}</strong>
 
     <span style="font-style: italic;">${err.name || ''} ${err.message || ''} ${err.code || ''}</span>
-    <pre style="margin-bottom: 0"><small style="-webkit-user-select: all !important">Reason: ${cause}</small></pre>`;
+    <small style="-webkit-user-select: text !important">Reason: ${cause}</small>`;
 
     await dialogCtrl.openConfirmDialog(
       `${errorMessage}`,

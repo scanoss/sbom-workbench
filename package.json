@@ -146,6 +146,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@grpc/grpc-js": "^1.8.7",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.6",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.1",
     "@testing-library/jest-dom": "^5.16.4",
@@ -187,6 +188,7 @@
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.5.0",
     "file-loader": "^6.2.0",
+    "google-protobuf": "^3.21.2",
     "html-webpack-plugin": "^5.5.0",
     "husky": "^8.0.1",
     "identity-obj-proxy": "^3.0.0",
