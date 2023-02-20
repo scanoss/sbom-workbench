@@ -31,6 +31,7 @@ export interface IWorkspaceCfg {
   PROXY: string;
   CA_CERT: string;
   IGNORE_CERT_ERRORS: boolean;
+  PAC: string;  //TODO: add this option to the migration
 }
 
 export interface Node {

@@ -1,6 +1,7 @@
 import log from "electron-log";
 import { app } from 'electron';
 import fs from 'fs';
+import os from 'os';
 import { IWorkspaceCfg } from '../../api/types';
 import { wsUtils } from '../workspace/WsUtils/WsUtils';
 
@@ -8,7 +9,6 @@ import packageJson from '../../../release/app/package.json';
 import AppConfig from '../../config/AppConfigModule';
 import { AppI18n } from '../../shared/i18n';
 import { WorkspaceMigration } from '../migration/WorkspaceMigration';
-import os from 'os';
 
 class UserSettingService {
   private myPath: string;
@@ -33,6 +33,7 @@ class UserSettingService {
     PROXY: '',
     CA_CERT: '',
     IGNORE_CERT_ERRORS: false,
+    PAC: '',
   };
 
   constructor() {
@@ -88,6 +89,7 @@ class UserSettingService {
       this.store = this.defaultStore;
     }
   }
+
   public async update(): Promise<void> {
     this.store.APIS[0] = {
       URL: `${AppConfig.API_URL}/scan/direct`,
