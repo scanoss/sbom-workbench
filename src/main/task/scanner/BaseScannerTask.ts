@@ -47,8 +47,8 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
 
  public abstract set(): Promise<void>;
 
-  public  init() {
-    this.setScannerConfig();
+  public async init() {
+    await this.setScannerConfig();
     this.cleanWorkDirectory();
     let {processedFiles} = this.project;
 
@@ -129,9 +129,11 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
     }
   }
 
-  protected setScannerConfig() {
+  protected async setScannerConfig() {
     const scannerCfg: ScannerCfg = new ScannerCfg();
-    const { DEFAULT_API_INDEX, APIS, CA_CERT, PROXY, IGNORE_CERT_ERRORS } = userSettingService.get();
+    scannerCfg.CLIENT_TIMESTAMP = 'Audit-Workbench';
+
+    const { DEFAULT_API_INDEX, APIS, CA_CERT, PROXY, IGNORE_CERT_ERRORS, PAC } = userSettingService.get();
 
     if (this.project.getApi()) {
       scannerCfg.API_URL = this.project.getApi();
@@ -147,7 +149,10 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
     scannerCfg.PROXY = PROXY || null;
     scannerCfg.IGNORE_CERT_ERRORS = IGNORE_CERT_ERRORS !== undefined ? IGNORE_CERT_ERRORS : false;
     scannerCfg.CA_CERT = CA_CERT !== undefined ? CA_CERT : null;
+    scannerCfg.PAC = PAC;
 
+
+    await scannerCfg.validate();
     this.scanner = new Scanner(scannerCfg);
     this.project.scanner = this.scanner;
     this.scanner.setWorkDirectory(this.project.getMyPath());

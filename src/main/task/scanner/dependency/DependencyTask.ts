@@ -1,4 +1,4 @@
-import { DependencyScanner } from 'scanoss';
+import { DependencyScanner, DependencyScannerCfg } from 'scanoss';
 import fs from 'fs';
 import log from 'electron-log';
 import i18next from 'i18next';
@@ -7,6 +7,7 @@ import { Project } from '../../../workspace/Project';
 import { dependencyService } from '../../../services/DependencyService';
 import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
+import { userSettingService } from "../../../services/UserSettingService";
 
 export class DependencyTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -41,7 +42,14 @@ export class DependencyTask implements Scanner.IPipelineTask {
         .forEach((f: File) => {
           allFiles.push(rootPath + f.path);
         });
-      const dependencies = await new DependencyScanner().scan(allFiles);
+
+      const cfg = new DependencyScannerCfg();
+      const { PAC, PROXY } = await userSettingService.get();
+      cfg.PAC = PAC;
+      cfg.PROXY = PROXY;
+      await cfg.validate();
+
+      const dependencies = await new DependencyScanner(cfg).scan(allFiles);
       dependencies.filesList.forEach((f) => {
         f.file = f.file.replace(rootPath, '');
       });
