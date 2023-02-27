@@ -1,8 +1,9 @@
 import {
+  logger,
   Scanner,
   ScannerCfg,
   ScannerEvents,
-  ScannerInput,
+  ScannerInput
 } from 'scanoss';
 import log from 'electron-log';
 import fs from "fs";
@@ -151,6 +152,8 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
     scannerCfg.CA_CERT = CA_CERT !== undefined ? CA_CERT : null;
     scannerCfg.PAC = PAC;
 
+    // Allows Scanoss SDK to write into project.log
+    logger.setTransport((msg) => log.info(`%c${msg}`, 'color: green'));
 
     await scannerCfg.validate();
     this.scanner = new Scanner(scannerCfg);
