@@ -3,8 +3,8 @@ import { IAppConfig } from './IAppConfig';
 
 export const AppConfigDefault: IAppConfig = {
   APP_NAME: 'SCANOSS Audit Workbench',
-  ABOUT_MESSAGE:
-    'SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.',
+  ABOUT_MESSAGE: 'SCANOSS Audit Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.',
+  OSSKB_HOST: 'osskb.org',
   API_URL: 'https://osskb.org/api',
   API_KEY: '',
   SCANOSS_WEBSITE_URL: 'https://www.scanoss.com',
