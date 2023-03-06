@@ -7,56 +7,37 @@ import AppConfig from '@config/AppConfigModule';
 // icons
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 
-const VulnerabilitiesCard = ({ data, blocked }) => {
+const VulnerabilitiesCard = ({ data }) => {
   return (
     <article
       id="VulnerabilitiesCard"
-      className={blocked ? 'blocked' : 'no-blocked'}
     >
       <section>
         <div className="vulnerability-container critical">
           <span className="vulnerability-number">
-            {!blocked ? data?.critical : 3}
+            {data?.critical}
           </span>
           <span className="vulnerability-label">Critical</span>
         </div>
         <div className="vulnerability-container high">
           <span className="vulnerability-number">
-            {!blocked ? data?.high : 4}
+            {data?.high}
           </span>
           <span className="vulnerability-label">High</span>
         </div>
         <div className="vulnerability-container medium">
           <span className="vulnerability-number">
-            {!blocked ? data?.medium : 23}
+            {data?.medium}
           </span>
           <span className="vulnerability-label">Medium</span>
         </div>
         <div className="vulnerability-container low">
           <span className="vulnerability-number">
-            {!blocked ? data?.low : 16}
+            {data?.low}
           </span>
           <span className="vulnerability-label">Low</span>
         </div>
       </section>
-
-      {blocked && (
-        <Alert
-          icon={<WarningAmberOutlinedIcon fontSize="inherit" />}
-          severity="warning"
-          className="alert mt-3"
-        >
-          <Trans i18nKey="NeedApiKeyVulnerability" components={{
-            1: <Link
-                color="inherit"
-                href={`${AppConfig.SCANOSS_WEBSITE_URL}/pricing`}
-                target="_blank"
-                rel="noreferrer"
-              />
-            }}
-          />
-        </Alert>
-      )}
     </article>
   );
 };

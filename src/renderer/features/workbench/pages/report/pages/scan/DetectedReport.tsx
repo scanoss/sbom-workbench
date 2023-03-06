@@ -26,7 +26,7 @@ const DetectedReport = ({ data }) => {
   const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
   const [obligations, setObligations] = useState(null);
 
-  const blocked = !projectScannerConfig?.type?.includes(Scanner.ScannerType.VULNERABILITIES)
+  const vulnerabilitiesDisabled = !projectScannerConfig?.type?.includes(Scanner.ScannerType.VULNERABILITIES)
 
   const init = async () => {
     const licenses = data.licenses.map((license) => license.label);
@@ -76,8 +76,8 @@ const DetectedReport = ({ data }) => {
           <MatchesChart data={data.summary} />
         </Card>
 
-        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={blocked} className="w-100">
-          <Card className={`report-item vulnerabilities ${blocked ? 'blocked' : 'no-blocked'}`}>
+        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={vulnerabilitiesDisabled} className="w-100">
+          <Card className={`report-item vulnerabilities ${vulnerabilitiesDisabled ? 'blocked' : 'no-blocked'}`}>
             <div className="report-title d-flex space-between align-center">
               <span>{t('Title:Vulnerabilities')}</span>
               <div className="action">
@@ -85,7 +85,10 @@ const DetectedReport = ({ data }) => {
                 <ArrowForwardOutlinedIcon fontSize="inherit" />
               </div>
             </div>
-            <VulnerabilitiesCard data={data.vulnerabilities} blocked={blocked} />
+            { !vulnerabilitiesDisabled
+              ? <VulnerabilitiesCard data={data.vulnerabilities}/>
+              : <p className="text-center mb-5 mt-5">{t('NoVulnerabilitiesScanned')}</p>
+            }
           </Card>
         </ConditionalLink>
 

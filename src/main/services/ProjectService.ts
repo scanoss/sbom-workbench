@@ -66,9 +66,11 @@ class ProjectService {
     const hasApiKey = projectDTO.api_key || APIS[DEFAULT_API_INDEX]?.API_KEY;
 
     if (!hasApiKey) {
-      projectDTO.scannerConfig.type = projectDTO.scannerConfig.type.filter(
+      // TODO: create a ScanerType filter in case some stage was not free
+      /* projectDTO.scannerConfig.type = projectDTO.scannerConfig.type.filter(
         (e) => e !== ScannerType.VULNERABILITIES
       );
+       */
     }
   }
 

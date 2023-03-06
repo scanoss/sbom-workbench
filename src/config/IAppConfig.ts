@@ -5,6 +5,7 @@ export interface IAppConfig {
   ABOUT_MESSAGE: string;
   SCANOSS_WEBSITE_URL: string;
 
+  OSSKB_HOST: string;
   API_URL: string;
   API_KEY: string;
   MIN_VERSION_SUPPORTED: string;

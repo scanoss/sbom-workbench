@@ -22,7 +22,7 @@ class GRPCConnection {
   }
 
   private getEndpoint(): string {
-    return `${AppConfigDefault.DEFAULT_IP_gRPC}:${AppConfigDefault.DEFAULT_PORT_gRPC}`
+    return `${AppConfigDefault.DEFAULT_IP_gRPC}:${AppConfigDefault.DEFAULT_PORT_gRPC}`;
   }
 
   private getCredentials(): grpc.ChannelCredentials {
@@ -47,8 +47,18 @@ class GRPCConnection {
   }
 
   public getVulnerabilityStub(): grpc.Client {
+    const hasApiKey = !!this.getApiKey();
+
+    const endpoint = !hasApiKey
+      ? `${AppConfigDefault.OSSKB_HOST}:${AppConfigDefault.DEFAULT_PORT_gRPC}`
+      : this.getEndpoint();
+
+    const credentials = !hasApiKey
+      ? grpc.credentials.createSsl()
+      : this.getCredentials();
+
     if (!this.vulnerabilityClient)
-      this.vulnerabilityClient = new VulnerabilitiesClient(this.getEndpoint(), this.getCredentials());
+      this.vulnerabilityClient = new VulnerabilitiesClient(endpoint, credentials);
     return this.vulnerabilityClient;
   }
 

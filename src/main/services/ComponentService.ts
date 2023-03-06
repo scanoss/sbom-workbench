@@ -11,7 +11,7 @@ import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
 import { ComponentAdapter } from '../adapters/ComponentAdapter';
-import { AddVulneravilityTask } from '../task/vulnerability/AddVulneravilityTask';
+import { AddVulnerabilityTask } from '../task/vulnerability/AddVulnerabilityTask';
 import {
   ComponentSource,
   ComponentVersion,
@@ -224,7 +224,7 @@ class ComponentService {
 
     // TODO: Uncomment code when gRPC service is integrated
     // Adds component's vulnerabilities
-    const addVulnerability = new AddVulneravilityTask();
+    const addVulnerability = new AddVulnerabilityTask();
     await addVulnerability.run(this.adaptToVulnerabilityTask(newComp));
     return response[0];
   }
