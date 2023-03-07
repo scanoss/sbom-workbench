@@ -64,16 +64,36 @@ const CodeViewer = ({ id, value, language, highlight, highlights, options }: ICo
   const updateHighlight = () => {
     if (editor.current) {
       if (highlight && highlight !== 'all') {
-        const decorations = highlight.split(',').map((range: string) => {
-          const [start, end] = range.split('-').map(Number);
-          return {
-            range: new monaco.Range(start, 1, end, 1),
-            options: {
-              isWholeLine: true,
-              className: 'lineHighlightDecoration',
-            },
-          };
-        });
+        const decorations =
+          highlight
+            .split(',')
+            .map((range: string) => {
+              const [start, end] = range.split('-').map(Number);
+              return [
+                {
+                  range: new monaco.Range(start, 1, start, 1),
+                  options: {
+                    isWholeLine: true,
+                  },
+                },
+                {
+                  range: new monaco.Range(end, 1, end, 1),
+                  options: {
+                    isWholeLine: true,
+                  },
+                },
+                {
+                  range: new monaco.Range(start, 1, end, 1),
+                  options: {
+                    isWholeLine: true,
+                    className: 'lineHighlightDecoration',
+                    linesDecorationsClassName: 'lineRangeDecoration',
+
+                  },
+                },
+              ];
+            })
+            .flat();
         editor.current.deltaDecorations([], decorations);
 
         editor.current.revealLineNearTop(decorations[0].range.startLineNumber);

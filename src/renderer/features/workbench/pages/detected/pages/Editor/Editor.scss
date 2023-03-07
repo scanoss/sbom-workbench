@@ -93,13 +93,20 @@
     }
 
     .lineHighlightDecoration {
-      background: rgba(52, 59, 36, 0.73);
+      background: rgba(9, 31, 105, 0.2);
+      filter: saturate(3);
     }
 
     .lineHighlightLineDecoration {
-      background: rgb(76, 105, 9);
+      background: rgba(76, 105, 9, 0.94);
       width: 3px !important;
-      margin-left: 3px;
+      margin-left: 10px;
+    }
+
+    .lineRangeDecoration {
+      background: rgb(18, 37, 121);
+      width: 3px !important;
+      margin-left: 5px;
     }
 
     .inlineWordHighlightDecoration {
