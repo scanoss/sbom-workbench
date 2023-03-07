@@ -21,7 +21,6 @@
 
   .component-name {
     font-weight: 700;
-    max-width: 25%;
     font-size: 16px;
     flex-shrink: .5;
     color: #3B82F6;
@@ -36,6 +35,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
     margin: 0 4px;
+
+    &.component {
+      max-width: 40%;
+
+      .value {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 12px;
+      }
+    }
 
     .label {
       font-size: 12px;

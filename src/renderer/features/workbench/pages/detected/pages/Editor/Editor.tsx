@@ -186,7 +186,7 @@ const Editor = () => {
       // const diff = currentMatch?.type !== 'file' || wfp || imported;
       const diff = currentMatch?.type !== 'file' && !imported && !wfp;
       setIsDiffView(diff);
-      console.log(diff);
+
       if (diff || wfp || imported) loadRemoteFile(currentMatch.md5_file);
     }
   }, [currentMatch]);
@@ -264,6 +264,7 @@ const Editor = () => {
                               match.license[0],
                             url: match.component?.url,
                             purl: match.component?.purl,
+                            matched: match.matched
                           }}
                           status={match.status}
                           onSelect={() => setCurrentMatch(matchInfo[index])}

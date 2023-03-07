@@ -26,6 +26,7 @@ interface MatchInfoCardProps {
     license: string;
     url: string;
     purl: string;
+    matched?: string;
   };
   selected: boolean;
   status: string;
@@ -57,7 +58,10 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
             {(status === 'pending' || status === 'identified') && (
               <div onMouseEnter={handlerOpen} onMouseLeave={() => setOver(false)} className="label-info">
                 <IconComponent name={match.vendor} size={32} />
-                <span className="component-name">{match.component}</span>
+                <div className="match-info-data component">
+                  <span className="component-name">{match.component}</span>
+                  <span className="component-purl value">{match.purl}</span>
+                </div>
                 <span className="match-info-data version">
                   <span className="label">{t('Title:Version')}</span>
                   <span className="value">{match.version}</span>
@@ -67,13 +71,22 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
                   {status === 'identified' && <span className="label">{t('Title:Usage')}</span>}
                   <span className="value">{match.usage}</span>
                 </div>
+                { match.matched &&
+                    <span className="match-info-data match">
+                      <span className="label">{t('Title:Match')}</span>
+                      <span className="value">{match.matched}</span>
+                    </span>
+                }
               </div>
             )}
 
             {status === 'ignored' && (
               <div className="label-info original">
                 <IconComponent name={match.vendor} size={32} />
-                <span className="component-span">{match.component}</span>
+                <div className="match-info-data component">
+                  <span className="component-name">{match.component}</span>
+                  <span className="component-purl value">{match.purl}</span>
+                </div>
                 <span className="match-info-data version">
                   <span className="label">{t('Title:Version')}</span>
                   <span className="value">{match.version}</span>
@@ -82,6 +95,12 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
                   <span className="label">{t('Title:Usage')}</span>
                   <span className="value">{match.usage}</span>
                 </div>
+                { match.matched &&
+                  <span className="match-info-data match">
+                      <span className="label">{t('Title:Match')}</span>
+                      <span className="value">{match.matched}</span>
+                    </span>
+                }
               </div>
             )}
 
