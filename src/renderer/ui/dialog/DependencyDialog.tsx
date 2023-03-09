@@ -14,6 +14,7 @@ import { DialogContext } from '@context/DialogProvider';
 import { NewDependencyDTO } from '@api/dto';
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from 'react-i18next';
+import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -133,50 +134,13 @@ const DependencyDialog = (props: DependencyDialogProps) => {
                 </IconButton>
               </Tooltip>
             </div>
-            <Paper className="dialog-form-field-control">
-              <Autocomplete
-                size="small"
-                fullWidth
+            <div className="dialog-form-field-control">
+              <LicenseSelector
                 options={licenses || []}
-                groupBy={(option) => option?.type}
-                value={
-                  licenses && form.license
-                    ? { spdxid: form.license, name: licenses.find((item) => item.spdxid === form.license)?.name }
-                    : ''
-                }
-                isOptionEqualToValue={(option: any) => option.spdxid === form.license}
-                getOptionLabel={(option: any) => option.name || option.spdxid || ''}
-                renderOption={(props, option, { selected }) => (
-                  <li {...props}>
-                    <div className={classes.option}>
-                      <span>{option.name}</span>
-                      <span className="middle">{option.spdxid}</span>
-                    </div>
-                  </li>
-                )}
-                filterOptions={(options, params) => {
-                  return options.filter(
-                    (option) =>
-                      option.name.toLowerCase().includes(params.inputValue.toLowerCase()) ||
-                      option.spdxid.toLowerCase().includes(params.inputValue.toLowerCase())
-                  );
-                }}
-                disableClearable
-                renderInput={(params) => (
-                  <TextField
-                    required
-                    {...params}
-                    InputProps={{
-                      ...params.InputProps,
-                      disableUnderline: true,
-                      startAdornment: <SearchIcon />,
-                      className: 'autocomplete-option',
-                    }}
-                  />
-                )}
+                value={licenses?.find((item) => item.spdxid === form.license) || {}}
                 onChange={(e, { spdxid }) => setForm({ ...form, license: spdxid })}
               />
-            </Paper>
+            </div>
           </div>
 
           <div className="dialog-form-field d-flex flex-column space-between">

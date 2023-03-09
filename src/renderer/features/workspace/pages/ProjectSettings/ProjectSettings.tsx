@@ -31,6 +31,7 @@ import FormGroup from '@mui/material/FormGroup';
 import { Scanner } from '../../../../../main/task/scanner/types';
 import ScannerType = Scanner.ScannerType;
 import ScannerSource = Scanner.ScannerSource;
+import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -239,66 +240,22 @@ const ProjectSettings = () => {
                       <span className="optional">- {t('Common:Optional')}</span>
                     </label>
                   </div>
-                  <Paper className="input-text-container license-input-container">
-                    <Autocomplete
-                      size="small"
+                  <div className="input-text-container license-input-container">
+                    <LicenseSelector
+                      options={licenses}
+                      disableClearable={false}
                       onChange={(e, value) =>
                         setProjectSettings({
                           ...projectSettings,
                           default_license: value?.spdxid,
                         })
                       }
-                      fullWidth
-                      value={
-                        licenses && projectSettings.default_license
-                          ? licenses?.find(
-                              (license) =>
-                                license?.spdxid ===
-                                projectSettings?.default_license
-                            )
-                          : ''
-                      }
+                      value={licenses?.find((item) => item.spdxid === projectSettings?.default_license) || {}}
                       selectOnFocus
                       clearOnBlur
                       handleHomeEndKeys
-                      options={licenses}
-                      isOptionEqualToValue={(option: any) =>
-                        option.spdxid === projectSettings.default_license
-                      }
-                      getOptionLabel={(option: any) =>
-                        option.name || option.spdxid || ''
-                      }
-                      renderOption={(props, option, { selected }) => (
-                        <li {...props}>
-                          <div className={classes.option}>
-                            <span>{option.name}</span>
-                            <span className="middle">{option.spdxid}</span>
-                          </div>
-                        </li>
-                      )}
-                      filterOptions={(options, params) => {
-                        return options.filter(
-                          (option) =>
-                            option.name
-                              .toLowerCase()
-                              .includes(params.inputValue.toLowerCase()) ||
-                            option.spdxid
-                              .toLowerCase()
-                              .includes(params.inputValue.toLowerCase())
-                        );
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          InputProps={{
-                            ...params.InputProps,
-                            startAdornment: <SearchIcon />,
-                            disableUnderline: true,
-                          }}
-                        />
-                      )}
                     />
-                  </Paper>
+                  </div>
                 </div>
               </div>
               <div className="api-conections-container mt-5">

@@ -17,8 +17,12 @@ import { useSelector } from 'react-redux';
 import { selectComponentState } from '@store/component-store/componentSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { makeStyles } from '@mui/styles';
-import CloseIcon from '@mui/icons-material/Close';
 import { useTranslation } from 'react-i18next';
+
+// icons
+import CloseIcon from '@mui/icons-material/Close'
+import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
+import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -167,7 +171,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       ...form,
       component: created.name,
       version: created.versions[0].version,
-      spdxid: created.versions[0].licenseId,
+      spdxid: component.versions[0].licenses[0]?.spdxid,
       purl: created.purl,
       url: created.url || '',
     });
@@ -292,8 +296,17 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       onClose={onCancel}
     >
       <header className="dialog-title">
-        <span>{!form.id ? t('Title:IdentifyComponent') : t('Title:EditIdentification')}</span>
-        <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
+        <span>
+          {!form.id
+            ? t('Title:IdentifyComponent')
+            : t('Title:EditIdentification')}
+        </span>
+        <IconButton
+          aria-label="close"
+          tabIndex={-1}
+          onClick={onCancel}
+          size="large"
+        >
           <CloseIcon />
         </IconButton>
       </header>
@@ -335,8 +348,14 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   clearOnBlur
                   options={components || []}
                   groupBy={(option) => option?.type}
-                  value={form.component && form.purl ? { name: form.component, purl: form.purl } : {}}
-                  isOptionEqualToValue={(option, value) => option.purl === value.purl}
+                  value={
+                    form.component && form.purl
+                      ? { name: form.component, purl: form.purl }
+                      : {}
+                  }
+                  isOptionEqualToValue={(option, value) =>
+                    option.purl === value.purl
+                  }
                   filterOptions={(options, params) => {
                     const filtered = filter(options, params);
 
@@ -346,7 +365,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       filtered.push({
                         inputValue,
                         search: true,
-                        name: t('SearchValueOnline', { value: inputValue}),
+                        name: t('SearchValueOnline', { value: inputValue }),
                       });
                     }
 
@@ -371,7 +390,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   )}
                   disableClearable
                   onChange={(e, value) => {
-                    if (value.search) openComponentSearcherDialog(value.inputValue);
+                    if (value.search)
+                      openComponentSearcherDialog(value.inputValue);
                     else componentAutocompleteHandler(value);
                   }}
                   renderInput={(params) => (
@@ -409,7 +429,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   options={versions || []}
                   value={form?.version || null}
                   disableClearable
-                  onChange={(e, value) => defaultAutocompleteHandler('version', value)}
+                  onChange={(e, value) =>
+                    defaultAutocompleteHandler('version', value)
+                  }
                   renderInput={(params) => (
                     <TextField
                       required
@@ -441,57 +463,36 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   <AddIcon fontSize="inherit" />
                 </IconButton>
               </div>
-              <Paper className="dialog-form-field-control">
-                <Autocomplete
-                  size="small"
-                  fullWidth
+              <div className="dialog-form-field-control">
+                <LicenseSelector
                   options={licenses || []}
                   groupBy={(option) => option?.type}
                   value={
                     licenses && form.spdxid
-                      ? { spdxid: form.spdxid, name: licenses.find((item) => item.spdxid === form.spdxid)?.name }
+                      ? {
+                          spdxid: form.spdxid,
+                          name: licenses.find(
+                            (item) => item.spdxid === form.spdxid
+                          )?.name,
+                        }
                       : null
                   }
-                  isOptionEqualToValue={(option: any) => option.spdxid === form.spdxid}
-                  getOptionLabel={(option: any) => option.name || option.spdxid || ''}
-                  renderOption={(props, option, { selected }) => (
-                    <li {...props} key={option.spdxid}>
-                      <div className={classes.option}>
-                        <span>{option.name}</span>
-                        <span className="middle">{option.spdxid}</span>
-                      </div>
-                    </li>
-                  )}
-                  filterOptions={(options, params) => {
-                    return options.filter(
-                      (option) =>
-                        option.name.toLowerCase().includes(params.inputValue.toLowerCase()) ||
-                        option.spdxid.toLowerCase().includes(params.inputValue.toLowerCase())
-                    );
-                  }}
-                  disableClearable
-                  renderInput={(params) => (
-                    <TextField
-                      required
-                      {...params}
-                      InputProps={{
-                        ...params.InputProps,
-                        startAdornment: <SearchIcon />,
-                        disableUnderline: true,
-                        className: 'autocomplete-option',
-                      }}
-                    />
-                  )}
-                  onChange={(e, value) => defaultAutocompleteHandler('spdxid', value.spdxid)}
+                  isOptionEqualToValue={(option: any) =>
+                    option.spdxid === form.spdxid
+                  }
+                  onChange={(e, value) =>
+                    defaultAutocompleteHandler('spdxid', value.spdxid)
+                  }
                 />
-              </Paper>
+              </div>
             </div>
           </div>
 
           <div className="dialog-row">
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">
-                {t('Title:UR')}L <span className="optional">- {t('Optional')}</span>
+                {t('Title:UR')}L{' '}
+                <span className="optional">- {t('Optional')}</span>
               </label>
               <Paper className="dialog-form-field-control">
                 <TextField
@@ -508,7 +509,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
           <div className="dialog-row">
             <div className="dialog-form-field">
-              <label className="dialog-form-field-label">{t('Title:PURL')}</label>
+              <label className="dialog-form-field-label">
+                {t('Title:PURL')}
+              </label>
               <Paper className="dialog-form-field-control">
                 <TextField
                   name="purl"
@@ -525,7 +528,9 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
           <div className={`${classes.usageNotes} dialog-row`}>
             <div className="dialog-form-field">
-              <label className="dialog-form-field-label">{t('Title:Usage')}</label>
+              <label className="dialog-form-field-label">
+                {t('Title:Usage')}
+              </label>
               <Paper className="dialog-form-field-control">
                 <Select
                   name="usage"
@@ -544,7 +549,8 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">
-                {t('Title:Notes')} <span className="optional">- {t('Optional')}</span>
+                {t('Title:Notes')}{' '}
+                <span className="optional">- {t('Optional')}</span>
               </label>
               <Paper className="dialog-form-field-control">
                 <TextField
@@ -564,7 +570,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <Button tabIndex={-1} onClick={onCancel} color="inherit">
             {t('Button:Cancel')}
           </Button>
-          <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
+          <Button
+            type="submit"
+            variant="contained"
+            color="secondary"
+            disabled={!isValid()}
+          >
             {t('Button:Identify')}
           </Button>
         </DialogActions>

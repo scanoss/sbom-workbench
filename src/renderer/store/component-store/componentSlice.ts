@@ -1,8 +1,7 @@
 import { ComponentGroup } from '@api/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {fetchComponent, fetchComponents, importGlobalComponent} from './componentThunks';
+import { fetchComponent, fetchComponents } from './componentThunks';
 import { RootState } from '../rootReducer';
-import {IComponentResult} from "../../../main/task/componentCatalog/iComponentCatalog/IComponentResult";
 
 const MAX_RECENT_USED_COMPONENTS = 5;
 

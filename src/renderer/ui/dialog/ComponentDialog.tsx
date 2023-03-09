@@ -14,6 +14,7 @@ import { licenseService } from '@api/services/license.service';
 import { DialogContext } from '@context/DialogProvider';
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from 'react-i18next';
+import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -53,6 +54,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   const dialogCtrl = useContext<any>(DialogContext);
   const [licenses, setLicenses] = useState<any[]>();
   const [readOnly, setReadOnly] = useState<boolean>();
+  const [license, setLicense] = useState<any>({}); // <License>
 
   const setDefaults = () => {
     setForm(component);
@@ -65,11 +67,6 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
       setLicenses(data);
     }
   };
-
-  useEffect(() => {
-    fetchData();
-  }, [open]);
-  useEffect(setDefaults, [component]);
 
   const inputHandler = (name, value) => {
     setForm({
@@ -106,7 +103,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     const response = await dialogCtrl.openLicenseCreate();
     if (response && response.action === ResponseStatus.OK) {
       setLicenses([...licenses, response.data]);
-      setForm({ ...form, licenseId: response.data.id });
+      setLicense(response.data);
     }
   };
 
@@ -114,6 +111,20 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
     const { name, version, licenseId, purl } = form;
     return name && version && licenseId && purl;
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [open]);
+
+
+  useEffect(() => {
+    setForm({
+      ...form,
+      licenseId: license?.id || null
+    });
+  }, [license]);
+
+  useEffect(setDefaults, [component]);
 
   return (
     <Dialog
@@ -175,31 +186,15 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                 </IconButton>
               </Tooltip>
             </div>
-            <Paper className="dialog-form-field-control">
-              <Autocomplete
-                fullWidth
-                size="small"
+            <div className="dialog-form-field-control">
+              <LicenseSelector
                 options={licenses || []}
-                // value={{ id: form?.licenseId }}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
+                value={license}
+                isOptionEqualToValue={(option, value) => option.spdxid === value.spdxid}
                 getOptionLabel={(option) => option.name || ''}
-                disableClearable
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    size="small"
-                    required
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: <SearchIcon />,
-                      disableUnderline: true,
-                      className: 'autocomplete-option',
-                    }}
-                  />
-                )}
-                onChange={(e, { id, name }) => setForm({ ...form, licenseId: id })}
+                onChange={(e, lic ) => setLicense(lic)}
               />
-            </Paper>
+            </div>
           </div>
 
           {!readOnly && (
