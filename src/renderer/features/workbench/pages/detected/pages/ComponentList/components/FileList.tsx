@@ -16,26 +16,30 @@ export const FileList = ({ files, filter, emptyMessage, onAction }: FileListProp
   const { t } = useTranslation();
   const { limit, paginate } = usePagination(250);
 
-  const filteredFiles = files.filter((file) => !filter || file.status === filter);
+  const filteredFiles = files?.filter((file) => !filter || file.status === filter);
+
+  // loader
+  if (!files)
+    return <p>Loading files...</p>;
+
+  // empty
+  if (filteredFiles?.length === 0)
+    return  <p>{emptyMessage || 'No files found'}</p>;
 
   return (
     <>
       <section className="file-list">
-        {filteredFiles.length > 0 ? (
-          filteredFiles.slice(0, limit).map((file) => (
-            <article className="item" key={file.id}>
-              <MatchCard
-                onAction={(action) => onAction(file, action)}
-                label={file.path}
-                status={file.status}
-                type={file.type}
-              />
-            </article>
-          ))
-        ) : (
-          <p>{emptyMessage || 'No files found'}</p>
-        )}
-      </section>
+        {filteredFiles.slice(0, limit).map((file) => (
+          <article className="item" key={file.id}>
+            <MatchCard
+              onAction={(action) => onAction(file, action)}
+              label={file.path}
+              status={file.status}
+              type={file.type}
+            />
+          </article>
+        ))}
+    </section>
 
       {filteredFiles.length > limit && (
         <Alert

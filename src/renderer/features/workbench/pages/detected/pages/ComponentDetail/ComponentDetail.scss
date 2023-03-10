@@ -96,7 +96,7 @@
 .file-list {
   display: grid;
   grid-template-columns: calc(50% - 7px) calc(50% - 7px);
-  grid-gap: 10px;
+  grid-gap: 7px;
 
   @media screen and (max-width: $default-width) {
     grid-template-columns: 100%;

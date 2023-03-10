@@ -1,4 +1,5 @@
-import { Component } from '../../api/types';
+import { Component, ComponentGroup } from '../../api/types';
+import React from 'react';
 
 export function mapFiles(files: any[]): any[] {
   return files.map((file) => mapFile(file));

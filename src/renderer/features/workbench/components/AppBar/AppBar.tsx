@@ -107,13 +107,35 @@ const AppProgress = ({ summary, progress }) => {
           <div id="ProgressTooltip">
             <header>
               <Typography className="title d-flex space-between">
-                <span>{t('Tooltip:DetectedFiles')}</span>
+                <span>{t('Tooltip:TotalFiles')}</span>
+                <span>{summary?.summary.totalFiles}</span>
+              </Typography>
+              <hr />
+              <Typography className="subtitle d-flex space-between">
+                <span>{t('Tooltip:Detected')}</span>
                 <span>{summary?.summary.matchFiles}</span>
+              </Typography>
+
+              <Typography className="subtitle d-flex space-between">
+                <span>{t('Tooltip:NotDetected')}</span>
+                <span>{summary?.summary.noMatchFiles}</span>
+              </Typography>
+
+              <Typography className="subtitle d-flex space-between">
+                <span>{t('Tooltip:Ignored')}</span>
+                <span>{summary?.summary.filterFiles}</span>
+              </Typography>
+            </header>
+
+            <header>
+              <Typography className="title d-flex space-between mt-4">
+                <span>{t('Tooltip:Progress')}</span>
+                <span>{summary?.identified.scan + summary?.original}/{summary?.summary.matchFiles} ({Math.trunc(progress)}%)</span>
               </Typography>
               <hr />
             </header>
 
-            <section className="d-flex space-between mt-1">
+            <section className="d-flex space-between mx-1 ml-1 mr-1 mb-1">
               <div className="mr-4">
                 <Typography className="has-status-bullet pending">{summary?.pending}</Typography>
                 <p className="m-0 text-uppercase">{t('Title:Pending')}</p>

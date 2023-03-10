@@ -8,7 +8,6 @@ export const ComponentInfo = ({ component }: { component: any }) => {
   const [over, setOver] = useState<boolean>(false);
   const group = !!component.versions;
 
-
   const getReliableLicense = (licenses: Array<any>, spdxid: string) => {
     return licenses.find((license) => license.spdxid === spdxid) || licenses[0];
   };
@@ -18,14 +17,18 @@ export const ComponentInfo = ({ component }: { component: any }) => {
       ? component.versions[0].version
       : `${component.versions.length} versions`
     : component.version;
-  const license =
 
+  // get all not repeated licenses
+  const licenses = React.useRef([...new Map(component.versions.map((version) =>version.licenses).flat().map(item => [item.spdxid, item])).values()]);
+
+  // get displayed license
+  const license = React.useRef(
     component.licenses || component.versions
       ? group
-        ? getReliableLicense(component.versions[0].licenses,component.versions[0].reliableLicense)?.name
+        ? getReliableLicense(licenses.current, component.versions.find((version) => version.reliableLicense !== null)?.reliableLicense)?.name
         : component.licenses[0]
-      : '-';
-
+      : '-'
+  );
 
   return (
     <div className="component-info">
@@ -40,7 +43,7 @@ export const ComponentInfo = ({ component }: { component: any }) => {
           <div className="component-details-card selectable">
             <div className="tiny-container-detail">
               <p className="title-detail">{t('Title:License')}</p>
-              <p className="desc-detail">{license}</p>
+              <p className="desc-detail">{license.current}</p>
             </div>
             <div className="tiny-container-detail">
               <p className="title-detail">{t('Title:PURL')}</p>

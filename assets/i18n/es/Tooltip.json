@@ -42,5 +42,10 @@
   "ExportHintRAW": "Exportar las respuestas JSON sin procesar desde la Plataforma SCANOSS",
   "ExportHintCSV": "Exportar informe en formato CSV",
   "ExportHintSPDXLite": "Exportar informe SBOM en formato SPDX",
-  "ExportHintHTML": "Exportar un resumen HTML del informe de identificación"
+  "ExportHintHTML": "Exportar un resumen HTML del informe de identificación",
+  "TotalFiles": "Ficheros totales",
+  "Detected": "Detectados",
+  "NotDetected": "No detectados",
+  "Ignored": "Ignorados",
+  "Progress": "Progreso"
 }

@@ -98,7 +98,13 @@
   header .title {
     margin-top: 4px;
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.2;
+  }
+
+  header .subtitle {
+    margin-top: 4px;
+    font-size: 0.75rem;
+    font-weight: 400;
   }
 }

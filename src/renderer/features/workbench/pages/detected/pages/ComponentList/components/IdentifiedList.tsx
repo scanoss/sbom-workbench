@@ -5,10 +5,10 @@ import { FileList } from './FileList';
 
 export const IdentifiedList = ({ files, emptyMessage, onAction }) => {
   const { component } = useSelector(selectComponentState);
-  const [groups, setGroups] = useState({});
+  const [groups, setGroups] = useState(null);
 
   const fetchGroups = () => {
-    const grupedFiles = files.reduce((acc, file) => {
+    const groupedFiles = files.reduce((acc, file) => {
       const key = file.component?.name;
       // eslint-disable-next-line no-prototype-builtins
       if (!acc.hasOwnProperty(key)) acc[key] = [];
@@ -16,10 +16,15 @@ export const IdentifiedList = ({ files, emptyMessage, onAction }) => {
       return acc;
     }, {});
 
-    setGroups(grupedFiles);
+    setGroups(groupedFiles);
   };
 
   useEffect(fetchGroups, [files]);
+
+  // loader
+  if (!files || !groups) {
+    return <p>Loading files...</p>;
+  }
 
   return (
     <div className="file-group-container">

@@ -44,13 +44,13 @@ const ActionButton = ({
         <>
           <ButtonGroup
             size="small"
-            disabled={files.pending.length === 0}
+            disabled={!files.pending || files.pending.length === 0}
             ref={anchorRef}
             variant="contained"
             color="secondary"
           >
             <Button variant="contained" onClick={onIdentifyAllPressed}>
-              {t('Button:IdentifyAllWithCount', { count: files.pending.length})}
+              {t('Button:IdentifyAllWithCount', { count: files.pending?.length})}
             </Button>
             <Button color="secondary" onClick={handleToggle}>
               <ArrowDropDownIcon fontSize="inherit" />
@@ -74,7 +74,7 @@ const ActionButton = ({
                           onIgnoreAllPressed();
                         }}
                       >
-                        {t('Button:MarkAllAsOriginalWithCount', { count: files.pending.length})}
+                        {t('Button:MarkAllAsOriginalWithCount', { count: files.pending?.length})}
                       </MenuItem>
                     </MenuList>
                   </ClickAwayListener>
@@ -87,23 +87,23 @@ const ActionButton = ({
       {tab === 1 && (
         <Button
           size="small"
-          disabled={files.identified.length === 0}
+          disabled={!files.identified || files.identified.length === 0}
           variant="contained"
           color="secondary"
           onClick={onDetachAllPressed}
         >
-          {t('Button:RestoreAllWithCount', { count: files.identified.length})}
+          {t('Button:RestoreAllWithCount', { count: files.identified?.length})}
         </Button>
       )}
       {tab === 2 && (
         <Button
           size="small"
-          disabled={files.ignored.length === 0}
+          disabled={!files.ignored || files.ignored.length === 0}
           variant="contained"
           color="secondary"
           onClick={onRestoreAllPressed}
         >
-          {t('Button:RestoreAllWithCount', { count: files.ignored.length})}
+          {t('Button:RestoreAllWithCount', { count: files.ignored?.length})}
         </Button>
       )}
     </>

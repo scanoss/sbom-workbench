@@ -41,9 +41,9 @@ export const ComponentDetail = () => {
 
   const [files, setFiles] = useState<any[]>([]);
   const [filterFiles, setFilterFiles] = useState<{ pending: any[]; identified: any[]; ignored: any[] }>({
-    pending: [],
-    identified: [],
-    ignored: [],
+    pending: null,
+    identified: null,
+    ignored: null,
   });
 
   const [tab, setTab] = useState<number>(0);
@@ -103,11 +103,11 @@ export const ComponentDetail = () => {
     const inv: Partial<Inventory> = {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      component: component?.name,
-      version: version || component?.versions[0]?.version,
-      spdxid: component?.versions[0].reliableLicense,
-      url: component?.url,
-      purl: component?.purl,
+      component: component.name,
+      version: version || component.versions[0]?.version,
+      spdxid: component.versions.find((version) => version.reliableLicense !== null)?.reliableLicense,
+      url: component.url,
+      purl: component.purl,
       usage: 'file',
     };
 
@@ -193,14 +193,16 @@ export const ComponentDetail = () => {
 
   useEffect(() => {
     setFilterFiles({
-      pending: [],
-      identified: [],
-      ignored: [],
+      pending: null,
+      identified: null,
+      ignored: null,
     });
     getFiles();
   }, [version, node]);
 
   useEffect(() => {
+    if(searchQuery === null || searchQuery === undefined || !files) return;
+
     setFilterFiles({
       pending: files.filter((file) => file.path.toLowerCase().includes(searchQuery) && file.status === 'pending'),
       identified: files.filter((file) => file.path.toLowerCase().includes(searchQuery) && file.status === 'identified'),

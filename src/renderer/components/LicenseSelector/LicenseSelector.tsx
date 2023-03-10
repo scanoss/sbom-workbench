@@ -80,7 +80,6 @@ const LicenseSelector: React.FC<Partial<LicenseSelectorProps>> = (props) => {
           {...autocompleteProps}
           renderInput={(params) => (
             <TextField
-              required
               {...params}
               InputProps={{
                 ...params.InputProps,
