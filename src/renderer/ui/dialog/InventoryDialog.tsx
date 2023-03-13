@@ -491,7 +491,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <div className="dialog-row">
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">
-                {t('Title:UR')}L{' '}
+                {t('Title:URL')}{' '}
                 <span className="optional">- {t('Optional')}</span>
               </label>
               <Paper className="dialog-form-field-control">
@@ -499,7 +499,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   size="small"
                   name="url"
                   fullWidth
-                  disabled
                   value={form?.url}
                   onChange={(e) => inputHandler(e)}
                 />

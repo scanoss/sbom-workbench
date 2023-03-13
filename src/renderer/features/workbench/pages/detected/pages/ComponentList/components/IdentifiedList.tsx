@@ -8,7 +8,7 @@ export const IdentifiedList = ({ files, emptyMessage, onAction }) => {
   const [groups, setGroups] = useState(null);
 
   const fetchGroups = () => {
-    const groupedFiles = files.reduce((acc, file) => {
+    const groupedFiles = files?.reduce((acc, file) => {
       const key = file.component?.name;
       // eslint-disable-next-line no-prototype-builtins
       if (!acc.hasOwnProperty(key)) acc[key] = [];
