@@ -85,14 +85,10 @@ class InventoryService  {
 
   public async getAll(inventory: Partial<Inventory>): Promise<Array<Inventory>> {
     try {
-      let inventories: any;
-      if (inventory.purl && inventory.version) {
-        inventories = await modelProvider.model.inventory.getByPurlVersion(inventory);
-      } else if (inventory.files) {
-        inventories = await modelProvider.model.inventory.getByResultId(inventory);
-      } else if (inventory.purl) {
-        inventories = await modelProvider.model.inventory.getByPurl(inventory);
-      } else inventories = await modelProvider.model.inventory.getAll();
+      const {purl,version,files} = inventory;
+      const params = JSON.parse(JSON.stringify({purl,version,filePath: files !== undefined ? files[0] : undefined }));
+      const queryBuilder = QueryBuilderCreator.create(params);
+      const inventories = await modelProvider.model.inventory.getAll(queryBuilder);
       if (inventory !== undefined) {
         const component: any = await modelProvider.model.component.getAll();
         const compObj = component.reduce((acc, comp) => {

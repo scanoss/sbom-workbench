@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 
 import log from 'electron-log';
+import util from 'util';
 import { Querys } from './querys_db';
 import { Model } from './Model';
 import { ComponentModel } from './ComponentModel';
 import { Inventory, Files } from '../../api/types';
 import { ResultModel } from './ResultModel';
-import util from 'util';
+import { QueryBuilder } from './queryBuilder/QueryBuilder';
 
 const query = new Querys();
 
@@ -21,45 +22,19 @@ export class InventoryModel extends Model {
     this.results = new ResultModel(path);
   }
 
-  public async getByResultId(inventory: Partial<Inventory>) {
+  public async getAll(queryBuilder?: QueryBuilder) {
+    const SQLquery = this.getSQL(
+      queryBuilder,
+      query.SQL_GET_ALL_INVENTORIES,
+      {purl:'c.purl', version:'c.version', filePath:'f.path'}
+    );
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const inventories = await call(query.SQL_SCAN_SELECT_INVENTORIES_FROM_PATH, inventory.files[0]);
-    db.close();
-    if (inventories) return inventories;
-    return undefined;
-  }
-
-  public async getByPurlVersion(inventory: Partial<Inventory>) {
-    return new Promise(async (resolve) => {
-      try {
-        const db = await this.openDb();
-        if (inventory.purl !== undefined) {
-          db.all(
-            query.SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION,
-            inventory.purl,
-            inventory.version,
-            (err: any, inv: any) => {
-              db.close();
-              if (err) resolve(undefined);
-              else resolve(inv);
-            }
-          );
-        }
-      } catch (error) {
-        log.error(error);
-        resolve(undefined);
-      }
-    });
-  }
-
-  public async getAll() {
-    const db = await this.openDb();
-    const call = util.promisify(db.all.bind(db));
-    const inventories = await call(query.SQL_GET_ALL_INVENTORIES);
+    const inventories = await call(SQLquery.SQL,...SQLquery.params);
     db.close();
     return inventories;
   }
+
   public async attachFileInventory(inventory: Partial<Inventory>):Promise<boolean> {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
@@ -73,6 +48,7 @@ export class InventoryModel extends Model {
     db.close();
     return true;
   }
+
   // DETACH FILE INVENTORY
   public async detachFileInventory(inventory: Partial<Inventory>):Promise<void> {
     const files = `(${inventory.files.toString()});`;
@@ -82,6 +58,7 @@ export class InventoryModel extends Model {
     await call(sql);
     db.close();
   }
+
   public async emptyInventory() {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
@@ -89,6 +66,7 @@ export class InventoryModel extends Model {
     db.close();
     return emptyInventories;
   }
+
   public async deleteAllEmpty(id: number[]):Promise<void> {
     const sql = `DELETE FROM inventories WHERE id in (${id.toString()});`;
     const db = await this.openDb();
@@ -96,6 +74,7 @@ export class InventoryModel extends Model {
     await call(sql);
     db.close();
   }
+
   // GET INVENTORY BY ID
   public async get(inventory: Partial<Inventory>) {
     let inventories: any;
@@ -117,13 +96,7 @@ export class InventoryModel extends Model {
     db.close();
     return inventory;
   }
-  public async getByPurl(inventory: Partial<Inventory>) {
-    const db = await this.openDb();
-    const call = util.promisify(db.all.bind(db));
-    const inventories = await call(query.SQL_GET_INVENTORY_BY_PURL, inventory.purl);
-    db.close();
-    return inventories;
-  }
+
   public async isInventory(inventory: Partial<Inventory>): Promise<Partial<Inventory>> {
     let SQLquery = `SELECT id FROM inventories WHERE  notes# AND usage=? AND spdxid=? AND cvid=? AND source='detected';`;
     SQLquery = SQLquery.replace('#', inventory.notes ? `='${inventory.notes}'` : ' IS NULL');
@@ -133,6 +106,7 @@ export class InventoryModel extends Model {
     db.close();
     return inventoryId;
   }
+
   public async create(inventory: any) {
     return new Promise<Partial<Inventory>>(async (resolve, reject) => {
       try {
@@ -158,6 +132,7 @@ export class InventoryModel extends Model {
       }
     });
   }
+
   public async update(inventory: Inventory): Promise<Inventory> {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
@@ -175,6 +150,7 @@ export class InventoryModel extends Model {
     db.close();
     return inventories;
   }
+
   private groupByComponentName(data: any) {
     const aux: Record<string, any> = data.reduce((acc, value) => {
       const key = value.name;
@@ -202,6 +178,7 @@ export class InventoryModel extends Model {
     db.close();
     return files;
   }
+
   public async delete(inventory: Partial<Inventory>): Promise<boolean> {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
@@ -210,6 +187,7 @@ export class InventoryModel extends Model {
     db.close();
     return true;
   }
+
    public async deleteDirtyFileInventories(id: number[]) {
      const db = await this.openDb();
      const call = util.promisify(db.run.bind(db));
@@ -217,6 +195,7 @@ export class InventoryModel extends Model {
      db.close();
      return dirtyInventories;
    }
+
   public async createBatch(inventories: Array<Partial<Inventory>>) {
     return new Promise<Array<Inventory>>(async (resolve, reject) => {
       try {
@@ -260,6 +239,7 @@ export class InventoryModel extends Model {
     db.close();
     return true;
   }
+
   public async deleteDirtyDependencyInventories(): Promise<void> {
     const sql = `DELETE FROM inventories WHERE cvid IN(
           SELECT cv.id FROM component_versions cv WHERE NOT EXISTS (SELECT 1 FROM dependencies WHERE purl = cv.purl AND version = cv.version) ORDER BY cv.id) AND source='declared' ;`;
