@@ -21,6 +21,9 @@ export class QueryBuilderCreator {
       if (params.source) {
         builder.add(new QueryBuilderCustom('source', '=', `${params.source}`));
       }
+      if (params.filePath) {
+        builder.add(new QueryBuilderCustom('filePath', '=', `${params.filePath}`));
+      }
       if (params.status) {
         builder.add(new QueryBuilderStatus(params.status));
       }
