@@ -9,6 +9,7 @@ import { ComponentModel } from './ComponentModel';
 import { licenseHelper } from '../helpers/LicenseHelper';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { IInsertResult, IResultLicense } from './interfaces/IInsertResult';
+import { QueryBuilderCreator } from './queryBuilder/QueryBuilderCreator';
 
 const query = new Querys();
 
@@ -245,6 +246,17 @@ export class ResultModel extends Model {
     const response = await call(`SELECT cv.purl,cv.version,cv.name, r.vendor, rl.spdxid,rl.patent_hints,rl.copyLeft,rl.incompatible_with FROM component_versions cv
                                 INNER JOIN results r ON cv.purl = r.purl AND cv.version = r.version
                                 INNER JOIN result_license rl ON rl.resultId = r.id;`);
+    db.close();
+    return response;
+  }
+
+  public async getFileMatch(queryBuilder: QueryBuilder) {
+    const SQLquery = this.getSQL(queryBuilder,`SELECT * from files f LEFT JOIN results r ON f.fileId = r.fileId #FILTER`, { path: 'f.path', purl: 'r.purl',
+      version: 'r.version', url: 'r.url'
+    });
+    const db = await this.openDb();
+    const call = util.promisify(db.get.bind(db));
+    const response = await call(SQLquery.SQL,...SQLquery.params);
     db.close();
     return response;
   }

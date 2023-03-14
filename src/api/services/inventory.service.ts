@@ -1,6 +1,7 @@
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
 import { IBatchInventory, Inventory } from '../types';
+import { InventoryFileDTO } from '@api/dto';
 
 class InventoryService extends BaseService {
   public async getAll(args: Partial<Inventory>): Promise<any> {
@@ -50,6 +51,11 @@ class InventoryService extends BaseService {
 
   public async acceptAllPreLoadInventory(data: Partial<IBatchInventory>): Promise<Partial<Array<Inventory>>> {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.INVENTORY_ACCEPT_PRE_LOAD, data);
+    return this.response(response);
+  }
+
+  public async getAllByFile(path: string): Promise<Array<InventoryFileDTO>> {
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.INVENTORY_GET_ALL_BY_FILE, path);
     return this.response(response);
   }
 }

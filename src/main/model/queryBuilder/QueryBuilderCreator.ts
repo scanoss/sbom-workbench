@@ -30,6 +30,9 @@ export class QueryBuilderCreator {
       if (params.purl) {
         builder.add(new QueryBuilderCustom('purl', '=', params.purl));
       }
+      if (params.url) {
+        builder.add(new QueryBuilderCustom('url', '=', params.url));
+      }
       if (params.version) {
         builder.add(new QueryBuilderCustom('version', '=', params.version));
       }
@@ -48,6 +51,9 @@ export class QueryBuilderCreator {
       }
       if (params.filename) {
         builder.add(new QueryBuilderFilename(params.filename));
+      }
+      if (params.filePath) {
+        builder.add(new QueryBuilderCustom('path','=',params.filePath));
       }
       if (params.paths) {
         const queryBuilderIN = new QueryBuilderIN();

@@ -1,4 +1,4 @@
-import { ComponentGroup, Dependency, ExportFormat, ExportSource } from '@api/types';
+import { ComponentGroup, Dependency, ExportFormat, ExportSource, Inventory , Result} from './types';
 import { ISearchComponent } from '../main/task/componentCatalog/iComponentCatalog/ISearchComponent';
 import { IComponentResult } from '../main/task/componentCatalog/iComponentCatalog/IComponentResult';
 
@@ -50,6 +50,11 @@ export interface NewLicenseDTO {
   fulltext: string;
   url?: string;
   spdxid?: string;
+}
+
+export interface InventoryFileDTO{
+  inventory: Inventory,
+  fromResult: Result
 }
 
 export interface IAppInfo {
