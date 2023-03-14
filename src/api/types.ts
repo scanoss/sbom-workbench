@@ -245,6 +245,29 @@ export enum FileTreeViewMode {
   PRUNE,
 }
 
+export interface Result {
+  id: number;
+  fileId: number;
+  md5_file: string;
+  vendor: string;
+  component: string;
+  version: string;
+  latest_version: string;
+  cpe: string,
+  lines: string;
+  url: string;
+  oss_lines: string;
+  matched: string;
+  filename: string;
+  size: string;
+  idtype: string;
+  md5_comp: string;
+  compid: number;
+  purl: string;
+  file_url: string;
+  source: string;
+}
+
 export interface Dependency {
   dependencyId: number;
   fileId: number;

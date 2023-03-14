@@ -3,6 +3,7 @@ import { modelProvider } from './ModelProvider';
 import { Component, IBatchInventory, Inventory, IWorkbenchFilter } from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
 import { QueryBuilderCreator } from "../model/queryBuilder/QueryBuilderCreator";
+import { InventoryFileDTO } from '@api/dto';
 
 class InventoryService  {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
@@ -198,6 +199,16 @@ class InventoryService  {
     } catch (err: any) {
       return err;
     }
+  }
+
+  public async getAllByFile(path:string): Promise<Array<InventoryFileDTO>> {
+    const inventories = await this.getAll({files:[path]});
+    const response = [];
+    for (let i=0; i< inventories.length; i+=1) {
+        const result = await modelProvider.model.result.getFileMatch( QueryBuilderCreator.create({ filePath:path , purl:inventories[i].component.purl } ));
+        response.push({inventory: inventories[i] , fromResult: result || null });
+      }
+    return response;
   }
 
 }
