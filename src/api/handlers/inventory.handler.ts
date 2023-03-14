@@ -16,7 +16,7 @@ ipcMain.handle(IpcChannels.INVENTORY_GET_ALL, async (_event, params: Partial<Inv
     const inventories = await inventoryService.getAll(params);
     return Response.ok({ message: 'Inventory Get All', data: inventories });
   } catch (error: any) {
-    log.error('[ INVENTORY GET ALL ]: ', e, params);
+    log.error('[ INVENTORY GET ALL ]: ', error, params);
     Response.fail({ message: error.message });
   }
 });
@@ -26,7 +26,7 @@ ipcMain.handle(IpcChannels.INVENTORY_GET, async (_event, param: Partial<Inventor
     const inventory: Inventory = await inventoryService.get(param);
     return Response.ok({ message: 'Inventory Get', data: inventory });
   } catch (error: any) {
-    log.error('[ INVENTORY GET ]: ', e, param);
+    log.error('[ INVENTORY GET ]: ', error, param);
     Response.fail({ message: error.message });
   }
 });
@@ -37,7 +37,7 @@ ipcMain.handle(IpcChannels.INVENTORY_CREATE, async (event, param: Inventory) => 
     treeService.updateTree(param.files, NodeStatus.IDENTIFIED);
     return Response.ok({ message: 'Inventory Create', data: inventory });
   } catch (error: any) {
-    log.error('[ INVENTORY CREATE ]: ', e, param);
+    log.error('[ INVENTORY CREATE ]: ', error, param);
     Response.fail({ message: error.message });
   }
 });
@@ -47,7 +47,7 @@ ipcMain.handle(IpcChannels.INVENTORY_ATTACH_FILE, async (_event, param: Partial<
     const success = await inventoryService.attach(param);
     return Response.ok({ message: 'Inventory Attach', data: success });
   } catch (error: any) {
-    log.error('[ INVENTORY ATTACH ]: ', e, param);
+    log.error('[ INVENTORY ATTACH ]: ', error, param);
     Response.fail({ message: error.message });
   }
 });
@@ -58,7 +58,7 @@ ipcMain.handle(IpcChannels.INVENTORY_DETACH_FILE, async (_event, param: Partial<
     treeService.retoreStatus(param.files);
     return Response.ok({ message: 'Inventory detach', data: success });
   } catch (error: any) {
-    log.error('[ INVENTORY DETACH ]: ', e, param);
+    log.error('[ INVENTORY DETACH ]: ', error, param);
     Response.fail({ message: error.message });
   }
 });
@@ -96,7 +96,7 @@ ipcMain.handle(IpcChannels.INVENTORY_BATCH, async (_event, params: IBatchInvento
     const success = await bachAction.execute();
     return Response.ok({ message: 'Inventory batch', data: success });
   } catch (error: any) {
-    log.error('[ INVENTORY BATCH ]: ', e, params);
+    log.error('[ INVENTORY BATCH ]: ', error, params);
     Response.fail({ message: error.message });
   }
 });
