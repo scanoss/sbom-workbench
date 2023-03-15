@@ -86,5 +86,7 @@
   "RemoteFileNotLoad" : "Remote source file could not be loaded",
   "FileTypeNotSupported": "File type not supported for viewing",
   "OverridePreviousWork": "Override previous work",
-  "ChooseProjectToImport": "Choose project to import identifications"
+  "ChooseProjectToImport": "Choose project to import identifications",
+  "KeepOriginalUsage": "Keep detected usage",
+  "PreRequiste": "Pre-Requisite"
 }

@@ -1,7 +1,18 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
-import { Dialog, Paper, DialogActions, Button, Select, MenuItem, TextField, IconButton, Tooltip } from '@mui/material';
+import {
+  Dialog,
+  Paper,
+  DialogActions,
+  Button,
+  Select,
+  MenuItem,
+  TextField,
+  IconButton,
+  Tooltip,
+  PaperProps
+} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import React, {useEffect, useState, useContext, useRef} from 'react';
@@ -11,18 +22,31 @@ import { Inventory } from '@api/types';
 import { InventoryForm } from '@context/types';
 import { componentService } from '@api/services/component.service';
 import { licenseService } from '@api/services/license.service';
-import { DialogContext } from '@context/DialogProvider';
+import { DialogContext, InventoryDialogOptions } from '@context/DialogProvider';
 import { ResponseStatus } from '@api/Response';
 import { useSelector } from 'react-redux';
 import { selectComponentState } from '@store/component-store/componentSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { makeStyles } from '@mui/styles';
 import { useTranslation } from 'react-i18next';
+import Draggable from 'react-draggable';
 
 // icons
 import CloseIcon from '@mui/icons-material/Close'
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
+
+function PaperComponent(props: PaperProps) {
+  return (
+    <Draggable
+      handle="#draggable-dialog-title"
+      cancel={'[class*="MuiDialogContent-root"]'}
+      bounds="parent"
+    >
+      <Paper {...props} />
+    </Draggable>
+  );
+}
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -55,6 +79,13 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.primary.main,
     },
   },
+
+  keep: {
+    '& .MuiInputBase-input': {
+      fontStyle: 'italic',
+      color: 'gray'
+    }
+  },
 }));
 
 const filter = createFilterOptions<any>();
@@ -62,6 +93,7 @@ const filter = createFilterOptions<any>();
 interface InventoryDialogProps {
   open: boolean;
   inventory: Partial<InventoryForm>;
+  options: InventoryDialogOptions;
   onClose: (inventory: Inventory) => void;
   onCancel: () => void;
 }
@@ -74,13 +106,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const { recents } = useSelector(selectComponentState);
   const { isFilterActive } = useSelector(selectNavigationState);
 
-  const { open, inventory, onClose, onCancel } = props;
+  const { open, inventory, options, onClose, onCancel } = props;
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
   const [components, setComponents] = useState<any[]>([]);
   const [versions, setVersions] = useState<any[]>([]);
   const [licenses, setLicenses] = useState<any[]>([]);
   const [licensesAll, setLicensesAll] = useState<any[]>();
-
 
   const loaded = useRef<boolean>(false);
 
@@ -241,13 +272,17 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   };
 
   const isValid = () => {
-    const { version, component, purl, spdxid, usage } = form;
+    const { version, component, purl, spdxid, usage} = form;
     return spdxid && version && component && purl && usage;
   };
 
   const onSubmit = (e) => {
     e.preventDefault();
     const newInventory: any = form;
+    if (newInventory.usage === "keep") {
+      newInventory.usage = null;
+    }
+
     onClose(newInventory);
   };
 
@@ -289,13 +324,14 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
     <Dialog
       id="InventoryDialog"
       className={`${classes.size} dialog`}
+      PaperComponent={PaperComponent}
       maxWidth="md"
       scroll="body"
       fullWidth
       open={open}
       onClose={onCancel}
     >
-      <header className="dialog-title">
+      <header className="dialog-title" style={{ cursor: 'move' }} id="draggable-dialog-title">
         <span>
           {!form.id
             ? t('Title:IdentifyComponent')
@@ -498,6 +534,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                 <TextField
                   size="small"
                   name="url"
+                  disabled
                   fullWidth
                   value={form?.url}
                   onChange={(e) => inputHandler(e)}
@@ -537,8 +574,10 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   fullWidth
                   value={form?.usage || 'file'}
                   disableUnderline
+                  className={ form?.usage === 'keep' ? classes.keep : ''}
                   onChange={(e) => inputHandler(e)}
                 >
+                  { options.keepOriginalOption && <MenuItem value="keep" sx={{fontStyle: 'italic', color: 'gray'}}>{t('KeepOriginalUsage')}</MenuItem> }
                   <MenuItem value="file">{t('File')}</MenuItem>
                   <MenuItem value="snippet">{t('Snippet')}</MenuItem>
                   <MenuItem value="pre-requisite">{t('PreRequisite')}</MenuItem>

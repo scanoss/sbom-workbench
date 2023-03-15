@@ -17,7 +17,7 @@ import ComponentSearcherDialog from '../ui/dialog/ComponentSearcherDialog';
 import { ProjectSelectorDialog } from '../ui/dialog/ProjectSelectorDialog';
 
 export interface IDialogContext {
-  openInventory: (inventory: Partial<InventoryForm>) => Promise<Inventory | null>;
+  openInventory: (inventory: Partial<InventoryForm>, options?: InventoryDialogOptions) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
   openAlertDialog: (message?: string, buttons?: any[]) => Promise<DialogResponse>;
@@ -31,6 +31,14 @@ export interface IDialogContext {
   openProjectSelectorDialog: (params?: { folder?: string, md5File?: string}) => Promise<DialogResponse>;
 }
 
+export interface InventoryDialogOptions {
+  keepOriginalOption?: boolean
+}
+
+export const defaultInventoryDialogOptions: InventoryDialogOptions = {
+  keepOriginalOption: false,
+};
+
 export const DialogContext = React.createContext<IDialogContext | null>(null);
 
 export const DialogProvider: React.FC<any> = ({ children }) => {
@@ -39,13 +47,15 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
   const [inventoryDialog, setInventoryDialog] = useState<{
     open: boolean;
     inventory: Partial<InventoryForm>;
+    options: InventoryDialogOptions;
     onClose?: (inventory) => void;
-  }>({ open: false, inventory: {} });
+  }>({ open: false, inventory: {}, options: {} });
 
-  const openInventory = (inventory: Partial<InventoryForm>): Promise<Inventory | null> => {
+  const openInventory = (inventory: Partial<InventoryForm>, options: InventoryDialogOptions = {}): Promise<Inventory | null> => {
     return new Promise<Inventory>((resolve) => {
       setInventoryDialog({
         inventory,
+        options: {...defaultInventoryDialogOptions, ...options},
         open: true,
         onClose: (inv) => {
           setInventoryDialog((dialog) => ({ ...dialog, open: false }));
@@ -352,6 +362,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         <InventoryDialog
           open={inventoryDialog.open}
           inventory={inventoryDialog.inventory}
+          options={inventoryDialog.options}
           onCancel={() => inventoryDialog.onClose && inventoryDialog.onClose(null)}
           onClose={(inventory) => inventoryDialog.onClose && inventoryDialog.onClose(inventory)}
         />

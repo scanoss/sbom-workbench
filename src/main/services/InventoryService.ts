@@ -3,7 +3,9 @@ import { modelProvider } from './ModelProvider';
 import { Component, IBatchInventory, Inventory, IWorkbenchFilter } from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
 import { QueryBuilderCreator } from "../model/queryBuilder/QueryBuilderCreator";
+import { getInventoriesGroupedByUsage, getUniqueResults } from './utils/inventoryServiceUtil';
 import { InventoryFileDTO } from '@api/dto';
+
 
 class InventoryService  {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
@@ -52,21 +54,30 @@ class InventoryService  {
     }
   }
 
-  public async create(inventory: Partial<Inventory>): Promise<Inventory> {
+  public async create(inventory: Partial<Inventory>): Promise<Array<Inventory>> {
     try {
       const component: any = await modelProvider.model.component.getbyPurlVersion({
         purl: inventory.purl,
         version: inventory.version,
       });
       inventory.cvid = component.compid;
-      const inv = await this.isInventory(inventory);
-      if (!inv) {
-        // eslint-disable-next-line no-param-reassign
-        inventory = (await modelProvider.model.inventory.create(inventory)) as Inventory;
-      } else inventory.id = inv.id;
-      await this.attach(inventory);
-      inventory.component = component as Component;
-      return inventory as Inventory;
+      const newInventories = [];
+      let inventories = [];
+      if (inventory.usage === null) {
+        const results = await modelProvider.model.result.getAll(QueryBuilderCreator.create({ fileId: inventory.files }));
+        inventories = getInventoriesGroupedByUsage(inventory, getUniqueResults(results));
+      } else inventories.push(inventory);
+      for (let i = 0; i< inventories.length ; i+=1) {
+        const inv = await this.isInventory(inventories[i]);
+        if (!inv) newInventories.push((await modelProvider.model.inventory.create(inventories[i])) as Inventory);
+        else {
+          inventories[i].id = inv.id;
+          newInventories.push(inventories[i])
+        }
+        await this.attach(inventories[i]);
+        inventories[i].component = component as Component;
+      }
+      return newInventories;
     } catch (error: any) {
       log.error(error);
       return error;
