@@ -11,13 +11,14 @@ import { workspace } from '../../main/workspace/Workspace';
 import { modelProvider } from '../../main/services/ModelProvider';
 import { Response } from '../Response';
 
+
 ipcMain.handle(IpcChannels.INVENTORY_GET_ALL, async (_event, params: Partial<Inventory>) => {
   try {
     const inventories = await inventoryService.getAll(params);
     return Response.ok({ message: 'Inventory Get All', data: inventories });
   } catch (error: any) {
     log.error('[ INVENTORY GET ALL ]: ', error, params);
-    Response.fail({ message: error.message });
+    return Response.fail({ message: error.message });
   }
 });
 
@@ -27,7 +28,7 @@ ipcMain.handle(IpcChannels.INVENTORY_GET, async (_event, param: Partial<Inventor
     return Response.ok({ message: 'Inventory Get', data: inventory });
   } catch (error: any) {
     log.error('[ INVENTORY GET ]: ', error, param);
-    Response.fail({ message: error.message });
+    return Response.fail({ message: error.message });
   }
 });
 
@@ -39,7 +40,7 @@ ipcMain.handle(IpcChannels.INVENTORY_CREATE, async (event, param: Inventory) => 
     return Response.ok({ message: 'Inventory Create', data: inventory });
   } catch (error: any) {
     log.error('[ INVENTORY CREATE ]: ', error, param);
-    Response.fail({ message: error.message });
+    return Response.fail({ message: error.message });
   }
 });
 
@@ -49,7 +50,7 @@ ipcMain.handle(IpcChannels.INVENTORY_ATTACH_FILE, async (_event, param: Partial<
     return Response.ok({ message: 'Inventory Attach', data: success });
   } catch (error: any) {
     log.error('[ INVENTORY ATTACH ]: ', error, param);
-    Response.fail({ message: error.message });
+    return Response.fail({ message: error.message });
   }
 });
 
@@ -60,7 +61,7 @@ ipcMain.handle(IpcChannels.INVENTORY_DETACH_FILE, async (_event, param: Partial<
     return Response.ok({ message: 'Inventory detach', data: success });
   } catch (error: any) {
     log.error('[ INVENTORY DETACH ]: ', error, param);
-    Response.fail({ message: error.message });
+    return Response.fail({ message: error.message });
   }
 });
 
@@ -76,7 +77,7 @@ ipcMain.handle(IpcChannels.INVENTORY_DELETE, async (_event, param: Partial<Inven
     return Response.ok({ message: 'Inventory Delete', data: success });
   } catch (error: any) {
     log.error('[ INVENTORY DELETE ]: ', error, param);
-    Response.fail({ message: error.message });
+    return Response.fail({ message: error.message });
   }
 });
 
@@ -86,7 +87,7 @@ ipcMain.handle(IpcChannels.INVENTORY_FROM_COMPONENT, async (_event) => {
     return Response.ok({ message: 'Inventories from component', data });
   } catch (error: any) {
     log.error('[ INVENTORY DELETE ]: ', error);
-    Response.fail({ message: error.message });
+    return Response.fail({ message: error.message });
   }
 });
 
@@ -98,7 +99,7 @@ ipcMain.handle(IpcChannels.INVENTORY_BATCH, async (_event, params: IBatchInvento
     return Response.ok({ message: 'Inventory batch', data: success });
   } catch (error: any) {
     log.error('[ INVENTORY BATCH ]: ', error, params);
-    Response.fail({ message: error.message });
+    return Response.fail({ message: error.message });
   }
 });
 
@@ -109,7 +110,7 @@ ipcMain.handle(IpcChannels.INVENTORY_ACCEPT_PRE_LOAD, async (_event, param: Part
     return Response.ok({ message: 'Inventory accept preload', data: inventories });
   } catch (error: any) {
     log.error('[ INVENTORY ACCEPT PRELOAD ]: ',error, param);
-    Response.fail({ message: error.message });
+    return Response.fail({ message: error.message });
   }
 });
 
@@ -119,7 +120,7 @@ ipcMain.handle(IpcChannels.INVENTORY_UPDATE, async (_event, param: Inventory) =>
     return Response.ok({ message: 'Inventory accept preload', data: inventory });
   } catch (error: any) {
     log.error('[ INVENTORY UPDATE ]: ',error, param);
-    Response.fail({ message: error.message });
+    return Response.fail({ message: error.message });
   }
 });
 
@@ -129,6 +130,6 @@ ipcMain.handle(IpcChannels.INVENTORY_GET_ALL_BY_FILE, async (_event, path: strin
     return Response.ok({ message: 'Inventory Get All by file', data: inventories });
   } catch (error: any) {
     log.error('[ INVENTORY GET ALL BY FILE]: ', error, path);
-    Response.fail({ message: error.message });
+    return Response.fail({ message: error.message });
   }
 });

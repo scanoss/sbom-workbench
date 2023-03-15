@@ -1,10 +1,10 @@
 import log from 'electron-log';
+import { InventoryFileDTO } from '../../api/dto';
 import { modelProvider } from './ModelProvider';
 import { Component, IBatchInventory, Inventory, IWorkbenchFilter } from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
 import { QueryBuilderCreator } from "../model/queryBuilder/QueryBuilderCreator";
 import { getInventoriesGroupedByUsage, getUniqueResults } from './utils/inventoryServiceUtil';
-import { InventoryFileDTO } from '@api/dto';
 
 
 class InventoryService  {
@@ -97,7 +97,7 @@ class InventoryService  {
 
   public async getAll(inventory: Partial<Inventory>): Promise<Array<Inventory>> {
     try {
-      const {purl,version,files} = inventory;
+      const { purl,version,files } = inventory;
       const params = JSON.parse(JSON.stringify({purl,version,filePath: files !== undefined ? files[0] : undefined }));
       const queryBuilder = QueryBuilderCreator.create(params);
       const inventories = await modelProvider.model.inventory.getAll(queryBuilder);
@@ -212,7 +212,7 @@ class InventoryService  {
     const inventories = await this.getAll({files:[path]});
     const response = [];
     for (let i=0; i< inventories.length; i+=1) {
-        const result = await modelProvider.model.result.getFileMatch( QueryBuilderCreator.create({ filePath:path , purl:inventories[i].component.purl } ));
+        const result = await modelProvider.model.result.getFileMatch( QueryBuilderCreator.create({ filePath: path , purl:inventories[i].component.purl } ));
         response.push({inventory: inventories[i] , fromResult: result || null });
       }
     return response;

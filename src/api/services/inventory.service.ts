@@ -1,7 +1,7 @@
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
 import { IBatchInventory, Inventory } from '../types';
-import { InventoryFileDTO } from '@api/dto';
+import { InventoryFileDTO } from '../dto';
 
 class InventoryService extends BaseService {
   public async getAll(args: Partial<Inventory>): Promise<any> {

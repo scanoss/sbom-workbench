@@ -26,7 +26,7 @@ export class InventoryModel extends Model {
     const SQLquery = this.getSQL(
       queryBuilder,
       query.SQL_GET_ALL_INVENTORIES,
-      {purl:'c.purl', version:'c.version', filePath:'f.path'}
+      { purl:'c.purl', version:'c.version', filePath:'f.path' }
     );
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
