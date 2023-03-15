@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
-import { FileType, Inventory } from '@api/types';
+import { FileType, Inventory, Result } from '@api/types';
 import { mapFiles } from '@shared/utils/scan-util';
 import { inventoryService } from '@api/services/inventory.service';
 import { resultService } from '@api/services/results.service';
@@ -50,6 +50,7 @@ const Editor = () => {
 
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);
+  const [inventoriesMatchInfo, setInventoriesMatchInfo] = useState<Result[] | null>(null);
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
@@ -58,6 +59,7 @@ const Editor = () => {
   const init = () => {
     setMatchInfo(null);
     setInventories(null);
+    setInventoriesMatchInfo(null);
     setIsDiffView(false);
     setLocalFileContent({ content: null, error: false, loading: false });
     setRemoteFileContent({ content: null, error: false, loading: false });
@@ -97,8 +99,11 @@ const Editor = () => {
   };
 
   const getInventories = async () => {
-    const inv = await inventoryService.getAll({ files: [file] });
-    setInventories(inv);
+    const inv = await inventoryService.getAllByFile(file);
+    const inventories = inv.map((i)=> i.inventory);
+    const results = inv.map((i)=> i.fromResult);
+    setInventories(inventories);
+    setInventoriesMatchInfo(results);
   };
 
   const getResults = async () => {
@@ -232,7 +237,7 @@ const Editor = () => {
               <section className="content">
                 <div className="match-info-default-container">
                   {inventories.length > 0
-                    ? inventories.map((inventory) => (
+                    ? inventories.map((inventory, index) => (
                         <MatchInfoCard
                           key={inventory.id}
                           selected={currentMatch === inventory}
@@ -244,6 +249,7 @@ const Editor = () => {
                             license: inventory.spdxid,
                             url: inventory.component.url,
                             purl: inventory.component.purl,
+                            matched: inventoriesMatchInfo[index]?.matched || ''
                           }}
                           status="identified"
                           onSelect={() => null}

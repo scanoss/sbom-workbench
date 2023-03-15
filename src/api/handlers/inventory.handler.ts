@@ -9,7 +9,7 @@ import { treeService } from '../../main/services/TreeService';
 import { NodeStatus } from '../../main/workspace/tree/Node';
 import { workspace } from '../../main/workspace/Workspace';
 import { modelProvider } from '../../main/services/ModelProvider';
-import { Response } from '../../api/Response';
+import { Response } from '../Response';
 
 ipcMain.handle(IpcChannels.INVENTORY_GET_ALL, async (_event, params: Partial<Inventory>) => {
   try {
@@ -30,6 +30,7 @@ ipcMain.handle(IpcChannels.INVENTORY_GET, async (_event, param: Partial<Inventor
     Response.fail({ message: error.message });
   }
 });
+
 
 ipcMain.handle(IpcChannels.INVENTORY_CREATE, async (event, param: Inventory) => {
   try {
@@ -118,6 +119,16 @@ ipcMain.handle(IpcChannels.INVENTORY_UPDATE, async (_event, param: Inventory) =>
     return Response.ok({ message: 'Inventory accept preload', data: inventory });
   } catch (error: any) {
     log.error('[ INVENTORY UPDATE ]: ',error, param);
+    Response.fail({ message: error.message });
+  }
+});
+
+ipcMain.handle(IpcChannels.INVENTORY_GET_ALL_BY_FILE, async (_event, path: string ) => {
+  try {
+    const inventories = await inventoryService.getAllByFile(path);
+    return Response.ok({ message: 'Inventory Get All by file', data: inventories });
+  } catch (error: any) {
+    log.error('[ INVENTORY GET ALL BY FILE]: ', error, path);
     Response.fail({ message: error.message });
   }
 });

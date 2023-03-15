@@ -116,14 +116,6 @@ export class Querys {
     'INSERT or IGNORE INTO license_component_version (cvid,licid) values ((SELECT id FROM component_versions where purl=? and version=?),(SELECT id FROM licenses where spdxid=?));';
 
   /** *** SQL SCAN GET * **** */
-  SQL_SCAN_SELECT_INVENTORIES_FROM_PATH =
-    'SELECT i.id,i.usage,i.cvid,i.notes,i.url,i.spdxid FROM inventories i INNER JOIN file_inventories fi ON i.id=fi.inventoryid INNER JOIN files f ON f.fileId=fi.fileId WHERE f.path=?;';
-
-  SQL_SCAN_SELECT_INVENTORIES_FROM_PURL_VERSION = `SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN component_versions cv ON i.cvid=cv.id INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE cv.purl=? AND cv.version=?;`;
-
-  // GET INVENTORY BY ID
-  SQL_GET_INVENTORY_BY_PURL =
-    'SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid INNER JOIN component_versions cv ON cv.id=i.cvid WHERE cv.purl=?;';
 
   // GET INVENTORY BY ID
   SQL_GET_INVENTORY_BY_ID =
@@ -152,7 +144,7 @@ export class Querys {
 
   // GET ALL THE INVENTORIES
   SQL_GET_ALL_INVENTORIES = `SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i
-  LEFT JOIN licenses l ON i.spdxid=l.spdxid;`;
+  LEFT JOIN licenses l ON i.spdxid=l.spdxid INNER JOIN file_inventories fi ON fi.inventoryId = i.id INNER JOIN files f ON fi.fileId = f.fileId  LEFT JOIN components c ON i.cvid = c.id #FILTER;`;
 
   SQL_UPDATE_IGNORED_FILES =
     'UPDATE files SET ignored=1,identified=0 WHERE fileId IN ';

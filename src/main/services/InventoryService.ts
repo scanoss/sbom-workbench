@@ -4,6 +4,8 @@ import { Component, IBatchInventory, Inventory, IWorkbenchFilter } from '../../a
 import { inventoryHelper } from '../helpers/InventoryHelper';
 import { QueryBuilderCreator } from "../model/queryBuilder/QueryBuilderCreator";
 import { getInventoriesGroupedByUsage, getUniqueResults } from './utils/inventoryServiceUtil';
+import { InventoryFileDTO } from '@api/dto';
+
 
 class InventoryService  {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
@@ -95,14 +97,10 @@ class InventoryService  {
 
   public async getAll(inventory: Partial<Inventory>): Promise<Array<Inventory>> {
     try {
-      let inventories: any;
-      if (inventory.purl && inventory.version) {
-        inventories = await modelProvider.model.inventory.getByPurlVersion(inventory);
-      } else if (inventory.files) {
-        inventories = await modelProvider.model.inventory.getByResultId(inventory);
-      } else if (inventory.purl) {
-        inventories = await modelProvider.model.inventory.getByPurl(inventory);
-      } else inventories = await modelProvider.model.inventory.getAll();
+      const {purl,version,files} = inventory;
+      const params = JSON.parse(JSON.stringify({purl,version,filePath: files !== undefined ? files[0] : undefined }));
+      const queryBuilder = QueryBuilderCreator.create(params);
+      const inventories = await modelProvider.model.inventory.getAll(queryBuilder);
       if (inventory !== undefined) {
         const component: any = await modelProvider.model.component.getAll();
         const compObj = component.reduce((acc, comp) => {
@@ -208,6 +206,16 @@ class InventoryService  {
     } catch (err: any) {
       return err;
     }
+  }
+
+  public async getAllByFile(path:string): Promise<Array<InventoryFileDTO>> {
+    const inventories = await this.getAll({files:[path]});
+    const response = [];
+    for (let i=0; i< inventories.length; i+=1) {
+        const result = await modelProvider.model.result.getFileMatch( QueryBuilderCreator.create({ filePath:path , purl:inventories[i].component.purl } ));
+        response.push({inventory: inventories[i] , fromResult: result || null });
+      }
+    return response;
   }
 
 }
