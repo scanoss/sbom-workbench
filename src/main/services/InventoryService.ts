@@ -212,7 +212,7 @@ class InventoryService  {
     const inventories = await this.getAll({files:[path]});
     const response = [];
     for (let i=0; i< inventories.length; i+=1) {
-        const result = await modelProvider.model.result.getFileMatch( QueryBuilderCreator.create({ filePath: path , purl:inventories[i].component.purl } ));
+        const result = await modelProvider.model.result.getFileMatch( QueryBuilderCreator.create({ filePath: path } ));
         response.push({inventory: inventories[i] , fromResult: result || null });
       }
     return response;

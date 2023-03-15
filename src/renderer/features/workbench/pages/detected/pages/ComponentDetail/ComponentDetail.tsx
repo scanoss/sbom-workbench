@@ -105,7 +105,7 @@ export const ComponentDetail = () => {
       // @ts-ignore
       component: component.name,
       version: version || component.versions[0]?.version,
-      spdxid: component.versions.find((version) => version.reliableLicense !== null)?.reliableLicense,
+      spdxid: component.versions[0]?.reliableLicense || component.versions[0]?.licenses[0]?.spdxid,
       url: component.url,
       purl: component.purl,
       usage: 'keep',

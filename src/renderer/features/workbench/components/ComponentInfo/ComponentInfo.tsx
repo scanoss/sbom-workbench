@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Title from '../Title/Title';
+import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 
 export const ComponentInfo = ({ component }: { component: any }) => {
   const { t } = useTranslation();
@@ -18,16 +19,13 @@ export const ComponentInfo = ({ component }: { component: any }) => {
       : `${component.versions.length} versions`
     : component.version;
 
-  // get all not repeated licenses
-  const licenses = React.useRef([...new Map(component.versions.map((version) =>version.licenses).flat().map(item => [item.spdxid, item])).values()]);
-
   // get displayed license
   const license = React.useRef(
     component.licenses || component.versions
       ? group
-        ? getReliableLicense(licenses.current, component.versions.find((version) => version.reliableLicense !== null)?.reliableLicense)?.name
+        ? getReliableLicense(component.versions[0].licenses, component.versions[0].reliableLicense)
         : component.licenses[0]
-      : '-'
+      : null
   );
 
   return (
@@ -43,7 +41,15 @@ export const ComponentInfo = ({ component }: { component: any }) => {
           <div className="component-details-card selectable">
             <div className="tiny-container-detail">
               <p className="title-detail">{t('Title:License')}</p>
-              <p className="desc-detail">{license.current}</p>
+              { license.current &&
+                <a
+                  href={`https://spdx.org/licenses/${license.current.spdxid}.html`} target="_blank" className="desc-detail url d-flex align-center" rel="noreferrer"
+                  tabIndex={-1}
+                >
+                  <span className="mr-1">{license.current.name}</span>
+                  <OpenInNewOutlinedIcon fontSize="inherit" />
+                </a>
+              }
             </div>
             <div className="tiny-container-detail">
               <p className="title-detail">{t('Title:PURL')}</p>
@@ -51,8 +57,12 @@ export const ComponentInfo = ({ component }: { component: any }) => {
             </div>
             <div className="tiny-container-detail">
               <p className="title-detail">{t('Title:URL')}</p>
-              <a href={component?.url} target="_blank" className="desc-detail url" rel="noreferrer">
-                {component?.url}
+              <a
+                href={component?.url} target="_blank" className="desc-detail url d-flex align-center" rel="noreferrer"
+                tabIndex={-1}
+              >
+                <span className="mr-1"> {component?.url}</span>
+                <OpenInNewOutlinedIcon fontSize="inherit" />
               </a>
             </div>
           </div>
