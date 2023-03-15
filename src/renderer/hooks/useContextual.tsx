@@ -89,9 +89,9 @@ const useContextual = () => {
   };
 
   const identifyAll = async (node: any, fileStatusType: FileStatusType) => {
-    const inventory = await dialogCtrl.openInventory({ usage: 'file' });
+    const inventory = await dialogCtrl.openInventory({ usage: fileStatusType === FileStatusType.PENDING ? 'keep' : 'file' }, {keepOriginalOption: fileStatusType === FileStatusType.PENDING });
     if (inventory) {
-      const { action } = showOverwriteOnIgnoreIdentify(node,fileStatusType) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
+      const { action } = showOverwriteOnIgnoreIdentify(node, fileStatusType) ? await showOverwriteDialog() : { action: DIALOG_ACTIONS.OK };
       if (inventory && action !== DIALOG_ACTIONS.CANCEL) {
         dispatch(
           executeBatch({

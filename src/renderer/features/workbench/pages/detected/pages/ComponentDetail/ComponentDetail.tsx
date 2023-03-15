@@ -108,10 +108,10 @@ export const ComponentDetail = () => {
       spdxid: component.versions.find((version) => version.reliableLicense !== null)?.reliableLicense,
       url: component.url,
       purl: component.purl,
-      usage: 'file',
+      usage: 'keep',
     };
 
-    await create(inv, selFiles);
+    await create(inv, selFiles, true);
   };
 
   const onIgnorePressed = async (file) => {
@@ -163,9 +163,9 @@ export const ComponentDetail = () => {
     navigate(`/workbench/identified/inventory/${file.inventoryid}`);
   };
 
-  const create = async (defaultInventory, selFiles) => {
-    // TODO: use recent componebnts
-    const inventory = await dialogCtrl.openInventory(defaultInventory);
+  const create = async (defaultInventory, selFiles, keepOriginalOption = false) => {
+    // TODO: use recent components
+    const inventory = await dialogCtrl.openInventory(defaultInventory, { keepOriginalOption });
     if (!inventory) return;
 
     dispatch(
