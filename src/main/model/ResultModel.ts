@@ -251,7 +251,7 @@ export class ResultModel extends Model {
   }
 
   public async getFileMatch(queryBuilder: QueryBuilder) {
-    const SQLquery = this.getSQL(queryBuilder,`SELECT * from files f LEFT JOIN results r ON f.fileId = r.fileId #FILTER`, { path: 'f.path', purl: 'r.purl',
+    const SQLquery = this.getSQL(queryBuilder,`SELECT * from files f LEFT JOIN results r ON f.fileId = r.fileId #FILTER`, { filePath: 'f.path', purl: 'r.purl',
       version: 'r.version', url: 'r.url'
     });
     const db = await this.openDb();

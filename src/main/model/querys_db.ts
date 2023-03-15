@@ -66,6 +66,7 @@ export class Querys {
   // SQL INSERT RESULTS
   SQL_INSERT_RESULTS =
     'INSERT or IGNORE INTO results (md5_file,vendor,component,version,latest_version,url,lines,oss_lines,matched,filename,idtype,md5_comp,purl,fileId,file_url,source) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+
   // SQL NEW INVENTORY
   SQL_SCAN_INVENTORY_INSERT =
     'INSERT INTO inventories (cvid,usage, notes, url, spdxid, source) VALUES (?,?,?,?,?,?);';
@@ -143,7 +144,7 @@ export class Querys {
     'SELECT id, spdxid, name, url, official FROM licenses ORDER BY name ASC;';
 
   // GET ALL THE INVENTORIES
-  SQL_GET_ALL_INVENTORIES = `SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i
+  SQL_GET_ALL_INVENTORIES = `SELECT DISTINCT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i
   LEFT JOIN licenses l ON i.spdxid=l.spdxid INNER JOIN file_inventories fi ON fi.inventoryId = i.id INNER JOIN files f ON fi.fileId = f.fileId  LEFT JOIN components c ON i.cvid = c.id #FILTER;`;
 
   SQL_UPDATE_IGNORED_FILES =
@@ -197,12 +198,16 @@ WHERE f.fileId IN (SELECT fileId FROM results) OR f.fileId IN (SELECT fileId FRO
 
   SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION =
     'UPDATE files SET identified=0 WHERE fileId IN (SELECT fileId FROM file_inventories WHERE inventoryid=?)';
+
   SQL_GET_SUMMARY_BY_RESULT_ID = `SELECT f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending FROM files f  WHERE fileId IN #values GROUP BY f.path;`;
+
   SQL_GET_RESULTS_RESCAN = `SELECT r.idtype,f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending, source AS original FROM files f INNER JOIN results r ON f.fileId=r.fileId;`;
+
   SQL_COMPONENTS_SUMMARY = `SELECT comp.purl,comp.id,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
   SUM(f.identified=0 AND f.ignored=0) AS pending FROM files f LEFT JOIN results r ON f.fileId=r.fileId
   INNER JOIN component_versions comp ON r.purl=comp.purl AND r.version=comp.version #FILTER
   GROUP BY r.purl, r.version;`;
+
   SQL_GET_ALL_COMPONENTS = `SELECT DISTINCT vendor.vendor,comp.comp_url,comp.compid,comp.comp_name,comp.license_url,comp.license_name,comp.license_spdxid,comp.purl,comp.version,comp.license_id,comp.source,comp.reliableLicense
   FROM
   (SELECT comp.url AS comp_url,comp.id AS compid,comp.name AS comp_name,lic.url AS license_url,lic.name AS license_name,lic.spdxid AS license_spdxid,comp.purl,comp.version,lic.license_id, comp.source, comp.reliableLicense FROM components AS comp

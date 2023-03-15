@@ -55,9 +55,6 @@ export class QueryBuilderCreator {
       if (params.filename) {
         builder.add(new QueryBuilderFilename(params.filename));
       }
-      if (params.filePath) {
-        builder.add(new QueryBuilderCustom('path','=',params.filePath));
-      }
       if (params.paths) {
         const queryBuilderIN = new QueryBuilderIN();
         queryBuilderIN.add(new QueryBuilderFIlePathIN(params.paths));
