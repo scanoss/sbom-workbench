@@ -30,7 +30,7 @@ export const NavigationSlice = createSlice({
     setFilter: (state, action: PayloadAction<{ filter: IWorkbenchFilter; override?: boolean }>) => {
       const { filter, override } = action.payload;
       state.filter = clean(override ? filter : { ...state.filter, ...filter });
-      state.isFilterActive = !!filter?.status || !!filter?.usage || !!filter?.filename;
+      state.isFilterActive = !!state.filter?.status || !!state.filter?.usage || !!state.filter?.filename;
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;

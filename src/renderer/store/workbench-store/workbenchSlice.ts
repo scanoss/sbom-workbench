@@ -69,8 +69,6 @@ export const workbenchSlice = createSlice({
     setProgress: (state, action: PayloadAction<ISummary>) => {
       const summary = action.payload;
 
-      console.log(summary);
-
       const progress =
         summary.summary.matchFiles === 0
           ? 100
