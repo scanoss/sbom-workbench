@@ -19,7 +19,7 @@ class ComponentService extends BaseService {
     return response;
   }
 
-  public async getFiles(component: Partial<Component>, params: IWorkbenchFilter = null): Promise<any> {
+  public async getFiles(component: Partial<Component>, params: IWorkbenchFilterParams = null): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.COMPONENT_GET_FILES, component, params);
     return this.response(response);
   }

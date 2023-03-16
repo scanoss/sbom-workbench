@@ -29,6 +29,7 @@ class ComponentService {
         version: data.version,
         ...filter,
       });
+
       let files: any = await modelProvider.model.result.getAll(queryBuilder);
       files = new ComponentAdapter().componentFileAdapter(files);
       const inventories: any = await modelProvider.model.inventory.getAll();
