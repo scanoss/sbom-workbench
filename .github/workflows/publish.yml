@@ -14,8 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ self-hosted ]
-
+        os: [macos-latest]
 
     steps:
       - name: Checkout git repo
@@ -48,4 +47,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm exec electron-builder -- --publish always --linux --win --mac
-
