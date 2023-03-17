@@ -257,14 +257,20 @@
       ]
     },
     "win": {
-      "target": [
-        "nsis"
-      ]
+      "target": {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }
     },
     "linux": {
-      "target": [
-        "AppImage"
-      ],
+      "target": {
+        "target": "AppImage",
+        "arch": [
+          "x64"
+        ]
+      },
       "category": "Development"
     },
     "directories": {
