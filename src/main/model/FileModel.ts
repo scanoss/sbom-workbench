@@ -77,7 +77,7 @@ export class FileModel extends Model {
   public async setDirty(dirty: number, path?: string) {
   const db = await this.openDb();
   const call = promisify(db.run.bind(db));
-  const SQLquery = path !== null ? `UPDATE files SET dirty=${dirty} WHERE path IN (${path});` : `UPDATE files SET dirty=${dirty};`;
+  const SQLquery = path !== undefined ? `UPDATE files SET dirty=${dirty} WHERE path IN (${path});` : `UPDATE files SET dirty=${dirty};`;
   await call(SQLquery);
   db.close();
   }
