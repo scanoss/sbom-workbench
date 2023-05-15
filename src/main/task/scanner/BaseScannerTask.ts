@@ -132,7 +132,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
 
   protected async setScannerConfig() {
     const scannerCfg: ScannerCfg = new ScannerCfg();
-    scannerCfg.CLIENT_TIMESTAMP = 'Audit-Workbench';
+    scannerCfg.CLIENT_TIMESTAMP = 'sbom-workbench';
 
     const { DEFAULT_API_INDEX, APIS, CA_CERT, PROXY, IGNORE_CERT_ERRORS, PAC } = userSettingService.get();
 

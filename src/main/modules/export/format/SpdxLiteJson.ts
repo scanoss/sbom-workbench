@@ -74,7 +74,7 @@ export class SpdxLiteJson extends Format {
       name: 'SCANOSS-SBOM',
       documentNamespace: 'https://spdx.org/spdxdocs/DOCUMENTNAME-UUID',
       creationInfo: {
-        creators: ['Tool: SCANOSS Audit Workbench', `Person: ${os.userInfo().username}`],
+        creators: ['Tool: SBOM Workbench', `Person: ${os.userInfo().username}`],
         created: utilModel.getTimeStamp(),
       },
       packages: [] as any,
