@@ -90,6 +90,10 @@
     display: flex;
     justify-content: flex-end;
 
+    position: fixed;
+    bottom: 16px;
+    right: 60px;
+
     .btn {
       padding: 12px 24px;
       border-radius: 4px;
@@ -103,8 +107,6 @@
     }
   }
 
-  .error {
-  }
 
   .input-label {
     font-weight: 600;
@@ -124,5 +126,10 @@
 
   .item-default {
     color: #a8a8a8 !important;
+  }
+
+  .helper {
+    margin-left: 32px;
+    margin-top: -8px;
   }
 }

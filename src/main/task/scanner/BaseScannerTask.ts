@@ -132,7 +132,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
 
   protected async setScannerConfig() {
     const scannerCfg: ScannerCfg = new ScannerCfg();
-    scannerCfg.CLIENT_TIMESTAMP = 'Audit-Workbench';
+    scannerCfg.CLIENT_TIMESTAMP = 'sbom-workbench';
 
     const { DEFAULT_API_INDEX, APIS, CA_CERT, PROXY, IGNORE_CERT_ERRORS, PAC } = userSettingService.get();
 
@@ -151,6 +151,8 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
     scannerCfg.IGNORE_CERT_ERRORS = IGNORE_CERT_ERRORS !== undefined ? IGNORE_CERT_ERRORS : false;
     scannerCfg.CA_CERT = CA_CERT !== undefined ? CA_CERT : null;
     scannerCfg.PAC = PAC;
+
+    scannerCfg.WFP_OBFUSCATION = !!this.project.getDto().scannerConfig.obfuscate;
 
     // Allows Scanoss SDK to write into project.log
     logger.setTransport((msg) => log.info(`%c${msg}`, 'color: green'));

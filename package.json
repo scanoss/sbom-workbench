@@ -1,14 +1,14 @@
 {
   "name": "scanoss-workbench",
-  "productName": "SCANOSS Audit Workbench",
-  "description": "Desktop version to use SCANOSS OSS in your projects",
-  "homepage": "https://github.com/scanoss/audit-workbench#readme",
+  "productName": "SCANOSS SBOM Workbench",
+  "description": "SCANOSS SBOM Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.",
+  "homepage": "https://github.com/scanoss/sbom-workbench#readme",
   "bugs": {
-    "url": "https://github.com/scanoss/audit-workbench/issues"
+    "url": "https://github.com/scanoss/sbom-workbench/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/scanoss/audit-workbench/"
+    "url": "git+https://github.com/scanoss/sbom-workbench/"
   },
   "author": {
     "name": "SCANOSS",
@@ -140,7 +140,7 @@
     "react-virtualized": "^9.22.3",
     "react-virtualized-tree": "^3.4.1",
     "regenerator-runtime": "^0.13.5",
-    "scanoss": "^0.8.2",
+    "scanoss": "^0.9.1",
     "sort-paths": "^1.1.1",
     "source-map-support": "^0.5.19",
     "translation-check": "^1.0.2",
@@ -218,9 +218,10 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "SCANOSS Audit Workbench",
+    "productName": "SCANOSS SBOM Workbench",
     "appId": "com.scanoss.workbench",
-    "copyright": "Copyright© 2020,2022 SCANOSS.COM",
+    "artifactName": "sbom-workbench-${version}-${os}-${arch}.${ext}",
+    "copyright": "Copyright© 2020, 2023 SCANOSS.COM",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -285,7 +286,7 @@
     "publish": {
       "provider": "github",
       "owner": "scanoss",
-      "repo": "audit-workbench"
+      "repo": "sbom-workbench"
     }
   },
   "devEngines": {

@@ -1,8 +1,8 @@
-# [SCANOSS AUDIT WORKBENCH](https://scanoss.com/product)
+# [SBOM Workbench](https://scanoss.com/product)
 
 ## Internationalization (i18n)
 
-SCANOSS Audit Workbench is multi-language enabled. This is done using the internationalization-framework i18next. See [official documentation](https://www.i18next.com) for more details.
+SBOM Workbench is multi-language enabled. This is done using the internationalization-framework i18next. See [official documentation](https://www.i18next.com) for more details.
 
 There are currently 2 languages:
 

@@ -89,5 +89,7 @@
   "OverridePreviousWork": "Sobreescribir trabajo previo",
   "ChooseProjectToImport": "Seleccione un proyecto",
   "KeepOriginalUsage": "Mantener uso detectado",
-  "PreRequiste": "Pre-Requisito"
+  "PreRequiste": "Pre-Requisito",
+  "ObfuscateFilePaths": "Ofuscar rutas de ficheros",
+  "ObfuscateFilePathsHint": "Todas sus rutas de ficheros se ofuscarán para garantizar una mayor confidencialidad."
 }
