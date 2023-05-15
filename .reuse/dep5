@@ -1,11 +1,11 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: SCANOSS Audit Workbench
+Upstream-Name: SBOM Workbench
 Upstream-Contact: SCANOSS <info@scanoss.com>
-Source: https://github.com/scanoss/audit-workbench
+Source: https://github.com/scanoss/sbom-workbench
 
 
 Files: src/* assets/* .* *.md *.json  *.js *.lock
-Copyright: 2021 SCANOSS Audit Workbench <info@scanoss.com>
+Copyright: 2021 SBOM Workbench <info@scanoss.com>
 License: GPL-2.0-only
 
 Files: .erb/* .vscode/*

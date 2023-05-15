@@ -1,15 +1,15 @@
-# [SCANOSS AUDIT WORKBENCH](https://scanoss.com/product)
+# [SBOM Workbench](https://scanoss.com/product)
 
 <div>
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/scanoss/audit-workbench)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/scanoss/sbom-workbench)
 ![License](https://img.shields.io/badge/license-GPL--2.0-brightgreen)
-[![REUSE status](https://api.reuse.software/badge/github.com/scanoss/audit-workbench)](https://api.reuse.software/info/github.com/scanoss/audit-workbench)
-![test_workflow](https://github.com/scanoss/audit-workbench/actions/workflows/test.yml/badge.svg?branch=main)
+[![REUSE status](https://api.reuse.software/badge/github.com/scanoss/sbom-workbench)](https://api.reuse.software/info/github.com/scanoss/sbom-workbench)
+![test_workflow](https://github.com/scanoss/sbom-workbench/actions/workflows/test.yml/badge.svg?branch=main)
 
 </div>
 
-The SCANOSS Audit Workbench is a graphical user interface to scan and audit source code using SCANOSS API.
+The SBOM Workbench is a graphical user interface to scan and audit source code using SCANOSS API.
 
 Auditing your source code for license compliance has never been easier. Simply scan your source code directory to find and identify open source components. Generate your SPDX-Lite software bill of materials (SBOM) with the press of a button.
 
@@ -32,7 +32,7 @@ npm install
 
 ### Troubleshooting
 
-SCANOSS Audit Workbench uses [node-gyp](https://www.npmjs.com/package/node-gyp) to compile SQLite3 native module.
+SBOM Workbench uses [node-gyp](https://www.npmjs.com/package/node-gyp) to compile SQLite3 native module.
 This module uses "node-pre-gyp" to download the prebuilt binary for your platform instead you need build from source.
 In case it does not exist for your platform, node-gyp going to build it.
 
@@ -58,10 +58,10 @@ npm run package
 
 ## Multi-language (i18n)
 
-SCANOSS Audit Workbench is multi-language enabled. To contribute a new language please see our [internationalization documentation](assets/i18n/README.md).
+SBOM Workbench is multi-language enabled. To contribute a new language please see our [internationalization documentation](assets/i18n/README.md).
 
 ## Proxy Configuration
-SCANOSS Audit Workbench support proxy settings, you might need to specify proxy settings depending on how your network is configured
+SBOM Workbench support proxy settings, you might need to specify proxy settings depending on how your network is configured
 
 All the configurations needs to be included in the workspace config file `~/scanoss-workspace/workspaceCfg.json`
 
@@ -78,7 +78,7 @@ You can disable any SSL errors, to do so you can change this option to true
 
 ## Contributing
 
-SCANOSS Audit Workbench is an open source project, and we love to receive contributions from our community. There are many ways to contribute. For more information see the [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
+SBOM Workbench is an open source project, and we love to receive contributions from our community. There are many ways to contribute. For more information see the [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Docs
 

@@ -35,7 +35,7 @@ const LicensesText = () => {
   return (
     <>
       <p className={classes.header}>
-        SCANOSS Audit Workbench is Open Source and makes use of more awesome opensource, for which the respective
+        SBOM Workbench is Open Source and makes use of more awesome opensource, for which the respective
         attribution notices are listed below:
       </p>
       <div className={classes.info}>
