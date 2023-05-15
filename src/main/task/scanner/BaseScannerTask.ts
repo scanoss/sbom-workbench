@@ -152,6 +152,8 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
     scannerCfg.CA_CERT = CA_CERT !== undefined ? CA_CERT : null;
     scannerCfg.PAC = PAC;
 
+    scannerCfg.WFP_OBFUSCATION = !!this.project.getDto().scannerConfig.obfuscate;
+
     // Allows Scanoss SDK to write into project.log
     logger.setTransport((msg) => log.info(`%c${msg}`, 'color: green'));
 

@@ -26,6 +26,7 @@ export namespace Scanner {
     mode?: ScannerMode;
     type?: ScannerType[];
     source?: ScannerSource;
+    obfuscate?: boolean;
   }
 
   export interface StageProperties {

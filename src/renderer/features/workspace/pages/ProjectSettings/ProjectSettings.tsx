@@ -28,10 +28,11 @@ import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import AppConfig from '@config/AppConfigModule';
 import { useDispatch, useSelector } from 'react-redux';
 import FormGroup from '@mui/material/FormGroup';
+import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 import { Scanner } from '../../../../../main/task/scanner/types';
+
 import ScannerType = Scanner.ScannerType;
 import ScannerSource = Scanner.ScannerSource;
-import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -88,6 +89,7 @@ const ProjectSettings = () => {
         ScannerType.DEPENDENCIES,
         ScannerType.VULNERABILITIES,
       ],
+      obfuscate: false,
     },
   });
 
@@ -181,6 +183,16 @@ const ProjectSettings = () => {
       }
     })
   };
+
+  const onObfuscate = (checked: boolean) => {
+    setProjectSettings({
+      ...projectSettings,
+      scannerConfig: {
+        ...projectSettings.scannerConfig,
+        obfuscate: checked,
+      }
+    })
+  }
 
   return (
     <>
@@ -329,6 +341,7 @@ const ProjectSettings = () => {
                   </div>
                 </div>
               </div>
+
               <div className="mt-5">
                 <label className="input-label">{t('Title:ScannerSettings')}</label>
                 <FormGroup>
@@ -338,14 +351,23 @@ const ProjectSettings = () => {
                     label={t('DecompressArchivesLabel')}
                     onChange={(event, checked) => onDecompress(checked)}
                   />
-                </FormGroup>
-                {projectSettings.scannerConfig.type.some(
-                  (item) => item === ScannerType.UNZIP
-                ) && (
-                  <FormHelperText>
+                  <FormHelperText className="helper">
                     {t('DecompressArchivesHint')}
                   </FormHelperText>
-                )}
+                </FormGroup>
+
+                <FormGroup>
+                  <FormControlLabel
+                    control={<Checkbox />}
+                    disabled={scanPath?.source === Scanner.ScannerSource.WFP}
+                    label={t('ObfuscateFilePaths')}
+                    onChange={(event, checked) => onObfuscate(checked)}
+                  />
+                  <FormHelperText className="helper">
+                    {t('ObfuscateFilePathsHint')}
+                  </FormHelperText>
+                </FormGroup>
+
               </div>
             </div>
             <div className="button-container">

@@ -88,5 +88,7 @@
   "OverridePreviousWork": "Override previous work",
   "ChooseProjectToImport": "Choose project to import identifications",
   "KeepOriginalUsage": "Keep detected usage",
-  "PreRequiste": "Pre-Requisite"
+  "PreRequiste": "Pre-Requisite",
+  "ObfuscateFilePaths": "Obfuscate filepaths",
+  "ObfuscateFilePathsHint": "All your filepaths will be obfuscated to ensure greater confidentiality."
 }
