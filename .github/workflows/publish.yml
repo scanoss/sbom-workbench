@@ -28,7 +28,7 @@ jobs:
 
       - name: Install and build
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run postinstall
           npm run build
 
