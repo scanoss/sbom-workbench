@@ -89,6 +89,6 @@
   "ChooseProjectToImport": "Choose project to import identifications",
   "KeepOriginalUsage": "Keep detected usage",
   "PreRequiste": "Pre-Requisite",
-  "ObfuscateFilePaths": "Obfuscate filepaths",
-  "ObfuscateFilePathsHint": "All your filepaths will be obfuscated to ensure greater confidentiality."
+  "ObfuscateFilePaths": "Obfuscate file paths",
+  "ObfuscateFilePathsHint": "Your filepaths will be obfuscated to ensure greater confidentiality."
 }
