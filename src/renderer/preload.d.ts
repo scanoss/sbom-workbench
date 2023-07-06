@@ -1,6 +1,6 @@
 import { IpcRendererEvent } from 'electron';
 import { IpcChannels } from '@api/ipc-channels';
-import {IAppInfo} from "@api/dto";
+import { IAppInfo } from "@api/dto";
 
 declare global {
   interface Window {

@@ -291,6 +291,7 @@ export default class MenuBuilder {
       backgroundColor: '#e4e4e7',
       webPreferences: {
         devTools: false,
+        sandbox: false,
         preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.erb/dll/preload.js'),
       },
     });
@@ -302,10 +303,10 @@ export default class MenuBuilder {
       }
     });
 
-    aboutWindow.webContents.on('new-window', (event, url) => {
-      event.preventDefault();
-      shell.openExternal(url);
-    });
+    aboutWindow.webContents.setWindowOpenHandler((details) => {
+      shell.openExternal(details.url);
+      return { action: 'deny' }
+    })
 
     aboutWindow.loadURL(`${this.mainURL}#/about`);
   }
