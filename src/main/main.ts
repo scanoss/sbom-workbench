@@ -73,7 +73,7 @@ if (isDebug) {
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ['REACT_DEVELOPER_TOOLS'];
+  const extensions = ['REDUX_DEVTOOLS'];
 
   return installer
     .default(
@@ -104,7 +104,10 @@ const createWindow = async () => {
     height: 820,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.erb/dll/preload.js'),
+      sandbox: false, // TODO:  remove de access from preload.js, see https://github.com/electron/electron/issues/36437
+      preload: app.isPackaged
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
 

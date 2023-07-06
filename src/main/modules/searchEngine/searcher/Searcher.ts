@@ -27,14 +27,14 @@ class Searcher {
       const index = new Index(getSearchConfig());
       const indexerAdapter = new IndexerAdapter();
       if (fs.existsSync(pathToDictionary)) {
-        fs.readdirSync(pathToDictionary).forEach((filename) => {
-          const file = path.join(pathToDictionary, filename);
-          const indexFile = indexerAdapter.getFileIndex(filename);
-          const data: any = fs.readFileSync(file, 'utf8');
-          index.import(indexFile, data ?? null);
+        fs.readdirSync(pathToDictionary).forEach((file) => {
+          const filepath = path.join(pathToDictionary, file);
+          const filename = path.parse(file).name;
+          const data: any = fs.readFileSync(filepath, 'utf8');
+          index.import(filename, data ?? null);
         });
         this.index = index;
-        setInterval(this.closeIndex, 60000); // Close index after 1 minute
+        setTimeout(this.closeIndex, 60000); // Close index after 1 minute
       }
     }
   }
