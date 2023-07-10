@@ -1,7 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { setInterval } from 'timers';
-import { IndexerAdapter } from '../indexer/IndexerAdapter';
 import { ISearcher } from './ISearcher';
 import { getSearchConfig } from '../../../../shared/utils/search-utils';
 
@@ -25,7 +23,6 @@ class Searcher {
   public loadIndex(pathToDictionary: string) {
     if (!this.index) {
       const index = new Index(getSearchConfig());
-      const indexerAdapter = new IndexerAdapter();
       if (fs.existsSync(pathToDictionary)) {
         fs.readdirSync(pathToDictionary).forEach((file) => {
           const filepath = path.join(pathToDictionary, file);
