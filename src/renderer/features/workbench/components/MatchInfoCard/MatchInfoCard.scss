@@ -136,7 +136,7 @@
 
 .component-details-matchinfo {
   width: fit-content;
-  max-width: 600px;
+  max-width: 500px;
   background-color: #ffff;
   display: flex;
   flex-direction: column;
@@ -147,10 +147,10 @@
   box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.05), 0px 10px 15px 0px rgba(0, 0, 0, 0.1);
 
   .tiny-container-detail-matchinfo {
-    margin: 16px 16px 0;
+    margin: 8px 16px 0;
 
     &:last-child {
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
     p {
@@ -160,16 +160,16 @@
     .title-detail-matchinfo {
       color: #3B82F6;
       font-weight: bold;
-      font-size: 12px;
+      font-size: 10px;
       text-transform: uppercase;
     }
 
     .desc-detail-matchinfo {
-      font-size: 16px;
+      font-size: 12px;
       font-weight: 400;
     }
 
-    .url-matchinfo{
+    .url-matchinfo {
       text-decoration: underline;
       word-wrap: normal;
     }

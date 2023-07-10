@@ -140,9 +140,11 @@ export default class File extends Node {
 
   public addDependency(path: string): void {
     if (this.getPath() === path) {
-      this.status = NodeStatus.PENDING;
-      this.setStatusOnClassnameAs(this.status);
-      this.isDependencyFile = true;
+      if(this.status !== NodeStatus.IDENTIFIED) { // only adds new dependencies
+        this.status = NodeStatus.PENDING;
+        this.setStatusOnClassnameAs(this.status);
+      }
+      this.isDependencyFile = true; // always set the flag. A new tree is built on rescan
     }
   }
 

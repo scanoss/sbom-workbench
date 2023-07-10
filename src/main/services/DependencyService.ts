@@ -33,7 +33,8 @@ class DependencyService {
       const dependencies = await modelProvider.model.dependency.getAll(
         queryBuilder
       );
-      const inventory: any = await modelProvider.model.inventory.getAll();
+      const queryBuilderDepInv = QueryBuilderCreator.create({inventoryUsage:'dependency'});
+      const inventory: any = await modelProvider.model.inventory.getAll(queryBuilderDepInv);
       const component: any = await modelProvider.model.component.getAll();
       dependencyHelper.mergeInventoryComponentToDependency(
         dependencies,

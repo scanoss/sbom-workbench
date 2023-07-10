@@ -1,4 +1,4 @@
-import log from "electron-log";
+ import log from "electron-log";
 import { ScannerStage, ScanState } from "../../../../api/types";
 import { BaseScannerTask } from "../BaseScannerTask";
 import { Scanner } from "../types";
@@ -7,6 +7,8 @@ import { licenseService } from "../../../services/LicenseService";
 import { rescanService } from "../../../services/RescanService";
 import { IDispatch } from "../dispatcher/IDispatch";
 import { IScannerInputAdapter } from "../adapter/IScannerInputAdapter";
+ import fs from 'fs';
+ import { treeService } from '../../../services/TreeService';
 
 export abstract class RescanTask<TDispatcher extends IDispatch,TInputScannerAdapter extends IScannerInputAdapter> extends BaseScannerTask<TDispatcher,TInputScannerAdapter> {
 
@@ -19,6 +21,12 @@ export abstract class RescanTask<TDispatcher extends IDispatch,TInputScannerAdap
   }
 
   public abstract reScan(): Promise<void>;
+
+  public async init(): Promise<void> {
+    await fs.promises.unlink(`${this.project.getMyPath()}/result.json`);
+    await fs.promises.unlink(`${this.project.getMyPath()}/winnowing.wfp`);
+    await super.init();
+  }
 
   // @Override
   public async set(): Promise<void> {

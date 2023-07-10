@@ -50,7 +50,8 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch ,TInputScann
 
   public async init() {
     await this.setScannerConfig();
-    this.cleanWorkDirectory();
+
+
     let {processedFiles} = this.project;
 
     this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (response) => {
