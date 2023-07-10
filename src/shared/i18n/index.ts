@@ -6,7 +6,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
 import { i18nextPlugin } from 'translation-check'
 
-const rsb = resourcesToBackend((language, namespace, callback) => {
+/* const rsb = resourcesToBackend((language, namespace, callback) => {
   import(`/assets/i18n/${language}/${namespace}.json`)
     .then((resources) => {
       return callback(null, resources)
@@ -14,7 +14,7 @@ const rsb = resourcesToBackend((language, namespace, callback) => {
     .catch((error) => {
       callback(error, null)
     })
-});
+}); */
 
 export enum AppI18nContext {
   MAIN,
@@ -55,7 +55,6 @@ export enum AppI18nContext {
       return {
         ...acc,
         [key]: {
-
           AppMenu: require(`../../../assets/i18n/${key}/AppMenu.json`),
           Common: require(`../../../assets/i18n/${key}/Common.json`),
           Title: require(`../../../assets/i18n/${key}/Title.json`),
