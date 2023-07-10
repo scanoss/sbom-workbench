@@ -1,11 +1,11 @@
 import log from 'electron-log';
+import util from 'util';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Model } from './Model';
 import { Querys } from './querys_db';
 import { Dependency } from '../../api/types';
 import { Dependency as Dep } from './entity/Dependency';
 import { NodeStatus } from '../workspace/tree/Node';
-import util from 'util';
 
 const query = new Querys();
 
@@ -40,6 +40,7 @@ export class DependencyModel extends Model {
     await Promise.all(promises);
     db.close();
   }
+
   public async getAll(queryBuilder: QueryBuilder): Promise<Array<Dependency>> {
     const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_DEPENDENCIES, DependencyModel.entityMapper);
     const db = await this.openDb();
@@ -62,18 +63,19 @@ export class DependencyModel extends Model {
       ...dependency);
     db.close();
   }
+
   public async deleteDirty(data: Record<string, string>): Promise<void> {
     const SQLquery = query.SQL_DELETE_DIRTY_DEPENDENCIES.replace(
       '#PURLS',
       data.purls
     )
       .replace('#VERSIONS', data.versions)
-      .replace('#LICENSES', data.licenses);
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
     await call(SQLquery);
     db.close();
   }
+
   public async getDependenciesFiles(): Promise<Array<Record<string, string>>> {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
@@ -81,6 +83,7 @@ export class DependencyModel extends Model {
     db.close();
     return dependencyFiles;
   }
+
   public async getStatus() {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
@@ -88,6 +91,7 @@ export class DependencyModel extends Model {
     db.close();
     return dependencyStatus;
   }
+
   public getEntityMapper(): Record<string, string> {
     return DependencyModel.entityMapper;
   }
