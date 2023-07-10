@@ -27,8 +27,9 @@ We strongly recommend handling your node versions using [nvm](https://github.com
 ## Install
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
+Please note that you should include the `--legacy-peer-deps` parameter in the installation command. This is because `@mui/styles` is not compatible with React 18. You can find more information about this at [https://mui.com/system/styles/basics/](https://mui.com/system/styles/basics/).
 
 ### Troubleshooting
 
