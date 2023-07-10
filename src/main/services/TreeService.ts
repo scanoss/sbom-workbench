@@ -45,7 +45,7 @@ class TreeService {
       });
   }
 
-  private async getDependencyStatus(): Promise<Array<Record<string, any>>> {
+  public async getDependencyStatus(): Promise<Array<Record<string, any>>> {
     const dependencies = await modelProvider.model.dependency.getStatus(); // getAll
     const dep = this.mapToDependencyStatus(dependencies);
     return dep;
@@ -85,7 +85,7 @@ class TreeService {
     this.updateDependencyStatus();
   }
 
-  private async updateDependencyStatus(): Promise<boolean> {
+  public async updateDependencyStatus(): Promise<boolean> {
     this.getDependencyStatus().then((dep) => {
       const depGroupedByStatus = dep.reduce((acc, item) => {
         if (!acc[item.status]) {

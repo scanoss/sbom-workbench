@@ -30,6 +30,9 @@ export class QueryBuilderCreator {
       if (params.usage) {
         builder.add(new QueryBuilderUsage(params.usage));
       }
+      if (params.inventoryUsage) {
+        builder.add(new QueryBuilderCustom('usage', '=', params.inventoryUsage));
+      }
       if (params.purl) {
         builder.add(new QueryBuilderCustom('purl', '=', params.purl));
       }

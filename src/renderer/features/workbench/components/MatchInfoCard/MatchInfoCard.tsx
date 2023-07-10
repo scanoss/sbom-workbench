@@ -66,6 +66,10 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
                   <span className="label">{t('Title:Version')}</span>
                   <span className="value">{match.version}</span>
                 </span>
+                <span className="match-info-data license">
+                  <span className="label">{t('Title:License')}</span>
+                  <span className="value">{match.license}</span>
+                </span>
                 <div className="match-info-data usage">
                   {status === 'pending' && <span className="label">{t('Title:Detected')}</span>}
                   {status === 'identified' && <span className="label">{t('Title:Usage')}</span>}
@@ -155,12 +159,16 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
           >
             <div className="component-details-matchinfo">
               <div className="tiny-container-detail-matchinfo">
-                <p className="title-detail-matchinfo">{t('Title:License')}</p>
-                <p className="desc-detail-matchinfo">{match?.license || '-'}</p>
-              </div>
-              <div className="tiny-container-detail-matchinfo">
                 <p className="title-detail-matchinfo">{t('Title:PURL')}</p>
                 <p className="desc-detail-matchinfo">{match?.purl}</p>
+              </div>
+              <div className="tiny-container-detail-matchinfo">
+                <p className="title-detail-matchinfo">{t('Title:Version')}</p>
+                <p className="desc-detail-matchinfo">{match?.version}</p>
+              </div>
+              <div className="tiny-container-detail-matchinfo">
+                <p className="title-detail-matchinfo">{t('Title:License')}</p>
+                <p className="desc-detail-matchinfo">{match?.license || '-'}</p>
               </div>
               <div className="tiny-container-detail-matchinfo">
                 <p className="title-detail-matchinfo">{t('Title:URL')}</p>

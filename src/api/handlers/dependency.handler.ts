@@ -9,7 +9,7 @@ import { treeService } from '../../main/services/TreeService';
 ipcMain.handle(IpcChannels.DEPENDENCY_GET_ALL, async (event, params: { path: string }) => {
   try {
     const dependencies = await dependencyService.getAll(params);
-    return Response.ok({ message: 'Component created successfully', data: dependencies });
+    return Response.ok({ message: 'Get all dependencies', data: dependencies });
   } catch (error: any) {
     log.error('[DEPENDENCY GET ALL]: ', error, params);
     return Response.fail({ message: error.message });

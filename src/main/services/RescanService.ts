@@ -6,6 +6,8 @@ import { componentService } from './ComponentService';
 import { dependencyService } from './DependencyService';
 import { modelProvider } from './ModelProvider';
 import { IInsertResult } from '../model/interfaces/IInsertResult';
+import { treeService } from './TreeService';
+import { Tree } from '../workspace/tree/Tree';
 
 class RescanService {
   public async reScan(
@@ -93,9 +95,28 @@ class RescanService {
       await modelProvider.model.component.updateMostReliableLicense(
         mostReliableLicensePerComponent
       );
+      // update the dependencie's status on file tree
+      await this.reScanUpdateDependenciesOnFileTree(projectPath); //
     } catch (err: any) {
       throw new Error('[ RESCAN DB ] Unable to insert new results');
     }
+  }
+
+  public async reScanUpdateDependenciesOnFileTree(projectPath: string){
+    // update dependency status on file tree
+    const m = await fs.promises.readFile(`${projectPath}/metadata.json`, 'utf8');
+    const metadata = JSON.parse(m);
+    const fileTree = await fs.promises.readFile(`${projectPath}/tree.json`, 'utf8');
+    const treeParsed = JSON.parse(fileTree);
+    const tree = new Tree(metadata.name, projectPath,metadata.scan_root);
+    tree.loadTree(treeParsed.tree.rootFolder);
+    const dep = await treeService.getDependencyStatus();
+    dep.forEach((d)=>{
+      tree.getRootFolder().setStatus(d.path,d.status as NodeStatus)
+    });
+    const n = await  tree.getTree();
+    treeParsed.tree.rootFolder = n;
+    await  fs.promises.writeFile(`${projectPath}/tree.json`,JSON.stringify(treeParsed),'utf-8');
   }
 
   public async reScanWFP(
@@ -226,8 +247,9 @@ class RescanService {
         dependencies.paths.push(d.file);
         dependencies.purls.push(e.purl);
         dependencies.versions.push(e.version);
-        const licenses = e.licensesList.join(',');
-        dependencies.licenses.push(licenses);
+        const spdxIds = e.licensesList.map(l=> l.spdxId);
+        const joinedIds = spdxIds.join(',');
+        dependencies.licenses.push(joinedIds);
       });
     });
     const aux = {
