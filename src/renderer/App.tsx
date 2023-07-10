@@ -70,29 +70,6 @@ export default class App {
     const container = document.getElementById('root')!;
     const root = createRoot(container);
     root.render(app);
-
-    // Save a reference to the original ResizeObserver
-    const OriginalResizeObserver = window.ResizeObserver;
-
-    // Create a new ResizeObserver constructor
-    window.ResizeObserver = function (callback) {
-      const wrappedCallback = (entries, observer) => {
-        window.requestAnimationFrame(() => {
-          callback(entries, observer);
-        });
-      };
-
-      // Create an instance of the original ResizeObserver
-      // with the wrapped callback
-      return new OriginalResizeObserver(wrappedCallback);
-    };
-
-    // Copy over static methods, if any
-    for (let staticMethod in OriginalResizeObserver) {
-      if (OriginalResizeObserver.hasOwnProperty(staticMethod)) {
-        window.ResizeObserver[staticMethod] = OriginalResizeObserver[staticMethod];
-      }
-    }
   }
 
   private async setTitle() {
