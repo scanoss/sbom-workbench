@@ -1,3 +1,4 @@
+import { app, utilityProcess } from 'electron';
 import { DecompressionManager } from 'scanoss';
 import path from 'path';
 import fs from 'fs';
@@ -25,6 +26,18 @@ export class DecompressTask implements Scanner.IPipelineTask {
 
   public async run(): Promise<boolean> {
     try {
+
+      const RESOURCES_PATH = app.isPackaged
+        ? path.join(__dirname, 'scanner.js')
+        : path.join(app.getAppPath(), '.erb/dll/scanner.js');
+      
+      const child = utilityProcess.fork(RESOURCES_PATH);
+
+      child.postMessage({ message: 'init' });
+      child.on('message', (data) => {
+        console.log(`Received chunk ${data}`);
+      });
+
       const filesToDecompress = this.getFilesToDecompress(
         this.project.getScanRoot(),
         this.decompressionManager.getSupportedFormats()

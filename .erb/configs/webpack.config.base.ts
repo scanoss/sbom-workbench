@@ -7,6 +7,7 @@ import webpackPaths from './webpack.paths';
 import path from 'path';
 import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
 import { dependencies as externals } from '../../release/app/package.json';
+import UtilityProcessPlugin from '../plugins/UtilityProcessPlugin';
 
 const configuration: webpack.Configuration = {
   externals: [...Object.keys(externals || {})],
@@ -60,6 +61,8 @@ const configuration: webpack.Configuration = {
       NODE_ENV: 'production',
     }),
     new MonacoWebpackPlugin(),
+
+    new UtilityProcessPlugin(),
   ],
 };
 
