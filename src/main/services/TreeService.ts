@@ -6,6 +6,7 @@ import { workspace } from '../workspace/Workspace';
 import { utilHelper } from '../helpers/UtilHelper';
 import { FilterTrue } from '../batch/Filter/FilterTrue';
 import { modelProvider } from './ModelProvider';
+import { broadcastManager } from '../broadcastManager/BroadcastManager';
 
 class TreeService {
   private updateStatus(paths: Array<string>, status: NodeStatus) {
@@ -21,8 +22,7 @@ class TreeService {
   }
 
   public updateStart(): void {
-    const project = workspace.getOpenedProjects()[0];
-    project.getTree().sendToUI(IpcChannels.TREE_UPDATING, {});
+    broadcastManager.get().send(IpcChannels.TREE_UPDATING, {});
   }
 
   public updateDone(): void {
@@ -114,7 +114,8 @@ class TreeService {
         .then((files: any) => {
           const paths = utilHelper.getArrayFromObjectFilter(files, 'path', new FilterTrue()) as Array<string>;
           const project = workspace.getOpenedProjects()[0];
-          project.getTree().sendToUI(IpcChannels.TREE_UPDATING, {});
+          // project.getTree().sendToUI(IpcChannels.TREE_UPDATING, {});
+          broadcastManager.get().send(IpcChannels.TREE_UPDATING, {})
           project.getTree().restoreStatus(paths);
           project.updateTree();
           return true;

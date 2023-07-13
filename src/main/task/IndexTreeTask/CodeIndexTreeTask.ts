@@ -2,10 +2,14 @@ import fs from "fs";
 import { IndexTreeTask } from "./IndexTreeTask";
 import Folder from "../../workspace/tree/Folder";
 import { Tree } from "../../workspace/tree/Tree";
+import log from 'electron-log';
+import { broadcastManager } from '../../broadcastManager/BroadcastManager';
 
-export class CodeIndexTreeTask  extends IndexTreeTask{
+export class CodeIndexTreeTask  extends IndexTreeTask {
 
   public async run(params: void):Promise<boolean> {
+    log.info('[ CodeIndexTreeTask init ]');
+
     const files = this.getProjectFiles(this.project.getScanRoot(),this.project.getScanRoot());
     const tree = await this.buildTree(files);
     this.setTreeSummary(tree);

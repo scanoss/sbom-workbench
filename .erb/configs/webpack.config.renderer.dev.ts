@@ -172,6 +172,14 @@ const configuration: webpack.Configuration = {
         .on('close', (code: number) => process.exit(code!))
         .on('error', (spawnError) => console.error(spawnError));
 
+      console.log('Starting threads builder...');
+      const threadProcess = spawn('npm', ['run', 'start:threads'], {
+        shell: true,
+        stdio: 'inherit',
+      })
+        .on('close', (code: number) => process.exit(code!))
+        .on('error', (spawnError) => console.error(spawnError));
+
       console.log('Starting Main Process...');
       let args = ['run', process.env.npm_config_watch ? 'start:main:watch' : 'start:main'];
       if (process.env.MAIN_ARGS) {
