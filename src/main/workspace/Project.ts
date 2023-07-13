@@ -17,6 +17,7 @@ import { modelProvider } from '../services/ModelProvider';
 import { TreeViewModeCreator } from './tree/treeViewModes/TreeViewModeCreator';
 import { IpcChannels } from '../../api/ipc-channels';
 import * as ScannerCFG from '../task/scanner/types';
+import { broadcastManager } from '../broadcastManager/BroadcastManager';
 
 export class Project {
   work_root: string;
@@ -234,7 +235,7 @@ export class Project {
 
   public async notifyTree() {
     const tree = await this.tree.getTree();
-    this.tree.sendToUI(IpcChannels.TREE_UPDATED, tree);
+    broadcastManager.get().send(IpcChannels.TREE_UPDATED, tree);
   }
 
   public getNode(path: string) {
@@ -267,7 +268,7 @@ export class Project {
           JSON.stringify({ ...this.filter, path: null })
         )
       ) {
-        this.tree.sendToUI(IpcChannels.TREE_UPDATING, {});
+        broadcastManager.get().send(IpcChannels.TREE_UPDATING, {});
         this.tree.setTreeViewMode(
           TreeViewModeCreator.create(filter, this.fileTreeViewMode)
         );

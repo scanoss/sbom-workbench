@@ -1,7 +1,7 @@
+import log from 'electron-log';
 import { app, utilityProcess } from 'electron';
 import { DecompressionManager } from 'scanoss';
 import path from 'path';
-import fs from 'fs';
 import { Project } from '../../workspace/Project';
 import { Scanner } from '../scanner/types';
 import { ScannerStage } from '../../../api/types';
@@ -24,59 +24,29 @@ export class DecompressTask implements Scanner.IPipelineTask {
     };
   }
 
-  public async run(): Promise<boolean> {
-    try {
+  public run(): Promise<boolean> {
+    log.info('[ DecompressTask init ]');
 
-      const RESOURCES_PATH = app.isPackaged
-        ? path.join(__dirname, 'scanner.js')
-        : path.join(app.getAppPath(), '.erb/dll/scanner.js');
-      
-      const child = utilityProcess.fork(RESOURCES_PATH);
+    const RESOURCES_PATH = app.isPackaged
+     ? path.join(__dirname, 'scanner.js')
+     : path.join(app.getAppPath(), '.erb/dll/scanner.js');
 
-      child.postMessage({ message: 'init' });
-      child.on('message', (data) => {
-        console.log(`Received chunk ${data}`);
-      });
+   const child = utilityProcess.fork(RESOURCES_PATH, [], { stdio: "pipe" });
 
-      const filesToDecompress = this.getFilesToDecompress(
-        this.project.getScanRoot(),
-        this.decompressionManager.getSupportedFormats()
-      );
-      await this.decompressionManager.decompress(filesToDecompress);
-      return true;
-    } catch (error: any) {
-      console.log(error);
-      return false;
-    }
+   child.stdout.on ("data", (data) => {
+     log.info(`%c[ THREAD ]: Decompress Thread `, 'color: green', data.toString());
+   });
+
+   child.postMessage({ action: 'DECOMPRESS', data: this.project.getScanRoot() });
+
+   return new Promise((resolve, reject) => {
+     child.on('message', (data) => {
+       log.info(`%c[ THREAD ]: Decompress Thread `, 'color: green', data.toString());
+       if (data.event === 'success') resolve(true);
+       else reject(new Error('Decompress task failed'));
+       child.kill();
+     });
+   });
   }
 
-  /**
-   * Find all files recursively in specific folder with specific extension, e.g:
-   * findFilesInDir('./project/src', '.html') ==> ['./project/src/a.html','./project/src/build/index.html']
-   * @param  {String} startPath    Path relative to this file or other file which requires this files
-   * @param  {String} extensions       Extension name, e.g: '.html'
-   * @return {Array}               Result files with path string in an array
-   */
-  private getFilesToDecompress(
-    startPath: string,
-    extensions: Array<string>
-  ): Array<string> {
-    let results = [];
-    if (!fs.existsSync(startPath)) {
-      return [];
-    }
-    const files = fs.readdirSync(startPath);
-    for (let i = 0; i < files.length; i++) {
-      const filename = path.join(startPath, files[i]);
-      const stat = fs.lstatSync(filename);
-      if (stat.isDirectory()) {
-        results = results.concat(
-          this.getFilesToDecompress(filename, extensions)
-        ); //  recurse
-      } else if (extensions.some((format) => filename.endsWith(format))) {
-        results.push(filename);
-      }
-    }
-    return results;
-  }
 }

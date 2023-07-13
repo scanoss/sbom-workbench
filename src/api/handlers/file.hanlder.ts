@@ -12,6 +12,7 @@ import { FilterTrue } from '../../main/batch/Filter/FilterTrue';
 import { resultService } from '../../main/services/ResultService';
 import { fileService } from '../../main/services/FileService';
 import { Response, ResponseStatus } from '../Response';
+import { broadcastManager } from '../../main/broadcastManager/BroadcastManager';
 
 const path = require('path');
 
@@ -90,7 +91,7 @@ ipcMain.handle(IpcChannels.IGNORED_FILES, async (_event, arg: number[]) => {
   try {
     const project = workspace.getOpenedProjects()[0];
     const data = await fileService.ignore(arg);
-    project.getTree().sendToUI(IpcChannels.TREE_UPDATING, {});
+    broadcastManager.get().send(IpcChannels.TREE_UPDATING, {});
     resultService
       .getResultsFromIDs(arg)
       .then((filesToUpdate: any) => {
