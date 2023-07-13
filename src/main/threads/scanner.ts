@@ -1,8 +1,9 @@
 import { DecompressionManager } from 'scanoss';
 
-function run() {
+function run(path: string) {
   const decompressionManager = new DecompressionManager();
   console.log("hey Agus, estoy dentro de un thread :)");
+  console.log(path);
   console.log(decompressionManager);
 
   process.parentPort.postMessage({
@@ -15,5 +16,6 @@ function run() {
  */
 process.parentPort.once('message', (e) => {
   // const [port] = e.ports;
-  run();
+
+  run('test');
 })

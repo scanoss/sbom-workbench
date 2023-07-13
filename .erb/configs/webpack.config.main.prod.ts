@@ -25,7 +25,7 @@ const configuration: webpack.Configuration = {
   entry: {
     main: path.join(webpackPaths.srcMainPath, 'main.ts'),
     preload: path.join(webpackPaths.srcMainPath, 'preload.ts'),
-    threads: path.join(webpackPaths.srcMainPath, '/threads/scanner.ts'),
+    scanner: path.join(webpackPaths.srcMainPath, '/threads/scanner.ts'),
   },
 
   output: {

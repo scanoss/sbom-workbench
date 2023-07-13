@@ -17,13 +17,15 @@ const configuration: webpack.Configuration = {
 
   mode: 'development',
 
-  target: 'electron-preload',
+  target: 'electron-main',
 
-  entry: path.join(webpackPaths.srcMainPath, '/threads/scanner.ts'),
+  entry: {
+    scanner: path.join(webpackPaths.srcMainPath, '/threads/scanner.ts'),
+  },
 
   output: {
     path: webpackPaths.dllPath,
-    filename: 'scanner.js',
+    filename: '[name].js',
   },
 
   plugins: [
