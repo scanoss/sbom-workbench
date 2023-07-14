@@ -4,6 +4,7 @@ import {WFPResumeScannerInputAdapter} from "../adapter/WFPResumeScannerInputAdap
 import {Project} from "../../../workspace/Project";
 import {ScanTask} from "../scan/ScanTask";
 
+
 export class WFPResumeTask extends ScanTask<WFPDispatcher, WFPResumeScannerInputAdapter> {
 
   constructor(project: Project) {
@@ -17,4 +18,5 @@ export class WFPResumeTask extends ScanTask<WFPDispatcher, WFPResumeScannerInput
     if (scanState !== ScanState.SCANNING && scanState !== ScanState.RESCANNING)
       throw new Error('Cannot resume project');
   }
+
 }
