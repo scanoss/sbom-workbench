@@ -1,4 +1,3 @@
-import { ScannerInput } from "scanoss";
 import { ScanTask } from "./ScanTask";
 import { WFPDispatcher } from "../dispatcher/WFPDispatcher";
 import { WFPScannerInputAdapter } from "../adapter/WFPScannerInputAdapter";
