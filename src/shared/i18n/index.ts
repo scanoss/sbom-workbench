@@ -27,6 +27,7 @@ export enum AppI18nContext {
     'en': "English",
     'es': "Español",
     'zh': '简体中文',
+    'jp': '日本語',
   }
 
   private static lng: string;
