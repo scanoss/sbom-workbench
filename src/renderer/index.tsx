@@ -3,11 +3,10 @@ import App from './App';
 const app = new App();
 app.setup();
 
-
 /*
   TODO: workaround to solve Monaco bug on Chromium 114.
   See: https://github.com/microsoft/vscode/pull/183325
- */
+*/
 
 // Save a reference to the original ResizeObserver
 const OriginalResizeObserver = window.ResizeObserver;
