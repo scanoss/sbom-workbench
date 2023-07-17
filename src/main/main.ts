@@ -11,7 +11,9 @@
 import path from 'path';
 import * as os from 'os';
 
-import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
+import {
+  app, BrowserWindow, shell, ipcMain, dialog,
+} from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import i18next from 'i18next';
@@ -20,7 +22,6 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { workspace } from './workspace/Workspace';
 import { userSettingService } from './services/UserSettingService';
-import { WorkspaceMigration } from './migration/WorkspaceMigration';
 import { AppI18n, AppI18nContext } from '../shared/i18n';
 
 // handlers
@@ -38,8 +39,6 @@ import '../api/handlers/userSetting.handler';
 import '../api/handlers/app.handler';
 import '../api/handlers/search.handler';
 import '../api/handlers/vulnerability.handler';
-
-
 
 import { broadcastManager } from './broadcastManager/BroadcastManager';
 
@@ -78,7 +77,7 @@ const installExtensions = async () => {
   return installer
     .default(
       extensions.map((name) => installer[name]),
-      forceDownload
+      forceDownload,
     )
     .catch(console.log);
 };
@@ -92,11 +91,7 @@ const createWindow = async () => {
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
 
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
-  };
-
-
+  const getAssetPath = (...paths: string[]): string => path.join(RESOURCES_PATH, ...paths);
 
   mainWindow = new BrowserWindow({
     show: false,
@@ -129,23 +124,23 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-   AppI18n.setLng(userSettingService.get().LNG);
-   AppI18n.init(AppI18nContext.MAIN);
+  AppI18n.setLng(userSettingService.get().LNG);
+  AppI18n.init(AppI18nContext.MAIN);
 
-   AppI18n.getI18n().on('languageChanged', async (e) => {
-     const { response } = await dialog.showMessageBox(
-       BrowserWindow.getFocusedWindow(),
-       {
-         buttons: [i18next.t('Button:RestartLater'), i18next.t('Button:RestartNow')],
-         message: i18next.t("Dialog:YouNeedRestartQuestion")
-       },
-     );
+  AppI18n.getI18n().on('languageChanged', async (e) => {
+    const { response } = await dialog.showMessageBox(
+      BrowserWindow.getFocusedWindow(),
+      {
+        buttons: [i18next.t('Button:RestartLater'), i18next.t('Button:RestartNow')],
+        message: i18next.t('Dialog:YouNeedRestartQuestion'),
+      },
+    );
 
-     if (response === 1) {
-       app.relaunch()
-       app.exit();
-     }
-   });
+    if (response === 1) {
+      app.relaunch();
+      app.exit();
+    }
+  });
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();

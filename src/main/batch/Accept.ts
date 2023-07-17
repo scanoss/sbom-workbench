@@ -16,24 +16,24 @@ export class Accept extends Batch {
   }
 
   public async execute() {
-      if (this.getOverWrite()) {
-        await new Restore(this.getParams()).execute();
-      }
-      const ids = this.getFilesToUpdateFromInventories(this.inventories);
-      if (this.note) {
-        this.inventories.forEach((inventory) => {
-          inventory.notes = this.note;
-        });
-      }
-      const inv = await inventoryService.InventoryBatchCreate(this.inventories);
-      const filesToUpdate: any = this.mergeFilesInventoryId(inv);
-      filesToUpdate.files = ids;
-      const success = await inventoryService.InventoryAttachFileBatch(filesToUpdate);
-      if (success) {
-        await this.updateTree(ids, NodeStatus.IDENTIFIED);
-        return inv;
-      }
-      return null;
+    if (this.getOverWrite()) {
+      await new Restore(this.getParams()).execute();
+    }
+    const ids = this.getFilesToUpdateFromInventories(this.inventories);
+    if (this.note) {
+      this.inventories.forEach((inventory) => {
+        inventory.notes = this.note;
+      });
+    }
+    const inv = await inventoryService.InventoryBatchCreate(this.inventories);
+    const filesToUpdate: any = this.mergeFilesInventoryId(inv);
+    filesToUpdate.files = ids;
+    const success = await inventoryService.InventoryAttachFileBatch(filesToUpdate);
+    if (success) {
+      await this.updateTree(ids, NodeStatus.IDENTIFIED);
+      return inv;
+    }
+    return null;
   }
 
   private getFilesToUpdateFromInventories(inventories: Array<Inventory>) {

@@ -2,15 +2,17 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import i18next from 'i18next'
-import { showTranslations } from 'translation-check'
+import i18next from 'i18next';
+import { showTranslations } from 'translation-check';
 
 import AppConfig from '@config/AppConfigModule';
 import { DialogProvider } from '@context/DialogProvider';
 import { WorkbenchProvider } from '@context/WorkbenchProvider';
 import AppProvider from '@context/AppProvider';
 import store from '@store/store';
-import { createTheme, ThemeProvider, StyledEngineProvider, Theme } from '@mui/material/styles';
+import {
+  createTheme, ThemeProvider, StyledEngineProvider, Theme,
+} from '@mui/material/styles';
 
 import { AppI18n } from '@shared/i18n';
 import { IpcChannels } from '@api/ipc-channels';
@@ -41,28 +43,28 @@ export default class App {
     const theme = this.loadTheme();
 
     const app = (
-        <StyledEngineProvider injectFirst>
-          <ThemeProvider theme={theme}>
-            <HashRouter>
-              <Provider store={store}>
-                <DialogProvider>
-                  <AppProvider>
-                    <WorkbenchProvider>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={theme}>
+          <HashRouter>
+            <Provider store={store}>
+              <DialogProvider>
+                <AppProvider>
+                  <WorkbenchProvider>
                     <React.Suspense fallback="">
-                        <Routes>
-                          <Route index element={<WorkspaceModule />} />
-                          <Route path="/workspace/*" element={<WorkspaceModule />} />
-                          <Route path="/workbench/*" element={<WorkbenchModule />} />
-                          <Route path="/about" element={<AboutModule />} />
-                        </Routes>
-                      </React.Suspense>
-                    </WorkbenchProvider>
-                  </AppProvider>
-                </DialogProvider>
-              </Provider>
-            </HashRouter>
-          </ThemeProvider>
-        </StyledEngineProvider>
+                      <Routes>
+                        <Route index element={<WorkspaceModule />} />
+                        <Route path="/workspace/*" element={<WorkspaceModule />} />
+                        <Route path="/workbench/*" element={<WorkbenchModule />} />
+                        <Route path="/about" element={<AboutModule />} />
+                      </Routes>
+                    </React.Suspense>
+                  </WorkbenchProvider>
+                </AppProvider>
+              </DialogProvider>
+            </Provider>
+          </HashRouter>
+        </ThemeProvider>
+      </StyledEngineProvider>
     );
 
     this.setupAppMenuListeners();
@@ -73,13 +75,13 @@ export default class App {
   }
 
   private async setTitle() {
-    const appInfo = await window.app.getInfo()
+    const appInfo = await window.app.getInfo();
     document.title = `${AppConfig.APP_NAME} (${appInfo.version})`;
   }
 
   setupAppMenuListeners() {
     window.electron.ipcRenderer.on(IpcChannels.MENU_OPEN_TRANSLATION_MANAGER, async (event) => {
-     showTranslations(i18next);
+      showTranslations(i18next);
     });
   }
 
@@ -115,7 +117,9 @@ export default class App {
               '& fieldset': {
                 borderColor: 'transparent',
               },
-              // TODO: we need to remove "!important" from rules. Currently, default style is more specific that custom styles. Could be controversial in the future
+              // TODO: we need to remove "!important" from rules. Currently,
+              // default style is more specific that custom styles.
+              // Could be controversial in the future
               '&.Mui-disabled fieldset': {
                 border: 0,
               },
