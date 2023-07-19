@@ -1,6 +1,6 @@
 {
-  "MarkOriginalFiles_one": "您确定要标记为原始 {{count}} 文件吗？",
-  "MarkOriginalFiles_other": "您确定要标记为原始 {{count}} 文件吗？",
+  "MarkOriginalFiles_one": "您确定要标记为自研 {{count}} 文件吗？",
+  "MarkOriginalFiles_other": "您确定要标记为自研 {{count}} 文件吗？",
   "RestoreFiles_one": "你确定要恢复 {{count}} 文件吗？",
   "RestoreFiles_other": "你确定要恢复 {{count}} 文件吗？",
   "AddComponentToCatalog": "你想添加 <strong>{{component}}</strong> 到你的目录吗？",

@@ -10,7 +10,7 @@
   "OK": "OK",
   "Identify": "识别",
   "IdentifyAllWithCount": "识别全部 ({{count}})",
-  "MarkAllAsOriginalWithCount": "标记所有未原始 ({{count}})",
+  "MarkAllAsOriginalWithCount": "标记所有为自研 ({{count}})",
   "RestoreAllWithCount": "恢复所有 ({{count}})",
   "AcceptAllWithCount": "接受所有 ({{count}})",
   "DismissAllPendingWithCount": "取消所有待定 ({{count}})",
