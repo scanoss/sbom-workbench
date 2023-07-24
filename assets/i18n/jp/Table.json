@@ -1,0 +1,23 @@
+{
+  "Header": {
+    "Name": "名前",
+    "Date": "日付",
+    "TotalFiles": "全ファイル",
+    "Component": "コンポーネント",
+    "Severity": "深刻度合",
+    "CVE": "CVE",
+    "Source": "ソース",
+    "Published": "Published",
+    "Modified": "Modified",
+    "Vendor": "ベンダー",
+    "Version": "バージョン",
+    "License": "ライセンス",
+    "Copyleft": "コピーレフト",
+    "IncompatibleLicenses": "互換性のないライセンス",
+    "PURL": "PURL",
+    "URL": "URL",
+    "LocalFile": "ローカルファイル"
+  },
+  "Version": "バージョン",
+  "License": "ライセンス"
+}
