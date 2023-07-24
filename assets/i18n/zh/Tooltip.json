@@ -1,6 +1,6 @@
 {
   "ProjectDeprecated": "该项目是使用不再受支持的先前版本扫描的。",
-  "ProjectImported": "该项目已导入。 您将无法看到原始源代码。",
+  "ProjectImported": "该项目已导入。 您将无法看到自研源代码。",
   "ResumeScan": "恢复扫描",
   "ExportProject": "导出项目",
   "Rescan": "重新扫描",
@@ -13,7 +13,7 @@
   "DetectedFiles":"检测到的文件",
   "BackToProjects": "返回项目",
   "Identify": "确认",
-  "MarkAsOriginal": "标记为原始",
+  "MarkAsOriginal": "标记为自研",
   "Restore": "恢复",
   "RemoveIdentification": "删除标识",
   "ViewIdentification": "查看标识",
@@ -39,7 +39,7 @@
   "OpenFileInFolder": "打开文件夹中的文件",
   "OpenFileInBrowser": "在浏览器中打开文件",
   "ExportHintWFP": "导出扫描项目的Winnowing指纹数据",
-  "ExportHintRAW": "E从 SCANOSS 平台导出原始 JSON 响应",
+  "ExportHintRAW": "从 SCANOSS 平台导出原始 JSON 格式报告",
   "ExportHintCSV": "导出逗号分隔值报告",
   "ExportHintSPDXLite": "导出符合 SPDX 的 SBOM 报告",
   "ExportHintHTML": "导出识别报告的 HTML 摘要"

@@ -1,10 +1,10 @@
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable global-require */
-import i18next, { i18n } from "i18next";
-import { initReactI18next } from "react-i18next";
+import i18next, { i18n } from 'i18next';
+import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
-import { i18nextPlugin } from 'translation-check'
+import { i18nextPlugin } from 'translation-check';
 
 /* const rsb = resourcesToBackend((language, namespace, callback) => {
   import(`/assets/i18n/${language}/${namespace}.json`)
@@ -21,22 +21,21 @@ export enum AppI18nContext {
   RENDERER,
 }
 
- export class AppI18n {
-
+export class AppI18n {
   private static languages: Record<string, string> = {
-    'en': "English",
-    'es': "Español",
-    'zh': '简体中文',
-    'jp': '日本語',
-  }
+    en: 'English',
+    es: 'Español',
+    zh: '简体中文',
+    jp: '日本語',   
+  };
 
   private static lng: string;
 
   private static i18next: i18n;
 
-  public static getLanguages():  Array<Record<string, string>> {
+  public static getLanguages(): Array<Record<string, string>> {
     return Object.entries(this.languages)
-      .reduce( (acc, [key, value]: any) => ([...acc, {key, value}]), []);
+      .reduce((acc, [key, value]: any) => ([...acc, { key, value }]), []);
   }
 
   public static setLng(lng: string) {
@@ -52,24 +51,22 @@ export enum AppI18nContext {
   }
 
   private static getResources() {
-    return Object.entries(this.languages).reduce( (acc, [key, value]: any) => {
-      return {
-        ...acc,
-        [key]: {
-          AppMenu: require(`../../../assets/i18n/${key}/AppMenu.json`),
-          Common: require(`../../../assets/i18n/${key}/Common.json`),
-          Title: require(`../../../assets/i18n/${key}/Title.json`),
-          Table: require(`../../../assets/i18n/${key}/Table.json`),
-          Tooltip: require(`../../../assets/i18n/${key}/Tooltip.json`),
-          Button: require(`../../../assets/i18n/${key}/Button.json`),
-          Dialog: require(`../../../assets/i18n/${key}/Dialog.json`),
-        },
-      }
-    }, {})
+    return Object.entries(this.languages).reduce((acc, [key, value]: any) => ({
+      ...acc,
+      [key]: {
+        AppMenu: require(`../../../assets/i18n/${key}/AppMenu.json`),
+        Common: require(`../../../assets/i18n/${key}/Common.json`),
+        Title: require(`../../../assets/i18n/${key}/Title.json`),
+        Table: require(`../../../assets/i18n/${key}/Table.json`),
+        Tooltip: require(`../../../assets/i18n/${key}/Tooltip.json`),
+        Button: require(`../../../assets/i18n/${key}/Button.json`),
+        Dialog: require(`../../../assets/i18n/${key}/Dialog.json`),
+      },
+    }), {});
   }
 
   public static init(context: AppI18nContext = AppI18nContext.RENDERER): i18n {
-    if (context === AppI18nContext.RENDERER) i18next.use(initReactI18next)
+    if (context === AppI18nContext.RENDERER) i18next.use(initReactI18next);
     if (context === AppI18nContext.RENDERER) i18next.use(i18nextPlugin);
 
     // .use(LanguageDetector)
@@ -81,13 +78,13 @@ export enum AppI18nContext {
       fallbackLng: 'en',
       initImmediate: false,
       saveMissing: true,
-      ns: ['AppMenu', 'Common', 'Title', 'Table',  'Tooltip', 'Dialog', 'Button'],
+      ns: ['AppMenu', 'Common', 'Title', 'Table', 'Tooltip', 'Dialog', 'Button'],
       defaultNS: 'Common',
 
       resources: this.getResources(),
     });
 
-    AppI18n.i18next = i18next
+    AppI18n.i18next = i18next;
     return AppI18n.i18next;
   }
- }
+}

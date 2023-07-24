@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import { IpcChannels } from "@api/ipc-channels";
+import { IpcChannels } from '@api/ipc-channels';
 import * as os from 'os';
 import path from 'path';
 
@@ -11,7 +11,6 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.send(channel, ...args);
     },
     on(channel: IpcChannels, listener: (_event: IpcRendererEvent, ...args: any[]) => void) {
-      // const subscription = (_event: IpcRendererEvent, ...args: unknown[]) => listener(_event, ...args);
       ipcRenderer.on(channel, listener);
       return () => ipcRenderer.removeListener(channel, listener);
     },
@@ -29,15 +28,11 @@ contextBridge.exposeInMainWorld('electron', {
 });
 
 contextBridge.exposeInMainWorld('os', {
-  homedir: () => {
-    return os.homedir();
-  },
+  homedir: () => os.homedir(),
 });
 
 contextBridge.exposeInMainWorld('path', {
-  resolve: (p: string, s: string) => {
-    return path.resolve(p, s);
-  },
+  resolve: (p: string, s: string) => path.resolve(p, s),
   sep: path.sep,
   basename: (filepath, extension) => path.basename(filepath, extension),
   dirname: (filepath) => path.dirname(filepath),
@@ -53,7 +48,5 @@ contextBridge.exposeInMainWorld('shell', {
 });
 
 contextBridge.exposeInMainWorld('app', {
-  getInfo: async () => {
-    return ipcRenderer.invoke(IpcChannels.APP_GET_APP_INFO);
-  },
+  getInfo: async () => ipcRenderer.invoke(IpcChannels.APP_GET_APP_INFO),
 });
