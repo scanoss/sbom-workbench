@@ -174,6 +174,7 @@ const defaultBannedList = {
     { condition: '=', value: '.wav', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.whl', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.woff', ftype: 'EXTENSION', scope: 'FILE' },
+    { condition: '=', value: '.woff2', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.xht', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.xhtml', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.xls', ftype: 'EXTENSION', scope: 'FILE' },
