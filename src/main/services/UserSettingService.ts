@@ -18,22 +18,25 @@ class UserSettingService {
   private store: IWorkspaceCfg;
 
   private defaultStore: IWorkspaceCfg = {
-    TOKEN: '',
+    TOKEN: null,
     DEFAULT_API_INDEX: 0,
     APIS: [
       {
         URL: `${AppConfig.API_URL}/scan/direct`,
         API_KEY: `${AppConfig.API_KEY}`,
-        DESCRIPTION: '',
+        DESCRIPTION: null,
       },
     ],
     SCAN_MODE: 'FULL_SCAN',
     VERSION: app.isPackaged === true ? app.getVersion() : packageJson.version,
     LNG: 'en',
-    PROXY: '',
-    CA_CERT: '',
-    IGNORE_CERT_ERRORS: false,
-    PAC: '',
+    PROXY: null,
+    CA_CERT: null,
+    IGNORE_CERT_ERRORS: null,
+    PAC: null,
+    SCANNER_CONCURRENCY_LIMIT: null,
+    SCANNER_POST_SIZE: null,
+    SCANNER_TIMEOUT: null,
   };
 
   constructor() {
@@ -102,8 +105,11 @@ class UserSettingService {
   public async save() {
     await fs.promises.writeFile(
       `${this.myPath}/${this.name}`,
-      JSON.stringify(this.store, undefined, 2),
-      'utf8'
+      JSON.stringify(this.store, (key, value) => {
+        if (value === null) return undefined;
+        return value;
+      }, 2),
+      'utf8',
     );
   }
 
