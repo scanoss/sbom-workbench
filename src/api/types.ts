@@ -31,7 +31,10 @@ export interface IWorkspaceCfg {
   PROXY: string;
   CA_CERT: string;
   IGNORE_CERT_ERRORS: boolean;
-  PAC: string;  //TODO: add this option to the migration
+  PAC: string; // TODO: add this option to the migration
+  SCANNER_TIMEOUT: number;
+  SCANNER_POST_SIZE: number;
+  SCANNER_CONCURRENCY_LIMIT: number;
 }
 
 export interface Node {

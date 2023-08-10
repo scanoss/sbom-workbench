@@ -61,17 +61,28 @@ npm run package
 
 SBOM Workbench is multi-language enabled. To contribute a new language please see our [internationalization documentation](assets/i18n/README.md).
 
-## Proxy Configuration
-SBOM Workbench support proxy settings, you might need to specify proxy settings depending on how your network is configured
+## Workbench Configuration
+SBOM Workbench support advanced settings. All the configurations needs to be included in the workspace config file `~/scanoss-workspace/workspaceCfg.json`
 
-All the configurations needs to be included in the workspace config file `~/scanoss-workspace/workspaceCfg.json`
+### Scanner parameters
+
+`"SCANNER_CONCURRENCY_LIMIT": "<integer>"`
+Number of threads to use while scanning (optional - default 5)
+
+`"SCANNER_POST_SIZE": "<intenger>"`
+Number of kilobytes to limit the post to while scanning (optional - default 16)
+
+`"SCANNER_TIMEOUT": "<integer>"`
+Timeout (in seconds) for API communication (optional - default 300)
+
+### Proxy settings
+You might need to specify proxy settings depending on how your network is configured
 
 `"PROXY": "<proxy_ip_address>:<proxy_port>"`
 
 If your network is using a proxy with SSL interception you can include your certificate in the configuration
 
 `  "CA_CERT": "<certificate_path>"`
-
 
 You can disable any SSL errors, to do so you can change this option to true
 
