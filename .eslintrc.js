@@ -35,6 +35,7 @@ module.exports = {
     'no-empty-pattern': ['off'],
     'react-hooks/exhaustive-deps': 'warn',
     'no-plusplus': ['warn', { allowForLoopAfterthoughts: true }],
+    'react/function-component-definition': ['off'],
   },
   parserOptions: {
     ecmaVersion: 2020,
