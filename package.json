@@ -174,7 +174,7 @@
     "css-minimizer-webpack-plugin": "^3.4.1",
     "detect-port": "^1.3.0",
     "electron": "^25.2.0",
-    "electron-builder": "^23.1.0",
+    "electron-builder": "^24.6.2",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.2.1",
     "electronmon": "^2.0.2",
@@ -233,6 +233,7 @@
     ],
     "afterSign": ".erb/scripts/notarize.js",
     "mac": {
+      "notarize" : false,
       "target": {
         "target": "default",
         "arch": [
