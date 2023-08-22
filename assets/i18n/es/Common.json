@@ -91,5 +91,7 @@
   "KeepOriginalUsage": "Mantener uso detectado",
   "PreRequiste": "Pre-Requisito",
   "ObfuscateFilePaths": "Ofuscar rutas de ficheros",
-  "ObfuscateFilePathsHint": "Todas sus rutas de ficheros se ofuscarán para garantizar una mayor confidencialidad."
+  "ObfuscateFilePathsHint": "Todas sus rutas de ficheros se ofuscarán para garantizar una mayor confidencialidad.",
+  "EnableHPSM": "Habilitar HPSM (High Precision Snippet Matching)",
+  "HPSMHint": "HPSM requiere una suscripción premium"
 }

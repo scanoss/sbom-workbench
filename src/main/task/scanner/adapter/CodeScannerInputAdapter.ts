@@ -1,10 +1,10 @@
-import { SbomMode, ScannerInput, WinnowingMode } from "scanoss";
-import fs from "fs";
-import { IScannerInputAdapter } from "./IScannerInputAdapter";
-import { Project } from "../../../workspace/Project";
+import { SbomMode, ScannerInput, WinnowingMode } from 'scanoss';
+import fs from 'fs';
+import { IScannerInputAdapter } from './IScannerInputAdapter';
+import { Project } from '../../../workspace/Project';
 
-export class CodeScannerInputAdapter implements IScannerInputAdapter{
-  adapterToScannerInput(project: Project,filesToScan: Record<string, string>): Array<ScannerInput> {
+export class CodeScannerInputAdapter implements IScannerInputAdapter {
+  adapterToScannerInput(project: Project, filesToScan: Record<string, string>): Array<ScannerInput> {
     const fullScanList: Array<string> = [];
     const quickScanList: Array<string> = [];
 
@@ -22,7 +22,9 @@ export class CodeScannerInputAdapter implements IScannerInputAdapter{
       result.push({
         fileList: fullScanList,
         folderRoot: project.metadata.getScanRoot(),
-        winnowing: { mode: WinnowingMode.FULL_WINNOWING_HPSM },
+        winnowing: {
+          mode: project.getDto().scannerConfig.hpsm ? WinnowingMode.FULL_WINNOWING_HPSM : WinnowingMode.FULL_WINNOWING,
+        },
       });
     }
 
@@ -47,5 +49,4 @@ export class CodeScannerInputAdapter implements IScannerInputAdapter{
     }
     return result;
   }
-
 }

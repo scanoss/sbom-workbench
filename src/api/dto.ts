@@ -52,7 +52,7 @@ export interface NewLicenseDTO {
   spdxid?: string;
 }
 
-export interface InventoryFileDTO{
+export interface InventoryFileDTO {
   inventory: Inventory,
   fromResult: Result
 }

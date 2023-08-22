@@ -90,5 +90,7 @@
   "KeepOriginalUsage": "Keep detected usage",
   "PreRequiste": "Pre-Requisite",
   "ObfuscateFilePaths": "Obfuscate file paths",
-  "ObfuscateFilePathsHint": "Your filepaths will be obfuscated to ensure greater confidentiality."
+  "ObfuscateFilePathsHint": "Your filepaths will be obfuscated to ensure greater confidentiality",
+  "EnableHPSM": "Enable HPSM (High Precision Snippet Matching)",
+  "HPSMHint": "HPSM requires a subscription"
 }
