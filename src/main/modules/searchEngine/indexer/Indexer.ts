@@ -1,21 +1,20 @@
 import fs from 'fs';
 import log from 'electron-log';
 import { IIndexer } from './IIndexer';
-import { IpcChannels } from "../../../../api/ipc-channels";
+import { IpcChannels } from '../../../../api/ipc-channels';
 import { getSearchConfig } from '../../../../shared/utils/search-utils';
-import { broadcastManager } from "../../../broadcastManager/BroadcastManager";
+import { broadcastManager } from '../../../broadcastManager/BroadcastManager';
 
 const { Index } = require('flexsearch');
 
 export class Indexer {
-
   public index(files: Array<IIndexer>) {
     const index = new Index(getSearchConfig());
     for (let i = 0; i < files.length; i += 1) {
       try {
         if (i % 100 === 0) {
           this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
-            processed: i*100/files.length,
+            processed: i * 100 / files.length,
           });
         }
         const fileContent = fs.readFileSync(files[i].path, 'utf-8');
@@ -40,6 +39,6 @@ export class Indexer {
   }
 
   private sendToUI(eventName, data: any) {
-    broadcastManager.get().send(eventName,data)
+    broadcastManager.get().send(eventName, data);
   }
 }

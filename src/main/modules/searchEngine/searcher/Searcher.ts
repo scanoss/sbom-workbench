@@ -3,7 +3,8 @@ import path from 'path';
 import { ISearcher } from './ISearcher';
 import { getSearchConfig } from '../../../../shared/utils/search-utils';
 
-const { Index } = require('flexsearch');
+
+const { Index }  = require('flexsearch');
 
 class Searcher {
   private index: any;
@@ -22,6 +23,7 @@ class Searcher {
 
   public loadIndex(pathToDictionary: string) {
     if (!this.index) {
+      // @ts-ignore
       const index = new Index(getSearchConfig());
       if (fs.existsSync(pathToDictionary)) {
         fs.readdirSync(pathToDictionary).forEach((file) => {
