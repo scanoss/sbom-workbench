@@ -29,11 +29,12 @@
       "@context/*": ["renderer/context/*"],
       "@components/*": ["renderer/components/*"],
       "@hooks/*": ["renderer/hooks/*"],
-      "@store/*": ["renderer/store/*"]
+      "@store/*": ["renderer/store/*"],
+      "flexsearch": ["node_modules/@types/flexsearch"]
     },
      /* Module Resolution Options */
      "noImplicitAny": false,
-     "strictNullChecks": false,
+     "strictNullChecks": false
   },
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
 }
