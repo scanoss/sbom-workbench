@@ -8,6 +8,10 @@ export interface IAppConfig {
   OSSKB_HOST: string;
   API_URL: string;
   API_KEY: string;
+
+  API_CONTENT_PATH: string;
+  API_SCAN_PATH: string;
+
   MIN_VERSION_SUPPORTED: string;
   DEFAULT_WORKSPACE_NAME: string;
   DEFAULT_IP_gRPC: string;
