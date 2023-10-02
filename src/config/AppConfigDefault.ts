@@ -7,6 +7,8 @@ export const AppConfigDefault: IAppConfig = {
   OSSKB_HOST: 'osskb.org',
   API_URL: 'https://osskb.org/api',
   API_KEY: '',
+  API_SCAN_PATH: '/scan/direct',
+  API_CONTENT_PATH: '/file_contents',
   SCANOSS_WEBSITE_URL: 'https://www.scanoss.com',
   MIN_VERSION_SUPPORTED: '0.17.0',
   DEFAULT_WORKSPACE_NAME: 'scanoss-workspace',

@@ -22,7 +22,7 @@ class UserSettingService {
     DEFAULT_API_INDEX: 0,
     APIS: [
       {
-        URL: `${AppConfig.API_URL}/scan/direct`,
+        URL: `${AppConfig.API_URL}`,
         API_KEY: `${AppConfig.API_KEY}`,
         DESCRIPTION: null,
       },
@@ -95,7 +95,7 @@ class UserSettingService {
 
   public async update(): Promise<void> {
     this.store.APIS[0] = {
-      URL: `${AppConfig.API_URL}/scan/direct`,
+      URL: `${AppConfig.API_URL}`,
       API_KEY: `${AppConfig.API_KEY}`,
       DESCRIPTION: '',
     };
