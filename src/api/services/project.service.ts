@@ -4,16 +4,15 @@ import {
   FileTreeViewMode,
   INewProject, Inventory, InventoryKnowledgeExtraction,
   IProject,
-  IWorkbenchFilter, ReuseIdentificationTaskDTO
+  IWorkbenchFilter, ReuseIdentificationTaskDTO,
 } from '../types';
 import { BaseService } from './base.service';
-
 
 class ProjectService extends BaseService {
   public async get(args: Partial<IProject>): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.INVENTORY_GET,
-      args
+      args,
     );
     return response;
   }
@@ -21,14 +20,14 @@ class ProjectService extends BaseService {
   public async resume(path: string): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.PROJECT_RESUME_SCAN,
-      path
+      path,
     );
     return response;
   }
 
   public async stop(): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(
-      IpcChannels.PROJECT_STOP_SCAN
+      IpcChannels.PROJECT_STOP_SCAN,
     );
     return response;
   }
@@ -36,7 +35,7 @@ class ProjectService extends BaseService {
   public async create(project: INewProject): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.PROJECT_CREATE,
-      project
+      project,
     );
     return response;
   }
@@ -44,7 +43,7 @@ class ProjectService extends BaseService {
   public async rescan(path: string): Promise<void> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.PROJECT_RESCAN,
-      path
+      path,
     );
     return this.response(response);
   }
@@ -52,14 +51,14 @@ class ProjectService extends BaseService {
   public async load(path: string): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.PROJECT_OPEN_SCAN,
-      path
+      path,
     );
     return response;
   }
 
   public async getProjectName(): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(
-      IpcChannels.UTILS_PROJECT_NAME
+      IpcChannels.UTILS_PROJECT_NAME,
     );
     return response;
   }
@@ -67,21 +66,21 @@ class ProjectService extends BaseService {
   public async getNodeFromPath(path: string): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.UTILS_GET_NODE_FROM_PATH,
-      path
+      path,
     );
     return this.response(response);
   }
 
   public async getToken(): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(
-      IpcChannels.GET_TOKEN
+      IpcChannels.GET_TOKEN,
     );
     return this.response(response);
   }
 
   public async getTree(): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(
-      IpcChannels.PROJECT_READ_TREE
+      IpcChannels.PROJECT_READ_TREE,
     );
     return this.response(response);
   }
@@ -89,7 +88,7 @@ class ProjectService extends BaseService {
   public async setFilter(filter: IWorkbenchFilter): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.PROJECT_SET_FILTER,
-      filter
+      filter,
     );
     return this.response(response);
   }
@@ -97,8 +96,13 @@ class ProjectService extends BaseService {
   public async setFileTreeViewMode(mode: FileTreeViewMode): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.PROJECT_SET_FILE_TREE_VIEW_MODE,
-      mode
+      mode,
     );
+    return this.response(response);
+  }
+
+  public async getApiURL(): Promise<string> {
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.GET_API_URL);
     return this.response(response);
   }
 
@@ -107,17 +111,15 @@ class ProjectService extends BaseService {
     return this.response(response);
   }
 
-  public async extractInventoryKnowledge(param: ExtractFromProjectDTO): Promise<InventoryKnowledgeExtraction>{
+  public async extractInventoryKnowledge(param: ExtractFromProjectDTO): Promise<InventoryKnowledgeExtraction> {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, param);
-    console.log(param, response);
     return this.response(response);
   }
 
-  public async acceptInventoryKnowledge(param: ReuseIdentificationTaskDTO): Promise<Inventory>{
+  public async acceptInventoryKnowledge(param: ReuseIdentificationTaskDTO): Promise<Inventory> {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_ACCEPT_INVENTORY_KNOWLEDGE, param);
     return this.response(response);
   }
-
 }
-export const projectService = new ProjectService();
 
+export const projectService = new ProjectService();

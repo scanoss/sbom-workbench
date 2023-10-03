@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Dialog, DialogActions, IconButton, InputBase, MenuItem, Paper, Select, Tooltip } from '@mui/material';
+import {
+  Button, Dialog, DialogActions, IconButton, InputBase, MenuItem, Paper, Select, Tooltip,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import TextField from '@mui/material/TextField';
 import AddIcon from '@mui/icons-material/Add';
@@ -9,10 +11,9 @@ import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { IWorkspaceCfg } from '@api/types';
 import { userSettingService } from '@api/services/userSetting.service';
 import AppConfig from '@config/AppConfigModule';
-import CloseIcon from "@mui/icons-material/Close";
+import CloseIcon from '@mui/icons-material/Close';
 import { useTranslation } from 'react-i18next';
 import { AppI18n } from '@shared/i18n';
-
 
 const filter = createFilterOptions();
 
@@ -48,7 +49,9 @@ interface NewEndpointDialogProps {
 const NewEndpointDialog = (props: NewEndpointDialogProps) => {
   const { t } = useTranslation();
 
-  const { open, onClose, onCancel, defaultData } = props;
+  const {
+    open, onClose, onCancel, defaultData,
+  } = props;
 
   const initial = {
     URL: '',
@@ -57,9 +60,7 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
   };
   const [data, setData] = useState<any>(initial);
 
-  const isValid = () => {
-    return data.URL.trim().length > 0;
-  };
+  const isValid = () => data.URL.trim().length > 0;
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -94,7 +95,12 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
           </div>
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">
-              API KEY <span className="optional">- {t('Optional')}</span>
+              API KEY
+              {' '}
+              <span className="optional">
+                -
+                {t('Optional')}
+              </span>
             </label>
             <Paper className="dialog-form-field-control">
               <TextField
@@ -127,7 +133,7 @@ interface SettingDialogProps {
 }
 
 const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
-  const { t, i18n } = useTranslation()
+  const { t, i18n } = useTranslation();
 
   const [selectedApi, setSelectedApi] = useState(null);
   const [apis, setApis] = useState([]);
@@ -153,7 +159,9 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
   };
 
   const setDefault = (config: Partial<IWorkspaceCfg>) => {
-    const { DEFAULT_API_INDEX, APIS, TOKEN, LNG } = config;
+    const {
+      DEFAULT_API_INDEX, APIS, TOKEN, LNG,
+    } = config;
 
     const urlsDefault = APIS || [];
     const selectedUrlDefault = APIS && APIS[DEFAULT_API_INDEX] ? APIS[DEFAULT_API_INDEX] : null;
@@ -299,30 +307,33 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                         // Regular option
                         return `${option.URL} ${option.API_KEY ? `(${option.API_KEY})` : ''}`;
                       }}
-                      renderOption={(props, option, { selected }) =>
-                        option.new ? (
-                          <li {...props} className={classes.new}>
-                            {option.URL}
-                          </li>
-                        ) : (
-                          <li {...props}>
-                            <article className="w-100 d-flex space-between align-center">
-                              <div className={classes.option}>
-                                <span>{option.URL}</span>
-                                {option.API_KEY && <span className="middle">API KEY: {option.API_KEY}</span>}
-                              </div>
-                              <IconButton
-                                size="small"
-                                aria-label="delete"
-                                className="btn-delete"
-                                onClick={(e) => handleTrash(e, option)}
-                              >
-                                <DeleteIcon fontSize="inherit" />
-                              </IconButton>
-                            </article>
-                          </li>
-                        )
-                      }
+                      renderOption={(props, option, { selected }) => (option.new ? (
+                        <li {...props} className={classes.new}>
+                          {option.URL}
+                        </li>
+                      ) : (
+                        <li {...props}>
+                          <article className="w-100 d-flex space-between align-center">
+                            <div className={classes.option}>
+                              <span>{option.URL}</span>
+                              {option.API_KEY && (
+                                <span className="middle">
+                                  API KEY:
+                                  {option.API_KEY}
+                                </span>
+                              )}
+                            </div>
+                            <IconButton
+                              size="small"
+                              aria-label="delete"
+                              className="btn-delete"
+                              onClick={(e) => handleTrash(e, option)}
+                            >
+                              <DeleteIcon fontSize="inherit" />
+                            </IconButton>
+                          </article>
+                        </li>
+                      ))}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -344,7 +355,12 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
               className={AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS ? 'dialog-form-field mt-7' : 'dialog-form-field'}
             >
               <label className="dialog-form-field-label">
-                {t('Title:SBOMLedgerToken')} <span className="optional">- {t('Optional')}</span>
+                {t('Title:SBOMLedgerToken')}
+                {' '}
+                <span className="optional">
+                  -
+                  {t('Optional')}
+                </span>
               </label>
               <Paper className="dialog-form-field-control">
                 <TextField
@@ -369,9 +385,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   onChange={(e) => setLanguage(e.target.value as string)}
                 >
 
-                  {AppI18n.getLanguages().map( (item) =>
-                    <MenuItem key={item.key} value={item.key}>{item.value}</MenuItem>
-                  )}
+                  {AppI18n.getLanguages().map((item) => <MenuItem key={item.key} value={item.key}>{item.value}</MenuItem>)}
                 </Select>
               </Paper>
             </div>

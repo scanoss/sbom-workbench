@@ -15,7 +15,6 @@ export class Identified extends Batch {
   private queryBuilder: QueryBuilder;
 
   constructor(params: IBatchInventory, inventory: Partial<Inventory>) {
-
     super(params);
     this.inventory = inventory;
     const filter = workspace.getOpenedProjects()[0].getGlobalFilter();

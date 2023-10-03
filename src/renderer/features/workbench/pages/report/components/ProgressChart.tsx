@@ -1,15 +1,14 @@
 import React, { useEffect } from 'react';
-import { Chart } from 'chart.js'
+import { Chart } from 'chart.js';
 
 const ProgressChart = ({ progress }) => {
   const chartRef = React.createRef<any>();
   const data = [];
   const dataInv = [];
-  if(progress) {
-    data[0] =  { label: 'Included', value: progress.includedFiles };
-    data[1] =  { label: 'Filtered', value: progress.filteredFiles };
-    data[2] = { label: 'User excluded', value: progress.totalFiles - progress.includedFiles - progress.filteredFiles }
-
+  if (progress) {
+    data[0] = { label: 'Included', value: progress.includedFiles };
+    data[1] = { label: 'Filtered', value: progress.filteredFiles };
+    data[2] = { label: 'User excluded', value: progress.totalFiles - progress.includedFiles - progress.filteredFiles };
 
     dataInv[0] = { label: 'Pending', value: progress.pendingFiles };
     dataInv[1] = { label: 'Identified', value: progress.identifiedFiles };
@@ -20,7 +19,7 @@ const ProgressChart = ({ progress }) => {
     const chart = new Chart(chartRef.current, {
       type: 'pie',
       data: {
-        labels: [data.map((d) => d.label), dataInv.map((d) => d.label) ],
+        labels: [data.map((d) => d.label), dataInv.map((d) => d.label)],
         datasets: [
           {
             label: 'Project',
@@ -34,8 +33,8 @@ const ProgressChart = ({ progress }) => {
               'rgb(97,255,86)', // TODO: estos se tienen q generar automaticamente
             ],
           },
-         {
-            label:  'Inventory',
+          {
+            label: 'Inventory',
             data: dataInv.map((d) => d.value),
             borderWidth: 0,
             backgroundColor: [

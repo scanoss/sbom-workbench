@@ -149,8 +149,26 @@ ipcMain.handle(
     } catch (e: any) {
       return Response.fail({ message: e.message });
     }
-  }
+  },
 );
+
+ipcMain.handle(IpcChannels.GET_API_URL, async (event) => {
+  try {
+    const p = workspace.getOpenProject();
+    let apiURL = p.getApi();
+    if (apiURL === undefined) {
+      const { APIS, DEFAULT_API_INDEX } = userSettingService.get();
+      if (DEFAULT_API_INDEX > 0) apiURL = APIS[DEFAULT_API_INDEX].URL;
+      else apiURL = null;
+    }
+    return Response.ok({
+      message: 'Api URL loaded successfully',
+      data: apiURL,
+    });
+  } catch (e: any) {
+    return Response.fail({ message: e.message });
+  }
+});
 
 ipcMain.handle(IpcChannels.GET_API_KEY, async (event) => {
   try {
