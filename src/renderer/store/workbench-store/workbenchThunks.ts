@@ -16,6 +16,11 @@ export const loadProject = createAsyncThunk('workbench/loadProject', async (path
   return response;
 });
 
+export const loadProjectSettings = createAsyncThunk('workbench/loadProjectSettings', async () => {
+  const response = await workbenchController.loadSettings();
+  return response;
+});
+
 export const setTree = createAsyncThunk('workbench/setTree', async (tree: any, thunkAPI) => {
   const state = thunkAPI.getState() as RootState;
   const nTree = await prom(tree, state.workbench.tree);

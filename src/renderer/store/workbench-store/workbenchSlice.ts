@@ -1,8 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { collapseAll, convertTreeToNode, expandAll, expandToMatches } from '@shared/utils/filetree-utils';
-import { loadProject, setTree } from './workbenchThunks';
+import {
+  collapseAll, convertTreeToNode, expandAll, expandToMatches,
+} from '@shared/utils/filetree-utils';
+import { loadProject, loadProjectSettings, setTree } from './workbenchThunks';
 import { RootState } from '../rootReducer';
-import { ISummary } from "../../../main/services/ReportService";
+import { ISummary } from '../../../main/services/ReportService';
 import { Scanner } from '../../../main/task/scanner/types';
 
 export interface WorkbenchState {
@@ -22,6 +24,8 @@ export interface WorkbenchState {
   loading: boolean;
   loaded: boolean;
   settings: {
+    api_url: string;
+    api_key: string;
     isApiKeySetted: boolean;
   };
 }
@@ -43,6 +47,8 @@ const initialState: WorkbenchState = {
     section: null,
   },
   settings: {
+    api_url: null,
+    api_key: null,
     isApiKeySetted: false,
   },
 };
@@ -52,10 +58,6 @@ export const workbenchSlice = createSlice({
   initialState,
   reducers: {
     load: (state, action: PayloadAction<WorkbenchState>) => {},
-   /* setTree: (state, action: PayloadAction<any>) => {
-      const tree = action.payload;
-      state.tree = convertTreeToNode(tree, state.tree);
-    }, */
     updateTree: (state, action: PayloadAction<any>) => {
       state.tree = action.payload;
     },
@@ -69,10 +71,9 @@ export const workbenchSlice = createSlice({
     setProgress: (state, action: PayloadAction<ISummary>) => {
       const summary = action.payload;
 
-      const progress =
-        summary.summary.matchFiles === 0
-          ? 100
-          : ((summary.identified.scan + summary.original) * 100) / summary.summary.matchFiles;
+      const progress = summary.summary.matchFiles === 0
+        ? 100
+        : ((summary.identified.scan + summary.original) * 100) / summary.summary.matchFiles;
 
       state.progress = progress;
       state.summary = summary;
@@ -87,14 +88,16 @@ export const workbenchSlice = createSlice({
       state.loading = true;
     });
     builder.addCase(loadProject.fulfilled, (state, action) => {
-      const { name, imported, fileTree, dependencies, scanRoot, config } = action.payload;
+      const {
+        name, imported, fileTree, dependencies, scanRoot, config,
+      } = action.payload;
 
       state.path = scanRoot;
       state.name = name;
       state.loading = false;
       state.loaded = true;
       state.imported = imported;
-      state.wfp = config.source === Scanner.ScannerSource.WFP
+      state.wfp = config.source === Scanner.ScannerSource.WFP;
       state.tree = convertTreeToNode(fileTree, [fileTree]);
       state.dependencies = dependencies;
       state.projectScannerConfig = config;
@@ -102,12 +105,21 @@ export const workbenchSlice = createSlice({
     builder.addCase(setTree.fulfilled, (state, action) => {
       state.tree = action.payload;
     });
+    builder.addCase(loadProjectSettings.fulfilled, (state, action) => {
+      const { api_url, api_key } = action.payload;
+      state.settings = {
+        api_key,
+        api_url,
+        isApiKeySetted: !!api_key,
+      };
+    });
   },
 });
 
 // actions
-export const { load, updateTree, collapseTree, expandTree, setProgress, setHistory, reset } =
-  workbenchSlice.actions;
+export const {
+  load, updateTree, collapseTree, expandTree, setProgress, setHistory, reset,
+} = workbenchSlice.actions;
 
 // selectors
 export const selectWorkbench = (state: RootState) => state.workbench;

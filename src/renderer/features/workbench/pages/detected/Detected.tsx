@@ -5,18 +5,16 @@ import { ComponentDetail } from './pages/ComponentDetail/ComponentDetail';
 import { ComponentList } from './pages/ComponentList/ComponentList';
 import FileViewer from './pages/FileViewer/FileViewer';
 
-const Detected = () => {
-  return (
-    <>
-      <Routes>
-        <Route path="/" element={<ComponentList />} />
-        <Route path="/component" element={<ComponentDetail />} />
-        <Route path="/file" element={<FileViewer />} />
-      </Routes>
+const Detected = () => (
+  <>
+    <Routes>
+      <Route path="/" element={<ComponentList />} />
+      <Route path="/component" element={<ComponentDetail />} />
+      <Route path="/file" element={<FileViewer />} />
+    </Routes>
 
-      <FilterSnackbar />
-    </>
-  );
-};
+    <FilterSnackbar />
+  </>
+);
 
 export default Detected;
