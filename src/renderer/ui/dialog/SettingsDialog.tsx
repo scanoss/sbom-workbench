@@ -65,7 +65,12 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
   const onSubmit = (e) => {
     e.preventDefault();
     if (isValid()) {
-      onClose({ action: DIALOG_ACTIONS.OK, data });
+      const nData = {
+        ...data,
+        URL: data.URL?.replace(/\/$/, ''),
+      };
+
+      onClose({ action: DIALOG_ACTIONS.OK, data: nData });
     }
   };
 
