@@ -61,7 +61,7 @@ class WorkbenchController {
    * @memberof WorkbenchController
    */
   public async fetchRemoteFile(hash: string, config: ProjectSettings = null): Promise<{content: string, status: number}> {
-    const URL = (config?.api_url || AppConfig.API_URL).replace('/scan/direct', '');
+    const URL = (config?.api_url || AppConfig.API_URL);
     const response = await fetch(`${URL}/file_contents/${hash}`, {
       headers: {
         ...(config?.api_key && { 'X-Session': config.api_key }),
