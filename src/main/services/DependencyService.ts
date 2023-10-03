@@ -16,14 +16,24 @@ class DependencyService {
   public async insert(dependencies: IDependencyResponse): Promise<void> {
     const files: Record<string, number> = await fileHelper.getPathFileId();
     const filesIds = [];
+
+    // Get dependencies fileIds
     dependencies.filesList.forEach((fileDependency) => {
-      filesIds.push(files[fileDependency.file]);
+      if (files[fileDependency.file]) {
+        filesIds.push(files[fileDependency.file]);
+      }
     });
-    const dep = dependencyHelper.dependecyModelAdapter(
+
+    // Get array of Dependencies to be inserted in the database
+    const dep = dependencyHelper.dependencyModelAdapter(
       dependencies.filesList,
-      files
+      files,
     );
+
+    // Updates file type on database
     await modelProvider.model.file.updateFileType(filesIds, 'MATCH');
+
+    // Insert dependencies in database
     await modelProvider.model.dependency.insertAll(dep);
   }
 
@@ -31,15 +41,15 @@ class DependencyService {
     try {
       const queryBuilder = QueryBuilderCreator.create(params);
       const dependencies = await modelProvider.model.dependency.getAll(
-        queryBuilder
+        queryBuilder,
       );
-      const queryBuilderDepInv = QueryBuilderCreator.create({inventoryUsage:'dependency'});
+      const queryBuilderDepInv = QueryBuilderCreator.create({ inventoryUsage: 'dependency' });
       const inventory: any = await modelProvider.model.inventory.getAll(queryBuilderDepInv);
       const component: any = await modelProvider.model.component.getAll();
       dependencyHelper.mergeInventoryComponentToDependency(
         dependencies,
         inventory,
-        component
+        component,
       );
       return dependencies;
     } catch (err: any) {
@@ -65,14 +75,14 @@ class DependencyService {
         await modelProvider.model.component.getAll(queryBuilderComp)
       )[0];
       let lic: any = await modelProvider.model.license.getBySpdxId(
-        dependency.licenses.length > 0 ? dependency.licenses[0] : params.license
+        dependency.licenses.length > 0 ? dependency.licenses[0] : params.license,
       );
       // Create license if it not exists in the catalog
       if (!lic) {
         const licenseName = licenseHelper.licenseNameToSPDXID(
           dependency.licenses.length > 0
             ? dependency.licenses[0]
-            : params.license
+            : params.license,
         );
         lic = await modelProvider.model.license.create({
           spdxid:
@@ -94,14 +104,15 @@ class DependencyService {
         newComponent.source = ComponentSource.MANUAL;
         newComponent.setLicenseIds([lic.id]);
         const component = await modelProvider.model.component.create(
-          newComponent
+          newComponent,
         );
         comp = await modelProvider.model.component.get(component.id);
-      } else
+      } else {
         await modelProvider.model.license.licenseAttach({
           license_id: lic.id,
           compid: comp.compid,
         });
+      }
 
       // Update dependency
       dependency = {
@@ -116,7 +127,7 @@ class DependencyService {
         dependency.purl,
         dependency.version,
         dependency.licenses.join(','),
-        dependency.dependencyId
+        dependency.dependencyId,
       );
       await modelProvider.model.dependency.update(dep);
 
@@ -140,10 +151,11 @@ class DependencyService {
       const dep = (await this.getAll({ id: dependencyId }))[0];
       if (dep.status === 'identified') {
         await modelProvider.model.inventory.delete(dep.inventory);
-        if (dep.component.source === 'manual')
+        if (dep.component.source === 'manual') {
           await modelProvider.model.component.deleteByID([
             dep.component.compid,
           ]);
+        }
       }
       const params = [];
       params.push(
@@ -152,7 +164,7 @@ class DependencyService {
         dep.purl,
         dep.originalVersion,
         dep.originalLicense ? dep.originalLicense.join(',') : null,
-        dep.dependencyId
+        dep.dependencyId,
       );
       await modelProvider.model.dependency.update(params);
       const response = (await this.getAll({ id: dependencyId }))[0];
@@ -164,7 +176,7 @@ class DependencyService {
   }
 
   public async restoreAllByIds(
-    dependenciesIds: number[]
+    dependenciesIds: number[],
   ): Promise<Array<Dependency>> {
     try {
       const results = [];
@@ -185,9 +197,8 @@ class DependencyService {
       const dependencies = await this.getAll({ path });
       const dependencyIds = dependencies
         .filter(
-          (d) =>
-            d.status === FileStatusType.IDENTIFIED ||
-            d.status === FileStatusType.ORIGINAL
+          (d) => d.status === FileStatusType.IDENTIFIED
+            || d.status === FileStatusType.ORIGINAL,
         )
         .map((d) => d.dependencyId);
       for (let i = 0; i < dependencyIds.length; i += 1) {
@@ -216,7 +227,7 @@ class DependencyService {
   }
 
   public async acceptAllByIds(
-    acceptedDep: Array<Dependency>
+    acceptedDep: Array<Dependency>,
   ): Promise<Array<Dependency>> {
     try {
       const dependencies = acceptedDep;
@@ -248,7 +259,7 @@ class DependencyService {
         dep.purl,
         dep.version,
         dep.licenses.length > 0 ? dep.licenses.join(',') : null,
-        dep.dependencyId
+        dep.dependencyId,
       );
       await modelProvider.model.dependency.update(params);
       const response = (await this.getAll({ id: dependencyId }))[0];
@@ -260,7 +271,7 @@ class DependencyService {
   }
 
   public async rejectAllByIds(
-    dependencyIds: Array<number>
+    dependencyIds: Array<number>,
   ): Promise<Array<Dependency>> {
     try {
       const response = [];
@@ -297,7 +308,7 @@ class DependencyService {
     try {
       let dependencies = await this.getAll({ path });
       dependencies = dependencies.filter(
-        (d) => d.status === FileStatusType.PENDING && d.valid === true
+        (d) => d.status === FileStatusType.PENDING && d.valid === true,
       );
       const response = [];
       for (const dep of dependencies) {

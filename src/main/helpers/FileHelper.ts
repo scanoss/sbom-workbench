@@ -2,6 +2,11 @@ import fs from 'fs';
 import { modelProvider } from '../services/ModelProvider';
 
 class FileHelper {
+
+  /**
+   * @Brief Get objects with file path and database id
+   * @Return Object with file path and database id
+   * */
   public async getPathFileId(): Promise<Record<string, number>> {
     const files = await modelProvider.model.file.getAll(null);
     const pathFileId = files.reduce((acc, file) => {

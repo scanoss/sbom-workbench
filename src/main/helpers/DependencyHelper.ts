@@ -1,26 +1,26 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-param-reassign */
 
-import { FilesList } from "scanoss";
+import { FilesList } from 'scanoss';
 import { Dependency } from '../../api/types';
-import { Dependency as Dep } from '../model/entity/Dependency'
+import { Dependency as Dep } from '../model/entity/Dependency';
 
 class DependencyHelper {
-  public dependecyModelAdapter(fileList: Array<FilesList> , files: Record<string,number> ): Array<Dep> {
-  const dependencies : Array<Dep> = [];
-     fileList.forEach((file) => {
-      file.dependenciesList.forEach((depList)=>{
+  public dependencyModelAdapter(fileList: Array<FilesList>, files: Record<string, number>): Array<Dep> {
+    const dependencies : Array<Dep> = [];
+    fileList.forEach((file) => {
+      file.dependenciesList.forEach((depList) => {
         const auxDep = new Dep();
         auxDep.fileId = files[file.file];
-          auxDep.version = depList.version;
-          auxDep.originalVersion = depList.version;
-          auxDep.purl = depList.purl;
-          auxDep.component = depList.component;
-          auxDep.scope = depList.scope ? depList.scope : null;
-          auxDep.licenses = [];
-          auxDep.originalLicense = [];
-        depList.licensesList.forEach((l)=>{
-          if(l.spdxId !== '') {
+        auxDep.version = depList.version;
+        auxDep.originalVersion = depList.version;
+        auxDep.purl = depList.purl;
+        auxDep.component = depList.component;
+        auxDep.scope = depList.scope ? depList.scope : null;
+        auxDep.licenses = [];
+        auxDep.originalLicense = [];
+        depList.licensesList.forEach((l) => {
+          if (l.spdxId !== '') {
             auxDep.licenses.push(l.spdxId);
             auxDep.originalLicense.push(l.spdxId);
           }
@@ -34,7 +34,7 @@ class DependencyHelper {
   public mergeInventoryComponentToDependency(
     dep: Array<any>,
     inventory: any,
-    component: any
+    component: any,
   ): Array<Dependency> {
     let inv: any = inventory;
     let comp: any = component;
