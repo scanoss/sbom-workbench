@@ -34,6 +34,8 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
 
   protected inputAdapter: TInputScannerAdapter;
 
+  protected obfuscationMapper: Record<string, string> = null;
+
   public abstract getStageProperties(): ScannerModule.StageProperties;
 
   constructor(project: Project, dispatch: TDispatcher, inputAdapter: TInputScannerAdapter) {
@@ -71,7 +73,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
         for (const file of response.getFilesScanned()) this.dispatcher.dispatch(this.project, file);
 
         this.project.tree.attachResults(response.getServerResponse());
-        response.getFilesScanned();
+
         Object.assign(
           this.project.filesNotScanned,
           this.project.filesNotScanned,
@@ -137,7 +139,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
       PAC,
       SCANNER_TIMEOUT,
       SCANNER_POST_SIZE,
-      SCANNER_CONCURRENCY_LIMIT
+      SCANNER_CONCURRENCY_LIMIT,
     } = userSettingService.get();
 
     if (this.project.getApi()) {
@@ -165,7 +167,9 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
     scannerCfg.CA_CERT = CA_CERT !== undefined ? CA_CERT : null;
     scannerCfg.PAC = PAC;
 
-    scannerCfg.WFP_OBFUSCATION = !!this.project.getDto().scannerConfig.obfuscate;
+    // Obfuscation
+    scannerCfg.WFP_OBFUSCATION = this.project.getDto().scannerConfig.obfuscate;
+    scannerCfg.RESULTS_DEOBFUSCATION = this.project.getDto().scannerConfig.obfuscate;
 
     // Allows Scanoss SDK to write into project.log
     logger.setTransport((msg) => log.info(`%c${msg}`, 'color: green'));
