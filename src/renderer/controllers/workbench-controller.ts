@@ -6,7 +6,6 @@ import { IpcChannels } from '@api/ipc-channels';
 import AppConfig from '../../config/AppConfigModule';
 import { Scanner } from '../../main/task/scanner/types';
 
-
 export interface ScanResult {
   name: string;
   imported: boolean;
@@ -15,6 +14,11 @@ export interface ScanResult {
   fileTree: any;
   dependencies: Array<string>;
   config: Scanner.ScannerConfig;
+}
+
+export interface ProjectSettings {
+  api_url: string;
+  api_key: string;
 }
 
 class WorkbenchController {
@@ -28,6 +32,13 @@ class WorkbenchController {
   public async loadScan(path: string): Promise<ScanResult> {
     const { data } = await projectService.load(path);
     return this.generateScanResult(data);
+  }
+
+  public async loadSettings(): Promise<ProjectSettings> {
+    const api_url = await projectService.getApiURL();
+    const api_key = await projectService.getApiKey();
+
+    return { api_key, api_url };
   }
 
   /**
@@ -46,15 +57,22 @@ class WorkbenchController {
    * Get file content from a remote file
    *
    * @param {string} hash
-   * @returns {string}
+   * @param {ProjectSettings} config
    * @memberof WorkbenchController
    */
-  public async fetchRemoteFile(hash: string): Promise<string> {
-    // TODO: move api url to API Config
-    const response = await fetch(`${AppConfig.API_URL}/file_contents/${hash}`);
+  public async fetchRemoteFile(hash: string, config: ProjectSettings = null): Promise<{content: string, status: number}> {
+    const URL = (config?.api_url || AppConfig.API_URL).replace('/scan/direct', '');
+    const response = await fetch(`${URL}/file_contents/${hash}`, {
+      headers: {
+        ...(config?.api_key && { 'X-Session': config.api_key }),
+      },
+    });
     if (!response.ok) throw new Error('File not found');
 
-    return response.text();
+    return {
+      content: await response.text(),
+      status: response.status,
+    };
   }
 
   public async getComponents(params: IWorkbenchFilterParams = null): Promise<ComponentGroup[]> {
@@ -69,7 +87,7 @@ class WorkbenchController {
   public async getComponent(purl: string, params: IWorkbenchFilterParams = null): Promise<ComponentGroup> {
     const comp = await componentService.get(
       { purl },
-      { ...params, filter: { ...params?.filter } }
+      { ...params, filter: { ...params?.filter } },
     );
     return comp;
   }

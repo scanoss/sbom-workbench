@@ -4,14 +4,12 @@ import { InventoryDetail } from './pages/InventoryDetail/InventoryDetail';
 import { InventoryList } from './pages/InventoryList/InventoryList';
 import { IdentifiedList } from './pages/IdentifiedList/IdentifiedList';
 
-const Identified = () => {
-  return (
-    <Routes>
-      <Route index element={<IdentifiedList />} />
-      <Route path="inventory" element={<InventoryList />} />
-      <Route path="inventory/:id" element={<InventoryDetail />} />
-    </Routes>
-  );
-};
+const Identified = () => (
+  <Routes>
+    <Route index element={<IdentifiedList />} />
+    <Route path="inventory" element={<InventoryList />} />
+    <Route path="inventory/:id" element={<InventoryDetail />} />
+  </Routes>
+);
 
 export default Identified;

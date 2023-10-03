@@ -10,7 +10,9 @@ import { InventoryForm } from '@context/types';
 import { getExtension } from '@shared/utils/utils';
 import { fileService } from '@api/services/file.service';
 import { useDispatch, useSelector } from 'react-redux';
-import { createInventory, detachFile, ignoreFile, restoreFile } from '@store/inventory-store/inventoryThunks';
+import {
+  createInventory, detachFile, ignoreFile, restoreFile,
+} from '@store/inventory-store/inventoryThunks';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import * as FileUtils from '@shared/utils/file-utils';
@@ -29,6 +31,7 @@ const MemoCodeViewer = React.memo(CodeViewer);
 
 export interface FileContent {
   content: string | null;
+  isHighlited?: boolean;
   error: boolean;
   loading: boolean;
 }
@@ -42,7 +45,9 @@ const Editor = () => {
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { path: scanBasePath, imported, summary, wfp } = useSelector(selectWorkbench);
+  const {
+    path: scanBasePath, imported, summary, wfp, settings,
+  } = useSelector(selectWorkbench);
   const { node } = useSelector(selectNavigationState);
 
   const file = node?.type === 'file' ? node.path : null;
@@ -82,17 +87,17 @@ const Editor = () => {
       const content = await workbenchController.fetchLocalFile(`${scanBasePath}/${path}`);
       if (content === FileType.BINARY) throw new Error(t('FileTypeNotSupported'));
 
-      setLocalFileContent({ content, error: false,  loading: false });
+      setLocalFileContent({ content, error: false, loading: false });
     } catch (error: any) {
-      setLocalFileContent({ content: error.message || t('FileNotLoad'), error: true,  loading: false });
+      setLocalFileContent({ content: t('FileNotLoad'), error: true, loading: false });
     }
   };
 
   const loadRemoteFile = async (path: string): Promise<void> => {
     try {
-      setRemoteFileContent({ content: null, error: false, loading: true });
-      const content = await workbenchController.fetchRemoteFile(path);
-      setRemoteFileContent({ content, error: false, loading: false });
+      setRemoteFileContent({ content: null, isHighlited: false, error: false, loading: true });
+      const { content, status } = await workbenchController.fetchRemoteFile(path, settings);
+      setRemoteFileContent({ content, isHighlited: status !== 204, error: false, loading: false });
     } catch (error) {
       setRemoteFileContent({ content: null, error: true, loading: false });
     }
@@ -100,8 +105,8 @@ const Editor = () => {
 
   const getInventories = async () => {
     const inv = await inventoryService.getAllByFile(file);
-    const inventories = inv.map((i)=> i.inventory);
-    const results = inv.map((i)=> i.fromResult);
+    const inventories = inv.map((i) => i.inventory);
+    const results = inv.map((i) => i.fromResult);
     setInventories(inventories);
     setInventoriesMatchInfo(results);
   };
@@ -119,7 +124,7 @@ const Editor = () => {
       createInventory({
         ...inventory,
         files: selFiles,
-      })
+      }),
     );
 
     getResults();
@@ -143,14 +148,14 @@ const Editor = () => {
       usage: 'file',
     });
     if (response) {
-        const f = await fileService.get({ path: file });
-        if (!f) return;
-        await dispatch(
-          createInventory({
-            ...response,
-            files: [f.fileId],
-          })
-        );
+      const f = await fileService.get({ path: file });
+      if (!f) return;
+      await dispatch(
+        createInventory({
+          ...response,
+          files: [f.fileId],
+        }),
+      );
     }
   };
 
@@ -223,90 +228,88 @@ const Editor = () => {
     }
   };
 
-  return <>
+  return (
     <section id="editor" className="app-page">
       <header className="app-header">
         <Breadcrumb />
-        <>
-          <header className="match-info-header">
-            {(!matchInfo || !inventories) && (
-              <Skeleton variant="rectangular" width="50%" height={58} style={{ marginBottom: 15 }} />
-            )}
+        <header className="match-info-header">
+          {(!matchInfo || !inventories) && (
+          <Skeleton variant="rectangular" width="50%" height={58} style={{ marginBottom: 15 }} />
+          )}
 
-            {matchInfo && inventories && (matchInfo.length > 0 || inventories.length > 0) && (
-              <section className="content">
-                <div className="match-info-default-container">
-                  {inventories.length > 0
-                    ? inventories.map((inventory, index) => (
-                        <MatchInfoCard
-                          key={inventory.id}
-                          selected={currentMatch === inventory}
-                          match={{
-                            component: inventory.component.name,
-                            vendor: inventory.component?.vendor,
-                            version: inventory.component.version,
-                            usage: inventory.usage,
-                            license: inventory.spdxid,
-                            url: inventory.component.url,
-                            purl: inventory.component.purl,
-                            matched: inventoriesMatchInfo[index]?.matched || ''
-                          }}
-                          status="identified"
-                          onSelect={() => null}
-                          onAction={(action) => onAction(action, inventory)}
-                        />
-                      ))
-                    : matchInfo?.map((match, index) => (
-                        <MatchInfoCard
-                          key={match.id}
-                          selected={currentMatch === match}
-                          match={{
-                            component: match.component?.name,
-                            vendor: match.component?.vendor,
-                            version: match.component?.version,
-                            usage: match.type,
-                            license:
-                              match.component?.licenses.find((l) => l.spdxid === match.license[0])?.name ||
-                              match.license[0],
-                            url: match.component?.url,
-                            purl: match.component?.purl,
-                            matched: match.matched
-                          }}
-                          status={match.status}
-                          onSelect={() => setCurrentMatch(matchInfo[index])}
-                          onAction={(action) => onAction(action, match)}
-                        />
-                      ))}
-                </div>
-              </section>
-            )}
+          {matchInfo && inventories && (matchInfo.length > 0 || inventories.length > 0) && (
+          <section className="content">
+            <div className="match-info-default-container">
+              {inventories.length > 0
+                ? inventories.map((inventory, index) => (
+                  <MatchInfoCard
+                    key={inventory.id}
+                    selected={currentMatch === inventory}
+                    match={{
+                      component: inventory.component.name,
+                      vendor: inventory.component?.vendor,
+                      version: inventory.component.version,
+                      usage: inventory.usage,
+                      license: inventory.spdxid,
+                      url: inventory.component.url,
+                      purl: inventory.component.purl,
+                      matched: inventoriesMatchInfo[index]?.matched || '',
+                    }}
+                    status="identified"
+                    onSelect={() => null}
+                    onAction={(action) => onAction(action, inventory)}
+                  />
+                ))
+                : matchInfo?.map((match, index) => (
+                  <MatchInfoCard
+                    key={match.id}
+                    selected={currentMatch === match}
+                    match={{
+                      component: match.component?.name,
+                      vendor: match.component?.vendor,
+                      version: match.component?.version,
+                      usage: match.type,
+                      license:
+                              match.component?.licenses.find((l) => l.spdxid === match.license[0])?.name
+                              || match.license[0],
+                      url: match.component?.url,
+                      purl: match.component?.purl,
+                      matched: match.matched,
+                    }}
+                    status={match.status}
+                    onSelect={() => setCurrentMatch(matchInfo[index])}
+                    onAction={(action) => onAction(action, match)}
+                  />
+                ))}
+            </div>
+          </section>
+          )}
 
-            <div className="info-files">
+          <div className="info-files">
+            <FileToolbar
+              id={CodeViewerManager.LEFT}
+              label={t('Title:SourceFile')}
+              fullpath={`${scanBasePath}${file}`}
+              file={file}
+            />
+            {matchInfo && currentMatch && currentMatch.file ? (
               <FileToolbar
-                id={CodeViewerManager.LEFT}
-                label={t('Title:SourceFile')}
-                fullpath={`${scanBasePath}${file}`}
-                file={file}
-              />
-              {matchInfo && currentMatch && currentMatch.file ? (
-                <FileToolbar
-                  id={isDiffView ? CodeViewerManager.RIGHT : CodeViewerManager.LEFT}
-                  label={t('Title:ComponentFile')}
-                  fullpath={FileUtils.getFileURL(currentMatch)}
-                  file={currentMatch.file}
-                  actions={
+                id={isDiffView ? CodeViewerManager.RIGHT : CodeViewerManager.LEFT}
+                label={t('Title:ComponentFile')}
+                fullpath={FileUtils.getFileURL(currentMatch)}
+                file={currentMatch.file}
+                actions={
                     FileUtils.canOpenURL(currentMatch)
                       ? [ToolbarActions.FIND, ToolbarActions.COPY_PATH, ToolbarActions.OPEN_IN_BROWSER]
                       : [ToolbarActions.FIND, ToolbarActions.COPY_PATH]
                   }
-                />
-              ) : (
-                inventories?.length === 0 &&
-                matchInfo?.length === 0 && <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} showLabel />
-              )}
-            </div>
-          </header>
-        </>
+              />
+            ) : (
+              inventories?.length === 0
+                && matchInfo?.length === 0 && <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} showLabel />
+            )}
+          </div>
+        </header>
       </header>
 
       <main
@@ -324,21 +327,26 @@ const Editor = () => {
               <MemoCodeViewer
                 id={CodeViewerManager.LEFT}
                 language={getExtension(file)}
-                value={ localFileContent?.content  || ''}
+                value={localFileContent?.content || ''}
                 highlight={currentMatch?.lines || null}
                 highlights={highlight || null}
               />
             ) : (
-              <div className="file-loader">{localFileContent?.content ||  t('LoadingLocalFile')}</div>
+              <div className="file-loader">{localFileContent?.content || t('LoadingLocalFile')}</div>
             )}
           </div>
         )}
 
-        { (imported || wfp) && !currentMatch && !localFileContent?.loading &&
+        { (imported || wfp) && !currentMatch && !localFileContent?.loading
+          && (
           <div className="editor">
-            <div className="file-loader"> {t(wfp ? 'ProjectWFPCantDisplay' : 'ProjectImportedCantDisplay')} </div>
+            <div className="file-loader">
+              {' '}
+              {t(wfp ? 'ProjectWFPCantDisplay' : 'ProjectImportedCantDisplay')}
+              {' '}
+            </div>
           </div>
-        }
+          )}
 
         { (isDiffView || wfp || imported) && currentMatch && (
           <div className="editor">
@@ -347,25 +355,31 @@ const Editor = () => {
                 id={CodeViewerManager.RIGHT}
                 language={getExtension(file)}
                 value={remoteFileContent.content || ''}
-                highlight={currentMatch.oss_lines || null}
+                highlight={remoteFileContent.isHighlited ? currentMatch.oss_lines : null}
                 highlights={highlight || null}
               />
             ) : (
               <div className="file-loader">
                 { !remoteFileContent.loading && (remoteFileContent?.error || (localFileContent?.error && (wfp || imported)))
-                  ?
+                  ? (
                     <>
-                      { localFileContent?.error && (wfp || imported) && <span>{t(wfp ? 'ProjectWFPCantDisplay' : 'ProjectImportedCantDisplay')}<br/></span> }
+                      { localFileContent?.error && (wfp || imported) && (
+                      <span>
+                        {t(wfp ? 'ProjectWFPCantDisplay' : 'ProjectImportedCantDisplay')}
+                        <br />
+                      </span>
+                      ) }
                       { remoteFileContent?.error && <span>{t('RemoteFileNotLoad')}</span> }
                     </>
+                  )
                   : t('LoadingRemoteFile')}
-                </div>
+              </div>
             )}
           </div>
         )}
       </main>
     </section>
-  </>;
+  );
 };
 
 export default Editor;
