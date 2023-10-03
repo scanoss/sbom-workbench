@@ -5,9 +5,6 @@ import { Project } from './Project';
 import { INewProject, IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../../../assets/data/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
-import { Scanner } from '../task/scanner/types';
-import { WorkspaceMigration } from '../migration/WorkspaceMigration';
-import { userSettingService } from '../services/UserSettingService';
 
 class Workspace {
   private projectList: Array<Project>;

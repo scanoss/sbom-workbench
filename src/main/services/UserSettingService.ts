@@ -53,7 +53,7 @@ class UserSettingService {
     return this.store;
   }
 
-  public setSetting(key: string, value: string) {
+  public setSetting(key: string, value: any) {
     this.store[key] = value;
   }
 
@@ -79,9 +79,10 @@ class UserSettingService {
         `${this.myPath}/${this.name}`,
         'utf8'
       );
-      const root = `${os.homedir()}/${AppConfig.DEFAULT_WORKSPACE_NAME}`;
-      await new WorkspaceMigration(userSettingService.get().VERSION, root).up();
       this.store =  {...this.store,...JSON.parse(setting)};
+
+      const root = `${os.homedir()}/${AppConfig.DEFAULT_WORKSPACE_NAME}`;
+      await new WorkspaceMigration(this.get().VERSION, root).up();
     } catch(error:any) {
       log.error("[ WORKSPACE CONFIG ]:", "Invalid workspace configuration");
       const ws =  await fs.promises.readFile(

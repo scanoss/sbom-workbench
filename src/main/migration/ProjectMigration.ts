@@ -8,6 +8,7 @@ import { migration120 } from './scripts/120';
 import { migration140 } from './scripts/140';
 import { migration150 } from './scripts/150';
 import { migration180 } from './scripts/180';
+import { projectMigration183 } from './scripts/183';
 
 export class ProjectMigration extends Migration {
   private scripts: Record<string, Array<(data: string) => void>>;
@@ -28,6 +29,7 @@ export class ProjectMigration extends Migration {
       '1.4.0': [migration140],
       '1.5.0': [migration150], // Max version supported
       '1.8.0': [migration180],
+      '1.8.3': [projectMigration183],
     };
   }
 
