@@ -38,6 +38,7 @@ export class ComponentModel extends Model {
     }
     return null;
   }
+
   // GET COMPONENENT ID FROM PURL
   public async getbyPurlVersion(data: any) {
     const db = await this.openDb();
@@ -46,13 +47,14 @@ export class ComponentModel extends Model {
     db.close();
     componentHelper.processComponent(component);
     const licenses = await this.getAllLicensesFromComponentId(
-      component.compid
+      component.compid,
     );
     component.licenses = licenses;
     const summary = await this.summaryByPurlVersion(component);
     component.summary = summary;
     return component;
   }
+
   // CREATE COMPONENT
   public async create(component: ComponentVersion): Promise<ComponentVersion> {
     const db = await this.openDb();
@@ -71,7 +73,7 @@ export class ComponentModel extends Model {
             component.id = this.lastID;
             callback(null, component);
           }
-        }
+        },
       );
     });
     const newComponent = await call();
@@ -83,9 +85,7 @@ export class ComponentModel extends Model {
   private async attachLicenses(component: ComponentVersion): Promise<void> {
     const licenses = component
       .getLicenseIds()
-      .map((l) =>
-        this.license.licenseAttach({ compid: component.id, license_id: l })
-      );
+      .map((l) => this.license.licenseAttach({ compid: component.id, license_id: l }));
     await Promise.all(licenses);
   }
 
@@ -99,6 +99,7 @@ export class ComponentModel extends Model {
     component.licenses = licenses;
     return component;
   }
+
   // GET LICENSE ATTACHED TO A COMPONENT
   private async getAllLicensesFromComponentId(id: any) {
     const db = await this.openDb();
@@ -107,34 +108,38 @@ export class ComponentModel extends Model {
     db.close();
     return compLicenses;
   }
-   public async getLicensesAttachedToComponentsFromResults() {
-     const db = await this.openDb();
-     const call = util.promisify(db.all.bind(db));
-     const licenses = await call(`SELECT DISTINCT cv.id,rl.spdxid FROM component_versions cv
+
+  public async getLicensesAttachedToComponentsFromResults() {
+    const db = await this.openDb();
+    const call = util.promisify(db.all.bind(db));
+    const licenses = await call(`SELECT DISTINCT cv.id,rl.spdxid FROM component_versions cv
            INNER JOIN results r ON cv.purl=r.purl AND cv.version = r.version
            INNER JOIN result_license rl ON r.id=rl.resultId
            ORDER BY cv.id;`);
-     db.close();
-     return licenses;
-   }
+    db.close();
+    return licenses;
+  }
+
   public async import(components: Array<Partial<Component>>) {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
     const promises = [];
     components.forEach((component) => {
-      promises.push(call(query.COMPDB_SQL_COMP_VERSION_INSERT,
+      promises.push(call(
+        query.COMPDB_SQL_COMP_VERSION_INSERT,
         component.name,
         component.version,
         'AUTOMATIC IMPORT',
         component.url,
         component.purl,
-        'engine'));
+        'engine',
+      ));
     });
     await Promise.all(promises);
     db.close();
   }
   // COMPONENT NEW
-  /*public async componentNewImportFromResults(db: any, data: any) {
+  /* public async componentNewImportFromResults(db: any, data: any) {
     return new Promise<boolean>((resolve) => {
       db.run(
         query.COMPDB_SQL_COMP_VERSION_INSERT,
@@ -150,37 +155,34 @@ export class ComponentModel extends Model {
         }
       );
     });
-  }*/
+  } */
 
   public async update(component: Component) {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
-    await call(query.SQL_COMPDB_COMP_VERSION_UPDATE,  component.name,
-      component.version,
-      component.description,
-      component.url,
-      component.purl,
-      component.description,
-      component.compid);
+    await call(query.SQL_COMPDB_COMP_VERSION_UPDATE, component.name, component.version, component.description, component.url, component.purl, component.description, component.compid);
     db.close();
   }
-    public async getUniqueComponentsFromResults():Promise<Array<Partial<Component>>>{
-      const db = await this.openDb();
-      const call = util.promisify(db.all.bind(db));
-      const components = await call(query.SQL_GET_UNIQUE_COMPONENT);
-      db.close();
-      components.forEach((result) => {
-        if (result.license) result.license = result.license.split(',');
-      });
-      return components;
-    }
-   private async summaryByPurlVersion(data: any) {
-     const db = await this.openDb();
-     const call = util.promisify(db.get.bind(db));
-     const summary = await call(query.SQL_GET_SUMMARY_BY_PURL_VERSION, data.purl, data.version);
-     db.close();
-     return summary;
-   }
+
+  public async getUniqueComponentsFromResults():Promise<Array<Partial<Component>>> {
+    const db = await this.openDb();
+    const call = util.promisify(db.all.bind(db));
+    const components = await call(query.SQL_GET_UNIQUE_COMPONENT);
+    db.close();
+    components.forEach((result) => {
+      if (result.license) result.license = result.license.split(',');
+    });
+    return components;
+  }
+
+  private async summaryByPurlVersion(data: any) {
+    const db = await this.openDb();
+    const call = util.promisify(db.get.bind(db));
+    const summary = await call(query.SQL_GET_SUMMARY_BY_PURL_VERSION, data.purl, data.version);
+    db.close();
+    return summary;
+  }
+
   public async summaryByPurl(data: any) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -190,14 +192,14 @@ export class ComponentModel extends Model {
           data.purl,
           (err: any, summary: any) => {
             db.close();
-            if (err)
+            if (err) {
               resolve({
                 identified: 0,
                 pending: 0,
                 ignored: 0,
               });
-            else resolve(summary);
-          }
+            } else resolve(summary);
+          },
         );
       } catch (error) {
         log.error(error);
@@ -209,7 +211,7 @@ export class ComponentModel extends Model {
   public async getIdentifiedForReport() {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const report = await call(       `SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name, l.spdxid, r.vendor
+    const report = await call(`SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name, l.spdxid, r.vendor
         FROM component_versions c
         INNER JOIN inventories i ON c.id=i.cvid
         LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
@@ -217,17 +219,18 @@ export class ComponentModel extends Model {
     db.close();
     return report;
   }
+
   public async getNotValid() {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const data = await call(`SELECT cv.id FROM component_versions cv  WHERE NOT EXISTS (SELECT 1 FROM results WHERE purl=cv.purl AND version=cv.version) AND cv.id NOT IN (SELECT i.cvid FROM inventories i);`,
-    );
+    const data = await call('SELECT cv.id FROM component_versions cv  WHERE NOT EXISTS (SELECT 1 FROM results WHERE purl=cv.purl AND version=cv.version) AND cv.id NOT IN (SELECT i.cvid FROM inventories i);');
     db.close();
     const ids: number[] = data.map(
-      (item: Record<string, number>) => item.id
+      (item: Record<string, number>) => item.id,
     );
     return ids;
   }
+
   public async deleteByID(componentIds: number[]) {
     const ids = componentIds.toString();
     const sql = `DELETE FROM component_versions WHERE id IN (${ids});`;
@@ -240,9 +243,10 @@ export class ComponentModel extends Model {
   public async updateOrphanToManual() {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
-    await call(`UPDATE component_versions  SET source='manual' WHERE  id IN ( SELECT i.cvid FROM inventories i INNER JOIN component_versions cv ON cv.id=i.cvid AND i.source="detected" WHERE (cv.purl,cv.version) NOT IN (SELECT r.purl,r.version FROM results r));`);
+    await call('UPDATE component_versions  SET source=\'manual\' WHERE  id IN ( SELECT i.cvid FROM inventories i INNER JOIN component_versions cv ON cv.id=i.cvid AND i.source="detected" WHERE (cv.purl,cv.version) NOT IN (SELECT r.purl,r.version FROM results r));');
     db.close();
   }
+
   public async getOverrideComponents() {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
@@ -255,7 +259,7 @@ export class ComponentModel extends Model {
     const SQLquery = this.getSQL(
       queryBuilder,
       query.SQL_GET_ALL_COMPONENTS,
-      this.getEntityMapper()
+      this.getEntityMapper(),
     );
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
@@ -264,24 +268,26 @@ export class ComponentModel extends Model {
     return components;
     db.close();
   }
-   public async summary(queryBuilder?: QueryBuilder) {
-     const SQLquery = this.getSQL(
-       queryBuilder,
-       query.SQL_COMPONENTS_SUMMARY,
-       this.getEntityMapper()
-     );
-     const db = await this.openDb();
-     const call = util.promisify(db.all.bind(db));
-     const summary = await call(SQLquery.SQL, ...SQLquery.params);
-     db.close();
-     return summary;
-   }
+
+  public async summary(queryBuilder?: QueryBuilder) {
+    const SQLquery = this.getSQL(
+      queryBuilder,
+      query.SQL_COMPONENTS_SUMMARY,
+      this.getEntityMapper(),
+    );
+    const db = await this.openDb();
+    const call = util.promisify(db.all.bind(db));
+    const summary = await call(SQLquery.SQL, ...SQLquery.params);
+    db.close();
+    return summary;
+  }
+
   public async getMostReliableLicensePerComponent(): Promise<
-    Array<IComponentLicenseReliable>
+  Array<IComponentLicenseReliable>
   > {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const components = await call(         `SELECT * FROM (SELECT cv.id AS cvid,rl.source,rl.spdxid AS reliableLicense,(CASE WHEN rl.source ='component_declared' THEN 1 WHEN rl.source = 'file_header' THEN 2 ELSE 3 END) ranking FROM results r LEFT JOIN component_versions cv
+    const components = await call(`SELECT * FROM (SELECT cv.id AS cvid,rl.source,rl.spdxid AS reliableLicense,(CASE WHEN rl.source ='component_declared' THEN 1 WHEN rl.source = 'file_header' THEN 2 ELSE 3 END) ranking FROM results r LEFT JOIN component_versions cv
             ON cv.purl=r.purl  AND cv.version= r.version LEFT JOIN result_license rl
             ON r.id = rl.resultId
             GROUP BY cvid, rl.source,rl.spdxid
@@ -291,20 +297,24 @@ export class ComponentModel extends Model {
     db.close();
     return components;
   }
+
   public async updateMostReliableLicense(
-    reliableLicenses: Array<IComponentLicenseReliable>
+    reliableLicenses: Array<IComponentLicenseReliable>,
   ): Promise<void> {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
     const promises = [];
     for (let i = 0; i < reliableLicenses.length; i += 1) {
-      promises.push(call('UPDATE component_versions SET reliableLicense=? WHERE id=?',
+      promises.push(call(
+        'UPDATE component_versions SET reliableLicense=? WHERE id=?',
         reliableLicenses[i].reliableLicense,
-        reliableLicenses[i].cvid));
+        reliableLicenses[i].cvid,
+      ));
     }
     await Promise.all(promises);
     db.close();
   }
+
   public getEntityMapper(): Record<string, string> {
     return ComponentModel.entityMapper;
   }
