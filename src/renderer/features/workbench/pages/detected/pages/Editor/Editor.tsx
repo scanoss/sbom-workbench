@@ -26,12 +26,12 @@ import { workbenchController } from '../../../../../../controllers/workbench-con
 import CodeViewer from '../../../../components/CodeViewer/CodeViewer';
 import { CodeViewerManager } from './CodeViewerManager';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
+import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 
 const MemoCodeViewer = React.memo(CodeViewer);
 
 export interface FileContent {
   content: string | null;
-  isHighlited?: boolean;
   error: boolean;
   loading: boolean;
 }
@@ -49,6 +49,7 @@ const Editor = () => {
     path: scanBasePath, imported, summary, wfp, settings,
   } = useSelector(selectWorkbench);
   const { node } = useSelector(selectNavigationState);
+  const { appInfo } = useSelector(selectWorkspaceState);
 
   const file = node?.type === 'file' ? node.path : null;
   const highlight = highlightParam ? SearchUtils.unStemmify(highlightParam) : null;
@@ -95,11 +96,11 @@ const Editor = () => {
 
   const loadRemoteFile = async (path: string): Promise<void> => {
     try {
-      setRemoteFileContent({ content: null, isHighlited: false, error: false, loading: true });
-      const { content, status } = await workbenchController.fetchRemoteFile(path, settings);
-      setRemoteFileContent({ content, isHighlited: status !== 204, error: false, loading: false });
-    } catch (error) {
-      setRemoteFileContent({ content: null, error: true, loading: false });
+      setRemoteFileContent({ content: null, error: false, loading: true });
+      const content = await workbenchController.fetchRemoteFile(path, settings);
+      setRemoteFileContent({ content, error: false, loading: false });
+    } catch (error: any) {
+      setRemoteFileContent({ content: error.message, error: true, loading: false });
     }
   };
 
@@ -355,7 +356,7 @@ const Editor = () => {
                 id={CodeViewerManager.RIGHT}
                 language={getExtension(file)}
                 value={remoteFileContent.content || ''}
-                highlight={remoteFileContent.isHighlited ? currentMatch.oss_lines : null}
+                highlight={currentMatch.oss_lines || null}
                 highlights={highlight || null}
               />
             ) : (
@@ -369,7 +370,7 @@ const Editor = () => {
                         <br />
                       </span>
                       ) }
-                      { remoteFileContent?.error && <span>{t('RemoteFileNotLoad')}</span> }
+                      { remoteFileContent?.error && (remoteFileContent?.content || <span>{t('RemoteFileNotLoad')}</span>) }
                     </>
                   )
                   : t('LoadingRemoteFile')}

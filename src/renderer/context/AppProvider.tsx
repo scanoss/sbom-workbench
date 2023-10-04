@@ -2,7 +2,7 @@ import { Button } from '@mui/material';
 import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { fetchProjects } from '@store/workspace-store/workspaceThunks';
+import { fetchProjects, init } from '@store/workspace-store/workspaceThunks';
 import { IProject } from '@api/types';
 import { workspaceService } from '@api/services/workspace.service';
 import { IpcChannels } from '@api/ipc-channels';
@@ -79,7 +79,7 @@ const AppProvider = ({ children }) => {
           label: 'OK',
           role: 'accept',
         },
-        true
+        true,
       );
     }
   };
@@ -143,7 +143,7 @@ const AppProvider = ({ children }) => {
           label: 'OK',
           role: 'accept',
         },
-        true
+        true,
       );
     }
   };
@@ -157,6 +157,9 @@ const AppProvider = ({ children }) => {
   };
 
   useEffect(setupAppMenuListeners, []);
+  useEffect(() => {
+    dispatch(init());
+  }, []);
 
   return (
     <AppContext.Provider
