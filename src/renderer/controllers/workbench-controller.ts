@@ -60,19 +60,18 @@ class WorkbenchController {
    * @param {ProjectSettings} config
    * @memberof WorkbenchController
    */
-  public async fetchRemoteFile(hash: string, config: ProjectSettings = null): Promise<{content: string, status: number}> {
+  public async fetchRemoteFile(hash: string, config: ProjectSettings = null): Promise<string> {
     const URL = (config?.api_url || AppConfig.API_URL);
-    const response = await fetch(`${URL}/file_contents/${hash}`, {
+
+    const response = await fetch(`${URL}${AppConfig.API_CONTENT_PATH}/${hash}`, {
       headers: {
         ...(config?.api_key && { 'X-Session': config.api_key }),
       },
     });
-    if (!response.ok) throw new Error('File not found');
 
-    return {
-      content: await response.text(),
-      status: response.status,
-    };
+    if (!response.ok || response.status === 203) throw new Error(await response.text());
+
+    return response.text();
   }
 
   public async getComponents(params: IWorkbenchFilterParams = null): Promise<ComponentGroup[]> {
