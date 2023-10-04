@@ -5,6 +5,7 @@ import { Project } from './Project';
 import { INewProject, IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../../../assets/data/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
+import { Model } from '../model/Model';
 
 class Workspace {
   private projectList: Array<Project>;
@@ -94,6 +95,9 @@ class Workspace {
 
   public async removeProjectFilter(filter: ProjectFilter) {
     const p = this.getProject(filter);
+    const m = new Model(p.metadata.getMyPath());
+    const db = await m.openDb();
+    await db.close();
     await this.removeProject(p);
     return true;
   }

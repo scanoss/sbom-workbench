@@ -17,7 +17,6 @@ import { modelProvider } from '../services/ModelProvider';
 import { TreeViewModeCreator } from './tree/treeViewModes/TreeViewModeCreator';
 import { IpcChannels } from '../../api/ipc-channels';
 import * as ScannerCFG from '../task/scanner/types';
-import { broadcastManager } from '../broadcastManager/BroadcastManager';
 
 export class Project {
   work_root: string;
@@ -78,7 +77,7 @@ export class Project {
     }
     const pMigration = new ProjectMigration(
       this.metadata.getVersion(),
-      this.metadata.getMyPath()
+      this.metadata.getMyPath(),
     );
     const newVersion: string = await pMigration.up();
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
@@ -88,11 +87,10 @@ export class Project {
 
   public async open(): Promise<boolean> {
     this.state = ProjectState.OPENED;
-    log.transports.file.resolvePath = () =>
-      `${this.metadata.getMyPath()}/project.log`;
+    log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`;
     const project = await fs.promises.readFile(
       `${this.metadata.getMyPath()}/tree.json`,
-      'utf8'
+      'utf8',
     );
     const a = JSON.parse(project);
     this.filesToScan = a.filesToScan;
@@ -101,7 +99,7 @@ export class Project {
     this.filesSummary = a.filesSummary;
     await modelProvider.init(this.metadata.getMyPath());
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
-    this.tree = new Tree(a.tree.rootFolder.label, this.metadata.getMyPath(),a.tree.rootFolder.label);
+    this.tree = new Tree(a.tree.rootFolder.label, this.metadata.getMyPath(), a.tree.rootFolder.label);
     this.tree.loadTree(a.tree.rootFolder);
     return true;
   }
@@ -110,7 +108,11 @@ export class Project {
     if (this.scanner && this.scanner.isRunning()) this.scanner.stop();
     log.info(
       `%c[ PROJECT ]: Closing project ${this.metadata.getName()}`,
-      'color: green'
+      'color: green',
+    );
+    log.info(
+      '%c[ PROJECT ]: Closing Database',
+      'color: green',
     );
     this.state = ProjectState.CLOSED;
     this.scanner = null;
@@ -134,11 +136,11 @@ export class Project {
     };
     fs.writeFileSync(
       `${this.metadata.getMyPath()}/tree.json`,
-      JSON.stringify(a)
+      JSON.stringify(a),
     );
     log.info(
       `%c[ PROJECT ]: Project ${this.metadata.getName()} saved`,
-      'color:green'
+      'color:green',
     );
   }
 
@@ -219,8 +221,8 @@ export class Project {
     return JSON.parse(
       await fs.promises.readFile(
         `${this.metadata.getMyPath()}/result.json`,
-        'utf8'
-      )
+        'utf8',
+      ),
     );
   }
 
@@ -251,8 +253,8 @@ export class Project {
       return JSON.parse(
         await fs.promises.readFile(
           `${this.metadata.getMyPath()}/dependencies.json`,
-          'utf8'
-        )
+          'utf8',
+        ),
       );
     } catch (e) {
       log.error(e);
@@ -264,13 +266,13 @@ export class Project {
     try {
       if (
         !(
-          JSON.stringify({ ...filter, path: null }) ===
-          JSON.stringify({ ...this.filter, path: null })
+          JSON.stringify({ ...filter, path: null })
+          === JSON.stringify({ ...this.filter, path: null })
         )
       ) {
         broadcastManager.get().send(IpcChannels.TREE_UPDATING, {});
         this.tree.setTreeViewMode(
-          TreeViewModeCreator.create(filter, this.fileTreeViewMode)
+          TreeViewModeCreator.create(filter, this.fileTreeViewMode),
         );
         this.notifyTree();
       }
