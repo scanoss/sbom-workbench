@@ -284,12 +284,7 @@
     },
     "extraResources": [
       "./assets/**"
-    ],
-    "publish": {
-      "provider": "github",
-      "owner": "scanoss",
-      "repo": "sbom-workbench"
-    }
+    ]
   },
   "devEngines": {
     "node": ">=14.x",
