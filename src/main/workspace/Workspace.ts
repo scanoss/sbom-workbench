@@ -6,6 +6,7 @@ import { INewProject, IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../../../assets/data/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
 
+
 class Workspace {
   private projectList: Array<Project>;
 
@@ -83,7 +84,7 @@ class Workspace {
     for (let i = 0; i < this.projectList.length; i += 1)
       if (this.projectList[i].getProjectName() === p.getProjectName()) {
         // eslint-disable-next-line no-await-in-loop
-        await fs.promises.rmdir(this.projectList[i].getMyPath(), {
+        await fs.promises.rm(this.projectList[i].getMyPath(), {
           recursive: true,
         });
         this.projectList.splice(i, 1);
