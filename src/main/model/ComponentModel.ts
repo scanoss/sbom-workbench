@@ -265,8 +265,8 @@ export class ComponentModel extends Model {
     const call = util.promisify(db.all.bind(db));
     const data = await call(SQLquery.SQL, ...SQLquery.params);
     const components = componentHelper.processComponent(data);
-    return components;
     db.close();
+    return components;
   }
 
   public async summary(queryBuilder?: QueryBuilder) {

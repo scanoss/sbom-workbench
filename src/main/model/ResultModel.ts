@@ -116,6 +116,7 @@ export class ResultModel extends Model {
       await Promise.all(promises);
       db.close();
   }
+
  public async count(): Promise<number> {
    const db = await this.openDb();
    const call = util.promisify(db.get.bind(db));
@@ -123,18 +124,21 @@ export class ResultModel extends Model {
    db.close();
    return result.count;
  }
+
   public async updateDirty(value: number):Promise<void> {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
     await call(`UPDATE results SET dirty=${value} WHERE id IN (SELECT id FROM results);`);
     db.close();
   }
+
   public async deleteDirty(): Promise<void> {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
     await call(`DELETE FROM results WHERE dirty=1;`);
     db.close();
   }
+  
   private insertResultBulk(db: any, data: any, fileId: number): Promise<number> {
     return new Promise<number>((resolve) => {
       db.run(
@@ -198,6 +202,7 @@ export class ResultModel extends Model {
       });
     });
   }
+
   public async getFromPath(path: string) {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
@@ -206,6 +211,7 @@ export class ResultModel extends Model {
     if(results) return results;
     return [];
   }
+
   public async getSummaryByids(ids: number[]) {
     const sql = query.SQL_GET_SUMMARY_BY_RESULT_ID.replace('#values', `(${ids.toString()})`);
     const db = await this.openDb();

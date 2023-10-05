@@ -120,9 +120,9 @@ export class InventoryModel extends Model {
           inventory.spdxid ? inventory.spdxid : null,
           inventory.source ? inventory.source : 'detected',
           async function (this: any, err: any) {
+            db.close();
             if (err) throw Error('Unable to create inventory');
             inventory.id = this.lastID;
-            db.close();
             resolve(inventory);
           }
         );
@@ -219,8 +219,8 @@ export class InventoryModel extends Model {
             );
           }
           db.run('commit', (err: any) => {
-            if (err) throw err;
             db.close();
+            if (err) throw err;
             resolve(inv);
           });
         });

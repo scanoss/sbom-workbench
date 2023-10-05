@@ -5,7 +5,7 @@ import { Project } from './Project';
 import { INewProject, IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../../../assets/data/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
-import { Model } from '../model/Model';
+
 
 class Workspace {
   private projectList: Array<Project>;
@@ -84,7 +84,7 @@ class Workspace {
     for (let i = 0; i < this.projectList.length; i += 1)
       if (this.projectList[i].getProjectName() === p.getProjectName()) {
         // eslint-disable-next-line no-await-in-loop
-        await fs.promises.rmdir(this.projectList[i].getMyPath(), {
+        await fs.promises.rm(this.projectList[i].getMyPath(), {
           recursive: true,
         });
         this.projectList.splice(i, 1);
@@ -95,9 +95,6 @@ class Workspace {
 
   public async removeProjectFilter(filter: ProjectFilter) {
     const p = this.getProject(filter);
-    const m = new Model(p.metadata.getMyPath());
-    const db = await m.openDb();
-    await db.close();
     await this.removeProject(p);
     return true;
   }

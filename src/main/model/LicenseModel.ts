@@ -57,8 +57,8 @@ export class LicenseModel extends Model {
             db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 1);
           }
           db.run('commit', (err: any) => {
-            if (err) throw err;
             db.close();
+            if (err) throw err;
             resolve(true);
           });
         });
@@ -190,8 +190,8 @@ export class LicenseModel extends Model {
         const db = await this.openDb();
         db.serialize(() => {
           db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
-            if (err) throw err;
             db.close();
+            if (err) throw err;
             resolve(true);
           });
         });
