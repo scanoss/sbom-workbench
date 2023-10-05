@@ -69,7 +69,7 @@ class WorkbenchController {
       },
     });
 
-    if (!response.ok || response.status === 203) throw new Error(await response.text());
+    if (!response.ok) throw new Error(await response.text());
 
     return response.text();
   }
