@@ -6,15 +6,51 @@ on:
     tags:
       - 'v*.*.*'
 
+#TODO: Split mac and windows build
 jobs:
-  publish:
-    environment: prod
+  build_mw:
+    name: "Build for macOS & Win"
+    runs-on: macos-latest
 
-    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v3
 
-    strategy:
-      matrix:
-        os: [macos-latest]
+      - name: Install Node and NPM
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          npm install --legacy-peer-deps
+          npm run postinstall
+          npm run build
+
+      - name: Build Binaries for MacOs & Windows
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASS }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          WIN_CSC_LINK: ${{ secrets.WIN_CSC }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+        run: |
+          npm exec -- electron-builder build --mac --win --publish never
+
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: artifact_mw
+          path: |
+            release/build/sbom-workbench*.exe
+            release/build/sbom-workbench*.dmg
+
+  build_l:
+    name: "Build for Linux"
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout git repo
@@ -32,19 +68,39 @@ jobs:
           npm run postinstall
           npm run build
 
-      - name: Publish releases
-        env:
-          # These values are used for auto updates signing
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASS }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          CSC_LINK: ${{ secrets.CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-
-          WIN_CSC_LINK: ${{ secrets.WIN_CSC }}
-          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
-          # This is used for uploading release assets to github
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build binaries for linux
         run: |
-          npm exec electron-builder -- --publish always --linux --win --mac
+          npm exec -- electron-builder build --linux --publish never
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: artifact_l
+          path: |
+            release/build/sbom-workbench*.AppImage
+
+
+  create_release:
+    needs: [build_mw, build_l]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact MW
+        uses: actions/download-artifact@v2
+        with:
+          name: artifact_mw
+
+      - name: Download artifact L
+        uses: actions/download-artifact@v2
+        with:
+          name: artifact_l
+
+      - name: Publish release draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PROMPT_DISABLED: "disable"
+        run: |
+          gh release create ${{github.ref_name}} \
+                            --repo https://github.com/scanoss/sbom-workbench \
+                            --generate-notes \
+                            --draft \
+                            $(ls *.AppImage *.exe *.dmg)
