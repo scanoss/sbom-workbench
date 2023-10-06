@@ -47,6 +47,10 @@ jobs:
           path: |
             release/build/sbom-workbench*.exe
             release/build/sbom-workbench*.dmg
+            release/build/latest-mac.yml
+            release/build/latest.yml
+            release/build/*dmg.blockmap
+            release/build/*exe.blockmap
 
   build_l:
     name: "Build for Linux"
@@ -77,6 +81,7 @@ jobs:
           name: artifact_l
           path: |
             release/build/sbom-workbench*.AppImage
+            release/build/latest-linux.yml
 
 
   create_release:
@@ -103,4 +108,4 @@ jobs:
                             --repo https://github.com/scanoss/sbom-workbench \
                             --generate-notes \
                             --draft \
-                            $(ls *.AppImage *.exe *.dmg)
+                            $(ls *.AppImage *.exe *.dmg *.yml *.blockmap)
