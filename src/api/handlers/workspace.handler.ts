@@ -28,6 +28,7 @@ ipcMain.handle(
   IpcChannels.WORKSPACE_DELETE_PROJECT,
   async (_event, projectPath: string) => {
     try {
+      console.log('PROJECT path',(projectPath));
       await workspace.removeProjectFilter(new ProjectFilterPath(projectPath));
       return Response.ok();
     } catch (error: any) {

@@ -12,8 +12,8 @@ export class ProjectFilterPath extends ProjectFilter {
   public getParam(): any{
     return this.path;
   }
-  
+
   public isValid(project: Project): boolean {
-    return project.getMyPath() === this.path;
+    return project.getWorkRoot() === this.path;
   }
 }
