@@ -145,12 +145,11 @@ class Workspace {
 
     if (!fs.existsSync(`${pDirectory}`)) await fs.promises.mkdir(pDirectory);
     const files = await fs.promises.readdir(pDirectory);
-    const unlinkPromises = files.map((filename) =>
-      fs.promises.unlink(`${pDirectory}/${filename}`)
+    const unlinkPromises = files.map((filename) => fs.promises.unlink(`${pDirectory}/${filename}`)
     );
     await Promise.all(unlinkPromises);
 
-    p.setMyPath(pDirectory);
+    p.setMyPath(p.getProjectName());
     p.save();
     this.addNewProject(p);
     return this.projectList.length - 1;
