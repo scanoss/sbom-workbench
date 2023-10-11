@@ -407,6 +407,7 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+      addEventListener("DOMContentLoaded", (event) => {
         const identifiedData = '#DATA';
         const auxSummaryData = '#SUMMARY';
         const auxData = Array.from(JSON.parse(identifiedData));
@@ -449,6 +450,7 @@
         Object.entries(rowDataTable).forEach(([key, value]) => {
             labels.push(key);
             values.push(value.componentCount);
+
         });
 
 
@@ -640,7 +642,7 @@
                 labels,
                 datasets: [
                     {
-                        label: 'My First dataset',
+                        label: 'Components',
                         backgroundColor: color,
                         borderColor: 'rgb(255, 255, 255)',
                         data: values,
@@ -767,6 +769,7 @@
                 aux.classList.add('hide');
             }
         });
+      });
 
     </script>
 

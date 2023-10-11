@@ -143,7 +143,7 @@ export class ProjectZipper {
     const projectMetadata = await Metadata.readFromPath(workspace.getMyPath() + path.sep + this.projectName);
     projectMetadata.setScanRoot(null);
     projectMetadata.setSource('IMPORTED');
-    projectMetadata.setMyPath(workspace.getMyPath() + path.sep + this.projectName);
+    projectMetadata.setMyPath(this.projectName);
     projectMetadata.save();
   }
 }
