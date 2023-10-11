@@ -42,6 +42,7 @@ class ProjectService {
 
   private async createNewProject(projectDTO: INewProject): Promise<Project> {
     const p = await workspace.createProject(projectDTO);
+    console.log("Create",p.getMyPath());
     await modelProvider.init(p.getMyPath());
     log.transports.file.resolvePath = () =>
       `${p.metadata.getMyPath()}/project.log`;

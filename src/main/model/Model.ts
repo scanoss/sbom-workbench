@@ -18,6 +18,7 @@ export class Model {
   constructor(path: string) {
     this.dbPath = `${path}/scan_db`;
   }
+
   public async init() {
     try {
       const success = await this.scanCreateDb();

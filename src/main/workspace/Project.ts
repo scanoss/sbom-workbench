@@ -88,7 +88,7 @@ export class Project {
 
   public async open(): Promise<boolean> {
     this.state = ProjectState.OPENED;
-    log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`;
+    log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`; //Concatenate workspace root
     const project = await fs.promises.readFile(
       `${this.metadata.getMyPath()}/tree.json`,
       'utf8',
@@ -98,6 +98,7 @@ export class Project {
     this.filesNotScanned = a.filesNotScanned;
     this.processedFiles = a.processedFiles;
     this.filesSummary = a.filesSummary;
+    console.log("INIT",this.metadata.getMyPath());
     await modelProvider.init(this.metadata.getMyPath());
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
     this.tree = new Tree(a.tree.rootFolder.label, this.metadata.getMyPath(), a.tree.rootFolder.label);
@@ -180,6 +181,10 @@ export class Project {
 
   public getMyPath() {
     return this.metadata.getMyPath();
+  }
+
+  public getWorkRoot() {
+    return this.metadata.getWorkRoot();
   }
 
   public getProjectName() {

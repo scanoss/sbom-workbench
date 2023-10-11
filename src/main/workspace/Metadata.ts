@@ -1,10 +1,12 @@
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { app } from 'electron';
+import * as os from 'os';
 import { IProject, ScanState } from '../../api/types';
 import packageJson from '../../../release/app/package.json';
 import { Scanner } from '../task/scanner/types';
 import * as ScannerCFG from '../task/scanner/types';
+import AppConfig from '../../config/AppConfigModule';
 
 export class Metadata {
   private appVersion: string;
@@ -52,7 +54,7 @@ export class Metadata {
 
   public save(): void {
     const str = JSON.stringify(this, null, 2);
-    fs.writeFileSync(`${this.work_root}/metadata.json`, str);
+    fs.writeFileSync(`${this.getMyPath()}/metadata.json`, str);
   }
 
   public setAppVersion(appVersion: string) {
@@ -73,6 +75,10 @@ export class Metadata {
 
   public setMyPath(workRoot: string) {
     this.work_root = workRoot;
+  }
+
+  public getWorkRoot() {
+    return this.work_root;
   }
 
   public setScanRoot(scanRoot: string) {
@@ -120,7 +126,7 @@ export class Metadata {
   }
 
   public getMyPath(): string {
-    return this.work_root;
+    return `${os.homedir()}/${AppConfig.DEFAULT_WORKSPACE_NAME}/${this.work_root}`;
   }
 
   public getUUID(): string {
