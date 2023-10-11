@@ -7,6 +7,7 @@ import packageJson from '../../../release/app/package.json';
 import { Scanner } from '../task/scanner/types';
 import * as ScannerCFG from '../task/scanner/types';
 import AppConfig from '../../config/AppConfigModule';
+import { workspace } from './Workspace';
 
 export class Metadata {
   private appVersion: string;
@@ -127,7 +128,7 @@ export class Metadata {
   }
 
   public getMyPath(): string {
-    return `${os.homedir()}/${AppConfig.DEFAULT_WORKSPACE_NAME}/${this.work_root}`;
+    return `${workspace.getMyPath()}/${this.work_root}`;
   }
 
   public getUUID(): string {

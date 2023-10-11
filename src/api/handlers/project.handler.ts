@@ -23,7 +23,7 @@ ipcMain.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, arg: any) => {
   searcher.closeIndex();
   const response = {
     logical_tree: p.getTree().getRootFolder(),
-    work_root: p.getMyPath(),
+    work_root: p.getWorkRoot(),
     scan_root: p.getScanRoot(),
     dependencies: Array.from(await dependencyService.getDependenciesFiles()),
     uuid: p.getUUID(),
