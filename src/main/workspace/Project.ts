@@ -98,7 +98,6 @@ export class Project {
     this.filesNotScanned = a.filesNotScanned;
     this.processedFiles = a.processedFiles;
     this.filesSummary = a.filesSummary;
-    console.log("INIT",this.metadata.getMyPath());
     await modelProvider.init(this.metadata.getMyPath());
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
     this.tree = new Tree(a.tree.rootFolder.label, this.metadata.getMyPath(), a.tree.rootFolder.label);
