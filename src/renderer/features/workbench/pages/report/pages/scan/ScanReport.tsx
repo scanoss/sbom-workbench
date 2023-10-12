@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Button, createStyles, Fade, Menu, MenuItem, Tooltip } from '@mui/material';
+import {
+  Button, createStyles, Fade, Menu, MenuItem, Tooltip,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { Navigate, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Navigate, NavLink, Route, Routes, useLocation, useNavigate,
+} from 'react-router-dom';
 import { reportService } from '@api/services/report.service';
 import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
@@ -15,6 +19,7 @@ import { dialogController } from '../../../../../../controllers/dialog-controlle
 import IdentifiedReport from './IdentifiedReport';
 import DetectedReport from './DetectedReport';
 import VulnerabilitiesReport from '../vulnerabilities/VulnerabilitiesReport';
+import Loader from '@components/Loader/Loader';
 
 const useStyles = makeStyles({
   tooltip: {
@@ -119,8 +124,8 @@ const Export = ({ empty }) => {
 
   return (
     <div>
-      {!AppConfig.FF_EXPORT_FORMAT_OPTIONS ||
-        (AppConfig.FF_EXPORT_FORMAT_OPTIONS.length === 0 && (
+      {!AppConfig.FF_EXPORT_FORMAT_OPTIONS
+        || (AppConfig.FF_EXPORT_FORMAT_OPTIONS.length === 0 && (
           <Button
             startIcon={<GetAppIcon />}
             aria-controls="customized-menu"
@@ -143,7 +148,7 @@ const Export = ({ empty }) => {
           onClick={() => onExport(AppConfig.FF_EXPORT_FORMAT_OPTIONS[0] as ExportFormat)}
           disabled={!exportLabels[AppConfig.FF_EXPORT_FORMAT_OPTIONS[0]].sources.includes(source)}
         >
-          {t('Button:ExportWithLabel', { label: exportLabels[AppConfig.FF_EXPORT_FORMAT_OPTIONS[0]].label})}
+          {t('Button:ExportWithLabel', { label: exportLabels[AppConfig.FF_EXPORT_FORMAT_OPTIONS[0]].label })}
         </Button>
       )}
 
@@ -162,13 +167,12 @@ const Export = ({ empty }) => {
           </Button>
           <Menu anchorEl={anchorEl} keepMounted open={open} onClose={handleClose} TransitionComponent={Fade}>
             {AppConfig.FF_EXPORT_FORMAT_OPTIONS.map(
-              (format) =>
-                exportLabels[format] &&
-                exportLabels[format].sources.includes(source) && (
+              (format) => exportLabels[format]
+                && exportLabels[format].sources.includes(source) && (
                   <Tooltip key={format} title={exportLabels[format].hint} placement="left" arrow>
                     <MenuItem onClick={() => onExport(format as ExportFormat)}>{exportLabels[format].label}</MenuItem>
                   </Tooltip>
-                )
+              ),
             )}
           </Menu>
         </>
@@ -184,10 +188,9 @@ const ScanReport = () => {
   const [detectedData, setDetectedData] = useState(null);
   const [identifiedData, setIdentifiedData] = useState(null);
 
-  const isEmpty =
-    identifiedData?.summary.identified.scan === 0 &&
-    identifiedData?.summary.original === 0 &&
-    identifiedData?.licenses.length === 0;
+  const isEmpty = identifiedData?.summary.identified.scan === 0
+    && identifiedData?.summary.original === 0
+    && identifiedData?.licenses.length === 0;
 
   const setTab = (identified) => {
     if (state.tree.hasIdentified || state.tree.hasIgnored || identified.licenses.length > 0) {
@@ -207,22 +210,24 @@ const ScanReport = () => {
     init();
   }, []);
 
+  if (!detectedData || !identifiedData) {
+    return <Loader message="Loading reports" />;
+  }
+
   return (
-    <>
-      <section id="Report" className="app-page">
-        <header className="app-header d-flex space-between align-center">
-          <Nav />
-          <Export empty={isEmpty} />
-        </header>
-        <main className="app-content">
-          <Routes>
-            <Route path="detected" element={detectedData && <DetectedReport data={detectedData} />} />
-            <Route path="identified" element={identifiedData && <IdentifiedReport data={identifiedData} />} />
-            <Route path="" element={<Navigate to="detected" />} />
-          </Routes>
-        </main>
-      </section>
-    </>
+    <section id="Report" className="app-page">
+      <header className="app-header d-flex space-between align-center">
+        <Nav />
+        <Export empty={isEmpty} />
+      </header>
+      <main className="app-content">
+        <Routes>
+          <Route path="detected" element={detectedData && <DetectedReport data={detectedData} />} />
+          <Route path="identified" element={identifiedData && <IdentifiedReport data={identifiedData} />} />
+          <Route path="" element={<Navigate to="detected" />} />
+        </Routes>
+      </main>
+    </section>
   );
 };
 
