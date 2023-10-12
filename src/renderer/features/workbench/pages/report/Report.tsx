@@ -7,7 +7,11 @@ const Reports = () => (
   <Routes>
     <Route path="scan/*" element={<ScanReport />} />
     <Route path="vulnerabilities" element={<VulnerabilitiesReport />} />
+<<<<<<< HEAD
     <Route path="" element={<Navigate to="scan" replace />} />
+=======
+    <Route path="" element={<Navigate to="scan" />} />
+>>>>>>> c28f0dc (DT-1061 Adds UI feedback on loading project)
   </Routes>
 );
 
