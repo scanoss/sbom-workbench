@@ -1,0 +1,664 @@
+{
+    "spdxVersion": "SPDX-2.2",
+    "dataLicense": "CC0-1.0",
+    "SPDXID": "SPDXRef-8119d7319c997aa275a35776638202329ad28f642b3f8203826df2d345784d84",
+    "name": "SCANOSS-SBOM",
+    "documentNamespace": "https://spdx.org/spdxdocs/sbom-workbench-8119d7319c997aa275a35776638202329ad28f642b3f8203826df2d345784d84",
+    "creationInfo": {
+        "creators": [
+            "Tool: SBOM Workbench",
+            "Person: SCANOSS"
+        ],
+        "created": "2023-10-12T15:06:13.866Z"
+    },
+    "packages": [
+        {
+            "name": "react-redux",
+            "SPDXID": "SPDXRef-d7bffd71e729d5b24fc788d110e37496",
+            "versionInfo": "7.2.9",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/react-redux",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "react-virtualized",
+            "SPDXID": "SPDXRef-c84e5c7d89e282e615724d5a259c3d0c",
+            "versionInfo": "9.22.5",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/react-virtualized",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "uuid",
+            "SPDXID": "SPDXRef-cca15824af604c60c2e0774f820b8d06",
+            "versionInfo": "8.3.2",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/uuid",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "pkg:npm/electron",
+            "SPDXID": "SPDXRef-af5fbe604adeaab2bd792687b5453a95",
+            "versionInfo": "^25.2.0",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "NOASSERTION",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/electron",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "google-protobuf",
+            "SPDXID": "SPDXRef-500b8ac1afa42a817e91ace4c1c07456",
+            "versionInfo": "3.21.2",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "BSD-3-Clause,Apache-2.0",
+            "licenseConcluded": "BSD-3-Clause",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/google-protobuf",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "@mui/icons-material",
+            "SPDXID": "SPDXRef-aea4cf66f7c608aa8f2ced8a764f548a",
+            "versionInfo": "5.11.16",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/@mui/icons-material",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "@mui/material",
+            "SPDXID": "SPDXRef-f48f756ab47bac43fbd9d551bf07166f",
+            "versionInfo": "5.13.1",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/@mui/material",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "@mui/x-data-grid",
+            "SPDXID": "SPDXRef-bee7f87a73a3c2e087f16847b871c9a4",
+            "versionInfo": "5.17.26",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/@mui/x-data-grid",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "@mui/lab",
+            "SPDXID": "SPDXRef-c13839fe97459e6e211e170b1b39781b",
+            "versionInfo": "5.0.0-alpha.130",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/@mui/lab",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "chart.js",
+            "SPDXID": "SPDXRef-a73543f35fe2936558f2c7213e2e281b",
+            "versionInfo": "3.9.1",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/chart.js",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "adm-zip",
+            "SPDXID": "SPDXRef-9496cbb6c178dbb87b58a4269de12b26",
+            "versionInfo": "0.5.10",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/adm-zip",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "flexsearch",
+            "SPDXID": "SPDXRef-8c2373feea358eff02bc79d86520215f",
+            "versionInfo": "0.7.31",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "Apache-2.0",
+            "licenseConcluded": "Apache-2.0",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/flexsearch",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "sqlite3",
+            "SPDXID": "SPDXRef-c728298673ea13934ea5482cf931397a",
+            "versionInfo": "5.1.6",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "BSD-3-Clause",
+            "licenseConcluded": "BSD-3-Clause",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/sqlite3",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "@reduxjs/toolkit",
+            "SPDXID": "SPDXRef-bcb783ac1a777440bf29f2dbd125c830",
+            "versionInfo": "1.9.5",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/@reduxjs/toolkit",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "electron-updater",
+            "SPDXID": "SPDXRef-8df82cb8c349b8d6fd5344f7ef4d665f",
+            "versionInfo": "5.3.0",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/electron-updater",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "electron-debug",
+            "SPDXID": "SPDXRef-80f49ec4e01c1782128f3c2169b1ffef",
+            "versionInfo": "3.2.0",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/electron-debug",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "electron-log",
+            "SPDXID": "SPDXRef-0d5266c0e75b500b64ad44617cd10546",
+            "versionInfo": "4.4.8",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/electron-log",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "form-data",
+            "SPDXID": "SPDXRef-e12296abbdd073e7b76094e8cc2633d6",
+            "versionInfo": "4.0.0",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/form-data",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "i18next",
+            "SPDXID": "SPDXRef-0b7b60695c1d687cc767d82d60c2f531",
+            "versionInfo": "21.10.0",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/i18next",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "i18next-browser-languagedetector",
+            "SPDXID": "SPDXRef-b47c17b4e8e0f1cb73850c01540a4cd9",
+            "versionInfo": "6.1.8",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/i18next-browser-languagedetector",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "i18next-http-backend",
+            "SPDXID": "SPDXRef-8cbbb19f20deb5aef3822c99c2104990",
+            "versionInfo": "1.4.5",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/i18next-http-backend",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "i18next-resources-to-backend",
+            "SPDXID": "SPDXRef-11884808c36753e384313667e2fe4d96",
+            "versionInfo": "1.1.4",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/i18next-resources-to-backend",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "react-i18next",
+            "SPDXID": "SPDXRef-11e7a9eb148d4ea23a91a53f5bd57c7e",
+            "versionInfo": "11.18.6",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/react-i18next",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "pkg:npm/scanoss",
+            "SPDXID": "SPDXRef-cded6ec96adb410a561ccc1d5ec2a66d",
+            "versionInfo": "^0.9.2",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "NOASSERTION",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/scanoss",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "@emotion/react",
+            "SPDXID": "SPDXRef-66881c9d91a1c7f23b925b30ba17a92e",
+            "versionInfo": "11.11.0",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/@emotion/react",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "react",
+            "SPDXID": "SPDXRef-3f5e69dc46c40fc6114a91045e219fa9",
+            "versionInfo": "18.2.0",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/react",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "react-split-pane",
+            "SPDXID": "SPDXRef-33a2fbad03db5145cfacb54b3e19a6b6",
+            "versionInfo": "0.1.92",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/react-split-pane",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "react-virtualized-tree",
+            "SPDXID": "SPDXRef-eea4ad72d81fbb82f3d44ba03115add0",
+            "versionInfo": "3.4.1",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/react-virtualized-tree",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "react-router-dom",
+            "SPDXID": "SPDXRef-1dec1a8132ef00eb80e681a6aad7b450",
+            "versionInfo": "6.11.2",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/react-router-dom",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "react-draggable",
+            "SPDXID": "SPDXRef-0f43b30acd53aeb2d07eef3ea947055c",
+            "versionInfo": "4.4.5",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/react-draggable",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "p-queue",
+            "SPDXID": "SPDXRef-c6f62c61d9a39f4103b346f39be9ea5c",
+            "versionInfo": "6.6.2",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/p-queue",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "monaco-editor",
+            "SPDXID": "SPDXRef-b3e3575b5d1d12480223c812660079f4",
+            "versionInfo": "0.33.0",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/monaco-editor",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "translation-check",
+            "SPDXID": "SPDXRef-4d2e0bb204fc3363eb5b1bc06609de3e",
+            "versionInfo": "1.0.3",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/translation-check",
+                    "referenceType": "purl"
+                }
+            ]
+        },
+        {
+            "name": "isbinaryfile",
+            "SPDXID": "SPDXRef-fb7d9b5b4ff939c82aff624cc4f0bca1",
+            "versionInfo": "4.0.10",
+            "downloadLocation": "NOASSERTION",
+            "filesAnalyzed": false,
+            "homepage": "NOASSERTION",
+            "licenseDeclared": "MIT",
+            "licenseConcluded": "MIT",
+            "copyrightText": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "referenceCategory": "PACKAGE_MANAGER",
+                    "referenceLocator": "pkg:npm/isbinaryfile",
+                    "referenceType": "purl"
+                }
+            ]
+        }
+    ],
+    "documentDescribes": [
+        "SPDXRef-d7bffd71e729d5b24fc788d110e37496",
+        "SPDXRef-c84e5c7d89e282e615724d5a259c3d0c",
+        "SPDXRef-cca15824af604c60c2e0774f820b8d06",
+        "SPDXRef-af5fbe604adeaab2bd792687b5453a95",
+        "SPDXRef-500b8ac1afa42a817e91ace4c1c07456",
+        "SPDXRef-aea4cf66f7c608aa8f2ced8a764f548a",
+        "SPDXRef-f48f756ab47bac43fbd9d551bf07166f",
+        "SPDXRef-bee7f87a73a3c2e087f16847b871c9a4",
+        "SPDXRef-c13839fe97459e6e211e170b1b39781b",
+        "SPDXRef-a73543f35fe2936558f2c7213e2e281b",
+        "SPDXRef-9496cbb6c178dbb87b58a4269de12b26",
+        "SPDXRef-8c2373feea358eff02bc79d86520215f",
+        "SPDXRef-c728298673ea13934ea5482cf931397a",
+        "SPDXRef-bcb783ac1a777440bf29f2dbd125c830",
+        "SPDXRef-8df82cb8c349b8d6fd5344f7ef4d665f",
+        "SPDXRef-80f49ec4e01c1782128f3c2169b1ffef",
+        "SPDXRef-0d5266c0e75b500b64ad44617cd10546",
+        "SPDXRef-e12296abbdd073e7b76094e8cc2633d6",
+        "SPDXRef-0b7b60695c1d687cc767d82d60c2f531",
+        "SPDXRef-b47c17b4e8e0f1cb73850c01540a4cd9",
+        "SPDXRef-8cbbb19f20deb5aef3822c99c2104990",
+        "SPDXRef-11884808c36753e384313667e2fe4d96",
+        "SPDXRef-11e7a9eb148d4ea23a91a53f5bd57c7e",
+        "SPDXRef-cded6ec96adb410a561ccc1d5ec2a66d",
+        "SPDXRef-66881c9d91a1c7f23b925b30ba17a92e",
+        "SPDXRef-3f5e69dc46c40fc6114a91045e219fa9",
+        "SPDXRef-33a2fbad03db5145cfacb54b3e19a6b6",
+        "SPDXRef-eea4ad72d81fbb82f3d44ba03115add0",
+        "SPDXRef-1dec1a8132ef00eb80e681a6aad7b450",
+        "SPDXRef-0f43b30acd53aeb2d07eef3ea947055c",
+        "SPDXRef-c6f62c61d9a39f4103b346f39be9ea5c",
+        "SPDXRef-b3e3575b5d1d12480223c812660079f4",
+        "SPDXRef-4d2e0bb204fc3363eb5b1bc06609de3e",
+        "SPDXRef-fb7d9b5b4ff939c82aff624cc4f0bca1"
+    ]
+}
