@@ -54,9 +54,7 @@ const ProjectScan = () => {
   };
 
   const handlerScannerError = async (e, err) => {
-    const cause = (err.cause.message || err.cause || '').replace(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/gm,  m => {
-      return `<a href="${m}" target='_blank'>${m}</a>`;
-    })
+    const cause = (err.cause.message || err.cause || '').replace(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/gm, (m) => `<a href="${m}" target='_blank'>${m}</a>`);
 
     const errorMessage = `<strong>${t('Dialog:ScanPaused')}</strong>
 
@@ -69,19 +67,19 @@ const ProjectScan = () => {
         label: t('Button:OK'),
         role: 'accept',
       },
-      true
+      true,
     );
     navigate('/workspace');
   };
 
   const onPauseHandler = async () => {
     const { action } = await dialogCtrl.openConfirmDialog(
-     t('Dialog:PauseScannerQuestion'),
+      t('Dialog:PauseScannerQuestion'),
       {
         label: t('Button:OK'),
         role: 'accept',
       },
-      false
+      false,
     );
     if (action === 'ok') {
       await projectService.stop();
@@ -93,6 +91,7 @@ const ProjectScan = () => {
 
   const handlerScannerFinish = async (e, args) => {
     await dispatch(fetchProjects());
+    console.log();
     if (args.success) {
       onShowScan(args.resultsPath);
     }
@@ -103,26 +102,26 @@ const ProjectScan = () => {
     subscriptions.push(
       window.electron.ipcRenderer.on(
         IpcChannels.SCANNER_UPDATE_STATUS,
-        handlerScannerStatus
-      )
+        handlerScannerStatus,
+      ),
     );
     subscriptions.push(
       window.electron.ipcRenderer.on(
         IpcChannels.SCANNER_FINISH_SCAN,
-        handlerScannerFinish
-      )
+        handlerScannerFinish,
+      ),
     );
     subscriptions.push(
       window.electron.ipcRenderer.on(
         IpcChannels.SCANNER_ERROR_STATUS,
-        handlerScannerError
-      )
+        handlerScannerError,
+      ),
     );
     subscriptions.push(
       window.electron.ipcRenderer.on(
         IpcChannels.SCANNER_UPDATE_STAGE,
-        handlerScannerStage
-      )
+        handlerScannerStage,
+      ),
     );
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
@@ -135,36 +134,34 @@ const ProjectScan = () => {
   }, []);
 
   return (
-    <>
-      <section id="ProjectScan" className="app-page">
-        <header className="app-header">
-          <div>
-            <h4 className="header-subtitle back">
-              <IconButton
-                onClick={onPauseHandler}
-                component="span"
-                size="large"
-              >
-                <ArrowBackIcon />
-              </IconButton>
-              <span className="text-uppercase">{t('Title:Scanning')}</span>
-            </h4>
-            <h1>{scanPath.projectName}</h1>
+    <section id="ProjectScan" className="app-page">
+      <header className="app-header">
+        <div>
+          <h4 className="header-subtitle back">
+            <IconButton
+              onClick={onPauseHandler}
+              component="span"
+              size="large"
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <span className="text-uppercase">{t('Title:Scanning')}</span>
+          </h4>
+          <h1>{scanPath.projectName}</h1>
+        </div>
+      </header>
+      <main className="app-content">
+        <div className="progressbar">
+          <div className="circular-progress-container">
+            <CircularComponent
+              stage={stage}
+              progress={progress}
+              pauseScan={() => onPauseHandler()}
+            />
           </div>
-        </header>
-        <main className="app-content">
-          <div className="progressbar">
-            <div className="circular-progress-container">
-              <CircularComponent
-                stage={stage}
-                progress={progress}
-                pauseScan={() => onPauseHandler()}
-              />
-            </div>
-          </div>
-        </main>
-      </section>
-    </>
+        </div>
+      </main>
+    </section>
   );
 };
 

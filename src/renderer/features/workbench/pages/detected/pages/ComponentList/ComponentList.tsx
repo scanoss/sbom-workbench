@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { resetFilter, selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { selectComponentState, setComponent } from '@store/component-store/componentSlice';
 import { useTranslation } from 'react-i18next';
+import Loader from '@components/Loader/Loader';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import EmptyResult from './components/EmptyResult/EmptyResult';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
@@ -52,6 +53,13 @@ export const ComponentList = () => {
     dispatch(setComponent(component));
   };
 
+  // loader
+  if (components === null) {
+    return (
+      <Loader message="Loading components" />
+    );
+  }
+
   return (
     <div id="ComponentList">
       <section className="app-page" onScroll={onScroll}>
@@ -70,33 +78,31 @@ export const ComponentList = () => {
               ))}
             </section>
           ) : (
-            <>
-              <EmptyResult>
-                {searchQuery ? (
-                  <>{t('NotResultsFoundWith', { searchQuery })}</>
-                ) : isFilterActive ? (
-                  <>
-                    <div className="mb-3">{t('NoComponentsFoundMatching')}</div>
-                    <Button
-                      className="text-uppercase"
-                      size="small"
-                      startIcon={<DeleteForeverOutlinedIcon />}
-                      onClick={() => dispatch(resetFilter())}
-                    >
-                     {t('Button:ClearFilters')}
-                    </Button>
-                  </>
-                ) : (
-                  <>{t('NoComponentsWereDetected')}</>
-                )}
-              </EmptyResult>
-            </>
+            <EmptyResult>
+              {searchQuery ? (
+                <>{t('NotResultsFoundWith', { searchQuery })}</>
+              ) : isFilterActive ? (
+                <>
+                  <div className="mb-3">{t('NoComponentsFoundMatching')}</div>
+                  <Button
+                    className="text-uppercase"
+                    size="small"
+                    startIcon={<DeleteForeverOutlinedIcon />}
+                    onClick={() => dispatch(resetFilter())}
+                  >
+                    {t('Button:ClearFilters')}
+                  </Button>
+                </>
+              ) : (
+                <>{t('NoComponentsWereDetected')}</>
+              )}
+            </EmptyResult>
           )}
 
           {filterItems?.length > limit && (
             <Alert className="mb-3" severity="info">
               <strong>
-                {t('ShowingLimitOfTotalComponents', { limit, total: filterItems.length})}
+                {t('ShowingLimitOfTotalComponents', { limit, total: filterItems.length })}
               </strong>
             </Alert>
           )}

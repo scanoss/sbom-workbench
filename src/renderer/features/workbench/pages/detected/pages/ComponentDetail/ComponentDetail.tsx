@@ -7,7 +7,9 @@ import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { DIALOG_ACTIONS } from '@context/types';
 import { mapFiles } from '@shared/utils/scan-util';
 import { useDispatch, useSelector } from 'react-redux';
-import { createInventory, detachFile, ignoreFile, restoreFile } from '@store/inventory-store/inventoryThunks';
+import {
+  createInventory, detachFile, ignoreFile, restoreFile,
+} from '@store/inventory-store/inventoryThunks';
 import { selectNavigationState, setVersion } from '@store/navigation-store/navigationSlice';
 import { selectComponentState } from '@store/component-store/componentSlice';
 import { selectWorkbench, setHistory } from '@store/workbench-store/workbenchSlice';
@@ -120,7 +122,7 @@ export const ComponentDetail = () => {
 
   const onIgnoreAllPressed = async () => {
     const { action } = await dialogCtrl.openConfirmDialog(
-      t('Dialog:MarkOriginalFiles', { count: filterFiles.pending.length})
+      t('Dialog:MarkOriginalFiles', { count: filterFiles.pending.length }),
     );
 
     if (action === DIALOG_ACTIONS.OK) {
@@ -131,7 +133,7 @@ export const ComponentDetail = () => {
 
   const onRestoreAllPressed = async () => {
     const { action } = await dialogCtrl.openConfirmDialog(
-      t('Dialog:RestoreFiles', { count: filterFiles.ignored.length})
+      t('Dialog:RestoreFiles', { count: filterFiles.ignored.length }),
     );
 
     if (action === DIALOG_ACTIONS.OK) {
@@ -142,7 +144,7 @@ export const ComponentDetail = () => {
 
   const onDetachAllPressed = async () => {
     const { action } = await dialogCtrl.openConfirmDialog(
-      t('Dialog:RestoreFiles', { count: filterFiles.identified.length})
+      t('Dialog:RestoreFiles', { count: filterFiles.identified.length }),
     );
 
     if (action === DIALOG_ACTIONS.OK) {
@@ -172,7 +174,7 @@ export const ComponentDetail = () => {
       createInventory({
         ...inventory,
         files: selFiles,
-      })
+      }),
     );
   };
 
@@ -201,7 +203,7 @@ export const ComponentDetail = () => {
   }, [version, node]);
 
   useEffect(() => {
-    if(searchQuery === null || searchQuery === undefined || !files) return;
+    if (searchQuery === null || searchQuery === undefined || !files) return;
 
     setFilterFiles({
       pending: files.filter((file) => file.path.toLowerCase().includes(searchQuery) && file.status === 'pending'),
@@ -224,7 +226,7 @@ export const ComponentDetail = () => {
         return (
           <FileList
             files={filterFiles.pending}
-            emptyMessage={searchQuery ? t('NoPendingFilesWith', { searchQuery }) :  t('NoPendingFiles')}
+            emptyMessage={searchQuery ? t('NoPendingFilesWith', { searchQuery }) : t('NoPendingFiles')}
             onAction={onAction}
           />
         );
@@ -232,7 +234,7 @@ export const ComponentDetail = () => {
         return (
           <IdentifiedList
             files={filterFiles.identified}
-            emptyMessage={searchQuery ? t('NoIdentifiedFilesWith', { searchQuery }) :  t('NoIdentifiedFiles')}
+            emptyMessage={searchQuery ? t('NoIdentifiedFilesWith', { searchQuery }) : t('NoIdentifiedFiles')}
             onAction={onAction}
           />
         );
@@ -240,7 +242,7 @@ export const ComponentDetail = () => {
         return (
           <FileList
             files={filterFiles.ignored}
-            emptyMessage={searchQuery ? t('NoOriginalFilesWith', { searchQuery }) :  t('NoOriginalFiles')}
+            emptyMessage={searchQuery ? t('NoOriginalFilesWith', { searchQuery }) : t('NoOriginalFiles')}
             onAction={onAction}
           />
         );
@@ -250,53 +252,51 @@ export const ComponentDetail = () => {
   };
 
   return (
-    <>
-      <section id="ComponentDetail" className="app-page">
-        <header className="app-header">
-          <div className="header">
-            <Breadcrumb />
-            <div className="filter-container">
-              <ComponentInfo component={component} />
-              <ChevronRightOutlinedIcon fontSize="small" />
-              <VersionSelector
-                versions={component?.versions}
-                version={version}
-                onSelect={(version) => dispatch(setVersion(version))}
-                component={component}
-              />
-            </div>
+    <section id="ComponentDetail" className="app-page">
+      <header className="app-header">
+        <div className="header">
+          <Breadcrumb />
+          <div className="filter-container">
+            <ComponentInfo component={component} />
+            <ChevronRightOutlinedIcon fontSize="small" />
+            <VersionSelector
+              versions={component?.versions}
+              version={version}
+              onSelect={(version) => dispatch(setVersion(version))}
+              component={component}
+            />
+          </div>
+        </div>
+
+        <section className="subheader">
+          <div className="search-box">
+            <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
           </div>
 
-          <section className="subheader">
-            <div className="search-box">
-              <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
-            </div>
+          <div className="tab-navigation">
+            <TabNavigation
+              tab={tab}
+              version={version}
+              query={searchQuery}
+              component={component}
+              filterFiles={filterFiles}
+              onSelect={(tab) => setTab(tab)}
+            />
 
-            <div className="tab-navigation">
-              <TabNavigation
-                tab={tab}
-                version={version}
-                query={searchQuery}
-                component={component}
-                filterFiles={filterFiles}
-                onSelect={(tab) => setTab(tab)}
-              />
+            <ActionButton
+              tab={tab}
+              files={filterFiles}
+              onIdentifyAllPressed={onIdentifyAllPressed}
+              onIgnoreAllPressed={onIgnoreAllPressed}
+              onRestoreAllPressed={onRestoreAllPressed}
+              onDetachAllPressed={onDetachAllPressed}
+            />
+          </div>
+        </section>
+      </header>
 
-              <ActionButton
-                tab={tab}
-                files={filterFiles}
-                onIdentifyAllPressed={onIdentifyAllPressed}
-                onIgnoreAllPressed={onIgnoreAllPressed}
-                onRestoreAllPressed={onRestoreAllPressed}
-                onDetachAllPressed={onDetachAllPressed}
-              />
-            </div>
-          </section>
-        </header>
-
-        <main className="app-content">{filterFiles && renderTab()}</main>
-      </section>
-    </>
+      <main className="app-content">{filterFiles && renderTab()}</main>
+    </section>
   );
 };
 
