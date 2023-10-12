@@ -1,8 +1,11 @@
 import React from 'react';
-import { Button } from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import { useTranslation } from 'react-i18next';
 import usePagination from '@hooks/usePagination';
+import Loader from '@components/Loader/Loader';
+import Info from '@components/Info/Info';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import MatchCard, { MATCH_CARD_ACTIONS } from '../../../../../components/MatchCard/MatchCard';
 
 export interface FileListProps {
@@ -19,12 +22,14 @@ export const FileList = ({ files, filter, emptyMessage, onAction }: FileListProp
   const filteredFiles = files?.filter((file) => !filter || file.status === filter);
 
   // loader
-  if (!files)
-    return <p>Loading files...</p>;
+  if (!files) {
+    return <Loader message="Loading files" />;
+  }
 
   // empty
-  if (filteredFiles?.length === 0)
-    return  <p>{emptyMessage || 'No files found'}</p>;
+  if (filteredFiles?.length === 0) {
+    return <Info message={emptyMessage || 'No files found'} icon={<ManageSearchIcon fontSize="large" />} />;
+  }
 
   return (
     <>
@@ -39,7 +44,7 @@ export const FileList = ({ files, filter, emptyMessage, onAction }: FileListProp
             />
           </article>
         ))}
-    </section>
+      </section>
 
       {filteredFiles.length > limit && (
         <Alert

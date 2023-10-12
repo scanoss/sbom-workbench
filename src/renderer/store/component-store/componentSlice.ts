@@ -13,7 +13,7 @@ export interface ComponentState {
 }
 
 const initialState: ComponentState = {
-  components: [],
+  components: null,
   component: null,
   recents: [],
   loading: false,

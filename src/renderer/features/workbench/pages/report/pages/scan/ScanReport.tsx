@@ -19,6 +19,7 @@ import { dialogController } from '../../../../../../controllers/dialog-controlle
 import IdentifiedReport from './IdentifiedReport';
 import DetectedReport from './DetectedReport';
 import VulnerabilitiesReport from '../vulnerabilities/VulnerabilitiesReport';
+import Loader from '@components/Loader/Loader';
 
 const useStyles = makeStyles({
   tooltip: {
@@ -213,6 +214,10 @@ const ScanReport = () => {
     };
     init();
   }, []);
+
+  if (!detectedData || !identifiedData) {
+    return <Loader message="Loading reports" />;
+  }
 
   return (
     <section id="Report" className="app-page">
