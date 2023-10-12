@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import Loader from '@components/Loader/Loader';
 import Detected from '../../pages/detected/Detected';
 import Identified from '../../pages/identified/Identified';
 import Search from '../../pages/search/Search';
@@ -14,17 +15,11 @@ const MainPanel = ({ loaderMessage }) => {
   const { loaded } = useSelector(selectWorkbench);
 
   // loader
-  if (!loaded)
+  if (!loaded) {
     return (
-      <section className="loader">
-        <div className="text-center">
-          <CircularProgress size={30} />
-          <p className="m-0 mt-2 font-medium">
-            <small>{loaderMessage || ' '}</small>
-          </p>
-        </div>
-      </section>
+      <Loader message={loaderMessage || 'Loading project'} />
     );
+  }
 
   return (
     <main id="Workbench" className="workbench">
