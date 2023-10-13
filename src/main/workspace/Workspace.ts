@@ -199,6 +199,14 @@ class Workspace {
     return null;
   }
 
+  public getProjects(){
+    return this.projectList;
+  }
+
+  public setProjectList(projects: Array<Project>){
+    this.projectList = projects;
+  }
+
   public addNewProject(p: Project) {
     if (p) this.projectList.push(p);
   }
