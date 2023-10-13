@@ -1,14 +1,29 @@
-import fs from 'fs';
-import path from 'path';
-import { Metadata } from '../../workspace/Metadata';
+import { userSettingService } from '../../services/UserSettingService';
+import { workspace } from '../../workspace/Workspace';
 
-export async function projectMigration184(projectPath: string): Promise<void> {
-  const metadataPath = path.join(projectPath, 'metadata.json');
-  const metadataRaw = await fs.promises.readFile(metadataPath, 'utf-8');
-  const metadata = JSON.parse(metadataRaw);
-  const m = await Metadata.readFromPath(metadata.name);
-  const absoluteWorkRoot = m.getMyPath();
-  const relativeWorkRoot = absoluteWorkRoot.split(path.sep);
-  m.setMyPath(relativeWorkRoot[relativeWorkRoot.length - 1]);
-  m.save();
+const fs = require('fs').promises;
+const path = require('path');
+
+export async function wsMigration184(wsPath: string): Promise<void> {
+  updateProjectPathsOnWorkspace();
+  userSettingService.setSetting('VERSION', '1.8.4');
+  await userSettingService.save();
+
+}
+
+async function getDirs(wsPath: string): Promise<Array<string>> {
+  const files = await fs.readdir(wsPath, { withFileTypes: true });
+  const folders: Array<string> = [];
+  files.forEach((f) => {
+    if (f.isDirectory()) folders.push(f.name);
+  });
+  return folders;
+}
+
+ function updateProjectPathsOnWorkspace() {
+  const projects = workspace.getProjects();
+  projects.forEach((p) => {
+    p.setMyPath(p.getProjectName());
+  });
+  workspace.setProjectList(projects);
 }

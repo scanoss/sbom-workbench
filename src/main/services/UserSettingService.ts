@@ -117,6 +117,10 @@ class UserSettingService {
   public setMyPath(path: string) {
     this.myPath = path;
   }
+
+  public getMypath(): string {
+    return this.myPath;
+  }
 }
 
 export const userSettingService = new UserSettingService();

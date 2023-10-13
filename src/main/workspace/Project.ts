@@ -78,7 +78,7 @@ export class Project {
     }
     const pMigration = new ProjectMigration(
       this.metadata.getVersion(),
-      this.metadata.getMyPath(),
+      this.metadata.getWorkRoot(),
     );
     const newVersion: string = await pMigration.up();
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
