@@ -2,6 +2,7 @@ import { Migration } from './Migration';
 import { wsMigration140 } from './scripts/140';
 import { wsMigration151 } from './scripts/151';
 import { wsMigration183 } from './scripts/183';
+import { wsMigration184 } from './scripts/184';
 
 export class WorkspaceMigration extends Migration {
   private scripts: Record<string, Array<(data: string) => void>>;
@@ -16,6 +17,7 @@ export class WorkspaceMigration extends Migration {
       '1.4.0': [wsMigration140],
       '1.5.1': [wsMigration151],
       '1.8.3': [wsMigration183],
+      '1.8.4': [wsMigration184],
     }
   }
 
