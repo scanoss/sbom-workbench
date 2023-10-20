@@ -160,8 +160,6 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
 
     scannerCfg.MAX_RESPONSES_IN_BUFFER = 500;
 
-    scannerCfg.DISPATCHER_QUEUE_SIZE_MAX_LIMIT = 500;
-    scannerCfg.DISPATCHER_QUEUE_SIZE_MIN_LIMIT = 450;
     scannerCfg.PROXY = PROXY || null;
     scannerCfg.IGNORE_CERT_ERRORS = IGNORE_CERT_ERRORS !== undefined ? IGNORE_CERT_ERRORS : false;
     scannerCfg.CA_CERT = CA_CERT !== undefined ? CA_CERT : null;
