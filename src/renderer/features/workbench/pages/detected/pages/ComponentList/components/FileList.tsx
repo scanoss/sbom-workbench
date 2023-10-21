@@ -41,6 +41,7 @@ export const FileList = ({ files, filter, emptyMessage, onAction }: FileListProp
               label={file.path}
               status={file.status}
               type={file.type}
+              version={file.version}
             />
           </article>
         ))}

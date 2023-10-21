@@ -23,10 +23,11 @@ interface MatchCardProps {
   label: string | null;
   status: string | null;
   type: string | null;
+  version: string | null;
   onAction: (action: number) => void;
 }
 
-const MatchCard = ({ label, status, onAction, type }: MatchCardProps) => {
+const MatchCard = ({ label, status, version, type, onAction }: MatchCardProps) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = React.useState(false);
 
@@ -43,7 +44,6 @@ const MatchCard = ({ label, status, onAction, type }: MatchCardProps) => {
         <div className="match-card-buttons">
           {status === 'pending' && isShow && (
             <>
-              <span className="type">version</span>
               <span className="type">{type}</span>
               <IconButton title={t('Tooltip:Identify')} size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IDENTIFY)}>
                 <CheckIcon className="icon check" fontSize="inherit" />

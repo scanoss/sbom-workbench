@@ -14,7 +14,7 @@ import {
   reject,
   rejectAll,
   restore,
-  restoreAll
+  restoreAll,
 } from '@store/dependency-store/dependencyThunks';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { Trans, useTranslation } from 'react-i18next';
@@ -28,17 +28,14 @@ import ActionButton from './components/ActionButton/ActionButton';
 import TabNavigation, { DependencyStatus } from './components/TabNavigation/TabNavigation';
 import { CodeViewerManager } from '../Editor/CodeViewerManager';
 import CodeViewer from '../../../../components/CodeViewer/CodeViewer';
+import FilterSelector from './components/FilterSelector/FilterSelector';
 
 export interface FileContent {
   content: string | null;
   error: boolean;
 }
 
-const filter = (items, query, status) => {
-  return items?.filter((item) => {
-    return (!status || item.status === status) && (!query || item.purl.toLowerCase().includes(query.toLowerCase()));
-  });
-};
+const filter = (items, query, status) => items?.filter((item) => (!status || item.status === status) && (!query || item.purl.toLowerCase().includes(query.toLowerCase())));
 
 const MemoCodeViewer = React.memo(CodeViewer);
 
@@ -118,7 +115,7 @@ const DependencyViewer = () => {
     const message = t('AllAcceptedOrDimissedRestored');
     const { action } = await dialogCtrl.openAlertDialog(message, [
       { label: t('Button:Cancel'), role: 'cancel' },
-      { label:  t('Button:RestoreAll'), action: 'accept', role: 'accept' },
+      { label: t('Button:RestoreAll'), action: 'accept', role: 'accept' },
     ]);
 
     if (action !== DIALOG_ACTIONS.CANCEL) {
@@ -146,88 +143,83 @@ const DependencyViewer = () => {
   }, [file]);
 
   return (
-    <>
-      <section id="Dependency" className="app-page">
-        <header className="app-header mb-3">
-          <div className="d-flex space-between">
-            <Breadcrumb />
-            <CodeViewSelector active={view} setView={setView} />
-          </div>
-          <div className="d-flex align-center mb-2">
-            <h3 className="mt-0 mb-0">{t('Title:DeclaredDependencies')}</h3>
-          </div>
+    <section id="Dependency" className="app-page">
+      <header className="app-header mb-3">
+        <div className="d-flex space-between">
+          <Breadcrumb />
+          <CodeViewSelector active={view} setView={setView} />
+        </div>
+        <div className="d-flex align-center mb-2">
+          <h3 className="mt-0 mb-0">{t('Title:DeclaredDependencies')}</h3>
+        </div>
 
-          <div className="search-box">
-            <SearchBox
-              disabled={view === CodeViewSelectorMode.CODE}
-              onChange={(value) => setSearchQuery(value.trim().toLowerCase())}
-            />
-          </div>
+        <div className="search-box">
+          <SearchBox
+            disabled={view === CodeViewSelectorMode.CODE}
+            onChange={(value) => setSearchQuery(value.trim().toLowerCase())}
+          />
+        </div>
 
-          <section className="subheader">
-            <TabNavigation
-              tab={statusFilter}
-              onChange={(status) => setStatusFilter(status)}
-            />
-            <ActionButton
-              count={[
-                validItems.length,
-                pendingItems.length,
-                workedItems.length,
-              ]}
-              onAcceptAll={onAcceptAllHandler}
-              onDismissAll={onDismissAllHandler}
-              onRestoreAll={onRestoreAllHandler}
-            />
-          </section>
-        </header>
-        <main className="editors editors-full app-content">
-          <div className="">
-            {localFileContent?.content ? (
+        <section className="subheader">
+          <TabNavigation
+            tab={statusFilter}
+            onChange={(status) => setStatusFilter(status)}
+          />
+          <ActionButton
+            count={[
+              validItems.length,
+              pendingItems.length,
+              workedItems.length,
+            ]}
+            onAcceptAll={onAcceptAllHandler}
+            onDismissAll={onDismissAllHandler}
+            onRestoreAll={onRestoreAllHandler}
+          />
+        </section>
+      </header>
+      <main className="editors editors-full app-content">
+        <div className="">
+          {localFileContent?.content ? (
+            view === CodeViewSelectorMode.CODE ? (
+              <MemoCodeViewer
+                id={CodeViewerManager.LEFT}
+                language={getExtension(file)}
+                value={localFileContent.content}
+                highlight={null}
+              />
+            ) : (
               <>
-                {view === CodeViewSelectorMode.CODE ? (
-                  <MemoCodeViewer
-                    id={CodeViewerManager.LEFT}
-                    language={getExtension(file)}
-                    value={localFileContent.content}
-                    highlight={null}
-                  />
-                ) : (
-                  <>
-                    <div className="dependencies-tree-header mt-1 mb-2">
-                      <div className="dependencies-tree-header-title">
-                        <Typography variant="subtitle2">
-                          <Trans
-                            i18nKey="ShowingDependenciesWithCount"
-                            values={{
-                              items: items.length,
-                              count: dependencies.length,
-                              file
-                            }}
-                            components= {{
-                              strong: <strong />
-                            }}
-                            />
-                        </Typography>
-                      </div>
-                    </div>
-
-                    <DependencyTree
-                      dependencies={items}
-                      onDependencyAccept={onAcceptHandler}
-                      onDependencyReject={onRejectHandler}
-                      onDependencyRestore={onRestoreHandler}
-                    />
-                  </>
-                )}
+                <div className="dependencies-tree-header mt-1 mb-2">
+                  <div className="dependencies-tree-header-title">
+                    <Typography variant="subtitle2">
+                      <Trans
+                        i18nKey="ShowingDependenciesWithCount"
+                        values={{
+                          items: items.length,
+                          count: dependencies.length,
+                          file,
+                        }}
+                        components={{
+                          strong: <strong />,
+                        }}
+                      />
+                    </Typography>
+                  </div>
+                </div>
+                <DependencyTree
+                  dependencies={items}
+                  onDependencyAccept={onAcceptHandler}
+                  onDependencyReject={onRejectHandler}
+                  onDependencyRestore={onRestoreHandler}
+                />
               </>
-            ) : imported ? (
-              <NoLocalFile />
-            ) : null}
-          </div>
-        </main>
-      </section>
-    </>
+            )
+          ) : imported ? (
+            <NoLocalFile />
+          ) : null}
+        </div>
+      </main>
+    </section>
   );
 };
 
