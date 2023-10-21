@@ -54,6 +54,7 @@ const VulnerabilitiesReport = () => {
     const response = await vulnerabilityService.getAll({ type: source });
     data.current = response;
 
+    console.log(response)
     setItems(data.current);
     setComponent(Array.from(new Set(data.current.map((item) => item.componentVersion.name))));
   };

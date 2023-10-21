@@ -19,15 +19,16 @@ export const FileList = ({ files, filter, onAction }: FileListProps) => {
       <section className="file-list">
         {filteredFiles.length > 0
           ? filteredFiles.slice(0, MAX_FILES).map((file, index) => (
-              <article className="item" key={index}>
-                <MatchCard
-                  onAction={(action) => onAction(file, action)}
-                  label={file.path}
-                  status={file.status}
-                  type={file.type}
-                />
-              </article>
-            ))
+            <article className="item" key={index}>
+              <MatchCard
+                onAction={(action) => onAction(file, action)}
+                label={file.path}
+                status={file.status}
+                type={file.type}
+                version={file.version}
+              />
+            </article>
+          ))
           : null}
       </section>
 
@@ -40,9 +41,8 @@ export const FileList = ({ files, filter, onAction }: FileListProps) => {
   );
 };
 
-
 FileList.defaultProps = {
   filter: null,
-}
+};
 
 export default FileList;

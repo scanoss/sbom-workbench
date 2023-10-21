@@ -43,7 +43,7 @@ export abstract class ScannerPipeline implements ITask<Project, boolean> {
     await project.close();
     broadcastManager.get().send(IpcChannels.SCANNER_FINISH_SCAN, {
       success: true,
-      resultsPath: project.metadata.getWorkRoot(),
+      resultsPath: project.metadata.getMyPath(),
     });
   }
 }

@@ -1,5 +1,7 @@
 import React from 'react';
-import { Card, IconButton, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import {
+  Card, IconButton, ListItem, ListItemIcon, ListItemText, Typography,
+} from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import BanIcon from '@mui/icons-material/NotInterested';
 import { RestoreOutlined } from '@mui/icons-material';
@@ -87,6 +89,13 @@ const DependencyTree = ({
                       )}
                     </div>
 
+                    <div className="info-container scope">
+                        <Typography variant="subtitle1">{t('Table:Scope')}</Typography>
+                        <div className="pill-scope">
+                          <small>{item.scope || '-'}</small>
+                        </div>
+                    </div>
+
                     <div className="item-action-buttons">
                       {item.status === 'pending' && (
                         <>
@@ -99,15 +108,12 @@ const DependencyTree = ({
                         </>
                       )}
                       {(item.status === 'original' || item.status === 'identified') && (
-                        <>
-                          <IconButton title={t('Tooltip:Restore')} onClick={() => onDependencyRestore(item)} size="large">
-                            <RestoreOutlined className="icon" fontSize="inherit" />
-                          </IconButton>
-                        </>
+                        <IconButton title={t('Tooltip:Restore')} onClick={() => onDependencyRestore(item)} size="large">
+                          <RestoreOutlined className="icon" fontSize="inherit" />
+                        </IconButton>
                       )}
                     </div>
                   </ListItem>
-                  {/* <Divider/> */}
                 </React.Fragment>
               );
             }}

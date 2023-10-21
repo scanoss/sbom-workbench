@@ -18,7 +18,7 @@
     padding-top: 4px;
     padding-bottom: 4px;
     display: grid;
-    grid-template-columns: 70px 1fr 0.3fr 0.3fr ;
+    grid-template-columns: 70px 1fr 0.25fr 0.25fr 0.25fr ;
 
     &.MuiListItem-gutters {
       border-bottom: solid 1px #e4e2e2;
@@ -128,6 +128,11 @@
 
   .pill-license, .pill-version {
     @include pill;
+    width: max-content;
+    font-size: 12px;
+  }
+
+  .pill-scope {
     width: max-content;
     font-size: 12px;
   }
