@@ -6,6 +6,7 @@ import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
 import { AddCryptographyTask } from '../../cryptography/AddCryptographyTask';
+import { userSettingService } from '../../../services/UserSettingService';
 
 export class CryptographyTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -26,8 +27,6 @@ export class CryptographyTask implements Scanner.IPipelineTask {
     log.info('[ Cryptography init ]');
     if (!AppConfig.FF_ENABLE_SCAN_VULNERABILITY) return false;
 
-    log.info('[ VulnerabilitiesTask init ]');
-
     const detectedComponents = await modelProvider.model.component.getAll(null);
     const dependencyComponents = await modelProvider.model.dependency.getAll(
       null,
@@ -36,8 +35,10 @@ export class CryptographyTask implements Scanner.IPipelineTask {
       detectedComponents,
       dependencyComponents,
     );
+
+    const token = this.project.getGlobalApiKey();
     const addCryptographyTask = new AddCryptographyTask();
-    await addCryptographyTask.run(components);
+    await addCryptographyTask.run({ components, token });
     this.project.save();
 
     return true;

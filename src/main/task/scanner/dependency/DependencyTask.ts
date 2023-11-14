@@ -7,7 +7,7 @@ import { Project } from '../../../workspace/Project';
 import { dependencyService } from '../../../services/DependencyService';
 import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
-import { userSettingService } from "../../../services/UserSettingService";
+import { userSettingService } from '../../../services/UserSettingService';
 
 export class DependencyTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -55,7 +55,7 @@ export class DependencyTask implements Scanner.IPipelineTask {
       });
       await fs.promises.writeFile(
         `${this.project.metadata.getMyPath()}/dependencies.json`,
-        JSON.stringify(dependencies, null, 2)
+        JSON.stringify(dependencies, null, 2),
       );
     } catch (e) {
       log.error(e);
@@ -67,8 +67,8 @@ export class DependencyTask implements Scanner.IPipelineTask {
       const dependencies = JSON.parse(
         await fs.promises.readFile(
           `${this.project.metadata.getMyPath()}/dependencies.json`,
-          'utf8'
-        )
+          'utf8',
+        ),
       );
       this.project.tree.addDependencies(dependencies);
       await dependencyService.insert(dependencies);
