@@ -3,9 +3,9 @@
 /* eslint-disable func-names */
 import log from 'electron-log';
 import sqlite3 from 'sqlite3';
+import util from 'util';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Querys } from './querys_db';
-import util from 'util';
 
 
 const query = new Querys();
