@@ -8,34 +8,30 @@ import { Project } from '../../../workspace/Project';
 import { Scanner } from '../types';
 import { ResumeScanTask } from '../resume/ResumeScanTask';
 import { DecompressTask } from '../../decompress/DecompressTask';
+import { ScannerPipeline } from './ScannerPipeline';
+import { CodeIndexTreeTask } from '../../IndexTreeTask/CodeIndexTreeTask';
+import { IScannerInputAdapter } from '../adapter/IScannerInputAdapter';
+import { IDispatch } from '../dispatcher/IDispatch';
 import ScannerType = Scanner.ScannerType;
-import {ScannerPipeline} from "./ScannerPipeline";
-import {CodeIndexTreeTask} from "../../IndexTreeTask/CodeIndexTreeTask";
-import {CodeDispatcher} from "../dispatcher/CodeDispatcher";
-import {CodeScannerInputAdapter} from "../adapter/CodeScannerInputAdapter";
-import {IScannerInputAdapter} from "../adapter/IScannerInputAdapter";
-import {IDispatch} from "../dispatcher/IDispatch";
+import { CryptographyTask } from '../cryptography/CryptographyTask';
 
-export class CodeScannerPipelineTask extends ScannerPipeline{
+export class CodeScannerPipelineTask extends ScannerPipeline {
   public async run(project: Project): Promise<boolean> {
     const { metadata } = project;
 
     // decompress
-    if (metadata.getScannerConfig().type.includes(ScannerType.UNZIP))
-      this.queue.push(new DecompressTask(project));
+    if (metadata.getScannerConfig().type.includes(ScannerType.UNZIP)) this.queue.push(new DecompressTask(project));
 
     // index
     if (
-      metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN ||
-      metadata.getScannerConfig().mode === Scanner.ScannerMode.RESCAN
-    )
-      this.queue.push(new CodeIndexTreeTask(project));
+      metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
+      || metadata.getScannerConfig().mode === Scanner.ScannerMode.RESCAN
+    ) this.queue.push(new CodeIndexTreeTask(project));
 
     // scan
-    const scanTask: BaseScannerTask<IDispatch,IScannerInputAdapter> =
-      metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
-        ? new CodeScanTask(project)
-        : metadata.getScannerConfig().mode === Scanner.ScannerMode.RESUME
+    const scanTask: BaseScannerTask<IDispatch, IScannerInputAdapter> = metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
+      ? new CodeScanTask(project)
+      : metadata.getScannerConfig().mode === Scanner.ScannerMode.RESUME
         ? new ResumeScanTask(project)
         : new CodeReScanTask(project);
 
@@ -44,12 +40,13 @@ export class CodeScannerPipelineTask extends ScannerPipeline{
     }
 
     // dependencies
-    if (metadata.getScannerConfig().type.includes(ScannerType.DEPENDENCIES))
-      this.queue.push(new DependencyTask(project));
+    if (metadata.getScannerConfig().type.includes(ScannerType.DEPENDENCIES)) this.queue.push(new DependencyTask(project));
 
     // vulnerabilities
-    if (metadata.getScannerConfig().type.includes(ScannerType.VULNERABILITIES))
-      this.queue.push(new VulnerabilitiesTask(project));
+    if (metadata.getScannerConfig().type.includes(ScannerType.VULNERABILITIES)) this.queue.push(new VulnerabilitiesTask(project));
+
+    // Cryptography
+    if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY))) this.queue.push(new CryptographyTask(project));
 
     // search index
     this.queue.push(new IndexTask(project));

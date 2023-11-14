@@ -56,6 +56,7 @@
   "Original": "Original",
   "Rescanning": "Rescanning",
   "AnalyzingDependencies": "Analyzing Dependencies",
+  "AnalyzingCryptography": "Analyzing Cryptography",
   "SearchingVulnerabilities": "Searching Vulnerabilities",
   "CreatingSearchIndex": "Creating Search Index",
   "Indexing": "Indexing",
