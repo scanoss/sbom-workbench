@@ -298,6 +298,7 @@ export enum ScannerStage {
   RESUME,
   DEPENDENCY,
   VULNERABILITY,
+  CRYPTOGRAPHY,
   SEARCH_INDEX,
 }
 

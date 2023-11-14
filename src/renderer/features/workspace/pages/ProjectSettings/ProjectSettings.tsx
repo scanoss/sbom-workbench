@@ -9,13 +9,11 @@ import {
   Paper,
   Select,
   TextField,
-  Tooltip,
+  Tooltip
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
-import Autocomplete from '@mui/material/Autocomplete';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Add } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -30,9 +28,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import FormGroup from '@mui/material/FormGroup';
 import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 import { Scanner } from '../../../../../main/task/scanner/types';
-
-import ScannerType = Scanner.ScannerType;
 import ScannerSource = Scanner.ScannerSource;
+import ScannerType = Scanner.ScannerType;
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -87,6 +84,7 @@ const ProjectSettings = () => {
         ScannerType.CODE,
         ScannerType.DEPENDENCIES,
         ScannerType.VULNERABILITIES,
+        ScannerType.CRYPTOGRAPHY
       ],
       obfuscate: false,
     },
