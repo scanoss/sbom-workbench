@@ -14,6 +14,7 @@ import { IScannerInputAdapter } from '../adapter/IScannerInputAdapter';
 import { IDispatch } from '../dispatcher/IDispatch';
 import ScannerType = Scanner.ScannerType;
 import { CryptographyTask } from '../cryptography/CryptographyTask';
+import { userSettingService } from '../../../services/UserSettingService';
 
 export class CodeScannerPipelineTask extends ScannerPipeline {
   public async run(project: Project): Promise<boolean> {
@@ -46,7 +47,7 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
     if (metadata.getScannerConfig().type.includes(ScannerType.VULNERABILITIES)) this.queue.push(new VulnerabilitiesTask(project));
 
     // Cryptography
-    if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY))) this.queue.push(new CryptographyTask(project));
+    if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY)) && project.getGlobalApiKey()) this.queue.push(new CryptographyTask(project));
 
     // search index
     this.queue.push(new IndexTask(project));

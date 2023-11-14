@@ -18,6 +18,7 @@ import { TreeViewModeCreator } from './tree/treeViewModes/TreeViewModeCreator';
 import { IpcChannels } from '../../api/ipc-channels';
 import * as ScannerCFG from '../task/scanner/types';
 import { broadcastManager } from '../broadcastManager/BroadcastManager';
+import { userSettingService } from '../services/UserSettingService';
 
 export class Project {
   work_root: string;
@@ -216,6 +217,22 @@ export class Project {
 
   public getApiKey() {
     return this.metadata.getApiKey();
+  }
+
+  public getGlobalApiKey(): string {
+    const {
+      DEFAULT_API_INDEX,
+      APIS,
+    } = userSettingService.get();
+    return this.getApiKey() ? this.getApiKey() : APIS[DEFAULT_API_INDEX].API_KEY;
+  }
+
+  public getGlobalApi(): string {
+    const {
+      DEFAULT_API_INDEX,
+      APIS,
+    } = userSettingService.get();
+    return this.getApi() ? this.getApi() : APIS[DEFAULT_API_INDEX].URL;
   }
 
   public async getResults() {

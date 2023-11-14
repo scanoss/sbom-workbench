@@ -1,5 +1,6 @@
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
+import { Cryptography } from '../model/entity/Cryptography';
 
 interface LicenseEntry {
   label: string;
@@ -90,8 +91,7 @@ class ReportService {
       }
     });
 
-    const vulnerabilities =
-      await modelProvider.model.vulnerability.getIdentifiedReport();
+    const vulnerabilities = await modelProvider.model.vulnerability.getIdentifiedReport();
     const vulnerabilityReport = {
       critical: 0,
       high: 0,
@@ -100,17 +100,19 @@ class ReportService {
       ...this.getVulnerabilitiesReport(vulnerabilities),
     };
 
-    return { licenses, vulnerabilities: vulnerabilityReport };
+    // Crypto
+    const crypto = await modelProvider.model.cryptography.findAllIdentifiedMatched();
+
+    return { licenses, vulnerabilities: vulnerabilityReport, crypto };
   }
 
   public async getDetected() {
     try {
       const results = await modelProvider.model.result.getDetectedReport();
       let licenses = this.getLicenseReportFromResults(results);
-      const crypto = await this.getCryptoFromResults();
+      const crypto = await modelProvider.model.cryptography.findAllDetected();
 
-      const vulnerabilities =
-        await modelProvider.model.vulnerability.getDetectedReport();
+      const vulnerabilities = await modelProvider.model.vulnerability.getDetectedReport();
       const vulnerabilityReport = {
         critical: 0,
         high: 0,
@@ -125,46 +127,7 @@ class ReportService {
 
       return { licenses, crypto, vulnerabilities: vulnerabilityReport };
     } catch (e) {
-      console.log('Catch an error: ', e);
       return { status: 'fail' };
-    }
-  }
-
-  private async getCryptoFromResults() {
-    const crypto: CryptoEntry[] = [{ label: 'None', files: [], value: 0 }];
-    const a = await workspace.getOpenedProjects()[0].getResults();
-    for (const [key, results] of Object.entries<any[]>(a)) {
-      for (const result of results) {
-        if (result.id !== 'none') {
-          // Crypto
-          if (
-            result.cryptography !== undefined &&
-            result.cryptography[0] !== undefined
-          ) {
-            if (
-              !crypto.some((l) => l.label === result.cryptography[0].algorithm)
-            ) {
-              const newCrypto = { label: '', files: [], value: 1 };
-              newCrypto.label = result.cryptography[0].algorithm;
-              newCrypto.files.push(result.file);
-              crypto.push(newCrypto);
-            } else {
-              const index = crypto.findIndex(
-                (l) => l.label === result.cryptography[0].algorithm
-              );
-              if (index >= 0) {
-                crypto[index].files.push(result.file);
-                crypto[index].value = crypto[index].files.length;
-              }
-            }
-          } else {
-            const index = crypto.findIndex((l) => l.label === 'None');
-            crypto[index].files.push(result.file);
-
-            crypto[index].value = crypto[index].files.length;
-          }
-        }
-      }
     }
   }
 
@@ -193,7 +156,7 @@ class ReportService {
           };
         } else {
           const componentIndex = acc[key].components.findIndex(
-            (c) => c.purl === curr.purl && c.version === curr.version
+            (c) => c.purl === curr.purl && c.version === curr.version,
           );
           if (componentIndex < 0) {
             acc[key].value += 1;
@@ -207,7 +170,7 @@ class ReportService {
         }
         return acc;
       },
-      {}
+      {},
     );
     Object.entries(licenses).forEach(([key, value]) => {
       value.value = value.components.length;
@@ -216,29 +179,27 @@ class ReportService {
   }
 
   private getVulnerabilitiesReport(vulnerabilities: any) {
-    const vulnerabilityReportMapper: Record<string, number> =
-      vulnerabilities.reduce((acc, curr) => {
-        if (!acc[curr.severity.toLowerCase()])
-          acc[curr.severity.toLowerCase()] = curr.count;
-        return acc;
-      }, {});
+    const vulnerabilityReportMapper: Record<string, number> = vulnerabilities.reduce((acc, curr) => {
+      if (!acc[curr.severity.toLowerCase()]) acc[curr.severity.toLowerCase()] = curr.count;
+      return acc;
+    }, {});
     return vulnerabilityReportMapper;
   }
 
   private checkForIncompatibilities(licenses: LicenseEntry[]) {
     for (let l = 0; l < licenses.length; l += 1) {
       const license = licenses[l];
-      if (license.incompatibles !== undefined)
+      if (license.incompatibles !== undefined) {
         for (let i = 0; i < license.incompatibles.length; i += 1) {
-          if (licenses.some((lic) => lic.label === license.incompatibles[i]))
-            license.has_incompatibles.push(license.incompatibles[i]);
+          if (licenses.some((lic) => lic.label === license.incompatibles[i])) license.has_incompatibles.push(license.incompatibles[i]);
         }
+      }
     }
   }
 
   private mergeLicenseData(
     licenses: LicenseEntry[],
-    dependencies: Array<any>
+    dependencies: Array<any>,
   ): Array<LicenseEntry> {
     const licenseMapper = licenses.reduce((acc, curr) => {
       if (!acc[curr.label]) acc[curr.label] = curr;
@@ -279,7 +240,7 @@ class ReportService {
           // if license already exists in the license mapper
           if (licenseMapper[l]) {
             const componentIndex = licenseMapper[l].components.findIndex(
-              (c) => c.purl === dep.purl && c.version === dep.version
+              (c) => c.purl === dep.purl && c.version === dep.version,
             );
             // check if the component already exists in the component array
             if (componentIndex < 0) {
