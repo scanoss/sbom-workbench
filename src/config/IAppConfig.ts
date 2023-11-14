@@ -24,6 +24,7 @@ export interface IAppConfig {
   FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN: boolean;
   FF_ENABLE_API_CONNECTION_SETTINGS: boolean;
   FF_ENABLE_SCAN_VULNERABILITY: boolean;
+  FF_ENABLE_SCAN_CRYPTOGRAPHY: boolean;
 
   // search engine
   SEARCH_ENGINE_DEFAULT_LIMIT: number;
