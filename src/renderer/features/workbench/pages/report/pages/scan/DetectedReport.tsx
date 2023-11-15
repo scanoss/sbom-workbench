@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Chart, registerables } from 'chart.js';
-import { Card } from '@mui/material';
+import {
+  Card, IconButton, Tab, Tabs,
+} from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
-import { projectService } from '@api/services/project.service';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
-import { Link } from 'react-router-dom';
 import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
 import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { useTranslation } from 'react-i18next';
+import CloseIcon from '@mui/icons-material/Close';
 import LicensesChart from '../../components/LicensesChart';
 import LicensesTable from '../../components/LicensesTable';
 import MatchesForLicense from '../../components/MatchesForLicense';
@@ -16,6 +17,7 @@ import MatchesChart from '../../components/MatchesChart';
 import LicensesObligations from '../../components/LicensesObligations';
 import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 import { Scanner } from '../../../../../../../main/task/scanner/types';
+import CryptographyDataTable from '../../components/CryptographyDataTable';
 
 Chart.register(...registerables);
 
@@ -23,20 +25,32 @@ const DetectedReport = ({ data }) => {
   const { projectScannerConfig } = useSelector(selectWorkbench);
   const { t } = useTranslation();
 
-  const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
-  const [obligations, setObligations] = useState(null);
+  const [tab, setTab] = useState<string>('matches');
 
-  const vulnerabilitiesDisabled = !projectScannerConfig?.type?.includes(Scanner.ScannerType.VULNERABILITIES)
+  const layers = useRef<Set<Scanner.ScannerType>>(new Set(projectScannerConfig?.type));
+
+  const [components, setComponents] = useState<any[]>([]);
+  const [licenseSelected, setLicenseSelected] = useState<any>(null);
+  const [obligations, setObligations] = useState(null);
 
   const init = async () => {
     const licenses = data.licenses.map((license) => license.label);
     const obligations = await obligationsService.getObligations(licenses);
     setObligations(obligations);
+    onLicenseClear();
   };
 
   const onLicenseSelected = (license: string) => {
-    const matchedLicense = data.licenses.find((item) => item?.label === license);
-    setMatchedLicenseSelected(matchedLicense);
+    const matchedLicense = data.licenses.find((item) => item.label === license);
+    setTab('matches');
+
+    setComponents(matchedLicense.components.map((item) => ({ ...item, license: matchedLicense.label })));
+    setLicenseSelected(matchedLicense);
+  };
+
+  const onLicenseClear = () => {
+    setComponents(data.licenses?.map((license: any) => license.components.map((item) => ({ ...item, license: license.label }))).flat());
+    setLicenseSelected(null);
   };
 
   useEffect(() => {
@@ -44,63 +58,97 @@ const DetectedReport = ({ data }) => {
   }, []);
 
   return (
-    <>
-      <section className="report-layout detected">
-        <Card className="report-item licenses">
-          <div className="report-title">{t('Title:Licenses')}</div>
-          {data.licenses.length > 0 ? (
-            <div className="report-full">
-              <LicensesChart data={data.licenses} />
-              <LicensesTable
-                matchedLicenseSelected={matchedLicenseSelected}
-                selectLicense={(license) => onLicenseSelected(license)}
-                data={data.licenses}
-              />
-            </div>
-          ) : (
-            <p className="report-empty">{t('NoLicensesFound')}</p>
-          )}
-        </Card>
+    <section className="report-layout detected">
+      <Card className="report-item licenses">
+        <div className="report-title">{t('Title:Licenses')} ({data.licenses.length})</div>
+        {data.licenses.length > 0 ? (
+          <div className="report-full">
+            <LicensesChart data={data.licenses} />
+            <LicensesTable
+              matchedLicenseSelected={licenseSelected}
+              selectLicense={(license) => onLicenseSelected(license)}
+              data={data.licenses}
+            />
+          </div>
+        ) : (
+          <p className="report-empty">{t('NoLicensesFound')}</p>
+        )}
+      </Card>
 
+      <Card className="report-item matches">
+        <div className="report-title">{t('Title:Matches')}</div>
+        <MatchesChart data={data.summary} />
+      </Card>
+
+      <Card className={`report-item dependencies ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
+        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={false} className="w-100">
+          <div className="report-title d-flex space-between align-center">
+            <span>{t('Title:DeclaredDependencies')}</span>
+            <div className="action">
+              <ArrowForwardOutlinedIcon fontSize="inherit" />
+            </div>
+          </div>
+          <p className="text-center mb-5 mt-5">{t('NoDependenciesScanned')}</p>
+        </ConditionalLink>
+      </Card>
+
+      <Card className={`report-item vulnerabilities ${layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? 'no-blocked' : 'blocked'}`}>
+        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={false} className="w-100">
+          <div className="report-title d-flex space-between align-center">
+            <span>{t('Title:Vulnerabilities')}</span>
+            <div className="action">
+              <ArrowForwardOutlinedIcon fontSize="inherit" />
+            </div>
+          </div>
+          { layers.current.has(Scanner.ScannerType.VULNERABILITIES)
+            ? <VulnerabilitiesCard data={data.vulnerabilities} />
+            : <p className="text-center mb-5 mt-5">{t('NoVulnerabilitiesScanned')}</p>}
+        </ConditionalLink>
+      </Card>
+
+      <Tabs value={tab} onChange={(e, value) => setTab(value)} className="tabs-navigator">
+        <Tab value="matches" label="Components matched" />
+        { layers.current.has(Scanner.ScannerType.VULNERABILITIES) && <Tab value="dependencies" label="Declared dependencies" />}
+        {/* <Tab value="vulnerabilities" label="Vulnerabilities" /> */}
+        <Tab value="obligations" label="Licenses obligations" />
+        { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label="Cryptography" />}
+      </Tabs>
+
+      {tab === 'matches' && (
         <Card className="report-item matches-for-license">
-          <div className="report-title">{t('Title:MatchesForLabel', { label: matchedLicenseSelected?.label })}</div>
+          <div className="report-title d-flex align-center">
+            { licenseSelected
+              ? (
+                <>
+                  <div className="mb-1 mt-1">{t('Title:MatchesForLabel', { label: licenseSelected.label, count: licenseSelected.components.length })}</div>
+                  <IconButton className="ml-1" onClick={(e) => onLicenseClear()} size="small">
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                </>
+              )
+              : <div className="mb-1 mt-1">{t('Title:MatchesForProject', { count: components.length })}</div>}
+          </div>
           {data.licenses.length > 0 ? (
-            <MatchesForLicense data={matchedLicenseSelected} />
+            <MatchesForLicense components={components} />
           ) : (
             <p className="report-empty">{t('Title:NoMatchesFound')}</p>
           )}
         </Card>
+      )}
 
-        <Card className="report-item matches">
-          <div className="report-title">{t('Title:Matches')}</div>
-          <MatchesChart data={data.summary} />
+      {tab === 'obligations' && (
+        <Card className="report-item licenses-obligation pt-1 mt-0">
+          <LicensesObligations data={obligations} />
         </Card>
+      )}
 
-        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={vulnerabilitiesDisabled} className="w-100">
-          <Card className={`report-item vulnerabilities ${vulnerabilitiesDisabled ? 'blocked' : 'no-blocked'}`}>
-            <div className="report-title d-flex space-between align-center">
-              <span>{t('Title:Vulnerabilities')}</span>
-              <div className="action">
-                <span className="mr-1">{t('Button:MoreDetails')}</span>
-                <ArrowForwardOutlinedIcon fontSize="inherit" />
-              </div>
-            </div>
-            { !vulnerabilitiesDisabled
-              ? <VulnerabilitiesCard data={data.vulnerabilities}/>
-              : <p className="text-center mb-5 mt-5">{t('NoVulnerabilitiesScanned')}</p>
-            }
-          </Card>
-        </ConditionalLink>
-
-        <Card className="report-item licenses-obligation">
-          {obligations ? (
-            <LicensesObligations data={obligations} />
-          ) : (
-            <p className="text-center mb-0 mt-0">{t('LoadingObligationsInfo')}</p>
-          )}
+      {tab === 'cryptography' && (
+        <Card className="report-item cryptography pt-1 mt-0">
+          <CryptographyDataTable data={data.crypto} />
         </Card>
-      </section>
-    </>
+      )}
+
+    </section>
   );
 };
 

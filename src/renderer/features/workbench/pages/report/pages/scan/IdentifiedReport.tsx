@@ -1,14 +1,17 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Chart, registerables } from 'chart.js';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import { Button, Card } from '@mui/material';
+import {
+  Button, Card, IconButton, Tab, Tabs,
+} from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
 import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
+import CloseIcon from '@mui/icons-material/Close';
 import LicensesChart from '../../components/LicensesChart';
 import IdentificationProgress from '../../components/IdentificationProgress';
 import LicensesTable from '../../components/LicensesTable';
@@ -17,6 +20,7 @@ import LicensesObligations from '../../components/LicensesObligations';
 import OssVsOriginalProgressBar from '../../components/OssVsOriginalProgressBar';
 import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 import { Scanner } from '../../../../../../../main/task/scanner/types';
+import CryptographyDataTable from '../../components/CryptographyDataTable';
 
 Chart.register(...registerables);
 
@@ -25,9 +29,13 @@ const IdentifiedReport = ({ data }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const [tab, setTab] = useState<string>('matches');
+
+  const layers = useRef<Set<Scanner.ScannerType>>(new Set(projectScannerConfig?.type));
+
+  const [components, setComponents] = useState<any[]>([]);
+  const [licenseSelected, setLicenseSelected] = useState<any>(null);
   const [obligations, setObligations] = useState(null);
-  const [matchedLicenseSelected, setMatchedLicenseSelected] = useState<any>(data.licenses?.[0]);
-  const blocked = !projectScannerConfig?.type?.includes(Scanner.ScannerType.VULNERABILITIES);
 
   const isEmpty = data.summary.identified.scan === 0 && data.summary.original === 0 && data.licenses.length === 0;
 
@@ -35,11 +43,20 @@ const IdentifiedReport = ({ data }) => {
     const licenses = data.licenses.map((license) => license.label);
     const obligations = await obligationsService.getObligations(licenses);
     setObligations(obligations);
+    onLicenseClear();
   };
 
   const onLicenseSelected = (license: string) => {
-    const matchedLicense = data.licenses.find((item) => item?.label === license);
-    setMatchedLicenseSelected(matchedLicense);
+    const matchedLicense = data.licenses.find((item) => item.label === license);
+    setTab('matches');
+
+    setComponents(matchedLicense.components.map((item) => ({ ...item, license: matchedLicense.label })));
+    setLicenseSelected(matchedLicense);
+  };
+
+  const onLicenseClear = () => {
+    setComponents(data.licenses?.map((license: any) => license.components.map((item) => ({ ...item, license: license.label }))).flat());
+    setLicenseSelected(null);
   };
 
   useEffect(() => {
@@ -74,12 +91,12 @@ const IdentifiedReport = ({ data }) => {
       </Card>
 
       <Card className="report-item licenses">
-        <div className="report-title">{t('Title:Licenses')}</div>
+        <div className="report-title">{t('Title:Licenses')} ({data.licenses.length})</div>
         {data.licenses.length > 0 ? (
           <div className="report-full">
             <LicensesChart data={data.licenses} />
             <LicensesTable
-              matchedLicenseSelected={matchedLicenseSelected}
+              matchedLicenseSelected={licenseSelected}
               selectLicense={(license) => onLicenseSelected(license)}
               data={data.licenses}
             />
@@ -89,35 +106,73 @@ const IdentifiedReport = ({ data }) => {
         )}
       </Card>
 
-      <Card className="report-item matches-for-license">
-        <div className="report-title">{t('Title:MatchesForLabel', { label: matchedLicenseSelected?.label })}</div>
-        {data.licenses.length > 0 ? (
-          <MatchesForLicense data={matchedLicenseSelected} />
-        ) : (
-          <p className="report-empty">{t('Title:NoMatchesFound')}</p>
-        )}
-      </Card>
-
-      <ConditionalLink to="../../vulnerabilities?type=identified" disabled={blocked} className="w-100">
-        <Card className={`report-item vulnerabilities ${blocked ? 'blocked' : 'no-blocked'}`}>
+      <Card className={`report-item dependencies ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
+        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={false} className="w-100">
           <div className="report-title d-flex space-between align-center">
-            <span>{t('Title:Vulnerabilities')}</span>
+            <span>{t('Title:DeclaredDependencies')}</span>
             <div className="action">
-              <span className="mr-1">{t('Button:MoreDetails')}</span>
               <ArrowForwardOutlinedIcon fontSize="inherit" />
             </div>
           </div>
-          <VulnerabilitiesCard data={data.vulnerabilities} blocked={blocked} />
-        </Card>
-      </ConditionalLink>
-
-      <Card className="report-item licenses-obligation">
-        {obligations ? (
-          <LicensesObligations data={obligations} />
-        ) : (
-          <p className="text-center mb-0 mt-0">{t('LoadingObligationsInfo')}</p>
-        )}
+          <p className="text-center mb-5 mt-5">{t('NoDependenciesScanned')}</p>
+        </ConditionalLink>
       </Card>
+
+      <Card className={`report-item vulnerabilities ${layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? 'no-blocked' : 'blocked'}`}>
+        <ConditionalLink to="../../vulnerabilities?type=identified" disabled={false} className="w-100">
+          <div className="report-title d-flex space-between align-center">
+            <span>{t('Title:Vulnerabilities')}</span>
+            <div className="action">
+              <ArrowForwardOutlinedIcon fontSize="inherit" />
+            </div>
+          </div>
+          { layers.current.has(Scanner.ScannerType.VULNERABILITIES)
+            ? <VulnerabilitiesCard data={data.vulnerabilities} />
+            : <p className="text-center mb-5 mt-5">{t('NoVulnerabilitiesScanned')}</p>}
+        </ConditionalLink>
+      </Card>
+
+      <Tabs value={tab} onChange={(e, value) => setTab(value)} className="tabs-navigator">
+        <Tab value="matches" label="Components matched" />
+        { layers.current.has(Scanner.ScannerType.VULNERABILITIES) && <Tab value="dependencies" label="Declared dependencies" />}
+        {/* <Tab value="vulnerabilities" label="Vulnerabilities" /> */}
+        <Tab value="obligations" label="Licenses obligations" />
+        { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label="Cryptography" />}
+      </Tabs>
+
+      {tab === 'matches' && (
+        <Card className="report-item matches-for-license">
+          <div className="report-title d-flex align-center">
+            { licenseSelected
+              ? (
+                <>
+                  <div className="mb-1 mt-1">{t('Title:MatchesForLabel', { label: licenseSelected.label, count: licenseSelected.components.length })}</div>
+                  <IconButton className="ml-1" onClick={(e) => onLicenseClear()} size="small">
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                </>
+              )
+              : <div className="mb-1 mt-1">{t('Title:MatchesForProject', { count: components.length })}</div>}
+          </div>
+          {data.licenses.length > 0 ? (
+            <MatchesForLicense components={components} />
+          ) : (
+            <p className="report-empty">{t('Title:NoMatchesFound')}</p>
+          )}
+        </Card>
+      )}
+
+      {tab === 'obligations' && (
+        <Card className="report-item licenses-obligation pt-1 mt-0">
+          <LicensesObligations data={obligations} />
+        </Card>
+      )}
+
+      {tab === 'cryptography' && (
+        <Card className="report-item cryptography pt-1 mt-0">
+          <CryptographyDataTable data={data.crypto} />
+        </Card>
+      )}
     </section>
   );
 };

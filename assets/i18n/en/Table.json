@@ -16,7 +16,9 @@
     "IncompatibleLicenses": "Incompatible Licenses",
     "PURL": "PURL",
     "URL": "URL",
-    "LocalFile": "Local File"
+    "LocalFile": "Local File",
+    "Algorithms": "Algorithms",
+    "Strength ": "Strength"
   },
   "Version": "Version",
   "License": "License"
