@@ -84,7 +84,6 @@ const ProjectSettings = () => {
         ScannerType.CODE,
         ScannerType.DEPENDENCIES,
         ScannerType.VULNERABILITIES,
-        ScannerType.CRYPTOGRAPHY
       ],
       obfuscate: false,
     },

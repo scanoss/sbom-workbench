@@ -40,71 +40,73 @@
 
   .report-layout {
     display: grid;
-    grid-gap: 20px;
-    grid-template-columns: 1fr 1fr;
+    grid-gap: 12px;
+    grid-template-columns: 1.6fr 1fr 1fr;
     margin-bottom: 16px;
 
+    .licenses {
+      grid-area: A1;
+    }
+    .dependencies {
+      grid-area: A3;
+    }
+    .vulnerabilities {
+      grid-area: A4;
+    }
+    .tabs-navigator {
+      grid-area: C;
+    }
+    .licenses-obligation, .matches-for-license, .cryptography {
+      grid-area: D;
+    }
+
     &.detected {
-      grid-template-rows: 350px 150px minmax(150px, auto) auto auto;
+      grid-template-rows: 115px 115px auto 600px;
 
       grid-template-areas:
-        'A B'
-        'C B'
-        'D B'
-        'E E';
+        'A1 A2 A2'
+        'A1 A3 A4'
+        'C  C  C'
+        'D  D  D';
 
-      .licenses {
-        grid-area: A;
-      }
       .matches {
-        grid-area: C;
+        grid-area: A2;
       }
-      .matches-for-license {
-        grid-area: B;
-      }
-      .vulnerabilities {
-        grid-area: D;
-      }
-      .licenses-obligation {
-        grid-area: E;
-      }
+
     }
 
     &.identified {
-      grid-template-rows: auto auto 400px minmax(150px, auto) auto;
+      grid-template-rows: 115px 115px 115px auto 600px;
+
       grid-template-areas:
-        'A A'
-        'B B'
-        'C D'
-        'E D'
-        'F F';
+      'Z1 Z1 Z1'
+      'A1 A2 A2'
+      'A1 A3 A4'
+      'C  C  C'
+      'D  D  D';
 
       .identification-progress {
-        grid-area: A;
+        grid-area: Z1;
       }
+
       .oss-original {
-        grid-area: B;
+        grid-area: A2;
       }
-      .licenses {
-        grid-area: C;
-      }
-      .matches-for-license {
-        grid-area: D;
-      }
-      .vulnerabilities {
-        grid-area: E;
-      }
-      .licenses-obligation {
-        grid-area: F;
-      }
+
+
     }
 
     .report-item {
-      padding: 24px;
+      padding: 12px 16px;
+
+      &.blocked {
+        opacity: 0.5;
+        pointer-events: none;
+      }
 
       .report-title {
         color: #27272a;
-        font-size: 18px;
+        font-size: 16px;
         font-style: normal;
         font-weight: 600;
       }
@@ -146,8 +148,8 @@
       flex-direction: column;
 
       .identification-canvas-container {
-        margin-top: 22px;
-        height: 55px;
+        margin-top: 20px;
+        height: 38px;
         width: 100%;
         display: flex;
         justify-content: space-between;
@@ -158,7 +160,7 @@
           margin-right: auto;
           text-align: center;
           color: #22c55e;
-          margin-top: 4px;
+          margin-top: -3px;
           font-size: 34px;
           font-weight: 700;
         }
@@ -245,9 +247,9 @@
 }
 
 #LicensesChart {
-  padding: 8px 0 4px;
-  max-width: 220px;
-  justify-self: center;
+  padding: 8px 16px 4px;
+  max-width: 180px;
+  justify-self: right;
 }
 
 .report-full {
@@ -316,7 +318,7 @@
   }
 
   .matches-canvas-container {
-    margin-top: 20px;
+    margin-top: 8px;
     height: 50px;
     display: flex;
     justify-content: space-between;
@@ -332,7 +334,7 @@
       .label-match {
         color: #6366f1;
         padding: 0px;
-        font-size: 2em;
+        font-size: 1.7em;
         font-weight: 400;
       }
 
@@ -382,7 +384,7 @@
 }
 
 #VulnerabilitiesCard {
-  margin-top: 15px;
+  margin-top: 6px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -393,33 +395,23 @@
     gap: 20px;
   }
 
-  &.blocked {
-    section {
-      opacity: 0.5;
-      pointer-events: none;
-    }
-
-    .vulnerability-number {
-      filter: blur(8px);
-    }
-  }
-
   .vulnerability-container {
     display: flex;
     flex-direction: column;
     width: fit-content;
-    min-width: 80px;
+    min-width: 50px;
 
     .vulnerability-number {
       font-weight: 500;
-      font-size: 62px;
-      line-height: 62px;
+      font-size: 42px;
+      line-height: 42px;
     }
 
     .vulnerability-label {
       font-size: 12px;
       font-weight: 500;
       color: black;
+
     }
 
     &.critical .vulnerability-number {
@@ -443,7 +435,7 @@
   align-items: center;
 
   .total-files-label {
-    font-size: 14px;
+    font-size: 12px;
     text-align: center;
   }
 }
@@ -474,7 +466,7 @@
 
 #Report .report-layout #OssProgress .identification-canvas-container {
   height: 70px;
-  margin-top: 5px;
+  margin-top: 0;
 }
 
 #OssProgress .total-files-container {

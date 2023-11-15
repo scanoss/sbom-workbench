@@ -57,7 +57,7 @@ const LicensesChart = ({ data }) => {
             data: data.map((d) => d.value),
             borderWidth: 0,
             backgroundColor: colorsForLicense,
-            cutout: 75,
+            cutout: 65,
           },
         ],
       },

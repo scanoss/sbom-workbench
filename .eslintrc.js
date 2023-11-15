@@ -37,6 +37,7 @@ module.exports = {
     'no-plusplus': ['warn', { allowForLoopAfterthoughts: true }],
     'react/function-component-definition': ['off'],
     'no-param-reassign': ['off'],
+    'react/jsx-one-expression-per-line': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
