@@ -13,6 +13,10 @@ import { useTranslation } from 'react-i18next';
 const useStyles = makeStyles({
   table: {
     minWidth: 400,
+
+    '& .MuiTableHead-root .MuiTableCell-root': {
+      backgroundColor: 'transparent !important',
+    },
   },
   tableCell: {
     padding: '0px 35px',
@@ -35,51 +39,51 @@ const LicensesObligations = ({ data }) => {
 
   useEffect(init, []);
 
+  if (!data) {
+    return <p className="text-center mb-0 mt-0">{t('LoadingObligationsInfo')}</p>;
+  }
+
   return (
-    <>
-      <TableContainer>
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow>
-              <TableCell align="left">{t('Table:Header:License')}</TableCell>
-              <TableCell>{t('Table:Header:Copyleft')}</TableCell>
-              <TableCell>{t('Table:Header:IncompatibleLicenses')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody className="selectable">
-            {data?.map((license) => (
-              <TableRow className="tableRowLicense" key={license.label}>
-                <TableCell component="th" scope="row">
-                  {license?.label}
-                </TableCell>
-                <TableCell>
-                  {license.copyleft === true ? (
-                    <CheckIcon style={{ fill: '#4ADE80' }} />
+    <TableContainer>
+      <Table className={classes.table}>
+        <TableHead>
+          <TableRow>
+            <TableCell align="left">{t('Table:Header:License')}</TableCell>
+            <TableCell>{t('Table:Header:Copyleft')}</TableCell>
+            <TableCell>{t('Table:Header:IncompatibleLicenses')}</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody className="selectable">
+          {data?.map((license) => (
+            <TableRow className="tableRowLicense" key={license.label}>
+              <TableCell component="th" scope="row">
+                {license?.label}
+              </TableCell>
+              <TableCell>
+                {license.copyleft === true ? (
+                  <CheckIcon style={{ fill: '#4ADE80' }} />
+                ) : (
+                  <ClearIcon style={{ fill: '#F87171' }} />
+                )}
+              </TableCell>
+              <TableCell className="tableCellForLicensePill">
+                <div className="container-licenses-pills">
+                  {license.incompatibles?.map((incompatibleLicense, index) => (!licenseHash[incompatibleLicense] ? (
+                    <div key={index} className="tinyPillLicenseContainer">
+                      <span className="tinyPillLicenseLabel">{incompatibleLicense}</span>
+                    </div>
                   ) : (
-                    <ClearIcon style={{ fill: '#F87171' }} />
-                  )}
-                </TableCell>
-                <TableCell className="tableCellForLicensePill">
-                  <div className="container-licenses-pills">
-                    {license.incompatibles?.map((incompatibleLicense, index) =>
-                      !licenseHash[incompatibleLicense] ? (
-                        <div key={index} className="tinyPillLicenseContainer">
-                          <span className="tinyPillLicenseLabel">{incompatibleLicense}</span>
-                        </div>
-                      ) : (
-                        <div key={index} className="incompatible tinyPillLicenseContainer">
-                          <span className="incompatible">{incompatibleLicense}</span>
-                        </div>
-                      )
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </>
+                    <div key={index} className="incompatible tinyPillLicenseContainer">
+                      <span className="incompatible">{incompatibleLicense}</span>
+                    </div>
+                  )))}
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 

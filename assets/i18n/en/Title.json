@@ -36,10 +36,10 @@
   "IdentificationProgress": "Identification Progress",
   "OSSvsOriginal": "OSS vs Original",
   "Licenses": "Licenses",
-  "MatchesForLabel": "Matches for {{label}}",
-  "Vulnerabilities": "Vulnerabilities",
-  "DetectedVulnerabilities": "Detected Vulnerabilities",
-  "IdentifiedVulnerabilities": "Identified Vulnerabilities",
+  "MatchesForLabel": "Matches for {{label}} ({{count}})",
+  "Vulnerabilities": "Vulnerabilities (CVEs)",
+  "DetectedVulnerabilities": "Detected Vulnerabilities (CVEs)",
+  "IdentifiedVulnerabilities": "Identified Vulnerabilities (CVEs)",
   "Severity": "Severity",
   "OSS": "OSS",
   "NoResultsFound": "No Results Found",
@@ -69,5 +69,6 @@
   "SelectProject": "Select Project",
   "PreviewIdentifications": "Preview Identifications",
   "ImportingIdentifications": "Importing Identifications",
-  "ImportFromProjects": "Import from Projects"
+  "ImportFromProjects": "Import from Projects",
+  "MatchesForProject": "Matches ({{count}})"
 }
