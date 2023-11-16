@@ -8,7 +8,7 @@ import { Inventory } from '../../../api/types';
 export function getInventoriesGroupedByUsage(inventory: Partial<Inventory>, results: any): Array<Partial<Inventory>> {
   const inventories = new Map<string, Partial<Inventory>>();
   results.forEach((r) => {
-    if(!inventories.has(r.type)) { // create a new inventory and set usage
+    if (!inventories.has(r.type)) { // create a new inventory and set usage
       const inv = {...inventory, usage:r.type , files: [r.id] };
       inventories.set(r.type, inv);
     } else inventories.get(r.type).files.push(r.id);
