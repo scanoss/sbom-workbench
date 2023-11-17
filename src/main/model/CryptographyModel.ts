@@ -47,7 +47,7 @@ export class CryptographyModel extends Model {
 
   public async findAllIdentifiedMatched(): Promise<Array<Cryptography>> {
     const db = await this.openDb();
-    const query = new Querys().SQL_GET_ALL_IDENTIFIED_MATCHED_CRYPTOGRAPHY;
+    const query = new Querys().SQL_GET_ALL_IDENTIFIED_CRYPTOGRAPHY;
     const call = await util.promisify(db.all.bind(db));
     const response = await call(query);
     const crypto = this.cryptographyAdapter(response);

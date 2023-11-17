@@ -22,8 +22,10 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
       // Convert response into Cryptography entity
       const cryptography: Array< { purl: string, version: string, algorithms: string } > = [];
       response.purlsList.forEach((p) => {
-        const crypto = { purl: p.purl, version: p.version, algorithms: JSON.stringify(p.algorithmsList) };
-        cryptography.push(crypto);
+        if (p.algorithmsList.length > 0) { // avoids empty crypto from response
+          const crypto = { purl: p.purl, version: p.version, algorithms: JSON.stringify(p.algorithmsList) };
+          cryptography.push(crypto);
+        }
       });
 
       // Import Crypto into Database
