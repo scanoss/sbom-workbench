@@ -1,18 +1,16 @@
- import log from "electron-log";
+import log from 'electron-log';
 import fs from 'fs';
-import { ScannerStage, ScanState } from "../../../../api/types";
-import { BaseScannerTask } from "../BaseScannerTask";
-import { Scanner } from "../types";
-import { modelProvider } from "../../../services/ModelProvider";
-import { licenseService } from "../../../services/LicenseService";
-import { rescanService } from "../../../services/RescanService";
-import { IDispatch } from "../dispatcher/IDispatch";
-import { IScannerInputAdapter } from "../adapter/IScannerInputAdapter";
- import { fileExists } from '../../../utils/utils';
+import { ScannerStage, ScanState } from '../../../../api/types';
+import { BaseScannerTask } from '../BaseScannerTask';
+import { Scanner } from '../types';
+import { modelProvider } from '../../../services/ModelProvider';
+import { licenseService } from '../../../services/LicenseService';
+import { rescanService } from '../../../services/RescanService';
+import { IDispatch } from '../dispatcher/IDispatch';
+import { IScannerInputAdapter } from '../adapter/IScannerInputAdapter';
+import { fileExists } from '../../../utils/utils';
 
-
-export abstract class RescanTask<TDispatcher extends IDispatch,TInputScannerAdapter extends IScannerInputAdapter> extends BaseScannerTask<TDispatcher,TInputScannerAdapter> {
-
+export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAdapter extends IScannerInputAdapter> extends BaseScannerTask<TDispatcher, TInputScannerAdapter> {
   public getStageProperties(): Scanner.StageProperties {
     return {
       name: ScannerStage.RESCAN,
@@ -44,8 +42,7 @@ export abstract class RescanTask<TDispatcher extends IDispatch,TInputScannerAdap
     const results = await rescanService.getNewResults();
     this.project.getTree().sync(results);
     this.project.metadata.setScannerState(ScanState.FINISHED);
-    log.info(`%c[ SCANNER ]: Re-scan finished `, 'color: green');
+    log.info('%c[ SCANNER ]: Re-scan finished ', 'color: green');
     this.project.save();
   }
-
 }
