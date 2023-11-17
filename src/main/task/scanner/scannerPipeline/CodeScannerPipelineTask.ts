@@ -47,7 +47,9 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
     if (metadata.getScannerConfig().type.includes(ScannerType.VULNERABILITIES)) this.queue.push(new VulnerabilitiesTask(project));
 
     // Cryptography
-    if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY)) && project.getGlobalApiKey()) this.queue.push(new CryptographyTask(project));
+    if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY)) && project.getGlobalApiKey()) {
+      this.queue.push(new CryptographyTask(project));
+    }
 
     // search index
     this.queue.push(new IndexTask(project));
