@@ -145,26 +145,14 @@ export class Querys {
     LEFT JOIN licenses lic ON lic.spdxid=i.spdxid
     LEFT JOIN dependencies dep ON cv.purl=dep.purl AND cv.version=dep.version;`;
 
-  SQL_GET_DETECTED_DATA = `
-SELECT DISTINCT
-	f.fileId,
-	(CASE WHEN r.idtype IS NOT NULL THEN r.idtype ELSE (CASE WHEN EXISTS (SELECT 1 FROM dependencies WHERE f.fileId = fileId) THEN 'dependency' ELSE NULL END) END) AS usage,
-	(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE dep.originalLicense END) AS identified_license,
-	(CASE WHEN rl.spdxid IS NOT NULL THEN rl.spdxid ELSE dep.originalLicense END) AS detected_license,
-	(CASE WHEN r.purl IS NOT NULL THEN r.purl ELSE dep.purl END) AS purl,
-	(CASE WHEN r.version IS NOT NULL THEN r.version ELSE dep.version END) AS version,
-	r.latest_version,
-	r.url,
-	(CASE WHEN f.path IS NOT NULL THEN f.path ELSE (SELECT f.path FROM files f WHERE f.fileId=dep.fileId) END) AS path,
-	(CASE WHEN r.component IS NOT NULL THEN r.component ELSE dep.component END) AS identified_component,
-	(CASE WHEN  r.component IS NOT NULL THEN r.component ELSE dep.component END) AS detected_component,
-	lic.fulltext,
-	lic.official
-FROM files f LEFT JOIN results r ON r.fileId=f.fileId
-LEFT JOIN result_license rl ON rl.resultId = r.id
-LEFT JOIN licenses lic ON lic.spdxid=rl.spdxid
-LEFT JOIN dependencies dep ON dep.fileId = f.fileId
-WHERE f.fileId IN (SELECT fileId FROM results) OR f.fileId IN (SELECT fileId FROM dependencies);`;
+  SQL_GET_DETECTED_DATA = `SELECT f.fileId, r.idtype as usage , rl.spdxid as identified_license, rl.spdxid as detected_license , r.purl, r.version , r.latest_version, r.url,
+f.path , r.component as identified_compoenent, r.component as detected_component, lic.fulltext, lic.official
+FROM files f INNER JOIN results r ON r.fileId = f.fileId LEFT JOIN result_license rl ON rl.resultid = r.id LEFT JOIN licenses lic ON lic.spdxid = rl.spdxid
+UNION
+SELECT f.fileId, 'dependency' as usage ,CASE WHEN INSTR(dep.originalLicense, ',') > 0 THEN REPLACE(dep.originalLicense, ',', ' AND ') ELSE dep.originalLicense END AS identified_license, CASE WHEN INSTR(dep.originalLicense, ',') > 0 THEN REPLACE(dep.originalLicense, ',', ' AND ') ELSE dep.originalLicense END AS detected_license,
+dep.purl, dep.originalVersion, dep.version as latest_version , NULL as url, f.path, dep.component as identified_component, dep.component as detected_component, lic.fulltext, lic.official
+FROM files f INNER JOIN dependencies dep ON f.fileId  = dep.fileId
+LEFT JOIN licenses lic ON lic.spdxid = detected_license;`;
 
   SQL_GET_SUMMARY_BY_PURL_VERSION = 'SELECT identified,pending,ignored FROM summary WHERE purl=? AND version=?;';
 
