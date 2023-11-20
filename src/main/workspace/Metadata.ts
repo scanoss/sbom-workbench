@@ -37,16 +37,13 @@ export class Metadata {
 
   constructor(name: string) {
     this.name = name;
-    this.appVersion =
-      app.isPackaged === true ? app.getVersion() : packageJson.version;
+    this.appVersion = app.isPackaged === true ? app.getVersion() : packageJson.version;
     this.date = new Date().toISOString();
     this.uuid = uuidv4();
   }
 
   public static async readFromPath(pathToProject: string): Promise<Metadata> {
-    const data: Metadata = JSON.parse(
-      await fs.promises.readFile(`${pathToProject}/metadata.json`, 'utf8')
-    );
+    const data: Metadata = JSON.parse(await fs.promises.readFile(`${pathToProject}/metadata.json`, 'utf8'));
     return Object.assign(Object.create(Metadata.prototype), data);
   }
 
@@ -69,6 +66,10 @@ export class Metadata {
 
   public setDate(date: string) {
     this.date = date;
+  }
+
+  public getDate(): string {
+    return this.date;
   }
 
   public setMyPath(workRoot: string) {
