@@ -1,30 +1,53 @@
 import { ComponentDataLayer, DataProvider, IDataLayers } from 'scanoss';
 import { modelProvider } from '../../../services/ModelProvider';
-import { Config, transformData } from '../../../utils/TransformData';
 
 export class IdentifiedComponentDataProvider implements DataProvider {
   async getData(): Promise<IDataLayers> {
-    const query = await modelProvider.model.component.getIdentifiedForReport();
+    const query = await modelProvider.model.component.getComponentsIdentifiedForReport();
+    const componentsMap: { [key: string]: ComponentDataLayer } = {};
 
-    const config: Config = {
-      key: 'purl',
-      rename: 'key',
-      properties: ['name', 'vendor', 'url'], // Direct properties of ComponentDataLayer
-      child: {
-        key: 'version',
-        rename: 'versions',
-        properties: ['version', 'license'], // Properties at the Version level
-        additionalKeys: [
-          {
-            name: 'cryptography',
-            properties: ['algorithm', 'strength'], // Properties at the Cryptography level
-          },
-        ],
-      },
-    };
+    query.forEach((item) => {
+      const key = item.purl; // Assuming purl[0] is used as the key
+
+      if (!componentsMap[key]) {
+        componentsMap[key] = {
+          key,
+          purls: [],
+          name: item.name,
+          vendor: item.vendor,
+          url: item.url,
+          versions: [],
+          health: null, // Layer not available on Identified Stage
+        };
+      }
+
+      const versionIndex = componentsMap[key].versions.findIndex((v) => v.version === item.version);
+      if (versionIndex >= 0) {
+        const version = componentsMap[key].versions[versionIndex];
+        if (!version.licenses.includes(item.spdxid)) {
+          version.licenses.push(item.spdxid);
+        }
+        if (item.algorithms) {
+          if (!version.cryptography) version.cryptography = [];
+          version.cryptography.push(...item.algorithms);
+        }
+      } else {
+        componentsMap[key].versions.push({
+          version: item.version,
+          licenses: [item.license],
+          cryptography: item.algorithms ? item.algorithms : null,
+          copyrights: null,
+          quality: null,
+        });
+      }
+
+      if (!componentsMap[key].purls.includes(item.purl)) {
+        componentsMap[key].purls.push(item.purl);
+      }
+    });
 
     return <IDataLayers>{
-      component: transformData(query, config) as unknown as ComponentDataLayer[],
+      component: Object.values(componentsMap) as unknown as ComponentDataLayer[],
     };
   }
 

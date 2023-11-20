@@ -213,25 +213,46 @@ export class ComponentModel extends Model {
     });
   }
 
-  public async getIdentifiedForReport() {
+  public async getComponentsIdentifiedForReport() {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const report =
-      (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, json_extract(value, '$.algorithm') AS algorithm, json_extract(value, '$.strength') AS strength
+    const query =
+      (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms
         FROM component_versions c
         INNER JOIN inventories i ON c.id=i.cvid
-        INNER JOIN licenses l ON l.spdxid=i.spdxid
+        LEFT JOIN licenses l ON l.spdxid=i.spdxid
 		LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
-		LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version
-		LEFT JOIN json_each(crypt.algorithms) je ON 1 = 1;`)) as Array<{
+		LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version;`)) as Array<{
         purl: string;
         name: string;
         vendor: string;
         url: string;
         version: string;
         license: string;
-        algorithm: string;
-        strength: string;
+        spdxid: string;
+        algorithms: { algorithm: string; strength: string }[] | null;
+      }>;
+    db.close();
+    return query.map((item) => ({ ...item, algorithms: JSON.parse(item.algorithms) }));
+  }
+
+  public async getIdentifiedForReport() {
+    const db = await this.openDb();
+    const call = util.promisify(db.all.bind(db));
+    const report =
+      (await call(`SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name, l.spdxid, r.vendor
+        FROM component_versions c
+        INNER JOIN inventories i ON c.id=i.cvid
+        LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
+        INNER JOIN licenses l ON l.spdxid=i.spdxid ORDER BY i.spdxid;`)) as Array<{
+        id: string;
+        comp_name: string;
+        version: string;
+        purl: string;
+        url: string;
+        license_name: string;
+        spdxid: string;
+        vendor: string;
       }>;
     db.close();
     return report;

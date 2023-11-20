@@ -26,19 +26,36 @@ export class DependencyModel extends Model {
     const call = util.promisify(db.run.bind(db));
     const promises = [];
     dependencies.forEach((d) => {
-      promises.push(call(
-        query.SQL_DEPENDENCIES_INSERT,
-        d.fileId,
-        d.purl ? decodeURIComponent(d.purl) : null,
-        d.version ? d.version : null,
-        d.scope ? d.scope : null,
-        d.licenses.length > 0 ? d.licenses.join(',') : null,
-        d.component,
-        d.version ? d.version : null,
-        d.originalLicense.length > 0 ? d.originalLicense.join(',') : null));
+      promises.push(
+        call(
+          query.SQL_DEPENDENCIES_INSERT,
+          d.fileId,
+          d.purl ? decodeURIComponent(d.purl) : null,
+          d.version ? d.version : null,
+          d.scope ? d.scope : null,
+          d.licenses.length > 0 ? d.licenses.join(',') : null,
+          d.component,
+          d.version ? d.version : null,
+          d.originalLicense.length > 0 ? d.originalLicense.join(',') : null
+        )
+      );
     });
     await Promise.all(promises);
     db.close();
+  }
+  public async getIdentifiedDependencies() {
+    const db = await this.openDb();
+    const query = new Querys().SQL_ALL_IDENTIFIED_DEPENDENCIES;
+    const call = await util.promisify(db.all.bind(db));
+    const response = (await call(query)) as Array<{
+      file: string;
+      component: string;
+      purl: string;
+      version: string;
+      licenses: string;
+    }>;
+    db.close();
+    return response;
   }
 
   public async getAll(queryBuilder: QueryBuilder): Promise<Array<Dependency>> {
@@ -50,26 +67,26 @@ export class DependencyModel extends Model {
     dependencies.forEach((d) => {
       if (d.licenses) d.licenses = d.licenses.split(/;|\//g);
       else d.licenses = [];
-      if (d.originalLicense)
-        d.originalLicense = d.originalLicense.split(/;|\//g);
+      if (d.originalLicense) d.originalLicense = d.originalLicense.split(/;|\//g);
     });
     return dependencies;
   }
 
-  public async update(dependency: Array<any>):Promise<void> {
+  public async update(dependency: Array<any>): Promise<void> {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
-    await call(`UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?;`,
-      ...dependency);
+    await call(
+      `UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?;`,
+      ...dependency
+    );
     db.close();
   }
 
   public async deleteDirty(data: Record<string, string>): Promise<void> {
-    const SQLquery = query.SQL_DELETE_DIRTY_DEPENDENCIES.replace(
-      '#PURLS',
-      data.purls
-    )
-      .replace('#VERSIONS', data.versions)
+    const SQLquery = query.SQL_DELETE_DIRTY_DEPENDENCIES.replace('#PURLS', data.purls).replace(
+      '#VERSIONS',
+      data.versions
+    );
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
     await call(SQLquery);
@@ -79,7 +96,9 @@ export class DependencyModel extends Model {
   public async getDependenciesFiles(): Promise<Array<Record<string, string>>> {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const dependencyFiles = await call('SELECT DISTINCT f.path FROM files f INNER JOIN dependencies d ON d.fileId=f.fileId;');
+    const dependencyFiles = await call(
+      'SELECT DISTINCT f.path FROM files f INNER JOIN dependencies d ON d.fileId=f.fileId;'
+    );
     db.close();
     return dependencyFiles;
   }
