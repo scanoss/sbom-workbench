@@ -130,7 +130,12 @@ class ReportService {
       licenses = this.mergeLicenseData(licenses, dependencies);
       if (licenses) this.checkForIncompatibilities(licenses);
 
-      return { licenses, crypto, vulnerabilities: vulnerabilityReport };
+      // Dependencies
+      const dependenciesSummary = await modelProvider.model.dependency.getDetectedSummary();
+
+      return {
+        licenses, crypto, vulnerabilities: vulnerabilityReport, dependencies: dependenciesSummary,
+      };
     } catch (e) {
       return { status: 'fail' };
     }
