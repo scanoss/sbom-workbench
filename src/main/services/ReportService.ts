@@ -103,7 +103,12 @@ class ReportService {
     // Crypto
     const crypto = await modelProvider.model.cryptography.findAllIdentifiedMatched();
 
-    return { licenses, vulnerabilities: vulnerabilityReport, crypto };
+    // Dependencies
+    const dependenciesSummary = await modelProvider.model.dependency.getIdentifiedSummary();
+
+    return {
+      licenses, vulnerabilities: vulnerabilityReport, crypto, dependencies: dependenciesSummary,
+    };
   }
 
   public async getDetected() {
