@@ -39,12 +39,24 @@ export class CodeScannerInputAdapter implements IScannerInputAdapter {
     // Allows to ignore a list of components from a SBOM place in the root folder
     const rootFolder = project.getTree().getRootFolder();
     const rootPath = project.getScanRoot();
-    if (rootFolder.containsFile('scanoss-ignore.json')) {
-      const sbom = fs.readFileSync(`${rootPath}/scanoss-ignore.json`, 'utf-8');
 
+    let sbom = '';
+    let sbomMode = SbomMode.SBOM_IDENTIFY;
+
+    if (rootFolder.containsFile('scanoss-ignore.json')) {
+      sbom = fs.readFileSync(`${rootPath}/scanoss-ignore.json`, 'utf-8');
+      sbomMode = SbomMode.SBOM_IGNORE;
+    }
+
+    if (rootFolder.containsFile('scanoss-identify.json')) {
+      sbom = fs.readFileSync(`${rootPath}/scanoss-identify.json`, 'utf-8');
+      sbomMode = SbomMode.SBOM_IDENTIFY;
+    }
+
+    if (sbom.length) {
       result.forEach((_, index, arr) => {
         arr[index].sbom = sbom;
-        arr[index].sbomMode = SbomMode.SBOM_IGNORE;
+        arr[index].sbomMode = sbomMode;
       });
     }
     return result;
