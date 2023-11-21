@@ -21,6 +21,8 @@ import OssVsOriginalProgressBar from '../../components/OssVsOriginalProgressBar'
 import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 import { Scanner } from '../../../../../../../main/task/scanner/types';
 import CryptographyDataTable from '../../components/CryptographyDataTable';
+import DependenciesCard from '../../components/DependenciesCard';
+import DependenciesDataTable from '../../components/DependenciesDataTable';
 
 Chart.register(...registerables);
 
@@ -106,16 +108,13 @@ const IdentifiedReport = ({ data }) => {
         )}
       </Card>
 
-      <Card className={`report-item dependencies ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
-        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={false} className="w-100">
-          <div className="report-title d-flex space-between align-center">
-            <span>{t('Title:DeclaredDependencies')}</span>
-            <div className="action">
-              <ArrowForwardOutlinedIcon fontSize="inherit" />
-            </div>
-          </div>
-          <p className="text-center mb-5 mt-5">{t('NoDependenciesScanned')}</p>
-        </ConditionalLink>
+      <Card onClick={e => setTab('dependencies')} className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
+        <div className="report-title d-flex space-between align-center">
+          <span>{t('Title:DeclaredDependencies')}</span>
+        </div>
+        { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
+          ? <DependenciesCard data={data.dependencies} />
+          : <p className="text-center mb-5 mt-5">{t('NoDependenciesScanned')}</p>}
       </Card>
 
       <Card className={`report-item vulnerabilities ${layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? 'no-blocked' : 'blocked'}`}>
@@ -159,6 +158,12 @@ const IdentifiedReport = ({ data }) => {
           ) : (
             <p className="report-empty">{t('Title:NoMatchesFound')}</p>
           )}
+        </Card>
+      )}
+
+      {tab === 'dependencies' && (
+        <Card className="report-item dependencies-table pt-1 mt-0">
+          <DependenciesDataTable data={data.dependencies} />
         </Card>
       )}
 

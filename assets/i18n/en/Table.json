@@ -18,7 +18,9 @@
     "URL": "URL",
     "LocalFile": "Local File",
     "Algorithms": "Algorithms",
-    "Strength ": "Strength"
+    "Strength ": "Strength",
+    "File ": "File",
+    "Dependencies ": "Dependencies"
   },
   "Version": "Version",
   "License": "License"

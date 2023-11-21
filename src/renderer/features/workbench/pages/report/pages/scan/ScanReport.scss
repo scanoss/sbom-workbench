@@ -56,12 +56,12 @@
     .tabs-navigator {
       grid-area: C;
     }
-    .licenses-obligation, .matches-for-license, .cryptography {
+    .licenses-obligation, .matches-for-license, .cryptography, .dependencies-table {
       grid-area: D;
     }
 
     &.detected {
-      grid-template-rows: 115px 115px auto 600px;
+      grid-template-rows: 110px 110px auto 600px;
 
       grid-template-areas:
         'A1 A2 A2'
@@ -76,7 +76,7 @@
     }
 
     &.identified {
-      grid-template-rows: 115px 115px 115px auto 600px;
+      grid-template-rows: 110px 110px 110px auto 600px;
 
       grid-template-areas:
       'Z1 Z1 Z1'
@@ -102,6 +102,10 @@
       &.blocked {
         opacity: 0.5;
         pointer-events: none;
+      }
+
+      &.more-details {
+        cursor: pointer;
       }
 
       .report-title {
@@ -411,7 +415,6 @@
       font-size: 12px;
       font-weight: 500;
       color: black;
-
     }
 
     &.critical .vulnerability-number {
@@ -471,4 +474,32 @@
 
 #OssProgress .total-files-container {
   margin-top: 10px;
+}
+
+
+#DependenciesCard {
+  .item {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    min-width: 50px;
+
+    .number {
+      font-weight: 500;
+      font-size: 42px;
+      line-height: 42px;
+      color: var(--color-primary);
+    }
+
+    .label {
+      font-size: 12px;
+      font-weight: 500;
+      color: black;
+    }
+  }
+}
+
+
+.fa.fa-dependency-file:before {
+  content: '\f1b3',
 }
