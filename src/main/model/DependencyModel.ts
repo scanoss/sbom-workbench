@@ -66,9 +66,9 @@ export class DependencyModel extends Model {
     const dependencies = await call(SQLquery.SQL, ...SQLquery.params);
     db.close();
     dependencies.forEach((d) => {
-      if (d.licenses) d.licenses = d.licenses.split(/;|\//g);
+      if (d.licenses) d.licenses = d.licenses.split(',');
       else d.licenses = [];
-      if (d.originalLicense) d.originalLicense = d.originalLicense.split(/;|\//g);
+      if (d.originalLicense) d.originalLicense = d.originalLicense.split(',');
     });
     return dependencies;
   }
