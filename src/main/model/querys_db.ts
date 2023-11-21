@@ -249,6 +249,15 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version
   LEFT JOIN inventories i ON cv.id = i.cvid AND i.source='declared' AND instr(d.licenses, i.spdxid)>0;`;
 
+  SQL_DEPENDENCY_IDENTIFIED_SUMMARY_BY_FILE_PATH = `SELECT f.path, count(*) as total FROM dependencies d
+    INNER JOIN component_versions cv ON d.purl = cv.purl AND d.version = cv.version AND d.component = cv.name
+    INNER JOIN inventories i ON cv.id = i.cvid
+    INNER JOIN files f ON d.fileId = f.fileId
+    WHERE i.usage = 'dependency'
+    GROUP BY f.path;`;
+
+  SQL_DEPENDENCY_TOTAL_IDENTIFIED = `SELECT count(*) as total FROM inventories i WHERE i.usage = 'dependency';`;
+
   // VULNERABILITIES
 
   SQL_GET_ALL_IDENTIFIED_VULNERABILITIES = `SELECT * FROM vulnerability v
