@@ -7,18 +7,9 @@ import {
   TableHeaderProps,
 } from 'react-virtualized';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
-  table: {
-    minWidth: 400,
-
-    '& .MuiTableHead-root .MuiTableCell-root': {
-      backgroundColor: 'transparent !important',
-    },
-  },
-  tableCell: {
-    padding: '0px 35px',
-  },
   headerColumn: {
     fontWeight: 600,
     fontSize: '0.875rem',
@@ -35,18 +26,38 @@ const useStyles = makeStyles({
     fontSize: '0.75rem',
     borderBottom: '1px solid rgba(224, 224, 224, 1)',
     color: 'rgba(0, 0, 0, 0.87)',
+
+    '& .table-cell': {
+      cursor: 'pointer',
+    },
+
+    '& .file': {
+      marginBottom: 2,
+    },
+
+    '&:hover .file': {
+      textDecoration: 'underline',
+    },
   },
 
 });
 
 const DependenciesDataTable = ({ data }) => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const items = useRef<any[]>([]);
 
   const init = () => {
-    items.current = data;
+    items.current = data.files;
+  };
+
+  const onClickHandler = (path) => {
+    navigate({
+      pathname: '/workbench/detected/file',
+      search: `?path=file|${encodeURIComponent(path)}`,
+    });
   };
 
   useEffect(init, []);
@@ -62,26 +73,29 @@ const DependenciesDataTable = ({ data }) => {
         <Table
           height={height}
           width={width}
-          rowHeight={28}
+          rowHeight={38}
           headerHeight={40}
           rowCount={items.current.length}
           rowGetter={({ index }) => items.current[index]}
           headerClassName={classes.headerColumn}
           rowClassName={classes.row}
         >
-          <Column label={t('Table:Header:PURL')} dataKey="purl" width={350} flexGrow={0} flexShrink={0} />
-          <Column label={t('Table:Header:Version')} dataKey="version" width={100} flexGrow={0} flexShrink={0} />
+
           <Column
-            label={t('Table:Header:Algorithms')}
-            dataKey="algorithms"
+            label={t('Table:Header:File')}
+            dataKey="component"
             width={500}
-            flexGrow={0}
+            flexGrow={10}
             flexShrink={0}
-            cellRenderer={({ cellData }) => cellData.map((algorithm) => (
-              <span>
-                {algorithm.algorithm} ({algorithm.strength}) - {' '}
-              </span>
-            ))}
+            cellRenderer={({ rowData }) => (
+              <div className="table-cell" onClick={e => onClickHandler(rowData.path)}>
+                <i className="fa fa-dependency-file mr-2"/>
+                <div className="d-flex flex-column">
+                  <span className="file">{rowData.path}</span>
+                  <span className="label small">{rowData.total} dependencies found</span>
+                </div>
+              </div>
+            )}
           />
         </Table>
       )}
