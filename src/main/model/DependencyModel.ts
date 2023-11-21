@@ -36,13 +36,14 @@ export class DependencyModel extends Model {
           d.licenses.length > 0 ? d.licenses.join(',') : null,
           d.component,
           d.version ? d.version : null,
-          d.originalLicense.length > 0 ? d.originalLicense.join(',') : null
-        )
+          d.originalLicense.length > 0 ? d.originalLicense.join(',') : null,
+        ),
       );
     });
     await Promise.all(promises);
     db.close();
   }
+
   public async getIdentifiedDependencies() {
     const db = await this.openDb();
     const query = new Querys().SQL_ALL_IDENTIFIED_DEPENDENCIES;
@@ -76,8 +77,8 @@ export class DependencyModel extends Model {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
     await call(
-      `UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?;`,
-      ...dependency
+      'UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?;',
+      ...dependency,
     );
     db.close();
   }
@@ -85,7 +86,7 @@ export class DependencyModel extends Model {
   public async deleteDirty(data: Record<string, string>): Promise<void> {
     const SQLquery = query.SQL_DELETE_DIRTY_DEPENDENCIES.replace('#PURLS', data.purls).replace(
       '#VERSIONS',
-      data.versions
+      data.versions,
     );
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
@@ -97,7 +98,7 @@ export class DependencyModel extends Model {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
     const dependencyFiles = await call(
-      'SELECT DISTINCT f.path FROM files f INNER JOIN dependencies d ON d.fileId=f.fileId;'
+      'SELECT DISTINCT f.path FROM files f INNER JOIN dependencies d ON d.fileId=f.fileId;',
     );
     db.close();
     return dependencyFiles;
@@ -113,5 +114,15 @@ export class DependencyModel extends Model {
 
   public getEntityMapper(): Record<string, string> {
     return DependencyModel.entityMapper;
+  }
+
+  public async getIdentifiedSummary() {
+    const db = await this.openDb();
+    const call = util.promisify(db.all.bind(db));
+    const files = await call(query.SQL_DEPENDENCY_IDENTIFIED_SUMMARY_BY_FILE_PATH);
+    const callTotal = util.promisify(db.get.bind(db));
+    const totalIdentifiedDependencies = await callTotal(query.SQL_DEPENDENCY_TOTAL_IDENTIFIED);
+    await db.close();
+    return { files, total: totalIdentifiedDependencies.total };
   }
 }
