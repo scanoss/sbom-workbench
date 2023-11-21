@@ -18,6 +18,8 @@ import LicensesObligations from '../../components/LicensesObligations';
 import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 import { Scanner } from '../../../../../../../main/task/scanner/types';
 import CryptographyDataTable from '../../components/CryptographyDataTable';
+import DependenciesCard from '../../components/DependenciesCard';
+import DependenciesDataTable from '../../components/DependenciesDataTable';
 
 Chart.register(...registerables);
 
@@ -34,6 +36,7 @@ const DetectedReport = ({ data }) => {
   const [obligations, setObligations] = useState(null);
 
   const init = async () => {
+    console.log(data.licenses);
     const licenses = data.licenses.map((license) => license.label);
     const obligations = await obligationsService.getObligations(licenses);
     setObligations(obligations);
@@ -80,16 +83,13 @@ const DetectedReport = ({ data }) => {
         <MatchesChart data={data.summary} />
       </Card>
 
-      <Card className={`report-item dependencies ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
-        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={false} className="w-100">
-          <div className="report-title d-flex space-between align-center">
-            <span>{t('Title:DeclaredDependencies')}</span>
-            <div className="action">
-              <ArrowForwardOutlinedIcon fontSize="inherit" />
-            </div>
-          </div>
-          <p className="text-center mb-5 mt-5">{t('NoDependenciesScanned')}</p>
-        </ConditionalLink>
+      <Card onClick={e => setTab('dependencies')} className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
+        <div className="report-title d-flex space-between align-center">
+          <span>{t('Title:DeclaredDependencies')}</span>
+        </div>
+        { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
+          ? <DependenciesCard data={data.dependencies} />
+          : <p className="text-center mb-5 mt-5">{t('NoDependenciesScanned')}</p>}
       </Card>
 
       <Card className={`report-item vulnerabilities ${layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? 'no-blocked' : 'blocked'}`}>
@@ -108,7 +108,7 @@ const DetectedReport = ({ data }) => {
 
       <Tabs value={tab} onChange={(e, value) => setTab(value)} className="tabs-navigator">
         <Tab value="matches" label="Components matched" />
-        { layers.current.has(Scanner.ScannerType.VULNERABILITIES) && <Tab value="dependencies" label="Declared dependencies" />}
+        { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="dependencies" label="Declared dependencies" />}
         {/* <Tab value="vulnerabilities" label="Vulnerabilities" /> */}
         <Tab value="obligations" label="Licenses obligations" />
         { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label="Cryptography" />}
@@ -133,6 +133,12 @@ const DetectedReport = ({ data }) => {
           ) : (
             <p className="report-empty">{t('Title:NoMatchesFound')}</p>
           )}
+        </Card>
+      )}
+
+      {tab === 'dependencies' && (
+        <Card className="report-item dependencies-table pt-1 mt-0">
+          <DependenciesDataTable data={data.dependencies} />
         </Card>
       )}
 
