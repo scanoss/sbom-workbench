@@ -121,8 +121,18 @@ export class DependencyModel extends Model {
     const call = util.promisify(db.all.bind(db));
     const files = await call(query.SQL_DEPENDENCY_IDENTIFIED_SUMMARY_BY_FILE_PATH);
     const callTotal = util.promisify(db.get.bind(db));
-    const totalIdentifiedDependencies = await callTotal(query.SQL_DEPENDENCY_TOTAL_IDENTIFIED);
+    const totalIdentified = await callTotal(query.SQL_DEPENDENCY_TOTAL_IDENTIFIED);
     await db.close();
-    return { files, total: totalIdentifiedDependencies.total };
+    return { files, total: totalIdentified.total };
+  }
+
+  public async getDetectedSummary() {
+    const db = await this.openDb();
+    const call = util.promisify(db.all.bind(db));
+    const files = await call(query.SQL_DEPENDENCY_DETECTED_SUMMARY_BY_FILE_PATH);
+    const callTotal = util.promisify(db.get.bind(db));
+    const totalDetected = await callTotal(query.SQL_DEPENDENCY_TOTAL_DETECTED);
+    await db.close();
+    return { files, total: totalDetected.total };
   }
 }
