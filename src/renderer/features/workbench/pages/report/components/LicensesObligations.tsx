@@ -16,10 +16,12 @@ const useStyles = makeStyles({
 
     '& .MuiTableHead-root .MuiTableCell-root': {
       backgroundColor: 'transparent !important',
+      padding: 8,
     },
   },
   tableCell: {
     padding: '0px 35px',
+    fontSize: 10,
   },
 });
 

@@ -63,8 +63,12 @@ const DependenciesDataTable = ({ data }) => {
   useEffect(init, []);
 
   // empty
-  if (!data || data.length === 0) {
-    return <p className="text-center mt-5 mb-3">{t('NoData')}</p>;
+  if (!data.files || data.files.length === 0) {
+    return (
+      <div className="empty-table">
+        <p className="text-center mt-5 mb-3">{t('NoDataFound')}</p>
+      </div>
+    );
   }
 
   return (
@@ -80,7 +84,6 @@ const DependenciesDataTable = ({ data }) => {
           headerClassName={classes.headerColumn}
           rowClassName={classes.row}
         >
-
           <Column
             label={t('Table:Header:File')}
             dataKey="component"
@@ -88,8 +91,8 @@ const DependenciesDataTable = ({ data }) => {
             flexGrow={10}
             flexShrink={0}
             cellRenderer={({ rowData }) => (
-              <div className="table-cell" onClick={e => onClickHandler(rowData.path)}>
-                <i className="fa fa-dependency-file mr-2"/>
+              <div className="table-cell" onClick={(e) => onClickHandler(rowData.path)}>
+                <i className="fa fa-dependency-file mr-2" />
                 <div className="d-flex flex-column">
                   <span className="file">{rowData.path}</span>
                   <span className="label small">{rowData.total} dependencies found</span>

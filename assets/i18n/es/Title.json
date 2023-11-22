@@ -69,5 +69,7 @@
   "SelectProject": "Seleccionar proyecto",
   "PreviewIdentifications": "Previsualizar identificaciones",
   "ImportingIdentifications": "Importar identificaciones",
-  "ImportFromProjects": "Importar desde proyectos"
+  "ImportFromProjects": "Importar desde proyectos",
+  "MatchesForProject": "Coincidencias ({{count}})",
+  "IdentifiedDependencies": "Dependencias identificadas"
 }

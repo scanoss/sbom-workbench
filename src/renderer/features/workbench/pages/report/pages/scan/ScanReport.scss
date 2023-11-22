@@ -58,6 +58,7 @@
     }
     .licenses-obligation, .matches-for-license, .cryptography, .dependencies-table {
       grid-area: D;
+
     }
 
     &.detected {
@@ -213,7 +214,8 @@
 
     .tableRowLicense {
       .MuiTableCell-root {
-        padding: 8px 16px;
+        padding: 4px 8px;
+        font-size: 12px;
       }
 
       .tableCellForLicensePill {
@@ -502,4 +504,9 @@
 
 .fa.fa-dependency-file:before {
   content: '\f1b3',
+}
+
+.empty-table {
+  margin-top: 100px;
+  text-align: center;
 }

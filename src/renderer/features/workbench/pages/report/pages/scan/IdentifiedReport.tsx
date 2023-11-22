@@ -110,7 +110,7 @@ const IdentifiedReport = ({ data }) => {
 
       <Card onClick={e => setTab('dependencies')} className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
         <div className="report-title d-flex space-between align-center">
-          <span>{t('Title:DeclaredDependencies')}</span>
+          <span>{t('Title:IdentifiedDependencies')}</span>
         </div>
         { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
           ? <DependenciesCard data={data.dependencies} />
@@ -132,11 +132,10 @@ const IdentifiedReport = ({ data }) => {
       </Card>
 
       <Tabs value={tab} onChange={(e, value) => setTab(value)} className="tabs-navigator">
-        <Tab value="matches" label="Components matched" />
-        { layers.current.has(Scanner.ScannerType.VULNERABILITIES) && <Tab value="dependencies" label="Declared dependencies" />}
-        {/* <Tab value="vulnerabilities" label="Vulnerabilities" /> */}
-        <Tab value="obligations" label="Licenses obligations" />
-        { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label="Cryptography" />}
+        <Tab value="matches" label={t('Title:MatchedTab')} />
+        { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="dependencies" label={t('Title:IdentifiedDependenciesTab')} />}
+        <Tab value="obligations" label={t('Title:ObligationsTab')} />
+        { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label={t('Title:CryptographyTab')} />}
       </Tabs>
 
       {tab === 'matches' && (

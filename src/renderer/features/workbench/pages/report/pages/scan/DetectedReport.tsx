@@ -20,6 +20,7 @@ import { Scanner } from '../../../../../../../main/task/scanner/types';
 import CryptographyDataTable from '../../components/CryptographyDataTable';
 import DependenciesCard from '../../components/DependenciesCard';
 import DependenciesDataTable from '../../components/DependenciesDataTable';
+import ObligationsDataTable from '../../components/ObligationsDataTable';
 
 Chart.register(...registerables);
 
@@ -36,7 +37,6 @@ const DetectedReport = ({ data }) => {
   const [obligations, setObligations] = useState(null);
 
   const init = async () => {
-    console.log(data.licenses);
     const licenses = data.licenses.map((license) => license.label);
     const obligations = await obligationsService.getObligations(licenses);
     setObligations(obligations);
@@ -107,11 +107,10 @@ const DetectedReport = ({ data }) => {
       </Card>
 
       <Tabs value={tab} onChange={(e, value) => setTab(value)} className="tabs-navigator">
-        <Tab value="matches" label="Components matched" />
-        { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="dependencies" label="Declared dependencies" />}
-        {/* <Tab value="vulnerabilities" label="Vulnerabilities" /> */}
-        <Tab value="obligations" label="Licenses obligations" />
-        { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label="Cryptography" />}
+        <Tab value="matches" label={t('Title:MatchedTab')} />
+        { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="dependencies" label={t('Title:DeclaredDependenciesTab')} />}
+        <Tab value="obligations" label={t('Title:ObligationsTab')} />
+        { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label={t('Title:CryptographyTab')} />}
       </Tabs>
 
       {tab === 'matches' && (

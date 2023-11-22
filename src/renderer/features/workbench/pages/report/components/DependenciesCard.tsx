@@ -10,9 +10,9 @@ const DependenciesCard = ({ data }) => (
           {data.total || ' - '}
         </span>
         <span className="label">
-          {data.files
-            ? (<>dependencies found in {data.files?.length} manifest files</>)
-            : (<>no manifest files found</>)}
+          {data.files?.length > 0
+            ? (<>found in {data.files?.length} manifest files</>)
+            : (<>No manifest files found</>)}
         </span>
       </div>
     </section>
