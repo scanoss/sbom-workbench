@@ -2,773 +2,1194 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <title>Report</title>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" rel="stylesheet">
+  <title>SCANOSS Detected Report</title>
 </head>
 
 <style>
-    body {
-        background-color: #f5f5f5a1;
-    }
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
-    header {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+  :root {
+    --primary: #6366F1;
+    --dark: #18181B;
+    --bg-color: rgba(241, 245, 249, 1);
+  }
 
-    }
+  body {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--bg-color);
+    color: var(--dark);
+    font-family: 'Space Grotesk', sans-serif;
+  }
 
-    h1 {
-        margin-top: 1%;
-        margin-bottom: 1%;
-        text-align: center;
-    }
 
-    h3 {
-        margin-top: 1%;
-        text-align: center;
-    }
+  .nav-link {
+    display: none;
+  }
 
-    .identification-progress-title {
-        margin-top: 1.2%
-    }
+  .nav-link.visible {
+    display: inline-block;
+  }
 
-    .divider {
-        border-bottom: 1px solid #b5b5b5ab;
-        text-align: center;
-        width: 90%;
-    }
+  header {
+    display: flex;
+    flex-direction: column;
+  }
 
-    .main-container {
-        width: 100%;
-        height: 800px;
-        margin-top: 1%;
-    }
+  footer {
+    font-size: 12px;
+    color: gray;
+  }
 
-    .progress-bar-container {
-        margin-top: 1%;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 2%;
-    }
+  .header-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 16px;
+  }
 
-    .main-content-info-container {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 700px;
-        padding-bottom: 4%;
-        padding-top: 7%;
-    }
+  .project-name-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+  }
 
-    .main-container-left {
-        display: flex;
-        flex-direction: column;
-        width: 45%;
-        height: 700px;
-    }
+  .header-title img {
+    height: 55px;
+  }
 
-    .main-container-right {
-        display: flex;
-        flex-direction: column;
-        width: 55%;
-        height: 700px;
-        border-left: 1px solid #e7e6e6ab;
-    }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    color: #656df1;
+    font-weight: 400;
+  }
 
-    .license-table-container {
-        width: 100%;
-        height: 700px;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: flex-start;
-        padding-left: 4%;
-        padding-right: 7%;
-    }
+  .primary {
+    color: var(--primary) !important;
+  }
 
-    .pie-chart-container {
-        width: 100%;
-        height: 330px;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        padding-top: 5px;
-        padding-bottom: 5px;
+  #date {
+    margin-top: 0;
+    color: darkgray;
+    font-size: 14px;
+  }
 
-    }
+  .divider {
+    border-bottom: 1px solid rgba(228, 228, 231, 1);
+    margin: 10px 0;
+  }
 
-    .table td,
-    .table th {
-        padding: 0.15rem;
-        text-align: center;
-        vertical-align: middle;
-    }
+  .divider.big {
+    margin: 25px 0;
+  }
 
-    table {
-        width: 100%;
-    }
+  .text-center {
+    text-align: center;
+  }
 
-    th {
-        font-size: 13px;
-    }
+  .main-container {
+    width: 100%;
+  }
 
-    tr {
-        font-size: 11px;
-    }
+  .scan-summary {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
 
-    .colour-ref-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-    }
+  .license-table-container {
+    width: 100%;
+    height: 700px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: 4%;
+    padding-right: 7%;
+  }
 
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: rgb(105 101 101 / 5%);
-    }
+  .pie-chart-container {
+    margin: 0 auto;
+  }
 
-    #myChart {
-        width: 235px;
-    }
 
-    .button-solid {
-        border: none;
-        background-color: rgb(105 101 101 / 5%);
-        color: rgb(104, 180, 250);
-        font-weight: bold;
-    }
+  .section__license-obligation {
+    display: none;
+  }
 
-    #drop-down-license-detail-btn {
-        display: block;
-        border: none;
-        width: 100%;
-        background-color: rgb(226 226 226);
-    }
+  .visible--block {
+    display: block;
+  }
 
-    .button-solid:focus,
-    #drop-down-license-detail-btn:focus {
-        border: none;
-        outline: none;
-    }
+  .incompatible-license-table td:first-child {
+    text-align: left;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: var(--dark);
+  }
 
-    .show {
-        display: table-cell;
-        border-top: 0;
-    }
+  .incompatible-license-table th {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 23px;
+    color: #A1A1AA;
+    border-color: #E4E4E7;
+  }
 
-    td.show {
-        border-top: 1px solid white;
-        padding: 0;
-    }
+  .incompatible-license-table th:first-child {
+    text-align: left;
+  }
 
-    .hide {
-        display: none;
-    }
+  .table td,
+  .table th {
+    padding: 0.15rem;
+    text-align: center;
+    vertical-align: middle;
+  }
 
-    .component-row {
-        width: 100%;
-    }
+  table {
+    width: 100%;
+  }
 
-    .license-ref-container {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly;
-        align-items: center;
-        flex-flow: nowrap;
-        width: 100%;
-    }
+  th {
+    font-size: 13px;
+    font-weight: bold;
+  }
 
-    .colour-ref-license-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 15px;
-    }
+  tr {
+    font-size: 11px;
+  }
 
-    .license-label {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        width: 80%;
-        font-size: 12px;
-    }
+  .color-reference {
+    width: 15px;
+    height: 15px;
+    display: block;
+    border-radius: 2px;
+  }
 
-    .label {
-        display: flex;
-        justify-content: left;
-        align-items: center;
-        width: 100%;
-        color: rgb(0 0 0 / 51%);
-    }
 
-    .license-name {
-        display: flex;
-        justify-content: left;
-        align-items: center;
-        width: 100%;
-        flex-flow: wrap;
-    }
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgb(105 101 101 / 5%);
+  }
 
-    p {
-        margin-top: 0;
-        margin-bottom: 0;
-        text-align: left;
-    }
 
-    .colour-ref-license {
-        width: 100%;
-        height: 15px;
-        border-radius: 3px;
-    }
 
-    .component-license-detail {
-        display: flex;
-        justify-content: space-around;
-        width: 100%;
-        background-color: rgb(236 232 232);
-    }
+  .button-solid {
+    border: none;
+    background-color: transparent;
+    margin-right: 0;
+    padding: 10px 0 10px 10px;
+    color: #656df1;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 15px;
+    letter-spacing: 0em;
+    text-align: right;
+  }
 
-    .comp-detail-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 33.3%;
-    }
 
-    .comp-label {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        justify-content: flex-start;
-        padding-left: 15%;
-        width: 100%;
-        font-size: 12px;
-        color: #777777;
-    }
+  .button-solid:focus,
+  #drop-down-license-detail-btn:focus {
+    border: none;
+    outline: none;
+  }
 
-    .comp-info {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        justify-content: flex-start;
-        width: 100%;
-        padding-left: 15%;
-        font-size: 12px;
-    }
+  .hide {
+    display: none;
+  }
 
-    #progress-bar {
-        height: 95px;
-        padding-left: 3.5px;
-    }
 
-    .progress-bar-child-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: row;
-        width: 65%;
-    }
+  .label {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    width: 100%;
+    color: rgb(0 0 0 / 51%);
+  }
 
-    #oss-percentage{
-        font-size: 25px;
-        display: block;
-        height: auto;
-        background-color: #f5f5f5a1;
-        padding-top: 28px;
-        font-size: 35px;
-    }
+  p {
+    margin-top: 0;
+    margin-bottom: 0;
+    text-align: left;
+  }
 
-    .identified,
-    .pending,
-    .original {
-        width: 30px;
-        height: 10px;
-    }
+  .drop-down-license-detail-container button {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
 
-    .table th.license-head-column {
-        text-align: left;
-        padding-left: 10%;
-    }
+  .license-info-detail {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 6px 0;
+  }
 
-    .drop-down-license-detail-container {
-        border-bottom: 1.5px solid #82828291;
-    }
+  .license-ref {
+    width: 90%;
+    display: flex;
+  }
 
-    .drop-down-license-detail-container button {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-    }
+  .license-component-button-container {
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
 
-    .show-license-detail {
-        display: block;
-    }
+  .license-info-container {
+    display: flex;
+    width: 85%;
+  }
 
-    .original-percentage {
-        color: #A1A1AA;
-        margin-left: 3px;
-    }
+  .color-reference-container {
+    width: 14%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+  }
 
-    .percentage-container{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: row;
-    }
+  .info-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 85%;
+    height: 30px;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .info.big {
+    width: auto;
+    margin: 0 15px;
+  }
+
+  .info.big .label {
+    font-weight: 400;
+    font-size: 20px;
+    color: rgb(113, 113, 122);
+    justify-content: center;
+  }
+
+  .info.big .value {
+    font-weight: 600;
+    font-size: 64px;
+    line-height: 64px;
+    justify-content: center;
+  }
+
+  .info .label {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .info .value {
+    display: flex;
+    justify-content: flex-start;
+    text-align: left;
+    width: 100%;
+    color: rgb(24, 24, 27);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 26px;
+
+  }
+
+  .info .value.small {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20px;
+    color: rgb(24, 24, 27)
+  }
+
+  .row-license-info-container {
+    display: flex;
+    width: 100%;
+  }
+
+  td.cell-info-container {
+    width: 30%;
+    display: flex;
+  }
+
+  td.cell-info-container:last-child {
+    justify-content: right;
+  }
+
+  td.cell-info-container:last-child {
+    justify-content: right;
+  }
+
+  td.cell-info-container.index {
+    width: 10%;
+
+  }
+
+  .row-info-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .detected-license-report-table-container,
+  .incompatibilities-table-container {
+    margin: 0px;
+  }
+
+  .incompatible-license-container {
+    margin: 10px 0;
+    min-height: 20px;
+    align-items: center;
+  }
+
+  .license-block {
+    margin: 2px;
+    font-size: 12px;
+    background-color: #dfdedd;
+    display: flex;
+    flex-flow: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    border-radius: 3px;
+    font-weight: bold;
+
+    -webkit-print-color-adjust: exact !important;
+
+  }
+
+  .incompatible-license-container {
+    display: flex;
+    flex-flow: wrap;
+    flex-direction: row;
+  }
+
+  #incompatible-license {
+    vertical-align: baseline;
+    border-top: 1px solid #fafafa;
+  }
+
+  .incompatible-ref {
+    background-color: #dc3545;
+    color: white;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  table.main-table>thead {
+    position: sticky;
+    top: 0;
+    background: var(--bg-color);
+  }
+
+  table.main-table td,
+  table.main-table th {
+    text-align: left;
+  }
+
+  .table.main-table>:not(:first-child) {
+    border-top: 0 !important;
+  }
+
+  table.main-table th {
+    padding: .5rem;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 23px;
+    color: #A1A1AA;
+    border-color: #E4E4E7;
+  }
+
+
+  table.main-table td {
+    padding: .5rem;
+    vertical-align: top;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: var(--dark);
+  }
+
+  table.main-table tr.subheader {
+    position: sticky;
+    top: 36px;
+  }
+
+  table.main-table tr.subheader td {
+    background-color: #efeff5;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgb(40, 40, 43)
+  }
+
+  table.main-table td:first-child {
+    font-weight: 600;
+  }
 </style>
 
+
+<!--See Bootstrap example: https://getbootstrap.com/docs/5.0/components/navs-tabs/#javascript-behavior-->
 <body>
-    <header>
-        <h1>Identification Report</h1>
-        <div class="divider"></div>
-    </header>
-    <div class="main-container">
-
-        <div class="progress-bar-container">
-            <h3 class="identification-progress-title">Original vs OSS</h3>
-            <div class="progress-bar-child-container">
-                <div class="percentage-container">
-                    <span id="oss-percentage"></span>
-                </div>
-                <canvas id="progress-bar"></canvas>
-                <div>
-                    <span class="original-percentage"></span>
-                </div>
-            </div>
-            <div>
-                <p id="total-files"></p>
-            </div>
-
-            <div class="divider"> </div>
-        </div>
-
-        <div class="main-content-info-container">
-            <div class="main-container-left">
-                <div>
-                    <h3>License Reference</h3>
-                    <div class="pie-chart-container">
-                        <div>
-                            <canvas id="myChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div>
-                    <h3 class="identified-license-detail-title">Identified License Detail</h3>
-                    <div class="drop-down-license-detail-container">
-                        <button id="drop-down-license-detail-btn"> Identified License Detail &#8711;</button>
-                    </div>
-                    <div class="drop-down-license-detail hide">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="body-license-detail-table">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="main-container-right">
-                <h3>Identified License Report</h3>
-                <div class="license-table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th class="license-head-column" scope="col">License</th>
-                                <th scope="col">Component Count</th>
-                            </tr>
-                        </thead>
-                        <tbody id="body-license-table">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+  <header>
+    <div class="header-title">
+      <img
+        src="data:image/png;base64,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">
+      <div>
+        <h5 id='header__report_title'></h5>
+        <h5 id="date"></h5>
+      </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const identifiedData = '#DATA';
-        const auxSummaryData = '#SUMMARY';
-        const auxData = Array.from(JSON.parse(identifiedData));
-        const summaryData = JSON.parse(auxSummaryData);
-        const totalFiles = summaryData.pending + summaryData.summary.noMatchFiles + summaryData.identified.total + summaryData.original;
-        const originalFiles = summaryData.summary.noMatchFiles + summaryData.original;
-        const ossFiles = (summaryData.identified.total * 100) / totalFiles;
-        const pendingFiles = (summaryData.pending * 100) / totalFiles;
-        const percentage = ossFiles + pendingFiles;
-        const labels = [];
-        const values = [];
-        const rowDataTable = {};
+    <section class="project-name-container">
+      <h1 id='project-name'></h1>
+    </section>
+    <div class="divider mt-3 mb-5"></div>
 
-        function rowData() {
-            auxData.forEach((d) => {
-                if (rowDataTable[d.label] === undefined) {
-                    rowDataTable[d.label] = {
-                        components: {},
-                        componentCount: 0,
-                    };
-                }
+    <div class="scan-summary"></div>
 
-                d.components.forEach((component) => {
-                    if (rowDataTable[d.label].components[component.name] === undefined) {
-                        rowDataTable[d.label].components[component.name] = {
-                            versions: [],
-                            vendor: component.vendor,
-                            purl: component.purl,
-                        };
-                    }
-                    rowDataTable[d.label].components[component.name].versions.push(component.version);
-                    rowDataTable[d.label].components[component.name].versions.sort();
-                });
-                rowDataTable[d.label].componentCount = Object.keys(rowDataTable[d.label].components).length;
-            });
-        }
-
-        rowData();
-
-        Object.entries(rowDataTable).forEach(([key, value]) => {
-            labels.push(key);
-            values.push(value.componentCount);
-        });
+    <div class="divider mt-5"></div>
+  </header>
 
 
-        const color = [
-            '#E8B34B',
-            '#E22C2C',
-            '#5754D0',
-            '#9F69C0',
-            '#FE7F10',
-            '#E56399',
-            '#E637BF',
-            '#474647',
-            '#153243',
-            '#2DE1C2',
-            '#F05365',
-            '#A2D729',
-            '#3C91E6',
-            '#FA824C',
-            '#C94277',
-            '#E56B6F',
-            '#F71735',
-            '#011627',
-            '#724E91',
-            '#7D451B',
-            '#9BE564',
-        ];
+  <nav>
+    <div class="nav nav-pills d-flex justify-content-center mb-5" id="nav-tab" role="tablist">
+      <button aria-controls="nav-licenses" aria-selected="true" class="nav-link active" data-bs-target="#nav-licenses"
+        data-bs-toggle="tab" id="nav-licenses-tab" role="tab" type="button">Licenses</button>
+      <button aria-controls="nav-components" aria-selected="false" class="nav-link" data-bs-target="#nav-components"
+        data-bs-toggle="tab" id="nav-components-tab" role="tab" type="button">Components</button>
+      <button aria-controls="nav-vulnerabilities" aria-selected="false" class="nav-link" data-bs-target="#nav-vulnerabilities"
+        data-bs-toggle="tab" id="nav-vulnerabilities-tab" role="tab" type="button">Vulnerabilities</button>
+      <button aria-controls="nav-dependencies" aria-selected="false" class="nav-link" data-bs-target="#nav-dependencies"
+        data-bs-toggle="tab" id="nav-dependencies-tab" role="tab" type="button">Dependencies</button>
+      <button aria-controls="nav-copyrights" aria-selected="false" class="nav-link" data-bs-target="#nav-copyrights"
+        data-bs-toggle="tab" id="nav-copyrights-tab" role="tab" type="button">Copyrights</button>
+      <button aria-controls="nav-cryptography" aria-selected="false" class="nav-link" data-bs-target="#nav-cryptography"
+        data-bs-toggle="tab" id="nav-cryptography-tab" role="tab" type="button">Cryptography</button>
+      <button aria-controls="nav-quality" aria-selected="false" class="nav-link" data-bs-target="#nav-quality"
+        data-bs-toggle="tab" id="nav-quality-tab" role="tab" type="button">Quality</button>
+      <button aria-controls="nav-health" aria-selected="false" class="nav-link" data-bs-target="#nav-health"
+        data-bs-toggle="tab" id="nav-health-tab" role="tab" type="button">Health</button>
+      <button aria-controls="nav-summary" aria-selected="false" class="nav-link" data-bs-target="#nav-summary" data-bs-toggle="tab"
+        id="nav-summary-tab" role="tab" type="button">Summary</button>
+    </div>
+  </nav>
 
-        function insertLicenseRow() {
-            const bodyLicenseTable = document.querySelector('#body-license-table');
-            let counter = 0;
-            Object.keys(rowDataTable).forEach((key) => {
-                const tr = document.createElement('tr');
-                const tdColor = document.createElement('td');
-                const licenseRefContainer = document.createElement('div');
-                licenseRefContainer.classList.add('license-ref-container');
-                const colourRefLicenseContainer = document.createElement('div');
-                colourRefLicenseContainer.classList.add('colour-ref-license-container');
-                const colourRefLicense = document.createElement('div');
-                colourRefLicense.classList.add('colour-ref-license');
-                colourRefLicense.style.backgroundColor = color[counter % color.length];
-                colourRefLicenseContainer.appendChild(colourRefLicense);
-                const licenseLabel = document.createElement('div');
-                licenseLabel.classList.add('license-label');
-                const licenseName = document.createElement('div');
-                licenseName.classList.add('license-name');
-                const licenseNameP = document.createElement('p');
-                licenseNameP.innerText = key;
-                licenseName.appendChild(licenseNameP);
-                licenseLabel.appendChild(licenseName);
 
-                licenseRefContainer.appendChild(colourRefLicenseContainer);
-                licenseRefContainer.appendChild(licenseLabel);
+  <main class="main-container">
 
-                tdColor.appendChild(licenseRefContainer);
-                tr.appendChild(tdColor);
+    <div class="tab-content" id="nav-tabContent">
 
-                // count components
-                const tdCount = document.createElement('td');
-                tdCount.classList.add('width-license-count');
+      <!-- licenses -->
+      <div aria-labelledby="nav-licenses-tab" class="tab-pane fade show active" id="nav-licenses" role="tabpanel"
+        tabindex="0">
+        <section class="mt-5">
+          <div class="pie-chart-container">
+            <div>
+              <canvas id="myChart"></canvas>
+            </div>
+          </div>
+        </section>
+        <section class="mt-5">
+          <div class="detected-license-report-table-container">
+            <table class="table">
+              <tbody id="body-license-detail-table">
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="mt-5 section__license-obligation" id="section__license-obligation">
+          <h4>License obligations</h4>
+          <div class="incompatibilities-table-container">
+            <table class="table incompatible-license-table main-table">
+              <thead>
+                <tr>
+                  <th>License</th>
+                  <th>Copyleft</th>
+                  <th>Incompatible Licenses</th>
+                </tr>
+              </thead>
+              <tbody id="incompatible-license">
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
 
-                const textCount = document.createTextNode(`${rowDataTable[key].componentCount}`);
-                tdCount.appendChild(textCount);
-                tr.appendChild(tdCount);
+      <!-- components -->
+      <section aria-labelledby="nav-components-tab" class="tab-pane fade" id="nav-components" role="tabpanel"
+        tabindex="0">
+        <table class="table main-table" id="table-components">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>PURL</th>
+              <th>Detected Versions</th>
+              <th>URL</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
 
-                bodyLicenseTable.appendChild(tr);
+        <template id="tpl-component-row">
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </template>
+      </section>
 
-                counter += 1;
-            });
-        }
+      <!-- vulnerabilities -->
+      <section aria-labelledby="nav-vulnerabilities-tab" class="tab-pane fade" id="nav-vulnerabilities" role="tabpanel"
+        tabindex="0">
+        <table class="table main-table" id="table-vulnerabilities">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Version</th>
+              <th>CVE</th>
+              <th>Severity</th>
+              <th>Published</th>
+              <th>Patched</th>
+              <th>Summary</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
 
-        insertLicenseRow();
+        <template id="tpl-vulnerabilities-row">
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </template>
+      </section>
+
+      <!-- dependencies -->
+      <section aria-labelledby="nav-dependencies-tab" class="tab-pane fade" id="nav-dependencies" role="tabpanel"
+        tabindex="0">
+        <table class="table main-table" id="table-dependencies">
+          <thead>
+            <tr>
+              <th>Dependency</th>
+              <th>PURL</th>
+              <th>Version</th>
+              <th>License</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+
+        <template id="tpl-dependencies-row">
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </template>
+      </section>
+
+      <!-- copyright -->
+      <section aria-labelledby="nav-copyrights-tab" class="tab-pane fade" id="nav-copyrights" role="tabpanel"
+        tabindex="0">
+        <table class="table main-table" id="table-copyrights">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Version</th>
+              <th>Copyright</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+
+        <template id="tpl-copyrights-row">
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </template>
+      </section>
+
+      <!-- cryptography -->
+      <section aria-labelledby="nav-cryptography-tab" class="tab-pane fade" id="nav-cryptography" role="tabpanel"
+       tabindex="0">
+       <table class="table main-table" id="table-cryptography">
+         <thead>
+           <tr>
+             <th>Component</th>
+             <th>Version</th>
+             <th>Cryptography</th>
+           </tr>
+         </thead>
+         <tbody>
+         </tbody>
+       </table>
+
+       <template id="tpl-cryptography-row">
+         <tr>
+           <td></td>
+           <td></td>
+           <td></td>
+         </tr>
+       </template>
+     </section>
+
+     <!-- quality -->
+     <section aria-labelledby="nav-quality-tab" class="tab-pane fade" id="nav-quality" role="tabpanel"
+     tabindex="0">
+     <table class="table main-table" id="table-quality">
+       <thead>
+         <tr>
+           <th>Component</th>
+           <th>Version</th>
+           <th>Quality</th>
+         </tr>
+       </thead>
+       <tbody>
+       </tbody>
+     </table>
+
+     <template id="tpl-quality-row">
+       <tr>
+         <td></td>
+         <td></td>
+         <td></td>
+       </tr>
+     </template>
+   </section>
+
+   <!-- health -->
+   <section aria-labelledby="nav-health-tab" class="tab-pane fade" id="nav-health" role="tabpanel"
+      tabindex="0">
+      <table class="table main-table" id="table-health">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>PURL</th>
+            <th>Creation Date</th>
+            <th>Issues</th>
+            <th>Last Push</th>
+            <th>Last Update</th>
+            <th>Watchers</th>
+            <th>Country</th>
+            <th>Forks</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+
+      <template id="tpl-health-row">
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </template>
+    </section>
+
+      <!-- summary -->
+      <div aria-labelledby="nav-summary-tab" class="tab-pane fade" id="nav-summary" role="tabpanel" tabindex="0">
+        SUMMARY
+      </div>
+    </div>
+  </main>
+
+  <div class="divider mt-5"></div>
+
+  <footer class="mb-2 text-center">
+    <p class="text-center">Reported generated by <a href="https://github.com/scanoss/scanoss.js"
+        target="_blank">scanoss.js</a></p>
+    <p class="text-center"><a href="https://www.scanoss.com" target="_blank">www.scanoss.com</a></p>
+  </footer>
+
+  <script crossorigin="anonymous"
+    integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    addEventListener('DOMContentLoaded', (event) => {
+      const entryData = '#DATA';
+      const data = JSON.parse(entryData);
+      let pieChartDataEntry = {
+        labels: [],
+        components: []
+      };
+
+      data.licenses.forEach((l) => {
+        pieChartDataEntry.labels.push(l.label);
+        pieChartDataEntry.components.push(l.value);
+      });
+
+      const color = [
+        '#E8B34B',
+        '#E22C2C',
+        '#5754D0',
+        '#9F69C0',
+        '#FE7F10',
+        '#E56399',
+        '#E637BF',
+        '#474647',
+        '#153243',
+        '#2DE1C2',
+        '#F05365',
+        '#A2D729',
+        '#3C91E6',
+        '#FA824C',
+        '#C94277',
+        '#E56B6F',
+        '#F71735',
+        '#011627',
+        '#724E91',
+        '#7D451B',
+        '#9BE564',
+      ];
+
+      function init() {
+
+        setupNavigation();
+
+        renderHeader();
+        renderLicensesTable();
+        renderComponentTable();
+        renderDependenciesTable();
+        renderVulnerabilitiesTable();
+        renderCopyrightTable();
+        renderCryptographyTable();
+        renderQualityTable();
+        renderHealthTable();
+      }
+
+      init();
+
+      function setupNavigation(componentList) {
+        const showTab = (id) => document.querySelector('.nav-link#' + id).classList.add('visible');
+
+        const existVersionKey = (key, componentList) => {
+          for (const component of componentList) {
+            for (const version of component.versions) {
+              if (version && version[key]) return true;
+            }
+          }
+          return false;
+        };
+
+
+        const existComponentKey = (key, componentList) => {
+          for (const component of componentList) {
+            if (component[key]) return true;
+          }
+          return false;
+        };
+
+
+        if (data.licenses) showTab('nav-licenses-tab');
+        if (data.component) showTab('nav-components-tab');
+        if (data.dependencies) showTab('nav-dependencies-tab');
+        if (data.vulnerabilities) showTab('nav-vulnerabilities-tab');
+        if (existVersionKey('copyrights', data.component)) showTab('nav-copyrights-tab');
+        if (existVersionKey('cryptography', data.component)) showTab('nav-cryptography-tab');
+        if (existVersionKey('quality', data.component)) showTab('nav-quality-tab');
+        if (existComponentKey('health', data.component)) showTab('nav-health-tab');
+      }
+
+      function renderHeader() {
+
+        // date
+        const d = document.querySelector('#date');
+        d.innerHTML += new Date(data.summary.timestamp).toLocaleDateString();
+
+        // project name
+        const p = document.querySelector('#project-name');
+        p.innerHTML += data.summary.projectName ? data.summary.projectName : '-';
+
+        const rh = document.querySelector('#header__report_title')
+        rh.innerHTML += data.summary.reportTitle ? data.summary.reportTitle : "Report"
+        // summary
+        const s = document.querySelector('.scan-summary');
+        s.innerHTML += `
+                            <div class="info big">
+                                <div class="value primary">${data.summary.totalFiles}</div>
+                                <div class="label">Files Scanned</div>
+                            </div>
+                            <div class="info big">
+                                <div class="value">${data.summary.matchedFiles}</div>
+                                <div class="label">Matched</div>
+                            </div>
+                            <div class="info big">
+                                <div class="value">${data.summary.noMatchFiles}</div>
+                                <div class="label">No Matches</div>
+                            </div>
+            `;
+      }
+
+      function renderLicensesTable() {
 
         function dropDown(id) {
-            const nodes = document.getElementsByClassName(id);
-            for (let i = 0; i < nodes.length; i += 1) {
-                if (nodes[i].classList.contains('hide')) {
-                    nodes[i].classList.remove('hide');
-                    nodes[i].classList.add('show');
-                } else {
-                    nodes[i].classList.remove('show');
-                    nodes[i].classList.add('hide');
-                }
+          const nodes = document.getElementsByClassName(id);
+          for (let i = 0; i < nodes.length; i += 1) {
+            if (nodes[i].classList.contains('hide')) {
+              nodes[i].classList.remove('hide');
+              nodes[i].classList.add('show');
+            } else {
+              nodes[i].classList.remove('show');
+              nodes[i].classList.add('hide');
             }
+          }
         }
 
         function addButtonListener() {
-            const btn = document.querySelectorAll('.button-solid');
-
-            btn.forEach((button) => {
-                button.addEventListener('click', (event) => {
-                    dropDown(event.target.id);
-                });
+          const btn = document.querySelectorAll('.button-solid');
+          btn.forEach((button) => {
+            button.addEventListener('click', (event) => {
+              dropDown(event.target.id);
             });
+          });
         }
-
-        function insertLicenseDetailRow() {
-            const bodyLicenseTable = document.querySelector('#body-license-detail-table');
-
-            let counter = 0;
-            Object.keys(rowDataTable).forEach((key) => {
-                const tr = document.createElement('tr');
-                const tdColor = document.createElement('td');
-                const licenseRefContainer = document.createElement('div');
-                licenseRefContainer.classList.add('license-ref-container');
-                const colourRefLicenseContainer = document.createElement('div');
-                colourRefLicenseContainer.classList.add('colour-ref-license-container');
-                const colourRefLicense = document.createElement('div');
-                colourRefLicense.classList.add('colour-ref-license');
-                colourRefLicense.style.backgroundColor = color[counter % color.length];
-                colourRefLicenseContainer.appendChild(colourRefLicense);
-                const licenseLabel = document.createElement('div');
-                licenseLabel.classList.add('license-label');
-                const label = document.createElement('div');
-                label.classList.add('label');
-                const labelP = document.createElement('p');
-                labelP.innerText = 'License';
-                label.appendChild(labelP);
-                licenseLabel.appendChild(label);
-                const licenseName = document.createElement('div');
-                licenseName.classList.add('license-name');
-                const licenseNameP = document.createElement('p');
-                licenseNameP.innerText = key;
-                licenseName.appendChild(licenseNameP);
-                licenseLabel.appendChild(licenseName);
-
-                licenseRefContainer.appendChild(colourRefLicenseContainer);
-                licenseRefContainer.appendChild(licenseLabel);
-
-                tdColor.appendChild(licenseRefContainer);
-                tr.appendChild(tdColor);
-
-                // count components
-                const tdCount = document.createElement('td');
-                tdCount.classList.add('width-license-count');
-                const btn = `<button class="button-solid" id="${counter}">${rowDataTable[key].componentCount} component found &#8711;</button>`;
-
-                tdCount.innerHTML = btn;
-                tr.appendChild(tdCount);
-                bodyLicenseTable.appendChild(tr);
-                let rows = '';
-                for (const [compName, value] of Object.entries(rowDataTable[key].components)) {
-                    const version =
-                        value.versions.length > 1
-                            ? `${value.versions.toString().replace(/,/g, ' , ')} &#10;&#13; (${value.versions.length} versions)`
-                            : value.versions.toString();
-                    rows += `<tr class="component-row">
-                    <td colspan="2" class="${counter} hide">
-                      <div class="component-license-detail">
-                        <div class="comp-detail-container">
-                          <div class="comp-label">
-                            <p>Component</p>
-                          </div>
-                        <div class="comp-info">
-                            <p>${compName}</p>
-                          </div>
-                        </div>
-                         <div class="comp-detail-container">
-                         <div class="comp-label">
-                          <p>Purl</p>
-                         </div>
-                         <div class="comp-info">
-                          <p>${value.purl}</p>
-                        </div>
-                        </div>
-                        <div class="comp-detail-container">
-                          <div class="comp-label">
-                            <p>Versions</p>
-                          </div>
-                          <div class="comp-info">
-                            <p>${version}</p>
-                          </div>
-                        </div>
-                        </div>
-
-                    </td>
-                </tr>`;
-                }
-
-                bodyLicenseTable.innerHTML += rows;
-
-                counter += 1;
-            });
-            addButtonListener();
-        }
-        insertLicenseDetailRow();
 
         function pieChart() {
-            const data = {
-                labels,
-                datasets: [
-                    {
-                        label: 'My First dataset',
-                        backgroundColor: color,
-                        borderColor: 'rgb(255, 255, 255)',
-                        data: values,
-                    },
-                ],
-            };
-            const config = {
-                type: 'pie',
-                data,
-                options: {
-                    elements: {
-                        arc: {
-                            borderWidth: 1,
-                        },
-                    },
-                    plugins: {
-                        legend: {
-                            display: false,
-                        },
-                    },
+          const data = {
+            labels: pieChartDataEntry.labels,
+            datasets: [
+              {
+                backgroundColor: color,
+                borderColor: 'rgb(255, 255, 255)',
+                data: pieChartDataEntry.components,
+              },
+            ],
+          };
+          const config = {
+            type: 'doughnut',
+            data,
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              elements: {
+                arc: {
+                  borderWidth: 1,
                 },
-            };
-            const myChart = new Chart(document.getElementById('myChart'), config);
+              },
+              plugins: {
+                legend: {
+                  display: true,
+                  position: 'right',
+                },
+              },
+            },
+          };
+          const myChart = new Chart(document.getElementById('myChart'), config);
+        }
+
+        function licenseDetail() {
+          const body = document.querySelector('#body-license-detail-table');
+          data.licenses.forEach((l, index) => {
+            body.innerHTML += `
+                                    <tr>
+                                    <td>
+                                      <div class="license-info-detail">
+                                          <div class="license-ref">
+                                              <div class="license-info-container">
+                                                  <div class="info-container">
+                                                      <div class="info">
+                                                          <div class="label">
+                                                              License
+                                                          </div>
+                                                          <div class="value">
+                                                              ${l.label}
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="license-component-button-container">
+                                              <button class="button-solid" id="${l.label}"> ${l.value} component found &#x25BC</button>
+                                            </div>
+                                      </div>
+                                      </td>
+                                    </tr>`;
+
+            body.innerHTML += `<tr class="${l.label} hide">
+                                          <td colspan="2">
+                                              <table>
+                                                  ${l.components.map((c, index) => {
+              return `<tr class="row-license-info-container">
+                                                                      <td class="cell-info-container index">
+                                                                          <div class="row-info-container">
+                                                                              <div class="info">
+                                                                                  <div class="value small">
+                                                                                      ${index + 1}
+                                                                                  </div>
+                                                                              </div>
+                                                                          </div>
+                                                                      </td>
+                                                                      <td class="cell-info-container">
+                                                                          <div class="row-info-container">
+                                                                              <div class="info">
+                                                                                  <div class="label">
+                                                                                      Component
+                                                                                  </div>
+                                                                                  <div class="value small">
+                                                                                      ${c.name}
+                                                                                  </div>
+                                                                              </div>
+                                                                          </div>
+                                                                      </td>
+                                                                      <td class="cell-info-container">
+                                                                      <div class="row-info-container">
+                                                                          <div class="info">
+                                                                              <div class="label">
+                                                                                  Purl
+                                                                              </div>
+                                                                              <div class="value small">
+                                                                                  ${decodeURIComponent(c.purl)}
+                                                                              </div>
+                                                                          </div>
+                                                                          </div>
+                                                                      </td>
+                                                                      <td class="cell-info-container">
+                                                                      <div class="row-info-container">
+                                                                          <div class="info">
+                                                                              <div class="label">
+                                                                                  ${c.versions.length > 1 ? 'Versions' : 'Version'}
+                                                                              </div>
+                                                                              <div class="value small">
+                                                                                  ${c.versions.toString()}
+                                                                              </div>
+                                                                          </div>
+                                                                          </div>
+                                                                      </td>
+                                                              </tr>`
+            }).join(' ')}
+                                              </table>
+                                          </td>
+                                        </tr>`;
+          });
+
+          addButtonListener();
+        }
+
+        function incompatibleLicenses() {
+          if (data.licensesObligations) {
+            document.querySelector('.section__license-obligation').classList.add('visible--block');
+
+            const licenseMapper = new Set();
+            data.licensesObligations.forEach((l) => licenseMapper.add(l.label));
+            const body = document.querySelector('#incompatible-license');
+            data.licensesObligations.forEach((l) => {
+              body.innerHTML += `
+                <tr>
+                    <td>${l.label}</td>
+                    <td>${l.copyleft === true ? '&#10004' : '&#10006'}</td>
+                    <td><div  class="incompatible-license-container">${l.incompatibleWith.map((i) => {
+                return `<div class="license-block ${licenseMapper.has(i) === true ? 'incompatible-ref' : ''}">
+                                    <p>${i}</p>
+                                </div>`;
+              }).join(' ')}</div></td>
+                </tr>`;
+            });
+          }
         }
 
         pieChart();
+        licenseDetail();
+        incompatibleLicenses();
 
-        function progressBar() {
-            const spanPercentage = document.querySelector('#oss-percentage');
-            spanPercentage.innerHTML=`${Math.floor(percentage)}%`;
-            const totalFilesText = document.querySelector('#total-files');
-            totalFilesText.innerText = `total files: ${totalFiles}`;
+      }
 
-            const chart = new Chart(document.getElementById('progress-bar'), {
-                type: 'bar',
-                data: {
-                    labels: [``],
-                    datasets: [
-                        {
-                            label: `OSS: ${summaryData.identified.total}`,
-                            data: [summaryData.identified.total],
-                            borderWidth: 0,
-                            backgroundColor: ['#22C55E'],
-                            barThickness: 34,
-                        },
-                        {
-                            label: `Pending: ${summaryData.pending}`,
-                            data: [summaryData.pending],
-                            borderWidth: 0,
-                            backgroundColor: ['#F97316'],
-                            barThickness: 34,
-                        },
-                        {
-                            label: `Original: ${originalFiles}`,
-                            data: [originalFiles],
-                            borderWidth: 0,
-                            backgroundColor: ['#A1A1AA'],
-                            barThickness: 34,
-                        },
-                    ],
-                },
-                options: {
-                    plugins: {
-                        tooltip: { enabled: false },
+      function renderComponentTable() {
+        const template = document.querySelector("#tpl-component-row");
+        const table = document.querySelector("#table-components tbody");
 
-                    },
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    scales: {
-                        y: {
-                            stacked: true,
-                            beginAtZero: true,
-                            grid: {
-                                display: false,
-                                drawBorder: false,
-                            },
-                            display: false,
-                        },
-                        x: {
-                            max: totalFiles,
-                            stacked: true,
-                            beginAtZero: true,
-                            grid: {
-                                display: false,
-                                drawBorder: false,
-                            },
-                            ticks: {
-                                display: false,
-                            },
-                        },
-                    },
-                },
-                plugins: [
-                    {
-                        id: 'line',
-                        afterDraw: (chart) => {
-                            const meta = chart.getDatasetMeta(1); // Gets datasets[1]
-                            if (!meta.hidden) {
-                                meta.data.forEach((element) => {
-                                    const { x } = element.tooltipPosition();
-                                    chart.ctx.beginPath();
-                                    chart.ctx.moveTo(x, 30);
-                                    chart.ctx.strokeStyle = 'black';
-                                    chart.ctx.lineTo(x, 90);
-                                    chart.ctx.stroke();
-                                    chart.ctx.save();
-                                });
-                            }
-                        },
-                    },
-                ],
-            });
+        const { component: componentData } = data;
+
+        if (!componentData) return false;
+
+        for (const component of componentData) {
+          const clon = template.content.cloneNode(true);
+          clon.querySelector('td:nth-child(1)').innerHTML = component.name;
+          clon.querySelector('td:nth-child(2)').innerHTML = decodeURIComponent(component.key);
+          clon.querySelector('td:nth-child(3)').innerHTML = component.versions?.map(item => item.version).join(', ');
+          clon.querySelector('td:nth-child(4)').innerHTML = component.url ? `<a href="${component.url}" target="_blank">${decodeURIComponent(component.url)}</a>` : '-';
+          table.appendChild(clon);
         }
+      }
 
-        progressBar();
+      function renderDependenciesTable() {
+        const template = document.querySelector("#tpl-dependencies-row");
+        const table = document.querySelector("#table-dependencies tbody");
 
-        document.getElementById('drop-down-license-detail-btn').addEventListener('click', () => {
-            const aux = document.querySelector('.drop-down-license-detail');
-            if (aux.classList.contains('hide')) {
-                aux.classList.remove('hide');
-                aux.classList.add('show-license-detail');
-            } else {
-                aux.classList.remove('show-license-detail');
-                aux.classList.add('hide');
-            }
-        });
+        const { dependencies: dependencyData } = data;
 
-    </script>
+        if (!dependencyData) return false;
+
+        for (const depData of dependencyData) {
+          table.innerHTML += `<tr class="subheader"> <td colspan='4'> ${depData.dependencies?.length} ${depData.dependencies?.length == 1 ? 'dependency' : 'dependencies'} found in <span class="primary">${depData.file}</span> </td> </tr>`;
+          for (const dependency of depData.dependencies) {
+            const clon = template.content.cloneNode(true);
+            clon.querySelector('td:nth-child(1)').innerHTML = dependency.component || '-';
+            clon.querySelector('td:nth-child(2)').innerHTML = decodeURIComponent(dependency.purl);
+            clon.querySelector('td:nth-child(3)').innerHTML = dependency.version;
+            clon.querySelector('td:nth-child(4)').innerHTML = dependency.licenses?.map(item => item.name).join(', ');
+            table.appendChild(clon);
+          }
+        }
+      };
+
+      function renderVulnerabilitiesTable() {
+        const template = document.querySelector("#tpl-vulnerabilities-row");
+        const table = document.querySelector("#table-vulnerabilities tbody");
+
+        const { vulnerabilities: vulnerabilityData } = data;
+
+        if (!vulnerabilityData) return false;
+
+        for (const purlVulData of vulnerabilityData) {
+          for (const vulnerabilty of purlVulData.vulnerability) {
+            const clon = template.content.cloneNode(true);
+            clon.querySelector('td:nth-child(1)').innerHTML = decodeURIComponent(purlVulData.purl);
+            clon.querySelector('td:nth-child(2)').innerHTML = "-";
+            clon.querySelector('td:nth-child(3)').innerHTML = vulnerabilty.cve;
+            clon.querySelector('td:nth-child(4)').innerHTML = vulnerabilty.severity;
+            clon.querySelector('td:nth-child(5)').innerHTML = vulnerabilty.published;
+            clon.querySelector('td:nth-child(6)').innerHTML = vulnerabilty.modified;
+            clon.querySelector('td:nth-child(7)').innerHTML = vulnerabilty.summary;
+            table.appendChild(clon);
+          }
+
+        }
+      }
+
+
+      function renderCopyrightTable() {
+        const template = document.querySelector("#tpl-copyrights-row");
+        const table = document.querySelector("#table-copyrights tbody");
+
+        const { component: componentData } = data;
+
+        if (!componentData) return false;
+
+        for (const compData of componentData) {
+          for (const version of compData.versions) {
+            if (!version.copyrights) continue
+            const clon = template.content.cloneNode(true);
+            clon.querySelector('td:nth-child(1)').innerHTML = compData.name;
+            clon.querySelector('td:nth-child(2)').innerHTML = version.version;
+            clon.querySelector('td:nth-child(3)').innerHTML = version.copyrights?.map(item => item.name).join(' - ');
+
+            table.appendChild(clon);
+          }
+        }
+      }
+
+      function renderCryptographyTable() {
+        const template = document.querySelector("#tpl-cryptography-row");
+        const table = document.querySelector("#table-cryptography tbody");
+
+        const { component: componentData } = data;
+
+        if (!componentData) return false;
+
+        for (const compData of componentData) {
+          for (const version of compData.versions) {
+            if (!version.cryptography) continue
+            const clon = template.content.cloneNode(true);
+            clon.querySelector('td:nth-child(1)').innerHTML = compData.name;
+            clon.querySelector('td:nth-child(2)').innerHTML = version.version;
+            clon.querySelector('td:nth-child(3)').innerHTML = version.cryptography.map(e => `${e.algorithm} (${e.strength})`).join('');
+
+            table.appendChild(clon);
+          }
+        }
+      }
+
+      function renderQualityTable() {
+        const template = document.querySelector("#tpl-quality-row");
+        const table = document.querySelector("#table-quality tbody");
+
+        const { component: componentData } = data;
+
+        if (!componentData) return false;
+
+        for (const compData of componentData) {
+          for (const version of compData.versions) {
+            if (!version.quality) continue
+            const clon = template.content.cloneNode(true);
+            clon.querySelector('td:nth-child(1)').innerHTML = compData.name;
+            clon.querySelector('td:nth-child(2)').innerHTML = version.version;
+            clon.querySelector('td:nth-child(3)').innerHTML = version.quality.scoreAvg + "/5";
+
+            table.appendChild(clon);
+          }
+        }
+      }
+
+      function renderHealthTable() {
+        const template = document.querySelector("#tpl-health-row");
+        const table = document.querySelector("#table-health tbody");
+
+        const { component: componentData } = data;
+
+        if (!componentData) return false;
+
+        for (const compData of componentData) {
+          if (!compData.health) continue
+          const clon = template.content.cloneNode(true);
+          clon.querySelector('td:nth-child(1)').innerHTML = compData.name;
+          clon.querySelector('td:nth-child(2)').innerHTML = compData.key;
+          clon.querySelector('td:nth-child(3)').innerHTML = compData.health.creation_date || '-';
+          clon.querySelector('td:nth-child(4)').innerHTML = compData.health.issues || '-';
+          clon.querySelector('td:nth-child(5)').innerHTML = compData.health.last_push || '-';
+          clon.querySelector('td:nth-child(6)').innerHTML = compData.health.last_update || '-';
+          clon.querySelector('td:nth-child(7)').innerHTML = compData.health.watchers || '-';
+          clon.querySelector('td:nth-child(8)').innerHTML = compData.health.country || '-';
+          clon.querySelector('td:nth-child(9)').innerHTML = compData.health.forks || '-';
+
+          table.appendChild(clon);
+        }
+      }
+    });
+  </script>
+
+
 
 </body>
 

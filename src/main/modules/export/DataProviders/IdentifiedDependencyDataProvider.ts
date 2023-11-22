@@ -3,6 +3,7 @@ import { modelProvider } from '../../../services/ModelProvider';
 export class IdentifiedDependencyDataProvider implements DataProvider {
   async getData(): Promise<IDataLayers> {
     const query = await modelProvider.model.dependency.getIdentifiedDependencies();
+    if (!query.length) return { dependencies: null } as IDataLayers;
 
     const fileMap: { [file: string]: Dependency[] } = {};
 
@@ -29,7 +30,6 @@ export class IdentifiedDependencyDataProvider implements DataProvider {
         dependencies: fileMap[file],
       })),
     };
-
     return results;
   }
 
