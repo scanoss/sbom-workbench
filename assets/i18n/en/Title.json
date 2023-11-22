@@ -70,5 +70,12 @@
   "PreviewIdentifications": "Preview Identifications",
   "ImportingIdentifications": "Importing Identifications",
   "ImportFromProjects": "Import from Projects",
-  "MatchesForProject": "Matches ({{count}})"
+  "MatchesForProject": "Matches ({{count}})",
+  "IdentifiedDependencies": "Identified Dependencies",
+  "MatchedTab": "Component matched",
+  "ObligationsTab": "License obligations",
+  "CryptographyTab": "Cryptography",
+  "DeclaredDependenciesTab": "Declared dependencies",
+  "IdentifiedDependenciesTab": "Identified dependencies"
+
 }
