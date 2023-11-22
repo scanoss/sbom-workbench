@@ -15,12 +15,18 @@ export class HtmlSummary extends Format {
 
   // @override
   public async generate() {
+    const isDev = process.env.NODE_ENV !== 'production';
+    const PATH = isDev
+      ? pathLib.join(__dirname, '../../../../../assets/exportTemplates/template.html')
+      : pathLib.join(__dirname, '../../../assets/exportTemplates/template.html');
+
     const dpm = new DataProviderManager();
     dpm.addDataProvider(new IdentifiedComponentDataProvider());
     dpm.addDataProvider(new IdentifiedLicenseDataProvider());
     dpm.addDataProvider(new IdentifiedSummaryDataProvider('Identified Report'));
     dpm.addDataProvider(new IdentifiedDependencyDataProvider());
     const report = new Report(dpm);
+    report.setTemplatePath(PATH);
     return report.getHTML();
   }
 }

@@ -6,13 +6,6 @@ export class IdentifiedLicenseDataProvider implements DataProvider {
     const licenses = [] as unknown as Array<LicenseDataLayer>;
     const query = await modelProvider.model.component.getIdentifiedForReport();
 
-    //TODO: Consume service to include copyleft, hasIncompatibles, incompatibleWith
-    // const spdxidSet = new Set<string>();
-    // query.forEach((item) => {
-    //   spdxidSet.add(item.spdxid);
-    // });
-    // await obligationsService.getObligations(Array.from(spdxidSet));
-
     // First pass: Group by license
     query.forEach((element) => {
       const licenseIndex = licenses.findIndex((obj) => obj.label === element.spdxid);
@@ -28,9 +21,6 @@ export class IdentifiedLicenseDataProvider implements DataProvider {
         licenses[licenseIndex].value += 1;
       } else {
         licenses.push({
-          copyleft: false,
-          hasIncompatibles: [],
-          incompatibleWith: [],
           label: element.spdxid,
           value: 1,
           components: [
