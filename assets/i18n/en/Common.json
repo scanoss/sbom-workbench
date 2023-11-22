@@ -94,5 +94,6 @@
   "EnableHPSM": "Enable HPSM (High Precision Snippet Matching)",
   "HPSMHint": "HPSM requires a subscription",
   "NoDependenciesScanned": "No dependencies scanned",
-  "NoVulnerabilitiesScanned": "No vulnerabilities scanned"
+  "NoVulnerabilitiesScanned": "No vulnerabilities scanned",
+  "NoDataFound": "No data found"
 }

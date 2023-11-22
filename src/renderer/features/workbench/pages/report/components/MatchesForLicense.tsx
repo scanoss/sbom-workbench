@@ -47,8 +47,8 @@ export default function MatchesForLicense({ components }) {
           <Column
             label={t('Table:Header:Component')}
             dataKey="component"
-            width={500}
-            flexGrow={10}
+            width={400}
+            flexGrow={2}
             flexShrink={0}
             cellRenderer={({ rowData }) => (
               <div className="table-cell">
@@ -60,8 +60,7 @@ export default function MatchesForLicense({ components }) {
               </div>
             )}
           />
-          <Column label={t('Table:Header:URL')} dataKey="url" width={300} flexGrow={1} flexShrink={0} />
-          <Column label={t('Table:Header:Vendor')} dataKey="vendor" width={100} flexGrow={1} flexShrink={0} />
+          <Column label={t('Table:Header:URL')} dataKey="url" width={200} flexGrow={1} flexShrink={0} />
           <Column label={t('Table:Header:Version')} dataKey="version" width={100} flexGrow={1} flexShrink={0} />
           <Column label={t('Table:Header:License')} dataKey="license" width={100} flexGrow={1} flexShrink={0} />
 
