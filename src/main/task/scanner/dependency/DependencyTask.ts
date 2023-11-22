@@ -38,7 +38,7 @@ export class DependencyTask implements Scanner.IPipelineTask {
       const rootPath = this.project.metadata.getScanRoot();
       this.project.tree
         .getRootFolder()
-        .getFiles(new BlackListDependencies())
+        .getFiles(new BlackListDependencies(`${this.project.metadata.getMyPath()}/filter.json`))
         .forEach((f: File) => {
           allFiles.push(rootPath + f.path);
         });

@@ -10,7 +10,7 @@ import { isBinaryFileSync } from 'isbinaryfile';
 
 const fpath = require('path');
 
-class AbstractFilter {
+export class AbstractFilter {
   // path: string | undefined;
   condition: string;
 
@@ -31,7 +31,8 @@ class AbstractFilter {
     return true;
   }
 }
-class NameFilter extends AbstractFilter {
+
+export class NameFilter extends AbstractFilter {
   constructor(condition: string, value: string, scope: string) {
     super(condition, value);
     this.ftype = 'NAME';
