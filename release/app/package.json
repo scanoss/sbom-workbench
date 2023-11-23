@@ -16,6 +16,6 @@
   },
   "dependencies": {
     "flexsearch": "^0.7.31",
-    "sqlite3": "^5.0.8"
+    "sqlite3": "^5.1.6"
   }
 }
