@@ -115,6 +115,7 @@ class ReportService {
     try {
       const results = await modelProvider.model.result.getDetectedReport();
       let licenses = this.getLicenseReportFromResults(results);
+
       const crypto = await modelProvider.model.cryptography.findAllDetected();
 
       const vulnerabilities = await modelProvider.model.vulnerability.getDetectedReport();
@@ -144,7 +145,7 @@ class ReportService {
   private getLicenseReportFromResults(results: any): Array<LicenseEntry> {
     const licenses: Record<string, LicenseEntry> = results.reduce(
       (acc, curr) => {
-        const key = curr.spdxid;
+        const key = curr.spdxid ? curr.spdxid : 'unknown';
         if (!acc[key]) {
           acc[key] = {
             label: key,

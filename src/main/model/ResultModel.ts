@@ -14,8 +14,11 @@ import { QueryBuilderCreator } from './queryBuilder/QueryBuilderCreator';
 const query = new Querys();
 
 export class ResultModel extends Model {
-  public static readonly entityMapper = { path: 'f.path', source: 'comp.source', purl: 'comp.purl',
-    version: 'comp.version'
+  public static readonly entityMapper = {
+    path: 'f.path',
+    source: 'comp.source',
+    purl: 'comp.purl',
+    version: 'comp.version',
   };
 
   component: ComponentModel;
@@ -57,73 +60,79 @@ export class ResultModel extends Model {
       }
     });
   }
-    public async insertFromFile(resultPath: string, files: any): Promise<IInsertResult> {
-        const resultLicense: any = {};
-        const result: Record<any, any> = await utilModel.readFile(resultPath);
-        const db = await this.openDb();
-        const promises = [];
-        const call = util.promisify(db.run.bind(db));
-        let resultId = 1;
-        let data: any;
-          for (const [key, value] of Object.entries(result)) {
-            for (let i = 0; i < value.length; i += 1) {
-              const filePath = key;
-              data = value[i];
-              if (data.id !== 'none') {
-                promises.push(call( query.SQL_INSERT_RESULTS,
-                  data.file_hash,
-                  data.vendor,
-                  data.component,
-                  data.version,
-                  data.latest,
-                  data.url,
-                  data.lines,
-                  data.oss_lines,
-                  data.matched,
-                  data.file,
-                  data.id,
-                  data.url_hash,
-                  data.purl ? data.purl[0] : ' ',
-                  files[filePath],
-                  data.file_url,
-                  'engine'));
-                resultLicense[resultId] = data.licenses;
-                resultId +=1;
-              }
-            }
-          }
-          await Promise.all(promises);
-          db.close();
-          return resultLicense;
+
+  public async insertFromFile(resultPath: string, files: any): Promise<IInsertResult> {
+    const resultLicense: any = {};
+    const result: Record<any, any> = await utilModel.readFile(resultPath);
+    const db = await this.openDb();
+    const promises = [];
+    const call = util.promisify(db.run.bind(db));
+    let resultId = 1;
+    let data: any;
+    for (const [key, value] of Object.entries(result)) {
+      for (let i = 0; i < value.length; i += 1) {
+        const filePath = key;
+        data = value[i];
+        if (data.id !== 'none') {
+          promises.push(call(
+            query.SQL_INSERT_RESULTS,
+            data.file_hash,
+            data.vendor,
+            data.component,
+            data.version,
+            data.latest,
+            data.url,
+            data.lines,
+            data.oss_lines,
+            data.matched,
+            data.file,
+            data.id,
+            data.url_hash,
+            data.purl ? data.purl[0] : ' ',
+            files[filePath],
+            data.file_url,
+            'engine',
+          ));
+          resultLicense[resultId] = data.licenses;
+          resultId += 1;
+        }
+      }
+    }
+    await Promise.all(promises);
+    db.close();
+    return resultLicense;
   }
+
   public async insertResultLicense(data: IInsertResult):Promise<void> {
     const db = await this.openDb();
     const promises = [];
     const call = util.promisify(db.run.bind(db));
-        for (const [resultId, value] of Object.entries<Array<IResultLicense>>(data)) {
-          for (let i = 0; i < value.length; i += 1) {
-            promises.push(call('INSERT OR IGNORE INTO result_license (spdxid,source,resultId,patent_hints,copyLeft,osadl_updated,incompatible_with,checklist_url) VALUES (?,?,?,?,?,?,?,?);',
-              value[i].name,
-              value[i].source,
-              resultId,
-              value[i].patent_hints ? value[i].patent_hints : null,
-              value[i].copyleft ? value[i].copyleft : null,
-              value[i].osadl_updated ? value[i].osadl_updated : null,
-              value[i].incompatible_with ? value[i].incompatible_with : null,
-              value[i].checklist_url ? value[i].checklist_url : null));
-          }
-        }
-      await Promise.all(promises);
-      db.close();
+    for (const [resultId, value] of Object.entries<Array<IResultLicense>>(data)) {
+      for (let i = 0; i < value.length; i += 1) {
+        promises.push(call(
+          'INSERT OR IGNORE INTO result_license (spdxid,source,resultId,patent_hints,copyLeft,osadl_updated,incompatible_with,checklist_url) VALUES (?,?,?,?,?,?,?,?);',
+          value[i].name,
+          value[i].source,
+          resultId,
+          value[i].patent_hints ? value[i].patent_hints : null,
+          value[i].copyleft ? value[i].copyleft : null,
+          value[i].osadl_updated ? value[i].osadl_updated : null,
+          value[i].incompatible_with ? value[i].incompatible_with : null,
+          value[i].checklist_url ? value[i].checklist_url : null,
+        ));
+      }
+    }
+    await Promise.all(promises);
+    db.close();
   }
 
- public async count(): Promise<number> {
-   const db = await this.openDb();
-   const call = util.promisify(db.get.bind(db));
-   const result = await call('SELECT COUNT(*)as count FROM results;');
-   db.close();
-   return result.count;
- }
+  public async count(): Promise<number> {
+    const db = await this.openDb();
+    const call = util.promisify(db.get.bind(db));
+    const result = await call('SELECT COUNT(*)as count FROM results;');
+    db.close();
+    return result.count;
+  }
 
   public async updateDirty(value: number):Promise<void> {
     const db = await this.openDb();
@@ -135,10 +144,10 @@ export class ResultModel extends Model {
   public async deleteDirty(): Promise<void> {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
-    await call(`DELETE FROM results WHERE dirty=1;`);
+    await call('DELETE FROM results WHERE dirty=1;');
     db.close();
   }
-  
+
   private insertResultBulk(db: any, data: any, fileId: number): Promise<number> {
     return new Promise<number>((resolve) => {
       db.run(
@@ -161,7 +170,7 @@ export class ResultModel extends Model {
         'engine',
         function (this: any, error: any) {
           resolve(this.lastID);
-        }
+        },
       );
     });
   }
@@ -191,7 +200,7 @@ export class ResultModel extends Model {
         data.id
       }' ; `;
       db.serialize(() => {
-        db.get(SQLquery, function (err: any, result: any) {
+        db.get(SQLquery, (err: any, result: any) => {
           if (result !== undefined) {
             db.run('UPDATE results SET dirty=0 WHERE id=?', result.id);
             resolve(-1);
@@ -208,7 +217,7 @@ export class ResultModel extends Model {
     const call = util.promisify(db.all.bind(db));
     const results = await call(query.SQL_SCAN_SELECT_FILE_RESULTS, path);
     db.close();
-    if(results) return results;
+    if (results) return results;
     return [];
   }
 
@@ -220,6 +229,7 @@ export class ResultModel extends Model {
     db.close();
     return summary;
   }
+
   public async getResultsPreLoadInventory(queryBuilder: QueryBuilder) {
     const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_RESULTS_PRELOADINVENTORY, this.getEntityMapper());
     const db = await this.openDb();
@@ -228,6 +238,7 @@ export class ResultModel extends Model {
     db.close();
     return results;
   }
+
   public async getAll(queryBuilder: QueryBuilder) {
     const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_RESULTS, this.getEntityMapper());
     const db = await this.openDb();
@@ -236,14 +247,15 @@ export class ResultModel extends Model {
     db.close();
     return results;
   }
+
   public async getDetectedReport() {
-   const db = await this.openDb();
-   const call = util.promisify(db.all.bind(db));
-   const response = await call(`SELECT cv.purl,cv.version,cv.name, r.vendor, rl.spdxid,rl.patent_hints,rl.copyLeft,rl.incompatible_with FROM component_versions cv
+    const db = await this.openDb();
+    const call = util.promisify(db.all.bind(db));
+    const response = await call(`SELECT cv.purl,cv.version,cv.name, r.vendor, rl.spdxid,rl.patent_hints,rl.copyLeft,rl.incompatible_with FROM component_versions cv
                                 INNER JOIN results r ON cv.purl = r.purl AND cv.version = r.version
-                                INNER JOIN result_license rl ON rl.resultId = r.id;`);
-   db.close();
-   return response;
+                                LEFT JOIN result_license rl ON rl.resultId = r.id;`);
+    db.close();
+    return response;
   }
 
   public async getIdentifiedReport() {
@@ -257,12 +269,15 @@ export class ResultModel extends Model {
   }
 
   public async getFileMatch(queryBuilder: QueryBuilder) {
-    const SQLquery = this.getSQL(queryBuilder,`SELECT * from files f LEFT JOIN results r ON f.fileId = r.fileId #FILTER`, { filePath: 'f.path', purl: 'r.purl',
-      version: 'r.version', url: 'r.url'
+    const SQLquery = this.getSQL(queryBuilder, 'SELECT * from files f LEFT JOIN results r ON f.fileId = r.fileId #FILTER', {
+      filePath: 'f.path',
+      purl: 'r.purl',
+      version: 'r.version',
+      url: 'r.url',
     });
     const db = await this.openDb();
     const call = util.promisify(db.get.bind(db));
-    const response = await call(SQLquery.SQL,...SQLquery.params);
+    const response = await call(SQLquery.SQL, ...SQLquery.params);
     db.close();
     return response;
   }

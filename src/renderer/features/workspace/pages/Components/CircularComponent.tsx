@@ -1,5 +1,5 @@
 import React from 'react';
-import { CircularProgress, Button } from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import PauseIcon from '@mui/icons-material/Pause';
 import { ScannerStage } from '@api/types';
@@ -94,14 +94,16 @@ const CircularComponent = ({
     stage.stageName === ScannerStage.UNZIP ||
     stage.stageName === ScannerStage.INDEX ||
     stage.stageName === ScannerStage.VULNERABILITY ||
-    stage.stageName === ScannerStage.DEPENDENCY
+    stage.stageName === ScannerStage.DEPENDENCY ||
+    stage.stageName === ScannerStage.CRYPTOGRAPHY
       ? 'indeterminate'
       : 'determinate';
 
   const noProgress =
     stage.stageName === ScannerStage.DEPENDENCY ||
     stage.stageName === ScannerStage.VULNERABILITY ||
-    stage.stageName === ScannerStage.UNZIP;
+    stage.stageName === ScannerStage.UNZIP ||
+    stage.stageName === ScannerStage.CRYPTOGRAPHY;
 
   const resumeEnable =
     stage.stageName === ScannerStage.SCAN ||
