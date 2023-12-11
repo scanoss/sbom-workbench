@@ -6,8 +6,8 @@
 
 import log from 'electron-log';
 import * as fs from 'fs';
-import { isBinaryFileSync } from 'isbinaryfile';
 
+const isBinaryPath = require('is-binary-path');
 const fpath = require('path');
 
 export class AbstractFilter {
@@ -70,7 +70,7 @@ class ContentFilter extends AbstractFilter {
   }
 
   evaluate(path: string): boolean {
-    const binary = isBinaryFileSync(path);
+    const binary = isBinaryPath(path);
 
     if (this.condition === '=' && this.value === 'BINARY' && binary) return false;
     if (this.condition === '!=' && this.value === 'TEXT' && binary) return false;

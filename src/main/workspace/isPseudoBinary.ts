@@ -1,4 +1,4 @@
-import { isBinaryFileSync } from 'isbinaryfile';
+const isBinaryPath = require('is-binary-path');
 import fs from 'fs';
 
 const path = require('path');
@@ -26,7 +26,7 @@ export function isPseudoBinary(filePath: string): boolean {
   }
 
   // if binary
-  if (isBinaryFileSync(filePath)) {
+  if (isBinaryPath(filePath)) {
     return true;
   }
 
