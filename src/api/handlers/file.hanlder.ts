@@ -1,7 +1,6 @@
 import log from 'electron-log';
 import * as fs from 'fs';
 import { ipcMain } from 'electron';
-import { isBinaryFileSync } from 'isbinaryfile';
 import { GetFileDTO } from "@api/dto";
 import { IpcChannels } from '../ipc-channels';
 import { FileType } from '../types';
@@ -15,6 +14,7 @@ import { Response, ResponseStatus } from '../Response';
 import { broadcastManager } from '../../main/broadcastManager/BroadcastManager';
 
 const path = require('path');
+const isBinaryPath = require('is-binary-path');
 
 function isAllowed(filePath: string) {
   const skip = new Set([
@@ -50,7 +50,7 @@ function isAllowed(filePath: string) {
   }
 
   // if binary
-  if (isBinaryFileSync(filePath)) {
+  if (isBinaryPath(filePath)) {
     return false;
   }
 

@@ -1,6 +1,6 @@
-import { isBinaryFileSync } from 'isbinaryfile';
 import { IDependencyResponse } from 'scanoss';
 import log from 'electron-log';
+
 import Node, { NodeStatus } from './Node';
 import File from './File';
 import Folder from './Folder';
@@ -12,6 +12,7 @@ import { TreeViewMode } from './treeViewModes/TreeViewMode';
 import { TreeViewDefault } from './treeViewModes/TreeViewDefault';
 import { defaultBannedList } from '../filtering/defaultFilter';
 
+const isBinaryPath = require('is-binary-path');
 const fs = require('fs');
 const pathLib = require('path');
 
@@ -152,7 +153,7 @@ export class Tree {
     return this.summary;
   }
 
-  private scanMode(filePath: string) {
+  private async scanMode(filePath: string) {
     // eslint-disable-next-line prettier/prettier
     const skipExtentions = new Set([
       '.exe',
@@ -203,10 +204,11 @@ export class Tree {
         return 'MD5_SCAN';
       }
     }
-    // if binary
-    if (isBinaryFileSync(filePath)) {
+
+    if (isBinaryPath(filePath)) {
       return 'MD5_SCAN';
     }
+
 
     return 'FULL_SCAN';
   }
