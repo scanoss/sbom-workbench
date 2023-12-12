@@ -1,12 +1,7 @@
-import log from 'electron-log';
-import { AddCryptographyTask } from '../../task/cryptography/AddCryptographyTask';
-import { workspace } from '../../workspace/Workspace';
+import { NewComponentDTO } from '@api/types';
+import { cryptographyService } from '../CryptographyService';
 
-export async function AddCrypto(data: any) {
-  const p = workspace.getOpenProject();
-  if (p.getGlobalApiKey()) {
-    log.info('%c[ Crypto ]: Importing cryptography into database', 'color: green');
-    const cryptoTask = new AddCryptographyTask();
-    await cryptoTask.run({ components: [`${data.purl}@${data.versions[0].version}`], token: p.getGlobalApiKey() });
-  }
+export async function AddCrypto(data: NewComponentDTO | NewComponentDTO[]) {
+  const components = Array.isArray(data) ? data : [data];
+  await cryptographyService.importFromComponents(components);
 }
