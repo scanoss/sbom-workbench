@@ -1,3 +1,5 @@
+/* eslint-disable object-curly-newline */
+
 // ------ FILTERS SYNC WITH PYTHON CLIENT 06/10/2021 ------ //
 const defaultBannedList = {
   name: 'Default',
@@ -11,6 +13,9 @@ const defaultBannedList = {
     { condition: 'fullmatch', value: 'node_modules', ftype: 'NAME', scope: 'FOLDER' },
     { condition: 'fullmatch', value: 'vendor', ftype: 'NAME', scope: 'FOLDER' },
 
+    // Vendor files
+    { condition: '=', value: '.mod', ftype: 'EXTENSION', scope: 'FILE' },
+    { condition: '=', value: '.sum', ftype: 'EXTENSION', scope: 'FILE' },
 
     // Folder filters
     { condition: 'ends', value: '.egg-info', ftype: 'NAME', scope: 'FOLDER' },
