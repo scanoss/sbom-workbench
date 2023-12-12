@@ -1,3 +1,4 @@
+import { After } from '../../services/utils/hookAfter';
 import { ITask } from '../Task';
 import {
   Component,
@@ -14,6 +15,8 @@ import { ComponentSource, ComponentVersion } from '../../model/entity/ComponentV
 import { QueryBuilderMD5FileIn } from '../../model/queryBuilder/QueryBuilderMD5FileIn';
 import { Accept } from '../../batch/Accept';
 import { QueryBuilderCreator } from '../../model/queryBuilder/QueryBuilderCreator';
+import { AddVulnerability } from '../../services/utils/vulnerability';
+import { AddCrypto } from '../../services/utils/cryptography';
 
 /**
  * @brief used to create new inventories from inventories extracted from another projects
@@ -190,6 +193,8 @@ export class ReuseIdentificationTask implements ITask<void, Array<Inventory>> {
  * @param newComponents array of new components to be created
  * @return Array<ComponentVersion> ComponentVersion Array of component version created
  * */
+  @After(AddVulnerability)
+  @After(AddCrypto)
   private async createNewComponents(newComponents: Array<NewComponentDTO>): Promise <Array<ComponentVersion>> {
     const promises = [];
     newComponents.forEach((comp) => {
