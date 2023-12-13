@@ -52,13 +52,15 @@ export const importGlobalComponent = createAsyncThunk(
       });
       return Object.values(nonCataloguedLicenses) as Array<NewLicenseDTO>;
     };
+
     const component = await componentService.getGlobalComponentVersion({ purl: newComponent.purl });
+
     // Creates those licenses what not exists in the local catalogue
     const lic = await licenses();
     const nonCataloguedLicenses: any = getNoCataloguedLicenses(lic, component.versions);
     const newLic = nonCataloguedLicenses.map((l) => licenseService.create(l));
     const newLicenses: Array<NewLicenseDTO> = await Promise.all(newLic);
-    newLicenses.forEach(function (nl) {
+    newLicenses.forEach((nl) => {
       lic[nl.spdxid] = nl;
     });
     const versions = component.versions.flatMap((v) => {
@@ -68,12 +70,14 @@ export const importGlobalComponent = createAsyncThunk(
       });
       return licenseVersion;
     });
+
+    const { component: name, purl, url } = newComponent;
     const response = await componentService.create({
-      name: component.component,
+      name,
       versions,
-      purl: component.purl,
-      url: component.url,
+      purl,
+      url,
     });
     return response;
-  }
+  },
 );

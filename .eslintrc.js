@@ -38,6 +38,7 @@ module.exports = {
     'react/function-component-definition': ['off'],
     'no-param-reassign': ['off'],
     'react/jsx-one-expression-per-line': 'off',
+    'object-curly-newline': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
