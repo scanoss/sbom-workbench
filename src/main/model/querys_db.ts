@@ -248,15 +248,13 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   WHERE (compv.version,compv.purl) IN (SELECT version,purl FROM component_versions cv WHERE cv.source='engine')
   OR (compv.version,compv.purl) IN (SELECT version,purl FROM dependencies)`;
 
-  SQL_GET_COMPONENT_VERSIONS_FOR_VULNERABILITIES = `SELECT DISTINCT purl, version, name FROM (
+  SQL_GET_COMPONENT_VERSIONS_FOR_VULNERABILITIES = `
+    SELECT DISTINCT purl, version, (CASE WHEN name IS '' THEN purl ELSE name END) as name  FROM (
     SELECT cv.purl, cv.version, cv.name FROM component_versions cv 
     UNION ALL
-    SELECT  compv.purl, compv.version, substr(compv.purl,(instr(compv.purl,'/') + 1 ))  as name 
-    FROM component_vulnerability compv
-    UNION ALL
-    SELECT dep.purl, dep.version, (CASE WHEN dep.component IS '' THEN substr(dep.purl,(instr(dep.purl,'/') + 1 ))  ELSE dep.component END) as name 
+    SELECT dep.purl, dep.version, dep.component as name 
     FROM dependencies dep
-    )
+    ) 
     WHERE purl ||'@'|| version IN (#COMPONENTS);`;
 
   SQL_GET_VULNERABILITIES_IDENTIFIED_REPORT = `SELECT v.severity, count(v.severity) as count FROM vulnerability v
