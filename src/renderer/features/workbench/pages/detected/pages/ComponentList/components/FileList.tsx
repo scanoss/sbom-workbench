@@ -49,13 +49,13 @@ export const FileList = ({ files, filter, emptyMessage, onAction }: FileListProp
 
       {filteredFiles.length > limit && (
         <Alert
-          className="mt-3 mb-1"
+          className="w-100 mt-3 mb-1"
           severity="info"
-          action={
+          action={(
             <Button className="text-uppercase" color="inherit" size="small" onClick={paginate}>
               {t('Button:ShowMore')}
             </Button>
-          }
+          )}
         >
           <strong>
             Showing {limit} of {filteredFiles.length} files.
@@ -66,6 +66,6 @@ export const FileList = ({ files, filter, emptyMessage, onAction }: FileListProp
   );
 };
 
-FileList.defaultProps = { emptyMessage: null, filter: null }
+FileList.defaultProps = { emptyMessage: null, filter: null };
 
 export default FileList;
