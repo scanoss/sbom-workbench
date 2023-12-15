@@ -28,7 +28,7 @@ export class Indexer {
 
   public async saveIndex(index: any, pathToDictionary: string) {
     if (fs.existsSync(pathToDictionary)) {
-      fs.rmdirSync(pathToDictionary, { recursive: true });
+      fs.rmSync(pathToDictionary, { recursive: true, force: true });
     }
     fs.mkdirSync(pathToDictionary);
     await index.export((key: any, data: string | NodeJS.ArrayBufferView) => {
