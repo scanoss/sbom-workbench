@@ -145,7 +145,7 @@ export class ReuseIdentificationTask implements ITask<void, Array<Inventory>> {
     const localLicensesMapper = new Map <string, number>();
     localLicenses.forEach((l) => localLicensesMapper.set(l.spdxid, l.id));
     for (let i = 0; i < components.length; i += 1) {
-      for (let j = 0; j < components[i].licenses; j += 1) {
+      for (let j = 0; j < components[i].licenses.length; j += 1) {
         const { spdxid, name } = components[i].licenses[j];
         if (!localLicensesMapper.has(components[i].licenses[j].spdxid)) {
           const newLicense = await modelProvider.model.license.create({ name, spdxid, fulltext: 'IMPORTED' });
