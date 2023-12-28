@@ -36,8 +36,7 @@ export class Querys {
     cve varchar(30) NOT NULL,
     rejectAt datetime,
     CONSTRAINT component_vulnerability_pk PRIMARY KEY (purl,version,cve),
-    CONSTRAINT component_vulnerability_vulnerability FOREIGN KEY (cve)
-    REFERENCES vulnerability (cve)
+    CONSTRAINT component_vulnerability_vulnerability FOREIGN KEY (cve) REFERENCES vulnerability (cve) ON DELETE CASCADE
 );`;
 
   CRYPTOGRAPHY_TABLE = `CREATE TABLE IF NOT EXISTS cryptography (
@@ -233,8 +232,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     INNER JOIN files f ON d.fileId = f.fileId
     GROUP BY f.path;`;
 
-  SQL_DEPENDENCY_TOTAL_DETECTED= 'SELECT count(*) as total FROM dependencies;';
-
+  SQL_DEPENDENCY_TOTAL_DETECTED = 'SELECT count(*) as total FROM dependencies;';
 
   // VULNERABILITIES
 
