@@ -24,6 +24,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import TableCellActions from '@components/TableCellActions/TableCellActions';
 import { vulnerabilityService } from '@api/services/vulnerability.service';
+import { cryptographyService } from '@api/services/cryptography.service';
 import { SourceType } from '@api/dto';
 import useSearchParams from '@hooks/useSearchParams';
 import { useNavigate } from 'react-router-dom'; // TODO: use alias?
@@ -52,6 +53,10 @@ const VulnerabilitiesReport = () => {
   const init = async () => {
     const source = type === SourceType.identified ? SourceType.identified : SourceType.detected;
     const response = await vulnerabilityService.getAll({ type: source });
+
+    // TODO:Remove this line , just for testing
+    await cryptographyService.update();
+
     data.current = response;
 
     setItems(data.current);
@@ -197,7 +202,7 @@ const VulnerabilitiesReport = () => {
                       rel="noreferrer"
                     >
                       {item.vulnerability.cve}  <OpenInNewOutlinedIcon className="external-link" fontSize="small" />
-                               </Link>
+                    </Link>
                     </TableCell>
                     <TableCell>{item.vulnerability.source}</TableCell>
                     <TableCell>{item.vulnerability.published}</TableCell>

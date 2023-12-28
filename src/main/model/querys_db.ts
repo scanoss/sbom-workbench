@@ -269,6 +269,8 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   OR (compv.version,compv.purl) IN (SELECT version,purl FROM dependencies)
   GROUP BY v.severity;`;
 
+  SQL_VULNERABILITY_DELETE_ALL = 'DELETE FROM vulnerability;';
+
   SQL_GET_KNOWLEDGE_INVENTORIES = `SELECT fdb.md5_file, fdb.purl, fdb.version, fdb.url, fdb.name, fdb.spdxid AS inventoryLicense, fdb.usage, fdb.notes, fdb.licenseName,fdb.path, target.path as targetFiles FROM (SELECT r.md5_file, f.path FROM files f INNER JOIN results r ON r.fileId = f.fileId) as target,
     (SELECT aux.results.md5_file, aux.component_versions.purl, aux.component_versions.version, aux.component_versions.url, aux.component_versions.name,
      aux.inventories.spdxid, aux.inventories.usage, aux.inventories.notes, aux.licenses.name as licenseName, aux.files.path
@@ -295,4 +297,6 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
  (SELECT cv.purl, cv.version FROM component_versions cv WHERE id IN (
  SELECT cvid FROM inventories i)) as  ic
  INNER JOIN cryptography crypto ON crypto.purl = ic.purl AND crypto.version = ic.version;`;
+
+  SQL_CRYPTOGRAPHY_DELETE_ALL = 'DELETE FROM cryptography';
 }

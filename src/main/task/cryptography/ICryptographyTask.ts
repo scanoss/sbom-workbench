@@ -1,5 +1,7 @@
 export interface ICryptographyTask {
-  components: Array<String>;
+  components: Array<string>;
 
-  token:string;
+  token: string;
+
+  force?: boolean;
 }

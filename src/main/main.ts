@@ -39,6 +39,7 @@ import '../api/handlers/userSetting.handler';
 import '../api/handlers/app.handler';
 import '../api/handlers/search.handler';
 import '../api/handlers/vulnerability.handler';
+import '../api/handlers/cryptography.handler';
 
 import { broadcastManager } from './broadcastManager/BroadcastManager';
 
