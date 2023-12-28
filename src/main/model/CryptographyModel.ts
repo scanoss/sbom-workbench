@@ -55,6 +55,14 @@ export class CryptographyModel extends Model {
     return crypto;
   }
 
+  public async deleteAll() {
+    const db = await this.openDb();
+    const query = new Querys().SQL_CRYPTOGRAPHY_DELETE_ALL;
+    const call = await util.promisify(db.run.bind(db));
+    await call(query);
+    db.close();
+  }
+
   private cryptographyAdapter(cryptography: Array<{ purl: string, version: string, algorithms: string }>): Array<Cryptography> {
     return cryptography.map((c) => ({ purl: c.purl, version: c.version, algorithms: JSON.parse(c.algorithms) }));
   }
