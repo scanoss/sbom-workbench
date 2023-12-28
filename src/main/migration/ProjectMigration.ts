@@ -10,6 +10,7 @@ import { migration150 } from './scripts/150';
 import { migration180 } from './scripts/180';
 import { projectMigration183 } from './scripts/183';
 import { projectMigration190 } from './scripts/0190';
+import { projectMigration193 } from './scripts/0193';
 
 export class ProjectMigration extends Migration {
   private scripts: Record<string, Array<(data: string) => void>>;
@@ -32,6 +33,7 @@ export class ProjectMigration extends Migration {
       '1.8.0': [migration180],
       '1.8.3': [projectMigration183],
       '1.9.0': [projectMigration190],
+      '1.9.3': [projectMigration193],
     };
   }
 
