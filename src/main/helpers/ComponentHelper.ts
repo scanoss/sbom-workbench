@@ -86,6 +86,20 @@ class ComponentHelper {
     });
     return components;
   }
+
+  public groupComponentByPurlVersion(
+    components: any,
+    dependencyComponents: any,
+  ): Array<string> {
+    const allComponents = components.concat(dependencyComponents);
+    const componentSet = new Set<string>();
+    allComponents.forEach((c) => {
+      if (c.purl && c.version) {
+        componentSet.add(`${c.purl}@${c.version}`);
+      }
+    });
+    return Array.from(componentSet);
+  }
 }
 
 export const componentHelper = new ComponentHelper();

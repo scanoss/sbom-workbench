@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Button, createStyles, Fade, Menu, MenuItem, Tooltip,
 } from '@mui/material';
@@ -7,6 +7,8 @@ import {
   Navigate, NavLink, Route, Routes, useLocation, useNavigate,
 } from 'react-router-dom';
 import { reportService } from '@api/services/report.service';
+import { cryptographyService } from '@api/services/cryptography.service';
+import { vulnerabilityService } from '@api/services/vulnerability.service';
 import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { ExportFormat, ExportSource, IProject } from '@api/types';
@@ -15,11 +17,12 @@ import AppConfig from '@config/AppConfigModule';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import { getFormatFilesAttributes } from '@shared/utils/file-utils';
 import { useTranslation } from 'react-i18next';
+import Loader from '@components/Loader/Loader';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { dialogController } from '../../../../../../controllers/dialog-controller';
 import IdentifiedReport from './IdentifiedReport';
 import DetectedReport from './DetectedReport';
 import VulnerabilitiesReport from '../vulnerabilities/VulnerabilitiesReport';
-import Loader from '@components/Loader/Loader';
 
 const useStyles = makeStyles({
   tooltip: {
@@ -185,6 +188,9 @@ const ScanReport = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const state = useSelector(selectWorkbench);
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
+
+  const { t } = useTranslation();
 
   const [detectedData, setDetectedData] = useState(null);
   const [identifiedData, setIdentifiedData] = useState(null);
@@ -203,13 +209,34 @@ const ScanReport = () => {
     }
   };
 
+  const refresh = async () => {
+    const dialog = await dialogCtrl.createProgressDialog('Updating report'.toUpperCase());
+    dialog.present();
+    try {
+      const promises = [cryptographyService.update(), vulnerabilityService.update()];
+      await Promise.all(promises);
+      dialog.finish({ message: 'Update Finished'.toUpperCase() });
+    } catch (e: any) {
+      dialog.dismiss();
+      dialogController.showError('Error refreshing', e.message);
+    } finally {
+      dialog.dismiss({ delay: 1500 });
+      await getReport();
+    }
+  };
+
+  const getReport = async () => {
+    const summary = await reportService.getSummary();
+    const detected = await reportService.detected();
+    const identified = await reportService.identified();
+    setDetectedData({ ...detected, summary });
+    setIdentifiedData({ ...identified, summary });
+    return { summary, detected, identified };
+  };
+
   useEffect(() => {
     const init = async () => {
-      const summary = await reportService.getSummary();
-      const detected = await reportService.detected();
-      const identified = await reportService.identified();
-      setDetectedData({ ...detected, summary });
-      setIdentifiedData({ ...identified, summary });
+      const { identified } = await getReport();
       setTab(identified);
     };
     init();
@@ -227,8 +254,8 @@ const ScanReport = () => {
       </header>
       <main className="app-content">
         <Routes>
-          <Route path="detected" element={detectedData && <DetectedReport data={detectedData} />} />
-          <Route path="identified" element={identifiedData && <IdentifiedReport data={identifiedData} />} />
+          <Route path="detected" element={detectedData && <DetectedReport data={detectedData} onRefresh={refresh} />} />
+          <Route path="identified" element={identifiedData && <IdentifiedReport data={identifiedData} onRefresh={refresh} />} />
         </Routes>
       </main>
     </section>
