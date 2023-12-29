@@ -138,9 +138,9 @@ const IdentifiedReport = ({ data, onRefresh }) => {
         <Tab value="obligations" label={t('Title:ObligationsTab')} />
         { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label={t('Title:CryptographyTab')} />}
         <div className="refresh-btn-container">
-          <Button onClick={onRefresh}>
+          <IconButton onClick={onRefresh}>
             <RefreshIcon />
-          </Button>
+          </IconButton>
         </div>
       </Tabs>
 

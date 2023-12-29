@@ -23,5 +23,8 @@
   "YouNeedRestartQuestion": "Es necesario reiniciar la aplicación para cambiar el idioma. ¿Quieres hacerlo?",
   "ExportingProject": "Exportando proyecto",
   "SuccesfulImport": "Importación exitosa",
-  "ImportingProject": "Importando proyecto"
+  "ImportingProject": "Importando proyecto",
+  "UpdatingReport": "Actualizando Reporte",
+  "UpdateFinished": "Actualizacion Existosa",
+  "ErrorUpdatingReport": "Error en la Actualizacion"
 }

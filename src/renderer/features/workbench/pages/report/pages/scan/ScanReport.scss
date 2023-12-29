@@ -60,7 +60,11 @@
 
       .refresh-btn-container {
         position: absolute;
-        top: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        height: 100%;
         right: 0;
       }
 
