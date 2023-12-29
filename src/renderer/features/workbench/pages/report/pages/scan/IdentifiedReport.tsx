@@ -11,6 +11,7 @@ import obligationsService from '@api/services/obligations.service';
 import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import CloseIcon from '@mui/icons-material/Close';
 import LicensesChart from '../../components/LicensesChart';
 import IdentificationProgress from '../../components/IdentificationProgress';
@@ -26,7 +27,7 @@ import DependenciesDataTable from '../../components/DependenciesDataTable';
 
 Chart.register(...registerables);
 
-const IdentifiedReport = ({ data }) => {
+const IdentifiedReport = ({ data, onRefresh }) => {
   const { projectScannerConfig } = useSelector(selectWorkbench);
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -136,6 +137,11 @@ const IdentifiedReport = ({ data }) => {
         { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="dependencies" label={t('Title:IdentifiedDependenciesTab')} />}
         <Tab value="obligations" label={t('Title:ObligationsTab')} />
         { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label={t('Title:CryptographyTab')} />}
+        <div className="refresh-btn-container">
+          <Button onClick={onRefresh}>
+            <RefreshIcon />
+          </Button>
+        </div>
       </Tabs>
 
       {tab === 'matches' && (

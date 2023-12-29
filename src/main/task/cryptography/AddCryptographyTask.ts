@@ -18,8 +18,9 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
       if (params.force) await modelProvider.model.cryptography.deleteAll();
       // Import Crypto into Database
       await modelProvider.model.cryptography.insertAll(cryptographies);
-    } catch (e) {
+    } catch (e: any) {
       log.error(e);
+      throw new Error(e.message);
     }
   }
 

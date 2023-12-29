@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Chart, registerables } from 'chart.js';
 import {
+  Button,
   Card, IconButton, Tab, Tabs,
 } from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
 import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
@@ -24,7 +26,7 @@ import ObligationsDataTable from '../../components/ObligationsDataTable';
 
 Chart.register(...registerables);
 
-const DetectedReport = ({ data }) => {
+const DetectedReport = ({ data, onRefresh }) => {
   const { projectScannerConfig } = useSelector(selectWorkbench);
   const { t } = useTranslation();
 
@@ -83,7 +85,7 @@ const DetectedReport = ({ data }) => {
         <MatchesChart data={data.summary} />
       </Card>
 
-      <Card onClick={e => setTab('dependencies')} className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
+      <Card onClick={(e) => setTab('dependencies')} className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
         <div className="report-title d-flex space-between align-center">
           <span>{t('Title:DeclaredDependencies')}</span>
         </div>
@@ -111,6 +113,11 @@ const DetectedReport = ({ data }) => {
         { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="dependencies" label={t('Title:DeclaredDependenciesTab')} />}
         <Tab value="obligations" label={t('Title:ObligationsTab')} />
         { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label={t('Title:CryptographyTab')} />}
+        <div className="refresh-btn-container">
+          <Button onClick={onRefresh}>
+            <RefreshIcon />
+          </Button>
+        </div>
       </Tabs>
 
       {tab === 'matches' && (

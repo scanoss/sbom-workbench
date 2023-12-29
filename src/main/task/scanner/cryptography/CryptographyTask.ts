@@ -6,7 +6,9 @@ import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
 import { AddCryptographyTask } from '../../cryptography/AddCryptographyTask';
-import { userSettingService } from '../../../services/UserSettingService';
+import { componentHelper } from '../../../helpers/ComponentHelper';
+
+
 
 export class CryptographyTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -31,7 +33,7 @@ export class CryptographyTask implements Scanner.IPipelineTask {
     const dependencyComponents = await modelProvider.model.dependency.getAll(
       null,
     );
-    const components = this.groupComponentByPurlVersion(
+    const components = componentHelper.groupComponentByPurlVersion(
       detectedComponents,
       dependencyComponents,
     );
@@ -42,19 +44,5 @@ export class CryptographyTask implements Scanner.IPipelineTask {
     this.project.save();
 
     return true;
-  }
-
-  private groupComponentByPurlVersion(
-    components: any,
-    dependencyComponents: any,
-  ): Array<string> {
-    const allComponents = components.concat(dependencyComponents);
-    const componentSet = new Set<string>();
-    allComponents.forEach((c) => {
-      if (c.purl && c.version) {
-        componentSet.add(`${c.purl}@${c.version}`);
-      }
-    });
-    return Array.from(componentSet);
   }
 }

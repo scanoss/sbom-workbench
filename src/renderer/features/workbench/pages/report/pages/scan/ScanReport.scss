@@ -53,8 +53,17 @@
     .vulnerabilities {
       grid-area: A4;
     }
+
     .tabs-navigator {
       grid-area: C;
+      position: relative;
+
+      .refresh-btn-container {
+        position: absolute;
+        top: 8px;
+        right: 0;
+      }
+
     }
     .licenses-obligation, .matches-for-license, .cryptography, .dependencies-table {
       grid-area: D;

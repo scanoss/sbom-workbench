@@ -3,6 +3,7 @@ import log from 'electron-log';
 import { workspace } from '../workspace/Workspace';
 import { AddCryptographyTask } from '../task/cryptography/AddCryptographyTask';
 import { modelProvider } from './ModelProvider';
+import { componentHelper } from '../helpers/ComponentHelper';
 
 class CryptographyService {
   public async importFromComponents(components: Array<NewComponentDTO>) {
@@ -23,20 +24,30 @@ class CryptographyService {
   }
 
   public async update() {
-    const p = workspace.getOpenProject();
-    if (!p.getGlobalApiKey()) throw new Error('API Key is required');
+    try {
+      const p = workspace.getOpenProject();
+      if (!p.getGlobalApiKey()) throw new Error('API Key is required');
 
-    const components = await modelProvider.model.component.getAll();
-    const comp = components.flatMap((c) => `${c.purl}@${c.version}`);
-    const cryptographyTask = new AddCryptographyTask();
-    await cryptographyTask.run({ components: comp, token: p.getGlobalApiKey(), force: true });
+      const componentVersion = await modelProvider.model.component.getAll(null);
+      const dependencyComponents = await modelProvider.model.dependency.getAll(null);
 
-    const detected = await modelProvider.model.cryptography.findAllDetected();
-    const identified = await modelProvider.model.cryptography.findAllIdentifiedMatched();
-    return {
-      identified,
-      detected,
-    };
+      const components = componentHelper.groupComponentByPurlVersion(
+        componentVersion,
+        dependencyComponents,
+      );
+
+      const cryptographyTask = new AddCryptographyTask();
+      await cryptographyTask.run({ components, token: p.getGlobalApiKey(), force: true });
+
+      const detected = await modelProvider.model.cryptography.findAllDetected();
+      const identified = await modelProvider.model.cryptography.findAllIdentifiedMatched();
+      return {
+        identified,
+        detected,
+      };
+    } catch (e: any) {
+      throw new Error(`Error updating cryptography: cause: ${e.message}`);
+    }
   }
 }
 
