@@ -210,15 +210,15 @@ const ScanReport = () => {
   };
 
   const refresh = async () => {
-    const dialog = await dialogCtrl.createProgressDialog('Updating report'.toUpperCase());
+    const dialog = await dialogCtrl.createProgressDialog(t('Dialog:UpdatingReport').toUpperCase());
     dialog.present();
     try {
       const promises = [cryptographyService.update(), vulnerabilityService.update()];
       await Promise.all(promises);
-      dialog.finish({ message: 'Update Finished'.toUpperCase() });
+      dialog.finish({ message: t('Dialog:UpdateFinished').toUpperCase() });
     } catch (e: any) {
       dialog.dismiss();
-      dialogController.showError('Error refreshing', e.message);
+      dialogController.showError(t('Dialog:ErrorUpdatingReport'), e.message);
     } finally {
       dialog.dismiss({ delay: 1500 });
       await getReport();
