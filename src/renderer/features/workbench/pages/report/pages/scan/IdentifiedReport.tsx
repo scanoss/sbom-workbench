@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Chart, registerables } from 'chart.js';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import {
-  Button, Card, IconButton, Tab, Tabs,
+  Button, Card, IconButton, Tab, Tabs, Tooltip,
 } from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
 import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
@@ -132,17 +132,21 @@ const IdentifiedReport = ({ data, onRefresh }) => {
         </ConditionalLink>
       </Card>
 
-      <Tabs value={tab} onChange={(e, value) => setTab(value)} className="tabs-navigator">
-        <Tab value="matches" label={t('Title:MatchedTab')} />
-        { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="dependencies" label={t('Title:IdentifiedDependenciesTab')} />}
-        <Tab value="obligations" label={t('Title:ObligationsTab')} />
-        { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label={t('Title:CryptographyTab')} />}
-        <div className="refresh-btn-container">
+
+      <div className="tabs-navigator">
+        <Tabs value={tab} onChange={(e, value) => setTab(value)}>
+          <Tab value="matches" label={t('Title:MatchedTab')} />
+          { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="dependencies" label={t('Title:IdentifiedDependenciesTab')} />}
+          <Tab value="obligations" label={t('Title:ObligationsTab')} />
+          { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label={t('Title:CryptographyTab')} />}
+        </Tabs>
+
+        <Tooltip title={t('Tooltip:RefreshReportButtonLabel')} classes={{ tooltip: 'tooltip' }}>
           <IconButton onClick={onRefresh}>
             <RefreshIcon />
           </IconButton>
-        </div>
-      </Tabs>
+        </Tooltip>
+      </div>
 
       {tab === 'matches' && (
         <Card className="report-item matches-for-license">

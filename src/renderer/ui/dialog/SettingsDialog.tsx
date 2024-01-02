@@ -140,9 +140,9 @@ interface SettingDialogProps {
 const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
   const { t, i18n } = useTranslation();
 
-  const [selectedApi, setSelectedApi] = useState(null);
-  const [apis, setApis] = useState([]);
-  const [sbomLedgerToken, setSbomLedgerToken] = useState(null);
+  const [selectedApi, setSelectedApi] = useState<any>('');
+  const [apis, setApis] = useState<any[]>([]);
+  const [sbomLedgerToken, setSbomLedgerToken] = useState<string>('');
   const [language, setLanguage] = useState<string>('en');
   const [apiDialog, setApiDialog] = useState({
     open: false,
@@ -266,7 +266,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   <Paper className="dialog-form-field-control">
                     <Autocomplete
                       fullWidth
-                      value={selectedApi}
+                      value={selectedApi || ''}
                       onChange={handleOnChange}
                       onKeyPress={(e: any) => {
                         if (e.key === 'Enter') {
@@ -344,7 +344,6 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                           {...params}
                           InputProps={{
                             ...params.InputProps,
-                            disableUnderline: true,
                           }}
                         />
                       )}
@@ -371,7 +370,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                 <TextField
                   name="token"
                   fullWidth
-                  value={sbomLedgerToken}
+                  value={sbomLedgerToken || ''}
                   onChange={(e) => setSbomLedgerToken(e.target.value)}
                 />
               </Paper>
@@ -385,8 +384,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   name="usage"
                   size="small"
                   fullWidth
-                  disableUnderline
-                  value={language}
+                  value={language || ''}
                   onChange={(e) => setLanguage(e.target.value as string)}
                 >
 

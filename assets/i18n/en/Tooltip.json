@@ -47,5 +47,6 @@
   "Detected": "Detected",
   "NotDetected": "Not Detected",
   "Ignored": "Ignored",
-  "Progress": "Progress"
+  "Progress": "Progress",
+  "RefreshReportButtonLabel": "Update report for the latest vulnerabilities and cryptography data"
 }

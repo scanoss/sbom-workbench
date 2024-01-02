@@ -84,7 +84,6 @@ const LicenseSelector: React.FC<Partial<LicenseSelectorProps>> = (props) => {
               InputProps={{
                 ...params.InputProps,
                 startAdornment: <SearchIcon />,
-                disableUnderline: true,
                 className: 'autocomplete-option',
               }}
             />

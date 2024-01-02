@@ -56,19 +56,12 @@
 
     .tabs-navigator {
       grid-area: C;
-      position: relative;
 
-      .refresh-btn-container {
-        position: absolute;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        top: 0;
-        height: 100%;
-        right: 0;
-      }
-
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
+
     .licenses-obligation, .matches-for-license, .cryptography, .dependencies-table {
       grid-area: D;
 
@@ -106,7 +99,6 @@
       .oss-original {
         grid-area: A2;
       }
-
 
     }
 
