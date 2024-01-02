@@ -1,28 +1,29 @@
-import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
 import { Cryptography } from '../model/entity/Cryptography';
 
 interface LicenseEntry {
   label: string;
-  components: any[];
+  components: Component[];
   value: number;
-  incompatibles: string[];
-  has_incompatibles: string[];
-  copyleft: boolean;
-  patent_hints: boolean;
-}
-interface CryptoEntry {
-  label: string;
-  value: number;
-  files: any[];
+  incompatibles?: string[];
+  has_incompatibles?: string[];
+  copyleft?: boolean;
+  patent_hints?: boolean;
 }
 
-interface InventoryProgress {
-  totalFiles: number;
-  scannedFiles: number;
-  excludedFiles: number;
-  detectedComponents: number;
-  acceptedComponents: number;
+interface Component {
+  name: string,
+  url: string,
+  vendor: string,
+  purl: string,
+  version: string,
+  source: string,
+  cryptography: Array<CryptographyAlgorithms> | [],
+}
+
+interface CryptographyAlgorithms {
+  algorithm: string,
+  strength: string,
 }
 
 export interface ISummary {
@@ -63,33 +64,25 @@ class ReportService {
   public async getIdentified() {
     let data: any = [];
     data = await modelProvider.model.component.getIdentifiedForReport();
-    const licenses = [];
+
+    const licenseMapper = new Map<string, LicenseEntry>();
     data.forEach((element) => {
-      const aux: any = {};
-      const index = licenses.findIndex((obj) => obj.label === element.spdxid);
-      if (index >= 0) {
-        licenses[index].components.push({
-          name: element.comp_name,
-          vendor: element.vendor,
-          url: element.url,
-          purl: element.purl,
-          version: element.version,
-        });
-        licenses[index].value += 1;
+      const { name, vendor, url, purl, version, source, spdxid } = element;
+      if (licenseMapper.has(spdxid)) {
+        const license = licenseMapper.get(spdxid);
+        license.components.push({ name, vendor, url, purl, version, source, cryptography: [] });
+        license.value += 1;
       } else {
-        aux.components = [];
-        aux.components.push({
-          name: element.comp_name,
-          vendor: element.vendor,
-          url: element.url,
-          purl: element.purl,
-          version: element.version,
-        });
-        aux.value = 1;
-        aux.label = element.spdxid;
-        licenses.push(aux);
+        const newLicense = {
+          components: [{ name, vendor, url, purl, version, source, cryptography: [] }],
+          value: 1,
+          label: spdxid,
+        };
+        licenseMapper.set(spdxid, newLicense);
       }
     });
+
+    const licenses = Array.from(licenseMapper.values()) as unknown as Array<LicenseEntry>;
 
     const vulnerabilities = await modelProvider.model.vulnerability.getIdentifiedReport();
     const vulnerabilityReport = {
@@ -102,15 +95,12 @@ class ReportService {
 
     // Crypto
     const crypto = await modelProvider.model.cryptography.findAllIdentifiedMatched();
-
     this.addCryptoToComponent(licenses, crypto);
 
     // Dependencies
     const dependenciesSummary = await modelProvider.model.dependency.getIdentifiedSummary();
 
-    return {
-      licenses, vulnerabilities: vulnerabilityReport, crypto, dependencies: dependenciesSummary,
-    };
+    return { licenses, vulnerabilities: vulnerabilityReport, crypto, dependencies: dependenciesSummary };
   }
 
   public async getDetected() {
@@ -130,7 +120,7 @@ class ReportService {
       };
 
       const dependencies = await modelProvider.model.dependency.getAll(null);
-      licenses = this.mergeLicenseData(licenses, dependencies);
+      licenses = this.addDependencyComponentsToLicenseReport(licenses, dependencies);
       if (licenses) this.checkForIncompatibilities(licenses);
 
       // Dependencies
@@ -152,9 +142,9 @@ class ReportService {
 
     licenses.forEach((l) => {
       l.components.forEach((c) => {
-        if (!cryptoMapper.has(`${c.purl}@${c.version}`)) {
-          c.cryptography = [];
-        } else { c.cryptography = cryptoMapper.get(`${c.purl}@${c.version}`).algorithms; }
+        if (cryptoMapper.has(`${c.purl}@${c.version}`)) {
+          c.cryptography = cryptoMapper.get(`${c.purl}@${c.version}`).algorithms;
+        }
       });
     });
   }
@@ -179,6 +169,8 @@ class ReportService {
                 vendor: curr.vendor,
                 version: curr.version,
                 purl: curr.purl,
+                cryptography: [],
+                source: 'detected',
               },
             ],
           };
@@ -193,6 +185,8 @@ class ReportService {
               vendor: curr.vendor,
               version: curr.version,
               purl: curr.purl,
+              cryptography: [],
+              source: 'detected',
             });
           }
         }
@@ -225,7 +219,14 @@ class ReportService {
     }
   }
 
-  private mergeLicenseData(
+  /**
+  * @description An array of LicenseEntry objects representing detected licenses with matched components.
+  * @param licenses Array of all detected licenses
+  * @param dependencies Array of all licenses
+  * @returns LicenseEntry[] Licenses with all the components
+  * */
+
+  private addDependencyComponentsToLicenseReport(
     licenses: LicenseEntry[],
     dependencies: Array<any>,
   ): Array<LicenseEntry> {
@@ -235,16 +236,19 @@ class ReportService {
     }, {} as any);
 
     dependencies.forEach((dep) => {
+      const { component, purl, version } = dep;
       // We don't know what is the license
       if (!dep.originalLicense) {
         if (!licenseMapper.unknown) {
           licenseMapper.unknown = {
             components: [
               {
-                name: dep.component !== '' ? dep.component : dep.purl,
+                name: component !== '' ? component : purl,
                 vendor: null,
-                version: dep.version,
-                purl: dep.purl,
+                version,
+                purl,
+                cryptography: [],
+                source: 'declared',
               },
             ],
             label: 'unknown',
@@ -256,10 +260,12 @@ class ReportService {
           };
         } else {
           licenseMapper.unknown.components.push({
-            name: dep.component !== '' ? dep.component : dep.purl,
+            name: component !== '' ? component : purl,
             vendor: null,
             version: dep.version,
             purl: dep.purl,
+            cryptography: [],
+            source: 'declared',
           });
           licenseMapper.unknown.value += 1;
         }
@@ -268,27 +274,30 @@ class ReportService {
           // if license already exists in the license mapper
           if (licenseMapper[l]) {
             const componentIndex = licenseMapper[l].components.findIndex(
-              (c) => c.purl === dep.purl && c.version === dep.version,
+              (c) => c.purl === dep.purl && c.version === dep.version && dep.source === 'dependency',
             );
             // check if the component already exists in the component array
             if (componentIndex < 0) {
               licenseMapper[l].components.push({
                 name: dep.componentName,
                 vendor: null,
-                version: dep.version,
-                purl: dep.purl,
+                version,
+                purl,
+                cryptography: [],
+                source: 'declared',
               });
               licenseMapper[l].value += 1;
             }
-          } // The license not exists in license mapper
-          else {
+          } else { // The license not exists in license mapper
             licenseMapper[l] = {
               components: [
                 {
                   name: dep.componentName,
                   vendor: null,
-                  version: dep.version,
-                  purl: dep.purl,
+                  version,
+                  purl,
+                  cryptography: [],
+                  source: 'declared',
                 },
               ],
               label: l,

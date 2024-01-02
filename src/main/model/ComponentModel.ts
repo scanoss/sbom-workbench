@@ -30,10 +30,8 @@ export class ComponentModel extends Model {
 
   public async get(component: number) {
     if (component) {
-      let comp: any;
-      comp = await this.getById(component);
-      const summary = await this.summaryByPurlVersion(comp);
-      comp.summary = summary;
+      const comp = await this.getById(component);
+      comp.summary = await this.summaryByPurlVersion(comp);
       return comp;
     }
     return null;
@@ -71,7 +69,7 @@ export class ComponentModel extends Model {
             component.id = this.lastID;
             callback(null, component);
           }
-        }
+        },
       );
     });
     const newComponent = await call();
@@ -131,8 +129,8 @@ export class ComponentModel extends Model {
           'AUTOMATIC IMPORT',
           component.url,
           component.purl,
-          'engine'
-        )
+          'engine',
+        ),
       );
     });
     await Promise.all(promises);
@@ -168,7 +166,7 @@ export class ComponentModel extends Model {
       component.url,
       component.purl,
       component.description,
-      component.compid
+      component.compid,
     );
     db.close();
   }
@@ -216,22 +214,21 @@ export class ComponentModel extends Model {
   public async getComponentsIdentifiedForReport() {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const query =
-      (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms
+    const query = (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms
         FROM component_versions c
         INNER JOIN inventories i ON c.id=i.cvid
         LEFT JOIN licenses l ON l.spdxid=i.spdxid
 		LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
 		LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version;`)) as Array<{
-        purl: string;
-        name: string;
-        vendor: string;
-        url: string;
-        version: string;
-        license: string;
-        spdxid: string;
-        algorithms: { algorithm: string; strength: string }[] | null;
-      }>;
+      purl: string;
+      name: string;
+      vendor: string;
+      url: string;
+      version: string;
+      license: string;
+      spdxid: string;
+      algorithms: { algorithm: string; strength: string }[] | null;
+    }>;
     db.close();
     return query.map((item) => ({ ...item, algorithms: JSON.parse(item.algorithms) }));
   }
@@ -239,21 +236,20 @@ export class ComponentModel extends Model {
   public async getIdentifiedForReport() {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const report =
-      (await call(`SELECT DISTINCT c.id,c.name AS comp_name , c.version, c.purl,c.url,l.name AS license_name, l.spdxid, r.vendor
+    const report = (await call(`SELECT DISTINCT c.id,c.name, c.version, c.purl,c.url,l.name AS license_name, l.spdxid, r.vendor, i.source
         FROM component_versions c
         INNER JOIN inventories i ON c.id=i.cvid
         LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
         INNER JOIN licenses l ON l.spdxid=i.spdxid ORDER BY i.spdxid;`)) as Array<{
-        id: string;
-        comp_name: string;
-        version: string;
-        purl: string;
-        url: string;
-        license_name: string;
-        spdxid: string;
-        vendor: string;
-      }>;
+      id: string;
+      comp_name: string;
+      version: string;
+      purl: string;
+      url: string;
+      license_name: string;
+      spdxid: string;
+      vendor: string;
+    }>;
     db.close();
     return report;
   }
@@ -262,7 +258,7 @@ export class ComponentModel extends Model {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
     const data = await call(
-      'SELECT cv.id FROM component_versions cv  WHERE NOT EXISTS (SELECT 1 FROM results WHERE purl=cv.purl AND version=cv.version) AND cv.id NOT IN (SELECT i.cvid FROM inventories i);'
+      'SELECT cv.id FROM component_versions cv  WHERE NOT EXISTS (SELECT 1 FROM results WHERE purl=cv.purl AND version=cv.version) AND cv.id NOT IN (SELECT i.cvid FROM inventories i);',
     );
     db.close();
     const ids: number[] = data.map((item: Record<string, number>) => item.id);
@@ -282,7 +278,7 @@ export class ComponentModel extends Model {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
     await call(
-      'UPDATE component_versions  SET source=\'manual\' WHERE  id IN ( SELECT i.cvid FROM inventories i INNER JOIN component_versions cv ON cv.id=i.cvid AND i.source="detected" WHERE (cv.purl,cv.version) NOT IN (SELECT r.purl,r.version FROM results r));'
+      'UPDATE component_versions  SET source=\'manual\' WHERE  id IN ( SELECT i.cvid FROM inventories i INNER JOIN component_versions cv ON cv.id=i.cvid AND i.source="detected" WHERE (cv.purl,cv.version) NOT IN (SELECT r.purl,r.version FROM results r));',
     );
     db.close();
   }
@@ -317,8 +313,7 @@ export class ComponentModel extends Model {
   public async getMostReliableLicensePerComponent(): Promise<Array<IComponentLicenseReliable>> {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const components =
-      await call(`SELECT * FROM (SELECT cv.id AS cvid,rl.source,rl.spdxid AS reliableLicense,(CASE WHEN rl.source ='component_declared' THEN 1 WHEN rl.source = 'file_header' THEN 2 ELSE 3 END) ranking FROM results r LEFT JOIN component_versions cv
+    const components = await call(`SELECT * FROM (SELECT cv.id AS cvid,rl.source,rl.spdxid AS reliableLicense,(CASE WHEN rl.source ='component_declared' THEN 1 WHEN rl.source = 'file_header' THEN 2 ELSE 3 END) ranking FROM results r LEFT JOIN component_versions cv
             ON cv.purl=r.purl  AND cv.version= r.version LEFT JOIN result_license rl
             ON r.id = rl.resultId
             GROUP BY cvid, rl.source,rl.spdxid
@@ -338,8 +333,8 @@ export class ComponentModel extends Model {
         call(
           'UPDATE component_versions SET reliableLicense=? WHERE id=?',
           reliableLicenses[i].reliableLicense,
-          reliableLicenses[i].cvid
-        )
+          reliableLicenses[i].cvid,
+        ),
       );
     }
     await Promise.all(promises);
