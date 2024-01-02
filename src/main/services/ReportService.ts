@@ -103,6 +103,8 @@ class ReportService {
     // Crypto
     const crypto = await modelProvider.model.cryptography.findAllIdentifiedMatched();
 
+    this.addCryptoToComponent(licenses, crypto);
+
     // Dependencies
     const dependenciesSummary = await modelProvider.model.dependency.getIdentifiedSummary();
 
@@ -134,12 +136,27 @@ class ReportService {
       // Dependencies
       const dependenciesSummary = await modelProvider.model.dependency.getDetectedSummary();
 
+      this.addCryptoToComponent(licenses, crypto);
+
       return {
         licenses, crypto, vulnerabilities: vulnerabilityReport, dependencies: dependenciesSummary,
       };
     } catch (e) {
       return { status: 'fail' };
     }
+  }
+
+  private addCryptoToComponent(licenses: Array<LicenseEntry>, crypto: Array<Cryptography>) {
+    const cryptoMapper = new Map<string, Cryptography>();
+    crypto.forEach((c) => cryptoMapper.set(`${c.purl}@${c.version}`, c));
+
+    licenses.forEach((l) => {
+      l.components.forEach((c) => {
+        if (!cryptoMapper.has(`${c.purl}@${c.version}`)) {
+          c.cryptography = [];
+        } else { c.cryptography = cryptoMapper.get(`${c.purl}@${c.version}`).algorithms; }
+      });
+    });
   }
 
   private getLicenseReportFromResults(results: any): Array<LicenseEntry> {
