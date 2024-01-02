@@ -8,8 +8,4 @@ class CryptographyService extends BaseService {
   }
 }
 
-
-
 export const cryptographyService = new CryptographyService();
-
-document.crypto = cryptographyService;

@@ -166,3 +166,9 @@ a {
 .selectable, .selectable * {
   -webkit-user-select: text !important;
 }
+
+.tooltip {
+  text-align: center;
+  font-size: .75rem;
+  max-width: 140px;
+}

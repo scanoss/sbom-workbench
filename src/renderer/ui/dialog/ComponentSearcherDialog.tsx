@@ -238,7 +238,6 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
                       {...params}
                       InputProps={{
                         ...params.InputProps,
-                        disableUnderline: true,
                         className: 'autocomplete-option',
                       }}
                     />

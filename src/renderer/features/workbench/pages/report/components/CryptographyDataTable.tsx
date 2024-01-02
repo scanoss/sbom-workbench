@@ -42,7 +42,11 @@ const CryptographyDataTable = ({ data }) => {
 
   // empty
   if (!data || data.length === 0) {
-    return <p className="text-center mt-5 mb-3">{t('NoData')}</p>;
+    return (
+      <div className="empty-table">
+        <p className="text-center mt-5 mb-3">{t('NoDataFound')}</p>
+      </div>
+    );
   }
 
   return (
@@ -57,6 +61,7 @@ const CryptographyDataTable = ({ data }) => {
           rowGetter={({ index }) => items.current[index]}
           headerClassName={classes.headerColumn}
           rowClassName={classes.row}
+          index={(index) => `${items.current[index].purl}@${items.current[index].version}`}
         >
           <Column label={t('Table:Header:PURL')} dataKey="purl" width={200} flexGrow={1} flexShrink={0} />
           <Column label={t('Table:Header:Version')} dataKey="version" width={100} flexGrow={1} flexShrink={0} />

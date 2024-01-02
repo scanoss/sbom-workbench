@@ -83,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
   keep: {
     '& .MuiInputBase-input': {
       fontStyle: 'italic',
-      color: 'gray'
+      color: 'gray',
     }
   },
 }));
@@ -436,7 +436,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       InputProps={{
                         ...params.InputProps,
                         startAdornment: <SearchIcon />,
-                        disableUnderline: true,
                         className: 'autocomplete-option',
                       }}
                     />
@@ -475,7 +474,6 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                       InputProps={{
                         ...params.InputProps,
                         startAdornment: <SearchIcon />,
-                        disableUnderline: true,
                         className: 'autocomplete-option',
                       }}
                     />
@@ -573,8 +571,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   size="small"
                   fullWidth
                   value={form?.usage || 'file'}
-                  disableUnderline
-                  className={ form?.usage === 'keep' ? classes.keep : ''}
+                  className={form?.usage === 'keep' ? classes.keep : ''}
                   onChange={(e) => inputHandler(e)}
                 >
                   { options.keepOriginalOption && <MenuItem value="keep" sx={{fontStyle: 'italic', color: 'gray'}}>{t('KeepOriginalUsage')}</MenuItem> }

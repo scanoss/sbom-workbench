@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Chart, registerables } from 'chart.js';
 import {
   Button,
-  Card, IconButton, Tab, Tabs,
+  Card, IconButton, Tab, Tabs, Tooltip,
 } from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
@@ -108,17 +108,20 @@ const DetectedReport = ({ data, onRefresh }) => {
         </ConditionalLink>
       </Card>
 
-      <Tabs value={tab} onChange={(e, value) => setTab(value)} className="tabs-navigator">
-        <Tab value="matches" label={t('Title:MatchedTab')} />
-        { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="dependencies" label={t('Title:DeclaredDependenciesTab')} />}
-        <Tab value="obligations" label={t('Title:ObligationsTab')} />
-        { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label={t('Title:CryptographyTab')} />}
-        <div className="refresh-btn-container">
+      <div className="tabs-navigator">
+        <Tabs value={tab} onChange={(e, value) => setTab(value)}>
+          <Tab value="matches" label={t('Title:MatchedTab')} />
+          { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="dependencies" label={t('Title:DeclaredDependenciesTab')} />}
+          <Tab value="obligations" label={t('Title:ObligationsTab')} />
+          { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label={t('Title:CryptographyTab')} />}
+        </Tabs>
+
+        <Tooltip title={t('Tooltip:RefreshReportButtonLabel')} classes={{ tooltip: 'tooltip' }}>
           <IconButton onClick={onRefresh}>
             <RefreshIcon />
           </IconButton>
-        </div>
-      </Tabs>
+        </Tooltip>
+      </div>
 
       {tab === 'matches' && (
         <Card className="report-item matches-for-license">
