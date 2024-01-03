@@ -272,6 +272,7 @@ export interface Result {
 }
 
 export interface Dependency {
+  path: string;
   dependencyId: number;
   fileId: number;
   licenses: string[];
