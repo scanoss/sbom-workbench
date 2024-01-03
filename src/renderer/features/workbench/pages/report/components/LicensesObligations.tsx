@@ -41,10 +41,6 @@ const LicensesObligations = ({ data }) => {
 
   useEffect(init, []);
 
-  if (!data) {
-    return <p className="text-center mb-0 mt-0">{t('LoadingObligationsInfo')}</p>;
-  }
-
   return (
     <TableContainer>
       <Table className={classes.table}>

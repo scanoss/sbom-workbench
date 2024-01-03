@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Chart, registerables } from 'chart.js';
 import {
   Button,
-  Card, IconButton, Tab, Tabs, Tooltip,
+  Card, Chip, IconButton, Tab, Tabs, Tooltip,
 } from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
@@ -12,6 +12,8 @@ import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { useTranslation } from 'react-i18next';
 import CloseIcon from '@mui/icons-material/Close';
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
+import { Component } from 'main/services/ReportService';
 import LicensesChart from '../../components/LicensesChart';
 import LicensesTable from '../../components/LicensesTable';
 import MatchesForLicense from '../../components/MatchesForLicense';
@@ -22,7 +24,6 @@ import { Scanner } from '../../../../../../../main/task/scanner/types';
 import CryptographyDataTable from '../../components/CryptographyDataTable';
 import DependenciesCard from '../../components/DependenciesCard';
 import DependenciesDataTable from '../../components/DependenciesDataTable';
-import ObligationsDataTable from '../../components/ObligationsDataTable';
 
 Chart.register(...registerables);
 
@@ -33,28 +34,37 @@ const DetectedReport = ({ data, onRefresh }) => {
   const [tab, setTab] = useState<string>('matches');
 
   const layers = useRef<Set<Scanner.ScannerType>>(new Set(projectScannerConfig?.type));
+  const obligations = useRef<any[]>([]);
 
-  const [components, setComponents] = useState<any[]>([]);
   const [licenseSelected, setLicenseSelected] = useState<any>(null);
-  const [obligations, setObligations] = useState(null);
+
+  const [componentsMatched, setComponentsMatched] = useState<Component[]>([]); // detected
+  const [componentsDeclared, setComponentsDeclared] = useState<Component[]>([]);
+  const [obligationsFiltered, setObligationsFiltered] = useState<any[]>([]);
 
   const init = async () => {
     const licenses = data.licenses.map((license) => license.label);
-    const obligations = await obligationsService.getObligations(licenses);
-    setObligations(obligations);
+    obligations.current = await obligationsService.getObligations(licenses);
+    setObligationsFiltered(obligations.current);
     onLicenseClear();
   };
 
   const onLicenseSelected = (license: string) => {
     const matchedLicense = data.licenses.find((item) => item.label === license);
-    setTab('matches');
 
-    setComponents(matchedLicense.components.map((item) => ({ ...item, license: matchedLicense.label })));
+    const filtered = matchedLicense.components.map((item) => ({ ...item, license: matchedLicense.label }));
+    setComponentsMatched(filtered.filter((item) => item.source === 'detected'));
+    setComponentsDeclared(filtered.filter((item) => item.source === 'declared'));
+    setObligationsFiltered(obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)));
     setLicenseSelected(matchedLicense);
   };
 
   const onLicenseClear = () => {
-    setComponents(data.licenses?.map((license: any) => license.components.map((item) => ({ ...item, license: license.label }))).flat());
+    const items = data.licenses?.map((license: any) => license.components.map((item) => ({ ...item, license: license.label }))).flat();
+    setComponentsMatched(items.filter((item) => item.source === 'detected'));
+    setComponentsDeclared(items.filter((item) => item.source === 'declared'));
+    setObligationsFiltered(obligations.current);
+
     setLicenseSelected(null);
   };
 
@@ -110,37 +120,40 @@ const DetectedReport = ({ data, onRefresh }) => {
 
       <div className="tabs-navigator">
         <Tabs value={tab} onChange={(e, value) => setTab(value)}>
-          <Tab value="matches" label={t('Title:MatchedTab')} />
-          { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="dependencies" label={t('Title:DeclaredDependenciesTab')} />}
-          <Tab value="obligations" label={t('Title:ObligationsTab')} />
+          <Tab value="matches" label={`${t('Title:MatchedTab')} (${componentsMatched.length})`} />
+          { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="declared" label={`${t('Title:IdentifiedDependenciesTab')} (${componentsDeclared.length})`} />}
+          <Tab value="obligations" label={`${t('Title:ObligationsTab')} (${obligationsFiltered.length})`} />
+
         </Tabs>
 
-        <Tooltip title={t('Tooltip:RefreshReportButtonLabel')} classes={{ tooltip: 'tooltip' }}>
-          <IconButton onClick={onRefresh}>
-            <RefreshIcon />
-          </IconButton>
-        </Tooltip>
+        <div className="d-flex align-center">
+          { licenseSelected
+            && (
+              <Chip
+                size="small"
+                icon={<FilterAltOutlinedIcon />}
+                label={licenseSelected.label}
+                onDelete={(e) => onLicenseClear()}
+              />
+            )}
+
+          <Tooltip title={t('Tooltip:RefreshReportButtonLabel')} classes={{ tooltip: 'tooltip' }}>
+            <IconButton onClick={onRefresh}>
+              <RefreshIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
       </div>
 
       {tab === 'matches' && (
-        <Card className="report-item matches-for-license">
-          <div className="report-title d-flex align-center">
-            { licenseSelected
-              ? (
-                <>
-                  <div className="mb-1 mt-1">{t('Title:MatchesForLabel', { label: licenseSelected.label, count: licenseSelected.components.length })}</div>
-                  <IconButton className="ml-1" onClick={(e) => onLicenseClear()} size="small">
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
-                </>
-              )
-              : <div className="mb-1 mt-1">{t('Title:MatchesForProject', { count: components.length })}</div>}
-          </div>
-          {data.licenses.length > 0 ? (
-            <MatchesForLicense components={components} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)}/>
-          ) : (
-            <p className="report-empty">{t('Title:NoMatchesFound')}</p>
-          )}
+        <Card className="report-item matches-for-license pt-1 mt-0">
+          <MatchesForLicense components={componentsMatched} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} />
+        </Card>
+      )}
+
+      {tab === 'declared' && (
+        <Card className="report-item dependencies-table pt-1 mt-0">
+          <MatchesForLicense components={componentsDeclared} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} />
         </Card>
       )}
 
@@ -152,7 +165,7 @@ const DetectedReport = ({ data, onRefresh }) => {
 
       {tab === 'obligations' && (
         <Card className="report-item licenses-obligation pt-1 mt-0">
-          <LicensesObligations data={obligations} />
+          <LicensesObligations data={obligationsFiltered} />
         </Card>
       )}
 

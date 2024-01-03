@@ -1,7 +1,7 @@
 import { modelProvider } from './ModelProvider';
 import { Cryptography } from '../model/entity/Cryptography';
 
-interface LicenseEntry {
+export interface LicenseEntry {
   label: string;
   components: Component[];
   value: number;
@@ -11,7 +11,7 @@ interface LicenseEntry {
   patent_hints?: boolean;
 }
 
-interface Component {
+export interface Component {
   name: string,
   url: string,
   vendor: string,
