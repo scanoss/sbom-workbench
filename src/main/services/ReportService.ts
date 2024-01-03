@@ -19,6 +19,7 @@ interface Component {
   version: string,
   source: string,
   cryptography: Array<CryptographyAlgorithms> | [],
+  manifestFile?: string;
 }
 
 interface CryptographyAlgorithms {
@@ -100,6 +101,9 @@ class ReportService {
     // Dependencies
     const dependenciesSummary = await modelProvider.model.dependency.getIdentifiedSummary();
 
+    // Add Manifest files
+    await this.addManifestFileToComponents(licenses);
+
     return { licenses, vulnerabilities: vulnerabilityReport, crypto, dependencies: dependenciesSummary };
   }
 
@@ -127,6 +131,9 @@ class ReportService {
       const dependenciesSummary = await modelProvider.model.dependency.getDetectedSummary();
 
       this.addCryptoToComponent(licenses, crypto);
+
+      // Add Manifest files
+      await this.addManifestFileToComponents(licenses);
 
       return {
         licenses, crypto, vulnerabilities: vulnerabilityReport, dependencies: dependenciesSummary,
@@ -320,6 +327,27 @@ class ReportService {
       licenseArray.push(aux);
     }
     return licenseArray as Array<LicenseEntry>;
+  }
+
+  private async getManifestFileMapper(): Promise<Map<string, string>> {
+    const dependencyData = await modelProvider.model.dependency.getAll(null);
+    const mapper = new Map<string, string>(); // Ei. pkg:golang/go.opentelemetry.io/otel@v1.17.0 -> /go.sum
+    dependencyData.forEach((d) => {
+      mapper.set(`${d.purl}@${d.version}`, d.path);
+    });
+    return mapper;
+  }
+
+  private async addManifestFileToComponents(data: Array<LicenseEntry>): Promise<void> {
+    const manifestMapper = await this.getManifestFileMapper();
+    data.forEach((l) => {
+      l.components.forEach((c) => {
+        const key = `${c.purl}@${c.version}`;
+        if (manifestMapper.has(key) && c.source === 'declared') {
+          c.manifestFile = manifestMapper.get(key);
+        }
+      });
+    });
   }
 }
 
