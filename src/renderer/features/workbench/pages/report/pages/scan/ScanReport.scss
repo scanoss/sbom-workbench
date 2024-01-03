@@ -195,6 +195,7 @@
     .table-cell {
       display: flex;
       align-items: center;
+      font-size: 14px;
       color: #3b82f6;
       word-break: break-all;
 
@@ -204,7 +205,7 @@
       }
 
       div > span.small {
-        font-size: 10px;
+        font-size: 12px;
         color: #3f3f46;
       }
     }

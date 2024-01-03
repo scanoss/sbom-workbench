@@ -1,11 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useTranslation } from 'react-i18next';
-import {
-  AutoSizer,
-  Column,
-  Table,
-} from 'react-virtualized';
+import { AutoSizer, Column, Table } from 'react-virtualized';
+
+/* icons  */
 import IconComponent from '../../../components/IconComponent/IconComponent';
 
 const useStyles = makeStyles({
@@ -27,7 +25,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function MatchesForLicense({ components }) {
+export default function MatchesForLicense({ components, showCrypto }) {
   const classes = useStyles();
   const { t } = useTranslation();
 
@@ -37,7 +35,7 @@ export default function MatchesForLicense({ components }) {
         <Table
           height={height}
           width={width}
-          rowHeight={38}
+          rowHeight={42}
           headerHeight={40}
           rowCount={components.length}
           rowGetter={({ index }) => components[index]}
@@ -52,18 +50,38 @@ export default function MatchesForLicense({ components }) {
             flexShrink={0}
             cellRenderer={({ rowData }) => (
               <div className="table-cell">
-                <IconComponent name={rowData.vendor} size={24} />
+                <IconComponent name={rowData.vendor} size={30} />
                 <div className="d-flex flex-column">
                   <span>{rowData.name}</span>
-                  <span className="small">{rowData.purl}</span>
+                  <span className="small">{rowData.purl}@{rowData.version}</span>
                 </div>
               </div>
             )}
           />
-          <Column label={t('Table:Header:URL')} dataKey="url" width={200} flexGrow={1} flexShrink={0} />
-          <Column label={t('Table:Header:Version')} dataKey="version" width={100} flexGrow={1} flexShrink={0} />
-          <Column label={t('Table:Header:License')} dataKey="license" width={100} flexGrow={1} flexShrink={0} />
 
+          <Column
+            label={t('Table:Header:License')}
+            dataKey="license"
+            width={100}
+            flexGrow={1}
+            flexShrink={0}
+          />
+
+          { showCrypto && (
+            <Column
+              label={t('Table:Header:Cryptography')}
+              dataKey="cryptography"
+              width={200}
+              flexGrow={1}
+              flexShrink={0}
+              cellRenderer={({ cellData }) => {
+                const data = cellData
+                  .map((algorithm, index) => (`${algorithm.algorithm} (${algorithm.strength})`))
+                  .join(' - ');
+                return <span title={data}>{data}</span>;
+              }}
+            />
+          )}
         </Table>
       )}
     </AutoSizer>

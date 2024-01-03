@@ -20,7 +20,8 @@
     "Algorithms": "Algorithms",
     "Strength ": "Strength",
     "File": "File",
-    "Dependencies ": "Dependencies"
+    "Dependencies ": "Dependencies",
+    "Cryptography": "Cryptography"
   },
   "Version": "Version",
   "License": "License"
