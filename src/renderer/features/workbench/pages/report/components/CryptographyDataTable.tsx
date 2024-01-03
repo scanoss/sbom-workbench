@@ -71,12 +71,16 @@ const CryptographyDataTable = ({ data }) => {
             width={500}
             flexGrow={10}
             flexShrink={0}
-            cellRenderer={({ cellData }) => cellData
-              .map((algorithm) => (
-                <span>
-                  {algorithm.algorithm} ({algorithm.strength})
-                </span>
-              )).reduce((acc, curr) => [acc, ' - ', curr])}
+            cellRenderer={({ cellData }) => {
+              const data = cellData
+                .map((algorithm) => (
+                  <span>
+                    {algorithm.algorithm} ({algorithm.strength})
+                  </span>
+                )).reduce((acc, curr) => [acc, ' - ', curr]);
+
+              return <span title={data}>data</span>;
+            }}
           />
         </Table>
       )}

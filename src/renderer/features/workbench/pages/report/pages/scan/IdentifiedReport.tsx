@@ -132,13 +132,12 @@ const IdentifiedReport = ({ data, onRefresh }) => {
         </ConditionalLink>
       </Card>
 
-
       <div className="tabs-navigator">
         <Tabs value={tab} onChange={(e, value) => setTab(value)}>
           <Tab value="matches" label={t('Title:MatchedTab')} />
+          { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="declared" label={t('Title:DeclaredTab')} />}
           { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="dependencies" label={t('Title:IdentifiedDependenciesTab')} />}
           <Tab value="obligations" label={t('Title:ObligationsTab')} />
-          { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) && <Tab value="cryptography" label={t('Title:CryptographyTab')} />}
         </Tabs>
 
         <Tooltip title={t('Tooltip:RefreshReportButtonLabel')} classes={{ tooltip: 'tooltip' }}>
@@ -163,10 +162,16 @@ const IdentifiedReport = ({ data, onRefresh }) => {
               : <div className="mb-1 mt-1">{t('Title:MatchesForProject', { count: components.length })}</div>}
           </div>
           {data.licenses.length > 0 ? (
-            <MatchesForLicense components={components} />
+            <MatchesForLicense components={components} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)}/>
           ) : (
             <p className="report-empty">{t('Title:NoMatchesFound')}</p>
           )}
+        </Card>
+      )}
+
+      {tab === 'declared' && (
+        <Card className="report-item dependencies-table pt-1 mt-0">
+           <MatchesForLicense components={components} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)}/>
         </Card>
       )}
 
