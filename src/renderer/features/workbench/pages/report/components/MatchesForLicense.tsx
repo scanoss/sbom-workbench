@@ -2,6 +2,11 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useTranslation } from 'react-i18next';
 import { AutoSizer, Column, Table } from 'react-virtualized';
+import { useDispatch } from 'react-redux';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { fetchComponent } from '@store/component-store/componentThunks';
+import { Link } from '@mui/material';
+import { Component } from 'main/services/ReportService';
 
 /* icons  */
 import IconComponent from '../../../components/IconComponent/IconComponent';
@@ -28,6 +33,31 @@ const useStyles = makeStyles({
 export default function MatchesForLicense({ components, showCrypto }) {
   const classes = useStyles();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
+
+  const onSelectComponent = async (e, component: Component) => {
+    console.log(component);
+    e.preventDefault();
+
+    if (component.manifestFile) {
+      onSelectFile(e, component.manifestFile);
+    } else if (component.inventoryId) {
+      navigate(`/workbench/identified/inventory/${component.inventoryId}`);
+    } else {
+      await dispatch(fetchComponent(component.purl));
+      navigate({ pathname: '/workbench/detected/component' });
+    }
+  };
+
+  const onSelectFile = async (e, path) => {
+    e.preventDefault();
+    navigate({
+      pathname: '/workbench/detected/file',
+      search: `?path=file|${encodeURIComponent(path)}`,
+    });
+  };
 
   return (
     <AutoSizer>
@@ -45,15 +75,24 @@ export default function MatchesForLicense({ components, showCrypto }) {
           <Column
             label={t('Table:Header:Component')}
             dataKey="component"
-            width={400}
+            width={500}
             flexGrow={2}
             flexShrink={0}
             cellRenderer={({ rowData }) => (
               <div className="table-cell">
                 <IconComponent name={rowData.vendor} size={30} />
                 <div className="d-flex flex-column">
-                  <span>{rowData.name}</span>
-                  <span className="small">{rowData.purl}@{rowData.version}</span>
+                  <Link
+                    href="#"
+                    underline="hover"
+                    onClick={(e) => onSelectComponent(e, rowData)}
+                  >
+                    {rowData.name}
+                  </Link>
+                  <div>
+                    <span className="small">{rowData.purl}@{rowData.version}</span>
+                    {rowData.manifestFile && <span className="small"> - Found in <Link href="#" underline="hover" color="inherit" onClick={(e) => onSelectFile(e, rowData.manifestFile)}>{rowData.manifestFile}</Link></span> }
+                  </div>
                 </div>
               </div>
             )}

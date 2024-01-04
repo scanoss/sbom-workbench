@@ -105,7 +105,7 @@ const DetectedReport = ({ data, onRefresh }) => {
       </Card>
 
       <Card className={`report-item vulnerabilities ${layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? 'no-blocked' : 'blocked'}`}>
-        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={false} className="w-100">
+        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={false} className="w-100 no-underline">
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:Vulnerabilities')}</span>
             <div className="action">
@@ -120,8 +120,8 @@ const DetectedReport = ({ data, onRefresh }) => {
 
       <div className="tabs-navigator">
         <Tabs value={tab} onChange={(e, value) => setTab(value)}>
-          <Tab value="matches" label={`${t('Title:MatchedTab')} (${componentsMatched.length})`} />
-          { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="declared" label={`${t('Title:IdentifiedDependenciesTab')} (${componentsDeclared.length})`} />}
+          <Tab value="matches" label={`${t('Title:DeclaredMatchedTab')} (${componentsMatched.length})`} />
+          { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="declared" label={`${t('Title:DeclaredDependenciesTab')} (${componentsDeclared.length})`} />}
           <Tab value="obligations" label={`${t('Title:ObligationsTab')} (${obligationsFiltered.length})`} />
 
         </Tabs>

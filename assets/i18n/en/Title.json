@@ -76,6 +76,7 @@
   "ObligationsTab": "License obligations",
   "CryptographyTab": "Cryptography",
   "DeclaredDependenciesTab": "Declared dependencies",
-  "IdentifiedDependenciesTab": "Identified dependencies"
-
+  "IdentifiedDependenciesTab": "Identified dependencies",
+  "DeclaredMatchedTab": "Matched components ",
+  "IdentifiedMatchedTab": "Identified components"
 }
