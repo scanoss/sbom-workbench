@@ -231,7 +231,7 @@ const ScanReport = () => {
     const identified = await reportService.identified();
     setDetectedData({ ...detected, summary });
     setIdentifiedData({ ...identified, summary });
-    console.log(detected);
+    console.log(identified);
     return { summary, detected, identified };
   };
 

@@ -55,6 +55,7 @@ export const componentSlice = createSlice({
     },
   },
 });
+
 // actions
 export const { setComponents, setComponent, setRecentComponent, reset } = componentSlice.actions;
 
