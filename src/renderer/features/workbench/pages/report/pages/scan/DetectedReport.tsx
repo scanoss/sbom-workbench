@@ -95,7 +95,7 @@ const DetectedReport = ({ data, onRefresh }) => {
         <MatchesChart data={data.summary} />
       </Card>
 
-      <Card onClick={(e) => setTab('dependencies')} className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
+      <Card onClick={(e) => setTab('declared')} className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
         <div className="report-title d-flex space-between align-center">
           <span>{t('Title:DeclaredDependencies')}</span>
         </div>
@@ -147,19 +147,13 @@ const DetectedReport = ({ data, onRefresh }) => {
 
       {tab === 'matches' && (
         <Card className="report-item matches-for-license pt-1 mt-0">
-          <MatchesForLicense components={componentsMatched} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} />
+          <MatchesForLicense components={componentsMatched} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)}  mode="detected" />
         </Card>
       )}
 
       {tab === 'declared' && (
         <Card className="report-item dependencies-table pt-1 mt-0">
-          <MatchesForLicense components={componentsDeclared} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} />
-        </Card>
-      )}
-
-      {tab === 'dependencies' && (
-        <Card className="report-item dependencies-table pt-1 mt-0">
-          <DependenciesDataTable data={data.dependencies} />
+          <MatchesForLicense components={componentsDeclared} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} mode="detected" />
         </Card>
       )}
 

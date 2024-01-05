@@ -68,6 +68,11 @@ const OssVsOriginalProgressBar = ({ data }) => {
             },
           },
         },
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
       },
       plugins: [
         {
@@ -78,9 +83,9 @@ const OssVsOriginalProgressBar = ({ data }) => {
               meta.data.forEach((element) => {
                 const { x }: any = element.tooltipPosition();
                 chart.ctx.beginPath();
-                chart.ctx.moveTo(x, 25);
+                chart.ctx.moveTo(x, 0);
                 chart.ctx.strokeStyle = 'black';
-                chart.ctx.lineTo(x, 85);
+                chart.ctx.lineTo(x, 29);
                 chart.ctx.stroke();
                 chart.ctx.save();
               });
@@ -108,7 +113,7 @@ const OssVsOriginalProgressBar = ({ data }) => {
         )}
       </div>
       <div className="total-files-container">
-        <span className="total-files-label">{t('NTotalFiles', { count: totalFiles})}</span>
+        <span className="total-files-label">{t('NTotalFiles', { count: totalFiles })}</span>
       </div>
     </div>
   );

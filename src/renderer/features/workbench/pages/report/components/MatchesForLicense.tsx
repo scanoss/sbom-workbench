@@ -7,6 +7,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchComponent } from '@store/component-store/componentThunks';
 import { Link } from '@mui/material';
 import { Component } from 'main/services/ReportService';
+import { setComponent } from '@store/component-store/componentSlice';
+import { componentService } from '@api/services/component.service';
 
 /* icons  */
 import IconComponent from '../../../components/IconComponent/IconComponent';
@@ -30,7 +32,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function MatchesForLicense({ components, showCrypto }) {
+export default function MatchesForLicense({ components, showCrypto, mode }) {
   const classes = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -38,16 +40,14 @@ export default function MatchesForLicense({ components, showCrypto }) {
   const dispatch = useDispatch();
 
   const onSelectComponent = async (e, component: Component) => {
-    console.log(component);
     e.preventDefault();
 
     if (component.manifestFile) {
       onSelectFile(e, component.manifestFile);
-    } else if (component.inventoryId) {
-      navigate(`/workbench/identified/inventory/${component.inventoryId}`);
     } else {
+      const pathname = mode === 'detected' ? '/workbench/detected/component' : '/workbench/identified/inventory';
       await dispatch(fetchComponent(component.purl));
-      navigate({ pathname: '/workbench/detected/component' });
+      navigate({ pathname });
     }
   };
 
@@ -60,53 +60,54 @@ export default function MatchesForLicense({ components, showCrypto }) {
   };
 
   return (
-    <AutoSizer>
-      {({ height, width }) => (
-        <Table
-          height={height}
-          width={width}
-          rowHeight={42}
-          headerHeight={40}
-          rowCount={components.length}
-          rowGetter={({ index }) => components[index]}
-          headerClassName={classes.headerColumn}
-          rowClassName={classes.row}
-        >
-          <Column
-            label={t('Table:Header:Component')}
-            dataKey="component"
-            width={500}
-            flexGrow={2}
-            flexShrink={0}
-            cellRenderer={({ rowData }) => (
-              <div className="table-cell">
-                <IconComponent name={rowData.vendor} size={30} />
-                <div className="d-flex flex-column">
-                  <Link
-                    href="#"
-                    underline="hover"
-                    onClick={(e) => onSelectComponent(e, rowData)}
-                  >
-                    {rowData.name}
-                  </Link>
-                  <div>
-                    <span className="small">{rowData.purl}@{rowData.version}</span>
-                    {rowData.manifestFile && <span className="small"> - Found in <Link href="#" underline="hover" color="inherit" onClick={(e) => onSelectFile(e, rowData.manifestFile)}>{rowData.manifestFile}</Link></span> }
+    <>
+      <AutoSizer>
+        {({ height, width }) => (
+          <Table
+            height={height}
+            width={width}
+            rowHeight={42}
+            headerHeight={40}
+            rowCount={components.length}
+            rowGetter={({ index }) => components[index]}
+            headerClassName={classes.headerColumn}
+            rowClassName={classes.row}
+          >
+            <Column
+              label={t('Table:Header:Component')}
+              dataKey="component"
+              width={500}
+              flexGrow={2}
+              flexShrink={0}
+              cellRenderer={({ rowData }) => (
+                <div className="table-cell">
+                  <IconComponent name={rowData.vendor} size={30} />
+                  <div className="d-flex flex-column">
+                    <Link
+                      href="#"
+                      underline="hover"
+                      onClick={(e) => onSelectComponent(e, rowData)}
+                    >
+                      {rowData.name}
+                    </Link>
+                    <div>
+                      <span className="small">{rowData.purl}@{rowData.version}</span>
+                      {rowData.manifestFile && <span className="small"> - Found in <Link href="#" underline="hover" color="inherit" onClick={(e) => onSelectFile(e, rowData.manifestFile)}>{rowData.manifestFile}</Link></span>}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          />
+              )}
+            />
 
-          <Column
-            label={t('Table:Header:License')}
-            dataKey="license"
-            width={100}
-            flexGrow={1}
-            flexShrink={0}
-          />
+            <Column
+              label={t('Table:Header:License')}
+              dataKey="license"
+              width={100}
+              flexGrow={1}
+              flexShrink={0}
+            />
 
-          { showCrypto && (
+            {showCrypto && (
             <Column
               label={t('Table:Header:Cryptography')}
               dataKey="cryptography"
@@ -120,9 +121,12 @@ export default function MatchesForLicense({ components, showCrypto }) {
                 return <span title={data}>{data}</span>;
               }}
             />
-          )}
-        </Table>
-      )}
-    </AutoSizer>
+            )}
+          </Table>
+        )}
+      </AutoSizer>
+
+      { components.length === 0 && <div className="mt-10 pt-2 text-center"><small>No data found</small></div> }
+    </>
   );
 }

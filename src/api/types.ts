@@ -49,6 +49,7 @@ export interface Inventory {
   purl: string;
   version: string;
   usage: string;
+  source: string;
   notes: string;
   url: string;
   license_name: string;
@@ -282,9 +283,9 @@ export interface Dependency {
   componentName: string;
   component: Component;
   status:
-    | FileStatusType.IDENTIFIED
-    | FileStatusType.ORIGINAL
-    | FileStatusType.PENDING;
+  | FileStatusType.IDENTIFIED
+  | FileStatusType.ORIGINAL
+  | FileStatusType.PENDING;
   inventory: Inventory;
   valid: boolean;
   originalVersion: string;

@@ -5,7 +5,7 @@ import util from 'util';
 import { Querys } from './querys_db';
 import { Model } from './Model';
 import { ComponentModel } from './ComponentModel';
-import { Inventory, Files } from '../../api/types';
+import { Inventory } from '../../api/types';
 import { ResultModel } from './ResultModel';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 
@@ -26,16 +26,16 @@ export class InventoryModel extends Model {
     const SQLquery = this.getSQL(
       queryBuilder,
       query.SQL_GET_ALL_INVENTORIES,
-      { purl:'c.purl', version:'c.version', filePath:'f.path' , usage:'i.usage' }
+      { purl: 'c.purl', version: 'c.version', filePath: 'f.path', usage: 'i.usage', source: 'i.source' },
     );
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const inventories = await call(SQLquery.SQL,...SQLquery.params);
+    const inventories = await call(SQLquery.SQL, ...SQLquery.params);
     db.close();
     return inventories;
   }
 
-  public async attachFileInventory(inventory: Partial<Inventory>):Promise<boolean> {
+  public async attachFileInventory(inventory: Partial<Inventory>): Promise<boolean> {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
     const promises = [];
@@ -98,11 +98,11 @@ export class InventoryModel extends Model {
   }
 
   public async isInventory(inventory: Partial<Inventory>): Promise<Partial<Inventory>> {
-    let SQLquery = `SELECT id FROM inventories WHERE  notes# AND usage=? AND spdxid=? AND cvid=? AND source='detected';`;
+    let SQLquery = 'SELECT id FROM inventories WHERE  notes# AND usage=? AND spdxid=? AND cvid=? AND source=\'detected\';';
     SQLquery = SQLquery.replace('#', inventory.notes ? `='${inventory.notes}'` : ' IS NULL');
     const db = await this.openDb();
     const call = util.promisify(db.get.bind(db));
-    const inventoryId = await call(SQLquery,inventory.usage, inventory.spdxid, inventory.cvid);
+    const inventoryId = await call(SQLquery, inventory.usage, inventory.spdxid, inventory.cvid);
     db.close();
     return inventoryId;
   }
@@ -124,7 +124,7 @@ export class InventoryModel extends Model {
             if (err) throw Error('Unable to create inventory');
             inventory.id = this.lastID;
             resolve(inventory);
-          }
+          },
         );
       } catch (error) {
         log.error(error);
@@ -136,7 +136,7 @@ export class InventoryModel extends Model {
   public async update(inventory: Inventory): Promise<Inventory> {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));
-    await call(query.SQL_UPDATE_INVENTORY, inventory.cvid, inventory.usage, inventory.notes ? inventory.notes : null, inventory.url ? inventory.url : null, inventory.spdxid, inventory.id,);
+    await call(query.SQL_UPDATE_INVENTORY, inventory.cvid, inventory.usage, inventory.notes ? inventory.notes : null, inventory.url ? inventory.url : null, inventory.spdxid, inventory.id);
     db.close();
     return inventory;
   }
@@ -173,8 +173,10 @@ export class InventoryModel extends Model {
   public async getInventoryFiles(inventory: Partial<Inventory>) {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const files = await call(query.SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID,
-      `${inventory.id}`);
+    const files = await call(
+      query.SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID,
+      `${inventory.id}`,
+    );
     db.close();
     return files;
   }
@@ -188,20 +190,20 @@ export class InventoryModel extends Model {
     return true;
   }
 
-   public async deleteDirtyFileInventories(id: number[]) {
-     const db = await this.openDb();
-     const call = util.promisify(db.run.bind(db));
-     const dirtyInventories = await call(`DELETE FROM file_inventories WHERE fileId IN (${id.toString()});`);
-     db.close();
-     return dirtyInventories;
-   }
+  public async deleteDirtyFileInventories(id: number[]) {
+    const db = await this.openDb();
+    const call = util.promisify(db.run.bind(db));
+    const dirtyInventories = await call(`DELETE FROM file_inventories WHERE fileId IN (${id.toString()});`);
+    db.close();
+    return dirtyInventories;
+  }
 
   public async createBatch(inventories: Array<Partial<Inventory>>) {
     return new Promise<Array<Inventory>>(async (resolve, reject) => {
       try {
         const inv: any = [];
         const db = await this.openDb();
-        db.serialize(function () {
+        db.serialize(() => {
           db.run('begin transaction');
           for (let i = 0; i < inventories.length; i += 1) {
             db.run(
@@ -215,7 +217,7 @@ export class InventoryModel extends Model {
               function (this: any, err: any) {
                 inventories[i].id = this.lastID;
                 inv.push(inventories[i]);
-              }
+              },
             );
           }
           db.run('commit', (err: any) => {

@@ -3,11 +3,10 @@ import { InventoryFileDTO } from '../../api/dto';
 import { modelProvider } from './ModelProvider';
 import { Component, IBatchInventory, Inventory, IWorkbenchFilter } from '../../api/types';
 import { inventoryHelper } from '../helpers/InventoryHelper';
-import { QueryBuilderCreator } from "../model/queryBuilder/QueryBuilderCreator";
+import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { getInventoriesGroupedByUsage, getUniqueResults } from './utils/inventoryServiceUtil';
 
-
-class InventoryService  {
+class InventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
     try {
       const inventory = (await modelProvider.model.inventory.getById(inv.id)) as Inventory;
@@ -67,12 +66,12 @@ class InventoryService  {
         const results = await modelProvider.model.result.getAll(QueryBuilderCreator.create({ fileId: inventory.files }));
         inventories = getInventoriesGroupedByUsage(inventory, getUniqueResults(results));
       } else inventories.push(inventory);
-      for (let i = 0; i< inventories.length ; i+=1) {
+      for (let i = 0; i < inventories.length; i += 1) {
         const inv = await this.isInventory(inventories[i]);
         if (!inv) newInventories.push((await modelProvider.model.inventory.create(inventories[i])) as Inventory);
         else {
           inventories[i].id = inv.id;
-          newInventories.push(inventories[i])
+          newInventories.push(inventories[i]);
         }
         await this.attach(inventories[i]);
         inventories[i].component = component as Component;
@@ -97,8 +96,8 @@ class InventoryService  {
 
   public async getAll(inventory: Partial<Inventory>): Promise<Array<Inventory>> {
     try {
-      const { purl,version,files } = inventory;
-      const params = JSON.parse(JSON.stringify({purl,version,filePath: files !== undefined ? files[0] : undefined }));
+      const { purl, version, files, source, usage } = inventory;
+      const params = JSON.parse(JSON.stringify({ purl, version, filePath: files !== undefined ? files[0] : undefined, source, usage }));
       const queryBuilder = QueryBuilderCreator.create(params);
       const inventories = await modelProvider.model.inventory.getAll(queryBuilder);
       if (inventory !== undefined) {
@@ -131,7 +130,7 @@ class InventoryService  {
 
   public async preLoadInventoriesAcceptAll(
     data: Partial<IBatchInventory>,
-    filter: IWorkbenchFilter
+    filter: IWorkbenchFilter,
   ): Promise<Array<Partial<Inventory>>> {
     try {
       let queryBuilder = null;
@@ -139,7 +138,7 @@ class InventoryService  {
       else queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.source.input, status: 'PENDING' });
       let files: any = await modelProvider.model.result.getResultsPreLoadInventory(queryBuilder);
       files = files.reduce((acc, curr) => {
-        if(!acc[curr.id]) {
+        if (!acc[curr.id]) {
           const aux = {
             id: curr.id,
             source: curr.source,
@@ -148,15 +147,13 @@ class InventoryService  {
             url: curr.url,
             purl: curr.purl,
             usage: curr.usage,
-            spdxid: []
+            spdxid: [],
           };
           aux.spdxid.push(curr.spdxid);
           acc[curr.id] = aux;
-        }
-          else
-            acc[curr.id].spdxid.push(curr.spdxid);
-          return acc;
-      },{});
+        } else { acc[curr.id].spdxid.push(curr.spdxid); }
+        return acc;
+      }, {});
       const components: any = await modelProvider.model.component.getAll(queryBuilder);
       let inventories = this.getPreLoadInventory(Object.values(files)) as Array<Partial<Inventory>>;
       inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);
@@ -209,15 +206,14 @@ class InventoryService  {
   }
 
   public async getAllByFile(path:string): Promise<Array<InventoryFileDTO>> {
-    const inventories = await this.getAll({files:[path]});
+    const inventories = await this.getAll({ files: [path] });
     const response = [];
-    for (let i=0; i< inventories.length; i+=1) {
-        const result = await modelProvider.model.result.getFileMatch( QueryBuilderCreator.create({ filePath: path } ));
-        response.push({inventory: inventories[i] , fromResult: result || null });
-      }
+    for (let i = 0; i < inventories.length; i += 1) {
+      const result = await modelProvider.model.result.getFileMatch(QueryBuilderCreator.create({ filePath: path }));
+      response.push({ inventory: inventories[i], fromResult: result || null });
+    }
     return response;
   }
-
 }
 
 export const inventoryService = new InventoryService();
