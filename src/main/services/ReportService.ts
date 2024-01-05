@@ -20,7 +20,6 @@ export interface Component {
   source: string,
   cryptography: Array<CryptographyAlgorithms> | [],
   manifestFile?: string;
-  inventoryId?: number;
 }
 
 interface CryptographyAlgorithms {
@@ -69,14 +68,14 @@ class ReportService {
 
     const licenseMapper = new Map<string, LicenseEntry>();
     data.forEach((element) => {
-      const { name, vendor, url, purl, version, source, spdxid, inventoryId } = element;
+      const { name, vendor, url, purl, version, source, spdxid } = element;
       if (licenseMapper.has(spdxid)) {
         const license = licenseMapper.get(spdxid);
         license.components.push({ name, vendor, url, purl, version, source, cryptography: [] });
         license.value += 1;
       } else {
         const newLicense = {
-          components: [{ name, vendor, url, purl, version, source, cryptography: [], inventoryId }],
+          components: [{ name, vendor, url, purl, version, source, cryptography: [] }],
           value: 1,
           label: spdxid,
         };

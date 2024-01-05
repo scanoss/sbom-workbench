@@ -41,7 +41,7 @@
   .report-layout {
     display: grid;
     grid-gap: 12px;
-    grid-template-columns: 1.6fr 1fr 1fr;
+    grid-template-columns: 1.4fr 1fr 1fr;
     margin-bottom: 16px;
 
     .licenses {
@@ -64,7 +64,6 @@
 
     .licenses-obligation, .matches-for-license, .cryptography, .dependencies-table {
       grid-area: D;
-
     }
 
     &.detected {
@@ -83,17 +82,16 @@
     }
 
     &.identified {
-      grid-template-rows: 110px 110px 110px auto 600px;
+      grid-template-rows: 110px 110px auto 600px;
 
       grid-template-areas:
-      'Z1 Z1 Z1'
-      'A1 A2 A2'
+      'A1 AZ A2'
       'A1 A3 A4'
       'C  C  C'
       'D  D  D';
 
       .identification-progress {
-        grid-area: Z1;
+        grid-area: AZ;
       }
 
       .oss-original {
@@ -163,6 +161,7 @@
         width: 100%;
         display: flex;
         justify-content: space-between;
+        gap: 6px;
 
         .label {
           float: left;
@@ -170,8 +169,7 @@
           margin-right: auto;
           text-align: center;
           color: #22c55e;
-          margin-top: -3px;
-          font-size: 34px;
+          font-size: 22px;
           font-weight: 700;
         }
 
@@ -187,7 +185,12 @@
         }
 
         .progress-bar {
-          width: 90%;
+          flex-grow: 1;
+          width: 100%;
+
+          canvas {
+            width: 100%;
+          }
         }
       }
     }
@@ -324,7 +327,7 @@
   flex-direction: column;
 
   canvas {
-    padding: 0 20px;
+    padding: 0;
     max-width: 600px;
     min-width: 200px;
   }
@@ -335,24 +338,26 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 6px;
 
     .label-match-container {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      width: 35%;
+
+      min-width: 70px;
 
       .label-match {
         color: #6366f1;
         padding: 0px;
-        font-size: 1.7em;
-        font-weight: 400;
+        font-size: 26px;
+        font-weight: 700;
       }
 
       .label-match-sublabel {
         color: #27272a;
-        font-size: 14px;
+        font-size: 12px;
       }
     }
 
@@ -361,17 +366,18 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      width: 35%;
+      min-width: 70px;
+
       .label-nomatch {
         color: #a5b4fc;
         padding: 0px;
-        font-size: 2em;
-        font-weight: 400;
+        font-size: 26px;
+        font-weight: 700;
       }
 
       .label-nomatch-sublabel {
         color: #27272a;
-        font-size: 14px;
+        font-size: 12px;
       }
     }
   }
@@ -462,26 +468,10 @@
   display: none;
 }
 
-#OssProgress {
-  height: 105px;
-}
 
-#OssOriginalProgress {
-  height: 95px;
-}
 
 #Report .report-layout #OssProgress .identification-canvas-container .label {
-  margin-top: 27px;
   color: #5d5d5d;
-}
-
-#Report .report-layout #OssProgress .identification-canvas-container {
-  height: 70px;
-  margin-top: 0;
-}
-
-#OssProgress .total-files-container {
-  margin-top: 10px;
 }
 
 
@@ -505,6 +495,10 @@
       color: black;
     }
   }
+}
+
+.identified #DependenciesCard .number {
+  color: var( --color-status-identified);
 }
 
 
