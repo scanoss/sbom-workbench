@@ -25,7 +25,8 @@ const filter = (items, query) => {
 
   const result = items.filter((item) => {
     const name = item.name.toLowerCase();
-    return name.includes(query.toLowerCase());
+    const identifiedAsMatch = item.identifiedAs.some(c => c.name.toLowerCase().includes(query.toLowerCase()));
+    return name.includes(query.toLowerCase()) || identifiedAsMatch;
   });
 
   return result;
