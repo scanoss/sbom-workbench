@@ -189,7 +189,7 @@ LEFT JOIN licenses lic ON lic.spdxid = detected_license;`;
   SQL_GET_ALL_DEPENDENCIES = `SELECT f.path, d.dependencyId, d.component AS componentName, d.purl, d.version, d.licenses, d.component, d.scope, i.id AS inventory,cv.id AS compid,d.rejectedAt,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN '${FileStatusType.IDENTIFIED}' WHEN d.rejectedAt IS NOT NULL THEN '${FileStatusType.ORIGINAL}' ELSE '${FileStatusType.PENDING}' END) AS status,(CASE WHEN d.purl IS NOT NULL AND d.version IS NOT NULL AND licenses IS NOT NULL THEN true ELSE false END) AS valid,d.originalVersion,d.originalLicense, d.fileId FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId
   LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version
-  LEFT JOIN inventories i ON cv.id = i.cvid  AND instr(d.licenses, i.spdxid)>0 #FILTER;`;
+  LEFT JOIN inventories i ON cv.id = i.cvid  AND instr(d.licenses, i.spdxid)>0 #FILTER AND (i.source = 'declared' OR i.source IS NULL);`;
 
   SQL_ALL_IDENTIFIED_DEPENDENCIES = `SELECT f.path as file ,d.component,d.purl,d.version,d.licenses FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId
