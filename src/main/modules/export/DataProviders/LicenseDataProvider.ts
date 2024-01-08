@@ -1,18 +1,20 @@
 import { DataProvider, IDataLayers, LicenseDataLayer } from 'scanoss';
 import { modelProvider } from '../../../services/ModelProvider';
+import { BaseDataProvider } from './BaseDataProvider';
+import { ExportSource } from '../../../../api/types';
 
-export class IdentifiedLicenseDataProvider implements DataProvider {
+export class LicenseDataProvider extends BaseDataProvider implements DataProvider {
   async getData(): Promise<IDataLayers> {
     const licenses = [] as unknown as Array<LicenseDataLayer>;
-    const query = await modelProvider.model.component.getIdentifiedForReport();
-
+    const query = this.source === ExportSource.IDENTIFIED ? await modelProvider.model.component.getIdentifiedForReport() : await modelProvider.model.component.getDetectedForReport();
     // First pass: Group by license
     query.forEach((element) => {
       const licenseIndex = licenses.findIndex((obj) => obj.label === element.spdxid);
+      const name = element.comp_name ? element.comp_name : element.purl.split('/').pop();
 
       if (licenseIndex >= 0) {
         licenses[licenseIndex].components.push({
-          name: element.comp_name,
+          name,
           vendor: element.vendor,
           url: element.url,
           purl: element.purl,
@@ -25,7 +27,7 @@ export class IdentifiedLicenseDataProvider implements DataProvider {
           value: 1,
           components: [
             {
-              name: element.comp_name,
+              name,
               vendor: element.vendor,
               url: element.url,
               purl: element.purl,
@@ -42,7 +44,7 @@ export class IdentifiedLicenseDataProvider implements DataProvider {
 
       license.components.forEach((component) => {
         const existingComponentIndex = combinedComponents.findIndex(
-          (comp) => comp.purl === component.purl && comp.vendor === component.vendor && comp.name === component.name
+          (comp) => comp.purl === component.purl && comp.vendor === component.vendor && comp.name === component.name,
         );
 
         if (existingComponentIndex >= 0) {

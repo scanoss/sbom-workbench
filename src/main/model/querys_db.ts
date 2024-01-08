@@ -191,10 +191,14 @@ LEFT JOIN licenses lic ON lic.spdxid = detected_license;`;
   LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version
   LEFT JOIN inventories i ON cv.id = i.cvid  AND instr(d.licenses, i.spdxid)>0 #FILTER AND (i.source = 'declared' OR i.source IS NULL);`;
 
-  SQL_ALL_IDENTIFIED_DEPENDENCIES = `SELECT f.path as file ,d.component,d.purl,d.version,d.licenses FROM dependencies d
+  SQL_ALL_IDENTIFIED_DEPENDENCIES = `SELECT f.path as file ,d.component,d.purl,d.version,d.licenses
+  FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId
   INNER JOIN inventories i ON cv.id = i.cvid
-  LEFT JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version;`;
+  INNER JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version;`;
+
+  SQL_ALL_DETECTED_DEPENDENCIES = `SELECT f.path as file ,d.component,d.purl,d.version,d.originalLicense as licenses FROM dependencies d
+  INNER JOIN files f ON f.fileId =  d.fileId;`;
 
   SQL_GET_ALL_FILES = `SELECT f.path, r.md5_file, f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending, f.type FROM files f
    LEFT JOIN results r ON f.fileId = r.fileId #FILTER;`;

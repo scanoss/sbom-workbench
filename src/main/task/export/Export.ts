@@ -56,7 +56,7 @@ export class Export implements ITask<string, IExportResult> {
         this.format = new SpdxLiteJson(exportDTO.source);
         break;
       case ExportFormat.HTMLSUMMARY:
-        this.format = new HtmlSummary();
+        this.format = new HtmlSummary(exportDTO.source);
         break;
       default:
     }

@@ -218,8 +218,9 @@ export class ComponentModel extends Model {
         FROM component_versions c
         INNER JOIN inventories i ON c.id=i.cvid
         LEFT JOIN licenses l ON l.spdxid=i.spdxid
-		LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
-		LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version;`)) as Array<{
+		    LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
+		    LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version
+		    WHERE c.source = 'engine' OR c.source='manual';`) as Array<{
       purl: string;
       name: string;
       vendor: string;
@@ -228,7 +229,7 @@ export class ComponentModel extends Model {
       license: string;
       spdxid: string;
       algorithms: { algorithm: string; strength: string }[] | null;
-    }>;
+    }>);
     db.close();
     return query.map((item) => ({ ...item, algorithms: JSON.parse(item.algorithms) }));
   }
@@ -236,7 +237,7 @@ export class ComponentModel extends Model {
   public async getIdentifiedForReport() {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const report = (await call(`SELECT DISTINCT c.id, c.name, c.version, c.purl,c.url,l.name AS license_name, l.spdxid, r.vendor, i.source
+    const report = (await call(`SELECT DISTINCT c.id, c.name as comp_name, c.version, c.purl,c.url,l.name AS license_name, l.spdxid, r.vendor, i.source
         FROM component_versions c
         INNER JOIN inventories i ON c.id=i.cvid
         LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
@@ -250,6 +251,43 @@ export class ComponentModel extends Model {
       spdxid: string;
       vendor: string;
     }>;
+    db.close();
+    return report;
+  }
+
+  public async getDetectedForReport() {
+    const db = await this.openDb();
+    const call = util.promisify(db.all.bind(db));
+    // l.atom is the license array dereference
+    const dependencyLicenseReport = (await call(`SELECT d.dependencyId  as id ,l.atom as spdxid, d.purl, d.version ,coalesce(lic.name,l.atom) as license_name,d.component as component_name, null as vendor, 'detected' as source, null as url ,'["' || REPLACE(d.licenses, ',', '","') || '"]' AS l_array FROM dependencies d, json_each(l_array) as l
+    LEFT JOIN licenses lic ON lic.spdxid = l.atom
+    UNION
+    SELECT d.dependencyId as id , coalesce (d.originalLicense,'unknown') as  license_name , d.purl, d.version,'unknown' as spdxid,d.component as component_name,null as vendor, 'detected' as source ,null as url ,'[]' as l_array FROM dependencies d WHERE d.originalLicense IS NULL`)) as Array<{
+      id: string;
+      comp_name: string;
+      version: string;
+      purl: string;
+      url: string;
+      license_name: string;
+      spdxid: string;
+      vendor: string;
+    }>;
+
+    const componentLicenseReport = (await call(`SELECT DISTINCT c.id, c.name as comp_name, c.version, c.purl,c.url,l.name AS license_name, l.spdxid, r.vendor, 'detected' as source, '[]' as l_array
+        FROM component_versions c INNER JOIN license_component_version lcv ON lcv.cvid = c.id
+        INNER JOIN licenses l ON l.id = lcv.licid
+        INNER JOIN results r ON r.version = c.version AND r.purl = c.purl
+        WHERE c.source = 'engine'`)) as Array<{
+      id: string;
+      comp_name: string;
+      version: string;
+      purl: string;
+      url: string;
+      license_name: string;
+      spdxid: string;
+      vendor: string;
+    }>;
+    const report = dependencyLicenseReport.concat(componentLicenseReport);
     db.close();
     return report;
   }
@@ -339,6 +377,27 @@ export class ComponentModel extends Model {
     }
     await Promise.all(promises);
     db.close();
+  }
+
+  public async getComponentsDetectedForReport() {
+    const db = await this.openDb();
+    const call = util.promisify(db.all.bind(db));
+    const query = (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms
+        FROM component_versions c INNER JOIN results r ON r.version = c.version AND r.purl = c.purl
+        INNER JOIN license_component_version lcv ON lcv.cvid = c.id
+        INNER JOIN licenses l ON lcv.licid = l.id
+        LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version;`) as Array<{
+      purl: string;
+      name: string;
+      vendor: string;
+      url: string;
+      version: string;
+      license: string;
+      spdxid: string;
+      algorithms: { algorithm: string; strength: string }[] | null;
+    }>);
+    db.close();
+    return query.map((item) => ({ ...item, algorithms: JSON.parse(item.algorithms) }));
   }
 
   public getEntityMapper(): Record<string, string> {

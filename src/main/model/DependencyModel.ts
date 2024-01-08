@@ -59,6 +59,21 @@ export class DependencyModel extends Model {
     return response;
   }
 
+  public async getDetectedDependencies() {
+    const db = await this.openDb();
+    const query = new Querys().SQL_ALL_DETECTED_DEPENDENCIES;
+    const call = await util.promisify(db.all.bind(db));
+    const response = (await call(query)) as Array<{
+      file: string;
+      component: string;
+      purl: string;
+      version: string;
+      licenses: string;
+    }>;
+    db.close();
+    return response;
+  }
+
   public async getAll(queryBuilder: QueryBuilder): Promise<Array<Dependency>> {
     const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_DEPENDENCIES, DependencyModel.entityMapper);
     const db = await this.openDb();
