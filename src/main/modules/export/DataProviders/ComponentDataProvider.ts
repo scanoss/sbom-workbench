@@ -1,9 +1,11 @@
 import { ComponentDataLayer, DataProvider, IDataLayers } from 'scanoss';
+import { ExportSource } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
+import { BaseDataProvider } from './BaseDataProvider';
 
-export class IdentifiedComponentDataProvider implements DataProvider {
+export class ComponentDataProvider extends BaseDataProvider implements DataProvider {
   async getData(): Promise<IDataLayers> {
-    const query = await modelProvider.model.component.getComponentsIdentifiedForReport();
+    const query = this.source === ExportSource.IDENTIFIED ? await modelProvider.model.component.getComponentsIdentifiedForReport() : await modelProvider.model.component.getComponentsDetectedForReport();
     const componentsMap: { [key: string]: ComponentDataLayer } = {};
 
     query.forEach((item) => {

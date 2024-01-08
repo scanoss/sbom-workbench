@@ -1,15 +1,19 @@
+import { DataProviderManager, Report } from 'scanoss';
+import { ExportSource } from '../../../../api/types';
 import { Format } from '../Format';
-import { IdentifiedComponentDataProvider } from '../DataProviders/IdentifiedComponentDataProvider';
-import { DataProviderManager, Report, SummaryDataProvider } from 'scanoss';
-import { IdentifiedLicenseDataProvider } from '../DataProviders/IdentifiedLicenseDataProvider';
-import { IdentifiedSummaryDataProvider } from '../DataProviders/IdentifiedSummaryDataProvider';
-import { IdentifiedDependencyDataProvider } from '../DataProviders/IdentifiedDependencyDataProvider';
+import { ComponentDataProvider } from '../DataProviders/ComponentDataProvider';
+import { LicenseDataProvider } from '../DataProviders/LicenseDataProvider';
+import { SummaryDataProvider } from '../DataProviders/SummaryDataProvider';
+import { DependencyDataProvider } from '../DataProviders/DependencyDataProvider';
 
 const pathLib = require('path');
 
 export class HtmlSummary extends Format {
-  constructor() {
+  private source: ExportSource;
+
+  constructor(source: ExportSource) {
     super();
+    this.source = source;
     this.extension = '.html';
   }
 
@@ -21,10 +25,10 @@ export class HtmlSummary extends Format {
       : pathLib.join(__dirname, '../../../assets/exportTemplates/template.html');
 
     const dpm = new DataProviderManager();
-    dpm.addDataProvider(new IdentifiedComponentDataProvider());
-    dpm.addDataProvider(new IdentifiedLicenseDataProvider());
-    dpm.addDataProvider(new IdentifiedSummaryDataProvider('Identified Report'));
-    dpm.addDataProvider(new IdentifiedDependencyDataProvider());
+    dpm.addDataProvider(new ComponentDataProvider(this.source));
+    dpm.addDataProvider(new LicenseDataProvider(this.source));
+    dpm.addDataProvider(new SummaryDataProvider(this.source === ExportSource.IDENTIFIED ? 'Identified Report' : 'Detected Report', this.source));
+    dpm.addDataProvider(new DependencyDataProvider(this.source));
     const report = new Report(dpm);
     report.setTemplatePath(PATH);
     return report.getHTML();

@@ -3,7 +3,6 @@ import fs from 'fs';
 
 import { ExportModel } from './Model/ExportModel';
 import { IExportResult } from './IExportResult';
-
 export abstract class Format {
   protected export: ExportModel;
 

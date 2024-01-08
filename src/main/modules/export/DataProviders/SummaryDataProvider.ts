@@ -1,20 +1,25 @@
 import { DataProvider, IDataLayers, SummaryDataLayer } from 'scanoss';
 import { modelProvider } from '../../../services/ModelProvider';
 import { workspace } from '../../../workspace/Workspace';
+import { BaseDataProvider } from './BaseDataProvider';
+import { ExportSource } from '../../../../api/types';
 
-export class IdentifiedSummaryDataProvider implements DataProvider {
+export class SummaryDataProvider extends BaseDataProvider implements DataProvider {
   private summary: SummaryDataLayer;
 
   private reportTitle: string;
 
-  constructor(reportTitle: string) {
+  constructor(reportTitle: string, source: ExportSource) {
+    super(source);
     this.reportTitle = reportTitle;
   }
+
   public getLayerName(): string {
     return this.constructor.name;
   }
+
   public async getData(): Promise<IDataLayers> {
-    const summary = await modelProvider.model.file.getSummary();
+    const summary = this.source === ExportSource.IDENTIFIED ? await modelProvider.model.file.getSummary() : await modelProvider.model.file.getDetectedSummary();
     const p = workspace.getOpenedProjects()[0];
 
     this.summary = {

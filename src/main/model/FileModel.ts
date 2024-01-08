@@ -149,6 +149,20 @@ export class FileModel extends Model {
     return summary;
   }
 
+  public async getDetectedSummary() {
+    const db = await this.openDb();
+    const call = promisify(db.get.bind(db));
+    const summary = await call(`SELECT COUNT(*) as totalFiles , (SELECT COUNT(*) FROM files WHERE type='MATCH') AS matchFiles,
+                (SELECT COUNT(*) FROM files WHERE type='FILTERED') AS filterFiles,
+                (SELECT COUNT(*) FROM files WHERE type='NO-MATCH') AS  noMatchFiles,
+                0 AS scannedIdentified,
+                0 AS totalIdentified,
+                0 AS original,
+                (SELECT COUNT(*) AS pending FROM files f WHERE f.identified=0 AND f.ignored=0 AND f.type="MATCH") AS pending  FROM files;`);
+    db.close();
+    return summary;
+  }
+
   public getEntityMapper(): Record<string, string> {
     return FileModel.entityMapper;
   }
