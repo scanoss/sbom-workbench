@@ -62,7 +62,7 @@
       align-items: center;
     }
 
-    .licenses-obligation, .matches-for-license, .cryptography, .dependencies-table {
+    .report-item-detail {
       grid-area: D;
     }
 
@@ -78,7 +78,6 @@
       .matches {
         grid-area: A2;
       }
-
     }
 
     &.identified {
