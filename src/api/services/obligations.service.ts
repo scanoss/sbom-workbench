@@ -4,14 +4,14 @@ import { BaseService } from './base.service';
 class ObligationsService extends BaseService {
   private cache: Map<string, any> = new Map();
 
-  public async getObligations(spdxIds: string[]): Promise<any[]> {
-    const p = spdxIds.map((spdxId) => this.getObligation(spdxId));
-    return await Promise.all(p);
+  public async getObligations(spdxIds: string[], force = false): Promise<any[]> {
+    const p = spdxIds.map((spdxId) => this.getObligation(spdxId, force));
+    return Promise.all(p);
   }
 
-  public async getObligation(spdxId: string): Promise<any> {
+  public async getObligation(spdxId: string, force: boolean): Promise<any> {
     try {
-      if (this.cache.has(spdxId)) {
+      if (!force && this.cache.has(spdxId)) {
         return this.cache.get(spdxId);
       }
 
@@ -32,7 +32,7 @@ class ObligationsService extends BaseService {
     return Object.keys(obligations).map((key) => ({
       label: key,
       ...obligations[key],
-      copyleft: obligations[key].copyleft === "yes",
+      copyleft: obligations[key].copyleft === 'yes',
       incompatibles: obligations[key].incompatible_with
         ? obligations[key].incompatible_with?.replace(/\s/g, '').split(',')
         : [],

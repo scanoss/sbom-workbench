@@ -1,12 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Chart, registerables } from 'chart.js';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import {
-  Button, Card, Chip, IconButton, Tab, Tabs, Tooltip,
-} from '@mui/material';
+import { Button, Card, Chip, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
 import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
@@ -33,6 +31,7 @@ const IdentifiedReport = ({ data, onRefresh }: { data: any, onRefresh: () => voi
   const { projectScannerConfig } = useSelector(selectWorkbench);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const location = useLocation();
 
   const [tab, setTab] = useState<string>('matches');
 
@@ -74,6 +73,13 @@ const IdentifiedReport = ({ data, onRefresh }: { data: any, onRefresh: () => voi
   };
 
   useEffect(() => {
+    if (location) {
+      const last = location.pathname.split('/').pop();
+      setTab(last);
+    }
+  }, [location]);
+
+  useEffect(() => {
     init();
   }, []);
 
@@ -99,6 +105,7 @@ const IdentifiedReport = ({ data, onRefresh }: { data: any, onRefresh: () => voi
         <div className="report-title">{t('Title:IdentificationProgress')}</div>
         <IdentificationProgress data={data.summary} />
       </Card>
+
       <Card className="report-item oss-original">
         <div className="report-title">{t('Title:OSSvsOriginal')}</div>
         <OssVsOriginalProgressBar data={data.summary} />
@@ -143,11 +150,13 @@ const IdentifiedReport = ({ data, onRefresh }: { data: any, onRefresh: () => voi
         </ConditionalLink>
       </Card>
 
-      <div className="tabs-navigator">
-        <Tabs value={tab} onChange={(e, value) => setTab(value)}>
-          <Tab value="matches" label={`${t('Title:IdentifiedMatchedTab')} (${componentsMatched.length})`} />
-          { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="declared" label={`${t('Title:IdentifiedDependenciesTab')} (${componentsDeclared.length})`} />}
-          <Tab value="obligations" label={`${t('Title:ObligationsTab')} (${obligationsFiltered.length})`} />
+      <nav className="tabs-navigator">
+        <Tabs value={tab}>
+          <Tab value="matches" label={`${t('Title:IdentifiedMatchedTab')} (${componentsMatched.length})`} component={Link} to="matches" replace />
+          { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
+          && <Tab value="declared" label={`${t('Title:IdentifiedDependenciesTab')} (${componentsDeclared.length})`} component={Link} to="declared" replace />}
+          <Tab value="obligations" label={`${t('Title:ObligationsTab')} (${obligationsFiltered.length})`} component={Link} to="obligations" replace />
+          <Tab value="identified" hidden /> {/* fallback value */}
         </Tabs>
 
         <div className="d-flex align-center">
@@ -167,31 +176,17 @@ const IdentifiedReport = ({ data, onRefresh }: { data: any, onRefresh: () => voi
             </IconButton>
           </Tooltip>
         </div>
-      </div>
+      </nav>
 
-      {tab === 'matches' && (
-        <Card className="report-item matches-for-license pt-1 mt-0">
-          <MatchesForLicense components={componentsMatched} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} mode="identified" />
-        </Card>
-      )}
+      <Card className="report-item report-item-detail matches-for-license pt-1 mt-0">
+        <Routes>
+          <Route path="matches" element={<MatchesForLicense components={componentsMatched} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} mode="detected" />} />
+          <Route path="declared" element={<MatchesForLicense components={componentsDeclared} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} mode="detected" />} />
+          <Route path="obligations" element={<LicensesObligations data={obligationsFiltered} />} />
+          <Route path="" element={<Navigate to="matches" replace />} />
+        </Routes>
+      </Card>
 
-      {tab === 'declared' && (
-        <Card className="report-item dependencies-table pt-1 mt-0">
-          <MatchesForLicense components={componentsDeclared} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} mode="identified" />
-        </Card>
-      )}
-
-      {tab === 'obligations' && (
-        <Card className="report-item licenses-obligation pt-1 mt-0">
-          <LicensesObligations data={obligationsFiltered} />
-        </Card>
-      )}
-
-      {tab === 'cryptography' && (
-        <Card className="report-item cryptography pt-1 mt-0">
-          <CryptographyDataTable data={data.crypto} />
-        </Card>
-      )}
     </section>
   );
 };

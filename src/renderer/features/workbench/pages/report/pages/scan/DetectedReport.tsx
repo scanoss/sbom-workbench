@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import CloseIcon from '@mui/icons-material/Close';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import { Component } from 'main/services/ReportService';
+import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import LicensesChart from '../../components/LicensesChart';
 import LicensesTable from '../../components/LicensesTable';
 import MatchesForLicense from '../../components/MatchesForLicense';
@@ -30,6 +31,7 @@ Chart.register(...registerables);
 const DetectedReport = ({ data, onRefresh }) => {
   const { projectScannerConfig } = useSelector(selectWorkbench);
   const { t } = useTranslation();
+  const location = useLocation();
 
   const [tab, setTab] = useState<string>('matches');
 
@@ -67,6 +69,13 @@ const DetectedReport = ({ data, onRefresh }) => {
 
     setLicenseSelected(null);
   };
+
+  useEffect(() => {
+    if (location) {
+      const last = location.pathname.split('/').pop();
+      setTab(last);
+    }
+  }, [location]);
 
   useEffect(() => {
     init();
@@ -118,12 +127,13 @@ const DetectedReport = ({ data, onRefresh }) => {
         </ConditionalLink>
       </Card>
 
-      <div className="tabs-navigator">
-        <Tabs value={tab} onChange={(e, value) => setTab(value)}>
-          <Tab value="matches" label={`${t('Title:DeclaredMatchedTab')} (${componentsMatched.length})`} />
-          { layers.current.has(Scanner.ScannerType.DEPENDENCIES) && <Tab value="declared" label={`${t('Title:DeclaredDependenciesTab')} (${componentsDeclared.length})`} />}
-          <Tab value="obligations" label={`${t('Title:ObligationsTab')} (${obligationsFiltered.length})`} />
-
+      <nav className="tabs-navigator">
+        <Tabs value={tab}>
+          <Tab value="matches" label={`${t('Title:DeclaredMatchedTab')} (${componentsMatched.length})`} component={Link} to="matches" replace />
+          { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
+          && <Tab value="declared" label={`${t('Title:DeclaredDependenciesTab')} (${componentsDeclared.length})`} component={Link} to="declared" replace />}
+          <Tab value="obligations" label={`${t('Title:ObligationsTab')} (${obligationsFiltered.length})`} component={Link} to="obligations" replace />
+          <Tab value="detected" hidden /> {/* fallback value */}
         </Tabs>
 
         <div className="d-flex align-center">
@@ -143,31 +153,16 @@ const DetectedReport = ({ data, onRefresh }) => {
             </IconButton>
           </Tooltip>
         </div>
-      </div>
+      </nav>
 
-      {tab === 'matches' && (
-        <Card className="report-item matches-for-license pt-1 mt-0">
-          <MatchesForLicense components={componentsMatched} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)}  mode="detected" />
-        </Card>
-      )}
-
-      {tab === 'declared' && (
-        <Card className="report-item dependencies-table pt-1 mt-0">
-          <MatchesForLicense components={componentsDeclared} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} mode="detected" />
-        </Card>
-      )}
-
-      {tab === 'obligations' && (
-        <Card className="report-item licenses-obligation pt-1 mt-0">
-          <LicensesObligations data={obligationsFiltered} />
-        </Card>
-      )}
-
-      {tab === 'cryptography' && (
-        <Card className="report-item cryptography pt-1 mt-0">
-          <CryptographyDataTable data={data.crypto} />
-        </Card>
-      )}
+      <Card className="report-item report-item-detail matches-for-license pt-1 mt-0">
+        <Routes>
+          <Route path="matches" element={<MatchesForLicense components={componentsMatched} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} mode="detected" />} />
+          <Route path="declared" element={<MatchesForLicense components={componentsDeclared} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} mode="detected" />} />
+          <Route path="obligations" element={<LicensesObligations data={obligationsFiltered} />} />
+          <Route path="" element={<Navigate to="matches" replace />} />
+        </Routes>
+      </Card>
 
     </section>
   );
