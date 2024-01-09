@@ -1,14 +1,14 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 
-import { reportService } from '@api/services/report.service';
-import { cryptographyService } from '@api/services/cryptography.service';
-import { vulnerabilityService } from '@api/services/vulnerability.service';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { useTranslation } from 'react-i18next';
 import Loader from '@components/Loader/Loader';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
+import { forceUpdate, getReport } from '@store/report-store/reportThunks';
+import { selectReportState } from '@store/report-store/reportSlice';
+import { AppDispatch } from '@store/store';
 import { dialogController } from '../../../../../../controllers/dialog-controller';
 import IdentifiedReport from './IdentifiedReport';
 import DetectedReport from './DetectedReport';
@@ -18,16 +18,31 @@ import { ExportButton } from './components/ExportButton';
 const ScanReport = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = useSelector(selectWorkbench);
-  const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const { t } = useTranslation();
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
+  const dispatch = useDispatch<AppDispatch>();
+  const state = useSelector(selectWorkbench);
 
-  const [detectedData, setDetectedData] = useState(null);
-  const [identifiedData, setIdentifiedData] = useState(null);
+  const { detected, identified, isLoading } = useSelector(selectReportState);
 
-  const isEmpty = identifiedData?.summary.identified.scan === 0
-    && identifiedData?.summary.original === 0
-    && identifiedData?.licenses.length === 0;
+  const isEmpty = identified?.summary.identified.scan === 0
+    && identified?.summary.original === 0
+    && identified?.licenses.length === 0;
+
+  const refresh = async () => {
+    const dialog = await dialogCtrl.createProgressDialog(t('Dialog:UpdatingReport').toUpperCase());
+    dialog.present();
+    try {
+      await dispatch(forceUpdate()).unwrap();
+      dialog.finish({ message: t('Dialog:UpdateFinished').toUpperCase() });
+    } catch (e: any) {
+      dialog.dismiss();
+      dialogController.showError(t('Dialog:ErrorUpdatingReport'), e.message);
+    } finally {
+      dialog.dismiss({ delay: 1500 });
+      dispatch(getReport());
+    }
+  };
 
   const setTab = (identified) => {
     if (location.pathname.endsWith('scan')) {
@@ -39,40 +54,15 @@ const ScanReport = () => {
     }
   };
 
-  const refresh = async () => {
-    const dialog = await dialogCtrl.createProgressDialog(t('Dialog:UpdatingReport').toUpperCase());
-    dialog.present();
-    try {
-      const promises = [cryptographyService.update(), vulnerabilityService.update()];
-      await Promise.all(promises);
-      dialog.finish({ message: t('Dialog:UpdateFinished').toUpperCase() });
-    } catch (e: any) {
-      dialog.dismiss();
-      dialogController.showError(t('Dialog:ErrorUpdatingReport'), e.message);
-    } finally {
-      dialog.dismiss({ delay: 1500 });
-      await getReport();
-    }
-  };
-
-  const getReport = async () => {
-    const summary = await reportService.getSummary();
-    const detected = await reportService.detected();
-    const identified = await reportService.identified();
-    setDetectedData({ ...detected, summary });
-    setIdentifiedData({ ...identified, summary });
-    return { summary, detected, identified };
-  };
-
   useEffect(() => {
     const init = async () => {
-      const { identified } = await getReport();
-      setTab(identified);
+      const { payload } = await dispatch<any>(getReport());
+      setTab(payload.identified);
     };
     init();
   }, []);
 
-  if (!detectedData || !identifiedData) {
+  if (!detected || !identified) {
     return <Loader message="Loading reports" />;
   }
 
@@ -84,8 +74,8 @@ const ScanReport = () => {
       </header>
       <main className="app-content">
         <Routes>
-          <Route path="detected/*" element={detectedData && <DetectedReport data={detectedData} onRefresh={refresh} />} />
-          <Route path="identified/*" element={identifiedData && <IdentifiedReport data={identifiedData} onRefresh={refresh} />} />
+          <Route path="detected/*" element={detected && <DetectedReport data={detected} onRefresh={refresh} />} />
+          <Route path="identified/*" element={identified && <IdentifiedReport data={identified} onRefresh={refresh} />} />
         </Routes>
       </main>
     </section>

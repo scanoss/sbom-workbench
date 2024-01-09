@@ -16,6 +16,8 @@ import { reportService } from '@api/services/report.service';
 import { load, reset, setProgress } from '@store/workbench-store/workbenchSlice';
 import * as component from '@store/component-store/componentSlice';
 import * as navigation from '@store/navigation-store/navigationSlice';
+import * as report from '@store/report-store/reportSlice';
+
 import { loadProject } from '@store/workbench-store/workbenchThunks';
 import {
   accept, getAll, reject, rejectAll, restore,
@@ -79,5 +81,6 @@ rootMiddleware.startListening({
   effect: async (action, api) => {
     api.dispatch(component.reset());
     api.dispatch(navigation.reset());
+    api.dispatch(report.reset());
   },
 });
