@@ -45,19 +45,19 @@ const ScanReport = () => {
   };
 
   const setTab = (identified) => {
-    if (location.pathname.endsWith('scan')) {
-      if (state.tree.hasIdentified || state.tree.hasIgnored || identified.licenses.length > 0) {
-        navigate('identified', { replace: true });
-      } else {
-        navigate('detected', { replace: true });
-      }
+    if (state.tree.hasIdentified || state.tree.hasIgnored || identified.licenses.length > 0) {
+      navigate('identified', { replace: true });
+    } else {
+      navigate('detected', { replace: true });
     }
   };
 
   useEffect(() => {
     const init = async () => {
-      const { payload } = await dispatch<any>(getReport());
-      setTab(payload.identified);
+      if (location.pathname.endsWith('scan')) { // only reload if user click in main item (avoid reload on back navigation)
+        const { payload } = await dispatch<any>(getReport());
+        setTab(payload.identified);
+      }
     };
     init();
   }, []);
