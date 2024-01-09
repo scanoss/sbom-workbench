@@ -133,7 +133,7 @@ class ReportService {
       this.addCryptoToComponent(licenses, crypto);
 
       // Add Manifest files
-      await this.addManifestFileToComponents(licenses);
+      // await this.addManifestFileToComponents(licenses);
 
       return {
         licenses, crypto, vulnerabilities: vulnerabilityReport, dependencies: dependenciesSummary,
@@ -243,7 +243,7 @@ class ReportService {
     }, {} as any);
 
     dependencies.forEach((dep) => {
-      const { component, purl, version } = dep;
+      const { component, purl, version, path } = dep;
       // We don't know what is the license
       if (!dep.originalLicense) {
         if (!licenseMapper.unknown) {
@@ -256,6 +256,7 @@ class ReportService {
                 purl,
                 cryptography: [],
                 source: 'declared',
+                manifestFile: path,
               },
             ],
             label: 'unknown',
@@ -273,6 +274,7 @@ class ReportService {
             purl: dep.purl,
             cryptography: [],
             source: 'declared',
+            manifestFile: path,
           });
           licenseMapper.unknown.value += 1;
         }
@@ -292,6 +294,7 @@ class ReportService {
                 purl,
                 cryptography: [],
                 source: 'declared',
+                manifestFile: path,
               });
               licenseMapper[l].value += 1;
             }
@@ -305,6 +308,7 @@ class ReportService {
                   purl,
                   cryptography: [],
                   source: 'declared',
+                  manifestFile: path,
                 },
               ],
               label: l,
@@ -333,7 +337,8 @@ class ReportService {
     const dependencyData = await modelProvider.model.dependency.getAll(null);
     const mapper = new Map<string, string>(); // Ei. pkg:golang/go.opentelemetry.io/otel@v1.17.0 -> /go.sum
     dependencyData.forEach((d) => {
-      mapper.set(`${d.purl}@${d.version}`, d.path);
+      const key = `${d.purl}@${d.version}`;
+      mapper.set(key, d.path);
     });
     return mapper;
   }
