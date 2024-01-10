@@ -42,7 +42,7 @@
   "ExportHintRAW": "Export the raw JSON responses from the SCANOSS Platform",
   "ExportHintCSV": "Export Comma Separate Value report",
   "ExportHintSPDXLite": "Export an SPDX compliant SBOM report",
-  "ExportHintHTML": "Export a HTML summary of the Identification report",
+  "ExportHintHTML": "Export a HTML summary of the report",
   "TotalFiles": "Total Files",
   "Detected": "Detected",
   "NotDetected": "Not Detected",

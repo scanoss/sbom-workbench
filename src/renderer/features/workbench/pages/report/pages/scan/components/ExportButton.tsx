@@ -46,7 +46,7 @@ export const ExportButton = ({ empty }) => {
     HTMLSUMMARY: {
       label: 'HTML Summary',
       hint: t('Tooltip:ExportHintHTML'),
-      sources: [ExportSource.IDENTIFIED],
+      sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
     },
   };
 
