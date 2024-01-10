@@ -198,9 +198,7 @@ class ComponentService {
 
   @After(AddCrypto)
   @After(AddVulnerability)
-  public async create(
-    newComp: NewComponentDTO,
-  ): Promise<Partial<ComponentGroup>> {
+  public async create(newComp: NewComponentDTO): Promise<Partial<ComponentGroup>> {
     const promises = newComp.versions.map((v) => {
       const component = new ComponentVersion();
       Object.assign(component, newComp);
@@ -209,16 +207,20 @@ class ComponentService {
       component.source = ComponentSource.MANUAL;
       return modelProvider.model.component.create(component);
     });
+
     const results = await Promise.all(promises.map((p) => p.catch((e) => e)));
     const validComponents = results.filter(
       (result) => !(result instanceof Error),
     );
+
     if (results.length - validComponents.length === newComp.versions.length) {
       throw new Error('Component already exists');
     }
+
     const component = await modelProvider.model.component.getAll(
       QueryBuilderCreator.create({ purl: newComp.purl }),
     );
+
     const compPurl: any = this.groupComponentsByPurl(component);
     const response = await this.mergeComponentByPurl(compPurl);
 
