@@ -23,30 +23,30 @@ export class SpdxLiteJson extends Format {
 
   // @override
   public async generate() {
-    const data =
-      this.source === ExportSource.IDENTIFIED
-        ? await this.export.getIdentifiedData()
-        : await this.export.getDetectedData();
+    const data = this.source === ExportSource.IDENTIFIED
+      ? await this.export.getIdentifiedData()
+      : await this.export.getDetectedData();
     const spdx = SpdxLiteJson.template();
     spdx.packages = [];
     spdx.documentDescribes = [];
+
     for (let i = 0; i < data.length; i += 1) {
-      const aux = spdx.packages.find((p) =>
-        p.versionInfo === data[i].version
-          ? data[i].version
-          : 'NOASSERTION' && p.externalRefs[0].referenceLocator === data[i].purl
-      );
-      if (aux !== undefined && data[i].detected_license) {
-        if (new RegExp(`\\b${data[i].detected_license}\\b`).test(aux.licenseDeclared) === false) {
-          aux.licenseDeclared =
-            aux.licenseDeclared === 'NOASSERTION'
-              ? aux.licenseDeclared.replace('NOASSERTION', data[i].detected_license) // Not concat when NOASSERTION exists
-              : aux.licenseDeclared.concat(' AND ', data[i].detected_license);
+      // Find already existing package by purl and version
+      const pkg = spdx.packages.find((p) => (p.versionInfo === (data[i].version || 'NOASSERTION') && (p.externalRefs[0].referenceLocator === data[i].purl)));
+
+      if (pkg && data[i].detected_license) {
+        if (new RegExp(`\\b${data[i].detected_license}\\b`).test(pkg.licenseDeclared) === false) {
+          pkg.licenseDeclared = pkg.licenseDeclared === 'NOASSERTION'
+            ? pkg.licenseDeclared.replace('NOASSERTION', data[i].detected_license) // Not concat when NOASSERTION exists
+            : pkg.licenseDeclared.concat(' AND ', data[i].detected_license);
         }
       } else {
-        const pkg = this.getPackage(data[i]);
-        spdx.packages.push(pkg);
-        spdx.documentDescribes.push(pkg.SPDXID);
+        // eslint-disable-next-line no-continue
+        if (pkg && !data[i].detected_license) continue;
+
+        const newPackage = this.getPackage(data[i]);
+        spdx.packages.push(newPackage);
+        spdx.documentDescribes.push(newPackage.SPDXID);
       }
     }
 
