@@ -65,40 +65,17 @@ export class ResultModel extends Model {
     const resultLicense: any = {};
     const result: Record<any, any> = await utilModel.readFile(resultPath);
     const db = await this.openDb();
-    const promises = [];
-    const call = util.promisify(db.run.bind(db));
-    let resultId = 1;
     let data: any;
     for (const [key, value] of Object.entries(result)) {
       for (let i = 0; i < value.length; i += 1) {
         const filePath = key;
         data = value[i];
         if (data.id !== 'none') {
-          promises.push(call(
-            query.SQL_INSERT_RESULTS,
-            data.file_hash,
-            data.vendor,
-            data.component,
-            data.version,
-            data.latest,
-            data.url,
-            data.lines,
-            data.oss_lines,
-            data.matched,
-            data.file,
-            data.id,
-            data.url_hash,
-            data.purl ? data.purl[0] : ' ',
-            files[filePath],
-            data.file_url,
-            'engine',
-          ));
+          const resultId = await this.insertResultBulk(db, data, files[filePath]);
           resultLicense[resultId] = data.licenses;
-          resultId += 1;
         }
       }
     }
-    await Promise.all(promises);
     db.close();
     return resultLicense;
   }
