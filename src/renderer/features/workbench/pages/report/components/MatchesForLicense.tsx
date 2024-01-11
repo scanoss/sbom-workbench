@@ -101,10 +101,14 @@ export default function MatchesForLicense({ components, showCrypto, mode }) {
 
             <Column
               label={t('Table:Header:License')}
-              dataKey="license"
+              dataKey="licenses"
               width={100}
               flexGrow={1}
               flexShrink={0}
+              cellRenderer={({ cellData }) => {
+                const data = cellData.join(' - ');
+                return <span title={data}>{data}</span>;
+              }}
             />
 
             {showCrypto && (

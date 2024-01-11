@@ -23,10 +23,10 @@ const ScanReport = () => {
   const dispatch = useDispatch<AppDispatch>();
   const state = useSelector(selectWorkbench);
 
-  const { detected, identified, isLoading } = useSelector(selectReportState);
+  const { detected, identified, summary, isLoading } = useSelector(selectReportState);
 
-  const isEmpty = identified?.summary.identified.scan === 0
-    && identified?.summary.original === 0
+  const isEmpty = summary?.identified.scan === 0
+    && summary?.original === 0
     && identified?.licenses.length === 0;
 
   const refresh = async () => {
@@ -74,8 +74,8 @@ const ScanReport = () => {
       </header>
       <main className="app-content">
         <Routes>
-          <Route path="detected/*" element={detected && <DetectedReport data={detected} onRefresh={refresh} />} />
-          <Route path="identified/*" element={identified && <IdentifiedReport data={identified} onRefresh={refresh} />} />
+          <Route path="detected/*" element={detected && <DetectedReport data={detected} summary={summary} onRefresh={refresh} />} />
+          <Route path="identified/*" element={identified && <IdentifiedReport data={identified} summary={summary} onRefresh={refresh} />} />
         </Routes>
       </main>
     </section>

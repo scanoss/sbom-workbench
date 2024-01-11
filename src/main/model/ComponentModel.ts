@@ -237,7 +237,8 @@ export class ComponentModel extends Model {
   public async getIdentifiedForReport() {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
-    const report = (await call(`SELECT DISTINCT c.id, c.name as comp_name, c.version, c.purl,c.url,l.name AS license_name, l.spdxid, r.vendor, i.source
+    const report = (await call(`
+        SELECT DISTINCT c.id, c.name, c.version, c.purl ,c.url, l.name AS license_name, l.spdxid, r.vendor, i.source
         FROM component_versions c
         INNER JOIN inventories i ON c.id=i.cvid
         LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl

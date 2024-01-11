@@ -27,7 +27,7 @@ import DependenciesDataTable from '../../components/DependenciesDataTable';
 
 Chart.register(...registerables);
 
-const IdentifiedReport = ({ data, onRefresh }: { data: any, onRefresh: () => void }) => {
+const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: any, onRefresh: () => void }) => {
   const { projectScannerConfig } = useSelector(selectWorkbench);
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -44,7 +44,7 @@ const IdentifiedReport = ({ data, onRefresh }: { data: any, onRefresh: () => voi
   const [componentsDeclared, setComponentsDeclared] = useState<Component[]>([]);
   const [obligationsFiltered, setObligationsFiltered] = useState<any[]>([]);
 
-  const isEmpty = data.summary.identified.scan === 0 && data.summary.original === 0 && data.licenses.length === 0;
+  const isEmpty = summary?.identified.scan === 0 && summary?.original === 0 && data.licenses.length === 0;
 
   const init = async () => {
     const licenses = data.licenses.map((license) => license.label);
@@ -56,7 +56,7 @@ const IdentifiedReport = ({ data, onRefresh }: { data: any, onRefresh: () => voi
   const onLicenseSelected = (license: string) => {
     const matchedLicense = data.licenses.find((item) => item.label === license);
 
-    const filtered = matchedLicense.components.map((item) => ({ ...item, license: matchedLicense.label }));
+    const filtered = data.components.filter((item) => item.licenses.includes(matchedLicense.label));
     setComponentsMatched(filtered.filter((item) => item.source === 'detected'));
     setComponentsDeclared(filtered.filter((item) => item.source === 'declared'));
     setObligationsFiltered(obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)));
@@ -64,7 +64,8 @@ const IdentifiedReport = ({ data, onRefresh }: { data: any, onRefresh: () => voi
   };
 
   const onLicenseClear = () => {
-    const items = data.licenses?.map((license: any) => license.components.map((item) => ({ ...item, license: license.label }))).flat();
+    const items = data.components;
+
     setComponentsMatched(items.filter((item) => item.source === 'detected'));
     setComponentsDeclared(items.filter((item) => item.source === 'declared'));
     setObligationsFiltered(obligations.current);
@@ -103,12 +104,12 @@ const IdentifiedReport = ({ data, onRefresh }: { data: any, onRefresh: () => voi
     <section className="report-layout identified">
       <Card className="report-item identification-progress">
         <div className="report-title">{t('Title:IdentificationProgress')}</div>
-        <IdentificationProgress data={data.summary} />
+        <IdentificationProgress data={summary} />
       </Card>
 
       <Card className="report-item oss-original">
         <div className="report-title">{t('Title:OSSvsOriginal')}</div>
-        <OssVsOriginalProgressBar data={data.summary} />
+        <OssVsOriginalProgressBar data={summary} />
       </Card>
 
       <Card className="report-item licenses">

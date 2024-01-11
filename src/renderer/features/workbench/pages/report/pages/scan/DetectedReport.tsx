@@ -25,10 +25,11 @@ import { Scanner } from '../../../../../../../main/task/scanner/types';
 import CryptographyDataTable from '../../components/CryptographyDataTable';
 import DependenciesCard from '../../components/DependenciesCard';
 import DependenciesDataTable from '../../components/DependenciesDataTable';
+import { Data } from 'electron';
 
 Chart.register(...registerables);
 
-const DetectedReport = ({ data, onRefresh }) => {
+const DetectedReport = ({ data, summary, onRefresh }) => {
   const { projectScannerConfig } = useSelector(selectWorkbench);
   const { t } = useTranslation();
   const location = useLocation();
@@ -54,7 +55,7 @@ const DetectedReport = ({ data, onRefresh }) => {
   const onLicenseSelected = (license: string) => {
     const matchedLicense = data.licenses.find((item) => item.label === license);
 
-    const filtered = matchedLicense.components.map((item) => ({ ...item, license: matchedLicense.label }));
+    const filtered = data.components.filter((item) => item.licenses.includes(matchedLicense.label));
     setComponentsMatched(filtered.filter((item) => item.source === 'detected'));
     setComponentsDeclared(filtered.filter((item) => item.source === 'declared'));
     setObligationsFiltered(obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)));
@@ -62,7 +63,8 @@ const DetectedReport = ({ data, onRefresh }) => {
   };
 
   const onLicenseClear = () => {
-    const items = data.licenses?.map((license: any) => license.components.map((item) => ({ ...item, license: license.label }))).flat();
+    const items = data.components;
+
     setComponentsMatched(items.filter((item) => item.source === 'detected'));
     setComponentsDeclared(items.filter((item) => item.source === 'declared'));
     setObligationsFiltered(obligations.current);
@@ -101,7 +103,7 @@ const DetectedReport = ({ data, onRefresh }) => {
 
       <Card className="report-item matches">
         <div className="report-title">{t('Title:Matches')}</div>
-        <MatchesChart data={data.summary} />
+        <MatchesChart data={summary} />
       </Card>
 
       <Card onClick={(e) => setTab('declared')} className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
