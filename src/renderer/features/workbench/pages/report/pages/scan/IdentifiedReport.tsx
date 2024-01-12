@@ -21,9 +21,7 @@ import LicensesObligations from '../../components/LicensesObligations';
 import OssVsOriginalProgressBar from '../../components/OssVsOriginalProgressBar';
 import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 import { Scanner } from '../../../../../../../main/task/scanner/types';
-import CryptographyDataTable from '../../components/CryptographyDataTable';
 import DependenciesCard from '../../components/DependenciesCard';
-import DependenciesDataTable from '../../components/DependenciesDataTable';
 
 Chart.register(...registerables);
 
@@ -128,13 +126,15 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
         )}
       </Card>
 
-      <Card onClick={(e) => setTab('declared')} className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
-        <div className="report-title d-flex space-between align-center">
-          <span>{t('Title:IdentifiedDependencies')}</span>
-        </div>
-        { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
-          ? <DependenciesCard data={data.dependencies} />
-          : <p className="text-center mb-5 mt-5">{t('NoDependenciesScanned')}</p>}
+      <Card className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
+        <ConditionalLink to="declared" replace className="w-100 no-underline" disabled={false}>
+          <div className="report-title d-flex space-between align-center">
+            <span>{t('Title:IdentifiedDependencies')}</span>
+          </div>
+          { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
+            ? <DependenciesCard data={data.dependencies} />
+            : <p className="text-center mb-5 mt-5">{t('NoDependenciesScanned')}</p>}
+        </ConditionalLink>
       </Card>
 
       <Card className={`report-item vulnerabilities ${layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? 'no-blocked' : 'blocked'}`}>

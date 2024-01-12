@@ -31,12 +31,12 @@ export const reportSlice = createSlice({
       state.summary = summary;
       state.detected = {
         ...detected,
-        components: groupByPurlVersion(detected.licenses),
+        components: getComponentsGrouped(detected.licenses),
       };
 
       state.identified = {
         ...identified,
-        components: groupByPurlVersion(identified.licenses),
+        components: getComponentsGrouped(identified.licenses),
       };
 
       state.isLoading = false;
@@ -45,9 +45,9 @@ export const reportSlice = createSlice({
   },
 });
 
-const groupByPurlVersion = (data: any[]) => {
-  const group = (acc, current) => { // groupByPurlAndVersion
-    const key = `${current.purl}@${current.version}`;
+const getComponentsGrouped = (data: any[]) => {
+  const group = (acc, current) => { // groupByPurlVersionSourceManifest
+    const key = `${current.purl}@${current.version}-${current.source}-${current.manifestFile}`;
     if (acc[key]) {
       acc[key].licenses.push(current.license);
     } else {

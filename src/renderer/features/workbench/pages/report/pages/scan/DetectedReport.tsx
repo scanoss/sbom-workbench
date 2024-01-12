@@ -15,6 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import { Component } from 'main/services/ReportService';
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Data } from 'electron';
 import LicensesChart from '../../components/LicensesChart';
 import LicensesTable from '../../components/LicensesTable';
 import MatchesForLicense from '../../components/MatchesForLicense';
@@ -25,7 +26,6 @@ import { Scanner } from '../../../../../../../main/task/scanner/types';
 import CryptographyDataTable from '../../components/CryptographyDataTable';
 import DependenciesCard from '../../components/DependenciesCard';
 import DependenciesDataTable from '../../components/DependenciesDataTable';
-import { Data } from 'electron';
 
 Chart.register(...registerables);
 
@@ -106,17 +106,19 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
         <MatchesChart data={summary} />
       </Card>
 
-      <Card onClick={(e) => setTab('declared')} className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
-        <div className="report-title d-flex space-between align-center">
-          <span>{t('Title:DeclaredDependencies')}</span>
-        </div>
-        { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
-          ? <DependenciesCard data={data.dependencies} />
-          : <p className="text-center mb-5 mt-5">{t('NoDependenciesScanned')}</p>}
+      <Card className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
+        <ConditionalLink to="declared" replace className="w-100 no-underline" disabled={false}>
+          <div className="report-title d-flex space-between align-center">
+            <span>{t('Title:DeclaredDependencies')}</span>
+          </div>
+          { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
+            ? <DependenciesCard data={data.dependencies} />
+            : <p className="text-center mb-5 mt-5">{t('NoDependenciesScanned')}</p>}
+        </ConditionalLink>
       </Card>
 
       <Card className={`report-item vulnerabilities ${layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? 'no-blocked' : 'blocked'}`}>
-        <ConditionalLink to="../../vulnerabilities?type=detected" disabled={false} className="w-100 no-underline">
+        <ConditionalLink to="../../vulnerabilities?type=detected" className="w-100 no-underline" disabled={false}>
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:Vulnerabilities')}</span>
             <div className="action">
