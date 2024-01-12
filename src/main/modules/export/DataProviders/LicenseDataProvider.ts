@@ -8,6 +8,7 @@ export class LicenseDataProvider extends BaseDataProvider implements DataProvide
     const licenses = [] as unknown as Array<LicenseDataLayer>;
     const query = this.source === ExportSource.IDENTIFIED ? await modelProvider.model.component.getIdentifiedForReport() : await modelProvider.model.component.getDetectedForReport();
     // First pass: Group by license
+
     query.forEach((element) => {
       const licenseIndex = licenses.findIndex((obj) => obj.label === element.spdxid);
       const name = element.comp_name ? element.comp_name : element.purl.split('/').pop();
