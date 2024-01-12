@@ -274,11 +274,12 @@ export class ComponentModel extends Model {
       vendor: string;
     }>;
 
-    const componentLicenseReport = (await call(`SELECT DISTINCT c.id, c.name as comp_name, c.version, c.purl,c.url,l.name AS license_name, l.spdxid, r.vendor, 'detected' as source, '[]' as l_array
-        FROM component_versions c INNER JOIN license_component_version lcv ON lcv.cvid = c.id
-        INNER JOIN licenses l ON l.id = lcv.licid
-        INNER JOIN results r ON r.version = c.version AND r.purl = c.purl
-        WHERE c.source = 'engine'`)) as Array<{
+    const componentLicenseReport = (await call(`SELECT DISTINCT c.id, c.name as comp_name, c.version, c.purl,c.url,coalesce(l.name,'unknown') AS license_name, coalesce(l.spdxid,'unknown') as spdxid, r.vendor, 'detected' as source, '[]' as l_array
+      FROM component_versions c
+      INNER JOIN results r ON r.version = c.version AND r.purl = c.purl
+      LEFT JOIN license_component_version lcv ON lcv.cvid = c.id
+      LEFT JOIN licenses l ON l.id = lcv.licid
+      WHERE c.source = 'engine';`)) as Array<{
       id: string;
       comp_name: string;
       version: string;
@@ -288,6 +289,7 @@ export class ComponentModel extends Model {
       spdxid: string;
       vendor: string;
     }>;
+
     const report = dependencyLicenseReport.concat(componentLicenseReport);
     db.close();
     return report;
@@ -385,8 +387,8 @@ export class ComponentModel extends Model {
     const call = util.promisify(db.all.bind(db));
     const query = (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms
         FROM component_versions c INNER JOIN results r ON r.version = c.version AND r.purl = c.purl
-        INNER JOIN license_component_version lcv ON lcv.cvid = c.id
-        INNER JOIN licenses l ON lcv.licid = l.id
+        LEFT JOIN license_component_version lcv ON lcv.cvid = c.id
+        LEFT JOIN licenses l ON lcv.licid = l.id
         LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version;`) as Array<{
       purl: string;
       name: string;
