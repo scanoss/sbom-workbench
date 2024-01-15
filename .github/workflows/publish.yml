@@ -6,10 +6,45 @@ on:
     tags:
       - 'v*.*.*'
 
-#TODO: Split mac and windows build
 jobs:
-  build_mw:
-    name: "Build for macOS & Win"
+  build_w:
+    name: "Build for Windows"
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v3
+
+      - name: Install Node and NPM
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          npm install --legacy-peer-deps
+          npm run postinstall
+          npm run build
+
+      - name: Build binaries for Windows
+        env:
+          WIN_CSC_LINK: ${{ secrets.WIN_CSC }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+        run: |
+          npm exec -- electron-builder build --win --publish never
+
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: artifact_w
+          path: |
+            release/build/sbom-workbench*.exe
+            release/build/latest.yml
+            release/build/*exe.blockmap
+
+  build_m:
+    name: "Build for MacOS"
     runs-on: macos-latest
 
     steps:
@@ -35,22 +70,17 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          WIN_CSC_LINK: ${{ secrets.WIN_CSC }}
-          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
         run: |
-          npm exec -- electron-builder build --mac --win --publish never
+          npm exec -- electron-builder build --mac --publish never
 
 
       - uses: actions/upload-artifact@v3
         with:
-          name: artifact_mw
+          name: artifact_m
           path: |
-            release/build/sbom-workbench*.exe
             release/build/sbom-workbench*.dmg
             release/build/latest-mac.yml
-            release/build/latest.yml
             release/build/*dmg.blockmap
-            release/build/*exe.blockmap
 
   build_l:
     name: "Build for Linux"
@@ -85,14 +115,19 @@ jobs:
 
 
   create_release:
-    needs: [build_mw, build_l]
+    needs: [build_w, build_m, build_l]
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download artifact MW
+      - name: Download artifact W
         uses: actions/download-artifact@v2
         with:
-          name: artifact_mw
+          name: artifact_w
+
+      - name: Download artifact M
+        uses: actions/download-artifact@v2
+        with:
+          name: artifact_m
 
       - name: Download artifact L
         uses: actions/download-artifact@v2
