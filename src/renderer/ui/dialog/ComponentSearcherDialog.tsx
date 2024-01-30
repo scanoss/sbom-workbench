@@ -156,7 +156,7 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
               <Trans i18nKey="NeedApiKeyComponents" components={{
                 1: <Link
                     color="inherit"
-                    href={`${AppConfig.SCANOSS_WEBSITE_URL}/pricing`}
+                    href={`${AppConfig.ORGANIZATION_URL}/pricing`}
                     target="_blank"
                     rel="noreferrer"
                   />

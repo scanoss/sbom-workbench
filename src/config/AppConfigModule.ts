@@ -1,15 +1,20 @@
+/* eslint-disable no-console */
+/* eslint-disable no-empty */
+/* eslint-disable global-require */
 import { AppConfigDefault } from './AppConfigDefault';
 import { IAppConfig } from './IAppConfig';
 
 let conf = AppConfigDefault;
+let overrideConf = {};
 
+console.info('%c[ CONFIGMODULE ]: Applying config override', 'color: yellow');
 try {
-  const overrideConf = require('./override.conf.json');
-  conf = { ...conf, ...overrideConf };
-  console.info(`%c[ CONFIGMODULE ]: Override config file found`, 'color: yellow');
-  // eslint-disable-next-line no-empty
-} catch (e) {}
+  overrideConf = require('./override.json');
+} catch (e) {
+  console.info('%c[ CONFIGMODULE ]: Missing override.json file', 'color: red');
+}
 
+conf = { ...conf, ...overrideConf };
 const AppConfig: IAppConfig = conf;
 
 export default AppConfig;

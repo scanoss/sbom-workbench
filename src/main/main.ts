@@ -95,6 +95,7 @@ const createWindow = async () => {
   const getAssetPath = (...paths: string[]): string => path.join(RESOURCES_PATH, ...paths);
 
   mainWindow = new BrowserWindow({
+    title: AppConfig.APP_NAME,
     show: false,
     width: 1330,
     height: 820,

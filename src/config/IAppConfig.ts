@@ -2,8 +2,11 @@ import { ExportFormat } from '../api/types';
 
 export interface IAppConfig {
   APP_NAME: string;
+  ORGANIZATION_NAME: string;
+  ORGANIZATION_URL: string;
+  DEFAULT_WORKSPACE_NAME: string;
+
   ABOUT_MESSAGE: string;
-  SCANOSS_WEBSITE_URL: string;
 
   OSSKB_HOST: string;
   API_URL: string;
@@ -12,8 +15,6 @@ export interface IAppConfig {
   API_CONTENT_PATH: string;
   API_SCAN_PATH: string;
 
-  MIN_VERSION_SUPPORTED: string;
-  DEFAULT_WORKSPACE_NAME: string;
   DEFAULT_IP_gRPC: string;
   DEFAULT_PORT_gRPC: number;
 
@@ -26,6 +27,6 @@ export interface IAppConfig {
   FF_ENABLE_SCAN_VULNERABILITY: boolean;
   FF_ENABLE_SCAN_CRYPTOGRAPHY: boolean;
 
-  // search engine
   SEARCH_ENGINE_DEFAULT_LIMIT: number;
+  MIN_VERSION_SUPPORTED: string;
 }

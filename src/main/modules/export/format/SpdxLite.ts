@@ -1,3 +1,4 @@
+import AppConfig from '../../../../config/AppConfigModule';
 import { ExportSource } from '../../../../api/types';
 import { workspace } from '../../../workspace/Workspace';
 import { Format } from '../Format';
@@ -36,7 +37,7 @@ export class SpdxLite extends Format {
   private static templateHeader() {
     const template = `DocumentName: ${workspace
       .getOpenedProjects()[0]
-      .getProjectName()}\nDocumentNamespace: https://example.com/example-v1.0\nCreator: Person: SCANOSS Inventory Engine', 'Organization: http://scanoss.com'\n\r`;
+      .getProjectName()}\nDocumentNamespace: https://example.com/example-v1.0\nCreator: Person: ${AppConfig.APP_NAME}', 'Organization: ${AppConfig.ORGANIZATION_URL}'\n\r`;
     return template;
   }
 }

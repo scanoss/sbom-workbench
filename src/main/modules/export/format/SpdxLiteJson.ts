@@ -4,6 +4,7 @@ import { utilModel } from '../../../model/UtilModel';
 import { Format } from '../Format';
 import { workspace } from '../../../workspace/Workspace';
 import { ExportSource } from '../../../../api/types';
+import AppConfig from '../../../../config/AppConfigModule';
 
 const crypto = require('crypto');
 
@@ -71,10 +72,10 @@ export class SpdxLiteJson extends Format {
       spdxVersion: 'SPDX-2.2',
       dataLicense: 'CC0-1.0',
       SPDXID: 'SPDXRef-###',
-      name: 'SCANOSS-SBOM',
+      name: 'SBOM',
       documentNamespace: 'https://spdx.org/spdxdocs/DOCUMENTNAME-UUID',
       creationInfo: {
-        creators: ['Tool: SBOM Workbench', `Person: ${os.userInfo().username}`],
+        creators: [`Tool: ${AppConfig.APP_NAME}`, `Person: ${os.userInfo().username}`],
         created: utilModel.getTimeStamp(),
       },
       packages: [] as any,
