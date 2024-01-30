@@ -1,0 +1,10 @@
+
+{
+  "APP_NAME": "Super SBOM Analyzer",
+  "ORGANIZATION_NAME": "My Organization",
+  "ORGANIZATION_URL": "https://www.myorg.com",
+  "ABOUT_MESSAGE": "This is a rebranded SBOM Workbech made for My Organization",
+  "DEFAULT_WORKSPACE_NAME": "sbom-workspace",
+  "FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN": true,
+  "FF_EXPORT_FORMAT_OPTIONS": ["CSV","RAW","WFP"]
+}

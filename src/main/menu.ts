@@ -60,7 +60,7 @@ export default class MenuBuilder {
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
-      label: 'Scanoss',
+      label: AppConfig.APP_NAME,
       submenu: [
         {
           label: i18next.t('AppMenu:NewProject'),

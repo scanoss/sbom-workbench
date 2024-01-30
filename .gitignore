@@ -31,3 +31,4 @@ npm-debug.log.*
 # Workbench
 *.worker.js
 *.worker.js.LICENSE.txt
+override.json
