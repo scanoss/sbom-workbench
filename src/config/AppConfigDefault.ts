@@ -10,6 +10,7 @@ export const AppConfigDefault: IAppConfig = {
   API_SCAN_PATH: '/scan/direct',
   API_CONTENT_PATH: '/file_contents',
   SCANOSS_WEBSITE_URL: 'https://www.scanoss.com',
+  DEFAULT_SETTING_NAME: '.scanoss',
   MIN_VERSION_SUPPORTED: '0.17.0',
   DEFAULT_WORKSPACE_NAME: 'scanoss-workspace',
   DEFAULT_IP_gRPC: 'scanoss.com',

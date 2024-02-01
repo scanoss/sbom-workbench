@@ -24,6 +24,8 @@ export interface IProjectCfg {
 export interface IWorkspaceCfg {
   DEFAULT_API_INDEX: number;
   APIS: Array<Record<string, string>>;
+  DEFAULT_WORKSPACE_INDEX: number;
+  WORKSPACES: Array<WorkspaceData>
   TOKEN: string;
   SCAN_MODE: string;
   VERSION: string;
@@ -35,6 +37,12 @@ export interface IWorkspaceCfg {
   SCANNER_TIMEOUT: number;
   SCANNER_POST_SIZE: number;
   SCANNER_CONCURRENCY_LIMIT: number;
+}
+
+export interface WorkspaceData {
+  NAME: string;
+  PATH: string;
+  DESCRIPTION: string;
 }
 
 export interface Node {

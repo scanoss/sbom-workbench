@@ -186,8 +186,9 @@ app
   .catch(console.log);
 
 async function init() {
-  const root = `${os.homedir()}/${AppConfig.DEFAULT_WORKSPACE_NAME}`;
-  await workspace.read(root);
-  await userSettingService.read(root);
-  await userSettingService.update();
+  await userSettingService.read();
+  const settings =  userSettingService.get();
+  const defaultWorkspacePath = settings.WORKSPACES[settings.DEFAULT_WORKSPACE_INDEX].PATH; 
+  await workspace.read(defaultWorkspacePath);
+
 }
