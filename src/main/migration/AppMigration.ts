@@ -4,7 +4,7 @@ import { wsMigration151 } from './scripts/151';
 import { wsMigration183 } from './scripts/183';
 import { wsMigration184 } from './scripts/184';
 
-export class WorkspaceMigration extends Migration {
+export class AppMigration extends Migration {
   private scripts: Record<string, Array<(data: string) => void>>;
 
   private wsPath: string;

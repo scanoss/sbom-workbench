@@ -7,6 +7,7 @@ export interface IAppConfig {
   DEFAULT_WORKSPACE_NAME: string;
 
   ABOUT_MESSAGE: string;
+  DEFAULT_SETTING_NAME: string;
 
   OSSKB_HOST: string;
   API_URL: string;
