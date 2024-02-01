@@ -3,7 +3,19 @@
   overflow-y: hidden;
 
   .app-header {
-    margin-top: 20px;
+    margin-top: 16px;
+
+    .workspace-selector {
+      display: flex;
+      align-items: center;
+      margin-bottom: 32px;
+
+      font-size: 22px;
+
+      > h4 {
+        margin: 0;
+      }
+    }
 
     .subheader {
       display: flex;
