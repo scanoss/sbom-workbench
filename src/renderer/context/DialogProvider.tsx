@@ -15,6 +15,7 @@ import { ProgressDialog } from '../ui/dialog/ProgressDialog';
 import DependencyDialog from '../ui/dialog/DependencyDialog';
 import ComponentSearcherDialog from '../ui/dialog/ComponentSearcherDialog';
 import { ProjectSelectorDialog } from '../ui/dialog/ProjectSelectorDialog';
+import WorkspaceAddDialog from 'renderer/ui/dialog/WorkspaceAddDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>, options?: InventoryDialogOptions) => Promise<Inventory | null>;
@@ -29,6 +30,7 @@ export interface IDialogContext {
   createProgressDialog: (message: ReactNode) => Promise<LoaderController>;
   openDependencyDialog: (dependency: Dependency) => Promise<DialogResponse>;
   openProjectSelectorDialog: (params?: { folder?: string, md5File?: string}) => Promise<DialogResponse>;
+  openWorkspaceAddDialog: () => Promise<DialogResponse>;
 }
 
 export interface InventoryDialogOptions {
@@ -326,6 +328,28 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     });
   };
 
+  const [workspaceAddDialog, setWorkspaceAddDialog] = useState<{
+    open: boolean;
+    onClose?: (response: DialogResponse) => void;
+    onCancel?: () => void;
+  }>({ open: false });
+
+  const openWorkspaceAddDialog = () => {
+    return new Promise<DialogResponse>((resolve) => {
+      setWorkspaceAddDialog({
+        open: true,
+        onCancel: () => {
+          setWorkspaceAddDialog((dialog) => ({ ...dialog, open: false }));
+          resolve({ action: DIALOG_ACTIONS.CANCEL });
+        },
+        onClose: (response) => {
+          setWorkspaceAddDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(response);
+        },
+      });
+    });
+  };
+
   const handleOpenSettings = () => {
     openSettings();
   };
@@ -354,6 +378,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         createProgressDialog,
         openDependencyDialog,
         openProjectSelectorDialog,
+        openWorkspaceAddDialog,
       }}
     >
       {children}
@@ -455,7 +480,19 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         onClose={(response) => alertDialog.onClose && alertDialog.onClose(response)}
       />
 
-      <ProgressDialog open={progressDialog.open} message={progressDialog.message} loader={progressDialog.loader} />
+      <ProgressDialog
+        open={progressDialog.open}
+        message={progressDialog.message}
+        loader={progressDialog.loader}
+      />
+
+      {workspaceAddDialog.open && (
+        <WorkspaceAddDialog
+          open={workspaceAddDialog.open}
+          onClose={(response) => workspaceAddDialog.onClose && workspaceAddDialog.onClose(response)}
+          onCancel={() => workspaceAddDialog.onCancel && workspaceAddDialog.onCancel()}
+        />
+      )}
     </DialogContext.Provider>
   );
 };

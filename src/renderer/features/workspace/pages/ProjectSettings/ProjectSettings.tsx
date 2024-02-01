@@ -310,7 +310,7 @@ const ProjectSettings = () => {
                             <span className="item-default">{t('Common:UseDefaultSettings')}</span>
                           </MenuItem>
                           ;
-                          {apis.map((api) => (
+                          {apis.slice(1).map((api) => (
                             <MenuItem value={api} key={api.key}>
                               <span>
                                 API URL:
