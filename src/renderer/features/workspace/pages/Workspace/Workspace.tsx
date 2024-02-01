@@ -14,13 +14,23 @@ import { useTranslation } from 'react-i18next';
 import ProjectList from '../Components/ProjectList';
 import AddProjectButton from '../Components/AddProjectButton/AddProjectButton';
 
+/* icons */
+import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
+import { IWorkspace, WorkspaceSelector } from '../Components/WorskpaceSelector/WorkspaceSelector';
 
 const Workspace = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
+  const { settings } = useSelector(selectWorkspaceState);
   const { projects } = useSelector(selectWorkspaceState);
+
+  // TODO: use WorkspaceState
+  const workspaces: IWorkspace[] = [
+    { NAME: 'My Workspace', LOCATION: '/home/franco/sbom-workbench', DESCRIPTION: ''},
+    { NAME: 'Example Shared', LOCATION: '/mnt/myorg/projects', DESCRIPTION: ''},
+  ];
 
   const { newProject, exportProject, importProject, newProjectFromWFP } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
@@ -74,6 +84,13 @@ const Workspace = () => {
     newProjectFromWFP();
   };
 
+  const onWorkspaceSelectedHandler = (workspace: IWorkspace) => {
+  };
+
+  const onWorkspaceCreateHandler = () => {
+    dialogCtrl.openWorkspaceAddDialog();
+  };
+
 
   const onTrashHandler = async (project: IProject) => {
     const { action } = await dialogCtrl.openConfirmDialog(t('Dialog:DeleteQuestion'), {
@@ -116,7 +133,17 @@ const Workspace = () => {
     <>
       <section id="Workspace" className="app-page">
         <header className="app-header">
-          <h1 className="header-title">{t('Title:Projects')}</h1>
+          <div className="workspace-selector">
+            <WorkspaceSelector
+              workspaces={workspaces}
+              selected={workspaces[0]}
+              onSelected={onWorkspaceSelectedHandler}
+              onCreated={onWorkspaceCreateHandler}
+            />
+            <ChevronRightOutlinedIcon fontSize="small" />
+            <h4 className="">{t('Title:Projects')}</h4>
+          </div>
+
           <section className="subheader">
             <div className="search-box">
               {projects && projects.length > 0 && (

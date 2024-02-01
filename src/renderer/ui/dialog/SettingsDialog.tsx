@@ -153,7 +153,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
 
   const submit = async () => {
     const config: Partial<IWorkspaceCfg> = {
-      DEFAULT_API_INDEX: selectedApi ? apis.findIndex((api) => api === selectedApi) : -1,
+      DEFAULT_API_INDEX: selectedApi ? apis.findIndex((api) => api === selectedApi) : 0,
       APIS: apis,
       TOKEN: sbomLedgerToken || null,
       LNG: language || 'en',
@@ -299,7 +299,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                       selectOnFocus
                       clearOnBlur
                       handleHomeEndKeys
-                      options={apis}
+                      options={apis.slice(1)}
                       getOptionLabel={(option) => {
                         // Value selected with enter, right from the input
                         if (typeof option === 'string') {
