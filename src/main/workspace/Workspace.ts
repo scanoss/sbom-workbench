@@ -9,6 +9,9 @@ import {
 } from '../../api/types';
 import { licenses } from '../../../assets/data/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
+import { userSettingService } from '../services/UserSettingService';
+import { AppMigration } from '../migration/AppMigration';
+
 
 class Workspace {
   private projectList: Array<Project>;
@@ -21,6 +24,8 @@ class Workspace {
 
   public async read(workspacePath: string) {
     this.wsPath = workspacePath;
+
+  
     await this.initWorkspaceFileSystem();
     log.transports.file.resolvePath = () => `${this.wsPath}/ws.log`;
     // if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes

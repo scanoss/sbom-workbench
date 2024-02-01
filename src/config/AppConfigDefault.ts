@@ -13,6 +13,7 @@ export const AppConfigDefault: IAppConfig = {
   API_KEY: '',
   API_SCAN_PATH: '/scan/direct',
   API_CONTENT_PATH: '/file_contents',
+  DEFAULT_SETTING_NAME: '.scanoss',
   OSSKB_HOST: 'osskb.org',
   DEFAULT_IP_gRPC: 'scanoss.com',
   DEFAULT_PORT_gRPC: 443,
