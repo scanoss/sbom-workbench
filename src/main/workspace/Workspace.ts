@@ -158,7 +158,23 @@ class Workspace {
   }
 
   private async initWorkspaceFileSystem() {
-    if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
+    try {
+      if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
+    } catch(e: any) {
+      log.error(e);
+      const settings = userSettingService.get();
+
+      const workspaces = settings.WORKSPACES;
+      workspaces.unshift(userSettingService.getDefault().WORKSPACES[0]);
+
+      // Set default workspace if selected workspace cannot be created
+      userSettingService.set({ WORKSPACES: workspaces, DEFAULT_WORKSPACE_INDEX: 0 } );
+      await userSettingService.save();
+    
+      // Set the default workspace path
+      this.wsPath = userSettingService.getDefault().WORKSPACES[0].PATH;
+      await this.initWorkspaceFileSystem();
+    }
   }
 
   private async getAllProjectsPaths() {
