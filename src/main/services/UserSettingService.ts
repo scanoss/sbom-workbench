@@ -56,7 +56,7 @@ class UserSettingService {
 
   public set(setting: Partial<IWorkspaceCfg>) {
     if (setting.LNG !== this.store.LNG)
-      AppI18n.getI18n().changeLanguage(setting.LNG);
+      AppI18n.getI18n()?.changeLanguage(setting.LNG);
 
     this.store = { ...this.store, ...setting };
 
