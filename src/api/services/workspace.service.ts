@@ -1,6 +1,6 @@
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
-import { INewProject, IProject, License } from '../types';
+import { IProject, License } from '../types';
 
 class WorkspaceService extends BaseService {
   public async getAllProjects(): Promise<IProject[]> {
@@ -48,6 +48,14 @@ class WorkspaceService extends BaseService {
       IpcChannels.WORKSPACE_EXPORT_PROJECT,
       pathToSave,
       projectPath
+    );
+    return this.response(response);
+  }
+
+  public async setCurrent(wsPath: string) {
+    const response = await window.electron.ipcRenderer.invoke(
+      IpcChannels.WORKSPACE_SET_CURRENT,
+      wsPath
     );
     return this.response(response);
   }
