@@ -188,7 +188,7 @@ app
 async function init() {
   await userSettingService.read();
   const settings =  userSettingService.get();
-  const defaultWorkspacePath = settings.WORKSPACES[settings.DEFAULT_WORKSPACE_INDEX].PATH; 
+  const defaultWorkspacePath = settings.WORKSPACES[settings.DEFAULT_WORKSPACE_INDEX].PATH;
   await workspace.read(defaultWorkspacePath);
 
 }
