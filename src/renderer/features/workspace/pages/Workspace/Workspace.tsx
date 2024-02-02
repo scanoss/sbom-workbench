@@ -79,6 +79,14 @@ const Workspace = () => {
   };
 
   const onWorkspaceSelectedHandler = (workspace: WorkspaceData) => {
+    workspaceService.setCurrent(workspace.PATH);
+  };
+
+  const onWorkspaceRemoveHandler = (workspace: WorkspaceData) => {
+    dispatch(setSettings({
+      ...settings,
+      WORKSPACES: settings.WORKSPACES.filter(items => items !== workspace),
+    }));
   };
 
   const  onWorkspaceCreateHandler = async  () => {
@@ -86,10 +94,7 @@ const Workspace = () => {
     if (action !== DIALOG_ACTIONS.CANCEL) {
       dispatch(setSettings({
         ...settings,
-        WORKSPACES: [
-          ...settings.WORKSPACES,
-          data,
-        ],
+        WORKSPACES: [...settings.WORKSPACES, data],
       }));
     }
    };
@@ -140,6 +145,7 @@ const Workspace = () => {
               workspaces={settings?.WORKSPACES}
               selected={settings?.WORKSPACES[settings?.DEFAULT_WORKSPACE_INDEX]}
               onSelected={onWorkspaceSelectedHandler}
+              onRemoved={onWorkspaceRemoveHandler}
               onCreated={onWorkspaceCreateHandler}
             />
             <ChevronRightOutlinedIcon fontSize="small" />
