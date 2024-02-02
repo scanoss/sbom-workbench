@@ -7,6 +7,7 @@ import { Response } from '../Response';
 import { IProject, License } from '../types';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
+import { workspaceService } from '../../main/services/WorkspaceService';
 
 ipcMain.handle(IpcChannels.WORKSPACE_PROJECT_LIST, async (_event) => {
   try {
@@ -84,6 +85,22 @@ ipcMain.handle(
       return Response.ok({
         message: 'Project exported successfully',
         data: true,
+      });
+    } catch (e: any) {
+      log.error('Catch an error: ', e);
+      return Response.fail({ message: e.message });
+    }
+  },
+);
+
+ipcMain.handle(
+  IpcChannels.WORKSPACE_SET_CURRENT,
+  async (_event, wsPath: string) => {
+    try {
+     await workspaceService.setCurrent(wsPath);
+      return Response.ok({
+        message: 'Workspace set successfully',
+        data: null,
       });
     } catch (e: any) {
       log.error('Catch an error: ', e);
