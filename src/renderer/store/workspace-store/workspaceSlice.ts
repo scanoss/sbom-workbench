@@ -1,6 +1,6 @@
 import { createSlice, current, PayloadAction } from '@reduxjs/toolkit';
 import { INewProject, IProject, IWorkspaceCfg } from '@api/types';
-import { fetchProjects, init } from '@store/workspace-store/workspaceThunks';
+import { fetchProjects, init, setSettings } from '@store/workspace-store/workspaceThunks';
 import { RootState } from '@store/rootReducer';
 import { IScan } from '@context/types';
 import { IAppInfo } from '@api/dto';
@@ -52,7 +52,10 @@ export const workspaceSlice = createSlice({
       appInfo: action.payload.app,
       settings: action.payload.settings
     }),
-
+    [setSettings.fulfilled.type]: (state, action: PayloadAction<IWorkspaceCfg>) => ({
+      ...state,
+      settings: action.payload
+    }),
   },
 });
 

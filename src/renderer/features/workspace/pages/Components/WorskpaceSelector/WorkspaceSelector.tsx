@@ -6,6 +6,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import WorkspacesIcon from '@mui/icons-material/Workspaces';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { WorkspaceData } from '@api/types';
 
 /* UI */
 const MainButton = styled(Button)({
@@ -15,16 +16,10 @@ const MainButton = styled(Button)({
 });
 
 
-export interface IWorkspace {
-  NAME: string;
-  LOCATION: string;
-  DESCRIPTION: string;
-};
-
 interface WorkspaceSelectorProps {
-  workspaces: IWorkspace[];
-  selected?: IWorkspace;
-  onSelected?: (workspace: IWorkspace) => void;
+  workspaces: WorkspaceData[];
+  selected?: WorkspaceData;
+  onSelected?: (workspace: WorkspaceData) => void;
   onCreated?: () => void;
 }
 
@@ -33,7 +28,7 @@ export const WorkspaceSelector = (props: WorkspaceSelectorProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const onItemSelected = (workspace: IWorkspace) => {
+  const onItemSelected = (workspace: WorkspaceData) => {
     handleClose();
     onSelected(workspace);
   }
@@ -70,9 +65,9 @@ export const WorkspaceSelector = (props: WorkspaceSelectorProps) => {
           'aria-labelledby': 'basic-button',
         }}
       >
-        {workspaces.map((workspace) => (
-          <MenuItem onClick={() => onItemSelected(workspace)} disableRipple>
-            <ListItemText primary={workspace.NAME} secondary={workspace.LOCATION} />
+        {workspaces?.map((workspace) => (
+          <MenuItem key={workspace.PATH} onClick={() => onItemSelected(workspace)} disableRipple>
+            <ListItemText primary={workspace.NAME} secondary={workspace.PATH} />
           </MenuItem>
         ))}
 

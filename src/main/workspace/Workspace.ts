@@ -25,7 +25,7 @@ class Workspace {
   public async read(workspacePath: string) {
     this.wsPath = workspacePath;
 
-  
+
     await this.initWorkspaceFileSystem();
     log.transports.file.resolvePath = () => `${this.wsPath}/ws.log`;
     // if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes

@@ -1,14 +1,35 @@
 import { useState, useEffect } from "react";
 import { DialogResponse, DIALOG_ACTIONS } from "@context/types";
-import { Dialog, Paper, TextField, DialogActions, Button } from "@mui/material";
+import { Dialog, Paper, TextField, DialogActions, Button, IconButton } from "@mui/material";
+import { makeStyles } from '@mui/styles';
 import { useTranslation } from "react-i18next";
+import { WorkspaceData } from "@api/types";
+import { dialogController } from "renderer/controllers/dialog-controller";
 
+/* icons */
+import CloseIcon from '@mui/icons-material/Close';
+import SearchIcon from '@mui/icons-material/Search';
 
-const initial = {
+const initial: WorkspaceData = {
   NAME: '',
-  LOCATION: '',
+  PATH: '',
   DESCRIPTION: '',
 };
+
+const useStyles = makeStyles((theme) => ({
+  size: {
+
+  },
+  field: {
+    width: '400px',
+  },
+  path: {
+    alignItems: 'end',
+    '& > .dialog-form-field:nth-child(2)': {
+      flex: '0 !important',
+    },
+  }
+}));
 
 interface WorkspaceAddDialogProps {
   open: boolean;
@@ -18,9 +39,21 @@ interface WorkspaceAddDialogProps {
 
 const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
   const { t } = useTranslation();
+  const classes = useStyles();
+
 
   const { open, onClose, onCancel } = props;
   const [data, setData] = useState<any>(initial);
+
+  const onSelectPathHandler = async () => {
+    const paths = await dialogController.showOpenDialog({
+      properties: ['openDirectory'],
+    });
+
+    if (paths && paths.length > 0) {
+      setData({...data, PATH: paths[0]});
+    }
+  }
 
   const isValid = () => {
     return true;
@@ -32,34 +65,55 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
   };
 
   return (
-    <Dialog id="WorkspaceAddDialog" maxWidth="xs" fullWidth className="dialog" open={open} onClose={onCancel}>
+    <Dialog
+      id="WorkspaceAddDialog"
+      className={`${classes.path} dialog`}
+      open={open} onClose={onCancel}
+    >
+
+      <header className="dialog-title">
+        <span>{t('Title:AddWorkspace')}</span>
+        <IconButton aria-label="close" tabIndex={-1} onClick={onCancel} size="large">
+          <CloseIcon />
+        </IconButton>
+      </header>
+
       <form onSubmit={onSubmit}>
         <div className="dialog-content">
           <div className="dialog-form-field">
             <label className="dialog-form-field-label"> Workspace Name</label>
-            <Paper className="dialog-form-field-control">
+            <Paper className={`${classes.field} dialog-form-field-control `}>
               <TextField
                 name="name"
                 size="small"
+                maxRows={30}
                 fullWidth
-                value={data.URL}
-                onChange={(e) => setData({ ...data, URL: e.target.value })}
+                value={data.NAME}
+                onChange={(e) => setData({ ...data, NAME: e.target.value })}
                 required
                 autoFocus
               />
             </Paper>
           </div>
-          <div className="dialog-form-field">
-            <label className="dialog-form-field-label">Workspace Location</label>
-            <Paper className="dialog-form-field-control">
-              <TextField
-                name="location"
-                size="small"
-                fullWidth
-                value={data.API_KEY}
-                onChange={(e) => setData({ ...data, API_KEY: e.target.value })}
-              />
-            </Paper>
+
+          <div className={`${classes.path} dialog-row`}>
+            <div className="dialog-form-field">
+              <label className="dialog-form-field-label">Workspace Location</label>
+              <Paper className={`${classes.field} dialog-form-field-control `}>
+                <TextField
+                  name="location"
+                  size="small"
+                  fullWidth
+                  value={data.PATH}
+                  onChange={(e) => setData({ ...data, PATH: e.target.value })}
+                />
+              </Paper>
+            </div>
+            <div className="dialog-form-field">
+              <Button type="button" variant="text" color="primary" startIcon={<SearchIcon />} onClick={onSelectPathHandler}>
+                {t('Button:Choose')}
+              </Button>
+            </div>
           </div>
         </div>
         <DialogActions>
