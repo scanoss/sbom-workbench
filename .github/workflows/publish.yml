@@ -140,7 +140,7 @@ jobs:
           GH_PROMPT_DISABLED: "disable"
         run: |
           gh release create ${{github.ref_name}} \
-                            --repo https://github.com/scanoss/sbom-workbench \
+                            --repo ${{ github.server_url }}/${{ github.repository }} \
                             --generate-notes \
                             --draft \
                             $(ls *.AppImage *.exe *.dmg *.yml *.blockmap)
