@@ -21,10 +21,11 @@ import { dependencyService } from '../../main/services/DependencyService';
 import { searcher } from '../../main/modules/searchEngine/searcher/Searcher';
 import { projectService } from '../../main/services/ProjectService';
 
-ipcMain.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, path: string, mode: ProjectAccessMode) => {
+ipcMain.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, path: string, mode: ProjectAccessMode = ProjectAccessMode.WRITE) => {
   // TODO: factory to create filters depending on arguments
   const p: Project = await workspace.openProject(new ProjectFilterPath(path));
   searcher.closeIndex();
+  await projectService.lockProject(p.getProjectName(), mode);
   const response: ProjectOpenResponse = {
     logical_tree: p.getTree().getRootFolder(),
     work_root: p.getWorkRoot(),
@@ -33,7 +34,7 @@ ipcMain.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, path: string, mode: 
     uuid: p.getUUID(),
     source: p.getDto().source,
     metadata: p.metadata,
-    mode: ProjectAccessMode.WRITE, //TODO: implement logic
+    mode: mode,
   };
   return {
     status: 'ok',

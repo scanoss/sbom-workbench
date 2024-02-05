@@ -11,6 +11,7 @@ import { licenses } from '../../../assets/data/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
 import { userSettingService } from '../services/UserSettingService';
 import { AppMigration } from '../migration/AppMigration';
+import { modelProvider } from '../services/ModelProvider';
 
 
 class Workspace {
@@ -25,8 +26,10 @@ class Workspace {
   public async read(workspacePath: string) {
     this.wsPath = workspacePath;
 
-
+  
     await this.initWorkspaceFileSystem();
+    await modelProvider.initWorkspace(this.wsPath);
+
     log.transports.file.resolvePath = () => `${this.wsPath}/ws.log`;
     // if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes
     log.info('%c[ WORKSPACE ]: Reading projects....', 'color: green');
@@ -53,6 +56,8 @@ class Workspace {
     this.projectList = projectsReaded.map(
       (p) => (p as PromiseFulfilledResult<Project>).value,
     );
+
+
   }
 
   public getProjectsDtos(): Array<IProject> {
@@ -170,7 +175,7 @@ class Workspace {
       // Set default workspace if selected workspace cannot be created
       userSettingService.set({ WORKSPACES: workspaces, DEFAULT_WORKSPACE_INDEX: 0 } );
       await userSettingService.save();
-    
+
       // Set the default workspace path
       this.wsPath = userSettingService.getDefault().WORKSPACES[0].PATH;
       await this.initWorkspaceFileSystem();
