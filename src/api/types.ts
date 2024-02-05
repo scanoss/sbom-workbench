@@ -1,6 +1,8 @@
 import { NodeStatus } from '../main/workspace/tree/Node';
 import { Scanner } from '../main/task/scanner/types';
 import ScannerConfig = Scanner.ScannerConfig;
+import Folder from '../main/workspace/tree/Folder';
+import { Metadata } from '../main/workspace/Metadata';
 
 export enum ScanState {
   CREATED = 'CREATED',
@@ -351,4 +353,15 @@ export interface ReuseIdentificationTaskDTO {
 export enum ProjectAccessMode {
   READ_ONLY = 'READ_ONLY',
   WRITE = 'WRITE',
+}
+
+export interface ProjectOpenResponse {
+  logical_tree: Folder;
+  work_root: string;
+  scan_root: string;
+  dependencies: string[];
+  uuid: string;
+  source: string;
+  metadata: Metadata;
+  mode: ProjectAccessMode;
 }
