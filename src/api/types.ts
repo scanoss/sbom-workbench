@@ -25,7 +25,7 @@ export interface IWorkspaceCfg {
   DEFAULT_API_INDEX: number;
   APIS: Array<Record<string, string>>;
   DEFAULT_WORKSPACE_INDEX: number;
-  WORKSPACES: Array<WorkspaceData>
+  WORKSPACES: Array<WorkspaceData>;
   TOKEN: string;
   SCAN_MODE: string;
   VERSION: string;
@@ -265,7 +265,7 @@ export interface Result {
   component: string;
   version: string;
   latest_version: string;
-  cpe: string,
+  cpe: string;
   lines: string;
   url: string;
   oss_lines: string;
@@ -290,10 +290,7 @@ export interface Dependency {
   scope: string;
   componentName: string;
   component: Component;
-  status:
-  | FileStatusType.IDENTIFIED
-  | FileStatusType.ORIGINAL
-  | FileStatusType.PENDING;
+  status: FileStatusType.IDENTIFIED | FileStatusType.ORIGINAL | FileStatusType.PENDING;
   inventory: Inventory;
   valid: boolean;
   originalVersion: string;
@@ -328,7 +325,7 @@ export interface InventoryKnowledgeExtraction {
   [key: string]: {
     inventories: Array<InventoryExtraction>;
     localFiles: Array<string>;
-  }
+  };
 }
 
 export interface ExternalFile {
@@ -349,4 +346,9 @@ export interface ReuseIdentificationTaskDTO {
   overwrite: boolean;
   path?: string;
   type: InventorySourceType;
+}
+
+export enum ProjectAccessMode {
+  READ_ONLY = 'READ_ONLY',
+  WRITE = 'WRITE',
 }
