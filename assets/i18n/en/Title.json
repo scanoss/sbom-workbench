@@ -78,5 +78,6 @@
   "DeclaredDependenciesTab": "Declared dependencies",
   "IdentifiedDependenciesTab": "Identified dependencies",
   "DeclaredMatchedTab": "Matched components ",
-  "IdentifiedMatchedTab": "Identified components"
+  "IdentifiedMatchedTab": "Identified components",
+  "AddWorkspace": "Add New Workspace"
 }

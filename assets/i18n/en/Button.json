@@ -39,5 +39,6 @@
   "Yes": "Yes",
   "RestartLater": "Restart later",
   "RestartNow": "Restart now",
-  "NewFromWFPFile": "New from WFP"
+  "NewFromWFPFile": "New from WFP",
+  "AddNewWorkspace": "Add new workspace"
 }
