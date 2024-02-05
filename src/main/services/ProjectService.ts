@@ -51,7 +51,7 @@ class ProjectService {
    * Validate .lock file exists before calling this function
    * @brief Lock project creating a new entry in lock table. Only locks projects in WRITE mode
    * @param projectName
-   * @param mode  
+   * @param mode
    * @returns Promise<void>
    */
   public async lockProject(projectName: string, mode: ProjectAccessMode): Promise<void> {
@@ -59,12 +59,12 @@ class ProjectService {
     if (mode === ProjectAccessMode.READ_ONLY){
       log.info("Read only mode set");
       return;
-    } 
+    }
 
     const db:any = modelProvider.getWorkspaceDb;
     const call = util.promisify(db.get.bind(db));
     const projectlock = await call(`SELECT l.project, l.username, l.hostname, l.createdAt , l.updatedAt FROM lock as l WHERE l.project = ? ;`, projectName);  // filter by projectName
-  
+
     if (!projectlock) {
       log.info('User lock project');
       const sentence = util.promisify(db.run.bind(db));
