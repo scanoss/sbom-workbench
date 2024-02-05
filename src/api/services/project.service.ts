@@ -8,6 +8,7 @@ import {
   IProject,
   IWorkbenchFilter,
   ProjectAccessMode,
+  ProjectOpenResponse,
   ReuseIdentificationTaskDTO,
 } from '../types';
 import { BaseService } from './base.service';
@@ -38,7 +39,7 @@ class ProjectService extends BaseService {
     return this.response(response);
   }
 
-  public async load(path: string, mode?: ProjectAccessMode): Promise<any> {
+  public async load(path: string, mode?: ProjectAccessMode): Promise<ProjectOpenResponse> {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_OPEN_SCAN, path, mode);
     return response;
   }
