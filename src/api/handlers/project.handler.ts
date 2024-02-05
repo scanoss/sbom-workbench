@@ -8,6 +8,7 @@ import {
   InventoryKnowledgeExtraction,
   IWorkbenchFilter,
   ProjectAccessMode,
+  ProjectOpenResponse,
   ReuseIdentificationTaskDTO,
 } from '../types';
 import { IpcChannels } from '../ipc-channels';
@@ -24,7 +25,7 @@ ipcMain.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, path: string, mode: 
   // TODO: factory to create filters depending on arguments
   const p: Project = await workspace.openProject(new ProjectFilterPath(path));
   searcher.closeIndex();
-  const response = {
+  const response: ProjectOpenResponse = {
     logical_tree: p.getTree().getRootFolder(),
     work_root: p.getWorkRoot(),
     scan_root: p.getScanRoot(),
@@ -32,6 +33,7 @@ ipcMain.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, path: string, mode: 
     uuid: p.getUUID(),
     source: p.getDto().source,
     metadata: p.metadata,
+    mode: ProjectAccessMode.WRITE, //TODO: implement logic
   };
   return {
     status: 'ok',
