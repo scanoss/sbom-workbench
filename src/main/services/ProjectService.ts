@@ -1,12 +1,5 @@
 import log from 'electron-log';
-import {
-  ExtractFromProjectDTO,
-  INewProject,
-  Inventory,
-  InventoryKnowledgeExtraction,
-  ProjectState,
-  ReuseIdentificationTaskDTO,
-} from '../../api/types';
+import { ExtractFromProjectDTO, INewProject, Inventory, InventoryKnowledgeExtraction, LOCK, ProjectAccessMode, ProjectState, ReuseIdentificationTaskDTO } from '../../api/types';
 import { Project } from '../workspace/Project';
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
@@ -19,6 +12,10 @@ import { ProjectKnowledgeExtractor } from '../modules/projectKnowledge/ProjectKn
 import { ReuseIdentificationTask } from '../task/reuseIdentification/ReuseIdentificationTask';
 import ScannerMode = Scanner.ScannerMode;
 import ScannerType = Scanner.ScannerType;
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import * as util from 'util';
 
 class ProjectService {
   private setCryptographyScanType(p: Project): void {
@@ -29,6 +26,49 @@ class ProjectService {
       p.metadata.getScannerConfig().type = Array.from(uniqueTypes);
     } else {
       p.metadata.getScannerConfig().type.filter((t) => t !== ScannerType.CRYPTOGRAPHY);
+    }
+  }
+
+
+  private async unlock(projectPath: string) {}
+
+  /**
+   * Validate .lock file exists before calling this function
+   * @param projectName
+   * @param mode  
+   * @returns
+   */
+  public async lockProject(projectName: string, mode: ProjectAccessMode): Promise<void> {
+
+    if (mode === ProjectAccessMode.READ_ONLY){
+      log.info("Read only mode set");
+      return;
+    } 
+
+    const db:any = modelProvider.getWorkspaceDb;
+    const call = util.promisify(db.get.bind(db));
+    const projectlock = await call(`SELECT l.project, l.username, l.hostname, l.createdAt , l.updatedAt FROM lock as l WHERE l.project = ? ;`, projectName);  // filter by projectName
+  
+    if (!projectlock) {
+      log.info('User lock project');
+      const sentence = util.promisify(db.run.bind(db));
+      await sentence('INSERT INTO lock (project, username, hostname, createdAt, updatedAt) values(?,?,?,?,?);', projectName, os.userInfo().username, os.hostname(),new Date().toISOString(), new Date().toISOString())
+    } else {
+      log.info('Project is locked');
+      const start = new Date(projectlock.updatedAt);
+      const end = new Date();
+
+      // Calculate the time difference in milliseconds
+      const timeDifference = Math.abs(end.getTime() - start.getTime());
+
+      // Convert the time difference to minutes
+      const minutesDifference = Math.floor(timeDifference / (1000 * 60));
+
+      if (minutesDifference > 1) {
+        log.info(`Time lock expired ${minutesDifference}, locking project`);
+        const sentence = util.promisify(db.run.bind(db));
+        await sentence('UPDATE lock SET  username=? , hostname=?, createdAt=?, updatedAt=? WHERE project = ?;', os.userInfo().username, os.hostname(),new Date().toISOString(), new Date().toISOString(), projectName);
+      }
     }
   }
 
@@ -63,7 +103,7 @@ class ProjectService {
 
   private async createNewProject(projectDTO: INewProject): Promise<Project> {
     const p = await workspace.createProject(projectDTO);
-    console.log("Create",p.getMyPath());
+    console.log('Create', p.getMyPath());
     await modelProvider.init(p.getMyPath());
     log.transports.file.resolvePath = () => `${p.metadata.getMyPath()}/project.log`;
     p.state = ProjectState.OPENED;
@@ -71,10 +111,7 @@ class ProjectService {
     return p;
   }
 
-  private async create(
-    projectDTO: INewProject,
-    event: Electron.WebContents = null,
-  ): Promise<Project> {
+  private async create(projectDTO: INewProject, event: Electron.WebContents = null): Promise<Project> {
     await workspace.closeAllProjects();
     projectDTO.scannerConfig.mode = ScannerMode.SCAN;
     await this.modeTypeFilter(projectDTO);

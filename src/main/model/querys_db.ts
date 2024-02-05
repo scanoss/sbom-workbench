@@ -46,6 +46,15 @@ export class Querys {
     CONSTRAINT cryptography_pk PRIMARY KEY (purl, version)
     );`;
 
+  WORKSPACE_LOCK = `CREATE TABLE IF NOT EXISTS lock (
+    project  text NOT NULL,
+    username text NOT NULL,
+    hostname text NOT NULL ,
+    createdAt text NOT NULL,
+    updatedAt text NOT NULL,
+    CONSTRAINT lock_pk PRIMARY KEY (project,username,hostname));`;
+
+
   SQL_DB_TABLES = this.SQL_CREATE_TABLE_RESULTS
     + this.FILES_TABLE
     + this.SQL_CREATE_TABLE_FILE_INVENTORIES
