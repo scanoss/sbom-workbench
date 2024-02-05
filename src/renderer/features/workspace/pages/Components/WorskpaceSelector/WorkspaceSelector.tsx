@@ -1,6 +1,8 @@
 import react, { useState } from 'react';
 import { Button, Divider, Menu, MenuItem, ListItemText, styled, ListItemIcon, Chip, IconButton } from '@mui/material';
 import { WorkspaceData } from '@api/types';
+import { makeStyles } from '@mui/styles';
+import { useTranslation } from 'react-i18next';
 
 /* icons */
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -16,6 +18,16 @@ const MainButton = styled(Button)({
   fontWeight: 500
 });
 
+const useStyles = makeStyles((theme) => ({
+  menuItem: {
+    '& .action': {
+      visibility: 'hidden'
+    },
+    '&:hover .action, &:focus .action': {
+      visibility: 'visible'
+    },
+  }
+}));
 
 interface WorkspaceSelectorProps {
   workspaces: WorkspaceData[];
@@ -26,6 +38,9 @@ interface WorkspaceSelectorProps {
 }
 
 export const WorkspaceSelector = (props: WorkspaceSelectorProps) => {
+  const classes = useStyles();
+  const { t } = useTranslation();
+
   const { selected, workspaces, onSelected, onCreated, onRemoved } = props;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -56,18 +71,26 @@ export const WorkspaceSelector = (props: WorkspaceSelectorProps) => {
     setAnchorEl(null);
   };
 
-  const isSelected = (workspace: WorkspaceData): boolean => {
+  const isSelected = (workspace: WorkspaceData, index: number = -1): boolean => {
     return workspace === selected;
   }
 
+  const isDefault = (workspace: WorkspaceData, index: number): boolean => {
+    return index === 0;
+  }
+
+  const isBlocked = (workspace: WorkspaceData, index: number): boolean => {
+    return isDefault(workspace, index) || isSelected(workspace, index);
+  }
 
   return (
     <div>
       <MainButton
-        aria-controls={open ? 'basic-menu' : undefined}
+        aria-controls={open ? 'user-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        startIcon={<AccountCircleIcon sx={{width: 36, height: 36, }} fontSize='large' />}
+        disableRipple
+        startIcon={<AccountCircleIcon sx={{width: 34, height: 34, }} fontSize='large' />}
         onClick={handleClick}
       >
         {selected ? selected.NAME : 'Choose your workspace'}
@@ -79,23 +102,29 @@ export const WorkspaceSelector = (props: WorkspaceSelectorProps) => {
         PaperProps={{
           style: {
             maxHeight: 250,
-            width: 500,
+            width: 450,
           },
         }}
       >
-        {workspaces?.map((workspace) => (
+        {workspaces?.map((workspace, index) => (
           <MenuItem
             key={workspace.PATH}
             onClick={() => onItemSelected(workspace)}
+            className={classes.menuItem}
             disableRipple
           >
-            <ListItemText primary={workspace.NAME} secondary={workspace.PATH} />
+            <ListItemText
+              title={workspace.PATH}
+              primaryTypographyProps={{ style: { fontSize: 15} }}
+              secondaryTypographyProps={{ style: { fontSize: 12, textOverflow: 'ellipsis', wordWrap: 'break-word', overflow: 'hidden' } }}
+              primary={workspace.NAME} secondary={workspace.PATH}
+            />
 
             <div className='actions ml-5'>
-              { isSelected(workspace)
-                  ? <Chip label="Current" />
-                  : <IconButton onClick={(e) => onItemRemoved(e, workspace)} aria-label="delete">
-                      <ClearIcon fontSize='small' />
+              { isBlocked(workspace, index)
+                  ? (isSelected(workspace, index) ? <Chip label={t('Current')} /> : <Chip label={t('Default')} />)
+                  : <IconButton size='small' className='action' onClick={(e) => onItemRemoved(e, workspace)} aria-label="delete">
+                      <ClearIcon fontSize='inherit' />
                     </IconButton>
               }
             </div>
@@ -105,7 +134,7 @@ export const WorkspaceSelector = (props: WorkspaceSelectorProps) => {
         <Divider />
         <MenuItem onClick={() => onItemNew()} disableRipple>
           <AddCircleOutlineIcon fontSize='inherit' className='mr-2' />
-          Add new workspace
+          {t('Button:AddNewWorkspace')}
         </MenuItem>
       </Menu>
     </div>
