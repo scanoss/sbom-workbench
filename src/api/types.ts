@@ -365,3 +365,13 @@ export interface ProjectOpenResponse {
   metadata: Metadata;
   mode: ProjectAccessMode;
 }
+
+export interface LOCK {
+  user: string;
+  id: {
+    mac: string;
+    interface: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
