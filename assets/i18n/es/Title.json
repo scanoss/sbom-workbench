@@ -71,5 +71,6 @@
   "ImportingIdentifications": "Importar identificaciones",
   "ImportFromProjects": "Importar desde proyectos",
   "MatchesForProject": "Coincidencias ({{count}})",
-  "IdentifiedDependencies": "Dependencias identificadas"
+  "IdentifiedDependencies": "Dependencias identificadas",
+  "AddWorkspace": "Agregar un espacio de trabajo"
 }
