@@ -99,7 +99,7 @@ ipcMain.handle(
     try {
      await workspaceService.setCurrent(wsPath);
       return Response.ok({
-        message: 'Workspace set successfully',
+        message: 'Current workspace set successfully',
         data: null,
       });
     } catch (e: any) {
