@@ -89,13 +89,15 @@ const Workspace = () => {
     }));
   };
 
-  const  onWorkspaceCreateHandler = async  () => {
+  const onWorkspaceCreateHandler = async  () => {
     const { action, data } = await dialogCtrl.openWorkspaceAddDialog();
     if (action !== DIALOG_ACTIONS.CANCEL) {
-      dispatch(setSettings({
+      await dispatch(setSettings({
         ...settings,
         WORKSPACES: [...settings.WORKSPACES, data],
       }));
+
+      onWorkspaceSelectedHandler(data);
     }
    };
 

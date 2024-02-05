@@ -26,5 +26,7 @@
   "ImportingProject": "Importando proyecto",
   "UpdatingReport": "Actualizando Reporte",
   "UpdateFinished": "Actualizacion Existosa",
-  "ErrorUpdatingReport": "Error en la Actualizacion"
+  "ErrorUpdatingReport": "Error en la Actualizacion",
+  "WorkspaceName": "Nombre del espacio",
+  "WorkspaceLocation": "Ubicación del espacio"
 }

@@ -26,5 +26,7 @@
   "ImportingProject": "Importing Project",
   "UpdatingReport": "Updating Report",
   "UpdateFinished": "Update Finished",
-  "ErrorUpdatingReport": "Error Updating Report"
+  "ErrorUpdatingReport": "Error Updating Report",
+  "WorkspaceName": "Workspace Name",
+  "WorkspaceLocation": "Workspace Location"
 }

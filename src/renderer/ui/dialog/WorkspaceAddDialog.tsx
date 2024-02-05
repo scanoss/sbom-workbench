@@ -41,8 +41,7 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
   const { t } = useTranslation();
   const classes = useStyles();
 
-
-  const { open, onClose, onCancel } = props;
+  const {open, onClose, onCancel} = props;
   const [data, setData] = useState<any>(initial);
 
   const onSelectPathHandler = async () => {
@@ -51,12 +50,14 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
     });
 
     if (paths && paths.length > 0) {
-      setData({...data, PATH: paths[0]});
+      const PATH = paths[0];
+      const NAME = PATH.split(window.path.sep)[PATH.split(window.path.sep).length - 1];
+      setData({ ...data, NAME, PATH });
     }
   }
 
-  const isValid = () => {
-    return true;
+  const isValid = (): boolean => {
+    return data.NAME && data.PATH;
   };
 
   const onSubmit = (e) => {
@@ -81,7 +82,7 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
       <form onSubmit={onSubmit}>
         <div className="dialog-content">
           <div className="dialog-form-field">
-            <label className="dialog-form-field-label"> Workspace Name</label>
+            <label className="dialog-form-field-label">{t('Dialog:WorkspaceName')}</label>
             <Paper className={`${classes.field} dialog-form-field-control `}>
               <TextField
                 name="name"
@@ -98,7 +99,7 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
 
           <div className={`${classes.path} dialog-row`}>
             <div className="dialog-form-field">
-              <label className="dialog-form-field-label">Workspace Location</label>
+              <label className="dialog-form-field-label"> {t('Dialog:WorkspaceLocation')}</label>
               <Paper className={`${classes.field} dialog-form-field-control `}>
                 <TextField
                   name="location"
