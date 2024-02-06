@@ -1,5 +1,5 @@
 import log from 'electron-log';
-import { ExtractFromProjectDTO, INewProject, Inventory, InventoryKnowledgeExtraction, LOCK, ProjectAccessMode, ProjectState, ReuseIdentificationTaskDTO } from '../../api/types';
+import { ExtractFromProjectDTO, INewProject, IProject, Inventory, InventoryKnowledgeExtraction, LOCK, ProjectAccessMode, ProjectState, ReuseIdentificationTaskDTO } from '../../api/types';
 import { Project } from '../workspace/Project';
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
@@ -29,14 +29,32 @@ class ProjectService {
     }
   }
 
+  public async close(): Promise<IProject> {
+    const p = workspace.getOpenProject();
+    const dto = p.getDto();
+    await p.close();
+    return dto;
+  }
 
-  private async unlock(projectPath: string) {}
+
+  public async unlock(projectName: string) {
+    const db:any = modelProvider.getWorkspaceDb;
+    const call = util.promisify(db.get.bind(db));
+    const projectlock = await call(`SELECT l.project, l.username, l.hostname, l.createdAt , l.updatedAt FROM lock as l WHERE l.project = ? AND l.username = ? AND l.hostname = ?;`, projectName, os.userInfo().username, os.hostname());  // filter by projectName
+
+    // Unlock project only if user has assigned the project
+    if (projectlock) {
+      const sentence = util.promisify(db.run.bind(db));
+      await sentence('DELETE FROM lock WHERE project = ? AND username = ? AND hostname = ?;',projectName, os.userInfo().username, os.hostname());
+    }
+  }
 
   /**
    * Validate .lock file exists before calling this function
+   * @brief Lock project creating a new entry in lock table. Only locks projects in WRITE mode
    * @param projectName
    * @param mode  
-   * @returns
+   * @returns Promise<void>
    */
   public async lockProject(projectName: string, mode: ProjectAccessMode): Promise<void> {
 

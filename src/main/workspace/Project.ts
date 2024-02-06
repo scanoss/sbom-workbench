@@ -19,6 +19,7 @@ import { IpcChannels } from '../../api/ipc-channels';
 import * as ScannerCFG from '../task/scanner/types';
 import { broadcastManager } from '../broadcastManager/BroadcastManager';
 import { userSettingService } from '../services/UserSettingService';
+import { projectService } from '../../main/services/ProjectService';
 
 export class Project {
   work_root: string;
@@ -116,13 +117,14 @@ export class Project {
       '%c[ PROJECT ]: Closing Database',
       'color: green',
     );
+    await projectService.unlock(this.getProjectName());
     this.state = ProjectState.CLOSED;
     this.scanner = null;
     this.logical_tree = null;
     this.tree = null;
     this.store = null;
     this.filesToScan = null;
-    this.filter = null;
+    this.filter = null;    
   }
 
   public save(): void {
