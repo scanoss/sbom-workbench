@@ -6,6 +6,7 @@ import {
   INewProject,
   Inventory,
   InventoryKnowledgeExtraction,
+  IProject,
   IWorkbenchFilter,
   ProjectAccessMode,
   ProjectOpenResponse,
@@ -214,6 +215,20 @@ ipcMain.handle(IpcChannels.PROJECT_ACCEPT_INVENTORY_KNOWLEDGE, async (_event, pa
     });
   } catch (error: any) {
     log.error('[PROJECT_EXTRACT_INVENTORY_KNOWLEDGE]', error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+
+ipcMain.handle(IpcChannels.PROJECT_CURRENT_CLOSE, async (_event) => {
+  try {
+    const project: IProject = await projectService.close();
+    return Response.ok({
+      message: 'Project Closed',
+      data: project,
+    });
+  } catch (error: any) {
+    log.error('[PROJECT_CURRENT_CLOSE]', error);
     return Response.fail({ message: error.message });
   }
 });
