@@ -93,6 +93,13 @@ class ProjectService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_ACCEPT_INVENTORY_KNOWLEDGE, param);
     return this.response(response);
   }
+
+  public async close(): Promise<IProject> {
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_CURRENT_CLOSE);
+    return this.response(response);
+  }
+
+
 }
 
 export const projectService = new ProjectService();
