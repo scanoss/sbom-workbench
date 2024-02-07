@@ -1,6 +1,6 @@
 import { FileStatusType } from '../../api/types';
 
-export class Querys {
+export class Queries {
   /** SQL CREATE SCAN TABLES * */
 
   SQL_CREATE_TABLE_RESULTS = 'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,fileId integer, vendor text, component text, version text, latest_version text, cpe text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,file_url text,source text,dirty INTEGER default 0, FOREIGN KEY (fileId) REFERENCES files(fileId));';
@@ -311,3 +311,5 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   SQL_CRYPTOGRAPHY_DELETE_ALL = 'DELETE FROM cryptography';
 }
+
+export const queries = new Queries();

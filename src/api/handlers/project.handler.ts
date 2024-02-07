@@ -26,7 +26,8 @@ api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, path: string, mode: Proj
   // TODO: factory to create filters depending on arguments
   const p: Project = await workspace.openProject(new ProjectFilterPath(path));
   searcher.closeIndex();
-  await projectService.lockProject(p.getProjectName(), mode);
+  console.log("MODE", mode);
+ // await projectService.lockProject(p.getProjectName(), mode);
   const response: ProjectOpenResponse = {
     logical_tree: p.getTree().getRootFolder(),
     work_root: p.getWorkRoot(),

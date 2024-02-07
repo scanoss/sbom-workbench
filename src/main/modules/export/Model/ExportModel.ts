@@ -2,20 +2,20 @@ import sqlite3 from 'sqlite3';
 
 import fs from 'fs';
 
-import { Querys } from '../../../model/querys_db';
+import { Queries } from '../../../model/querys_db';
 import { workspace } from '../../../workspace/Workspace';
 
 export class ExportModel {
   private db: sqlite3;
 
-  private query: Querys;
+  private query: Queries;
 
   constructor() {
     this.db = new sqlite3.Database(`${workspace.getOpenedProjects()[0].getMyPath()}/scan_db`, sqlite3.OPEN_READWRITE);
     this.db.run('PRAGMA journal_mode = WAL;');
     this.db.run('PRAGMA synchronous = OFF');
     this.db.run('PRAGMA foreign_keys = ON;');
-    this.query = new Querys();
+    this.query = new Queries();
   }
 
   public getIdentifiedData() {

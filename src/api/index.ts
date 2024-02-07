@@ -15,9 +15,11 @@ import '../api/handlers/vulnerability.handler';
 import '../api/handlers/cryptography.handler';
 import { IpcChannels } from '../api/ipc-channels';
 import api from '../api/api';
-import { ProjectAccessMode } from '@api/types';
+import { ProjectAccessMode } from '../api/types';
+import { lockMiddleware } from '../api/middlewares/lock.middleware';
+import { unlockMiddleware } from '../api/middlewares/unlock.middleware';
 
 // Example how to use a middleware
-api.use(IpcChannels.PROJECT_OPEN_SCAN, (event, path: string, mode: ProjectAccessMode) => console.log('Running middleware before opening project'));
+api.use(IpcChannels.PROJECT_OPEN_SCAN, (event, projectPath: string, mode: ProjectAccessMode) => lockMiddleware(projectPath, mode));
 
-api.use(IpcChannels.PROJECT_CURRENT_CLOSE, () => console.log('Running middleware before closing project'));
+api.use(IpcChannels.PROJECT_CURRENT_CLOSE, (event, projectPath) => unlockMiddleware(projectPath));

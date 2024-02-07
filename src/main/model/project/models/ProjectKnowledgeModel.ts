@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 import util from "util";
-import {Querys} from "./querys_db";
+import { queries } from "../../querys_db";
 
 export class ProjectKnowledgeModel {
 
@@ -24,7 +24,6 @@ export class ProjectKnowledgeModel {
   }
 
   public async extractProjectInventoryData(projectPath: string,filesToProcess:Array<string>, md5File = null){
-    const queries = new Querys();
     const db = await this.openDb();
     const call = await this.attach(db,projectPath);
     let query;
