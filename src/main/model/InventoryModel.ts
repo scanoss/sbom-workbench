@@ -29,7 +29,7 @@ export class InventoryModel extends Model {
       { purl: 'c.purl', version: 'c.version', filePath: 'f.path', usage: 'i.usage', source: 'i.source' },
     );
     const db = await this.openDb();
-    const call = util.promisify(db.all.bind(db));
+    const call = util.promisify(db.all.bind(db)) as any;
     const inventories = await call(SQLquery.SQL, ...SQLquery.params);
     db.close();
     return inventories;
@@ -37,7 +37,7 @@ export class InventoryModel extends Model {
 
   public async attachFileInventory(inventory: Partial<Inventory>): Promise<boolean> {
     const db = await this.openDb();
-    const call = util.promisify(db.run.bind(db));
+    const call = util.promisify(db.run.bind(db)) as any;
     const promises = [];
     if (inventory.files) {
       for (const id of inventory.files) {
@@ -91,7 +91,7 @@ export class InventoryModel extends Model {
 
   public async getById(id: number) {
     const db = await this.openDb();
-    const call = util.promisify(db.get.bind(db));
+    const call = util.promisify(db.get.bind(db)) as any;
     const inventory = await call(query.SQL_GET_INVENTORY_BY_ID, id);
     db.close();
     return inventory;
@@ -101,7 +101,7 @@ export class InventoryModel extends Model {
     let SQLquery = 'SELECT id FROM inventories WHERE  notes# AND usage=? AND spdxid=? AND cvid=? AND source=\'detected\';';
     SQLquery = SQLquery.replace('#', inventory.notes ? `='${inventory.notes}'` : ' IS NULL');
     const db = await this.openDb();
-    const call = util.promisify(db.get.bind(db));
+    const call = util.promisify(db.get.bind(db)) as any;
     const inventoryId = await call(SQLquery, inventory.usage, inventory.spdxid, inventory.cvid);
     db.close();
     return inventoryId;
@@ -135,7 +135,7 @@ export class InventoryModel extends Model {
 
   public async update(inventory: Inventory): Promise<Inventory> {
     const db = await this.openDb();
-    const call = util.promisify(db.run.bind(db));
+    const call = util.promisify(db.run.bind(db)) as any;
     await call(query.SQL_UPDATE_INVENTORY, inventory.cvid, inventory.usage, inventory.notes ? inventory.notes : null, inventory.url ? inventory.url : null, inventory.spdxid, inventory.id);
     db.close();
     return inventory;
@@ -172,7 +172,7 @@ export class InventoryModel extends Model {
   // GET FILES ATTACHED TO AN INVENTORY BY INVENTORY ID
   public async getInventoryFiles(inventory: Partial<Inventory>) {
     const db = await this.openDb();
-    const call = util.promisify(db.all.bind(db));
+    const call = util.promisify(db.all.bind(db)) as any;
     const files = await call(
       query.SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID,
       `${inventory.id}`,
@@ -183,7 +183,7 @@ export class InventoryModel extends Model {
 
   public async delete(inventory: Partial<Inventory>): Promise<boolean> {
     const db = await this.openDb();
-    const call = util.promisify(db.run.bind(db));
+    const call = util.promisify(db.run.bind(db)) as any;
     await call(query.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION, inventory.id);
     await call(query.SQL_DELETE_INVENTORY_BY_ID, inventory.id);
     db.close();
