@@ -14,14 +14,19 @@ import {
   Chip,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+
+import { IProject, ProjectAccessMode, ScanState } from '@api/types';
+import { Trans, useTranslation } from 'react-i18next';
+import AppConfig from '../../../../../config/AppConfigModule';
+
+/* icons */
+import EditOffIcon from '@mui/icons-material/EditOff';
+import GetAppOutlined from '@mui/icons-material/GetAppOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ReplayIcon from '@mui/icons-material/Replay';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import WarningOutlinedIcon from '@mui/icons-material/WarningOutlined';
-import GetAppOutlined from '@mui/icons-material/GetAppOutlined';
-import { IProject, ScanState } from '@api/types';
-import { Trans, useTranslation } from 'react-i18next';
-import AppConfig from '../../../../../config/AppConfigModule';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const filter = (items, query) => {
   if (!items) return null;
@@ -56,7 +61,7 @@ const isProjectImported = (project: IProject): boolean => project.source === 'IM
 interface ProjectListProps {
   projects: IProject[];
   searchQuery: string;
-  onProjectClick: (project: IProject) => void;
+  onProjectClick: (project: IProject, mode: ProjectAccessMode) => void;
   onProjectDelete: (project: IProject) => void;
   onProjectRestore: (project: IProject) => void;
   onProjectRescan: (project: IProject) => void;
@@ -95,7 +100,7 @@ const ProjectList = (props: ProjectListProps) => {
                     `}
                     hover
                     key={project.name}
-                    onClick={() => isProjectFinished(project) && props.onProjectClick(project)}
+                    onClick={() => isProjectFinished(project) && props.onProjectClick(project, ProjectAccessMode.WRITE)}
                   >
                     <TableCell component="th" scope="row">
                       <div className="project-name">
@@ -140,6 +145,20 @@ const ProjectList = (props: ProjectListProps) => {
 
                         {isProjectFinished(project) && !isProjectDeprecated(project) && (
                           <>
+                            <Tooltip title={t('Tooltip:OpenInReadMode')}>
+                              <IconButton
+                                aria-label="read-only-mode"
+                                className="btn-read-only"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  props.onProjectClick(project, ProjectAccessMode.READ_ONLY);
+                                }}
+                                size="large"
+                              >
+                                <VisibilityIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
                             <Tooltip title={t('Tooltip:ExportProject')}>
                               <IconButton
                                 aria-label="export"

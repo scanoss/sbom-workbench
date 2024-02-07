@@ -47,5 +47,6 @@
   "Detected": "Detectados",
   "NotDetected": "No detectados",
   "Ignored": "Ignorados",
-  "Progress": "Progreso"
+  "Progress": "Progreso",
+  "OpenInReadMode": "Abrir en modo lectura"
 }
