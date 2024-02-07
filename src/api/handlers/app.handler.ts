@@ -3,13 +3,14 @@ import { IAppInfo } from '../dto';
 import { IpcChannels } from '../ipc-channels';
 import packageJson from '../../../release/app/package.json';
 import { workspace } from '../../main/workspace/Workspace';
+import api from '../api';
 
-ipcMain.handle(IpcChannels.DIALOG_SHOW_OPEN_DIALOG, async (event, options) => {
+api.handle(IpcChannels.DIALOG_SHOW_OPEN_DIALOG, async (event, options) => {
   const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), options);
   return !canceled ? filePaths : null;
 });
 
-ipcMain.handle(IpcChannels.DIALOG_SHOW_SAVE_DIALOG, async (event, options) => {
+api.handle(IpcChannels.DIALOG_SHOW_SAVE_DIALOG, async (event, options) => {
   const { canceled, filePath } = await dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), options);
   return !canceled ? filePath : null;
 });
@@ -40,7 +41,7 @@ ipcMain.on(IpcChannels.DIALOG_BUILD_CUSTOM_POPUP_MENU, (event, params: any) => {
   menu.popup({ window: BrowserWindow.fromWebContents(event.sender) });
 });
 
-ipcMain.handle(IpcChannels.APP_GET_APP_INFO, async(event) => {
+api.handle(IpcChannels.APP_GET_APP_INFO, async (event) => {
   const appInfo: IAppInfo = {
     version: app.isPackaged ? app.getVersion() : packageJson.version,
     name: app.getName(),

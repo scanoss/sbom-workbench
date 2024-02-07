@@ -1,7 +1,7 @@
 import log from 'electron-log';
 import * as fs from 'fs';
-import { ipcMain } from 'electron';
-import { GetFileDTO } from "@api/dto";
+import api from '../api';
+import { GetFileDTO } from '@api/dto';
 import { IpcChannels } from '../ipc-channels';
 import { FileType } from '../types';
 import { workspace } from '../../main/workspace/Workspace';
@@ -57,7 +57,7 @@ function isAllowed(filePath: string) {
   return true;
 }
 
-ipcMain.handle(IpcChannels.FILE_GET_CONTENT, async (_event, filePath: string) => {
+api.handle(IpcChannels.FILE_GET_CONTENT, async (_event, filePath: string) => {
   const fileContent = { content: null };
   try {
     if (!isAllowed(filePath)) {
@@ -77,17 +77,17 @@ ipcMain.handle(IpcChannels.FILE_GET_CONTENT, async (_event, filePath: string) =>
   }
 });
 
-ipcMain.handle(IpcChannels.FILE_GET, async (_event, params: GetFileDTO) => {
+api.handle(IpcChannels.FILE_GET, async (_event, params: GetFileDTO) => {
   try {
     const data = await fileService.get(params);
     return Response.ok({ message: 'File retrieve successfully', data });
   } catch (error: any) {
-    log.error('[ IGNORE FILES ]:',error, params);
+    log.error('[ IGNORE FILES ]:', error, params);
     return Response.fail({ message: error.message });
   }
 });
 
-ipcMain.handle(IpcChannels.IGNORED_FILES, async (_event, arg: number[]) => {
+api.handle(IpcChannels.IGNORED_FILES, async (_event, arg: number[]) => {
   try {
     const project = workspace.getOpenedProjects()[0];
     const data = await fileService.ignore(arg);
@@ -108,7 +108,7 @@ ipcMain.handle(IpcChannels.IGNORED_FILES, async (_event, arg: number[]) => {
       });
     return Response.ok({ message: 'Files successfully ignored', data });
   } catch (error: any) {
-    log.error('[ IGNORE FILES ]:',error, arg);
+    log.error('[ IGNORE FILES ]:', error, arg);
     return Response.fail({ message: 'Ignore file service' });
   }
 });

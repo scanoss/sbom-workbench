@@ -9,15 +9,10 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import * as os from 'os';
-
-import {
-  app, BrowserWindow, shell, ipcMain, dialog,
-} from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import i18next from 'i18next';
-import AppConfig from '../config/AppConfigModule';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { workspace } from './workspace/Workspace';
@@ -25,21 +20,7 @@ import { userSettingService } from './services/UserSettingService';
 import { AppI18n, AppI18nContext } from '../shared/i18n';
 
 // handlers
-import '../api/handlers/inventory.handler';
-import '../api/handlers/component.handler';
-import '../api/handlers/project.handler';
-import '../api/handlers/results.handler';
-import '../api/handlers/file.hanlder';
-import '../api/handlers/formats.handler';
-import '../api/handlers/workspace.handler';
-import '../api/handlers/report.handler';
-import '../api/handlers/license.handler';
-import '../api/handlers/dependency.handler';
-import '../api/handlers/userSetting.handler';
-import '../api/handlers/app.handler';
-import '../api/handlers/search.handler';
-import '../api/handlers/vulnerability.handler';
-import '../api/handlers/cryptography.handler';
+import '../api/index';
 
 import { broadcastManager } from './broadcastManager/BroadcastManager';
 import { modelProvider } from './services/ModelProvider';
@@ -79,7 +60,7 @@ const installExtensions = async () => {
   return installer
     .default(
       extensions.map((name) => installer[name]),
-      forceDownload,
+      forceDownload
     )
     .catch(console.log);
 };
@@ -192,5 +173,4 @@ async function init() {
   const settings =  userSettingService.get();
   const defaultWorkspacePath = settings.WORKSPACES[settings.DEFAULT_WORKSPACE_INDEX].PATH;
   await workspace.read(defaultWorkspacePath);
-
 }
