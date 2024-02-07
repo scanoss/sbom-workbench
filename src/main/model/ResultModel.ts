@@ -81,7 +81,7 @@ export class ResultModel extends Model {
   }
 
   public async insertResultLicense(data: IInsertResult):Promise<void> {
-    const db = await this.openDb();
+    const db:any = await this.openDb();
     const promises = [];
     const call = util.promisify(db.run.bind(db));
     for (const [resultId, value] of Object.entries<Array<IResultLicense>>(data)) {
@@ -104,7 +104,7 @@ export class ResultModel extends Model {
   }
 
   public async count(): Promise<number> {
-    const db = await this.openDb();
+    const db:any = await this.openDb();
     const call = util.promisify(db.get.bind(db));
     const result = await call('SELECT COUNT(*)as count FROM results;');
     db.close();
@@ -191,7 +191,7 @@ export class ResultModel extends Model {
 
   public async getFromPath(path: string) {
     const db = await this.openDb();
-    const call = util.promisify(db.all.bind(db));
+    const call = util.promisify(db.all.bind(db)) as any;
     const results = await call(query.SQL_SCAN_SELECT_FILE_RESULTS, path);
     db.close();
     if (results) return results;
@@ -210,7 +210,7 @@ export class ResultModel extends Model {
   public async getResultsPreLoadInventory(queryBuilder: QueryBuilder) {
     const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_RESULTS_PRELOADINVENTORY, this.getEntityMapper());
     const db = await this.openDb();
-    const call = util.promisify(db.all.bind(db));
+    const call = util.promisify(db.all.bind(db)) as any;
     const results = await call(SQLquery.SQL, ...SQLquery.params);
     db.close();
     return results;
@@ -219,7 +219,7 @@ export class ResultModel extends Model {
   public async getAll(queryBuilder: QueryBuilder) {
     const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_RESULTS, this.getEntityMapper());
     const db = await this.openDb();
-    const call = util.promisify(db.all.bind(db));
+    const call = util.promisify(db.all.bind(db)) as any;
     const results = await call(SQLquery.SQL, ...SQLquery.params);
     db.close();
     return results;
@@ -252,7 +252,7 @@ export class ResultModel extends Model {
       version: 'r.version',
       url: 'r.url',
     });
-    const db = await this.openDb();
+    const db:any = await this.openDb();
     const call = util.promisify(db.get.bind(db));
     const response = await call(SQLquery.SQL, ...SQLquery.params);
     db.close();

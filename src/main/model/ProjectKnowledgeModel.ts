@@ -10,7 +10,7 @@ export class ProjectKnowledgeModel {
     this.sourceProject = sourceProject;
   }
 
-  private async openDb(): Promise<sqlite3.database> {
+  private async openDb(): Promise<sqlite3.Database> {
     return new Promise((resolve, reject) => {
       const conn =  new sqlite3.Database(this.sourceProject,
         sqlite3.OPEN_READWRITE,function(err){
@@ -39,13 +39,13 @@ export class ProjectKnowledgeModel {
     return inventories;
   }
 
-  private async getInventories(db,query:string){
+  private async getInventories(db:sqlite3.Database, query:string){
     const callInventories = util.promisify(db.all.bind(db));
     const inventories = await callInventories(query);
     return inventories;
   }
 
-  private async attach(db: sqlite3.database, projectPath:string): Promise<any>{
+  private async attach(db:sqlite3.Database, projectPath:string): Promise<any>{
     const call = util.promisify(db.run.bind(db));
     await call(`ATTACH '${projectPath}' AS aux`);
     return  call;

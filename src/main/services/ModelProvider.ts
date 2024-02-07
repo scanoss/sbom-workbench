@@ -4,6 +4,8 @@ import sqlite3 from 'sqlite3';
 import path from 'path';
 import { Querys } from '../model/querys_db';
 import { log } from 'console';
+import * as util from 'util';
+import { workspace } from '../../main/workspace/Workspace';
 
 class ModelProvider {
   private _model: ScanModel;
@@ -23,7 +25,7 @@ class ModelProvider {
     this._model = value;
   }
 
-  public get getWorkspaceDb(): sqlite3.Database | null {
+  public get getWorkspaceDb():sqlite3.Database {
     return this._workspace;
   }
 
@@ -33,7 +35,7 @@ class ModelProvider {
 
   public async init(projectPath: string) {
     // Create scan_db
-    await new Model(projectPath).init();
+    await new Model(projectPath).initScanDb();
     // Init all models
     const model = new ScanModel(projectPath);
     this.model = model;
@@ -41,18 +43,10 @@ class ModelProvider {
 
   private async initWorkspaceDb(wsPath: string) {
     const query = new Querys();
-    return new Promise<sqlite3.Database| null>((resolve, reject) => {
-      const db = new sqlite3.Database(path.join(wsPath,'workspace.sqlite'), (err: any) => {
-        if (err) {
-          console.error("Unable to create Workspace DB");
-          reject(null);
-        } else {
-          db.exec(query.WORKSPACE_LOCK,async () => {
-            resolve(db);
-          });
-        }
-      });
-    });
+    const db = await Model.createDB(path.join(wsPath,'workspace.sqlite'));
+    const call = util.promisify(db.run.bind(db));
+    await call(query.WORKSPACE_LOCK);
+    return db;   
   }
 
 

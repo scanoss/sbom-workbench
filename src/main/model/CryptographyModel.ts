@@ -11,7 +11,7 @@ export class CryptographyModel extends Model {
 
   public async insertAll(cryptography: Array<{ purl: string, version: string, algorithms: string }>): Promise<void> {
     const db = await this.openDb();
-    const call = util.promisify(db.run.bind(db));
+    const call = util.promisify(db.run.bind(db)) as any;
     const promises = [];
     cryptography.forEach((c) => {
       promises.push(call(
@@ -28,7 +28,7 @@ export class CryptographyModel extends Model {
   public async findAll() : Promise<Array<Cryptography>> {
     const db = await this.openDb();
     const query = new Querys().SQL_GET_ALL_CRYPTOGRAPHY;
-    const call = await util.promisify(db.all.bind(db));
+    const call = await util.promisify(db.all.bind(db)) as any;
     const response = await call(query);
     const crypto = this.cryptographyAdapter(response);
     db.close();
@@ -38,7 +38,7 @@ export class CryptographyModel extends Model {
   public async findAllDetected(): Promise<Array<Cryptography>> {
     const db = await this.openDb();
     const query = new Querys().SQL_GET_ALL_DETECTED_CRYPTOGRAPHY;
-    const call = await util.promisify(db.all.bind(db));
+    const call = await util.promisify(db.all.bind(db)) as any;
     const response = await call(query);
     const crypto = this.cryptographyAdapter(response);
     db.close();
@@ -48,7 +48,7 @@ export class CryptographyModel extends Model {
   public async findAllIdentifiedMatched(): Promise<Array<Cryptography>> {
     const db = await this.openDb();
     const query = new Querys().SQL_GET_ALL_IDENTIFIED_CRYPTOGRAPHY;
-    const call = await util.promisify(db.all.bind(db));
+    const call = await util.promisify(db.all.bind(db)) as any;
     const response = await call(query);
     const crypto = this.cryptographyAdapter(response);
     db.close();
