@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Divider,
   IconButton,
@@ -22,7 +23,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import { useSelector } from 'react-redux';
-import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
+import { selectIsReadOnly, selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { useTranslation } from 'react-i18next';
 
 const Navigation = () => {
@@ -214,6 +215,7 @@ const AppBar = ({ exp }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const state = useSelector(selectWorkbench);
+  const isReadOnly = useSelector(selectIsReadOnly);
 
   const onBackPressed = () =>  navigate('/workspace');
 
@@ -239,6 +241,8 @@ const AppBar = ({ exp }) => {
             <AppProgress summary={state.summary} progress={state.progress} />
           </div>
         </Toolbar>
+
+        { isReadOnly && <Alert severity="warning">You are in <b>read-only</b> mode while another user perform an audit.</Alert> }
       </MaterialAppBar>
     </>
   );

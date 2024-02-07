@@ -7,6 +7,9 @@ import IconButton from '@mui/material/IconButton';
 import { Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import IconComponent from '../IconComponent/IconComponent';
+import { selectIsReadOnly } from '@store/workbench-store/workbenchSlice';
+import { useSelector } from 'react-redux';
+import useMode from '@hooks/useMode';
 
 export enum MATCH_INFO_CARD_ACTIONS {
   ACTION_ENTER,
@@ -36,6 +39,8 @@ interface MatchInfoCardProps {
 
 const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInfoCardProps) => {
   const { t } = useTranslation();
+  const { props } = useMode();
+
   const [over, setOver] = useState<boolean>(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const ref = React.useRef<any>();
@@ -112,12 +117,12 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
               {status === 'pending' && (
                 <>
                   <Tooltip title={t('Tooltip:Identify')}>
-                    <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY)} size="large">
+                    <IconButton data-write {...props } onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_IDENTIFY)} size="large">
                       <CheckIcon className="icon check" />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title={t('Tooltip:MarkAsOriginal')}>
-                    <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE)} size="large">
+                    <IconButton data-write {...props } onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_IGNORE)} size="large">
                       <BanIcon className="icon ban" />
                     </IconButton>
                   </Tooltip>
@@ -125,7 +130,7 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
               )}
               {status === 'ignored' && (
                 <>
-                  <Tooltip title={t('Tooltip:Restore')}>
+                  <Tooltip data-write {...props } title={t('Tooltip:Restore')}>
                     <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_RESTORE)} size="large">
                       <RestoreOutlined className="icon" />
                     </IconButton>
@@ -135,12 +140,12 @@ const MatchInfoCard = ({ match, onSelect, status, selected, onAction }: MatchInf
               {status === 'identified' && (
                 <>
                   <Tooltip title={t('Tooltip:RemoveIdentification')}>
-                    <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_DETACH)} size="large">
+                    <IconButton data-write {...props } onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_DETACH)} size="large">
                       <RestoreOutlined className="icon" />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title={t('Tooltip:ViewIdentification')}>
-                    <IconButton onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_DETAIL)} size="large">
+                    <IconButton data-write {...props } onClick={() => onAction(MATCH_INFO_CARD_ACTIONS.ACTION_DETAIL)} size="large">
                       <DescriptionOutlined />
                     </IconButton>
                   </Tooltip>

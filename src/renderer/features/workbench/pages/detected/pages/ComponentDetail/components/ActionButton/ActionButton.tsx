@@ -9,6 +9,9 @@ import MenuList from '@mui/material/MenuList';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Grow } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { selectIsReadOnly } from '@store/workbench-store/workbenchSlice';
+import { useSelector } from 'react-redux';
+import useMode from '@hooks/useMode';
 
 const ActionButton = ({
   tab,
@@ -19,6 +22,7 @@ const ActionButton = ({
   onRestoreAllPressed,
 }) => {
   const { t } = useTranslation();
+  const { props } = useMode();
 
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
@@ -43,8 +47,9 @@ const ActionButton = ({
       {tab === 0 && (
         <>
           <ButtonGroup
+            { ...props }
             size="small"
-            disabled={!files.pending || files.pending.length === 0}
+            disabled={ props.disabled ||!files.pending || files.pending.length === 0 }
             ref={anchorRef}
             variant="contained"
             color="secondary"
@@ -87,7 +92,7 @@ const ActionButton = ({
       {tab === 1 && (
         <Button
           size="small"
-          disabled={!files.identified || files.identified.length === 0}
+          disabled={ props.disabled || !files.identified || files.identified.length === 0}
           variant="contained"
           color="secondary"
           onClick={onDetachAllPressed}
@@ -98,7 +103,7 @@ const ActionButton = ({
       {tab === 2 && (
         <Button
           size="small"
-          disabled={!files.ignored || files.ignored.length === 0}
+          disabled={props.disabled ||  !files.ignored || files.ignored.length === 0}
           variant="contained"
           color="secondary"
           onClick={onRestoreAllPressed}
