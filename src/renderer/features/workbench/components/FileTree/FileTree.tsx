@@ -11,6 +11,7 @@ import { CircularProgress } from '@mui/material';
 import { IpcChannels } from '@api/ipc-channels';
 import { useTranslation } from 'react-i18next';
 import { FileStatusType } from '@api/types';
+import useMode from '@hooks/useMode';
 
 const { Expandable } = Renderers;
 
@@ -39,6 +40,7 @@ const FileTree = () => {
   const contextual = useContextual();
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  const { menu: menuProps } = useMode();
 
   const { tree } = useSelector(selectWorkbench);
   const state = useSelector(selectNavigationState);
@@ -119,8 +121,6 @@ const FileTree = () => {
   };
 
 
-
-
   const onSelectNode = async (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
     const { children, value } = node;
     if (!children) {
@@ -137,7 +137,6 @@ const FileTree = () => {
   };
 
   const onContextMenu = (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
-    console.log(state?.filter?.status);
     const onlyRestore = !node.hasPendingProgress;
     selectedNode.current = node;
     let menu = [];
@@ -146,17 +145,17 @@ const FileTree = () => {
         {
           label: t('AppMenu:AcceptAllDependencies'),
           actionId: 'Action:AcceptAllDependencies',
-          enabled: node.status === 'PENDING',
+          enabled: menuProps.enabled && node.status === 'PENDING',
         },
         {
           label:  t('AppMenu:DismissAllDependencies'),
           actionId: 'Action:DismissAllDependencies',
-          enabled: node.status === 'PENDING',
+          enabled: menuProps.enabled && node.status === 'PENDING',
         },
         {
           label: t('AppMenu:RestoreAllDependencies'),
           actionId: 'Action:RestorellDependencies',
-          // enabled: node.status === 'PENDING',
+          enabled: menuProps.enabled,
         },
       ];
     } else {
@@ -165,28 +164,29 @@ const FileTree = () => {
             {
               label: t('AppMenu:MarkFileAsOriginal'),
               actionId: 'Action:MarkFileAsOriginal',
-              enabled: node.status !== 'FILTERED' && node.status !== 'NO-MATCH' && !node.isDependencyFile, // TODO: CHECK WITH FRANCO
+              enabled: menuProps.enabled && (node.status !== 'FILTERED' && node.status !== 'NO-MATCH' && !node.isDependencyFile),
             },
             {
               label: t('AppMenu:RestoreFile'),
               actionId: 'Action:RestoreFile',
-              enabled: node.status === 'IDENTIFIED' || node.status === 'IGNORED',
+              enabled: menuProps.enabled && (menuProps.enabled || node.status === 'IDENTIFIED' || node.status === 'IGNORED'),
             },
           ]
         : [
             {
               label: t('AppMenu:AcceptAll', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
               actionId: 'Action:AcceptAll',
-              enabled: !onlyRestore,
+              enabled: menuProps.enabled && !onlyRestore,
             },
             { type: 'separator' },
             {
               label: t('AppMenu:IdentifyAllAs', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
+
               submenu: [
                 {
                   label: t('AppMenu:IdentifyDetected'),
                   actionId: 'Action:IdentifyAllAs',
-                  enabled: node.someMatchChild && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.NOMATCH &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
+                  enabled:  (node.someMatchChild && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.NOMATCH &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL)),
                 },
                 {
                   label: t('AppMenu:IdentifyNoMatch'),
@@ -200,7 +200,7 @@ const FileTree = () => {
 
                 }
               ],
-              enabled: !node.value.toString().startsWith('/.'),
+              enabled: menuProps.enabled && !node.value.toString().startsWith('/.'),
             },
             {
               label: t('AppMenu:MarkAllAsOriginal', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
@@ -222,17 +222,18 @@ const FileTree = () => {
 
                 }
               ],
-              enabled: !node.value.toString().startsWith('/.') ,
+              enabled: menuProps.enabled && !node.value.toString().startsWith('/.') ,
             },
             {
               label: t('AppMenu:RestoreAll', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
               actionId: 'Action:RestoreAll',
-              enabled: node.hasIgnoredProgress || node.hasIdentifiedProgress,
+              enabled: menuProps.enabled && (node.hasIgnoredProgress || node.hasIdentifiedProgress),
             },
             { type: 'separator' },
             {
               label: t('AppMenu:ImportFrom'),
               actionId: 'Action:ImportFrom',
+              enabled: menuProps.enabled,
             },
             { type: 'separator' },
             {

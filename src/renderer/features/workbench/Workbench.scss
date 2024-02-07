@@ -1,3 +1,9 @@
+.workbench-layout {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+}
+
 .Pane2 {
   overflow: hidden;
 }
