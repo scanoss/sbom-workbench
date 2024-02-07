@@ -1,5 +1,5 @@
-import { Chip } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import { Chip } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -15,12 +15,14 @@ import { useTranslation } from 'react-i18next';
 import Label from '../../../../components/Label/Label';
 import { MATCH_CARD_ACTIONS } from '../../../../components/MatchCard/MatchCard';
 import { FileList } from './components/FileList';
+import useMode from '@hooks/useMode';
 
 export const InventoryDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams<any>();
   const { t } = useTranslation();
+  const { props } = useMode();
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -92,10 +94,10 @@ export const InventoryDetail = () => {
       <header className="app-header">
         <div className="identified-info-card">
           <div className="actions">
-            <IconButton className="btn-delete" onClick={onEditClicked} size="large">
+            <IconButton data-write {...props} className="btn-edit" onClick={onEditClicked} size="large">
               <EditOutlinedIcon />
             </IconButton>
-            <IconButton className="btn-delete" onClick={onRemoveClicked} size="large">
+            <IconButton data-write {...props} className="btn-delete" onClick={onRemoveClicked} size="large">
               <DeleteOutlineOutlinedIcon />
             </IconButton>
           </div>

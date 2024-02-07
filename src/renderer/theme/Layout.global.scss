@@ -39,8 +39,9 @@
 }
 
 .SplitPane {
-  height: calc(100% - var(--appbar-height)) !important;
-  margin-top: var(--appbar-height) !important;
+  height: 100% !important;
+  position: static !important;
+  // margin-top: var(--appbar-height) !important;
 }
 
 .app-header {

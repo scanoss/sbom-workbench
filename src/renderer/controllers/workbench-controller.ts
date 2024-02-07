@@ -14,6 +14,7 @@ export interface ScanResult {
   fileTree: any;
   dependencies: Array<string>;
   config: Scanner.ScannerConfig;
+  mode: 'READ_ONLY | WRITE'
 }
 
 export interface ProjectSettings {
