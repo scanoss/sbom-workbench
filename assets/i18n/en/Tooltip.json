@@ -48,5 +48,6 @@
   "NotDetected": "Not Detected",
   "Ignored": "Ignored",
   "Progress": "Progress",
-  "RefreshReportButtonLabel": "Update report for the latest vulnerabilities and cryptography data"
+  "RefreshReportButtonLabel": "Update report for the latest vulnerabilities and cryptography data",
+  "OpenInReadMode": "Open in read-only mode"
 }
