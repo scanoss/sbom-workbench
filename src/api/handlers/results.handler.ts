@@ -1,8 +1,8 @@
-import { ipcMain } from 'electron';
+import api from '../api';
 import { IpcChannels } from '../ipc-channels';
 import { resultService } from '../../main/services/ResultService';
 
-ipcMain.handle(IpcChannels.RESULTS_GET, async (event, arg: string) => {
+api.handle(IpcChannels.RESULTS_GET, async (event, arg: string) => {
   const result = await resultService.getFromPath(arg);
   if (result)
     return {
