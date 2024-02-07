@@ -42,6 +42,7 @@ import '../api/handlers/vulnerability.handler';
 import '../api/handlers/cryptography.handler';
 
 import { broadcastManager } from './broadcastManager/BroadcastManager';
+import { modelProvider } from './services/ModelProvider';
 
 class AppUpdater {
   constructor() {

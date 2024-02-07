@@ -6,6 +6,7 @@ import sqlite3 from 'sqlite3';
 import util from 'util';
 import { QueryBuilder } from './queryBuilder/QueryBuilder';
 import { Querys } from './querys_db';
+const { promisify } = require('util');
 
 
 const query = new Querys();
@@ -19,38 +20,46 @@ export class Model {
     this.dbPath = `${path}/scan_db`;
   }
 
-  public async init() {
+  public async initScanDb(): Promise<void>{
     try {
-      const success = await this.scanCreateDb();
-      if (success) return true;
-    } catch (error) {
+      const db = await Model.createDB(this.dbPath);
+      await db.close();
+      await this.createScanDb();
+    } catch (error: any) {
       return error;
     }
-    return false;
   }
 
-  // CREATE A NEW SCAN DB
-  private scanCreateDb() {
-    return new Promise((resolve, reject) => {
-      const db = new sqlite3.Database(this.dbPath, (err: any) => {
+  public static createDB(dbPath: string) {
+    return new Promise<sqlite3.Database>((resolve, reject) => {
+      const db = new sqlite3.Database(dbPath, (err: any) => {
         if (err) {
           reject(new Error('Unable to create DB'));
         } else {
-          db.exec(query.SQL_DB_TABLES,async () => {
-            db.close();
-            await this.createViews();
-            resolve(true);
-          });
+          resolve(db);
         }
       });
     });
+  }  
+
+  public async createScanDb() {
+    const db = await this.openDb();
+    const call = promisify(db.get.bind(db));
+    await call(query.SQL_DB_TABLES);
+    await this.createViews();
+    await db.close();
   }
 
 
-  public openDb(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const db: any = new sqlite3.Database(
-        this.dbPath,
+  public async openDb(): Promise<sqlite3.Database> {
+    const db = await Model.openDb(this.dbPath);
+    return db;
+  }
+
+  public static async openDb(path: string) {
+    return new Promise<sqlite3.Database>((resolve, reject) => {
+      const db = new sqlite3.Database(
+        path,
         sqlite3.OPEN_READWRITE,
         (err: any) => {
           if (err) {
@@ -65,6 +74,8 @@ export class Model {
       );
     });
   }
+
+
   private async createViews(): Promise<void> {
     const db = await this.openDb();
     const call = util.promisify(db.run.bind(db));

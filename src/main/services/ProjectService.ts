@@ -12,8 +12,6 @@ import { ProjectKnowledgeExtractor } from '../modules/projectKnowledge/ProjectKn
 import { ReuseIdentificationTask } from '../task/reuseIdentification/ReuseIdentificationTask';
 import ScannerMode = Scanner.ScannerMode;
 import ScannerType = Scanner.ScannerType;
-import fs from 'fs';
-import path from 'path';
 import os from 'os';
 import * as util from 'util';
 
