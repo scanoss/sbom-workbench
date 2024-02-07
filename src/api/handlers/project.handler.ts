@@ -1,4 +1,3 @@
-import { ipcMain } from 'electron';
 import log from 'electron-log';
 import {
   ExtractFromProjectDTO,
@@ -21,8 +20,9 @@ import { workspace } from '../../main/workspace/Workspace';
 import { dependencyService } from '../../main/services/DependencyService';
 import { searcher } from '../../main/modules/searchEngine/searcher/Searcher';
 import { projectService } from '../../main/services/ProjectService';
+import api from '../api';
 
-ipcMain.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, path: string, mode: ProjectAccessMode = ProjectAccessMode.WRITE) => {
+api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, path: string, mode: ProjectAccessMode = ProjectAccessMode.WRITE) => {
   // TODO: factory to create filters depending on arguments
   const p: Project = await workspace.openProject(new ProjectFilterPath(path));
   searcher.closeIndex();
@@ -49,7 +49,7 @@ function getUserHome() {
   return process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 }
 
-ipcMain.handle(IpcChannels.PROJECT_STOP_SCAN, async (_event) => {
+api.handle(IpcChannels.PROJECT_STOP_SCAN, async (_event) => {
   const projectList = workspace.getOpenedProjects();
   let pPromises = [];
   for (const p of projectList) pPromises.push(p.save());
@@ -60,7 +60,7 @@ ipcMain.handle(IpcChannels.PROJECT_STOP_SCAN, async (_event) => {
   await Promise.all(pPromises);
 });
 
-ipcMain.handle(IpcChannels.PROJECT_RESUME_SCAN, async (event, projectPath: string) => {
+api.handle(IpcChannels.PROJECT_RESUME_SCAN, async (event, projectPath: string) => {
   try {
     await projectService.resume(projectPath);
     return Response.ok();
@@ -70,7 +70,7 @@ ipcMain.handle(IpcChannels.PROJECT_RESUME_SCAN, async (event, projectPath: strin
   }
 });
 
-ipcMain.handle(IpcChannels.PROJECT_RESCAN, async (event, projectPath: string) => {
+api.handle(IpcChannels.PROJECT_RESCAN, async (event, projectPath: string) => {
   try {
     await projectService.reScan(projectPath);
     return Response.ok();
@@ -80,7 +80,7 @@ ipcMain.handle(IpcChannels.PROJECT_RESCAN, async (event, projectPath: string) =>
   }
 });
 
-ipcMain.handle(IpcChannels.UTILS_PROJECT_NAME, async (event) => {
+api.handle(IpcChannels.UTILS_PROJECT_NAME, async (event) => {
   const projectName = workspace.getOpenedProjects()[0].project_name;
   return {
     status: 'ok',
@@ -89,7 +89,7 @@ ipcMain.handle(IpcChannels.UTILS_PROJECT_NAME, async (event) => {
   };
 });
 
-ipcMain.handle(IpcChannels.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
+api.handle(IpcChannels.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
   try {
     const p = workspace.getOpenedProjects()[0];
     const node = p.getTree().getNode(path);
@@ -102,7 +102,7 @@ ipcMain.handle(IpcChannels.UTILS_GET_NODE_FROM_PATH, (event, path: string) => {
   }
 });
 
-ipcMain.handle(IpcChannels.GET_TOKEN, async (event) => {
+api.handle(IpcChannels.GET_TOKEN, async (event) => {
   try {
     let token = workspace.getOpenedProjects()[0].getToken();
     if (!token || token === '') {
@@ -118,7 +118,7 @@ ipcMain.handle(IpcChannels.GET_TOKEN, async (event) => {
   }
 });
 
-ipcMain.handle(IpcChannels.PROJECT_READ_TREE, (event) => {
+api.handle(IpcChannels.PROJECT_READ_TREE, (event) => {
   try {
     const tree = workspace.getOpenedProjects()[0].getTree().getRootFolder();
     return Response.ok({ message: 'Tree read successfully', data: tree });
@@ -127,7 +127,7 @@ ipcMain.handle(IpcChannels.PROJECT_READ_TREE, (event) => {
   }
 });
 
-ipcMain.handle(IpcChannels.PROJECT_SET_FILTER, async (event, filter: IWorkbenchFilter) => {
+api.handle(IpcChannels.PROJECT_SET_FILTER, async (event, filter: IWorkbenchFilter) => {
   try {
     const p = workspace.getOpenedProjects()[0];
     await p.setGlobalFilter(filter);
@@ -137,7 +137,7 @@ ipcMain.handle(IpcChannels.PROJECT_SET_FILTER, async (event, filter: IWorkbenchF
   }
 });
 
-ipcMain.handle(IpcChannels.PROJECT_SET_FILE_TREE_VIEW_MODE, async (event, mode: FileTreeViewMode) => {
+api.handle(IpcChannels.PROJECT_SET_FILE_TREE_VIEW_MODE, async (event, mode: FileTreeViewMode) => {
   try {
     const p = workspace.getOpenedProjects()[0];
     p.setFileTreeViewMode(mode);
@@ -147,7 +147,7 @@ ipcMain.handle(IpcChannels.PROJECT_SET_FILE_TREE_VIEW_MODE, async (event, mode: 
   }
 });
 
-ipcMain.handle(IpcChannels.GET_API_URL, async (event) => {
+api.handle(IpcChannels.GET_API_URL, async (event) => {
   try {
     const p = workspace.getOpenProject();
     let apiURL = p.getApi();
@@ -165,7 +165,7 @@ ipcMain.handle(IpcChannels.GET_API_URL, async (event) => {
   }
 });
 
-ipcMain.handle(IpcChannels.GET_API_KEY, async (event) => {
+api.handle(IpcChannels.GET_API_KEY, async (event) => {
   try {
     const p = workspace.getOpenProject();
     let apiKey = p.getApiKey();
@@ -183,7 +183,7 @@ ipcMain.handle(IpcChannels.GET_API_KEY, async (event) => {
   }
 });
 
-ipcMain.handle(IpcChannels.PROJECT_CREATE, async (_event, projectDTO: INewProject) => {
+api.handle(IpcChannels.PROJECT_CREATE, async (_event, projectDTO: INewProject) => {
   try {
     await projectService.createProject(projectDTO);
     return Response.ok();
@@ -193,7 +193,7 @@ ipcMain.handle(IpcChannels.PROJECT_CREATE, async (_event, projectDTO: INewProjec
   }
 });
 
-ipcMain.handle(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, async (_event, param: ExtractFromProjectDTO) => {
+api.handle(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, async (_event, param: ExtractFromProjectDTO) => {
   try {
     const inventoryKnowledgeExtraction: InventoryKnowledgeExtraction = await projectService.extractProjectKnowledgeInventoryData(param);
     return Response.ok({
@@ -206,7 +206,7 @@ ipcMain.handle(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, async (_event, p
   }
 });
 
-ipcMain.handle(IpcChannels.PROJECT_ACCEPT_INVENTORY_KNOWLEDGE, async (_event, param: ReuseIdentificationTaskDTO) => {
+api.handle(IpcChannels.PROJECT_ACCEPT_INVENTORY_KNOWLEDGE, async (_event, param: ReuseIdentificationTaskDTO) => {
   try {
     const inventories: Array<Inventory> = await projectService.acceptInventoryKnowledge(param);
     return Response.ok({
@@ -219,8 +219,7 @@ ipcMain.handle(IpcChannels.PROJECT_ACCEPT_INVENTORY_KNOWLEDGE, async (_event, pa
   }
 });
 
-
-ipcMain.handle(IpcChannels.PROJECT_CURRENT_CLOSE, async (_event) => {
+api.handle(IpcChannels.PROJECT_CURRENT_CLOSE, async (_event) => {
   try {
     const project: IProject = await projectService.close();
     return Response.ok({

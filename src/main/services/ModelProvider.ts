@@ -46,7 +46,7 @@ class ModelProvider {
     const db = await Model.createDB(path.join(wsPath,'workspace.sqlite'));
     const call = util.promisify(db.run.bind(db));
     await call(query.WORKSPACE_LOCK);
-    return db;   
+    return db;
   }
 
 

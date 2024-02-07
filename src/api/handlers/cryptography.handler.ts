@@ -1,11 +1,11 @@
 import log from 'electron-log';
-import { ipcMain } from 'electron';
+import api from '../api';
 import { type } from 'os';
 import { cryptographyService } from '../../main/services/CryptographyService';
 import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
 
-ipcMain.handle(IpcChannels.CRYPTOGRAPHY_UPDATE, async (event) => {
+api.handle(IpcChannels.CRYPTOGRAPHY_UPDATE, async (event) => {
   try {
     const data = await cryptographyService.update();
     return Response.ok({ message: 'Cryptography updated successfully', data });

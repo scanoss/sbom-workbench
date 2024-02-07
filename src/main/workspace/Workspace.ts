@@ -26,7 +26,6 @@ class Workspace {
   public async read(workspacePath: string) {
     this.wsPath = workspacePath;
 
-  
     await this.initWorkspaceFileSystem();
     await modelProvider.initWorkspace(this.wsPath);
 

@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import api from '../api';
 import log from 'electron-log';
 import { NewExportDTO } from 'api/dto';
 import { IpcChannels } from '../ipc-channels';
@@ -10,7 +10,7 @@ const pathLib = require('path');
 
 const crypto = require('crypto');
 
-ipcMain.handle(IpcChannels.EXPORT, async (_event, params: NewExportDTO) => {
+api.handle(IpcChannels.EXPORT, async (_event, params: NewExportDTO) => {
   try {
     const exportTask = new Export();
     exportTask.setFormat(params);
@@ -22,7 +22,7 @@ ipcMain.handle(IpcChannels.EXPORT, async (_event, params: NewExportDTO) => {
   }
 });
 
-ipcMain.handle(IpcChannels.EXPORT_NOTARIZE_SBOM, async (event, type: string) => {
+api.handle(IpcChannels.EXPORT_NOTARIZE_SBOM, async (event, type: string) => {
   try {
     const SPDXV20 = new Spdxv20();
     const data = SPDXV20.generate();

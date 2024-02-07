@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import api from '../api';
 import log from 'electron-log';
 import { IBatchInventory, Inventory } from '../types';
 import { IpcChannels } from '../ipc-channels';
@@ -11,8 +11,7 @@ import { workspace } from '../../main/workspace/Workspace';
 import { modelProvider } from '../../main/services/ModelProvider';
 import { Response } from '../Response';
 
-
-ipcMain.handle(IpcChannels.INVENTORY_GET_ALL, async (_event, params: Partial<Inventory>) => {
+api.handle(IpcChannels.INVENTORY_GET_ALL, async (_event, params: Partial<Inventory>) => {
   try {
     const inventories = await inventoryService.getAll(params);
     return Response.ok({ message: 'Inventory Get All', data: inventories });
@@ -22,7 +21,7 @@ ipcMain.handle(IpcChannels.INVENTORY_GET_ALL, async (_event, params: Partial<Inv
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_GET, async (_event, param: Partial<Inventory>) => {
+api.handle(IpcChannels.INVENTORY_GET, async (_event, param: Partial<Inventory>) => {
   try {
     const inventory: Inventory = await inventoryService.get(param);
     return Response.ok({ message: 'Inventory Get', data: inventory });
@@ -32,8 +31,7 @@ ipcMain.handle(IpcChannels.INVENTORY_GET, async (_event, param: Partial<Inventor
   }
 });
 
-
-ipcMain.handle(IpcChannels.INVENTORY_CREATE, async (event, param: Inventory) => {
+api.handle(IpcChannels.INVENTORY_CREATE, async (event, param: Inventory) => {
   try {
     const inventory = await inventoryService.create(param);
     treeService.updateTree(param.files, NodeStatus.IDENTIFIED);
@@ -44,7 +42,7 @@ ipcMain.handle(IpcChannels.INVENTORY_CREATE, async (event, param: Inventory) => 
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_ATTACH_FILE, async (_event, param: Partial<Inventory>) => {
+api.handle(IpcChannels.INVENTORY_ATTACH_FILE, async (_event, param: Partial<Inventory>) => {
   try {
     const success = await inventoryService.attach(param);
     return Response.ok({ message: 'Inventory Attach', data: success });
@@ -54,7 +52,7 @@ ipcMain.handle(IpcChannels.INVENTORY_ATTACH_FILE, async (_event, param: Partial<
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_DETACH_FILE, async (_event, param: Partial<Inventory>) => {
+api.handle(IpcChannels.INVENTORY_DETACH_FILE, async (_event, param: Partial<Inventory>) => {
   try {
     const success: boolean = await inventoryService.detach(param);
     treeService.retoreStatus(param.files);
@@ -65,9 +63,9 @@ ipcMain.handle(IpcChannels.INVENTORY_DETACH_FILE, async (_event, param: Partial<
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_DELETE, async (_event, param: Partial<Inventory>) => {
+api.handle(IpcChannels.INVENTORY_DELETE, async (_event, param: Partial<Inventory>) => {
   try {
-    const inventoryFiles= await inventoryService.get(param);
+    const inventoryFiles = await inventoryService.get(param);
     const files = inventoryFiles.files.reduce((acc, file) => {
       acc.push(file.id);
       return acc;
@@ -81,7 +79,7 @@ ipcMain.handle(IpcChannels.INVENTORY_DELETE, async (_event, param: Partial<Inven
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_FROM_COMPONENT, async (_event) => {
+api.handle(IpcChannels.INVENTORY_FROM_COMPONENT, async (_event) => {
   try {
     const data = await modelProvider.model.inventory.getFromComponent();
     return Response.ok({ message: 'Inventories from component', data });
@@ -91,7 +89,7 @@ ipcMain.handle(IpcChannels.INVENTORY_FROM_COMPONENT, async (_event) => {
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_BATCH, async (_event, params: IBatchInventory) => {
+api.handle(IpcChannels.INVENTORY_BATCH, async (_event, params: IBatchInventory) => {
   try {
     const factory = new BatchFactory();
     const bachAction: Batch = factory.create(params);
@@ -103,28 +101,28 @@ ipcMain.handle(IpcChannels.INVENTORY_BATCH, async (_event, params: IBatchInvento
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_ACCEPT_PRE_LOAD, async (_event, param: Partial<IBatchInventory>) => {
+api.handle(IpcChannels.INVENTORY_ACCEPT_PRE_LOAD, async (_event, param: Partial<IBatchInventory>) => {
   try {
     const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
     const inventories: Array<Partial<Inventory>> = await inventoryService.preLoadInventoriesAcceptAll(param, filter);
     return Response.ok({ message: 'Inventory accept preload', data: inventories });
   } catch (error: any) {
-    log.error('[ INVENTORY ACCEPT PRELOAD ]: ',error, param);
+    log.error('[ INVENTORY ACCEPT PRELOAD ]: ', error, param);
     return Response.fail({ message: error.message });
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_UPDATE, async (_event, param: Inventory) => {
+api.handle(IpcChannels.INVENTORY_UPDATE, async (_event, param: Inventory) => {
   try {
     const inventory = await inventoryService.update(param);
     return Response.ok({ message: 'Inventory accept preload', data: inventory });
   } catch (error: any) {
-    log.error('[ INVENTORY UPDATE ]: ',error, param);
+    log.error('[ INVENTORY UPDATE ]: ', error, param);
     return Response.fail({ message: error.message });
   }
 });
 
-ipcMain.handle(IpcChannels.INVENTORY_GET_ALL_BY_FILE, async (_event, path: string ) => {
+api.handle(IpcChannels.INVENTORY_GET_ALL_BY_FILE, async (_event, path: string) => {
   try {
     const inventories = await inventoryService.getAllByFile(path);
     return Response.ok({ message: 'Inventory Get All by file', data: inventories });

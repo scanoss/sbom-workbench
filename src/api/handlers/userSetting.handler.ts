@@ -1,10 +1,10 @@
-import { ipcMain } from 'electron';
+import api from '../api';
 import { Response } from '../Response';
 import { IpcChannels } from '../ipc-channels';
 import { IWorkspaceCfg } from '../types';
 import { userSettingService } from '../../main/services/UserSettingService';
 
-ipcMain.handle(IpcChannels.USER_SETTING_SET, async (event, conf: Partial<IWorkspaceCfg>) => {
+api.handle(IpcChannels.USER_SETTING_SET, async (event, conf: Partial<IWorkspaceCfg>) => {
   try {
     const settings = userSettingService.set(conf);
     await userSettingService.save();
@@ -14,7 +14,7 @@ ipcMain.handle(IpcChannels.USER_SETTING_SET, async (event, conf: Partial<IWorksp
   }
 });
 
-ipcMain.handle(IpcChannels.USER_SETTING_GET, async (event) => {
+api.handle(IpcChannels.USER_SETTING_GET, async (event) => {
   try {
     const settings: Partial<IWorkspaceCfg> = userSettingService.get();
     return Response.ok({ message: 'Node from path retrieve succesfully', data: settings });
