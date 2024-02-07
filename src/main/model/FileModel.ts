@@ -40,14 +40,14 @@ export class FileModel extends Model {
   public async getAll(queryBuilder?: QueryBuilder): Promise<any[]> {
     const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_FILES, this.getEntityMapper());
     const db = await this.openDb();
-    const call = promisify(db.all.bind(db));
-    const files = await call(SQLquery.SQL,...SQLquery.params);
+    const call = promisify(db.all.bind(db)); 
+    const files = await call(SQLquery.SQL, SQLquery.params);
     db.close();
     return files;
   }
 
   public async getAllBySearch(queryBuilder?: QueryBuilder): Promise<any[]> {
-    const db = await this.openDb();
+    const db:any = await this.openDb();
     const SQLQuery = this.getSQL(queryBuilder, query.SQL_GET_ALL_FILES_BY_SEARCH, this.getEntityMapper());
     const call = util.promisify(db.all.bind(db));
     const files = await call(SQLQuery.SQL, ...SQLQuery.params);

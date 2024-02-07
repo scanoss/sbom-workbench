@@ -22,7 +22,7 @@ export class DependencyModel extends Model {
   }
 
   public async insertAll(dependencies: Array<Dep>) {
-    const db = await this.openDb();
+    const db:any = await this.openDb();
     const call = util.promisify(db.run.bind(db));
     const promises = [];
     dependencies.forEach((d) => {
@@ -76,7 +76,7 @@ export class DependencyModel extends Model {
 
   public async getAll(queryBuilder: QueryBuilder): Promise<Array<Dependency>> {
     const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_DEPENDENCIES, DependencyModel.entityMapper);
-    const db = await this.openDb();
+    const db:any = await this.openDb();
     const call = util.promisify(db.all.bind(db));
     const dependencies = await call(SQLquery.SQL, ...SQLquery.params);
     db.close();
@@ -89,7 +89,7 @@ export class DependencyModel extends Model {
   }
 
   public async update(dependency: Array<any>): Promise<void> {
-    const db = await this.openDb();
+    const db:any = await this.openDb();
     const call = util.promisify(db.run.bind(db));
     await call(
       'UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?;',
@@ -110,7 +110,7 @@ export class DependencyModel extends Model {
   }
 
   public async getDependenciesFiles(): Promise<Array<Record<string, string>>> {
-    const db = await this.openDb();
+    const db:any = await this.openDb();
     const call = util.promisify(db.all.bind(db));
     const dependencyFiles = await call(
       'SELECT DISTINCT f.path FROM files f INNER JOIN dependencies d ON d.fileId=f.fileId;',
@@ -132,7 +132,7 @@ export class DependencyModel extends Model {
   }
 
   public async getIdentifiedSummary() {
-    const db = await this.openDb();
+    const db:any = await this.openDb();
     const call = util.promisify(db.all.bind(db));
     const files = await call(query.SQL_DEPENDENCY_IDENTIFIED_SUMMARY_BY_FILE_PATH);
     const callTotal = util.promisify(db.get.bind(db));
@@ -145,7 +145,7 @@ export class DependencyModel extends Model {
     const db = await this.openDb();
     const call = util.promisify(db.all.bind(db));
     const files = await call(query.SQL_DEPENDENCY_DETECTED_SUMMARY_BY_FILE_PATH);
-    const callTotal = util.promisify(db.get.bind(db));
+    const callTotal = util.promisify(db.get.bind(db)) as any;
     const totalDetected = await callTotal(query.SQL_DEPENDENCY_TOTAL_DETECTED);
     await db.close();
     return { files, total: totalDetected.total };
