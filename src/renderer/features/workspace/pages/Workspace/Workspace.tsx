@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext, IAppContext } from '@context/AppProvider';
-import { IProject, WorkspaceData } from '@api/types';
+import { IProject, ProjectAccessMode, WorkspaceData } from '@api/types';
 import { workspaceService } from '@api/services/workspace.service';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { DIALOG_ACTIONS } from '@context/types';
@@ -40,9 +40,9 @@ const Workspace = () => {
 
   const cleanup = () => {};
 
-  const onShowScanHandler = async (project: IProject) => {
+  const onShowScanHandler = async (project: IProject, mode: ProjectAccessMode) => {
     if (project.appVersion >= AppConfig.MIN_VERSION_SUPPORTED) {
-      dispatch(setScanPath({ path: project.work_root, action: 'none' }));
+      dispatch(setScanPath({ path: project.work_root, action: 'none', mode, }));
       navigate('/workbench/detected');
     } else {
       const { action } = await dialogCtrl.openAlertDialog(

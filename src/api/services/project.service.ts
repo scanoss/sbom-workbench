@@ -41,7 +41,7 @@ class ProjectService extends BaseService {
 
   public async load(path: string, mode?: ProjectAccessMode): Promise<ProjectOpenResponse> {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_OPEN_SCAN, path, mode);
-    return response;
+    return this.response(response);
   }
 
   public async getProjectName(): Promise<any> {

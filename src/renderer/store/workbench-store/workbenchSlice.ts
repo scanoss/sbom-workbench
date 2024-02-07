@@ -6,6 +6,8 @@ import { loadProject, loadProjectSettings, setTree } from './workbenchThunks';
 import { RootState } from '../rootReducer';
 import { ISummary } from '../../../main/services/ReportService';
 import { Scanner } from '../../../main/task/scanner/types';
+import { ProjectAccessMode } from '@api/types';
+import { status } from '@grpc/grpc-js';
 
 export interface WorkbenchState {
   path: string;
@@ -28,6 +30,7 @@ export interface WorkbenchState {
     api_key: string;
     isApiKeySetted: boolean;
   };
+  mode: ProjectAccessMode,
 }
 
 const initialState: WorkbenchState = {
@@ -51,6 +54,7 @@ const initialState: WorkbenchState = {
     api_key: null,
     isApiKeySetted: false,
   },
+  mode: ProjectAccessMode.WRITE
 };
 
 export const workbenchSlice = createSlice({
@@ -89,7 +93,7 @@ export const workbenchSlice = createSlice({
     });
     builder.addCase(loadProject.fulfilled, (state, action) => {
       const {
-        name, imported, fileTree, dependencies, scanRoot, config,
+        name, imported, fileTree, dependencies, scanRoot, config, mode,
       } = action.payload;
 
       state.path = scanRoot;
@@ -101,6 +105,7 @@ export const workbenchSlice = createSlice({
       state.tree = convertTreeToNode(fileTree, [fileTree]);
       state.dependencies = dependencies;
       state.projectScannerConfig = config;
+      state.mode = mode;
     });
     builder.addCase(setTree.fulfilled, (state, action) => {
       state.tree = action.payload;
@@ -123,6 +128,6 @@ export const {
 
 // selectors
 export const selectWorkbench = (state: RootState) => state.workbench;
-export const selectIsReadOnly = (state: RootState): boolean => true;
+export const selectIsReadOnly = (state: RootState) => state.workbench.mode === ProjectAccessMode.READ_ONLY;
 
 export default workbenchSlice.reducer;
