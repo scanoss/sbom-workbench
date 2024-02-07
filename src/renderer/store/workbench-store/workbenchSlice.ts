@@ -13,7 +13,7 @@ export interface WorkbenchState {
   imported: boolean;
   wfp: boolean;
   tree: any[]; // TODO: define type
-  summary: ISummary; // TODO: define type
+  summary: ISummary;
   progress: number;
   projectScannerConfig: Scanner.ScannerConfig;
   dependencies: string[]; // TODO: move to dependency store
@@ -123,5 +123,6 @@ export const {
 
 // selectors
 export const selectWorkbench = (state: RootState) => state.workbench;
+export const selectIsReadOnly = (state: RootState): boolean => true;
 
 export default workbenchSlice.reducer;

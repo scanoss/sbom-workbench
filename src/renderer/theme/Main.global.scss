@@ -61,6 +61,10 @@ a {
   font-weight: 400;
 }
 
+.MuiIconButton-root.Mui-disabled {
+  filter: grayscale(1);
+}
+
 
 .has-status-bullet {
   &::before {
@@ -173,4 +177,12 @@ a {
   text-align: center;
   font-size: .75rem;
   max-width: 140px;
+}
+
+
+.read-only-mode {
+  [data-write=true] {
+    pointer-events: none;
+    user-select: none;
+  }
 }

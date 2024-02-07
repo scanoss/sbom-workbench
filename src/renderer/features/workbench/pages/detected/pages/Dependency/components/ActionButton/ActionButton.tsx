@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, ButtonGroup, Menu, MenuItem } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useTranslation } from 'react-i18next';
+import useMode from '@hooks/useMode';
 
 const ActionButton = ({
   count,
@@ -15,6 +16,7 @@ const ActionButton = ({
   onRestoreAll: () => void;
 }) => {
   const { t } = useTranslation();
+  const { props } = useMode();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -31,7 +33,7 @@ const ActionButton = ({
     <>
       <ButtonGroup
         size="small"
-        disabled={count[0] === 0 && count[1] === 0 && count[2] === 0}
+        disabled={props.disabled || (count[0] === 0 && count[1] === 0 && count[2] === 0)}
         variant="contained"
         color="secondary"
       >

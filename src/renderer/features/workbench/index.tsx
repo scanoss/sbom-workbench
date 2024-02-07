@@ -4,17 +4,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import SplitPane from 'react-split-pane';
 
 import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
-import { reset } from '@store/workbench-store/workbenchSlice';
+import { reset, selectIsReadOnly } from '@store/workbench-store/workbenchSlice';
 import { loadProject } from '@store/workbench-store/workbenchThunks';
 import { IpcChannels } from '@api/ipc-channels';
 import AppBar from './components/AppBar/AppBar';
 import MainSidebar from './components/MainSidebar/MainSidebar';
 import MainPanel from './components/MainPanel/MainPanel';
+import { Alert } from '@mui/material';
 
 const WorkbenchModule = () => {
   const { pathname } = useLocation();
   const dispatch = useDispatch();
   const { scanPath } = useSelector(selectWorkspaceState);
+  const isReadOnly = useSelector(selectIsReadOnly);
 
   const [loaderMessage, setLoaderMessage] = useState<string>(null);
 
@@ -47,8 +49,12 @@ const WorkbenchModule = () => {
   useEffect(onInit, []);
 
   return (
-    <div>
+    <div className={`
+      workbench-layout
+      ${isReadOnly ? 'read-only-mode' : ''}
+    `}>
       <AppBar />
+
       {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
       {/* @ts-ignore */}
       <SplitPane

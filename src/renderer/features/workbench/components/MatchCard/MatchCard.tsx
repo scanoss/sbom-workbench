@@ -9,6 +9,7 @@ import RestoreOutlined from '@mui/icons-material/RestoreOutlined';
 import DescriptionOutlined from '@mui/icons-material/DescriptionOutlined';
 import { useTranslation } from 'react-i18next';
 import Label from '../Label/Label';
+import useMode from '@hooks/useMode';
 
 export enum MATCH_CARD_ACTIONS {
   ACTION_ENTER,
@@ -29,6 +30,8 @@ interface MatchCardProps {
 
 const MatchCard = ({ label, status, version, type, onAction }: MatchCardProps) => {
   const { t } = useTranslation();
+  const { isReadOnly } = useMode();
+
   const [isShow, setIsShow] = React.useState(false);
 
   return (
@@ -42,31 +45,30 @@ const MatchCard = ({ label, status, version, type, onAction }: MatchCardProps) =
           <Label label={label} textColor="black" />
         </div>
         <div className="match-card-buttons">
-          {status === 'pending' && isShow && (
+          {status === 'pending' && isShow && !isReadOnly && (
             <>
-              <span className="type">version</span>
               <span className="type">{type}</span>
-              <IconButton title={t('Tooltip:Identify')} size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IDENTIFY)}>
+              <IconButton data-write title={t('Tooltip:Identify')} size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IDENTIFY)}>
                 <CheckIcon className="icon check" fontSize="inherit" />
               </IconButton>
-              <IconButton title={t('Tooltip:MarkAsOriginal')} size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IGNORE)}>
+              <IconButton data-write title={t('Tooltip:MarkAsOriginal')} size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_IGNORE)}>
                 <BanIcon className="icon ban" fontSize="inherit" />
               </IconButton>
             </>
           )}
-          {status === 'ignored' && isShow && (
+          {status === 'ignored' && isShow && !isReadOnly && (
             <>
-              <IconButton title={t('Tooltip:Restore')} size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_RESTORE)}>
+              <IconButton data-write title={t('Tooltip:Restore')} size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_RESTORE)}>
                 <RestoreOutlined className="icon" fontSize="inherit" />
               </IconButton>
             </>
           )}
-          {status === 'identified' && isShow && (
+          {status === 'identified' && isShow && !isReadOnly && (
             <>
-              <IconButton title={t('Tooltip:RemoveIdentification')} size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_DETACH)}>
+              <IconButton data-write title={t('Tooltip:RemoveIdentification')} size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_DETACH)}>
                 <RestoreOutlined className="icon" fontSize="inherit" />
               </IconButton>
-              <IconButton title={t('Tooltip:ViewIdentification')} size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_DETAIL)}>
+              <IconButton data-write title={t('Tooltip:ViewIdentification')} size="small" onClick={() => onAction(MATCH_CARD_ACTIONS.ACTION_DETAIL)}>
                 <DescriptionOutlined fontSize="inherit" />
               </IconButton>
             </>
