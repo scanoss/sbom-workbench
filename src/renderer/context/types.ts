@@ -1,4 +1,4 @@
-import { Inventory } from '@api/types';
+import { Inventory, ProjectAccessMode } from '@api/types';
 import { Scanner } from '../../main/task/scanner/types';
 
 export enum DIALOG_ACTIONS {
@@ -38,5 +38,6 @@ export interface IScan {
   path: string;
   action: string;
   source?: Scanner.ScannerSource,
+  mode?: ProjectAccessMode,
 }
 

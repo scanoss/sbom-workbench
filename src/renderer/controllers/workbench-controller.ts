@@ -1,6 +1,6 @@
 import { projectService } from '@api/services/project.service';
 import { componentService } from '@api/services/component.service';
-import { ComponentGroup, ComponentSource, IWorkbenchFilterParams } from '@api/types';
+import { ComponentGroup, ComponentSource, IWorkbenchFilterParams, ProjectAccessMode, ProjectOpenResponse } from '@api/types';
 import { sortComponents } from '@shared/utils/scan-util';
 import { IpcChannels } from '@api/ipc-channels';
 import AppConfig from '../../config/AppConfigModule';
@@ -14,7 +14,7 @@ export interface ScanResult {
   fileTree: any;
   dependencies: Array<string>;
   config: Scanner.ScannerConfig;
-  mode: 'READ_ONLY | WRITE'
+  mode: ProjectAccessMode
 }
 
 export interface ProjectSettings {
@@ -30,8 +30,8 @@ class WorkbenchController {
    * @returns {Promise<ScanResult>}
    * @memberof WorkbenchController
    */
-  public async loadScan(path: string): Promise<ScanResult> {
-    const { data } = await projectService.load(path);
+  public async loadScan(path: string, mode?: ProjectAccessMode): Promise<ScanResult> {
+    const data = await projectService.load(path, mode);
     return this.generateScanResult(data);
   }
 
@@ -97,11 +97,13 @@ class WorkbenchController {
     return tree;
   }
 
-  private async generateScanResult(data): Promise<ScanResult> {
+  private async generateScanResult(data: ProjectOpenResponse): Promise<ScanResult> {
     const tree = data.logical_tree;
     const work = data.work_root;
     const { dependencies } = data;
     const imported = data.source === 'IMPORTED';
+
+    console.log(data);
 
     return {
       name: data.metadata.name,
@@ -111,6 +113,7 @@ class WorkbenchController {
       fileTree: tree,
       dependencies,
       config: data.metadata.scannerConfig,
+      mode: data.mode,
     };
   }
 }
