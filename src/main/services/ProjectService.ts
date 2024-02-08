@@ -36,7 +36,7 @@ class ProjectService {
 
 
   public async unlock(projectName: string) {
-    const db:any = modelProvider.getWorkspaceDb;
+    const db:any = modelProvider.workspace;
     const call = util.promisify(db.get.bind(db));
     const projectlock = await call(`SELECT l.project, l.username, l.hostname, l.createdAt , l.updatedAt FROM lock as l WHERE l.project = ? AND l.username = ? AND l.hostname = ?;`, projectName, os.userInfo().username, os.hostname());  // filter by projectName
 
@@ -61,7 +61,7 @@ class ProjectService {
       return;
     }
 
-    const db:any = modelProvider.getWorkspaceDb;
+    const db:any = modelProvider.workspace;
     const call = util.promisify(db.get.bind(db));
     const projectlock = await call(`SELECT l.project, l.username, l.hostname, l.createdAt , l.updatedAt FROM lock as l WHERE l.project = ? ;`, projectName);  // filter by projectName
 
