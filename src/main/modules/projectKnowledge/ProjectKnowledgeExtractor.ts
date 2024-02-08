@@ -1,6 +1,6 @@
 import path from 'path';
 import { ExtractFromProjectDTO, FileStatusType, InventoryKnowledgeExtraction } from '../../../api/types';
-import { ProjectKnowledgeModel } from '../../model/ProjectKnowledgeModel';
+import { ProjectKnowledgeModel } from '../../model/project/models/ProjectKnowledgeModel';
 import { inventoryToInventoryKnowledgeExtraction } from './projectKnowledgeAdapters/projectKnowledgeAdapter';
 import { QueryBuilderCreator } from '../../model/queryBuilder/QueryBuilderCreator';
 import { modelProvider } from '../../services/ModelProvider';

@@ -25,9 +25,9 @@ class Api {
         return await handler(_event, ...args);
       } catch (e: any) {
         if (e instanceof Error) {
-          Response.fail({ message: e.message, data: null });
+          return Response.fail({ message: e.message, data: e });
         } else {
-          Response.fail({ message: 'An unknown error occurred', data: null });
+          return Response.fail({ message: 'An unknown error occurred', data: e });
         }
       }
     });

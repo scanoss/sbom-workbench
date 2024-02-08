@@ -27,7 +27,7 @@ class Workspace {
     this.wsPath = workspacePath;
 
     await this.initWorkspaceFileSystem();
-    await modelProvider.initWorkspace(this.wsPath);
+    await modelProvider.initWorkspaceModel(this.wsPath);
 
     log.transports.file.resolvePath = () => `${this.wsPath}/ws.log`;
     // if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes

@@ -1,7 +1,7 @@
 import sqlite3 from 'sqlite3';
 import log from 'electron-log';
 import { modelProvider } from '../../services/ModelProvider';
-import { Querys } from '../../model/querys_db';
+import { Queries } from '../../model/querys_db';
 import { utilModel } from '../../model/UtilModel';
 
 export async function migration110(projectPath: string): Promise<void> {
@@ -22,7 +22,7 @@ export async function migration110(projectPath: string): Promise<void> {
 }
 
 async function updateTables(projectPath: string) {
-  const query = new Querys();
+  const query = new Queries();
   return new Promise<void>((resolve, reject) => {
     try {
       const db: any = new sqlite3.Database(

@@ -1,5 +1,5 @@
 import sqlite3 from 'sqlite3';
-import { Querys } from '../../model/querys_db';
+import { Queries } from '../../model/querys_db';
 import log from 'electron-log';
 import fs from 'fs';
 import { dependencyService } from '../../services/DependencyService';
@@ -21,7 +21,7 @@ export async function migration0230(projectPath: string): Promise<void> {
 }
 
 async function regenerateDependencyTable(projectPath): Promise<void> {
-  const query = new Querys();
+  const query = new Queries();
   return new Promise((resolve, reject) => {
     try {
       const db: any = new sqlite3.Database(

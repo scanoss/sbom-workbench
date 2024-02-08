@@ -1,54 +1,41 @@
-import { Model } from '../model/Model';
-import { ScanModel } from '../model/ScanModel';
-import sqlite3 from 'sqlite3';
-import path from 'path';
-import { Querys } from '../model/querys_db';
-import { log } from 'console';
-import * as util from 'util';
-import { workspace } from '../../main/workspace/Workspace';
+import { ProjectModel } from '../model/project/ProjectModel';
+import { WorkspaceModel } from '../model/workspace/WorkspaceModel';
+
 
 class ModelProvider {
-  private _model: ScanModel;
+  private _model: ProjectModel;
 
-  private _workspace: sqlite3.Database | null;
+  private _workspace: WorkspaceModel;
 
   private projectPath: string;
 
-
-  public get model(): ScanModel {
+  // TODO: Change model by project
+  public get model(): ProjectModel {
     // eslint-disable-next-line no-underscore-dangle
     return this._model;
   }
 
-  public set model(value: ScanModel) {
+  public set model(value: ProjectModel) {
     // eslint-disable-next-line no-underscore-dangle
     this._model = value;
   }
 
-  public get getWorkspaceDb():sqlite3.Database {
+  public get workspace():WorkspaceModel {
     return this._workspace;
   }
 
-  public async initWorkspace(wsPath: string) {
-    this._workspace = await this.initWorkspaceDb(wsPath);
+  public async initWorkspaceModel(wsPath: string) {
+    const workspaceModel = new WorkspaceModel(wsPath);
+    await workspaceModel.init();
+    this._workspace = workspaceModel;
+
   }
 
   public async init(projectPath: string) {
-    // Create scan_db
-    await new Model(projectPath).initScanDb();
-    // Init all models
-    const model = new ScanModel(projectPath);
-    this.model = model;
+    const model = new ProjectModel(projectPath);
+    await model.init();
+    this._model = model;
   }
-
-  private async initWorkspaceDb(wsPath: string) {
-    const query = new Querys();
-    const db = await Model.createDB(path.join(wsPath,'workspace.sqlite'));
-    const call = util.promisify(db.run.bind(db));
-    await call(query.WORKSPACE_LOCK);
-    return db;
-  }
-
 
 }
 

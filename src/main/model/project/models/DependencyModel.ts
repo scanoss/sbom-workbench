@@ -1,15 +1,15 @@
-import log from 'electron-log';
 import util from 'util';
-import { QueryBuilder } from './queryBuilder/QueryBuilder';
-import { Model } from './Model';
-import { Querys } from './querys_db';
-import { Dependency } from '../../api/types';
-import { Dependency as Dep } from './entity/Dependency';
-import { NodeStatus } from '../workspace/tree/Node';
-
-const query = new Querys();
+import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
+import { queries } from '../../querys_db';
+import { Dependency } from '@api/types';
+import { Dependency as Dep } from '../../entity/Dependency';
+import sqlite3 from 'sqlite3';
+import { Model } from '../../Model';
 
 export class DependencyModel extends Model {
+
+  private connection: sqlite3.Database;
+
   public static readonly entityMapper = {
     path: 'f.path',
     purl: 'd.purl',
@@ -17,18 +17,18 @@ export class DependencyModel extends Model {
     id: 'd.dependencyId',
   };
 
-  public constructor(path: string) {
-    super(path);
+  public constructor(conn: sqlite3.Database) {
+    super();
+    this.connection = conn;
   }
 
   public async insertAll(dependencies: Array<Dep>) {
-    const db:any = await this.openDb();
-    const call = util.promisify(db.run.bind(db));
+    const call:any = util.promisify(this.connection.run.bind(this.connection));
     const promises = [];
     dependencies.forEach((d) => {
       promises.push(
         call(
-          query.SQL_DEPENDENCIES_INSERT,
+          queries.SQL_DEPENDENCIES_INSERT,
           d.fileId,
           d.purl ? decodeURIComponent(d.purl) : null,
           d.version ? d.version : null,
@@ -41,13 +41,11 @@ export class DependencyModel extends Model {
       );
     });
     await Promise.all(promises);
-    db.close();
   }
 
   public async getIdentifiedDependencies() {
-    const db = await this.openDb();
-    const query = new Querys().SQL_ALL_IDENTIFIED_DEPENDENCIES;
-    const call = await util.promisify(db.all.bind(db));
+    const query = queries.SQL_ALL_IDENTIFIED_DEPENDENCIES;
+    const call = await util.promisify(this.connection.all.bind(this.connection));
     const response = (await call(query)) as Array<{
       file: string;
       component: string;
@@ -55,14 +53,12 @@ export class DependencyModel extends Model {
       version: string;
       licenses: string;
     }>;
-    db.close();
     return response;
   }
 
   public async getDetectedDependencies() {
-    const db = await this.openDb();
-    const query = new Querys().SQL_ALL_DETECTED_DEPENDENCIES;
-    const call = await util.promisify(db.all.bind(db));
+    const query = queries.SQL_ALL_DETECTED_DEPENDENCIES;
+    const call = await util.promisify(this.connection.all.bind(this.connection));
     const response = (await call(query)) as Array<{
       file: string;
       component: string;
@@ -70,16 +66,13 @@ export class DependencyModel extends Model {
       version: string;
       licenses: string;
     }>;
-    db.close();
     return response;
   }
 
   public async getAll(queryBuilder: QueryBuilder): Promise<Array<Dependency>> {
-    const SQLquery = this.getSQL(queryBuilder, query.SQL_GET_ALL_DEPENDENCIES, DependencyModel.entityMapper);
-    const db:any = await this.openDb();
-    const call = util.promisify(db.all.bind(db));
+    const SQLquery = this.getSQL(queryBuilder, queries.SQL_GET_ALL_DEPENDENCIES, DependencyModel.entityMapper);
+    const call:any = util.promisify(this.connection.all.bind(this.connection));
     const dependencies = await call(SQLquery.SQL, ...SQLquery.params);
-    db.close();
     dependencies.forEach((d) => {
       if (d.licenses) d.licenses = d.licenses.split(',');
       else d.licenses = [];
@@ -89,41 +82,33 @@ export class DependencyModel extends Model {
   }
 
   public async update(dependency: Array<any>): Promise<void> {
-    const db:any = await this.openDb();
-    const call = util.promisify(db.run.bind(db));
+    const call:any = util.promisify(this.connection.run.bind(this.connection));
     await call(
       'UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?;',
       ...dependency,
     );
-    db.close();
   }
 
   public async deleteDirty(data: Record<string, string>): Promise<void> {
-    const SQLquery = query.SQL_DELETE_DIRTY_DEPENDENCIES.replace('#PURLS', data.purls).replace(
+    const SQLquery = queries.SQL_DELETE_DIRTY_DEPENDENCIES.replace('#PURLS', data.purls).replace(
       '#VERSIONS',
       data.versions,
     );
-    const db = await this.openDb();
-    const call = util.promisify(db.run.bind(db));
+    const call = util.promisify(this.connection.run.bind(this.connection));
     await call(SQLquery);
-    db.close();
   }
 
   public async getDependenciesFiles(): Promise<Array<Record<string, string>>> {
-    const db:any = await this.openDb();
-    const call = util.promisify(db.all.bind(db));
+    const call:any = util.promisify(this.connection.all.bind(this.connection));
     const dependencyFiles = await call(
       'SELECT DISTINCT f.path FROM files f INNER JOIN dependencies d ON d.fileId=f.fileId;',
     );
-    db.close();
     return dependencyFiles;
   }
 
   public async getStatus() {
-    const db = await this.openDb();
-    const call = util.promisify(db.all.bind(db));
-    const dependencyStatus = await call(query.SQL_DEPENDENCY_STATUS);
-    db.close();
+    const call = util.promisify(this.connection.all.bind(this.connection));
+    const dependencyStatus = await call(queries.SQL_DEPENDENCY_STATUS);
     return dependencyStatus;
   }
 
@@ -132,22 +117,18 @@ export class DependencyModel extends Model {
   }
 
   public async getIdentifiedSummary() {
-    const db:any = await this.openDb();
-    const call = util.promisify(db.all.bind(db));
-    const files = await call(query.SQL_DEPENDENCY_IDENTIFIED_SUMMARY_BY_FILE_PATH);
-    const callTotal = util.promisify(db.get.bind(db));
-    const totalIdentified = await callTotal(query.SQL_DEPENDENCY_TOTAL_IDENTIFIED);
-    await db.close();
+    const call = util.promisify(this.connection.all.bind(this.connection));
+    const files = await call(queries.SQL_DEPENDENCY_IDENTIFIED_SUMMARY_BY_FILE_PATH);
+    const callTotal:any = util.promisify(this.connection.get.bind(this.connection));
+    const totalIdentified = await callTotal(queries.SQL_DEPENDENCY_TOTAL_IDENTIFIED);
     return { files, total: totalIdentified.total };
   }
 
   public async getDetectedSummary() {
-    const db = await this.openDb();
-    const call = util.promisify(db.all.bind(db));
-    const files = await call(query.SQL_DEPENDENCY_DETECTED_SUMMARY_BY_FILE_PATH);
-    const callTotal = util.promisify(db.get.bind(db)) as any;
-    const totalDetected = await callTotal(query.SQL_DEPENDENCY_TOTAL_DETECTED);
-    await db.close();
+    const call = util.promisify(this.connection.all.bind(this.connection));
+    const files = await call(queries.SQL_DEPENDENCY_DETECTED_SUMMARY_BY_FILE_PATH);
+    const callTotal = util.promisify(this.connection.get.bind(this.connection)) as any;
+    const totalDetected = await callTotal(queries.SQL_DEPENDENCY_TOTAL_DETECTED);
     return { files, total: totalDetected.total };
   }
 }

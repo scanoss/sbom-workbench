@@ -1,15 +1,17 @@
 import log from 'electron-log';
 import { LicenseDTO, NewLicenseDTO } from '@api/dto';
-import { Querys } from './querys_db';
-import { Model } from './Model';
-import { License } from '../../api/types';
-import { IComponentLicense } from './interfaces/component/IComponentLicense';
-
-const query = new Querys();
+import { queries } from '../../querys_db';
+import { License } from '@api/types';
+import { IComponentLicense } from '../../interfaces/component/IComponentLicense';
+import sqlite3 from 'sqlite3';
+import { Model } from '../../Model';
 
 export class LicenseModel extends Model {
-  public constructor(path: string) {
-    super(path);
+
+  private connection: sqlite3.Database
+  public constructor(conn: sqlite3.Database) {
+    super();
+    this.connection = conn;
   }
 
   public bulkCreate(db: any, license: Partial<License>) {
@@ -18,8 +20,8 @@ export class LicenseModel extends Model {
         license.fulltext = 'AUTOMATIC IMPORT';
         license.url = 'AUTOMATIC IMPORT';
         db.serialize(async function () {
-          db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.spdxid, license.fulltext, license.url, 1);
-          db.get(`${query.SQL_SELECT_LICENSE}spdxid=?;`, license.spdxid, (err: any, data: any) => {
+          db.run(queries.SQL_CREATE_LICENSE, license.spdxid, license.spdxid, license.fulltext, license.url, 1);
+          db.get(`${queries.SQL_SELECT_LICENSE}spdxid=?;`, license.spdxid, (err: any, data: any) => {
             if (err) throw err;
             resolve(data.id);
           });
@@ -33,13 +35,12 @@ export class LicenseModel extends Model {
 
   // CREATE LICENSE
   public create(license: NewLicenseDTO) {
+    const self = this
     return new Promise<Partial<LicenseDTO>>(async (resolve, reject) => {
-      const db = await this.openDb();
-      db.serialize(async function () {
-        db.run('begin transaction');
-        db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 0);
-        db.run('commit', function (this: any, err: any) {
-          db.close();
+      this.connection.serialize(async function () {
+        self.connection.run('begin transaction');
+        self.connection.run(queries.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 0);
+        self.connection.run('commit', function (this: any, err: any) {
           if (err || this.lastID === 0) reject(err !== null ? err : new Error('License already exists'));
           resolve({ id: this.lastID, ...license });
         });
@@ -48,16 +49,15 @@ export class LicenseModel extends Model {
   }
 
   public importFromJSON(json: Record<any, any>) {
+    const self = this;
     return new Promise(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        db.serialize(function () {
-          db.run('begin transaction');
+        this.connection.serialize(function () {
+          self.connection.run('begin transaction');
           for (const [key, license] of Object.entries(json)) {
-            db.run(query.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 1);
+            self.connection.run(queries.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 1);
           }
-          db.run('commit', (err: any) => {
-            db.close();
+          self.connection.run('commit', (err: any) => {
             if (err) throw err;
             resolve(true);
           });
@@ -73,9 +73,7 @@ export class LicenseModel extends Model {
   public get(id: number) {
     return new Promise<LicenseDTO>(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        db.get(`${query.SQL_SELECT_LICENSE} id=${id};`, (err: any, license: LicenseDTO) => {
-          db.close();
+        this.connection.get(`${queries.SQL_SELECT_LICENSE} id=${id};`, (err: any, license: LicenseDTO) => {
           if (err || license === undefined) throw new Error('Unable to get license ');
           resolve(license);
         });
@@ -88,12 +86,11 @@ export class LicenseModel extends Model {
 
   // GET LICENSE
   public getAll() {
+    const self = this;
     return new Promise<Array<LicenseDTO>>(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        db.serialize(function () {
-          db.all(query.SQL_SELECT_ALL_LICENSES, (err: any, license: Array<LicenseDTO>) => {
-            db.close();
+        this.connection.serialize(function () {
+          self.connection.all(queries.SQL_SELECT_ALL_LICENSES, (err: any, license: Array<LicenseDTO>) => {
             if (err) throw new Error('Unable to get all licenses');
             resolve(license);
           });
@@ -113,9 +110,8 @@ export class LicenseModel extends Model {
           if (!acc[act.spdxid]) acc[act.spdxid] = act.id;
           return acc;
         }, {});
-        const db = await this.openDb();
-        db.serialize(async () => {
-          db.run('begin transaction');
+        this.connection.serialize(async () => {
+          this.connection.run('begin transaction');
           for (const component of data) {
             if (component.license) {
               for (let i = 0; i < component.license.length; i += 1) {
@@ -123,7 +119,7 @@ export class LicenseModel extends Model {
                 if (licenses[component.license[i]] !== undefined) {
                   licenseId = licenses[component.license[i]];
                 } else {
-                  licenseId = await this.bulkCreate(db, {
+                  licenseId = await this.bulkCreate(this.connection, {
                     spdxid: component.license[i],
                   });
                   licenses = {
@@ -131,12 +127,11 @@ export class LicenseModel extends Model {
                     [component.license[i]]: licenseId,
                   };
                 }
-                await this.bulkAttachLicensebyId(db, { compid: component.id, license_id: licenseId });
+                await this.bulkAttachLicensebyId(this.connection, { compid: component.id, license_id: licenseId });
               }
             }
           }
-          db.run('commit', (err: any) => {
-            db.close();
+          this.connection.run('commit', (err: any) => {
             if (err) throw err;
             resolve();
           });
@@ -173,7 +168,7 @@ export class LicenseModel extends Model {
   public bulkAttachLicensebyId(db: any, data: any) {
     return new Promise(async (resolve, reject) => {
       try {
-        db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
+        db.run(queries.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
           if (err) log.error(err);
           resolve(true);
         });
@@ -187,10 +182,8 @@ export class LicenseModel extends Model {
   private attachLicensebyId(data: any) {
     return new Promise(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        db.serialize(() => {
-          db.run(query.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
-            db.close();
+        this.connection.serialize(() => {
+          this.connection.run(queries.SQL_LICENSE_ATTACH_TO_COMPONENT_BY_ID, data.compid, data.license_id, (err: any) => {
             if (err) throw err;
             resolve(true);
           });
@@ -205,11 +198,9 @@ export class LicenseModel extends Model {
   private attachLicenseByPurlLicenseName(data: any) {
     return new Promise(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        const stmt = db.prepare(query.SQL_ATTACH_LICENSE_BY_PURL_NAME);
+        const stmt = this.connection.prepare(queries.SQL_ATTACH_LICENSE_BY_PURL_NAME);
         stmt.run(data.purl, data.version, data.license_name, (err: any) => {
           if (err) reject(new Error('License was not attached'));
-          db.close();
           stmt.finalize();
           resolve(true);
         });
@@ -224,11 +215,9 @@ export class LicenseModel extends Model {
   private attachLicenseByPurlSpdxid(data: any) {
     return new Promise(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        const stmt = db.prepare(query.SQL_ATTACH_LICENSE_PURL_SPDXID);
+        const stmt = this.connection.prepare(queries.SQL_ATTACH_LICENSE_PURL_SPDXID);
         stmt.run(data.purl, data.version, data.license_spdxid, (err: any) => {
           if (err) throw new Error('License was not attached');
-          db.close();
           stmt.finalize();
           resolve(true);
         });
@@ -243,10 +232,8 @@ export class LicenseModel extends Model {
   update(license: License) {
     return new Promise(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        const stmt = db.prepare(query.SQL_CREATE_LICENSE);
+        const stmt = this.connection.prepare(queries.SQL_CREATE_LICENSE);
         stmt.run(license.spdxid, license.name, license.fulltext, license.url, function (this: any, err: any) {
-          db.close();
           if (err || this.lastID === 0) throw new Error('The license was not created or already exist');
           license.id = this.lastID;
           stmt.finalize();
@@ -262,9 +249,7 @@ export class LicenseModel extends Model {
   public async getBySpdxId(spdxid: string) {
     return new Promise(async (resolve, reject) => {
       try {
-        const db = await this.openDb();
-        db.get(`${query.SQL_SELECT_LICENSE}spdxid='${spdxid}';`, (err: any, license: any) => {
-          db.close();
+        this.connection.get(`${queries.SQL_SELECT_LICENSE}spdxid='${spdxid}';`, (err: any, license: any) => {
           if (err) throw err;
           resolve(license);
         });
