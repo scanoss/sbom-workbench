@@ -49,7 +49,7 @@ export const restoreFile = createAsyncThunk('inventory/restore', async (files: n
 });
 
 export const acceptInventoryKnowledge = createAsyncThunk('inventory/acceptInventoryKnowledge', async (params: ReuseIdentificationTaskDTO, { dispatch }) => {
- const response =  await projectService.acceptInventoryKnowledge(params)
+  const response = await projectService.acceptInventoryKnowledge(params);
   return response;
 })
 
