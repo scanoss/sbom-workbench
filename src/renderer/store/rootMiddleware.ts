@@ -84,3 +84,10 @@ rootMiddleware.startListening({
     api.dispatch(report.reset());
   },
 });
+
+rootMiddleware.startListening({
+  actionCreator: accept.rejected,
+  effect: async ({ error }, api) => {
+    console.log(error)
+  },
+});
