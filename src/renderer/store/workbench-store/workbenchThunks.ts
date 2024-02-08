@@ -4,6 +4,7 @@ import { RootState } from '@store/rootReducer';
 import { setLoading } from '@store/navigation-store/navigationSlice';
 import { workbenchController } from '../../controllers/workbench-controller';
 import { ProjectAccessMode } from '@api/types';
+import { reset } from './workbenchSlice';
 
 const prom = (tree, old): Promise<any> => {
   return new Promise<any>((resolve, reject) => {
@@ -29,4 +30,10 @@ export const setTree = createAsyncThunk('workbench/setTree', async (tree: any, t
   setTimeout(() => thunkAPI.dispatch(setLoading(false)), 10);
 
   return nTree;
+});
+
+export const closeProject = createAsyncThunk('workbench/closeProject', async (_, thunkAPI) => {
+  thunkAPI.dispatch(reset());
+  workbenchController.closeCurrentScan().catch(e => console.log(e));
+  return true;
 });

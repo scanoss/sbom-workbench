@@ -1,6 +1,6 @@
 import { projectService } from '@api/services/project.service';
 import { componentService } from '@api/services/component.service';
-import { ComponentGroup, ComponentSource, IWorkbenchFilterParams, ProjectAccessMode, ProjectOpenResponse } from '@api/types';
+import { ComponentGroup, ComponentSource, IProject, IWorkbenchFilterParams, ProjectAccessMode, ProjectOpenResponse } from '@api/types';
 import { sortComponents } from '@shared/utils/scan-util';
 import { IpcChannels } from '@api/ipc-channels';
 import AppConfig from '../../config/AppConfigModule';
@@ -33,6 +33,10 @@ class WorkbenchController {
   public async loadScan(path: string, mode?: ProjectAccessMode): Promise<ScanResult> {
     const data = await projectService.load(path, mode);
     return this.generateScanResult(data);
+  }
+
+  public async closeCurrentScan(): Promise<IProject> {
+    return projectService.close();
   }
 
   public async loadSettings(): Promise<ProjectSettings> {
