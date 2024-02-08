@@ -2,22 +2,24 @@ import { modelProvider } from '../../main/services/ModelProvider';
 import { ProjectAccessMode } from '../types';
 import log from 'electron-log';
 import os from 'os';
+import path from 'path';
 
 const MAX_LOCKING_MINUTES = 1;
 
 export async function lockMiddleware(projectPath: string, mode: ProjectAccessMode) {
-  console.log("Lock middleware");
+  console.log('Lock middleware');
 
+  const pName = path.basename(projectPath);
   if (mode === ProjectAccessMode.READ_ONLY) return;
 
   const username = os.userInfo().username;
   const hostname = os.hostname();
 
-  const projectLock = await modelProvider.workspace.lock.getByProjectPath(projectPath);
+  const projectLock = await modelProvider.workspace.lock.getByProjectPath(pName);
 
   if (!projectLock) {
     log.info('Project locked');
-    await modelProvider.workspace.lock.create({username, hostname, projectPath: projectPath})
+    await modelProvider.workspace.lock.create({ username, hostname, projectPath: pName });
   } else {
     const start = new Date(projectLock.updatedAt);
     const end = new Date();
@@ -35,9 +37,6 @@ export async function lockMiddleware(projectPath: string, mode: ProjectAccessMod
     }
 
     await modelProvider.workspace.lock.delete(projectLock.project, projectLock.username, projectLock.hostname);
-    await modelProvider.workspace.lock.create( { projectPath,  hostname, username }  )
+    await modelProvider.workspace.lock.create({ projectPath: pName, hostname, username });
   }
-
-
-
 }
