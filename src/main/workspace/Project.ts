@@ -118,7 +118,6 @@ export class Project {
       'color: green',
     );
     modelProvider.model.destroy();
-    // await projectService.unlock(this.getProjectName());
     this.state = ProjectState.CLOSED;
     this.scanner = null;
     this.logical_tree = null;

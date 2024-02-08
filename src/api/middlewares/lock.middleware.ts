@@ -7,9 +7,10 @@ import path from 'path';
 const MAX_LOCKING_MINUTES = 1;
 
 export async function lockMiddleware(payload: any) {
+  try {
   console.log('Lock middleware');
 
-  const pName = path.basename(payload.projectPath);
+  const pName = path.basename(payload.path);
   if (payload.mode === ProjectAccessMode.READ_ONLY) return;
 
   const username = os.userInfo().username;
@@ -39,4 +40,7 @@ export async function lockMiddleware(payload: any) {
     await modelProvider.workspace.lock.delete(projectLock.project, projectLock.username, projectLock.hostname);
     await modelProvider.workspace.lock.create({ projectPath: pName, hostname, username });
   }
+} catch(e:any){
+  console.error(e);
+}
 }
