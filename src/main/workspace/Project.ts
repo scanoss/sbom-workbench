@@ -9,7 +9,7 @@ import {
   IWorkbenchFilterParams,
   ProjectState,
 } from '../../api/types';
-import { ScanModel } from '../model/ScanModel';
+import { ProjectModel } from '../model/project/ProjectModel';
 import { Metadata } from './Metadata';
 import { ProjectMigration } from '../migration/ProjectMigration';
 import { Tree } from './tree/Tree';
@@ -34,7 +34,7 @@ export class Project {
 
   results: any;
 
-  store!: ScanModel;
+  store!: ProjectModel;
 
   scanner!: Scanner;
 
@@ -117,14 +117,14 @@ export class Project {
       '%c[ PROJECT ]: Closing Database',
       'color: green',
     );
-    await projectService.unlock(this.getProjectName());
+    modelProvider.model.destroy();
     this.state = ProjectState.CLOSED;
     this.scanner = null;
     this.logical_tree = null;
     this.tree = null;
     this.store = null;
     this.filesToScan = null;
-    this.filter = null;    
+    this.filter = null;
   }
 
   public save(): void {
