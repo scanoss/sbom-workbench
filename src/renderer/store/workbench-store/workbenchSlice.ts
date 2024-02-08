@@ -54,7 +54,7 @@ const initialState: WorkbenchState = {
     api_key: null,
     isApiKeySetted: false,
   },
-  mode: ProjectAccessMode.WRITE
+  mode: ProjectAccessMode.WRITE,
 };
 
 export const workbenchSlice = createSlice({

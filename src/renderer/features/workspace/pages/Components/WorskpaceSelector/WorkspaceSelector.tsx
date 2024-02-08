@@ -10,6 +10,7 @@ import WorkspacesIcon from '@mui/icons-material/Workspaces';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ClearIcon from '@mui/icons-material/Clear';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 /* UI */
 const MainButton = styled(Button)({
@@ -19,6 +20,10 @@ const MainButton = styled(Button)({
 });
 
 const useStyles = makeStyles((theme) => ({
+  menuInner: {
+    maxHeight: 216,
+    overflowY: 'auto',
+  },
   menuItem: {
     '& .action': {
       visibility: 'hidden'
@@ -47,8 +52,6 @@ export const WorkspaceSelector = (props: WorkspaceSelectorProps) => {
 
   const onItemSelected = (workspace: WorkspaceData) => {
     handleClose();
-    if (isSelected(workspace)) return;
-
     onSelected(workspace);
   }
 
@@ -101,35 +104,43 @@ export const WorkspaceSelector = (props: WorkspaceSelectorProps) => {
         onClose={handleClose}
         PaperProps={{
           style: {
-            maxHeight: 250,
             width: 450,
           },
         }}
       >
-        {workspaces?.map((workspace, index) => (
-          <MenuItem
-            key={workspace.PATH}
-            onClick={() => onItemSelected(workspace)}
-            className={classes.menuItem}
-            disableRipple
-          >
-            <ListItemText
-              title={workspace.PATH}
-              primaryTypographyProps={{ style: { fontSize: 15} }}
-              secondaryTypographyProps={{ style: { fontSize: 12, textOverflow: 'ellipsis', wordWrap: 'break-word', overflow: 'hidden' } }}
-              primary={workspace.NAME} secondary={workspace.PATH}
-            />
+        <div className={classes.menuInner}>
+          {workspaces?.map((workspace, index) => (
+            <MenuItem
+              key={workspace.PATH}
+              onClick={() => !isSelected(workspace, index) ? onItemSelected(workspace) : handleClose() }
+              className={classes.menuItem}
+              disableRipple
+            >
+              <ListItemText
+                title={workspace.PATH}
+                primaryTypographyProps={{ style: { fontSize: 15} }}
+                secondaryTypographyProps={{ style: { fontSize: 12, textOverflow: 'ellipsis', wordWrap: 'break-word', overflow: 'hidden' } }}
+                primary={workspace.NAME} secondary={workspace.PATH}
+              />
 
-            <div className='actions ml-5'>
-              { isBlocked(workspace, index)
-                  ? (isSelected(workspace, index) ? <Chip label={t('Current')} /> : <Chip label={t('Default')} />)
-                  : <IconButton size='small' className='action' onClick={(e) => onItemRemoved(e, workspace)} aria-label="delete">
-                      <ClearIcon fontSize='inherit' />
-                    </IconButton>
-              }
-            </div>
-          </MenuItem>
-        ))}
+              <div className='actions ml-5'>
+                { isBlocked(workspace, index)
+                    ? (isSelected(workspace, index) ?
+                      <>
+                        <IconButton title="" size='small' className='action mr-1' onClick={(e) => onItemSelected(workspace)} aria-label="delete">
+                          <RefreshIcon fontSize='inherit' />
+                        </IconButton>
+                        <Chip label={t('Current')} />
+                      </>
+                      : <Chip label={t('Default')} />)
+                    : <IconButton title="" size='small' className='action' onClick={(e) => onItemRemoved(e, workspace)} aria-label="delete">
+                        <ClearIcon fontSize='inherit' />
+                      </IconButton>
+                }
+              </div>
+            </MenuItem>
+          ))}
+        </div>
 
         <Divider />
         <MenuItem onClick={() => onItemNew()} disableRipple>

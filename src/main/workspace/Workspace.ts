@@ -12,6 +12,8 @@ import { ProjectFilter } from './filters/ProjectFilter';
 import { userSettingService } from '../services/UserSettingService';
 import { AppMigration } from '../migration/AppMigration';
 import { modelProvider } from '../services/ModelProvider';
+import { BrowserWindow, dialog } from 'electron';
+import i18next from 'i18next';
 
 
 class Workspace {
@@ -166,17 +168,31 @@ class Workspace {
       if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
     } catch(e: any) {
       log.error(e);
-      const settings = userSettingService.get();
 
-      const workspaces = settings.WORKSPACES;
-      workspaces.unshift(userSettingService.getDefault().WORKSPACES[0]);
+      const { response } = await dialog.showMessageBox(
+        null,
+        {
+          buttons: ['Try again', 'Switch to default workspace'],
+          message: 'Could not access the selected folder for the workspace. What would you like to do?',
+          title: 'Workspace Folder Access Error'
+        },
+      );
 
-      // Set default workspace if selected workspace cannot be created
-      userSettingService.set({ WORKSPACES: workspaces, DEFAULT_WORKSPACE_INDEX: 0 } );
-      await userSettingService.save();
+      if (response === 1) {
+        const settings = userSettingService.get();
+        const workspaces = settings.WORKSPACES;
 
-      // Set the default workspace path
-      this.wsPath = userSettingService.getDefault().WORKSPACES[0].PATH;
+        // Override default workspace
+        workspaces[0] = userSettingService.getDefault().WORKSPACES[0];
+
+        // Set default workspace if selected workspace cannot be created
+        userSettingService.set({ WORKSPACES: workspaces, DEFAULT_WORKSPACE_INDEX: 0 } );
+        await userSettingService.save();
+
+        // Set the default workspace path
+        this.wsPath = userSettingService.getDefault().WORKSPACES[0].PATH;
+      }
+
       await this.initWorkspaceFileSystem();
     }
   }
