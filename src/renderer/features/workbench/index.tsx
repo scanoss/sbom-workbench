@@ -5,7 +5,7 @@ import SplitPane from 'react-split-pane';
 
 import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 import { reset, selectIsReadOnly } from '@store/workbench-store/workbenchSlice';
-import { loadProject } from '@store/workbench-store/workbenchThunks';
+import { closeProject, loadProject } from '@store/workbench-store/workbenchThunks';
 import { IpcChannels } from '@api/ipc-channels';
 import AppBar from './components/AppBar/AppBar';
 import MainSidebar from './components/MainSidebar/MainSidebar';
@@ -31,7 +31,7 @@ const WorkbenchModule = () => {
 
     return () => {
       console.log('Closing workbench...');
-      dispatch(reset());
+      dispatch(closeProject());
     };
   };
 
