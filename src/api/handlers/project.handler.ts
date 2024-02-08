@@ -22,12 +22,11 @@ import { searcher } from '../../main/modules/searchEngine/searcher/Searcher';
 import { projectService } from '../../main/services/ProjectService';
 import api from '../api';
 
-api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, path: string, mode: ProjectAccessMode = ProjectAccessMode.WRITE) => {
+api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, payload: any) => {
   // TODO: factory to create filters depending on arguments
-  const p: Project = await workspace.openProject(new ProjectFilterPath(path));
+  const p: Project = await workspace.openProject(new ProjectFilterPath(payload.path));
   searcher.closeIndex();
-  console.log("MODE", mode);
- // await projectService.lockProject(p.getProjectName(), mode);
+  // await projectService.lockProject(p.getProjectName(), mode);
   const response: ProjectOpenResponse = {
     logical_tree: p.getTree().getRootFolder(),
     work_root: p.getWorkRoot(),
@@ -36,7 +35,7 @@ api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, path: string, mode: Proj
     uuid: p.getUUID(),
     source: p.getDto().source,
     metadata: p.metadata,
-    mode: mode,
+    mode: payload.mode,
   };
   return {
     status: 'ok',

@@ -6,11 +6,11 @@ import path from 'path';
 
 const MAX_LOCKING_MINUTES = 1;
 
-export async function lockMiddleware(projectPath: string, mode: ProjectAccessMode) {
+export async function lockMiddleware(payload: any) {
   console.log('Lock middleware');
 
-  const pName = path.basename(projectPath);
-  if (mode === ProjectAccessMode.READ_ONLY) return;
+  const pName = path.basename(payload.projectPath);
+  if (payload.mode === ProjectAccessMode.READ_ONLY) return;
 
   const username = os.userInfo().username;
   const hostname = os.hostname();
@@ -32,7 +32,7 @@ export async function lockMiddleware(projectPath: string, mode: ProjectAccessMod
 
     //New user trying to access a project blocked by another user
     if ((projectLock.username !== username || projectLock.hostname !== hostname) && timeLocking <= MAX_LOCKING_MINUTES) {
-      mode = ProjectAccessMode.READ_ONLY;
+      payload.mode = ProjectAccessMode.READ_ONLY;
       return;
     }
 

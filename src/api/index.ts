@@ -20,6 +20,7 @@ import { lockMiddleware } from '../api/middlewares/lock.middleware';
 import { unlockMiddleware } from '../api/middlewares/unlock.middleware';
 
 // Example how to use a middleware
-api.use(IpcChannels.PROJECT_OPEN_SCAN, (event, projectPath: string, mode: ProjectAccessMode) => lockMiddleware(projectPath, mode));
+// Disclaimer: Payload must be an object in order to modify the data on the middleware
+api.use(IpcChannels.PROJECT_OPEN_SCAN, (event, payload) => lockMiddleware(payload));
 
-api.use(IpcChannels.PROJECT_CURRENT_CLOSE, (event, projectPath) => unlockMiddleware(projectPath));
+api.use(IpcChannels.PROJECT_CURRENT_CLOSE, (event, payload) => unlockMiddleware(payload));

@@ -15,7 +15,6 @@ class Api {
   }
 
   public handle(channel: string, handler: any) {
-    console.log("CHANNEL", channel);
     if (!this.store[channel]) this.store[channel] = [];
 
     ipcMain.handle(channel, async (_event, ...args: any[]) => {

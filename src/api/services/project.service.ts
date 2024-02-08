@@ -40,7 +40,7 @@ class ProjectService extends BaseService {
   }
 
   public async load(path: string, mode?: ProjectAccessMode): Promise<ProjectOpenResponse> {
-    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_OPEN_SCAN, path, mode);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_OPEN_SCAN, { path, mode });
     return this.response(response);
   }
 
@@ -98,8 +98,6 @@ class ProjectService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_CURRENT_CLOSE);
     return this.response(response);
   }
-
-
 }
 
 export const projectService = new ProjectService();
