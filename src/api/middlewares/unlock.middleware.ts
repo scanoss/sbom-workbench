@@ -1,14 +1,12 @@
-import { modelProvider } from '../../main/services/ModelProvider';
 import os from 'os';
+import { modelProvider } from '../../main/services/ModelProvider';
 import { workspace } from '../../main/workspace/Workspace';
 
 export async function unlockMiddleware() {
+  const p = workspace.getOpenedProjects()[0];
+  if (!p) return;
 
-  console.log("Unlock Middleware");
-
-  const p =  workspace.getOpenedProjects()[0];
-
-  const username = os.userInfo().username;
+  const { username } = os.userInfo();
   const hostname = os.hostname();
 
   const projectLock = await modelProvider.workspace.lock.get(p.getProjectName(), username, hostname);
