@@ -1,9 +1,5 @@
 module.exports = {
-  extends: [
-    'erb',
-    'airbnb',
-    'airbnb-typescript',
-  ],
+  extends: ['erb', 'airbnb', 'airbnb-typescript'],
   rules: {
     // A temporary hack related to IDE not resolving correct package.json
     'import/no-extraneous-dependencies': 'off',
@@ -39,7 +35,7 @@ module.exports = {
     'no-param-reassign': ['off'],
     'react/jsx-one-expression-per-line': 'off',
     'object-curly-newline': 'off',
-    'react/no-unstable-nested-components': 'off'
+    'react/no-unstable-nested-components': 'off',
     'react/jsx-one-expression-per-line': ['off'],
   },
   parserOptions: {
