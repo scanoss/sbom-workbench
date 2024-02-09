@@ -36,6 +36,7 @@ api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, payload: any) => {
     source: p.getDto().source,
     metadata: p.metadata,
     mode: payload.mode,
+    lockedBy: 'test@test', // TODO: set locked user
   };
   return {
     status: 'ok',

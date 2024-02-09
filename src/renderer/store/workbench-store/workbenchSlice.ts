@@ -2,12 +2,12 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   collapseAll, convertTreeToNode, expandAll, expandToMatches,
 } from '@shared/utils/filetree-utils';
+import { ProjectAccessMode } from '@api/types';
+import { status } from '@grpc/grpc-js';
 import { loadProject, loadProjectSettings, setTree } from './workbenchThunks';
 import { RootState } from '../rootReducer';
 import { ISummary } from '../../../main/services/ReportService';
 import { Scanner } from '../../../main/task/scanner/types';
-import { ProjectAccessMode } from '@api/types';
-import { status } from '@grpc/grpc-js';
 
 export interface WorkbenchState {
   path: string;
@@ -31,6 +31,7 @@ export interface WorkbenchState {
     isApiKeySetted: boolean;
   };
   mode: ProjectAccessMode,
+  lockedBy: string;
 }
 
 const initialState: WorkbenchState = {
@@ -55,6 +56,7 @@ const initialState: WorkbenchState = {
     isApiKeySetted: false,
   },
   mode: ProjectAccessMode.WRITE,
+  lockedBy: null,
 };
 
 export const workbenchSlice = createSlice({
@@ -93,7 +95,7 @@ export const workbenchSlice = createSlice({
     });
     builder.addCase(loadProject.fulfilled, (state, action) => {
       const {
-        name, imported, fileTree, dependencies, scanRoot, config, mode,
+        name, imported, fileTree, dependencies, scanRoot, config, mode, lockedBy,
       } = action.payload;
 
       state.path = scanRoot;
@@ -106,6 +108,7 @@ export const workbenchSlice = createSlice({
       state.dependencies = dependencies;
       state.projectScannerConfig = config;
       state.mode = mode;
+      state.lockedBy = lockedBy;
     });
     builder.addCase(setTree.fulfilled, (state, action) => {
       state.tree = action.payload;
