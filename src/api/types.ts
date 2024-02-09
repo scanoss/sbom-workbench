@@ -364,6 +364,7 @@ export interface ProjectOpenResponse {
   source: string;
   metadata: Metadata;
   mode: ProjectAccessMode;
+  lockedBy: string;
 }
 
 export interface LOCK {

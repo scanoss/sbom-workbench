@@ -15,6 +15,7 @@ export interface ScanResult {
   dependencies: Array<string>;
   config: Scanner.ScannerConfig;
   mode: ProjectAccessMode
+  lockedBy: string;
 }
 
 export interface ProjectSettings {
@@ -107,8 +108,6 @@ class WorkbenchController {
     const { dependencies } = data;
     const imported = data.source === 'IMPORTED';
 
-    console.log(data);
-
     return {
       name: data.metadata.name,
       imported,
@@ -118,6 +117,7 @@ class WorkbenchController {
       dependencies,
       config: data.metadata.scannerConfig,
       mode: data.mode,
+      lockedBy: data.lockedBy,
     };
   }
 }

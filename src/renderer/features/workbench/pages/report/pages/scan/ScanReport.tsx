@@ -37,7 +37,6 @@ const ScanReport = () => {
       dialog.finish({ message: t('Dialog:UpdateFinished').toUpperCase() });
     } catch (e: any) {
       dialog.dismiss();
-      dialogController.showError(t('Dialog:ErrorUpdatingReport'), e.message);
     } finally {
       dialog.dismiss({ delay: 1500 });
       dispatch(getReport());
