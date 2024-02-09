@@ -1,10 +1,10 @@
-import log from "electron-log";
+import log from 'electron-log';
 import { app } from 'electron';
 import fs from 'fs';
 import os from 'os';
+import path from 'path';
 import { IWorkspaceCfg } from '../../api/types';
 import { wsUtils } from '../workspace/WsUtils/WsUtils';
-import path from 'path';
 
 import packageJson from '../../../release/app/package.json';
 import AppConfig from '../../config/AppConfigModule';
@@ -28,12 +28,12 @@ class UserSettingService {
         DESCRIPTION: null,
       },
     ],
-    DEFAULT_WORKSPACE_INDEX : 0,
+    DEFAULT_WORKSPACE_INDEX: 0,
     WORKSPACES: [
       {
-        NAME:'My Workspace',
-        PATH: path.join(os.homedir(),AppConfig.DEFAULT_WORKSPACE_NAME),
-        DESCRIPTION:''
+        NAME: 'My Workspace',
+        PATH: path.join(os.homedir(), AppConfig.DEFAULT_WORKSPACE_NAME),
+        DESCRIPTION: '',
       },
 
     ],
@@ -50,13 +50,12 @@ class UserSettingService {
   };
 
   constructor() {
-    this.name = 'settings.json';
+    this.name = 'sbom-workbench-settings.json';
     this.store = this.defaultStore;
   }
 
   public set(setting: Partial<IWorkspaceCfg>) {
-    if (setting.LNG !== this.store.LNG)
-      AppI18n.getI18n()?.changeLanguage(setting.LNG);
+    if (setting.LNG !== this.store.LNG) AppI18n.getI18n()?.changeLanguage(setting.LNG);
 
     this.store = { ...this.store, ...setting };
 
@@ -82,29 +81,25 @@ class UserSettingService {
 
   public async read() {
     try {
-      this.setMyPath(path.join(os.homedir(),AppConfig.DEFAULT_SETTING_NAME,this.name));
+      this.setMyPath(path.join(os.homedir(), AppConfig.DEFAULT_SETTING_NAME, this.name));
       if (!(await wsUtils.fileExist(this.myPath))) {
         // Creates DEFAULT_SETTING_NAME folder if not exists
-        await fs.promises.mkdir(path.join(os.homedir(),AppConfig.DEFAULT_SETTING_NAME),{recursive:true});
-
+        await fs.promises.mkdir(path.join(os.homedir(), AppConfig.DEFAULT_SETTING_NAME), { recursive: true });
         // use save method to create file if not exists
         await this.save();
       }
 
       const setting = await fs.promises.readFile(this.myPath, 'utf8');
-      this.store =  {...this.store,...JSON.parse(setting)};
+      this.store = { ...this.store, ...JSON.parse(setting) };
 
-
-    
       await new AppMigration(userSettingService.get().VERSION, this.myPath).up();
-     
-    } catch(error:any) {
-      log.error("[ WORKSPACE CONFIG ]:", "Invalid settings configuration");
-      const ws =  await fs.promises.readFile(
+    } catch (error:any) {
+      log.error('[ WORKSPACE CONFIG ]:', 'Invalid settings configuration');
+      const ws = await fs.promises.readFile(
         this.myPath,
-        'utf8'
+        'utf8',
       );
-      await fs.promises.writeFile(`${this.myPath}/settings-invalid.json`,ws);
+      await fs.promises.writeFile(`${this.myPath}/settings-invalid.json`, ws);
       this.store = this.defaultStore;
     }
   }
@@ -120,7 +115,7 @@ class UserSettingService {
 
   public async save() {
     await fs.promises.writeFile(
-     this.myPath,
+      this.myPath,
       JSON.stringify(this.store, (key, value) => {
         if (value === null) return undefined;
         return value;

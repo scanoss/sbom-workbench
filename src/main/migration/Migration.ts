@@ -17,8 +17,7 @@ export abstract class Migration {
     const myVersion: string = this.getVersion();
     const oldestCompatibleVersion: string = Object.keys(scripts)[0];
     let latestVersion = myVersion;
-    if (SemVerCompareVersion(myVersion, oldestCompatibleVersion) === -1)
-      throw new Error(`Cannot upgrade version ${myVersion}`); // myVersion < oldCom....
+    if (SemVerCompareVersion(myVersion, oldestCompatibleVersion) === -1) throw new Error(`Cannot upgrade version ${myVersion}`); // myVersion < oldCom....
     broadcastManager
       .get()
       ?.send(IpcChannels.MIGRATION_INIT, {
@@ -41,8 +40,8 @@ export abstract class Migration {
   }
 
   public abstract getScripts(): Record<
-    string,
-    Array<(path: string) => Promise<any>>
+  string,
+  Array<(path: string) => Promise<any>>
   >;
 
   public abstract getPath(): string;
