@@ -13,7 +13,6 @@ export const getAll = createAsyncThunk('dependency/fetchAll', async (path: strin
 });
 
 export const accept = createAsyncThunk('dependency/accept', async (dependencyDTO: NewDependencyDTO) => {
-  throw new Error('test');
   const response = await dependencyService.accept(dependencyDTO);
   return response;
 });

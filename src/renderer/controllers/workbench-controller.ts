@@ -117,7 +117,7 @@ class WorkbenchController {
       fileTree: tree,
       dependencies,
       config: data.metadata.scannerConfig,
-      mode: data?.mode,
+      mode: data.mode,
     };
   }
 }
