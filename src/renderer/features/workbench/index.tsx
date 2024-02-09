@@ -7,10 +7,10 @@ import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 import { reset, selectIsReadOnly } from '@store/workbench-store/workbenchSlice';
 import { closeProject, loadProject } from '@store/workbench-store/workbenchThunks';
 import { IpcChannels } from '@api/ipc-channels';
+import { Alert } from '@mui/material';
 import AppBar from './components/AppBar/AppBar';
 import MainSidebar from './components/MainSidebar/MainSidebar';
 import MainPanel from './components/MainPanel/MainPanel';
-import { Alert } from '@mui/material';
 
 const WorkbenchModule = () => {
   const { pathname } = useLocation();
@@ -27,7 +27,7 @@ const WorkbenchModule = () => {
 
   const onInit = () => {
     console.log('Init workbench...');
-    dispatch(loadProject({ path: scanPath?.path, mode: scanPath.mode }));
+    dispatch(loadProject({ path: scanPath?.path, mode: scanPath?.mode }));
 
     return () => {
       console.log('Closing workbench...');
@@ -52,7 +52,8 @@ const WorkbenchModule = () => {
     <div className={`
       workbench-layout
       ${isReadOnly ? 'read-only-mode' : ''}
-    `}>
+    `}
+    >
       <AppBar />
 
       {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
