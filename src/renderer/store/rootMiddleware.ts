@@ -1,4 +1,4 @@
-import { createListenerMiddleware, current, isAnyOf } from '@reduxjs/toolkit';
+import { createListenerMiddleware, current, isAnyOf, isRejected } from '@reduxjs/toolkit';
 import {
   acceptInventoryKnowledge,
   attachFile,
@@ -23,6 +23,7 @@ import {
   accept, getAll, reject, rejectAll, restore,
 } from '@store/dependency-store/dependencyThunks';
 import { setCurrentProject } from './workspace-store/workspaceSlice';
+import { dialogController } from 'renderer/controllers/dialog-controller';
 
 export const rootMiddleware = createListenerMiddleware();
 
@@ -85,9 +86,12 @@ rootMiddleware.startListening({
   },
 });
 
+
+
 rootMiddleware.startListening({
-  actionCreator: accept.rejected,
+  matcher: isRejected,
   effect: async ({ error }, api) => {
-    console.log(error)
+    console.log(error);
+    dialogController.showError('Error', error.message )
   },
 });
