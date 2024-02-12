@@ -34,6 +34,7 @@ export async function lockMiddleware(payload: any) {
       //New user trying to access a project blocked by another user
       if ((projectLock.username !== username || projectLock.hostname !== hostname) && timeLocking <= MAX_LOCKING_MINUTES) {
         payload.mode = ProjectAccessMode.READ_ONLY;
+        payload.lockedBy = `${projectLock.username}@${projectLock.hostname}`;
         return;
       }
 
