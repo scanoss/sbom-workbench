@@ -1,13 +1,8 @@
 import sqlite3 from 'sqlite3';
-import { Queries } from '../../model/querys_db';
 import log from 'electron-log';
 import fs from 'fs';
+import { Queries } from '../../model/querys_db';
 import { dependencyService } from '../../services/DependencyService';
-import { projectService } from '../../services/ProjectService';
-import { workspace } from '../../workspace/Workspace';
-import { ProjectFilter } from '../../workspace/filters/ProjectFilter';
-import { ProjectFilterPath } from '../../workspace/filters/ProjectFilterPath';
-import { dependencyHelper } from '../../helpers/DependencyHelper';
 import { fileHelper } from '../../helpers/FileHelper';
 import { modelProvider } from '../../services/ModelProvider';
 import { Tree } from '../../workspace/tree/Tree';
@@ -32,7 +27,7 @@ async function regenerateDependencyTable(projectPath): Promise<void> {
           db.run('DROP TABLE IF EXISTS dependencies;');
           db.run(query.DEPENDENCY_TABLE);
           resolve();
-        }
+        },
       );
     } catch (e) {
       reject(e);
@@ -46,7 +41,7 @@ async function addDependencies(projectPath: string) {
     const exist = await fileHelper.fileExist(depPath);
     if (exist) {
       const dependencies: any = JSON.parse(
-        await fs.promises.readFile(`${depPath}`, 'utf8')
+        await fs.promises.readFile(`${depPath}`, 'utf8'),
       );
       await updateDependenciesOnTree(projectPath, dependencies);
       await updateFlagsOnTree(projectPath);
@@ -61,12 +56,12 @@ async function addDependencies(projectPath: string) {
 async function updateFlagsOnTree(projectPath: string) {
   const project = await fs.promises.readFile(
     `${projectPath}/tree.json`,
-    'utf8'
+    'utf8',
   );
   const a = JSON.parse(project);
   const m = await fs.promises.readFile(`${projectPath}/metadata.json`, 'utf8');
   const metadata = JSON.parse(m);
-  const tree = new Tree(metadata.name, projectPath,metadata.scan_root);
+  const tree = new Tree(metadata.name, projectPath, metadata.scan_root);
   tree.loadTree(a.tree.rootFolder);
   const rootFolder = tree.getRootFolder();
   addProgressFlags(rootFolder);
@@ -77,12 +72,12 @@ async function updateFlagsOnTree(projectPath: string) {
 async function updateDependenciesOnTree(projectPath: string, dependencies) {
   const project = await fs.promises.readFile(
     `${projectPath}/tree.json`,
-    'utf8'
+    'utf8',
   );
   const a = JSON.parse(project);
   const m = await fs.promises.readFile(`${projectPath}/metadata.json`, 'utf8');
   const metadata = JSON.parse(m);
-  const tree = new Tree(metadata.name, projectPath,metadata.scan_root);
+  const tree = new Tree(metadata.name, projectPath, metadata.scan_root);
   tree.loadTree(a.tree.rootFolder);
   tree.addDependencies(dependencies);
   a.tree = tree;
@@ -108,12 +103,9 @@ function addProgressFlags(node) {
       if (status === NodeStatus.IGNORED) node.hasIgnored = true;
       if (status === NodeStatus.NOMATCH) node.hasNoMatch = true;
       if (status === NodeStatus.FILTERED) node.hasFiltered = true;
-      if (status === NodeStatus.IDENTIFIED && !child.isDependency())
-        node.hasIdentifiedProgress = true;
-      if (status === NodeStatus.PENDING && !child.isDependency())
-        node.hasPendingProgress = true;
-      if (status === NodeStatus.IGNORED && !child.isDependency())
-        node.hasIgnoredProgress = true;
+      if (status === NodeStatus.IDENTIFIED && !child.isDependency()) node.hasIdentifiedProgress = true;
+      if (status === NodeStatus.PENDING && !child.isDependency()) node.hasPendingProgress = true;
+      if (status === NodeStatus.IGNORED && !child.isDependency()) node.hasIgnoredProgress = true;
       const stat = node.getStatus();
       node.setStatusOnClassnameAs(stat);
     }
