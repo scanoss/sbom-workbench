@@ -16,7 +16,7 @@
   "AllValidDependenciesWillBeAcceptedSubtitle": "不接受那些缺少版本或许可证详细信息的依赖项。",
   "AllPendingDependenciesWillBeDismissed": "所有待定的依赖项都将被取消。",
   "AllAcceptedOrDismissedDependenciesWillBeRestored": "所有接受或取消的依赖项都将被恢复。",
-  "YouHaveAlreadyWorkQuestion": "您已经使用过其中一些文件。你想覆盖还是保留它们？",
+  "YouHaveAlreadyWorkQuestionLanguage": "您已经使用过其中一些文件。你想覆盖还是保留它们？",
   "ActionWillBeExecutedOnAllSelectedQuestion": "此操作将对所有选定的文件执行。你确定吗？",
   "DeleteQuestion": "您确定要删除此项目吗？",
   "RescanQuestion": "您确定要重新扫描此项目吗？",

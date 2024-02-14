@@ -20,7 +20,7 @@
   "ActionWillBeExecutedOnAllSelectedQuestion": "Esta acción se ejecutará en todos los ficheros seleccionados. ¿Está seguro?",
   "DeleteQuestion": "Seguro que quieres borrar este proyecto?",
   "RescanQuestion": "Seguro que quieres rescanear este proyecto?",
-  "YouNeedRestartQuestion": "Es necesario reiniciar la aplicación para cambiar el idioma. ¿Quieres hacerlo?",
+  "YouNeedRestartQuestionLanguage": "Es necesario reiniciar la aplicación para cambiar el idioma. ¿Quieres hacerlo?",
   "ExportingProject": "Exportando proyecto",
   "SuccesfulImport": "Importación exitosa",
   "ImportingProject": "Importando proyecto",
@@ -28,5 +28,6 @@
   "UpdateFinished": "Actualizacion Existosa",
   "ErrorUpdatingReport": "Error en la Actualizacion",
   "WorkspaceName": "Nombre del espacio",
-  "WorkspaceLocation": "Ubicación del espacio"
+  "WorkspaceLocation": "Ubicación del espacio",
+  "YouNeedRestartQuestionWorkspace": "Es necesario reiniciar la aplicación para cambiar el espacio de trabajo. ¿Quieres hacerlo?"
 }

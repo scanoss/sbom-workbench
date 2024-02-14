@@ -20,7 +20,7 @@
   "ActionWillBeExecutedOnAllSelectedQuestion": "このアクションは、選択されたすべてのファイルに対して実行されます。よろしいですか？",
   "DeleteQuestion": "このプロジェクトを削除してもよいですか？",
   "RescanQuestion": "このプロジェクトを再スキャンしてもよいですか？",
-  "YouNeedRestartQuestion": "言語を変更するためには、アプリケーションを再起動する必要があります。再起動しますか？",
+  "YouNeedRestartQuestionLanguage": "言語を変更するためには、アプリケーションを再起動する必要があります。再起動しますか？",
   "ExportingProject": "プロジェクトをエクスポート中",
   "SuccesfulImport": "インポート成功",
   "ImportingProject": "プロジェクトをインポート中"
