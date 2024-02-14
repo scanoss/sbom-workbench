@@ -10,16 +10,20 @@ export interface Lock {
 }
 
 export class LockModel {
-  private readonly connection: sqlite3.Database;
+  private connection: sqlite3.Database;
 
   constructor(conn: sqlite3.Database) {
+    this.connection = conn;
+  }
+
+  public setConnection(conn: sqlite3.Database) {
     this.connection = conn;
   }
 
   public async get(projectPath: string, username: string, hostname: string): Promise<Lock> {
     const call: any = util.promisify(this.connection.get.bind(this.connection));
     return await call(
-      `SELECT l.project, l.username, l.hostname, l.createdAt , l.updatedAt FROM lock as l WHERE l.project = ? AND l.username = ? AND l.hostname = ?;`,
+      'SELECT l.project, l.username, l.hostname, l.createdAt , l.updatedAt FROM lock as l WHERE l.project = ? AND l.username = ? AND l.hostname = ?;',
       projectPath,
       username,
       hostname
@@ -35,7 +39,8 @@ export class LockModel {
 
   public async getByProjectPath(projectPath: string): Promise<Lock> {
     const call: any = util.promisify(this.connection.get.bind(this.connection));
-    return await call(`SELECT l.project, l.username, l.hostname, l.createdAt , l.updatedAt FROM lock as l WHERE l.project = ? ;`, projectPath);
+    const lockedProject = await call('SELECT l.project, l.username, l.hostname, l.createdAt , l.updatedAt FROM lock as l WHERE l.project = ? ;', projectPath);
+    return lockedProject;
   }
 
   public async create(data: { projectPath: string; username: string; hostname: string }): Promise<Lock> {
@@ -51,7 +56,7 @@ export class LockModel {
     return this.get(data.projectPath, data.username, data.hostname);
   }
 
-  public async update(data: { projectPath: string; username: string; hostname: string }): Promise<Lock> {
+  public async update(data: { projectPath: string; username: string; hostname: string; createdAt: string; updatedAt: string }): Promise<Lock> {
     const call: any = util.promisify(this.connection.get.bind(this.connection));
     await call(
       'UPDATE lock SET  username=? , hostname=?, createdAt=?, updatedAt=? WHERE project = ?;',
