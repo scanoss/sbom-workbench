@@ -20,7 +20,7 @@
   "ActionWillBeExecutedOnAllSelectedQuestion": "This action will be executed on all selected files. Are you sure",
   "DeleteQuestion": "Are you sure you want to delete this project?",
   "RescanQuestion": "Are you sure you want to rescan this project?",
-  "YouNeedRestartQuestion": "You need restart the application to change the language. Do you?",
+  "YouNeedRestartQuestionLanguage": "You need restart the application to change the language. Do you?",
   "ExportingProject": "Exporting Project",
   "SuccesfulImport": "Successful Import",
   "ImportingProject": "Importing Project",
@@ -28,5 +28,6 @@
   "UpdateFinished": "Update Finished",
   "ErrorUpdatingReport": "Error Updating Report",
   "WorkspaceName": "Workspace Name",
-  "WorkspaceLocation": "Workspace Location"
+  "WorkspaceLocation": "Workspace Location",
+  "YouNeedRestartQuestionWorkspace": "You need restart the application to change the workspace. Do you?"
 }

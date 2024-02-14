@@ -9,10 +9,11 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog, RelaunchOptions } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import i18next from 'i18next';
+import { execFile } from 'child_process';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { workspace } from './workspace/Workspace';
@@ -60,7 +61,7 @@ const installExtensions = async () => {
   return installer
     .default(
       extensions.map((name) => installer[name]),
-      forceDownload
+      forceDownload,
     )
     .catch(console.log);
 };
@@ -116,13 +117,21 @@ const createWindow = async () => {
       BrowserWindow.getFocusedWindow(),
       {
         buttons: [i18next.t('Button:RestartLater'), i18next.t('Button:RestartNow')],
-        message: i18next.t('Dialog:YouNeedRestartQuestion'),
+        message: i18next.t('Dialog:YouNeedRestartQuestionLanguage'),
       },
     );
 
     if (response === 1) {
-      app.relaunch();
-      app.exit();
+      const options: RelaunchOptions = {
+        args: process.argv.slice(1).concat(['--relaunch']),
+        execPath: process.execPath,
+      };
+      if (process.env.APPIMAGE) {
+        options.execPath = process.env.APPIMAGE;
+        options.args.unshift('--appimage-extract-and-run');
+      }
+      app.relaunch(options);
+      app.exit(0);
     }
   });
 
