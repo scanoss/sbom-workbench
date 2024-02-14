@@ -35,7 +35,6 @@ class UserSettingService {
         PATH: path.join(os.homedir(), AppConfig.DEFAULT_WORKSPACE_NAME),
         DESCRIPTION: '',
       },
-
     ],
     SCAN_MODE: 'FULL_SCAN',
     VERSION: app.isPackaged === true ? app.getVersion() : packageJson.version,
@@ -47,6 +46,7 @@ class UserSettingService {
     SCANNER_CONCURRENCY_LIMIT: null,
     SCANNER_POST_SIZE: null,
     SCANNER_TIMEOUT: null,
+    MULTIUSER_LOCK_TIMEOUT: AppConfig.DEFAULT_MULTIUSER_LOCK_TIMEOUT,
   };
 
   constructor() {
@@ -93,12 +93,9 @@ class UserSettingService {
       this.store = { ...this.store, ...JSON.parse(setting) };
 
       await new AppMigration(userSettingService.get().VERSION, this.myPath).up();
-    } catch (error:any) {
+    } catch (error: any) {
       log.error('[ WORKSPACE CONFIG ]:', 'Invalid settings configuration');
-      const ws = await fs.promises.readFile(
-        this.myPath,
-        'utf8',
-      );
+      const ws = await fs.promises.readFile(this.myPath, 'utf8');
       await fs.promises.writeFile(`${this.myPath}/settings-invalid.json`, ws);
       this.store = this.defaultStore;
     }
@@ -116,11 +113,15 @@ class UserSettingService {
   public async save() {
     await fs.promises.writeFile(
       this.myPath,
-      JSON.stringify(this.store, (key, value) => {
-        if (value === null) return undefined;
-        return value;
-      }, 2),
-      'utf8',
+      JSON.stringify(
+        this.store,
+        (key, value) => {
+          if (value === null) return undefined;
+          return value;
+        },
+        2
+      ),
+      'utf8'
     );
   }
 
