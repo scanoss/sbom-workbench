@@ -18,6 +18,7 @@ import { IpcChannels } from './ipc-channels';
 import api from './api';
 import { lockMiddleware } from './middlewares/lock.middleware';
 import { unlockMiddleware } from './middlewares/unlock.middleware';
+import { refreshMiddleware } from './middlewares/refresh.middleware';
 
 // Example how to use a middleware
 // Disclaimer: Payload must be an object in order to modify the data on the middleware
@@ -58,4 +59,7 @@ api.use(IpcChannels.PROJECT_CURRENT_CLOSE, () => unlockMiddleware());
   IpcChannels.DEPENDENCY_REJECT,
   IpcChannels.DEPENDENCY_REJECT_ALL,
   IpcChannels.VULNERABILITY_UPDATE,
-].forEach((c) => api.use(c, () => accessMiddleware()));
+].forEach((c) => {
+  api.use(c, () => accessMiddleware());
+  api.use(c, () => refreshMiddleware());
+});
