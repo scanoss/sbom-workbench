@@ -36,7 +36,7 @@ api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, payload: any) => {
     source: p.getDto().source,
     metadata: p.metadata,
     mode: payload.mode,
-    lockedBy: payload.lockedBy,
+    ...(payload.lockedBy && { lockedBy: payload.lockedBy }),
   };
   return {
     status: 'ok',
