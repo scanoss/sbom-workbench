@@ -5,44 +5,50 @@ import { Connection } from '../Connection';
 import { LockModel } from './models/LockModel';
 
 export class WorkspaceModel {
+  private connection: Connection;
 
-    private connection: sqlite3.Database;
+  lock: LockModel;
 
-    lock: LockModel;
+  private readonly path: string;
 
-    private readonly path: string;
+  constructor(path: string) {
+    this.path = `${path}/workspace.sqlite`;
+  }
 
+  private async createWorkspaceTables() {
+    const db = await this.connection.openDb();
+    const call = util.promisify(db.run.bind(db));
+    await call(queries.WORKSPACE_LOCK);
+  }
 
-    constructor(path: string) {
-        this.path = `${path}/workspace.sqlite`;
-    }
+  private async initWorkspaceModel() {
+    const db = await this.connection.openDb();
+    this.lock = new LockModel(db);
+  }
 
-    private async createWorkspaceTables() {
-        const call = util.promisify(this.connection.run.bind(this.connection));
-        await call(queries.WORKSPACE_LOCK);
-    }
+  public async init() {
+    await this.createWorkspaceDB();
+    await this.createWorkspaceTables();
+    await this.initWorkspaceModel();
+    await this.destroy();
+  }
 
-    private initWorkspaceModel(){
-      this.lock = new LockModel(this.connection);
-    }
+  private async createWorkspaceDB() {
+    this.connection = new Connection(this.path);
+    await this.connection.createDB();
+    return this.connection;
+  }
 
-    public async init() {
-        const conn = new Connection(this.path);
-        this.connection = await conn.createDB();
-        await this.createWorkspaceTables();
-        this.initWorkspaceModel();
-        return this.connection;
-    }
+  public async openDb(): Promise<sqlite3.Database> {
+    await this.destroy();
+    this.connection = await new Connection(this.path);
+    const db = await this.connection.openDb();
+    this.lock.setConnection(db);
+    return db;
+  }
 
-    public async openDb(): Promise<sqlite3.Database> {
-       return this.connection;
-    }
-
-
-    public destroy(){
-        this.connection.close();
-        this.connection = null;
-    }
-
-
+  public async destroy() {
+    if (this.connection) await this.connection.close();
+    this.connection = null;
+  }
 }

@@ -7,9 +7,11 @@ import { userSettingService } from '../../main/services/UserSettingService';
 
 export async function lockMiddleware(payload: any) {
   try {
+    await modelProvider.workspace.openDb();
     const MAX_LOCKING_MINUTES = userSettingService.get().MULTIUSER_LOCK_TIMEOUT;
 
-    const pName = path.basename(payload.path);
+    const pName = path.basename(payload.path).trim();
+
     if (payload.mode === ProjectAccessMode.READ_ONLY) return;
 
     const { username } = os.userInfo();
@@ -42,5 +44,7 @@ export async function lockMiddleware(payload: any) {
     }
   } catch (e: any) {
     console.error(e);
+  } finally {
+    await modelProvider.workspace.destroy();
   }
 }
