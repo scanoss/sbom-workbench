@@ -39,6 +39,7 @@ export interface IWorkspaceCfg {
   SCANNER_TIMEOUT: number;
   SCANNER_POST_SIZE: number;
   SCANNER_CONCURRENCY_LIMIT: number;
+  MULTIUSER_LOCK_TIMEOUT: number;
 }
 
 export interface WorkspaceData {
