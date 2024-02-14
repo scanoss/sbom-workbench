@@ -17,6 +17,7 @@ export const AppConfigDefault: IAppConfig = {
   OSSKB_HOST: 'osskb.org',
   DEFAULT_IP_gRPC: 'scanoss.com',
   DEFAULT_PORT_gRPC: 443,
+  DEFAULT_MULTIUSER_LOCK_TIMEOUT: 30,
 
   // feature flags
   FF_ENABLE_COMPONENT_LOGO: true,

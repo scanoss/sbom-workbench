@@ -3,12 +3,11 @@ import { ProjectAccessMode } from '../types';
 import log from 'electron-log';
 import os from 'os';
 import path from 'path';
-
-const MAX_LOCKING_MINUTES = 1;
+import { userSettingService } from '../../main/services/UserSettingService';
 
 export async function lockMiddleware(payload: any) {
   try {
-    console.log('Lock middleware');
+    const MAX_LOCKING_MINUTES = userSettingService.get().MULTIUSER_LOCK_TIMEOUT;
 
     const pName = path.basename(payload.path);
     if (payload.mode === ProjectAccessMode.READ_ONLY) return;
@@ -32,7 +31,7 @@ export async function lockMiddleware(payload: any) {
       const timeLocking = Math.floor(timeDifference / (1000 * 60));
 
       //New user trying to access a project blocked by another user
-      if ((projectLock.username !== username || projectLock.hostname !== hostname) && timeLocking <= MAX_LOCKING_MINUTES) {
+      if ((projectLock.username !== username || projectLock.hostname !== hostname) && timeLocking < MAX_LOCKING_MINUTES) {
         payload.mode = ProjectAccessMode.READ_ONLY;
         payload.lockedBy = `${projectLock.username}@${projectLock.hostname}`;
         return;

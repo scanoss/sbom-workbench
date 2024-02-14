@@ -19,6 +19,8 @@ export interface IAppConfig {
   DEFAULT_IP_gRPC: string;
   DEFAULT_PORT_gRPC: number;
 
+  DEFAULT_MULTIUSER_LOCK_TIMEOUT: number;
+
   // feature flags
   FF_ENABLE_COMPONENT_LOGO: boolean;
   FF_ENABLE_WORKBENCH_FILTERS: boolean;
