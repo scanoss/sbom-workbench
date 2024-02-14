@@ -3,16 +3,24 @@ import { modelProvider } from '../../main/services/ModelProvider';
 import { workspace } from '../../main/workspace/Workspace';
 
 export async function unlockMiddleware() {
-  const p = workspace.getOpenedProjects()[0];
-  if (!p) return;
+  try {
+    await modelProvider.workspace.openDb();
 
-  const { username } = os.userInfo();
-  const hostname = os.hostname();
+    const p = workspace.getOpenedProjects()[0];
+    if (!p) return;
 
-  const projectLock = await modelProvider.workspace.lock.get(p.getProjectName(), username, hostname);
+    const { username } = os.userInfo();
+    const hostname = os.hostname();
 
-  // Unlock project only if user has assigned the project
-  if (projectLock) {
-    await modelProvider.workspace.lock.delete(p.getProjectName(), username, hostname);
+    const projectLock = await modelProvider.workspace.lock.get(p.getProjectName(), username, hostname);
+
+    // Unlock project only if user has assigned the project
+    if (projectLock) {
+      await modelProvider.workspace.lock.delete(p.getProjectName(), username, hostname);
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await modelProvider.workspace.destroy();
   }
 }
