@@ -24,7 +24,7 @@ import { AppI18n, AppI18nContext } from '../shared/i18n';
 import '../api/index';
 
 import { broadcastManager } from './broadcastManager/BroadcastManager';
-import { modelProvider } from './services/ModelProvider';
+import AppConfig from '../config/AppConfigModule';
 
 class AppUpdater {
   constructor() {
@@ -61,7 +61,7 @@ const installExtensions = async () => {
   return installer
     .default(
       extensions.map((name) => installer[name]),
-      forceDownload,
+      forceDownload
     )
     .catch(console.log);
 };
@@ -71,9 +71,7 @@ const createWindow = async () => {
     await installExtensions();
   }
 
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets');
+  const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
 
   const getAssetPath = (...paths: string[]): string => path.join(RESOURCES_PATH, ...paths);
 
@@ -85,9 +83,7 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       sandbox: false, // TODO:  remove de access from preload.js, see https://github.com/electron/electron/issues/36437
-      preload: app.isPackaged
-        ? path.join(__dirname, 'preload.js')
-        : path.join(__dirname, '../../.erb/dll/preload.js'),
+      preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
 
@@ -113,13 +109,10 @@ const createWindow = async () => {
   AppI18n.init(AppI18nContext.MAIN);
 
   AppI18n.getI18n().on('languageChanged', async (e) => {
-    const { response } = await dialog.showMessageBox(
-      BrowserWindow.getFocusedWindow(),
-      {
-        buttons: [i18next.t('Button:RestartLater'), i18next.t('Button:RestartNow')],
-        message: i18next.t('Dialog:YouNeedRestartQuestionLanguage'),
-      },
-    );
+    const { response } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
+      buttons: [i18next.t('Button:RestartLater'), i18next.t('Button:RestartNow')],
+      message: i18next.t('Dialog:YouNeedRestartQuestionLanguage'),
+    });
 
     if (response === 1) {
       const options: RelaunchOptions = {
