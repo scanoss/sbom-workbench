@@ -88,6 +88,8 @@ You can disable any SSL errors, to do so you can change this option to true
 
 `"IGNORE_CERT_ERRORS:"true"`
 
+## [Collaborative Workspace](COLLAB_WORKSPACE.md)
+
 ## Contributing
 
 SBOM Workbench is an open source project, and we love to receive contributions from our community. There are many ways to contribute. For more information see the [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
