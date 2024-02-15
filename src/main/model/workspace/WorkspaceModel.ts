@@ -41,7 +41,7 @@ export class WorkspaceModel {
 
   public async openDb(): Promise<sqlite3.Database> {
     await this.destroy();
-    this.connection = await new Connection(this.path);
+    this.connection = new Connection(this.path);
     const db = await this.connection.openDb();
     this.lock.setConnection(db);
     return db;

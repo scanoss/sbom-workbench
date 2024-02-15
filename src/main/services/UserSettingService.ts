@@ -119,9 +119,9 @@ class UserSettingService {
           if (value === null) return undefined;
           return value;
         },
-        2
+        2,
       ),
-      'utf8'
+      'utf8',
     );
   }
 

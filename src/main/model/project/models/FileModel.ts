@@ -1,14 +1,13 @@
 import * as util from 'util';
+import sqlite3 from 'sqlite3';
 import { queries } from '../../querys_db';
 import { InventoryModel } from './InventoryModel';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
-import sqlite3 from 'sqlite3';
 import { Model } from '../../Model';
+
 const { promisify } = require('util');
 
-
-export class FileModel  extends Model {
-
+export class FileModel extends Model {
   private connection: sqlite3.Database;
 
   public static readonly entityMapper = {
@@ -28,12 +27,13 @@ export class FileModel  extends Model {
   }
 
   public async get(queryBuilder: QueryBuilder) {
-    const SQLquery = this.getSQL(queryBuilder,
-                `SELECT f.fileId, f.path,(CASE WHEN f.identified=1 THEN 'IDENTIFIED' WHEN f.identified=0 AND f.ignored=0 THEN 'PENDING' ELSE 'ORIGINAL' END) AS status, f.type FROM files f #FILTER;`,
-                this.getEntityMapper()
-              );
+    const SQLquery = this.getSQL(
+      queryBuilder,
+      'SELECT f.fileId, f.path,(CASE WHEN f.identified=1 THEN \'IDENTIFIED\' WHEN f.identified=0 AND f.ignored=0 THEN \'PENDING\' ELSE \'ORIGINAL\' END) AS status, f.type FROM files f #FILTER;',
+      this.getEntityMapper(),
+    );
     const call = promisify(this.connection.get.bind(this.connection));
-    const file = await call(SQLquery.SQL,...SQLquery.params);
+    const file = await call(SQLquery.SQL, ...SQLquery.params);
     return file;
   }
 
@@ -60,33 +60,36 @@ export class FileModel  extends Model {
   public async insertFiles(data: Array<any>) {
     const call = promisify(this.connection.run.bind(this.connection));
     const promises = [];
-    for(let i=0; i< data.length ; i+=1) {
+    for (let i = 0; i < data.length; i += 1) {
       promises.push(call('INSERT INTO FILES(path,type) VALUES(?,?)', data[i].path, data[i].type));
     }
     await Promise.all(promises);
   }
 
   public async setDirty(dirty: number, path?: string) {
-  const call = promisify(this.connection.run.bind(this.connection));
-  const SQLquery = path !== undefined ? `UPDATE files SET dirty=${dirty} WHERE path IN (${path});` : `UPDATE files SET dirty=${dirty};`;
-  await call(SQLquery);
+    const call = promisify(this.connection.run.bind(this.connection));
+    const SQLquery = path !== undefined ? `UPDATE files SET dirty=${dirty} WHERE path IN (${path});` : `UPDATE files SET dirty=${dirty};`;
+    await call(SQLquery);
   }
 
   public async getDirty() {
     const call = promisify(this.connection.all.bind(this.connection));
-    const dirtyFiles = await call(`SELECT fileId AS id FROM files WHERE dirty=1;`);
+    const dirtyFiles = await call('SELECT fileId AS id FROM files WHERE dirty=1;');
     if (dirtyFiles) return dirtyFiles.map((item: any) => item.id);
     return [];
   }
+
   public async deleteDirty() {
     const call = promisify(this.connection.run.bind(this.connection));
-    await call(`DELETE FROM files WHERE dirty=1;`);
+    await call('DELETE FROM files WHERE dirty=1;');
   }
+
   public async getClean() {
     const call = promisify(this.connection.all.bind(this.connection));
     const files = await call('SELECT * FROM files WHERE dirty=0;');
     return files;
   }
+
   public async getFilesRescan() {
     const call = promisify(this.connection.all.bind(this.connection));
     const files = await call('SELECT f.path,f.identified ,f.ignored ,f.type AS original,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending FROM files f;');
@@ -106,10 +109,11 @@ export class FileModel  extends Model {
     const sql = queries.SQL_FILES_UPDATE_IDENTIFIED + resultsid;
     await call(sql);
   }
+
   public async updateFileType(fileIds: number[], fileType: string) {
     const call = promisify(this.connection.run.bind(this.connection));
     const sql = `UPDATE files SET type=? WHERE fileId IN (${fileIds.toString()});`;
-    await call(sql,fileType);
+    await call(sql, fileType);
   }
 
   public async getSummary() {

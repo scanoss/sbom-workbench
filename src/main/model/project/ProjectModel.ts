@@ -1,3 +1,5 @@
+import util from 'util';
+import sqlite3 from 'sqlite3';
 import { ComponentModel } from './models/ComponentModel';
 import { FileModel } from './models/FileModel';
 import { InventoryModel } from './models/InventoryModel';
@@ -6,15 +8,12 @@ import { ResultModel } from './models/ResultModel';
 import { DependencyModel } from './models/DependencyModel';
 import { VulnerabilityModel } from './models/VulnerabilityModel';
 import { CryptographyModel } from './models/CryptographyModel';
-import util from 'util';
 import { queries } from '../querys_db';
-import sqlite3 from 'sqlite3';
 import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 import { Connection } from '../Connection';
 
 export class ProjectModel {
-
-  private connection: sqlite3.Database;
+  private connection: Connection;
 
   private readonly path: string;
 
@@ -50,9 +49,9 @@ export class ProjectModel {
     this.cryptography = null;
   }
 
-
   private async createViews(): Promise<void> {
-    const call = util.promisify(this.connection.run.bind(this.connection));
+    const db = await this.connection.openDb();
+    const call = util.promisify(db.run.bind(db));
     await call('CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url,source,reliableLicense) AS SELECT DISTINCT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url,comp.source,comp.reliableLicense FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;');
     await call('CREATE VIEW IF NOT EXISTS license_view (cvid,name,spdxid,url,license_id) AS SELECT lcv.cvid,lic.name,lic.spdxid,lic.url,lic.id FROM license_component_version AS lcv LEFT JOIN licenses AS lic ON lcv.licid=lic.id;');
     await call(`
@@ -67,40 +66,41 @@ export class ProjectModel {
   }
 
   private async createProjectDb() {
-    const call = util.promisify(this.connection.exec.bind(this.connection));
+    const db = await this.connection.openDb();
+    const call = util.promisify(db.exec.bind(db));
     await call(queries.SQL_DB_TABLES);
     await this.createViews();
   }
 
-  private initProjectModels() {
-    this.file = new FileModel(this.connection);
-    this.inventory = new InventoryModel(this.connection);
-    this.result = new ResultModel(this.connection);
-    this.license = new LicenseModel(this.connection);
-    this.component = new ComponentModel(this.connection);
-    this.dependency = new DependencyModel(this.connection);
-    this.vulnerability = new VulnerabilityModel(this.connection);
-    this.cryptography = new CryptographyModel(this.connection);
+  private async initProjectModels(db: sqlite3.Database) {
+    this.file = new FileModel(db);
+    this.inventory = new InventoryModel(db);
+    this.result = new ResultModel(db);
+    this.license = new LicenseModel(db);
+    this.component = new ComponentModel(db);
+    this.dependency = new DependencyModel(db);
+    this.vulnerability = new VulnerabilityModel(db);
+    this.cryptography = new CryptographyModel(db);
   }
 
-
-  public async init(): Promise<void>{
+  public async init(mode: number): Promise<void> {
     try {
-      const conn = new Connection(this.path);
-      this.connection = await conn.createDB();
+      this.connection = new Connection(this.path);
+      await this.connection.createDB();
       await this.createProjectDb();
-      this.initProjectModels();
+      const db = await this.connection.openDb(mode);
+      await this.initProjectModels(db);
     } catch (error: any) {
       console.log(error);
       return error;
     }
   }
 
-  public getEntityMapper():Record<string,string>{
+  public getEntityMapper():Record<string, string> {
     return ProjectModel.entityMapper;
   }
 
-  public getSQL(queryBuilder:QueryBuilder , SQLquery:string, entityMapper:Record<string,string>){
+  public getSQL(queryBuilder:QueryBuilder, SQLquery:string, entityMapper:Record<string, string>) {
     let SQL = SQLquery;
     const filter = queryBuilder?.getSQL(entityMapper)
       ? `WHERE ${queryBuilder.getSQL(entityMapper).toString()}`
@@ -110,10 +110,8 @@ export class ProjectModel {
     return { SQL, params };
   }
 
-  public destroy(){
+  public destroy() {
     this.connection.close();
     this.connection = null;
   }
-
-
 }
