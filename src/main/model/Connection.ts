@@ -12,7 +12,7 @@ export class Connection {
     this.dbPath = path;
   }
 
-  public createDB() {
+  public createDB(): Promise<sqlite3.Database> {
     return new Promise<sqlite3.Database>((resolve, reject) => {
       const db = new sqlite3.Database(this.dbPath, (err: any) => {
         if (err) {
@@ -25,9 +25,9 @@ export class Connection {
     });
   }
 
-  public async openDb() {
+  public async openDb(mode: number = sqlite3.OPEN_READWRITE): Promise<sqlite3.Database> {
     return new Promise<sqlite3.Database>((resolve, reject) => {
-      const db = new sqlite3.Database(this.dbPath, sqlite3.OPEN_READWRITE, (err: any) => {
+      const db = new sqlite3.Database(this.dbPath, mode, (err: any) => {
         if (err) {
           log.error(err);
           reject(err);

@@ -1,8 +1,8 @@
-import { modelProvider } from '../../main/services/ModelProvider';
-import { ProjectAccessMode } from '../types';
 import log from 'electron-log';
 import os from 'os';
 import path from 'path';
+import { ProjectAccessMode } from '../types';
+import { modelProvider } from '../../main/services/ModelProvider';
 import { userSettingService } from '../../main/services/UserSettingService';
 
 export async function lockMiddleware(payload: any) {
@@ -32,7 +32,7 @@ export async function lockMiddleware(payload: any) {
       // Convert the time difference to minutes
       const timeLocking = Math.floor(timeDifference / (1000 * 60));
 
-      //New user trying to access a project blocked by another user
+      // New user trying to access a project blocked by another user
       if ((projectLock.username !== username || projectLock.hostname !== hostname) && timeLocking < MAX_LOCKING_MINUTES) {
         payload.mode = ProjectAccessMode.READ_ONLY;
         payload.lockedBy = `${projectLock.username}@${projectLock.hostname}`;

@@ -1,4 +1,5 @@
 import log from 'electron-log';
+import sqlite3 from 'sqlite3';
 import {
   ExtractFromProjectDTO,
   FileTreeViewMode,
@@ -21,9 +22,12 @@ import { dependencyService } from '../../main/services/DependencyService';
 import { searcher } from '../../main/modules/searchEngine/searcher/Searcher';
 import { projectService } from '../../main/services/ProjectService';
 import api from '../api';
+import { modelProvider } from '../../main/services/ModelProvider';
 
 api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, payload: any) => {
   // TODO: factory to create filters depending on arguments
+  modelProvider.openModeProjectModel = payload.mode === ProjectAccessMode.WRITE ? sqlite3.OPEN_READWRITE : sqlite3.OPEN_READONLY;
+
   const p: Project = await workspace.openProject(new ProjectFilterPath(payload.path));
   searcher.closeIndex();
   // await projectService.lockProject(p.getProjectName(), mode);

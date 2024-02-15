@@ -1,7 +1,10 @@
+/* eslint-disable no-bitwise */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as fs from 'fs';
 import log from 'electron-log';
 import os from 'os';
+import { BrowserWindow, dialog } from 'electron';
+import i18next from 'i18next';
 import AppConfig from '../../config/AppConfigModule';
 import { Project } from './Project';
 import {
@@ -12,9 +15,6 @@ import { ProjectFilter } from './filters/ProjectFilter';
 import { userSettingService } from '../services/UserSettingService';
 import { AppMigration } from '../migration/AppMigration';
 import { modelProvider } from '../services/ModelProvider';
-import { BrowserWindow, dialog } from 'electron';
-import i18next from 'i18next';
-
 
 class Workspace {
   private projectList: Array<Project>;
@@ -57,8 +57,6 @@ class Workspace {
     this.projectList = projectsReaded.map(
       (p) => (p as PromiseFulfilledResult<Project>).value,
     );
-
-
   }
 
   public getProjectsDtos(): Array<IProject> {
@@ -165,8 +163,10 @@ class Workspace {
 
   private async initWorkspaceFileSystem() {
     try {
+      await fs.promises.access(this.getMyPath(), fs.constants.R_OK | fs.constants.W_OK | fs.constants.X_OK);
+
       if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
-    } catch(e: any) {
+    } catch (e: any) {
       log.error(e);
 
       const { response } = await dialog.showMessageBox(
@@ -174,7 +174,7 @@ class Workspace {
         {
           buttons: ['Try again', 'Switch to default workspace'],
           message: 'Could not access the selected folder for the workspace. What would you like to do?',
-          title: 'Workspace Folder Access Error'
+          title: 'Workspace Folder Access Error',
         },
       );
 
@@ -186,7 +186,7 @@ class Workspace {
         workspaces[0] = userSettingService.getDefault().WORKSPACES[0];
 
         // Set default workspace if selected workspace cannot be created
-        userSettingService.set({ WORKSPACES: workspaces, DEFAULT_WORKSPACE_INDEX: 0 } );
+        userSettingService.set({ WORKSPACES: workspaces, DEFAULT_WORKSPACE_INDEX: 0 });
         await userSettingService.save();
 
         // Set the default workspace path
@@ -240,11 +240,11 @@ class Workspace {
     return null;
   }
 
-  public getProjects(){
+  public getProjects() {
     return this.projectList;
   }
 
-  public setProjectList(projects: Array<Project>){
+  public setProjectList(projects: Array<Project>) {
     this.projectList = projects;
   }
 
