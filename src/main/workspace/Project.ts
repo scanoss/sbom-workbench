@@ -117,7 +117,7 @@ export class Project {
       '%c[ PROJECT ]: Closing Database',
       'color: green',
     );
-    modelProvider.model.destroy();
+    await modelProvider.model.destroy();
     this.state = ProjectState.CLOSED;
     this.scanner = null;
     this.logical_tree = null;
