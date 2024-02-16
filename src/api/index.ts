@@ -87,7 +87,6 @@ api.use(IpcChannels.PROJECT_CURRENT_CLOSE, () => unlockMiddleware());
 [
   IpcChannels.UTILS_GET_PROJECT_DTO,
   IpcChannels.UTILS_GET_NODE_FROM_PATH,
-  IpcChannels.GET_LICENSES,
   IpcChannels.INVENTORY_GET,
   IpcChannels.INVENTORY_GET_ALL,
   IpcChannels.INVENTORY_GET_ALL_BY_FILE,
