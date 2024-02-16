@@ -26,8 +26,10 @@ async function restartApp() {
     });
 
     if (response === 0) {
+      // Close all projects and workspace database before restarting the app 
+      await workspace.closeAllProjects();
       await modelProvider.workspace.destroy();
-      await modelProvider.model.destroy();
+
       // Set default workspace on accept
       userSettingService.set({ DEFAULT_WORKSPACE_INDEX: 0 });
       await userSettingService.save();
