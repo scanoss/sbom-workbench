@@ -4,6 +4,7 @@ import fs from 'fs';
 import os from 'os';
 import { userSettingService } from '../../main/services/UserSettingService';
 import { workspace } from '../../main/workspace/Workspace';
+import { modelProvider } from '../../main/services/ModelProvider';
 
 export async function wsPermissionsMiddleware() {
   try {
@@ -24,6 +25,8 @@ async function restartApp() {
   );
 
   if (response === 0) {
+    await modelProvider.workspace.destroy();
+    await modelProvider.model.destroy();
     // Set default workspace on accept
     userSettingService.set({ DEFAULT_WORKSPACE_INDEX: 0 });
     await userSettingService.save();

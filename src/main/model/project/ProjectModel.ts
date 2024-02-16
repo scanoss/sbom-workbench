@@ -110,8 +110,8 @@ export class ProjectModel {
     return { SQL, params };
   }
 
-  public destroy() {
-    this.connection.close();
+  public async destroy() {
+    if (this.connection) await this.connection.close();
     this.connection = null;
   }
 }
