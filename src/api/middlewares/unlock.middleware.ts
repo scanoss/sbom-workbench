@@ -20,6 +20,7 @@ export async function unlockMiddleware() {
     }
   } catch (e) {
     console.error(e);
+    throw e;
   } finally {
     await modelProvider.workspace.destroy();
   }

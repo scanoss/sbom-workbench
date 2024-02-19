@@ -34,7 +34,9 @@ api.handle(IpcChannels.INVENTORY_GET, async (_event, param: Partial<Inventory>) 
 api.handle(IpcChannels.INVENTORY_CREATE, async (event, param: Inventory) => {
   try {
     const inventory = await inventoryService.create(param);
-    treeService.updateTree(param.files, NodeStatus.IDENTIFIED);
+    treeService.updateTree(param.files, NodeStatus.IDENTIFIED).catch((e) => {
+      console.log('Error updating tree: ', e);
+    });
     return Response.ok({ message: 'Inventory Create', data: inventory });
   } catch (error: any) {
     log.error('[ INVENTORY CREATE ]: ', error, param);

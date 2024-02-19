@@ -52,8 +52,12 @@ export class ProjectModel {
   private async createViews(): Promise<void> {
     const db = await this.connection.openDb();
     const call = util.promisify(db.run.bind(db));
-    await call('CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url,source,reliableLicense) AS SELECT DISTINCT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url,comp.source,comp.reliableLicense FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;');
-    await call('CREATE VIEW IF NOT EXISTS license_view (cvid,name,spdxid,url,license_id) AS SELECT lcv.cvid,lic.name,lic.spdxid,lic.url,lic.id FROM license_component_version AS lcv LEFT JOIN licenses AS lic ON lcv.licid=lic.id;');
+    await call(
+      'CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url,source,reliableLicense) AS SELECT DISTINCT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url,comp.source,comp.reliableLicense FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;'
+    );
+    await call(
+      'CREATE VIEW IF NOT EXISTS license_view (cvid,name,spdxid,url,license_id) AS SELECT lcv.cvid,lic.name,lic.spdxid,lic.url,lic.id FROM license_component_version AS lcv LEFT JOIN licenses AS lic ON lcv.licid=lic.id;'
+    );
     await call(`
           CREATE VIEW IF NOT EXISTS summary AS SELECT cv.id AS compid,cv.purl,cv.version,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
           SUM(f.identified=0 AND f.ignored=0) AS pending
@@ -92,19 +96,17 @@ export class ProjectModel {
       await this.initProjectModels(db);
     } catch (error: any) {
       console.log(error);
-      return error;
+      throw error;
     }
   }
 
-  public getEntityMapper():Record<string, string> {
+  public getEntityMapper(): Record<string, string> {
     return ProjectModel.entityMapper;
   }
 
-  public getSQL(queryBuilder:QueryBuilder, SQLquery:string, entityMapper:Record<string, string>) {
+  public getSQL(queryBuilder: QueryBuilder, SQLquery: string, entityMapper: Record<string, string>) {
     let SQL = SQLquery;
-    const filter = queryBuilder?.getSQL(entityMapper)
-      ? `WHERE ${queryBuilder.getSQL(entityMapper).toString()}`
-      : '';
+    const filter = queryBuilder?.getSQL(entityMapper) ? `WHERE ${queryBuilder.getSQL(entityMapper).toString()}` : '';
     const params = queryBuilder?.getFilters() ? queryBuilder.getFilters() : [];
     SQL = SQLquery.replace('#FILTER', filter);
     return { SQL, params };

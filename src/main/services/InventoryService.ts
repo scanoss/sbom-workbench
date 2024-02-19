@@ -16,7 +16,7 @@ class InventoryService {
       inventory.files = files;
       return inventory;
     } catch (err: any) {
-      return err;
+      throw err;
     }
   }
 
@@ -31,7 +31,7 @@ class InventoryService {
       }
       return true;
     } catch (err: any) {
-      return err;
+      throw err;
     }
   }
 
@@ -40,7 +40,7 @@ class InventoryService {
       const success: boolean = await modelProvider.model.inventory.delete(inv);
       return success;
     } catch (err: any) {
-      return err;
+      throw err;
     }
   }
 
@@ -49,7 +49,7 @@ class InventoryService {
       const inv: Partial<Inventory> = await modelProvider.model.inventory.isInventory(inventory);
       return inv;
     } catch (err: any) {
-      return err;
+      throw err;
     }
   }
 
@@ -79,7 +79,7 @@ class InventoryService {
       return newInventories;
     } catch (error: any) {
       log.error(error);
-      return error;
+      throw error;
     }
   }
 
@@ -114,7 +114,7 @@ class InventoryService {
       return [];
     } catch (error: any) {
       log.error(error);
-      return error;
+      throw error;
     }
   }
 
@@ -124,14 +124,11 @@ class InventoryService {
       const success: boolean = await modelProvider.model.inventory.attachFileInventory(inv);
       return success;
     } catch (err: any) {
-      return err;
+      throw err;
     }
   }
 
-  public async preLoadInventoriesAcceptAll(
-    data: Partial<IBatchInventory>,
-    filter: IWorkbenchFilter,
-  ): Promise<Array<Partial<Inventory>>> {
+  public async preLoadInventoriesAcceptAll(data: Partial<IBatchInventory>, filter: IWorkbenchFilter): Promise<Array<Partial<Inventory>>> {
     try {
       let queryBuilder = null;
       if (data.overwrite) queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.source.input });
@@ -151,7 +148,9 @@ class InventoryService {
           };
           aux.spdxid.push(curr.spdxid);
           acc[curr.id] = aux;
-        } else { acc[curr.id].spdxid.push(curr.spdxid); }
+        } else {
+          acc[curr.id].spdxid.push(curr.spdxid);
+        }
         return acc;
       }, {});
       const components: any = await modelProvider.model.component.getAll(queryBuilder);
@@ -159,7 +158,7 @@ class InventoryService {
       inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);
       return inventories;
     } catch (err: any) {
-      return err;
+      throw err;
     }
   }
 
@@ -205,7 +204,7 @@ class InventoryService {
     }
   }
 
-  public async getAllByFile(path:string): Promise<Array<InventoryFileDTO>> {
+  public async getAllByFile(path: string): Promise<Array<InventoryFileDTO>> {
     const inventories = await this.getAll({ files: [path] });
     const response = [];
     for (let i = 0; i < inventories.length; i += 1) {

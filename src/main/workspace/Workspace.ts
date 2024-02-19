@@ -2,18 +2,12 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as fs from 'fs';
 import log from 'electron-log';
-import os from 'os';
-import { BrowserWindow, dialog } from 'electron';
-import i18next from 'i18next';
-import AppConfig from '../../config/AppConfigModule';
+import { dialog } from 'electron';
 import { Project } from './Project';
-import {
-  INewProject, IProject, License, ProjectState,
-} from '../../api/types';
+import { INewProject, IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../../../assets/data/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
 import { userSettingService } from '../services/UserSettingService';
-import { AppMigration } from '../migration/AppMigration';
 import { modelProvider } from '../services/ModelProvider';
 
 class Workspace {
@@ -35,28 +29,20 @@ class Workspace {
     // if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes
     log.info('%c[ WORKSPACE ]: Reading projects....', 'color: green');
     const projectPaths = await this.getAllProjectsPaths();
-    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) => Project.readFromPath(projectPath)
-      .then((p) => {
-        log.info(
-          `%c[ WORKSPACE ]: Successfully read project ${projectPath}`,
-          'color: green',
-        );
-        return p;
-      })
-      .catch((e) => {
-        log.info(
-          `%c[ WORKSPACE ]: Cannot read project ${projectPath}`,
-          'color: green',
-        );
-        throw e;
-      }));
-    let projectsReaded = (await Promise.allSettled(
-      projectArray,
-    )) as PromiseSettledResult<Project>[];
-    projectsReaded = projectsReaded.filter((p) => p.status === 'fulfilled');
-    this.projectList = projectsReaded.map(
-      (p) => (p as PromiseFulfilledResult<Project>).value,
+    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) =>
+      Project.readFromPath(projectPath)
+        .then((p) => {
+          log.info(`%c[ WORKSPACE ]: Successfully read project ${projectPath}`, 'color: green');
+          return p;
+        })
+        .catch((e) => {
+          log.info(`%c[ WORKSPACE ]: Cannot read project ${projectPath}`, 'color: green');
+          throw e;
+        })
     );
+    let projectsReaded = (await Promise.allSettled(projectArray)) as PromiseSettledResult<Project>[];
+    projectsReaded = projectsReaded.filter((p) => p.status === 'fulfilled');
+    this.projectList = projectsReaded.map((p) => (p as PromiseFulfilledResult<Project>).value);
   }
 
   public getProjectsDtos(): Array<IProject> {
@@ -84,13 +70,10 @@ class Workspace {
   }
 
   public async removeProject(p: Project) {
-    log.info(
-      `%c[ WORKSPACE ]: Removing project ${p.getProjectName()}`,
-      'color: green',
-    );
+    log.info(`%c[ WORKSPACE ]: Removing project ${p.getProjectName()}`, 'color: green');
     for (let i = 0; i < this.projectList.length; i += 1) {
       if (this.projectList[i].getProjectName() === p.getProjectName()) {
-      // eslint-disable-next-line no-await-in-loop
+        // eslint-disable-next-line no-await-in-loop
         await fs.promises.rm(this.projectList[i].getMyPath(), {
           recursive: true,
         });
@@ -117,10 +100,7 @@ class Workspace {
 
     // eslint-disable-next-line no-restricted-syntax
     const p: Project = this.getProject(filter);
-    log.info(
-      `%c[ WORKSPACE ]: Opening project ${filter.getParam()}`,
-      'color: green',
-    );
+    log.info(`%c[ WORKSPACE ]: Opening project ${filter.getParam()}`, 'color: green');
     await p.upgrade();
     await p.open();
     return p;
@@ -138,16 +118,10 @@ class Workspace {
 
   public async addProject(p: Project) {
     if (this.existProject(p.getProjectName())) {
-      log.info(
-        '%c[ WORKSPACE ]: Project already exist and will be replaced',
-        'color: green',
-      );
+      log.info('%c[ WORKSPACE ]: Project already exist and will be replaced', 'color: green');
       await this.removeProject(p);
     }
-    log.info(
-      `%c[ WORKSPACE ]: Adding project ${p.getProjectName()} to workspace`,
-      'color: green',
-    );
+    log.info(`%c[ WORKSPACE ]: Adding project ${p.getProjectName()} to workspace`, 'color: green');
     const pDirectory = `${this.wsPath}/${p.getProjectName()}`;
 
     if (!fs.existsSync(`${pDirectory}`)) await fs.promises.mkdir(pDirectory);
@@ -163,20 +137,16 @@ class Workspace {
 
   private async initWorkspaceFileSystem() {
     try {
-      await fs.promises.access(this.getMyPath(), fs.constants.R_OK | fs.constants.W_OK | fs.constants.X_OK);
-
       if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
+      await fs.promises.access(this.getMyPath(), fs.constants.R_OK | fs.constants.W_OK | fs.constants.X_OK);
     } catch (e: any) {
       log.error(e);
 
-      const { response } = await dialog.showMessageBox(
-        null,
-        {
-          buttons: ['Try again', 'Switch to default workspace'],
-          message: 'Could not access the selected folder for the workspace. What would you like to do?',
-          title: 'Workspace Folder Access Error',
-        },
-      );
+      const { response } = await dialog.showMessageBox(null, {
+        buttons: ['Try again', 'Switch to default workspace'],
+        message: 'Could not access the selected folder for the workspace. What would you like to do?',
+        title: 'Workspace Folder Access Error',
+      });
 
       if (response === 1) {
         const settings = userSettingService.get();
@@ -198,20 +168,13 @@ class Workspace {
   }
 
   private async getAllProjectsPaths() {
-    const workspaceStuff = await fs.promises
-      .readdir(this.wsPath, { withFileTypes: true })
-      .catch((e) => {
-        log.info(
-          `%c[ WORKSPACE ]: Cannot read the workspace directory ${this.wsPath}`,
-          'color: green',
-        );
-        log.error(e);
-        throw e;
-      });
+    const workspaceStuff = await fs.promises.readdir(this.wsPath, { withFileTypes: true }).catch((e) => {
+      log.info(`%c[ WORKSPACE ]: Cannot read the workspace directory ${this.wsPath}`, 'color: green');
+      log.error(e);
+      throw e;
+    });
     const projectsDirEnt = workspaceStuff.filter((dirent) => !dirent.isSymbolicLink() && !dirent.isFile());
-    const projectPaths = projectsDirEnt.map(
-      (dirent) => `${this.wsPath}/${dirent.name}`,
-    );
+    const projectPaths = projectsDirEnt.map((dirent) => `${this.wsPath}/${dirent.name}`);
     return projectPaths;
   }
 

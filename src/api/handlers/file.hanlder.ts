@@ -71,9 +71,9 @@ api.handle(IpcChannels.FILE_GET_CONTENT, async (_event, filePath: string) => {
       message: 'File content retrieved',
       data: fileContent,
     };
-  } catch (e) {
-    console.log('Error on file get content: ', e);
-    return { status: 'fail' };
+  } catch (error: any) {
+    console.log('Error on file get content: ', error);
+    return Response.fail({ message: error.message });
   }
 });
 

@@ -21,8 +21,6 @@ import { lockMiddleware } from './middlewares/lock.middleware';
 import { unlockMiddleware } from './middlewares/unlock.middleware';
 import { refreshMiddleware } from './middlewares/refresh.middleware';
 import { projectOpenPermissionsMiddleware } from './middlewares/project.open.permissions.middleware';
-import { projectPermissionsMiddleware } from './middlewares/project.permissions.middleware';
-import { wsPermissionsMiddleware } from './middlewares/ws.permissions.middleware';
 
 // Example how to use a middleware
 // api.use(IpcChannels.PROJECT_OPEN_SCAN, (_, payload) => permissionsMiddleware(payload));
@@ -30,27 +28,18 @@ import { wsPermissionsMiddleware } from './middlewares/ws.permissions.middleware
 
 // Disclaimer: Payload must be an object in order to modify the data on the middleware
 /* eslint-disable */
-[
-  IpcChannels.PROJECT_OPEN_SCAN, 
-  IpcChannels.PROJECT_RESUME_SCAN, 
-  IpcChannels.PROJECT_RESCAN
-].forEach((c) => {
-    api.use(c, () => wsPermissionsMiddleware());
-    api.use(c,(_, payload) => projectOpenPermissionsMiddleware(payload));
-    api.use(c, () => unlockMiddleware());
-    api.use(c, (_, payload) => lockMiddleware(payload));
-  
-  });
+[IpcChannels.PROJECT_OPEN_SCAN, IpcChannels.PROJECT_RESUME_SCAN, IpcChannels.PROJECT_RESCAN].forEach((c) => {
+  api.use(c, (_, payload) => projectOpenPermissionsMiddleware(payload));
+  api.use(c, () => unlockMiddleware());
+  api.use(c, (_, payload) => lockMiddleware(payload));
+});
 
-api.use(IpcChannels.PROJECT_CREATE, () => wsPermissionsMiddleware());
 api.use(IpcChannels.PROJECT_CREATE, (_, payload) => lockMiddleware({ path: payload.name }));
 
 api.use(IpcChannels.PROJECT_CURRENT_CLOSE, () => unlockMiddleware());
 
 /* eslint-disable */
 [
-  IpcChannels.COMPONENT_CREATE,
-  IpcChannels.COMPONENT_DELETE,
   IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE,
   IpcChannels.PROJECT_ACCEPT_INVENTORY_KNOWLEDGE,
   IpcChannels.INVENTORY_CREATE,
@@ -77,32 +66,6 @@ api.use(IpcChannels.PROJECT_CURRENT_CLOSE, () => unlockMiddleware());
   IpcChannels.DEPENDENCY_REJECT_ALL,
   IpcChannels.VULNERABILITY_UPDATE,
 ].forEach((c) => {
-  api.use(c, () => wsPermissionsMiddleware());
-  api.use(c, () => projectPermissionsMiddleware(fs.constants.W_OK | fs.constants.X_OK));
   api.use(c, () => accessMiddleware());
   api.use(c, () => refreshMiddleware());
 });
-
-
-[
-  IpcChannels.UTILS_GET_PROJECT_DTO,
-  IpcChannels.UTILS_GET_NODE_FROM_PATH,
-  IpcChannels.INVENTORY_GET,
-  IpcChannels.INVENTORY_GET_ALL,
-  IpcChannels.INVENTORY_GET_ALL_BY_FILE,
-  IpcChannels.COMPONENT_GET_FILES,
-  IpcChannels.COMPONENT_GET_ALL,
-  IpcChannels.COMPONENT_GET,
-  IpcChannels.COMPONENT_GET_GLOBAL_COMPONENTS,
-  IpcChannels.COMPONENT_GET_GLOBAL_COMPONENT_VERSION,
-  IpcChannels.LICENSE_GET,
-  IpcChannels.LICENSE_GET_ALL,
-  IpcChannels.FILE_GET_CONTENT,
-  IpcChannels.FILE_GET,
-  IpcChannels.RESULTS_GET,
-  IpcChannels.DEPENDENCY_GET_ALL,
-  IpcChannels.VULNERABILITY_GET_ALL,
-].forEach((c) => {
-  api.use(c, () => wsPermissionsMiddleware());
-  api.use(c, () => projectPermissionsMiddleware(fs.constants.R_OK));
- });
