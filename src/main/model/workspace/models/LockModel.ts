@@ -1,5 +1,6 @@
 import sqlite3 from 'sqlite3';
 import util from 'util';
+import os from 'os';
 
 export interface Lock {
   project: string;
@@ -22,12 +23,13 @@ export class LockModel {
 
   public async get(projectPath: string, username: string, hostname: string): Promise<Lock> {
     const call: any = util.promisify(this.connection.get.bind(this.connection));
-    return await call(
+    const lockedProject = await call(
       'SELECT l.project, l.username, l.hostname, l.createdAt , l.updatedAt FROM lock as l WHERE l.project = ? AND l.username = ? AND l.hostname = ?;',
       projectPath,
       username,
-      hostname
+      hostname,
     ); // filter by projectName
+    return lockedProject;
   }
 
   public async delete(projectPath: string, username: string, hostname: string): Promise<Lock> {
@@ -51,7 +53,7 @@ export class LockModel {
       data.username,
       data.hostname,
       new Date().toISOString(),
-      new Date().toISOString()
+      new Date().toISOString(),
     );
     return this.get(data.projectPath, data.username, data.hostname);
   }
@@ -64,7 +66,7 @@ export class LockModel {
       data.hostname,
       data.createdAt,
       data.updatedAt,
-      data.projectPath
+      data.projectPath,
     );
     return this.get(data.projectPath, data.username, data.hostname);
   }
@@ -73,5 +75,12 @@ export class LockModel {
     const call: any = util.promisify(this.connection.get.bind(this.connection));
     await call('UPDATE lock SET  updatedAt=? WHERE project = ?;', new Date().toISOString(), data.projectPath);
     return this.getByProjectPath(data.projectPath);
+  }
+
+  public async releaseProjects() {
+    const { username } = os.userInfo();
+    const hostname = os.hostname();
+    const call: any = util.promisify(this.connection.run.bind(this.connection));
+    await call('DELETE FROM lock WHERE username=? AND hostname=?', username, hostname);
   }
 }
