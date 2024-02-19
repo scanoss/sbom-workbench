@@ -43,7 +43,7 @@ export abstract class Batch {
       if (this.params.source.type === InventorySourceType.PATH) {
         const aux = await this.getFilesInFolder(builder);
         const uniqueIds = new Set<number>();
-        const files = aux.filter(element => {
+        const files = aux.filter((element) => {
           const isDuplicate = uniqueIds.has(element.id);
           if (!isDuplicate) {
             uniqueIds.add(element.id);
@@ -58,7 +58,8 @@ export abstract class Batch {
       // If not Overwrite, keep ignored and identified files
       return files.filter((f) => this.overWrite || (!f.ignored && !f.identified)).map((f) => f.id);
     } catch (e: any) {
-      return e;
+      console.log(e);
+      throw e;
     }
   }
 

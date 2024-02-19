@@ -32,8 +32,8 @@ api.handle(IpcChannels.REPORT_DETECTED, async (event, arg: string) => {
       message: 'detected report successfully retrieved',
       data,
     };
-  } catch (e) {
-    log.error('[REPORT DETECTED]: ', e);
-    return { status: 'fail' };
+  } catch (error: any) {
+    log.error('[REPORT DETECTED]: ', error);
+    return Response.fail({ message: error.message });
   }
 });

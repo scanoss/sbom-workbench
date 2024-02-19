@@ -44,6 +44,7 @@ export async function lockMiddleware(payload: any) {
     }
   } catch (e: any) {
     console.error(e);
+    throw e;
   } finally {
     await modelProvider.workspace.destroy();
   }

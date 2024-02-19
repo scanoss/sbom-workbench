@@ -39,7 +39,8 @@ export class Identified extends Batch {
       let success = null;
       const ids = (await this.getFilesToProcess(this.queryBuilder, 'id')) as Array<number>;
 
-      if (this.inventory.usage === null) { // usage should be only null when pending files will be identified
+      if (this.inventory.usage === null) {
+        // usage should be only null when pending files will be identified
         const results = await modelProvider.model.result.getAll(QueryBuilderCreator.create({ fileId: ids }));
         const inventories = getInventoriesGroupedByUsage(this.inventory, getUniqueResults(results));
         for (let i = 0; i < inventories.length; i += 1) {
@@ -53,7 +54,7 @@ export class Identified extends Batch {
       if (success) return success;
       throw new Error('[ INVENTORY FOLDER] error on identified files service');
     } catch (error: any) {
-      return error;
+      throw error;
     }
   }
 }

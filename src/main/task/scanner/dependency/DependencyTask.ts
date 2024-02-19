@@ -16,7 +16,7 @@ export class DependencyTask implements Scanner.IPipelineTask {
     this.project = project;
   }
 
-  public getStageProperties():Scanner.StageProperties {
+  public getStageProperties(): Scanner.StageProperties {
     return {
       name: ScannerStage.DEPENDENCY,
       label: i18next.t('Title:AnalyzingDependencies'),
@@ -24,7 +24,7 @@ export class DependencyTask implements Scanner.IPipelineTask {
     };
   }
 
-  public async run():Promise<boolean> {
+  public async run(): Promise<boolean> {
     log.info('[ DependencyTask init ]');
     await this.scanDependencies();
     await this.addDependencies();
@@ -53,27 +53,21 @@ export class DependencyTask implements Scanner.IPipelineTask {
       dependencies.filesList.forEach((f) => {
         f.file = f.file.replace(rootPath, '');
       });
-      await fs.promises.writeFile(
-        `${this.project.metadata.getMyPath()}/dependencies.json`,
-        JSON.stringify(dependencies, null, 2),
-      );
+      await fs.promises.writeFile(`${this.project.metadata.getMyPath()}/dependencies.json`, JSON.stringify(dependencies, null, 2));
     } catch (e) {
       log.error(e);
+      throw e;
     }
   }
 
   private async addDependencies(): Promise<void> {
     try {
-      const dependencies = JSON.parse(
-        await fs.promises.readFile(
-          `${this.project.metadata.getMyPath()}/dependencies.json`,
-          'utf8',
-        ),
-      );
+      const dependencies = JSON.parse(await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8'));
       this.project.tree.addDependencies(dependencies);
       await dependencyService.insert(dependencies);
     } catch (e) {
       log.error(e);
+      throw e;
     }
   }
 }

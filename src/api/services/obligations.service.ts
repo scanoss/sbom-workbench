@@ -33,9 +33,7 @@ class ObligationsService extends BaseService {
       label: key,
       ...obligations[key],
       copyleft: obligations[key].copyleft === 'yes',
-      incompatibles: obligations[key].incompatible_with
-        ? obligations[key].incompatible_with?.replace(/\s/g, '').split(',')
-        : [],
+      incompatibles: obligations[key].incompatible_with ? obligations[key].incompatible_with?.replace(/\s/g, '').split(',') : [],
     }))[0];
   }
 }

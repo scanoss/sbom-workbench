@@ -9,6 +9,7 @@ export async function refreshMiddleware() {
     const lock = await modelProvider.workspace.lock.updateTimer({ projectPath: p.metadata.getName() });
   } catch (e) {
     console.error(e);
+    throw e;
   } finally {
     await modelProvider.workspace.destroy();
   }

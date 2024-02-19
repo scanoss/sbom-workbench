@@ -1,6 +1,6 @@
 /* eslint-disable no-async-promise-executor */
 
-import {NewExportDTO} from "api/dto";
+import { NewExportDTO } from 'api/dto';
 import { Format } from '../../modules/export/Format';
 import { Spdxv20 } from '../../modules/export/format/Spdxv20';
 import { SpdxLite } from '../../modules/export/format/SpdxLite';
@@ -10,9 +10,8 @@ import { Wfp } from '../../modules/export/format/Wfp';
 import { HtmlSummary } from '../../modules/export/format/HtmlSummary';
 import { SpdxLiteJson } from '../../modules/export/format/SpdxLiteJson';
 import { ITask } from '../Task';
-import { IExportResult } from "../../modules/export/IExportResult";
-import { ExportFormat } from "../../../api/types";
-
+import { IExportResult } from '../../modules/export/IExportResult';
+import { ExportFormat } from '../../../api/types';
 
 export class Export implements ITask<string, IExportResult> {
   private format: Format;
@@ -22,7 +21,7 @@ export class Export implements ITask<string, IExportResult> {
       const result = await this.format.save(path);
       return result;
     } catch (error: any) {
-      return error;
+      throw error;
     }
   }
 
@@ -31,7 +30,7 @@ export class Export implements ITask<string, IExportResult> {
       const data = await this.format.generate();
       return data;
     } catch (e) {
-      return e;
+      throw e;
     }
   }
 

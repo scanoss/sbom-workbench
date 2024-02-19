@@ -9,11 +9,18 @@ export async function projectOpenPermissionsMiddleware(payload: any) {
   const pName = path.basename(payload.path).trim();
   const pPath = path.join(workspace.getMyPath(), pName);
   const { username } = os.userInfo();
-  // be sure the user has read access to pPath
+  const wPath = workspace.getMyPath();
+
+  try {
+    await fs.promises.access(wPath, fs.constants.R_OK | fs.constants.W_OK | fs.constants.X_OK);
+  } catch (e) {
+    throw new Error(`User '${username}' has not R/W permissions on ${wPath}`);
+  }
+
   try {
     await fs.promises.access(pPath, fs.constants.R_OK);
   } catch (e) {
-    throw new Error(`User '${username}' has not read permissions on ${pPath}`);
+    throw new Error(`User '${username}' has not R permissions on ${pPath}`);
   }
 
   try {

@@ -2,13 +2,7 @@
 import fs from 'fs';
 import log from 'electron-log';
 import { IDependencyResponse, Scanner } from 'scanoss';
-import {
-  FileTreeViewMode,
-  IProjectCfg,
-  IWorkbenchFilter,
-  IWorkbenchFilterParams,
-  ProjectState,
-} from '../../api/types';
+import { FileTreeViewMode, IProjectCfg, IWorkbenchFilter, IWorkbenchFilterParams, ProjectState } from '../../api/types';
 import { ProjectModel } from '../model/project/ProjectModel';
 import { Metadata } from './Metadata';
 import { ProjectMigration } from '../migration/ProjectMigration';
@@ -19,7 +13,6 @@ import { IpcChannels } from '../../api/ipc-channels';
 import * as ScannerCFG from '../task/scanner/types';
 import { broadcastManager } from '../broadcastManager/BroadcastManager';
 import { userSettingService } from '../services/UserSettingService';
-import { projectService } from '../../main/services/ProjectService';
 
 export class Project {
   work_root: string;
@@ -78,10 +71,7 @@ export class Project {
       this.metadata.setAppVersion('0.8.0');
       this.metadata.save();
     }
-    const pMigration = new ProjectMigration(
-      this.metadata.getVersion(),
-      this.metadata.getMyPath(),
-    );
+    const pMigration = new ProjectMigration(this.metadata.getVersion(), this.metadata.getMyPath());
     const newVersion: string = await pMigration.up();
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
     this.metadata.setAppVersion(newVersion);
@@ -91,10 +81,7 @@ export class Project {
   public async open(): Promise<boolean> {
     this.state = ProjectState.OPENED;
     log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`; //Concatenate workspace root
-    const project = await fs.promises.readFile(
-      `${this.metadata.getMyPath()}/tree.json`,
-      'utf8',
-    );
+    const project = await fs.promises.readFile(`${this.metadata.getMyPath()}/tree.json`, 'utf8');
     const a = JSON.parse(project);
     this.filesToScan = a.filesToScan;
     this.filesNotScanned = a.filesNotScanned;
@@ -109,14 +96,8 @@ export class Project {
 
   public async close() {
     if (this.scanner && this.scanner.isRunning()) this.scanner.stop();
-    log.info(
-      `%c[ PROJECT ]: Closing project ${this.metadata.getName()}`,
-      'color: green',
-    );
-    log.info(
-      '%c[ PROJECT ]: Closing Database',
-      'color: green',
-    );
+    log.info(`%c[ PROJECT ]: Closing project ${this.metadata.getName()}`, 'color: green');
+    log.info('%c[ PROJECT ]: Closing Database', 'color: green');
     await modelProvider.model.destroy();
     this.state = ProjectState.CLOSED;
     this.scanner = null;
@@ -138,14 +119,8 @@ export class Project {
       filesSummary: self.filesSummary,
       tree: self.tree,
     };
-    fs.writeFileSync(
-      `${this.metadata.getMyPath()}/tree.json`,
-      JSON.stringify(a),
-    );
-    log.info(
-      `%c[ PROJECT ]: Project ${this.metadata.getName()} saved`,
-      'color:green',
-    );
+    fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(a));
+    log.info(`%c[ PROJECT ]: Project ${this.metadata.getName()} saved`, 'color:green');
   }
 
   public setState(state: ProjectState) {
@@ -226,28 +201,17 @@ export class Project {
   }
 
   public getGlobalApiKey(): string {
-    const {
-      DEFAULT_API_INDEX,
-      APIS,
-    } = userSettingService.get();
+    const { DEFAULT_API_INDEX, APIS } = userSettingService.get();
     return this.getApiKey() ? this.getApiKey() : APIS[DEFAULT_API_INDEX].API_KEY;
   }
 
   public getGlobalApi(): string {
-    const {
-      DEFAULT_API_INDEX,
-      APIS,
-    } = userSettingService.get();
+    const { DEFAULT_API_INDEX, APIS } = userSettingService.get();
     return this.getApi() ? this.getApi() : APIS[DEFAULT_API_INDEX].URL;
   }
 
   public async getResults() {
-    return JSON.parse(
-      await fs.promises.readFile(
-        `${this.metadata.getMyPath()}/result.json`,
-        'utf8',
-      ),
-    );
+    return JSON.parse(await fs.promises.readFile(`${this.metadata.getMyPath()}/result.json`, 'utf8'));
   }
 
   public getTree(): Tree {
@@ -274,37 +238,25 @@ export class Project {
 
   public async getDependencies(): Promise<IDependencyResponse> {
     try {
-      return JSON.parse(
-        await fs.promises.readFile(
-          `${this.metadata.getMyPath()}/dependencies.json`,
-          'utf8',
-        ),
-      );
+      return JSON.parse(await fs.promises.readFile(`${this.metadata.getMyPath()}/dependencies.json`, 'utf8'));
     } catch (e) {
       log.error(e);
-      return null;
+      throw e;
     }
   }
 
   public async setGlobalFilter(filter: IWorkbenchFilter) {
     try {
-      if (
-        !(
-          JSON.stringify({ ...filter, path: null })
-          === JSON.stringify({ ...this.filter, path: null })
-        )
-      ) {
+      if (!(JSON.stringify({ ...filter, path: null }) === JSON.stringify({ ...this.filter, path: null }))) {
         broadcastManager.get().send(IpcChannels.TREE_UPDATING, {});
-        this.tree.setTreeViewMode(
-          TreeViewModeCreator.create(filter, this.fileTreeViewMode),
-        );
+        this.tree.setTreeViewMode(TreeViewModeCreator.create(filter, this.fileTreeViewMode));
         this.notifyTree();
       }
       this.filter = filter;
       return true;
     } catch (e) {
       log.error(e);
-      return e;
+      throw e;
     }
   }
 

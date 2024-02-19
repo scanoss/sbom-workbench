@@ -1,4 +1,3 @@
-import api from '../api';
 import log from 'electron-log';
 import { IpcChannels } from '../ipc-channels';
 import { SearchTask } from '../../main/task/search/searchTask/SearchTask';
