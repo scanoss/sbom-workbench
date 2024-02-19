@@ -25,6 +25,7 @@ import '../api/index';
 
 import { broadcastManager } from './broadcastManager/BroadcastManager';
 import AppConfig from '../config/AppConfigModule';
+import { modelProvider } from './services/ModelProvider';
 
 class AppUpdater {
   constructor() {
@@ -101,7 +102,10 @@ const createWindow = async () => {
     }
   });
 
-  mainWindow.on('closed', () => {
+  mainWindow.on('closed', async () => {
+    await modelProvider.workspace.openDb();
+    await modelProvider.workspace.lock.releaseProjects();
+    await modelProvider.workspace.destroy();
     mainWindow = null;
   });
 
