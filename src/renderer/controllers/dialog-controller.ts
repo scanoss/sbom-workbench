@@ -9,8 +9,8 @@ class DialogController {
     return window.electron.ipcRenderer.invoke(IpcChannels.DIALOG_SHOW_SAVE_DIALOG, options);
   }
 
-  public showError(title: string, content: string): void {
-    window.electron.ipcRenderer.send(IpcChannels.DIALOG_SHOW_ERROR_BOX, title, content);
+  public showError(title: string, content: string): Promise<Electron.MessageBoxReturnValue> {
+    return window.electron.ipcRenderer.invoke(IpcChannels.DIALOG_SHOW_ERROR_BOX, title, content);
   }
 }
 

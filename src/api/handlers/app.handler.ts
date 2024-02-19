@@ -15,8 +15,8 @@ api.handle(IpcChannels.DIALOG_SHOW_SAVE_DIALOG, async (event, options) => {
   return !canceled ? filePath : null;
 });
 
-ipcMain.on(IpcChannels.DIALOG_SHOW_ERROR_BOX, (event, title: string, content: string) => {
-  dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
+api.handle(IpcChannels.DIALOG_SHOW_ERROR_BOX, (event, title: string, content: string) => {
+  return dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
     type: 'error',
     title,
     message: content,
@@ -25,10 +25,11 @@ ipcMain.on(IpcChannels.DIALOG_SHOW_ERROR_BOX, (event, title: string, content: st
 
 ipcMain.on(IpcChannels.DIALOG_BUILD_CUSTOM_POPUP_MENU, (event, params: any) => {
   params.forEach((p) => {
-    if (p.actionId)
+    if (p.actionId) {
       p.click = () => {
         event.sender.send(IpcChannels.CONTEXT_MENU_COMMAND, p.actionId);
       };
+    }
     if (p.submenu) {
       p.submenu.forEach((s) => {
         s.click = () => {

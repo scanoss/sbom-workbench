@@ -36,7 +36,7 @@ module.exports = {
     'react/jsx-one-expression-per-line': 'off',
     'object-curly-newline': 'off',
     'react/no-unstable-nested-components': 'off',
-    'react/jsx-one-expression-per-line': ['off'],
+    'arrow-body-style': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

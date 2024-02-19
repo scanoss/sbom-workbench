@@ -22,8 +22,8 @@ import { loadProject } from '@store/workbench-store/workbenchThunks';
 import {
   accept, getAll, reject, rejectAll, restore,
 } from '@store/dependency-store/dependencyThunks';
-import { setCurrentProject } from './workspace-store/workspaceSlice';
 import { dialogController } from 'renderer/controllers/dialog-controller';
+import { setCurrentProject } from './workspace-store/workspaceSlice';
 
 export const rootMiddleware = createListenerMiddleware();
 
@@ -86,12 +86,14 @@ rootMiddleware.startListening({
   },
 });
 
-
+const isExcluded = isAnyOf(loadProject.rejected);
 
 rootMiddleware.startListening({
   matcher: isRejected,
-  effect: async ({ error }, api) => {
-    console.log(error);
-    dialogController.showError('Error', error.message )
+  effect: async (action, api) => {
+    const { error } = action;
+    if (isExcluded(action)) return;
+
+    dialogController.showError('Error', error.message);
   },
 });
