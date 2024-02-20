@@ -9,7 +9,7 @@ export class ProjectFilterPath extends ProjectFilter {
     this.path = path;
   }
 
-  public getParam(): any{
+  public getParam(): any {
     return this.path;
   }
 
