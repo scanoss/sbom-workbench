@@ -1,5 +1,4 @@
-import { BrowserWindow, RelaunchOptions, app, dialog } from 'electron';
-import i18next from 'i18next';
+import { BrowserWindow, RelaunchOptions, app } from 'electron';
 import { userSettingService } from './UserSettingService';
 
 class WorkspaceService {
@@ -13,26 +12,18 @@ class WorkspaceService {
     userSettingService.set({ DEFAULT_WORKSPACE_INDEX: workspaceIndex });
     await userSettingService.save();
 
-    const { response } = await dialog.showMessageBox(
-      BrowserWindow.getFocusedWindow(),
-      {
-        buttons: [i18next.t('Button:RestartLater'), i18next.t('Button:RestartNow')],
-        message: i18next.t('Dialog:YouNeedRestartQuestionWorkspace'),
-      },
-    );
+    const options: RelaunchOptions = {
+      args: process.argv.slice(1).concat(['--relaunch']),
+      execPath: process.execPath,
+    };
 
-    if (response === 1) {
-      const options: RelaunchOptions = {
-        args: process.argv.slice(1).concat(['--relaunch']),
-        execPath: process.execPath,
-      };
-      if (process.env.APPIMAGE) {
-        options.execPath = process.env.APPIMAGE;
-        options.args.unshift('--appimage-extract-and-run');
-      }
-      app.relaunch(options);
-      app.exit(0);
+    if (process.env.APPIMAGE) {
+      options.execPath = process.env.APPIMAGE;
+      options.args.unshift('--appimage-extract-and-run');
     }
+
+    app.relaunch(options);
+    app.exit(0);
   }
 }
 
