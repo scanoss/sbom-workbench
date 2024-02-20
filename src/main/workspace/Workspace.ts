@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as fs from 'fs';
 import log from 'electron-log';
-import { dialog } from 'electron';
+import { app, dialog } from 'electron';
 import { Project } from './Project';
 import { INewProject, IProject, License, ProjectState } from '../../api/types';
 import { licenses } from '../../../assets/data/licenses';
@@ -29,17 +29,15 @@ class Workspace {
     // if (this.projectList.length) this.close();  //Prevents to keep projects opened when directory changes
     log.info('%c[ WORKSPACE ]: Reading projects....', 'color: green');
     const projectPaths = await this.getAllProjectsPaths();
-    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) =>
-      Project.readFromPath(projectPath)
-        .then((p) => {
-          log.info(`%c[ WORKSPACE ]: Successfully read project ${projectPath}`, 'color: green');
-          return p;
-        })
-        .catch((e) => {
-          log.info(`%c[ WORKSPACE ]: Cannot read project ${projectPath}`, 'color: green');
-          throw e;
-        })
-    );
+    const projectArray: Promise<Project>[] = projectPaths.map((projectPath) => Project.readFromPath(projectPath)
+      .then((p) => {
+        log.info(`%c[ WORKSPACE ]: Successfully read project ${projectPath}`, 'color: green');
+        return p;
+      })
+      .catch((e) => {
+        log.info(`%c[ WORKSPACE ]: Cannot read project ${projectPath}`, 'color: green');
+        throw e;
+      }));
     let projectsReaded = (await Promise.allSettled(projectArray)) as PromiseSettledResult<Project>[];
     projectsReaded = projectsReaded.filter((p) => p.status === 'fulfilled');
     this.projectList = projectsReaded.map((p) => (p as PromiseFulfilledResult<Project>).value);
@@ -143,7 +141,7 @@ class Workspace {
       log.error(e);
 
       const { response } = await dialog.showMessageBox(null, {
-        buttons: ['Try again', 'Switch to default workspace'],
+        buttons: ['Try again', 'Switch to default workspace', 'Exit'],
         message: 'Could not access the selected folder for the workspace. What would you like to do?',
         title: 'Workspace Folder Access Error',
       });
@@ -163,7 +161,11 @@ class Workspace {
         this.wsPath = userSettingService.getDefault().WORKSPACES[0].PATH;
       }
 
-      await this.initWorkspaceFileSystem();
+      if (response === 0 || response === 1) { await this.initWorkspaceFileSystem(); }
+
+      if (response === 2) {
+        app.exit(0);
+      }
     }
   }
 

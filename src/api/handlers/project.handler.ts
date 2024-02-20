@@ -26,7 +26,7 @@ import { modelProvider } from '../../main/services/ModelProvider';
 
 api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, payload: any) => {
   // TODO: factory to create filters depending on arguments
-  modelProvider.openModeProjectModel = payload.mode === ProjectAccessMode.WRITE ? sqlite3.OPEN_READWRITE : sqlite3.OPEN_READONLY;
+  modelProvider.openModeProjectModel = payload.mode === ProjectAccessMode.READ_ONLY ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE;
 
   const p: Project = await workspace.openProject(new ProjectFilterPath(payload.path));
   searcher.closeIndex();
@@ -65,9 +65,9 @@ api.handle(IpcChannels.PROJECT_STOP_SCAN, async (_event) => {
   await Promise.all(pPromises);
 });
 
-api.handle(IpcChannels.PROJECT_RESUME_SCAN, async (event, projectPath: string) => {
+api.handle(IpcChannels.PROJECT_RESUME_SCAN, async (event, payload: any) => {
   try {
-    await projectService.resume(projectPath);
+    await projectService.resume(payload.path);
     return Response.ok();
   } catch (error: any) {
     console.error(error);
@@ -75,9 +75,9 @@ api.handle(IpcChannels.PROJECT_RESUME_SCAN, async (event, projectPath: string) =
   }
 });
 
-api.handle(IpcChannels.PROJECT_RESCAN, async (event, projectPath: string) => {
+api.handle(IpcChannels.PROJECT_RESCAN, async (event, payload: any) => {
   try {
-    await projectService.reScan(projectPath);
+    await projectService.reScan(payload.path);
     return Response.ok();
   } catch (error: any) {
     console.error(error);

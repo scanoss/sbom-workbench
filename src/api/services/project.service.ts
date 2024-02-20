@@ -20,7 +20,7 @@ class ProjectService extends BaseService {
   }
 
   public async resume(path: string): Promise<any> {
-    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_RESUME_SCAN, path);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_RESUME_SCAN, { path });
     return response;
   }
 
@@ -35,7 +35,7 @@ class ProjectService extends BaseService {
   }
 
   public async rescan(path: string): Promise<void> {
-    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_RESCAN, path);
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_RESCAN, { path });
     return this.response(response);
   }
 

@@ -150,9 +150,6 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
       scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
     }
 
-    console.log(scannerCfg.API_URL);
-    console.log(scannerCfg.API_KEY);
-
     // This parameter allow to keep scanning even when some package has error
     // WARNING: You won't get the results of all yours files.
     // scannerCfg.ABORT_ON_MAX_RETRIES = false

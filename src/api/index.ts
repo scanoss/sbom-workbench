@@ -65,6 +65,7 @@ api.use(IpcChannels.PROJECT_CURRENT_CLOSE, () => unlockMiddleware());
   IpcChannels.DEPENDENCY_REJECT,
   IpcChannels.DEPENDENCY_REJECT_ALL,
   IpcChannels.VULNERABILITY_UPDATE,
+  IpcChannels.IGNORED_FILES
 ].forEach((c) => {
   api.use(c, () => accessMiddleware());
   api.use(c, () => refreshMiddleware());
