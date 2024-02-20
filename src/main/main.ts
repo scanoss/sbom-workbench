@@ -103,10 +103,7 @@ const createWindow = async () => {
   });
 
   mainWindow.on('closed', async () => {
-    await modelProvider.workspace.openDb();
-    await modelProvider.workspace.lock.releaseProjects();
-    await modelProvider.workspace.destroy();
-    mainWindow = null;
+      mainWindow = null;
   });
 
   AppI18n.setLng(userSettingService.get().LNG);
@@ -153,7 +150,14 @@ const createWindow = async () => {
  * Add event listeners...
  */
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', async () => {
+
+  // Release all project on close app
+  await workspace.closeAllProjects();
+  await modelProvider.workspace.openDb();
+  await modelProvider.workspace.lock.releaseProjects();
+  await modelProvider.workspace.destroy();
+  
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   if (process.platform !== 'darwin') {
@@ -173,6 +177,7 @@ app
     });
   })
   .catch(console.log);
+
 
 async function init() {
   await userSettingService.read();
