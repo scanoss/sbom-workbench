@@ -14,11 +14,12 @@ export class Connection {
 
   public createDB(): Promise<sqlite3.Database> {
     return new Promise<sqlite3.Database>((resolve, reject) => {
-      const db = new sqlite3.Database(this.dbPath, (err: any) => {
+      const db = new sqlite3.Database(this.dbPath, async (err: any) => {
         if (err) {
           reject(new Error('Unable to create DB'));
         } else {
           this.connection = db;
+          await this.connection.close();
           resolve(db);
         }
       });
