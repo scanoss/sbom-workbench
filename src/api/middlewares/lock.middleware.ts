@@ -21,6 +21,7 @@ export async function lockMiddleware(payload: any) {
 
     if (!projectLock) {
       log.info('Project locked');
+      await modelProvider.workspace.lock.releaseProjects();
       await modelProvider.workspace.lock.create({ username, hostname, projectPath: pName });
     } else {
       const start = new Date(projectLock.updatedAt);

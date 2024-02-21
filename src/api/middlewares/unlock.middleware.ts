@@ -2,6 +2,10 @@ import os from 'os';
 import { modelProvider } from '../../main/services/ModelProvider';
 import { workspace } from '../../main/workspace/Workspace';
 
+/**
+ * Middleware for unlocking a project in the workspace.
+ * This function attempts to unlock the opened project.
+ */
 export async function unlockMiddleware() {
   try {
     await modelProvider.workspace.openDb();
@@ -18,9 +22,6 @@ export async function unlockMiddleware() {
     if (projectLock) {
       await modelProvider.workspace.lock.delete(p.getProjectName(), username, hostname);
     }
-  } catch (e) {
-    console.error(e);
-    throw e;
   } finally {
     await modelProvider.workspace.destroy();
   }

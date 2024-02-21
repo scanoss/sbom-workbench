@@ -189,7 +189,7 @@ api.handle(IpcChannels.GET_API_KEY, async (event) => {
 });
 
 api.handle(IpcChannels.PROJECT_CREATE, async (_event, projectDTO: INewProject) => {
-  try {
+  try {    
     await projectService.createProject(projectDTO);
     return Response.ok();
   } catch (error: any) {
