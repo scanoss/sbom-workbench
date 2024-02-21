@@ -1,4 +1,5 @@
 import * as util from 'util';
+import sqlite3 from 'sqlite3';
 import { queries } from '../../querys_db';
 import { utilModel } from '../../UtilModel';
 import { ComponentModel } from './ComponentModel';
@@ -7,11 +8,8 @@ import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { IInsertResult, IResultLicense } from '../../interfaces/IInsertResult';
 import { QueryBuilderCreator } from '../../queryBuilder/QueryBuilderCreator';
 import { Model } from '../../Model';
-import sqlite3 from 'sqlite3';
-
 
 export class ResultModel extends Model {
-
   private connection: sqlite3.Database;
 
   public static readonly entityMapper = {
@@ -61,41 +59,56 @@ export class ResultModel extends Model {
   }
 
   public async insertFromFile(resultPath: string, files: any): Promise<IInsertResult> {
-    const resultLicense: any = {};
-    const result: Record<any, any> = await utilModel.readFile(resultPath);
-    let data: any;
-    for (const [key, value] of Object.entries(result)) {
-      for (let i = 0; i < value.length; i += 1) {
-        const filePath = key;
-        data = value[i];
-        if (data.id !== 'none') {
-          const resultId = await this.insertResultBulk(this.connection, data, files[filePath]);
-          resultLicense[resultId] = data.licenses;
+    return new Promise<IInsertResult>(async (resolve, reject) => {
+      const resultLicense: any = {};
+      const result: Record<any, any> = await utilModel.readFile(resultPath);
+      let data: any;
+      this.connection.serialize(async () => {
+        this.connection.run('begin transaction');
+        for (const [key, value] of Object.entries(result)) {
+          for (let i = 0; i < value.length; i += 1) {
+            const filePath = key;
+            data = value[i];
+            if (data.id !== 'none') {
+              const resultId = await this.insertResultBulk(this.connection, data, files[filePath]);
+              resultLicense[resultId] = data.licenses;
+            }
+          }
         }
-      }
-    }
-    return resultLicense;
+        this.connection.run('commit', (err: any) => {
+          if (!err) resolve(resultLicense);
+          reject(err);
+        });
+      });
+    });
   }
 
   public async insertResultLicense(data: IInsertResult):Promise<void> {
-    const promises = [];
-    const call:any = util.promisify(this.connection.run.bind(this.connection));
-    for (const [resultId, value] of Object.entries<Array<IResultLicense>>(data)) {
-      for (let i = 0; i < value.length; i += 1) {
-        promises.push(call(
-          'INSERT OR IGNORE INTO result_license (spdxid,source,resultId,patent_hints,copyLeft,osadl_updated,incompatible_with,checklist_url) VALUES (?,?,?,?,?,?,?,?);',
-          value[i].name,
-          value[i].source,
-          resultId,
-          value[i].patent_hints ? value[i].patent_hints : null,
-          value[i].copyleft ? value[i].copyleft : null,
-          value[i].osadl_updated ? value[i].osadl_updated : null,
-          value[i].incompatible_with ? value[i].incompatible_with : null,
-          value[i].checklist_url ? value[i].checklist_url : null,
-        ));
-      }
-    }
-    await Promise.all(promises);
+    return new Promise<void>(async (resolve, reject) => {
+      this.connection.serialize(async () => {
+        this.connection.run('begin transaction');
+        for (const [resultId, value] of Object.entries<Array<IResultLicense>>(data)) {
+          for (let i = 0; i < value.length; i += 1) {
+            this.connection.run(
+              'INSERT OR IGNORE INTO result_license (spdxid,source,resultId,patent_hints,copyLeft,osadl_updated,incompatible_with,checklist_url) VALUES (?,?,?,?,?,?,?,?);',
+              value[i].name,
+              value[i].source,
+              resultId,
+              value[i].patent_hints ? value[i].patent_hints : null,
+              value[i].copyleft ? value[i].copyleft : null,
+              value[i].osadl_updated ? value[i].osadl_updated : null,
+              value[i].incompatible_with ? value[i].incompatible_with : null,
+              value[i].checklist_url ? value[i].checklist_url : null,
+            );
+          }
+        }
+
+        this.connection.run('commit', (err: any) => {
+          if (!err) resolve();
+          reject(err);
+        });
+      });
+    });
   }
 
   public async count(): Promise<number> {

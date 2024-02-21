@@ -1,14 +1,14 @@
 import log from 'electron-log';
 import util from 'util';
+import sqlite3 from 'sqlite3';
 import { queries } from '../../querys_db';
 import { ComponentModel } from './ComponentModel';
-import { Inventory } from '@api/types';
+import { Inventory } from '../../../../api/types';
 import { ResultModel } from './ResultModel';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
-import sqlite3 from 'sqlite3';
 import { Model } from '../../Model';
-export class InventoryModel extends Model{
 
+export class InventoryModel extends Model {
   private connection: sqlite3.Database;
 
   component: ComponentModel;

@@ -1,28 +1,37 @@
 import util from 'util';
+import sqlite3 from 'sqlite3';
 import { Cryptography } from '../../entity/Cryptography';
 import { queries } from '../../querys_db';
 import { Model } from '../../Model';
-import sqlite3 from 'sqlite3';
 
 export class CryptographyModel extends Model {
-  private connection: sqlite3.Database
+  private connection: sqlite3.Database;
+
   public constructor(conn: sqlite3.Database) {
     super();
     this.connection = conn;
   }
 
   public async insertAll(cryptography: Array<{ purl: string, version: string, algorithms: string }>): Promise<void> {
-    const call = util.promisify(this.connection.run.bind(this.connection)) as any;
-    const promises = [];
-    cryptography.forEach((c) => {
-      promises.push(call(
-        'INSERT OR IGNORE INTO cryptography (purl,version,algorithms) VALUES(?,?,?);',
-        c.purl,
-        c.version,
-        c.algorithms,
-      ));
+    return new Promise<void>(async (resolve, reject) => {
+      this.connection.serialize(async () => {
+        this.connection.run('begin transaction');
+
+        cryptography.forEach((c) => {
+          this.connection.run(
+            'INSERT OR IGNORE INTO cryptography (purl,version,algorithms) VALUES(?,?,?);',
+            c.purl,
+            c.version,
+            c.algorithms,
+          );
+        });
+
+        this.connection.run('commit', (err: any) => {
+          if (!err) resolve();
+          reject(err);
+        });
+      });
     });
-    await Promise.all(promises);
   }
 
   public async findAll() : Promise<Array<Cryptography>> {

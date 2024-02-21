@@ -58,12 +58,22 @@ export class FileModel extends Model {
   }
 
   public async insertFiles(data: Array<any>) {
-    const call = promisify(this.connection.run.bind(this.connection));
-    const promises = [];
-    for (let i = 0; i < data.length; i += 1) {
-      promises.push(call('INSERT INTO FILES(path,type) VALUES(?,?)', data[i].path, data[i].type));
-    }
-    await Promise.all(promises);
+    return new Promise<void>(async (resolve, reject) => {
+     // const call = promisify(this.connection.run.bind(this.connection));
+     // const promises = [];
+      this.connection.serialize(async () => {
+        this.connection.run('begin transaction');
+        for (let i = 0; i < data.length; i += 1) {
+          this.connection.run('INSERT INTO FILES(path,type) VALUES(?,?)', data[i].path, data[i].type);
+          // promises.push(call('INSERT INTO FILES(path,type) VALUES(?,?)', data[i].path, data[i].type));
+        }
+
+        this.connection.run('commit', (err: any) => {
+          if (!err) resolve();
+          reject(err);
+        });
+      });
+    });
   }
 
   public async setDirty(dirty: number, path?: string) {

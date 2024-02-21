@@ -1,18 +1,17 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import log from 'electron-log';
 import util from 'util';
-import { queries } from '../../querys_db';
 import { Component } from '@api/types';
+import sqlite3 from 'sqlite3';
+import { queries } from '../../querys_db';
 import { LicenseModel } from './LicenseModel';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { componentHelper } from '../../../helpers/ComponentHelper';
 import { IComponentLicenseReliable } from '../../interfaces/component/IComponentLicenseReliable';
 import { ComponentVersion } from '../../entity/ComponentVersion';
-import sqlite3 from 'sqlite3';
 import { Model } from '../../Model';
 
 export class ComponentModel extends Model {
-
   private connection: sqlite3.Database;
 
   public static readonly entityMapper = {
@@ -26,7 +25,7 @@ export class ComponentModel extends Model {
 
   public constructor(conn: sqlite3.Database) {
     super();
-    this.connection =  conn;
+    this.connection = conn;
     this.license = new LicenseModel(conn);
   }
 
@@ -109,22 +108,28 @@ export class ComponentModel extends Model {
   }
 
   public async import(components: Array<Partial<Component>>) {
-    const call = util.promisify(this.connection.all.bind(this.connection)) as any;
-    const promises = [];
-    components.forEach((component) => {
-      promises.push(
-        call(
-          queries.COMPDB_SQL_COMP_VERSION_INSERT,
-          component.name,
-          component.version,
-          'AUTOMATIC IMPORT',
-          component.url,
-          component.purl,
-          'engine',
-        ),
-      );
+    return new Promise<void>(async (resolve, reject) => {
+      this.connection.serialize(async () => {
+        this.connection.run('begin transaction');
+
+        components.forEach((component) => {
+          this.connection.run(
+            queries.COMPDB_SQL_COMP_VERSION_INSERT,
+            component.name,
+            component.version,
+            'AUTOMATIC IMPORT',
+            component.url,
+            component.purl,
+            'engine',
+          );
+        });
+
+        this.connection.run('commit', (err: any) => {
+          if (!err) resolve();
+          reject(err);
+        });
+      });
     });
-    await Promise.all(promises);
   }
   // COMPONENT NEW
   /* public async componentNewImportFromResults(this.connection: any, data: any) {
@@ -302,7 +307,7 @@ export class ComponentModel extends Model {
 
   public async getAll(queryBuilder?: QueryBuilder) {
     const SQLquery = this.getSQL(queryBuilder, queries.SQL_GET_ALL_COMPONENTS, this.getEntityMapper());
-    const call = <(sql: string, params: any[]) => any>  util.promisify(this.connection.all.bind(this.connection));
+    const call = <(sql: string, params: any[]) => any> util.promisify(this.connection.all.bind(this.connection));
     const data = await call(SQLquery.SQL, SQLquery.params);
     const components = componentHelper.processComponent(data);
     return components;
