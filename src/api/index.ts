@@ -13,8 +13,8 @@ import './handlers/app.handler';
 import './handlers/search.handler';
 import './handlers/vulnerability.handler';
 import './handlers/cryptography.handler';
-import fs from 'fs';
-import { accessMiddleware } from './middlewares/access.middleware';
+
+import { writeAccessMiddleware } from './middlewares/writeAccess.middleware';
 import { IpcChannels } from './ipc-channels';
 import api from './api';
 import { lockMiddleware } from './middlewares/lock.middleware';
@@ -27,16 +27,37 @@ import { projectOpenPermissionsMiddleware } from './middlewares/project.open.per
 // api.use(IpcChannels.PROJECT_OPEN_SCAN, () => unlockMiddleware());
 
 // Disclaimer: Payload must be an object in order to modify the data on the middleware
-/* eslint-disable */
-[IpcChannels.PROJECT_OPEN_SCAN, IpcChannels.PROJECT_RESUME_SCAN, IpcChannels.PROJECT_RESCAN].forEach((c) => {
+
+[
+  IpcChannels.WORKSPACE_DELETE_PROJECT
+].forEach((c) => {
+  api.use(c, (_, payload) => writeAccessMiddleware(payload));
+});
+
+[
+  IpcChannels.PROJECT_RESUME_SCAN,
+  IpcChannels.PROJECT_RESCAN,
+].forEach((c) => {
   api.use(c, (_, payload) => projectOpenPermissionsMiddleware(payload));
-  api.use(c, () => unlockMiddleware());
+  api.use(c, (_, payload) => writeAccessMiddleware(payload.path));
   api.use(c, (_, payload) => lockMiddleware(payload));
 });
 
-api.use(IpcChannels.PROJECT_CREATE, (_, payload) => lockMiddleware({ path: payload.name }));
+/* eslint-disable */
+[
+  IpcChannels.PROJECT_OPEN_SCAN,
+].forEach((c) => {
+  api.use(c, (_, payload)   => projectOpenPermissionsMiddleware(payload));
+  api.use(c, (_, payload)   => lockMiddleware(payload));
+});
 
-api.use(IpcChannels.PROJECT_CURRENT_CLOSE, () => unlockMiddleware());
+
+
+api.use(IpcChannels.PROJECT_CREATE,
+  (_, payload) => lockMiddleware({ path: payload.name }));
+
+api.use(IpcChannels.PROJECT_CURRENT_CLOSE,
+  () => unlockMiddleware());
 
 /* eslint-disable */
 [
@@ -66,6 +87,6 @@ api.use(IpcChannels.PROJECT_CURRENT_CLOSE, () => unlockMiddleware());
   IpcChannels.VULNERABILITY_UPDATE,
   IpcChannels.IGNORED_FILES
 ].forEach((c) => {
-  api.use(c, () => accessMiddleware());
+  api.use(c, () => writeAccessMiddleware());
   api.use(c, () => refreshMiddleware());
 });

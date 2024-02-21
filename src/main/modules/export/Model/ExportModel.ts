@@ -12,7 +12,7 @@ export class ExportModel {
 
   constructor() {
     this.db = new sqlite3.Database(`${workspace.getOpenedProjects()[0].getMyPath()}/scan_db`, sqlite3.OPEN_READWRITE);
-    // this.db.run('PRAGMA journal_mode = WAL;');
+    this.db.run('PRAGMA journal_mode = WAL;');
     this.db.run('PRAGMA synchronous = OFF');
     this.db.run('PRAGMA foreign_keys = ON;');
     this.query = new Queries();

@@ -1,6 +1,5 @@
 import i18next from 'i18next';
 import fs from 'fs';
-import sqlite3 from 'sqlite3';
 import { ScannerStage, ScanState } from '../../../../api/types';
 import { BaseScannerTask } from '../BaseScannerTask';
 import { Scanner } from '../types';

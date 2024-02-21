@@ -11,6 +11,7 @@ import { CryptographyModel } from './models/CryptographyModel';
 import { queries } from '../querys_db';
 import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 import { Connection } from '../Connection';
+import { modelProvider } from '../../services/ModelProvider';
 
 export class ProjectModel {
   private connection: Connection;
@@ -113,5 +114,8 @@ export class ProjectModel {
   public async destroy() {
     if (this.connection) await this.connection.close();
     this.connection = null;
+
+    // Be sure the DB is open in R/W 
+    modelProvider.openModeProjectModel = sqlite3.OPEN_READWRITE;
   }
 }

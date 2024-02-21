@@ -15,7 +15,7 @@ export class ProjectKnowledgeModel {
       const conn =  new sqlite3.Database(this.sourceProject,
         sqlite3.OPEN_READWRITE,function(err){
           if(err)reject(err);
-         // conn.run("PRAGMA journal_mode = WAL;");
+          conn.run("PRAGMA journal_mode = WAL;");
           conn.run("PRAGMA synchronous = OFF");
           conn.run("PRAGMA foreign_keys = ON;");
           resolve(conn);
