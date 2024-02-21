@@ -1,13 +1,12 @@
 import util from 'util';
+import { Dependency } from '@api/types';
+import sqlite3 from 'sqlite3';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { queries } from '../../querys_db';
-import { Dependency } from '@api/types';
 import { Dependency as Dep } from '../../entity/Dependency';
-import sqlite3 from 'sqlite3';
 import { Model } from '../../Model';
 
 export class DependencyModel extends Model {
-
   private connection: sqlite3.Database;
 
   public static readonly entityMapper = {
@@ -23,24 +22,30 @@ export class DependencyModel extends Model {
   }
 
   public async insertAll(dependencies: Array<Dep>) {
-    const call:any = util.promisify(this.connection.run.bind(this.connection));
-    const promises = [];
-    dependencies.forEach((d) => {
-      promises.push(
-        call(
-          queries.SQL_DEPENDENCIES_INSERT,
-          d.fileId,
-          d.purl ? decodeURIComponent(d.purl) : null,
-          d.version ? d.version : null,
-          d.scope ? d.scope : null,
-          d.licenses.length > 0 ? d.licenses.join(',') : null,
-          d.component,
-          d.version ? d.version : null,
-          d.originalLicense.length > 0 ? d.originalLicense.join(',') : null,
-        ),
-      );
+    return new Promise<void>(async (resolve, reject) => {
+      this.connection.serialize(async () => {
+        this.connection.run('begin transaction');
+
+        dependencies.forEach((d) => {
+          this.connection.run(
+            queries.SQL_DEPENDENCIES_INSERT,
+            d.fileId,
+            d.purl ? decodeURIComponent(d.purl) : null,
+            d.version ? d.version : null,
+            d.scope ? d.scope : null,
+            d.licenses.length > 0 ? d.licenses.join(',') : null,
+            d.component,
+            d.version ? d.version : null,
+            d.originalLicense.length > 0 ? d.originalLicense.join(',') : null,
+          );
+        });
+      });
+
+      this.connection.run('commit', (err: any) => {
+        if (!err) resolve();
+        reject(err);
+      });
     });
-    await Promise.all(promises);
   }
 
   public async getIdentifiedDependencies() {
