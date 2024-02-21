@@ -49,8 +49,7 @@ export class ProjectModel {
     this.cryptography = null;
   }
 
-  private async createViews(): Promise<void> {
-    const db = await this.connection.openDb();
+  private async createViews(db: sqlite3.Database): Promise<void> {
     const call = util.promisify(db.run.bind(db));
     await call(
       'CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url,source,reliableLicense) AS SELECT DISTINCT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url,comp.source,comp.reliableLicense FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;'
@@ -69,11 +68,10 @@ export class ProjectModel {
           `);
   }
 
-  private async createProjectDb() {
-    const db = await this.connection.openDb();
+  private async createProjectDb(db: sqlite3.Database) {
     const call = util.promisify(db.exec.bind(db));
     await call(queries.SQL_DB_TABLES);
-    await this.createViews();
+    await this.createViews(db);
   }
 
   private async initProjectModels(db: sqlite3.Database) {
@@ -89,10 +87,10 @@ export class ProjectModel {
 
   public async init(mode: number): Promise<void> {
     try {
-      this.connection = new Connection(this.path);
+      this.connection = new Connection(this.path);    
       await this.connection.createDB();
-      await this.createProjectDb();
       const db = await this.connection.openDb(mode);
+      await this.createProjectDb(db);      
       await this.initProjectModels(db);
     } catch (error: any) {
       console.log(error);

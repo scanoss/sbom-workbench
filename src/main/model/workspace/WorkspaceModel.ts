@@ -15,28 +15,26 @@ export class WorkspaceModel {
     this.path = `${path}/workspace.sqlite`;
   }
 
-  private async createWorkspaceTables() {
-    const db = await this.connection.openDb();
+  private async createWorkspaceTables(db: sqlite3.Database) {
     const call = util.promisify(db.run.bind(db));
     await call(queries.WORKSPACE_LOCK);
   }
 
-  private async initWorkspaceModel() {
-    const db = await this.connection.openDb();
+  private async initWorkspaceModel(db: sqlite3.Database) {
     this.lock = new LockModel(db);
   }
 
   public async init() {
     await this.createWorkspaceDB();
-    await this.createWorkspaceTables();
-    await this.initWorkspaceModel();
+    const db = await this.connection.openDb();
+    await this.createWorkspaceTables(db);
+    await this.initWorkspaceModel(db);
     await this.destroy();
   }
 
   private async createWorkspaceDB() {
     this.connection = new Connection(this.path);
     await this.connection.createDB();
-    return this.connection;
   }
 
   public async openDb(): Promise<sqlite3.Database> {

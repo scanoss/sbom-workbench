@@ -47,7 +47,6 @@ api.use(IpcChannels.PROJECT_CURRENT_CLOSE, () => unlockMiddleware());
   IpcChannels.INVENTORY_UPDATE,
   IpcChannels.INVENTORY_ATTACH_FILE,
   IpcChannels.INVENTORY_DETACH_FILE,
-  IpcChannels.INVENTORY_FROM_COMPONENT,
   IpcChannels.INVENTORY_BATCH,
   IpcChannels.COMPONENT_CREATE,
   IpcChannels.COMPONENT_DELETE,
