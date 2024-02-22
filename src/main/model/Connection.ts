@@ -33,7 +33,7 @@ export class Connection {
           log.error(err);
           reject(err);
         }
-        db.run('PRAGMA journal_mode = WAL;');
+        // db.run('PRAGMA journal_mode = WAL;');
         db.run('PRAGMA synchronous = OFF');
         db.run('PRAGMA foreign_keys = ON;');
         this.connection = db;

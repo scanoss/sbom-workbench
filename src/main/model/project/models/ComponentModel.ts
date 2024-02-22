@@ -107,8 +107,8 @@ export class ComponentModel extends Model {
     return licenses;
   }
 
-  public async import(components: Array<Partial<Component>>) {
-    return new Promise<void>(async (resolve, reject) => {
+  public async bulkImport(components: Array<Partial<Component>>) {
+    return new Promise<Array<Partial<Component>>>(async (resolve, reject) => {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
 
@@ -117,38 +117,23 @@ export class ComponentModel extends Model {
             queries.COMPDB_SQL_COMP_VERSION_INSERT,
             component.name,
             component.version,
-            'AUTOMATIC IMPORT',
+            component.description,
             component.url,
             component.purl,
-            'engine',
+            component.source,
+            function (this: any, error: any) {
+              component.compid = this.lastID;
+            },
           );
         });
 
         this.connection.run('commit', (err: any) => {
-          if (!err) resolve();
+          if (!err) resolve(components);
           reject(err);
         });
       });
     });
   }
-  // COMPONENT NEW
-  /* public async componentNewImportFromResults(this.connection: any, data: any) {
-    return new Promise<boolean>((resolve) => {
-      this.connection.run(
-        queries.COMPDB_SQL_COMP_VERSION_INSERT,
-        data.component,
-        data.version,
-        'AUTOMATIC IMPORT',
-        data.url,
-        data.purl,
-        'engine',
-        (err: any) => {
-          log.error(err);
-          resolve(true);
-        }
-      );
-    });
-  } */
 
   public async update(component: Component) {
     const call:any = util.promisify(this.connection.run.bind(this.connection));

@@ -91,6 +91,7 @@ export interface License {
   spdxid: string;
   url: string;
   fulltext: string;
+  official?: number;
 }
 
 export interface NewComponentDTO {
