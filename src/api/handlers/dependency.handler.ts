@@ -1,5 +1,5 @@
-import api from '../api';
 import log from 'electron-log';
+import api from '../api';
 import { dependencyService } from '../../main/services/DependencyService';
 import { AcceptAllDependeciesDTO, NewDependencyDTO, RejectAllDependeciesDTO, RestoreAllDependenciesDTO } from '../dto';
 import { IpcChannels } from '../ipc-channels';
