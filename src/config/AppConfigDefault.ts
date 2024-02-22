@@ -33,6 +33,7 @@ export const AppConfigDefault: IAppConfig = {
   FF_ENABLE_API_CONNECTION_SETTINGS: true,
   FF_ENABLE_SCAN_VULNERABILITY: true,
   FF_ENABLE_SCAN_CRYPTOGRAPHY: true,
+  FF_ENABLE_SETTINGS_HINT: true,
 
   // other config
   MIN_VERSION_SUPPORTED: '0.17.0',

@@ -349,9 +349,13 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                       )}
                     />
                   </Paper>
+
+                  {AppConfig.FF_ENABLE_SETTINGS_HINT && (
                   <p className="dialog-form-field-hint">
                     {t('SettingsApiKeyHint')}
                   </p>
+                  )}
+
                 </div>
               </>
             )}
