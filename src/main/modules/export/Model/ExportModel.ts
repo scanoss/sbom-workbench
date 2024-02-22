@@ -6,13 +6,13 @@ import { Queries } from '../../../model/querys_db';
 import { workspace } from '../../../workspace/Workspace';
 
 export class ExportModel {
-  private db: sqlite3;
+  private db: sqlite3.Database;
 
   private query: Queries;
 
   constructor() {
     this.db = new sqlite3.Database(`${workspace.getOpenedProjects()[0].getMyPath()}/scan_db`, sqlite3.OPEN_READWRITE);
-    this.db.run('PRAGMA journal_mode = WAL;');
+    // this.db.run('PRAGMA journal_mode = WAL;');
     this.db.run('PRAGMA synchronous = OFF');
     this.db.run('PRAGMA foreign_keys = ON;');
     this.query = new Queries();
@@ -53,7 +53,7 @@ export class ExportModel {
   public async getWfpData(): Promise<string> {
     const data: string = await fs.promises.readFile(
       `${workspace.getOpenedProjects()[0].getMyPath()}/winnowing.wfp`,
-      'utf-8'
+      'utf-8',
     );
     return data;
   }

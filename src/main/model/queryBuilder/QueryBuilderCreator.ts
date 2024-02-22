@@ -63,7 +63,7 @@ export class QueryBuilderCreator {
         queryBuilderIN.add(new QueryBuilderFIlePathIN(params.paths));
         return queryBuilderIN;
       }
-      if(params.md5){
+      if (params.md5) {
         const queryBuilderMD5 = new QueryBuilderMD5FileIn(params.md5);
         builder.add(queryBuilderMD5);
       }

@@ -25,6 +25,9 @@ export class Accept extends Batch {
         inventory.notes = this.note;
       });
     }
+
+    this.inventories.forEach((inventory) => { inventory.source = 'detected'; });
+
     const inv = await inventoryService.InventoryBatchCreate(this.inventories);
     const filesToUpdate: any = this.mergeFilesInventoryId(inv);
     filesToUpdate.files = ids;
