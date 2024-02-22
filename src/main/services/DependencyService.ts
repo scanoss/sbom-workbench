@@ -1,13 +1,13 @@
 import log from 'electron-log';
 import { IDependencyResponse } from 'scanoss';
-import { NewDependencyDTO } from '../../api/dto';
-import { Dependency, FileStatusType } from '../../api/types';
+import { LicenseDTO, NewDependencyDTO } from '../../api/dto';
+import { Component, Dependency, FileStatusType, License } from '../../api/types';
 import { dependencyHelper } from '../helpers/DependencyHelper';
 import { fileHelper } from '../helpers/FileHelper';
 import { licenseHelper } from '../helpers/LicenseHelper';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { modelProvider } from './ModelProvider';
-import { ComponentSource, ComponentVersion } from '../model/entity/ComponentVersion';
+import { ComponentSource } from '../model/entity/ComponentVersion';
 
 class DependencyService {
   public async insert(dependencies: IDependencyResponse): Promise<void> {
@@ -48,64 +48,14 @@ class DependencyService {
 
   public async accept(params: NewDependencyDTO): Promise<Dependency> {
     try {
-      if (!params.dependencyId) throw new Error('Dependency id is required');
-      const queryBuilderDependency = QueryBuilderCreator.create({
-        id: params.dependencyId,
-      });
-      let dependency: Dependency = (await modelProvider.model.dependency.getAll(queryBuilderDependency))[0];
-      const queryBuilderComp = QueryBuilderCreator.create({
-        purl: params.purl,
-        version: params.version,
-      });
-      let comp = (await modelProvider.model.component.getAll(queryBuilderComp))[0];
-      let lic: any = await modelProvider.model.license.getBySpdxId(dependency.licenses.length > 0 ? dependency.licenses[0] : params.license);
-      // Create license if it not exists in the catalog
-      if (!lic) {
-        const licenseName = licenseHelper.licenseNameToSPDXID(dependency.licenses.length > 0 ? dependency.licenses[0] : params.license);
-        lic = await modelProvider.model.license.create({
-          spdxid: dependency.licenses.length > 0 ? dependency.licenses[0] : params.license,
-          name: licenseName,
-          fulltext: '',
-          url: '',
-        });
-      }
-      // Create component if it not exists in the catalog
-      if (!comp) {
-        const newComponent = new ComponentVersion();
-        newComponent.name = dependency.componentName || dependency.purl;
-        newComponent.version = params.version;
-        newComponent.purl = params.purl;
-        newComponent.url = null;
-        newComponent.source = ComponentSource.MANUAL;
-        newComponent.setLicenseIds([lic.id]);
-        const component = await modelProvider.model.component.create(newComponent);
-        comp = await modelProvider.model.component.get(component.id);
-      } else {
-        await modelProvider.model.license.licenseAttach({
-          license_id: lic.id,
-          compid: comp.compid,
-        });
-      }
-
-      // Update dependency
-      dependency = {
-        ...dependency,
-        licenses: [params.license],
-        version: params.version,
-      };
-      const dep = [];
-      dep.push(null, dependency.scope ? dependency.scope : null, dependency.purl, dependency.version, dependency.licenses.join(','), dependency.dependencyId);
-      await modelProvider.model.dependency.update(dep);
-
-      // Create inventory
-      await modelProvider.model.inventory.create({
-        cvid: comp.compid,
-        spdxid: params.license,
-        source: 'declared',
-        usage: 'dependency',
-      });
-      const response = (await this.getAll({ id: params.dependencyId }))[0];
-      return response;
+      const dependency = (await this.getAll({ id: params.dependencyId }))[0];
+      dependency.licenses = [params.license];
+      dependency.version = params.version;
+      await this.acceptAllByIds([dependency]);
+      const updatedDependency = [];
+      updatedDependency.push(null, dependency.scope ? dependency.scope : null, dependency.purl, dependency.version, dependency.licenses.join(','), dependency.dependencyId);
+      await modelProvider.model.dependency.update(updatedDependency);
+      return (await this.getAll({ id: params.dependencyId }))[0];
     } catch (error: any) {
       log.error(error);
       throw error;
@@ -179,17 +129,105 @@ class DependencyService {
   public async acceptAllByIds(acceptedDep: Array<Dependency>): Promise<Array<Dependency>> {
     try {
       const dependencies = acceptedDep;
-      const response = [];
-      for (const dep of dependencies) {
-        const d = await this.accept({
-          dependencyId: dep.dependencyId,
-          purl: dep.purl,
-          version: dep.version,
-          license: dep.licenses[0],
-        } as NewDependencyDTO);
-        response.push(d);
+
+      // Licenses
+      const licenses = await modelProvider.model.license.getAll();
+      let licenseMapper = new Map<string, LicenseDTO>();
+      const newLicensesMapper = new Map<string, License>();
+      licenses.forEach((l) => licenseMapper.set(l.spdxid, l));
+
+      // Get new licenses from dependencies
+      dependencies.forEach((d) => {
+        d.licenses.forEach((l) => {
+          if (!licenseMapper.has(l)) {
+            newLicensesMapper.set(l, {
+              spdxid: l,
+              name: licenseHelper.licenseNameToSPDXID(l),
+              fulltext: '',
+              url: '',
+              official: 0,
+            });
+          }
+        });
+      });
+
+      let newLicenseCatalog = [];
+      if (newLicensesMapper.size > 0) {
+        const newLicenses = await modelProvider.model.license.insertInBulk(Array.from(newLicensesMapper.values()));
+        newLicenseCatalog = [...licenses, ...newLicenses];
+
+        // Creates a new map with a new catalog
+        licenseMapper = new Map<string, LicenseDTO>();
+        newLicenseCatalog.forEach((l) => licenseMapper.set(l.spdxid, l));
       }
-      return response;
+
+      // Create new components
+      const components = await modelProvider.model.component.getAll(null);
+      const componentMapper = new Map<string, any>();
+
+      components.forEach((c) => {
+        componentMapper.set(`${c.purl}@${c.version}`, c);
+      });
+
+      let attach = [];
+      dependencies.forEach((d) => {
+        if (componentMapper.has(`${d.purl}@${d.version}`)) {
+          const comp = componentMapper.get(`${d.purl}@${d.version}`);
+          const newLicensesToAttach = comp.licenses.filter((license) => !licenseMapper.has(license.spdxid)).map((filteredLicense) => filteredLicense.id);
+          attach.push({ compid: comp.compid, license: newLicensesToAttach });
+        }
+      });
+
+      const newComponentsMapper = new Map<string, Component>();
+
+      dependencies.forEach((d) => {
+        if (!componentMapper.has(`${d.purl}@${d.version}`)) {
+          const licenseIds = [];
+          d.licenses.forEach((l) => licenseIds.push(licenseMapper.get(l).id));
+
+          newComponentsMapper.set(`${d.purl}@${d.version}`, {
+            name: d.purl,
+            purl: d.purl,
+            version: d.version,
+            description: 'n/a',
+            url: '',
+            source: ComponentSource.MANUAL,
+            vendor: '',
+            licenses: licenseIds, // Set new licenses ids to be attached
+          });
+        }
+      });
+
+      if (newComponentsMapper.size > 0) {
+        const newComponents = await modelProvider.model.component.bulkImport(Array.from(newComponentsMapper.values()));
+
+        // Adapt structure to attach new components to licenses
+        const newComponentLicenses = newComponents.map((c) => { return { compid: c.compid, licenses: c.licenses }; });
+
+        attach = [...attach, ...newComponentLicenses];
+
+        // Attach licenses to components
+        await modelProvider.model.license.attachLicensesToComponentBulk(attach);
+
+        const newComponentCatalog = await modelProvider.model.component.getAll(null);
+        newComponentCatalog.forEach((c) => {
+          componentMapper.set(`${c.purl}@${c.version}`, c);
+        });
+      }
+
+      const inventories = [];
+      for (const dep of dependencies) {
+        inventories.push({
+          cvid: componentMapper.get(`${dep.purl}@${dep.version}`).compid,
+          spdxid: dep.licenses[0],
+          source: 'declared',
+          usage: 'dependency',
+        });
+      }
+
+      await modelProvider.model.inventory.createBatch(inventories);
+
+      return dependencies;
     } catch (error: any) {
       log.error(error);
       throw error;
@@ -245,17 +283,7 @@ class DependencyService {
     try {
       let dependencies = await this.getAll({ path });
       dependencies = dependencies.filter((d) => d.status === FileStatusType.PENDING && d.valid === true);
-      const response = [];
-      for (const dep of dependencies) {
-        const d = await this.accept({
-          dependencyId: dep.dependencyId,
-          purl: dep.purl,
-          version: dep.version,
-          license: dep.licenses[0],
-        } as NewDependencyDTO);
-        response.push(d);
-      }
-      return response;
+      return await this.acceptAllByIds(dependencies);
     } catch (error: any) {
       log.error(error);
       throw error;

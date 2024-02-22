@@ -1,43 +1,23 @@
 import log from 'electron-log';
 import { LicenseDTO, NewLicenseDTO } from '@api/dto';
-import { queries } from '../../querys_db';
 import { License } from '@api/types';
-import { IComponentLicense } from '../../interfaces/component/IComponentLicense';
 import sqlite3 from 'sqlite3';
+import { queries } from '../../querys_db';
+import { IComponentLicense } from '../../interfaces/component/IComponentLicense';
 import { Model } from '../../Model';
 
 export class LicenseModel extends Model {
+  private connection: sqlite3.Database;
 
-  private connection: sqlite3.Database
   public constructor(conn: sqlite3.Database) {
     super();
     this.connection = conn;
   }
 
-  public bulkCreate(db: any, license: Partial<License>) {
-    return new Promise<number>((resolve, reject) => {
-      try {
-        license.fulltext = 'AUTOMATIC IMPORT';
-        license.url = 'AUTOMATIC IMPORT';
-        db.serialize(async function () {
-          db.run(queries.SQL_CREATE_LICENSE, license.spdxid, license.spdxid, license.fulltext, license.url, 1);
-          db.get(`${queries.SQL_SELECT_LICENSE}spdxid=?;`, license.spdxid, (err: any, data: any) => {
-            if (err) throw err;
-            resolve(data.id);
-          });
-        });
-      } catch (error) {
-        log.error(error);
-        reject(new Error('The license was not created'));
-      }
-    });
-  }
-
-  // CREATE LICENSE
   public create(license: NewLicenseDTO) {
-    const self = this
+    const self = this;
     return new Promise<Partial<LicenseDTO>>(async (resolve, reject) => {
-      this.connection.serialize(async function () {
+      this.connection.serialize(async () => {
         self.connection.run('begin transaction');
         self.connection.run(queries.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 0);
         self.connection.run('commit', function (this: any, err: any) {
@@ -52,7 +32,7 @@ export class LicenseModel extends Model {
     const self = this;
     return new Promise(async (resolve, reject) => {
       try {
-        this.connection.serialize(function () {
+        this.connection.serialize(() => {
           self.connection.run('begin transaction');
           for (const [key, license] of Object.entries(json)) {
             self.connection.run(queries.SQL_CREATE_LICENSE, license.spdxid, license.name, license.fulltext, license.url, 1);
@@ -89,7 +69,7 @@ export class LicenseModel extends Model {
     const self = this;
     return new Promise<Array<LicenseDTO>>(async (resolve, reject) => {
       try {
-        this.connection.serialize(function () {
+        this.connection.serialize(() => {
           self.connection.all(queries.SQL_SELECT_ALL_LICENSES, (err: any, license: Array<LicenseDTO>) => {
             if (err) throw new Error('Unable to get all licenses');
             resolve(license);
@@ -119,8 +99,12 @@ export class LicenseModel extends Model {
                 if (licenses[component.license[i]] !== undefined) {
                   licenseId = licenses[component.license[i]];
                 } else {
-                  licenseId = await this.bulkCreate(this.connection, {
+                  licenseId = await this.insertLicensesBulk({
                     spdxid: component.license[i],
+                    fulltext: 'AUTOMATIC IMPORT',
+                    url: 'AUTOMATIC IMPORT',
+                    name: component.license[i],
+                    official: 1,
                   });
                   licenses = {
                     ...licenses,
@@ -257,6 +241,57 @@ export class LicenseModel extends Model {
         log.error(err);
         reject(err);
       }
+    });
+  }
+
+  private insertLicensesBulk(license: License): Promise<number> {
+    return new Promise<number>((resolve) => {
+      this.connection.run(
+        queries.SQL_CREATE_LICENSE,
+        license.spdxid,
+        license.spdxid,
+        license.fulltext,
+        license.url,
+        license.official,
+        function (this: any, error: any) {
+          resolve(this.lastID);
+        },
+      );
+    });
+  }
+
+  public async insertInBulk(licenses: Array<License>): Promise<Array<License>> {
+    return new Promise<Array<License>>(async (resolve, reject) => {
+      this.connection.serialize(async () => {
+        this.connection.run('begin transaction');
+        for (let i = 0; i < licenses.length; i += 1) {
+          const licenseId = await this.insertLicensesBulk(licenses[i]);
+          licenses[i].id = licenseId;
+        }
+
+        this.connection.run('commit', (err: any) => {
+          if (!err) resolve(licenses);
+          reject(err);
+        });
+      });
+    });
+  }
+
+  public attachLicensesToComponentBulk(data: Array<{ compid: number, licenses: Array<Number> }>) {
+    return new Promise<void>(async (resolve, reject) => {
+      this.connection.serialize(async () => {
+        this.connection.run('begin transaction');
+        for (let i = 0; i < data.length; i += 1) {
+          data[i].licenses.forEach((l) => {
+            this.bulkAttachLicensebyId(this.connection, { compid: data[i].compid, license_id: l });
+          });
+        }
+
+        this.connection.run('commit', (err: any) => {
+          if (!err) resolve();
+          reject(err);
+        });
+      });
     });
   }
 }
