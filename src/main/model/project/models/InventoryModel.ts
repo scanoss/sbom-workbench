@@ -218,4 +218,22 @@ export class InventoryModel extends Model {
     const call = util.promisify(this.connection.run.bind(this.connection));
     await call(sql);
   }
+
+  public async deleteBulk(ids: Array<Number>) {
+    return new Promise<void>(async (resolve, reject) => {
+      this.connection.serialize(async () => {
+        this.connection.run('begin transaction');
+
+        ids.forEach((id) => {
+          this.connection.run(queries.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION, id);
+          this.connection.run(queries.SQL_DELETE_INVENTORY_BY_ID, id);
+
+          this.connection.run('commit', (err: any) => {
+            if (!err) resolve();
+            reject(err);
+          });
+        });
+      });
+    });
+  }
 }
