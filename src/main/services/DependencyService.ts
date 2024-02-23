@@ -109,17 +109,21 @@ class DependencyService {
         return { ...d,
           ...{ rejectedAt: null,
             version: d.originalVersion,
-            dependencyId: d.dependencyId,
           },
         };
       });
       await modelProvider.model.dependency.restoreBulk(restore);
 
-      // Filter dependencies to be restored
-      const updatedDependencies = await this.getAll(null);
-      const restoredDependencies = updatedDependencies.filter((d) => dependencyIdMapper.has(d.dependencyId));
+      restoreDependencies.forEach((d) => {
+        d.component = null;
+        d.status = null;
+        d.inventory = null;
+        d.status = FileStatusType.PENDING;
+        d.version = d.originalVersion;
+        d.licenses = d.originalLicense;
+      });
 
-      return restoredDependencies;
+      return restoreDependencies;
     } catch (error: any) {
       log.error(error);
       throw error;
