@@ -84,12 +84,42 @@ class DependencyService {
 
   public async restoreAllByIds(dependenciesIds: number[]): Promise<Array<Dependency>> {
     try {
-      const results = [];
-      for (let i = 0; i < dependenciesIds.length; i += 1) {
-        const result = await this.restore(dependenciesIds[i]);
-        results.push(result);
+      const dependencyIdMapper = new Set<Number>(dependenciesIds);
+      const dependencies = await this.getAll(null);
+
+      // Filter dependencies to be restored
+      const restoreDependencies = dependencies.filter((d) => dependencyIdMapper.has(d.dependencyId));
+
+      // Delete inventories
+      const inventoryIds = [];
+      restoreDependencies.forEach((d) => { if (d.status === 'identified') inventoryIds.push(d.inventory.id); });
+      if (inventoryIds.length > 0) {
+        await modelProvider.model.inventory.deleteBulk(inventoryIds);
       }
-      return results;
+
+      // Delete components
+      const componentIds = [];
+      restoreDependencies.forEach((d) => { if (d.component.source === 'manual') componentIds.push(d.component.compid); });
+      if (componentIds.length > 0) {
+        await modelProvider.model.component.deleteByID(componentIds);
+      }
+
+      // Restore dependencies
+      const restore = restoreDependencies.map((d) => {
+        return { ...d,
+          ...{ rejectedAt: null,
+            version: d.originalVersion,
+            dependencyId: d.dependencyId,
+          },
+        };
+      });
+      await modelProvider.model.dependency.restoreBulk(restore);
+
+      // Filter dependencies to be restored
+      const updatedDependencies = await this.getAll(null);
+      const restoredDependencies = updatedDependencies.filter((d) => dependencyIdMapper.has(d.dependencyId));
+
+      return restoredDependencies;
     } catch (error: any) {
       log.error(error);
       throw error;
@@ -98,14 +128,12 @@ class DependencyService {
 
   public async restoreAllByPath(path: string): Promise<Array<Dependency>> {
     try {
-      const results = [];
+      // Get depencies to be restore by path
       const dependencies = await this.getAll({ path });
-      const dependencyIds = dependencies.filter((d) => d.status === FileStatusType.IDENTIFIED || d.status === FileStatusType.ORIGINAL).map((d) => d.dependencyId);
-      for (let i = 0; i < dependencyIds.length; i += 1) {
-        const result = await this.restore(dependencyIds[i]);
-        results.push(result);
-      }
-      return results;
+      const ids = dependencies.filter((d) => d.status === FileStatusType.IDENTIFIED || d.status === FileStatusType.ORIGINAL).map((d) => d.dependencyId);
+
+      // Restore dependencies
+      return await this.restoreAllByIds(ids);
     } catch (error: any) {
       log.error(error);
       throw error;

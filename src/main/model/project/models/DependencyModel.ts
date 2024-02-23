@@ -94,6 +94,31 @@ export class DependencyModel extends Model {
     );
   }
 
+  public async restoreBulk(dependencies: Array<Partial<Dependency>>): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      this.connection.serialize(async () => {
+        this.connection.run('begin transaction');
+
+        dependencies.forEach((d) => {
+          this.connection.run(
+            'UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?;',
+            null,
+            d.scope ? d.scope : null,
+            d.purl,
+            d.version ? d.version : null,
+            d.originalLicense ? d.originalLicense.join(',').toString() : null,
+            d.dependencyId,
+          );
+        });
+      });
+
+      this.connection.run('commit', (err: any) => {
+        if (!err) resolve();
+        reject(err);
+      });
+    });
+  }
+
   public async deleteDirty(data: Record<string, string>): Promise<void> {
     const SQLquery = queries.SQL_DELETE_DIRTY_DEPENDENCIES.replace('#PURLS', data.purls).replace(
       '#VERSIONS',
@@ -135,5 +160,13 @@ export class DependencyModel extends Model {
     const callTotal = util.promisify(this.connection.get.bind(this.connection)) as any;
     const totalDetected = await callTotal(queries.SQL_DEPENDENCY_TOTAL_DETECTED);
     return { files, total: totalDetected.total };
+  }
+
+  public async getById(ids: Array<Number>) {
+    const dependenciesIds = ids.map((id) => `'${id}'`).join(',');
+    const call:any = util.promisify(this.connection.all.bind(this.connection));
+    const query = queries.SQL_DEPENDENCIES_BY_IDS.replace('#IDS', dependenciesIds);
+    const depencencies = await call(query);
+    return depencencies;
   }
 }
