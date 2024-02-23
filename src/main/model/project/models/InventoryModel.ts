@@ -225,13 +225,12 @@ export class InventoryModel extends Model {
         this.connection.run('begin transaction');
 
         ids.forEach((id) => {
-          this.connection.run(queries.SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION, id);
           this.connection.run(queries.SQL_DELETE_INVENTORY_BY_ID, id);
+        });
 
-          this.connection.run('commit', (err: any) => {
-            if (!err) resolve();
-            reject(err);
-          });
+        this.connection.run('commit', (err: any) => {
+          if (!err) resolve();
+          reject(err);
         });
       });
     });
