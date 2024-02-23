@@ -247,6 +247,8 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   SQL_DEPENDENCY_TOTAL_DETECTED = 'SELECT count(*) as total FROM dependencies;';
 
+  SQL_DEPENDENCIES_BY_IDS = 'SELECT * FROM dependencies WHERE dependencyId IN (#IDS);';
+
   // VULNERABILITIES
 
   SQL_GET_ALL_IDENTIFIED_VULNERABILITIES = `SELECT * FROM vulnerability v
