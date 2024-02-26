@@ -107,8 +107,8 @@ export class ComponentModel extends Model {
     return licenses;
   }
 
-  public async bulkImport(components: Array<Partial<Component>>) {
-    return new Promise<Array<Partial<Component>>>(async (resolve, reject) => {
+  public async bulkImport(components: Array<Component>) {
+    return new Promise<Array<Component>>(async (resolve, reject) => {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
 
@@ -149,7 +149,7 @@ export class ComponentModel extends Model {
     );
   }
 
-  public async getUniqueComponentsFromResults(): Promise<Array<Partial<Component>>> {
+  public async getUniqueComponentsFromResults(): Promise<Array<Component>> {
     const call = util.promisify(this.connection.all.bind(this.connection)) as any;
     const components = await call(queries.SQL_GET_UNIQUE_COMPONENT);
     components.forEach((result) => {

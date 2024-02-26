@@ -132,7 +132,7 @@ class ComponentService {
 
   public async importComponents() {
     try {
-      const components: Array<Partial<Component>> = await modelProvider.model.component.getUniqueComponentsFromResults();
+      const components: Array<Component> = await modelProvider.model.component.getUniqueComponentsFromResults();
       components.forEach((c) => { c.description = 'AUTOMATIC IMPORT'; c.source = ComponentSource.ENGINE; });
       await modelProvider.model.component.bulkImport(components);
       const data = await modelProvider.model.component.getLicensesAttachedToComponentsFromResults();
