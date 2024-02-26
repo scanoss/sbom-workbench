@@ -218,7 +218,7 @@ class DependencyService {
           d.licenses.forEach((l) => licenseIds.push(licenseMapper.get(l).id));
 
           newComponentsMapper.set(`${d.purl}@${d.version}`, {
-            name: d.purl,
+            name: d.componentName ? d.componentName : d.purl,
             purl: d.purl,
             version: d.version,
             description: 'n/a',
