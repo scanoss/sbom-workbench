@@ -107,7 +107,7 @@ export class ReuseIdentificationTask implements ITask<void, Array<Inventory>> {
   private getReuseIdentificationComponentsMapper(reuseComponent: Record<string, Array<any>>): Map<string, number> {
     const componentMapper = new Map<string, number>();
     reuseComponent.existingComponents.forEach((c) => componentMapper.set(`${c.purl}${c.version}`, c.compid));
-    reuseComponent.newComponents.forEach((c) => componentMapper.set(`${c.purl}${c.version}`, c.id));
+    reuseComponent.newComponents.forEach((c) => componentMapper.set(`${c.purl}${c.version}`, c.compid));
     return componentMapper;
   }
 
@@ -144,15 +144,17 @@ export class ReuseIdentificationTask implements ITask<void, Array<Inventory>> {
     const localLicenses = await modelProvider.model.license.getAll();
     const localLicensesMapper = new Map <string, number>();
     localLicenses.forEach((l) => localLicensesMapper.set(l.spdxid, l.id));
+    let newLicenses = [];
     for (let i = 0; i < components.length; i += 1) {
       for (let j = 0; j < components[i].licenses.length; j += 1) {
-        const { spdxid, name } = components[i].licenses[j];
+        const { spdxid, name, url } = components[i].licenses[j];
         if (!localLicensesMapper.has(components[i].licenses[j].spdxid)) {
-          const newLicense = await modelProvider.model.license.create({ name, spdxid, fulltext: 'IMPORTED' });
-          localLicensesMapper.set(newLicense.spdxid, newLicense.id);
+          newLicenses.push({ name, spdxid, fulltext: 'IMPORTED', url: url || null, official: 0 });
         }
       }
     }
+    newLicenses = await modelProvider.model.license.insertInBulk(newLicenses);
+    newLicenses.forEach((l) => localLicensesMapper.set(l.spdxid, l.id));
     return localLicensesMapper;
   }
 
@@ -195,26 +197,27 @@ export class ReuseIdentificationTask implements ITask<void, Array<Inventory>> {
  * */
   @After(AddVulnerability)
   @After(AddCrypto)
-  private async createNewComponents(newComponents: Array<NewComponentDTO>): Promise <Array<ComponentVersion>> {
-    const promises = [];
+  private async createNewComponents(newComponents: Array<NewComponentDTO>): Promise <Array<Component>> {
+    let components: Array<Component> = [];
     newComponents.forEach((comp) => {
-      const component = new ComponentVersion();
-      promises.push(comp.versions.map((v) => {
-        Object.assign(component, comp);
-        component.version = v.version;
-        component.source = ComponentSource.MANUAL;
-        component.setLicenseIds(v.licenses);
-        return modelProvider.model.component.create(component);
-      }));
+      comp.versions.forEach((v) => {
+        components.push({
+          version: v.version,
+          source: ComponentSource.MANUAL,
+          licenses: v.licenses,
+          purl: comp.purl,
+          name: comp.name,
+          vendor: comp.name,
+          url: comp.url,
+          description: 'n/a',
+        });
+      });
     });
-    const newComp = [];
-    for (let i = 0; i < promises.length; i += 1) {
-      const results = await Promise.all(promises[i].map((p) => p.catch((e) => e)));
-      const components = results.filter(
-        (result) => !(result instanceof Error),
-      );
-      components.forEach((c) => newComp.push(c));
-    }
-    return newComp;
+
+    components = await modelProvider.model.component.bulkImport(components);
+
+    const attachLicensesToComponents = components.map((c) => { return { compid: c.compid, licenses: c.licenses }; });
+    await modelProvider.model.license.attachLicensesToComponentBulk(attachLicensesToComponents);
+    return components;
   }
 }
