@@ -94,7 +94,7 @@ export class DependencyModel extends Model {
     );
   }
 
-  public async restoreBulk(dependencies: Array<Partial<Dependency>>): Promise<void> {
+  public async updateBulk(dependencies: Array<Partial<Dependency>>): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
@@ -102,7 +102,7 @@ export class DependencyModel extends Model {
         dependencies.forEach((d) => {
           this.connection.run(
             'UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?;',
-            null,
+            d.rejectedAt,
             d.scope ? d.scope : null,
             d.purl,
             d.version ? d.version : null,
@@ -110,11 +110,11 @@ export class DependencyModel extends Model {
             d.dependencyId,
           );
         });
-      });
 
-      this.connection.run('commit', (err: any) => {
-        if (!err) resolve();
-        reject(err);
+        this.connection.run('commit', (err: any) => {
+          if (!err) resolve();
+          reject(err);
+        });
       });
     });
   }

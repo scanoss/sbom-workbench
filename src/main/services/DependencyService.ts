@@ -112,7 +112,7 @@ class DependencyService {
           },
         };
       });
-      await modelProvider.model.dependency.restoreBulk(restore);
+      await modelProvider.model.dependency.updateBulk(restore);
 
       restoreDependencies.forEach((d) => {
         d.component = null;
@@ -267,48 +267,32 @@ class DependencyService {
   }
 
   public async reject(dependencyId: number): Promise<Dependency> {
-    try {
-      const dep = (await this.getAll({ id: dependencyId }))[0];
-      const params = [];
-      //  `UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?
-      params.push(new Date().toISOString(), dep.scope ? dep.scope : null, dep.purl, dep.version, dep.licenses.length > 0 ? dep.licenses.join(',') : null, dep.dependencyId);
-      await modelProvider.model.dependency.update(params);
-      const response = (await this.getAll({ id: dependencyId }))[0];
-      return response;
-    } catch (error: any) {
-      log.error(error);
-      throw error;
-    }
+    const rejectedDependency = await this.rejectAllByIds([dependencyId]);
+    return rejectedDependency[0];
   }
 
   public async rejectAllByIds(dependencyIds: Array<number>): Promise<Array<Dependency>> {
-    try {
-      const response = [];
-      for (let i = 0; i < dependencyIds.length; i += 1) {
-        const dep = await this.reject(dependencyIds[i]);
-        response.push(dep);
-      }
-      return response;
-    } catch (error: any) {
-      log.error(error);
-      throw error;
-    }
+    const dependencyCatalog = (await this.getAll(null));
+    const idsMapper = new Set<Number>(dependencyIds);
+    const dependenciesToReject = dependencyCatalog.filter((d) => idsMapper.has(d.dependencyId));
+
+    const rejectedDependencies = dependenciesToReject.map((d) => {
+      return { ...d,
+        ...{ rejectedAt: new Date().toISOString(),
+          status: FileStatusType.ORIGINAL as FileStatusType.ORIGINAL,
+        },
+      };
+    });
+
+    await modelProvider.model.dependency.updateBulk(rejectedDependencies);
+
+    return rejectedDependencies;
   }
 
   public async rejectAllByPath(path: string): Promise<Array<Dependency>> {
-    try {
-      const dependencies = await this.getAll({ path });
-      const dependencyIds = dependencies.filter((d) => d.status === FileStatusType.PENDING).map((d) => d.dependencyId);
-      const response = [];
-      for (let i = 0; i < dependencyIds.length; i += 1) {
-        const dep = await this.reject(dependencyIds[i]);
-        response.push(dep);
-      }
-      return response;
-    } catch (error: any) {
-      log.error(error);
-      throw error;
-    }
+    const dependencies = await this.getAll({ path });
+    const dependencyIds = dependencies.filter((d) => d.status === FileStatusType.PENDING).map((d) => d.dependencyId);
+    return this.rejectAllByIds(dependencyIds);
   }
 
   public async acceptAllByPath(path: string): Promise<Array<Dependency>> {

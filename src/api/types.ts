@@ -299,6 +299,7 @@ export interface Dependency {
   valid: boolean;
   originalVersion: string;
   originalLicense: string[];
+  rejectedAt?: string
 }
 
 export enum ScannerStage {
