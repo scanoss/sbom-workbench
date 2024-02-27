@@ -78,7 +78,7 @@ const DependencyViewer = () => {
       if (content === FileType.BINARY) throw new Error(FileType.BINARY);
       setLocalFileContent({ content, error: false });
     } catch (error) {
-      setLocalFileContent({ content: null, error: true });
+      setLocalFileContent({ content: t('FileNotLoad'), error: true });
     }
   };
 
