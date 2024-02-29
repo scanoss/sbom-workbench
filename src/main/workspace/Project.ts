@@ -247,6 +247,8 @@ export class Project {
 
   public async setGlobalFilter(filter: IWorkbenchFilter) {
     try {
+      if (filter?.path) filter.path = filter.path + '/';
+
       if (!(JSON.stringify({ ...filter, path: null }) === JSON.stringify({ ...this.filter, path: null }))) {
         broadcastManager.get().send(IpcChannels.TREE_UPDATING, {});
         this.tree.setTreeViewMode(TreeViewModeCreator.create(filter, this.fileTreeViewMode));

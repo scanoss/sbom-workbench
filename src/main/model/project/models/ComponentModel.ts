@@ -16,6 +16,7 @@ export class ComponentModel extends Model {
 
   public static readonly entityMapper = {
     path: 'f.path',
+    filePath: 'f.path',
     purl: 'comp.purl',
     version: 'comp.version',
     source: 'comp.source',

@@ -29,7 +29,7 @@ class ResultService {
   public async getFromPath(path: string) {
     let results = await modelProvider.model.result.getFromPath(path);
     results = new ResultAdapter().adapt(results);
-    const queryBuilder = QueryBuilderCreator.create({ path });
+    const queryBuilder = QueryBuilderCreator.create({ filePath: path });
     const components: any = await modelProvider.model.component.getAll(queryBuilder);
     results.forEach((result) => {
       if (result.version) result.component = components.find((component) => component.purl === result.purl && component.version === result.version);
