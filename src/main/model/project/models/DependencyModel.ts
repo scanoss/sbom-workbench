@@ -39,11 +39,10 @@ export class DependencyModel extends Model {
             d.originalLicense.length > 0 ? d.originalLicense.join(',') : null,
           );
         });
-      });
-
-      this.connection.run('commit', (err: any) => {
-        if (!err) resolve();
-        reject(err);
+        this.connection.run('commit', (err: any) => {
+          if (!err) resolve();
+          reject(err);
+        });
       });
     });
   }
