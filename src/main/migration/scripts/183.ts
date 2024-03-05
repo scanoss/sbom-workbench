@@ -1,6 +1,6 @@
-import { userSettingService } from '../../services/UserSettingService';
 import fs from 'fs';
 import path from 'path';
+import { userSettingService } from '../../services/UserSettingService';
 
 export async function wsMigration183(): Promise<void> {
   const apis = userSettingService.get().APIS;

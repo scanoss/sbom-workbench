@@ -84,8 +84,19 @@ class UserSettingService {
       this.setMyPath(path.join(os.homedir(), AppConfig.DEFAULT_SETTING_NAME, this.name));
       if (!(await wsUtils.fileExist(this.myPath))) {
         // Creates DEFAULT_SETTING_NAME folder if not exists
+
         await fs.promises.mkdir(path.join(os.homedir(), AppConfig.DEFAULT_SETTING_NAME), { recursive: true });
-        // use save method to create file if not exists
+
+        // Keep old version in case old workspaceCfg exists
+        const oldWsConfigPath = path.join(os.homedir(), AppConfig.DEFAULT_WORKSPACE_NAME, 'workspaceCfg.json');
+        if (await wsUtils.fileExist(oldWsConfigPath)) {
+          const oldWorkspaceConfig = await fs.promises.readFile(oldWsConfigPath, 'utf8');
+          const oldConfig: IWorkspaceCfg = JSON.parse(oldWorkspaceConfig);
+          if (oldConfig.VERSION) {
+            this.set({ VERSION: oldConfig.VERSION });
+          }
+        }
+
         await this.save();
       }
 

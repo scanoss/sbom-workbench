@@ -86,9 +86,12 @@ If your network is using a proxy with SSL interception you can include your cert
 
 You can disable any SSL errors, to do so you can change this option to true
 
-`"IGNORE_CERT_ERRORS: true`
+`"IGNORE_CERT_ERRORS": true`
 
 ## [Collaborative Workspace](COLLAB_WORKSPACE.md)
+
+The SBOM Workbench includes support for a collaborative workspace, a feature designed to enhance teamwork. View more details [here](COLLAB_WORKSPACE.md).
+
 
 ## Contributing
 

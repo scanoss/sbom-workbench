@@ -13,11 +13,12 @@ export async function wsMigration1120(): Promise<void> {
     const oldWorkspaceConfig = await fs.promises.readFile(oldWsConfigPath, 'utf8');
     const oldConfig: IWorkspaceCfg = JSON.parse(oldWorkspaceConfig);
     const currentSettings = userSettingService.get();
-    const updatedSettings = { ...currentSettings, ...oldConfig };
+    const updatedSettings = { ...currentSettings, ...oldConfig, VERSION: '1.12.0' };
     userSettingService.set(updatedSettings);
     await userSettingService.save();
     await fs.promises.unlink(oldWsConfigPath);
   } catch (e: any) {
+    console.log(e);
     log.info('Workspace config not found');
   }
 }
