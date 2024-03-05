@@ -62,7 +62,7 @@ npm run package
 SBOM Workbench is multi-language enabled. To contribute a new language please see our [internationalization documentation](assets/i18n/README.md).
 
 ## Workbench Configuration
-SBOM Workbench support advanced settings. All the configurations needs to be included in the workspace config file `~/scanoss-workspace/workspaceCfg.json`
+SBOM Workbench support advanced settings. All the configurations needs to be included in the global config file `~/.scanoss/sbom-workbench-settings.json`
 
 ### Scanner parameters
 
@@ -86,7 +86,7 @@ If your network is using a proxy with SSL interception you can include your cert
 
 You can disable any SSL errors, to do so you can change this option to true
 
-`"IGNORE_CERT_ERRORS:"true"`
+`"IGNORE_CERT_ERRORS: true`
 
 ## [Collaborative Workspace](COLLAB_WORKSPACE.md)
 
