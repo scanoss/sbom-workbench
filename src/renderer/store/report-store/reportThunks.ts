@@ -12,7 +12,19 @@ export const getReport = createAsyncThunk('report/getReport', async () => {
 });
 
 export const forceUpdate = createAsyncThunk('report/forceUpdate', async () => {
-  const promises = [cryptographyService.update(), vulnerabilityService.update()];
-  await Promise.all(promises);
-  return true;
+  // workaround: second IPC call is lost in promise All
+  const delayedPromise = new Promise((resolve, reject) => {
+    setTimeout(async () => {
+      try {
+        const response = await cryptographyService.update();
+        resolve(response);
+      } catch (e) {
+        reject(e);
+      }
+    }, 100);
+  });
+
+  const promises = [vulnerabilityService.update(), delayedPromise];
+  const all = await Promise.allSettled(promises);
+  return all;
 });

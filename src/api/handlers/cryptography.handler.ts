@@ -10,7 +10,7 @@ api.handle(IpcChannels.CRYPTOGRAPHY_UPDATE, async (event) => {
     const data = await cryptographyService.update();
     return Response.ok({ message: 'Cryptography updated successfully', data });
   } catch (error: any) {
-    log.error('[Vulnerability Update]: ', error);
+    log.error('[Cryptography Update]: ', error);
     return Response.fail({ message: error.message });
   }
 });

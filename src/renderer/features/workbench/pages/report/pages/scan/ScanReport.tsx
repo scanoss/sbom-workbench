@@ -33,10 +33,15 @@ const ScanReport = () => {
     const dialog = await dialogCtrl.createProgressDialog(t('Dialog:UpdatingReport').toUpperCase());
     dialog.present();
     try {
-      await dispatch(forceUpdate()).unwrap();
+      const results = await dispatch(forceUpdate()).unwrap();
+      for (const result of results) {
+        if (result.status === 'rejected') throw Error(result.reason);
+      }
+
       dialog.finish({ message: t('Dialog:UpdateFinished').toUpperCase() });
     } catch (e: any) {
       dialog.dismiss();
+      dialogCtrl.openAlertDialog(e);
     } finally {
       dialog.dismiss({ delay: 1500 });
       dispatch(getReport());
