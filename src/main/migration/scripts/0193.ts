@@ -12,22 +12,36 @@ export async function projectMigration193(projectPath: string): Promise<void> {
   log.info('Migration 1.9.3 Finished');
 }
 async function addOnCascadeDeleteConstraint(projectPath:string): Promise<void> {
-  const model = new Model(projectPath);
-  const db = await model.openDb();
-  const call = util.promisify(db.run.bind(db));
-  await call('PRAGMA foreign_keys = OFF;');
-  await call('CREATE TABLE temp_component_vulnerability AS SELECT * FROM component_vulnerability;');
-  await call('DROP TABLE component_vulnerability;');
-  await call(`CREATE TABLE IF NOT EXISTS component_vulnerability (
-    purl varchar(45) NOT NULL,
-    version varchar(45) NOT NULL,
-    cve varchar(30) NOT NULL,
-    rejectAt datetime,
-    CONSTRAINT component_vulnerability_pk PRIMARY KEY (purl,version,cve),
-    CONSTRAINT component_vulnerability_vulnerability FOREIGN KEY (cve) REFERENCES vulnerability (cve) ON DELETE CASCADE)
-    ;`);
-  await call('INSERT INTO component_vulnerability SELECT * FROM temp_component_vulnerability;');
-  await call('DROP TABLE temp_component_vulnerability;');
-  await call('PRAGMA foreign_keys = ON;');
-  await db.close();
+  return new Promise((resolve, reject) => {
+    try {
+      const db: any = new sqlite3.Database(
+        `${projectPath}/scan_db`,
+        sqlite3.OPEN_READWRITE,
+        async (err: any) => {
+          if (err) log.error(err);
+          db.serialize(async () => {
+            db.run('PRAGMA foreign_keys = OFF;');
+            db.run('CREATE TABLE temp_component_vulnerability AS SELECT * FROM component_vulnerability;');
+            db.run('DROP TABLE component_vulnerability;');
+            db.run(`CREATE TABLE IF NOT EXISTS component_vulnerability (
+                    purl varchar(45) NOT NULL,
+                    version varchar(45) NOT NULL,
+                    cve varchar(30) NOT NULL,
+                    rejectAt datetime,
+                    CONSTRAINT component_vulnerability_pk PRIMARY KEY (purl,version,cve),
+                    CONSTRAINT component_vulnerability_vulnerability FOREIGN KEY (cve) REFERENCES vulnerability (cve) ON DELETE CASCADE)
+                    ;`);
+            db.run('INSERT INTO component_vulnerability SELECT * FROM temp_component_vulnerability;');
+            db.run('DROP TABLE temp_component_vulnerability;');
+            db.run('PRAGMA foreign_keys = ON;');
+            db.close();
+          });
+
+          resolve();
+        },
+      );
+    } catch (e) {
+      reject(e);
+    }
+  });
 }
