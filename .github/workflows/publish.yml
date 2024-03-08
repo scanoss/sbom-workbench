@@ -28,20 +28,58 @@ jobs:
           npm run build
 
       - name: Build binaries for Windows
-        env:
-          WIN_CSC_LINK: ${{ secrets.WIN_CSC }}
-          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
         run: |
           npm exec -- electron-builder build --win --publish never
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: artifact_w_unsigned
+          path: |
+            release/build/sbom-workbench*.exe
+            release/build/latest.yml
+            release/build/*exe.blockmap
+
+
+  build_w_sign:
+    name: "Sign with CodeSignTool"
+    needs: [build_w]
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Download artifact W unsigned
+        uses: actions/download-artifact@v2
+        with:
+          name: artifact_w_unsigned
+
+
+      - name: Find Windows Artifact Path
+        id: win-path-artifact
+        run: |
+          export WIN_BINARY_FILEPATH=$(ls sbom-workbench*.exe)
+          mkdir win_unsigned
+          mv "$WIN_BINARY_FILEPATH" win_unsigned/
+          echo "ARTIFACT_WIN_PATH=win_unsigned/$WIN_BINARY_FILEPATH" >> "$GITHUB_OUTPUT"
+
+      - name: Sign Windows Artifact with CodeSignTool
+        uses: sslcom/actions-codesigner@develop
+        env:
+          ARTIFACT_WIN_PATH: ${{ steps.win-path-artifact.outputs.ARTIFACT_WIN_PATH }}
+        with:
+          command: sign
+          username: ${{secrets.ES_USERNAME}}
+          password: ${{secrets.ES_PASSWORD}}
+          credential_id: ${{secrets.CREDENTIAL_ID}}
+          totp_secret: ${{secrets.ES_TOTP_SECRET}}
+          file_path:  ${GITHUB_WORKSPACE}/${{ env.ARTIFACT_WIN_PATH }}
+          output_path:  ${GITHUB_WORKSPACE}
 
       - uses: actions/upload-artifact@v3
         with:
           name: artifact_w
           path: |
-            release/build/sbom-workbench*.exe
-            release/build/latest.yml
-            release/build/*exe.blockmap
+            sbom-workbench*.exe
+            latest.yml
+            *exe.blockmap
 
   build_m:
     name: "Build for MacOS"
@@ -50,6 +88,12 @@ jobs:
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.0'
+          architecture: 'x64'
 
       - name: Install Node and NPM
         uses: actions/setup-node@v3
@@ -63,7 +107,7 @@ jobs:
           npm run postinstall
           npm run build
 
-      - name: Build Binaries for MacOs & Windows
+      - name: Build Binaries for MacOs
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASS }}
@@ -115,7 +159,7 @@ jobs:
 
 
   create_release:
-    needs: [build_w, build_m, build_l]
+    needs: [build_w_sign, build_l, build_m]
     runs-on: ubuntu-latest
 
     steps:
