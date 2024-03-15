@@ -14,6 +14,7 @@ export class WFPResumeTask extends ScanTask<WFPDispatcher, WFPResumeScannerInput
   // @Override
   public async set(): Promise<void> {
     await this.project.open();
+    this.project.processedFiles = this.project.filesSummary.include - Object.keys(this.project.filesToScan).length;
     const scanState: ScanState = this.project.metadata.getScannerState();
     if (scanState !== ScanState.SCANNING && scanState !== ScanState.RESCANNING)
       throw new Error('Cannot resume project');
