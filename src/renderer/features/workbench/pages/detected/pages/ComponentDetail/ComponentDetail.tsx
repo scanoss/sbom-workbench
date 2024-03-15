@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import { Inventory } from '@api/types';
@@ -37,11 +37,13 @@ export const ComponentDetail = () => {
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
+  const isLoaded = useRef<boolean>(false);
+
   const { summary, history: stateHistory } = useSelector(selectWorkbench);
   const { component } = useSelector(selectComponentState);
   const { filter, node, version } = useSelector(selectNavigationState);
 
-  const [files, setFiles] = useState<any[]>([]);
+  const [files, setFiles] = useState<any[] | null>(null);
   const [filterFiles, setFilterFiles] = useState<{ pending: any[]; identified: any[]; ignored: any[] }>({
     pending: null,
     identified: null,
@@ -59,10 +61,7 @@ export const ComponentDetail = () => {
   const onAction = async (file: any, action: MATCH_CARD_ACTIONS) => {
     switch (action) {
       case MATCH_CARD_ACTIONS.ACTION_ENTER:
-        navigate({
-          pathname: '/workbench/detected/file',
-          search: `?path=file|${encodeURIComponent(file.path)}`,
-        });
+        onEnterPressed(file);
         break;
       case MATCH_CARD_ACTIONS.ACTION_IDENTIFY:
         await onIdentifyPressed(file);
@@ -83,7 +82,16 @@ export const ComponentDetail = () => {
         break;
     }
 
-    getFiles();
+    if (action !== MATCH_CARD_ACTIONS.ACTION_ENTER && action !== MATCH_CARD_ACTIONS.ACTION_DETAIL) {
+      getFiles();
+    }
+  };
+
+  const onEnterPressed = (file) => {
+    navigate({
+      pathname: '/workbench/detected/file',
+      search: `?path=file|${encodeURIComponent(file.path)}`,
+    });
   };
 
   const onIdentifyPressed = async (result) => {
@@ -103,8 +111,6 @@ export const ComponentDetail = () => {
   const onIdentifyAllPressed = async () => {
     const selFiles = filterFiles.pending.map((file) => file.id);
     const inv: Partial<Inventory> = {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       component: component.name,
       version: version || component.versions[0]?.version,
       spdxid: component.versions[0]?.reliableLicense || component.versions[0]?.licenses[0]?.spdxid,
@@ -199,12 +205,14 @@ export const ComponentDetail = () => {
       identified: null,
       ignored: null,
     });
-    getFiles();
   }, [version, node]);
 
   useEffect(() => {
-    if (searchQuery === null || searchQuery === undefined || !files) return;
+    if (isLoaded.current) getFiles();
+  }, [summary, version, node]);
 
+  useEffect(() => {
+    if (searchQuery === null || searchQuery === undefined || !files) return;
     setFilterFiles({
       pending: files.filter((file) => file.path.toLowerCase().includes(searchQuery) && file.status === 'pending'),
       identified: files.filter((file) => file.path.toLowerCase().includes(searchQuery) && file.status === 'identified'),
@@ -213,12 +221,17 @@ export const ComponentDetail = () => {
   }, [searchQuery, files]);
 
   useEffect(() => {
-    getFiles();
-  }, [summary]);
-
-  useEffect(() => {
     dispatch(setHistory({ section: tab }));
   }, [tab]);
+
+  useEffect(() => {
+    const init = async () => {
+      await getFiles();
+      isLoaded.current = true;
+    };
+
+    init();
+  }, []);
 
   const renderTab = () => {
     switch (tab) {
