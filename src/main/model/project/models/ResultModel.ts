@@ -6,7 +6,6 @@ import { ComponentModel } from './ComponentModel';
 import { licenseHelper } from '../../../helpers/LicenseHelper';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { IInsertResult, IResultLicense } from '../../interfaces/IInsertResult';
-import { QueryBuilderCreator } from '../../queryBuilder/QueryBuilderCreator';
 import { Model } from '../../Model';
 
 export class ResultModel extends Model {
@@ -15,8 +14,8 @@ export class ResultModel extends Model {
   public static readonly entityMapper = {
     path: 'f.path',
     source: 'comp.source',
-    purl: 'comp.purl',
-    version: 'comp.version',
+    purl: 'r.purl',
+    version: 'r.version',
   };
 
   component: ComponentModel;
