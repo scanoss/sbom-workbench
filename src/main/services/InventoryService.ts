@@ -8,49 +8,33 @@ import { getInventoriesGroupedByUsage, getUniqueResults } from './utils/inventor
 
 class InventoryService {
   public async get(inv: Partial<Inventory>): Promise<Inventory> {
-    try {
-      const inventory = (await modelProvider.model.inventory.getById(inv.id)) as Inventory;
-      const comp: Component = (await modelProvider.model.component.get(inventory.cvid)) as Component;
-      inventory.component = comp as Component;
-      const files: any = await modelProvider.model.inventory.getInventoryFiles(inventory);
-      inventory.files = files;
-      return inventory;
-    } catch (err: any) {
-      throw err;
-    }
+    const inventory = (await modelProvider.model.inventory.getById(inv.id)) as Inventory;
+    const comp: Component = (await modelProvider.model.component.get(inventory.cvid)) as Component;
+    inventory.component = comp as Component;
+    const files: any = await modelProvider.model.inventory.getInventoryFiles(inventory);
+    inventory.files = files;
+    return inventory;
   }
 
   public async detach(inv: Partial<Inventory>): Promise<boolean> {
-    try {
-      await modelProvider.model.file.restore(inv.files);
-      await modelProvider.model.inventory.detachFileInventory(inv);
-      const emptyInv: any = await modelProvider.model.inventory.emptyInventory();
-      if (emptyInv) {
-        const result = emptyInv.map((item: Record<string, number>) => item.id);
-        await modelProvider.model.inventory.deleteAllEmpty(result);
-      }
-      return true;
-    } catch (err: any) {
-      throw err;
+    await modelProvider.model.file.restore(inv.files);
+    await modelProvider.model.inventory.detachFileInventory(inv);
+    const emptyInv: any = await modelProvider.model.inventory.emptyInventory();
+    if (emptyInv) {
+      const result = emptyInv.map((item: Record<string, number>) => item.id);
+      await modelProvider.model.inventory.deleteAllEmpty(result);
     }
+    return true;
   }
 
   public async delete(inv: Partial<Inventory>): Promise<boolean> {
-    try {
-      const success: boolean = await modelProvider.model.inventory.delete(inv);
-      return success;
-    } catch (err: any) {
-      throw err;
-    }
+    const success: boolean = await modelProvider.model.inventory.delete(inv);
+    return success;
   }
 
   private async isInventory(inventory: Partial<Inventory>): Promise<Partial<Inventory>> {
-    try {
-      const inv: Partial<Inventory> = await modelProvider.model.inventory.isInventory(inventory);
-      return inv;
-    } catch (err: any) {
-      throw err;
-    }
+    const inv: Partial<Inventory> = await modelProvider.model.inventory.isInventory(inventory);
+    return inv;
   }
 
   public async create(inventory: Partial<Inventory>): Promise<Array<Inventory>> {
@@ -100,14 +84,17 @@ class InventoryService {
       const params = JSON.parse(JSON.stringify({ purl, version, filePath: files !== undefined ? files[0] : undefined, source, usage }));
       const queryBuilder = QueryBuilderCreator.create(params);
       const inventories = await modelProvider.model.inventory.getAll(queryBuilder);
-      if (inventory !== undefined) {
-        const component: any = await modelProvider.model.component.getAll();
-        const compObj = component.reduce((acc, comp) => {
-          acc[comp.compid] = comp;
-          return acc;
-        }, {});
+
+      if (inventories.length > 0 && inventory !== undefined) {
+        // const component: any = await modelProvider.model.component.getAll();
+        // const compObj = component.reduce((acc, comp) => {
+        //   acc[comp.compid] = comp;
+        //   return acc;
+        // }, {});
         for (let i = 0; i < inventories.length; i += 1) {
-          inventories[i].component = compObj[inventories[i].cvid];
+          const queryBuilder = QueryBuilderCreator.create({ compid: inventories[i].cvid });
+          const [component]: any = await modelProvider.model.component.getAll(queryBuilder);
+          inventories[i].component = component;
         }
         return inventories;
       }
@@ -119,47 +106,39 @@ class InventoryService {
   }
 
   public async attach(inv: Partial<Inventory>): Promise<boolean> {
-    try {
-      await modelProvider.model.file.identified(inv.files);
-      const success: boolean = await modelProvider.model.inventory.attachFileInventory(inv);
-      return success;
-    } catch (err: any) {
-      throw err;
-    }
+    await modelProvider.model.file.identified(inv.files);
+    const success: boolean = await modelProvider.model.inventory.attachFileInventory(inv);
+    return success;
   }
 
   public async preLoadInventoriesAcceptAll(data: Partial<IBatchInventory>, filter: IWorkbenchFilter): Promise<Array<Partial<Inventory>>> {
-    try {
-      let queryBuilder = null;
-      if (data.overwrite) queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.source.input });
-      else queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.source.input, status: 'PENDING' });
-      let files: any = await modelProvider.model.result.getResultsPreLoadInventory(queryBuilder);
-      files = files.reduce((acc, curr) => {
-        if (!acc[curr.id]) {
-          const aux = {
-            id: curr.id,
-            source: curr.source,
-            component: curr.component,
-            version: curr.version,
-            url: curr.url,
-            purl: curr.purl,
-            usage: curr.usage,
-            spdxid: [],
-          };
-          aux.spdxid.push(curr.spdxid);
-          acc[curr.id] = aux;
-        } else {
-          acc[curr.id].spdxid.push(curr.spdxid);
-        }
-        return acc;
-      }, {});
-      const components: any = await modelProvider.model.component.getAll(queryBuilder);
-      let inventories = this.getPreLoadInventory(Object.values(files)) as Array<Partial<Inventory>>;
-      inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);
-      return inventories;
-    } catch (err: any) {
-      throw err;
-    }
+    let queryBuilder = null;
+    if (data.overwrite) queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.source.input });
+    else queryBuilder = QueryBuilderCreator.create({ ...filter, path: data.source.input, status: 'PENDING' });
+    let files: any = await modelProvider.model.result.getResultsPreLoadInventory(queryBuilder);
+    files = files.reduce((acc, curr) => {
+      if (!acc[curr.id]) {
+        const aux = {
+          id: curr.id,
+          source: curr.source,
+          component: curr.component,
+          version: curr.version,
+          url: curr.url,
+          purl: curr.purl,
+          usage: curr.usage,
+          spdxid: [],
+        };
+        aux.spdxid.push(curr.spdxid);
+        acc[curr.id] = aux;
+      } else {
+        acc[curr.id].spdxid.push(curr.spdxid);
+      }
+      return acc;
+    }, {});
+    const components: any = await modelProvider.model.component.getAll(queryBuilder);
+    let inventories = this.getPreLoadInventory(Object.values(files)) as Array<Partial<Inventory>>;
+    inventories = inventoryHelper.AddComponentIdToInventory(components, inventories);
+    return inventories;
   }
 
   private getPreLoadInventory(results: any[]): Array<any> {
