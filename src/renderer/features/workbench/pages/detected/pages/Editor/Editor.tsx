@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
@@ -19,6 +19,7 @@ import * as FileUtils from '@shared/utils/file-utils';
 import * as SearchUtils from '@shared/utils/search-utils';
 import useSearchParams from '@hooks/useSearchParams';
 import { useTranslation } from 'react-i18next';
+import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
 import FileToolbar, { ToolbarActions } from '../../../../components/FileToolbar/FileToolbar';
@@ -26,7 +27,6 @@ import { workbenchController } from '../../../../../../controllers/workbench-con
 import CodeViewer from '../../../../components/CodeViewer/CodeViewer';
 import { CodeViewerManager } from './CodeViewerManager';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
-import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 
 const MemoCodeViewer = React.memo(CodeViewer);
 
@@ -40,6 +40,8 @@ const Editor = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { t } = useTranslation();
+
+  const isLoaded = useRef<boolean>(false);
 
   const highlightParam = useSearchParams().get('highlight');
 
@@ -62,7 +64,7 @@ const Editor = () => {
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
   const [isDiffView, setIsDiffView] = useState<boolean>(false);
 
-  const init = () => {
+  const init = async () => {
     setMatchInfo(null);
     setInventories(null);
     setInventoriesMatchInfo(null);
@@ -70,8 +72,12 @@ const Editor = () => {
     setLocalFileContent({ content: null, error: false, loading: false });
     setRemoteFileContent({ content: null, error: false, loading: false });
 
-    getInventories();
-    getResults();
+    Promise.allSettled([
+      getInventories(),
+      getResults(),
+    ])
+      .then(() => isLoaded.current = true)
+      .catch(() => isLoaded.current = false);
 
     if (file) {
       loadLocalFile(file);
@@ -203,8 +209,10 @@ const Editor = () => {
   }, [currentMatch]);
 
   useEffect(() => {
-    getInventories();
-    getResults();
+    if (isLoaded.current) {
+      getInventories();
+      getResults();
+    }
   }, [summary]);
 
   const onAction = (action: MATCH_INFO_CARD_ACTIONS, result: any = null) => {

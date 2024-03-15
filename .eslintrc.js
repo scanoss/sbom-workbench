@@ -37,6 +37,7 @@ module.exports = {
     'object-curly-newline': 'off',
     'react/no-unstable-nested-components': 'off',
     'arrow-body-style': 'off',
+    'no-return-assign': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
