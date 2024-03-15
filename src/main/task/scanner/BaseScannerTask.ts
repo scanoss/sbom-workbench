@@ -57,7 +57,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
 
     this.scanner.on(ScannerEvents.DISPATCHER_NEW_DATA, async (response) => {
       processedFiles += response.getNumberOfFilesScanned();
-
+      for (const file of response.getFilesScanned()) this.dispatcher.dispatch(this.project, file);
       this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
         processed:
           (100 * processedFiles)
@@ -69,9 +69,6 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
       ScannerEvents.RESULTS_APPENDED,
       (response, filesNotScanned) => {
         this.project.processedFiles += response.getNumberOfFilesScanned();
-
-        for (const file of response.getFilesScanned()) this.dispatcher.dispatch(this.project, file);
-
         this.project.tree.attachResults(response.getServerResponse());
 
         Object.assign(
