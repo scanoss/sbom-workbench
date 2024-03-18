@@ -6,6 +6,10 @@ on:
     tags:
       - 'v*.*.*'
 
+
+env:
+  ARTIFACT_NAME_PREFIX: "sbom-workbench"    ##This is the build.artifactName on package.json prefix
+
 jobs:
   build_w:
     name: "Build for Windows"
@@ -28,20 +32,58 @@ jobs:
           npm run build
 
       - name: Build binaries for Windows
-        env:
-          WIN_CSC_LINK: ${{ secrets.WIN_CSC }}
-          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
         run: |
           npm exec -- electron-builder build --win --publish never
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: artifact_w_unsigned
+          path: |
+            release/build/${{ env.ARTIFACT_NAME_PREFIX }}*.exe
+            release/build/latest.yml
+            release/build/*exe.blockmap
+
+  build_w_sign:
+    name: "Sign with CodeSignTool"
+    needs: [build_w]
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Download artifact W unsigned
+        uses: actions/download-artifact@v2
+        with:
+          name: artifact_w_unsigned
+
+        #This stage locates the unsigned .exe binary and move to win_unsigned folder.
+        #CodeSignTool does not support reading and writting into the same filepath
+      - name: Find Windows Artifact Path
+        id: win-path-artifact
+        run: |
+          export WIN_BINARY_FILEPATH=$(ls ${{ env.ARTIFACT_NAME_PREFIX }}*.exe)
+          mkdir win_unsigned
+          mv "$WIN_BINARY_FILEPATH" win_unsigned/
+          echo "ARTIFACT_WIN_PATH=win_unsigned/$WIN_BINARY_FILEPATH" >> "$GITHUB_OUTPUT"
+
+      - name: Sign Windows Artifact with CodeSignTool
+        uses: sslcom/actions-codesigner@develop
+        env:
+          ARTIFACT_WIN_PATH: ${{ steps.win-path-artifact.outputs.ARTIFACT_WIN_PATH }}
+        with:
+          command: sign
+          username: ${{secrets.ES_USERNAME}}
+          password: ${{secrets.ES_PASSWORD}}
+          credential_id: ${{secrets.CREDENTIAL_ID}}
+          totp_secret: ${{secrets.ES_TOTP_SECRET}}
+          file_path:  ${GITHUB_WORKSPACE}/${{ env.ARTIFACT_WIN_PATH }}
+          output_path:  ${GITHUB_WORKSPACE}
 
       - uses: actions/upload-artifact@v3
         with:
           name: artifact_w
           path: |
-            release/build/sbom-workbench*.exe
-            release/build/latest.yml
-            release/build/*exe.blockmap
+            ${{ env.ARTIFACT_NAME_PREFIX }}*.exe
+            latest.yml
+            *exe.blockmap
 
   build_m:
     name: "Build for MacOS"
@@ -78,7 +120,7 @@ jobs:
         with:
           name: artifact_m
           path: |
-            release/build/sbom-workbench*.dmg
+            release/build/${{ env.ARTIFACT_NAME_PREFIX }}*.dmg
             release/build/latest-mac.yml
             release/build/*dmg.blockmap
 
@@ -110,12 +152,12 @@ jobs:
         with:
           name: artifact_l
           path: |
-            release/build/sbom-workbench*.AppImage
+            release/build/${{ env.ARTIFACT_NAME_PREFIX }}*.AppImage
             release/build/latest-linux.yml
 
 
   create_release:
-    needs: [build_w, build_m, build_l]
+    needs: [build_w_sign, build_m, build_l]
     runs-on: ubuntu-latest
 
     steps:
