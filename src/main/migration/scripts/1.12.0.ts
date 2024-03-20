@@ -3,13 +3,13 @@ import log from 'electron-log';
 import * as os from 'os';
 import { IWorkspaceCfg } from '../../../api/types';
 import { userSettingService } from '../../services/UserSettingService';
-import { AppConfigDefault } from '../../../config/AppConfigDefault';
+import AppConfig from '../../../config/AppConfigModule';
 
 const path = require('path');
 
 export async function wsMigration1120(): Promise<void> {
   try {
-    const oldWsConfigPath = path.join(os.homedir(), AppConfigDefault.DEFAULT_WORKSPACE_NAME, 'workspaceCfg.json');
+    const oldWsConfigPath = path.join(os.homedir(), AppConfig.DEFAULT_WORKSPACE_NAME, 'workspaceCfg.json');
     const oldWorkspaceConfig = await fs.promises.readFile(oldWsConfigPath, 'utf8');
     const oldConfig: IWorkspaceCfg = JSON.parse(oldWorkspaceConfig);
     const currentSettings = userSettingService.get();
