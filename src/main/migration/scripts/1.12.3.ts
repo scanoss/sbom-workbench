@@ -1,14 +1,14 @@
 import fs from 'fs';
 import log from 'electron-log';
 import * as os from 'os';
-import { AppConfigDefault } from '../../../config/AppConfigDefault';
+import AppConfig from '../../../config/AppConfigModule';
 import { userSettingService } from '../../services/UserSettingService';
 
 const path = require('path');
 
 export async function appMigration1123(): Promise<void> {
   try {
-    const defaultWorkspacePath = path.join(os.homedir(), AppConfigDefault.DEFAULT_WORKSPACE_NAME);
+    const defaultWorkspacePath = path.join(os.homedir(), AppConfig.DEFAULT_WORKSPACE_NAME);
 
     const workspaceStuff = await fs.promises.readdir(defaultWorkspacePath, { withFileTypes: true }).catch((e) => {
       log.info(`%c[ WORKSPACE ]: Cannot read the workspace directory ${defaultWorkspacePath}`, 'color: green');
