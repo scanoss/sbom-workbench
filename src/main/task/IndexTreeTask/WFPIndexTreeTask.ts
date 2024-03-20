@@ -16,7 +16,7 @@ export class WFPIndexTreeTask extends IndexTreeTask {
 
   private getFiles(): Array<string> {
     const wfp = this.getWFPContent();
-    const regex = new RegExp(/^file=\w+,\w+,(?<path>.+$)/gm);
+    const regex = new RegExp(/file=.*,.*,(?<path>.*)/g);
     const files = [];
     let result = regex.exec(wfp);
     while (result !== null) {
