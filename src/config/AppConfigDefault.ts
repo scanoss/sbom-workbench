@@ -9,13 +9,13 @@ export const AppConfigDefault: IAppConfig = {
   DEFAULT_WORKSPACE_NAME: 'scanoss-workspace',
 
   // connection settings
-  API_URL: 'https://osskb.org/api',
+  API_URL: 'https://api.osskb.org',
   API_KEY: '',
   API_SCAN_PATH: '/scan/direct',
   API_CONTENT_PATH: '/file_contents',
   DEFAULT_SETTING_NAME: '.scanoss',
-  OSSKB_HOST: 'osskb.org',
-  DEFAULT_IP_gRPC: 'scanoss.com',
+  OSSKB_HOST: 'api.osskb.org',
+  DEFAULT_IP_gRPC: 'api.scanoss.com',
   DEFAULT_PORT_gRPC: 443,
   DEFAULT_MULTIUSER_LOCK_TIMEOUT: 30,
 
