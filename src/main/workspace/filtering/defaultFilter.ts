@@ -44,7 +44,6 @@ const defaultBannedList = {
     { condition: 'fullmatch', value: 'copying.lib', ftype: 'NAME', scope: 'FILE' },
     { condition: 'fullmatch', value: 'makefile', ftype: 'NAME', scope: 'FILE' },
 
-    { condition: 'starts', value: '.asar', ftype: 'NAME', scope: 'FILE' },
 
     { condition: 'ends', value: 'news', ftype: 'NAME', scope: 'FILE' },
     { condition: 'ends', value: 'authors', ftype: 'NAME', scope: 'FILE' },
@@ -177,7 +176,6 @@ const defaultBannedList = {
     { condition: '=', value: '.utf-8', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.vim', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.wav', ftype: 'EXTENSION', scope: 'FILE' },
-    { condition: '=', value: '.whl', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.woff', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.woff2', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.xht', ftype: 'EXTENSION', scope: 'FILE' },
@@ -203,6 +201,14 @@ const defaultBannedList = {
     { condition: '=', value: '.gem', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.lst', ftype: 'EXTENSION', scope: 'FILE' },
     { condition: '=', value: '.asar', ftype: 'EXTENSION', scope: 'FILE' },
+    { condition: '=', value: '.pickle', ftype: 'EXTENSION', scope: 'FILE' },
+    { condition: '=', value: '.pdb', ftype: 'EXTENSION', scope: 'FILE' },
+    { condition: '=', value: '.gml', ftype: 'EXTENSION', scope: 'FILE' },
+    { condition: '=', value: '.pot', ftype: 'EXTENSION', scope: 'FILE' },
+    { condition: '=', value: '.plt', ftype: 'EXTENSION', scope: 'FILE' },
+
+
+    { condition: 'starts', value: '.asar', ftype: 'NAME', scope: 'FILE' },
   ],
 };
 export { defaultBannedList };
