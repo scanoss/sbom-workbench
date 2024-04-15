@@ -153,7 +153,7 @@ export class Tree {
 
   private scanMode(filePath: string) {
     // eslint-disable-next-line prettier/prettier
-    const skipExtentions = new Set([
+    const skipExtensions = new Set([
       '.exe',
       '.zip',
       '.tar',
@@ -178,6 +178,32 @@ export class Tree {
       '.xls',
       '.xlsx',
       '.ppt',
+      '.whl',
+      '.7z',
+      '.bin',
+      '.lst',
+      '.dat',
+      '.json',
+      '.htm',
+      '.html',
+      '.xml',
+      '.md',
+      '.txt',
+      '.pptx',
+      '.odt',
+      '.ods',
+      '.odp',
+      '.pages',
+      '.key',
+      '.numbers',
+      '.pdf',
+      '.min.js',
+      '.mf',
+      '.sum',
+      '.woff',
+      '.woff2',
+      '.xsd',
+      '.pom',
     ]);
     const skipStartWith = ['{', '[', '<?xml', '<html', '<ac3d', '<!doc'];
     const MIN_FILE_SIZE = 256;
@@ -185,7 +211,7 @@ export class Tree {
 
     // Filter by extension
     const ext = pathLib.extname(filePath);
-    if (skipExtentions.has(ext)) {
+    if (skipExtensions.has(ext)) {
       return 'MD5_SCAN';
     }
     // Filter by  size
