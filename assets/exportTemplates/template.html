@@ -322,14 +322,21 @@
     color: rgb(24, 24, 27)
   }
 
+  .info .v-label{
+    justify-content: flex-end;
+  }
+
+  .info .v-value{
+    justify-content: flex-end;
+  }
+
+
   .row-license-info-container {
-    display: flex;
     width: 100%;
   }
 
   td.cell-info-container {
-    width: 30%;
-    display: flex;
+    word-break: break-word;
   }
 
   td.cell-info-container:last-child {
@@ -341,7 +348,13 @@
   }
 
   td.cell-info-container.index {
-    width: 10%;
+    width: 50px;
+
+  }
+
+  td.cell-info-container.version {
+    width: 20%;
+    word-break: break-all;
 
   }
 
@@ -446,6 +459,13 @@
   table.main-table td:first-child {
     font-weight: 600;
   }
+
+  #table-components td, #table-dependencies td, #table-components td, #table-cryptography td  {
+    word-break: break-word;
+  }
+
+
+
 </style>
 
 
@@ -985,14 +1005,14 @@
                                                                           </div>
                                                                           </div>
                                                                       </td>
-                                                                      <td class="cell-info-container">
+                                                                      <td class="cell-info-container version">
                                                                       <div class="row-info-container">
                                                                           <div class="info">
-                                                                              <div class="label">
+                                                                              <div class="label v-label">
                                                                                   ${c.versions.length > 1 ? 'Versions' : 'Version'}
                                                                               </div>
-                                                                              <div class="value small">
-                                                                                  ${c.versions.toString()}
+                                                                              <div class="value small v-value">
+                                                                                  ${c.versions.join(', ').toString()}
                                                                               </div>
                                                                           </div>
                                                                           </div>
