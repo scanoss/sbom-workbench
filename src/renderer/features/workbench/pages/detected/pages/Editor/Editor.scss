@@ -42,15 +42,15 @@
 
 .match-info-default-container {
   display: grid;
-  grid-template-columns: calc(50% - 7px) calc(50% - 7px);
+  grid-template-columns: 100%;
   grid-gap: 10px;
   overflow-y: auto;
   max-height: 160px;
   padding-bottom: 2px;
   padding-top: 1px;
 
-  @media screen and (max-width: 1440px) {
-    grid-template-columns: 100%;
+  @media screen and (min-width: 2560px) {
+    grid-template-columns: calc(50% - 7px) calc(50% - 7px);
     .match-card {
       margin: 0;
     }
