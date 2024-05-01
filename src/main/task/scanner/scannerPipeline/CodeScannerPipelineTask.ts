@@ -15,6 +15,7 @@ import { IDispatch } from '../dispatcher/IDispatch';
 import ScannerType = Scanner.ScannerType;
 import { CryptographyTask } from '../cryptography/CryptographyTask';
 import { userSettingService } from '../../../services/UserSettingService';
+import { LocalCryptographyTask } from '../cryptography/LocalCryptographyTask';
 
 export class CodeScannerPipelineTask extends ScannerPipeline {
   public async run(project: Project): Promise<boolean> {
@@ -50,6 +51,8 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
     if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY)) && project.getGlobalApiKey()) {
       this.queue.push(new CryptographyTask(project));
     }
+
+    this.queue.push(new LocalCryptographyTask(project));
 
     // search index
     this.queue.push(new IndexTask(project));
