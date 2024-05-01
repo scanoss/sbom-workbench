@@ -4,6 +4,7 @@ import { workspace } from '../workspace/Workspace';
 import { AddCryptographyTask } from '../task/cryptography/AddCryptographyTask';
 import { modelProvider } from './ModelProvider';
 import { componentHelper } from '../helpers/ComponentHelper';
+import { LocalCryptographyTask } from '../task/scanner/cryptography/LocalCryptographyTask';
 
 class CryptographyService {
   public async importFromComponents(components: Array<NewComponentDTO>) {
@@ -47,6 +48,16 @@ class CryptographyService {
       };
     } catch (e: any) {
       throw new Error(`Error updating cryptography: cause: ${e.message}`);
+    }
+  }
+
+  public async updateLocal() {
+    try {
+      const p = workspace.getOpenProject();
+      const localCryptographyTask = new LocalCryptographyTask(p);
+      await localCryptographyTask.run();
+    } catch (e: any) {
+      throw new Error(`Error updating local cryptography: cause: ${e.message}`);
     }
   }
 }
