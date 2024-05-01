@@ -1,18 +1,30 @@
 import log from 'electron-log';
 import i18next from 'i18next';
-import { CryptographyScanner, CryptoCfg } from 'scanoss';
+import { CryptographyScanner, CryptoCfg, ILocalCryptographyResponse } from 'scanoss';
 import path from 'path';
+import { modelProvider } from '../../../services/ModelProvider';
 import { Project } from '../../../workspace/Project';
 import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
 
+/**
+ * Represents a pipeline task for performing local cryptography analysis.
+ */
 export class LocalCryptographyTask implements Scanner.IPipelineTask {
   private project: Project;
 
+  /**
+   * Constructs a new LocalCryptographyTask with the specified project.
+   * @param project The project to analyze for local cryptography.
+   */
   constructor(project: Project) {
     this.project = project;
   }
 
+  /**
+   * Retrieves the properties of the stage associated with this task.
+   * @returns The stage properties.
+   */
   public getStageProperties():Scanner.StageProperties {
     return {
       name: ScannerStage.LOCAL_CRYPTOGRAPHY,
@@ -21,9 +33,14 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
     };
   }
 
+  /**
+   * Runs the local cryptography analysis task.
+   * @returns A promise that resolves to a boolean indicating the success of the task.
+   */
   public async run():Promise<boolean> {
     try {
-      console.log('LocalCryptographyTask init');
+      log.info('[ DependencyTask init ]');
+
       let rules = null;
       const rootFolder = this.project.getTree().getRootFolder();
       if (rootFolder.containsFile('scanoss-crypto-rules.json')) {
@@ -32,19 +49,43 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       const cryptoCfg = new CryptoCfg(rules);
       const cryptoScanner = new CryptographyScanner(cryptoCfg);
       const allFiles = this.project.getTree().getRootFolder().getFiles();
-      const files = [];
-      allFiles.forEach((f) => {
-        if (f.type !== 'FILTERED') files.push(path.join(this.project.getScanRoot(), f.path));
-      });
-      const localCryptography = await cryptoScanner.scan(files);
-      
-      console.log(localCryptography.cryptoItems);
 
-      console.log('CRYPTO', JSON.stringify(localCryptography, null, 2));
+      // Get files that have not been filtered
+      const files = allFiles
+        .filter((f) => f.type !== 'FILTERED')
+        .map((f) => path.join(this.project.getScanRoot(), f.path));
+
+      const localCryptography = await cryptoScanner.scan(files);
+
+      // Import local cryptography
+      await this.importLocalCrypto(localCryptography);
 
       return true;
     } catch (e) {
+      log.error('[ LOCAL CRYPTO TASK ]: ', e);
       return false;
     }
+  }
+
+  /**
+   * Imports the results of local cryptography analysis into the database.
+   * @param crypto The results of local cryptography analysis.
+   */
+  private async importLocalCrypto(crypto: ILocalCryptographyResponse) {
+    // Creates a map to get file id by file path
+    const files = await modelProvider.model.file.getAll(null);
+    const fileIdMapper = new Map<string, number>();
+    files.forEach((f) => { fileIdMapper.set(f.path, f.id); });
+
+    // Remove scan root from each ICryptoItem
+    const scanRoot = this.project.getScanRoot();
+    const filesWithCrypto = crypto.cryptoItems.filter((ci) => ci.crypto.length > 0);
+    filesWithCrypto.forEach((ci) => { ci.file = path.join('/', path.relative(scanRoot, ci.file)); });
+
+    // Convert file paths to fileIds
+    const localCrypto = filesWithCrypto.map((fc) => { return { fileId: fileIdMapper.get(fc.file), algorithms: JSON.stringify(fc.crypto) }; });
+
+    // Import results of local cryprography
+    await modelProvider.model.localCryptography.import(localCrypto);
   }
 }
