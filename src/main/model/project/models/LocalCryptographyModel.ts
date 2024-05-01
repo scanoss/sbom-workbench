@@ -49,6 +49,12 @@ export class LocalCryptographyModel extends Model {
     return crypto;
   }
 
+  public async deleteAll() {
+    const query = queries.SQL_DELETE_LOCAL_CRYPTOGRAPHY;
+    const call = await util.promisify(this.connection.run.bind(this.connection));
+    await call(query);
+  }
+
   private cryptographyAdapter(crypto: Array <ILocalCryptographyModel>): Array<LocalCryptography> {
     return crypto.map((c) => { return { file: c.path, algorithms: JSON.parse(c.algorithms) }; });
   }

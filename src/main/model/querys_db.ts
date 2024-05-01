@@ -322,10 +322,13 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
  SELECT cvid FROM inventories i)) as  ic
  INNER JOIN cryptography crypto ON crypto.purl = ic.purl AND crypto.version = ic.version;`;
 
-  SQL_CRYPTOGRAPHY_DELETE_ALL = 'DELETE FROM cryptography';
+  SQL_DELETE_CRYPTOGRAPHY = 'DELETE FROM cryptography';
 
+  // Local Cryptography
   SQL_GET_ALL_LOCAL_CRYPTOGRAPHY = `SELECT lc.id, lc.file_id, lc.algorithms, f.path, f.type  FROM local_cryptography lc
   INNER JOIN files f ON f.fileId = lc.file_id;`;
+
+  SQL_DELETE_LOCAL_CRYPTOGRAPHY = 'DELETE FROM local_cryptography';
 }
 
 export const queries = new Queries();

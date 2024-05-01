@@ -1,8 +1,8 @@
 import util from 'util';
 import sqlite3 from 'sqlite3';
-
 import { queries } from '../../querys_db';
 import { Model } from '../../Model';
+import { Cryptography } from '../../entity/Cryptography';
 
 export class CryptographyModel extends Model {
   private connection: sqlite3.Database;
@@ -59,7 +59,7 @@ export class CryptographyModel extends Model {
   }
 
   public async deleteAll() {
-    const query = queries.SQL_CRYPTOGRAPHY_DELETE_ALL;
+    const query = queries.SQL_DELETE_CRYPTOGRAPHY;
     const call = await util.promisify(this.connection.run.bind(this.connection));
     await call(query);
   }
