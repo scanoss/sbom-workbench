@@ -1,6 +1,6 @@
 import util from 'util';
 import sqlite3 from 'sqlite3';
-import { Cryptography } from '../../entity/Cryptography';
+
 import { queries } from '../../querys_db';
 import { Model } from '../../Model';
 
