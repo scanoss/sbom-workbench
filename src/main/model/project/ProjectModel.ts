@@ -12,6 +12,7 @@ import { queries } from '../querys_db';
 import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 import { Connection } from '../Connection';
 import { modelProvider } from '../../services/ModelProvider';
+import { LocalCryptographyModel } from './models/LocalCryptographyModel';
 
 export class ProjectModel {
   private connection: Connection;
@@ -38,6 +39,8 @@ export class ProjectModel {
 
   cryptography: CryptographyModel;
 
+  localCryptography: LocalCryptographyModel;
+
   constructor(path: string) {
     this.path = `${path}/scan_db`;
     this.file = null;
@@ -48,15 +51,16 @@ export class ProjectModel {
     this.dependency = null;
     this.vulnerability = null;
     this.cryptography = null;
+    this.localCryptography = null;
   }
 
   private async createViews(db: sqlite3.Database): Promise<void> {
     const call = util.promisify(db.run.bind(db));
     await call(
-      'CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url,source,reliableLicense) AS SELECT DISTINCT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url,comp.source,comp.reliableLicense FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;'
+      'CREATE VIEW IF NOT EXISTS components (id,name,version,purl,url,source,reliableLicense) AS SELECT DISTINCT comp.id AS compid ,comp.name,comp.version,comp.purl,comp.url,comp.source,comp.reliableLicense FROM component_versions AS comp LEFT JOIN license_component_version lcv ON comp.id=lcv.cvid;',
     );
     await call(
-      'CREATE VIEW IF NOT EXISTS license_view (cvid,name,spdxid,url,license_id) AS SELECT lcv.cvid,lic.name,lic.spdxid,lic.url,lic.id FROM license_component_version AS lcv LEFT JOIN licenses AS lic ON lcv.licid=lic.id;'
+      'CREATE VIEW IF NOT EXISTS license_view (cvid,name,spdxid,url,license_id) AS SELECT lcv.cvid,lic.name,lic.spdxid,lic.url,lic.id FROM license_component_version AS lcv LEFT JOIN licenses AS lic ON lcv.licid=lic.id;',
     );
     await call(`
           CREATE VIEW IF NOT EXISTS summary AS SELECT cv.id AS compid,cv.purl,cv.version,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
@@ -84,14 +88,15 @@ export class ProjectModel {
     this.dependency = new DependencyModel(db);
     this.vulnerability = new VulnerabilityModel(db);
     this.cryptography = new CryptographyModel(db);
+    this.localCryptography = new LocalCryptographyModel(db);
   }
 
   public async init(mode: number): Promise<void> {
     try {
-      this.connection = new Connection(this.path);    
+      this.connection = new Connection(this.path);
       await this.connection.createDB();
       const db = await this.connection.openDb(mode);
-      await this.createProjectDb(db);      
+      await this.createProjectDb(db);
       await this.initProjectModels(db);
     } catch (error: any) {
       console.log(error);
@@ -115,7 +120,7 @@ export class ProjectModel {
     if (this.connection) await this.connection.close();
     this.connection = null;
 
-    // Be sure the DB is open in R/W 
+    // Be sure the DB is open in R/W
     modelProvider.openModeProjectModel = sqlite3.OPEN_READWRITE;
   }
 }

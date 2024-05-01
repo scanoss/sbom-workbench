@@ -46,6 +46,17 @@ export class Queries {
     CONSTRAINT cryptography_pk PRIMARY KEY (purl, version)
     );`;
 
+  LOCAL_CRYPTOGRAPHY_TABLE = `CREATE TABLE IF NOT EXISTS local_cryptography (
+    id integer,
+    file_id integer NOT NULL,
+    algorithms varchar(500) NOT NULL,
+    CONSTRAINT pk_local_cryptography PRIMARY KEY (id),
+    CONSTRAINT fk_local_cryptography FOREIGN KEY (file_id) REFERENCES files(fileId)
+    ON DELETE CASCADE
+    );`;
+
+  // WORKSPACE
+
   WORKSPACE_LOCK = `CREATE TABLE IF NOT EXISTS lock (
     project  text NOT NULL,
     username text NOT NULL,
@@ -53,7 +64,6 @@ export class Queries {
     createdAt text NOT NULL,
     updatedAt text NOT NULL,
     CONSTRAINT lock_pk PRIMARY KEY (project,username,hostname));`;
-
 
   SQL_DB_TABLES = this.SQL_CREATE_TABLE_RESULTS
     + this.FILES_TABLE
@@ -66,7 +76,8 @@ export class Queries {
     + this.RESULT_LICENSE
     + this.VULNERABILITY_TABLE
     + this.COMPONENT_VULNERABILITY
-    + this.CRYPTOGRAPHY_TABLE;
+    + this.CRYPTOGRAPHY_TABLE
+    + this.LOCAL_CRYPTOGRAPHY_TABLE;
 
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS
