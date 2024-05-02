@@ -84,3 +84,7 @@ export enum SourceType {
 export interface VulnerabilitiesGetAllDTO {
   type: SourceType,
 }
+
+export interface CryptographyGetAllDTO {
+  type: SourceType,
+}

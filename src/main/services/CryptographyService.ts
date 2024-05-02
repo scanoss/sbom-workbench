@@ -1,9 +1,10 @@
-import { NewComponentDTO } from '@api/types';
+import { CryptographyResponseDTO, NewComponentDTO } from '@api/types';
 import log from 'electron-log';
 import { workspace } from '../workspace/Workspace';
 import { AddCryptographyTask } from '../task/cryptography/AddCryptographyTask';
 import { modelProvider } from './ModelProvider';
 import { componentHelper } from '../helpers/ComponentHelper';
+import { SourceType } from '../../api/dto';
 
 class CryptographyService {
   public async importFromComponents(components: Array<NewComponentDTO>) {
@@ -47,6 +48,39 @@ class CryptographyService {
       };
     } catch (e: any) {
       throw new Error(`Error updating cryptography: cause: ${e.message}`);
+    }
+  }
+
+  public async getAll(type: SourceType): Promise<CryptographyResponseDTO> {
+    const response = type === SourceType.detected
+      ? await this.getDetected()
+      : await this.getIdentified();
+    return response;
+  }
+
+  private async getDetected(): Promise<CryptographyResponseDTO> {
+    try {
+      const components = await modelProvider.model.cryptography.findAllDetected();
+      const files = await modelProvider.model.localCryptography.findAll();
+      return {
+        files,
+        components,
+      };
+    } catch (e: any) {
+      throw new Error(`Error retrieving detected cryptography: cause: ${e.message}`);
+    }
+  }
+
+  private async getIdentified(): Promise<CryptographyResponseDTO> {
+    try {
+      const components = await modelProvider.model.cryptography.findAllIdentifiedMatched();
+      const files = await modelProvider.model.localCryptography.findAll();
+      return {
+        files,
+        components,
+      };
+    } catch (e: any) {
+      throw new Error(`Error retrieving identified cryptography: cause: ${e.message}`);
     }
   }
 }

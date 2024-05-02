@@ -3,6 +3,8 @@ import { Scanner } from '../main/task/scanner/types';
 import ScannerConfig = Scanner.ScannerConfig;
 import Folder from '../main/workspace/tree/Folder';
 import { Metadata } from '../main/workspace/Metadata';
+import { Cryptography } from '../main/model/entity/Cryptography';
+import { LocalCryptography } from '../main/model/entity/LocalCryptography';
 
 export enum ScanState {
   CREATED = 'CREATED',
@@ -379,4 +381,9 @@ export interface LOCK {
   };
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CryptographyResponseDTO {
+  files: Array<LocalCryptography>;
+  components: Array<Cryptography>;
 }
