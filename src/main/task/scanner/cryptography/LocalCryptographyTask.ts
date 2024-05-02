@@ -39,8 +39,10 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
    */
   public async run():Promise<boolean> {
     try {
-      log.info('[ DependencyTask init ]');
+      log.info('[ LocalCryptographyTask init ]');
 
+      // Delete all local crypto
+      await modelProvider.model.localCryptography.deleteAll();
       let rules = null;
       const rootFolder = this.project.getTree().getRootFolder();
       if (rootFolder.containsFile('scanoss-crypto-rules.json')) {
@@ -79,11 +81,11 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
 
     // Remove scan root from each ICryptoItem
     const scanRoot = this.project.getScanRoot();
-    const filesWithCrypto = crypto.cryptoItems.filter((ci) => ci.crypto.length > 0);
+    const filesWithCrypto = crypto.fileList.filter((ci) => ci.algorithms.length > 0);
     filesWithCrypto.forEach((ci) => { ci.file = path.join('/', path.relative(scanRoot, ci.file)); });
 
     // Convert file paths to fileIds
-    const localCrypto = filesWithCrypto.map((fc) => { return { fileId: fileIdMapper.get(fc.file), algorithms: JSON.stringify(fc.crypto) }; });
+    const localCrypto = filesWithCrypto.map((fc) => { return { fileId: fileIdMapper.get(fc.file), algorithms: JSON.stringify(fc.algorithms) }; });
 
     // Import results of local cryprography
     await modelProvider.model.localCryptography.import(localCrypto);

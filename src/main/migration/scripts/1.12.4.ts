@@ -1,7 +1,6 @@
 import fs from 'fs';
 import log from 'electron-log';
 import * as os from 'os';
-import { Metadata } from 'main/workspace/Metadata';
 import { IWorkspaceCfg } from '../../../api/types';
 import { userSettingService } from '../../services/UserSettingService';
 import AppConfig from '../../../config/AppConfigModule';

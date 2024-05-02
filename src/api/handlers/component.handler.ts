@@ -1,5 +1,5 @@
-import api from '../api';
 import log from 'electron-log';
+import api from '../api';
 import { Component, ComponentGroup, IWorkbenchFilterParams, NewComponentDTO } from '../types';
 import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
@@ -8,6 +8,7 @@ import { ISearchComponent } from '../../main/task/componentCatalog/iComponentCat
 import { SearchComponentTask } from '../../main/task/componentCatalog/SearchComponentTask';
 import { ISearchComponentVersion } from '../../main/task/componentCatalog/iComponentCatalog/ISearchComponentVersion';
 import { SearchComponentVersionTask } from '../../main/task/componentCatalog/SearchComponentVersionTask';
+
 api.handle(IpcChannels.COMPONENT_CREATE, async (_event, component: NewComponentDTO) => {
   try {
     const newComp = await componentService.create(component);
