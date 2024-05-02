@@ -1,7 +1,5 @@
 import sqlite3 from 'sqlite3';
 import log from 'electron-log';
-import util from 'util';
-import { Model } from '../../model/Model';
 
 export async function projectMigration193(projectPath: string): Promise<void> {
   log.info('Migration 1.9.3 In progress...');
