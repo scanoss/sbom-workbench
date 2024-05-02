@@ -33,9 +33,6 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
     this.project.metadata.setScannerState(ScanState.RESCANNING);
     await modelProvider.init(this.project.getMyPath());
     await licenseService.import();
-
-    // Delete all local crypto
-    await modelProvider.model.localCryptography.deleteAll();
     this.project.save();
   }
 
