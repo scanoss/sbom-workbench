@@ -40,8 +40,8 @@
 
   .report-layout {
     display: grid;
-    grid-gap: 12px;
-    grid-template-columns: 1.4fr 1fr 1fr;
+    grid-gap: 10px;
+    grid-template-columns: 450px 1fr 1fr 1fr;
     margin-bottom: 16px;
 
     .licenses {
@@ -52,6 +52,9 @@
     }
     .vulnerabilities {
       grid-area: A4;
+    }
+    .cryptography {
+      grid-area: A5;
     }
 
     .tabs-navigator {
@@ -70,10 +73,10 @@
       grid-template-rows: 110px 110px auto 600px;
 
       grid-template-areas:
-        'A1 A2 A2'
-        'A1 A3 A4'
-        'C  C  C'
-        'D  D  D';
+        'A1 A2 A2 A2'
+        'A1 A3 A4 A5'
+        'C  C  C  C'
+        'D  D  D  D';
 
       .matches {
         grid-area: A2;
@@ -81,13 +84,14 @@
     }
 
     &.identified {
+      grid-template-columns: 450px repeat(6, 1fr);
       grid-template-rows: 110px 110px auto 600px;
 
       grid-template-areas:
-      'A1 AZ A2'
-      'A1 A3 A4'
-      'C  C  C'
-      'D  D  D';
+      'A1 AZ AZ AZ A2 A2 A2'
+      'A1 A3 A3 A4 A4 A5 A5'
+      'C  C  C  C  C  C  C'
+      'D  D  D  D  D  D  D';
 
       .identification-progress {
         grid-area: AZ;
@@ -262,7 +266,7 @@
 
 #LicensesChart {
   padding: 8px 16px 4px;
-  max-width: 180px;
+  max-width: 160px;
   justify-self: right;
 }
 
@@ -382,7 +386,7 @@
   }
 }
 
-.vulnerabilities {
+.vulnerabilities, .cryptography {
   .report-title .action {
     display: flex;
     align-items: center;
@@ -409,19 +413,18 @@
   section {
     display: flex;
     width: 100%;
-    gap: 20px;
+    gap: 10px;
   }
 
   .vulnerability-container {
     display: flex;
     flex-direction: column;
     width: fit-content;
-    min-width: 50px;
 
     .vulnerability-number {
       font-weight: 500;
-      font-size: 42px;
-      line-height: 42px;
+      font-size: 36px;
+      line-height: 44px;
     }
 
     .vulnerability-label {
@@ -474,7 +477,7 @@
 }
 
 
-#DependenciesCard {
+#DependenciesCard, #CryptographyCard {
   .item {
     display: flex;
     flex-direction: column;
@@ -496,7 +499,9 @@
   }
 }
 
-.identified #DependenciesCard .number {
+
+
+.identified #DependenciesCard .number, .identified #CryptographyCard .number {
   color: var( --color-status-identified);
 }
 

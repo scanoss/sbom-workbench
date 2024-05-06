@@ -1,14 +1,13 @@
-#VulnerabilitiesReportPage {
+#CryptographyReportPage {
   display: grid;
 
   .app-header {
     .header-title {
-
     }
   }
 
   .app-content {
-    .vulnerabilities-table {
+    .cryptography-table {
       max-height: 100%;
     }
   }
@@ -40,31 +39,5 @@
   .tag {
     padding: 2px 8px;
     border-radius: 4px;
-    text-transform: uppercase;
-    font-weight: 700;
-
-    &.tag-critical {
-      background: #ef4444;
-      color: white;
-    }
-
-    &.tag-high {
-      background: #fecaca;
-      color: #ef4444;
-    }
-
-    &.tag-medium {
-      background: #fed7aa;
-      color: #f38609;
-    }
-
-    &.tag-low {
-      background: #e4e4e7;
-    }
-  }
-
-  .external-link {
-    font-size: 0.7rem;
-    margin-left: 5px;
   }
 }

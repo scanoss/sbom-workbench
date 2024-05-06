@@ -22,6 +22,7 @@ import OssVsOriginalProgressBar from '../../components/OssVsOriginalProgressBar'
 import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 import { Scanner } from '../../../../../../../main/task/scanner/types';
 import DependenciesCard from '../../components/DependenciesCard';
+import CryptographyCard from '../../components/CryptographyCard';
 
 Chart.register(...registerables);
 
@@ -148,6 +149,20 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
           { layers.current.has(Scanner.ScannerType.VULNERABILITIES)
             ? <VulnerabilitiesCard data={data.vulnerabilities} />
             : <p className="text-center mb-5 mt-5">{t('NoVulnerabilitiesScanned')}</p>}
+        </ConditionalLink>
+      </Card>
+
+      <Card className={`report-item cryptography ${layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) ? 'no-blocked' : 'blocked'}`}>
+        <ConditionalLink to="../../cryptographies?type=identified" className="w-100 no-underline" disabled={false}>
+          <div className="report-title d-flex space-between align-center">
+            <span>{t('Title:Cryptography')}</span>
+            <div className="action">
+              <ArrowForwardOutlinedIcon fontSize="inherit" />
+            </div>
+          </div>
+          { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)
+            ? <CryptographyCard data={data.dependencies} />
+            : <p className="text-center mb-5 mt-5">{t('NoCryptographyScanned')}</p>}
         </ConditionalLink>
       </Card>
 

@@ -26,6 +26,7 @@ import { Scanner } from '../../../../../../../main/task/scanner/types';
 import CryptographyDataTable from '../../components/CryptographyDataTable';
 import DependenciesCard from '../../components/DependenciesCard';
 import DependenciesDataTable from '../../components/DependenciesDataTable';
+import CryptographyCard from '../../components/CryptographyCard';
 
 Chart.register(...registerables);
 
@@ -109,7 +110,7 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
       <Card className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
         <ConditionalLink to="declared" replace className="w-100 no-underline" disabled={false}>
           <div className="report-title d-flex space-between align-center">
-            <span>{t('Title:DeclaredDependencies')}</span>
+            <span>{t('Title:Dependencies')}</span>
           </div>
           { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
             ? <DependenciesCard data={data.dependencies} />
@@ -128,6 +129,20 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
           { layers.current.has(Scanner.ScannerType.VULNERABILITIES)
             ? <VulnerabilitiesCard data={data.vulnerabilities} />
             : <p className="text-center mb-5 mt-5">{t('NoVulnerabilitiesScanned')}</p>}
+        </ConditionalLink>
+      </Card>
+
+      <Card className={`report-item cryptography ${layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) ? 'no-blocked' : 'blocked'}`}>
+        <ConditionalLink to="../../cryptographies?type=detected" className="w-100 no-underline" disabled={false}>
+          <div className="report-title d-flex space-between align-center">
+            <span>{t('Title:Cryptography')}</span>
+            <div className="action">
+              <ArrowForwardOutlinedIcon fontSize="inherit" />
+            </div>
+          </div>
+          { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)
+            ? <CryptographyCard data={data.dependencies} />
+            : <p className="text-center mb-5 mt-5">{t('NoCryptographyScanned')}</p>}
         </ConditionalLink>
       </Card>
 
