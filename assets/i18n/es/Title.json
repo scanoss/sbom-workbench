@@ -37,7 +37,7 @@
   "OSSvsOriginal": "OSS vs Original",
   "Licenses": "Licencias",
   "MatchesForLabel": "Coincidencias para {{label}} ({{count}})",
-  "Vulnerabilities": "Vulnerabilidades (CVEs)",
+  "Vulnerabilities": "Vulnerabilidades",
   "DetectedVulnerabilities": "Vulnerabilidades detectadas (CVEs)",
   "IdentifiedVulnerabilities": "Vulnerabilidades identificadas (CVEs)",
   "Severity": "Severidad",
