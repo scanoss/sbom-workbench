@@ -51,22 +51,22 @@
     display: flex;
     align-items: center;
     margin: 0;
-    height: 48px;
+    height: 32px;
     font-size: 14px;
     font-weight: 700;
     text-transform: uppercase;
 
     &.back {
-      margin-left: -48px;
+      margin-left: -12px;
     }
   }
 
   .header-title {
     margin: 0 0 10px;
-    font-size: 34px;
+    font-size: 28px;
     font-weight: 700;
 
-    margin-bottom: 40px;
+    margin-bottom: 32px;
   }
 }
 
