@@ -87,7 +87,7 @@ const VulnerabilitiesReport = () => {
     <>
       <section id="VulnerabilitiesReportPage" className="app-page">
         <header className="app-header">
-          <h4 className="header-subtitle back pl-3">
+          <h4 className="header-subtitle back">
             <IconButton onClick={() => navigate(-1)} component="span">
               <ArrowBackIcon />
             </IconButton>

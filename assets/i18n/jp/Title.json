@@ -37,7 +37,7 @@
   "OSSvsOriginal": "OSS 対オリジナル",
   "Licenses": "ライセンス",
   "MatchesForLabel": "{{label}}の一致",
-  "Vulnerabilities": "脆弱性 (CVEs)",
+  "Vulnerabilities": "脆弱性",
   "DetectedVulnerabilities": "検出された脆弱性 (CVEs)",
   "IdentifiedVulnerabilities": "識別された脆弱性 (CVEs)",
   "Severity": "重大度",

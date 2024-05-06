@@ -37,7 +37,7 @@
   "OSSvsOriginal": "OSS vs 自研",
   "Licenses": "许可证",
   "MatchesForLabel": "匹配 {{label}}",
-  "Vulnerabilities": "漏洞 (CVEs)",
+  "Vulnerabilities": "漏洞",
   "DetectedVulnerabilities": "已识别的漏洞 (CVEs)",
   "IdentifiedVulnerabilities": "已确认的漏洞 (CVEs)",
   "Severity": "严重程度",
