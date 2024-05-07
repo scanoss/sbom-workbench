@@ -7,12 +7,14 @@ import {
   IconButton,
   ListItemText,
   Paper,
+  Tab,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  Tabs,
   TextField,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -24,35 +26,34 @@ import { useNavigate } from 'react-router-dom';
 // icons
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { cryptographyService } from '@api/services/cryptography.service';
+import { CryptographyResponseDTO } from '@api/types';
 
 // interfaces & types
 interface ICryptographyFilter {
   algorithm?: string[];
 }
 
-type CryptoItem = any; // TODO: get real type
-
 const CryptographyReport = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const type = useSearchParams().get('type');
 
-  const data = useRef<CryptoItem[]>(null);
-  const [items, setItems] = useState<CryptoItem[]>([]);
+  const data = useRef<CryptographyResponseDTO>(null);
+
+  const [items, setItems] = useState<CryptographyResponseDTO>(null);
   const [filter, setFilter] = useState<ICryptographyFilter>(null);
+
+  const [tab, setTab] = useState<string>('local');
 
   const init = async () => {
     const source = type === SourceType.identified ? SourceType.identified : SourceType.detected;
-    const response = await vulnerabilityService.getAll({ type: source });
+    const response = await cryptographyService.getAll({ type: source });
     data.current = response;
-
     setItems(data.current);
-  };
 
-  const filterItems = (items: CryptoItem[]) => (filter
-    ? items
-      .filter((item) => !filter.algorithm || filter.algorithm.length === 0 || filter.algorithm.includes(item.algorithm?.toLowerCase()))
-    : items);
+    console.log(data.current);
+  };
 
   const onFilterHandler = (newFilter: ICryptographyFilter) => {
     setFilter({ ...filter, ...newFilter });
@@ -60,7 +61,7 @@ const CryptographyReport = () => {
 
   // filter items
   useEffect(() => {
-    setItems(filterItems(data.current));
+    // setItems(filterItems(data.current));
   }, [filter]);
 
   // on mounted
@@ -79,13 +80,19 @@ const CryptographyReport = () => {
         </h4>
         <h1 className="header-title">{type === SourceType.detected ? t('Title:DetectedCryptography') : t('Title:IdentifiedCryptography')}</h1>
         <section className="subheader">
+          <nav className="tabs-navigator">
+            <Tabs value={tab} onChange={(e, value) => setTab(value)}>
+              <Tab value="local" label={`${t('Title:Local')} (${items?.files.length})`} />
+              <Tab value="sbom" label={`${t('Title:SBOM')} (${items?.components.length})`} />
+            </Tabs>
+          </nav>
           <form className="default-form">
             <div className="form-row filter">
               <div className="form-group filter-algorithm">
-                <label>{t('Title:Algorithm')}</label>
                 <Paper>
                   <Autocomplete
                     options={['md5', 'otro']}
+                    size="small"
                     disablePortal
                     multiple
                     forcePopupIcon
@@ -93,7 +100,7 @@ const CryptographyReport = () => {
                     onChange={(e_, value) => onFilterHandler({ ...filter, algorithm: value })}
                     renderOption={(props, option, { selected }) => (
                       <li {...props}>
-                        <Checkbox style={{ marginRight: 8 }} checked={selected} />
+                        <Checkbox style={{ marginRight: 8 }} checked={selected} size="small" />
                         <span className={`tag tag-${option} option`}> {option} </span>
                       </li>
                     )}
@@ -129,57 +136,63 @@ const CryptographyReport = () => {
       </header>
 
       <main className="app-content">
-        <TableContainer className="cryptography-table selectable" component={Paper}>
-          <Table stickyHeader aria-label="cryptography table">
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('Table:Header:Component')}</TableCell>
-                <TableCell>{t('Table:Header:Algorithm')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items?.map((item) => (
-                <TableRow key={item.purl + item.version + item.vulnerability.cve}>
-                  <TableCell className="pb-0 pt-0">
-                    <ListItemText
-                      primary={item.componentVersion.name}
-                      secondary={`${item.componentVersion.purl}@${item.componentVersion.version}`}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <span className={`tag tag-${item.vulnerability.severity?.toLowerCase()}`}>{item.vulnerability.severity}</span>
-                  </TableCell>
+        {tab === 'local' && (
+          <TableContainer className="local-cryptography-table selectable" component={Paper}>
+            <Table stickyHeader aria-label="cryptography table" size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('Table:Header:File')}</TableCell>
+                  <TableCell>{t('Table:Header:Algorithms')}</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {items?.files.map((item) => (
+                  <TableRow key={item.file}>
+                    <TableCell>{item.file}</TableCell>
+                    <TableCell className="algorithms">{item.algorithms.map((algorithm) => <span className="tag"> {algorithm.algorithm} ({algorithm.strength})</span>)}</TableCell>
+                  </TableRow>
+                ))}
 
-        <TableContainer className="cryptography-table selectable" component={Paper}>
-          <Table stickyHeader aria-label="cryptography table">
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('Table:Header:File')}</TableCell>
-                <TableCell>{t('Table:Header:Algorithm')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items?.map((item) => (
-                <TableRow key={item.purl + item.version + item.vulnerability.cve}>
-                  <TableCell className="pb-0 pt-0">
-                    <ListItemText
-                      primary={item.componentVersion.name}
-                      secondary={`${item.componentVersion.purl}@${item.componentVersion.version}`}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <span className={`tag tag-${item.vulnerability.severity?.toLowerCase()}`}>{item.vulnerability.severity}</span>
-                  </TableCell>
+                {(!items || items.files.length === 0) && (
+                  <TableRow>
+                    <TableCell colSpan={2} align="center" className="pt-4 pb-4">
+                      { !items ? t('Loading') : t('NoDataFound') }
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+
+        {tab === 'sbom' && (
+          <TableContainer className="sbom-cryptography-table selectable" component={Paper}>
+            <Table stickyHeader aria-label="cryptography table" size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('Table:Header:Component')}</TableCell>
+                  <TableCell>{t('Table:Header:Algorithms')}</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {items?.components.map((item) => (
+                  <TableRow key={item.purl + item.version}>
+                    <TableCell>{item.purl}@{item.version}</TableCell>
+                    <TableCell className="algorithms">{item.algorithms.map((algorithm) => <span className="tag"> {algorithm.algorithm} ({algorithm.strength})</span>)}</TableCell>
+                  </TableRow>
+                ))}
+
+                {(!items || items.components.length === 0) && (
+                  <TableRow>
+                    <TableCell colSpan={2} align="center" className="pt-4 pb-4">
+                      { !items ? t('Loading') : t('NoDataFound') }
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </main>
     </section>
   );
