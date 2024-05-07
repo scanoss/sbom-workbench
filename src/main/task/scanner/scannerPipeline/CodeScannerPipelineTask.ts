@@ -50,9 +50,8 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
     // Cryptography
     if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY)) && project.getGlobalApiKey()) {
       this.queue.push(new CryptographyTask(project));
+      this.queue.push(new LocalCryptographyTask(project));
     }
-
-    this.queue.push(new LocalCryptographyTask(project));
 
     // search index
     this.queue.push(new IndexTask(project));
