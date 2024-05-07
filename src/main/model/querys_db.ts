@@ -324,11 +324,18 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   SQL_DELETE_CRYPTOGRAPHY = 'DELETE FROM cryptography';
 
+  SQL_GET_ALL_IDENTIFIED_ALGORITHMS = `SELECT  '[' || GROUP_CONCAT(SUBSTR(crypto.algorithms, 2, LENGTH(crypto.algorithms) - 2), ', ') || ']' AS  algorithms FROM
+  (SELECT cv.purl, cv.version FROM component_versions cv WHERE id IN (
+  SELECT cvid FROM inventories i)) as  ic
+  INNER JOIN cryptography crypto ON crypto.purl = ic.purl AND crypto.version = ic.version;`;
+
   // Local Cryptography
   SQL_GET_ALL_LOCAL_CRYPTOGRAPHY = `SELECT lc.id, lc.file_id, lc.algorithms, f.path, f.type  FROM local_cryptography lc
   INNER JOIN files f ON f.fileId = lc.file_id;`;
 
   SQL_DELETE_LOCAL_CRYPTOGRAPHY = 'DELETE FROM local_cryptography';
+
+  SQL_GET_ALL_LOCAL_ALGORITHMS = "SELECT '[' || GROUP_CONCAT(SUBSTR(lc.algorithms, 2, LENGTH(lc.algorithms) - 2), ', ') || ']' AS  algorithms  FROM local_cryptography lc;";
 }
 
 export const queries = new Queries();

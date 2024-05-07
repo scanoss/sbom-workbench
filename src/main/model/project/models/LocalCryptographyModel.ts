@@ -55,6 +55,17 @@ export class LocalCryptographyModel extends Model {
     await call(query);
   }
 
+  public async getAllAlgorithms() {
+    const query = queries.SQL_GET_ALL_LOCAL_ALGORITHMS;
+    const call = await util.promisify(this.connection.get.bind(this.connection));
+    const response = await call(query) as any;
+    if (!response) return [];
+    const allAlgorithms = JSON.parse(response.algorithms);
+    if (!allAlgorithms) return [];
+    const algorithms = allAlgorithms.map((a) => a.algorithm);
+    return Array.from(new Set(algorithms).values());
+  }
+
   private cryptographyAdapter(crypto: Array <ILocalCryptographyModel>): Array<LocalCryptography> {
     return crypto.map((c) => { return { file: c.path, algorithms: JSON.parse(c.algorithms) }; });
   }
