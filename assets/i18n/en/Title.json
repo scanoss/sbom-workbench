@@ -79,5 +79,7 @@
   "IdentifiedDependenciesTab": "Identified dependencies",
   "DeclaredMatchedTab": "Matched components ",
   "IdentifiedMatchedTab": "Identified components",
-  "AddWorkspace": "Add New Workspace"
+  "AddWorkspace": "Add New Workspace",
+  "DetectedCryptography": "Detected Cryptography",
+  "IdentifiedCryptography": "Identified Cryptography"
 }

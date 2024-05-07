@@ -2,22 +2,26 @@
   display: grid;
 
   .app-header {
-    .header-title {
+    padding-bottom: 10px;
+
+    .subheader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
   }
 
   .app-content {
-    .cryptography-table {
+    .local-cryptography-table, .sbom-cryptography-table {
       max-height: 100%;
     }
   }
 
   .form-row.filter {
     .form-group {
-      width: 350px;
+      min-width: 280px;
 
-      &.filter-severity {
-        min-width: 350px;
+      &.filter-algorithm {
         width: auto;
 
         .MuiAutocomplete-option {
@@ -36,8 +40,16 @@
     }
   }
 
-  .tag {
-    padding: 2px 8px;
-    border-radius: 4px;
+  .algorithms {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+
+    .tag {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 400;
+      background: #e4e4e7;
+    }
   }
 }

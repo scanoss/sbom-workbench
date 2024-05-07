@@ -5,6 +5,7 @@ import Folder from '../main/workspace/tree/Folder';
 import { Metadata } from '../main/workspace/Metadata';
 import { Cryptography } from '../main/model/entity/Cryptography';
 import { LocalCryptography } from '../main/model/entity/LocalCryptography';
+import { IReportData, ISummary } from 'main/services/ReportService';
 
 export enum ScanState {
   CREATED = 'CREATED',
@@ -387,3 +388,7 @@ export interface CryptographyResponseDTO {
   files: Array<LocalCryptography>;
   components: Array<Cryptography>;
 }
+
+/* Report Handler */
+export type ReportSummary = ISummary;
+export type ReportData = IReportData;

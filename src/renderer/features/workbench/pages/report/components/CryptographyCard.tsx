@@ -7,7 +7,7 @@ const CryptographyCard = ({ data }) => (
     <section>
       <div className="item mt-1">
         <span className="number">
-          {data.total}
+          {data.sbom + data.local}
         </span>
         <span className="label">
           crypto algorithms detected
