@@ -64,6 +64,17 @@ export class CryptographyModel extends Model {
     await call(query);
   }
 
+  public async getAllIdentifiedAlgorithms() {
+    const query = queries.SQL_GET_ALL_IDENTIFIED_ALGORITHMS;
+    const call = await util.promisify(this.connection.get.bind(this.connection));
+    const response = await call(query) as any;
+    if (!response.algorithms) return [];
+    const allAlgorithms = JSON.parse(response.algorithms);
+    if (!allAlgorithms) return [];
+    const algorithms = allAlgorithms.map((a) => a.algorithm);
+    return Array.from(new Set(algorithms).values());
+  }
+
   private cryptographyAdapter(cryptography: Array<{ purl: string, version: string, algorithms: string }>): Array<Cryptography> {
     return cryptography.map((c) => ({ purl: c.purl, version: c.version, algorithms: JSON.parse(c.algorithms) }));
   }

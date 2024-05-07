@@ -94,9 +94,21 @@ class ReportService {
       ...this.getVulnerabilitiesReport(vulnerabilities),
     };
 
-    // Crypto
-    const crypto = await modelProvider.model.cryptography.findAllIdentifiedMatched();
-    this.addCryptoToComponent(licenses, crypto);
+    // Get Crypto stats
+    const detectedCrypto = await modelProvider.model.cryptography.findAllDetected();
+    const sbomAlgorithms = new Set();
+
+    detectedCrypto.forEach((c) => {
+      c.algorithms.forEach((a) => {
+        sbomAlgorithms.add(a.algorithm);
+      });
+    });
+
+    const localAlgorithms = await modelProvider.model.localCryptography.getAllAlgorithms();
+    const cryptographies = {
+      sbom: Array.from(sbomAlgorithms.values()).length,
+      local: localAlgorithms.length,
+    };
 
     // Dependencies
     const dependenciesSummary = await modelProvider.model.dependency.getIdentifiedSummary();
@@ -104,15 +116,13 @@ class ReportService {
     // Add Manifest files
     await this.addManifestFileToComponents(licenses);
 
-    return { licenses, vulnerabilities: vulnerabilityReport, crypto, dependencies: dependenciesSummary };
+    return { licenses, vulnerabilities: vulnerabilityReport, cryptographies, dependencies: dependenciesSummary };
   }
 
   public async getDetected() {
     try {
       const results = await modelProvider.model.result.getDetectedReport();
       let licenses = this.getLicenseReportFromResults(results);
-
-      const crypto = await modelProvider.model.cryptography.findAllDetected();
 
       const vulnerabilities = await modelProvider.model.vulnerability.getDetectedReport();
       const vulnerabilityReport = {
@@ -130,30 +140,24 @@ class ReportService {
       // Dependencies
       const dependenciesSummary = await modelProvider.model.dependency.getDetectedSummary();
 
-      this.addCryptoToComponent(licenses, crypto);
-
       // Add Manifest files
       // await this.addManifestFileToComponents(licenses);
 
+      // Get Crypto stats
+      const sbomAlgorithms = await modelProvider.model.cryptography.getAllDetectedAlgorithms();
+      const localAlgorithms = await modelProvider.model.localCryptography.getAllAlgorithms();
+
+      const cryptographies = {
+        sbom: sbomAlgorithms.length,
+        local: localAlgorithms.length,
+      };
+
       return {
-        licenses, crypto, vulnerabilities: vulnerabilityReport, dependencies: dependenciesSummary,
+        licenses, cryptographies, vulnerabilities: vulnerabilityReport, dependencies: dependenciesSummary,
       };
     } catch (e) {
       return { status: 'fail' };
     }
-  }
-
-  private addCryptoToComponent(licenses: Array<LicenseEntry>, crypto: Array<Cryptography>) {
-    const cryptoMapper = new Map<string, Cryptography>();
-    crypto.forEach((c) => cryptoMapper.set(`${c.purl}@${c.version}`, c));
-
-    licenses.forEach((l) => {
-      l.components.forEach((c) => {
-        if (cryptoMapper.has(`${c.purl}@${c.version}`)) {
-          c.cryptography = cryptoMapper.get(`${c.purl}@${c.version}`).algorithms;
-        }
-      });
-    });
   }
 
   private getLicenseReportFromResults(results: any): Array<LicenseEntry> {
