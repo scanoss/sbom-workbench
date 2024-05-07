@@ -95,7 +95,8 @@ const CircularComponent = ({
     stage.stageName === ScannerStage.INDEX ||
     stage.stageName === ScannerStage.VULNERABILITY ||
     stage.stageName === ScannerStage.DEPENDENCY ||
-    stage.stageName === ScannerStage.CRYPTOGRAPHY
+    stage.stageName === ScannerStage.CRYPTOGRAPHY ||
+    stage.stageName === ScannerStage.LOCAL_CRYPTOGRAPHY
       ? 'indeterminate'
       : 'determinate';
 
@@ -103,7 +104,8 @@ const CircularComponent = ({
     stage.stageName === ScannerStage.DEPENDENCY ||
     stage.stageName === ScannerStage.VULNERABILITY ||
     stage.stageName === ScannerStage.UNZIP ||
-    stage.stageName === ScannerStage.CRYPTOGRAPHY;
+    stage.stageName === ScannerStage.CRYPTOGRAPHY || 
+    stage.stageName === ScannerStage.LOCAL_CRYPTOGRAPHY;
 
   const resumeEnable =
     stage.stageName === ScannerStage.SCAN ||
