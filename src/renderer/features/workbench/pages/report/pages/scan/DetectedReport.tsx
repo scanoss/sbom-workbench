@@ -141,7 +141,7 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
             </div>
           </div>
           { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)
-            ? <CryptographyCard data={data.dependencies} />
+            ? <CryptographyCard data={data.cryptographies} />
             : <p className="text-center mb-5 mt-5">{t('NoCryptographyScanned')}</p>}
         </ConditionalLink>
       </Card>

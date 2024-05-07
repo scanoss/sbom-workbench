@@ -1,11 +1,13 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '@store/rootReducer';
+import { ReportSummary } from '@api/types';
+import { ReportData } from 'electron-log';
 import { getReport } from './reportThunks';
 
 export interface ReportState {
-  summary: any,
-  detected: any; // TODO: create interface
-  identified: any; // TODO: create interface
+  summary: ReportSummary,
+  detected: ReportData;
+  identified: ReportData;
 
   isLoading: boolean;
 }
