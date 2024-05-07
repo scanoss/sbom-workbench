@@ -95,18 +95,11 @@ class ReportService {
     };
 
     // Get Crypto stats
-    const detectedCrypto = await modelProvider.model.cryptography.findAllDetected();
-    const sbomAlgorithms = new Set();
-
-    detectedCrypto.forEach((c) => {
-      c.algorithms.forEach((a) => {
-        sbomAlgorithms.add(a.algorithm);
-      });
-    });
+    const sbomAlgorithms = await modelProvider.model.cryptography.getAllIdentifiedAlgorithms();
 
     const localAlgorithms = await modelProvider.model.localCryptography.getAllAlgorithms();
     const cryptographies = {
-      sbom: Array.from(sbomAlgorithms.values()).length,
+      sbom: sbomAlgorithms.length,
       local: localAlgorithms.length,
     };
 
@@ -144,11 +137,18 @@ class ReportService {
       // await this.addManifestFileToComponents(licenses);
 
       // Get Crypto stats
-      const sbomAlgorithms = await modelProvider.model.cryptography.getAllDetectedAlgorithms();
+      const detectedCrypto = await modelProvider.model.cryptography.findAllDetected();
+      const sbomAlgorithms = new Set();
+  
+      detectedCrypto.forEach((c) => {
+        c.algorithms.forEach((a) => {
+          sbomAlgorithms.add(a.algorithm);
+        });
+      });
       const localAlgorithms = await modelProvider.model.localCryptography.getAllAlgorithms();
 
       const cryptographies = {
-        sbom: sbomAlgorithms.length,
+        sbom: Array.from(sbomAlgorithms.values()).length,
         local: localAlgorithms.length,
       };
 
