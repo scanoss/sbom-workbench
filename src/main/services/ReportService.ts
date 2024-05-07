@@ -42,6 +42,24 @@ export interface ISummary {
   original: number;
 }
 
+export interface IReportData {
+  licenses: LicenseEntry[];
+  vulnerabilities: {
+    critical: number;
+    high: number;
+    low: number;
+    medium: number;
+  };
+  cryptographies: {
+    sbom: number;
+    local: number;
+  }
+  dependencies: {
+    files: any; // FIX TYPE
+    total: number;
+  }
+}
+
 class ReportService {
   public async getReportSummary(): Promise<ISummary> {
     const auxSummary = await modelProvider.model.file.getSummary();
@@ -62,7 +80,7 @@ class ReportService {
     return summary;
   }
 
-  public async getIdentified() {
+  public async getIdentified(): Promise<IReportData> {
     let data: any = [];
     data = await modelProvider.model.component.getIdentifiedForReport();
 
@@ -112,52 +130,48 @@ class ReportService {
     return { licenses, vulnerabilities: vulnerabilityReport, cryptographies, dependencies: dependenciesSummary };
   }
 
-  public async getDetected() {
-    try {
-      const results = await modelProvider.model.result.getDetectedReport();
-      let licenses = this.getLicenseReportFromResults(results);
+  public async getDetected(): Promise<IReportData> {
+    const results = await modelProvider.model.result.getDetectedReport();
+    let licenses = this.getLicenseReportFromResults(results);
 
-      const vulnerabilities = await modelProvider.model.vulnerability.getDetectedReport();
-      const vulnerabilityReport = {
-        critical: 0,
-        high: 0,
-        low: 0,
-        medium: 0,
-        ...this.getVulnerabilitiesReport(vulnerabilities),
-      };
+    const vulnerabilities = await modelProvider.model.vulnerability.getDetectedReport();
+    const vulnerabilityReport = {
+      critical: 0,
+      high: 0,
+      low: 0,
+      medium: 0,
+      ...this.getVulnerabilitiesReport(vulnerabilities),
+    };
 
-      const dependencies = await modelProvider.model.dependency.getAll(null);
-      licenses = this.addDependencyComponentsToLicenseReport(licenses, dependencies);
-      if (licenses) this.checkForIncompatibilities(licenses);
+    const dependencies = await modelProvider.model.dependency.getAll(null);
+    licenses = this.addDependencyComponentsToLicenseReport(licenses, dependencies);
+    if (licenses) this.checkForIncompatibilities(licenses);
 
-      // Dependencies
-      const dependenciesSummary = await modelProvider.model.dependency.getDetectedSummary();
+    // Dependencies
+    const dependenciesSummary = await modelProvider.model.dependency.getDetectedSummary();
 
-      // Add Manifest files
-      // await this.addManifestFileToComponents(licenses);
+    // Add Manifest files
+    // await this.addManifestFileToComponents(licenses);
 
-      // Get Crypto stats
-      const detectedCrypto = await modelProvider.model.cryptography.findAllDetected();
-      const sbomAlgorithms = new Set();
-  
-      detectedCrypto.forEach((c) => {
-        c.algorithms.forEach((a) => {
-          sbomAlgorithms.add(a.algorithm);
-        });
+    // Get Crypto stats
+    const detectedCrypto = await modelProvider.model.cryptography.findAllDetected();
+    const sbomAlgorithms = new Set();
+
+    detectedCrypto.forEach((c) => {
+      c.algorithms.forEach((a) => {
+        sbomAlgorithms.add(a.algorithm);
       });
-      const localAlgorithms = await modelProvider.model.localCryptography.getAllAlgorithms();
+    });
+    const localAlgorithms = await modelProvider.model.localCryptography.getAllAlgorithms();
 
-      const cryptographies = {
-        sbom: Array.from(sbomAlgorithms.values()).length,
-        local: localAlgorithms.length,
-      };
+    const cryptographies = {
+      sbom: Array.from(sbomAlgorithms.values()).length,
+      local: localAlgorithms.length,
+    };
 
-      return {
-        licenses, cryptographies, vulnerabilities: vulnerabilityReport, dependencies: dependenciesSummary,
-      };
-    } catch (e) {
-      return { status: 'fail' };
-    }
+    return {
+      licenses, cryptographies, vulnerabilities: vulnerabilityReport, dependencies: dependenciesSummary,
+    };
   }
 
   private getLicenseReportFromResults(results: any): Array<LicenseEntry> {
