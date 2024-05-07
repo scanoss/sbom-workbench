@@ -82,8 +82,10 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
     // Remove scan root from each ICryptoItem
     const scanRoot = this.project.getScanRoot();
     const filesWithCrypto = crypto.fileList.filter((ci) => ci.algorithms.length > 0);
-    filesWithCrypto.forEach((ci) => { ci.file = path.join('/', path.relative(scanRoot, ci.file)); });
-
+    console.log(scanRoot);
+    filesWithCrypto.forEach((ci) => { 
+      ci.file = '/' + path.relative(scanRoot, ci.file);;
+    });
     // Convert file paths to fileIds
     const localCrypto = filesWithCrypto.map((fc) => { return { fileId: fileIdMapper.get(fc.file), algorithms: JSON.stringify(fc.algorithms) }; });
 
