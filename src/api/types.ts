@@ -186,6 +186,11 @@ export enum ExportSource {
   IDENTIFIED = 'IDENTIFIED',
 }
 
+export enum InventoryType {
+  SBOM = 'SBOM',
+  CBOM = 'CBOM',
+}
+
 export type IParams = Record<PropertyKey, any> & {
   // non-generic interface properties go here
   sort?: string;

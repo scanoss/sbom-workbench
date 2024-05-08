@@ -11,7 +11,7 @@ import { HtmlSummary } from '../../modules/export/format/HtmlSummary';
 import { SpdxLiteJson } from '../../modules/export/format/SpdxLiteJson';
 import { ITask } from '../Task';
 import { IExportResult } from '../../modules/export/IExportResult';
-import { ExportFormat } from '../../../api/types';
+import { ExportFormat, InventoryType } from '../../../api/types';
 
 export class Export implements ITask<string, IExportResult> {
   private format: Format;
@@ -43,7 +43,9 @@ export class Export implements ITask<string, IExportResult> {
         this.format = new SpdxLite(exportDTO.source);
         break;
       case ExportFormat.CSV:
-        this.format = new Csv(exportDTO.source);
+        if (exportDTO.inventoryType === InventoryType.SBOM) {
+          this.format = new Csv(exportDTO.source);
+        }
         break;
       case ExportFormat.RAW:
         this.format = new Raw();

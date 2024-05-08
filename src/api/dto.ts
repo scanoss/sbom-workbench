@@ -1,4 +1,4 @@
-import { ComponentGroup, Dependency, ExportFormat, ExportSource, Inventory , Result} from './types';
+import { Dependency, ExportFormat, ExportSource, Inventory, InventoryType, Result } from './types';
 import { ISearchComponent } from '../main/task/componentCatalog/iComponentCatalog/ISearchComponent';
 import { IComponentResult } from '../main/task/componentCatalog/iComponentCatalog/IComponentResult';
 
@@ -74,6 +74,7 @@ export interface NewExportDTO {
   format: ExportFormat;
   source: ExportSource;
   path: string;
+  inventoryType?: InventoryType;
 }
 
 export enum SourceType {
