@@ -12,26 +12,19 @@ import { SpdxLiteJson } from '../../modules/export/format/SpdxLiteJson';
 import { ITask } from '../Task';
 import { IExportResult } from '../../modules/export/IExportResult';
 import { ExportFormat, InventoryType } from '../../../api/types';
+import { Cbom } from '../../modules/export/format/Cbom';
 
 export class Export implements ITask<string, IExportResult> {
   private format: Format;
 
   public async run(path: string): Promise<IExportResult> {
-    try {
-      const result = await this.format.save(path);
-      return result;
-    } catch (error: any) {
-      throw error;
-    }
+    const result = await this.format.save(path);
+    return result;
   }
 
   public async generate() {
-    try {
-      const data = await this.format.generate();
-      return data;
-    } catch (e) {
-      throw e;
-    }
+    const data = await this.format.generate();
+    return data;
   }
 
   public setFormat(exportDTO: NewExportDTO) {
@@ -45,6 +38,9 @@ export class Export implements ITask<string, IExportResult> {
       case ExportFormat.CSV:
         if (exportDTO.inventoryType === InventoryType.SBOM) {
           this.format = new Csv(exportDTO.source);
+        }
+        if (exportDTO.inventoryType === InventoryType.CBOM) {
+          this.format = new Cbom(exportDTO.source);
         }
         break;
       case ExportFormat.RAW:
