@@ -3,12 +3,10 @@ import { makeStyles } from '@mui/styles';
 import { useTranslation } from 'react-i18next';
 import { AutoSizer, Column, Table } from 'react-virtualized';
 import { useDispatch } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { fetchComponent } from '@store/component-store/componentThunks';
 import { Link } from '@mui/material';
 import { Component } from 'main/services/ReportService';
-import { setComponent } from '@store/component-store/componentSlice';
-import { componentService } from '@api/services/component.service';
 
 /* icons  */
 import IconComponent from '../../../components/IconComponent/IconComponent';
@@ -32,11 +30,10 @@ const useStyles = makeStyles({
   },
 });
 
-export default function MatchesForLicense({ components, showCrypto, mode }) {
+export default function MatchesForLicense({ components, mode }) {
   const classes = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
   const dispatch = useDispatch();
 
   const onSelectComponent = async (e, component: Component) => {
@@ -110,22 +107,6 @@ export default function MatchesForLicense({ components, showCrypto, mode }) {
                 return <span title={data}>{data}</span>;
               }}
             />
-
-            {showCrypto && (
-            <Column
-              label={t('Table:Header:Cryptography')}
-              dataKey="cryptography"
-              width={200}
-              flexGrow={1}
-              flexShrink={0}
-              cellRenderer={({ cellData }) => {
-                const data = cellData
-                  .map((algorithm, index) => (`${algorithm.algorithm} (${algorithm.strength})`))
-                  .join(' - ');
-                return <span title={data}>{data}</span>;
-              }}
-            />
-            )}
           </Table>
         )}
       </AutoSizer>

@@ -12,7 +12,7 @@
   }
 
   .app-content {
-    .local-cryptography-table, .sbom-cryptography-table {
+    .local-cryptography-table, .component-cryptography-table {
       max-height: 100%;
     }
   }
@@ -20,6 +20,7 @@
   .form-row.filter {
     .form-group {
       min-width: 280px;
+      max-width: 600px;
 
       &.filter-algorithm {
         width: auto;

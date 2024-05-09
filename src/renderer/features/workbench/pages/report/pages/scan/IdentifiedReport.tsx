@@ -196,8 +196,8 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
 
       <Card className="report-item report-item-detail matches-for-license pt-1 mt-0">
         <Routes>
-          <Route path="matches" element={<MatchesForLicense components={componentsMatched} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} mode="detected" />} />
-          <Route path="declared" element={<MatchesForLicense components={componentsDeclared} showCrypto={layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)} mode="detected" />} />
+          <Route path="matches" element={<MatchesForLicense components={componentsMatched} mode="identified" />} />
+          <Route path="declared" element={<MatchesForLicense components={componentsDeclared} mode="identified" />} />
           <Route path="obligations" element={<LicensesObligations data={obligationsFiltered} />} />
           <Route path="" element={<Navigate to="matches" replace />} />
         </Routes>

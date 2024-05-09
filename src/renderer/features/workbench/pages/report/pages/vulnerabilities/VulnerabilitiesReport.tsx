@@ -102,6 +102,7 @@ const VulnerabilitiesReport = () => {
                   <Paper>
                     <Autocomplete
                       id="input-component"
+                      size="small"
                       options={components}
                       disablePortal
                       onChange={(e_, value) => onFilterHandler({ component: value })}
@@ -123,6 +124,7 @@ const VulnerabilitiesReport = () => {
                   <Paper>
                     <Autocomplete
                       options={['critical', 'high', 'medium', 'low']}
+                      size="small"
                       disablePortal
                       multiple
                       forcePopupIcon
