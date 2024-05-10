@@ -31,15 +31,15 @@ export class Cbom extends Format {
   private csvCreate(data: CBOMInputData) {
     let csv = 'Source, Algorithms\n';
 
-    // components
-    data.components.forEach((c) => {
-      const row = `${c.component}, ${c.algorithms}\r\n`;
+    // Local
+    data.local.forEach((c) => {
+      const row = `${c.file}, ${c.algorithms}\r\n`;
       csv += row;
     });
 
-    // local
-    data.local.forEach((c) => {
-      const row = `${c.file}, ${c.algorithms}\r\n`;
+    // Components
+    data.components.forEach((c) => {
+      const row = `${c.component}, ${c.algorithms}\r\n`;
       csv += row;
     });
 
