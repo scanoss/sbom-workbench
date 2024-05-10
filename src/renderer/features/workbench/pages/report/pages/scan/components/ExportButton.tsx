@@ -1,7 +1,7 @@
 import react, { useState } from 'react';
 
 import { exportService } from '@api/services/export.service';
-import { ExportSource, ExportFormat } from '@api/types';
+import { ExportSource, ExportFormat, InventoryType } from '@api/types';
 import AppConfig from '@config/AppConfigModule';
 import { getFormatFilesAttributes } from '@shared/utils/file-utils';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
@@ -9,9 +9,10 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { dialogController } from 'renderer/controllers/dialog-controller';
-import { Button, Fade, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Button, Collapse, Fade, List, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material';
 
 import GetAppIcon from '@mui/icons-material/GetApp';
+import { ExpandLess, ExpandMore, StarBorder } from '@mui/icons-material';
 
 export const ExportButton = ({ empty }) => {
   const { pathname } = useLocation();
@@ -37,6 +38,20 @@ export const ExportButton = ({ empty }) => {
       label: 'CSV',
       hint: t('Tooltip:ExportHintCSV'),
       sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+      childrens: [
+        {
+          label: 'SBOM',
+          hint: t('Tooltip:ExportHintCSVSBOM'),
+          sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+          type: InventoryType.SBOM,
+        },
+        {
+          label: 'Cryptography',
+          hint: t('Tooltip:ExportHintCSVCBOM'),
+          sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+          type: InventoryType.CBOM,
+        },
+      ],
     },
     SPDXLITEJSON: {
       label: 'SPDX Lite',
@@ -52,6 +67,7 @@ export const ExportButton = ({ empty }) => {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [subMenuOpened, setSubMenuOpened] = useState<string>(null);
 
   const onExportClicked = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -61,27 +77,57 @@ export const ExportButton = ({ empty }) => {
     setAnchorEl(null);
   };
 
-  const onExport = async (format: ExportFormat) => {
-    await exportFile(format);
+  const onExport = async (format: ExportFormat, inventoryType: InventoryType = null) => {
+    await exportFile(format, inventoryType);
     handleClose();
   };
 
-  const exportFile = async (format: ExportFormat) => {
+  const exportFile = async (format: ExportFormat, inventoryType: InventoryType) => {
     const dirname = localStorage.getItem('last-path-used') || projectPath;
     const attributes = getFormatFilesAttributes(format);
     const path = await dialogController.showSaveDialog({
-      defaultPath: `${dirname}/${name}${attributes.prefix ? `-${attributes.prefix}` : ''}.${attributes.extension}`,
+      defaultPath: `${dirname}/${name}${attributes.prefix ? `-${attributes.prefix}` : ''}${inventoryType ? `-${inventoryType}` : ''}.${attributes.extension}`,
       filters: [{ name: attributes.description, extensions: [attributes.extension] }],
     });
 
     if (path) {
       localStorage.setItem('last-path-used', window.path.dirname(path));
-      await exportService.export({ path, format, source });
+      await exportService.export({ path, format, source, inventoryType });
     }
   };
 
+  const CustomMenuItem = ({ format, item, depth = 1 }) => {
+    const onClickHandler = (e) => {
+      if (!item.childrens) {
+        onExport(format as ExportFormat, item.type);
+      } else {
+        setSubMenuOpened(subMenuOpened === format ? null : format);
+      }
+    };
+
+    return (
+      <>
+        <Tooltip key={item.label} title={item.hint} placement="left" arrow>
+          <MenuItem onClick={onClickHandler} sx={{ pl: 1 + depth }} className="d-flex space-between">
+            <span>{item.label}</span>
+            {item.childrens && (subMenuOpened === format ? <ExpandLess /> : <ExpandMore />)}
+          </MenuItem>
+        </Tooltip>
+        {item.childrens && (
+        <Collapse in={subMenuOpened === format} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {item.childrens.map((children) => (
+              <CustomMenuItem format={format} item={children} depth={depth + 1} />
+            ))}
+          </List>
+        </Collapse>
+        )}
+      </>
+    );
+  };
+
   return (
-    <div>
+    <div id="ExportButton">
       {!AppConfig.FF_EXPORT_FORMAT_OPTIONS
         || (AppConfig.FF_EXPORT_FORMAT_OPTIONS.length === 0 && (
           <Button
@@ -127,9 +173,7 @@ export const ExportButton = ({ empty }) => {
             {AppConfig.FF_EXPORT_FORMAT_OPTIONS.map(
               (format) => exportLabels[format]
                 && exportLabels[format].sources.includes(source) && (
-                  <Tooltip key={format} title={exportLabels[format].hint} placement="left" arrow>
-                    <MenuItem onClick={() => onExport(format as ExportFormat)}>{exportLabels[format].label}</MenuItem>
-                  </Tooltip>
+                <CustomMenuItem format={format} item={exportLabels[format]} />
               ),
             )}
           </Menu>
