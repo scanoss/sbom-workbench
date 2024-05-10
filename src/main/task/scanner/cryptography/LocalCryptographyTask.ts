@@ -6,6 +6,7 @@ import { modelProvider } from '../../../services/ModelProvider';
 import { Project } from '../../../workspace/Project';
 import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
+import { normalizeCryptoAlgorithms } from '../../../../shared/adapters/crypto.adapter';
 
 /**
  * Represents a pipeline task for performing local cryptography analysis.
@@ -86,7 +87,7 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       ci.file = `/${path.relative(scanRoot, ci.file)}`;
     });
     // Convert file paths to fileIds
-    const localCrypto = filesWithCrypto.map((fc) => { return { fileId: fileIdMapper.get(fc.file), algorithms: JSON.stringify(fc.algorithms) }; });
+    const localCrypto = filesWithCrypto.map((fc) => { return { fileId: fileIdMapper.get(fc.file), algorithms: JSON.stringify(normalizeCryptoAlgorithms(fc.algorithms)) }; });
 
     // Import results of local cryprography
     await modelProvider.model.localCryptography.import(localCrypto);

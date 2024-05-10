@@ -6,6 +6,7 @@ import fs from 'fs';
 import { ITask } from '../Task';
 import { modelProvider } from '../../services/ModelProvider';
 import { ICryptographyTask } from './ICryptographyTask';
+import { normalizeCryptoAlgorithms } from '../../../shared/adapters/crypto.adapter';
 
 export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
   async run(params: ICryptographyTask): Promise<void> {
@@ -39,7 +40,7 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
     response.purlsList.forEach((crypto) => {
       if (crypto.algorithmsList.length > 0) { // avoids empty crypto from response
         const [purl, version] = crypto.purl.split('@');
-        const cryptography = { purl, version, algorithms: JSON.stringify(crypto.algorithmsList) };
+        const cryptography = { purl, version, algorithms: JSON.stringify(normalizeCryptoAlgorithms(crypto.algorithmsList)) };
         cryptographies.push(cryptography);
       }
     });
