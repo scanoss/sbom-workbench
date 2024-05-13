@@ -14,6 +14,8 @@ import { normalizeCryptoAlgorithms } from '../../../../shared/adapters/crypto.ad
 export class LocalCryptographyTask implements Scanner.IPipelineTask {
   private project: Project;
 
+  private readonly THREADS = 5;
+
   /**
    * Constructs a new LocalCryptographyTask with the specified project.
    * @param project The project to analyze for local cryptography.
@@ -49,7 +51,7 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       if (rootFolder.containsFile('scanoss-crypto-rules.json')) {
         rules = path.join(this.project.getScanRoot(), 'scanoss-crypto-rules.json');
       }
-      const cryptoCfg = new CryptoCfg(rules);
+      const cryptoCfg = new CryptoCfg({ rulesPath: rules, threads: this.THREADS });
       const cryptoScanner = new CryptographyScanner(cryptoCfg);
       const allFiles = this.project.getTree().getRootFolder().getFiles();
 
