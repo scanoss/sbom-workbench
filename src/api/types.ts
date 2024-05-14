@@ -188,7 +188,7 @@ export enum ExportSource {
 
 export enum InventoryType {
   SBOM = 'SBOM',
-  CBOM = 'CBOM',
+  CRYPTOGRAPHY = 'CRYPTOGRAPHY',
 }
 
 export type IParams = Record<PropertyKey, any> & {

@@ -14,12 +14,12 @@ export interface CryptoLocal {
   algorithms: string,
 }
 
-export interface CBOMInputData {
+export interface CryptoInputData {
   components: Array<CryptoComponent>;
   local: Array<CryptoLocal>
 }
 
-export class Cbom extends Format {
+export class Crypto extends Format {
   private source: string;
 
   constructor(source: string) {
@@ -28,18 +28,18 @@ export class Cbom extends Format {
     this.extension = '.csv';
   }
 
-  private csvCreate(data: CBOMInputData) {
-    let csv = 'Source, Algorithms\n';
+  private csvCreate(data: CryptoInputData) {
+    let csv = 'source, algorithms\n';
 
     // Local
     data.local.forEach((c) => {
-      const row = `${c.file}, ${c.algorithms}\r\n`;
+      const row = `${c.file}, "${c.algorithms}"\r\n`;
       csv += row;
     });
 
     // Components
     data.components.forEach((c) => {
-      const row = `${c.component}, ${c.algorithms}\r\n`;
+      const row = `${c.component}, "${c.algorithms}"\r\n`;
       csv += row;
     });
 
@@ -66,7 +66,7 @@ export class Cbom extends Format {
       uniqueAlgorithms.add(alg.algorithm);
     });
 
-    const uniqueAlgorithmsString = Array.from(uniqueAlgorithms).join(' - ');
+    const uniqueAlgorithmsString = Array.from(uniqueAlgorithms).join(', ');
     return uniqueAlgorithmsString;
   }
 
@@ -108,9 +108,9 @@ export class Cbom extends Format {
 
   /**
    * Fetches cryptography data identified as matched from the database.
-   * @returns {Promise<CBOMInputData>} The cryptography data.
+   * @returns {Promise<CryptoInputData>} The cryptography data.
    */
-  private async getDetectedData(): Promise<CBOMInputData> {
+  private async getDetectedData(): Promise<CryptoInputData> {
     const components = await modelProvider.model.cryptography.findAllDetected();
     const cryptoComponents = this.getComponentCrypto(components);
 
@@ -125,9 +125,9 @@ export class Cbom extends Format {
 
   /**
    * Fetches cryptography data identified as matched from the database.
-   * @returns {Promise<CBOMInputData>} The cryptography data.
+   * @returns {Promise<CryptoInputData>} The cryptography data.
    */
-  private async getIdentifyData(): Promise<CBOMInputData> {
+  private async getIdentifyData(): Promise<CryptoInputData> {
     const components = await modelProvider.model.cryptography.findAllIdentifiedMatched();
     const cryptoComponents = this.getComponentCrypto(components);
 
