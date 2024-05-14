@@ -97,5 +97,6 @@
   "NoVulnerabilitiesScanned": "No vulnerabilities scanned",
   "NoDataFound": "No data found",
   "Current": "Current",
-  "Default": "Default"
+  "Default": "Default",
+  "NoScanned": "No scanned"
 }

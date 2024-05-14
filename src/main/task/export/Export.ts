@@ -12,7 +12,7 @@ import { SpdxLiteJson } from '../../modules/export/format/SpdxLiteJson';
 import { ITask } from '../Task';
 import { IExportResult } from '../../modules/export/IExportResult';
 import { ExportFormat, InventoryType } from '../../../api/types';
-import { Cbom } from '../../modules/export/format/Cbom';
+import { Crypto } from '../../modules/export/format/Crypto';
 
 export class Export implements ITask<string, IExportResult> {
   private format: Format;
@@ -39,8 +39,8 @@ export class Export implements ITask<string, IExportResult> {
         if (exportDTO.inventoryType === InventoryType.SBOM) {
           this.format = new Csv(exportDTO.source);
         }
-        if (exportDTO.inventoryType === InventoryType.CBOM) {
-          this.format = new Cbom(exportDTO.source);
+        if (exportDTO.inventoryType === InventoryType.CRYPTOGRAPHY) {
+          this.format = new Crypto(exportDTO.source);
         }
         break;
       case ExportFormat.RAW:

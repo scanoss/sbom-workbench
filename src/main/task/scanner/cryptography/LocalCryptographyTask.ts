@@ -53,17 +53,19 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       }
       const cryptoCfg = new CryptoCfg({ rulesPath: rules, threads: this.THREADS });
       const cryptoScanner = new CryptographyScanner(cryptoCfg);
-      const allFiles = this.project.getTree().getRootFolder().getFiles();
+      const files = this.project.getTree().getRootFolder().getFiles();
 
-      // Get files that have not been filtered
-      const files = allFiles
+      // Map absolute -> relative
+      const fileIdMapper = new Map<string, string>();
+
+      files
         .filter((f) => f.type !== 'FILTERED')
-        .map((f) => path.join(this.project.getScanRoot(), f.path));
+        .forEach((f) => fileIdMapper.set(path.join(this.project.getScanRoot(), f.path), f.path));
 
-      const localCryptography = await cryptoScanner.scan(files);
+      const localCryptography = await cryptoScanner.scan([...fileIdMapper.keys()]);
 
       // Import local cryptography
-      await this.importLocalCrypto(localCryptography);
+      await this.importLocalCrypto(localCryptography, fileIdMapper);
 
       return true;
     } catch (e) {
@@ -76,20 +78,17 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
    * Imports the results of local cryptography analysis into the database.
    * @param crypto The results of local cryptography analysis.
    */
-  private async importLocalCrypto(crypto: ILocalCryptographyResponse) {
-    // Creates a map to get file id by file path
+  private async importLocalCrypto(crypto: ILocalCryptographyResponse, filePathMapper: Map<string, string>) {
+    // Map relative -> fileId
     const files = await modelProvider.model.file.getAll(null);
     const fileIdMapper = new Map<string, number>();
     files.forEach((f) => { fileIdMapper.set(f.path, f.id); });
 
     // Remove scan root from each ICryptoItem
-    const scanRoot = this.project.getScanRoot();
     const filesWithCrypto = crypto.fileList.filter((ci) => ci.algorithms.length > 0);
-    filesWithCrypto.forEach((ci) => {
-      ci.file = `/${path.relative(scanRoot, ci.file)}`;
-    });
+
     // Convert file paths to fileIds
-    const localCrypto = filesWithCrypto.map((fc) => { return { fileId: fileIdMapper.get(fc.file), algorithms: JSON.stringify(normalizeCryptoAlgorithms(fc.algorithms)) }; });
+    const localCrypto = filesWithCrypto.map((fc) => ({ fileId: fileIdMapper.get(filePathMapper.get(fc.file)), algorithms: JSON.stringify(normalizeCryptoAlgorithms(fc.algorithms)) }));
 
     // Import results of local cryprography
     await modelProvider.model.localCryptography.import(localCrypto);

@@ -134,7 +134,7 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
           </div>
           { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
             ? <DependenciesCard data={data.dependencies} />
-            : <p className="text-center mb-5 mt-5">{t('NoDependenciesScanned')}</p>}
+            : <p className="text-center mb-5 mt-5">{t('NoScanned')}</p>}
         </ConditionalLink>
       </Card>
 
@@ -148,7 +148,7 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
           </div>
           { layers.current.has(Scanner.ScannerType.VULNERABILITIES)
             ? <VulnerabilitiesCard data={data.vulnerabilities} />
-            : <p className="text-center mb-5 mt-5">{t('NoVulnerabilitiesScanned')}</p>}
+            : <p className="text-center mb-5 mt-5">{t('NoScanned')}</p>}
         </ConditionalLink>
       </Card>
 
@@ -162,7 +162,7 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
           </div>
           { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)
             ? <CryptographyCard data={data.cryptographies} />
-            : <p className="text-center mb-5 mt-5">{t('NoCryptographyScanned')}</p>}
+            : <p className="text-center mb-5 mt-5">{t('NoScanned')}</p>}
         </ConditionalLink>
       </Card>
 

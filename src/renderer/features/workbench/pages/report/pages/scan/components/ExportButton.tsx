@@ -9,10 +9,10 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { dialogController } from 'renderer/controllers/dialog-controller';
-import { Button, Collapse, Fade, List, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Button, Collapse, Fade, List, Menu, MenuItem, Tooltip } from '@mui/material';
 
 import GetAppIcon from '@mui/icons-material/GetApp';
-import { ExpandLess, ExpandMore, StarBorder } from '@mui/icons-material';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
 export const ExportButton = ({ empty }) => {
   const { pathname } = useLocation();
@@ -47,9 +47,9 @@ export const ExportButton = ({ empty }) => {
         },
         {
           label: 'Cryptography',
-          hint: t('Tooltip:ExportHintCSVCBOM'),
+          hint: t('Tooltip:ExportHintCSVCryptography'),
           sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
-          type: InventoryType.CBOM,
+          type: InventoryType.CRYPTOGRAPHY,
         },
       ],
     },
