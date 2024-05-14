@@ -50,6 +50,11 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       const rootFolder = this.project.getTree().getRootFolder();
       if (rootFolder.containsFile('scanoss-crypto-rules.json')) {
         rules = path.join(this.project.getScanRoot(), 'scanoss-crypto-rules.json');
+      } else {
+        const isDev = process.env.NODE_ENV !== 'production';
+        rules = isDev
+          ? path.join(__dirname, '../../../../../assets/data/defaultCryptoRules.json')
+          : path.join(__dirname, '../../../assets/data/defaultCryptoRules.json');
       }
       const cryptoCfg = new CryptoCfg({ rulesPath: rules, threads: this.THREADS });
       const cryptoScanner = new CryptographyScanner(cryptoCfg);
