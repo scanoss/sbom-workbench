@@ -5,6 +5,7 @@ import { ComponentDataProvider } from '../DataProviders/ComponentDataProvider';
 import { LicenseDataProvider } from '../DataProviders/LicenseDataProvider';
 import { SummaryDataProvider } from '../DataProviders/SummaryDataProvider';
 import { DependencyDataProvider } from '../DataProviders/DependencyDataProvider';
+import { CryptographyDataProvider } from '../DataProviders/CryptographyDataProvider';
 
 const pathLib = require('path');
 
@@ -29,6 +30,7 @@ export class HtmlSummary extends Format {
     dpm.addDataProvider(new LicenseDataProvider(this.source));
     dpm.addDataProvider(new SummaryDataProvider(this.source === ExportSource.IDENTIFIED ? 'Identified Report' : 'Detected Report', this.source));
     dpm.addDataProvider(new DependencyDataProvider(this.source));
+    dpm.addDataProvider(new CryptographyDataProvider(this.source));
     const report = new Report(dpm);
     report.setTemplatePath(PATH);
     return report.getHTML();

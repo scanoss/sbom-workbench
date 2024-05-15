@@ -663,29 +663,61 @@
         </template>
       </section>
 
-      <!-- cryptography -->
-      <section aria-labelledby="nav-cryptography-tab" class="tab-pane fade" id="nav-cryptography" role="tabpanel"
-       tabindex="0">
-       <table class="table main-table" id="table-cryptography">
-         <thead>
-           <tr>
-             <th>Component</th>
-             <th>Version</th>
-             <th>Cryptography</th>
-           </tr>
-         </thead>
-         <tbody>
-         </tbody>
-       </table>
+    <!-- cryptography -->
+    <section aria-labelledby="nav-cryptography-tab" class="tab-pane fade" id="nav-cryptography" role="tabpanel"
+          tabindex="0">
+      <nav>
+        <div class="nav nav-tabs" id="nav-tab-crypto" role="tablist">
+          <button aria-controls="pane-local-cryptography"  class="nav-link visible active"  aria-selected="false"  data-bs-target="#pane-local-cryptography"
+                  data-bs-toggle="tab" id="crypto-file-tab" role="tab" type="button">Files</button>
+          <button aria-controls="pane-component-cryptography" class="nav-link visible" aria-selected="true"  data-bs-target="#pane-component-cryptography"
+                  data-bs-toggle="tab" id="crypto-component-tab" role="tab" type="button">Components</button>
+        </div>
+      </nav>
 
-       <template id="tpl-cryptography-row">
-         <tr>
-           <td></td>
-           <td></td>
-           <td></td>
-         </tr>
-       </template>
-     </section>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane" id="pane-component-cryptography" aria-labelledby="crypto-component-tab" role="tabpanel" tabindex="0">
+          <table class="table main-table" id="table-cryptography" >
+            <thead>
+            <tr>
+              <th>Component</th>
+              <th>Version</th>
+              <th>Cryptography</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+
+          <template id="tpl-cryptography-row">
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </template>
+      </div>
+      <div class="tab-pane active" id="pane-local-cryptography" role="tabpanel" aria-labelledby="crypto-file-tab" tabindex="0">
+        <table class="table main-table" id="table-local-cryptography">
+          <thead>
+          <tr>
+            <th>File</th>
+            <th>Cryptography</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+
+        <template id="tpl-local-cryptography-row">
+          <tr>
+            <td></td>
+            <td></td>
+          </tr>
+        </template>
+      </div>
+      </div>  
+    </section>
 
      <!-- quality -->
      <section aria-labelledby="nav-quality-tab" class="tab-pane fade" id="nav-quality" role="tabpanel"
@@ -814,7 +846,8 @@
         renderDependenciesTable();
         renderVulnerabilitiesTable();
         renderCopyrightTable();
-        renderCryptographyTable();
+        renderComponentCryptographyTable();
+        renderLocalCryptographyTable();
         renderQualityTable();
         renderHealthTable();
       }
@@ -847,7 +880,7 @@
         if (data.dependencies) showTab('nav-dependencies-tab');
         if (data.vulnerabilities) showTab('nav-vulnerabilities-tab');
         if (existVersionKey('copyrights', data.component)) showTab('nav-copyrights-tab');
-        if (existVersionKey('cryptography', data.component)) showTab('nav-cryptography-tab');
+        if (data.cryptography) showTab('nav-cryptography-tab');
         if (existVersionKey('quality', data.component)) showTab('nav-quality-tab');
         if (existComponentKey('health', data.component)) showTab('nav-health-tab');
       }
@@ -1140,24 +1173,36 @@
         }
       }
 
-      function renderCryptographyTable() {
+      function renderComponentCryptographyTable() {
         const template = document.querySelector("#tpl-cryptography-row");
         const table = document.querySelector("#table-cryptography tbody");
 
-        const { component: componentData } = data;
+        const { cryptography } = data;
 
-        if (!componentData) return false;
+        if (!cryptography && !cryptography.components) return false;
 
-        for (const compData of componentData) {
-          for (const version of compData.versions) {
-            if (!version.cryptography) continue
+        for (const crypto of cryptography.components) {   
             const clon = template.content.cloneNode(true);
-            clon.querySelector('td:nth-child(1)').innerHTML = compData.name;
-            clon.querySelector('td:nth-child(2)').innerHTML = version.version;
-            clon.querySelector('td:nth-child(3)').innerHTML = version.cryptography.map(e => `${e.algorithm} (${e.strength})`).join('');
+            clon.querySelector('td:nth-child(1)').innerHTML = crypto.purl;
+            clon.querySelector('td:nth-child(2)').innerHTML = crypto.version;
+            clon.querySelector('td:nth-child(3)').innerHTML = crypto.algorithms.map(e => `${e.algorithm} (${e.strength})`).join(' - ');
+            table.appendChild(clon);          
+        }
+      }
 
-            table.appendChild(clon);
-          }
+      function renderLocalCryptographyTable(){
+        const template = document.querySelector("#tpl-local-cryptography-row");
+        const table = document.querySelector("#table-local-cryptography tbody");
+
+        const { cryptography } = data;
+
+        if (!cryptography && !cryptography.files) return false;
+
+        for (const crypto of cryptography.files) {
+          const clon = template.content.cloneNode(true);
+          clon.querySelector('td:nth-child(1)').innerHTML = crypto.file;
+          clon.querySelector('td:nth-child(2)').innerHTML = crypto.algorithms.map(e => `${e.algorithm} (${e.strength})`).join(' - ');
+          table.appendChild(clon);
         }
       }
 
