@@ -27,7 +27,7 @@ export class CryptographyTask implements Scanner.IPipelineTask {
 
   public async run():Promise<boolean> {
     log.info('[ Cryptography init ]');
-    if (!AppConfig.FF_ENABLE_SCAN_VULNERABILITY) return false;
+    if (!AppConfig.FF_ENABLE_SCAN_CRYPTOGRAPHY) return false;
 
     const detectedComponents = await modelProvider.model.component.getAll(null);
     const dependencyComponents = await modelProvider.model.dependency.getAll(

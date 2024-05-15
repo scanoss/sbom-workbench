@@ -29,10 +29,6 @@ export class ComponentDataProvider extends BaseDataProvider implements DataProvi
         if (!version.licenses.includes(item.spdxid)) {
           version.licenses.push(item.spdxid);
         }
-        if (item.algorithms) {
-          if (!version.cryptography) version.cryptography = [];
-          version.cryptography.push(...item.algorithms);
-        }
       } else {
         componentsMap[key].versions.push({
           version: item.version,
