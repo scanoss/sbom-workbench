@@ -29,17 +29,17 @@ export class Crypto extends Format {
   }
 
   private csvCreate(data: CryptoInputData) {
-    let csv = 'source, algorithms\n';
+    let csv = 'source,algorithms\n';
 
     // Local
     data.local.forEach((c) => {
-      const row = `${c.file}, "${c.algorithms}"\r\n`;
+      const row = `${c.file},"${c.algorithms}"\r\n`;
       csv += row;
     });
 
     // Components
     data.components.forEach((c) => {
-      const row = `${c.component}, "${c.algorithms}"\r\n`;
+      const row = `${c.component},"${c.algorithms}"\r\n`;
       csv += row;
     });
 
@@ -66,7 +66,7 @@ export class Crypto extends Format {
       uniqueAlgorithms.add(alg.algorithm);
     });
 
-    const uniqueAlgorithmsString = Array.from(uniqueAlgorithms).join(', ');
+    const uniqueAlgorithmsString = Array.from(uniqueAlgorithms).join(',');
     return uniqueAlgorithmsString;
   }
 
