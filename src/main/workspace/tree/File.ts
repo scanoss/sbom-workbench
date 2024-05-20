@@ -8,6 +8,7 @@ export default class File extends Node {
     super(name, path);
     this.type = 'file';
     this.isDependencyFile = false;
+    this.isBinaryFile = false;
   }
 
   public setStatus(path: string, status: NodeStatus): boolean {
@@ -62,7 +63,7 @@ export default class File extends Node {
 
   public restoreStatus(path: string) {
     if (this.getPath() !== path) return;
-    if(this.isDependencyFile) return;
+    if (this.isDependencyFile) return;
     if (this.getAction() === 'filter') {
       this.status = NodeStatus.FILTERED;
       this.setStatusOnClassnameAs(this.status);
@@ -102,7 +103,7 @@ export default class File extends Node {
   }
 
   public getFiles(banned: BlackListAbstract = null): Array<any> {
-    if(banned && banned.evaluate(this)) return [];
+    if (banned && banned.evaluate(this)) return [];
     let type = '';
     if (this.status === NodeStatus.PENDING) type = NodeStatus.MATCH;
     if (this.status === NodeStatus.FILTERED) type = NodeStatus.FILTERED;
@@ -111,6 +112,7 @@ export default class File extends Node {
       {
         path: this.getPath(),
         type,
+        isBinaryFile: this.isBinaryFile,
       },
     ];
   }
@@ -140,7 +142,7 @@ export default class File extends Node {
 
   public addDependency(path: string): void {
     if (this.getPath() === path) {
-      if(this.status !== NodeStatus.IDENTIFIED) { // only adds new dependencies
+      if (this.status !== NodeStatus.IDENTIFIED) { // only adds new dependencies
         this.status = NodeStatus.PENDING;
         this.setStatusOnClassnameAs(this.status);
       }
@@ -191,7 +193,7 @@ export default class File extends Node {
     return this.getName() === filename;
   }
 
-  public order():void{
+  public order():void {
   }
 
   public updateStatusFlags() {
@@ -199,6 +201,4 @@ export default class File extends Node {
 
   public updateFlags() {
   }
-
-
 }

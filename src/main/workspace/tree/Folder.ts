@@ -41,6 +41,7 @@ export default class Folder extends Node {
     this.someFilteredChild = false;
     this.someNoMatchChild = false;
     this.someMatchChild = false;
+    this.isBinaryFile = false;
   }
 
   public order(): void {

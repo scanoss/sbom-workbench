@@ -1,4 +1,4 @@
-import { BlackListAbstract } from "./blackList/BlackListAbstract";
+import { BlackListAbstract } from './blackList/BlackListAbstract';
 
 export enum NodeStatus {
   FILTERED = 'FILTERED',
@@ -33,6 +33,8 @@ export default abstract class Node {
   private scanMode: string;
 
   private isFilteredMatch: boolean;
+
+  protected isBinaryFile: boolean;
 
   constructor(path: string, label: string) {
     this.value = path;
@@ -125,6 +127,14 @@ export default abstract class Node {
 
   public getFilteredMatch(): boolean {
     return this.isFilteredMatch;
+  }
+
+  public setIsBinaryFile(isBinaryFile: boolean):void {
+    this.isBinaryFile = isBinaryFile;
+  }
+
+  public isBinaryDile():boolean {
+    return this.isBinaryFile;
   }
 
   public abstract getChild(i: number): Node;
