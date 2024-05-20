@@ -263,6 +263,8 @@ export class Tree {
           processed: this.filesIndexed,
         });
       }
+      const absolutePath = scanRoot + node.getValue();
+      node.setIsBinaryFile(isBinaryPath(absolutePath));
       if (bannedList.evaluate(scanRoot + node.getValue())) {
         node.setAction('scan');
         node.setScanMode(this.scanMode(scanRoot + node.getValue()));

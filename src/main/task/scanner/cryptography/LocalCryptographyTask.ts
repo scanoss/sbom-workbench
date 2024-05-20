@@ -7,6 +7,7 @@ import { Project } from '../../../workspace/Project';
 import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
 import { normalizeCryptoAlgorithms } from '../../../../shared/adapters/crypto.adapter';
+import { NodeStatus } from '../../../workspace/tree/Node';
 
 /**
  * Represents a pipeline task for performing local cryptography analysis.
@@ -64,7 +65,7 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       const fileIdMapper = new Map<string, string>();
 
       files
-        .filter((f) => f.type !== 'FILTERED')
+        .filter((f) => !f.isBinaryFile && f.type !== NodeStatus.FILTERED)
         .forEach((f) => fileIdMapper.set(path.join(this.project.getScanRoot(), f.path), f.path));
 
       const localCryptography = await cryptoScanner.scan([...fileIdMapper.keys()]);
