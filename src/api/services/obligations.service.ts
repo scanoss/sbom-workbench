@@ -24,7 +24,7 @@ class ObligationsService extends BaseService {
       throw new Error(response.statusText);
     } catch (error: any) {
       console.log(error);
-      return { label: spdxId };
+      return { label: spdxId, error: true };
     }
   }
 
