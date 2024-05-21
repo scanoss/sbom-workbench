@@ -113,6 +113,7 @@ export default class File extends Node {
         path: this.getPath(),
         type,
         isBinaryFile: this.isBinaryFile,
+        isDependencyFile: this.isDependencyFile,
       },
     ];
   }

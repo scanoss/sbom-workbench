@@ -65,7 +65,7 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       const fileIdMapper = new Map<string, string>();
 
       files
-        .filter((f) => !f.isBinaryFile && f.type !== NodeStatus.FILTERED)
+        .filter((f) => !f.isBinaryFile && !f.isDependencyFile && f.type !== NodeStatus.FILTERED)
         .forEach((f) => fileIdMapper.set(path.join(this.project.getScanRoot(), f.path), f.path));
 
       const localCryptography = await cryptoScanner.scan([...fileIdMapper.keys()]);
