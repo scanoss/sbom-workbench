@@ -96,3 +96,16 @@ api.handle(IpcChannels.WORKSPACE_SET_CURRENT, async (_event, wsPath: string) => 
     return Response.fail({ message: e.message });
   }
 });
+
+api.handle(IpcChannels.WORKSPACE_CONTEXT_FILES, async (_event, scanRoot: string) => {
+  try {
+    const contextFiles = await workspaceService.contextFiles(scanRoot);
+    return Response.ok({
+      message: 'Context files retrieved successfully',
+      data: contextFiles,
+    });
+  } catch (e: any) {
+    log.error('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
