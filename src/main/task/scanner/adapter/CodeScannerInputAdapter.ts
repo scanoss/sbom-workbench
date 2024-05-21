@@ -1,10 +1,11 @@
 import { SbomMode, ScannerInput, WinnowingMode } from 'scanoss';
 import fs from 'fs';
+import { getContextFiles } from '../../../services/utils/workspace';
 import { IScannerInputAdapter } from './IScannerInputAdapter';
 import { Project } from '../../../workspace/Project';
 
 export class CodeScannerInputAdapter implements IScannerInputAdapter {
-  adapterToScannerInput(project: Project, filesToScan: Record<string, string>): Array<ScannerInput> {
+  async adapterToScannerInput(project: Project, filesToScan: Record<string, string>): Promise<Array<ScannerInput>> {
     const fullScanList: Array<string> = [];
     const quickScanList: Array<string> = [];
 
@@ -37,19 +38,20 @@ export class CodeScannerInputAdapter implements IScannerInputAdapter {
     }
 
     // Allows to ignore a list of components from a SBOM place in the root folder
-    const rootFolder = project.getTree().getRootFolder();
     const rootPath = project.getScanRoot();
 
     let sbom = '';
     let sbomMode = SbomMode.SBOM_IDENTIFY;
 
-    if (rootFolder.containsFile('scanoss-ignore.json')) {
-      sbom = fs.readFileSync(`${rootPath}/scanoss-ignore.json`, 'utf-8');
+    const contextFiles = await getContextFiles(rootPath);
+
+    if (contextFiles.ignoreFile) {
+      sbom = fs.readFileSync(`${rootPath}/${contextFiles.identifyFile}`, 'utf-8');
       sbomMode = SbomMode.SBOM_IGNORE;
     }
 
-    if (rootFolder.containsFile('scanoss-identify.json')) {
-      sbom = fs.readFileSync(`${rootPath}/scanoss-identify.json`, 'utf-8');
+    if (contextFiles.identifyFile) {
+      sbom = fs.readFileSync(`${rootPath}/${contextFiles.identifyFile}`, 'utf-8');
       sbomMode = SbomMode.SBOM_IDENTIFY;
     }
 

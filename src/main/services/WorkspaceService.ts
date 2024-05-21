@@ -1,5 +1,6 @@
 import { BrowserWindow, RelaunchOptions, app } from 'electron';
 import { userSettingService } from './UserSettingService';
+import { getContextFiles } from './utils/workspace';
 
 class WorkspaceService {
   public async setCurrent(wsPath: string): Promise<void> {
@@ -24,6 +25,10 @@ class WorkspaceService {
 
     app.relaunch(options);
     app.exit(0);
+  }
+
+  public async contextFiles(scanRoot: string) {
+    return getContextFiles(scanRoot);
   }
 }
 
