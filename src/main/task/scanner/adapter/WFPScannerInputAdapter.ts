@@ -1,13 +1,13 @@
-import { ScannerInput } from "scanoss";
-import { IScannerInputAdapter } from "./IScannerInputAdapter";
-import { Project } from "../../../workspace/Project";
+import { ScannerInput } from 'scanoss';
+import { IScannerInputAdapter } from './IScannerInputAdapter';
+import { Project } from '../../../workspace/Project';
 
 export class WFPScannerInputAdapter implements IScannerInputAdapter {
-  adapterToScannerInput(project: Project, filesToScan: Record<string, string>): Array<ScannerInput> {
+  async adapterToScannerInput(project: Project, filesToScan: Record<string, string>): Promise<Array<ScannerInput>> {
     // @Override
-        const scannerInput:Array<ScannerInput> =[{
+    const scannerInput:Array<ScannerInput> = [{
       fileList: [],
-      wfpPath:  project.getScanRoot(),
+      wfpPath: project.getScanRoot(),
     }];
     return scannerInput;
   }
