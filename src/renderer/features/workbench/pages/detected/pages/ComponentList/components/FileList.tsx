@@ -17,7 +17,7 @@ export interface FileListProps {
 
 export const FileList = ({ files, filter, emptyMessage, onAction }: FileListProps) => {
   const { t } = useTranslation();
-  const { limit, paginate } = usePagination(250);
+  const { limit, paginate } = usePagination(50);
 
   const filteredFiles = files?.filter((file) => !filter || file.status === filter);
 
@@ -49,7 +49,7 @@ export const FileList = ({ files, filter, emptyMessage, onAction }: FileListProp
 
       {filteredFiles.length > limit && (
         <Alert
-          className="w-100 mt-3 mb-1"
+          className="mt-3 mb-1"
           severity="info"
           action={(
             <Button className="text-uppercase" color="inherit" size="small" onClick={paginate}>

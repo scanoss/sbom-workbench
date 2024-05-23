@@ -141,7 +141,6 @@ const ProjectScan = () => {
             <IconButton
               onClick={onPauseHandler}
               component="span"
-              size="large"
             >
               <ArrowBackIcon />
             </IconButton>

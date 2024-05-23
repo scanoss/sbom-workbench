@@ -22,8 +22,8 @@
 
   .app-content {
     display: flex;
+    flex-direction: column;
     min-height: calc(100% - 300px);
-    align-items: flex-start;
 
     .loader,  .file-group-container .loader {
       justify-self: center;

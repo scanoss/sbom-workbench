@@ -1,6 +1,6 @@
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
-import { IProject, License } from '../types';
+import { ContextFiles, IProject, License } from '../types';
 
 class WorkspaceService extends BaseService {
   public async getAllProjects(): Promise<IProject[]> {
@@ -60,7 +60,7 @@ class WorkspaceService extends BaseService {
     return this.response(response);
   }
 
-  public async contextFiles(scanRoot: string) {
+  public async contextFiles(scanRoot: string): Promise<ContextFiles> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.WORKSPACE_CONTEXT_FILES,
       scanRoot,

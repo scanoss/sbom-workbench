@@ -231,6 +231,10 @@ export const ComponentDetail = () => {
     };
 
     init();
+
+    return () => {
+      dispatch(setVersion(null));
+    };
   }, []);
 
   const renderTab = () => {
