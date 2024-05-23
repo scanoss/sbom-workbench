@@ -39,6 +39,9 @@ contextBridge.exposeInMainWorld('path', {
 });
 
 contextBridge.exposeInMainWorld('shell', {
+  openPath: (p: string) => {
+    shell.openPath(p);
+  },
   showItemInFolder: (p: string) => {
     shell.showItemInFolder(p);
   },

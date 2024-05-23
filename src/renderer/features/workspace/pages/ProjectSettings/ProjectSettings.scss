@@ -8,10 +8,13 @@
       justify-content: space-between;
     }
 
-    .project-form-container {
-      max-width: 600px;
-      min-width: 400px;
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+    }
 
+    .form-container {
       .project-license-container {
         .input-container {
           transform-origin: 0;
@@ -69,12 +72,19 @@
           }
         }
       }
+
+      .context-files-info {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 24px;
+      }
     }
   }
 
   .input-container-license,
   .api-subcontainer {
-    max-width: 500px;
+    max-width: 600px;
   }
 
   .label-input-container {

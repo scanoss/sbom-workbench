@@ -397,3 +397,8 @@ export interface CryptographyResponseDTO {
 /* Report Handler */
 export type ReportSummary = ISummary;
 export type ReportData = IReportData;
+
+export interface ContextFiles {
+  identifyFile: string | null;
+  ignoreFile: string | null;
+}

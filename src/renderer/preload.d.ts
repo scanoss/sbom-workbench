@@ -20,6 +20,7 @@ declare global {
       homedir(): string;
     };
     shell: {
+      openPath(path: string): void;
       showItemInFolder(path: string): void;
       openExternal(url: string, options?: Electron.OpenExternalOptions): Promise<void>;
     };
