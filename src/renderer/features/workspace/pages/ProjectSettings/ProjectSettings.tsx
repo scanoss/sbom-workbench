@@ -437,19 +437,19 @@ const ProjectSettings = () => {
                       </Button>
                   )}
                   >
-                    No context file found. You can provide one by creating an SBOM file in the <Link color="inherit" onClick={onOpenWorkRoot}>root of your project</Link>.
+                    No context file found. You can provide one by creating an SBOM file in the <Link className="cursor-pointer" color="inherit" onClick={onOpenWorkRoot}>root of your project</Link>.
                   </Alert>
                 )}
 
                 { context && (context.identifyFile) && (
                   <Alert severity="success">
-                    A context file was found (<Link color="inherit" onClick={() => onOpenFile(context.identifyFile)}>{context.identifyFile}</Link>). It will be used to enhance the scan results.
+                    A context file was found (<Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(context.identifyFile)}>{context.identifyFile}</Link>). It will be used to enhance the scan results.
                   </Alert>
                 )}
 
                 { context && (context.ignoreFile) && (
                   <Alert severity="success">
-                    An ignore file was found (<Link color="inherit" onClick={() => onOpenFile(context.ignoreFile)}>{context.ignoreFile}</Link>). It will be used to avoid specific  results.
+                    An ignore file was found (<Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(context.ignoreFile)}>{context.ignoreFile}</Link>). It will be used to avoid specific  results.
                   </Alert>
                 )}
 

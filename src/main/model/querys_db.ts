@@ -235,8 +235,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   SQL_GET_RESULTS_PRELOADINVENTORY = 'SELECT f.fileId AS id,r.source,r.idtype AS usage,r.component,r.version,rl.spdxid,r.url,r.purl,f.type FROM files f INNER JOIN results r ON f.fileId=r.fileId LEFT JOIN component_versions comp ON comp.purl=r.purl AND comp.version=r.version LEFT JOIN result_license rl ON rl.resultId=r.id #FILTER';
 
-  SQL_DELETE_DIRTY_DEPENDENCIES = `DELETE FROM dependencies WHERE dependencyId IN (SELECT dependencyId FROM dependencies WHERE dependencyId NOT IN (SELECT d.dependencyId FROM dependencies d WHERE d.purl IN (#PURLS) AND d.version IN (#VERSIONS)
-  ));`;
+  SQL_DELETE_ALL_DEPENDENCIES = 'DELETE FROM dependencies;';
 
   SQL_DEPENDENCY_STATUS = `SELECT DISTINCT f.path,d.fileId,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN 'IDENTIFIED' WHEN d.rejectedAt IS NOT NULL THEN 'IGNORED' ELSE 'PENDING' END) AS status FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId

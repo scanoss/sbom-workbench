@@ -118,11 +118,8 @@ export class DependencyModel extends Model {
     });
   }
 
-  public async deleteDirty(data: Record<string, string>): Promise<void> {
-    const SQLquery = queries.SQL_DELETE_DIRTY_DEPENDENCIES.replace('#PURLS', data.purls).replace(
-      '#VERSIONS',
-      data.versions,
-    );
+  public async deleteAll(): Promise<void> {
+    const SQLquery = queries.SQL_DELETE_ALL_DEPENDENCIES;
     const call = util.promisify(this.connection.run.bind(this.connection));
     await call(SQLquery);
   }

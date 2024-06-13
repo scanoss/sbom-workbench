@@ -14,8 +14,8 @@ import { IScannerInputAdapter } from '../adapter/IScannerInputAdapter';
 import { IDispatch } from '../dispatcher/IDispatch';
 import ScannerType = Scanner.ScannerType;
 import { CryptographyTask } from '../cryptography/CryptographyTask';
-import { userSettingService } from '../../../services/UserSettingService';
 import { LocalCryptographyTask } from '../cryptography/LocalCryptographyTask';
+import { ReScanDependencyTask } from '../dependency/ReScanDependencyTask';
 
 export class CodeScannerPipelineTask extends ScannerPipeline {
   public async run(project: Project): Promise<boolean> {
@@ -42,7 +42,10 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
     }
 
     // dependencies
-    if (metadata.getScannerConfig().type.includes(ScannerType.DEPENDENCIES)) this.queue.push(new DependencyTask(project));
+    const dependencyTask: DependencyTask = metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
+      ? new DependencyTask(project) : new ReScanDependencyTask(project);
+
+    this.queue.push(dependencyTask);
 
     // vulnerabilities
     if (metadata.getScannerConfig().type.includes(ScannerType.VULNERABILITIES)) this.queue.push(new VulnerabilitiesTask(project));
