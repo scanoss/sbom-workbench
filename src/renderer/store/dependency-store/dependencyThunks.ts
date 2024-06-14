@@ -4,7 +4,7 @@ import {
   AcceptAllDependeciesDTO,
   NewDependencyDTO,
   RejectAllDependeciesDTO,
-  RestoreAllDependenciesDTO
+  RestoreAllDependenciesDTO,
 } from '@api/dto';
 
 export const getAll = createAsyncThunk('dependency/fetchAll', async (path: string) => {
