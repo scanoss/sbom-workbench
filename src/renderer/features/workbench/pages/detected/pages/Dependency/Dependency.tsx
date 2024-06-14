@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Typography } from '@mui/material';
+import { Autocomplete, Paper, TextField, Typography } from '@mui/material';
 import { DIALOG_ACTIONS } from '@context/types';
 import { Dependency, FileType } from '@api/types';
 import { getExtension } from '@shared/utils/utils';
@@ -18,6 +18,7 @@ import {
 } from '@store/dependency-store/dependencyThunks';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { Trans, useTranslation } from 'react-i18next';
+import SearchIcon from '@mui/icons-material/Search';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import CodeViewSelector, { CodeViewSelectorMode } from './components/CodeViewSelector/CodeViewSelector';
@@ -35,7 +36,7 @@ export interface FileContent {
   error: boolean;
 }
 
-const filter = (items, query, status) => items?.filter((item) => (!status || item.status === status) && (!query || item.purl.toLowerCase().includes(query.toLowerCase())));
+const filter = (items, query, status, scope) => items?.filter((item) => (!status || item.status === status) && (!query || item.purl.toLowerCase().includes(query.toLowerCase())) && (!scope || item.scope === scope));
 
 const MemoCodeViewer = React.memo(CodeViewer);
 
@@ -45,7 +46,8 @@ const DependencyViewer = () => {
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
-  const { dependencies } = useSelector(selectDependencyState);
+  const { dependencies, scopes } = useSelector(selectDependencyState);
+
   const { path: scanBasePath, imported } = useSelector(selectWorkbench);
   const { node } = useSelector(selectNavigationState);
 
@@ -55,16 +57,17 @@ const DependencyViewer = () => {
 
   const [view, setView] = useState<CodeViewSelectorMode>(CodeViewSelectorMode.GRAPH);
 
+  const [scopeFilter, setScopeFilter] = useState<string | null>(null);
+
   const file = node?.type === 'file' ? node.path : null;
-  const items: Array<Dependency> = filter(dependencies, searchQuery, statusFilter);
+  const items: Array<Dependency> = filter(dependencies, searchQuery, statusFilter, scopeFilter);
   const pendingItems: Array<Dependency> = items?.filter((item) => item.status === 'pending');
   const validItems: Array<Dependency> = pendingItems.filter((item) => item.valid);
   const workedItems: Array<Dependency> = items?.filter((item) => item.status === 'identified' || item.status === 'original');
 
-  const init = () => {
+  const init = async () => {
     dispatch(reset());
     setLocalFileContent({ content: null, error: false });
-
     if (file) {
       dispatch(getAll(file));
       loadLocalFile(file);
@@ -138,6 +141,10 @@ const DependencyViewer = () => {
     dispatch(reject(dependency.dependencyId));
   };
 
+  const onFilterHandler = (scope: string) => {
+    setScopeFilter(scope);
+  };
+
   useEffect(() => {
     init();
   }, [file]);
@@ -154,10 +161,35 @@ const DependencyViewer = () => {
         </div>
 
         <div className="search-box">
-          <SearchBox
-            disabled={view === CodeViewSelectorMode.CODE}
-            onChange={(value) => setSearchQuery(value.trim().toLowerCase())}
-          />
+          
+          <Paper className="search-bar">
+            <SearchBox
+              disabled={view === CodeViewSelectorMode.CODE}
+              onChange={(value) => setSearchQuery(value.trim().toLowerCase())}
+            />
+          </Paper>
+
+          <Paper className="filter-box">
+            <Autocomplete
+              id="input-component"
+              size="small"
+              placeholder="Scope"
+              options={scopes}
+              disablePortal
+              onChange={(e_, value) => onFilterHandler(value as string)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Scope"
+                  InputProps={{
+                    ...params.InputProps,
+                    startAdornment: <SearchIcon />,
+                  }}
+                />
+              )}
+            />
+          </Paper>
+
         </div>
 
         <section className="subheader">

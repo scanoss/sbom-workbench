@@ -15,12 +15,14 @@ export interface DependencyState {
   dependencies: Dependency[];
   loading: boolean;
   batchRunning: boolean;
+  scopes: Array<string>;
 }
 
 const initialState: DependencyState = {
   dependencies: [],
   loading: false,
   batchRunning: false,
+  scopes: [],
 };
 
 export const dependencySlice = createSlice({
@@ -36,6 +38,7 @@ export const dependencySlice = createSlice({
     [getAll.fulfilled.type]: (state, action: PayloadAction<Dependency[]>) => {
       state.loading = false;
       state.dependencies = action.payload;
+      state.scopes = getDependencyScopes(action.payload);
     },
     [getAll.rejected.type]: (state) => {
       state.loading = false;
@@ -84,6 +87,14 @@ export const dependencySlice = createSlice({
     },
   },
 });
+
+const getDependencyScopes = (dep: Array<Dependency>) => {
+  const scopeMapper = new Set<string>();
+  dep.forEach((d) => {
+    scopeMapper.add(d.scope);
+  });
+  return Array.from(scopeMapper.values());
+};
 
 // actions
 export const { reset } = dependencySlice.actions;
