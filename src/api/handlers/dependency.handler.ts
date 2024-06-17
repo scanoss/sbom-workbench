@@ -1,4 +1,5 @@
 import log from 'electron-log';
+import { DependencyManifestFile } from '@api/types';
 import api from '../api';
 import { dependencyService } from '../../main/services/DependencyService';
 import { AcceptAllDependeciesDTO, NewDependencyDTO, RejectAllDependeciesDTO, RestoreAllDependenciesDTO } from '../dto';
@@ -84,6 +85,16 @@ api.handle(IpcChannels.DEPENDENCY_REJECT_ALL, async (event, param: RejectAllDepe
     return Response.ok({ message: 'Component created successfully', data: response });
   } catch (error: any) {
     log.error('[DEPENDENCY REJECT ALL]: ', error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+api.handle(IpcChannels.DEPENDENCY_MANIFEST_FILE_SUMMARY, async (event) => {
+  try {
+    const response: Array<DependencyManifestFile> = await dependencyService.getSummary();
+    return Response.ok({ message: 'Dependency summary retrieved successfully', data: response });
+  } catch (error: any) {
+    log.error('[DEPENDENCY SUMMARY]: ', error);
     return Response.fail({ message: error.message });
   }
 });

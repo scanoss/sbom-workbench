@@ -3,7 +3,7 @@ import { Dependency } from '@api/types';
 import sqlite3 from 'sqlite3';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { queries } from '../../querys_db';
-import { Dependency as Dep } from '../../entity/Dependency';
+import { Dependency as Dep, ModelDependencySummary } from '../../entity/Dependency';
 import { Model } from '../../Model';
 
 export class DependencyModel extends Model {
@@ -163,6 +163,12 @@ export class DependencyModel extends Model {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
     const query = queries.SQL_DEPENDENCIES_BY_IDS.replace('#IDS', dependenciesIds);
     const depencencies = await call(query);
+    return depencencies;
+  }
+
+  public async getSummary(): Promise<Array<ModelDependencySummary>> {
+    const call:any = util.promisify(this.connection.all.bind(this.connection));
+    const depencencies = await call(queries.SQL_DEPENDENCY_SUMMARY);
     return depencencies;
   }
 }

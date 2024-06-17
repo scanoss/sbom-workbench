@@ -402,3 +402,14 @@ export interface ContextFiles {
   identifyFile: string | null;
   ignoreFile: string | null;
 }
+
+export interface DependencyManifestFile {
+  path: string;
+  fileId: number;
+  summary: {
+    identified: number
+    ignored: number;
+    pending: number;
+  }
+}
+
