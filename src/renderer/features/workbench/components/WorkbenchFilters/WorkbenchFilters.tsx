@@ -78,171 +78,168 @@ const WorkbenchFilters = () => {
   };
 
   return (
-    <>
-      <Box id="WorkbenchFilters" boxShadow={0} className={`workbench-filters ${open ? 'no-collapsed' : 'collapsed'}`}>
-        <header className="workbench-filters-header">
-          <h4 className="mr-1 mb-2 mt-0 d-flex align-end">
-            {t('Title:Filters')}
+    <Box id="WorkbenchFilters" boxShadow={0} className={`workbench-filters ${open ? 'no-collapsed' : 'collapsed'}`}>
+      <header className="workbench-filters-header">
+        <h4 className="mr-1 mb-2 mt-0 d-flex align-end">
+          {t('Title:Filters')}
+          <Tooltip
+            classes={{ tooltip: classes.info }}
+            title={(
+              <Trans
+                i18nKey="Tooltip:FilterUsageHelp"
+                components={{
+                  0: <p className="mt-1 mb-1" />,
+                  1: <p />,
+                  2: <small />,
+                }}
+              >
+                <p className="mt-1 mb-1">Use filters to modify displayed results.</p>
+                <p>
+                  <small>
+                    USAGE <br />
+                    Filter by file match type: File or Snippet.
+                  </small>
+                </p>
+                <p>
+                  <small>
+                    STATUS <br />
+                    Filter by the status of each file.
+                  </small>
+                </p>
+                <p>
+                  <small>
+                    PATH <br />
+                    Filter by the path of each file.
+                  </small>
+                </p>
+              </Trans>
+              )}
+            placement="bottom"
+            arrow
+          >
+            <small>
+              <InfoOutlinedIcon className="ml-1" fontSize="inherit" />
+            </small>
+          </Tooltip>
+        </h4>
+        {isFilterActive && (
+        <Tooltip title={t('Tooltip:ClearFilters')}>
+          <IconButton size="small" aria-label="clear" className="btn-clean" onClick={handleReset}>
+            <DeleteIcon fontSize="inherit" />
+          </IconButton>
+        </Tooltip>
+        )}
+      </header>
+      <Collapse in={open} collapsedSize={30}>
+        <form className="workbench-filters-body">
+          <FormControl
+            component="fieldset"
+            className={`workbench-filters-group usage ${filter?.usage ? 'active' : ''}`}
+          >
+            <FormLabel component="span">{t('Title:Usage')}</FormLabel>
+            <RadioGroup
+              aria-label="usage"
+              name="usage"
+              value={filter?.usage || 'all'}
+              onChange={(event) => handleChange('usage', event.target.value)}
+              onClick={(event: any) => event.target.value && handleClick('usage', event.target.value)}
+              className="flex-row ml-2"
+            >
+              <FormControlElement value="all" label={t('Title:All')} className="d-none" />
+              <FormControlElement value={FileUsageType.FILE} label={t(FileUsageType.FILE)} />
+              <FormControlElement value={FileUsageType.SNIPPET} label={t(FileUsageType.SNIPPET)} />
+              <FormControlElement value={FileUsageType.DEPENDENCY} label={t(FileUsageType.DEPENDENCY)} />
+            </RadioGroup>
+          </FormControl>
+
+          <Divider orientation="vertical" flexItem />
+
+          <FormControl
+            component="fieldset"
+            className={`workbench-filters-group usage ${filter?.status ? 'active' : ''}`}
+          >
+            <FormLabel component="span">{t('Title:Status')}</FormLabel>
+            <RadioGroup
+              aria-label="status"
+              name="usage"
+              value={filter?.status || 'all'}
+              onChange={(event) => handleChange('status', event.target.value)}
+              onClick={(event: any) => event.target.value && handleClick('status', event.target.value)}
+              className="flex-row ml-2"
+            >
+              <FormControlElement value="all" label="All" className="d-none" />
+              <FormControlElement
+                className={FileStatusType.PENDING}
+                value={FileStatusType.PENDING}
+                label={t(FileStatusType.PENDING)}
+              />
+              <FormControlElement
+                className={FileStatusType.IDENTIFIED}
+                value={FileStatusType.IDENTIFIED}
+                label={t(FileStatusType.IDENTIFIED)}
+              />
+              <FormControlElement
+                className={FileStatusType.ORIGINAL}
+                value={FileStatusType.ORIGINAL}
+                label={t(FileStatusType.ORIGINAL)}
+              />
+              <FormControlElement
+                className={FileStatusType.NOMATCH}
+                value={FileStatusType.NOMATCH}
+                label={t('NoMatch')}
+              />
+              <FormControlElement
+                className={FileStatusType.FILTERED}
+                value={FileStatusType.FILTERED}
+                label={t('Ignored')}
+              />
+            </RadioGroup>
+          </FormControl>
+
+          <Divider orientation="vertical" flexItem />
+
+          <FormGroup>
             <Tooltip
               classes={{ tooltip: classes.info }}
-              title={
-                <Trans
-                  i18nKey="Tooltip:FilterUsageHelp"
-                  components={{
-                    0: <p className="mt-1 mb-1" />,
-                    1: <p/>,
-                    2: <small />
-                  }}
-                  >
-                  <p className="mt-1 mb-1">Use filters to modify displayed results.</p>
-                  <p>
-                    <small>
-                      USAGE <br />
-                      Filter by file match type: File or Snippet.
-                    </small>
-                  </p>
-                  <p>
-                    <small>
-                      STATUS <br />
-                      Filter by the status of each file.
-                    </small>
-                  </p>
-                  <p>
-                    <small>
-                      PATH <br />
-                      Filter by the path of each file.
-                    </small>
-                  </p>
-                </Trans>
-              }
-              placement="bottom"
+              placement={open ? 'right' : 'bottom'}
+              title={(
+                <p className="mt-1 mb-1">{t('Tooltip:ShowOnlyFilteredMatches')}</p>
+                )}
+              disableHoverListener={open}
               arrow
             >
-              <small>
-                <InfoOutlinedIcon className="ml-1" fontSize="inherit" />
-              </small>
+              <FormControlLabel
+                disabled={!isFilterActive}
+                className="tree-toggle-switch"
+                control={(
+                  <Switch
+                    onChange={(e) => setFileTreeViewMode(e.target.checked)}
+                    checked={fileTreeViewMode}
+                    size="small"
+                    color="primary"
+                  />
+                  )}
+                label={open ? <small>{t('ShowOnlyFilteredMatches')}</small> : ''}
+              />
             </Tooltip>
-          </h4>
-          {isFilterActive && (
-            <Tooltip title={t('Tooltip:ClearFilters')}>
-              <IconButton size="small" aria-label="clear" className="btn-clean" onClick={handleReset}>
-                <DeleteIcon fontSize="inherit" />
-              </IconButton>
-            </Tooltip>
-          )}
-        </header>
-        <Collapse in={open} collapsedSize={30}>
-          <form className="workbench-filters-body">
-            <FormControl
-              component="fieldset"
-              className={`workbench-filters-group usage ${filter?.usage ? 'active' : ''}`}
-            >
-              <FormLabel component="span">{t('Title:Usage')}</FormLabel>
-              <RadioGroup
-                aria-label="usage"
-                name="usage"
-                value={filter?.usage || 'all'}
-                onChange={(event) => handleChange('usage', event.target.value)}
-                onClick={(event: any) => event.target.value && handleClick('usage', event.target.value)}
-                className="flex-row ml-2"
-              >
-                <FormControlElement value="all" label={t('Title:All')} className="d-none" />
-                <FormControlElement value={FileUsageType.FILE} label={t(FileUsageType.FILE)} />
-                <FormControlElement value={FileUsageType.SNIPPET} label={t(FileUsageType.SNIPPET)} />
-              </RadioGroup>
-            </FormControl>
+          </FormGroup>
+        </form>
+      </Collapse>
 
-            <Divider orientation="vertical" flexItem />
+      <Button onClick={() => setOpen(!open)}>
+        {open ? (
+          <KeyboardArrowUpOutlinedIcon fontSize="inherit" />
+        ) : (
+          <KeyboardArrowDownOutlinedIcon fontSize="inherit" />
+        )}
+      </Button>
 
-            <FormControl
-              component="fieldset"
-              className={`workbench-filters-group usage ${filter?.status ? 'active' : ''}`}
-            >
-              <FormLabel component="span">{t('Title:Status')}</FormLabel>
-              <RadioGroup
-                aria-label="status"
-                name="usage"
-                value={filter?.status || 'all'}
-                onChange={(event) => handleChange('status', event.target.value)}
-                onClick={(event: any) => event.target.value && handleClick('status', event.target.value)}
-                className="flex-row ml-2"
-              >
-                <FormControlElement value="all" label="All" className="d-none" />
-                <FormControlElement
-                  className={FileStatusType.PENDING}
-                  value={FileStatusType.PENDING}
-                  label={t(FileStatusType.PENDING)}
-                />
-                <FormControlElement
-                  className={FileStatusType.IDENTIFIED}
-                  value={FileStatusType.IDENTIFIED}
-                  label={t(FileStatusType.IDENTIFIED)}
-                />
-                <FormControlElement
-                  className={FileStatusType.ORIGINAL}
-                  value={FileStatusType.ORIGINAL}
-                  label={t(FileStatusType.ORIGINAL)}
-                />
-                <FormControlElement
-                  className={FileStatusType.NOMATCH}
-                  value={FileStatusType.NOMATCH}
-                  label={t('NoMatch')}
-                />
-                <FormControlElement
-                  className={FileStatusType.FILTERED}
-                  value={FileStatusType.FILTERED}
-                  label={t('Ignored')}
-                />
-              </RadioGroup>
-            </FormControl>
-
-            <Divider orientation="vertical" flexItem />
-
-            <FormGroup>
-              <Tooltip
-                classes={{ tooltip: classes.info }}
-                placement={open ? 'right' : 'bottom'}
-                title={
-                  <>
-                    <p className="mt-1 mb-1">{t('Tooltip:ShowOnlyFilteredMatches')}</p>
-                  </>
-                }
-                disableHoverListener={open}
-                arrow
-              >
-                <FormControlLabel
-                  disabled={!isFilterActive}
-                  className="tree-toggle-switch"
-                  control={
-                    <Switch
-                      onChange={(e) => setFileTreeViewMode(e.target.checked)}
-                      checked={fileTreeViewMode}
-                      size="small"
-                      color="primary"
-                    />
-                  }
-                  label={open ? <small>{t('ShowOnlyFilteredMatches')}</small> : ''}
-                />
-              </Tooltip>
-            </FormGroup>
-          </form>
-        </Collapse>
-
-        <Button onClick={() => setOpen(!open)}>
-          {open ? (
-            <KeyboardArrowUpOutlinedIcon fontSize="inherit" />
-          ) : (
-            <KeyboardArrowDownOutlinedIcon fontSize="inherit" />
-          )}
-        </Button>
-
-        <SearchBox
-          value={filter?.filename || ''}
-          placeholder={t('FilterByPathEG')}
-          onChange={(e) => handleFilenameChange(e)}
-        />
-      </Box>
-    </>
+      <SearchBox
+        value={filter?.filename || ''}
+        placeholder={t('FilterByPathEG')}
+        onChange={(e) => handleFilenameChange(e)}
+      />
+    </Box>
   );
 };
 

@@ -1,6 +1,6 @@
 .component-card {
   width: 100%;
-  //min-height: 230px;
+  min-height: 230px;
 
   button {
     width: 100%;
@@ -15,13 +15,9 @@
     height: 100%;
     width: 100%;
 
-    //display: grid;
-    //grid-template-rows: auto minmax(75px,85px) 45px;
-    //align-items: center;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
+    display: grid;
+    grid-template-rows: auto minmax(75px,85px) 45px;
+    align-items: center;
 
     p {margin: 0;}
 

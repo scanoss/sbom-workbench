@@ -249,6 +249,7 @@ export enum FileStatusType {
 export enum FileUsageType {
   SNIPPET = 'snippet',
   FILE = 'file',
+  DEPENDENCY = 'dependency',
 }
 
 export enum ComponentSource {
