@@ -20,7 +20,7 @@ import * as report from '@store/report-store/reportSlice';
 
 import { loadProject } from '@store/workbench-store/workbenchThunks';
 import {
-  accept, getAll, reject, rejectAll, restore,
+  accept, getAll, getAllManifestFiles, reject, rejectAll, restore,
 } from '@store/dependency-store/dependencyThunks';
 import { dialogController } from 'renderer/controllers/dialog-controller';
 import { setCurrentProject } from './workspace-store/workspaceSlice';
@@ -60,6 +60,16 @@ rootMiddleware.startListening({
     const state = listenerApi.getState() as RootState;
     const currentProject = state.workspace.projects.find((p) => p.work_root === action.payload.projectRoot);
     listenerApi.dispatch(setCurrentProject(currentProject));
+  },
+});
+
+rootMiddleware.startListening({
+  matcher: isAnyOf(
+    loadProject.fulfilled,
+    // Aca tenia esto: getAllManifestFiles.fulfilled
+  ),
+  effect: async (action, listenerApi) => {
+    listenerApi.dispatch(getAllManifestFiles());
   },
 });
 

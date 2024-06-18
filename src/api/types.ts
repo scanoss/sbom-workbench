@@ -71,6 +71,12 @@ export interface Inventory {
   files: any[];
 }
 
+export type AuditSummaryCount = {
+  pending: number;
+  ignored: number;
+  identified: number;
+};
+
 export interface Component {
   compid?: number;
   purl: string;
@@ -79,13 +85,15 @@ export interface Component {
   vendor: string;
   url: string;
   description: string;
-  summary?: {
-    pending: number;
-    ignored: number;
-    identified: number;
-  };
+  summary?: AuditSummaryCount;
   licenses: any[];
   source: string;
+}
+
+export interface DependencyManifestFile {
+  path: string;
+  fileId: number;
+  summary: AuditSummaryCount;
 }
 
 export interface License {

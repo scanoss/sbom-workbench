@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import { Button } from '@mui/material';
@@ -10,11 +10,14 @@ import { resetFilter, selectNavigationState } from '@store/navigation-store/navi
 import { selectComponentState, setComponent } from '@store/component-store/componentSlice';
 import { useTranslation } from 'react-i18next';
 import Loader from '@components/Loader/Loader';
-import Card from 'renderer/features/workbench/components/Card/Card';
+import BaseCard from 'renderer/features/workbench/components/BaseCard/BaseCard';
+import { selectDependencyState } from '@store/dependency-store/dependencySlice';
+import { AuditSummaryCount, DependencyManifestFile } from '@api/types';
+import { getAllManifestFiles } from '@store/dependency-store/dependencyThunks';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import EmptyResult from './components/EmptyResult/EmptyResult';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
-import { selectDependencyState } from '@store/dependency-store/dependencySlice';
+import DependencyManifestFileCard from '../../../../components/DependencyManifestFileCard/DependencyManifestFileCard';
 
 const filterComponents = (items, query) => {
   if (!items) {
@@ -34,7 +37,6 @@ const filterComponents = (items, query) => {
   return result;
 };
 
-
 export const ComponentList = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,18 +45,20 @@ export const ComponentList = () => {
   const { limit, onScroll } = usePagination(20);
 
   const { components } = useSelector(selectComponentState);
-  const { files } = useSelector(selectDependencyState);
+  const { dependencyManifestFiles } = useSelector(selectDependencyState);
 
-  console.log(files);
+  console.log('manifest files: ', dependencyManifestFiles);
 
   const { isFilterActive } = useSelector(selectNavigationState);
 
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filterComponents(components, searchQuery);
 
-
- 
-
+  const mockAuditsummaryCount: AuditSummaryCount = {
+    identified: 8,
+    ignored: 1,
+    pending: 1,
+  };
 
   const onSelectComponent = (component) => {
     navigate({
@@ -64,7 +68,6 @@ export const ComponentList = () => {
 
     dispatch(setComponent(component));
   };
-
 
   const onSelectedDependency = (component) => {
     console.log(component);
@@ -82,7 +85,7 @@ export const ComponentList = () => {
       <Loader message="Loading components" />
     );
   }
-
+  //
   return (
     <div id="ComponentList">
       <section className="app-page" onScroll={onScroll}>
@@ -94,11 +97,20 @@ export const ComponentList = () => {
         </header>
 
         <main className="app-content">
+          <section className="dependency-manifest-file-list">
+            {dependencyManifestFiles.map((d: DependencyManifestFile) => (
+              <BaseCard auditSummaryCount={d.summary} onClick={() => { console.log('click: ', d.path); }}>
+                <DependencyManifestFileCard dependencyManifestFile={d} />
+              </BaseCard>
+            ))}
+          </section>
+
           {components && filterItems && filterItems.length > 0 ? (
             <section className="component-list">
               {filterItems.slice(0, limit).map((component, i) => (
-                <Card component={component} onClick={onSelectComponent} key={component.purl}><ComponentCard onClick={onSelectComponent} component={component} key={component.purl}/></Card>
-                // <ComponentCard key={component.purl} component={component} onClick={onSelectComponent} />
+                <BaseCard auditSummaryCount={mockAuditsummaryCount} onClick={() => onSelectComponent(component)} key={i}>
+                  <ComponentCard component={component} />
+                </BaseCard>
               ))}
             </section>
           ) : (

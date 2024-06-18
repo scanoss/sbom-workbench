@@ -1,9 +1,9 @@
-import { Dependency } from '@api/types';
+import { Dependency, DependencyManifestFile } from '@api/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   accept,
   acceptAll,
-  getAll,
+  getAll, getAllManifestFiles,
   reject,
   rejectAll,
   restore,
@@ -15,14 +15,14 @@ export interface DependencyState {
   dependencies: Dependency[];
   loading: boolean;
   batchRunning: boolean;
-  files: Array<string>;
+  dependencyManifestFiles: DependencyManifestFile[];
 }
 
 const initialState: DependencyState = {
   dependencies: [],
+  dependencyManifestFiles: [],
   loading: false,
   batchRunning: false,
-  files: [],
 };
 
 export const dependencySlice = createSlice({
@@ -32,6 +32,9 @@ export const dependencySlice = createSlice({
     reset: (state) => initialState,
   },
   extraReducers: {
+    [getAllManifestFiles.fulfilled.type]: (state, action: PayloadAction<DependencyManifestFile[]>) => {
+      state.dependencyManifestFiles = action.payload;
+    },
     [getAll.pending.type]: (state) => {
       state.loading = true;
     },
@@ -40,7 +43,6 @@ export const dependencySlice = createSlice({
       action.payload.forEach((d) => { files.add(d.path); });
       state.loading = false;
       state.dependencies = action.payload;
-      state.files = Array.from(files.values());
     },
     [getAll.rejected.type]: (state) => {
       state.loading = false;
