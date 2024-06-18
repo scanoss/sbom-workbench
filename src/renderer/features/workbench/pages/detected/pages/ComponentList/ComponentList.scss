@@ -19,7 +19,7 @@
     overflow-y: visible;
   }
 
-  .component-list {
+  .component-list, .dependency-manifest-file-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, 200px);
     grid-row-gap: 1.5em;
@@ -27,6 +27,11 @@
     overflow-y: scroll;
     padding-bottom: 10px;
   }
+
+  .dependency-manifest-file-list {
+    margin-block-end: 2em;
+  }
+
 }
 
 

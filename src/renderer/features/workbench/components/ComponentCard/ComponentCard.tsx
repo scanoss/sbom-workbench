@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Tooltip, ButtonBase } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { ComponentGroup } from '@api/types';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
@@ -8,11 +8,9 @@ import IconComponent from '../IconComponent/IconComponent';
 
 interface ComponentCardProps {
   component: ComponentGroup;
-  onClick: (component) => void;
 }
 
-const ComponentCard = ({ component, onClick }: ComponentCardProps) => {
-  const state = useSelector(selectWorkbench);
+const ComponentCard = ({ component }: ComponentCardProps) => {
   const multiple: boolean = component.versions.length > 1;
   const identified = component.identifiedAs.filter((item) => item.purl !== component.purl);
   const keepOriginal: boolean = identified.length < component.identifiedAs.length;
