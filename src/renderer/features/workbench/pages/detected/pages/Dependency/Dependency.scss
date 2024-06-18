@@ -17,8 +17,18 @@
     .search-box {
       width: $search-box-width;
       margin-bottom: 16px;
-    }
+      display: flex;
+      gap: 1em;
 
+      .search-bar {
+        width: 55%;
+      }
+
+      .filter-box {
+        width: 40%;
+      }
+  
+    }
     .subheader {
       display: flex;
       justify-content: space-between;

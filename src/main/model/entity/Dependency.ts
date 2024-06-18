@@ -1,5 +1,4 @@
 export class Dependency {
-
   dependencyId: number;
 
   fileId: number;
@@ -19,5 +18,12 @@ export class Dependency {
   originalVersion: string;
 
   originalLicense: Array<string>;
+}
 
+export interface ModelDependencyManifest {
+  fileId: number;
+  path: string;
+  identified: number;
+  ignored: number;
+  pending: number;
 }

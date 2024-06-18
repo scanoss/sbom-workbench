@@ -16,6 +16,7 @@ export interface DependencyState {
   loading: boolean;
   batchRunning: boolean;
   dependencyManifestFiles: DependencyManifestFile[];
+  scopes: Array<string>;
 }
 
 const initialState: DependencyState = {
@@ -23,6 +24,7 @@ const initialState: DependencyState = {
   dependencyManifestFiles: [],
   loading: false,
   batchRunning: false,
+  scopes: [],
 };
 
 export const dependencySlice = createSlice({
@@ -39,10 +41,9 @@ export const dependencySlice = createSlice({
       state.loading = true;
     },
     [getAll.fulfilled.type]: (state, action: PayloadAction<Dependency[]>) => {
-      const files = new Set<string>();
-      action.payload.forEach((d) => { files.add(d.path); });
       state.loading = false;
       state.dependencies = action.payload;
+      state.scopes = getDependencyScopes(action.payload);
     },
     [getAll.rejected.type]: (state) => {
       state.loading = false;
@@ -85,6 +86,14 @@ export const dependencySlice = createSlice({
     },
   },
 });
+
+const getDependencyScopes = (dep: Array<Dependency>) => {
+  const scopeMapper = new Set<string>();
+  dep.forEach((d) => {
+    scopeMapper.add(d.scope);
+  });
+  return Array.from(scopeMapper.values());
+};
 
 // actions
 export const { reset } = dependencySlice.actions;

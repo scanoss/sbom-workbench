@@ -1,6 +1,6 @@
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
-import { Dependency } from '../types';
+import { Dependency, DependencyManifestFile } from '../types';
 import { AcceptAllDependeciesDTO, NewDependencyDTO, RejectAllDependeciesDTO, RestoreAllDependenciesDTO } from '../dto';
 
 class DepencyService extends BaseService {
@@ -36,6 +36,11 @@ class DepencyService extends BaseService {
 
   public async rejectAll(params: RejectAllDependeciesDTO): Promise<Array<Dependency>> {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.DEPENDENCY_REJECT_ALL, params);
+    return this.response(response);
+  }
+
+  public async getManifestFileSummary(): Promise<Array<DependencyManifestFile>> {
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.DEPENDENCY_MANIFEST_FILE_SUMMARY);
     return this.response(response);
   }
 }

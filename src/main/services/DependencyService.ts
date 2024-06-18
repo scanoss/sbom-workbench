@@ -1,7 +1,8 @@
 import log from 'electron-log';
 import { IDependencyResponse } from 'scanoss';
+import { ModelDependencyManifest } from 'main/model/entity/Dependency';
 import { LicenseDTO, NewDependencyDTO } from '../../api/dto';
-import { Component, Dependency, FileStatusType, License } from '../../api/types';
+import { Component, Dependency, DependencyManifestFile, FileStatusType, License } from '../../api/types';
 import { dependencyHelper } from '../helpers/DependencyHelper';
 import { fileHelper } from '../helpers/FileHelper';
 import { licenseHelper } from '../helpers/LicenseHelper';
@@ -300,6 +301,27 @@ class DependencyService {
       let dependencies = await this.getAll({ path });
       dependencies = dependencies.filter((d) => d.status === FileStatusType.PENDING && d.valid === true);
       return await this.acceptAllByIds(dependencies);
+    } catch (error: any) {
+      log.error(error);
+      throw error;
+    }
+  }
+
+  public async getSummary(): Promise<Array<DependencyManifestFile>> {
+    try {
+      const modelSummary: Array<ModelDependencyManifest> = await modelProvider.model.dependency.getSummary();
+
+      const dependencyManifestFiles: DependencyManifestFile[] = modelSummary.map((d: ModelDependencyManifest): DependencyManifestFile => ({
+        fileId: d.fileId,
+        path: d.path,
+        summary: {
+          identified: d.identified,
+          ignored: d.ignored,
+          pending: d.pending,
+        }
+      }));
+
+      return dependencyManifestFiles ;
     } catch (error: any) {
       log.error(error);
       throw error;

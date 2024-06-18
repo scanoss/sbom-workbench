@@ -259,6 +259,27 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   SQL_DEPENDENCIES_BY_IDS = 'SELECT * FROM dependencies WHERE dependencyId IN (#IDS);';
 
+  SQL_DEPENDENCY_SUMMARY = `SELECT depSummary.fId as fileId,
+    f.path,
+    SUM(depSummary.identified) as identified,
+    SUM(depSummary.ignored) as ignored,
+    SUM(depSummary.total) - (SUM(depSummary.identified) + SUM(depSummary.ignored)) as pending 
+    FROM (
+     SELECT d.fileId as fId, COUNT(*) identified, 0 as 'ignored', 0 as 'total' FROM dependencies d
+     INNER JOIN component_versions cv 
+     ON d.purl = cv.purl 
+     AND d.version = cv.version 
+     GROUP BY d.fileId 
+    UNION 
+     SELECT d.fileId as fId, 0  as 'identified', COUNT(*) as ignored, 0 as 'total' 
+     FROM dependencies d 
+     WHERE d.rejectedAt IS NOT NULL 
+     GROUP BY d.fileId
+    UNION 
+     SELECT d.fileId as fId, 0 as 'identified' , 0 as 'ignored', COUNT(*) as total FROM dependencies d GROUP BY (d.fileId)) as depSummary
+     INNER JOIN files f ON f.fileId = depSummary.fId
+     GROUP BY depSummary.fId, f.path;`;
+
   // VULNERABILITIES
 
   SQL_GET_ALL_IDENTIFIED_VULNERABILITIES = `SELECT * FROM vulnerability v
