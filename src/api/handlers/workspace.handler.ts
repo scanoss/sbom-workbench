@@ -1,6 +1,6 @@
-import api from '../api';
 import log from 'electron-log';
 import path from 'path';
+import api from '../api';
 import { IpcChannels } from '../ipc-channels';
 import { workspace } from '../../main/workspace/Workspace';
 import { Response } from '../Response';
@@ -8,6 +8,8 @@ import { IProject, License } from '../types';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
 import { workspaceService } from '../../main/services/WorkspaceService';
+import { GroupSearchKeywordDTO } from '@api/dto';
+import { group } from 'console';
 
 api.handle(IpcChannels.WORKSPACE_PROJECT_LIST, async (_event) => {
   try {
@@ -103,6 +105,64 @@ api.handle(IpcChannels.WORKSPACE_CONTEXT_FILES, async (_event, scanRoot: string)
     return Response.ok({
       message: 'Context files retrieved successfully',
       data: contextFiles,
+    });
+  } catch (e: any) {
+    log.error('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
+
+/** Search Group Items * */
+
+// GET
+api.handle(IpcChannels.WORKSPACE_GET_SEARCH_GROUP_KEYWORDS, async (_event) => {
+  try {
+    const groups = await workspaceService.getAllSearchGroupKeywords();
+    return Response.ok({
+      message: 'Groups keywords retrieved successfully',
+      data: groups,
+    });
+  } catch (e: any) {
+    log.error('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
+
+// POST
+api.handle(IpcChannels.WORKSPACE_POST_SEARCH_GROUP, async (_event, group:Array<GroupSearchKeywordDTO>) => {
+  try {
+    const groups = await workspaceService.addSearchGroupKeywords(group);
+    return Response.ok({
+      message: 'Group keywords added successfully',
+      data: groups,
+    });
+  } catch (e: any) {
+    log.error('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
+
+// PUT
+api.handle(IpcChannels.WORKSPACE_PUT_SEARCH_GROUP, async (_event, group: GroupSearchKeywordDTO) => {
+  try {
+    const data = await workspaceService.updateSearchGroupKeyword(group);
+    return Response.ok({
+      message: 'Groups keywords retrieved successfully',
+      data,
+    });
+  } catch (e: any) {
+    log.error('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
+
+// DELETE
+api.handle(IpcChannels.WORKSPACE_DELETE_SEARCH_GROUP, async (_event, id: number) => {
+  try {
+    const group = await workspaceService.deleteSearchGroupKeyword(id);
+    return Response.ok({
+      message: 'Groups keywords retrieved successfully',
+      data: group,
     });
   } catch (e: any) {
     log.error('Catch an error: ', e);

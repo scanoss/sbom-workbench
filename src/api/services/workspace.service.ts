@@ -1,6 +1,7 @@
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
-import { ContextFiles, IProject, License } from '../types';
+import { ContextFiles, GroupSearchKeyword, IProject, License } from '../types';
+import { GroupSearchKeywordDTO } from '@api/dto';
 
 class WorkspaceService extends BaseService {
   public async getAllProjects(): Promise<IProject[]> {
@@ -64,6 +65,42 @@ class WorkspaceService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.WORKSPACE_CONTEXT_FILES,
       scanRoot,
+    );
+    return this.response(response);
+  }
+
+  /** Workspace Group Search * */
+  // GET
+  public async getAllGroupSearchKeywords(): Promise<Array<GroupSearchKeyword>> {
+    const response = await window.electron.ipcRenderer.invoke(
+      IpcChannels.WORKSPACE_GET_SEARCH_GROUP_KEYWORDS,
+    );
+    return this.response(response);
+  }
+
+  // POST
+  public async addSearchGroups(groups: Array<GroupSearchKeywordDTO>): Promise<Array<GroupSearchKeyword>>{
+    const response = await window.electron.ipcRenderer.invoke(
+      IpcChannels.WORKSPACE_POST_SEARCH_GROUP,
+      groups,
+    );
+    return this.response(response);
+  }
+
+  // PUT
+  public async updateSearchGroup(group: GroupSearchKeywordDTO): Promise<Array<GroupSearchKeyword>> {
+    const response = await window.electron.ipcRenderer.invoke(
+      IpcChannels.WORKSPACE_PUT_SEARCH_GROUP,
+      group,
+    );
+    return this.response(response);
+  }
+
+  // DELETE
+  public async deleteSearchGroup(id: number): Promise<GroupSearchKeyword> {
+    const response = await window.electron.ipcRenderer.invoke(
+      IpcChannels.WORKSPACE_DELETE_SEARCH_GROUP,
+      id,
     );
     return this.response(response);
   }

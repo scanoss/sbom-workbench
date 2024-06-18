@@ -89,3 +89,10 @@ export interface VulnerabilitiesGetAllDTO {
 export interface CryptographyGetAllDTO {
   type: SourceType,
 }
+
+export interface GroupSearchKeywordDTO {
+  id?: number;
+  label: string;
+  keywords: Array<string>;
+}
+

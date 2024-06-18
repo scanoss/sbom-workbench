@@ -413,3 +413,9 @@ export interface DependencyManifestFile {
   }
 }
 
+export interface GroupSearchKeyword {
+  id: number;
+  label: string;
+  words: Array<string>;
+}
+
