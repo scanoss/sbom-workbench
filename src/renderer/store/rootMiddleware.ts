@@ -66,7 +66,11 @@ rootMiddleware.startListening({
 rootMiddleware.startListening({
   matcher: isAnyOf(
     loadProject.fulfilled,
-    // Aca tenia esto: getAllManifestFiles.fulfilled
+    accept.fulfilled,
+    reject.fulfilled,
+    rejectAll.fulfilled,
+    restore.fulfilled,
+    load, // this is a workaround for the fact that still has setFilter on WorkbenchContext
   ),
   effect: async (action, listenerApi) => {
     listenerApi.dispatch(getAllManifestFiles());

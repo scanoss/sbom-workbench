@@ -72,6 +72,8 @@ class ProjectService extends BaseService {
 
   public async setFileTreeViewMode(mode: FileTreeViewMode): Promise<any> {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_SET_FILE_TREE_VIEW_MODE, mode);
+    console.log('PROJECT_SET_FILE_TREE_VIEW_MODE: ', mode);
+
     return this.response(response);
   }
 

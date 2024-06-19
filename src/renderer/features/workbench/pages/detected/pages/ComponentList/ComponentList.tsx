@@ -13,7 +13,6 @@ import Loader from '@components/Loader/Loader';
 import BaseCard from 'renderer/features/workbench/components/BaseCard/BaseCard';
 import { selectDependencyState } from '@store/dependency-store/dependencySlice';
 import { AuditSummaryCount, DependencyManifestFile } from '@api/types';
-import { getAllManifestFiles } from '@store/dependency-store/dependencyThunks';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import EmptyResult from './components/EmptyResult/EmptyResult';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
@@ -47,18 +46,10 @@ export const ComponentList = () => {
   const { components } = useSelector(selectComponentState);
   const { dependencyManifestFiles } = useSelector(selectDependencyState);
 
-  console.log('manifest files: ', dependencyManifestFiles);
-
-  const { isFilterActive } = useSelector(selectNavigationState);
-
+  const { isFilterActive, filter } = useSelector(selectNavigationState);
+  console.log('filters: ', filter);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filterComponents(components, searchQuery);
-
-  const mockAuditsummaryCount: AuditSummaryCount = {
-    identified: 8,
-    ignored: 1,
-    pending: 1,
-  };
 
   const onSelectComponent = (component) => {
     navigate({
@@ -69,14 +60,11 @@ export const ComponentList = () => {
     dispatch(setComponent(component));
   };
 
-  const onSelectedDependency = (component) => {
-    console.log(component);
+  const onSelectedDependency = (path: string) => {
     navigate({
       pathname: '/workbench/detected/file',
-      search: location.search,
+      search: `?path=file|${encodeURIComponent(path)}`,
     });
-
-    // dispatch(setComponent(component));
   };
 
   // loader
@@ -85,7 +73,7 @@ export const ComponentList = () => {
       <Loader message="Loading components" />
     );
   }
-  //
+
   return (
     <div id="ComponentList">
       <section className="app-page" onScroll={onScroll}>
@@ -99,16 +87,16 @@ export const ComponentList = () => {
         <main className="app-content">
           <section className="dependency-manifest-file-list">
             {dependencyManifestFiles.map((d: DependencyManifestFile) => (
-              <BaseCard auditSummaryCount={d.summary} onClick={() => { console.log('click: ', d.path); }}>
+              <BaseCard auditSummaryCount={d.summary} onClick={() => { onSelectedDependency(d.path); }}>
                 <DependencyManifestFileCard dependencyManifestFile={d} />
               </BaseCard>
             ))}
           </section>
 
-          {components && filterItems && filterItems.length > 0 ? (
+          {(components && filterItems && filterItems.length > 0) && (filter?.usage ? filter.usage !== 'dependency' : true) ? (
             <section className="component-list">
               {filterItems.slice(0, limit).map((component, i) => (
-                <BaseCard auditSummaryCount={mockAuditsummaryCount} onClick={() => onSelectComponent(component)} key={i}>
+                <BaseCard auditSummaryCount={component.summary} onClick={() => onSelectComponent(component)} key={i}>
                   <ComponentCard component={component} />
                 </BaseCard>
               ))}
@@ -142,6 +130,7 @@ export const ComponentList = () => {
               </strong>
             </Alert>
           )}
+
         </main>
       </section>
     </div>
