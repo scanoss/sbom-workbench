@@ -13,21 +13,9 @@ export const getAll = createAsyncThunk('dependency/fetchAll', async (path: strin
 });
 
 export const getAllManifestFiles = createAsyncThunk('dependency/fetchAllManifestFiles', async () => {
-  return Promise.resolve([
-    {
-      path: '/package.jsoooon',
-      fileId: 1,
-      summary: { identified: 8, pending: 10, ignored: 0 },
-    }, {
-      fileId: 2,
-      path: 'pom.xml',
-      summary: { identified: 0, pending: 10, ignored: 0 },
-    }, {
-      fileId: 3,
-      path: 'pyproject.toml',
-      summary: { identified: 10, ignored: 0, pending: 0 },
-    },
-  ]);
+  const response = await dependencyService.getManifestFileSummary();
+  console.log(response);
+  return response;
 });
 
 export const accept = createAsyncThunk('dependency/accept', async (dependencyDTO: NewDependencyDTO) => {

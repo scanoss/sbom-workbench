@@ -40,6 +40,7 @@ export const NavigationSlice = createSlice({
       state.isFilterActive = false;
     },
     setCurrentNode: (state, action: PayloadAction<any>) => {
+      console.log('current node: ', action.payload);
       const node = action.payload;
       state.node = node;
       state.filter = clean({
