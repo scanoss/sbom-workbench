@@ -1,0 +1,107 @@
+#Group-keyword-box {
+    position: relative;
+
+    .Menu{
+        position: absolute;
+        background-color: white;
+        z-index: 5;
+        box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
+        min-width: 400px;
+        width: 300px;
+        padding: 20px;
+        display: flex;
+        flex-flow: column;
+        gap: 0.6em;
+        border-radius: 6px;
+
+        ul , li {
+            list-style: none;
+        }
+
+        .keyword-group-container{
+
+            >section{
+                display: flex;
+                justify-content: space-between;
+            }
+
+            >ul{
+                max-height: 300px; 
+                overflow: auto; 
+                padding-left: 0px;   
+                border: solid 1px #f3f1f1;
+                padding-left: 0px;
+                border-radius: 4px; 
+            }
+
+            .odd {
+                background-color: rgb(247 247 247 / 40%);                
+                border: solid 1px #00000008;
+            }
+
+            .row-group {
+                padding-left: 10px;
+                padding-right: 10px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                cursor: pointer;
+                transition: all 0.2s ease-out;
+
+                div{
+                    display: flex;
+                    flex-direction: column;
+                    width: 75%;
+                    gap: 13px;
+                    padding: 6px 0 6px 0;
+                }
+
+                div:nth-child(2){
+                    display: flex;
+                    justify-content: center;
+                    width: 10%;
+                }               
+            }
+
+            .row-group:hover{
+                .label{
+                    scale: 1.1;
+                    margin-left:15px;
+                }
+                background-color: #f3f1f1;
+                
+            }       
+
+            .label {
+                padding: 0;
+                margin: 0;
+                transition: all 0.2s ease-out;
+            
+            }
+
+            .group-box {
+                display: flex;
+                flex-flow: row;
+                gap: 0.5em;
+                justify-content: space-between;
+                padding: 7px 0px 15px 0px;
+            }
+            .words-box {
+                display: flex;
+                margin-top: -10px;
+                gap: 8px;
+                flex-wrap: wrap;
+    
+                .pill {
+                     background-color: var(--background-color-primary);
+                    padding: 3px 8px;
+                    border-radius: 10px;
+                    font-size: 12px;
+                }
+            }
+
+        }
+
+      
+    }
+}
