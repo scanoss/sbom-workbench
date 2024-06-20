@@ -2,27 +2,49 @@
     position: relative;
 
     .Menu{
-        position: absolute;
-        background-color: white;
+        position: absolute;        
         z-index: 5;
         box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
-        min-width: 400px;
-        width: 300px;
-        padding: 20px;
+        min-width: 500px;      
         display: flex;
+        background-color:  rgb(244, 244, 245);  
         flex-flow: column;
-        gap: 0.6em;
         border-radius: 6px;
+
+        .dialog-bar{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            border-top-right-radius: 6px;
+            border-top-left-radius: 6px;
+            padding: 10px;
+    
+            div span {
+                font-size: 1.3em;
+                font-weight: bold;
+            }
+
+            button{
+                margin-right: 3px;
+            }
+        }
 
         ul , li {
             list-style: none;
         }
 
-        .keyword-group-container{
+        .keyword-group-container {
+            padding: 15px;
 
-            >section{
+            .add-new-group-btn-box {
                 display: flex;
-                justify-content: space-between;
+                align-items: center;
+            }
+
+            section:nth-child(1){
+                display: flex;
+                justify-content: flex-end;
             }
 
             >ul{
@@ -32,6 +54,8 @@
                 border: solid 1px #f3f1f1;
                 padding-left: 0px;
                 border-radius: 4px; 
+                padding: 5px;
+                background-color: white;
             }
 
             .odd {
@@ -47,6 +71,7 @@
                 justify-content: space-between;
                 cursor: pointer;
                 transition: all 0.2s ease-out;
+                align-items: center;
 
                 div{
                     display: flex;
@@ -58,8 +83,9 @@
 
                 div:nth-child(2){
                     display: flex;
-                    justify-content: center;
-                    width: 10%;
+                    justify-content: flex-end;
+                    width: 25%;
+                    flex-flow: row;
                 }               
             }
 
@@ -98,7 +124,12 @@
                     border-radius: 10px;
                     font-size: 12px;
                 }
+            }                     
+
+            .hide {
+                display: none;
             }
+
 
         }
 

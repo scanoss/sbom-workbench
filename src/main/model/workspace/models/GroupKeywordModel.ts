@@ -37,6 +37,7 @@ export class GroupKeywordModel {
   }
 
   public async addMany(groups: Array<GroupSearchKeywordDTO>): Promise<void> {
+    console.log(groups);
     return new Promise<void>(async (resolve, reject) => {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
@@ -45,23 +46,22 @@ export class GroupKeywordModel {
           this.connection.run(
             'INSERT INTO groupKeyword (label, keywords) VALUES (?,?);',
             g.label,
-            JSON.stringify(g.keywords),
+            JSON.stringify(g.words),
           );
         });
 
         this.connection.run('commit', async (err: any) => {
           if (!err) resolve();
-          console.log("ERROR", err);
           reject(err);
         });
       });
     });
   }
 
-  public async update(group: GroupSearchKeywordDTO): Promise<GroupSearchKeyword> {
+  public async update(group: GroupSearchKeywordDTO): Promise<Array<GroupSearchKeyword>> {
     const call: any = util.promisify(this.connection.run.bind(this.connection));
-    await call(`UPDATE groupKeyword SET label=?, keywords=? WHERE id=?;`,group.label, JSON.stringify(group.keywords), group.id);
-    return this.get(group.id);
+    await call(`UPDATE groupKeyword SET label=?, keywords=? WHERE id=?;`,group.label, JSON.stringify(group.words), group.id);
+    return this.getAll();
   }
 
   public async delete(id: number): Promise<void> {

@@ -203,8 +203,6 @@ const SearchPanel = () => {
   };
 
   const handleGroupKeyword = (group: GroupSearchKeyword) => {   
-    console.log('Value emitted from child:', group);
-   
     const nTags = sanitizeTags(group.words);
 
     searchQuery.current = nTags.join(' ');

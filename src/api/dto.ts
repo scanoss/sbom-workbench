@@ -93,6 +93,6 @@ export interface CryptographyGetAllDTO {
 export interface GroupSearchKeywordDTO {
   id?: number;
   label: string;
-  keywords: Array<string>;
+  words: Array<string>;
 }
 

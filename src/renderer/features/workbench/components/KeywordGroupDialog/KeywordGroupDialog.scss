@@ -1,0 +1,54 @@
+.new-group-dialog {
+    display: flex;
+    justify-content: flex-start;
+    background-color: rgb(224 224 224 / 63%);
+    flex-flow: column;
+    gap: 5px;
+    border-radius: 3px;
+    border: solid 1px #80808036;
+
+    .form-box{
+        display: flex;
+        flex-flow: column;
+        padding: 10px 15px;
+        gap: 20px;
+
+        .dialog-form-field-control{
+            margin-top: 5px;
+           }
+        
+    }
+
+    .group-exists{
+        color: red;
+    }
+
+    >div{
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-around;
+        flex-flow: column;
+        gap: 25px;
+        padding: 15px;                
+
+        article{
+            width: 100%;
+        }                    
+    }
+
+    .new-group-btn-box {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        margin-top: 6px;
+        gap:8px;
+        padding: 5px 0px 5px 0px;
+        background-color: white;
+        border-bottom-left-radius:3px;
+        border-bottom-right-radius:3px;
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+
+   
+}
