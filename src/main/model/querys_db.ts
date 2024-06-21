@@ -69,7 +69,9 @@ export class Queries {
   WORKSPACE_SEARCH_ITEM_GROUP_TABLE = `CREATE TABLE IF NOT EXISTS groupKeyword (
     id INTEGER PRIMARY KEY ASC,
     label varchar(64) UNIQUE NOT NULL,
-    keywords varchar (256) NOT NULL
+    keywords varchar (256) NOT NULL,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
     );`;  
 
 

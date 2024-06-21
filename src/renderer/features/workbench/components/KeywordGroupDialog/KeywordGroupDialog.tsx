@@ -97,13 +97,14 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
     }
 
     const createGroup = async () => {
-        let groups = null;
-        if(form && form.id){
-          groups = await workspaceService.updateSearchGroup(form as GroupSearchKeywordDTO); 
+        // Update group if id is present
+        if(form && form.id) { 
+           await workspaceService.updateSearchGroup(form as GroupSearchKeywordDTO); 
         } else {
-          groups = await workspaceService.addSearchGroups([form] as Array<GroupSearchKeywordDTO>); 
+           await workspaceService.addSearchGroups([form] as Array<GroupSearchKeywordDTO>); 
         }    
-        return onGroupCreated();
+        resetFields();
+        onGroupCreated();
     }
 
     const inputHandler = (name, value) => {

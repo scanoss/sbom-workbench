@@ -128,53 +128,61 @@ export const KeywordGroupMenu = ({ onValueChange }) => {
                     <section className={`newGroup-box ${showNewGroup ? '' : 'hide'}`}>
                         <KeywordGroupDialog isEditMode={isEditGroup} groupMapper={groupMap}  groupEdit={groupEdit} onGroupCreated={onGroupCreated} isOpen={showNewGroup} onCancel={onCancelGroup}></KeywordGroupDialog>
                     </section>
-                    <ul>
-                        {keywordGroups.map((group,index) => (
-                            <li
-                              onClick={(event) => {
-                              event.stopPropagation();
-                              onSelectedGroup(group);
-                            }}
-                          
-                            className={ index%2 ===0 ? "row-group odd": "row-group" } key={group.id}>
-                                <div>
-                                  <h4 className='label'>{group.label}</h4>
-                                  <ul className='group-box'>
-                                      
-                                          <li className='words-box'>
-                                            {group.words.map((word, index) => (
-                                              <span className='pill'>{word}</span>
-                                              ))}
-                                          </li>                                             
-                                  </ul>
-                                </div>                                  
-                                <div>
-                                    <IconButton
-                                        aria-label="delete"
-                                        className="btn-delete"                                          
-                                        onClick={(event) => {
-                                          event.stopPropagation(); 
-                                          editGroup(group);                                               
-                                        }}
-                                        size="small"
-                                        >
-                                        <ModeEditIcon fontSize="small" />
-                                    </IconButton>
-                                    <IconButton
-                                        aria-label="delete"
-                                        className="btn-delete"
-                                        onClick={(event) => {
-                                          event.stopPropagation(); 
-                                          deleteGroup(group.id);                                               
-                                        }}
-                                        size="small"
-                                        >
-                                        <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>                     
+                    { keywordGroups.length > 0 ? ( 
+                        <ul>
+                            {keywordGroups.map((group,index) => (
+                                <li
+                                  onClick={(event) => {
+                                  event.stopPropagation();
+                                  onSelectedGroup(group);
+                                }}
+                              
+                                className={ index%2 ===0 ? "row-group odd": "row-group" } key={group.id}>
+                                    <div>
+                                      <h4 className='label'>{group.label}</h4>
+                                      <ul className='group-box'>
+                                          
+                                              <li className='words-box'>
+                                                {group.words.map((word, index) => (
+                                                  <span className='pill'>{word}</span>
+                                                  ))}
+                                              </li>                                             
+                                      </ul>
+                                    </div>                                  
+                                    <div>
+                                        <IconButton
+                                            aria-label="delete"
+                                            className="btn-delete"                                          
+                                            onClick={(event) => {
+                                              event.stopPropagation(); 
+                                              editGroup(group);                                               
+                                            }}
+                                            size="small"
+                                            >
+                                            <ModeEditIcon fontSize="small" />
+                                        </IconButton>
+                                        <IconButton
+                                            aria-label="delete"
+                                            className="btn-delete"
+                                            onClick={(event) => {
+                                              event.stopPropagation(); 
+                                              deleteGroup(group.id);                                               
+                                            }}
+                                            size="small"
+                                            >
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </div>
+                                </li>
+                            ))}
+                          </ul> 
+                    ):
+                    (                    
+                      <div className='no-groups-available'>
+                       <p>No groups available</p>
+                      </div>                  
+                    )}
+                
                 </div>
             </div>
       )}

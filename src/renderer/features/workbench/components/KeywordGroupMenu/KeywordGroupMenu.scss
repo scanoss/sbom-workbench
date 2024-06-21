@@ -130,6 +130,17 @@
                 display: none;
             }
 
+            .no-groups-available{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                p{
+                    color: #71717A;
+                    font-weight: 500;
+                }
+            }
+
 
         }
 

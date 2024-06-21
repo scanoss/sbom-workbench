@@ -16,28 +16,29 @@ export class GroupKeywordModel {
     this.connection = conn;
   }
 
-  private toGroupKeywordEntity( data: Array<{id: number, label: string, keywords: string}>): Array<GroupSearchKeyword>{
+  private toGroupKeywordEntity( data: Array<{id: number, label: string, keywords: string , createdAt: string, updatedAt: string}>): Array<GroupSearchKeyword>{
     return data.map(group => ({
       id: group.id,
       label: group.label,
-      words: JSON.parse(group.keywords) as Array<string>, // Convert keywords from JSON string to JSON array
+      words: JSON.parse(group.keywords) as Array<string>,// Convert keywords from JSON string to JSON array
+      createdAt: group.createdAt,
+      updatedAt: group.updatedAt 
     }));
   }
 
   public async get(id: number): Promise<GroupSearchKeyword> {
     const call: any = util.promisify(this.connection.get.bind(this.connection));
-    const groups = await call(`SELECT id, label, keywords FROM groupKeyword WHERE id=?;`, id);
+    const groups = await call(`SELECT id, label, keywords, createdAt, updatedAt FROM groupKeyword WHERE id=? ORDER BY updatedAt DESC;`, id);
     return this.toGroupKeywordEntity([groups])[0];
   }
 
   public async getAll(): Promise<Array<GroupSearchKeyword>> {
     const call: any = util.promisify(this.connection.all.bind(this.connection));
-    const groups = await call(`SELECT id, label, keywords FROM groupKeyword;`);
+    const groups = await call(`SELECT id, label, keywords, createdAt, updatedAt FROM groupKeyword ORDER BY updatedAt DESC;`);
     return this.toGroupKeywordEntity(groups);
   }
 
   public async addMany(groups: Array<GroupSearchKeywordDTO>): Promise<void> {
-    console.log(groups);
     return new Promise<void>(async (resolve, reject) => {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
@@ -60,7 +61,7 @@ export class GroupKeywordModel {
 
   public async update(group: GroupSearchKeywordDTO): Promise<Array<GroupSearchKeyword>> {
     const call: any = util.promisify(this.connection.run.bind(this.connection));
-    await call(`UPDATE groupKeyword SET label=?, keywords=? WHERE id=?;`,group.label, JSON.stringify(group.words), group.id);
+    await call(`UPDATE groupKeyword SET label=?, keywords=?, updatedAt= CURRENT_TIMESTAMP WHERE id=?;`,group.label, JSON.stringify(group.words), group.id);
     return this.getAll();
   }
 

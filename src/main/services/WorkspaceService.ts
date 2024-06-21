@@ -43,14 +43,13 @@ class WorkspaceService {
 
   public async addSearchGroupKeywords(groups: Array<GroupSearchKeywordDTO>): Promise<Array<GroupSearchKeyword>> {
     await modelProvider.workspace.openDb();
-    console.log("GROUPS",groups);
     await modelProvider.workspace.groupKeywoard.addMany(groups);
     const newGroups = await modelProvider.workspace.groupKeywoard.getAll();
     await modelProvider.workspace.destroy();
     return newGroups;
   }
 
-  public async updateSearchGroupKeyword(group: GroupSearchKeywordDTO): Promise<GroupSearchKeyword> {
+  public async updateSearchGroupKeyword(group: GroupSearchKeywordDTO): Promise<Array<GroupSearchKeyword>> {
     await modelProvider.workspace.openDb();
     const newGroups = await modelProvider.workspace.groupKeywoard.update(group);
     await modelProvider.workspace.destroy();
