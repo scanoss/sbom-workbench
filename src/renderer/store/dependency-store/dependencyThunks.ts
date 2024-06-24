@@ -14,7 +14,6 @@ export const getAll = createAsyncThunk('dependency/fetchAll', async (path: strin
 
 export const getAllManifestFiles = createAsyncThunk('dependency/fetchAllManifestFiles', async () => {
   const response = await dependencyService.getManifestFileSummary();
-  console.log(response);
   return response;
 });
 
