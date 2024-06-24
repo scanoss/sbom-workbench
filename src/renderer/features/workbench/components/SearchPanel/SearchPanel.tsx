@@ -292,7 +292,7 @@ const SearchPanel = () => {
             />
             <div>
               <IconButton
-                title={'Keyword Groups'}
+                title={t('NewGroup')}
                 onClick={openMenu} >
                 <TocOutlinedIcon></TocOutlinedIcon>
               </IconButton>

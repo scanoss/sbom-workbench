@@ -17,11 +17,10 @@
             background-color: white;
             border-top-right-radius: 6px;
             border-top-left-radius: 6px;
-            padding: 10px;
+            padding: 10px 13px;
     
             div span {
-                font-size: 1.3em;
-                font-weight: bold;
+                font-size: 1.3em;               
             }
 
             button{
@@ -34,7 +33,7 @@
         }
 
         .keyword-group-container {
-            padding: 20px 15px;
+            padding: 20px 15px 0px 15px;
 
             .add-new-group-btn-box {
                 display: flex;
@@ -51,9 +50,11 @@
                 }
             }
             
-            .group-box-list{
-                height: 400px;
-                >ul{
+            .group-box-list {
+
+                height: 385px;
+
+                >ul {
                     max-height: 300px; 
                     overflow: auto; 
                     padding-left: 0px;   
@@ -69,7 +70,7 @@
                     border: solid 1px #00000008;
                 }
                 
-                .pointer{
+                .pointer {
                     cursor: pointer;
                 }
 
@@ -83,7 +84,7 @@
                     transition: all 0.2s ease-out;
                     align-items: center;
     
-                    div{
+                    div {
                         display: flex;
                         flex-direction: column;
                         width: 75%;
@@ -91,7 +92,7 @@
                         padding: 6px 0 6px 0;
                     }
     
-                    div:nth-child(2){
+                    div:nth-child(2) {
                         display: flex;
                         justify-content: flex-end;
                         width: 25%;
@@ -100,15 +101,15 @@
                 }
 
             }        
-          
 
-            .row-group:hover{
-                .label{
+            .row-group:hover {
+
+                background-color: #f3f1f1;
+
+                .label {
                     scale: 1.1;
                     margin-left:15px;
-                }
-                background-color: #f3f1f1;
-                
+                }              
             }       
 
             .label {
@@ -125,6 +126,7 @@
                 justify-content: space-between;
                 padding: 7px 0px 15px 0px;
             }
+
             .words-box {
                 display: flex;
                 margin-top: -10px;
@@ -143,20 +145,26 @@
                 display: none;
             }
 
-            .no-groups-available{
+            .no-groups-available {
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 height: 100%;
 
-                p{
+                p {
                     color: #71717A;
                     font-weight: 500;
                 }
             }
-
-
-        }        
+        }  
+        
+        .close-btn-box {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 10px 20px 10px;
+            background-color: white;
+        }
     }
     
 }

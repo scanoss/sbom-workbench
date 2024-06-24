@@ -20,5 +20,9 @@
   "ActionWillBeExecutedOnAllSelectedQuestion": "此操作将对所有选定的文件执行。你确定吗？",
   "DeleteQuestion": "您确定要删除此项目吗？",
   "RescanQuestion": "您确定要重新扫描此项目吗？",
-  "YouNeedRestartQuestion": "您需要重新启动应用程序才能更改语言。要重启吗？"
+  "YouNeedRestartQuestion": "您需要重新启动应用程序才能更改语言。要重启吗？",
+  "NoGroupKeywordsAvailable": "No groups available",
+  "GroupNameLabel": "Group name",
+  "GroupKeywordLabel": "Keywords",
+  "GroupAlreadyExists": "Group already exists!"
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { GroupSearchKeyword } from '@api/types';
 import { useTranslation } from 'react-i18next';
-import { Dialog, IconButton } from '@mui/material';
+import { Button, Dialog, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
@@ -119,7 +119,7 @@ export const KeywordGroupMenu = ({ onValueChange, open , close }) => {
               <div className="Menu">
                   <div className='dialog-bar'>   
                         <div>  
-                          <span>Keyword Groups</span>      
+                          <span>{t('Title:GroupKeywordTitle')}</span>      
                         </div>                           
                         <IconButton
                         aria-label="close"
@@ -137,7 +137,7 @@ export const KeywordGroupMenu = ({ onValueChange, open , close }) => {
                         <section>                         
                           <div className='add-new-group-btn-box'>
                             <IconButton
-                              title={'Add New Group'}
+                              title={t('NewGroup')}
                               tabIndex={-1}
                               color="inherit"
                               size="medium"
@@ -206,12 +206,16 @@ export const KeywordGroupMenu = ({ onValueChange, open , close }) => {
                           ):
                           (                    
                             <div className='no-groups-available'>
-                            <p>No groups available</p>
+                            <p>{t('Dialog:NoGroupKeywordsAvailable')}</p>
                             </div>                  
                           )}`
-                      </section>
-                  
+                      </section>                  
                   </div>
+                  <section className='close-btn-box'>
+                    <Button tabIndex={-1} onClick={close} color="inherit">
+                      {t('Button:Cancel')}
+                    </Button>
+                  </section>
               </div>
         </Dialog>
       </div>

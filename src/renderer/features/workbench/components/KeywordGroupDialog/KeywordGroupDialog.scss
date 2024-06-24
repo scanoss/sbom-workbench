@@ -7,7 +7,8 @@
     border-radius: 3px;
     border: solid 1px rgb(128 128 128 / 8%);
 
-    .form-box{
+    .form-box {
+
         display: flex;
         flex-flow: column;
         padding: 10px 15px;
@@ -15,15 +16,15 @@
 
         .dialog-form-field-control{
             margin-top: 5px;
-           }
+        }
         
     }
 
-    .group-exists{
+    .group-exists {
         color: red;
     }
 
-    >div{
+    >div {
         display: flex;
         align-items: flex-start;
         justify-content: space-around;
@@ -31,7 +32,7 @@
         gap: 25px;
         padding: 15px;                
 
-        article{
+        article {
             width: 100%;
         }                    
     }

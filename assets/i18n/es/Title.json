@@ -72,5 +72,6 @@
   "ImportFromProjects": "Importar desde proyectos",
   "MatchesForProject": "Coincidencias ({{count}})",
   "IdentifiedDependencies": "Dependencias identificadas",
-  "AddWorkspace": "Agregar un espacio de trabajo"
+  "AddWorkspace": "Agregar un espacio de trabajo",
+  "GroupKeywordTitle": "Grupo de Palabras"
 }

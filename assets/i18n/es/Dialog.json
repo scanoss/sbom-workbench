@@ -29,5 +29,9 @@
   "ErrorUpdatingReport": "Error en la Actualizacion",
   "WorkspaceName": "Nombre del espacio",
   "WorkspaceLocation": "Ubicación del espacio",
-  "YouNeedRestartQuestionWorkspace": "Es necesario reiniciar la aplicación para cambiar el espacio de trabajo. ¿Quieres hacerlo?"
+  "YouNeedRestartQuestionWorkspace": "Es necesario reiniciar la aplicación para cambiar el espacio de trabajo. ¿Quieres hacerlo?",
+  "NoGroupKeywordsAvailable": "No hay grupos disponibles",
+  "GroupNameLabel": "Grupo",
+  "GroupKeywordLabel": "Palabras",
+  "GroupAlreadyExists": "El grupo ya existe"
 }
