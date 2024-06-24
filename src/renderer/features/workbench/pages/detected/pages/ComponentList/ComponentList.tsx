@@ -47,7 +47,6 @@ export const ComponentList = () => {
   const { dependencyManifestFiles } = useSelector(selectDependencyState);
 
   const { isFilterActive, filter } = useSelector(selectNavigationState);
-  console.log('filters: ', filter);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filterItems = filterComponents(components, searchQuery);
 
