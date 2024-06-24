@@ -158,7 +158,7 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
           <section className='form-box'>
             <article>
               <div className="dialog-form-field">
-                <label className="dialog-form-field-label">Group</label><span className='group-exists' hidden={isEditMode || !groupMapper.has(form.label)} > group already exists!</span>
+                <label className="dialog-form-field-label">Group Name</label><span className='group-exists' hidden={isEditMode || !groupMapper.has(form.label)} > group already exists!</span>
                   <Paper className="dialog-form-field-control">
                     <TextField                                      
                       name="label"
@@ -203,7 +203,7 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
                   renderInput={(params) => (
                     <>
                     <div className="dialog-form-field">
-                        <label className="dialog-form-field-label">Words</label>
+                        <label className="dialog-form-field-label">Keywords</label>
                         <Paper className="dialog-form-field-control">
                           <TextField
                             {...params}

@@ -9,9 +9,24 @@ import TocOutlinedIcon from '@mui/icons-material/TocOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { workspaceService } from '@api/services/workspace.service';
 import { KeywordGroupDialog } from '../KeywordGroupDialog/KeywordGroupDialog';
+import SearchBox from '@components/SearchBox/SearchBox';
 
 
 export const KeywordGroupMenu = ({ onValueChange }) => {
+
+
+  const filter = (groups: Array<GroupSearchKeyword>, searchQuery: string | null)=>{
+    if(!searchQuery)return groups;
+
+    const filteredGroups = groups.filter((g: GroupSearchKeyword)=>{
+      const labelToLower = g.label.toLowerCase();
+      if(g.label.includes(searchQuery)) return g;
+      return null;
+    });
+  
+    return filteredGroups;
+  }
+
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [showNewGroup, setShowNewGroup] = useState(false);
@@ -19,6 +34,9 @@ export const KeywordGroupMenu = ({ onValueChange }) => {
   const [groupMap, setGroupMap] = useState<Set<string>>(new Set());
   const [isEditGroup, setIsEditGroup] = useState<boolean>(false);
   const [groupEdit, setGroupEdit] = useState<GroupSearchKeyword>(null);
+
+  const [searchQuery, setSearchQuery] = useState<string | null>(null);
+  const filterItems = filter(keywordGroups, searchQuery);
 
   const setGroups = (groups: Array<GroupSearchKeyword>) => {
     const groupMapper =  new Set<string>();  
@@ -48,6 +66,13 @@ export const KeywordGroupMenu = ({ onValueChange }) => {
       const groups = keywordGroups.filter((g)=> g.id!== id);
       setGroups(groups);
   }
+
+  const search = (value: string) => {
+
+    setSearchQuery(value);
+
+  }
+
 
   const handleNewGroup = ()=> {
     setShowNewGroup(!showNewGroup);
@@ -113,26 +138,31 @@ export const KeywordGroupMenu = ({ onValueChange }) => {
                     </IconButton>                  
                 </div>
                 <div className='keyword-group-container'>
-                    <section>                         
-                      <div className='add-new-group-btn-box'>
-                        <IconButton
-                          title={'Add New Group'}
-                          tabIndex={-1}
-                          color="inherit"
-                          size="medium"
-                          disabled={showNewGroup}                              
-                          onClick={handleNewGroup}
-                        >
-                          <AddIcon fontSize="inherit" />
-                        </IconButton>
-                      </div>
-                    </section>
+                  <article className={`${showNewGroup ? 'hide'  : 'new-group-bar' }`}>
+                      <section className='search-box'>
+                        <SearchBox onChange={(value) => search(value.trim().toLowerCase())} />
+                      </section>
+                      <section>                         
+                        <div className='add-new-group-btn-box'>
+                          <IconButton
+                            title={'Add New Group'}
+                            tabIndex={-1}
+                            color="inherit"
+                            size="medium"
+                            disabled={showNewGroup}                              
+                            onClick={handleNewGroup}
+                          >
+                            <AddIcon fontSize="inherit" />
+                          </IconButton>
+                        </div>
+                      </section>
+                    </article>
                     <section className={`newGroup-box ${showNewGroup ? '' : 'hide'}`}>
                         <KeywordGroupDialog isEditMode={isEditGroup} groupMapper={groupMap}  groupEdit={groupEdit} onGroupCreated={onGroupCreated} isOpen={showNewGroup} onCancel={onCancelGroup}></KeywordGroupDialog>
                     </section>
-                    { keywordGroups.length > 0 ? ( 
+                    { filterItems.length > 0 ? ( 
                         <ul>
-                            {keywordGroups.map((group,index) => (
+                            {filterItems.map((group,index) => (
                                 <li
                                   onClick={(event) => {
                                   event.stopPropagation();
