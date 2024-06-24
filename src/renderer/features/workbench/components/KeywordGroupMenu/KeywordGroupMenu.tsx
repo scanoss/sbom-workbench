@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { GroupSearchKeyword } from '@api/types';
 import { useTranslation } from 'react-i18next';
-import { IconButton } from '@mui/material';
+import { Dialog, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
@@ -12,7 +12,7 @@ import { KeywordGroupDialog } from '../KeywordGroupDialog/KeywordGroupDialog';
 import SearchBox from '@components/SearchBox/SearchBox';
 
 
-export const KeywordGroupMenu = ({ onValueChange }) => {
+export const KeywordGroupMenu = ({ onValueChange, open , close }) => {
 
 
   const filter = (groups: Array<GroupSearchKeyword>, searchQuery: string | null)=>{
@@ -28,7 +28,6 @@ export const KeywordGroupMenu = ({ onValueChange }) => {
   }
 
   const { t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
   const [showNewGroup, setShowNewGroup] = useState(false);
   const [keywordGroups, setKeywordGroups] = useState<Array<GroupSearchKeyword>>([]);
   const [groupMap, setGroupMap] = useState<Set<string>>(new Set());
@@ -52,13 +51,9 @@ export const KeywordGroupMenu = ({ onValueChange }) => {
   };
 
 
-  const openMenu = () => {
-      setIsOpen(true);
-  };
-
   const closeMenu = () => {
      reset();
-     setIsOpen(false);
+     close();
   };
 
   const deleteGroup = async(id: number) => {
@@ -68,9 +63,7 @@ export const KeywordGroupMenu = ({ onValueChange }) => {
   }
 
   const search = (value: string) => {
-
     setSearchQuery(value);
-
   }
 
 
@@ -88,7 +81,6 @@ export const KeywordGroupMenu = ({ onValueChange }) => {
       setGroupEdit(null);
       onValueChange(group);
       setKeywordGroups([]);
-      setIsOpen(false);
    }
   }
 
@@ -112,113 +104,118 @@ export const KeywordGroupMenu = ({ onValueChange }) => {
   useEffect(() => {
     getGroupKeywords();
   }
-  ,[isOpen]);
+  ,[open]);
 
 
   return (
     <div id="Group-keyword-box">     
-      <IconButton
-        title={'Keyword Groups'}
-        onClick={openMenu} >
-        <TocOutlinedIcon></TocOutlinedIcon>
-      </IconButton>
-  
-      {isOpen && ( // Render the menu only if isOpen is true
-            <div className="Menu">
-                <div className='dialog-bar'>   
-                      <div>  
-                        <span>Keyword Groups</span>      
-                      </div>                           
-                      <IconButton
-                      aria-label="close"
-                      size="small"
-                      onClick={closeMenu}
-                    >
-                      <CloseIcon />
-                    </IconButton>                  
-                </div>
-                <div className='keyword-group-container'>
-                  <article className={`${showNewGroup ? 'hide'  : 'new-group-bar' }`}>
-                      <section className='search-box'>
-                        <SearchBox onChange={(value) => search(value.trim().toLowerCase())} />
+          <Dialog
+            id="KeywordGroupDialog"
+            maxWidth="sm"
+            scroll="body"
+            fullWidth
+            open={open}            
+          >
+              <div className="Menu">
+                  <div className='dialog-bar'>   
+                        <div>  
+                          <span>Keyword Groups</span>      
+                        </div>                           
+                        <IconButton
+                        aria-label="close"
+                        size="small"
+                        onClick={closeMenu}
+                      >
+                        <CloseIcon />
+                      </IconButton>                  
+                  </div>
+                  <div className='keyword-group-container'>
+                    <article className={`${showNewGroup ? 'hide'  : 'new-group-bar' }`}>
+                        <section className='search-box'>
+                          <SearchBox onChange={(value) => search(value.trim().toLowerCase())} />
+                        </section>
+                        <section>                         
+                          <div className='add-new-group-btn-box'>
+                            <IconButton
+                              title={'Add New Group'}
+                              tabIndex={-1}
+                              color="inherit"
+                              size="medium"
+                              disabled={showNewGroup}                              
+                              onClick={handleNewGroup}
+                            >
+                              <AddIcon fontSize="inherit" />
+                            </IconButton>
+                          </div>
+                        </section>
+                      </article>
+                      <section className={`newGroup-box ${showNewGroup ? '' : 'hide'}`}>
+                          <KeywordGroupDialog isEditMode={isEditGroup} groupMapper={groupMap}  groupEdit={groupEdit} onGroupCreated={onGroupCreated} isOpen={showNewGroup} onCancel={onCancelGroup}></KeywordGroupDialog>
                       </section>
-                      <section>                         
-                        <div className='add-new-group-btn-box'>
-                          <IconButton
-                            title={'Add New Group'}
-                            tabIndex={-1}
-                            color="inherit"
-                            size="medium"
-                            disabled={showNewGroup}                              
-                            onClick={handleNewGroup}
-                          >
-                            <AddIcon fontSize="inherit" />
-                          </IconButton>
-                        </div>
+                      <section className='group-box-list'>
+                        `  { filterItems.length > 0 ? ( 
+                              <ul>
+                                  {filterItems.map((group,index) => (
+                                      <li
+                                        onClick={(event) => {
+                                        event.stopPropagation();
+                                        onSelectedGroup(group);
+                                      }}
+                                      className={
+                                        `${index % 2 === 0 ? "row-group odd" : "row-group"} ${onValueChange ? "pointer" : ""}`
+                                      }                            
+                                      >
+                                          <div>
+                                            <h4 className='label'>{group.label}</h4>
+                                            <ul className='group-box'>
+                                                
+                                                    <li className='words-box'>
+                                                      {group.words.map((word, index) => (
+                                                        <span className='pill'>{word}</span>
+                                                        ))}
+                                                    </li>                                             
+                                            </ul>
+                                          </div>                                  
+                                          <div>
+                                              <IconButton
+                                                  aria-label="delete"
+                                                  className="btn-delete"                                          
+                                                  onClick={(event) => {
+                                                    event.stopPropagation(); 
+                                                    editGroup(group);                                               
+                                                  }}
+                                                  size="small"
+                                                  >
+                                                  <ModeEditIcon fontSize="small" />
+                                              </IconButton>
+                                              <IconButton
+                                                  aria-label="delete"
+                                                  className="btn-delete"
+                                                  onClick={(event) => {
+                                                    event.stopPropagation(); 
+                                                    deleteGroup(group.id);                                               
+                                                  }}
+                                                  size="small"
+                                                  >
+                                                  <DeleteIcon fontSize="small" />
+                                              </IconButton>
+                                          </div>
+                                      </li>
+                                  ))}
+                                </ul> 
+                          ):
+                          (                    
+                            <div className='no-groups-available'>
+                            <p>No groups available</p>
+                            </div>                  
+                          )}`
                       </section>
-                    </article>
-                    <section className={`newGroup-box ${showNewGroup ? '' : 'hide'}`}>
-                        <KeywordGroupDialog isEditMode={isEditGroup} groupMapper={groupMap}  groupEdit={groupEdit} onGroupCreated={onGroupCreated} isOpen={showNewGroup} onCancel={onCancelGroup}></KeywordGroupDialog>
-                    </section>
-                    { filterItems.length > 0 ? ( 
-                        <ul>
-                            {filterItems.map((group,index) => (
-                                <li
-                                  onClick={(event) => {
-                                  event.stopPropagation();
-                                  onSelectedGroup(group);
-                                }}
-                              
-                                className={ index%2 ===0 ? "row-group odd": "row-group" } key={group.id}>
-                                    <div>
-                                      <h4 className='label'>{group.label}</h4>
-                                      <ul className='group-box'>
-                                          
-                                              <li className='words-box'>
-                                                {group.words.map((word, index) => (
-                                                  <span className='pill'>{word}</span>
-                                                  ))}
-                                              </li>                                             
-                                      </ul>
-                                    </div>                                  
-                                    <div>
-                                        <IconButton
-                                            aria-label="delete"
-                                            className="btn-delete"                                          
-                                            onClick={(event) => {
-                                              event.stopPropagation(); 
-                                              editGroup(group);                                               
-                                            }}
-                                            size="small"
-                                            >
-                                            <ModeEditIcon fontSize="small" />
-                                        </IconButton>
-                                        <IconButton
-                                            aria-label="delete"
-                                            className="btn-delete"
-                                            onClick={(event) => {
-                                              event.stopPropagation(); 
-                                              deleteGroup(group.id);                                               
-                                            }}
-                                            size="small"
-                                            >
-                                            <DeleteIcon fontSize="small" />
-                                        </IconButton>
-                                    </div>
-                                </li>
-                            ))}
-                          </ul> 
-                    ):
-                    (                    
-                      <div className='no-groups-available'>
-                       <p>No groups available</p>
-                      </div>                  
-                    )}
-                
-                </div>
-            </div>
-      )}
-    </div>
+                  
+                  </div>
+              </div>
+        </Dialog>
+      </div>
+    
   );
 };
 

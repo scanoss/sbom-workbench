@@ -1,8 +1,7 @@
-#Group-keyword-box {
-    position: relative;
+#KeywordGroupDialog { 
+
 
     .Menu{
-        position: absolute;        
         z-index: 5;
         box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
         min-width: 500px;      
@@ -51,48 +50,57 @@
                     width: 90%;
                 }
             }
-        
-            >ul{
-                max-height: 300px; 
-                overflow: auto; 
-                padding-left: 0px;   
-                border: solid 1px #f3f1f1;
-                padding-left: 0px;
-                border-radius: 4px; 
-                padding: 5px;
-                background-color: white;
-            }
-
-            .odd {
-                background-color: rgb(247 247 247 / 40%);                
-                border: solid 1px #00000008;
-            }
-
-            .row-group {
-                padding-left: 10px;
-                padding-right: 10px;
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                cursor: pointer;
-                transition: all 0.2s ease-out;
-                align-items: center;
-
-                div{
-                    display: flex;
-                    flex-direction: column;
-                    width: 75%;
-                    gap: 13px;
-                    padding: 6px 0 6px 0;
+            
+            .group-box-list{
+                height: 400px;
+                >ul{
+                    max-height: 300px; 
+                    overflow: auto; 
+                    padding-left: 0px;   
+                    border: solid 1px #f3f1f1;
+                    padding-left: 0px;
+                    border-radius: 4px; 
+                    padding: 5px;
+                    background-color: white;
+                }
+    
+                .odd {
+                    background-color: rgb(247 247 247 / 40%);                
+                    border: solid 1px #00000008;
+                }
+                
+                .pointer{
+                    cursor: pointer;
                 }
 
-                div:nth-child(2){
+                .row-group {
+                    padding-left: 10px;
+                    padding-right: 10px;
                     display: flex;
-                    justify-content: flex-end;
-                    width: 25%;
-                    flex-flow: row;
-                }               
-            }
+                    flex-direction: row;
+                    justify-content: space-between;
+                 
+                    transition: all 0.2s ease-out;
+                    align-items: center;
+    
+                    div{
+                        display: flex;
+                        flex-direction: column;
+                        width: 75%;
+                        gap: 13px;
+                        padding: 6px 0 6px 0;
+                    }
+    
+                    div:nth-child(2){
+                        display: flex;
+                        justify-content: flex-end;
+                        width: 25%;
+                        flex-flow: row;
+                    }               
+                }
+
+            }        
+          
 
             .row-group:hover{
                 .label{
@@ -139,6 +147,7 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                height: 100%;
 
                 p{
                     color: #71717A;
@@ -147,8 +156,7 @@
             }
 
 
-        }
-
-      
+        }        
     }
+    
 }

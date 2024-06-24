@@ -13,9 +13,9 @@ import useBatch from '@hooks/useBatch';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { useTranslation } from 'react-i18next';
 import TreeNode from '../TreeNode/TreeNode';
-import { workspaceService } from '@api/services/workspace.service';
 import { KeywordGroupMenu } from '../KeywordGroupMenu/KeywordGroupMenu';
 import { GroupSearchKeyword } from '@api/types';
+import TocOutlinedIcon from '@mui/icons-material/TocOutlined';
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -99,6 +99,7 @@ const SearchPanel = () => {
   const [value, setValue] = React.useState<string[]>([]);
   const [results, setResults] = React.useState<any[]>([]);
   const [selected, setSelected] = React.useState<any[]>([]);
+  const [isOpenGroupKeywordDialog, setOpenKeywordDialog] = React.useState<boolean>(false);
 
 
   const refSelected = useRef([]);
@@ -226,6 +227,13 @@ const SearchPanel = () => {
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
 
+  const openMenu = () =>{
+    setOpenKeywordDialog(true);
+  }
+
+  const closeMenu = () =>{
+    setOpenKeywordDialog(false);
+  }
 
 
   useEffect(() => {
@@ -283,7 +291,12 @@ const SearchPanel = () => {
               )}
             />
             <div>
-              <KeywordGroupMenu onValueChange={handleGroupKeyword} ></KeywordGroupMenu>
+              <IconButton
+                title={'Keyword Groups'}
+                onClick={openMenu} >
+                <TocOutlinedIcon></TocOutlinedIcon>
+              </IconButton>
+              <KeywordGroupMenu onValueChange={handleGroupKeyword} open={isOpenGroupKeywordDialog} close={closeMenu}></KeywordGroupMenu>
             </div>
           </div>
         </div>

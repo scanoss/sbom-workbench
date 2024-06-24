@@ -83,6 +83,13 @@ export default class MenuBuilder {
           },
         },
         {
+          label: i18next.t('AppMenu:Settings'),
+          accelerator: 'Command+,',
+          click: () => {
+            this.mainWindow.webContents.send(IpcChannels.MENU_OPEN_SETTINGS);
+          },
+        },
+        {
           label: i18next.t('AppMenu:Quit'),
           accelerator: 'Command+Q',
           click: () => {
@@ -193,6 +200,12 @@ export default class MenuBuilder {
             accelerator: 'Ctrl+Alt+S',
             click: () => {
               this.mainWindow.webContents.send(IpcChannels.MENU_OPEN_SETTINGS);
+            },
+          },
+          {
+            label: i18next.t('AppMenu:ManageSearchIndexGroups'),
+            click: () => {
+              this.mainWindow.webContents.send(IpcChannels.MENU_OPEN_SEARCH_INDEX_GROUPS);
             },
           },
           {
