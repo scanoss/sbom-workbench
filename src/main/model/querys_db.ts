@@ -66,7 +66,7 @@ export class Queries {
     updatedAt text NOT NULL,
     CONSTRAINT lock_pk PRIMARY KEY (project,username,hostname));`;
 
-  WORKSPACE_SEARCH_ITEM_GROUP_TABLE = `CREATE TABLE IF NOT EXISTS groupKeyword (
+  WORKSPACE_SEARCH_ITEM_GROUP_TABLE = `CREATE TABLE IF NOT EXISTS group_keyword (
     id INTEGER PRIMARY KEY ASC,
     label varchar(64) UNIQUE NOT NULL,
     keywords varchar (256) NOT NULL,

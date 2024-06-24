@@ -92,7 +92,9 @@ export const KeywordGroupMenu = ({ onValueChange }) => {
 
   return (
     <div id="Group-keyword-box">     
-      <IconButton  onClick={openMenu} >
+      <IconButton
+        title={'Keyword Groups'}
+        onClick={openMenu} >
         <TocOutlinedIcon></TocOutlinedIcon>
       </IconButton>
   

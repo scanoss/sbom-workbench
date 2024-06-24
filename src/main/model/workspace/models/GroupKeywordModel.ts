@@ -28,13 +28,13 @@ export class GroupKeywordModel {
 
   public async get(id: number): Promise<GroupSearchKeyword> {
     const call: any = util.promisify(this.connection.get.bind(this.connection));
-    const groups = await call(`SELECT id, label, keywords, createdAt, updatedAt FROM groupKeyword WHERE id=? ORDER BY updatedAt DESC;`, id);
+    const groups = await call(`SELECT id, label, keywords, createdAt, updatedAt FROM group_keyword WHERE id=? ORDER BY updatedAt DESC;`, id);
     return this.toGroupKeywordEntity([groups])[0];
   }
 
   public async getAll(): Promise<Array<GroupSearchKeyword>> {
     const call: any = util.promisify(this.connection.all.bind(this.connection));
-    const groups = await call(`SELECT id, label, keywords, createdAt, updatedAt FROM groupKeyword ORDER BY updatedAt DESC;`);
+    const groups = await call(`SELECT id, label, keywords, createdAt, updatedAt FROM group_keyword ORDER BY updatedAt DESC;`);
     return this.toGroupKeywordEntity(groups);
   }
 
@@ -45,7 +45,7 @@ export class GroupKeywordModel {
 
         groups.forEach((g) => {
           this.connection.run(
-            'INSERT INTO groupKeyword (label, keywords) VALUES (?,?);',
+            'INSERT INTO group_keyword (label, keywords) VALUES (?,?);',
             g.label,
             JSON.stringify(g.words),
           );
@@ -61,13 +61,13 @@ export class GroupKeywordModel {
 
   public async update(group: GroupSearchKeywordDTO): Promise<Array<GroupSearchKeyword>> {
     const call: any = util.promisify(this.connection.run.bind(this.connection));
-    await call(`UPDATE groupKeyword SET label=?, keywords=?, updatedAt= CURRENT_TIMESTAMP WHERE id=?;`,group.label, JSON.stringify(group.words), group.id);
+    await call(`UPDATE group_keyword SET label=?, keywords=?, updatedAt= CURRENT_TIMESTAMP WHERE id=?;`,group.label, JSON.stringify(group.words), group.id);
     return this.getAll();
   }
 
   public async delete(id: number): Promise<void> {
     const call: any = util.promisify(this.connection.run.bind(this.connection));
-    await call(`DELETE FROM groupKeyword WHERE id=?;`, id);
+    await call(`DELETE FROM group_keyword WHERE id=?;`, id);
   }
 
 }

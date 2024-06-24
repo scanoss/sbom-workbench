@@ -126,7 +126,7 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
         const nTags = getTags(tags);
         searchQuery.current = nTags.join(' ');
         setValue(nTags);
-        inputHandler('words', tags.length > 0 ? tags : [] );
+        inputHandler('words', tags.length > 0 ? nTags : [] );
       };
 
     const enableSubmit = (form)=>{
@@ -145,7 +145,7 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
           ...prevForm,
           id: groupEdit.id,
           words: groupEdit.words,
-          label: groupEdit.label // or any other value you want to set for the label
+          label: groupEdit.label
         }));
         setValue(tags);
     }

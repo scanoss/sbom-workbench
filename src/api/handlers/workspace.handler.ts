@@ -9,7 +9,7 @@ import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPat
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
 import { workspaceService } from '../../main/services/WorkspaceService';
 import { GroupSearchKeywordDTO } from '@api/dto';
-import { group } from 'console';
+
 
 api.handle(IpcChannels.WORKSPACE_PROJECT_LIST, async (_event) => {
   try {

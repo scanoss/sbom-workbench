@@ -107,5 +107,3 @@ class WorkspaceService extends BaseService {
 }
 
 export const workspaceService = new WorkspaceService();
-
-document.d = workspaceService;
