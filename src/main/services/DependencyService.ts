@@ -51,7 +51,6 @@ class DependencyService {
 
   public async accept(params: NewDependencyDTO): Promise<Dependency> {
     try {
-      console.log('Called dependencyService.accept()');
       const dependency = (await this.getAll({ id: params.dependencyId }))[0];
       dependency.licenses = [params.license];
       dependency.version = params.version;
@@ -313,8 +312,6 @@ class DependencyService {
   public async getSummary(): Promise<Array<DependencyManifestFile>> {
     try {
       const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
-      console.log('Called dependencyService.getSummary()');
-      console.log('filter from dependencyService: ', filter);
 
       if (filter?.usage && filter.usage !== FileUsageType.DEPENDENCY) { return []; }
 
