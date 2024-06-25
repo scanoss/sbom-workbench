@@ -1,27 +1,17 @@
-.component-card {
+#component-card {
+  text-align: left;
+  padding-top: 0;
+  padding-bottom: 0 !important;
+  min-height: 200px;
   width: 100%;
-  min-height: 230px;
 
-  button {
-    width: 100%;
-    height: 100%;
-    font-size: 60px;
-    text-align: left;
-  }
+    display: grid;
+    grid-template-rows: auto minmax(75px,100px);
+    align-items: center;
 
-  .component-card-content {
-    padding-top: 0;
-    padding-bottom: 0 !important;
-    height: 100%;
-    width: 100%;
-
-    //display: grid;
-    //grid-template-rows: auto minmax(75px,85px) 45px;
-    //align-items: center;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
+    //display: flex;
+    //flex-direction: column;
+    //justify-content: flex-end;
 
     p {margin: 0;}
 
@@ -29,7 +19,7 @@
       margin-top: 28px !important;
     }
 
-    .component-card-info {
+    .component-card__info {
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -89,10 +79,8 @@
         font-weight: 400;
       }
     }
-  }
 
-  &.override {
-    .component-card-info .original {
+    .component-card__info.override .original {
       p, h6 {
         text-decoration: line-through;
         opacity: .6;
@@ -104,6 +92,8 @@
         margin-bottom: 6px;
       }
     }
+
+
   }
 
-}
+
