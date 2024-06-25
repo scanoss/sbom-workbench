@@ -31,6 +31,7 @@ export const KeywordGroupMenu = ({ onValueChange, open , close }) => {
   const [showNewGroup, setShowNewGroup] = useState(false);
   const [keywordGroups, setKeywordGroups] = useState<Array<GroupSearchKeyword>>([]);
   const [groupMap, setGroupMap] = useState<Set<string>>(new Set());
+  const [selectedGroup, setSelectedGroup] = useState<GroupSearchKeyword>(null);
   const [isEditGroup, setIsEditGroup] = useState<boolean>(false);
   const [groupEdit, setGroupEdit] = useState<GroupSearchKeyword>(null);
 
@@ -76,12 +77,22 @@ export const KeywordGroupMenu = ({ onValueChange, open , close }) => {
       setGroups(groups);
   };
 
-  const onSelectedGroup = async(group: GroupSearchKeyword) =>{
-    if (onValueChange) {
-      setGroupEdit(null);
-      onValueChange(group);
-      setKeywordGroups([]);
-   }
+  const onSelectedGroup = async(group: GroupSearchKeyword) => {
+      if(selectedGroup && selectedGroup.id === group.id){
+        setSelectedGroup(null);
+        return;
+      } 
+      setSelectedGroup(group);
+  }
+
+  const accept = ()=>{
+    if(onValueChange && selectedGroup){
+    setGroupEdit(null);
+    onValueChange(selectedGroup);
+    setKeywordGroups([]);
+    setSelectedGroup(null);
+    close();
+    }
   }
 
   const editGroup = (group: GroupSearchKeyword) => {
@@ -161,9 +172,7 @@ export const KeywordGroupMenu = ({ onValueChange, open , close }) => {
                                         event.stopPropagation();
                                         onSelectedGroup(group);
                                       }}
-                                      className={
-                                        `${index % 2 === 0 ? "row-group odd" : "row-group"} ${onValueChange ? "pointer" : ""}`
-                                      }                            
+                                      className={ `${index % 2 === 0 ? "row-group odd" : "row-group"} ${onValueChange ? "pointer" : ""} ${onValueChange && selectedGroup && selectedGroup.id === group.id ? 'selected' : ""} `      }                            
                                       >
                                           <div>
                                             <h4 className='label'>{group.label}</h4>
@@ -214,6 +223,9 @@ export const KeywordGroupMenu = ({ onValueChange, open , close }) => {
                   <section className='close-btn-box'>
                     <Button tabIndex={-1} onClick={close} color="inherit">
                       {t('Button:Cancel')}
+                    </Button>
+                    <Button  className={`${onValueChange ? '' : 'hide'}`} tabIndex={-1} disabled={!selectedGroup} color="secondary" variant="contained" onClick={accept} >
+                      {t('Button:Accept')}
                     </Button>
                   </section>
               </div>
