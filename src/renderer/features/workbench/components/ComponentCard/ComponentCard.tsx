@@ -16,10 +16,11 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
   const keepOriginal: boolean = identified.length < component.identifiedAs.length;
   const override: boolean = !component.summary?.pending && !keepOriginal;
 
+  console.log('override: ', override);
   return (
-    <>
+    <div id="component-card">
       <IconComponent name={component.vendor} size={64} />
-      <div className="component-card-info">
+      <div className={` component-card__info ${override && 'override'}`}>
         {override ? (
           <>
             <div className="original">
@@ -52,7 +53,7 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

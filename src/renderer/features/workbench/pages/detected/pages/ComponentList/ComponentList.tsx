@@ -84,43 +84,60 @@ export const ComponentList = () => {
         </header>
 
         <main className="app-content">
-          <section className="dependency-manifest-file-list">
-            {dependencyManifestFiles.map((d: DependencyManifestFile) => (
-              <BaseCard auditSummaryCount={d.summary} onClick={() => { onSelectedDependency(d.path); }}>
-                <DependencyManifestFileCard dependencyManifestFile={d} />
-              </BaseCard>
-            ))}
+          <section className="dependency">
+
+            <div className="dependency__header">
+              <p className="dependency__title">Dependencies</p>
+            </div>
+
+            <div className="card__list">
+              {dependencyManifestFiles.map((d: DependencyManifestFile) => (
+                <BaseCard auditSummaryCount={d.summary} onClick={() => { onSelectedDependency(d.path); }}>
+                  <DependencyManifestFileCard dependencyManifestFile={d} />
+                </BaseCard>
+              ))}
+            </div>
           </section>
 
-          {(components && filterItems && filterItems.length > 0) && (filter?.usage ? filter.usage !== 'dependency' : true) ? (
-            <section className="component-list">
+          <section className="component">
+
+            <div className="component__header">
+              <p className="component__title">Components</p>
+            </div>
+
+            <div className="card__list">
+
               {filterItems.slice(0, limit).map((component, i) => (
                 <BaseCard auditSummaryCount={component.summary} onClick={() => onSelectComponent(component)} key={i}>
                   <ComponentCard component={component} />
                 </BaseCard>
               ))}
-            </section>
-          ) : (
-            <EmptyResult>
-              {searchQuery ? (
-                <>{t('NotResultsFoundWith', { searchQuery })}</>
-              ) : isFilterActive ? (
-                <>
-                  <div className="mb-3">{t('NoComponentsFoundMatching')}</div>
-                  <Button
-                    className="text-uppercase"
-                    size="small"
-                    startIcon={<DeleteForeverOutlinedIcon />}
-                    onClick={() => dispatch(resetFilter())}
-                  >
-                    {t('Button:ClearFilters')}
-                  </Button>
-                </>
-              ) : (
-                <>{t('NoComponentsWereDetected')}</>
-              )}
-            </EmptyResult>
-          )}
+            </div>
+
+          </section>
+
+          {(components && filterItems && filterItems.length > 0) && (filter?.usage ? filter.usage !== 'dependency' : true) ? (<div />)
+            : (
+              <EmptyResult>
+                {searchQuery ? (
+                  <>{t('NotResultsFoundWith', { searchQuery })}</>
+                ) : isFilterActive ? (
+                  <>
+                    <div className="mb-3">{t('NoComponentsFoundMatching')}</div>
+                    <Button
+                      className="text-uppercase"
+                      size="small"
+                      startIcon={<DeleteForeverOutlinedIcon />}
+                      onClick={() => dispatch(resetFilter())}
+                    >
+                      {t('Button:ClearFilters')}
+                    </Button>
+                  </>
+                ) : (
+                  <>{t('NoComponentsWereDetected')}</>
+                )}
+              </EmptyResult>
+            )}
 
           {filterItems?.length > limit && (
             <Alert className="mb-3" severity="info">
