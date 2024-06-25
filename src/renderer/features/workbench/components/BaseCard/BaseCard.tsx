@@ -11,22 +11,16 @@ interface BaseCardProps {
 }
 
 const BaseCard = ({ children, onClick, auditSummaryCount }: BaseCardProps) => {
-  const state = useSelector(selectWorkbench);
-
-  const override: boolean = false; // TODO: Investigate what is this for
-
   return (
     <Card
-      className={`
-          base-card
-          ${override && 'override'}
-        `}
+      className="base-card"
       elevation={1}
     >
-      <ButtonBase onClick={() => onClick()}> {/* TODO: Define how to pass the onClick Callback */}
-        <CardContent className="base-card-content">
+      <ButtonBase className="base-card__button" onClick={() => onClick()}>
+        <CardContent className="base-card__content">
           {children}
-          <div className={`base-card-files ${state.filter?.status || 'no-status-filter'}`}>
+
+          <div className="base-card__files">
             {auditSummaryCount.identified !== 0 ? (
               <span className="info-count has-status-bullet identified">{auditSummaryCount.identified}</span>
             ) : null}

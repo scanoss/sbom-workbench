@@ -1,6 +1,6 @@
 #ComponentList, #IdentifiedList {
   display: grid;
-  // grid-template-rows: auto 1fr;
+  grid-template-rows: auto 1fr;
   height: 100%;
 
   .app-page {
@@ -15,23 +15,55 @@
   }
 
   .app-content {
-    // height: 100%;
+    //height: 100%;
     overflow-y: visible;
+    display: grid;
+
   }
 
-  .component-list, .dependency-manifest-file-list {
+
+  .dependency {
+    margin-block-end: 10px;
+  }
+
+  .dependency__title, .component__title {
+    margin-block: 0;
+    padding-block-end: 6px;
+    font-family: "Inter","Roboto","Helvetica","Arial",sans-serif;
+    color: var(--text-color-primary);
+    color: #505050db;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  .dependency__header, .component__header {
+    border-block-end: 1px solid #50505049;
+    margin-block-end: 20px;
+  }
+
+  .card__list {
     display: grid;
     grid-template-columns: repeat(auto-fill, 200px);
     grid-row-gap: 1.5em;
     grid-column-gap: 1.5em;
     overflow-y: scroll;
     padding-bottom: 10px;
+    margin-block-end: 0;
   }
 
-  .dependency-manifest-file-list {
-    margin-block-end: 2em;
+
+  .component__header {
+    padding-top: 20px;
   }
 
 }
 
+
+/*
+
+* /package.json         3 *    5 **    10 ***
+* /src/package.json
+
+
+ */
 
