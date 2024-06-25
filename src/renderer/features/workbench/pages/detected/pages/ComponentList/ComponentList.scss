@@ -26,6 +26,10 @@
     margin-block-end: 10px;
   }
 
+  .dependency--hide, .component--hide {
+    display:none;
+  }
+
   .dependency__title, .component__title {
     margin-block: 0;
     padding-block-end: 6px;
@@ -57,13 +61,4 @@
   }
 
 }
-
-
-/*
-
-* /package.json         3 *    5 **    10 ***
-* /src/package.json
-
-
- */
 
