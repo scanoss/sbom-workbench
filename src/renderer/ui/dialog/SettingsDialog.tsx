@@ -14,6 +14,9 @@ import AppConfig from '@config/AppConfigModule';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTranslation } from 'react-i18next';
 import { AppI18n } from '@shared/i18n';
+import { setApis  as workbenchStoreApi } from '@store/workspace-store/workspaceSlice'
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@store/store';
 
 const filter = createFilterOptions();
 
@@ -139,7 +142,7 @@ interface SettingDialogProps {
 
 const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
   const { t, i18n } = useTranslation();
-
+  const dispatch = useDispatch<AppDispatch>();
   const [selectedApi, setSelectedApi] = useState<any>('');
   const [apis, setApis] = useState<any[]>([]);
   const [sbomLedgerToken, setSbomLedgerToken] = useState<string>('');
@@ -160,6 +163,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
     };
 
     await userSettingService.set(config);
+    dispatch(workbenchStoreApi(config.APIS ? config.APIS : []));
     onClose({ action: DIALOG_ACTIONS.OK });
   };
 
@@ -216,6 +220,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
   const handleTrash = (e, option) => {
     e.stopPropagation();
     setApis(apis.filter((url) => url !== option));
+    dispatch(workbenchStoreApi(apis.filter((url) => url !== option)));
     if (selectedApi && option.url === selectedApi.url) {
       setSelectedApi(null);
     }

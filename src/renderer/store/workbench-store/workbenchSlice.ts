@@ -126,7 +126,7 @@ export const workbenchSlice = createSlice({
 
 // actions
 export const {
-  load, updateTree, collapseTree, expandTree, setProgress, setHistory, reset,
+  load, updateTree, collapseTree, expandTree, setHistory, reset, setProgress
 } = workbenchSlice.actions;
 
 // selectors

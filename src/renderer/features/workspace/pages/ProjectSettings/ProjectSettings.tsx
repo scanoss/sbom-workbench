@@ -66,7 +66,7 @@ const ProjectSettings = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
-  const { projects, scanPath } = useSelector(selectWorkspaceState);
+  const { projects, scanPath, settings } = useSelector(selectWorkspaceState);
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -122,6 +122,10 @@ const ProjectSettings = () => {
       name: projectName,
     });
   };
+
+  useEffect(() => {
+    setApis(settings.APIS);
+  }, [settings]);
 
   const getContextInfo = async () => {
     const { path } = scanPath;
