@@ -16,7 +16,6 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
   const keepOriginal: boolean = identified.length < component.identifiedAs.length;
   const override: boolean = !component.summary?.pending && !keepOriginal;
 
-  console.log('override: ', override);
   return (
     <div id="component-card">
       <IconComponent name={component.vendor} size={64} />

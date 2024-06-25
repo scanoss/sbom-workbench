@@ -13,6 +13,7 @@ import Loader from '@components/Loader/Loader';
 import BaseCard from 'renderer/features/workbench/components/BaseCard/BaseCard';
 import { selectDependencyState } from '@store/dependency-store/dependencySlice';
 import { AuditSummaryCount, DependencyManifestFile } from '@api/types';
+import { dependencies } from 'webpack';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import EmptyResult from './components/EmptyResult/EmptyResult';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
@@ -36,6 +37,22 @@ const filterComponents = (items, query) => {
   return result;
 };
 
+const filterDependencies = (dependencies: DependencyManifestFile[], query: string) => {
+  if (!dependencies) {
+    return null;
+  }
+
+  if (!query) {
+    return dependencies;
+  }
+
+  const result = dependencies.filter((dependency) => {
+    return dependency.path.toLowerCase().includes(query.toLowerCase());
+  });
+
+  return result;
+};
+
 export const ComponentList = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -48,7 +65,11 @@ export const ComponentList = () => {
 
   const { isFilterActive, filter } = useSelector(selectNavigationState);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
-  const filterItems = filterComponents(components, searchQuery);
+  const filteredComponents = filterComponents(components, searchQuery);
+  const filteredDependencies = filterDependencies(dependencyManifestFiles, searchQuery);
+
+  const showDependencySection = (dependencyManifestFiles && filteredDependencies && filteredDependencies.length > 0);
+  const showComponentsSection = (components && filteredComponents && filteredComponents.length > 0);
 
   const onSelectComponent = (component) => {
     navigate({
@@ -67,7 +88,7 @@ export const ComponentList = () => {
   };
 
   // loader
-  if (components === null) {
+  if (components === null || dependencyManifestFiles === null) {
     return (
       <Loader message="Loading components" />
     );
@@ -84,14 +105,12 @@ export const ComponentList = () => {
         </header>
 
         <main className="app-content">
-          <section className="dependency">
-
+          <section className={`dependency ${showDependencySection ? '' : 'dependency--hide'}`}>
             <div className="dependency__header">
               <p className="dependency__title">Dependencies</p>
             </div>
-
             <div className="card__list">
-              {dependencyManifestFiles.map((d: DependencyManifestFile) => (
+              {filteredDependencies.map((d: DependencyManifestFile) => (
                 <BaseCard auditSummaryCount={d.summary} onClick={() => { onSelectedDependency(d.path); }}>
                   <DependencyManifestFileCard dependencyManifestFile={d} />
                 </BaseCard>
@@ -99,25 +118,21 @@ export const ComponentList = () => {
             </div>
           </section>
 
-          <section className="component">
-
+          <section className={`component ${showComponentsSection ? '' : 'component--hide'}`}>
             <div className="component__header">
               <p className="component__title">Components</p>
             </div>
-
             <div className="card__list">
-
-              {filterItems.slice(0, limit).map((component, i) => (
+              {filteredComponents.slice(0, limit).map((component, i) => (
                 <BaseCard auditSummaryCount={component.summary} onClick={() => onSelectComponent(component)} key={i}>
                   <ComponentCard component={component} />
                 </BaseCard>
               ))}
             </div>
-
           </section>
 
-          {(components && filterItems && filterItems.length > 0) && (filter?.usage ? filter.usage !== 'dependency' : true) ? (<div />)
-            : (
+          { (!showComponentsSection && !showDependencySection)
+              && (
               <EmptyResult>
                 {searchQuery ? (
                   <>{t('NotResultsFoundWith', { searchQuery })}</>
@@ -137,12 +152,12 @@ export const ComponentList = () => {
                   <>{t('NoComponentsWereDetected')}</>
                 )}
               </EmptyResult>
-            )}
+              )}
 
-          {filterItems?.length > limit && (
+          {filteredComponents?.length > limit && (
             <Alert className="mb-3" severity="info">
               <strong>
-                {t('ShowingLimitOfTotalComponents', { limit, total: filterItems.length })}
+                {t('ShowingLimitOfTotalComponents', { limit, total: filteredComponents.length })}
               </strong>
             </Alert>
           )}
