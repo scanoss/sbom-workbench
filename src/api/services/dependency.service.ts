@@ -3,7 +3,7 @@ import { BaseService } from './base.service';
 import { Dependency, DependencyManifestFile } from '../types';
 import { AcceptAllDependeciesDTO, NewDependencyDTO, RejectAllDependeciesDTO, RestoreAllDependenciesDTO } from '../dto';
 
-class DepencyService extends BaseService {
+class DependencyService extends BaseService {
   public async getAll(params: any): Promise<Array<Dependency>> {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.DEPENDENCY_GET_ALL, params);
     return this.response(response);
@@ -44,4 +44,4 @@ class DepencyService extends BaseService {
     return this.response(response);
   }
 }
-export const dependencyService = new DepencyService();
+export const dependencyService = new DependencyService();

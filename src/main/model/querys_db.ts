@@ -55,7 +55,8 @@ export class Queries {
     ON DELETE CASCADE
     );`;
 
-  // WORKSPACE
+
+  /****** WORKSPACE ******/ 
 
   WORKSPACE_LOCK = `CREATE TABLE IF NOT EXISTS lock (
     project  text NOT NULL,
@@ -64,6 +65,16 @@ export class Queries {
     createdAt text NOT NULL,
     updatedAt text NOT NULL,
     CONSTRAINT lock_pk PRIMARY KEY (project,username,hostname));`;
+
+  WORKSPACE_SEARCH_ITEM_GROUP_TABLE = `CREATE TABLE IF NOT EXISTS group_keyword (
+    id INTEGER PRIMARY KEY ASC,
+    label varchar(64) UNIQUE NOT NULL,
+    keywords varchar (256) NOT NULL,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );`;  
+
+
 
   SQL_DB_TABLES = this.SQL_CREATE_TABLE_RESULTS
     + this.FILES_TABLE
@@ -78,6 +89,9 @@ export class Queries {
     + this.COMPONENT_VULNERABILITY
     + this.CRYPTOGRAPHY_TABLE
     + this.LOCAL_CRYPTOGRAPHY_TABLE;
+
+   WORKSPACE_DB = this.WORKSPACE_LOCK
+    + this.WORKSPACE_SEARCH_ITEM_GROUP_TABLE;
 
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS

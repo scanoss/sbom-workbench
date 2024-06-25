@@ -90,5 +90,6 @@
   "KeepOriginalUsage": "検出されたUsageを保持する",
   "PreRequiste": "前条件",
   "ObfuscateFilePaths": "不明瞭なファイルパス",
-  "ObfuscateFilePathsHint": "ファイルパスは秘密性を保持するため難読化されます"
+  "ObfuscateFilePathsHint": "ファイルパスは秘密性を保持するため難読化されます",
+  "NewGroup": "New Group"
 }

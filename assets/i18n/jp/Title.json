@@ -68,5 +68,6 @@
   "SelectProject": "プロジェクト選択",
   "PreviewIdentifications": "識別プレビュー",
   "ImportingIdentifications": "識別情報インポート中",
-  "ImportFromProjects": "プロジェクトからインポート"
+  "ImportFromProjects": "プロジェクトからインポート",
+  "GroupKeywordTitle": "Group Keywords"
 }

@@ -13,6 +13,9 @@ import useBatch from '@hooks/useBatch';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { useTranslation } from 'react-i18next';
 import TreeNode from '../TreeNode/TreeNode';
+import { KeywordGroupMenu } from '../KeywordGroupMenu/KeywordGroupMenu';
+import { GroupSearchKeyword } from '@api/types';
+import TocOutlinedIcon from '@mui/icons-material/TocOutlined';
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -96,6 +99,9 @@ const SearchPanel = () => {
   const [value, setValue] = React.useState<string[]>([]);
   const [results, setResults] = React.useState<any[]>([]);
   const [selected, setSelected] = React.useState<any[]>([]);
+  const [isOpenGroupKeywordDialog, setOpenKeywordDialog] = React.useState<boolean>(false);
+
+
   const refSelected = useRef([]);
   const refResults = useRef([]);
 
@@ -121,13 +127,21 @@ const SearchPanel = () => {
     setLocalPage(0);
 
     const nTags = tags
-      .map((tag) => tag.toLowerCase().trim())
-      .map((tag) => SearchUtils.getTerms(tag))
-      .flat();
+    .map((tag) => tag.toLowerCase().trim())
+    .map((tag) => SearchUtils.getTerms(tag))
+    .flat();
 
     searchQuery.current = nTags.join(' ');
     setValue(nTags);
   };
+
+  const sanitizeTags = (tags: string[]) => {
+    const nTags = tags
+    .map((tag) => tag.toLowerCase().trim())
+    .map((tag) => SearchUtils.getTerms(tag))
+    .flat();
+    return nTags;
+  }
 
   const onSearchResponse = (event, data) => {
     setResults(serverPage.current === 0 ? (oldState) => [...data] : (oldState) => [...oldState, ...data]);
@@ -189,6 +203,13 @@ const SearchPanel = () => {
     }
   };
 
+  const handleGroupKeyword = (group: GroupSearchKeyword) => {   
+    const nTags = sanitizeTags(group.words);
+
+    searchQuery.current = nTags.join(' ');
+    setValue(nTags);
+};
+
   // trigger the search on value change
   useEffect(() => {
     search();
@@ -206,12 +227,23 @@ const SearchPanel = () => {
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
 
+  const openMenu = () =>{
+    setOpenKeywordDialog(true);
+  }
+
+  const closeMenu = () =>{
+    setOpenKeywordDialog(false);
+  }
+
+
   useEffect(() => {
     search();
   }, [summary]);
 
   // setup listeners
-  useEffect(setupListeners, []);
+  useEffect(() => {
+    setupListeners();
+   } ,[]);
 
   return (
     <div className="panel panel-left search-panel-container">
@@ -258,6 +290,14 @@ const SearchPanel = () => {
                 />
               )}
             />
+            <div>
+              <IconButton
+                title={t('NewGroup')}
+                onClick={openMenu} >
+                <TocOutlinedIcon></TocOutlinedIcon>
+              </IconButton>
+              <KeywordGroupMenu onValueChange={handleGroupKeyword} open={isOpenGroupKeywordDialog} close={closeMenu}></KeywordGroupMenu>
+            </div>
           </div>
         </div>
       </header>

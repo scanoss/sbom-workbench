@@ -16,6 +16,7 @@ import DependencyDialog from '../ui/dialog/DependencyDialog';
 import ComponentSearcherDialog from '../ui/dialog/ComponentSearcherDialog';
 import { ProjectSelectorDialog } from '../ui/dialog/ProjectSelectorDialog';
 import WorkspaceAddDialog from 'renderer/ui/dialog/WorkspaceAddDialog';
+import { KeywordGroupMenu } from 'renderer/features/workbench/components/KeywordGroupMenu/KeywordGroupMenu';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>, options?: InventoryDialogOptions) => Promise<Inventory | null>;
@@ -52,6 +53,13 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     options: InventoryDialogOptions;
     onClose?: (inventory) => void;
   }>({ open: false, inventory: {}, options: {} });
+
+
+  const [keywordGroupDialog, setKeywordGroupDialog] = useState<{
+    open: boolean,
+    onValueChange: any,
+    close?: ()=> void;
+  }>({ open: false, onValueChange: null });
 
   const openInventory = (inventory: Partial<InventoryForm>, options: InventoryDialogOptions = {}): Promise<Inventory | null> => {
     return new Promise<Inventory>((resolve) => {
@@ -214,6 +222,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     });
   };
 
+
   const [componentDialog, setComponentDialog] = useState<{
     open: boolean;
     component: Partial<NewComponentDTO>;
@@ -354,11 +363,23 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     openSettings();
   };
 
+  const handleOpenGroupKeywords = () =>{
+      setKeywordGroupDialog({
+        open: true,
+        onValueChange: null,
+        close: ()=>{
+          setKeywordGroupDialog({open: false, onValueChange: null})
+        },        
+      });
+  };
+
   const setupAppMenuListeners = (): (() => void) => {
     const subscriptions = [];
     subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_OPEN_SETTINGS, handleOpenSettings));
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_OPEN_SEARCH_INDEX_GROUPS, handleOpenGroupKeywords));
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
+
 
   // setup listeners
   useEffect(setupAppMenuListeners, []);
@@ -382,6 +403,12 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
       }}
     >
       {children}
+
+
+      {keywordGroupDialog.open && (
+        <KeywordGroupMenu open={keywordGroupDialog.open} onValueChange={null} close={keywordGroupDialog.close && keywordGroupDialog.close}></KeywordGroupMenu>
+
+      )}
 
       {inventoryDialog.open && (
         <InventoryDialog
