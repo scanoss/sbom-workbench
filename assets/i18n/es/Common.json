@@ -12,7 +12,7 @@
   "NotResultsFoundWith": "No se encontraron resultados con \"{{searchQuery}}\"",
   "NoComponentsFoundMatching": "No se encontraron componentes acorde a los criterios de búsqueda",
   "NoComponentsWereDetected": "No se detectaron componentes",
-  "ShowingLimitOfTotalComponents": "Mostrando {{limit}} de {{filterItems.length}} componentes.",
+  "ShowingLimitOfTotalComponents": "Mostrando {{limit}} de {{total}} componentes.",
   "CountVersions": "{{count}} versiones",
   "NoPendingFiles": "No hay ficheros pendientes",
   "NoPendingFilesWith": "No se encontraron ficheros pendientes con \"{searchQuery}}\"",
