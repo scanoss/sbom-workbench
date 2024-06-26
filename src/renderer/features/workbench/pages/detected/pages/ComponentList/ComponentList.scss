@@ -6,20 +6,60 @@
   .app-page {
     height: 100%;
     display: grid;
+
   }
 
+
+
   .app-header {
+
     .search-box {
-      width: $search-box-width
+      width: $search-box-width  
+    }
+  
+
+
+    .nav {
+        display: flex;
+        gap: 5px;
+      .MuiButton-root {
+        background: #d4d4d8;
+        color: #505055;
+        font-weight: 600;
+        padding: 8px 20px;
+      }
+  
+      .active {
+        .MuiButton-root {
+          background-color: white;
+          color: black;
+        }
+      }
+
+      .disabled{
+        pointer-events: none;
+      }
     }
   }
 
   .app-content {
-    //height: 100%;
     overflow-y: visible;
     display: grid;
 
+    #main-box{
+      padding-top: 10px;
+      display: flex;
+      flex-flow: column;
+      gap: 20px;
+
+      .search-box{
+        width: 40%;
+      }
+    }
+
   }
+
+
 
 
   .dependency {
@@ -56,9 +96,6 @@
   }
 
 
-  .component__header {
-    padding-top: 20px;
-  }
 
 }
 

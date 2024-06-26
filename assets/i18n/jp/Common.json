@@ -12,7 +12,7 @@
   "NotResultsFoundWith": "結果が見つかりません \"{{searchQuery}}\"",
   "NoComponentsFoundMatching": "指定された条件ではコンポーネントが見つかりません",
   "NoComponentsWereDetected": "コンポーネントが検出されませんでした",
-  "ShowingLimitOfTotalComponents": " {{limit}} of {{filterItems.length}} コンポーネント表示.",
+  "ShowingLimitOfTotalComponents": " {{limit}} of {{total}} コンポーネント表示.",
   "CountVersions": "{{count}} バージョン",
   "NoPendingFiles": "ペンディングファイルなし",
   "NoPendingFilesWith": "ペンディングファイルなし \"{{searchQuery}}\"",

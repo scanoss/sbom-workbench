@@ -12,7 +12,7 @@
   "NotResultsFoundWith": "Not results found with \"{{searchQuery}}\"",
   "NoComponentsFoundMatching": "No components found matching the current filter criteria",
   "NoComponentsWereDetected": "No components were detected",
-  "ShowingLimitOfTotalComponents": "Showing {{limit}} of {{filterItems.length}} components.",
+  "ShowingLimitOfTotalComponents": "Showing {{limit}} of {{total}} components.",
   "CountVersions": "{{count}} versions",
   "NoPendingFiles": "No pending files",
   "NoPendingFilesWith": "No pending files found with \"{{searchQuery}}\"",

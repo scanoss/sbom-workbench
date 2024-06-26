@@ -8,7 +8,7 @@ import FileViewer from './pages/FileViewer/FileViewer';
 const Detected = () => (
   <>
     <Routes>
-      <Route path="/" element={<ComponentList />} />
+      <Route path="/*" element={<ComponentList />} />
       <Route path="/component" element={<ComponentDetail />} />
       <Route path="/file" element={<FileViewer />} />
     </Routes>

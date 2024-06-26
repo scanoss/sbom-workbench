@@ -12,7 +12,7 @@
   "NotResultsFoundWith": "未找到结果 \"{{searchQuery}}\"",
   "NoComponentsFoundMatching": "找不到符合当前筛选条件的组件",
   "NoComponentsWereDetected": "未检测到任何组件",
-  "ShowingLimitOfTotalComponents": "显示 {{limit}}的{{filterItems.length}}组件。",
+  "ShowingLimitOfTotalComponents": "显示 {{limit}}的{{total}}组件。",
   "CountVersions": "{{count}} 版本",
   "NoPendingFiles": "没有待定文件",
   "NoPendingFilesWith": "未找到待定的文件\"{{searchQuery}}\"",
