@@ -3,13 +3,14 @@ import fs from 'fs';
 
 import { ExportModel } from './Model/ExportModel';
 import { IExportResult } from './IExportResult';
+
 export abstract class Format {
   protected export: ExportModel;
 
   protected extension: string;
 
-  constructor() {
-    this.export = new ExportModel();
+  constructor(exportModel: ExportModel = new ExportModel()) {
+    this.export = exportModel;
   }
 
   public abstract generate();

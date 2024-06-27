@@ -1,34 +1,103 @@
 import * as CDX from '@cyclonedx/cyclonedx-library';
-import AppConfig from '../../../../config/AppConfigModule';
-import { ExportSource } from '../../../../api/types';
-import { workspace } from '../../../workspace/Workspace';
+import { PackageURL } from 'packageurl-js';
+import { ExportSource, FileUsageType } from '../../../../api/types';
 import { Format } from '../Format';
+import { Workspace } from '../../../workspace/Workspace';
+import { ExportModel } from '../Model/ExportModel';
+import { Project } from '../../../workspace/Project';
+// import Workspace from '../../../../renderer/features/workspace';
+
+interface ExportData {
+  inventoryId: number;
+  fileId: number;
+  usage: FileUsageType;
+  notes: string;
+  identified_license: string;
+  detected_license: string;
+  purl: string;
+  version: string;
+  latest_version: string;
+  url: string;
+  path: string;
+  identified_component: string;
+  detected_component: string;
+  fulltext: string;
+  official: number;
+}
 
 export class CycloneDX extends Format {
   private source: string;
 
-  constructor(source: string) {
-    super();
+  private project: Project;
+
+  constructor(source: string, project: Project, exportModel: ExportModel) {
+    super(exportModel);
     this.source = source;
     this.extension = '.bom';
+    this.project = project;
   }
 
   // See CycloneDX 1.6 https://cyclonedx.org/docs/1.6/json
   // See CycloneDX Example w/ Crypto & Dependencies https://raw.githubusercontent.com/CycloneDX/bom-examples/master/CBOM/Example-With-Dependencies/bom.json
   public async generate() {
-    /*
-    TODO:
-          - Get project licence and add to bom.metadata.component.license
-          - Get crypto algorithms and add to bom.components (with "type"="cryptographic-asset")
-          - Get dependencies and reference all to project (since there is not support yet for transitive dependencies)
-          -
-     */
+    // Create CycloneDX Header
     const bom = new CDX.Models.Bom();
+    bom.metadata.component = new CDX.Models.Component(
+      CDX.Enums.ComponentType.Application,
+      this.project.project_name,
+    );
+    bom.metadata.licenses.add(
+      new CDX.Models.SpdxLicense(
+        this.project.metadata.getLicense(),
+      ),
+    );
 
-    // bom.metadata.component.;
+    let sbomWorkbenchComponents = (this.source === ExportSource.IDENTIFIED
+      ? await this.export.getIdentifiedData()
+      : await this.export.getDetectedData()) as ExportData[];
 
-    const lFac = new CDX.Factories.LicenseFactory();
+    // Remove duplicated, this is because the query returns multiple rows with the same purl & version.
+    // TODO: Create a specific query to get DISTINCT purls, versions & licenses
+    const compRepository = new Map<string, ExportData>();
+    sbomWorkbenchComponents.forEach((comp) => {
+      compRepository.set(`${comp.purl}@${comp.version}`, comp);
+    });
 
-    lFac.makeSpdxLicense('asd');
+    sbomWorkbenchComponents = Array.from(compRepository.values());
+
+    // Add components to CycloneDX with each respective license
+    sbomWorkbenchComponents.forEach((sbomWorkbenchComponent) => {
+      const licenseRepository = new CDX.Models.LicenseRepository();
+
+      if (sbomWorkbenchComponent.detected_license) {
+        licenseRepository.add(new CDX.Models.SpdxLicense(sbomWorkbenchComponent.detected_license, { acknowledgement: CDX.Enums.LicenseAcknowledgement.Declared }));
+      }
+
+      if (this.source === ExportSource.IDENTIFIED && sbomWorkbenchComponent.identified_license) {
+        licenseRepository.add(new CDX.Models.SpdxLicense(sbomWorkbenchComponent.identified_license, { acknowledgement: CDX.Enums.LicenseAcknowledgement.Concluded }));
+      }
+
+      const externalReferenceRepository = new CDX.Models.ExternalReferenceRepository();
+      externalReferenceRepository.add(new CDX.Models.ExternalReference(sbomWorkbenchComponent.url, CDX.Enums.ExternalReferenceType.Website));
+
+      const cdxComponent = new CDX.Models.Component(
+        CDX.Enums.ComponentType.Library,
+        sbomWorkbenchComponent.detected_component,
+        {
+          purl: PackageURL.fromString(sbomWorkbenchComponent.purl),
+          version: sbomWorkbenchComponent.version,
+          licenses: licenseRepository,
+          externalReferences: externalReferenceRepository,
+        },
+      );
+
+      bom.components.add(cdxComponent);
+    });
+
+    const jsonSerializer = new CDX.Serialize.JsonSerializer(
+      new CDX.Serialize.JSON.Normalize.Factory(CDX.Spec.Spec1dot6),
+    );
+
+    return jsonSerializer.serialize(bom, { sortLists: true, space: 2 });
   }
 }

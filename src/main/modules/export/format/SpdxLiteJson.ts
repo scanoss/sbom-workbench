@@ -27,6 +27,7 @@ export class SpdxLiteJson extends Format {
     const data = this.source === ExportSource.IDENTIFIED
       ? await this.export.getIdentifiedData()
       : await this.export.getDetectedData();
+
     const spdx = SpdxLiteJson.template();
     spdx.packages = [];
     spdx.documentDescribes = [];

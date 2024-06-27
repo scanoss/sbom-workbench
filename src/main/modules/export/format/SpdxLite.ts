@@ -15,6 +15,8 @@ export class SpdxLite extends Format {
   // @override
   public async generate() {
     const data = this.source === ExportSource.IDENTIFIED ? await this.export.getIdentifiedData() : null;
+
+
     let spdxLite = SpdxLite.templateHeader();
     let body = '';
     for (let i = 0; i < data.length; i += 1) {

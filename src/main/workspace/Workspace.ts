@@ -10,7 +10,7 @@ import { ProjectFilter } from './filters/ProjectFilter';
 import { userSettingService } from '../services/UserSettingService';
 import { modelProvider } from '../services/ModelProvider';
 
-class Workspace {
+export class Workspace {
   private projectList: Array<Project>;
 
   private wsPath: string;

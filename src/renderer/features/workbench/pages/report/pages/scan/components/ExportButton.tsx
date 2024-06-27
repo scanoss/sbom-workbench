@@ -53,6 +53,11 @@ export const ExportButton = ({ empty }) => {
         },
       ],
     },
+    CYCLONEDX: {
+      label: 'Cyclone DX',
+      hint: t('Tooltip:ExportHintCycloneDX'),
+      sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+    },
     SPDXLITEJSON: {
       label: 'SPDX Lite',
       hint: t('Tooltip:ExportHintSPDXLite'),

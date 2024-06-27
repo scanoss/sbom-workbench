@@ -178,6 +178,7 @@ export enum ExportFormat {
   RAW = 'RAW',
   WFP = 'WFP',
   SPDXLITEJSON = 'SPDXLITEJSON',
+  CYCLONEDX = 'CYCLONEDX',
   HTMLSUMMARY = 'HTMLSUMMARY',
 }
 
@@ -249,6 +250,7 @@ export enum FileStatusType {
 export enum FileUsageType {
   SNIPPET = 'snippet',
   FILE = 'file',
+  DEPENDENCY = 'dependency',
 }
 
 export enum ComponentSource {
@@ -412,4 +414,3 @@ export interface DependencyManifestFile {
     pending: number;
   }
 }
-

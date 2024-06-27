@@ -27,6 +27,7 @@ const getFormatFilesAttributes = (format: ExportFormat) => {
   attr.set(ExportFormat.WFP, { description: 'WFP Files', extension: 'wfp' });
   attr.set(ExportFormat.CSV, { description: 'CSV Files', extension: 'csv' });
   attr.set(ExportFormat.SPDXLITEJSON, { description: 'JSON Files', prefix: 'SPDXLite', extension: 'json' });
+  attr.set(ExportFormat.CYCLONEDX, { description: 'JSON Files', prefix: 'cyclonedx', extension: 'json' });
   attr.set(ExportFormat.HTMLSUMMARY, { description: 'HTML Files', extension: 'html' });
 
   return attr.get(format);
