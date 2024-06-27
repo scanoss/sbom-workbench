@@ -91,7 +91,10 @@ export const dependencySlice = createSlice({
 const getDependencyScopes = (dep: Array<Dependency>) => {
   const scopeMapper = new Set<string>();
   dep.forEach((d) => {
-    scopeMapper.add(d.scope);
+    if(d.scope){
+       scopeMapper.add(d.scope);
+    }  
+     
   });
   return Array.from(scopeMapper.values());
 };
