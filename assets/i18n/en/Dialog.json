@@ -29,5 +29,9 @@
   "ErrorUpdatingReport": "Error Updating Report",
   "WorkspaceName": "Workspace Name",
   "WorkspaceLocation": "Workspace Location",
-  "YouNeedRestartQuestionWorkspace": "You need restart the application to change the workspace. Do you?"
+  "YouNeedRestartQuestionWorkspace": "You need restart the application to change the workspace. Do you?",
+  "NoGroupKeywordsAvailable": "No groups available",
+  "GroupNameLabel": "Group name",
+  "GroupKeywordLabel": "Keywords",
+  "GroupAlreadyExists": "Group already exists!"
 }

@@ -2,28 +2,8 @@ import * as CDX from '@cyclonedx/cyclonedx-library';
 import { PackageURL } from 'packageurl-js';
 import { ExportSource, FileUsageType } from '../../../../api/types';
 import { Format } from '../Format';
-import { Workspace } from '../../../workspace/Workspace';
-import { ExportModel } from '../Model/ExportModel';
+import { ExportData, ExportModel } from '../Model/ExportModel';
 import { Project } from '../../../workspace/Project';
-// import Workspace from '../../../../renderer/features/workspace';
-
-interface ExportData {
-  inventoryId: number;
-  fileId: number;
-  usage: FileUsageType;
-  notes: string;
-  identified_license: string;
-  detected_license: string;
-  purl: string;
-  version: string;
-  latest_version: string;
-  url: string;
-  path: string;
-  identified_component: string;
-  detected_component: string;
-  fulltext: string;
-  official: number;
-}
 
 export class CycloneDX extends Format {
   private source: string;
@@ -52,9 +32,9 @@ export class CycloneDX extends Format {
       ),
     );
 
-    let sbomWorkbenchComponents = (this.source === ExportSource.IDENTIFIED
+    let sbomWorkbenchComponents = this.source === ExportSource.IDENTIFIED
       ? await this.export.getIdentifiedData()
-      : await this.export.getDetectedData()) as ExportData[];
+      : await this.export.getDetectedData();
 
     // Remove duplicated, this is because the query returns multiple rows with the same purl & version.
     // TODO: Create a specific query to get DISTINCT purls, versions & licenses
@@ -68,11 +48,9 @@ export class CycloneDX extends Format {
     // Add components to CycloneDX with each respective license
     sbomWorkbenchComponents.forEach((sbomWorkbenchComponent) => {
       const licenseRepository = new CDX.Models.LicenseRepository();
-
       if (sbomWorkbenchComponent.detected_license) {
         licenseRepository.add(new CDX.Models.SpdxLicense(sbomWorkbenchComponent.detected_license, { acknowledgement: CDX.Enums.LicenseAcknowledgement.Declared }));
       }
-
       if (this.source === ExportSource.IDENTIFIED && sbomWorkbenchComponent.identified_license) {
         licenseRepository.add(new CDX.Models.SpdxLicense(sbomWorkbenchComponent.identified_license, { acknowledgement: CDX.Enums.LicenseAcknowledgement.Concluded }));
       }

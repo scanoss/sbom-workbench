@@ -1,0 +1,170 @@
+#KeywordGroupDialog { 
+
+
+    .Menu{
+        z-index: 5;
+        box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
+        min-width: 500px;      
+        display: flex;
+        background-color:  rgb(244, 244, 245);  
+        flex-flow: column;
+        border-radius: 6px;
+
+        .dialog-bar{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            border-top-right-radius: 6px;
+            border-top-left-radius: 6px;
+            padding: 10px 13px;
+    
+            div span {
+                font-size: 1.3em;               
+            }
+
+            button{
+                margin-right: 3px;
+            }
+        }
+
+        ul , li {
+            list-style: none;
+        }
+
+        .keyword-group-container {
+            padding: 20px 15px 0px 15px;
+
+            .add-new-group-btn-box {
+                display: flex;
+                align-items: center;
+            }
+
+            .new-group-bar {
+                display: flex;
+                justify-content: space-between;
+                padding: 2px;
+                
+                .search-box {
+                    width: 90%;
+                }
+            }
+            
+            .group-box-list {
+
+                height: 385px;
+
+                >ul {
+                    max-height: 300px; 
+                    overflow: auto; 
+                    padding-left: 0px;   
+                    border: solid 1px #f3f1f1;
+                    padding-left: 0px;
+                    border-radius: 4px; 
+                    padding: 5px;
+                    background-color: white;
+                }
+    
+                .odd {
+                    background-color: rgb(247 247 247 / 40%);                
+                    border: solid 1px #00000008;
+                }
+                
+                .pointer {
+                    cursor: pointer;
+                }
+
+                .row-group {
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                 
+                    transition: all 0.2s ease-out;
+                    align-items: center;
+    
+                    div {
+                        display: flex;
+                        flex-direction: column;
+                        width: 75%;
+                        gap: 13px;
+                        padding: 6px 0 6px 0;
+                    }
+    
+                    div:nth-child(2) {
+                        display: flex;
+                        justify-content: flex-end;
+                        width: 25%;
+                        flex-flow: row;
+                    }               
+                }
+
+            }        
+
+            .row-group:hover {
+
+                background-color: #f3f1f1;
+
+                .label {
+                    scale: 1.1;
+                    margin-left:15px;
+                }              
+            }       
+
+            .label {
+                padding: 0;
+                margin: 0;
+                transition: all 0.2s ease-out;
+            
+            }
+
+            .group-box {
+                display: flex;
+                flex-flow: row;
+                gap: 0.5em;
+                justify-content: space-between;
+                padding: 7px 0px 15px 0px;
+            }
+
+            .words-box {
+                display: flex;
+                margin-top: -10px;
+                gap: 8px;
+                flex-wrap: wrap;
+    
+                .pill {
+                     background-color: var(--background-color-primary);
+                    padding: 3px 8px;
+                    border-radius: 10px;
+                    font-size: 12px;
+                }
+            }                     
+
+            .hide {
+                display: none;
+            }
+
+            .no-groups-available {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+
+                p {
+                    color: #71717A;
+                    font-weight: 500;
+                }
+            }
+        }  
+        
+        .close-btn-box {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 10px 20px 10px;
+            background-color: white;
+        }
+    }
+    
+}

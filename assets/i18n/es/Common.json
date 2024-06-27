@@ -95,5 +95,6 @@
   "EnableHPSM": "Habilitar HPSM (High Precision Snippet Matching)",
   "HPSMHint": "HPSM requiere una suscripción premium",
   "Current": "Actual",
-  "Default": "Default"
+  "Default": "Default",
+  "NewGroup": "Nuevo Grupo"
 }

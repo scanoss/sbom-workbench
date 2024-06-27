@@ -81,5 +81,6 @@
   "IdentifiedMatchedTab": "Identified components",
   "AddWorkspace": "Add New Workspace",
   "DetectedCryptography": "Detected Cryptography",
-  "IdentifiedCryptography": "Identified Cryptography"
+  "IdentifiedCryptography": "Identified Cryptography",
+  "GroupKeywordTitle": "Group Keywords"
 }

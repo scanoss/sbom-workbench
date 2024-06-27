@@ -414,3 +414,12 @@ export interface DependencyManifestFile {
     pending: number;
   }
 }
+
+export interface GroupSearchKeyword {
+  id: number;
+  label: string;
+  words: Array<string>;
+  createdAt: string;
+  updatedAt:string;
+}
+
