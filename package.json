@@ -108,7 +108,6 @@
     }
   },
   "dependencies": {
-    "@cyclonedx/cyclonedx-library": "^6.10.0",
     "@electron/rebuild": "^3.2.13",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
