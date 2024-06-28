@@ -1,0 +1,16 @@
+.dependency-card-content{
+
+    height: 65px;
+
+    .content{
+      height: 100%;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      line-break: anywhere;
+      >span{
+        font-size: 13px;
+        color: #3a3a3a;
+      }
+    }
+}

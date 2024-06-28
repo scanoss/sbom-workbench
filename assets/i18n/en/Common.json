@@ -40,6 +40,7 @@
   "of": "of",
   "file": "file",
   "snippet": "snippet",
+  "dependency": "dependency",
   "status": "Status",
   "pending": "pending",
   "original": "original",

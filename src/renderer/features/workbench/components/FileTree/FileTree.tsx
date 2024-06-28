@@ -23,8 +23,8 @@ const FileTreeNode = ({ node, onClick, onContextMenu }) => {
       onContextMenu={(e) => onContextMenu(e, node)}
     >
       <span className="ft-node-icon">
-        {node.type === 'folder' &&
-          (node.state?.expanded ? <i className="fa fa-folder-open" /> : <i className="fa fa-folder" />)}
+        {node.type === 'folder'
+          && (node.state?.expanded ? <i className="fa fa-folder-open" /> : <i className="fa fa-folder" />)}
 
         {node.type === 'file' && !node.isDependencyFile && <i className="fa fa-file-o" />}
 
@@ -47,7 +47,6 @@ const FileTree = () => {
   const selectedNode = React.useRef<any>(null);
 
   const onActionMenuHandler = (e, params) => {
-    console.log(params);
     const { current: node } = selectedNode;
 
     switch (params) {
@@ -120,7 +119,6 @@ const FileTree = () => {
     dispatch(collapseTree(node));
   };
 
-
   const onSelectNode = async (_e: React.MouseEvent<HTMLSpanElement, MouseEvent>, node: any) => {
     const { children, value } = node;
     if (!children) {
@@ -148,7 +146,7 @@ const FileTree = () => {
           enabled: menuProps.enabled && node.status === 'PENDING',
         },
         {
-          label:  t('AppMenu:DismissAllDependencies'),
+          label: t('AppMenu:DismissAllDependencies'),
           actionId: 'Action:DismissAllDependencies',
           enabled: menuProps.enabled && node.status === 'PENDING',
         },
@@ -161,99 +159,99 @@ const FileTree = () => {
     } else {
       menu = !node.children
         ? [
-            {
-              label: t('AppMenu:MarkFileAsOriginal'),
-              actionId: 'Action:MarkFileAsOriginal',
-              enabled: menuProps.enabled && (node.status !== 'FILTERED' && node.status !== 'NO-MATCH' && !node.isDependencyFile),
-            },
-            {
-              label: t('AppMenu:RestoreFile'),
-              actionId: 'Action:RestoreFile',
-              enabled: menuProps.enabled && (menuProps.enabled || node.status === 'IDENTIFIED' || node.status === 'IGNORED'),
-            },
-          ]
+          {
+            label: t('AppMenu:MarkFileAsOriginal'),
+            actionId: 'Action:MarkFileAsOriginal',
+            enabled: menuProps.enabled && (node.status !== 'FILTERED' && node.status !== 'NO-MATCH' && !node.isDependencyFile),
+          },
+          {
+            label: t('AppMenu:RestoreFile'),
+            actionId: 'Action:RestoreFile',
+            enabled: menuProps.enabled && (menuProps.enabled || node.status === 'IDENTIFIED' || node.status === 'IGNORED'),
+          },
+        ]
         : [
-            {
-              label: t('AppMenu:AcceptAll', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
-              actionId: 'Action:AcceptAll',
-              enabled: menuProps.enabled && !onlyRestore,
-            },
-            { type: 'separator' },
-            {
-              label: t('AppMenu:IdentifyAllAs', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
+          {
+            label: t('AppMenu:AcceptAll', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
+            actionId: 'Action:AcceptAll',
+            enabled: menuProps.enabled && !onlyRestore,
+          },
+          { type: 'separator' },
+          {
+            label: t('AppMenu:IdentifyAllAs', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
 
-              submenu: [
-                {
-                  label: t('AppMenu:IdentifyDetected'),
-                  actionId: 'Action:IdentifyAllAs',
-                  enabled:  (node.someMatchChild && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.NOMATCH &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL)),
-                },
-                {
-                  label: t('AppMenu:IdentifyNoMatch'),
-                  actionId: 'Action:IdentifyNoMatch',
-                  enabled: (node.someNoMatchChild || (node.someNoMatchChild && state?.filter?.status === FileStatusType.NOMATCH)) && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.PENDING &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
-                },
-                {
-                  label: t('AppMenu:IdentifyIgnored'),
-                  actionId: 'Action:IdentifyIgnored',
-                  enabled: (node.someFilteredChild || (node.someFilteredChild && state?.filter?.status === FileStatusType.FILTERED)) && (state?.filter?.status !== FileStatusType.NOMATCH && state?.filter?.status !== FileStatusType.PENDING &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
+            submenu: [
+              {
+                label: t('AppMenu:IdentifyDetected'),
+                actionId: 'Action:IdentifyAllAs',
+                enabled: (node.someMatchChild && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.NOMATCH && state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL)),
+              },
+              {
+                label: t('AppMenu:IdentifyNoMatch'),
+                actionId: 'Action:IdentifyNoMatch',
+                enabled: (node.someNoMatchChild || (node.someNoMatchChild && state?.filter?.status === FileStatusType.NOMATCH)) && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.PENDING && state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
+              },
+              {
+                label: t('AppMenu:IdentifyIgnored'),
+                actionId: 'Action:IdentifyIgnored',
+                enabled: (node.someFilteredChild || (node.someFilteredChild && state?.filter?.status === FileStatusType.FILTERED)) && (state?.filter?.status !== FileStatusType.NOMATCH && state?.filter?.status !== FileStatusType.PENDING && state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
 
-                }
-              ],
-              enabled: menuProps.enabled && !node.value.toString().startsWith('/.'),
-            },
-            {
-              label: t('AppMenu:MarkAllAsOriginal', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
-              submenu: [
-                {
-                  label: t('AppMenu:MarkDetectedAsOriginal'),
-                  actionId: 'Action:MarkAllAsOriginal',
-                  enabled: node.someMatchChild && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.NOMATCH &&  state?.filter?.status !== FileStatusType.IDENTIFIED),
-                },
-                {
-                  label: t('AppMenu:MarkNoMatchAsOriginal'),
-                  actionId: 'Action:MarkNoMatchAsOriginal',
-                  enabled: (node.someNoMatchChild || (node.someNoMatchChild && (state?.filter?.status === FileStatusType.NOMATCH && state?.filter?.status === FileStatusType.ORIGINAL))) && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.PENDING &&  state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
-                },
-                {
-                  label: t('AppMenu:MarkIgnoredAsOriginal'),
-                  actionId: 'Action:MarkIgnoredAsOriginal',
-                  enabled: (node.someFilteredChild || (node.someFilteredChild && (state?.filter?.status === FileStatusType.FILTERED || state?.filter?.status === FileStatusType.ORIGINAL))) && (state?.filter?.status !== FileStatusType.NOMATCH && state?.filter?.status !== FileStatusType.PENDING && state?.filter?.status !== FileStatusType.IDENTIFIED ),
+              },
+            ],
+            enabled: menuProps.enabled && !node.value.toString().startsWith('/.'),
+          },
+          {
+            label: t('AppMenu:MarkAllAsOriginal', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
+            submenu: [
+              {
+                label: t('AppMenu:MarkDetectedAsOriginal'),
+                actionId: 'Action:MarkAllAsOriginal',
+                enabled: node.someMatchChild && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.NOMATCH && state?.filter?.status !== FileStatusType.IDENTIFIED),
+              },
+              {
+                label: t('AppMenu:MarkNoMatchAsOriginal'),
+                actionId: 'Action:MarkNoMatchAsOriginal',
+                enabled: (node.someNoMatchChild || (node.someNoMatchChild && (state?.filter?.status === FileStatusType.NOMATCH && state?.filter?.status === FileStatusType.ORIGINAL))) && (state?.filter?.status !== FileStatusType.FILTERED && state?.filter?.status !== FileStatusType.PENDING && state?.filter?.status !== FileStatusType.IDENTIFIED && state?.filter?.status !== FileStatusType.ORIGINAL),
+              },
+              {
+                label: t('AppMenu:MarkIgnoredAsOriginal'),
+                actionId: 'Action:MarkIgnoredAsOriginal',
+                enabled: (node.someFilteredChild || (node.someFilteredChild && (state?.filter?.status === FileStatusType.FILTERED || state?.filter?.status === FileStatusType.ORIGINAL))) && (state?.filter?.status !== FileStatusType.NOMATCH && state?.filter?.status !== FileStatusType.PENDING && state?.filter?.status !== FileStatusType.IDENTIFIED),
 
-                }
-              ],
-              enabled: menuProps.enabled && !node.value.toString().startsWith('/.') ,
-            },
-            {
-              label: t('AppMenu:RestoreAll', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
-              actionId: 'Action:RestoreAll',
-              enabled: menuProps.enabled && (node.hasIgnoredProgress || node.hasIdentifiedProgress),
-            },
-            { type: 'separator' },
-            {
-              label: t('AppMenu:ImportFrom'),
-              actionId: 'Action:ImportFrom',
-              enabled: menuProps.enabled,
-            },
-            { type: 'separator' },
-            {
-              label: t('AppMenu:ExpandCollapse'),
-              submenu: [
-                {
-                  label: t('AppMenu:ExpandAll'),
-                  actionId: 'Action:ExpandAll',
-                },
-                {
-                  label: t('AppMenu:ExpandToMatches'),
-                  actionId: 'Action:ExpandToMatches',
-                },
-                {
-                  label: t('AppMenu:CollapseAll'),
-                  actionId: 'Action:CollapseAll',
-                },
-              ],
-            },
-          ];
+              },
+            ],
+            enabled: menuProps.enabled && !node.value.toString().startsWith('/.'),
+          },
+          {
+            label: t('AppMenu:RestoreAll', { context: state.isFilterActive ? 'filter' : 'nofilter' }),
+            actionId: 'Action:RestoreAll',
+            enabled: menuProps.enabled && (node.hasIgnoredProgress || node.hasIdentifiedProgress),
+          },
+          { type: 'separator' },
+          {
+            label: t('AppMenu:ImportFrom'),
+            actionId: 'Action:ImportFrom',
+            enabled: menuProps.enabled,
+          },
+          { type: 'separator' },
+          {
+            label: t('AppMenu:ExpandCollapse'),
+            submenu: [
+              {
+                label: t('AppMenu:ExpandAll'),
+                actionId: 'Action:ExpandAll',
+              },
+              {
+                label: t('AppMenu:ExpandToMatches'),
+                actionId: 'Action:ExpandToMatches',
+              },
+              {
+                label: t('AppMenu:CollapseAll'),
+                actionId: 'Action:CollapseAll',
+              },
+            ],
+          },
+        ];
     }
     window.electron.ipcRenderer.send(IpcChannels.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
   };

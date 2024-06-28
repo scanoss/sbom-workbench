@@ -1,13 +1,13 @@
-import { Dependency } from '@api/types';
+import { Dependency, DependencyManifestFile } from '@api/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   accept,
   acceptAll,
-  getAll,
+  getAll, getAllManifestFiles,
   reject,
   rejectAll,
   restore,
-  restoreAll
+  restoreAll,
 } from '@store/dependency-store/dependencyThunks';
 import { RootState } from '@store/rootReducer';
 
@@ -15,11 +15,13 @@ export interface DependencyState {
   dependencies: Dependency[];
   loading: boolean;
   batchRunning: boolean;
+  dependencyManifestFiles: DependencyManifestFile[];
   scopes: Array<string>;
 }
 
 const initialState: DependencyState = {
   dependencies: [],
+  dependencyManifestFiles: [],
   loading: false,
   batchRunning: false,
   scopes: [],
@@ -32,6 +34,9 @@ export const dependencySlice = createSlice({
     reset: (state) => initialState,
   },
   extraReducers: {
+    [getAllManifestFiles.fulfilled.type]: (state, action: PayloadAction<DependencyManifestFile[]>) => {
+      state.dependencyManifestFiles = action.payload;
+    },
     [getAll.pending.type]: (state) => {
       state.loading = true;
     },
@@ -44,19 +49,13 @@ export const dependencySlice = createSlice({
       state.loading = false;
     },
     [accept.fulfilled.type]: (state, action: PayloadAction<Dependency>) => {
-      state.dependencies = state.dependencies.map((dependency) =>
-        dependency.dependencyId === action.payload.dependencyId ? action.payload : dependency
-      );
+      state.dependencies = state.dependencies.map((dependency) => (dependency.dependencyId === action.payload.dependencyId ? action.payload : dependency));
     },
     [reject.fulfilled.type]: (state, action: PayloadAction<Dependency>) => {
-      state.dependencies = state.dependencies.map((dependency) =>
-        dependency.dependencyId === action.payload.dependencyId ? action.payload : dependency
-      );
+      state.dependencies = state.dependencies.map((dependency) => (dependency.dependencyId === action.payload.dependencyId ? action.payload : dependency));
     },
     [restore.fulfilled.type]: (state, action: PayloadAction<Dependency>) => {
-      state.dependencies = state.dependencies.map((dependency) =>
-        dependency.dependencyId === action.payload.dependencyId ? action.payload : dependency
-      );
+      state.dependencies = state.dependencies.map((dependency) => (dependency.dependencyId === action.payload.dependencyId ? action.payload : dependency));
     },
     [acceptAll.pending.type]: (state) => {
       state.batchRunning = true;

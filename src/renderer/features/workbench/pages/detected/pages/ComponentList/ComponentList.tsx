@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import { Button } from '@mui/material';
@@ -10,11 +10,16 @@ import { resetFilter, selectNavigationState } from '@store/navigation-store/navi
 import { selectComponentState, setComponent } from '@store/component-store/componentSlice';
 import { useTranslation } from 'react-i18next';
 import Loader from '@components/Loader/Loader';
+import BaseCard from 'renderer/features/workbench/components/BaseCard/BaseCard';
+import { selectDependencyState } from '@store/dependency-store/dependencySlice';
+import { AuditSummaryCount, DependencyManifestFile } from '@api/types';
+import { dependencies } from 'webpack';
 import ComponentCard from '../../../../components/ComponentCard/ComponentCard';
 import EmptyResult from './components/EmptyResult/EmptyResult';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
+import DependencyManifestFileCard from '../../../../components/DependencyManifestFileCard/DependencyManifestFileCard';
 
-const filter = (items, query) => {
+const filterComponents = (items, query) => {
   if (!items) {
     return null;
   }
@@ -25,8 +30,24 @@ const filter = (items, query) => {
 
   const result = items.filter((item) => {
     const name = item.name.toLowerCase();
-    const identifiedAsMatch = item.identifiedAs.some(c => c.name.toLowerCase().includes(query.toLowerCase()));
+    const identifiedAsMatch = item.identifiedAs.some((c) => c.name.toLowerCase().includes(query.toLowerCase()));
     return name.includes(query.toLowerCase()) || identifiedAsMatch;
+  });
+
+  return result;
+};
+
+const filterDependencies = (dependencies: DependencyManifestFile[], query: string) => {
+  if (!dependencies) {
+    return null;
+  }
+
+  if (!query) {
+    return dependencies;
+  }
+
+  const result = dependencies.filter((dependency) => {
+    return dependency.path.toLowerCase().includes(query.toLowerCase());
   });
 
   return result;
@@ -40,10 +61,15 @@ export const ComponentList = () => {
   const { limit, onScroll } = usePagination(20);
 
   const { components } = useSelector(selectComponentState);
-  const { isFilterActive } = useSelector(selectNavigationState);
+  const { dependencyManifestFiles } = useSelector(selectDependencyState);
 
+  const { isFilterActive, filter } = useSelector(selectNavigationState);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
-  const filterItems = filter(components, searchQuery);
+  const filteredComponents = filterComponents(components, searchQuery);
+  const filteredDependencies = filterDependencies(dependencyManifestFiles, searchQuery);
+
+  const showDependencySection = (dependencyManifestFiles && filteredDependencies && filteredDependencies.length > 0);
+  const showComponentsSection = (components && filteredComponents && filteredComponents.length > 0);
 
   const onSelectComponent = (component) => {
     navigate({
@@ -54,8 +80,15 @@ export const ComponentList = () => {
     dispatch(setComponent(component));
   };
 
+  const onSelectedDependency = (path: string) => {
+    navigate({
+      pathname: '/workbench/detected/file',
+      search: `?path=file|${encodeURIComponent(path)}`,
+    });
+  };
+
   // loader
-  if (components === null) {
+  if (components === null || dependencyManifestFiles === null) {
     return (
       <Loader message="Loading components" />
     );
@@ -72,41 +105,63 @@ export const ComponentList = () => {
         </header>
 
         <main className="app-content">
-          {components && filterItems && filterItems.length > 0 ? (
-            <section className="component-list">
-              {filterItems.slice(0, limit).map((component, i) => (
-                <ComponentCard key={component.purl} component={component} onClick={onSelectComponent} />
+          <section className={`dependency ${showDependencySection ? '' : 'dependency--hide'}`}>
+            <div className="dependency__header">
+              <p className="dependency__title">Dependencies</p>
+            </div>
+            <div className="card__list">
+              {filteredDependencies.map((d: DependencyManifestFile) => (
+                <BaseCard auditSummaryCount={d.summary} onClick={() => { onSelectedDependency(d.path); }}>
+                  <DependencyManifestFileCard dependencyManifestFile={d} />
+                </BaseCard>
               ))}
-            </section>
-          ) : (
-            <EmptyResult>
-              {searchQuery ? (
-                <>{t('NotResultsFoundWith', { searchQuery })}</>
-              ) : isFilterActive ? (
-                <>
-                  <div className="mb-3">{t('NoComponentsFoundMatching')}</div>
-                  <Button
-                    className="text-uppercase"
-                    size="small"
-                    startIcon={<DeleteForeverOutlinedIcon />}
-                    onClick={() => dispatch(resetFilter())}
-                  >
-                    {t('Button:ClearFilters')}
-                  </Button>
-                </>
-              ) : (
-                <>{t('NoComponentsWereDetected')}</>
-              )}
-            </EmptyResult>
-          )}
+            </div>
+          </section>
 
-          {filterItems?.length > limit && (
+          <section className={`component ${showComponentsSection ? '' : 'component--hide'}`}>
+            <div className="component__header">
+              <p className="component__title">Components</p>
+            </div>
+            <div className="card__list">
+              {filteredComponents.slice(0, limit).map((component, i) => (
+                <BaseCard auditSummaryCount={component.summary} onClick={() => onSelectComponent(component)} key={i}>
+                  <ComponentCard component={component} />
+                </BaseCard>
+              ))}
+            </div>
+          </section>
+
+          { (!showComponentsSection && !showDependencySection)
+              && (
+              <EmptyResult>
+                {searchQuery ? (
+                  <>{t('NotResultsFoundWith', { searchQuery })}</>
+                ) : isFilterActive ? (
+                  <>
+                    <div className="mb-3">{t('NoComponentsFoundMatching')}</div>
+                    <Button
+                      className="text-uppercase"
+                      size="small"
+                      startIcon={<DeleteForeverOutlinedIcon />}
+                      onClick={() => dispatch(resetFilter())}
+                    >
+                      {t('Button:ClearFilters')}
+                    </Button>
+                  </>
+                ) : (
+                  <>{t('NoComponentsWereDetected')}</>
+                )}
+              </EmptyResult>
+              )}
+
+          {filteredComponents?.length > limit && (
             <Alert className="mb-3" severity="info">
               <strong>
-                {t('ShowingLimitOfTotalComponents', { limit, total: filterItems.length })}
+                {t('ShowingLimitOfTotalComponents', { limit, total: filteredComponents.length })}
               </strong>
             </Alert>
           )}
+
         </main>
       </section>
     </div>
