@@ -82,7 +82,7 @@ You might need to specify proxy settings depending on how your network is config
 
 If your network is using a proxy with SSL interception you can include your certificate in the configuration
 
-`  "CA_CERT": "<certificate_path>"`
+`"CA_CERT": "<certificate_path>"`
 
 You can disable any SSL errors, to do so you can change this option to true
 
