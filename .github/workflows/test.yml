@@ -27,11 +27,10 @@ jobs:
 
       - name: npm install
         run: |
-          npm install --frozen-lockfile
+          npm install --frozen-lockfile --legacy-peer-deps
 
       - name: npm test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm run package
-          npm test
+          npm run test
