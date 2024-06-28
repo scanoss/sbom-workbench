@@ -277,21 +277,22 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     f.path,
     SUM(depSummary.identified) as identified,
     SUM(depSummary.ignored) as ignored,
-    SUM(depSummary.total) - (SUM(depSummary.identified) + SUM(depSummary.ignored)) as pending 
+    SUM(depSummary.total) - (SUM(depSummary.identified) + SUM(depSummary.ignored)) as pending
     FROM (
      SELECT d.fileId as fId, COUNT(*) identified, 0 as 'ignored', 0 as 'total' FROM dependencies d
-     INNER JOIN component_versions cv 
-     ON d.purl = cv.purl 
-     AND d.version = cv.version 
-     GROUP BY d.fileId 
-    UNION 
-     SELECT d.fileId as fId, 0  as 'identified', COUNT(*) as ignored, 0 as 'total' 
-     FROM dependencies d 
-     WHERE d.rejectedAt IS NOT NULL 
+     INNER JOIN component_versions cv
+     ON d.purl = cv.purl
+     AND d.version = cv.version
      GROUP BY d.fileId
-    UNION 
+    UNION
+     SELECT d.fileId as fId, 0  as 'identified', COUNT(*) as ignored, 0 as 'total'
+     FROM dependencies d
+     WHERE d.rejectedAt IS NOT NULL
+     GROUP BY d.fileId
+    UNION
      SELECT d.fileId as fId, 0 as 'identified' , 0 as 'ignored', COUNT(*) as total FROM dependencies d GROUP BY (d.fileId)) as depSummary
      INNER JOIN files f ON f.fileId = depSummary.fId
+     WHERE f.path LIKE ?
      GROUP BY depSummary.fId, f.path;`;
 
   // VULNERABILITIES

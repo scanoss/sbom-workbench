@@ -166,9 +166,9 @@ export class DependencyModel extends Model {
     return depencencies;
   }
 
-  public async getSummary(): Promise<Array<ModelDependencySummary>> {
+  public async getSummary(path: string): Promise<Array<ModelDependencySummary>> {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
-    const depencencies = await call(queries.SQL_DEPENDENCY_SUMMARY);
+    const depencencies = await call(queries.SQL_DEPENDENCY_SUMMARY, `${path}%`);
     return depencencies;
   }
 }

@@ -1,5 +1,6 @@
 import Node, { NodeStatus } from './Node';
 import { BlackListAbstract } from './blackList/BlackListAbstract';
+import { Visitor } from './visitor/Visitor';
 
 export default class Folder extends Node {
   private children: Node[];
@@ -16,7 +17,7 @@ export default class Folder extends Node {
 
   someFilteredChild: boolean;
 
-  someNoMatchChild :boolean;
+  someNoMatchChild: boolean;
 
   someMatchChild: boolean;
 
@@ -45,12 +46,12 @@ export default class Folder extends Node {
   }
 
   public order(): void {
-    this.children.sort( (a:Node, b:Node)=>{
-      if(a.getType()!=="folder" && b.getType()==="folder") return 1;
-      if(a.getType()==="folder" && b.getType()!=="folder") return -1;
+    this.children.sort((a: Node, b: Node) => {
+      if (a.getType() !== 'folder' && b.getType() === 'folder') return 1;
+      if (a.getType() === 'folder' && b.getType() !== 'folder') return -1;
       return a.getPath().localeCompare(b.getPath());
-    })
-    this.children.forEach((c)=> c.order());
+    });
+    this.children.forEach((c) => c.order());
   }
 
   public addChild(node: Node): void {
@@ -108,45 +109,44 @@ export default class Folder extends Node {
       if (status === NodeStatus.PENDING && !child.isDependency()) this.hasPendingProgress = true;
       if (status === NodeStatus.IGNORED && !child.isDependency()) this.hasIgnoredProgress = true;
       if (
-        this.hasPending &&
-        this.hasIdentified &&
-        this.hasIgnored &&
-        this.hasNoMatch &&
-        this.hasFiltered &&
-        this.hasIdentifiedProgress &&
-        this.hasPendingProgress &&
-        this.hasIgnoredProgress
-      )
-        break;
+        this.hasPending
+        && this.hasIdentified
+        && this.hasIgnored
+        && this.hasNoMatch
+        && this.hasFiltered
+        && this.hasIdentifiedProgress
+        && this.hasPendingProgress
+        && this.hasIgnoredProgress
+      ) break;
     }
   }
 
-public updateFlags() : void {
- for(let i = 0  ; i < this.children.length ; i +=1){
-   const c = this.children[i];
-    c.updateFlags();
-    const someMatch = c.someMatch();
-    const someFiltered = c.someFiltered();
-    const someNoMatch = c.someNoMatch();
-    if(someFiltered) this.someFilteredChild = someFiltered;
-    if(someNoMatch) this.someNoMatchChild = someNoMatch;
-    if(someMatch) this.someMatchChild = someMatch;
+  public updateFlags(): void {
+    for (let i = 0; i < this.children.length; i += 1) {
+      const c = this.children[i];
+      c.updateFlags();
+      const someMatch = c.someMatch();
+      const someFiltered = c.someFiltered();
+      const someNoMatch = c.someNoMatch();
+      if (someFiltered) this.someFilteredChild = someFiltered;
+      if (someNoMatch) this.someNoMatchChild = someNoMatch;
+      if (someMatch) this.someMatchChild = someMatch;
+    }
   }
-}
 
-public someMatch(): boolean {
-  return this.someMatchChild;
-}
+  public someMatch(): boolean {
+    return this.someMatchChild;
+  }
 
-  public someFiltered():boolean{
+  public someFiltered(): boolean {
     return this.someFilteredChild;
   }
 
-  public someNoMatch():boolean{
+  public someNoMatch(): boolean {
     return this.someNoMatchChild;
   }
 
-  public identifiedProgress():boolean {
+  public identifiedProgress(): boolean {
     return this.hasIdentifiedProgress;
   }
 
@@ -322,5 +322,17 @@ public someMatch(): boolean {
       if (child.getName() === filename) return true;
     }
     return false;
+  }
+
+  public accept<T>(visitor: Visitor<T>): T {
+    return visitor.VisitFolder(this);
+  }
+
+  public removeChild(node: Node) {
+    this.children = this.getChildren().filter((child) => child !== node);
+  }
+
+  public isEmpty(): boolean {
+    return this.getChildren().length === 0;
   }
 }

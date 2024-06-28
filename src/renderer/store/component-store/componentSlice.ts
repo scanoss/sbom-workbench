@@ -24,7 +24,7 @@ export const componentSlice = createSlice({
   initialState,
   reducers: {
     setComponents: (state, action: PayloadAction<ComponentGroup[]>) => {
-      state.components = action.payload;
+     state.components = action.payload;
     },
     setComponent: (state, action: PayloadAction<ComponentGroup | null>) => {
       state.component = action.payload;

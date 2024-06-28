@@ -66,7 +66,7 @@ const DependencyViewer = () => {
   const workedItems: Array<Dependency> = items?.filter((item) => item.status === 'identified' || item.status === 'original');
 
   const init = async () => {
-    dispatch(reset());
+    // dispatch(reset());
     setLocalFileContent({ content: null, error: false });
     if (file) {
       dispatch(getAll(file));
@@ -161,7 +161,7 @@ const DependencyViewer = () => {
         </div>
 
         <div className="search-box">
-          
+
           <Paper className="search-bar">
             <SearchBox
               disabled={view === CodeViewSelectorMode.CODE}

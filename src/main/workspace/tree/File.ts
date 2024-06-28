@@ -1,11 +1,12 @@
 import Node, { NodeStatus } from './Node';
 import { BlackListAbstract } from './blackList/BlackListAbstract';
+import { Visitor } from './visitor/Visitor';
 
 export default class File extends Node {
   private isDependencyFile: boolean;
 
-  constructor(name: string, path: string) {
-    super(name, path);
+  constructor(path: string, name: string) {
+    super(path, name);
     this.type = 'file';
     this.isDependencyFile = false;
     this.isBinaryFile = false;
@@ -54,11 +55,11 @@ export default class File extends Node {
   }
 
   public someNoMatch(): boolean {
-    return (this.original === 'NO-MATCH' && this.getAction() === 'scan');
+    return this.original === 'NO-MATCH' && this.getAction() === 'scan';
   }
 
   public someMatch(): boolean {
-    return (this.original === 'MATCH' && this.getAction() === 'scan');
+    return this.original === 'MATCH' && this.getAction() === 'scan';
   }
 
   public restoreStatus(path: string) {
@@ -143,7 +144,8 @@ export default class File extends Node {
 
   public addDependency(path: string): void {
     if (this.getPath() === path) {
-      if (this.status !== NodeStatus.IDENTIFIED) { // only adds new dependencies
+      if (this.status !== NodeStatus.IDENTIFIED) {
+        // only adds new dependencies
         this.status = NodeStatus.PENDING;
         this.setStatusOnClassnameAs(this.status);
       }
@@ -194,12 +196,13 @@ export default class File extends Node {
     return this.getName() === filename;
   }
 
-  public order():void {
-  }
+  public order(): void {}
 
-  public updateStatusFlags() {
-  }
+  public updateStatusFlags() {}
 
-  public updateFlags() {
+  public updateFlags() {}
+
+  public accept<T>(visitor: Visitor<T>) {
+    return visitor.VisitFile(this);
   }
 }

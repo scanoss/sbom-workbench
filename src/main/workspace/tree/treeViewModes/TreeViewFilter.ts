@@ -4,7 +4,7 @@ import Node from '../Node';
 import { TreeViewMode } from './TreeViewMode';
 
 export abstract class TreeViewFilter extends TreeViewMode {
-  private filter: any;
+  protected filter: any;
 
   constructor(filter: any) {
     super();
