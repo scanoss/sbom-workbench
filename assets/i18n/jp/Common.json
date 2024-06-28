@@ -91,5 +91,7 @@
   "PreRequiste": "前条件",
   "ObfuscateFilePaths": "不明瞭なファイルパス",
   "ObfuscateFilePathsHint": "ファイルパスは秘密性を保持するため難読化されます",
-  "NewGroup": "New Group"
+  "NewGroup": "New Group",
+  "NoDependenciesFoundMatching": "No dependencies found matching the current filter criteria",
+  "NoDependenciesWereDetected": "No dependencies were detected"
 }

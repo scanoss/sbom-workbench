@@ -1,16 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import usePagination from '@hooks/usePagination';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetFilter, selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { selectComponentState } from '@store/component-store/componentSlice';
 import { useTranslation } from 'react-i18next';
 import Loader from '@components/Loader/Loader';
 import BaseCard from 'renderer/features/workbench/components/BaseCard/BaseCard';
-import { selectDependencyState } from '@store/dependency-store/dependencySlice';
 import { DependencyManifestFile } from '@api/types';
 import DependencyManifestFileCard from 'renderer/features/workbench/components/DependencyManifestFileCard/DependencyManifestFileCard';
-import SearchBox from '@components/SearchBox/SearchBox';
 import { Button } from '@mui/material';
 import EmptyResult from './components/EmptyResult/EmptyResult';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
@@ -32,13 +29,11 @@ const filterDependencies = (dependencies: DependencyManifestFile[], query: strin
   return result;
 };
 
-export const Dependency = ({ limit }) => {
+export const Dependency = ({ limit, dependencyManifestFiles }) => {
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const { components } = useSelector(selectComponentState);
-  const { dependencyManifestFiles } = useSelector(selectDependencyState);
   const { isFilterActive, filter } = useSelector(selectNavigationState);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const filteredDependencies = filterDependencies(dependencyManifestFiles, searchQuery);  
@@ -59,14 +54,10 @@ export const Dependency = ({ limit }) => {
   }
 
 
-
-
 return (
     <>
     <div id='main-box'>
-      <div className="search-box">
-        <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
-      </div>         
+     
 
       <section className={`dependency ${showDependencySection ? '' : 'dependency--hide'}`}>
             <div className="card__list">
@@ -85,7 +76,7 @@ return (
                   <>{t('NotResultsFoundWith', { searchQuery })}</>
                 ) : isFilterActive ? (
                   <>
-                    <div className="mb-3">{t('NoComponentsFoundMatching')}</div>
+                    <div className="mb-3">{t('NoDependenciesFoundMatching')}</div>
                     <Button
                       className="text-uppercase"
                       size="small"
@@ -96,7 +87,7 @@ return (
                     </Button>
                   </>
                 ) : (
-                  <>{t('NoComponentsWereDetected')}</>
+                  <>{t('NoDependenciesWereDetected')}</>
                 )}
               </EmptyResult>
       )}

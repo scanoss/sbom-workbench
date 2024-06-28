@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
+import { NavLink, Route, Routes, useNavigate , useLocation } from 'react-router-dom';
 import { Button, Tooltip } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectComponentState } from '@store/component-store/componentSlice';
@@ -11,7 +11,8 @@ import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import { Component } from './Component';
 import { Dependency } from './Dependency';
 import usePagination from '@hooks/usePagination';
-import { idID } from '@mui/material/locale';
+import SearchBox from '@components/SearchBox/SearchBox';
+
 
 // Move to common module
 const filterComponents = (items, query) => {
@@ -54,6 +55,7 @@ export const ComponentList = () => {
   const { t } = useTranslation();
   const { limit, onScroll } = usePagination(20);
   const navigate = useNavigate();
+  const location = useLocation();
   const { components } = useSelector(selectComponentState);
   const { dependencyManifestFiles } = useSelector(selectDependencyState);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
@@ -61,36 +63,41 @@ export const ComponentList = () => {
   const filteredDependencies = filterDependencies(dependencyManifestFiles, searchQuery);
   const [ showComponentsSection, setComponentSection ] = useState<boolean>(null);
   const [ showDependencySection, setDependencySection ] = useState<boolean>(null);
+  const [ fileTreeSearchPath, setFileTreeSearchPath ] = useState<string>("");
 
+
+  useEffect(() => {  
+    setFileTreeSearchPath(location.search);   
+
+   }, [location]);
 
   useEffect(() => {
-    console.log("components");
-    const showComponents = components && filteredComponents && filteredComponents.length > 0;
+    const showComponents = (components && filteredComponents && filteredComponents.length > 0);
     setComponentSection(showComponents);
-  }, [components, filteredComponents]);
+  }, [components]);
 
   useEffect(() => {
-    console.log("dependencies");
-    const showDependencies = dependencyManifestFiles && filteredDependencies && filteredDependencies.length > 0;
+    const showDependencies = (dependencyManifestFiles && filteredDependencies && filteredDependencies.length > 0);
     setDependencySection(showDependencies);
-  }, [dependencyManifestFiles, filteredDependencies]);
+  }, [dependencyManifestFiles]);
 
 
   useEffect(() => {
-    if (showComponentsSection !==null && showDependencySection!=null) {
-      if(showComponentsSection){
-        navigate('components', { replace: true });
+    if (showComponentsSection !==null && showDependencySection!=null) {     
+      if(showComponentsSection){        
+        navigate(`components${fileTreeSearchPath}`, { replace: true });
         return;
       }
 
       if(showDependencySection){
-        navigate('dependencies', { replace: true });
+        navigate(`dependencies${fileTreeSearchPath}`, { replace: true });
         return;
       }
       
-      navigate('components', { replace: true });
+      navigate(`components${fileTreeSearchPath}`, { replace: true });
     }
-  }, [showDependencySection , showComponentsSection]);
+  }, [fileTreeSearchPath ,showDependencySection , showComponentsSection]);
+
  
 
   // loader
@@ -106,25 +113,28 @@ export const ComponentList = () => {
         <header className="app-header">
           <Breadcrumb />
           <section className="nav">
-            <NavLink to="components" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} tabIndex={-1} >
+            <NavLink to={`components${fileTreeSearchPath}`} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} tabIndex={-1} >
               <Tooltip
                 title={'Detected Components'}             >
                 <Button size="large">Components</Button>
               </Tooltip>
             </NavLink>
-            <NavLink to="dependencies" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} tabIndex={-1} >
+            <NavLink to={`dependencies${fileTreeSearchPath}`} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} tabIndex={-1} >
               <Tooltip
                 title={'Detected Dependencies'}             >
                 <Button  size="large">Dependencies</Button>
               </Tooltip>
             </NavLink>
           </section>
+          <div className="search-box">
+            <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
+          </div>
         </header>
 
         <main className="app-content">
           <Routes>
-            <Route path="components" element={<Component limit={limit}/>} />
-            <Route path="dependencies" element={<Dependency limit={limit}/>} />          
+            <Route path="components/*" element={<Component limit={limit} components={filteredComponents} showComponentsSection={showComponentsSection}/>} />
+            <Route path="dependencies/*" element={<Dependency limit={limit} dependencyManifestFiles={filteredDependencies}/>} />          
           </Routes> 
         </main>
       </section>

@@ -100,5 +100,7 @@
   "Current": "Current",
   "Default": "Default",
   "NotScanned": "Not scanned",
-  "NewGroup": "New Group"
+  "NewGroup": "New Group",
+  "NoDependenciesFoundMatching": "No dependencies found matching the current filter criteria",
+  "NoDependenciesWereDetected": "No dependencies were detected"
 }

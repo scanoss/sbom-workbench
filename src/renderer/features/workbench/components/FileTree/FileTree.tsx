@@ -128,7 +128,7 @@ const FileTree = () => {
       });
     } else {
       navigate({
-        pathname: '/workbench/detected',
+        pathname: '/workbench/detected/components',
         search: node.value ? `?path=folder|${encodeURIComponent(value)}` : null,
       });
     }

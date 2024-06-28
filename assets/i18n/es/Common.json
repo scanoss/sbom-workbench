@@ -96,5 +96,7 @@
   "HPSMHint": "HPSM requiere una suscripción premium",
   "Current": "Actual",
   "Default": "Default",
-  "NewGroup": "Nuevo Grupo"
+  "NewGroup": "Nuevo Grupo",
+  "NoDependenciesFoundMatching": "No dependencies found matching the current filter criteria",
+  "NoDependenciesWereDetected": "No dependencies were detected"
 }
