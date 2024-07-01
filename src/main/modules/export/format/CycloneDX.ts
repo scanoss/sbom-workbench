@@ -26,17 +26,20 @@ export class CycloneDX extends Format {
       CDX.Enums.ComponentType.Application,
       this.project.project_name,
     );
-    bom.metadata.licenses.add(
-      new CDX.Models.SpdxLicense(
-        this.project.metadata.getLicense(),
-      ),
-    );
+
+    if (this.project.metadata.getLicense()) {
+      bom.metadata.licenses.add(
+        new CDX.Models.SpdxLicense(
+          this.project.metadata.getLicense(),
+        ),
+      );
+    }
 
     let sbomWorkbenchComponents = this.source === ExportSource.IDENTIFIED
       ? await this.export.getIdentifiedData()
       : await this.export.getDetectedData();
 
-    // Remove duplicated, this is because the query returns multiple rows with the same purl & version.
+    // Remove duplicated components, this is because the query returns multiple rows with the same purl & version.
     // TODO: Create a specific query to get DISTINCT purls, versions & licenses
     const compRepository = new Map<string, ExportData>();
     sbomWorkbenchComponents.forEach((comp) => {
@@ -46,24 +49,26 @@ export class CycloneDX extends Format {
     sbomWorkbenchComponents = Array.from(compRepository.values());
 
     // Add components to CycloneDX with each respective license
-    sbomWorkbenchComponents.forEach((sbomWorkbenchComponent) => {
+    sbomWorkbenchComponents.forEach((storedComponent) => {
       const licenseRepository = new CDX.Models.LicenseRepository();
-      if (sbomWorkbenchComponent.detected_license) {
-        licenseRepository.add(new CDX.Models.SpdxLicense(sbomWorkbenchComponent.detected_license, { acknowledgement: CDX.Enums.LicenseAcknowledgement.Declared }));
+      if (storedComponent.detected_license) {
+        licenseRepository.add(new CDX.Models.SpdxLicense(storedComponent.detected_license, { acknowledgement: CDX.Enums.LicenseAcknowledgement.Declared }));
       }
-      if (this.source === ExportSource.IDENTIFIED && sbomWorkbenchComponent.identified_license) {
-        licenseRepository.add(new CDX.Models.SpdxLicense(sbomWorkbenchComponent.identified_license, { acknowledgement: CDX.Enums.LicenseAcknowledgement.Concluded }));
+      if (this.source === ExportSource.IDENTIFIED && storedComponent.identified_license) {
+        licenseRepository.add(new CDX.Models.SpdxLicense(storedComponent.identified_license, { acknowledgement: CDX.Enums.LicenseAcknowledgement.Concluded }));
       }
 
       const externalReferenceRepository = new CDX.Models.ExternalReferenceRepository();
-      externalReferenceRepository.add(new CDX.Models.ExternalReference(sbomWorkbenchComponent.url, CDX.Enums.ExternalReferenceType.Website));
+      if (storedComponent.url) {
+        externalReferenceRepository.add(new CDX.Models.ExternalReference(storedComponent.url, CDX.Enums.ExternalReferenceType.Website));
+      }
 
       const cdxComponent = new CDX.Models.Component(
         CDX.Enums.ComponentType.Library,
-        sbomWorkbenchComponent.detected_component,
+        this.source === ExportSource.IDENTIFIED ? storedComponent.identified_component : storedComponent.detected_component,
         {
-          purl: PackageURL.fromString(sbomWorkbenchComponent.purl),
-          version: sbomWorkbenchComponent.version,
+          purl: PackageURL.fromString(storedComponent.purl.replace('@', '%40')),
+          version: storedComponent.version,
           licenses: licenseRepository,
           externalReferences: externalReferenceRepository,
         },
