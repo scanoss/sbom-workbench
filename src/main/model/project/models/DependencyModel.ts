@@ -1,6 +1,7 @@
 import util from 'util';
 import { Dependency } from '@api/types';
 import sqlite3 from 'sqlite3';
+import { PackageURL } from 'packageurl-js';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { queries } from '../../querys_db';
 import { Dependency as Dep, ModelDependencySummary } from '../../entity/Dependency';
@@ -30,7 +31,7 @@ export class DependencyModel extends Model {
           this.connection.run(
             queries.SQL_DEPENDENCIES_INSERT,
             d.fileId,
-            d.purl ? decodeURIComponent(d.purl) : null,
+            d.purl ? d.purl : null,
             d.version ? d.version : null,
             d.scope ? d.scope : null,
             d.licenses.length > 0 ? d.licenses.join(',') : null,

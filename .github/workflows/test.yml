@@ -21,17 +21,17 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: 15
+          node-version: 21
 
       - name: npm install
         run: |
-          npm install --frozen-lockfile
+          npm install --frozen-lockfile --legacy-peer-deps
 
       - name: npm test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm run package
-          npm test
+          npm run test

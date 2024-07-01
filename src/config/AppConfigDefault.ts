@@ -27,6 +27,7 @@ export const AppConfigDefault: IAppConfig = {
     ExportFormat.WFP,
     ExportFormat.CSV,
     ExportFormat.SPDXLITEJSON,
+    ExportFormat.CYCLONEDX,
     ExportFormat.HTMLSUMMARY,
   ],
   FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN: false,
