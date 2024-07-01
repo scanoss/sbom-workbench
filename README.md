@@ -93,7 +93,8 @@ You can disable any SSL errors, to do so you can change this option to true
 
 Local cryptography can be detected by SBOM-Workbench when an API key is set.
 
-A default set of rules is defined for local cryptography detection. However, a custom set of rules can be defined at the root of the project with the following name: __scanoss-crypto-rules.json.
+A default set of rules is defined for local cryptography detection. However, a custom set of rules can be defined at the root of the project to be scanned with the following name  **scanoss-crypto-rules.json**.
+A sample file can be found [here](./samples/scanoss-crypto-rules.json).
 
 Example structure of the file:
 
