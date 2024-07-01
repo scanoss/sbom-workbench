@@ -88,6 +88,35 @@ You can disable any SSL errors, to do so you can change this option to true
 
 `"IGNORE_CERT_ERRORS": true`
 
+
+### Local Cryptography Detection
+
+Local cryptography can be detected by SBOM-Workbench when an API key is set.
+
+A default set of rules is defined for local cryptography detection. However, a custom set of rules can be defined at the root of the project with the following name: __scanoss-crypto-rules.json.
+
+Example structure of the file:
+
+```json
+[
+   {
+    "algorithm": "md5",
+    "strength": "128",
+    "keywords": [
+      "md5_file",
+      "md5",
+      "md5crypt",
+      "aprcrypt",
+      "md5_encrypt",
+      "md5_block_data_order",
+      "ossl_md5_sha1_",
+      "MD5_Init"
+    ]
+  }
+]
+```
+
+
 ## [Collaborative Workspace](COLLAB_WORKSPACE.md)
 
 The SBOM Workbench includes support for a collaborative workspace, a feature designed to enhance teamwork. View more details [here](COLLAB_WORKSPACE.md).
