@@ -23,8 +23,17 @@ export function sortIdentifyFilesComparator(a, b) {
 }
 
 export async function getContextFiles(scanRoot: string) {
-  const files = await fs.promises.readdir(scanRoot);
+  const stats = await fs.promises.stat(scanRoot);
+  const isDirectory = stats.isDirectory();
 
+  if (!isDirectory) {
+    return {
+      identifyFile: null,
+      ignoreFile: null,
+    };
+  }
+
+  const files = await fs.promises.readdir(scanRoot);
   const identifyFiles = [];
   const ignoreFiles = [];
   // Test string
