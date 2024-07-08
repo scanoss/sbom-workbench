@@ -13,6 +13,9 @@ import { ITask } from '../Task';
 import { IExportResult } from '../../modules/export/IExportResult';
 import { ExportFormat, InventoryType } from '../../../api/types';
 import { Crypto } from '../../modules/export/format/Crypto';
+import { CycloneDX } from '../../modules/export/format/CycloneDX';
+import { workspace } from '../../workspace/Workspace';
+import { ExportModel } from '../../modules/export/Model/ExportModel';
 
 export class Export implements ITask<string, IExportResult> {
   private format: Format;
@@ -51,6 +54,9 @@ export class Export implements ITask<string, IExportResult> {
         break;
       case ExportFormat.SPDXLITEJSON:
         this.format = new SpdxLiteJson(exportDTO.source);
+        break;
+      case ExportFormat.CYCLONEDX:
+        this.format = new CycloneDX(exportDTO.source, workspace.getOpenedProjects()[0], new ExportModel());
         break;
       case ExportFormat.HTMLSUMMARY:
         this.format = new HtmlSummary(exportDTO.source);

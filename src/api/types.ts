@@ -186,6 +186,7 @@ export enum ExportFormat {
   RAW = 'RAW',
   WFP = 'WFP',
   SPDXLITEJSON = 'SPDXLITEJSON',
+  CYCLONEDX = 'CYCLONEDX',
   HTMLSUMMARY = 'HTMLSUMMARY',
 }
 
