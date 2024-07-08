@@ -86,7 +86,7 @@ export const IdentifiedList = () => {
 
       <main className="app-content">
         {filterItems && filterItems.length > 0 ? (
-          <section className="component-list">
+          <section className="identified-list">
             {filterItems.slice(0, limit).map((inventory) => (
               <RecognizedCard
                 key={inventory.component}
