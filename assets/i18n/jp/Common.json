@@ -12,7 +12,7 @@
   "NotResultsFoundWith": "結果が見つかりません \"{{searchQuery}}\"",
   "NoComponentsFoundMatching": "指定された条件ではコンポーネントが見つかりません",
   "NoComponentsWereDetected": "コンポーネントが検出されませんでした",
-  "ShowingLimitOfTotalComponents": " {{limit}} of {{filterItems.length}} コンポーネント表示.",
+  "ShowingLimitOfTotalComponents": " {{limit}} of {{total}} コンポーネント表示.",
   "CountVersions": "{{count}} バージョン",
   "NoPendingFiles": "ペンディングファイルなし",
   "NoPendingFilesWith": "ペンディングファイルなし \"{{searchQuery}}\"",
@@ -91,5 +91,7 @@
   "PreRequiste": "前条件",
   "ObfuscateFilePaths": "不明瞭なファイルパス",
   "ObfuscateFilePathsHint": "ファイルパスは秘密性を保持するため難読化されます",
-  "NewGroup": "New Group"
+  "NewGroup": "New Group",
+  "NoDependenciesFoundMatching": "No dependencies found matching the current filter criteria",
+  "NoDependenciesWereDetected": "No dependencies were detected"
 }

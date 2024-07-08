@@ -3,18 +3,20 @@
   height: 230px;
 
   button {
+    height: 100%;
     width: 100%;
     font-size: 60px;
     text-align: left;
+    padding-block-start: 25px;
   }
 
   .component-card-content {
     padding-top: 0;
     padding-bottom: 0 !important;
     height: 100%;
-
+    width: 100%;
     display: grid;
-    grid-template-rows: auto 75px 45px;
+    grid-template-rows: auto 75px 50px;
 
     p {margin: 0;}
 

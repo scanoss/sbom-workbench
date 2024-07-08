@@ -1,4 +1,5 @@
 import { BlackListAbstract } from './blackList/BlackListAbstract';
+import { Visitor } from './visitor/Visitor';
 
 export enum NodeStatus {
   FILTERED = 'FILTERED',
@@ -193,4 +194,6 @@ export default abstract class Node {
 
   // Only looks for a specific filename one depth level. WARNING: It does not verify in subfolders!
   public abstract containsFile(filename: string): boolean;
+
+  public abstract accept<T>(visitor: Visitor<T>): T;
 }

@@ -1,32 +1,102 @@
 #ComponentList, #IdentifiedList {
   display: grid;
-  // grid-template-rows: auto 1fr;
+  grid-template-rows: auto 1fr;
   height: 100%;
 
   .app-page {
     height: 100%;
     display: grid;
+
   }
 
+
+
   .app-header {
+
     .search-box {
-      width: $search-box-width
+      width: $search-box-width;
+      padding-top: 3em;
+    }
+  
+
+
+    .nav {
+        display: flex;
+        gap: 5px;
+      .MuiButton-root {
+        background: #d4d4d8;
+        color: #505055;
+        font-weight: 600;
+        padding: 8px 20px;
+      }
+  
+      .active {
+        .MuiButton-root {
+          background-color: white;
+          color: black;
+        }
+      }
+
+      .disabled{
+        pointer-events: none;
+      }
     }
   }
 
   .app-content {
-    // height: 100%;
     overflow-y: visible;
+    display: grid;
+
+    #main-box{
+      padding-top: 10px;
+      display: flex;
+      flex-flow: column;
+      gap: 20px;
+
+      .search-box{
+        width: 40%;
+      }
+    }
+
   }
 
-  .component-list {
+
+
+
+  .dependency {
+    margin-block-end: 10px;
+  }
+
+  .dependency--hide, .component--hide {
+    display:none;
+  }
+
+  .dependency__title, .component__title {
+    margin-block: 0;
+    padding-block-end: 6px;
+    font-family: "Inter","Roboto","Helvetica","Arial",sans-serif;
+    color: var(--text-color-primary);
+    color: #505050db;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  .dependency__header, .component__header {
+    border-block-end: 1px solid #50505049;
+    margin-block-end: 20px;
+  }
+
+  .card__list {
     display: grid;
     grid-template-columns: repeat(auto-fill, 200px);
     grid-row-gap: 1.5em;
     grid-column-gap: 1.5em;
     overflow-y: scroll;
     padding-bottom: 10px;
+    margin-block-end: 0;
   }
-}
 
+
+
+}
 

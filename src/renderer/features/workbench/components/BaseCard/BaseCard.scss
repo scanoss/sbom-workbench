@@ -1,0 +1,42 @@
+.base-card {
+  width: 100%;
+  height: 100%;
+
+  .base-card__button {
+    width: 100%;
+    height: 100%;
+  }
+
+  .base-card__content {
+    padding-top: 0;
+    padding-bottom: 0 !important;
+    height: 100%;
+    width: 100%;
+    font-size: 16px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+
+    .base-card__files {
+      border-top: 1px solid #E4E4E7;
+      padding: 10px 0;
+      display: flex;
+
+      &.pending .info-count.pending { opacity: 1; }
+      &.original .info-count.ignored { opacity: 1; }
+      &.identified .info-count.identified { opacity: 1; }
+
+      .info-count {
+        display: flex;
+        align-items: center;
+        margin-right: 10px;
+        font-size: 16px;
+        font-weight: 400;
+      }
+    }
+  }
+
+
+}

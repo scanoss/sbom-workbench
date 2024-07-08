@@ -12,6 +12,11 @@ export const getAll = createAsyncThunk('dependency/fetchAll', async (path: strin
   return response;
 });
 
+export const getAllManifestFiles = createAsyncThunk('dependency/fetchAllManifestFiles', async () => {
+  const response = await dependencyService.getManifestFileSummary();
+  return response;
+});
+
 export const accept = createAsyncThunk('dependency/accept', async (dependencyDTO: NewDependencyDTO) => {
   const response = await dependencyService.accept(dependencyDTO);
   return response;
@@ -32,7 +37,7 @@ export const acceptAll = createAsyncThunk(
   async (acceptAllDependeciesDTO: AcceptAllDependeciesDTO) => {
     const response = await dependencyService.acceptAll(acceptAllDependeciesDTO);
     return response;
-  }
+  },
 );
 
 export const rejectAll = createAsyncThunk(
@@ -40,7 +45,7 @@ export const rejectAll = createAsyncThunk(
   async (rejectAllDependeciesDTO: RejectAllDependeciesDTO) => {
     const response = await dependencyService.rejectAll(rejectAllDependeciesDTO);
     return response;
-  }
+  },
 );
 
 export const restoreAll = createAsyncThunk(
@@ -48,5 +53,5 @@ export const restoreAll = createAsyncThunk(
   async (restoreAllDependenciesDTO: RestoreAllDependenciesDTO) => {
     const response = await dependencyService.restoreAll(restoreAllDependenciesDTO);
     return response;
-  }
+  },
 );

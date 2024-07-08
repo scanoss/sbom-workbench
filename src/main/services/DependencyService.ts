@@ -2,13 +2,15 @@ import log from 'electron-log';
 import { IDependencyResponse } from 'scanoss';
 import { ModelDependencyManifest } from 'main/model/entity/Dependency';
 import { LicenseDTO, NewDependencyDTO } from '../../api/dto';
-import { Component, Dependency, DependencyManifestFile, FileStatusType, License } from '../../api/types';
+import { Component, Dependency, DependencyManifestFile, FileStatusType, FileUsageType, License } from '../../api/types';
 import { dependencyHelper } from '../helpers/DependencyHelper';
 import { fileHelper } from '../helpers/FileHelper';
 import { licenseHelper } from '../helpers/LicenseHelper';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { modelProvider } from './ModelProvider';
 import { ComponentSource } from '../model/entity/ComponentVersion';
+import { workspace } from '../workspace/Workspace';
+import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 
 class DependencyService {
   public async insert(dependencies: IDependencyResponse): Promise<void> {
@@ -309,7 +311,12 @@ class DependencyService {
 
   public async getSummary(): Promise<Array<DependencyManifestFile>> {
     try {
-      const modelSummary: Array<ModelDependencyManifest> = await modelProvider.model.dependency.getSummary();
+      const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
+
+      if (filter?.usage && filter.usage !== FileUsageType.DEPENDENCY) { return []; }
+
+      const input = filter?.path ? filter.path : '';
+      const modelSummary: Array<ModelDependencyManifest> = await modelProvider.model.dependency.getSummary(input);
 
       const dependencyManifestFiles: DependencyManifestFile[] = modelSummary.map((d: ModelDependencyManifest): DependencyManifestFile => ({
         fileId: d.fileId,
@@ -318,10 +325,22 @@ class DependencyService {
           identified: d.identified,
           ignored: d.ignored,
           pending: d.pending,
-        }
+        },
       }));
 
-      return dependencyManifestFiles ;
+      if (filter?.status && filter.status === FileStatusType.ORIGINAL) {
+        return dependencyManifestFiles.filter((d) => d.summary.ignored > 0);
+      }
+
+      if (filter?.status && filter.status === FileStatusType.IDENTIFIED) {
+        return dependencyManifestFiles.filter((d) => d.summary.identified > 0);
+      }
+
+      if (filter?.status && filter.status === FileStatusType.PENDING) {
+        return dependencyManifestFiles.filter((d) => d.summary.pending > 0);
+      }
+
+      return dependencyManifestFiles;
     } catch (error: any) {
       log.error(error);
       throw error;

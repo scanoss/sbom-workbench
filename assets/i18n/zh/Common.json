@@ -12,7 +12,7 @@
   "NotResultsFoundWith": "未找到结果 \"{{searchQuery}}\"",
   "NoComponentsFoundMatching": "找不到符合当前筛选条件的组件",
   "NoComponentsWereDetected": "未检测到任何组件",
-  "ShowingLimitOfTotalComponents": "显示 {{limit}}的{{filterItems.length}}组件。",
+  "ShowingLimitOfTotalComponents": "显示 {{limit}}的{{total}}组件。",
   "CountVersions": "{{count}} 版本",
   "NoPendingFiles": "没有待定文件",
   "NoPendingFilesWith": "未找到待定的文件\"{{searchQuery}}\"",
@@ -77,5 +77,7 @@
   "ClickOrEnterToAddValue": "点击或输入添加 \"{{value}}\"",
   "SettingsApiKeyHint": "此值对于专用 SCANOSS 服务器实例是可选的。 当此值为空时，将针对我们的免费公共服务启动扫描。 如果您对可用性和吞吐量有保证的专用实例感兴趣，请通过 sales@scanoss.com 联系我们。",
   "WorkspaceIsReduced": "工作区上下文减少，因为有启动的过滤器。",
-  "NewGroup": "New Group"
+  "NewGroup": "New Group",
+  "NoDependenciesFoundMatching": "No dependencies found matching the current filter criteria",
+  "NoDependenciesWereDetected": "No dependencies were detected"
 }
