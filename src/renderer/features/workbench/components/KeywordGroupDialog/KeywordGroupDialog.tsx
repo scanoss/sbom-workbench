@@ -84,11 +84,15 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
       label: string;
       words: Array<string>;
     }>>({ words: [] });
+    const [inputValue, setInputValue] = React.useState("");
 
     const resetFields = ()=>{
-      searchQuery.current = [];
+      searchQuery.current = null;
       setForm({words:[], label:'' });
       setValue([]);
+      isEditMode = false;
+      groupEdit = null;
+      setInputValue("");
     };
 
     const cancel = () => {
@@ -185,7 +189,11 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
                   size="small"
                   options={['license', 'copyright', 'author', 'version']}
                   freeSolo
-                  value={value}
+                  onInputChange={(event, newInputValue) => {
+                    setInputValue(newInputValue);
+                  }}
+                  inputValue={inputValue}
+                  value = {value}
                   renderTags={(value: readonly string[], getTagProps) =>
                     value.map((option: string, index: number) => (
                       // eslint-disable-next-line react/jsx-key
