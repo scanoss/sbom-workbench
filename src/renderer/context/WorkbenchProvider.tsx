@@ -35,6 +35,7 @@ export const WorkbenchProvider: React.FC<any> = ({ children }) => {
     dispatch(setTree(fileTree));
   };
   const setNode = async (node: Node) => dispatch(setCurrentNode(node));
+  
 
   /**
    * Dispatch load action when a filter is set

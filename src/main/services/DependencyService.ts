@@ -311,7 +311,7 @@ class DependencyService {
 
   public async getSummary(): Promise<Array<DependencyManifestFile>> {
     try {
-      const filter = workspace.getOpenedProjects()[0].getGlobalFilter();
+      const filter = workspace.getOpenedProjects()[0]?.getGlobalFilter();
 
       if (filter?.usage && filter.usage !== FileUsageType.DEPENDENCY) { return []; }
 
