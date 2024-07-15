@@ -20,7 +20,7 @@ import * as report from '@store/report-store/reportSlice';
 
 import { loadProject } from '@store/workbench-store/workbenchThunks';
 import {
-  accept, getAll, getAllManifestFiles, reject, rejectAll, restore,
+  accept, getAll, getAllManifestFiles, reject, rejectAll, restore, acceptAll, restoreAll
 } from '@store/dependency-store/dependencyThunks';
 import { dialogController } from 'renderer/controllers/dialog-controller';
 import { setCurrentProject } from './workspace-store/workspaceSlice';
@@ -51,6 +51,7 @@ rootMiddleware.startListening({
     if (state.component.component) {
       listenerApi.dispatch(fetchComponent(state.component.component.purl));
     }
+  
   },
 });
 
@@ -70,6 +71,8 @@ rootMiddleware.startListening({
     reject.fulfilled,
     rejectAll.fulfilled,
     restore.fulfilled,
+    acceptAll.fulfilled,
+    restoreAll.fulfilled,
     load, // this is a workaround for the fact that still has setFilter on WorkbenchContext
   ),
   effect: async (action, listenerApi) => {
@@ -88,6 +91,7 @@ rootMiddleware.startListening({
   effect: async (action, listenerApi) => {
     const summary = await reportService.getSummary();
     listenerApi.dispatch(setProgress(summary));
+    listenerApi.dispatch(getAllManifestFiles());
   },
 });
 
