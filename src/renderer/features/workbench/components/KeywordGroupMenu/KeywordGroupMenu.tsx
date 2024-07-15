@@ -46,10 +46,12 @@ export const KeywordGroupMenu = ({ onValueChange, open, close }) => {
 
   const reset = () => {
     setIsEditGroup(false);
+    setGroupEdit(null);
   };
 
   const closeMenu = () => {
     reset();
+    setSelectedGroup(null);
     close();
   };
 
@@ -217,7 +219,7 @@ export const KeywordGroupMenu = ({ onValueChange, open, close }) => {
             </section>
           </div>
           <section className="close-btn-box">
-            <Button tabIndex={-1} onClick={close} color="inherit">
+            <Button tabIndex={-1} onClick={closeMenu} color="inherit">
               {t('Button:Cancel')}
             </Button>
             <Button className={`${onValueChange ? '' : 'hide'}`} tabIndex={-1} disabled={!selectedGroup} color="secondary" variant="contained" onClick={accept}>
