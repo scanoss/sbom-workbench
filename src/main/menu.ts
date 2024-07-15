@@ -83,10 +83,9 @@ export default class MenuBuilder {
           },
         },
         {
-          label: i18next.t('AppMenu:Settings'),
-          accelerator: 'Command+,',
+          label: i18next.t('AppMenu:ManageSearchIndexGroups'),
           click: () => {
-            this.mainWindow.webContents.send(IpcChannels.MENU_OPEN_SETTINGS);
+            this.mainWindow.webContents.send(IpcChannels.MENU_OPEN_SEARCH_INDEX_GROUPS);
           },
         },
         {
