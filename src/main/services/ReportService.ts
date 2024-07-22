@@ -1,5 +1,6 @@
 import { modelProvider } from './ModelProvider';
 import { Cryptography } from '../model/entity/Cryptography';
+import { dependencies } from 'webpack';
 
 export interface LicenseEntry {
   label: string;
@@ -20,6 +21,7 @@ export interface Component {
   source: string,
   cryptography: Array<CryptographyAlgorithms> | [],
   manifestFile?: string;
+  fileCount: number;
 }
 
 interface CryptographyAlgorithms {
@@ -84,16 +86,19 @@ class ReportService {
     let data: any = [];
     data = await modelProvider.model.component.getIdentifiedForReport();
 
+    const componentFileCountSummary = await this.getIdentifiedComponentFileSummary();
+
+
     const licenseMapper = new Map<string, LicenseEntry>();
     data.forEach((element) => {
       const { name, vendor, url, purl, version, source, spdxid } = element;
       if (licenseMapper.has(spdxid)) {
-        const license = licenseMapper.get(spdxid);
-        license.components.push({ name, vendor, url, purl, version, source, cryptography: [] });
-        license.value += 1;
+        const license = licenseMapper.get(spdxid);       
+        license.components.push({ name, vendor, url, purl, version, source, cryptography: [], fileCount: componentFileCountSummary.get(`${spdxid}${purl}${version}`) });
+        license.value += 1;    
       } else {
         const newLicense = {
-          components: [{ name, vendor, url, purl, version, source, cryptography: [] }],
+          components: [{ name, vendor, url, purl, version, source, cryptography: [], fileCount:componentFileCountSummary.get(`${spdxid}${purl}${version}`) }],
           value: 1,
           label: spdxid,
         };
@@ -101,7 +106,9 @@ class ReportService {
       }
     });
 
+
     const licenses = Array.from(licenseMapper.values()) as unknown as Array<LicenseEntry>;
+
 
     const vulnerabilities = await modelProvider.model.vulnerability.getIdentifiedReport();
     const vulnerabilityReport = {
@@ -132,7 +139,7 @@ class ReportService {
 
   public async getDetected(): Promise<IReportData> {
     const results = await modelProvider.model.result.getDetectedReport();
-    let licenses = this.getLicenseReportFromResults(results);
+    let licenses = await this.getLicenseReportFromResults(results);
 
     const vulnerabilities = await modelProvider.model.vulnerability.getDetectedReport();
     const vulnerabilityReport = {
@@ -150,9 +157,6 @@ class ReportService {
     // Dependencies
     const dependenciesSummary = await modelProvider.model.dependency.getDetectedSummary();
 
-    // Add Manifest files
-    // await this.addManifestFileToComponents(licenses);
-
     // Get Crypto stats
     const detectedCrypto = await modelProvider.model.cryptography.findAllDetected();
     const sbomAlgorithms = new Set();
@@ -169,12 +173,14 @@ class ReportService {
       local: localAlgorithms.length,
     };
 
-    return {
+   return {
       licenses, cryptographies, vulnerabilities: vulnerabilityReport, dependencies: dependenciesSummary,
     };
   }
 
-  private getLicenseReportFromResults(results: any): Array<LicenseEntry> {
+  private async getLicenseReportFromResults(results: any): Promise<Array<LicenseEntry>> {
+    // key map = {spdxid}{purl}{version}
+    const componentFileCountMapper =  await this.getDetectedComponentFileSummary();
     const licenses: Record<string, LicenseEntry> = results.reduce(
       (acc, curr) => {
         const key = curr.spdxid ? curr.spdxid : 'unknown';
@@ -196,6 +202,7 @@ class ReportService {
                 purl: curr.purl,
                 cryptography: [],
                 source: 'detected',
+                fileCount: componentFileCountMapper.get(`${key}${curr.purl}${curr.version}`)
               },
             ],
           };
@@ -212,6 +219,7 @@ class ReportService {
               purl: curr.purl,
               cryptography: [],
               source: 'detected',
+              fileCount: componentFileCountMapper.get(`${key}${curr.purl}${curr.version}`)
             });
           }
         }
@@ -225,6 +233,7 @@ class ReportService {
     return Object.values(licenses);
   }
 
+  
   private getVulnerabilitiesReport(vulnerabilities: any) {
     const vulnerabilityReportMapper: Record<string, number> = vulnerabilities.reduce((acc, curr) => {
       if (!acc[curr.severity.toLowerCase()]) acc[curr.severity.toLowerCase()] = curr.count;
@@ -260,23 +269,25 @@ class ReportService {
       return acc;
     }, {} as any);
 
+
+    const createComponent = (dep: any) => ({
+      name: dep.component !== '' ? dep.component : dep.purl,
+      vendor: null,
+      version: dep.version,
+      purl: dep.purl,
+      cryptography: [],
+      source: 'declared',
+      manifestFile: dep.path,
+      fileCount: 1,
+    });
+
     dependencies.forEach((dep) => {
       const { component, purl, version, path } = dep;
       // We don't know what is the license
       if (!dep.originalLicense) {
         if (!licenseMapper.unknown) {
           licenseMapper.unknown = {
-            components: [
-              {
-                name: component !== '' ? component : purl,
-                vendor: null,
-                version,
-                purl,
-                cryptography: [],
-                source: 'declared',
-                manifestFile: path,
-              },
-            ],
+            components: [createComponent(dep)],
             label: 'unknown',
             value: 1,
             incompatibles: [],
@@ -285,50 +296,36 @@ class ReportService {
             copyleft: false,
           };
         } else {
-          licenseMapper.unknown.components.push({
-            name: component !== '' ? component : purl,
-            vendor: null,
-            version: dep.version,
-            purl: dep.purl,
-            cryptography: [],
-            source: 'declared',
-            manifestFile: path,
-          });
-          licenseMapper.unknown.value += 1;
+
+          const componentIndex = licenseMapper.unknown.components.findIndex(
+            (c) => c.purl === dep.purl && c.version === dep.version && dep.source === 'declared',
+          );
+
+          if(componentIndex<0){
+            licenseMapper.unknown.components.push(createComponent(dep))
+            licenseMapper.unknown.value += 1;
+          }else{
+            licenseMapper.unknown.components[componentIndex].fileCount += 1; 
+          }         
         }
       } else {
         dep.originalLicense?.forEach((l) => {
           // if license already exists in the license mapper
           if (licenseMapper[l]) {
             const componentIndex = licenseMapper[l].components.findIndex(
-              (c) => c.purl === dep.purl && c.version === dep.version && dep.source === 'dependency',
+              (c) => c.purl === dep.purl && c.version === dep.version && dep.source === 'declared',
             );
             // check if the component already exists in the component array
             if (componentIndex < 0) {
-              licenseMapper[l].components.push({
-                name: dep.componentName,
-                vendor: null,
-                version,
-                purl,
-                cryptography: [],
-                source: 'declared',
-                manifestFile: path,
-              });
+              licenseMapper[l].components.push(createComponent(dep));
               licenseMapper[l].value += 1;
+            }else{
+              licenseMapper[l].components[componentIndex].fileCount += 1;
             }
+
           } else { // The license not exists in license mapper
             licenseMapper[l] = {
-              components: [
-                {
-                  name: dep.componentName,
-                  vendor: null,
-                  version,
-                  purl,
-                  cryptography: [],
-                  source: 'declared',
-                  manifestFile: path,
-                },
-              ],
+              components: [createComponent(dep)],
               label: l,
               value: 1,
               incompatibles: [],
@@ -368,9 +365,37 @@ class ReportService {
         const key = `${c.purl}@${c.version}`;
         if (manifestMapper.has(key) && c.source === 'declared') {
           c.manifestFile = manifestMapper.get(key);
+          c.fileCount = 1;
         }
       });
     });
+  }
+
+  /**
+   * @brief Gets detected component file summary and convert to a map. Key of map is {spdxid}{purl}{version}
+   *
+   * */
+
+  private async getDetectedComponentFileSummary():Promise<Map<string,number>>{
+    const componentSummary = await modelProvider.model.result.getDetectedComponentFileSummary();
+    const detectedComponentFileMapper = new Map<string, number>();
+    componentSummary.forEach((cs)=>{
+      detectedComponentFileMapper.set(`${cs.spdxid}${cs.purl}${cs.version}`,cs.fileCount);
+    });
+
+    return detectedComponentFileMapper;
+
+  }
+
+  private async getIdentifiedComponentFileSummary():Promise<Map<string,number>>{
+    const componentSummary = await modelProvider.model.component.getIdentifiedComponentFileSummary();
+    const detectedComponentFileMapper = new Map<string, number>();
+    componentSummary.forEach((cs)=>{
+      detectedComponentFileMapper.set(`${cs.spdxid}${cs.purl}${cs.version}`,cs.fileCount);
+    });
+
+    return detectedComponentFileMapper;
+
   }
 }
 

@@ -7,6 +7,8 @@ import { licenseHelper } from '../../../helpers/LicenseHelper';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { IInsertResult, IResultLicense } from '../../interfaces/IInsertResult';
 import { Model } from '../../Model';
+import { IFileComponentMatchSummary } from 'main/model/interfaces/IFileComponentMatchSummary';
+
 
 export class ResultModel extends Model {
   private connection: sqlite3.Database;
@@ -248,5 +250,19 @@ export class ResultModel extends Model {
 
   public getEntityMapper(): Record<string, string> {
     return ResultModel.entityMapper;
+  }
+
+  /**
+   * @brief Returns the ammount of files matched to each detected component. Grouped by purl, version and license
+   * 
+   */
+
+  public async getDetectedComponentFileSummary():Promise<IFileComponentMatchSummary[]> {
+    const call = util.promisify(this.connection.all.bind(this.connection));
+    const response:Array<IFileComponentMatchSummary> = await call(`SELECT r.purl,r.version, COALESCE(rl.spdxid, 'unknown') as spdxid, COUNT(*) as fileCount
+    FROM results r 
+    LEFT JOIN result_license rl ON r.id = rl.resultId
+    GROUP BY r.version, r.purl, rl.spdxid;`) as Array<IFileComponentMatchSummary>;
+    return response;
   }
 }

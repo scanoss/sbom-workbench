@@ -10,6 +10,8 @@ import { componentHelper } from '../../../helpers/ComponentHelper';
 import { IComponentLicenseReliable } from '../../interfaces/component/IComponentLicenseReliable';
 import { ComponentVersion } from '../../entity/ComponentVersion';
 import { Model } from '../../Model';
+import { IFileComponentMatchSummary } from 'main/model/interfaces/IFileComponentMatchSummary';
+
 
 export class ComponentModel extends Model {
   private connection: sqlite3.Database;
@@ -350,6 +352,15 @@ export class ComponentModel extends Model {
       algorithms: { algorithm: string; strength: string }[] | null;
     }>);
     return query.map((item) => ({ ...item, algorithms: JSON.parse(item.algorithms) }));
+  }
+
+  public async getIdentifiedComponentFileSummary():Promise<Array<IFileComponentMatchSummary>> {
+    const call = util.promisify(this.connection.all.bind(this.connection));
+    const response:Array<IFileComponentMatchSummary> = await call(`SELECT r.purl,r.version, COALESCE(rl.spdxid, 'unknown') as spdxid, COUNT(*) as fileCount
+    FROM results r 
+    LEFT JOIN result_license rl ON r.id = rl.resultId
+    GROUP BY r.version, r.purl, rl.spdxid;`) as Array<IFileComponentMatchSummary>;
+    return response;
   }
 
   public getEntityMapper(): Record<string, string> {
