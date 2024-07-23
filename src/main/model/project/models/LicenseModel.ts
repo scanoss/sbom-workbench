@@ -1,10 +1,13 @@
 import log from 'electron-log';
 import { LicenseDTO, NewLicenseDTO } from '@api/dto';
-import { License } from '@api/types';
+import { DetectedLicenseSummary, License } from '@api/types';
 import sqlite3 from 'sqlite3';
 import { queries } from '../../querys_db';
 import { IComponentLicense } from '../../interfaces/component/IComponentLicense';
 import { Model } from '../../Model';
+import util from 'util';
+import { detectedLicenseSummaryAdapter } from '../../adapters/license/detectedLicenseSummaryAdapter';
+import { After } from '../../hooks/after/afterHook';
 
 export class LicenseModel extends Model {
   private connection: sqlite3.Database;
@@ -294,4 +297,51 @@ export class LicenseModel extends Model {
       });
     });
   }
+
+  @After(detectedLicenseSummaryAdapter)
+  public async getDetectedSummary(): Promise<Record<string,DetectedLicenseSummary>> {
+    const call:any = util.promisify(this.connection.all.bind(this.connection));
+    const detectedSummary = await call(`SELECT spdxid, SUM(detectedLicenseComponentCount) as componentLicenseCount, SUM(declaredLicenseDependencyCount) as dependencyLicenseCount , SUM(detectedLicenseComponentCount + declaredLicenseDependencyCount) as total FROM (
+      -- First part: Count component license
+      SELECT l.spdxid, COUNT(*) as detectedLicenseComponentCount,  0 as declaredLicenseDependencyCount  FROM component_versions cv
+      LEFT JOIN license_component_version lcv ON cv.id = lcv.cvid
+      LEFT JOIN licenses l ON l.id = lcv.licid
+      WHERE cv.source = 'engine'
+      GROUP BY l.spdxid
+      UNION
+          -- Second part: splitting originalLicense by ',' and counting dependency licenses
+          SELECT spdxid, 0 AS detectedLicenseComponentCount, declaredLicenseDependencyCount
+          FROM (
+              WITH RECURSIVE split(label, str) AS (
+                 SELECT '', COALESCE(originalLicense, 'unknown') || ','
+                  FROM dependencies
+                  UNION ALL
+                 SELECT
+              CASE 
+                WHEN substr(str, 1, instr(str, ',') - 1) = '' THEN 'unknown'
+                ELSE substr(str, 1, instr(str, ',') - 1)
+              END,
+                   substr(str, instr(str, ',') + 1)
+                  FROM split 
+                  WHERE str != ''
+              )
+              SELECT label as spdxid, 
+                     COUNT(*) AS declaredlicenseDependencyCount
+              FROM split
+              WHERE label != ''
+              GROUP BY spdxid
+          )) as detected
+      GROUP BY spdxid;`);
+    return detectedSummary;
+  }
+
+
+  public async getDetectedLicenseData(){
+    const call:any = util.promisify(this.connection.all.bind(this.connection));
+    const incompatibleLicenses = await call(`SELECT spdxid, copyLeft, coalesce(incompatible_with,'') as incompatible_with, patent_hints FROM result_license
+    GROUP BY spdxid, copyleft, incompatible_with, patent_hints;`);
+    return incompatibleLicenses;
+  }
 }
+
+

@@ -24,6 +24,7 @@ const ScanReport = () => {
   const state = useSelector(selectWorkbench);
 
   const { detected, identified, summary, isLoading } = useSelector(selectReportState);
+  console.log(detected);
 
   const isEmpty = summary?.identified.scan === 0
     && summary?.original === 0

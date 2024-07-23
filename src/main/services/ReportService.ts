@@ -1,5 +1,6 @@
 import { modelProvider } from './ModelProvider';
 import { Cryptography } from '../model/entity/Cryptography';
+import { COMPONENT_SOURCE, ComponentReport, DetectedLicense, DetectedLicenseSummary } from '../../api\/types';
 
 export interface LicenseEntry {
   label: string;
@@ -42,8 +43,17 @@ export interface ISummary {
   original: number;
 }
 
+export interface  DetectedLicenseSummaryDetail {
+  label: string,
+  value: number;
+}
+
 export interface IReportData {
-  licenses: LicenseEntry[];
+  licenses: LicenseEntry[],
+  lic: {    
+    data:  Record<string,DetectedLicenseSummary>,
+    summary: Array<DetectedLicenseSummaryDetail>,
+  };
   vulnerabilities: {
     critical: number;
     high: number;
@@ -58,6 +68,10 @@ export interface IReportData {
     files: any; // FIX TYPE
     total: number;
   }
+  allComponentList: ComponentReport[],
+  allDependencyComponentList: ComponentReport[],
+  
+
 }
 
 class ReportService {
@@ -127,12 +141,26 @@ class ReportService {
     // Add Manifest files
     await this.addManifestFileToComponents(licenses);
 
-    return { licenses, vulnerabilities: vulnerabilityReport, cryptographies, dependencies: dependenciesSummary };
+    return { licenses,
+       lic:{ data: null, summary: null},
+       vulnerabilities: vulnerabilityReport,
+       cryptographies,
+       dependencies: dependenciesSummary,
+       allComponentList: [],
+       allDependencyComponentList:[] };
   }
 
   public async getDetected(): Promise<IReportData> {
-    const results = await modelProvider.model.result.getDetectedReport();
-    let licenses = this.getLicenseReportFromResults(results);
+
+    const detectedLicenses = await modelProvider.model.license.getDetectedSummary();
+    //console.log(detectedLicenses);
+ 
+ 
+
+
+
+    const detectedComponents: any = await modelProvider.model.result.getDetectedReport();
+    let licenses = this.getLicenseReportFromResults(detectedComponents);
 
     const vulnerabilities = await modelProvider.model.vulnerability.getDetectedReport();
     const vulnerabilityReport = {
@@ -143,7 +171,54 @@ class ReportService {
       ...this.getVulnerabilitiesReport(vulnerabilities),
     };
 
+
+    // Attach components to licenses
+    detectedComponents.forEach((comp)=> {
+      detectedLicenses[comp.spdxid].componentList.push({
+        cryptography:[],
+        name: comp.name? comp.name : comp.purl,
+        purl: comp.purl,
+        version: comp.version,
+        source: COMPONENT_SOURCE.DETECTED,
+        vendor: comp.vendor ? comp.vendor : comp.purl,
+        manifestFile: null,
+        licenses:[comp.spdxid],
+      });
+
+    });
+
+    // Attach dependencies to licenses
     const dependencies = await modelProvider.model.dependency.getAll(null);
+    dependencies.forEach((d)=>{
+      const { component, purl, version, path } = d;
+      if(d.originalLicense){
+        const comp: ComponentReport = {            
+          cryptography:[],
+          name: component.name ? component.name : purl,
+          purl: purl,
+          version: version,
+          source: COMPONENT_SOURCE.DECLARED,
+          vendor: purl,
+          manifestFile: path,
+          licenses:d.originalLicense
+        };
+        d.originalLicense.forEach((spdxid)=>{
+          detectedLicenses[spdxid].dependencyComponentList.push(comp);
+        });
+      }else{
+        detectedLicenses['unknown'].dependencyComponentList.push({         
+            cryptography:[],
+            name: component.name ? component.name : purl,
+            purl: purl,
+            version: version,
+            source: COMPONENT_SOURCE.DECLARED,
+            vendor: purl,
+            manifestFile: path,
+            licenses:['unknown']
+        });
+      }    
+    });
+
     licenses = this.addDependencyComponentsToLicenseReport(licenses, dependencies);
     if (licenses) this.checkForIncompatibilities(licenses);
 
@@ -169,9 +244,50 @@ class ReportService {
       local: localAlgorithms.length,
     };
 
-    return {
-      licenses, cryptographies, vulnerabilities: vulnerabilityReport, dependencies: dependenciesSummary,
+
+    // Gets summary and all components (detected componentes and dependency components)
+    const summary: Array<DetectedLicenseSummaryDetail> = [];
+    const allComponentMapper = new Map<string,{component: ComponentReport , licenses: Set<string>}>();
+    const allDependencyComponentMapper = new Map<string, {component: ComponentReport , licenses: Set<string>}>();
+    Object.values(detectedLicenses).forEach(value => {
+      // Label = spdxid, used by front end
+      const  { label, componentLicenseCount, dependencyLicenseCount } = value;
+      summary.push({label , value: componentLicenseCount + dependencyLicenseCount});
+      
+      // All detected components
+      value.componentList.forEach((cl)=>{
+        const key  =`${cl.purl}@${cl.version}`;
+        if(allComponentMapper.get(key)) {
+            allComponentMapper.get(key).licenses.add(label)
+        }else {
+          allComponentMapper.set(key,{component:cl, licenses: new Set([...cl.licenses])});
+        }
+      });
+
+      // All dependency components
+      value.dependencyComponentList.forEach((cl)=>{
+        const key  =`${cl.purl}@${cl.version}`;
+        if(allDependencyComponentMapper.get(key)) {
+            allDependencyComponentMapper.get(key).licenses.add(label)
+        }else {
+          allDependencyComponentMapper.set(key,{component:cl, licenses: new Set([...cl.licenses])});
+        }
+      });
+    });
+
+   
+    // TODO: change lic to license. 
+    const report = {
+      licenses,
+      lic:{data:detectedLicenses, summary},
+      cryptographies,
+      vulnerabilities: vulnerabilityReport,
+      dependencies: dependenciesSummary,
+      allComponentList: Array.from(allComponentMapper.values()).map((c)=>{ c.component.licenses = Array.from(c.licenses); return c.component;}),
+      allDependencyComponentList: Array.from(allDependencyComponentMapper.values()).map((c)=>{ c.component.licenses = Array.from(c.licenses); return c.component;})
     };
+
+    return report;
   }
 
   private getLicenseReportFromResults(results: any): Array<LicenseEntry> {
