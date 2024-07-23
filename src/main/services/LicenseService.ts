@@ -26,6 +26,7 @@ class LicenseService {
     const license = await modelProvider.model.license.get(lic.id);
     return license;
   }
+  
 }
 
 export const licenseService = new LicenseService();

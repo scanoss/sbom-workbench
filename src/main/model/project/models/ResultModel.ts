@@ -220,7 +220,7 @@ export class ResultModel extends Model {
 
   public async getDetectedReport() {
     const call = util.promisify(this.connection.all.bind(this.connection));
-    const response = await call(`SELECT cv.purl,cv.version,cv.name, r.vendor, rl.spdxid,rl.patent_hints,rl.copyLeft,rl.incompatible_with FROM component_versions cv
+    const response = await call(`SELECT DISTINCT cv.purl,cv.version,cv.name, r.vendor, rl.spdxid,rl.patent_hints,rl.copyLeft,rl.incompatible_with FROM component_versions cv
                                 INNER JOIN results r ON cv.purl = r.purl AND cv.version = r.version
                                 LEFT JOIN result_license rl ON rl.resultId = r.id;`);
     return response;

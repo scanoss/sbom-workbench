@@ -434,3 +434,40 @@ export interface GroupSearchKeyword {
   updatedAt:string;
 }
 
+
+
+
+
+
+
+
+// Report
+export interface LicenseReport {
+  label: string; //spdxid
+  componentLicenseCount: number;
+  dependencyLicenseCount: number;
+}
+
+export enum COMPONENT_SOURCE {
+  DETECTED = 'detected',
+  DECLARED = 'declared'
+}
+
+export interface ComponentReport {
+  name: string;
+  vendor: string;
+  version: string;
+  purl: string;
+  cryptography: [];
+  source: COMPONENT_SOURCE;  
+  manifestFile: string;
+  licenses: Array<string>;
+}
+
+export interface DetectedLicenseSummary extends LicenseReport {
+  componentList:ComponentReport[];
+  dependencyComponentList:ComponentReport[];
+  copyLeft: string;
+  incompatible_with: Array<string>;
+  patent_hints: string;
+}
