@@ -5,7 +5,7 @@ import Folder from '../main/workspace/tree/Folder';
 import { Metadata } from '../main/workspace/Metadata';
 import { Cryptography } from '../main/model/entity/Cryptography';
 import { LocalCryptography } from '../main/model/entity/LocalCryptography';
-import { IReportData, ISummary } from 'main/services/ReportService';
+import { IReportData, ISummary, ReportComponent } from 'main/services/ReportService';
 
 export enum ScanState {
   CREATED = 'CREATED',
@@ -434,35 +434,7 @@ export interface GroupSearchKeyword {
   updatedAt:string;
 }
 
-
-
-
-
-
-
-
-
-
-export enum COMPONENT_SOURCE {
-  DETECTED = 'detected',
-  DECLARED = 'declared'
-}
-
-export interface ComponentReport {
-  name: string;
-  vendor: string;
-  version: string;
-  purl: string;
-  cryptography: [];
-  source: COMPONENT_SOURCE;  
-  manifestFile: string;
-  licenses: Array<string>;
-}
-
-export interface DetectedLicenseSummary extends LicenseReport {
-  componentList:ComponentReport[];
-  dependencyComponentList:ComponentReport[];
-  copyLeft: string;
-  incompatible_with: Array<string>;
-  patent_hints: string;
+export interface ComponentReportResponse {
+  components:ReportComponent[];
+  declaredComponents: ReportComponent[];
 }

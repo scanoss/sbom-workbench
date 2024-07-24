@@ -10,7 +10,7 @@ import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Component, LicenseEntry } from 'main/services/ReportService';
+import { ReportComponent } from 'main/services/ReportService';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import LicensesChart from '../../components/LicensesChart';
@@ -39,8 +39,8 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
 
   const [licenseSelected, setLicenseSelected] = useState<any>(null);
 
-  const [componentsMatched, setComponentsMatched] = useState<Component[]>([]); // detected
-  const [componentsDeclared, setComponentsDeclared] = useState<Component[]>([]);
+  const [componentsMatched, setComponentsMatched] = useState<ReportComponent[]>([]); // detected
+  const [componentsDeclared, setComponentsDeclared] = useState<ReportComponent[]>([]);
   const [obligationsFiltered, setObligationsFiltered] = useState<any[]>([]);
 
   const isEmpty = summary?.identified.scan === 0 && summary?.original === 0 && data.licenses.length === 0;

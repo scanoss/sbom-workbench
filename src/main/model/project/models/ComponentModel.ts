@@ -10,6 +10,9 @@ import { componentHelper } from '../../../helpers/ComponentHelper';
 import { IComponentLicenseReliable } from '../../interfaces/component/IComponentLicenseReliable';
 import { ComponentVersion } from '../../entity/ComponentVersion';
 import { Model } from '../../Model';
+import { After } from '../../hooks/after/afterHook';
+import { detectedComponentAdapter } from '../../adapters/component/detectedComponentAdapter';
+import { ReportComponent } from '../../../services/ReportService';
 
 export class ComponentModel extends Model {
   private connection: sqlite3.Database;
@@ -333,13 +336,14 @@ export class ComponentModel extends Model {
     await Promise.all(promises);
   }
 
+
   public async getComponentsDetectedForReport() {
     const call = util.promisify(this.connection.all.bind(this.connection));
     const query:any = (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms
         FROM component_versions c INNER JOIN results r ON r.version = c.version AND r.purl = c.purl
         LEFT JOIN license_component_version lcv ON lcv.cvid = c.id
         LEFT JOIN licenses l ON lcv.licid = l.id
-        LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version;`) as Array<{
+        LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version; `) as Array<{
       purl: string;
       name: string;
       vendor: string;
@@ -350,6 +354,11 @@ export class ComponentModel extends Model {
       algorithms: { algorithm: string; strength: string }[] | null;
     }>);
     return query.map((item) => ({ ...item, algorithms: JSON.parse(item.algorithms) }));
+  }
+
+  @After(detectedComponentAdapter)
+  public async getDetectedComponents():Promise<Array<ReportComponent>>{
+    return await this.getComponentsDetectedForReport();
   }
 
   public getEntityMapper(): Record<string, string> {
