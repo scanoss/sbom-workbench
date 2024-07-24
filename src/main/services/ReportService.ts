@@ -1,17 +1,7 @@
+import { ComponentReportResponse } from '@api/types';
 import { modelProvider } from './ModelProvider';
 
-
-export interface LicenseEntry {
-  label: string;
-  components: Component[];
-  value: number;
-  incompatibles?: string[];
-  has_incompatibles?: string[];
-  copyleft?: boolean;
-  patent_hints?: boolean;
-}
-
-export interface Component {
+export interface ReportComponent {
   name: string,
   url: string,
   vendor: string,
@@ -20,9 +10,10 @@ export interface Component {
   source: string,
   cryptography: Array<CryptographyAlgorithms> | [],
   manifestFile?: string;
+  licenses: Array<string>,
 }
 
-interface CryptographyAlgorithms {
+export interface CryptographyAlgorithms {
   algorithm: string,
   strength: string,
 }
@@ -171,69 +162,51 @@ class ReportService {
     const cryptographies = {
       sbom: Array.from(sbomAlgorithms.values()).length,
       local: localAlgorithms.length,
-    };
+    };  
 
-
-   
-
-    const report = {
+    return {
       licenses,
       cryptographies,
       vulnerabilities: vulnerabilityReport,
       dependencies: dependenciesSummary,
     };
-    return report;
   }
 
-  private getLicenseReportFromResults(results: any): Array<LicenseEntry> {
-    const licenses: Record<string, LicenseEntry> = results.reduce(
-      (acc, curr) => {
-        const key = curr.spdxid ? curr.spdxid : 'unknown';
-        if (!acc[key]) {
-          acc[key] = {
-            label: key,
-            value: 1,
-            incompatibles: curr?.incompatible_with
-              ? curr.incompatible_with.split(',')
-              : [],
-            has_incompatibles: [],
-            patent_hints: curr?.patent_hints ? curr.patent_hints : false,
-            copyleft: curr?.copyleft ? curr.copyleft : false,
-            components: [
-              {
-                name: curr.name,
-                vendor: curr.vendor,
-                version: curr.version,
-                purl: curr.purl,
-                cryptography: [],
-                source: 'detected',
-              },
-            ],
-          };
-        } else {
-          const componentIndex = acc[key].components.findIndex(
-            (c) => c.purl === curr.purl && c.version === curr.version,
-          );
-          if (componentIndex < 0) {
-            acc[key].value += 1;
-            acc[key].components.push({
-              name: curr.name,
-              vendor: curr.vendor,
-              version: curr.version,
-              purl: curr.purl,
-              cryptography: [],
-              source: 'detected',
-            });
-          }
-        }
-        return acc;
-      },
-      {},
-    );
-    Object.entries(licenses).forEach(([key, value]) => {
-      value.value = value.components.length;
+  public async getDetectedComponents(license?: string): Promise<ComponentReportResponse> {    
+    let components = await modelProvider.model.component.getDetectedComponents();
+    let dependencyComponentRaw = await modelProvider.model.dependency.getDetectedDependencies();
+    // Filter by license
+    if(license) {
+      const licenseToLower = license.toLocaleLowerCase();    
+      components = components.filter((c)=>{ 
+        return c.licenses.some((l)=> l.toLocaleLowerCase()===licenseToLower);       
+      });   
+      dependencyComponentRaw = dependencyComponentRaw.filter((d) => {
+        // ignore those components without license except for when user search by 'unknown'
+        if(!d.licenses && license === 'unknown') return true; 
+        if(!d.licenses) return false;       
+        const licenses = d.licenses.split(',');
+        return licenses.some((l) => l.toLocaleLowerCase()===licenseToLower);       
+      });       
+    }
+
+    // Group dependency components by purl and version
+    const declaredComponentMapper = new Map<string, ReportComponent>();
+    dependencyComponentRaw.forEach((d) => {
+      const key = `${d.purl}@${d.version}`;
+      const newLicenses = d.licenses ? d.licenses.split(',') : ['unknown'];  
+      if(declaredComponentMapper.get(key)) {
+        const licenses = declaredComponentMapper.get(key).licenses;    
+        declaredComponentMapper.get(key).licenses = Array.from(new Set([...licenses, ...newLicenses]));       
+      }else {
+        declaredComponentMapper.set(key, { purl: d.purl, version: d.version, name:d.purl, url:'', cryptography: [], vendor:'', manifestFile:d.file, source:'declared', licenses:newLicenses})
+      }          
     });
-    return Object.values(licenses);
+    
+    return { 
+      components,
+      declaredComponents: Array.from(declaredComponentMapper.values()),
+    }
   }
 
   private getVulnerabilitiesReport(vulnerabilities: any) {
@@ -243,146 +216,7 @@ class ReportService {
     }, {});
     return vulnerabilityReportMapper;
   }
-
-  private checkForIncompatibilities(licenses: LicenseEntry[]) {
-    for (let l = 0; l < licenses.length; l += 1) {
-      const license = licenses[l];
-      if (license.incompatibles !== undefined) {
-        for (let i = 0; i < license.incompatibles.length; i += 1) {
-          if (licenses.some((lic) => lic.label === license.incompatibles[i])) license.has_incompatibles.push(license.incompatibles[i]);
-        }
-      }
-    }
-  }
-
-  /**
-  * @description An array of LicenseEntry objects representing detected licenses with matched components.
-  * @param licenses Array of all detected licenses
-  * @param dependencies Array of all licenses
-  * @returns LicenseEntry[] Licenses with all the components
-  * */
-
-  private addDependencyComponentsToLicenseReport(
-    licenses: LicenseEntry[],
-    dependencies: Array<any>,
-  ): Array<LicenseEntry> {
-    const licenseMapper = licenses.reduce((acc, curr) => {
-      if (!acc[curr.label]) acc[curr.label] = curr;
-      return acc;
-    }, {} as any);
-
-    dependencies.forEach((dep) => {
-      const { component, purl, version, path } = dep;
-      // We don't know what is the license
-      if (!dep.originalLicense) {
-        if (!licenseMapper.unknown) {
-          licenseMapper.unknown = {
-            components: [
-              {
-                name: component !== '' ? component : purl,
-                vendor: null,
-                version,
-                purl,
-                cryptography: [],
-                source: 'declared',
-                manifestFile: path,
-              },
-            ],
-            label: 'unknown',
-            value: 1,
-            incompatibles: [],
-            has_incompatibles: [],
-            patent_hints: false,
-            copyleft: false,
-          };
-        } else {
-          licenseMapper.unknown.components.push({
-            name: component !== '' ? component : purl,
-            vendor: null,
-            version: dep.version,
-            purl: dep.purl,
-            cryptography: [],
-            source: 'declared',
-            manifestFile: path,
-          });
-          licenseMapper.unknown.value += 1;
-        }
-      } else {
-        dep.originalLicense?.forEach((l) => {
-          // if license already exists in the license mapper
-          if (licenseMapper[l]) {
-            const componentIndex = licenseMapper[l].components.findIndex(
-              (c) => c.purl === dep.purl && c.version === dep.version && dep.source === 'dependency',
-            );
-            // check if the component already exists in the component array
-            if (componentIndex < 0) {
-              licenseMapper[l].components.push({
-                name: dep.componentName,
-                vendor: null,
-                version,
-                purl,
-                cryptography: [],
-                source: 'declared',
-                manifestFile: path,
-              });
-              licenseMapper[l].value += 1;
-            }
-          } else { // The license not exists in license mapper
-            licenseMapper[l] = {
-              components: [
-                {
-                  name: dep.componentName,
-                  vendor: null,
-                  version,
-                  purl,
-                  cryptography: [],
-                  source: 'declared',
-                  manifestFile: path,
-                },
-              ],
-              label: l,
-              value: 1,
-              incompatibles: [],
-              has_incompatibles: [],
-              patent_hints: false,
-              copyleft: false,
-            };
-          }
-        });
-      }
-    });
-    // Used to position the unknown license element to the end of the array
-    const licenseArray = Object.values(licenseMapper) as Array<LicenseEntry>;
-    if (licenseMapper.unknown) {
-      const index = licenseArray.findIndex((l) => l.label === 'unknown');
-      const aux = licenseArray[index];
-      licenseArray.splice(index, 1);
-      licenseArray.push(aux);
-    }
-    return licenseArray as Array<LicenseEntry>;
-  }
-
-  private async getManifestFileMapper(): Promise<Map<string, string>> {
-    const dependencyData = await modelProvider.model.dependency.getAll(null);
-    const mapper = new Map<string, string>(); // Ei. pkg:golang/go.opentelemetry.io/otel@v1.17.0 -> /go.sum
-    dependencyData.forEach((d) => {
-      const key = `${d.purl}@${d.version}`;
-      mapper.set(key, d.path);
-    });
-    return mapper;
-  }
-
-  private async addManifestFileToComponents(data: Array<LicenseEntry>): Promise<void> {
-    const manifestMapper = await this.getManifestFileMapper();
-    data.forEach((l) => {
-      l.components.forEach((c) => {
-        const key = `${c.purl}@${c.version}`;
-        if (manifestMapper.has(key) && c.source === 'declared') {
-          c.manifestFile = manifestMapper.get(key);
-        }
-      });
-    });
-  }
+ 
 }
 
 export const reportService = new ReportService();

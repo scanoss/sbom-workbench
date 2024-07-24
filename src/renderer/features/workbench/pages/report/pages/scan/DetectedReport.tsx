@@ -27,6 +27,7 @@ import CryptographyDataTable from '../../components/CryptographyDataTable';
 import DependenciesCard from '../../components/DependenciesCard';
 import DependenciesDataTable from '../../components/DependenciesDataTable';
 import CryptographyCard from '../../components/CryptographyCard';
+import { reportService } from '@api/services/report.service';
 
 Chart.register(...registerables);
 
@@ -51,23 +52,26 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
     const licenses = data.licenses.map((license) => license.label);
     obligations.current = await obligationsService.getObligations(licenses);
     setObligationsFiltered(obligations.current);
-    onLicenseClear();
+    await onLicenseClear();
   };
 
-  const onLicenseSelected = (license: string) => {
-    const matchedLicense = data.lic.data[license]; //data.licenses.find((item) => item.label === license);
+  const onLicenseSelected = async (license: string) => {
+    const matchedLicense = data.licenses.find((item) => item.label === license);
     // const filtered = data.components.filter((item) => item.licenses.includes(matchedLicense.label));
-    setComponentsMatched([]);// filtered.filter((item) => item.source === 'detected'));
-    setComponentsDeclared([]);// filtered.filter((item) => item.source === 'declared'));
+    const detected = await reportService.getDetectedComponents(license);
+    console.log("Detected diltered", detected);
+    setComponentsMatched(detected.components);// filtered.filter((item) => item.source === 'detected'));
+    setComponentsDeclared(detected.declaredComponents);// filtered.filter((item) => item.source === 'declared'));
     setObligationsFiltered(obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)));
     setLicenseSelected(matchedLicense);
   };
 
-  const onLicenseClear = () => {
+  const onLicenseClear = async () => {
     const items = data.components;
+    const detected = await reportService.getDetectedComponents();
 
-    setComponentsMatched([]);
-    setComponentsDeclared([]);
+    setComponentsMatched(detected.components);
+    setComponentsDeclared(detected.declaredComponents);
     setObligationsFiltered(obligations.current);
     setLicenseSelected(null);
   };
@@ -92,7 +96,7 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
             <LicensesChart data={data.licenses} />
             <LicensesTable
               matchedLicenseSelected={licenseSelected}
-              selectLicense={(license) => onLicenseSelected(license)}
+              selectLicense={async (license) => await onLicenseSelected(license)}
               data={data.licenses}
             />
           </div>

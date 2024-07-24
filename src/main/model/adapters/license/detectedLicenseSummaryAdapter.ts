@@ -1,7 +1,5 @@
 
 import { LicenseReport } from "main/services/ReportService";
-import { DetectedLicenseSummary } from "../../../../api/types";
-import { modelProvider } from "../../../services/ModelProvider";
 import { ModelAdapter } from "../adapter";
 
 
