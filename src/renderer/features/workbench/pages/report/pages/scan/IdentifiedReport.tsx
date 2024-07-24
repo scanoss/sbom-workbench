@@ -56,8 +56,8 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
     const matchedLicense = data.licenses.find((item) => item.label === license);
 
     const filtered = data.components.filter((item) => item.licenses.includes(matchedLicense.label));
-    setComponentsMatched(filtered.filter((item) => item.source === 'detected'));
-    setComponentsDeclared(filtered.filter((item) => item.source === 'declared'));
+    setComponentsMatched([]);
+    setComponentsDeclared([]);
     setObligationsFiltered(obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)));
     setLicenseSelected(matchedLicense);
   };
@@ -65,8 +65,8 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
   const onLicenseClear = () => {
     const items = data.components;
 
-    setComponentsMatched(items.filter((item) => item.source === 'detected'));
-    setComponentsDeclared(items.filter((item) => item.source === 'declared'));
+    setComponentsMatched([]);
+    setComponentsDeclared([]);
     setObligationsFiltered(obligations.current);
 
     setLicenseSelected(null);
