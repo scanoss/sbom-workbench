@@ -441,12 +441,7 @@ export interface GroupSearchKeyword {
 
 
 
-// Report
-export interface LicenseReport {
-  label: string; //spdxid
-  componentLicenseCount: number;
-  dependencyLicenseCount: number;
-}
+
 
 export enum COMPONENT_SOURCE {
   DETECTED = 'detected',

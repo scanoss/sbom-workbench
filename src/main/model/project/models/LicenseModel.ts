@@ -1,6 +1,6 @@
 import log from 'electron-log';
 import { LicenseDTO, NewLicenseDTO } from '@api/dto';
-import { DetectedLicenseSummary, License } from '@api/types';
+import { License } from '@api/types';
 import sqlite3 from 'sqlite3';
 import { queries } from '../../querys_db';
 import { IComponentLicense } from '../../interfaces/component/IComponentLicense';
@@ -8,6 +8,7 @@ import { Model } from '../../Model';
 import util from 'util';
 import { detectedLicenseSummaryAdapter } from '../../adapters/license/detectedLicenseSummaryAdapter';
 import { After } from '../../hooks/after/afterHook';
+import { LicenseReport } from 'main/services/ReportService';
 
 export class LicenseModel extends Model {
   private connection: sqlite3.Database;
@@ -299,7 +300,7 @@ export class LicenseModel extends Model {
   }
 
   @After(detectedLicenseSummaryAdapter)
-  public async getDetectedSummary(): Promise<Record<string,DetectedLicenseSummary>> {
+  public async getDetectedSummary(): Promise<Array<LicenseReport>> {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
     const detectedSummary = await call(`SELECT spdxid, SUM(detectedLicenseComponentCount) as componentLicenseCount, SUM(declaredLicenseDependencyCount) as dependencyLicenseCount , SUM(detectedLicenseComponentCount + declaredLicenseDependencyCount) as total FROM (
       -- First part: Count component license
@@ -335,13 +336,6 @@ export class LicenseModel extends Model {
     return detectedSummary;
   }
 
-
-  public async getDetectedLicenseData(){
-    const call:any = util.promisify(this.connection.all.bind(this.connection));
-    const incompatibleLicenses = await call(`SELECT spdxid, copyLeft, coalesce(incompatible_with,'') as incompatible_with, patent_hints FROM result_license
-    GROUP BY spdxid, copyleft, incompatible_with, patent_hints;`);
-    return incompatibleLicenses;
-  }
 }
 
 

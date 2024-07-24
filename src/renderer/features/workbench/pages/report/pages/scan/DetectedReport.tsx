@@ -47,7 +47,8 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
   const [obligationsFiltered, setObligationsFiltered] = useState<any[]>([]);
 
   const init = async () => {
-    const licenses = data.lic.summary.map((license) => license.label);
+    console.log(data);
+    const licenses = data.licenses.map((license) => license.label);
     obligations.current = await obligationsService.getObligations(licenses);
     setObligationsFiltered(obligations.current);
     onLicenseClear();
@@ -56,8 +57,8 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
   const onLicenseSelected = (license: string) => {
     const matchedLicense = data.lic.data[license]; //data.licenses.find((item) => item.label === license);
     // const filtered = data.components.filter((item) => item.licenses.includes(matchedLicense.label));
-    setComponentsMatched(data.lic.data[license].componentList);// filtered.filter((item) => item.source === 'detected'));
-    setComponentsDeclared(data.lic.data[license].dependencyComponentList);// filtered.filter((item) => item.source === 'declared'));
+    setComponentsMatched([]);// filtered.filter((item) => item.source === 'detected'));
+    setComponentsDeclared([]);// filtered.filter((item) => item.source === 'declared'));
     setObligationsFiltered(obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)));
     setLicenseSelected(matchedLicense);
   };
@@ -65,8 +66,8 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
   const onLicenseClear = () => {
     const items = data.components;
 
-    setComponentsMatched(data.allComponentList);
-    setComponentsDeclared(data.allDependencyComponentList);
+    setComponentsMatched([]);
+    setComponentsDeclared([]);
     setObligationsFiltered(obligations.current);
     setLicenseSelected(null);
   };
@@ -88,11 +89,11 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
         <div className="report-title">{t('Title:Licenses')} ({data.licenses.length})</div>
         {data.licenses.length > 0 ? (
           <div className="report-full">
-            <LicensesChart data={data.lic.summary} />
+            <LicensesChart data={data.licenses} />
             <LicensesTable
               matchedLicenseSelected={licenseSelected}
               selectLicense={(license) => onLicenseSelected(license)}
-              data={data.lic.summary}
+              data={data.licenses}
             />
           </div>
         ) : (
