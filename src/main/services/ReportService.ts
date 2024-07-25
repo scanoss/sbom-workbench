@@ -62,9 +62,10 @@ class ReportService {
 
   private filterComponentsByLicense(license: string, components: Array<ReportComponent>): Array<ReportComponent> {
     const licenseToLower = license.toLowerCase();
-    return components.filter((c)=> {
+    const filteredComponents = components.filter((c)=> {
       return c.licenses.some((l)=> l.toLowerCase()===licenseToLower); 
     });
+    return filteredComponents;
    }
 
   private getVulnerabilitiesReport(vulnerabilities: any) {
@@ -169,37 +170,17 @@ class ReportService {
   }
 
   public async getDetectedComponents(license?: string): Promise<ComponentReportResponse> {    
-    let components = await modelProvider.model.component.getDetectedComponents();
-    let dependencyComponentRaw = await modelProvider.model.dependency.getDetectedDependencies();
+    let components = await modelProvider.model.component.findAllDetectedComponents();
+    let declaredComponents = await modelProvider.model.dependency.findAllDeclaredComponents();
     // Filter by license
     if(license) {
-      const licenseToLower = license.toLowerCase()
-      components = this.filterComponentsByLicense(license, components);  
-      dependencyComponentRaw = dependencyComponentRaw.filter((d) => {
-        // ignore those components without license except for when user search by 'unknown'
-        if(!d.licenses && license === 'unknown') return true; 
-        if(!d.licenses) return false;       
-        const licenses = d.licenses.split(',');
-        return licenses.some((l) => l.toLowerCase()===licenseToLower);       
-      });       
-    }
-
-    // Group dependency components by purl and version
-    const declaredComponentMapper = new Map<string, ReportComponent>();
-    dependencyComponentRaw.forEach((d) => {
-      const key = `${d.purl}@${d.version}`;
-      const newLicenses = d.licenses ? d.licenses.split(',') : ['unknown'];  
-      if(declaredComponentMapper.get(key)) {
-        const licenses = declaredComponentMapper.get(key).licenses;    
-        declaredComponentMapper.get(key).licenses = Array.from(new Set([...licenses, ...newLicenses]));       
-      }else {
-        declaredComponentMapper.set(key, { purl: d.purl, version: d.version, name:d.purl, url:'', cryptography: [], vendor:'', manifestFile:d.file, source:'declared', licenses:newLicenses})
-      }          
-    });
-    
+      components = this.filterComponentsByLicense(license, components); 
+      declaredComponents = this.filterComponentsByLicense(license, declaredComponents);        
+    }  
+   
     return { 
       components,
-      declaredComponents: Array.from(declaredComponentMapper.values()),
+      declaredComponents
     }
   }
 

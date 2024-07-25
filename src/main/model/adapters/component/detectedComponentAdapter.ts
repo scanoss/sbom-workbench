@@ -1,9 +1,6 @@
-
-import { CryptographyAlgorithms, LicenseReport, ReportComponent } from "main/services/ReportService";
+import { CryptographyAlgorithms, ReportComponent } from "main/services/ReportService";
 import { ModelAdapter } from "../adapter";
 
-//c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms
-// Report
 export interface DetectedComponentInput {
     purl: string; //spdxid
     name: string;

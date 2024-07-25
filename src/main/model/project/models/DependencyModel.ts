@@ -6,6 +6,9 @@ import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { queries } from '../../querys_db';
 import { Dependency as Dep, ModelDependencySummary } from '../../entity/Dependency';
 import { Model } from '../../Model';
+import { ReportComponent } from 'main/services/ReportService';
+import { After } from '../../hooks/after/afterHook';
+import { declaredComponentsAdapter } from '../../../model/adapters/dependency/declaredComponentAdapter';
 
 export class DependencyModel extends Model {
   private connection: sqlite3.Database;
@@ -171,5 +174,10 @@ export class DependencyModel extends Model {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
     const depencencies = await call(queries.SQL_DEPENDENCY_SUMMARY, `${path}%`);
     return depencencies;
+  }
+
+  @After(declaredComponentsAdapter)
+  public async findAllDeclaredComponents(): Promise<Array<ReportComponent>>{
+   return await this.getDetectedDependencies() as unknown as Array<ReportComponent>;
   }
 }
