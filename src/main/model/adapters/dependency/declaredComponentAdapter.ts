@@ -15,7 +15,8 @@ export class DeclaredComponentAdapter implements ModelAdapter<Array<DependencyCo
         input.forEach((d)=>{
             const key = `${d.purl}@${d.version}`;
             if(componentMapper.has(key)) {
-              const licenses = componentMapper.get(key).licenses;
+                const component = componentMapper.get(key);
+              const licenses = component.licenses;
               if(licenses){
                 let aux:Array<string>;
                 if(d.licenses){
@@ -23,12 +24,13 @@ export class DeclaredComponentAdapter implements ModelAdapter<Array<DependencyCo
                 }else{
                     aux = ['unknown'];
                 }
-                componentMapper.get(key).licenses = Array.from(new Set(aux)); 
-              }             
+                component.licenses = Array.from(new Set(aux));                
+              }  
+              component.manifestFiles.push(d.file);          
             }else {
                 const algorithms = []  as unknown as Array<CryptographyAlgorithms>;
                 const licenses = d.licenses ? d.licenses.split(',') : ['unknown'];
-                componentMapper.set(key,{...d ,licenses ,source:'declared', name: d.purl, manifestFile: d.file, vendor:'',url:'',  cryptography:algorithms })
+                componentMapper.set(key,{...d ,licenses ,source:'declared', name: d.purl, manifestFiles: [d.file], vendor:'',url:'',  cryptography:algorithms })
             }
         });
 

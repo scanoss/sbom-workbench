@@ -38,9 +38,8 @@ export default function MatchesForLicense({ components, mode }) {
 
   const onSelectComponent = async (e, component: Component) => {
     e.preventDefault();
-
-    if (component.manifestFile) {
-      onSelectFile(e, component.manifestFile);
+    if (component.manifestFiles) {
+      onSelectFile(e, component.manifestFiles[0]);
     } else {
       const pathname = mode === 'detected' ? '/workbench/detected/component' : '/workbench/identified/inventory';
       await dispatch(fetchComponent(component.purl));
@@ -87,12 +86,12 @@ export default function MatchesForLicense({ components, mode }) {
                       <span className="small">
                         {rowData.purl}@{rowData.version}
                       </span>
-                      {rowData.manifestFile && (
+                      {rowData.manifestFiles && (
                         <span className="small">
                           {' '}
                           - Found in{' '}
-                          <Link href="#" underline="hover" color="inherit" onClick={(e) => onSelectFile(e, rowData.manifestFile)}>
-                            {rowData.manifestFile}
+                          <Link href="#" underline="hover" color="inherit" onClick={(e) => onSelectFile(e, rowData.manifestFiles[0])}>
+                            {rowData.manifestFiles.join(' - ')}
                           </Link>
                         </span>
                       )}

@@ -378,6 +378,22 @@ export class ComponentModel extends Model {
     return componentsFileCount;
   }
 
+  public async getIdentifiedComponentFileCount(){
+    const call = util.promisify(this.connection.all.bind(this.connection)) as any;
+    const componentsFileCount = await call(`SELECT cv.purl, cv.version, count(*) as fileCount, i.source FROM inventories i 
+    INNER JOIN component_versions cv ON cv.id = i.cvid
+    LEFT JOIN file_inventories fi ON fi.inventoryid = i.id
+    WHERE i.source = 'detected'
+    GROUP BY cv.purl, cv.version, i.source
+    UNION
+    SELECT d.purl, d.version , COUNT(d.fileId) as fileCount, 'declared' as source FROM dependencies d
+    INNER JOIN component_versions cv ON cv.purl = d.purl AND cv.version = d.version
+    INNER JOIN inventories i ON i.cvid = cv.id  AND i.spdxid = d.licenses
+    WHERE i.source = 'declared' 
+    GROUP BY d.purl, d.version;`); 
+    return componentsFileCount;
+  }
+
 
   public getEntityMapper(): Record<string, string> {
     return ComponentModel.entityMapper;

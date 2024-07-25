@@ -10,7 +10,7 @@ export interface ReportComponent {
   version: string,
   source: string,
   cryptography: Array<CryptographyAlgorithms> | [],
-  manifestFile?: string;
+  manifestFiles?: Array<string>;
   licenses: Array<string>,
   fileCount?: number;
 }
@@ -75,6 +75,30 @@ class ReportService {
       return acc;
     }, {});
     return vulnerabilityReportMapper;
+  }
+
+  private getFileCountComponentMapper(input : Array<{ purl: string, version: string, fileCount: number, source: string}>): Map<string, { componentFileCount: number, declaredComponentFileCount: number }> {
+    const componentFileCountMapper = new Map<string, { componentFileCount: number, declaredComponentFileCount: number }>();
+
+    // Adds files detected for each component (divided in 'detected' and 'declared')
+    input.forEach((c) => { 
+      const key = `${c.purl}@${c.version}`;
+      const existingEntry = componentFileCountMapper.get(key);    
+      if (existingEntry) {
+        if (c.source === 'declared') {
+          existingEntry.declaredComponentFileCount = c.fileCount;
+        } else {
+          existingEntry.componentFileCount = c.fileCount;
+        }
+      } else {
+        const fileCount = {
+          componentFileCount: c.source === 'declared' ? 0 : c.fileCount,
+          declaredComponentFileCount: c.source === 'declared' ? c.fileCount : 0,
+        };
+        componentFileCountMapper.set(key, fileCount);
+      }
+    });
+    return componentFileCountMapper;
   }
 
 
@@ -172,27 +196,7 @@ class ReportService {
 
   public async getDetectedComponents(license?: string): Promise<ComponentReportResponse> {  
     const componentFileCount = await modelProvider.model.component.getDetectedComponentFileCount();
-    const componentFileCountMapper = new Map<string, { componentFileCount: number, declaredComponentFileCount: number }>();
-
-    // Adds files detected for each component (divided in 'detected' and 'declared')
-    componentFileCount.forEach((c) => { 
-      const key = `${c.purl}@${c.version}`;
-      const existingEntry = componentFileCountMapper.get(key);    
-      if (existingEntry) {
-        if (c.source === 'declared') {
-          existingEntry.declaredComponentFileCount = c.fileCount;
-        } else {
-          existingEntry.componentFileCount = c.fileCount;
-        }
-      } else {
-        const fileCount = {
-          componentFileCount: c.source === 'declared' ? 0 : c.fileCount,
-          declaredComponentFileCount: c.source === 'declared' ? c.fileCount : 0,
-        };
-        componentFileCountMapper.set(key, fileCount);
-      }
-    });
-    
+    const componentFileCountMapper = this.getFileCountComponentMapper(componentFileCount);    
 
     // Adds file count detected for each detected component  
     let components = await modelProvider.model.component.findAllDetectedComponents();
@@ -209,8 +213,6 @@ class ReportService {
     }    
 
 
-   
-    console.log(components);
     return { 
       components,
       declaredComponents
@@ -228,16 +230,18 @@ class ReportService {
       const declaredComponents: ReportComponent[] = [];
       //Get components and declared components
 
-      const componentFileCount = await modelProvider.model.component.getDetectedComponentFileCount();
-      const componentFileCountMapper = new Map<string, number>();
-      componentFileCount.forEach((c)=>{ componentFileCountMapper.set(`${c.purl}@${c.version}`, c.fileCount)});
+      const componentFileCount = await modelProvider.model.component.getIdentifiedComponentFileCount();
+      const componentFileCountMapper = this.getFileCountComponentMapper(componentFileCount);
       indentifiedComponents.forEach((c)=>{
-        if(c.source === 'detected') {
-          // Adds number of identified files to the component
-          c.fileCount =  componentFileCountMapper.get(`${c.purl}@${c.version}`);
+        const component = componentFileCountMapper.get(`${c.purl}@${c.version}`);
+        if(c.source === 'detected') {        
+          c.fileCount = component.componentFileCount;
           components.push(c);
         } 
-        else declaredComponents.push(c);
+        else{
+          c.fileCount = component.declaredComponentFileCount;
+          declaredComponents.push(c);
+        } 
       });
 
       return{

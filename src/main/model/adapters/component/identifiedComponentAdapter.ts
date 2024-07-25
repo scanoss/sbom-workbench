@@ -18,7 +18,8 @@ export class IdentifiedComponentAdapter implements ModelAdapter<Array<Identified
     async run (input: Array<IdentifiedComponentInput>){
         const componentMapper = new Map<string, ReportComponent>();
         input.forEach((c)=>{
-            const key = `${c.purl}@${c.version}`;
+            // Use purl, version and sorue as key. A component can be used to identified a dependency or a component
+            const key = `${c.purl}@${c.version}@${c.source}`;
             if(componentMapper.has(key)) {
               const component =  componentMapper.get(key);
               const licenses = component.licenses;
