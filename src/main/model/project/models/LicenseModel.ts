@@ -300,7 +300,7 @@ export class LicenseModel extends Model {
   }
 
   @After(detectedLicenseSummaryAdapter)
-  public async getDetectedSummary(): Promise<Array<LicenseReport>> {
+  public async getDetectedLicenseComponentSummary(): Promise<Array<LicenseReport>> {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
     const detectedSummary = await call(`SELECT spdxid, SUM(detectedLicenseComponentCount) as componentLicenseCount, SUM(declaredLicenseDependencyCount) as dependencyLicenseCount , SUM(detectedLicenseComponentCount + declaredLicenseDependencyCount) as total FROM (
       -- First part: Count component license
@@ -334,6 +334,13 @@ export class LicenseModel extends Model {
           ) GROUP BY spdxid) as detected
       GROUP BY spdxid;`);
     return detectedSummary;
+  }
+
+  public async getIdentifedLicenseComponentSummary(): Promise<Array<LicenseReport>> {
+    const call:any = util.promisify(this.connection.all.bind(this.connection));
+    return await call(`SELECT i.spdxid as label ,COUNT (DISTINCT i.source || cv.purl || cv.version) as value FROM inventories i
+    INNER JOIN component_versions cv ON cv.id = i.cvid
+    GROUP BY i.spdxid;`);
   }
 
 }
