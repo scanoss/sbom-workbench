@@ -73,5 +73,15 @@
   "MatchesForProject": "Coincidencias ({{count}})",
   "IdentifiedDependencies": "Dependencias identificadas",
   "AddWorkspace": "Agregar un espacio de trabajo",
-  "GroupKeywordTitle": "Grupo de Palabras"
+  "GroupKeywordTitle": "Grupo de Palabras",
+  "ProxySettings": "Configurar proxy para acceder a internet",
+  "ProxyManualConfiguration": "Configuración manual de proxy",
+  "ProxyAutoConfiguration": "URL de configuración automática del proxy",
+  "ProxyHttp": "Proxy HTTP",
+  "ProxyHttps": "Proxy HTTPS",
+  "ProxyUseSameForHttps": "Utilice también este proxy para HTTPS",
+  "ProxyWhitelist": "Sin proxy para",
+  "ProxyWhitelistExample_one": "Ejemplo: .mozilla.org, .net.nz, 192.168.1.0/24",
+  "ProxyWhitelistExample_other": "Conexiones a localhost, 127.0.0.1/8 and ::1 nunca son proxy.",
+  "Port": "Puerto"
 }

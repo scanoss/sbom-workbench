@@ -82,5 +82,15 @@
   "AddWorkspace": "Add New Workspace",
   "DetectedCryptography": "Detected Cryptography",
   "IdentifiedCryptography": "Identified Cryptography",
-  "GroupKeywordTitle": "Group Keywords"
+  "GroupKeywordTitle": "Group Keywords",
+  "ProxySettings": "Configure proxy to access the internet",
+  "ProxyManualConfiguration": "Manual proxy configuration",
+  "ProxyAutoConfiguration": "Automatic proxy configuration url",
+  "ProxyHttp": "HTTP Proxy",
+  "ProxyHttps": "HTTPS Proxy",
+  "ProxyUseSameForHttps": "Also use this proxy for HTTPS",
+  "ProxyWhitelist": "No proxy for",
+  "ProxyWhitelistExample_one": "Example: .mozilla.org, .net.nz, 192.168.1.0/24",
+  "ProxyWhitelistExample_other": "Connections to localhost, 127.0.0.1/8 and ::1 are never proxied.",
+  "Port": "Port"
 }

@@ -1,6 +1,7 @@
 import { INewProject, ProxyMode } from '@api/types';
 import { Box, Checkbox, FormControl, FormControlLabel, FormGroup, FormHelperText, Grid, Paper, Radio, RadioGroup, TextField } from '@mui/material';
 import { ChangeEvent, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   projectSettings: INewProject;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 function ProxyConfigSetup({ projectSettings, setProjectSettings }: Props) {
+  const { t } = useTranslation();
   const [sameConfigAsHttp, setSameConfigAsHttp] = useState(false);
 
   const onChangeProxyMode = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,19 +50,16 @@ function ProxyConfigSetup({ projectSettings, setProjectSettings }: Props) {
 
   return (
     <FormControl component="fieldset">
-      <label className="input-label">Configure proxy to access the internet</label>
+      <label className="input-label">{t('Title:ProxySettings')}</label>
       <RadioGroup name="proxyMode" className="ml-3" onChange={(e) => onChangeProxyMode(e)}>
-        <FormControlLabel control={<Radio size="small" />} value={ProxyMode.Manual} label="Manual proxy configuration" />
+        <FormControlLabel control={<Radio size="small" />} value={ProxyMode.Manual} label={t('Title:ProxyManualConfiguration')} />
         {isManualProxy && (
           <Grid container columnSpacing={3} rowGap={1} sx={{ my: 1.5 }}>
             <Grid item xs={12} md={8}>
               <Box display="flex" gap={2} alignItems="center">
-                <label htmlFor="httpHost" style={{ textWrap: 'nowrap' }}>
-                  HTTP Proxy
-                </label>
+                <label style={{ textWrap: 'nowrap' }}>{t('Title:ProxyHttp')}</label>
                 <Paper sx={{ width: '100%' }}>
                   <TextField
-                    aria-label="httpHost"
                     fullWidth
                     name="httpHost"
                     onChange={(e) => handleChange(e)}
@@ -74,10 +73,9 @@ function ProxyConfigSetup({ projectSettings, setProjectSettings }: Props) {
             </Grid>
             <Grid item xs={12} md={4}>
               <Box display="flex" gap={2} alignItems="center">
-                <label htmlFor="httpPort">Port</label>
+                <label>{t('Title:Port')}</label>
                 <Paper>
                   <TextField
-                    aria-label="httpPort"
                     fullWidth
                     name="httpPort"
                     onChange={(e) => handleChange(e)}
@@ -100,44 +98,28 @@ function ProxyConfigSetup({ projectSettings, setProjectSettings }: Props) {
                     }}
                   />
                 }
-                label="Also use this proxy for HTTPS"
+                label={t('Title:ProxyUseSameForHttps')}
               />
             </Grid>
             <Grid item xs={12} md={8}>
               <Box display="flex" gap={2} alignItems="center">
-                <label htmlFor="httpsHost" style={{ textWrap: 'nowrap' }}>
-                  HTTPS Proxy
-                </label>
+                <label style={{ textWrap: 'nowrap' }}>{t('Title:ProxyHttps')}</label>
                 <Paper sx={{ width: '100%' }}>
-                  <TextField
-                    aria-label="httpsHost"
-                    fullWidth
-                    name="httpsHost"
-                    onChange={(e) => handleChange(e)}
-                    size="small"
-                    value={projectSettings.proxyConfig?.httpsHost ?? ''}
-                  />
+                  <TextField fullWidth name="httpsHost" onChange={(e) => handleChange(e)} size="small" value={projectSettings.proxyConfig?.httpsHost ?? ''} />
                 </Paper>
               </Box>
             </Grid>
             <Grid item xs={12} md={4}>
               <Box display="flex" gap={2} alignItems="center">
-                <label htmlFor="httpsPort">Port</label>
+                <label>{t('Title:Port')}</label>
                 <Paper sx={{ width: '100%' }}>
-                  <TextField
-                    aria-label="httpsPort"
-                    fullWidth
-                    name="httpsPort"
-                    onChange={(e) => handleChange(e)}
-                    size="small"
-                    value={projectSettings.proxyConfig?.httpsPort ?? ''}
-                  />
+                  <TextField fullWidth name="httpsPort" onChange={(e) => handleChange(e)} size="small" value={projectSettings.proxyConfig?.httpsPort ?? ''} />
                 </Paper>
               </Box>
             </Grid>
           </Grid>
         )}
-        <FormControlLabel control={<Radio size="small" />} value={ProxyMode.Automatic} label="Automatic proxy configuration url" />
+        <FormControlLabel control={<Radio size="small" />} value={ProxyMode.Automatic} label={t('Title:ProxyAutoConfiguration')} />
         {isAutomaticProxy && (
           <Grid container rowGap={2} sx={{ my: 1.5 }}>
             <Grid item xs={12}>
@@ -147,14 +129,14 @@ function ProxyConfigSetup({ projectSettings, setProjectSettings }: Props) {
             </Grid>
             <Grid item xs={12}>
               <FormGroup>
-                <label className="mb-1">No proxy for</label>
+                <label className="mb-1">{t('Title:ProxyWhitelist')}</label>
                 <Paper sx={{ width: '100%' }}>
                   <TextField fullWidth size="small" />
                 </Paper>
                 <FormHelperText>
-                  Example: .mozilla.org, .net.nz, 192.168.1.0/24
+                  {t('ProxyWhitelistExample_one')}
                   <br />
-                  Connections to localhost, 127.0.0.1/8 and ::1 are never proxied.
+                  {t('ProxyWhitelistExample_other')}
                 </FormHelperText>
               </FormGroup>
             </Grid>
