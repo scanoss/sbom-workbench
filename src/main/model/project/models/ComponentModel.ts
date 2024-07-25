@@ -358,7 +358,7 @@ export class ComponentModel extends Model {
   }
 
   @After(detectedComponentAdapter)
-  public async getDetectedComponents():Promise<Array<ReportComponent>>{
+  public async findAllDetectedComponents():Promise<Array<ReportComponent>>{
     return await this.getComponentsDetectedForReport();
   }
 
