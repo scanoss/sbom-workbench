@@ -80,21 +80,29 @@ export default function MatchesForLicense({ components, mode }) {
                 <div className="table-cell">
                   <IconComponent name={rowData.vendor} size={30} />
                   <div className="d-flex flex-column">
-                    <Link
-                      href="#"
-                      underline="hover"
-                      onClick={(e) => onSelectComponent(e, rowData)}
-                    >
+                    <Link href="#" underline="hover" onClick={(e) => onSelectComponent(e, rowData)}>
                       {rowData.name}
                     </Link>
                     <div>
-                      <span className="small">{rowData.purl}@{rowData.version}</span>
-                      {rowData.manifestFile && <span className="small"> - Found in <Link href="#" underline="hover" color="inherit" onClick={(e) => onSelectFile(e, rowData.manifestFile)}>{rowData.manifestFile}</Link></span>}
+                      <span className="small">
+                        {rowData.purl}@{rowData.version}
+                      </span>
+                      {rowData.manifestFile && (
+                        <span className="small">
+                          {' '}
+                          - Found in{' '}
+                          <Link href="#" underline="hover" color="inherit" onClick={(e) => onSelectFile(e, rowData.manifestFile)}>
+                            {rowData.manifestFile}
+                          </Link>
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
               )}
             />
+
+            <Column label="Files" dataKey="fileCount" width={100} flexGrow={1} flexShrink={0} />
 
             <Column
               label={t('Table:Header:License')}
@@ -111,7 +119,11 @@ export default function MatchesForLicense({ components, mode }) {
         )}
       </AutoSizer>
 
-      { components.length === 0 && <div className="mt-10 pt-2 text-center"><small>No data found</small></div> }
+      {components.length === 0 && (
+        <div className="mt-10 pt-2 text-center">
+          <small>No data found</small>
+        </div>
+      )}
     </>
   );
 }
