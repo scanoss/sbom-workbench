@@ -363,8 +363,19 @@ export class ComponentModel extends Model {
   }
 
   @After(identifiedComponentAdapter)
-  public async getIDentifiedComponents():Promise<Array<ReportComponent>>{
+  public async getIdentifiedComponents():Promise<Array<ReportComponent>>{
     return await this.getComponentsIdentifiedForReport();
+  }
+
+  public async getDetectedComponentFileCount(){
+    const call = util.promisify(this.connection.all.bind(this.connection)) as any;
+    const componentsFileCount = await call(`SELECT r.purl,r.version, COUNT(*) as fileCount, 'detected' as source FROM results r 
+    LEFT JOIN result_license rl ON r.id = rl.resultId
+    GROUP BY r.version, r.purl
+    UNION
+    SELECT d.purl, d.version, COUNT(*) as fileCount,'declared' as source FROM dependencies d
+    GROUP by d.purl,d.version;`); 
+    return componentsFileCount;
   }
 
 

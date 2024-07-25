@@ -12,6 +12,7 @@ export interface ReportComponent {
   cryptography: Array<CryptographyAlgorithms> | [],
   manifestFile?: string;
   licenses: Array<string>,
+  fileCount?: number;
 }
 
 export interface CryptographyAlgorithms {
@@ -169,15 +170,47 @@ class ReportService {
     };
   }
 
-  public async getDetectedComponents(license?: string): Promise<ComponentReportResponse> {    
+  public async getDetectedComponents(license?: string): Promise<ComponentReportResponse> {  
+    const componentFileCount = await modelProvider.model.component.getDetectedComponentFileCount();
+    const componentFileCountMapper = new Map<string, { componentFileCount: number, declaredComponentFileCount: number }>();
+
+    // Adds files detected for each component (divided in 'detected' and 'declared')
+    componentFileCount.forEach((c) => { 
+      const key = `${c.purl}@${c.version}`;
+      const existingEntry = componentFileCountMapper.get(key);    
+      if (existingEntry) {
+        if (c.source === 'declared') {
+          existingEntry.declaredComponentFileCount = c.fileCount;
+        } else {
+          existingEntry.componentFileCount = c.fileCount;
+        }
+      } else {
+        const fileCount = {
+          componentFileCount: c.source === 'declared' ? 0 : c.fileCount,
+          declaredComponentFileCount: c.source === 'declared' ? c.fileCount : 0,
+        };
+        componentFileCountMapper.set(key, fileCount);
+      }
+    });
+    
+
+    // Adds file count detected for each detected component  
     let components = await modelProvider.model.component.findAllDetectedComponents();
+    components.forEach((c)=> { c.fileCount = componentFileCountMapper.get(`${c.purl}@${c.version}`).componentFileCount });
+
+    // Adds file count detected for each declared detected component
     let declaredComponents = await modelProvider.model.dependency.findAllDeclaredComponents();
+    declaredComponents.forEach((c)=> { c.fileCount = componentFileCountMapper.get(`${c.purl}@${c.version}`).declaredComponentFileCount });
+
     // Filter by license
     if(license) {
       components = this.filterComponentsByLicense(license, components); 
       declaredComponents = this.filterComponentsByLicense(license, declaredComponents);        
-    }  
+    }    
+
+
    
+    console.log(components);
     return { 
       components,
       declaredComponents
@@ -186,7 +219,7 @@ class ReportService {
 
 
   public async getIdentifiedComponents(license?: string): Promise<ComponentReportResponse> {
-      let indentifiedComponents = await modelProvider.model.component.getIDentifiedComponents();
+      let indentifiedComponents = await modelProvider.model.component.getIdentifiedComponents();
       if(license){
         indentifiedComponents = this.filterComponentsByLicense(license, indentifiedComponents);
       }
@@ -195,8 +228,15 @@ class ReportService {
       const declaredComponents: ReportComponent[] = [];
       //Get components and declared components
 
+      const componentFileCount = await modelProvider.model.component.getDetectedComponentFileCount();
+      const componentFileCountMapper = new Map<string, number>();
+      componentFileCount.forEach((c)=>{ componentFileCountMapper.set(`${c.purl}@${c.version}`, c.fileCount)});
       indentifiedComponents.forEach((c)=>{
-        if(c.source === 'detected') components.push(c);
+        if(c.source === 'detected') {
+          // Adds number of identified files to the component
+          c.fileCount =  componentFileCountMapper.get(`${c.purl}@${c.version}`);
+          components.push(c);
+        } 
         else declaredComponents.push(c);
       });
 

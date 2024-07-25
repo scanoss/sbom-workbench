@@ -20,15 +20,18 @@ export class IdentifiedComponentAdapter implements ModelAdapter<Array<Identified
         input.forEach((c)=>{
             const key = `${c.purl}@${c.version}`;
             if(componentMapper.has(key)) {
-              const licenses = componentMapper.get(key).licenses;
+              const component =  componentMapper.get(key);
+              const licenses = component.licenses;
               if(licenses){
                 licenses.push(c.spdxid);
-                componentMapper.get(key).licenses = Array.from(new Set(licenses));  
-              }             
+                component.licenses = Array.from(new Set(licenses));  
+              }               
             }else {
+                // Adds new component to map
                 const algorithms =  (c.algortithms ?  c.algortithms?.split(','): [])  as unknown as Array<CryptographyAlgorithms>;
-                const license = c.spdxid ? c.spdxid :'unknown';
-                componentMapper.set(key,{...c,licenses: [license] ,  cryptography:algorithms })
+                // if license is not defined , set unknown license
+                const license = c.spdxid ? c.spdxid :'unknown';                
+                componentMapper.set(key,{...c,licenses: [license]  ,  cryptography:algorithms })
             }
         });
         return Array.from(componentMapper.values());
