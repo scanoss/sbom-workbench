@@ -22,6 +22,11 @@ class ReportService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.REPORT_GET_DETECTED_COMPONENTS, license);
     return this.response(response);
   }
+
+  public async getIdentifiedComponents(license?: string): Promise<ComponentReportResponse> {
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.REPORT_GET_IDENTIFIED_COMPONENTS, license);
+    return this.response(response);
+  }
 }
 
 export const reportService = new ReportService();

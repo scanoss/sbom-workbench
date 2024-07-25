@@ -13,6 +13,7 @@ import { Model } from '../../Model';
 import { After } from '../../hooks/after/afterHook';
 import { detectedComponentAdapter } from '../../adapters/component/detectedComponentAdapter';
 import { ReportComponent } from '../../../services/ReportService';
+import { identifiedComponentAdapter } from '../../adapters/component/identifiedComponentAdapter';
 
 export class ComponentModel extends Model {
   private connection: sqlite3.Database;
@@ -189,7 +190,7 @@ export class ComponentModel extends Model {
 
   public async getComponentsIdentifiedForReport() {
     const call = util.promisify(this.connection.all.bind(this.connection)) as any;
-    const queries:any = (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms
+    const queries:any = (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms, i.source
         FROM component_versions c
         INNER JOIN inventories i ON c.id=i.cvid
         LEFT JOIN licenses l ON l.spdxid=i.spdxid
@@ -360,6 +361,12 @@ export class ComponentModel extends Model {
   public async getDetectedComponents():Promise<Array<ReportComponent>>{
     return await this.getComponentsDetectedForReport();
   }
+
+  @After(identifiedComponentAdapter)
+  public async getIDentifiedComponents():Promise<Array<ReportComponent>>{
+    return await this.getComponentsIdentifiedForReport();
+  }
+
 
   public getEntityMapper(): Record<string, string> {
     return ComponentModel.entityMapper;

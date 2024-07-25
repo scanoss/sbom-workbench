@@ -23,6 +23,7 @@ import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 import { Scanner } from '../../../../../../../main/task/scanner/types';
 import DependenciesCard from '../../components/DependenciesCard';
 import CryptographyCard from '../../components/CryptographyCard';
+import { reportService } from '@api/services/report.service';
 
 Chart.register(...registerables);
 
@@ -52,21 +53,22 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
     onLicenseClear();
   };
 
-  const onLicenseSelected = (license: string) => {
+  const onLicenseSelected = async (license: string) => {
     const matchedLicense = data.licenses.find((item) => item.label === license);
+    
+    const identified = await reportService.getIdentifiedComponents(license);
 
-    const filtered = data.components.filter((item) => item.licenses.includes(matchedLicense.label));
-    setComponentsMatched([]);
-    setComponentsDeclared([]);
+    setComponentsMatched(identified.components);
+    setComponentsDeclared(identified.declaredComponents);
     setObligationsFiltered(obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)));
     setLicenseSelected(matchedLicense);
   };
 
-  const onLicenseClear = () => {
+  const onLicenseClear = async () => {
     const items = data.components;
-
-    setComponentsMatched([]);
-    setComponentsDeclared([]);
+    const identified = await reportService.getIdentifiedComponents();
+    setComponentsMatched(identified.components);
+    setComponentsDeclared(identified.declaredComponents);
     setObligationsFiltered(obligations.current);
 
     setLicenseSelected(null);
@@ -118,7 +120,7 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
             <LicensesChart data={data.licenses} />
             <LicensesTable
               matchedLicenseSelected={licenseSelected}
-              selectLicense={(license) => onLicenseSelected(license)}
+              selectLicense={async (license) => onLicenseSelected(license)}
               data={data.licenses}
             />
           </div>
