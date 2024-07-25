@@ -77,25 +77,7 @@ class ReportService {
   }
 
   public async getIdentified(): Promise<IReportData> {
-    let data: any = [];
-    data = await modelProvider.model.component.getIdentifiedForReport();
-
-    const licenseMapper = new Map<string, LicenseReport>();
-    data.forEach((element) => {
-      const { name, vendor, url, purl, version, source, spdxid } = element;
-      if (licenseMapper.has(spdxid)) {
-        const license = licenseMapper.get(spdxid);
-        license.value += 1;
-      } else {
-        const newLicense = {
-          value: 1,
-          label: spdxid,
-        };
-        licenseMapper.set(spdxid, newLicense);
-      }
-    });
-
-    const licenses = Array.from(licenseMapper.values()) as unknown as Array<LicenseReport>;
+    const identifiedLicenseSummary = await modelProvider.model.license.getIdentifedLicenseComponentSummary();
 
     const vulnerabilities = await modelProvider.model.vulnerability.getIdentifiedReport();
     const vulnerabilityReport = {
@@ -121,7 +103,7 @@ class ReportService {
     // Add Manifest files
    // await this.addManifestFileToComponents(licenses);
 
-    return { licenses,
+    return { licenses: identifiedLicenseSummary,
        vulnerabilities: vulnerabilityReport,
        cryptographies,
        dependencies: dependenciesSummary,
@@ -130,7 +112,7 @@ class ReportService {
 
   public async getDetected(): Promise<IReportData> {
 
-    const licenses = await modelProvider.model.license.getDetectedSummary();
+    const licenses = await modelProvider.model.license.getDetectedLicenseComponentSummary();
 
 
     const vulnerabilities = await modelProvider.model.vulnerability.getDetectedReport();
