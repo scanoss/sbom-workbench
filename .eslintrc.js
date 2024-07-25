@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['erb', 'airbnb', 'airbnb-typescript'],
+  extends: ['erb', 'airbnb', 'airbnb-typescript', 'plugin:prettier/recommended'],
   rules: {
     // A temporary hack related to IDE not resolving correct package.json
     'import/no-extraneous-dependencies': 'off',
@@ -29,7 +29,7 @@ module.exports = {
     'react/no-array-index-key': ['warn'],
     'import/no-cycle': ['warn'],
     'no-empty-pattern': ['off'],
-    'react-hooks/exhaustive-deps': 'warn',
+    'react-hooks/exhaustive-deps': 'off',
     'no-plusplus': ['warn', { allowForLoopAfterthoughts: true }],
     'react/function-component-definition': ['off'],
     'no-param-reassign': ['off'],

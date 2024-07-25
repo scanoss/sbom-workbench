@@ -1,11 +1,11 @@
+import { IReportData, ISummary } from 'main/services/ReportService';
+import { Scanner } from 'main/task/scanner/types';
 import { NodeStatus } from '../main/workspace/tree/Node';
-import { Scanner } from '../main/task/scanner/types';
-import ScannerConfig = Scanner.ScannerConfig;
 import Folder from '../main/workspace/tree/Folder';
-import { Metadata } from '../main/workspace/Metadata';
 import { Cryptography } from '../main/model/entity/Cryptography';
 import { LocalCryptography } from '../main/model/entity/LocalCryptography';
-import { IReportData, ISummary } from 'main/services/ReportService';
+
+import ScannerConfig = Scanner.ScannerConfig;
 
 export enum ScanState {
   CREATED = 'CREATED',
@@ -133,6 +133,21 @@ export interface INewProject {
   api_key?: string;
   source: string;
   scannerConfig: ScannerConfig;
+  proxyConfig?: ProxyConfig;
+}
+
+interface ProxyConfig {
+  mode: ProxyMode;
+  httpHost?: string;
+  httpPort?: string;
+  httpsHost?: string;
+  httpsPort?: string;
+  whitelistedHosts?: string[] | null;
+}
+
+export enum ProxyMode {
+  Automatic = 'automatic',
+  Manual = 'manual',
 }
 
 export interface IProject extends INewProject {
@@ -317,7 +332,7 @@ export interface Dependency {
   valid: boolean;
   originalVersion: string;
   originalLicense: string[];
-  rejectedAt?: string
+  rejectedAt?: string;
 }
 
 export enum ScannerStage {
@@ -413,21 +428,10 @@ export interface ContextFiles {
   ignoreFile: string | null;
 }
 
-export interface DependencyManifestFile {
-  path: string;
-  fileId: number;
-  summary: {
-    identified: number
-    ignored: number;
-    pending: number;
-  }
-}
-
 export interface GroupSearchKeyword {
   id: number;
   label: string;
   words: Array<string>;
   createdAt: string;
-  updatedAt:string;
+  updatedAt: string;
 }
-
