@@ -367,10 +367,23 @@ export class ComponentModel extends Model {
     return await this.getComponentsIdentifiedForReport();
   }
 
-  public async getDetectedComponentFileCount(){
+/**
+ * @brief Retrieves the number of detected and declared files for each component (purl and version). *
+ * This method queries the database to get the count of files for each component version, grouped by the package URL (purl) and version.
+ * It combines data from detected results and declared dependencies.
+ *
+ * @returns {Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>>} - 
+ * A promise that resolves to an array of objects, each containing:
+ *   - `purl` (string): The package URL of the component.
+ *   - `version` (string): The version of the component.
+ *   - `fileCount` (number): The number of files associated with the component.
+ *   - `source` (string): The source of the file count ('detected' or 'declared').
+ *
+ * @throws {Error} - Throws an error if the database query fails.
+ */
+  public async getDetectedComponentFileCount():Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>> {
     const call = util.promisify(this.connection.all.bind(this.connection)) as any;
     const componentsFileCount = await call(`SELECT r.purl,r.version, COUNT(*) as fileCount, 'detected' as source FROM results r 
-    LEFT JOIN result_license rl ON r.id = rl.resultId
     GROUP BY r.version, r.purl
     UNION
     SELECT d.purl, d.version, COUNT(*) as fileCount,'declared' as source FROM dependencies d
@@ -378,7 +391,26 @@ export class ComponentModel extends Model {
     return componentsFileCount;
   }
 
-  public async getIdentifiedComponentFileCount(){
+/**
+ * @brief Retrieves the number of identified files for each component (purl and version).
+ * This method queries the database to get the count of identified files for each
+ * component version, grouped by the package URL (purl) and version. It combines
+ * data from identified detected sources and identified declared dependencies. If the `spdxid` is provided,
+ * it filters the results by the specified `spdxid`( Only applied to declared components). If `spdxid` is null or undefined,
+ * it retrieves all components.
+ *
+ * @param {string} [spdxid] - The SPDX identifier to filter the results. If not provided, retrieves all licenses.
+ * @returns {Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>>} - 
+ * A promise that resolves to an array of objects, each containing:
+ *   - `purl` (string): The package URL of the component.
+ *   - `version` (string): The version of the component.
+ *   - `fileCount` (number): The number of identified files for the component.
+ *   - `source` (string): The source of the component (either 'detected' or 'declared').
+ *
+ * @throws {Error} - Throws an error if the database query fails.
+ */
+  
+  public async getIdentifiedComponentFileCount(spdxid?: string):Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>> {
     const call = util.promisify(this.connection.all.bind(this.connection)) as any;
     const componentsFileCount = await call(`SELECT cv.purl, cv.version, count(*) as fileCount, i.source FROM inventories i 
     INNER JOIN component_versions cv ON cv.id = i.cvid
@@ -389,8 +421,8 @@ export class ComponentModel extends Model {
     SELECT d.purl, d.version , COUNT(d.fileId) as fileCount, 'declared' as source FROM dependencies d
     INNER JOIN component_versions cv ON cv.purl = d.purl AND cv.version = d.version
     INNER JOIN inventories i ON i.cvid = cv.id  AND i.spdxid = d.licenses
-    WHERE i.source = 'declared' 
-    GROUP BY d.purl, d.version;`); 
+    WHERE i.source = 'declared' AND (i.spdxid = ? OR ? IS NULL)
+    GROUP BY d.purl, d.version;`, [spdxid, spdxid]); 
     return componentsFileCount;
   }
 

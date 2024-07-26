@@ -121,6 +121,27 @@ class ReportService {
     return summary;
   }
 
+  /**
+ *@brief Retrieves a summary of identified data, including licenses, vulnerabilities, cryptographic algorithms, and dependencies.
+ *
+ * This method fetches various types of identified information from the database and compiles a summary report.
+ * It includes identified license components, vulnerability counts categorized by severity, identified cryptographic algorithms, 
+ * and identified dependencies.
+ *
+ * @returns {Promise<IReportData>} - A promise that resolves to an object containing:
+ *   - `licenses` (IdentifiedLicenseComponentSummary): Summary of identified license components.
+ *   - `cryptographies` (Object): An object with two properties:
+ *     - `sbom` (number): The number of cryptographic algorithms identified in SBOM.
+ *     - `local` (number): The number of cryptographic algorithms identified locally.
+ *   - `vulnerabilities` (Object): An object with counts of identified vulnerabilities categorized by severity:
+ *     - `critical` (number): Number of critical vulnerabilities.
+ *     - `high` (number): Number of high vulnerabilities.
+ *     - `medium` (number): Number of medium vulnerabilities.
+ *     - `low` (number): Number of low vulnerabilities.
+ *   - `dependencies` (IdentifiedDependenciesSummary): Summary of identified dependencies.
+ *
+ * @throws {Error} - Throws an error if any of the data fetching or processing operations fail.
+ */
   public async getIdentified(): Promise<IReportData> {
     
     // License components summary
@@ -154,6 +175,26 @@ class ReportService {
        };
   }
 
+/**
+ * @brief Retrieves a summary of detected data, including licenses, vulnerabilities, dependencies, and cryptographic algorithms.
+ * This method gathers various types of detected information from the database and compiles a summary report.
+ * It includes detected license components, vulnerability counts categorized by severity, detected dependencies, 
+ * and cryptographic algorithms both from SBOM (Software Bill of Materials) and local sources.
+ *
+ * @returns {Promise<IReportData>} - A promise that resolves to an object containing:
+ *   - `licenses` (DetectedLicenseComponentSummary): Summary of detected license components.
+ *   - `cryptographies` (Object): An object with two properties:
+ *     - `sbom` (number): The number of unique cryptographic algorithms found in SBOM.
+ *     - `local` (number): The number of cryptographic algorithms found locally.
+ *   - `vulnerabilities` (Object): An object with counts of detected vulnerabilities categorized by severity:
+ *     - `critical` (number): Number of critical vulnerabilities.
+ *     - `high` (number): Number of high vulnerabilities.
+ *     - `medium` (number): Number of medium vulnerabilities.
+ *     - `low` (number): Number of low vulnerabilities.
+ *   - `dependencies` (DetectedDependenciesSummary): Summary of detected dependencies.
+ *
+ * @throws {Error} - Throws an error if any of the data fetching or processing operations fail.
+ */
   public async getDetected(): Promise<IReportData> {
     
     // License components summary
@@ -194,6 +235,18 @@ class ReportService {
     };
   }
 
+
+  /**
+ *@brief Retrieves a list of detected components and declared components with their associated file counts.
+ * This method fetches the count of files detected for each component and declared dependency.
+ * It then combines this data with details of detected and declared components, and optionally
+ * filters the results by a specified license.
+ *
+ * @param {string} [license] - The license to filter components by. If provided, only components
+ *                             matching this license will be included in the results.
+ * @returns {Promise<ComponentReportResponse>}
+ * @throws {Error} - Throws an error if any of the data fetching or processing operations fail.
+ */
   public async getDetectedComponents(license?: string): Promise<ComponentReportResponse> {  
     const componentFileCount = await modelProvider.model.component.getDetectedComponentFileCount();
     const componentFileCountMapper = this.getFileCountComponentMapper(componentFileCount);    
@@ -212,17 +265,26 @@ class ReportService {
       declaredComponents = this.filterComponentsByLicense(license, declaredComponents);        
     }    
 
-
     return { 
       components,
       declaredComponents
     }
   }
 
-
+/**
+ *@brief Retrieves identified components with their associated file counts, optionally filtering by license.
+ * This method fetches identified components from the database and adds file count data 
+ * for each component based on its source ('detected' or 'declared'). It then filters the results 
+ * by a specified license if provided.
+ *
+ * @param {string} [license] - The license to filter components by. If provided, only components
+ *                             matching this license will be included in the results.
+ * @returns {Promise<ComponentReportResponse>}
+ * @throws {Error} - Throws an error if any of the data fetching or processing operations fail.
+ */
   public async getIdentifiedComponents(license?: string): Promise<ComponentReportResponse> {
       let indentifiedComponents = await modelProvider.model.component.getIdentifiedComponents();
-      if(license){
+      if(license) {
         indentifiedComponents = this.filterComponentsByLicense(license, indentifiedComponents);
       }
 
@@ -230,7 +292,7 @@ class ReportService {
       const declaredComponents: ReportComponent[] = [];
       //Get components and declared components
 
-      const componentFileCount = await modelProvider.model.component.getIdentifiedComponentFileCount();
+      const componentFileCount = await modelProvider.model.component.getIdentifiedComponentFileCount(license);
       const componentFileCountMapper = this.getFileCountComponentMapper(componentFileCount);
       indentifiedComponents.forEach((c)=>{
         const component = componentFileCountMapper.get(`${c.purl}@${c.version}`);
@@ -248,8 +310,7 @@ class ReportService {
         components,
         declaredComponents
       }
-   }
- 
+   } 
 }
 
 export const reportService = new ReportService();
