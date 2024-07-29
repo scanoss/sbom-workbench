@@ -13,7 +13,6 @@ export class ComponentReportVisitor extends ComponentReport {
 
         const components: ReportComponent[] = [];
         const declaredComponents: ReportComponent[] = [];
-
         // Adds file count to each component depending on its source (detected or declared)
         allIdentifiedComponents.forEach((c)=>{
             const component = componentFileCountMapper.get(`${c.purl}@${c.version}`);

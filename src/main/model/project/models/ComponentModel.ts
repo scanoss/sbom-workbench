@@ -364,7 +364,33 @@ export class ComponentModel extends Model {
 
   @After(identifiedComponentAdapter)
   public async getIdentifiedComponents():Promise<Array<ReportComponent>>{
-    return await this.getComponentsIdentifiedForReport();
+    const call = util.promisify(this.connection.all.bind(this.connection)) as any;
+    const queries:any = (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms, i.source, null as file
+    FROM component_versions c
+    INNER JOIN inventories i ON c.id=i.cvid
+    LEFT JOIN licenses l ON l.spdxid=i.spdxid
+    LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
+    LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version
+    WHERE c.source = 'engine' OR c.source='manual' AND i.source = 'detected'			
+    UNION 
+    SELECT d.purl, d.purl as name,'' as vendor ,'' as url,d.version ,i.spdxid as license,i.spdxid,'' as algorithms, i.source,  f.path as file
+    FROM dependencies d 
+    INNER JOIN component_versions cv ON d.purl = cv.purl AND d.version = cv.version
+    INNER JOIN files f ON d.fileId = f.fileId
+    INNER JOIN inventories i ON cv.id = i.cvid
+    WHERE i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0
+    GROUP BY d.purl, d.version, i.spdxid, f.path;`) as Array<{
+      purl: string;
+      name: string;
+      vendor: string;
+      url: string;
+      version: string;
+      license: string;
+      spdxid: string;
+      algorithms: { algorithm: string; strength: string }[] | null;
+      file: string;
+    }>);
+    return queries.map((item) => ({ ...item, algorithms: item.algorithms ? JSON.parse(item.algorithms): null }));
   }
 
 /**
@@ -420,7 +446,7 @@ export class ComponentModel extends Model {
     UNION
     SELECT d.purl, d.version , COUNT(d.fileId) as fileCount, 'declared' as source FROM dependencies d
     INNER JOIN component_versions cv ON cv.purl = d.purl AND cv.version = d.version
-    INNER JOIN inventories i ON i.cvid = cv.id  AND i.spdxid = d.licenses
+    INNER JOIN inventories i ON i.cvid = cv.id  AND instr(d.licenses, i.spdxid) > 0
     WHERE i.source = 'declared' AND (i.spdxid = ? OR ? IS NULL)
     GROUP BY d.purl, d.version;`, [spdxid, spdxid]); 
     return componentsFileCount;

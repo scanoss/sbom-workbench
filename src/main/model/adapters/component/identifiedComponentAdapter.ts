@@ -12,6 +12,7 @@ export interface IdentifiedComponentInput {
     spdxid: string;
     algortithms: string;
     source: string;
+    file: string;
 }
 
 export class IdentifiedComponentAdapter implements ModelAdapter<Array<IdentifiedComponentInput>,Array<ReportComponent>> {
@@ -26,13 +27,19 @@ export class IdentifiedComponentAdapter implements ModelAdapter<Array<Identified
               if(licenses){
                 licenses.push(c.spdxid);
                 component.licenses = Array.from(new Set(licenses));  
-              }               
+              }     
+              if (c.source === 'declared') component.manifestFiles.push(c.file);          
             }else {
                 // Adds new component to map
                 const algorithms =  (c.algortithms ?  c.algortithms?.split(','): [])  as unknown as Array<CryptographyAlgorithms>;
                 // if license is not defined , set unknown license
                 const license = c.spdxid ? c.spdxid :'unknown';                
-                componentMapper.set(key,{...c,licenses: [license]  ,  cryptography:algorithms })
+                componentMapper.set(key,{...c,
+                      licenses: [license],
+                      cryptography:algorithms,
+                      ...(c.source === 'declared' ? { manifestFiles: [c.file] } : {})
+                    });
+                
             }
         });
         return Array.from(componentMapper.values());
