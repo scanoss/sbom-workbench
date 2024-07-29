@@ -130,10 +130,13 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
     const {
       DEFAULT_API_INDEX,
       APIS,
+      HTTP_PROXY,
+      HTTPS_PROXY,
+      PAC_PROXY,
+      GRPC_PROXY,
+      NO_PROXY,
       CA_CERT,
-      PROXY,
       IGNORE_CERT_ERRORS,
-      PAC,
       SCANNER_TIMEOUT,
       SCANNER_POST_SIZE,
       SCANNER_CONCURRENCY_LIMIT,
@@ -157,10 +160,12 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
 
     scannerCfg.MAX_RESPONSES_IN_BUFFER = 500;
 
-    scannerCfg.PROXY = PROXY || null;
+    scannerCfg.HTTP_PROXY = ""
+    scannerCfg.HTTPS_PROXY = "";
+    scannerCfg.NO_PROXY = "";
+
     scannerCfg.IGNORE_CERT_ERRORS = IGNORE_CERT_ERRORS !== undefined ? IGNORE_CERT_ERRORS : false;
     scannerCfg.CA_CERT = CA_CERT !== undefined ? CA_CERT : null;
-    scannerCfg.PAC = PAC;
 
     // Obfuscation
     scannerCfg.WFP_OBFUSCATION = this.project.getDto().scannerConfig.obfuscate;

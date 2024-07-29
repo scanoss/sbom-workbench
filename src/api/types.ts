@@ -35,10 +35,13 @@ export interface IWorkspaceCfg {
   SCAN_MODE: string;
   VERSION: string;
   LNG: string;
-  PROXY: string;
+  HTTP_PROXY: string;   // [http://|https://][<username>[:<password>]@]<IP|domain_name>[:<port>]
+  HTTPS_PROXY: string;
+  GRPC_PROXY: string;
+  PAC_PROXY: string;    //URL
+  NO_PROXY: string[];
   CA_CERT: string;
   IGNORE_CERT_ERRORS: boolean;
-  PAC: string; // TODO: add this option to the migration
   SCANNER_TIMEOUT: number;
   SCANNER_POST_SIZE: number;
   SCANNER_CONCURRENCY_LIMIT: number;
@@ -136,7 +139,7 @@ export interface INewProject {
   proxyConfig?: ProxyConfig;
 }
 
-interface ProxyConfig {
+export interface ProxyConfig {
   mode: ProxyMode;
   httpHost?: string;
   httpPort?: string;
