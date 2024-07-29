@@ -10,17 +10,18 @@ import { DialogProvider } from '@context/DialogProvider';
 import { WorkbenchProvider } from '@context/WorkbenchProvider';
 import AppProvider from '@context/AppProvider';
 import store from '@store/store';
-import {
-  createTheme, ThemeProvider, StyledEngineProvider, Theme,
-} from '@mui/material/styles';
+import { createTheme, ThemeProvider, StyledEngineProvider, Theme } from '@mui/material/styles';
 
 import { AppI18n } from '@shared/i18n';
 import { IpcChannels } from '@api/ipc-channels';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { userSettingService } from '@api/services/userSetting.service';
 import WorkbenchModule from './features/workbench';
 import WorkspaceModule from './features/workspace';
 import AboutModule from './features/about';
 import './App.global.scss';
+
+const queryClient = new QueryClient();
 
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -46,22 +47,24 @@ export default class App {
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
           <HashRouter>
-            <Provider store={store}>
-              <DialogProvider>
-                <AppProvider>
-                  <WorkbenchProvider>
-                    <React.Suspense fallback="">
-                      <Routes>
-                        <Route index element={<WorkspaceModule />} />
-                        <Route path="/workspace/*" element={<WorkspaceModule />} />
-                        <Route path="/workbench/*" element={<WorkbenchModule />} />
-                        <Route path="/about" element={<AboutModule />} />
-                      </Routes>
-                    </React.Suspense>
-                  </WorkbenchProvider>
-                </AppProvider>
-              </DialogProvider>
-            </Provider>
+            <QueryClientProvider client={queryClient}>
+              <Provider store={store}>
+                <DialogProvider>
+                  <AppProvider>
+                    <WorkbenchProvider>
+                      <React.Suspense fallback="">
+                        <Routes>
+                          <Route index element={<WorkspaceModule />} />
+                          <Route path="/workspace/*" element={<WorkspaceModule />} />
+                          <Route path="/workbench/*" element={<WorkbenchModule />} />
+                          <Route path="/about" element={<AboutModule />} />
+                        </Routes>
+                      </React.Suspense>
+                    </WorkbenchProvider>
+                  </AppProvider>
+                </DialogProvider>
+              </Provider>
+            </QueryClientProvider>
           </HashRouter>
         </ThemeProvider>
       </StyledEngineProvider>

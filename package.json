@@ -57,7 +57,7 @@
   "browserslist": [],
   "prettier": {
     "singleQuote": true,
-    "printWidth": 180,
+    "printWidth": 120,
     "overrides": [
       {
         "files": [
@@ -111,12 +111,14 @@
     "@electron/rebuild": "^3.2.13",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@hookform/resolvers": "^3.9.0",
     "@mui/icons-material": "^5.15.10",
     "@mui/lab": "^5.0.0-alpha.165",
     "@mui/material": "^5.15.10",
     "@mui/styles": "^5.15.10",
     "@mui/x-data-grid": "^5.12.3",
     "@reduxjs/toolkit": "^1.8.1",
+    "@tanstack/react-query": "^5.51.15",
     "adm-zip": "^0.5.9",
     "chart.js": "^3.5.0",
     "electron-debug": "^3.2.0",
@@ -137,6 +139,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.5",
+    "react-hook-form": "^7.52.1",
     "react-i18next": "^11.18.6",
     "react-redux": "^7.2.8",
     "react-router-dom": "^6.3.0",
@@ -150,7 +153,8 @@
     "sort-paths": "^1.1.1",
     "source-map-support": "^0.5.19",
     "translation-check": "^1.0.2",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@grpc/grpc-js": "^1.8.7",

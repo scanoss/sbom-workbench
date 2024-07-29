@@ -1,22 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Button, Dialog, DialogActions, IconButton, InputBase, MenuItem, Paper, Select, Tooltip,
-} from '@mui/material';
+import React, { MouseEvent, SyntheticEvent, useEffect, useState } from 'react';
+import { Button, Dialog, DialogActions, IconButton, MenuItem, Paper, Select, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import TextField from '@mui/material/TextField';
 import AddIcon from '@mui/icons-material/Add';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
-import { IWorkspaceCfg } from '@api/types';
 import { userSettingService } from '@api/services/userSetting.service';
 import AppConfig from '@config/AppConfigModule';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTranslation } from 'react-i18next';
 import { AppI18n } from '@shared/i18n';
-import { setApis  as workbenchStoreApi } from '@store/workspace-store/workspaceSlice'
+import { setApis as workbenchStoreApi } from '@store/workspace-store/workspaceSlice';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@store/store';
+import { useForm, useWatch } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ApiFormValues, globalSettingsFormSchema, GlobalSettingsFormValues } from 'renderer/features/workspace/domain';
+import { mapToWorkspaceConfig } from 'renderer/features/workspace/encode';
+import { useQuery } from '@tanstack/react-query';
 
 const filter = createFilterOptions();
 
@@ -52,9 +54,7 @@ interface NewEndpointDialogProps {
 const NewEndpointDialog = (props: NewEndpointDialogProps) => {
   const { t } = useTranslation();
 
-  const {
-    open, onClose, onCancel, defaultData,
-  } = props;
+  const { open, onClose, onCancel, defaultData } = props;
 
   const initial = {
     URL: '',
@@ -103,12 +103,7 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
           </div>
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">
-              API KEY
-              {' '}
-              <span className="optional">
-                -
-                {t('Optional')}
-              </span>
+              API KEY <span className="optional">-{t('Optional')}</span>
             </label>
             <Paper className="dialog-form-field-control">
               <TextField
@@ -141,96 +136,92 @@ interface SettingDialogProps {
 }
 
 const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const classes = useStyles();
   const dispatch = useDispatch<AppDispatch>();
-  const [selectedApi, setSelectedApi] = useState<any>('');
-  const [apis, setApis] = useState<any[]>([]);
-  const [sbomLedgerToken, setSbomLedgerToken] = useState<string>('');
-  const [language, setLanguage] = useState<string>('en');
+
   const [apiDialog, setApiDialog] = useState({
     open: false,
     data: null,
   });
 
-  const classes = useStyles();
+  const { refetch: refetchConfig } = useQuery({
+    queryKey: ['globalConfig'],
+    queryFn: async () => userSettingService.get(),
+    enabled: false,
+  });
 
-  const submit = async () => {
-    const config: Partial<IWorkspaceCfg> = {
-      DEFAULT_API_INDEX: selectedApi ? apis.findIndex((api) => api === selectedApi) : 0,
-      APIS: apis,
-      TOKEN: sbomLedgerToken || null,
-      LNG: language || 'en',
-    };
+  const onSubmit = async (data: GlobalSettingsFormValues) => {
+    const dto = mapToWorkspaceConfig(data);
 
-    await userSettingService.set(config);
-    dispatch(workbenchStoreApi(config.APIS ? config.APIS : []));
+    await userSettingService.set(dto);
+    dispatch(workbenchStoreApi(dto.APIS ?? []));
     onClose({ action: DIALOG_ACTIONS.OK });
   };
 
-  const setDefault = (config: Partial<IWorkspaceCfg>) => {
-    const {
-      DEFAULT_API_INDEX, APIS, TOKEN, LNG,
-    } = config;
-
-    const urlsDefault = APIS || [];
-    const selectedUrlDefault = APIS && APIS[DEFAULT_API_INDEX] ? APIS[DEFAULT_API_INDEX] : null;
-
-    setSbomLedgerToken(TOKEN);
-    setApis(urlsDefault);
-    setSelectedApi(selectedUrlDefault);
-    setLanguage(LNG);
-  };
-
-  const fetchConfig = async () => {
-    const config = await userSettingService.get();
-    setDefault(config || {});
-  };
-
-  const onNewEndpointHandler = () => {
+  const handleAddNewEndpoint = () => {
     setApiDialog({ ...apiDialog, open: true, data: null });
   };
 
+  const { handleSubmit, control, setValue, register } = useForm<GlobalSettingsFormValues>({
+    resolver: zodResolver(globalSettingsFormSchema),
+    defaultValues: async () => {
+      const { data: initialConfig } = await refetchConfig();
+
+      const { DEFAULT_API_INDEX, APIS } = initialConfig;
+      const defaultSelectedApi = APIS && APIS[DEFAULT_API_INDEX] ? APIS[DEFAULT_API_INDEX] : null;
+
+      return {
+        apis: initialConfig?.APIS || [],
+        apiKey: defaultSelectedApi?.API_KEY,
+        apiUrl: defaultSelectedApi?.URL,
+        language: initialConfig?.LNG,
+        sbomLedgerToken: initialConfig?.TOKEN,
+        proxyConfig: null,
+      };
+    },
+  });
+
+  const [apiUrl, sbomLedgerToken, language, apis] = useWatch({
+    name: ['apiUrl', 'sbomLedgerToken', 'language', 'apis'],
+    control,
+  });
+
   const onCloseDialogHandler = (response: DialogResponse) => {
     setApiDialog({ ...apiDialog, open: false });
-    setSelectedApi(response.data);
-    setApis([...apis, response.data]);
+    setValue('apiUrl', response.data.URL);
+    setValue('apiKey', response.data.API_KEY);
+    setValue('apis', [...apis, response.data]);
   };
 
-  const handleClose = (e) => {
-    e.preventDefault();
-    submit();
-  };
-
-  const handleOnChange = (event, newValue) => {
-    if (typeof newValue === 'string') {
-      setSelectedApi({
-        url: newValue,
-      });
-    } else if (newValue && newValue.new) {
+  const handleChangeApi = (_: SyntheticEvent<Element, Event>, newValue: ApiFormValues) => {
+    if (newValue?.new) {
       const value = {
-        URL: newValue.inputValue,
+        URL: newValue.URL,
         API_KEY: '',
       };
       setApiDialog({ ...apiDialog, open: true, data: value });
-    } else {
-      setSelectedApi(newValue);
+
+      return;
     }
+
+    setValue('apiUrl', newValue?.URL || '');
+    setValue('apiKey', newValue?.API_KEY || '');
   };
 
-  const handleTrash = (e, option) => {
+  const handleTrash = (e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>, option: ApiFormValues) => {
     e.stopPropagation();
-    setApis(apis.filter((url) => url !== option));
-    dispatch(workbenchStoreApi(apis.filter((url) => url !== option)));
-    if (selectedApi && option.url === selectedApi.url) {
-      setSelectedApi(null);
+
+    const newApis = apis.filter((api) => api.URL !== option.URL);
+
+    setValue('apis', newApis);
+    dispatch(workbenchStoreApi(newApis));
+
+    if (apiUrl === option.URL) {
+      setValue('apiUrl', '');
+      setValue('apiKey', '');
     }
   };
-
-  useEffect(() => {
-    if (open) {
-      fetchConfig();
-    }
-  }, [open]);
 
   return (
     <>
@@ -250,7 +241,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
           </IconButton>
         </header>
 
-        <form onSubmit={handleClose}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="dialog-content">
             {AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS && (
               <>
@@ -262,7 +253,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                 <div className="dialog-form-field">
                   <div className="dialog-form-field-label">
                     <label>{t('Title:KnowledgebaseAPI')}</label>
-                    <Tooltip title={t('Tooltip:AddNewEndpoint')} onClick={onNewEndpointHandler}>
+                    <Tooltip title={t('Tooltip:AddNewEndpoint')} onClick={handleAddNewEndpoint}>
                       <IconButton tabIndex={-1} color="inherit" size="small">
                         <AddIcon fontSize="inherit" />
                       </IconButton>
@@ -271,17 +262,17 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   <Paper className="dialog-form-field-control">
                     <Autocomplete
                       fullWidth
-                      value={selectedApi || ''}
-                      onChange={handleOnChange}
+                      value={apis?.find((api) => api.URL === apiUrl) || null}
+                      onChange={handleChangeApi}
                       onKeyPress={(e: any) => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
                           const { value } = e.target;
-                          const isExisting = apis.some((option) => value === option.URL);
-                          if (!isExisting) {
-                            handleOnChange(e, { new: true, inputValue: value });
+                          const exists = apis.some((option) => value === option.URL);
+                          if (!exists) {
+                            handleChangeApi(e, { new: true, URL: value, API_KEY: '' });
                           } else {
-                            setSelectedApi({ URL: value });
+                            setValue('apiUrl', value);
                           }
                         }
                       }}
@@ -290,8 +281,9 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
 
                         const { inputValue } = params;
                         // Suggest the creation of a new value
-                        const isExisting = options.some((option) => inputValue === option.URL);
-                        if (inputValue !== '' && !isExisting) {
+                        const exists = options.some((option) => inputValue === option.URL);
+
+                        if (inputValue !== '' && !exists) {
                           filtered.push({
                             inputValue,
                             new: true,
@@ -304,46 +296,49 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                       selectOnFocus
                       clearOnBlur
                       handleHomeEndKeys
-                      options={apis.slice(1)}
+                      options={apis || []}
                       getOptionLabel={(option) => {
                         // Value selected with enter, right from the input
                         if (typeof option === 'string') {
                           return option;
                         }
-                        // Add "xxx" option created dynamically
-                        if (option.inputValue) {
-                          return option.inputValue;
-                        }
+
                         // Regular option
                         return `${option.URL} ${option.API_KEY ? `(${option.API_KEY})` : ''}`;
                       }}
-                      renderOption={(props, option, { selected }) => (option.new ? (
-                        <li {...props} className={classes.new}>
-                          {option.URL}
-                        </li>
-                      ) : (
-                        <li {...props}>
-                          <article className="w-100 d-flex space-between align-center">
-                            <div className={classes.option}>
-                              <span>{option.URL}</span>
-                              {option.API_KEY && (
-                                <span className="middle">
-                                  API KEY:
-                                  {option.API_KEY}
-                                </span>
-                              )}
-                            </div>
-                            <IconButton
-                              size="small"
-                              aria-label="delete"
-                              className="btn-delete"
-                              onClick={(e) => handleTrash(e, option)}
-                            >
-                              <DeleteIcon fontSize="inherit" />
-                            </IconButton>
-                          </article>
-                        </li>
-                      ))}
+                      renderOption={(props, option) => {
+                        if (option.new) {
+                          return (
+                            <li {...props} className={classes.new}>
+                              {option.URL}
+                            </li>
+                          );
+                        }
+
+                        return (
+                          <li {...props}>
+                            <article className="w-100 d-flex space-between align-center">
+                              <div className={classes.option}>
+                                <span>{option.URL}</span>
+                                {option.API_KEY && (
+                                  <span className="middle">
+                                    API KEY:
+                                    {option.API_KEY}
+                                  </span>
+                                )}
+                              </div>
+                              <IconButton
+                                size="small"
+                                aria-label="delete"
+                                className="btn-delete"
+                                onClick={(e) => handleTrash(e, option)}
+                              >
+                                <DeleteIcon fontSize="inherit" />
+                              </IconButton>
+                            </article>
+                          </li>
+                        );
+                      }}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -356,11 +351,8 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   </Paper>
 
                   {AppConfig.FF_ENABLE_SETTINGS_HINT && (
-                  <p className="dialog-form-field-hint">
-                    {t('SettingsApiKeyHint')}
-                  </p>
+                    <p className="dialog-form-field-hint">{t('SettingsApiKeyHint')}</p>
                   )}
-
                 </div>
               </>
             )}
@@ -368,20 +360,10 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
               className={AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS ? 'dialog-form-field mt-7' : 'dialog-form-field'}
             >
               <label className="dialog-form-field-label">
-                {t('Title:SBOMLedgerToken')}
-                {' '}
-                <span className="optional">
-                  -
-                  {t('Optional')}
-                </span>
+                {t('Title:SBOMLedgerToken')} <span className="optional">-{t('Optional')}</span>
               </label>
               <Paper className="dialog-form-field-control">
-                <TextField
-                  name="token"
-                  fullWidth
-                  value={sbomLedgerToken || ''}
-                  onChange={(e) => setSbomLedgerToken(e.target.value)}
-                />
+                <TextField {...register('sbomLedgerToken')} fullWidth value={sbomLedgerToken || ''} />
               </Paper>
             </div>
             <div className="dialog-form-field">
@@ -389,15 +371,12 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                 <b>{t('Title:Language')}</b>
               </label>
               <Paper className="dialog-form-field-control">
-                <Select
-                  name="usage"
-                  size="small"
-                  fullWidth
-                  value={language || ''}
-                  onChange={(e) => setLanguage(e.target.value as string)}
-                >
-
-                  {AppI18n.getLanguages().map((item) => <MenuItem key={item.key} value={item.key}>{item.value}</MenuItem>)}
+                <Select {...register('language')} size="small" fullWidth value={language || ''}>
+                  {AppI18n.getLanguages().map((item) => (
+                    <MenuItem key={item.key} value={item.key}>
+                      {item.value}
+                    </MenuItem>
+                  ))}
                 </Select>
               </Paper>
             </div>
