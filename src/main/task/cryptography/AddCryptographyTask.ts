@@ -13,7 +13,7 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
 
   async run(params: ICryptographyTask): Promise<void> {
     const {GRPC_PROXY} = userSettingService.get();
-    if (GRPC_PROXY) process.env.grpc_proxy = GRPC_PROXY;
+    process.env.grpc_proxy =  GRPC_PROXY ? GRPC_PROXY : '';
 
     try {
       const response = await this.getAlgorithms(params.components, params.token);
