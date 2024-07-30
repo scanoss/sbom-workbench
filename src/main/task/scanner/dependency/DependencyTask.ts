@@ -45,9 +45,8 @@ export class DependencyTask implements Scanner.IPipelineTask {
         });
 
       const cfg = new DependencyScannerCfg();
-      const { PAC, PROXY } = await userSettingService.get();
-      cfg.PAC = PAC;
-      cfg.PROXY = PROXY;
+      const { GRPC_PROXY } = await userSettingService.get();
+      cfg.GRPC_PROXY = GRPC_PROXY;
       await cfg.validate();
 
       const dependencies = await new DependencyScanner(cfg).scan(allFiles);

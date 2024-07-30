@@ -160,12 +160,13 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
 
     scannerCfg.MAX_RESPONSES_IN_BUFFER = 500;
 
-    scannerCfg.HTTP_PROXY = ""
-    scannerCfg.HTTPS_PROXY = "";
-    scannerCfg.NO_PROXY = "";
+    const PAC_URL = PAC_PROXY ? `pac+${PAC_PROXY.trim()}` : null;
+    scannerCfg.HTTP_PROXY = PAC_URL || HTTP_PROXY || ""
+    scannerCfg.HTTPS_PROXY = PAC_URL || HTTPS_PROXY || "";
+    scannerCfg.NO_PROXY = NO_PROXY ? NO_PROXY.join(",") : null;
 
-    scannerCfg.IGNORE_CERT_ERRORS = IGNORE_CERT_ERRORS !== undefined ? IGNORE_CERT_ERRORS : false;
-    scannerCfg.CA_CERT = CA_CERT !== undefined ? CA_CERT : null;
+    scannerCfg.IGNORE_CERT_ERRORS = IGNORE_CERT_ERRORS || false;
+    scannerCfg.CA_CERT = CA_CERT || null;
 
     // Obfuscation
     scannerCfg.WFP_OBFUSCATION = this.project.getDto().scannerConfig.obfuscate;
