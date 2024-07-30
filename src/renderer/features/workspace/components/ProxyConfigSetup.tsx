@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Controller, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import {
   Button,
   Checkbox,
@@ -95,7 +95,13 @@ function ProxyConfigSetup() {
                   <Grid item xs={12}>
                     <FormControlLabel
                       label={t('Title:ProxyUseSameForHttps')}
-                      control={<Checkbox size="small" {...register('proxyConfig.sameConfigAsHttp')} />}
+                      control={
+                        <Checkbox
+                          size="small"
+                          {...register('proxyConfig.sameConfigAsHttp')}
+                          defaultChecked={sameConfigAsHttp}
+                        />
+                      }
                     />
                   </Grid>
                   <Grid item xs={12} md={8}>

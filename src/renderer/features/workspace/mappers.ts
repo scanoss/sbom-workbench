@@ -2,13 +2,23 @@ import { IWorkspaceCfg } from '@api/types';
 import { GlobalSettingsFormValues, ProxyMode } from './domain';
 
 const extractHostAndPort = (url: string): [string, string] | [null, null] => {
-  const [host, port] = url.split(':');
+  try {
+    const urlObj = new URL(url);
 
-  if (!host || !port) {
+    const { username, password, port, protocol, hostname } = urlObj;
+
+    if (!username && !password) {
+      const host = `${protocol ? `${protocol}//` : ''}${hostname}`;
+
+      return [host, port];
+    }
+
+    const host = `${protocol ?? ''}//${username ?? ''}${password ? `:${password}` : ''}@${hostname}`;
+
+    return [host, urlObj.port];
+  } catch (error) {
     return [null, null];
   }
-
-  return [host, port];
 };
 
 export const mapToGlobalSettingsFormValues = (cfg: IWorkspaceCfg): GlobalSettingsFormValues => {
@@ -35,7 +45,9 @@ export const mapToGlobalSettingsFormValues = (cfg: IWorkspaceCfg): GlobalSetting
   const [httpHost, httpPort] = extractHostAndPort(HTTP_PROXY);
   const [httpsHost, httpsPort] = extractHostAndPort(HTTPS_PROXY);
 
-  const sameConfigAsHttp = !!httpHost && !!httpPort && !!httpsHost && httpsPort && httpHost === httpsHost && httpPort === httpsPort;
+  const sameConfigAsHttp = httpHost === httpsHost && httpPort === httpsPort;
+
+  console.log('sameConfigAsHttp', sameConfigAsHttp);
 
   return {
     apiKey: defaultApi.API_KEY,

@@ -29,12 +29,7 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@store/store';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  ApiFormValues,
-  globalSettingsFormSchema,
-  GlobalSettingsFormValues,
-  ProxyMode,
-} from 'renderer/features/workspace/domain';
+import { ApiFormValues, globalSettingsFormSchema, GlobalSettingsFormValues } from 'renderer/features/workspace/domain';
 import { mapToWorkspaceConfig } from 'renderer/features/workspace/encode';
 import ProxyConfigSetup from 'renderer/features/workspace/components/ProxyConfigSetup';
 import { mapToGlobalSettingsFormValues } from 'renderer/features/workspace/mappers';

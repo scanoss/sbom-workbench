@@ -9,11 +9,14 @@ export enum ProxyMode {
 
 const isValidPortNumber = (port: number) => port >= 1 && port <= 65535;
 
-const PROXY_HOST_URL_REGEX = /^(https?:\/\/)?((\w+(:\w+)?@)?(([a-zA-Z0-9\-.]+\.[a-zA-Z]{2,})|(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))(:\d+)?)(\/.*)?$/;
+const PROXY_HOST_URL_REGEX = /^(https?:\/\/)?(([\w\-.%]+(:[\w\-.%]+)?@)?(([a-zA-Z0-9\-.]+\.[a-zA-Z]{2,})|(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))(:\d+)?)(\/.*)?$/;
 
-const hostValidationSchema = z.string().regex(PROXY_HOST_URL_REGEX, AppI18n.getI18n()?.t('Common:InvalidUrl'));
+const hostValidationSchema = z.string().refine((value) => value === '' || PROXY_HOST_URL_REGEX.test(value), {
+  message: AppI18n.getI18n()?.t('Common:InvalidUrl'),
+});
+
 const portValidationSchema = z.string().transform((value, ctx) => {
-  if (!value) return undefined;
+  if (value === '') return value;
 
   const parsedValue = parseInt(value, 10);
 
