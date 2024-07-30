@@ -23,6 +23,7 @@ function ProxyConfigSetup() {
   const { setValue, control, watch, register } = useFormContext<GlobalSettingsFormValues>();
 
   const proxyMode = watch('proxyConfig.mode');
+  const hasNoProxy = proxyMode === ProxyMode.NoProxy;
   const isManualProxy = proxyMode === ProxyMode.Manual;
   const isAutomaticProxy = proxyMode === ProxyMode.Automatic;
 
@@ -56,78 +57,70 @@ function ProxyConfigSetup() {
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <FormControl component="fieldset" sx={{ width: '100%' }}>
-            <Controller
+            <RadioGroup
               name="proxyConfig.mode"
-              control={control}
-              render={({ field }) => (
-                <RadioGroup {...field}>
-                  <FormControlLabel
-                    control={<Radio size="small" />}
-                    value={ProxyMode.NoProxy}
-                    label={t('Title:NoProxy')}
-                  />
-                  <FormControlLabel
-                    control={<Radio size="small" />}
-                    value={ProxyMode.Manual}
-                    label={t('Title:ProxyManualConfiguration')}
-                  />
-                  {isManualProxy && (
-                    <Grid container columnSpacing={3} rowGap={1} sx={{ my: 1.5 }}>
-                      <Grid item xs={12} md={8}>
-                        <ControlledInput
-                          control={control}
-                          label="Title:ProxyHttp"
-                          name="proxyConfig.httpHost"
-                          rules={{ required: isManualProxy }}
-                          placeholder="192.168.0.0.1"
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <ControlledInput
-                          control={control}
-                          label="Title:Port"
-                          name="proxyConfig.httpPort"
-                          rules={{ required: isManualProxy }}
-                          placeholder="8080"
-                          type="number"
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <FormControlLabel
-                          label={t('Title:ProxyUseSameForHttps')}
-                          control={<Checkbox size="small" {...register('proxyConfig.sameConfigAsHttp')} />}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={8}>
-                        <ControlledInput control={control} label="Title:ProxyHttps" name="proxyConfig.httpsHost" />
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <ControlledInput
-                          control={control}
-                          label="Title:Port"
-                          name="proxyConfig.httpsPort"
-                          type="number"
-                        />
-                      </Grid>
-                    </Grid>
-                  )}
-                  <FormControlLabel
-                    control={<Radio size="small" />}
-                    value={ProxyMode.Automatic}
-                    label={t('Title:ProxyAutoConfiguration')}
-                  />
-                  {isAutomaticProxy && (
+              onChange={(e, value) => setValue('proxyConfig.mode', value as ProxyMode)}
+            >
+              <FormControlLabel
+                control={<Radio size="small" checked={hasNoProxy} />}
+                value={ProxyMode.NoProxy}
+                label={t('Title:NoProxy')}
+              />
+              <FormControlLabel
+                control={<Radio size="small" checked={isManualProxy} />}
+                value={ProxyMode.Manual}
+                label={t('Title:ProxyManualConfiguration')}
+              />
+              {isManualProxy && (
+                <Grid container columnSpacing={3} rowGap={1} sx={{ my: 1.5 }}>
+                  <Grid item xs={12} md={8}>
                     <ControlledInput
                       control={control}
-                      label="Pac file url"
-                      name="proxyConfig.automaticProxyUrl"
-                      fullWidth
-                      sx={{ my: 1.5 }}
+                      label="Title:ProxyHttp"
+                      name="proxyConfig.httpHost"
+                      rules={{ required: isManualProxy }}
+                      placeholder="192.168.0.0.1"
                     />
-                  )}
-                </RadioGroup>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <ControlledInput
+                      control={control}
+                      label="Title:Port"
+                      name="proxyConfig.httpPort"
+                      rules={{ required: isManualProxy }}
+                      placeholder="8080"
+                      type="number"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      label={t('Title:ProxyUseSameForHttps')}
+                      control={<Checkbox size="small" {...register('proxyConfig.sameConfigAsHttp')} />}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={8}>
+                    <ControlledInput control={control} label="Title:ProxyHttps" name="proxyConfig.httpsHost" />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <ControlledInput control={control} label="Title:Port" name="proxyConfig.httpsPort" type="number" />
+                  </Grid>
+                </Grid>
               )}
-            />
+              <FormControlLabel
+                control={<Radio size="small" checked={isAutomaticProxy} />}
+                value={ProxyMode.Automatic}
+                label={t('Title:ProxyAutoConfiguration')}
+              />
+              {isAutomaticProxy && (
+                <ControlledInput
+                  control={control}
+                  label="Pac file url"
+                  name="proxyConfig.automaticProxyUrl"
+                  fullWidth
+                  sx={{ my: 1.5 }}
+                />
+              )}
+            </RadioGroup>
           </FormControl>
         </Grid>
         <Grid item xs={12}>

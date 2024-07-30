@@ -2,13 +2,13 @@ import { IWorkspaceCfg } from '@api/types';
 import { GlobalSettingsFormValues, ProxyMode } from './domain';
 
 const extractHostAndPort = (url: string): [string, string] | [null, null] => {
-  const urlObj = new URL(url);
+  const [host, port] = url.split(':');
 
-  if (!urlObj.hostname || !urlObj.port) {
+  if (!host || !port) {
     return [null, null];
   }
 
-  return [urlObj.hostname, urlObj.port];
+  return [host, port];
 };
 
 export const mapToGlobalSettingsFormValues = (cfg: IWorkspaceCfg): GlobalSettingsFormValues => {
