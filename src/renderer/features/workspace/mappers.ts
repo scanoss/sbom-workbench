@@ -1,8 +1,13 @@
 import { IWorkspaceCfg } from '@api/types';
 import { GlobalSettingsFormValues, ProxyMode } from './domain';
 
-const extractHostAndPort = (url: string): [string, string] => {
+const extractHostAndPort = (url: string): [string, string] | [null, null] => {
   const urlObj = new URL(url);
+
+  if (!urlObj.hostname || !urlObj.port) {
+    return [null, null];
+  }
+
   return [urlObj.hostname, urlObj.port];
 };
 
@@ -26,18 +31,19 @@ export const mapToGlobalSettingsFormValues = (cfg: IWorkspaceCfg): GlobalSetting
   const hasNoProxy = !HTTP_PROXY && !PAC_PROXY;
   const initialProxyMode = hasNoProxy ? ProxyMode.NoProxy : PAC_PROXY ? ProxyMode.Automatic : ProxyMode.Manual;
 
-  const [grpcProxyHost, grpcProxyPort] = GRPC_PROXY ? extractHostAndPort(GRPC_PROXY) : [null, null];
-  const [httpHost, httpPort] = HTTP_PROXY ? extractHostAndPort(HTTP_PROXY) : [null, null];
-  const [httpsHost, httpsPort] = HTTPS_PROXY ? extractHostAndPort(HTTPS_PROXY) : [null, null];
+  const [grpcProxyHost, grpcProxyPort] = extractHostAndPort(GRPC_PROXY);
+  const [httpHost, httpPort] = extractHostAndPort(HTTP_PROXY);
+  const [httpsHost, httpsPort] = extractHostAndPort(HTTPS_PROXY);
+
+  const sameConfigAsHttp = !!httpHost && !!httpPort && !!httpsHost && httpsPort && httpHost === httpsHost && httpPort === httpsPort;
 
   return {
-    apis: APIS || [],
     apiKey: defaultApi.API_KEY,
+    apis: APIS || [],
     apiUrl: defaultApi.URL,
     language: LNG,
     sbomLedgerToken: TOKEN,
     proxyConfig: {
-      mode: initialProxyMode,
       automaticProxyUrl: PAC_PROXY,
       caCertificatePath: CA_CERT,
       grpcProxyHost,
@@ -47,7 +53,8 @@ export const mapToGlobalSettingsFormValues = (cfg: IWorkspaceCfg): GlobalSetting
       httpsHost,
       httpsPort,
       ignoreCertificateErrors: IGNORE_CERT_ERRORS,
-      sameConfigAsHttp: httpHost === httpsHost && httpPort === httpsPort,
+      mode: initialProxyMode,
+      sameConfigAsHttp,
       whitelistedHosts: NO_PROXY ? NO_PROXY.join(', ') : '',
     },
   };

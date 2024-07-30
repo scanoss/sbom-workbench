@@ -84,7 +84,7 @@
   "DecompressArchivesLabel": "Decompress archives and scan inner files",
   "DecompressArchivesHint": "This option will decompress archives into project folder",
   "FileNotLoad": "File could not be loaded",
-  "RemoteFileNotLoad" : "Remote source file could not be loaded",
+  "RemoteFileNotLoad": "Remote source file could not be loaded",
   "FileTypeNotSupported": "File type not supported for viewing",
   "OverridePreviousWork": "Override previous work",
   "ChooseProjectToImport": "Choose project to import identifications",
@@ -102,5 +102,11 @@
   "NotScanned": "Not scanned",
   "NewGroup": "New Group",
   "NoDependenciesFoundMatching": "No dependencies found matching the current filter criteria",
-  "NoDependenciesWereDetected": "No dependencies were detected"
+  "NoDependenciesWereDetected": "No dependencies were detected",
+  "InvalidUrl": "The URL is not valid",
+  "InvalidPortNumber": "Invalid port number",
+  "InvalidPortNumberRange": "Port number must be between 1 and 65535",
+  "ProxyPacUrlRequired": "You must provide a valid URL to your PAC file",
+  "ProxyHostUrlRequired": "You must provide a valid URL to your proxy host",
+  "PortRequired": "You must provide a valid port number"
 }

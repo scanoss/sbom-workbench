@@ -1,3 +1,4 @@
+import { AppI18n } from '@shared/i18n';
 import { z } from 'zod';
 
 export enum ProxyMode {
@@ -10,7 +11,7 @@ const isValidPortNumber = (port: number) => port >= 1 && port <= 65535;
 
 const PROXY_HOST_URL_REGEX = /^(https?:\/\/)?((\w+(:\w+)?@)?(([a-zA-Z0-9\-.]+\.[a-zA-Z]{2,})|(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))(:\d+)?)(\/.*)?$/;
 
-const hostValidationSchema = z.string().regex(PROXY_HOST_URL_REGEX, 'The URL is not valid');
+const hostValidationSchema = z.string().regex(PROXY_HOST_URL_REGEX, AppI18n.getI18n()?.t('Common:InvalidUrl'));
 const portValidationSchema = z.string().transform((value, ctx) => {
   if (!value) return undefined;
 
@@ -19,14 +20,14 @@ const portValidationSchema = z.string().transform((value, ctx) => {
   if (Number.isNaN(parsedValue)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'Invalid port number',
+      message: AppI18n.getI18n()?.t('Common:InvalidPortNumber'),
     });
   }
 
   if (!isValidPortNumber(parsedValue)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'Port number must be between 1 and 65535',
+      message: AppI18n.getI18n()?.t('Common:InvalidPortNumberRange'),
     });
   }
 
@@ -52,21 +53,21 @@ export const proxyConfigSchema = z
     if (data.mode === ProxyMode.Automatic && !data.automaticProxyUrl) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'You must provide a proxy URL',
+        message: AppI18n.getI18n()?.t('Common:ProxyPacUrlRequired'),
         path: ['automaticProxyUrl'],
       });
     } else if (data.mode === ProxyMode.Manual) {
       if (!data.httpHost) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'You must provide a host URL',
+          message: AppI18n.getI18n()?.t('Common:ProxyHostUrlRequired'),
           path: ['httpHost'],
         });
       }
       if (!data.httpPort) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'You must provide a port',
+          message: AppI18n.getI18n()?.t('Common:PortRequired'),
           path: ['httpPort'],
         });
       }
