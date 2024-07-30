@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import {
   Button,
   Checkbox,
@@ -20,7 +20,7 @@ import { GlobalSettingsFormValues, ProxyMode } from '../domain';
 
 function ProxyConfigSetup() {
   const { t } = useTranslation();
-  const { setValue, control, watch, register } = useFormContext<GlobalSettingsFormValues>();
+  const { setValue, control, watch } = useFormContext<GlobalSettingsFormValues>();
 
   const proxyMode = watch('proxyConfig.mode');
   const hasNoProxy = proxyMode === ProxyMode.NoProxy;
@@ -28,6 +28,7 @@ function ProxyConfigSetup() {
   const isAutomaticProxy = proxyMode === ProxyMode.Automatic;
 
   const sameConfigAsHttp = watch('proxyConfig.sameConfigAsHttp');
+  const ignoreCertificateErrors = watch('proxyConfig.ignoreCertificateErrors');
 
   const handleSelectCertificate = async () => {
     const [path] = await dialogController.showOpenDialog({
@@ -93,15 +94,16 @@ function ProxyConfigSetup() {
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <FormControlLabel
-                      label={t('Title:ProxyUseSameForHttps')}
-                      control={
-                        <Checkbox
-                          size="small"
-                          {...register('proxyConfig.sameConfigAsHttp')}
-                          defaultChecked={sameConfigAsHttp}
+                    <Controller
+                      control={control}
+                      name="proxyConfig.sameConfigAsHttp"
+                      defaultValue={!!sameConfigAsHttp}
+                      render={({ field: { onChange, value } }) => (
+                        <FormControlLabel
+                          label={t('Title:ProxyUseSameForHttps')}
+                          control={<Checkbox checked={value} onChange={onChange} size="small" />}
                         />
-                      }
+                      )}
                     />
                   </Grid>
                   <Grid item xs={12} md={8}>
@@ -160,9 +162,16 @@ function ProxyConfigSetup() {
                 {t('Title:Browse')}
               </Button>
             </Stack>
-            <FormControlLabel
-              label={t('Title:IgnoreCertificateErrors')}
-              control={<Checkbox size="small" {...register('proxyConfig.ignoreCertificateErrors')} />}
+            <Controller
+              control={control}
+              name="proxyConfig.ignoreCertificateErrors"
+              defaultValue={!!ignoreCertificateErrors}
+              render={({ field: { onChange, value } }) => (
+                <FormControlLabel
+                  label={t('Title:IgnoreCertificateErrors')}
+                  control={<Checkbox checked={value} onChange={onChange} size="small" />}
+                />
+              )}
             />
           </Stack>
         </Grid>
