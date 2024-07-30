@@ -1,10 +1,69 @@
 import { IWorkspaceCfg } from '@api/types';
-import { ApiFormValues, GlobalSettingsFormValues } from './domain';
+import { ApiFormValues, GlobalSettingsFormValues, ProxyMode } from './domain';
 
 const mapToApiDto = (api: ApiFormValues): Record<string, string> => {
   return {
     URL: api.URL || '',
     API_KEY: api.API_KEY || '',
+  };
+};
+
+type ProxyConfig = Pick<
+IWorkspaceCfg,
+'IGNORE_CERT_ERRORS' | 'CA_CERT' | 'GRPC_PROXY' | 'NO_PROXY' | 'HTTP_PROXY' | 'HTTPS_PROXY' | 'PAC_PROXY'
+>;
+
+export const mapToProxyConfig = (values: GlobalSettingsFormValues): ProxyConfig | null => {
+  if (!values.proxyConfig) return null;
+
+  const {
+    mode,
+    ignoreCertificateErrors,
+    caCertificatePath,
+    automaticProxyUrl,
+    whitelistedHosts,
+    httpHost,
+    httpPort,
+    httpsHost,
+    httpsPort,
+    grpcProxyHost,
+    grpcProxyPort,
+  } = values.proxyConfig;
+
+  if (mode === ProxyMode.NoProxy) {
+    return {
+      CA_CERT: null,
+      GRPC_PROXY: null,
+      HTTP_PROXY: null,
+      HTTPS_PROXY: null,
+      IGNORE_CERT_ERRORS: null,
+      NO_PROXY: null,
+      PAC_PROXY: null,
+    };
+  }
+
+  const commonConfig = {
+    CA_CERT: caCertificatePath,
+    IGNORE_CERT_ERRORS: ignoreCertificateErrors,
+    NO_PROXY: whitelistedHosts.split(',').map((host) => host.trim()),
+  };
+
+  if (mode === ProxyMode.Automatic) {
+    return {
+      ...commonConfig,
+      GRPC_PROXY: null,
+      HTTP_PROXY: null,
+      HTTPS_PROXY: null,
+      PAC_PROXY: automaticProxyUrl,
+    };
+  }
+
+  return {
+    ...commonConfig,
+    GRPC_PROXY: `${grpcProxyHost}:${grpcProxyPort}`,
+    HTTP_PROXY: `${httpHost}:${httpPort}`,
+    HTTPS_PROXY: `${httpsHost}:${httpsPort}`,
+    PAC_PROXY: null,
   };
 };
 
@@ -16,7 +75,6 @@ export const mapToWorkspaceConfig = (values: GlobalSettingsFormValues): Partial<
     DEFAULT_API_INDEX: values.apiUrl ? APIS.findIndex((api) => api.URL === values.apiUrl) : 0,
     TOKEN: values.sbomLedgerToken || null,
     LNG: values.language || 'en',
-    // TODO: Add this
-    // proxyConfig: values.proxyConfig,
+    ...mapToProxyConfig(values),
   };
 };

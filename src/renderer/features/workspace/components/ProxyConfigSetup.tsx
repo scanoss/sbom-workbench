@@ -15,6 +15,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 import ControlledInput from 'renderer/ui/Input';
+import { dialogController } from 'renderer/controllers/dialog-controller';
 import { GlobalSettingsFormValues, ProxyMode } from '../domain';
 
 function ProxyConfigSetup() {
@@ -26,6 +27,16 @@ function ProxyConfigSetup() {
   const isAutomaticProxy = proxyMode === ProxyMode.Automatic;
 
   const sameConfigAsHttp = watch('proxyConfig.sameConfigAsHttp');
+
+  const handleSelectCertificate = async () => {
+    const [path] = await dialogController.showOpenDialog({
+      properties: ['openFile'],
+    });
+
+    if (!path) return;
+
+    setValue('proxyConfig.caCertificatePath', path);
+  };
 
   useEffect(() => {
     if (isManualProxy && sameConfigAsHttp) {
@@ -149,7 +160,7 @@ function ProxyConfigSetup() {
           <Stack gap={1}>
             <Stack direction="row" gap={2} alignItems="flex-end" sx={{ width: '100%' }}>
               <ControlledInput control={control} label="CA Certificate" name="proxyConfig.caCertificatePath" />
-              <Button variant="contained" color="primary">
+              <Button variant="contained" color="primary" onClick={handleSelectCertificate}>
                 {t('Title:Browse')}
               </Button>
             </Stack>
