@@ -23,6 +23,7 @@ export default function ControlledInput<T extends FieldValues>({
   name,
   required = false,
   rows = 1,
+  size = 'small',
   type = 'text',
   variant = 'outlined',
   ...props
@@ -41,6 +42,7 @@ export default function ControlledInput<T extends FieldValues>({
           display="flex"
           flexDirection={labelPosition === 'top' ? 'column' : 'row'}
           gap={labelPosition === 'top' ? 1 : 2}
+          sx={{ width: '100%' }}
         >
           {label && (
             <Stack direction="row" alignItems="center" gap={1}>
@@ -57,15 +59,19 @@ export default function ControlledInput<T extends FieldValues>({
           <TextField
             {...field}
             {...props}
-            helperText={helperText ?? error ? error.message : null}
-            error={!!error}
-            fullWidth
+            {...(helperText && {
+              helperText,
+            })}
+            {...(error && {
+              error: true,
+              helperText: error.message,
+            })}
             disabled={disabled}
             type={type}
             rows={rows}
             multiline={multiline}
             variant={variant}
-            size="small"
+            size={size}
             name={name}
             InputLabelProps={{
               shrink: true,

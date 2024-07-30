@@ -3,11 +3,14 @@ import { z } from 'zod';
 export enum ProxyMode {
   Automatic = 'automatic',
   Manual = 'manual',
+  NoProxy = 'no-proxy',
 }
 
 const isValidPortNumber = (port: number) => port >= 1 && port <= 65535;
 
-const hostValidationSchema = z.string().url();
+const PROXY_HOST_URL_REGEX = /^(https?:\/\/)?((\w+(:\w+)?@)?(([a-zA-Z0-9\-.]+\.[a-zA-Z]{2,})|(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))(:\d+)?)(\/.*)?$/;
+
+const hostValidationSchema = z.string().regex(PROXY_HOST_URL_REGEX, 'The URL is not valid');
 const portValidationSchema = z.string().transform((value, ctx) => {
   if (!value) return undefined;
 
@@ -17,7 +20,6 @@ const portValidationSchema = z.string().transform((value, ctx) => {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'Invalid port number',
-      path: ctx.path,
     });
   }
 
@@ -25,7 +27,6 @@ const portValidationSchema = z.string().transform((value, ctx) => {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'Port number must be between 1 and 65535',
-      path: ctx.path,
     });
   }
 
@@ -34,14 +35,18 @@ const portValidationSchema = z.string().transform((value, ctx) => {
 
 export const proxyConfigSchema = z
   .object({
-    automaticProxyUrl: hostValidationSchema.optional(),
-    httpHost: hostValidationSchema.optional(),
-    httpPort: portValidationSchema.optional(),
-    httpsHost: hostValidationSchema.optional(),
-    httpsPort: portValidationSchema.optional(),
-    mode: z.enum([ProxyMode.Automatic, ProxyMode.Manual]),
-    sameConfigAsHttp: z.boolean().optional(),
-    whitelistedHosts: z.array(hostValidationSchema).optional(),
+    automaticProxyUrl: hostValidationSchema.optional().nullable(),
+    caCertificatePath: z.string().optional().nullable(),
+    grpcProxyHost: hostValidationSchema.optional().nullable(),
+    grpcProxyPort: portValidationSchema.optional().nullable(),
+    httpHost: hostValidationSchema.optional().nullable(),
+    httpPort: portValidationSchema.optional().nullable(),
+    httpsHost: hostValidationSchema.optional().nullable(),
+    httpsPort: portValidationSchema.optional().nullable(),
+    ignoreCertificateErrors: z.boolean().optional().nullable(),
+    mode: z.enum([ProxyMode.Automatic, ProxyMode.Manual, ProxyMode.NoProxy]),
+    sameConfigAsHttp: z.boolean().optional().nullable(),
+    whitelistedHosts: z.string().optional().nullable(),
   })
   .superRefine((data, ctx) => {
     if (data.mode === ProxyMode.Automatic && !data.automaticProxyUrl) {
@@ -54,7 +59,7 @@ export const proxyConfigSchema = z
       if (!data.httpHost) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'You must provide a host url',
+          message: 'You must provide a host URL',
           path: ['httpHost'],
         });
       }
@@ -80,7 +85,7 @@ export const globalSettingsFormSchema = z.object({
   apiUrl: z.string().optional().nullable(),
   language: z.string().optional().nullable(),
   sbomLedgerToken: z.string().optional().nullable(),
-  // proxyConfig: proxyConfigSchema,
+  proxyConfig: proxyConfigSchema.optional().nullable(),
 });
 
 export type GlobalSettingsFormValues = z.infer<typeof globalSettingsFormSchema>;

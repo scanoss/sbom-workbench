@@ -118,7 +118,6 @@
     "@mui/styles": "^5.15.10",
     "@mui/x-data-grid": "^5.12.3",
     "@reduxjs/toolkit": "^1.8.1",
-    "@tanstack/react-query": "^5.51.15",
     "adm-zip": "^0.5.9",
     "chart.js": "^3.5.0",
     "electron-debug": "^3.2.0",

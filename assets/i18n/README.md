@@ -4,13 +4,14 @@
 
 SBOM Workbench is multi-language enabled. This is done using the internationalization-framework i18next. See [official documentation](https://www.i18next.com) for more details.
 
-There are currently 2 languages:
+There are currently 4 languages:
 
-| Language    | Language Code |
-| ----------- | ------------- |
-| **English** | [en](./en/)   |
-| **Spanish** | [es](./es/)   |
-| **Chinese** | [zh](./zh/)   |
+| Language     | Language Code |
+| ------------ | ------------- |
+| **English**  | [en](./en/)   |
+| **Spanish**  | [es](./es/)   |
+| **Chinese**  | [zh](./zh/)   |
+| **Japanese** | [jp](./jp/)   |
 
 ### Contributing a new lenguage
 
