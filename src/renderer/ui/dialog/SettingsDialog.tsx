@@ -37,6 +37,7 @@ import {
 } from 'renderer/features/workspace/domain';
 import { mapToWorkspaceConfig } from 'renderer/features/workspace/encode';
 import ProxyConfigSetup from 'renderer/features/workspace/components/ProxyConfigSetup';
+import { mapToGlobalSettingsFormValues } from 'renderer/features/workspace/mappers';
 import ControlledInput from '../Input';
 
 const filter = createFilterOptions();
@@ -179,19 +180,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
     defaultValues: async () => {
       const initialConfig = await userSettingService.get();
 
-      const { DEFAULT_API_INDEX, APIS } = initialConfig;
-      const defaultSelectedApi = APIS && APIS[DEFAULT_API_INDEX] ? APIS[DEFAULT_API_INDEX] : null;
-
-      return {
-        apis: initialConfig?.APIS || [],
-        apiKey: defaultSelectedApi?.API_KEY,
-        apiUrl: defaultSelectedApi?.URL,
-        language: initialConfig?.LNG,
-        sbomLedgerToken: initialConfig?.TOKEN,
-        proxyConfig: {
-          mode: ProxyMode.NoProxy,
-        },
-      };
+      return mapToGlobalSettingsFormValues(initialConfig);
     },
   });
 

@@ -20,7 +20,7 @@ import { GlobalSettingsFormValues, ProxyMode } from '../domain';
 
 function ProxyConfigSetup() {
   const { t } = useTranslation();
-  const { setValue, control, watch, getValues, register, formState } = useFormContext<GlobalSettingsFormValues>();
+  const { setValue, control, watch, register } = useFormContext<GlobalSettingsFormValues>();
 
   const proxyMode = watch('proxyConfig.mode');
   const isManualProxy = proxyMode === ProxyMode.Manual;
@@ -47,9 +47,6 @@ function ProxyConfigSetup() {
       setValue('proxyConfig.httpsPort', httpPort);
     }
   }, [isManualProxy, sameConfigAsHttp, watch('proxyConfig.httpHost'), watch('proxyConfig.httpPort')]);
-
-  console.log(getValues());
-  console.log(formState.errors);
 
   return (
     <>
