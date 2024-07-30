@@ -7,6 +7,10 @@ const extractHostAndPort = (url: string): [string, string] | [null, null] => {
 
     const { username, password, port, protocol, hostname } = urlObj;
 
+    if (!hostname) {
+      return [null, null];
+    }
+
     if (!username && !password) {
       const host = `${protocol ? `${protocol}//` : ''}${hostname}`;
 
@@ -46,8 +50,6 @@ export const mapToGlobalSettingsFormValues = (cfg: IWorkspaceCfg): GlobalSetting
   const [httpsHost, httpsPort] = extractHostAndPort(HTTPS_PROXY);
 
   const sameConfigAsHttp = httpHost === httpsHost && httpPort === httpsPort;
-
-  console.log('sameConfigAsHttp', sameConfigAsHttp);
 
   return {
     apiKey: defaultApi.API_KEY,
