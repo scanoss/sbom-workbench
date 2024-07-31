@@ -79,5 +79,11 @@
   "WorkspaceIsReduced": "工作区上下文减少，因为有启动的过滤器。",
   "NewGroup": "New Group",
   "NoDependenciesFoundMatching": "No dependencies found matching the current filter criteria",
-  "NoDependenciesWereDetected": "No dependencies were detected"
+  "NoDependenciesWereDetected": "No dependencies were detected",
+  "InvalidUrl": "URL が無効です",
+  "InvalidPortNumber": "無効なポート番号です",
+  "InvalidPortNumberRange": "ポート番号は 1 ～ 65535 でなければなりません",
+  "ProxyPacUrlRequired": "PAC ファイルへの有効な URL を指定する必要があります",
+  "ProxyHostUrlRequired": "プロキシ ホストに有効な URL を指定する必要があります",
+  "PortRequired": "有効なポート番号を指定する必要があります"
 }

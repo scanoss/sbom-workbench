@@ -84,7 +84,7 @@
   "DecompressArchivesLabel": "Descomprimir ficheros y analizarlo internamente",
   "DecompressArchivesHint": "Esta opción va a descomprimir los ficheros dentro de la carpeta del proyecto",
   "FileNotLoad": "El fichero no pudo ser cargado",
-  "RemoteFileNotLoad" : "Fichero remoto del componente no pudo ser cargado",
+  "RemoteFileNotLoad": "Fichero remoto del componente no pudo ser cargado",
   "FileTypeNotSupported": "Tipo de fichero no soportado para visualización",
   "OverridePreviousWork": "Sobreescribir trabajo previo",
   "ChooseProjectToImport": "Seleccione un proyecto",
@@ -98,5 +98,11 @@
   "Default": "Default",
   "NewGroup": "Nuevo Grupo",
   "NoDependenciesFoundMatching": "No dependencies found matching the current filter criteria",
-  "NoDependenciesWereDetected": "No dependencies were detected"
+  "NoDependenciesWereDetected": "No dependencies were detected",
+  "InvalidUrl": "La URL no es válida",
+  "InvalidPortNumber": "Número de puerto inválido",
+  "InvalidPortNumberRange": "El número de puerto debe estar entre 1 y 65535",
+  "ProxyPacUrlRequired": "Debe proporcionar una URL válida a su archivo PAC",
+  "ProxyHostUrlRequired": "Debe proporcionar una URL válida a su servidor proxy",
+  "PortRequired": "Debe proporcionar un número de puerto válido"
 }

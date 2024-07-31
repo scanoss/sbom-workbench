@@ -69,5 +69,17 @@
   "PreviewIdentifications": "識別プレビュー",
   "ImportingIdentifications": "識別情報インポート中",
   "ImportFromProjects": "プロジェクトからインポート",
-  "GroupKeywordTitle": "Group Keywords"
+  "GroupKeywordTitle": "Group Keywords",
+  "ProxySettings": "インターネットにアクセスするためのプロキシを構成する",
+  "ProxyManualConfiguration": "手動プロキシ構成",
+  "ProxyAutoConfiguration": "自動プロキシ構成 URL",
+  "ProxyHttp": "HTTPプロキシ",
+  "ProxyHttps": "HTTPSプロキシ",
+  "ProxyUseSameForHttps": "HTTPS にもこのプロキシを使用します",
+  "ProxyWhitelist": "プロキシがありません",
+  "ProxyWhitelistExample_one": "例： .mozilla.org, .net.nz, 192.168.1.0/24",
+  "ProxyWhitelistExample_other": "への接続 localhost, 127.0.0.1/8 and ::1 プロキシされることはありません",
+  "Port": "ポート",
+  "NoProxy": "プロキシなし",
+  "IgnoreCertificateErrors": "認証局エラーを無視する"
 }

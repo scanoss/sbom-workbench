@@ -5,7 +5,6 @@ import os from 'os';
 import path from 'path';
 import { IWorkspaceCfg } from '../../api/types';
 import { wsUtils } from '../workspace/WsUtils/WsUtils';
-
 import packageJson from '../../../release/app/package.json';
 import AppConfig from '../../config/AppConfigModule';
 import { AppI18n } from '../../shared/i18n';
@@ -39,10 +38,13 @@ class UserSettingService {
     SCAN_MODE: 'FULL_SCAN',
     VERSION: app.isPackaged === true ? app.getVersion() : packageJson.version,
     LNG: 'en',
-    PROXY: null,
+    HTTP_PROXY: null,   // [http://|https://][<username>[:<password>]@]<IP|domain_name>[:<port>]
+    HTTPS_PROXY: null,
+    GRPC_PROXY: null,
+    PAC_PROXY: null,    // URL http o https
+    NO_PROXY: null,
     CA_CERT: null,
     IGNORE_CERT_ERRORS: null,
-    PAC: null,
     SCANNER_CONCURRENCY_LIMIT: null,
     SCANNER_POST_SIZE: null,
     SCANNER_TIMEOUT: null,

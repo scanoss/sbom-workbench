@@ -10,9 +10,7 @@ import { DialogProvider } from '@context/DialogProvider';
 import { WorkbenchProvider } from '@context/WorkbenchProvider';
 import AppProvider from '@context/AppProvider';
 import store from '@store/store';
-import {
-  createTheme, ThemeProvider, StyledEngineProvider, Theme,
-} from '@mui/material/styles';
+import { createTheme, ThemeProvider, StyledEngineProvider, Theme } from '@mui/material/styles';
 
 import { AppI18n } from '@shared/i18n';
 import { IpcChannels } from '@api/ipc-channels';

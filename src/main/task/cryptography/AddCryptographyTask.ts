@@ -7,9 +7,14 @@ import { ITask } from '../Task';
 import { modelProvider } from '../../services/ModelProvider';
 import { ICryptographyTask } from './ICryptographyTask';
 import { normalizeCryptoAlgorithms } from '../../../shared/adapters/crypto.adapter';
+import { userSettingService } from '../../services/UserSettingService';
 
 export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
+
   async run(params: ICryptographyTask): Promise<void> {
+    const {GRPC_PROXY} = userSettingService.get();
+    process.env.grpc_proxy =  GRPC_PROXY ? GRPC_PROXY : '';
+
     try {
       const response = await this.getAlgorithms(params.components, params.token);
 

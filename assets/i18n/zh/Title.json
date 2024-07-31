@@ -63,5 +63,17 @@
   "ScannerSettings": "Scanner Settings",
   "Status": "状态",
   "OnlineComponentSearch": "Online Component Search",
-  "GroupKeywordTitle": "Group Keywords"
+  "GroupKeywordTitle": "Group Keywords",
+  "ProxySettings": "設定代理存取互聯網",
+  "ProxyManualConfiguration": "手動代理配置",
+  "ProxyAutoConfiguration": "自動代理配置 url",
+  "ProxyHttp": "HTTP代理",
+  "ProxyHttps": "HTTPS代理",
+  "ProxyUseSameForHttps": "也可以將此代理用於 HTTPS",
+  "ProxyWhitelist": "沒有代理",
+  "ProxyWhitelistExample_one": "例子: .mozilla.org, .net.nz, 192.168.1.0/24",
+  "ProxyWhitelistExample_other": "連接至 localhost, 127.0.0.1/8 and ::1 從未被代理.",
+  "Port": "港口",
+  "NoProxy": "無代理",
+  "IgnoreCertificateErrors": "忽略證書頒發機構錯誤"
 }

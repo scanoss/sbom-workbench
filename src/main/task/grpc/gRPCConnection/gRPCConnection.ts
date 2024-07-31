@@ -41,25 +41,24 @@ class GRPCConnection {
   }
 
   public getComponentCatalogStub(): grpc.Client {
-    if (!this.componentCatalogClient)
-      this.componentCatalogClient = new ComponentsClient(this.getEndpoint(), this.getCredentials());
+    this.componentCatalogClient = null;
+    this.componentCatalogClient = new ComponentsClient(this.getEndpoint(), this.getCredentials());
     return this.componentCatalogClient;
   }
 
   public getVulnerabilityStub(): grpc.Client {
-    const hasApiKey = !!this.getApiKey();
+      const hasApiKey = !!this.getApiKey();
 
-    const endpoint = !hasApiKey
-      ? `${AppConfigDefault.OSSKB_HOST}:${AppConfigDefault.DEFAULT_PORT_gRPC}`
-      : this.getEndpoint();
+      const endpoint = !hasApiKey
+        ? `${AppConfigDefault.OSSKB_HOST}:${AppConfigDefault.DEFAULT_PORT_gRPC}`
+        : this.getEndpoint();
 
-    const credentials = !hasApiKey
-      ? grpc.credentials.createSsl()
-      : this.getCredentials();
+      const credentials = !hasApiKey
+        ? grpc.credentials.createSsl()
+        : this.getCredentials();
 
-    if (!this.vulnerabilityClient)
       this.vulnerabilityClient = new VulnerabilitiesClient(endpoint, credentials);
-    return this.vulnerabilityClient;
+      return this.vulnerabilityClient;
   }
 
 }
