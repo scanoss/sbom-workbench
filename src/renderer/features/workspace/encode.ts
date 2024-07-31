@@ -30,24 +30,21 @@ export const mapToProxyConfig = (values: GlobalSettingsFormValues): ProxyConfig 
     grpcProxyPort,
   } = values.proxyConfig;
 
-  if (mode === ProxyMode.NoProxy) {
-    return {
-      CA_CERT: null,
-      GRPC_PROXY: null,
-      HTTP_PROXY: null,
-      HTTPS_PROXY: null,
-      IGNORE_CERT_ERRORS: null,
-      NO_PROXY: null,
-      PAC_PROXY: null,
-    };
-  }
-
   const commonConfig = {
     CA_CERT: caCertificatePath,
     GRPC_PROXY: grpcProxyHost && grpcProxyPort ? `${grpcProxyHost}:${grpcProxyPort}` : null,
     IGNORE_CERT_ERRORS: ignoreCertificateErrors,
     NO_PROXY: whitelistedHosts.split(',').map((host) => host.trim()),
   };
+
+  if (mode === ProxyMode.NoProxy) {
+    return {
+      ...commonConfig,
+      HTTP_PROXY: null,
+      HTTPS_PROXY: null,
+      PAC_PROXY: null,
+    };
+  }
 
   if (mode === ProxyMode.Automatic) {
     return {
