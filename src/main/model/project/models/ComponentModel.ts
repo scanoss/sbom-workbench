@@ -10,6 +10,10 @@ import { componentHelper } from '../../../helpers/ComponentHelper';
 import { IComponentLicenseReliable } from '../../interfaces/component/IComponentLicenseReliable';
 import { ComponentVersion } from '../../entity/ComponentVersion';
 import { Model } from '../../Model';
+import { After } from '../../hooks/after/afterHook';
+import { detectedComponentAdapter } from '../../adapters/component/detectedComponentAdapter';
+import { ReportComponent } from '../../../services/ReportService';
+import { identifiedComponentAdapter } from '../../adapters/component/identifiedComponentAdapter';
 
 export class ComponentModel extends Model {
   private connection: sqlite3.Database;
@@ -186,7 +190,7 @@ export class ComponentModel extends Model {
 
   public async getComponentsIdentifiedForReport() {
     const call = util.promisify(this.connection.all.bind(this.connection)) as any;
-    const queries:any = (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms
+    const queries:any = (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms, i.source
         FROM component_versions c
         INNER JOIN inventories i ON c.id=i.cvid
         LEFT JOIN licenses l ON l.spdxid=i.spdxid
@@ -333,13 +337,14 @@ export class ComponentModel extends Model {
     await Promise.all(promises);
   }
 
+
   public async getComponentsDetectedForReport() {
     const call = util.promisify(this.connection.all.bind(this.connection));
     const query:any = (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms
         FROM component_versions c INNER JOIN results r ON r.version = c.version AND r.purl = c.purl
         LEFT JOIN license_component_version lcv ON lcv.cvid = c.id
         LEFT JOIN licenses l ON lcv.licid = l.id
-        LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version;`) as Array<{
+        LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version; `) as Array<{
       purl: string;
       name: string;
       vendor: string;
@@ -351,6 +356,102 @@ export class ComponentModel extends Model {
     }>);
     return query.map((item) => ({ ...item, algorithms: JSON.parse(item.algorithms) }));
   }
+
+  @After(detectedComponentAdapter)
+  public async findAllDetectedComponents():Promise<Array<ReportComponent>>{
+    return await this.getComponentsDetectedForReport();
+  }
+
+  @After(identifiedComponentAdapter)
+  public async getIdentifiedComponents():Promise<Array<ReportComponent>>{
+    const call = util.promisify(this.connection.all.bind(this.connection)) as any;
+    const queries:any = (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms, i.source, null as file
+    FROM component_versions c
+    INNER JOIN inventories i ON c.id=i.cvid
+    LEFT JOIN licenses l ON l.spdxid=i.spdxid
+    LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
+    LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version
+    WHERE c.source = 'engine' OR c.source='manual' AND i.source = 'detected'			
+    UNION 
+    SELECT d.purl, d.purl as name,'' as vendor ,'' as url,d.version ,i.spdxid as license,i.spdxid,'' as algorithms, i.source,  f.path as file
+    FROM dependencies d 
+    INNER JOIN component_versions cv ON d.purl = cv.purl AND d.version = cv.version
+    INNER JOIN files f ON d.fileId = f.fileId
+    INNER JOIN inventories i ON cv.id = i.cvid
+    WHERE i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0
+    GROUP BY d.purl, d.version, i.spdxid, f.path;`) as Array<{
+      purl: string;
+      name: string;
+      vendor: string;
+      url: string;
+      version: string;
+      license: string;
+      spdxid: string;
+      algorithms: { algorithm: string; strength: string }[] | null;
+      file: string;
+    }>);
+    return queries.map((item) => ({ ...item, algorithms: item.algorithms ? JSON.parse(item.algorithms): null }));
+  }
+
+/**
+ * @brief Retrieves the number of detected and declared files for each component (purl and version). *
+ * This method queries the database to get the count of files for each component version, grouped by the package URL (purl) and version.
+ * It combines data from detected results and declared dependencies.
+ *
+ * @returns {Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>>} - 
+ * A promise that resolves to an array of objects, each containing:
+ *   - `purl` (string): The package URL of the component.
+ *   - `version` (string): The version of the component.
+ *   - `fileCount` (number): The number of files associated with the component.
+ *   - `source` (string): The source of the file count ('detected' or 'declared').
+ *
+ * @throws {Error} - Throws an error if the database query fails.
+ */
+  public async getDetectedComponentFileCount():Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>> {
+    const call = util.promisify(this.connection.all.bind(this.connection)) as any;
+    const componentsFileCount = await call(`SELECT r.purl,r.version, COUNT(*) as fileCount, 'detected' as source FROM results r 
+    GROUP BY r.version, r.purl
+    UNION
+    SELECT d.purl, d.version, COUNT(*) as fileCount,'declared' as source FROM dependencies d
+    GROUP by d.purl,d.version;`); 
+    return componentsFileCount;
+  }
+
+/**
+ * @brief Retrieves the number of identified files for each component (purl and version).
+ * This method queries the database to get the count of identified files for each
+ * component version, grouped by the package URL (purl) and version. It combines
+ * data from identified detected sources and identified declared dependencies. If the `spdxid` is provided,
+ * it filters the results by the specified `spdxid`( Only applied to declared components). If `spdxid` is null or undefined,
+ * it retrieves all components.
+ *
+ * @param {string} [spdxid] - The SPDX identifier to filter the results. If not provided, retrieves all licenses.
+ * @returns {Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>>} - 
+ * A promise that resolves to an array of objects, each containing:
+ *   - `purl` (string): The package URL of the component.
+ *   - `version` (string): The version of the component.
+ *   - `fileCount` (number): The number of identified files for the component.
+ *   - `source` (string): The source of the component (either 'detected' or 'declared').
+ *
+ * @throws {Error} - Throws an error if the database query fails.
+ */
+  
+  public async getIdentifiedComponentFileCount(spdxid?: string):Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>> {
+    const call = util.promisify(this.connection.all.bind(this.connection)) as any;
+    const componentsFileCount = await call(`SELECT cv.purl, cv.version, count(*) as fileCount, i.source FROM inventories i 
+    INNER JOIN component_versions cv ON cv.id = i.cvid
+    LEFT JOIN file_inventories fi ON fi.inventoryid = i.id
+    WHERE i.source = 'detected'
+    GROUP BY cv.purl, cv.version, i.source
+    UNION
+    SELECT d.purl, d.version , COUNT(d.fileId) as fileCount, 'declared' as source FROM dependencies d
+    INNER JOIN component_versions cv ON cv.purl = d.purl AND cv.version = d.version
+    INNER JOIN inventories i ON i.cvid = cv.id  AND instr(d.licenses, i.spdxid) > 0
+    WHERE i.source = 'declared' AND (i.spdxid = ? OR ? IS NULL)
+    GROUP BY d.purl, d.version;`, [spdxid, spdxid]); 
+    return componentsFileCount;
+  }
+
 
   public getEntityMapper(): Record<string, string> {
     return ComponentModel.entityMapper;

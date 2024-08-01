@@ -33,12 +33,12 @@ export const reportSlice = createSlice({
       state.summary = summary;
       state.detected = {
         ...detected,
-        components: getComponentsGrouped(detected.licenses),
+      //  components: getComponentsGrouped(detected.licenses),
       };
 
       state.identified = {
         ...identified,
-        components: getComponentsGrouped(identified.licenses),
+       // components: getComponentsGrouped(identified.licenses),
       };
 
       state.isLoading = false;

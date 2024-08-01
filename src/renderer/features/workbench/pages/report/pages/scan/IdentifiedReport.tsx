@@ -10,7 +10,7 @@ import { ConditionalLink } from '@components/ConditionalLink/ConditionalLink';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Component, LicenseEntry } from 'main/services/ReportService';
+import { ReportComponent } from 'main/services/ReportService';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import LicensesChart from '../../components/LicensesChart';
@@ -23,6 +23,7 @@ import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 import { Scanner } from '../../../../../../../main/task/scanner/types';
 import DependenciesCard from '../../components/DependenciesCard';
 import CryptographyCard from '../../components/CryptographyCard';
+import { reportService } from '@api/services/report.service';
 
 Chart.register(...registerables);
 
@@ -39,8 +40,8 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
 
   const [licenseSelected, setLicenseSelected] = useState<any>(null);
 
-  const [componentsMatched, setComponentsMatched] = useState<Component[]>([]); // detected
-  const [componentsDeclared, setComponentsDeclared] = useState<Component[]>([]);
+  const [componentsMatched, setComponentsMatched] = useState<ReportComponent[]>([]); // detected
+  const [componentsDeclared, setComponentsDeclared] = useState<ReportComponent[]>([]);
   const [obligationsFiltered, setObligationsFiltered] = useState<any[]>([]);
 
   const isEmpty = summary?.identified.scan === 0 && summary?.original === 0 && data.licenses.length === 0;
@@ -52,21 +53,22 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
     onLicenseClear();
   };
 
-  const onLicenseSelected = (license: string) => {
+  const onLicenseSelected = async (license: string) => {
     const matchedLicense = data.licenses.find((item) => item.label === license);
+    
+    const identified = await reportService.getIdentifiedComponents(license);
 
-    const filtered = data.components.filter((item) => item.licenses.includes(matchedLicense.label));
-    setComponentsMatched(filtered.filter((item) => item.source === 'detected'));
-    setComponentsDeclared(filtered.filter((item) => item.source === 'declared'));
+    setComponentsMatched(identified.components);
+    setComponentsDeclared(identified.declaredComponents);
     setObligationsFiltered(obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)));
     setLicenseSelected(matchedLicense);
   };
 
-  const onLicenseClear = () => {
+  const onLicenseClear = async () => {
     const items = data.components;
-
-    setComponentsMatched(items.filter((item) => item.source === 'detected'));
-    setComponentsDeclared(items.filter((item) => item.source === 'declared'));
+    const identified = await reportService.getIdentifiedComponents();
+    setComponentsMatched(identified.components);
+    setComponentsDeclared(identified.declaredComponents);
     setObligationsFiltered(obligations.current);
 
     setLicenseSelected(null);
@@ -118,7 +120,7 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
             <LicensesChart data={data.licenses} />
             <LicensesTable
               matchedLicenseSelected={licenseSelected}
-              selectLicense={(license) => onLicenseSelected(license)}
+              selectLicense={async (license) => onLicenseSelected(license)}
               data={data.licenses}
             />
           </div>

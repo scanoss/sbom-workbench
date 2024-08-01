@@ -37,3 +37,29 @@ api.handle(IpcChannels.REPORT_DETECTED, async (event, arg: string) => {
     return Response.fail({ message: error.message });
   }
 });
+
+api.handle(IpcChannels.REPORT_GET_DETECTED_COMPONENTS, async (event, license?: string) => {
+  try {
+    const data = await reportService.getDetectedComponents(license);
+    return Response.ok({
+      message: 'Detected Components',
+      data,
+    });
+  } catch (error: any) {
+    log.error('[REPORT GET DETECTED COMPONENTS]: ', error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+api.handle(IpcChannels.REPORT_GET_IDENTIFIED_COMPONENTS, async (event, license?: string) => {
+  try {
+    const data = await reportService.getIdentifiedComponents(license);
+    return Response.ok({
+      message: 'Identified Components',
+      data,
+    });
+  } catch (error: any) {
+    log.error('[REPORT GET IDENTIFIED COMPONENTS]: ', error);
+    return Response.fail({ message: error.message });
+  }
+});
