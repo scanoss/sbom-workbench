@@ -229,7 +229,8 @@ LEFT JOIN licenses lic ON lic.spdxid = detected_license;`;
   FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId
   INNER JOIN inventories i ON cv.id = i.cvid
-  INNER JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version;`;
+  INNER JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version
+  GROUP BY f.path, d.component, d.version, d.purl;`;
 
   SQL_ALL_DETECTED_DEPENDENCIES = `SELECT f.path as file ,d.component,d.purl,d.version,d.originalLicense as licenses FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId;`;
