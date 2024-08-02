@@ -337,7 +337,6 @@ export class ComponentModel extends Model {
     await Promise.all(promises);
   }
 
-
   public async getComponentsDetectedForReport() {
     const call = util.promisify(this.connection.all.bind(this.connection));
     const query:any = (await call(`SELECT DISTINCT c.purl, c.name, r.vendor, c.url, c.version, l.name AS license, l.spdxid, crypt.algorithms

@@ -372,6 +372,35 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   SQL_DELETE_LOCAL_CRYPTOGRAPHY = 'DELETE FROM local_cryptography';
 
   SQL_GET_ALL_LOCAL_ALGORITHMS = "SELECT '[' || GROUP_CONCAT(SUBSTR(lc.algorithms, 2, LENGTH(lc.algorithms) - 2), ', ') || ']' AS  algorithms  FROM local_cryptography lc;";
+
+  SQL_CSV_IDENTIFIED  = `SELECT DISTINCT i.id as inventory_id, f.path, i.usage,coalesce(r.component,'') as detected_component,coalesce(cv.name,'') as concluded_component, r.purl as detected_purl, cv.purl as concluded_purl, r.version as detected_version, cv.version as concluded_version, r.latest_version, cv.reliableLicense as detected_license, i.spdxid as concluded_license
+  FROM inventories i
+  INNER JOIN file_inventories fi ON i.id = fi.inventoryid
+  INNER JOIN files f ON f.fileId = fi.fileId
+  INNER JOIN component_versions cv ON cv.id = i.cvid
+  INNER JOIN results r ON f.fileId = r.fileId
+  UNION
+  SELECT i.id as inventory_id, f.path, i.usage,d.component as detected_component,cv.name as concluded_component,d.purl as detected_purl, cv.purl as concluded_purl, d.originalVersion as detected_version, d.version as concluded_version, '' as latest_version, REPLACE(d.originalLicense, ',', '|') as detected_license, i.spdxid as concluded_license
+  FROM dependencies d
+  INNER JOIN files f ON d.fileId = f.fileId
+  INNER JOIN component_versions cv ON cv.purl = d.purl and cv.version = d.version
+  INNER JOIN inventories i ON cv.id = i.cvid 
+  WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0
+  GROUP BY d.dependencyId;`;
+
+  SQL_CSV_DETECTED  = `SELECT * FROM(  
+    SELECT DISTINCT '' as inventory_id, f.path,r.idtype as usage, r.component as detected_component, '' as concluded_component,
+    r.purl as detected_purl, '' as concluded_purl, r.version as detected_version, '' as concluded_version, r.latest_version,  rl.spdxid as detected_license, '' as concluded_license
+    FROM files f 
+    INNER JOIN results r ON f.fileId = r.fileId 
+    LEFT JOIN result_license rl ON r.id = rl.resultId
+    UNION 
+    SELECT '' as inventory_id, f.path, 'dependency' as usage, d.component as detected_component, '' as concluded_component,
+    d.purl as detected_purl, '' as concluded_purl, d.originalVersion as detected_version , '' as concluded_version, '' as latest_version,
+    REPLACE(d.originalLicense, ',', ' | ') as detected_license, '' as concluded_license FROM dependencies d
+    INNER JOIN files f ON f.fileId = d.fileId
+    GROUP BY d.dependencyId) as detected
+    ORDER BY usage DESC;`;
 }
 
 export const queries = new Queries();

@@ -13,6 +13,7 @@ import { QueryBuilder } from '../queryBuilder/QueryBuilder';
 import { Connection } from '../Connection';
 import { modelProvider } from '../../services/ModelProvider';
 import { LocalCryptographyModel } from './models/LocalCryptographyModel';
+import { ReportModel } from './models/ReportModel';
 
 export class ProjectModel {
   private connection: Connection;
@@ -41,6 +42,8 @@ export class ProjectModel {
 
   localCryptography: LocalCryptographyModel;
 
+  report : ReportModel;
+
   constructor(path: string) {
     this.path = `${path}/scan_db`;
     this.file = null;
@@ -52,6 +55,7 @@ export class ProjectModel {
     this.vulnerability = null;
     this.cryptography = null;
     this.localCryptography = null;
+    this.report = null;
   }
 
   private async createViews(db: sqlite3.Database): Promise<void> {
@@ -89,6 +93,7 @@ export class ProjectModel {
     this.vulnerability = new VulnerabilityModel(db);
     this.cryptography = new CryptographyModel(db);
     this.localCryptography = new LocalCryptographyModel(db);
+    this.report = new ReportModel(db);
   }
 
   public async init(mode: number): Promise<void> {
