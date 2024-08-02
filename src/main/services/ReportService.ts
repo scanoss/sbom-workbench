@@ -115,7 +115,7 @@ class ReportService {
   public async getIdentified(): Promise<IReportData> {
     
     // License components summary
-    const identifiedLicenseSummary = await modelProvider.model.license.getIdentifedLicenseComponentSummary();
+    const identifiedLicenseSummary = await modelProvider.model.report.identifedLicenseComponentSummary();
 
     // Vulnerabilities
     const vulnerabilities = await modelProvider.model.vulnerability.getIdentifiedReport();
@@ -168,7 +168,7 @@ class ReportService {
   public async getDetected(): Promise<IReportData> {
     
     // License components summary
-    const detectedlicensesSummary = await modelProvider.model.license.getDetectedLicenseComponentSummary();
+    const detectedlicensesSummary = await modelProvider.model.report.detectedLicenseComponentSummary();
 
     // Vulnerabilities
     const vulnerabilities = await modelProvider.model.vulnerability.getDetectedReport();

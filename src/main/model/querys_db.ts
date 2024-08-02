@@ -373,6 +373,42 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   SQL_GET_ALL_LOCAL_ALGORITHMS = "SELECT '[' || GROUP_CONCAT(SUBSTR(lc.algorithms, 2, LENGTH(lc.algorithms) - 2), ', ') || ']' AS  algorithms  FROM local_cryptography lc;";
 
+  SQL_DETECTED_REPORT_LICENSE_COMPONENT_SUMMARY = `SELECT spdxid, SUM(detectedLicenseComponentCount) as componentLicenseCount, SUM(declaredLicenseDependencyCount) as dependencyLicenseCount , SUM(detectedLicenseComponentCount + declaredLicenseDependencyCount) as total FROM (
+    -- First part: Count component license
+    SELECT l.spdxid, COUNT(DISTINCT cv.purl || cv.version) as detectedLicenseComponentCount,  0 as declaredLicenseDependencyCount  FROM component_versions cv
+    LEFT JOIN license_component_version lcv ON cv.id = lcv.cvid
+    LEFT JOIN licenses l ON l.id = lcv.licid
+    WHERE cv.source = 'engine'
+    GROUP BY l.spdxid
+    UNION
+        -- Second part: splitting originalLicense by ',' and counting dependency licenses
+          SELECT spdxid, 0 AS detectedLicenseComponentCount, count(*) as declaredLicenseDependencyCount FROM (
+            WITH RECURSIVE split(label, str,purl,version) AS (
+               SELECT '', COALESCE(originalLicense, 'unknown') || ',', purl, version
+                FROM dependencies
+                UNION ALL
+               SELECT
+            CASE 
+              WHEN substr(str, 1, instr(str, ',') - 1) = '' THEN 'unknown'
+              ELSE substr(str, 1, instr(str, ',') - 1)
+            END,
+                 substr(str, instr(str, ',') + 1),
+                 purl,
+                 version
+                FROM split 
+                WHERE str != ''
+            )
+            SELECT label as spdxid,purl,version
+            FROM split
+            WHERE label != ''
+            GROUP BY spdxid,purl,version
+        ) GROUP BY spdxid) as detected
+    GROUP BY spdxid;`;
+
+  SQL_IDENTIFIED_REPORT_LICENSE_COMPONENT_SUMMARY = `SELECT i.spdxid as label ,COUNT (DISTINCT i.source || cv.purl || cv.version) as value FROM inventories i
+  INNER JOIN component_versions cv ON cv.id = i.cvid
+  GROUP BY i.spdxid;`;
+
   SQL_CSV_IDENTIFIED  = `SELECT DISTINCT i.id as inventory_id, f.path, i.usage,coalesce(r.component,'') as detected_component,coalesce(cv.name,'') as concluded_component, r.purl as detected_purl, cv.purl as concluded_purl, r.version as detected_version, cv.version as concluded_version, r.latest_version, cv.reliableLicense as detected_license, i.spdxid as concluded_license
   FROM inventories i
   INNER JOIN file_inventories fi ON i.id = fi.inventoryid
