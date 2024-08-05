@@ -1,4 +1,4 @@
-export interface CSVDataRecord {
+export interface DataRecord {
     inventory_id: number;
     path: string;
     usage: string;
@@ -11,4 +11,5 @@ export interface CSVDataRecord {
     latest_version: string;
     detected_license: string;
     concluded_license: string;
+    url: string;
   }

@@ -2,10 +2,11 @@ import { Model } from "../../../../main/model/Model";
 import sqlite3 from 'sqlite3';
 import util from 'util';
 import { queries } from '../../querys_db';
-import { CSVDataRecord } from "../../interfaces/report/CSVDataRecord";
 import { LicenseReport } from "../../../../main/services/ReportService";
 import { After } from "../../../../main/model/hooks/after/afterHook";
 import { detectedLicenseSummaryAdapter } from "../../../../main/model/adapters/report/detectedLicenseSummaryAdapter";
+import { DataRecord } from "../../../../main/model/interfaces/report/DataRecord";
+import { ExportComponentData } from "../../../../main/model/interfaces/report/ExportComponentData";
 
 
 export class ReportModel extends Model {
@@ -16,18 +17,48 @@ export class ReportModel extends Model {
         this.connection = conn;
     }
 
-    public async fetchAllIdentifiedCSVRecords(): Promise<Array<CSVDataRecord>> {
+   /**
+   * Fetches all identified component records for each file.
+   * @returns {Promise<Array<DataRecord>>} A promise that resolves to an array of identified data records.
+   */
+    public async fetchAllIdentifiedRecordsFiles(): Promise<Array<DataRecord>> {
         const call = util.promisify(this.connection.all.bind(this.connection)) as any;
-        const data = await call(queries.SQL_CSV_IDENTIFIED);
+        const data = await call(queries.IDENTIFIED_REPORT_DATA_FILES);
         return data;        
     }
 
 
-    public async fetchAllDetectedCSVRecords(): Promise<Array<CSVDataRecord>> {
+    /**
+    * Fetches all detected component records for each file.
+    * @returns {Promise<Array<DataRecord>>} A promise that resolves to an array of detected data records.
+    */
+    public async fetchAllDetectedRecordsFiles(): Promise<Array<DataRecord>> {
         const call = util.promisify(this.connection.all.bind(this.connection)) as any;
-        const data = await call(queries.SQL_CSV_DETECTED);
+        const data = await call(queries.DETECTED_REPORT_DATA_FILES);
         return data;        
     }
+
+      /**
+     * Fetches all detected components along with their licenses.
+     * @returns {Promise<Array<DataRecord>>} A promise that resolves to an array of detected data records with licenses.
+     */
+      public async fetchAllDetectedComponents(): Promise<Array<ExportComponentData>> {
+        const call = util.promisify(this.connection.all.bind(this.connection)) as any;
+        const data = await call(queries.DETECTED_REPORT_DATA);
+        return data;        
+    }
+
+          /**
+     * Fetches all detected components along with their licenses.
+     * @returns {Promise<Array<DataRecord>>} A promise that resolves to an array of detected data records with licenses.
+     */
+          public async fetchAllIdentifiedComponents(): Promise<Array<ExportComponentData>> {
+            const call = util.promisify(this.connection.all.bind(this.connection)) as any;
+            const data = await call(queries.IDENTIFIED_REPORT_DATA);
+            return data;        
+        }
+
+
 
     @After(detectedLicenseSummaryAdapter)
     public async detectedLicenseComponentSummary(): Promise<Array<LicenseReport>> {

@@ -86,6 +86,24 @@ export class LicenseModel extends Model {
     });
   }
 
+    // GET LICENSE
+    public getAllWithFullText() {
+      const self = this;
+      return new Promise<Array<LicenseDTO>>(async (resolve, reject) => {
+        try {
+          this.connection.serialize(() => {
+            self.connection.all(queries.SQL_SELECT_ALL_LICENSES_FULL_TEXT, (err: any, license: Array<any>) => {
+              if (err) throw new Error('Unable to get all licenses');
+              resolve(license);
+            });
+          });
+        } catch (error) {
+          log.error(error);
+          reject(error);
+        }
+      });
+    }
+
   public async bulkAttachComponentLicense(data: Array<IComponentLicense>) {
     return new Promise<void>(async (resolve, reject) => {
       try {

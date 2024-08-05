@@ -5,6 +5,10 @@ import { Format } from '../Format';
 import { workspace } from '../../../workspace/Workspace';
 import { ExportSource } from '../../../../api/types';
 import AppConfig from '../../../../config/AppConfigModule';
+import { DataRecord } from '../../../../main/model/interfaces/report/DataRecord';
+import { modelProvider } from '../../../../main/services/ModelProvider';
+import { LicenseDTO } from '../../../../api/dto';
+
 
 const crypto = require('crypto');
 
@@ -15,6 +19,7 @@ export enum LicenseType {
 
 export class SpdxLiteJson extends Format {
   private source: string;
+  private licenseMapper: Map<string,any>;
 
   constructor(source: string) {
     super();
@@ -24,6 +29,12 @@ export class SpdxLiteJson extends Format {
 
   // @override
   public async generate() {
+
+    const licenses = await modelProvider.model.license.getAllWithFullText();
+    this.licenseMapper = new Map<string,any>();
+    licenses.forEach((l)=>{
+      this.licenseMapper.set(l.spdxid, l);
+    });
     const data = this.source === ExportSource.IDENTIFIED
       ? await this.export.getIdentifiedData()
       : await this.export.getDetectedData();
@@ -33,8 +44,23 @@ export class SpdxLiteJson extends Format {
     spdx.documentDescribes = [];
 
     for (let i = 0; i < data.length; i += 1) {
+
+      let license:string;
+      let version:string;
+      let purl: string;
+      if(this.source === ExportSource.DETECTED){
+        license = data[i].detected_license;
+        version = data[i].detected_version;
+        purl = data[i].detected_purl
+      }else{
+        license = data[i].concluded_license;
+        version = data[i].concluded_version;
+        purl = data[i].concluded_purl
+      }
+
+
       // Find already existing package by purl and version
-      const pkg = spdx.packages.find((p) => (p.versionInfo === (data[i].version || 'NOASSERTION') && (p.externalRefs[0].referenceLocator === data[i].purl)));
+      const pkg = spdx.packages.find((p) => (p.versionInfo === (version || 'NOASSERTION') && (p.externalRefs[0].referenceLocator === purl)));
 
       if (pkg && data[i].detected_license) {
         if (new RegExp(`\\b${data[i].detected_license}\\b`).test(pkg.licenseDeclared) === false) {
@@ -90,25 +116,38 @@ export class SpdxLiteJson extends Format {
     return buf.toString('base64');
   }
 
-  private getPackage(data: any) {
+  private getPackage(data: DataRecord) {
+    let license:string;
+    let version:string;
+    let purl: string;
+    if(this.source === ExportSource.DETECTED){
+      license = data.detected_license;
+      version = data.detected_version;
+      purl = data.detected_purl
+    }else{
+      license = data.concluded_license;
+      version = data.concluded_version;
+      purl = data.concluded_purl
+    }
+
     const pkg: any = {};
-    pkg.name = data.identified_component !== '' ? data.identified_component : data.purl;
-    pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${data.purl}@${data.version}`).digest('hex')}`; // md5 purl@version
-    pkg.versionInfo = data.version ? data.version : 'NOASSERTION';
+    pkg.name = purl;
+    pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${purl}@${version}`).digest('hex')}`; // md5 purl@version
+    pkg.versionInfo = version ? version : 'NOASSERTION';
     pkg.downloadLocation = data.url ? data.url : 'NOASSERTION';
     pkg.filesAnalyzed = false;
     pkg.homepage = data.url || 'NOASSERTION';
     pkg.licenseDeclared = data.detected_license ? data.detected_license : 'NOASSERTION';
-    pkg.licenseConcluded = this.source === ExportSource.DETECTED ? 'NOASSERTION' : data.identified_license;
-    if (data.official === LicenseType.CUSTOM) {
-      pkg.copyrightText = this.fulltextToBase64(data.fulltext);
+    pkg.licenseConcluded = this.source === ExportSource.DETECTED ? 'NOASSERTION' : data.concluded_license;
+    if (this.licenseMapper.get(data.detected_license).official === LicenseType.CUSTOM) {
+      pkg.copyrightText = this.fulltextToBase64(this.licenseMapper.get(data.detected_license).fulltext);
     } else {
       pkg.copyrightText = 'NOASSERTION';
     }
     pkg.externalRefs = [
       {
         referenceCategory: 'PACKAGE_MANAGER',
-        referenceLocator: data.purl,
+        referenceLocator: purl,
         referenceType: 'purl',
       },
     ];

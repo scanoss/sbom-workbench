@@ -1,6 +1,6 @@
 /* eslint-disable no-async-promise-executor */
 
-import { NewExportDTO } from 'api/dto';
+import { NewExportDTO, SourceType } from 'api/dto';
 import { Format } from '../../modules/export/Format';
 import { Spdxv20 } from '../../modules/export/format/Spdxv20';
 import { SpdxLite } from '../../modules/export/format/SpdxLite';
@@ -11,11 +11,12 @@ import { HtmlSummary } from '../../modules/export/format/HtmlSummary';
 import { SpdxLiteJson } from '../../modules/export/format/SpdxLiteJson';
 import { ITask } from '../Task';
 import { IExportResult } from '../../modules/export/IExportResult';
-import { ExportFormat, InventoryType } from '../../../api/types';
+import { ExportFormat, ExportSource, InventoryType } from '../../../api/types';
 import { Crypto } from '../../modules/export/format/Crypto';
-import { CycloneDX } from '../../modules/export/format/CycloneDX';
 import { workspace } from '../../workspace/Workspace';
 import { ExportModel } from '../../modules/export/Model/ExportModel';
+import { CycloneDXDetected } from '../../modules/export/format/CycloneDX/CycloneDXDetected';
+import { CycloneDXIdentified } from '../../modules/export/format/CycloneDX/CycloneDxIdentified';
 
 export class Export implements ITask<string, IExportResult> {
   private format: Format;
@@ -56,7 +57,7 @@ export class Export implements ITask<string, IExportResult> {
         this.format = new SpdxLiteJson(exportDTO.source);
         break;
       case ExportFormat.CYCLONEDX:
-        this.format = new CycloneDX(exportDTO.source, workspace.getOpenedProjects()[0], new ExportModel());
+        this.format = exportDTO.source === ExportSource.DETECTED ? new CycloneDXDetected(exportDTO.source, workspace.getOpenedProjects()[0], new ExportModel()) : new CycloneDXIdentified(exportDTO.source, workspace.getOpenedProjects()[0], new ExportModel()) ;
         break;
       case ExportFormat.HTMLSUMMARY:
         this.format = new HtmlSummary(exportDTO.source);
