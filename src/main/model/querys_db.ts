@@ -157,6 +157,10 @@ export class Queries {
   // GET LICENSES
   SQL_SELECT_ALL_LICENSES = 'SELECT id, spdxid, name, url, official FROM licenses ORDER BY name ASC;';
 
+
+  // GET LICENSES
+  SQL_SELECT_ALL_LICENSES_FULL_TEXT = 'SELECT id, spdxid, name, url, official, fulltext FROM licenses ORDER BY name ASC;';
+
   // GET ALL THE INVENTORIES
   SQL_GET_ALL_INVENTORIES = `SELECT DISTINCT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i
   LEFT JOIN licenses l ON i.spdxid=l.spdxid LEFT JOIN file_inventories fi ON fi.inventoryId = i.id LEFT JOIN files f ON fi.fileId = f.fileId  LEFT JOIN components c ON i.cvid = c.id #FILTER;`;
@@ -229,7 +233,8 @@ LEFT JOIN licenses lic ON lic.spdxid = detected_license;`;
   FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId
   INNER JOIN inventories i ON cv.id = i.cvid
-  INNER JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version;`;
+  INNER JOIN component_versions cv ON cv.purl= d.purl AND cv.version = d.version
+  GROUP BY f.path, d.component, d.version, d.purl;`;
 
   SQL_ALL_DETECTED_DEPENDENCIES = `SELECT f.path as file ,d.component,d.purl,d.version,d.originalLicense as licenses FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId;`;
@@ -371,6 +376,116 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   SQL_DELETE_LOCAL_CRYPTOGRAPHY = 'DELETE FROM local_cryptography';
 
   SQL_GET_ALL_LOCAL_ALGORITHMS = "SELECT '[' || GROUP_CONCAT(SUBSTR(lc.algorithms, 2, LENGTH(lc.algorithms) - 2), ', ') || ']' AS  algorithms  FROM local_cryptography lc;";
+
+  SQL_DETECTED_REPORT_LICENSE_COMPONENT_SUMMARY = `SELECT spdxid, SUM(detectedLicenseComponentCount) as componentLicenseCount, SUM(declaredLicenseDependencyCount) as dependencyLicenseCount , SUM(detectedLicenseComponentCount + declaredLicenseDependencyCount) as total FROM (
+    -- First part: Count component license
+    SELECT l.spdxid, COUNT(DISTINCT cv.purl || cv.version) as detectedLicenseComponentCount,  0 as declaredLicenseDependencyCount  FROM component_versions cv
+    LEFT JOIN license_component_version lcv ON cv.id = lcv.cvid
+    LEFT JOIN licenses l ON l.id = lcv.licid
+    WHERE cv.source = 'engine'
+    GROUP BY l.spdxid
+    UNION
+        -- Second part: splitting originalLicense by ',' and counting dependency licenses
+          SELECT spdxid, 0 AS detectedLicenseComponentCount, count(*) as declaredLicenseDependencyCount FROM (
+            WITH RECURSIVE split(label, str,purl,version) AS (
+               SELECT '', COALESCE(originalLicense, 'unknown') || ',', purl, version
+                FROM dependencies
+                UNION ALL
+               SELECT
+            CASE 
+              WHEN substr(str, 1, instr(str, ',') - 1) = '' THEN 'unknown'
+              ELSE substr(str, 1, instr(str, ',') - 1)
+            END,
+                 substr(str, instr(str, ',') + 1),
+                 purl,
+                 version
+                FROM split 
+                WHERE str != ''
+            )
+            SELECT label as spdxid,purl,version
+            FROM split
+            WHERE label != ''
+            GROUP BY spdxid,purl,version
+        ) GROUP BY spdxid) as detected
+    GROUP BY spdxid;`;
+
+  SQL_IDENTIFIED_REPORT_LICENSE_COMPONENT_SUMMARY = `SELECT i.spdxid as label ,COUNT (DISTINCT i.source || cv.purl || cv.version) as value FROM inventories i
+  INNER JOIN component_versions cv ON cv.id = i.cvid
+  GROUP BY i.spdxid;`;
+
+  IDENTIFIED_REPORT_DATA_FILES  = `SELECT * FROM (SELECT  DISTINCT i.id as inventory_id, f.path, i.usage,coalesce(r.component,'') as detected_component
+  ,coalesce(cv.name,'') as concluded_component, r.purl as detected_purl, cv.purl as concluded_purl,
+   r.version as detected_version, cv.version as concluded_version, r.latest_version,
+     (SELECT GROUP_CONCAT(l.spdxid, ' AND ') 
+       FROM license_component_version lcv 
+       INNER JOIN licenses l ON lcv.licid = l.id 
+       WHERE lcv.cvid = cv.id) AS detected_license, i.spdxid as concluded_license, cv.url
+    FROM inventories i
+    INNER JOIN file_inventories fi ON i.id = fi.inventoryid
+    INNER JOIN files f ON f.fileId = fi.fileId
+    INNER JOIN component_versions cv ON cv.id = i.cvid
+    INNER JOIN results r ON f.fileId = r.fileId
+    UNION
+    SELECT i.id as inventory_id, f.path, i.usage,d.component as detected_component,cv.name as concluded_component,d.purl as detected_purl, cv.purl as concluded_purl, d.originalVersion as detected_version, d.version as concluded_version, '' as latest_version, REPLACE(d.originalLicense, ',', '|') as detected_license, i.spdxid as concluded_license, '' as url
+    FROM dependencies d
+    INNER JOIN files f ON d.fileId = f.fileId
+    INNER JOIN component_versions cv ON cv.purl = d.purl and cv.version = d.version
+    INNER JOIN inventories i ON cv.id = i.cvid 
+    WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0
+    GROUP BY d.dependencyId)
+    ORDER BY usage DESC ;`;
+
+  DETECTED_REPORT_DATA_FILES  = `SELECT * FROM(  
+    SELECT DISTINCT '' as inventory_id, f.path,r.idtype as usage, r.component as detected_component, '' as concluded_component,
+    r.purl as detected_purl, '' as concluded_purl, r.version as detected_version, '' as concluded_version, r.latest_version,
+	(SELECT GROUP_CONCAT(l.spdxid, ' AND ') 
+       FROM license_component_version lcv 
+       INNER JOIN licenses l ON lcv.licid = l.id 
+       WHERE lcv.cvid = cv.id) AS detected_license,
+       '' as concluded_license,
+	  r.url
+    FROM files f 
+    INNER JOIN results r ON f.fileId = r.fileId 
+    LEFT JOIN result_license rl ON r.id = rl.resultId
+	  INNER JOIN component_versions cv ON cv.purl = r.purl AND cv.version = r.version
+    UNION 
+    SELECT '' as inventory_id, f.path, 'dependency' as usage, d.component as detected_component, '' as concluded_component,
+    d.purl as detected_purl, '' as concluded_purl, d.originalVersion as detected_version , '' as concluded_version, '' as latest_version,
+    REPLACE(d.originalLicense, ',', ' | ') as detected_license, '' as concluded_license, '' as url FROM dependencies d
+    INNER JOIN files f ON f.fileId = d.fileId
+    GROUP BY d.dependencyId) as detected
+    ORDER BY usage DESC;`;
+
+    DETECTED_REPORT_DATA = `SELECT DISTINCT r.component, r.purl, r.version, 
+    (SELECT GROUP_CONCAT(l.spdxid, ' AND ')  FROM license_component_version lcv 
+           INNER JOIN licenses l ON lcv.licid = l.id 
+           WHERE lcv.cvid = cv.id) AS detected_licenses, 
+         '' as concluded_licenses,
+          r.url
+        FROM results r
+        INNER JOIN component_versions cv ON cv.purl = r.purl AND cv.version = r.version
+        UNION 
+    SELECT DISTINCT component, d.purl, d.originalVersion as detected_version ,  REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, '' as concluded_licenses, '' as url 
+    FROM dependencies d;`;
+
+    IDENTIFIED_REPORT_DATA = `SELECT coalesce(cv.name,'') as component, cv.purl,cv.version,
+    (SELECT GROUP_CONCAT(l.spdxid, ' AND ') 
+           FROM license_component_version lcv 
+           INNER JOIN licenses l ON lcv.licid = l.id 
+           WHERE lcv.cvid = cv.id) AS detected_licenses, i.spdxid as concluded_licenses,
+       cv.url
+        FROM inventories i
+        INNER JOIN file_inventories fi ON i.id = fi.inventoryid
+        INNER JOIN files f ON f.fileId = fi.fileId
+        INNER JOIN component_versions cv ON cv.id = i.cvid
+        INNER JOIN results r ON f.fileId = r.fileId
+      GROUP BY cv.purl, cv.version, concluded_licenses
+      UNION
+      SELECT cv.name as component,cv.purl,d.version as concluded_version, REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, i.spdxid as concluded_licenses, '' as url
+      FROM dependencies d
+      INNER JOIN component_versions cv ON cv.purl = d.purl and cv.version = d.version
+      INNER JOIN inventories i ON cv.id = i.cvid 
+      WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0;`;    
 }
 
 export const queries = new Queries();

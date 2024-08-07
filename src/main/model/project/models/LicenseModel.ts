@@ -6,7 +6,7 @@ import { queries } from '../../querys_db';
 import { IComponentLicense } from '../../interfaces/component/IComponentLicense';
 import { Model } from '../../Model';
 import util from 'util';
-import { detectedLicenseSummaryAdapter } from '../../adapters/license/detectedLicenseSummaryAdapter';
+import { detectedLicenseSummaryAdapter } from '../../adapters/report/detectedLicenseSummaryAdapter';
 import { After } from '../../hooks/after/afterHook';
 import { LicenseReport } from 'main/services/ReportService';
 
@@ -85,6 +85,24 @@ export class LicenseModel extends Model {
       }
     });
   }
+
+    // GET LICENSE
+    public getAllWithFullText() {
+      const self = this;
+      return new Promise<Array<LicenseDTO>>(async (resolve, reject) => {
+        try {
+          this.connection.serialize(() => {
+            self.connection.all(queries.SQL_SELECT_ALL_LICENSES_FULL_TEXT, (err: any, license: Array<any>) => {
+              if (err) throw new Error('Unable to get all licenses');
+              resolve(license);
+            });
+          });
+        } catch (error) {
+          log.error(error);
+          reject(error);
+        }
+      });
+    }
 
   public async bulkAttachComponentLicense(data: Array<IComponentLicense>) {
     return new Promise<void>(async (resolve, reject) => {
@@ -297,50 +315,6 @@ export class LicenseModel extends Model {
         });
       });
     });
-  }
-
-  @After(detectedLicenseSummaryAdapter)
-  public async getDetectedLicenseComponentSummary(): Promise<Array<LicenseReport>> {
-    const call:any = util.promisify(this.connection.all.bind(this.connection));
-    const detectedSummary = await call(`SELECT spdxid, SUM(detectedLicenseComponentCount) as componentLicenseCount, SUM(declaredLicenseDependencyCount) as dependencyLicenseCount , SUM(detectedLicenseComponentCount + declaredLicenseDependencyCount) as total FROM (
-      -- First part: Count component license
-      SELECT l.spdxid, COUNT(DISTINCT cv.purl || cv.version) as detectedLicenseComponentCount,  0 as declaredLicenseDependencyCount  FROM component_versions cv
-      LEFT JOIN license_component_version lcv ON cv.id = lcv.cvid
-      LEFT JOIN licenses l ON l.id = lcv.licid
-      WHERE cv.source = 'engine'
-      GROUP BY l.spdxid
-      UNION
-          -- Second part: splitting originalLicense by ',' and counting dependency licenses
-            SELECT spdxid, 0 AS detectedLicenseComponentCount, count(*) as declaredLicenseDependencyCount FROM (
-              WITH RECURSIVE split(label, str,purl,version) AS (
-                 SELECT '', COALESCE(originalLicense, 'unknown') || ',', purl, version
-                  FROM dependencies
-                  UNION ALL
-                 SELECT
-              CASE 
-                WHEN substr(str, 1, instr(str, ',') - 1) = '' THEN 'unknown'
-                ELSE substr(str, 1, instr(str, ',') - 1)
-              END,
-                   substr(str, instr(str, ',') + 1),
-				   purl,
-				   version
-                  FROM split 
-                  WHERE str != ''
-              )
-              SELECT label as spdxid,purl,version
-              FROM split
-              WHERE label != ''
-              GROUP BY spdxid,purl,version
-          ) GROUP BY spdxid) as detected
-      GROUP BY spdxid;`);
-    return detectedSummary;
-  }
-
-  public async getIdentifedLicenseComponentSummary(): Promise<Array<LicenseReport>> {
-    const call:any = util.promisify(this.connection.all.bind(this.connection));
-    return await call(`SELECT i.spdxid as label ,COUNT (DISTINCT i.source || cv.purl || cv.version) as value FROM inventories i
-    INNER JOIN component_versions cv ON cv.id = i.cvid
-    GROUP BY i.spdxid;`);
   }
 
 }

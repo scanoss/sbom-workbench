@@ -1,7 +1,7 @@
-/* eslint-disable no-restricted-syntax */
-import { CsvAdapter } from '../../../task/export/format/formatAdapter/CsvAdapter';
 import { Format } from '../Format';
 import { ExportSource } from '../../../../api/types';
+import { modelProvider } from '../../../../main/services/ModelProvider';
+import { DataRecord } from '../../../model/interfaces/report/DataRecord';
 
 export class Csv extends Format {
   private source: string;
@@ -12,27 +12,12 @@ export class Csv extends Format {
     this.extension = '.csv';
   }
 
-  private csvCreate(data: any) {
-    let csv = `inventory_id,path,detected_usage,detected_component,detected_license,detected_version,detected_latest,detected_purls\n`;
+  private csvCreate(data: Array<DataRecord>) {
+    let csv = `path, usage, detected_component, concluded_component, detected_purl, concluded_purl,detected_version, concluded_version, latest_version, detected_license, concluded_license\n`;
     for (let i = 0; i < data.length; i += 1) {
-      const inventoryId = i + 1;
-      const row = `${inventoryId},${data[i].path},${data[i].usage || 'n/a'},${
-        this.source === ExportSource.IDENTIFIED
-          ? data[i].identified_component
-          : data[i].detected_component
-          ? data[i].detected_component
-          : 'n/a'
-      },${
-        this.source === ExportSource.IDENTIFIED
-          ? data[i].identified_license[0]
-          : data[i].detected_license.length > 0
-          ? data[i].detected_license.join(';')
-          : 'n/a'
-      },${data[i].version ? data[i].version : 'n/a'},${data[i].latest_version ? data[i].latest_version : 'n/a'},${
-        data[i].purl
-      }\r\n`;
+      const row =`${data[i].path},${data[i].usage},${data[i].detected_component},${data[i].concluded_component},${data[i].detected_purl},${data[i].concluded_purl},${data[i].detected_version},${data[i].concluded_version},${data[i].latest_version},${data[i].detected_license},${data[i].concluded_license}\r\n`;
       csv += row;
-    }
+    };
     return csv;
   }
 
@@ -40,10 +25,14 @@ export class Csv extends Format {
   public async generate() {
     const data =
       this.source === ExportSource.IDENTIFIED
-        ? await this.export.getIdentifiedData()
-        : await this.export.getDetectedData();
-    const csvData = new CsvAdapter().adapt(data);
-    const csv = this.csvCreate(csvData);
+        ? await modelProvider.model.report.fetchAllIdentifiedRecordsFiles()
+        : await modelProvider.model.report.fetchAllDetectedRecordsFiles()
+    const csv = this.csvCreate(data);
     return csv;
   }
 }
+
+
+
+
+
