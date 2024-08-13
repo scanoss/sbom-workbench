@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Chart, registerables } from 'chart.js';
-import {
-  Button,
-  Card, Chip, IconButton, Tab, Tabs, Tooltip,
-} from '@mui/material';
+import { Button, Card, Chip, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -16,6 +13,8 @@ import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import { Component } from 'main/services/ReportService';
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Data } from 'electron';
+import { reportService } from '@api/services/report.service';
+import { projectService } from '@api/services/project.service';
 import LicensesChart from '../../components/LicensesChart';
 import LicensesTable from '../../components/LicensesTable';
 import MatchesForLicense from '../../components/MatchesForLicense';
@@ -27,7 +26,6 @@ import CryptographyDataTable from '../../components/CryptographyDataTable';
 import DependenciesCard from '../../components/DependenciesCard';
 import DependenciesDataTable from '../../components/DependenciesDataTable';
 import CryptographyCard from '../../components/CryptographyCard';
-import { reportService } from '@api/services/report.service';
 
 Chart.register(...registerables);
 
@@ -47,11 +45,16 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
   const [componentsDeclared, setComponentsDeclared] = useState<Component[]>([]);
   const [obligationsFiltered, setObligationsFiltered] = useState<any[]>([]);
 
+  const [apiKey, setApiKey] = useState<string>('');
+
   const init = async () => {
-    console.log(data);
     const licenses = data.licenses.map((license) => license.label);
+    const projectApiKey = await projectService.getApiKey();
+
     obligations.current = await obligationsService.getObligations(licenses);
     setObligationsFiltered(obligations.current);
+    setApiKey(projectApiKey);
+
     await onLicenseClear();
   };
 
@@ -59,10 +62,11 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
     const matchedLicense = data.licenses.find((item) => item.label === license);
     // const filtered = data.components.filter((item) => item.licenses.includes(matchedLicense.label));
     const detected = await reportService.getDetectedComponents(license);
-    console.log("Detected diltered", detected);
-    setComponentsMatched(detected.components);// filtered.filter((item) => item.source === 'detected'));
-    setComponentsDeclared(detected.declaredComponents);// filtered.filter((item) => item.source === 'declared'));
-    setObligationsFiltered(obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)));
+    setComponentsMatched(detected.components); // filtered.filter((item) => item.source === 'detected'));
+    setComponentsDeclared(detected.declaredComponents); // filtered.filter((item) => item.source === 'declared'));
+    setObligationsFiltered(
+      obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)),
+    );
     setLicenseSelected(matchedLicense);
   };
 
@@ -90,13 +94,15 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
   return (
     <section className="report-layout detected">
       <Card className="report-item licenses">
-        <div className="report-title">{t('Title:Licenses')} ({data.licenses.length})</div>
+        <div className="report-title">
+          {t('Title:Licenses')} ({data.licenses.length})
+        </div>
         {data.licenses.length > 0 ? (
           <div className="report-full">
             <LicensesChart data={data.licenses} />
             <LicensesTable
               matchedLicenseSelected={licenseSelected}
-              selectLicense={async (license) => await onLicenseSelected(license)}
+              selectLicense={async (license) => onLicenseSelected(license)}
               data={data.licenses}
             />
           </div>
@@ -110,18 +116,28 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
         <MatchesChart data={summary} />
       </Card>
 
-      <Card className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
+      <Card
+        className={`report-item dependencies more-details ${
+          layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'
+        }`}
+      >
         <ConditionalLink to="declared" replace className="w-100 no-underline" disabled={false}>
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:Dependencies')}</span>
           </div>
-          { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
-            ? <DependenciesCard data={data.dependencies} />
-            : <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>}
+          {layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? (
+            <DependenciesCard data={data.dependencies} />
+          ) : (
+            <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>
+          )}
         </ConditionalLink>
       </Card>
 
-      <Card className={`report-item vulnerabilities ${layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? 'no-blocked' : 'blocked'}`}>
+      <Card
+        className={`report-item vulnerabilities ${
+          layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? 'no-blocked' : 'blocked'
+        }`}
+      >
         <ConditionalLink to="../../vulnerabilities?type=detected" className="w-100 no-underline" disabled={false}>
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:Vulnerabilities')}</span>
@@ -129,13 +145,19 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
               <ArrowForwardOutlinedIcon fontSize="inherit" />
             </div>
           </div>
-          { layers.current.has(Scanner.ScannerType.VULNERABILITIES)
-            ? <VulnerabilitiesCard data={data.vulnerabilities} />
-            : <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>}
+          {layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? (
+            <VulnerabilitiesCard data={data.vulnerabilities} />
+          ) : (
+            <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>
+          )}
         </ConditionalLink>
       </Card>
 
-      <Card className={`report-item cryptography ${layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) ? 'no-blocked' : 'blocked'}`}>
+      <Card
+        className={`report-item cryptography ${
+          layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) ? 'no-blocked' : 'blocked'
+        }`}
+      >
         <ConditionalLink to="../../cryptographies?type=detected" className="w-100 no-underline" disabled={false}>
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:Cryptography')}</span>
@@ -143,34 +165,54 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
               <ArrowForwardOutlinedIcon fontSize="inherit" />
             </div>
           </div>
-          { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)
-            ? <CryptographyCard data={data.cryptographies} />
-            : <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>}
+          {layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) ? (
+            <CryptographyCard data={data.cryptographies} />
+          ) : (
+            <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>
+          )}
         </ConditionalLink>
       </Card>
 
       <nav className="tabs-navigator">
         <Tabs value={tab}>
-          <Tab value="matches" label={`${t('Title:DeclaredMatchedTab')} (${componentsMatched.length})`} component={Link} to="matches" replace />
-          { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
-          && <Tab value="declared" label={`${t('Title:DeclaredDependenciesTab')} (${componentsDeclared.length})`} component={Link} to="declared" replace />}
-          <Tab value="obligations" label={`${t('Title:ObligationsTab')} (${obligationsFiltered.length})`} component={Link} to="obligations" replace />
+          <Tab
+            value="matches"
+            label={`${t('Title:DeclaredMatchedTab')} (${componentsMatched.length})`}
+            component={Link}
+            to="matches"
+            replace
+          />
+          {layers.current.has(Scanner.ScannerType.DEPENDENCIES) && (
+            <Tab
+              value="declared"
+              label={`${t('Title:DeclaredDependenciesTab')} (${componentsDeclared.length})`}
+              component={Link}
+              to="declared"
+              replace
+            />
+          )}
+          <Tab
+            value="obligations"
+            label={`${t('Title:ObligationsTab')} (${obligationsFiltered.length})`}
+            component={Link}
+            to="obligations"
+            replace
+          />
           <Tab value="detected" hidden /> {/* fallback value */}
         </Tabs>
 
         <div className="d-flex align-center">
-          { licenseSelected
-            && (
-              <Chip
-                size="small"
-                icon={<FilterAltOutlinedIcon />}
-                label={licenseSelected.label}
-                onDelete={(e) => onLicenseClear()}
-              />
-            )}
+          {licenseSelected && (
+            <Chip
+              size="small"
+              icon={<FilterAltOutlinedIcon />}
+              label={licenseSelected.label}
+              onDelete={(e) => onLicenseClear()}
+            />
+          )}
 
           <Tooltip title={t('Tooltip:RefreshReportButtonLabel')} classes={{ tooltip: 'tooltip' }}>
-            <IconButton onClick={onRefresh}>
+            <IconButton onClick={onRefresh} disabled={!apiKey}>
               <RefreshIcon />
             </IconButton>
           </Tooltip>
@@ -185,7 +227,6 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
           <Route path="" element={<Navigate to="matches" replace />} />
         </Routes>
       </Card>
-
     </section>
   );
 };
