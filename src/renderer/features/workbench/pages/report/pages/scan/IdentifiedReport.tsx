@@ -13,6 +13,8 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { ReportComponent } from 'main/services/ReportService';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import { reportService } from '@api/services/report.service';
+import { projectService } from '@api/services/project.service';
 import LicensesChart from '../../components/LicensesChart';
 import IdentificationProgress from '../../components/IdentificationProgress';
 import LicensesTable from '../../components/LicensesTable';
@@ -23,7 +25,6 @@ import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 import { Scanner } from '../../../../../../../main/task/scanner/types';
 import DependenciesCard from '../../components/DependenciesCard';
 import CryptographyCard from '../../components/CryptographyCard';
-import { reportService } from '@api/services/report.service';
 
 Chart.register(...registerables);
 
@@ -44,18 +45,24 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
   const [componentsDeclared, setComponentsDeclared] = useState<ReportComponent[]>([]);
   const [obligationsFiltered, setObligationsFiltered] = useState<any[]>([]);
 
+  const [apiKey, setApiKey] = useState<string>('');
+
   const isEmpty = summary?.identified.scan === 0 && summary?.original === 0 && data.licenses.length === 0;
 
   const init = async () => {
     const licenses = data.licenses.map((license) => license.label);
+    const projectApiKey = await projectService.getApiKey();
+
     obligations.current = await obligationsService.getObligations(licenses);
     setObligationsFiltered(obligations.current);
+    setApiKey(projectApiKey);
+
     onLicenseClear();
   };
 
   const onLicenseSelected = async (license: string) => {
     const matchedLicense = data.licenses.find((item) => item.label === license);
-    
+
     const identified = await reportService.getIdentifiedComponents(license);
 
     setComponentsMatched(identified.components);
@@ -189,7 +196,7 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
             )}
 
           <Tooltip title={t('Tooltip:RefreshReportButtonLabel')} classes={{ tooltip: 'tooltip' }}>
-            <IconButton onClick={onRefresh}>
+            <IconButton onClick={onRefresh} disabled={!apiKey}>
               <RefreshIcon />
             </IconButton>
           </Tooltip>
