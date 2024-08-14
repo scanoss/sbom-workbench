@@ -45,17 +45,13 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
   const [componentsDeclared, setComponentsDeclared] = useState<ReportComponent[]>([]);
   const [obligationsFiltered, setObligationsFiltered] = useState<any[]>([]);
 
-  const [apiKey, setApiKey] = useState<string>('');
-
   const isEmpty = summary?.identified.scan === 0 && summary?.original === 0 && data.licenses.length === 0;
 
   const init = async () => {
     const licenses = data.licenses.map((license) => license.label);
-    const projectApiKey = await projectService.getApiKey();
 
     obligations.current = await obligationsService.getObligations(licenses);
     setObligationsFiltered(obligations.current);
-    setApiKey(projectApiKey);
 
     onLicenseClear();
   };
@@ -196,7 +192,7 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
             )}
 
           <Tooltip title={t('Tooltip:RefreshReportButtonLabel')} classes={{ tooltip: 'tooltip' }}>
-            <IconButton onClick={onRefresh} disabled={!apiKey}>
+            <IconButton onClick={onRefresh}>
               <RefreshIcon />
             </IconButton>
           </Tooltip>

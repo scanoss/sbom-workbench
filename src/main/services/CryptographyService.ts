@@ -27,7 +27,13 @@ class CryptographyService {
   public async update() {
     try {
       const p = workspace.getOpenProject();
-      if (!p.getGlobalApiKey()) throw new Error('API Key is required');
+
+      if (!p.getGlobalApiKey()) {
+        return {
+          identified: [],
+          detected: [],
+        };
+      }
 
       const componentVersion = await modelProvider.model.component.getAll(null);
       const dependencyComponents = await modelProvider.model.dependency.getAll(null);
