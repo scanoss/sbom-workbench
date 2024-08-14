@@ -23,8 +23,7 @@ const ScanReport = () => {
   const dispatch = useDispatch<AppDispatch>();
   const state = useSelector(selectWorkbench);
 
-  const { detected, identified, summary, isLoading } = useSelector(selectReportState);
-  console.log("Detected",detected);
+  const { detected, identified, summary } = useSelector(selectReportState);
 
   const isEmpty = summary?.identified.scan === 0
     && summary?.original === 0
