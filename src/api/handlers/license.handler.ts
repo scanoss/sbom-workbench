@@ -5,6 +5,7 @@ import { IpcChannels } from '../ipc-channels';
 import { Response } from '../Response';
 import { licenseService } from '../../main/services/LicenseService';
 
+
 api.handle(IpcChannels.LICENSE_GET_ALL, async (_event) => {
   try {
     const license = await licenseService.getAll();
@@ -32,5 +33,15 @@ api.handle(IpcChannels.LICENSE_CREATE, async (_event, newLicense: NewLicenseDTO)
   } catch (error: any) {
     log.error('[CREATE LICENSE]', error);
     return Response.fail({ message: error.message });
+  }
+});
+
+api.handle(IpcChannels.GET_LICENSE_OBLIGATIONS, async (_event, spdxid: string) => {
+  try {
+    const licenseObligations = await licenseService.getLicenseObligations(spdxid);
+    return Response.ok({ message: 'License obligations retrieved successfully', data: licenseObligations });
+  } catch (error: any) {
+    log.error('[ LICENSE OBLIGATIONS ]', error);
+    return Response.fail({ message: error });
   }
 });

@@ -438,3 +438,12 @@ export interface ComponentReportResponse {
   components:ReportComponent[];
   declaredComponents: ReportComponent[];
 }
+
+export interface LicenseObligation {
+  checklist_url: string;
+  copyleft: string;
+  incompatible_with: string;
+  osadl_updated: string;
+  patent_hints: string;
+  label?: string;
+}
