@@ -2,7 +2,7 @@ import './handlers/inventory.handler';
 import './handlers/component.handler';
 import './handlers/project.handler';
 import './handlers/results.handler';
-import './handlers/file.hanlder';
+import './handlers/file.handler';
 import './handlers/formats.handler';
 import './handlers/workspace.handler';
 import './handlers/report.handler';

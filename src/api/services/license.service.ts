@@ -17,6 +17,7 @@ class LicenseService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.LICENSE_CREATE, license);
     return this.response(response);
   }
+
 }
 
 export const licenseService = new LicenseService();

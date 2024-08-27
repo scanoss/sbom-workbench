@@ -112,28 +112,18 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
         <MatchesChart data={summary} />
       </Card>
 
-      <Card
-        className={`report-item dependencies more-details ${
-          layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'
-        }`}
-      >
+      <Card className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
         <ConditionalLink to="declared" replace className="w-100 no-underline" disabled={false}>
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:Dependencies')}</span>
           </div>
-          {layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? (
-            <DependenciesCard data={data.dependencies} />
-          ) : (
-            <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>
-          )}
+          { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
+            ? <DependenciesCard data={data.dependencies} />
+            : <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>}
         </ConditionalLink>
       </Card>
 
-      <Card
-        className={`report-item vulnerabilities ${
-          layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? 'no-blocked' : 'blocked'
-        }`}
-      >
+      <Card className={`report-item vulnerabilities ${layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? 'no-blocked' : 'blocked'}`}>
         <ConditionalLink to="../../vulnerabilities?type=detected" className="w-100 no-underline" disabled={false}>
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:Vulnerabilities')}</span>
@@ -141,19 +131,13 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
               <ArrowForwardOutlinedIcon fontSize="inherit" />
             </div>
           </div>
-          {layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? (
-            <VulnerabilitiesCard data={data.vulnerabilities} />
-          ) : (
-            <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>
-          )}
+          { layers.current.has(Scanner.ScannerType.VULNERABILITIES)
+            ? <VulnerabilitiesCard data={data.vulnerabilities} />
+            : <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>}
         </ConditionalLink>
       </Card>
 
-      <Card
-        className={`report-item cryptography ${
-          layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) ? 'no-blocked' : 'blocked'
-        }`}
-      >
+      <Card className={`report-item cryptography ${layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) ? 'no-blocked' : 'blocked'}`}>
         <ConditionalLink to="../../cryptographies?type=detected" className="w-100 no-underline" disabled={false}>
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:Cryptography')}</span>
@@ -161,51 +145,31 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
               <ArrowForwardOutlinedIcon fontSize="inherit" />
             </div>
           </div>
-          {layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) ? (
-            <CryptographyCard data={data.cryptographies} />
-          ) : (
-            <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>
-          )}
+          { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)
+            ? <CryptographyCard data={data.cryptographies} />
+            : <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>}
         </ConditionalLink>
       </Card>
 
       <nav className="tabs-navigator">
         <Tabs value={tab}>
-          <Tab
-            value="matches"
-            label={`${t('Title:DeclaredMatchedTab')} (${componentsMatched.length})`}
-            component={Link}
-            to="matches"
-            replace
-          />
-          {layers.current.has(Scanner.ScannerType.DEPENDENCIES) && (
-            <Tab
-              value="declared"
-              label={`${t('Title:DeclaredDependenciesTab')} (${componentsDeclared.length})`}
-              component={Link}
-              to="declared"
-              replace
-            />
-          )}
-          <Tab
-            value="obligations"
-            label={`${t('Title:ObligationsTab')} (${obligationsFiltered.length})`}
-            component={Link}
-            to="obligations"
-            replace
-          />
+          <Tab value="matches" label={`${t('Title:DeclaredMatchedTab')} (${componentsMatched.length})`} component={Link} to="matches" replace />
+          { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
+          && <Tab value="declared" label={`${t('Title:DeclaredDependenciesTab')} (${componentsDeclared.length})`} component={Link} to="declared" replace />}
+          <Tab value="obligations" label={`${t('Title:ObligationsTab')} (${obligationsFiltered.length})`} component={Link} to="obligations" replace />
           <Tab value="detected" hidden /> {/* fallback value */}
         </Tabs>
 
         <div className="d-flex align-center">
-          {licenseSelected && (
-            <Chip
-              size="small"
-              icon={<FilterAltOutlinedIcon />}
-              label={licenseSelected.label}
-              onDelete={(e) => onLicenseClear()}
-            />
-          )}
+          { licenseSelected
+            && (
+              <Chip
+                size="small"
+                icon={<FilterAltOutlinedIcon />}
+                label={licenseSelected.label}
+                onDelete={(e) => onLicenseClear()}
+              />
+            )}
 
           <Tooltip title={t('Tooltip:RefreshReportButtonLabel')} classes={{ tooltip: 'tooltip' }}>
             <IconButton onClick={onRefresh}>
@@ -223,6 +187,7 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
           <Route path="" element={<Navigate to="matches" replace />} />
         </Routes>
       </Card>
+
     </section>
   );
 };

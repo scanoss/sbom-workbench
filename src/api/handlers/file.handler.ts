@@ -112,3 +112,13 @@ api.handle(IpcChannels.IGNORED_FILES, async (_event, arg: number[]) => {
     return Response.fail({ message: 'Ignore file service' });
   }
 });
+
+api.handle(IpcChannels.FILE_GET_REMOTE_CONTENT, async (_event, fileHash: string) => {
+  try {
+    const data = await fileService.getRemoteFileContent(fileHash);
+    return Response.ok({ message: 'Remote file content retrieve successfully', data });
+  } catch (error: any) {
+    log.error('[ REMOTE FILE CONTENT ]:', error, fileHash);
+    return Response.fail({ message: error.message });
+  }
+});
