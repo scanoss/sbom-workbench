@@ -2,7 +2,7 @@ import { LicenseDTO, NewLicenseDTO } from '@api/dto';
 import { licenses } from '../../../assets/data/licenses';
 import { modelProvider } from './ModelProvider';
 import { licenseHelper } from '../helpers/LicenseHelper';
-import { HttpProxy } from 'scanoss';
+import { HttpClient, HttpProxy } from 'scanoss';
 import { getHttpConfig } from './utils/httpUtil';
 import { userSettingService } from './UserSettingService';
 import { workspace } from '../../main/workspace/Workspace';
@@ -41,7 +41,7 @@ class LicenseService {
       APIS
     } = userSettingService.get();
    
-    const scanossHttp = new HttpProxy(getHttpConfig());
+    const scanossHttp = new HttpClient(getHttpConfig());
 
     const URL = project.getApi() ?  project.getApi() : APIS[DEFAULT_API_INDEX].URL;
  

@@ -15,16 +15,14 @@ export const getHttpConfig = (): HttpProxyConfig => {
       IGNORE_CERT_ERRORS,
     } = userSettingService.get();
 
-
-    const PAC_URL = PAC_PROXY ? `pac+${PAC_PROXY.trim()}` : null;
-
     const cfg:HttpProxyConfig = {
-      HTTP_PROXY: PAC_URL || HTTP_PROXY || '',
-      HTTPS_PROXY:  PAC_URL || HTTPS_PROXY || '',
-      NO_PROXY: NO_PROXY ? NO_PROXY.join(',') : null,
+      PAC_PROXY: PAC_PROXY,
+      HTTP_PROXY: HTTP_PROXY,
+      HTTPS_PROXY: HTTPS_PROXY,
+      NO_PROXY: NO_PROXY,
       API_KEY: project.getApi() ? project.getApiKey() : APIS[DEFAULT_API_INDEX].API_KEY,     
-      CA_CERT: CA_CERT || null,
-      IGNORE_CERT_ERRORS: IGNORE_CERT_ERRORS || false    
+      CA_CERT: CA_CERT,
+      IGNORE_CERT_ERRORS: IGNORE_CERT_ERRORS    
     }
 
     return cfg;

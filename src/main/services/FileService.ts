@@ -1,7 +1,7 @@
 import { FileDTO, GetFileDTO } from "@api/dto";
 import { modelProvider } from './ModelProvider';
 import { QueryBuilderCreator } from "../model/queryBuilder/QueryBuilderCreator";
-import { HttpProxy, HttpProxyConfig } from "scanoss";
+import { HttpClient, HttpProxy, HttpProxyConfig } from "scanoss";
 import { userSettingService } from "./UserSettingService";
 import { workspace } from "../../main/workspace/Workspace";
 import AppConfig from "../../config/AppConfigModule";
@@ -32,7 +32,7 @@ class FileService {
       APIS
     } = userSettingService.get();
    
-    const scanossHttp = new HttpProxy(getHttpConfig());
+    const scanossHttp = new HttpClient(getHttpConfig());
 
     const URL = project.getApi() ?  project.getApi() : APIS[DEFAULT_API_INDEX].URL;
     const fileContentUrl = `${URL}${AppConfig.API_CONTENT_PATH}/${fileHash}`;
