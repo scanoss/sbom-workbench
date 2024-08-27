@@ -19,5 +19,10 @@ class FileService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.IGNORED_FILES, files);
     return this.response(response);
   }
+
+  public async getRemoteFileContent(fileHash: string): Promise<string> {
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.FILE_GET_REMOTE_CONTENT, fileHash);
+    return this.response(response);
+  }
 }
 export const fileService = new FileService();

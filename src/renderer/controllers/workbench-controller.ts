@@ -3,8 +3,9 @@ import { componentService } from '@api/services/component.service';
 import { ComponentGroup, ComponentSource, IProject, IWorkbenchFilterParams, ProjectAccessMode, ProjectOpenResponse } from '@api/types';
 import { sortComponents } from '@shared/utils/scan-util';
 import { IpcChannels } from '@api/ipc-channels';
-import AppConfig from '../../config/AppConfigModule';
 import { Scanner } from '../../main/task/scanner/types';
+import { fileService } from '@api/services/file.service';
+
 
 export interface ScanResult {
   name: string;
@@ -67,17 +68,8 @@ class WorkbenchController {
    * @memberof WorkbenchController
    */
   public async fetchRemoteFile(hash: string, config: ProjectSettings = null): Promise<string> {
-    const URL = (config?.api_url || AppConfig.API_URL);
-
-    const response = await fetch(`${URL}${AppConfig.API_CONTENT_PATH}/${hash}`, {
-      headers: {
-        ...(config?.api_key && { 'X-Session': config.api_key }),
-      },
-    });
-
-    if (!response.ok) throw new Error(await response.text());
-
-    return response.text();
+    const fileContent = await fileService.getRemoteFileContent(hash);
+    return fileContent;
   }
 
   public async getComponents(params: IWorkbenchFilterParams = null): Promise<ComponentGroup[]> {
