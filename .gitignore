@@ -32,3 +32,6 @@ npm-debug.log.*
 *.worker.js
 *.worker.js.LICENSE.txt
 override.json
+
+# Documentation
+build/
