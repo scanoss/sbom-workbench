@@ -4,7 +4,7 @@ Upstream-Contact: SCANOSS <info@scanoss.com>
 Source: https://github.com/scanoss/sbom-workbench
 
 
-Files: src/* assets/* .* *.md *.json  *.js *.lock
+Files: src/* assets/* .* *.md *.json  *.js *.lock 
 Copyright: 2021 SBOM Workbench <info@scanoss.com>
 License: GPL-2.0-only
 
@@ -19,3 +19,7 @@ License: OFL-1.1
 Files: assets/fonts/SpaceMono-*
 Copyright: Colophon <https://www.colophon-foundry.org/>
 License: OFL-1.1
+
+Files: docs/* .readthedocs.yaml
+Copyright: 2024 SBOM Workbench <info@scanoss.com>
+License: GPL-2.0-only
