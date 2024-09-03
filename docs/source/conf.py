@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'SBOM Workbench User Guide'
+project = 'SBOM Workbench'
 copyright = '2024, Scan Open Source Solutions SL'
 author = 'Scan Open Source Solutions SL'
 
