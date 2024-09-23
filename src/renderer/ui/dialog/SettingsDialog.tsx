@@ -181,8 +181,8 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
 
   const { control, handleSubmit, setValue, register } = form;
 
-  const [apiUrl, sbomLedgerToken, language, apis] = useWatch({
-    name: ['apiUrl', 'sbomLedgerToken', 'language', 'apis'],
+  const [apiUrl, apiKey, sbomLedgerToken, language, apis] = useWatch({
+    name: ['apiUrl', 'apiKey', 'sbomLedgerToken', 'language', 'apis'],
     control,
   });
 
@@ -261,7 +261,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                       <Paper className="dialog-form-field-control">
                         <Autocomplete
                           fullWidth
-                          value={apis?.find((api) => api.URL === apiUrl) || null}
+                          value={apis?.find((api) => api.URL === apiUrl && api.API_KEY === apiKey) || null}
                           onChange={handleChangeApi}
                           onKeyPress={(e: any) => {
                             if (e.key === 'Enter') {
