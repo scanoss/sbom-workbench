@@ -68,7 +68,10 @@ export const mapToWorkspaceConfig = (values: GlobalSettingsFormValues): Partial<
 
   return {
     APIS,
-    DEFAULT_API_INDEX: values.apiUrl ? APIS.findIndex((api) => api.URL === values.apiUrl) : 0,
+    DEFAULT_API_INDEX:
+      values.apiUrl && values.apiKey
+        ? APIS.findIndex((api) => api.URL === values.apiUrl && api.API_KEY === values.apiKey)
+        : APIS.findIndex((api) => api.URL === values.apiUrl) || 0,
     TOKEN: values.sbomLedgerToken || null,
     LNG: values.language || 'en',
     ...mapToProxyConfig(values),
