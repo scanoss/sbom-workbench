@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { FileUsageType } from '@api/types';
 import { workspace } from '../../../workspace/Workspace';
-import { modelProvider } from '../../../../main/services/ModelProvider';
+import { modelProvider } from '../../../services/ModelProvider';
 import { ExportComponentData } from '../../../model/interfaces/report/ExportComponentData';
 
 export interface ExportData {
@@ -23,13 +23,12 @@ export interface ExportData {
 }
 
 export class ExportModel {
-
   public async getIdentifiedData(): Promise<ExportComponentData[]> {
-   return await modelProvider.model.report.fetchAllIdentifiedComponents();
+    return modelProvider.model.report.fetchAllIdentifiedComponents();
   }
 
   public async getDetectedData(): Promise<ExportComponentData[]> {
-    return await modelProvider.model.report.fetchAllDetectedComponents();
+    return modelProvider.model.report.fetchAllDetectedComponents();
   }
 
   public getRawData() {
@@ -42,5 +41,13 @@ export class ExportModel {
       'utf-8',
     );
     return data;
+  }
+
+  public async getScanossComponentJsonData() {
+    return modelProvider.model.report.getScanossJsonComponents();
+  }
+
+  public async getScanossIgnoredComponentFiles(purls: Array<string>) {
+    return modelProvider.model.report.getScanossJsonIgnoredComponentFiles(purls);
   }
 }

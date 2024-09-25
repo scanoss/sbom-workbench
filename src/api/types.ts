@@ -191,6 +191,7 @@ export enum ExportFormat {
   SPDXLITEJSON = 'SPDXLITEJSON',
   CYCLONEDX = 'CYCLONEDX',
   HTMLSUMMARY = 'HTMLSUMMARY',
+  SCANOSS_JSON = 'SCANOSS_JSON',
 }
 
 export enum ExportSource {

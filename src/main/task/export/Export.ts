@@ -17,6 +17,7 @@ import { CycloneDXDetected } from '../../modules/export/format/CycloneDX/Cyclone
 import { CycloneDXIdentified } from '../../modules/export/format/CycloneDX/CycloneDxIdentified';
 import { SpdxLiteDetected } from '../../modules/export/format/SPDXLite/SpdxLiteDetected';
 import { SpdxLiteIdentified } from '../../modules/export/format/SPDXLite/SpdxLiteIdentified';
+import { ScanossJson } from '../../modules/export/format/ScanossJson';
 
 export class Export implements ITask<string, IExportResult> {
   private format: Format;
@@ -58,6 +59,9 @@ export class Export implements ITask<string, IExportResult> {
         break;
       case ExportFormat.HTMLSUMMARY:
         this.format = new HtmlSummary(exportDTO.source);
+        break;
+      case ExportFormat.SCANOSS_JSON:
+        this.format = new ScanossJson(exportDTO.source);
         break;
       default:
     }
