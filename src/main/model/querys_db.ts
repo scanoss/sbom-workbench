@@ -55,8 +55,7 @@ export class Queries {
     ON DELETE CASCADE
     );`;
 
-
-  /****** WORKSPACE ******/ 
+  /** **** WORKSPACE ***** */
 
   WORKSPACE_LOCK = `CREATE TABLE IF NOT EXISTS lock (
     project  text NOT NULL,
@@ -72,9 +71,7 @@ export class Queries {
     keywords varchar (256) NOT NULL,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-    );`;  
-
-
+    );`;
 
   SQL_DB_TABLES = this.SQL_CREATE_TABLE_RESULTS
     + this.FILES_TABLE
@@ -90,7 +87,7 @@ export class Queries {
     + this.CRYPTOGRAPHY_TABLE
     + this.LOCAL_CRYPTOGRAPHY_TABLE;
 
-   WORKSPACE_DB = this.WORKSPACE_LOCK
+  WORKSPACE_DB = this.WORKSPACE_LOCK
     + this.WORKSPACE_SEARCH_ITEM_GROUP_TABLE;
 
   /** SQL SCAN INSERT* */
@@ -156,7 +153,6 @@ export class Queries {
 
   // GET LICENSES
   SQL_SELECT_ALL_LICENSES = 'SELECT id, spdxid, name, url, official FROM licenses ORDER BY name ASC;';
-
 
   // GET LICENSES
   SQL_SELECT_ALL_LICENSES_FULL_TEXT = 'SELECT id, spdxid, name, url, official, fulltext FROM licenses ORDER BY name ASC;';
@@ -413,7 +409,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   INNER JOIN component_versions cv ON cv.id = i.cvid
   GROUP BY i.spdxid;`;
 
-  IDENTIFIED_REPORT_DATA_FILES  = `SELECT * FROM (SELECT  DISTINCT i.id as inventory_id, f.path, i.usage,coalesce(r.component,'') as detected_component
+  IDENTIFIED_REPORT_DATA_FILES = `SELECT * FROM (SELECT  DISTINCT i.id as inventory_id, f.path, i.usage,coalesce(r.component,'') as detected_component
   ,coalesce(cv.name,'') as concluded_component, r.purl as detected_purl, cv.purl as concluded_purl,
    r.version as detected_version, cv.version as concluded_version, r.latest_version,
      (SELECT GROUP_CONCAT(l.spdxid, ' AND ') 
@@ -435,7 +431,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     GROUP BY d.dependencyId)
     ORDER BY usage DESC ;`;
 
-  DETECTED_REPORT_DATA_FILES  = `SELECT * FROM(  
+  DETECTED_REPORT_DATA_FILES = `SELECT * FROM(  
     SELECT DISTINCT '' as inventory_id, f.path,r.idtype as usage, r.component as detected_component, '' as concluded_component,
     r.purl as detected_purl, '' as concluded_purl, r.version as detected_version, '' as concluded_version, r.latest_version,
 	(SELECT GROUP_CONCAT(l.spdxid, ' AND ') 
@@ -456,7 +452,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     GROUP BY d.dependencyId) as detected
     ORDER BY usage DESC;`;
 
-    DETECTED_REPORT_DATA = `SELECT DISTINCT r.component, r.purl, r.version, 
+  DETECTED_REPORT_DATA = `SELECT DISTINCT r.component, r.purl, r.version, 
     (SELECT GROUP_CONCAT(l.spdxid, ' AND ')  FROM license_component_version lcv 
            INNER JOIN licenses l ON lcv.licid = l.id 
            WHERE lcv.cvid = cv.id) AS detected_licenses, 
@@ -468,7 +464,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     SELECT DISTINCT component, d.purl, d.originalVersion as detected_version ,  REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, '' as concluded_licenses, '' as url 
     FROM dependencies d;`;
 
-    IDENTIFIED_REPORT_DATA = `SELECT coalesce(cv.name,'') as component, cv.purl,cv.version,
+  IDENTIFIED_REPORT_DATA = `SELECT coalesce(cv.name,'') as component, cv.purl,cv.version,
     (SELECT GROUP_CONCAT(l.spdxid, ' AND ') 
            FROM license_component_version lcv 
            INNER JOIN licenses l ON lcv.licid = l.id 
@@ -485,7 +481,31 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       FROM dependencies d
       INNER JOIN component_versions cv ON cv.purl = d.purl and cv.version = d.version
       INNER JOIN inventories i ON cv.id = i.cvid 
-      WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0;`;    
+      WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0;`;
+
+  SCANOSS_JSON_COMPONENTS = `SELECT  purl,totalMatchedFiles, COALESCE(identifiedFiles, 0) AS identifiedFiles, COALESCE(ignoredFiles, 0) AS ignoredFiles FROM (
+        (SELECT r.purl,COUNT(*)as totalMatchedFiles FROM results r
+        INNER JOIN files f ON r.fileId = f.fileId
+        GROUP BY r.purl)as summary 
+        LEFT JOIN 
+        (SELECT SUM(1) as identifiedFiles ,cv.purl as identified FROM component_versions cv 
+        INNER JOIN inventories i ON cv.id = i.cvid 
+        INNER JOIN file_inventories fi ON fi.inventoryid = i.id
+        INNER JOIN files f ON f.fileId = fi.fileId
+        INNER JOIN results r ON f.fileId = r.fileId
+
+        GROUP BY cv.purl) as identifiedComponent ON summary.purl = identifiedComponent.identified
+        LEFT JOIN
+        (
+        SELECT COUNT(*) as ignoredFiles ,r.purl as ignoredComponent FROM files f
+        INNER JOIN results r ON r.fileId = f.fileId
+        WHERE f.ignored = 1
+        GROUP BY r.purl) as ignoredComponents ON summary.purl = ignoredComponents.ignoredComponent
+        );`;
+
+  SCANOSS_JSON_IGNORED_COMPONENTS_FILES = `SELECT f.path, r.purl FROM files f
+    INNER JOIN results r ON f.fileId = r.fileId 
+    WHERE r.purl IN (#PLACEHOLDER) AND f.ignored = 1;`;
 }
 
 export const queries = new Queries();
