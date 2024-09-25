@@ -36,8 +36,8 @@ export class ScanossJson extends Format {
     const components = await this.model.getScanossComponentJsonData();
     components.forEach((c) => {
       if (c.identifiedFiles > 0) includedComponents.push({ purl: c.purl });
-      if (c.totalMatchedFiles === c.ignoredFiles) ignoredComponents.push({ purl: c.purl });
-      if (c.ignoredFiles > 0 && c.ignoredFiles < c.totalMatchedFiles) partiallyIgnoredComponents.push(c.purl);
+      if (c.totalMatchedFiles === c.ignoredFiles && c.source === 'engine') ignoredComponents.push({ purl: c.purl });
+      if ((c.ignoredFiles > 0 && c.ignoredFiles < c.totalMatchedFiles)) partiallyIgnoredComponents.push(c.purl);
     });
     const ignoredComponentFiles = await this.model.getScanossIgnoredComponentFiles(partiallyIgnoredComponents);
 
@@ -50,7 +50,6 @@ export class ScanossJson extends Format {
     if (this.source === ExportSource.IDENTIFIED) {
       return this.generateScanossJson();
     }
-    
     return JSON.stringify(this.scanossJson, null, 2);
   }
 }

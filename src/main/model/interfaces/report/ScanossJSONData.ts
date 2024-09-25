@@ -3,6 +3,7 @@ export interface ScanossJsonComponentData {
   totalMatchedFiles: number;
   identifiedFiles: number;
   ignoredFiles: number;
+  source: 'manual' | 'engine';
 }
 
 export interface ScanossJsonFileData {
