@@ -3,6 +3,7 @@ import { FileUsageType } from '@api/types';
 import { workspace } from '../../../workspace/Workspace';
 import { modelProvider } from '../../../services/ModelProvider';
 import { ExportComponentData } from '../../../model/interfaces/report/ExportComponentData';
+import { ScanossJsonComponentData } from 'main/model/interfaces/report/ScanossJSONData';
 
 export interface ExportData {
   inventoryId: number;
@@ -43,11 +44,11 @@ export class ExportModel {
     return data;
   }
 
-  public async getScanossComponentJsonData() {
+  public async getScanossComponentJsonData(): Promise<Array<ScanossJsonComponentData>> {
     return modelProvider.model.report.getScanossJsonComponents();
   }
 
-  public async getScanossIgnoredComponentFiles(purls: Array<string>) {
+  public async getScanossIgnoredComponentFiles(purls: Array<string>): Promise<Array<ScanossJsonComponentData>> {
     return modelProvider.model.report.getScanossJsonIgnoredComponentFiles(purls);
   }
 }

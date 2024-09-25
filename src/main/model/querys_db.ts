@@ -483,6 +483,17 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       INNER JOIN inventories i ON cv.id = i.cvid 
       WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0;`;
 
+  /**
+ * SQL query to retrieve component summary for SCANOSS JSON export.
+ *
+ * This query provides summary of each component, including:
+ * - Summary of components with their number of files matched. For manual source, number of matches is 0.
+ * - The number of files that have been identified as belonging to this component
+ * - The number of files associated with this component that have been ignored
+ * - The source of the component (either 'engine' for automatically detected or 'manual' for manually added)
+ *
+ * @type {string}
+ */
   SCANOSS_JSON_COMPONENTS = `SELECT purl,totalMatchedFiles, COALESCE(identifiedFiles, 0) AS identifiedFiles, COALESCE(ignoredFiles, 0) AS ignoredFiles, source FROM (
         
         (SELECT r.purl,COUNT(*)as totalMatchedFiles, 'engine' as source FROM results r
@@ -508,6 +519,18 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
         WHERE f.ignored = 1
         GROUP BY r.purl) as ignoredComponents ON summary.purl = ignoredComponents.ignoredComponent);`;
 
+  /**
+ * SQL query to retrieve the ignored files paths associated to a list ofcomponents for the SCANOSS JSON export.
+ *
+ * Returns the file path and corresponding PURL for each ignored file.
+ *
+ * @type {string}
+ * *
+ * @returns {Object[]} An array of objects, each containing:
+ *   @returns {string} path - The file path of the ignored file
+ *   @returns {string} purl - The Package URL (PURL) of the component associated with the ignored file
+ *
+ */
   SCANOSS_JSON_IGNORED_COMPONENTS_FILES = `SELECT f.path, r.purl FROM files f
     INNER JOIN results r ON f.fileId = r.fileId 
     WHERE r.purl IN (#PLACEHOLDER) AND f.ignored = 1;`;
