@@ -483,25 +483,30 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       INNER JOIN inventories i ON cv.id = i.cvid 
       WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0;`;
 
-  SCANOSS_JSON_COMPONENTS = `SELECT  purl,totalMatchedFiles, COALESCE(identifiedFiles, 0) AS identifiedFiles, COALESCE(ignoredFiles, 0) AS ignoredFiles FROM (
-        (SELECT r.purl,COUNT(*)as totalMatchedFiles FROM results r
+  SCANOSS_JSON_COMPONENTS = `SELECT purl,totalMatchedFiles, COALESCE(identifiedFiles, 0) AS identifiedFiles, COALESCE(ignoredFiles, 0) AS ignoredFiles, source FROM (
+        
+        (SELECT r.purl,COUNT(*)as totalMatchedFiles, 'engine' as source FROM results r
         INNER JOIN files f ON r.fileId = f.fileId
-        GROUP BY r.purl)as summary 
+        GROUP BY r.purl
+        UNION
+        SELECT cv.purl , 0 as totalMatches, cv.source FROM component_versions cv 
+        WHERE cv.source = 'manual') as summary 
+
         LEFT JOIN 
+
         (SELECT SUM(1) as identifiedFiles ,cv.purl as identified FROM component_versions cv 
         INNER JOIN inventories i ON cv.id = i.cvid 
         INNER JOIN file_inventories fi ON fi.inventoryid = i.id
         INNER JOIN files f ON f.fileId = fi.fileId
         INNER JOIN results r ON f.fileId = r.fileId
-
         GROUP BY cv.purl) as identifiedComponent ON summary.purl = identifiedComponent.identified
+
         LEFT JOIN
-        (
-        SELECT COUNT(*) as ignoredFiles ,r.purl as ignoredComponent FROM files f
+
+        (SELECT COUNT(*) as ignoredFiles ,r.purl as ignoredComponent FROM files f
         INNER JOIN results r ON r.fileId = f.fileId
         WHERE f.ignored = 1
-        GROUP BY r.purl) as ignoredComponents ON summary.purl = ignoredComponents.ignoredComponent
-        );`;
+        GROUP BY r.purl) as ignoredComponents ON summary.purl = ignoredComponents.ignoredComponent);`;
 
   SCANOSS_JSON_IGNORED_COMPONENTS_FILES = `SELECT f.path, r.purl FROM files f
     INNER JOIN results r ON f.fileId = r.fileId 

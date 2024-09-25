@@ -52,5 +52,6 @@
   "RefreshReportButtonLabel": "Update report for the latest vulnerabilities and cryptography data",
   "OpenInReadMode": "Open in read-only mode",
   "ExportHintCSVSBOM": "Export SBOM report",
-  "ExportHintCSVCryptography": "Export Cryptography report"
+  "ExportHintCSVCryptography": "Export Cryptography report",
+  "ExportHintSCANOSSJSON": "Export a SCANOSS file"
 }

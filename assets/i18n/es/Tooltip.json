@@ -48,5 +48,6 @@
   "NotDetected": "No detectados",
   "Ignored": "Ignorados",
   "Progress": "Progreso",
-  "OpenInReadMode": "Abrir en modo lectura"
+  "OpenInReadMode": "Abrir en modo lectura",
+  "ExportHintSCANOSSJSON": "Exportar SCANOSS file"
 }

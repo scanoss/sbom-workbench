@@ -68,6 +68,13 @@ export const ExportButton = ({ empty }) => {
       hint: t('Tooltip:ExportHintHTML'),
       sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
     },
+    SCANOSS_JSON: {
+      label: 'SCANOSS json',
+      hint: t('Tooltip:ExportHintSCANOSSJSON'),
+      sources: [ExportSource.IDENTIFIED],
+      fileName: 'scanoss',
+    },
+
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -91,7 +98,7 @@ export const ExportButton = ({ empty }) => {
     const dirname = localStorage.getItem('last-path-used') || projectPath;
     const attributes = getFormatFilesAttributes(format);
     const path = await dialogController.showSaveDialog({
-      defaultPath: `${dirname}/${name}${attributes.prefix ? `-${attributes.prefix}` : ''}${inventoryType ? `-${inventoryType}` : ''}.${attributes.extension}`,
+      defaultPath: `${dirname}/${name}${attributes.prefix ? `-${attributes.prefix}` : ''}${attributes.defaultFileName ? `-${attributes.defaultFileName}` : ''}.${attributes.extension}`,
       filters: [{ name: attributes.description, extensions: [attributes.extension] }],
     });
 

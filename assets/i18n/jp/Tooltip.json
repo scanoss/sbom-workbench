@@ -47,5 +47,6 @@
   "Detected": "検出済",
   "NotDetected": "未検出",
   "Ignored": "無視された",
-  "Progress": "進行中"
+  "Progress": "進行中",
+  "ExportHintSCANOSSJSON": "Export a SCANOSS file"
 }
