@@ -7,8 +7,14 @@ import { ExportRepository } from '../Repository/ExportRepository';
  * Represents a component in the SCANOSS JSON output.
  */
 export interface ScanossJsonComponent {
-  path?: string,
-  purl: string,
+  path?: string;
+  purl: string;
+}
+
+export interface ScanossJsonComponentReplace {
+  paths: Array<string>;
+  purl: string;
+  replaceWith: string;
 }
 
 /**
@@ -18,6 +24,7 @@ export interface ScanossJsonOutput {
   bom: {
     include: Array<ScanossJsonComponent>;
     remove: Array<ScanossJsonComponent>;
+    replaced: Array<ScanossJsonComponentReplace>;
   }
 }
 
@@ -42,18 +49,19 @@ export class ScanossJson extends Format {
     this.source = source;
     this.extension = '.json';
     this.model = model;
-    this.scanossJson = { bom: { include: [], remove: [] } };
+    this.scanossJson = { bom: { include: [], remove: [], replaced: [] } };
   }
 
   /**
    * Generates the SCANOSS JSON output.
-   * This method retrieves all identified components, ignored components, and ignored files
+   * This method retrieves all identified components, ignored components, ignored files and replaced components
    * to create a SCANOSS JSON output.
    * @private
    * @returns {Promise<string>} A promise that resolves to the stringified SCANOSS JSON output
    */
   private async generateScanossJson(): Promise<string> {
     const components = await this.model.getScanossComponentJsonData();
+
     const [includedComponents, ignoredComponents, partiallyIgnoredComponents] = components.reduce(
       ([included, ignored, partialIgnored], c) => {
         if (c.identifiedFiles > 0) included.push({ purl: c.purl });
@@ -66,9 +74,18 @@ export class ScanossJson extends Format {
 
     // Retrieve ignored component file from a list of purls
     const ignoredComponentFiles = await this.model.getScanossIgnoredComponentFiles(partiallyIgnoredComponents);
+    // Retrieve replaced components
+    const allReplacedComponents = await this.model.getScanossReplacedComponentFiles();
+
+    const [replacedComponents] = allReplacedComponents.reduce(([replaced], c) => {
+      replaced.push({ paths: c.paths, replaceWith: c.identified, purl: c.original });
+      return [replaced];
+    }, [[]] as [Array<ScanossJsonComponentReplace>]);
+
     this.scanossJson.bom = {
       include: includedComponents,
       remove: [...ignoredComponents, ...ignoredComponentFiles],
+      replaced: [...replacedComponents],
     };
     return JSON.stringify(this.scanossJson, null, 2);
   }
