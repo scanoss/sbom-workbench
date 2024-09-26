@@ -2,13 +2,13 @@ import util from 'util';
 import { Dependency } from '@api/types';
 import sqlite3 from 'sqlite3';
 import { PackageURL } from 'packageurl-js';
+import { ReportComponent } from 'main/services/ReportService';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { queries } from '../../querys_db';
-import { Dependency as Dep, ModelDependencySummary } from '../../entity/Dependency';
+import { Dependency as Dep } from '../../entity/Dependency';
 import { Model } from '../../Model';
-import { ReportComponent } from 'main/services/ReportService';
 import { After } from '../../hooks/after/afterHook';
-import { declaredComponentsAdapter } from '../../../model/adapters/dependency/declaredComponentAdapter';
+import { declaredComponentsAdapter } from '../../adapters/dependency/declaredComponentAdapter';
 
 export class DependencyModel extends Model {
   private connection: sqlite3.Database;
@@ -170,14 +170,14 @@ export class DependencyModel extends Model {
     return depencencies;
   }
 
-  public async getSummary(path: string): Promise<Array<ModelDependencySummary>> {
+  public async getSummary(path: string): Promise<Array<any>> {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
     const depencencies = await call(queries.SQL_DEPENDENCY_SUMMARY, `${path}%`);
     return depencencies;
   }
 
   @After(declaredComponentsAdapter)
-  public async findAllDeclaredComponents(): Promise<Array<ReportComponent>>{
-   return await this.getDetectedDependencies() as unknown as Array<ReportComponent>;
+  public async findAllDeclaredComponents(): Promise<Array<ReportComponent>> {
+    return await this.getDetectedDependencies() as unknown as Array<ReportComponent>;
   }
 }

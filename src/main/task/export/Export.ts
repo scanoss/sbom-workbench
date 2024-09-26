@@ -12,7 +12,7 @@ import { IExportResult } from '../../modules/export/IExportResult';
 import { ExportFormat, ExportSource, InventoryType } from '../../../api/types';
 import { Crypto } from '../../modules/export/format/Crypto';
 import { workspace } from '../../workspace/Workspace';
-import { ExportModel } from '../../modules/export/Model/ExportModel';
+import { ExportRepositorySqliteImp } from '../../modules/export/Repository/ExportRepositorySqliteImp';
 import { CycloneDXDetected } from '../../modules/export/format/CycloneDX/CycloneDXDetected';
 import { CycloneDXIdentified } from '../../modules/export/format/CycloneDX/CycloneDxIdentified';
 import { SpdxLiteDetected } from '../../modules/export/format/SPDXLite/SpdxLiteDetected';
@@ -55,7 +55,7 @@ export class Export implements ITask<string, IExportResult> {
         this.format = exportDTO.source === ExportSource.DETECTED ? new SpdxLiteDetected(exportDTO.source) : new SpdxLiteIdentified(exportDTO.source);
         break;
       case ExportFormat.CYCLONEDX:
-        this.format = exportDTO.source === ExportSource.DETECTED ? new CycloneDXDetected(exportDTO.source, workspace.getOpenedProjects()[0], new ExportModel()) : new CycloneDXIdentified(exportDTO.source, workspace.getOpenedProjects()[0], new ExportModel());
+        this.format = exportDTO.source === ExportSource.DETECTED ? new CycloneDXDetected(exportDTO.source, workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp()) : new CycloneDXIdentified(exportDTO.source, workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp());
         break;
       case ExportFormat.HTMLSUMMARY:
         this.format = new HtmlSummary(exportDTO.source);

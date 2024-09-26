@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 import util from 'util';
-import { ScanossJsonComponentData } from 'main/model/interfaces/report/ScanossJSONData';
+import { ScanossJsonComponentData, ScanossJsonFileData } from 'main/model/interfaces/report/ScanossJSONData';
 import { Model } from '../../Model';
 import { queries } from '../../querys_db';
 import { LicenseReport } from '../../../services/ReportService';
@@ -73,7 +73,7 @@ export class ReportModel extends Model {
     return call(queries.SCANOSS_JSON_COMPONENTS);
   }
 
-  public async getScanossJsonIgnoredComponentFiles(purls: Array<string>): Promise<Array<ScanossJsonComponentData>> {
+  public async getScanossJsonIgnoredComponentFiles(purls: Array<string>): Promise<Array<ScanossJsonFileData>> {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
     const query = queries.SCANOSS_JSON_IGNORED_COMPONENTS_FILES.replace('#PLACEHOLDERS', purls.map(() => '?').join(','));
     return call(query, ...purls);

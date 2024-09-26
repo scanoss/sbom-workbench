@@ -3,8 +3,7 @@
 import { Format } from '../Format';
 
 export class Wfp extends Format {
-
-  constructor(){
+  constructor() {
     super();
     this.extension = '.wfp';
   }

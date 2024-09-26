@@ -1,15 +1,16 @@
 import log from 'electron-log';
 import fs from 'fs';
 
-import { ExportModel } from './Model/ExportModel';
+import { ExportRepositorySqliteImp } from './Repository/ExportRepositorySqliteImp';
 import { IExportResult } from './IExportResult';
+import { ExportRepository } from './Repository/ExportRepository';
 
 export abstract class Format {
-  protected export: ExportModel;
+  protected export: ExportRepository;
 
   protected extension: string;
 
-  constructor(exportModel: ExportModel = new ExportModel()) {
+  constructor(exportModel: ExportRepository = new ExportRepositorySqliteImp()) {
     this.export = exportModel;
   }
 
