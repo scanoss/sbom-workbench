@@ -1,5 +1,5 @@
 import { ExportComponentData } from '../../main/model/interfaces/report/ExportComponentData';
-import { ScanossJsonComponentData, ScanossJsonFileData } from '../../main/model/interfaces/report/ScanossJSONData';
+import { ScanossJsonComponentData, ScanossJsonFileData, ScanossJsonReplacedComponentFileData } from '../../main/model/interfaces/report/ScanossJSONData';
 
 export class ExportRepositoryMock {
   private mockData: {
@@ -7,14 +7,16 @@ export class ExportRepositoryMock {
     detectedData?: ExportComponentData[];
     rawData?: any;
     wfpData?: string;
-    scanossComponentJsonData?: Array<ScanossJsonComponentData>;
+    scanossJsonComponentData?: Array<ScanossJsonComponentData>;
     scanossJsonFileData?: Array<ScanossJsonFileData>;
+    scanossJsonDetectedComponentData?:Array<ScanossJsonReplacedComponentFileData>
   } = {};
 
   constructor(mockData: Partial<ExportRepositoryMock['mockData']> = {}) {
     this.mockData = mockData;
-    this.mockData.scanossComponentJsonData = [];
+    this.mockData.scanossJsonComponentData = [];
     this.mockData.scanossJsonFileData = [];
+    this.mockData.scanossJsonDetectedComponentData = [];
   }
 
   public setMockData(newMockData: Partial<ExportRepositoryMock['mockData']>) {
@@ -45,13 +47,19 @@ export class ExportRepositoryMock {
 
   public getScanossComponentJsonData(): Promise<Array<ScanossJsonComponentData>> {
     return new Promise<Array<ScanossJsonComponentData>>((resolve) => {
-      resolve(this.mockData.scanossComponentJsonData);
+      resolve(this.mockData.scanossJsonComponentData);
     });
   }
 
   public getScanossIgnoredComponentFiles(purls: Array<string>): Promise<Array<ScanossJsonFileData>> {
     return new Promise<Array<ScanossJsonFileData>>((resolve) => {
       resolve(this.mockData.scanossJsonFileData);
+    });
+  }
+
+  public async getScanossReplacedComponentFiles(): Promise<Array<ScanossJsonReplacedComponentFileData>> {
+    return new Promise<Array<ScanossJsonReplacedComponentFileData>>((resolve) => {
+      resolve(this.mockData.scanossJsonDetectedComponentData);
     });
   }
 }

@@ -37,7 +37,7 @@ describe('export tests', () => {
   });
 
   it('should generate correct SCANOSS JSON', async () => {
-    exportRepositoryMock.setMockData({ scanossComponentJsonData: [
+    exportRepositoryMock.setMockData({ scanossJsonComponentData: [
       { purl: 'pkg:github/scanoss/engine', totalMatchedFiles: 1, identifiedFiles: 0, ignoredFiles: 1, source: 'engine' },
       { purl: 'pkg:github/scanoss/scanner.c', totalMatchedFiles: 12, identifiedFiles: 12, ignoredFiles: 1, source: 'engine' },
       { purl: 'pkg:github/scanoss/minr', totalMatchedFiles: 2, identifiedFiles: 0, ignoredFiles: 0, source: 'engine' },
@@ -70,6 +70,7 @@ describe('export tests', () => {
           purl: 'pkg:github/scanoss/scanner.c',
         },
       ],
+      replaced: [],
     },
     };
 
@@ -78,7 +79,7 @@ describe('export tests', () => {
   });
 
   it('Should generate scanoss.json with populated include and empty remove arrays', async () => {
-    exportRepositoryMock.setMockData({ scanossComponentJsonData: [
+    exportRepositoryMock.setMockData({ scanossJsonComponentData: [
       { purl: 'pkg:github/scanoss/engine', totalMatchedFiles: 1, identifiedFiles: 1, ignoredFiles: 0, source: 'engine' },
       { purl: 'pkg:github/scanoss/scanner.c', totalMatchedFiles: 12, identifiedFiles: 12, ignoredFiles: 1, source: 'engine' },
       { purl: 'pkg:github/scanoss/minr', totalMatchedFiles: 2, identifiedFiles: 0, ignoredFiles: 0, source: 'engine' },
@@ -104,6 +105,7 @@ describe('export tests', () => {
           },
         ],
         remove: [],
+        replaced: [],
       },
     };
     const scanossJson = await scanossJsonFormat.generate();
@@ -112,7 +114,7 @@ describe('export tests', () => {
   });
 
   it('Should generate scanoss.json with populated remove and empty include arrays', async () => {
-    exportRepositoryMock.setMockData({ scanossComponentJsonData: [
+    exportRepositoryMock.setMockData({ scanossJsonComponentData: [
       { purl: 'pkg:github/scanoss/engine', totalMatchedFiles: 1, identifiedFiles: 0, ignoredFiles: 1, source: 'engine' },
       { purl: 'pkg:github/scanoss/scanner.c', totalMatchedFiles: 12, identifiedFiles: 0, ignoredFiles: 12, source: 'engine' },
       { purl: 'pkg:github/scanoss/minr', totalMatchedFiles: 2, identifiedFiles: 0, ignoredFiles: 2, source: 'engine' },
@@ -137,6 +139,7 @@ describe('export tests', () => {
             purl: 'pkg:github/scanoss/scanoss.java',
           },
         ],
+        replaced: [],
       },
     };
     const scanossJson = await scanossJsonFormat.generate();
@@ -149,11 +152,65 @@ describe('export tests', () => {
       bom: {
         include: [],
         remove: [],
+        replaced: [],
       },
     };
     const scanossJson = await scanossJsonFormat.generate();
     expect(scanossJson).toEqual(JSON.stringify(expectedOutput, null, 2));
     expect(JSON.parse(scanossJson).bom.include.length).toEqual(0);
     expect(JSON.parse(scanossJson).bom.remove.length).toEqual(0);
+  });
+
+  it('Should create an entry in the replaced array', async () => {
+    exportRepositoryMock.setMockData({ scanossJsonComponentData: [
+      { purl: 'pkg:github/scanoss/engine', totalMatchedFiles: 1, identifiedFiles: 0, ignoredFiles: 1, source: 'engine' },
+      { purl: 'pkg:github/scanoss/scanner.c', totalMatchedFiles: 12, identifiedFiles: 14, ignoredFiles: 1, source: 'engine' },
+      { purl: 'pkg:github/scanoss/minr', totalMatchedFiles: 2, identifiedFiles: 0, ignoredFiles: 0, source: 'engine' },
+      { purl: 'pkg:github/scanoss/scanoss.java', totalMatchedFiles: 1, identifiedFiles: 0, ignoredFiles: 1, source: 'engine' },
+      { purl: 'test', totalMatchedFiles: 0, identifiedFiles: 1, ignoredFiles: 0, source: 'manual' },
+    ],
+    scanossJsonDetectedComponentData: [
+      { paths: ['/external/inc/json.h', 'pkg:github/scanoss/scanner.c'],
+        identified: 'pkg:github/scanoss/scanner.c',
+        original: 'pkg:github/scanoss/minr',
+      }],
+    scanossJsonFileData: [
+      { path: '/external/inc/json.h', purl: 'pkg:github/scanoss/scanner.c' },
+    ],
+    });
+
+    const expectedOutput = { bom: {
+      include: [
+        {
+          purl: 'pkg:github/scanoss/scanner.c',
+        },
+        {
+          purl: 'test',
+        },
+      ],
+      remove: [
+        {
+          purl: 'pkg:github/scanoss/engine',
+        },
+        {
+          purl: 'pkg:github/scanoss/scanoss.java',
+        },
+        {
+          path: '/external/inc/json.h',
+          purl: 'pkg:github/scanoss/scanner.c',
+        },
+      ],
+      replaced: [
+        {
+          paths: ['/external/inc/json.h', 'pkg:github/scanoss/scanner.c'],
+          replaceWith: 'pkg:github/scanoss/scanner.c',
+          purl: 'pkg:github/scanoss/minr',
+        },
+      ],
+    },
+    };
+
+    const scanossJson = await scanossJsonFormat.generate();
+    expect(scanossJson).toEqual(JSON.stringify(expectedOutput, null, 2));
   });
 });

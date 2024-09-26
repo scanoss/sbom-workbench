@@ -10,3 +10,9 @@ export interface ScanossJsonFileData {
   purl: string;
   path: string;
 }
+
+export interface ScanossJsonReplacedComponentFileData {
+  original: string;
+  identified: string;
+  paths: Array<string>;
+}

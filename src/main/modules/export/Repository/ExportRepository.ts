@@ -1,5 +1,5 @@
 import { ExportComponentData } from '../../../model/interfaces/report/ExportComponentData';
-import { ScanossJsonComponentData, ScanossJsonFileData } from '../../../model/interfaces/report/ScanossJSONData';
+import { ScanossJsonComponentData, ScanossJsonFileData, ScanossJsonReplacedComponentFileData } from '../../../model/interfaces/report/ScanossJSONData';
 
 export interface ExportRepository {
   getIdentifiedData(): Promise<ExportComponentData[]>;
@@ -8,4 +8,5 @@ export interface ExportRepository {
   getWfpData(): Promise<string>;
   getScanossComponentJsonData(): Promise<Array<ScanossJsonComponentData>>;
   getScanossIgnoredComponentFiles(purls: Array<string>): Promise<Array<ScanossJsonFileData>>;
+  getScanossReplacedComponentFiles(): Promise<Array<ScanossJsonReplacedComponentFileData>>;
 }
