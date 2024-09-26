@@ -1,6 +1,7 @@
 import { ExportSource } from '../../../../api/types';
 import { Format } from '../Format';
-import { ExportModel } from '../Model/ExportModel';
+import { ExportRepositorySqliteImp } from '../Repository/ExportRepositorySqliteImp';
+import { ExportRepository } from '../Repository/ExportRepository';
 
 /**
  * Represents a component in the SCANOSS JSON output.
@@ -27,16 +28,16 @@ export interface ScanossJsonOutput {
 export class ScanossJson extends Format {
   private source: string;
 
-  private model: ExportModel;
+  private model: ExportRepository;
 
   private scanossJson: ScanossJsonOutput;
 
   /**
    * Creates an instance of ScanossJson.
    * @param {string} source - The source of the export data (IDENTIFIED - DETECTED)
-   * @param {ExportModel} [model=new ExportModel()] - The model used for data retrieval
+   * @param {ExportRepositorySqliteImp} [model=new ExportRepositorySqliteImp()] - The model used for data retrieval
    */
-  constructor(source: string, model: ExportModel = new ExportModel()) {
+  constructor(source: string, model: ExportRepository = new ExportRepositorySqliteImp()) {
     super();
     this.source = source;
     this.extension = '.json';
@@ -51,24 +52,24 @@ export class ScanossJson extends Format {
    * @private
    * @returns {Promise<string>} A promise that resolves to the stringified SCANOSS JSON output
    */
-  private async generateScanossJson() {
-    const includedComponents: Array<ScanossJsonComponent> = [];
-    const ignoredComponents: Array<ScanossJsonComponent> = [];
-    const partiallyIgnoredComponents = [];
+  private async generateScanossJson(): Promise<string> {
     const components = await this.model.getScanossComponentJsonData();
-
-    // Retrieve component data and categorize components
-    components.forEach((c) => {
-      if (c.identifiedFiles > 0) includedComponents.push({ purl: c.purl });
-      if (c.totalMatchedFiles === c.ignoredFiles && c.source === 'engine') ignoredComponents.push({ purl: c.purl });
-      if ((c.ignoredFiles > 0 && c.ignoredFiles < c.totalMatchedFiles)) partiallyIgnoredComponents.push(c.purl);
-    });
+    const [includedComponents, ignoredComponents, partiallyIgnoredComponents] = components.reduce(
+      ([included, ignored, partialIgnored], c) => {
+        if (c.identifiedFiles > 0) included.push({ purl: c.purl });
+        if (c.totalMatchedFiles === c.ignoredFiles && c.source === 'engine') ignored.push({ purl: c.purl });
+        if (c.ignoredFiles > 0 && c.ignoredFiles < c.totalMatchedFiles) partialIgnored.push(c.purl);
+        return [included, ignored, partialIgnored];
+      },
+      [[], [], []] as [ScanossJsonComponent[], ScanossJsonComponent[], string[]],
+    );
 
     // Retrieve ignored component file from a list of purls
     const ignoredComponentFiles = await this.model.getScanossIgnoredComponentFiles(partiallyIgnoredComponents);
-
-    this.scanossJson.bom.include = includedComponents;
-    this.scanossJson.bom.remove = [...ignoredComponents, ...ignoredComponentFiles];
+    this.scanossJson.bom = {
+      include: includedComponents,
+      remove: [...ignoredComponents, ...ignoredComponentFiles],
+    };
     return JSON.stringify(this.scanossJson, null, 2);
   }
 

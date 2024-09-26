@@ -105,7 +105,10 @@
     ],
     "transform": {
       "\\.(ts|tsx|js|jsx)$": "ts-jest"
-    }
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(uuid)/)"
+    ]
   },
   "dependencies": {
     "@electron/rebuild": "^3.2.13",

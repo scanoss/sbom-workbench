@@ -1,9 +1,10 @@
 import fs from 'fs';
 import { FileUsageType } from '@api/types';
+import { ScanossJsonComponentData, ScanossJsonFileData } from 'main/model/interfaces/report/ScanossJSONData';
 import { workspace } from '../../../workspace/Workspace';
 import { modelProvider } from '../../../services/ModelProvider';
 import { ExportComponentData } from '../../../model/interfaces/report/ExportComponentData';
-import { ScanossJsonComponentData } from 'main/model/interfaces/report/ScanossJSONData';
+import { ExportRepository } from './ExportRepository';
 
 export interface ExportData {
   inventoryId: number;
@@ -23,7 +24,7 @@ export interface ExportData {
   official?: number;
 }
 
-export class ExportModel {
+export class ExportRepositorySqliteImp implements ExportRepository {
   public async getIdentifiedData(): Promise<ExportComponentData[]> {
     return modelProvider.model.report.fetchAllIdentifiedComponents();
   }
@@ -48,7 +49,7 @@ export class ExportModel {
     return modelProvider.model.report.getScanossJsonComponents();
   }
 
-  public async getScanossIgnoredComponentFiles(purls: Array<string>): Promise<Array<ScanossJsonComponentData>> {
+  public async getScanossIgnoredComponentFiles(purls: Array<string>): Promise<Array<ScanossJsonFileData>> {
     return modelProvider.model.report.getScanossJsonIgnoredComponentFiles(purls);
   }
 }

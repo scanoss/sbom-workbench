@@ -7,6 +7,7 @@ import { ExportSource } from '../../../../../api/types';
 import AppConfig from '../../../../../config/AppConfigModule';
 import { modelProvider } from '../../../../services/ModelProvider';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
+
 const crypto = require('crypto');
 
 export enum LicenseType {
@@ -16,7 +17,8 @@ export enum LicenseType {
 
 export abstract class SpdxLite extends Format {
   private source: string;
-  protected licenseMapper: Map<string,any>;
+
+  protected licenseMapper: Map<string, any>;
 
   constructor(source: string) {
     super();
@@ -28,17 +30,14 @@ export abstract class SpdxLite extends Format {
 
   protected abstract getLicenseCopyRight(component: ExportComponentData);
 
-
-
   // @override
   public async generate() {
-
     const licenses = await modelProvider.model.license.getAllWithFullText();
-    this.licenseMapper = new Map<string,any>();
-    licenses.forEach((l)=>{
+    this.licenseMapper = new Map<string, any>();
+    licenses.forEach((l) => {
       this.licenseMapper.set(l.spdxid, l);
     });
-    
+
     const data = this.source === ExportSource.IDENTIFIED
       ? await this.export.getIdentifiedData()
       : await this.export.getDetectedData();
@@ -48,7 +47,7 @@ export abstract class SpdxLite extends Format {
     const spdx = SpdxLite.template();
     spdx.packages = [];
     spdx.documentDescribes = [];
-    components.forEach((c)=>{
+    components.forEach((c) => {
       const newPackage = this.getPackage(c);
       spdx.packages.push(newPackage);
       spdx.documentDescribes.push(newPackage.SPDXID);
@@ -92,26 +91,25 @@ export abstract class SpdxLite extends Format {
     return buf.toString('base64');
   }
 
-      // @Override
-  private  getPackage(component: ExportComponentData) {
-        const pkg: any = {};
-        pkg.name = component.purl;
-        pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${component.purl}@${component.version}`).digest('hex')}`; // md5 purl@version
-        pkg.versionInfo = component.version ? component.version : 'NOASSERTION';
-        pkg.downloadLocation = component.url ? component.url : 'NOASSERTION';
-        pkg.filesAnalyzed = false;
-        pkg.homepage = component.url || 'NOASSERTION';
-        pkg.licenseDeclared = component.detected_licenses ? component.detected_licenses : 'NOASSERTION';
-        pkg.licenseConcluded = component.concluded_licenses;
-        pkg.copyrightText = this.getLicenseCopyRight(component);
-        pkg.externalRefs = [
-          {
-            referenceCategory: 'PACKAGE_MANAGER',
-            referenceLocator: component.purl,
-            referenceType: 'purl',
-          },
-        ];
-        return pkg;
-      }
-  
+  // @Override
+  private getPackage(component: ExportComponentData) {
+    const pkg: any = {};
+    pkg.name = component.purl;
+    pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${component.purl}@${component.version}`).digest('hex')}`; // md5 purl@version
+    pkg.versionInfo = component.version ? component.version : 'NOASSERTION';
+    pkg.downloadLocation = component.url ? component.url : 'NOASSERTION';
+    pkg.filesAnalyzed = false;
+    pkg.homepage = component.url || 'NOASSERTION';
+    pkg.licenseDeclared = component.detected_licenses ? component.detected_licenses : 'NOASSERTION';
+    pkg.licenseConcluded = component.concluded_licenses;
+    pkg.copyrightText = this.getLicenseCopyRight(component);
+    pkg.externalRefs = [
+      {
+        referenceCategory: 'PACKAGE_MANAGER',
+        referenceLocator: component.purl,
+        referenceType: 'purl',
+      },
+    ];
+    return pkg;
+  }
 }
