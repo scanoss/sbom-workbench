@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { FileUsageType } from '@api/types';
-import { ScanossJsonComponentData, ScanossJsonFileData, ScanossJsonReplacedComponentFileData } from 'main/model/interfaces/report/ScanossJSONData';
+import { SettingsComponentData, SettingsFileData, SettingsReplacedComponentFileData } from '../../../model/interfaces/report/SettingsReport';
 import { workspace } from '../../../workspace/Workspace';
 import { modelProvider } from '../../../services/ModelProvider';
 import { ExportComponentData } from '../../../model/interfaces/report/ExportComponentData';
@@ -45,15 +45,15 @@ export class ExportRepositorySqliteImp implements ExportRepository {
     return data;
   }
 
-  public async getScanossComponentJsonData(): Promise<Array<ScanossJsonComponentData>> {
-    return modelProvider.model.report.getScanossJsonComponents();
+  public async getSettingsComponents(): Promise<Array<SettingsComponentData>> {
+    return modelProvider.model.report.getSettingsComponents();
   }
 
-  public async getScanossIgnoredComponentFiles(purls: Array<string>): Promise<Array<ScanossJsonFileData>> {
-    return modelProvider.model.report.getScanossJsonIgnoredComponentFiles(purls);
+  public async getSettingsIgnoredComponentFiles(purls: Array<string>): Promise<Array<SettingsFileData>> {
+    return modelProvider.model.report.getSettingsIgnoredComponentFiles(purls);
   }
 
-  public async getScanossReplacedComponentFiles(): Promise<Array<ScanossJsonReplacedComponentFileData>> {
-    return modelProvider.model.report.getScanossJsonReplacedComponentFiles();
+  public async getSettingsReplacedComponentFiles(): Promise<Array<SettingsReplacedComponentFileData>> {
+    return modelProvider.model.report.getSettingsReplacedComponentFiles();
   }
 }

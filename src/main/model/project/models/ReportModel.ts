@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 import util from 'util';
-import { ScanossJsonComponentData, ScanossJsonFileData, ScanossJsonReplacedComponentFileData } from 'main/model/interfaces/report/ScanossJSONData';
+import { SettingsComponentData, SettingsFileData, SettingsReplacedComponentFileData } from '../../interfaces/report/SettingsReport';
 import { Model } from '../../Model';
 import { queries } from '../../querys_db';
 import { LicenseReport } from '../../../services/ReportService';
@@ -68,20 +68,20 @@ export class ReportModel extends Model {
     return call(queries.SQL_IDENTIFIED_REPORT_LICENSE_COMPONENT_SUMMARY);
   }
 
-  public async getScanossJsonComponents(): Promise<Array<ScanossJsonComponentData>> {
+  public async getSettingsComponents(): Promise<Array<SettingsComponentData>> {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
-    return call(queries.SCANOSS_JSON_COMPONENTS);
+    return call(queries.SETTINGS_COMPONENTS);
   }
 
-  public async getScanossJsonIgnoredComponentFiles(purls: Array<string>): Promise<Array<ScanossJsonFileData>> {
+  public async getSettingsIgnoredComponentFiles(purls: Array<string>): Promise<Array<SettingsFileData>> {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
-    const query = queries.SCANOSS_JSON_IGNORED_COMPONENTS_FILES.replace('#PLACEHOLDERS', purls.map(() => '?').join(','));
+    const query = queries.SETTINGS_IGNORED_COMPONENTS_FILES.replace('#PLACEHOLDERS', purls.map(() => '?').join(','));
     return call(query, ...purls);
   }
 
-  public async getScanossJsonReplacedComponentFiles(): Promise<Array<ScanossJsonReplacedComponentFileData>> {
+  public async getSettingsReplacedComponentFiles(): Promise<Array<SettingsReplacedComponentFileData>> {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
-    const data = await call(queries.SCANOSS_JSON_REPLACED_COMPONENTS_FILES);
+    const data = await call(queries.SETTINGS_REPLACED_COMPONENTS_FILES);
     return data.map((c) => {
       return { ...c, paths: c.paths.split(',') };
     });

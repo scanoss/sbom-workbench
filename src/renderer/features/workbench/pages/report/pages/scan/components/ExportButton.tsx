@@ -68,11 +68,11 @@ export const ExportButton = ({ empty }) => {
       hint: t('Tooltip:ExportHintHTML'),
       sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
     },
-    SCANOSS_JSON: {
-      label: 'SCANOSS json',
-      hint: t('Tooltip:ExportHintSCANOSSJSON'),
+    SETTINGS: {
+      label: 'Settings',
+      hint: t('Tooltip:ExportHintSettings'),
       sources: [ExportSource.IDENTIFIED],
-      fileName: 'scanoss',
+      fileName: 'settings',
     },
 
   };

@@ -29,7 +29,7 @@ const getFormatFilesAttributes = (format: ExportFormat) => {
   attr.set(ExportFormat.SPDXLITEJSON, { description: 'JSON Files', prefix: 'SPDXLite', extension: 'json' });
   attr.set(ExportFormat.CYCLONEDX, { description: 'JSON Files', prefix: 'cyclonedx', extension: 'json' });
   attr.set(ExportFormat.HTMLSUMMARY, { description: 'HTML Files', extension: 'html', defaultFileName: 'HTMLSummary' });
-  attr.set(ExportFormat.SCANOSS_JSON, { description: 'SCANOSS json', extension: 'json', defaultFileName: 'scanoss' });
+  attr.set(ExportFormat.SETTINGS, { description: 'settings', extension: 'json', defaultFileName: 'settings' });
 
   return attr.get(format);
 };

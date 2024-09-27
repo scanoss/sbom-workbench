@@ -6,25 +6,25 @@ import { ExportRepository } from '../Repository/ExportRepository';
 /**
  * Represents a component in the SCANOSS JSON output.
  */
-export interface ScanossJsonComponent {
+export interface Component {
   path?: string;
   purl: string;
 }
 
-export interface ScanossJsonComponentReplace {
+export interface ComponentReplace {
   paths: Array<string>;
   purl: string;
-  replaceWith: string;
+  replace_with: string;
 }
 
 /**
  * Represents the structure of the SCANOSS JSON output.
  */
-export interface ScanossJsonOutput {
+export interface SettingsOutput {
   bom: {
-    include: Array<ScanossJsonComponent>;
-    remove: Array<ScanossJsonComponent>;
-    replaced: Array<ScanossJsonComponentReplace>;
+    include: Array<Component>;
+    remove: Array<Component>;
+    replace: Array<ComponentReplace>;
   }
 }
 
@@ -32,12 +32,12 @@ export interface ScanossJsonOutput {
  * Class for generating SCANOSS JSON output.
  * @extends Format
  */
-export class ScanossJson extends Format {
+export class Settings extends Format {
   private source: string;
 
   private model: ExportRepository;
 
-  private scanossJson: ScanossJsonOutput;
+  private scanossJson: SettingsOutput;
 
   /**
    * Creates an instance of ScanossJson.
@@ -49,7 +49,7 @@ export class ScanossJson extends Format {
     this.source = source;
     this.extension = '.json';
     this.model = model;
-    this.scanossJson = { bom: { include: [], remove: [], replaced: [] } };
+    this.scanossJson = { bom: { include: [], remove: [], replace: [] } };
   }
 
   /**
@@ -59,8 +59,8 @@ export class ScanossJson extends Format {
    * @private
    * @returns {Promise<string>} A promise that resolves to the stringified SCANOSS JSON output
    */
-  private async generateScanossJson(): Promise<string> {
-    const components = await this.model.getScanossComponentJsonData();
+  private async generateSettingsFile(): Promise<string> {
+    const components = await this.model.getSettingsComponents();
 
     const [includedComponents, ignoredComponents, partiallyIgnoredComponents] = components.reduce(
       ([included, ignored, partialIgnored], c) => {
@@ -69,23 +69,23 @@ export class ScanossJson extends Format {
         if (c.ignoredFiles > 0 && c.ignoredFiles < c.totalMatchedFiles) partialIgnored.push(c.purl);
         return [included, ignored, partialIgnored];
       },
-      [[], [], []] as [ScanossJsonComponent[], ScanossJsonComponent[], string[]],
+      [[], [], []] as [Component[], Component[], string[]],
     );
 
     // Retrieve ignored component file from a list of purls
-    const ignoredComponentFiles = await this.model.getScanossIgnoredComponentFiles(partiallyIgnoredComponents);
+    const ignoredComponentFiles = await this.model.getSettingsIgnoredComponentFiles(partiallyIgnoredComponents);
     // Retrieve replaced components
-    const allReplacedComponents = await this.model.getScanossReplacedComponentFiles();
+    const allReplacedComponents = await this.model.getSettingsReplacedComponentFiles();
 
     const [replacedComponents] = allReplacedComponents.reduce(([replaced], c) => {
-      replaced.push({ paths: c.paths, replaceWith: c.identified, purl: c.original });
+      replaced.push({ paths: c.paths, replace_with: c.identified, purl: c.original });
       return [replaced];
-    }, [[]] as [Array<ScanossJsonComponentReplace>]);
+    }, [[]] as [Array<ComponentReplace>]);
 
     this.scanossJson.bom = {
       include: includedComponents,
       remove: [...ignoredComponents, ...ignoredComponentFiles],
-      replaced: [...replacedComponents],
+      replace: [...replacedComponents],
     };
     return JSON.stringify(this.scanossJson, null, 2);
   }
@@ -99,7 +99,7 @@ export class ScanossJson extends Format {
    */
   public async generate() {
     if (this.source === ExportSource.IDENTIFIED) {
-      return this.generateScanossJson();
+      return this.generateSettingsFile();
     }
     return JSON.stringify(this.scanossJson, null, 2);
   }

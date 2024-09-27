@@ -1,12 +1,12 @@
 import { ExportComponentData } from '../../../model/interfaces/report/ExportComponentData';
-import { ScanossJsonComponentData, ScanossJsonFileData, ScanossJsonReplacedComponentFileData } from '../../../model/interfaces/report/ScanossJSONData';
+import { SettingsComponentData, SettingsFileData, SettingsReplacedComponentFileData } from '../../../model/interfaces/report/SettingsReport';
 
 export interface ExportRepository {
   getIdentifiedData(): Promise<ExportComponentData[]>;
   getDetectedData(): Promise<ExportComponentData[]>;
   getRawData();
   getWfpData(): Promise<string>;
-  getScanossComponentJsonData(): Promise<Array<ScanossJsonComponentData>>;
-  getScanossIgnoredComponentFiles(purls: Array<string>): Promise<Array<ScanossJsonFileData>>;
-  getScanossReplacedComponentFiles(): Promise<Array<ScanossJsonReplacedComponentFileData>>;
+  getSettingsComponents(): Promise<Array<SettingsComponentData>>;
+  getSettingsIgnoredComponentFiles(purls: Array<string>): Promise<Array<SettingsFileData>>;
+  getSettingsReplacedComponentFiles(): Promise<Array<SettingsReplacedComponentFileData>>;
 }

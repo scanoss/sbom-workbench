@@ -53,5 +53,5 @@
   "OpenInReadMode": "Open in read-only mode",
   "ExportHintCSVSBOM": "Export SBOM report",
   "ExportHintCSVCryptography": "Export Cryptography report",
-  "ExportHintSCANOSSJSON": "Export a SCANOSS file"
+  "ExportHintSettings": "Export a settings file"
 }
