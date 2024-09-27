@@ -1,22 +1,23 @@
+import { ExportRepository } from '../../main/modules/export/Repository/ExportRepository';
 import { ExportComponentData } from '../../main/model/interfaces/report/ExportComponentData';
-import { ScanossJsonComponentData, ScanossJsonFileData, ScanossJsonReplacedComponentFileData } from '../../main/model/interfaces/report/ScanossJSONData';
+import { SettingsComponentData, SettingsFileData, SettingsReplacedComponentFileData } from '../../main/model/interfaces/report/SettingsReport';
 
-export class ExportRepositoryMock {
+export class ExportRepositoryMock implements ExportRepository {
   private mockData: {
     identifiedData?: ExportComponentData[];
     detectedData?: ExportComponentData[];
     rawData?: any;
     wfpData?: string;
-    scanossJsonComponentData?: Array<ScanossJsonComponentData>;
-    scanossJsonFileData?: Array<ScanossJsonFileData>;
-    scanossJsonDetectedComponentData?:Array<ScanossJsonReplacedComponentFileData>
+    settingsComponentData?: Array<SettingsComponentData>;
+    settingsFileData?: Array<SettingsFileData>;
+    settingsDetectedComponentData?:Array<SettingsReplacedComponentFileData>
   } = {};
 
   constructor(mockData: Partial<ExportRepositoryMock['mockData']> = {}) {
     this.mockData = mockData;
-    this.mockData.scanossJsonComponentData = [];
-    this.mockData.scanossJsonFileData = [];
-    this.mockData.scanossJsonDetectedComponentData = [];
+    this.mockData.settingsComponentData = [];
+    this.mockData.settingsFileData = [];
+    this.mockData.settingsDetectedComponentData = [];
   }
 
   public setMockData(newMockData: Partial<ExportRepositoryMock['mockData']>) {
@@ -45,21 +46,21 @@ export class ExportRepositoryMock {
     });
   }
 
-  public getScanossComponentJsonData(): Promise<Array<ScanossJsonComponentData>> {
-    return new Promise<Array<ScanossJsonComponentData>>((resolve) => {
-      resolve(this.mockData.scanossJsonComponentData);
+  public getSettingsComponents(): Promise<Array<SettingsComponentData>> {
+    return new Promise<Array<SettingsComponentData>>((resolve) => {
+      resolve(this.mockData.settingsComponentData);
     });
   }
 
-  public getScanossIgnoredComponentFiles(purls: Array<string>): Promise<Array<ScanossJsonFileData>> {
-    return new Promise<Array<ScanossJsonFileData>>((resolve) => {
-      resolve(this.mockData.scanossJsonFileData);
+  public getSettingsIgnoredComponentFiles(purls: Array<string>): Promise<Array<SettingsFileData>> {
+    return new Promise<Array<SettingsFileData>>((resolve) => {
+      resolve(this.mockData.settingsFileData);
     });
   }
 
-  public async getScanossReplacedComponentFiles(): Promise<Array<ScanossJsonReplacedComponentFileData>> {
-    return new Promise<Array<ScanossJsonReplacedComponentFileData>>((resolve) => {
-      resolve(this.mockData.scanossJsonDetectedComponentData);
+  public async getSettingsReplacedComponentFiles(): Promise<Array<SettingsReplacedComponentFileData>> {
+    return new Promise<Array<SettingsReplacedComponentFileData>>((resolve) => {
+      resolve(this.mockData.settingsDetectedComponentData);
     });
   }
 }

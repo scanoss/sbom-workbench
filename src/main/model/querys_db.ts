@@ -484,7 +484,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0;`;
 
   /**
- * SQL query to retrieve component summary for SCANOSS JSON export.
+ * SQL query to retrieve component summary for SETTINGS export.
  *
  * This query provides summary of each component, including:
  * - Summary of components with their number of files matched. For manual source, number of matches is 0.
@@ -494,7 +494,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
  *
  * @type {string}
  */
-  SCANOSS_JSON_COMPONENTS = `SELECT purl,totalMatchedFiles, COALESCE(identifiedFiles, 0) AS identifiedFiles, COALESCE(ignoredFiles, 0) AS ignoredFiles, source FROM (
+  SETTINGS_COMPONENTS = `SELECT purl,totalMatchedFiles, COALESCE(identifiedFiles, 0) AS identifiedFiles, COALESCE(ignoredFiles, 0) AS ignoredFiles, source FROM (
         
         (SELECT r.purl,COUNT(*)as totalMatchedFiles, 'engine' as source FROM results r
         INNER JOIN files f ON r.fileId = f.fileId
@@ -532,11 +532,11 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
  *   @returns {string} purl - The Package URL (PURL) of the component associated with the ignored file
  *
  */
-  SCANOSS_JSON_IGNORED_COMPONENTS_FILES = `SELECT f.path, r.purl FROM files f
+  SETTINGS_IGNORED_COMPONENTS_FILES = `SELECT f.path, r.purl FROM files f
     INNER JOIN results r ON f.fileId = r.fileId 
     WHERE r.purl IN (#PLACEHOLDERS) AND f.ignored = 1;`;
 
-  SCANOSS_JSON_REPLACED_COMPONENTS_FILES = `SELECT  r.purl as original, cv.purl as identified, GROUP_CONCAT(f.path, ',') as paths
+  SETTINGS_REPLACED_COMPONENTS_FILES = `SELECT  r.purl as original, cv.purl as identified, GROUP_CONCAT(f.path, ',') as paths
       FROM component_versions cv INNER JOIN inventories i ON cv.id = i.cvid
       INNER JOIN file_inventories fi ON fi.inventoryid = i.id 
       INNER JOIN files f ON f.fileId = fi.fileId

@@ -48,5 +48,5 @@
   "NotDetected": "未検出",
   "Ignored": "無視された",
   "Progress": "進行中",
-  "ExportHintSCANOSSJSON": "Export a SCANOSS file"
+  "ExportHintSettings": "Export a Settings file"
 }

@@ -1,4 +1,4 @@
-export interface ScanossJsonComponentData {
+export interface SettingsComponentData {
   purl: string;
   totalMatchedFiles: number;
   identifiedFiles: number;
@@ -6,12 +6,12 @@ export interface ScanossJsonComponentData {
   source: 'manual' | 'engine';
 }
 
-export interface ScanossJsonFileData {
+export interface SettingsFileData {
   purl: string;
   path: string;
 }
 
-export interface ScanossJsonReplacedComponentFileData {
+export interface SettingsReplacedComponentFileData {
   original: string;
   identified: string;
   paths: Array<string>;

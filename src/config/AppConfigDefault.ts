@@ -29,7 +29,7 @@ export const AppConfigDefault: IAppConfig = {
     ExportFormat.SPDXLITEJSON,
     ExportFormat.CYCLONEDX,
     ExportFormat.HTMLSUMMARY,
-    ExportFormat.SCANOSS_JSON,
+    ExportFormat.SETTINGS,
   ],
   FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN: false,
   FF_ENABLE_API_CONNECTION_SETTINGS: true,
