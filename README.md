@@ -3,7 +3,7 @@
 <div>
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/scanoss/sbom-workbench)
-![License](https://img.shields.io/badge/license-GPL--2.0-brightgreen)
+![License](https://img.shields.io/badge/license-GPL--2.0--only-brightgreen)
 [![REUSE status](https://api.reuse.software/badge/github.com/scanoss/sbom-workbench)](https://api.reuse.software/info/github.com/scanoss/sbom-workbench)
 ![test_workflow](https://github.com/scanoss/sbom-workbench/actions/workflows/test.yml/badge.svg?branch=main)
 

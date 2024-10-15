@@ -15,7 +15,7 @@
     "email": "info@scanoss.com",
     "url": "https://www.scanoss.com/"
   },
-  "license": "GPL-2.0",
+  "license": "GPL-2.0-only",
   "keywords": [
     "scanoss",
     "opensource"
