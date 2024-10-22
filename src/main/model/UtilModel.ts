@@ -23,7 +23,7 @@ class UtilModel {
 
   getTimeStamp() {
     const time = new Date();
-    const timeStamp = time.toISOString();
+    const timeStamp = `${time.toISOString().split('.')[0]}Z`;
     return timeStamp;
   }
 }
