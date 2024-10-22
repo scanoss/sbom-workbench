@@ -61,6 +61,7 @@ export class Settings extends Format {
    */
   private async generateSettingsFile(): Promise<string> {
     const components = await this.model.getSettingsComponents();
+    console.log(components);
 
     const [includedComponents, ignoredComponents, partiallyIgnoredComponents] = components.reduce(
       ([included, ignored, partialIgnored], c) => {
@@ -74,11 +75,14 @@ export class Settings extends Format {
 
     // Retrieve ignored component file from a list of purls
     const ignoredComponentFiles = await this.model.getSettingsIgnoredComponentFiles(partiallyIgnoredComponents);
+
     // Retrieve replaced components
     const allReplacedComponents = await this.model.getSettingsReplacedComponentFiles();
 
     const [replacedComponents] = allReplacedComponents.reduce(([replaced], c) => {
-      replaced.push({ paths: c.paths, replace_with: c.identified, purl: c.original });
+      if (c.paths && c.identified && c.original) {
+        replaced.push({ paths: c.paths, replace_with: c.identified, purl: c.original });
+      }
       return [replaced];
     }, [[]] as [Array<ComponentReplace>]);
 
