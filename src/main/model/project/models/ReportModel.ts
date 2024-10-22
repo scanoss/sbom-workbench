@@ -83,7 +83,7 @@ export class ReportModel extends Model {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
     const data = await call(queries.SETTINGS_REPLACED_COMPONENTS_FILES);
     return data.map((c) => {
-      return { ...c, paths: c.paths.split(',') };
+      return { ...c, paths: c.paths?.split(',') };
     });
   }
 }
