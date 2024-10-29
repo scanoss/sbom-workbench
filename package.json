@@ -102,7 +102,7 @@
     },
     "testPathIgnorePatterns": [
       "release/app/dist",
-      "src/__tests__/export/ExportRepositoryMock.ts" 
+      "src/__tests__/export/ExportRepositoryMock.ts"
     ],
     "transform": {
       "\\.(ts|tsx|js|jsx)$": "ts-jest"
@@ -152,7 +152,7 @@
     "react-virtualized-tree": "^3.4.1",
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "^0.13.5",
-    "scanoss": "^0.15.1",
+    "scanoss": "^0.15.2",
     "sort-paths": "^1.1.1",
     "source-map-support": "^0.5.19",
     "translation-check": "^1.0.2",
