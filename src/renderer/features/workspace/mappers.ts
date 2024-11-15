@@ -39,7 +39,6 @@ export const mapToGlobalSettingsFormValues = (cfg: IWorkspaceCfg): GlobalSetting
     HTTPS_PROXY,
     IGNORE_CERT_ERRORS,
   } = cfg;
-
   const defaultApi = APIS && APIS[DEFAULT_API_INDEX] ? APIS[DEFAULT_API_INDEX] : null;
 
   const hasNoProxy = !HTTP_PROXY && !PAC_PROXY;
@@ -52,9 +51,9 @@ export const mapToGlobalSettingsFormValues = (cfg: IWorkspaceCfg): GlobalSetting
   const sameConfigAsHttp = httpHost === httpsHost && httpPort === httpsPort;
 
   return {
-    apiKey: defaultApi.API_KEY,
+    apiKey: defaultApi?.API_KEY,
     apis: APIS || [],
-    apiUrl: defaultApi.URL,
+    apiUrl: defaultApi?.URL,
     language: LNG,
     sbomLedgerToken: TOKEN,
     proxyConfig: {
