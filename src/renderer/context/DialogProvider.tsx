@@ -22,7 +22,7 @@ export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>, options?: InventoryDialogOptions) => Promise<Inventory | null>;
   openInventorySelector: (inventories: Inventory[]) => Promise<InventorySelectorResponse>;
   openConfirmDialog: (message?: string, button?: any, hideDeleteButton?: boolean) => Promise<DialogResponse>;
-  openAlertDialog: (message?: string, buttons?: any[]) => Promise<DialogResponse>;
+  openAlertDialog: (message?: string, buttons?: any[], slots?:any) => Promise<DialogResponse>;
   openLicenseCreate: (save?: boolean) => Promise<DialogResponse>;
   openSettings: () => Promise<DialogResponse>;
   openComponentDialog: (component: Partial<NewComponentDTO>, label: string) => Promise<DialogResponse>;
@@ -128,6 +128,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
   };
 
   const [alertDialog, setAlertDialog] = useState<{
+    slots?: any;
     open: boolean;
     message?: string;
     buttons?: any[];
@@ -144,10 +145,12 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         label: 'OK',
         role: 'accept',
       },
-    ]
+    ],
+    slots?:any,
   ): Promise<DialogResponse> => {
     return new Promise<DialogResponse>((resolve) => {
       setAlertDialog({
+        slots,
         open: true,
         message,
         buttons,
@@ -369,7 +372,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         onValueChange: null,
         close: ()=>{
           setKeywordGroupDialog({open: false, onValueChange: null})
-        },        
+        },
       });
   };
 
@@ -501,6 +504,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
       />
 
       <AlertDialog
+        slots={alertDialog.slots}
         open={alertDialog.open}
         message={alertDialog.message}
         buttons={alertDialog.buttons}

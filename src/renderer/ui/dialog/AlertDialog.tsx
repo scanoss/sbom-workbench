@@ -40,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
 
 interface AlertDialogProps {
   open: boolean;
+  slots: any;
   message: string;
   buttons: any[];
   onClose: (response: DialogResponse) => void;
@@ -47,7 +48,7 @@ interface AlertDialogProps {
 
 export const AlertDialog = (props: AlertDialogProps) => {
   const classes = useStyles();
-  const { open, message, buttons, onClose } = props;
+  const { open, message, buttons, onClose, slots } = props;
 
   const handleCancel = () => onClose({ action: DIALOG_ACTIONS.CANCEL });
   const handleAccept = (action: string) => onClose({ action });
@@ -61,6 +62,7 @@ export const AlertDialog = (props: AlertDialogProps) => {
       fullWidth
       open={open}
       onClose={handleCancel}
+      {...slots}
     >
       <DialogContent className={classes.content}>
         <IconButton

@@ -1,4 +1,4 @@
-import React, { MouseEvent, SyntheticEvent, useEffect, useState } from 'react';
+import React, { MouseEvent, SyntheticEvent, useContext, useEffect, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -33,6 +33,7 @@ import { ApiFormValues, globalSettingsFormSchema, GlobalSettingsFormValues } fro
 import { mapToWorkspaceConfig } from 'renderer/features/workspace/encode';
 import ProxyConfigSetup from 'renderer/features/workspace/components/ProxyConfigSetup';
 import { mapToGlobalSettingsFormValues } from 'renderer/features/workspace/mappers';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import ControlledInput from '../Input';
 
 const filter = createFilterOptions();
@@ -154,7 +155,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
   const { t } = useTranslation();
   const classes = useStyles();
   const dispatch = useDispatch<AppDispatch>();
-
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const [apiDialog, setApiDialog] = useState({
     open: false,
     data: null,
@@ -163,9 +164,14 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
   const onSubmit = async (data: GlobalSettingsFormValues) => {
     const dto = mapToWorkspaceConfig(data);
 
-    await userSettingService.set(dto);
-    dispatch(workbenchStoreApi(dto.APIS ?? []));
-    onClose({ action: DIALOG_ACTIONS.OK });
+    try {
+      await userSettingService.set(dto);
+      dispatch(workbenchStoreApi(dto.APIS ?? []));
+      onClose({ action: DIALOG_ACTIONS.OK });
+    } catch (e: any) {
+      await dialogCtrl.openAlertDialog(e.message, [
+        { label: 'OK', action: 'error', role: 'delete' }], { fullWidth: false });
+    }
   };
 
   const handleAddNewEndpoint = () => setApiDialog({ ...apiDialog, open: true, data: null });
@@ -260,6 +266,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                       </Stack>
                       <Paper className="dialog-form-field-control">
                         <Autocomplete
+                          clearIcon={false}
                           fullWidth
                           value={apis?.find((api) => api.URL === apiUrl && api.API_KEY === apiKey) || null}
                           onChange={handleChangeApi}
@@ -327,6 +334,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                                     )}
                                   </div>
                                   <IconButton
+                                    disabled={apis && apis?.length <= 1}
                                     size="small"
                                     aria-label="delete"
                                     className="btn-delete"

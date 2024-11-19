@@ -38,10 +38,10 @@ class UserSettingService {
     SCAN_MODE: 'FULL_SCAN',
     VERSION: app.isPackaged === true ? app.getVersion() : packageJson.version,
     LNG: 'en',
-    HTTP_PROXY: null,   // [http://|https://][<username>[:<password>]@]<IP|domain_name>[:<port>]
+    HTTP_PROXY: null, // [http://|https://][<username>[:<password>]@]<IP|domain_name>[:<port>]
     HTTPS_PROXY: null,
     GRPC_PROXY: null,
-    PAC_PROXY: null,    // URL http o https
+    PAC_PROXY: null, // URL http o https
     NO_PROXY: null,
     CA_CERT: null,
     IGNORE_CERT_ERRORS: null,
@@ -59,8 +59,11 @@ class UserSettingService {
   public set(setting: Partial<IWorkspaceCfg>) {
     if (setting.LNG !== this.store.LNG) AppI18n.getI18n()?.changeLanguage(setting.LNG);
 
-    this.store = { ...this.store, ...setting };
+    if (setting.APIS.length <= 0) {
+      throw new Error('At least one API URL must be provided');
+    }
 
+    this.store = { ...this.store, ...setting };
     return this.store;
   }
 
@@ -69,7 +72,17 @@ class UserSettingService {
   }
 
   public get(): Partial<IWorkspaceCfg> {
-    return JSON.parse(JSON.stringify(this.store));
+    const settings: IWorkspaceCfg = JSON.parse(JSON.stringify(this.store));
+    // Sets the  default API KEY if no API's are set
+    if (settings.APIS.length <= 0 || settings.DEFAULT_API_INDEX <= 0) {
+      // Only sets default when no API URLS are set
+      if (settings.APIS.length <= 0) {
+        settings.APIS.push({ URL: AppConfig.API_URL, API_KEY: AppConfig.API_KEY });
+      }
+      // Be sure to set the DEFAULT_API_INDEX in 0
+      settings.DEFAULT_API_INDEX = 0;
+    }
+    return settings;
   }
 
   public getSetting(key: string) {
