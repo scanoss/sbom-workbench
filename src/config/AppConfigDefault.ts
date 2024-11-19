@@ -7,6 +7,7 @@ export const AppConfigDefault: IAppConfig = {
   ABOUT_MESSAGE: 'SBOM Workbench brings free of charge, secure and anonymous Open Source Auditing to your desktop.',
   ORGANIZATION_URL: 'https://www.scanoss.com',
   DEFAULT_WORKSPACE_NAME: 'scanoss-workspace',
+  ORGANIZATION_EMAIL: 'info@scanoss.com',
 
   // connection settings
   API_URL: 'https://api.osskb.org',

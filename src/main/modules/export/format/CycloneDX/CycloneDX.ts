@@ -1,10 +1,12 @@
 import * as CDX from '@cyclonedx/cyclonedx-library';
 import { PackageURL } from 'packageurl-js';
+import AppConfig from '../../../../../config/AppConfigModule';
 import { ExportSource } from '../../../../../api/types';
 import { Format } from '../../Format';
 import { Project } from '../../../../workspace/Project';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
 import { ExportRepository } from '../../Repository/ExportRepository';
+
 
 export abstract class CycloneDX extends Format {
   private source: string;
@@ -25,9 +27,21 @@ export abstract class CycloneDX extends Format {
   public async generate() {
     // Create CycloneDX Header
     const bom = new CDX.Models.Bom();
+    bom.metadata = new CDX.Models.Metadata({
+      authors: new CDX.Models.OrganizationalContactRepository([
+        new CDX.Models.OrganizationalContact({
+          name: AppConfig.ORGANIZATION_NAME,
+          email: AppConfig.ORGANIZATION_EMAIL,
+        }),
+      ]),
+      timestamp: new Date(),
+    });
     bom.metadata.component = new CDX.Models.Component(
       CDX.Enums.ComponentType.Application,
-      this.project.project_name,
+      this.project.metadata.getName(),
+      { version: 'NOASSERTION',
+      },
+
     );
 
     if (this.project.metadata.getLicense()) {
@@ -68,6 +82,7 @@ export abstract class CycloneDX extends Format {
         CDX.Enums.ComponentType.Library,
         c.purl,
         {
+          publisher: c.vendor ? c.vendor : 'NOASSERTION',
           purl: PackageURL.fromString(c.purl.replace('@', '%40')),
           version: c.version,
           licenses: licenseRepository,
