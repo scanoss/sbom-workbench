@@ -63,6 +63,10 @@ class UserSettingService {
       throw new Error('At least one API URL must be provided');
     }
 
+    if (setting.DEFAULT_API_INDEX < 0) {
+      throw new Error('Please choose an API endpoint from the settings menu before continuing.');
+    }
+
     this.store = { ...this.store, ...setting };
     return this.store;
   }
