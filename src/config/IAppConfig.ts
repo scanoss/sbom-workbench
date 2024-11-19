@@ -5,6 +5,7 @@ export interface IAppConfig {
   ORGANIZATION_NAME: string;
   ORGANIZATION_URL: string;
   DEFAULT_WORKSPACE_NAME: string;
+  ORGANIZATION_EMAIL: string;
 
   ABOUT_MESSAGE: string;
   DEFAULT_SETTING_NAME: string;

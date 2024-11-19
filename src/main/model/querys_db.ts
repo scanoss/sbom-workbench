@@ -388,14 +388,14 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
                 FROM dependencies
                 UNION ALL
                SELECT
-            CASE 
+            CASE
               WHEN substr(str, 1, instr(str, ',') - 1) = '' THEN 'unknown'
               ELSE substr(str, 1, instr(str, ',') - 1)
             END,
                  substr(str, instr(str, ',') + 1),
                  purl,
                  version
-                FROM split 
+                FROM split
                 WHERE str != ''
             )
             SELECT label as spdxid,purl,version
@@ -412,9 +412,9 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   IDENTIFIED_REPORT_DATA_FILES = `SELECT * FROM (SELECT  DISTINCT i.id as inventory_id, f.path, i.usage,coalesce(r.component,'') as detected_component
   ,coalesce(cv.name,'') as concluded_component, r.purl as detected_purl, cv.purl as concluded_purl,
    r.version as detected_version, cv.version as concluded_version, r.latest_version,
-     (SELECT GROUP_CONCAT(l.spdxid, ' AND ') 
-       FROM license_component_version lcv 
-       INNER JOIN licenses l ON lcv.licid = l.id 
+     (SELECT GROUP_CONCAT(l.spdxid, ' AND ')
+       FROM license_component_version lcv
+       INNER JOIN licenses l ON lcv.licid = l.id
        WHERE lcv.cvid = cv.id) AS detected_license, i.spdxid as concluded_license, cv.url
     FROM inventories i
     INNER JOIN file_inventories fi ON i.id = fi.inventoryid
@@ -426,25 +426,25 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     FROM dependencies d
     INNER JOIN files f ON d.fileId = f.fileId
     INNER JOIN component_versions cv ON cv.purl = d.purl and cv.version = d.version
-    INNER JOIN inventories i ON cv.id = i.cvid 
+    INNER JOIN inventories i ON cv.id = i.cvid
     WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0
     GROUP BY d.dependencyId)
     ORDER BY usage DESC ;`;
 
-  DETECTED_REPORT_DATA_FILES = `SELECT * FROM(  
+  DETECTED_REPORT_DATA_FILES = `SELECT * FROM(
     SELECT DISTINCT '' as inventory_id, f.path,r.idtype as usage, r.component as detected_component, '' as concluded_component,
     r.purl as detected_purl, '' as concluded_purl, r.version as detected_version, '' as concluded_version, r.latest_version,
-	(SELECT GROUP_CONCAT(l.spdxid, ' AND ') 
-       FROM license_component_version lcv 
-       INNER JOIN licenses l ON lcv.licid = l.id 
+	(SELECT GROUP_CONCAT(l.spdxid, ' AND ')
+       FROM license_component_version lcv
+       INNER JOIN licenses l ON lcv.licid = l.id
        WHERE lcv.cvid = cv.id) AS detected_license,
        '' as concluded_license,
 	  r.url
-    FROM files f 
-    INNER JOIN results r ON f.fileId = r.fileId 
+    FROM files f
+    INNER JOIN results r ON f.fileId = r.fileId
     LEFT JOIN result_license rl ON r.id = rl.resultId
 	  INNER JOIN component_versions cv ON cv.purl = r.purl AND cv.version = r.version
-    UNION 
+    UNION
     SELECT '' as inventory_id, f.path, 'dependency' as usage, d.component as detected_component, '' as concluded_component,
     d.purl as detected_purl, '' as concluded_purl, d.originalVersion as detected_version , '' as concluded_version, '' as latest_version,
     REPLACE(d.originalLicense, ',', ' | ') as detected_license, '' as concluded_license, '' as url FROM dependencies d
@@ -452,22 +452,22 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     GROUP BY d.dependencyId) as detected
     ORDER BY usage DESC;`;
 
-  DETECTED_REPORT_DATA = `SELECT DISTINCT r.component, r.purl, r.version, 
-    (SELECT GROUP_CONCAT(l.spdxid, ' AND ')  FROM license_component_version lcv 
-           INNER JOIN licenses l ON lcv.licid = l.id 
-           WHERE lcv.cvid = cv.id) AS detected_licenses, 
+  DETECTED_REPORT_DATA = `SELECT DISTINCT r.component, r.purl, r.version, r.vendor,
+    (SELECT GROUP_CONCAT(l.spdxid, ' AND ')  FROM license_component_version lcv
+           INNER JOIN licenses l ON lcv.licid = l.id
+           WHERE lcv.cvid = cv.id) AS detected_licenses,
          '' as concluded_licenses,
           r.url
         FROM results r
         INNER JOIN component_versions cv ON cv.purl = r.purl AND cv.version = r.version
-        UNION 
-    SELECT DISTINCT component, d.purl, d.originalVersion as detected_version ,  REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, '' as concluded_licenses, '' as url 
+        UNION
+    SELECT DISTINCT component, d.purl, d.originalVersion as detected_version ,null as vendor,  REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, '' as concluded_licenses, '' as url
     FROM dependencies d;`;
 
-  IDENTIFIED_REPORT_DATA = `SELECT coalesce(cv.name,'') as component, cv.purl,cv.version,
-    (SELECT GROUP_CONCAT(l.spdxid, ' AND ') 
-           FROM license_component_version lcv 
-           INNER JOIN licenses l ON lcv.licid = l.id 
+  IDENTIFIED_REPORT_DATA = `SELECT coalesce(cv.name,'') as component, cv.purl,cv.version,r.vendor,
+    (SELECT GROUP_CONCAT(l.spdxid, ' AND ')
+           FROM license_component_version lcv
+           INNER JOIN licenses l ON lcv.licid = l.id
            WHERE lcv.cvid = cv.id) AS detected_licenses, i.spdxid as concluded_licenses,
        cv.url
         FROM inventories i
@@ -477,10 +477,10 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
         INNER JOIN results r ON f.fileId = r.fileId
       GROUP BY cv.purl, cv.version, concluded_licenses
       UNION
-      SELECT cv.name as component,cv.purl,d.version as concluded_version, REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, i.spdxid as concluded_licenses, '' as url
+      SELECT cv.name as component,cv.purl,d.version as concluded_version,null as vendor,REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, i.spdxid as concluded_licenses, '' as url
       FROM dependencies d
       INNER JOIN component_versions cv ON cv.purl = d.purl and cv.version = d.version
-      INNER JOIN inventories i ON cv.id = i.cvid 
+      INNER JOIN inventories i ON cv.id = i.cvid
       WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0;`;
 
   /**
@@ -495,19 +495,19 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
  * @type {string}
  */
   SETTINGS_COMPONENTS = `SELECT purl,totalMatchedFiles, COALESCE(identifiedFiles, 0) AS identifiedFiles, COALESCE(ignoredFiles, 0) AS ignoredFiles, source FROM (
-        
+
         (SELECT r.purl,COUNT(*)as totalMatchedFiles, 'engine' as source FROM results r
         INNER JOIN files f ON r.fileId = f.fileId
         WHERE f.identified = 1  OR f.ignored = 1
         GROUP BY r.purl
         UNION
-        SELECT cv.purl , 0 as totalMatches, cv.source FROM component_versions cv 
-        WHERE cv.source = 'manual') as summary 
+        SELECT cv.purl , 0 as totalMatches, cv.source FROM component_versions cv
+        WHERE cv.source = 'manual') as summary
 
-        LEFT JOIN 
+        LEFT JOIN
 
-        (SELECT SUM(CASE WHEN cv.purl = r.purl THEN 1 ELSE 0 END) as identifiedFiles ,cv.purl as identified FROM component_versions cv 
-        INNER JOIN inventories i ON cv.id = i.cvid 
+        (SELECT SUM(CASE WHEN cv.purl = r.purl THEN 1 ELSE 0 END) as identifiedFiles ,cv.purl as identified FROM component_versions cv
+        INNER JOIN inventories i ON cv.id = i.cvid
         INNER JOIN file_inventories fi ON fi.inventoryid = i.id
         INNER JOIN files f ON f.fileId = fi.fileId
         INNER JOIN results r ON f.fileId = r.fileId
@@ -533,12 +533,12 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
  *
  */
   SETTINGS_IGNORED_COMPONENTS_FILES = `SELECT f.path, r.purl FROM files f
-    INNER JOIN results r ON f.fileId = r.fileId 
+    INNER JOIN results r ON f.fileId = r.fileId
     WHERE r.purl IN (#PLACEHOLDERS) AND f.ignored = 1;`;
 
   SETTINGS_REPLACED_COMPONENTS_FILES = `SELECT  r.purl as original, cv.purl as identified, GROUP_CONCAT(f.path, ',') as paths
       FROM component_versions cv INNER JOIN inventories i ON cv.id = i.cvid
-      INNER JOIN file_inventories fi ON fi.inventoryid = i.id 
+      INNER JOIN file_inventories fi ON fi.inventoryid = i.id
       INNER JOIN files f ON f.fileId = fi.fileId
       INNER JOIN results r ON f.fileId = r.fileId
       WHERE r.purl != cv.purl`;
