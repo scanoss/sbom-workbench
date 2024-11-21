@@ -52,11 +52,22 @@ const useStyles = makeStyles((theme) => ({
   option: {
     display: 'flex',
     flexDirection: 'column',
+    gap: 3,
     padding: 6,
     '& span.middle': {
       fontSize: '0.8rem',
       color: '#6c6c6e',
     },
+  },
+  key: {
+    textAlign: 'center',
+    verticalAlign: 'center',
+    marginLeft: '5px',
+    letterSpacing: 2,
+    padding: '4px 3px 2px 4px',
+    borderRadius: '4px',
+    backgroundColor: '#eef2ff',
+    fontSize: '0.6rem',
   },
 }));
 
@@ -310,7 +321,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                             }
 
                             // Regular option
-                            return `${option.URL} ${option.API_KEY ? `(${option.API_KEY})` : ''}`;
+                            return `${option.URL} ${option.API_KEY ? `(${'*'.repeat(8)})` : ''}`;
                           }}
                           renderOption={(props, option) => {
                             if (option.new) {
@@ -327,9 +338,11 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                                   <div className={classes.option}>
                                     <span>{option.URL}</span>
                                     {option.API_KEY && (
-                                      <span className="middle">
-                                        API KEY:
-                                        {option.API_KEY}
+                                      <span className="middle">API KEY:
+                                        <span
+                                          className={`${classes.key}`}
+                                        >{'*'.repeat(8)}
+                                        </span>
                                       </span>
                                     )}
                                   </div>
