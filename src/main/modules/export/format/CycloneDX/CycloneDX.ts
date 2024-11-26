@@ -82,7 +82,7 @@ export abstract class CycloneDX extends Format {
         CDX.Enums.ComponentType.Library,
         c.purl,
         {
-          publisher: c.vendor ? c.vendor : 'NOASSERTION',
+          publisher: c.vendor ? c.vendor : (PackageURL.fromString(c.purl).namespace || 'NOASSERTION'),
           purl: PackageURL.fromString(c.purl.replace('@', '%40')),
           version: c.version,
           licenses: licenseRepository,
