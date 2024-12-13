@@ -37,180 +37,88 @@ describe('export tests', () => {
   });
 
   it('should generate a valid settings file', async () => {
-    exportRepositoryMock.setMockData({ settingsComponentData: [
-      { purl: 'pkg:github/scanoss/engine', totalMatchedFiles: 1, identifiedFiles: 0, ignoredFiles: 1, source: 'engine' },
-      { purl: 'pkg:github/scanoss/scanner.c', totalMatchedFiles: 12, identifiedFiles: 12, ignoredFiles: 1, source: 'engine' },
-      { purl: 'pkg:github/scanoss/minr', totalMatchedFiles: 2, identifiedFiles: 0, ignoredFiles: 0, source: 'engine' },
-      { purl: 'pkg:github/scanoss/scanoss.java', totalMatchedFiles: 1, identifiedFiles: 0, ignoredFiles: 1, source: 'engine' },
-      { purl: 'test', totalMatchedFiles: 0, identifiedFiles: 1, ignoredFiles: 0, source: 'manual' },
-    ],
-    settingsFileData: [
-      { path: '/external/inc/json.h', purl: 'pkg:github/scanoss/scanner.c' },
-    ],
-    });
+    exportRepositoryMock.setDecisionMockData([
+      {
+        identifiedAs: 'pkg:github/scanoss/engine',
+        original: 'pkg:github/scanoss/scanner.c',
+        path: '.git/external/applypatch-msg.sample',
+        type: 'FILTERED',
+        identified: 0,
+        ignored: 1,
+      },
+      {
+        identifiedAs: 'pkg:github/scanoss/scanner.c',
+        original: 'pkg:github/scanoss/scanner.c',
+        path: '.git/spdx.json',
+        type: 'FILTERED',
+        identified: 1,
+        ignored: 0,
+      },
+      {
+        identifiedAs: 'pkg:github/scanoss/engine',
+        original: 'pkg:github/scanoss/scanner.c',
+        path: '.git/hooks/commit-msg.sample',
+        type: 'FILTERED',
+        identified: 1,
+        ignored: 0,
+      },
+      {
+        identifiedAs: 'pkg:github/scanoss/engine',
+        original: 'pkg:github/scanoss/scanner.c',
+        path: '.git/hooks/fsmonitor-watchman.sample',
+        type: 'MATCH',
+        identified: 1,
+        ignored: 0,
+      },
+      {
+        identifiedAs: 'pkg:github/scanoss/engine',
+        original: 'pkg:github/scanoss/scanner.c',
+        path: '.git/hooks/scanner.c',
+        type: 'MATCH',
+        identified: 1,
+        ignored: 0,
+      },
+      {
+        identifiedAs: 'pkg:github/scanoss/engine',
+        original: 'pkg:github/scanoss/scanner.c',
+        path: 'status.md',
+        type: 'FILTERED',
+        identified: 0,
+        ignored: 1,
+      },
+    ]);
+    settingsFormat = new Settings(ExportSource.IDENTIFIED, exportRepositoryMock);
+    const settings = await settingsFormat.generate();
 
-    const expectedOutput = { bom: {
-      include: [
-        {
-          purl: 'pkg:github/scanoss/scanner.c',
-        },
-        {
-          purl: 'test',
-        },
-      ],
-      remove: [
-        {
-          purl: 'pkg:github/scanoss/engine',
-        },
-        {
-          purl: 'pkg:github/scanoss/scanoss.java',
-        },
-        {
-          path: '/external/inc/json.h',
-          purl: 'pkg:github/scanoss/scanner.c',
-        },
-      ],
-      replace: [],
-    },
-    };
 
-    const scanossJson = await settingsFormat.generate();
-    expect(scanossJson).toEqual(JSON.stringify(expectedOutput, null, 2));
-  });
-
-  it('Should generate settings file with populated include and empty remove arrays', async () => {
-    exportRepositoryMock.setMockData({ settingsComponentData: [
-      { purl: 'pkg:github/scanoss/engine', totalMatchedFiles: 1, identifiedFiles: 1, ignoredFiles: 0, source: 'engine' },
-      { purl: 'pkg:github/scanoss/scanner.c', totalMatchedFiles: 12, identifiedFiles: 12, ignoredFiles: 1, source: 'engine' },
-      { purl: 'pkg:github/scanoss/minr', totalMatchedFiles: 2, identifiedFiles: 0, ignoredFiles: 0, source: 'engine' },
-      { purl: 'pkg:github/scanoss/scanoss.java', totalMatchedFiles: 1, identifiedFiles: 1, ignoredFiles: 0, source: 'engine' },
-      { purl: 'test', totalMatchedFiles: 0, identifiedFiles: 1, ignoredFiles: 0, source: 'manual' },
-    ],
-    });
-
-    const expectedOutput = {
+    expect(JSON.parse(JSON.stringify(settings))).toEqual({
       bom: {
         include: [
           {
-            purl: 'pkg:github/scanoss/engine',
-          },
-          {
+            path: '.git/spdx.json',
             purl: 'pkg:github/scanoss/scanner.c',
           },
-          {
-            purl: 'pkg:github/scanoss/scanoss.java',
-          },
-          {
-            purl: 'test',
-          },
         ],
-        remove: [],
-        replace: [],
-      },
-    };
-    const scanossJson = await settingsFormat.generate();
-    expect(scanossJson).toEqual(JSON.stringify(expectedOutput, null, 2));
-    expect(JSON.parse(scanossJson).bom.remove.length).toEqual(0);
-  });
-
-  it('Should generate settings file with populated remove and empty include arrays', async () => {
-    exportRepositoryMock.setMockData({ settingsComponentData: [
-      { purl: 'pkg:github/scanoss/engine', totalMatchedFiles: 1, identifiedFiles: 0, ignoredFiles: 1, source: 'engine' },
-      { purl: 'pkg:github/scanoss/scanner.c', totalMatchedFiles: 12, identifiedFiles: 0, ignoredFiles: 12, source: 'engine' },
-      { purl: 'pkg:github/scanoss/minr', totalMatchedFiles: 2, identifiedFiles: 0, ignoredFiles: 2, source: 'engine' },
-      { purl: 'pkg:github/scanoss/scanoss.java', totalMatchedFiles: 1, identifiedFiles: 0, ignoredFiles: 1, source: 'engine' },
-    ],
-    });
-
-    const expectedOutput = {
-      bom: {
-        include: [],
         remove: [
           {
-            purl: 'pkg:github/scanoss/engine',
-          },
-          {
+            path: '.git/external',
             purl: 'pkg:github/scanoss/scanner.c',
           },
           {
-            purl: 'pkg:github/scanoss/minr',
-          },
-          {
-            purl: 'pkg:github/scanoss/scanoss.java',
+            path: 'status.md',
+            purl: 'pkg:github/scanoss/scanner.c',
           },
         ],
-        replace: [],
+        replace: [
+          {
+            paths: [
+              '.git/hooks',
+            ],
+            purl: 'pkg:github/scanoss/scanner.c',
+            replace_with: 'pkg:github/scanoss/engine',
+          },
+        ],
       },
-    };
-    const scanossJson = await settingsFormat.generate();
-    expect(scanossJson).toEqual(JSON.stringify(expectedOutput, null, 2));
-    expect(JSON.parse(scanossJson).bom.include.length).toEqual(0);
-  });
-
-  it('Should generate a seetings file with empty include and remove arrays', async () => {
-    const expectedOutput = {
-      bom: {
-        include: [],
-        remove: [],
-        replace: [],
-      },
-    };
-    const scanossJson = await settingsFormat.generate();
-    expect(scanossJson).toEqual(JSON.stringify(expectedOutput, null, 2));
-    expect(JSON.parse(scanossJson).bom.include.length).toEqual(0);
-    expect(JSON.parse(scanossJson).bom.remove.length).toEqual(0);
-  });
-
-  it('Should create a settings file with an entry in the replaced array', async () => {
-    exportRepositoryMock.setMockData({ settingsComponentData: [
-      { purl: 'pkg:github/scanoss/engine', totalMatchedFiles: 1, identifiedFiles: 0, ignoredFiles: 1, source: 'engine' },
-      { purl: 'pkg:github/scanoss/scanner.c', totalMatchedFiles: 12, identifiedFiles: 14, ignoredFiles: 1, source: 'engine' },
-      { purl: 'pkg:github/scanoss/minr', totalMatchedFiles: 2, identifiedFiles: 0, ignoredFiles: 0, source: 'engine' },
-      { purl: 'pkg:github/scanoss/scanoss.java', totalMatchedFiles: 1, identifiedFiles: 0, ignoredFiles: 1, source: 'engine' },
-      { purl: 'test', totalMatchedFiles: 0, identifiedFiles: 1, ignoredFiles: 0, source: 'manual' },
-    ],
-    settingsDetectedComponentData: [
-      { paths: ['/external/inc/json.h', 'pkg:github/scanoss/scanner.c'],
-        identified: 'pkg:github/scanoss/scanner.c',
-        original: 'pkg:github/scanoss/minr',
-      }],
-    settingsFileData: [
-      { path: '/external/inc/json.h', purl: 'pkg:github/scanoss/scanner.c' },
-    ],
     });
-
-    const expectedOutput = { bom: {
-      include: [
-        {
-          purl: 'pkg:github/scanoss/scanner.c',
-        },
-        {
-          purl: 'test',
-        },
-      ],
-      remove: [
-        {
-          purl: 'pkg:github/scanoss/engine',
-        },
-        {
-          purl: 'pkg:github/scanoss/scanoss.java',
-        },
-        {
-          path: '/external/inc/json.h',
-          purl: 'pkg:github/scanoss/scanner.c',
-        },
-      ],
-      replace: [
-        {
-          paths: ['/external/inc/json.h', 'pkg:github/scanoss/scanner.c'],
-          replace_with: 'pkg:github/scanoss/scanner.c',
-          purl: 'pkg:github/scanoss/minr',
-        },
-      ],
-    },
-    };
-
-    const scanossJson = await settingsFormat.generate();
-    expect(scanossJson).toEqual(JSON.stringify(expectedOutput, null, 2));
   });
 });

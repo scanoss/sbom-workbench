@@ -25,7 +25,7 @@ export class BomLeafProcessor {
      * @param node The leaf node to process
      *
      */
-  public generateBom(node: Leaf) {
+  private generateBom(node: Leaf) {
     const identified = node.getIdentified();
     const ignored = node.getIgnore();
     const matchedPurl = node.getMatchedPurl();

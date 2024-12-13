@@ -1,66 +1,39 @@
 import { ExportRepository } from '../../main/modules/export/Repository/ExportRepository';
 import { ExportComponentData } from '../../main/model/interfaces/report/ExportComponentData';
-import { SettingsComponentData, SettingsFileData, SettingsReplacedComponentFileData } from '../../main/model/interfaces/report/SettingsReport';
+import { DecisionData } from '../../main/model/interfaces/report/DecisionData';
 
 export class ExportRepositoryMock implements ExportRepository {
-  private mockData: {
-    identifiedData?: ExportComponentData[];
-    detectedData?: ExportComponentData[];
-    rawData?: any;
-    wfpData?: string;
-    settingsComponentData?: Array<SettingsComponentData>;
-    settingsFileData?: Array<SettingsFileData>;
-    settingsDetectedComponentData?:Array<SettingsReplacedComponentFileData>
-  } = {};
 
-  constructor(mockData: Partial<ExportRepositoryMock['mockData']> = {}) {
-    this.mockData = mockData;
-    this.mockData.settingsComponentData = [];
-    this.mockData.settingsFileData = [];
-    this.mockData.settingsDetectedComponentData = [];
+  private mockDecisionData: Array<DecisionData>;
+
+
+  constructor() {
+    this.mockDecisionData = [];
   }
 
-  public setMockData(newMockData: Partial<ExportRepositoryMock['mockData']>) {
-    this.mockData = { ...this.mockData, ...newMockData };
+  public setDecisionMockData(data: Array<DecisionData>) {
+    this.mockDecisionData = data;
   }
 
-  public async getIdentifiedData(): Promise<ExportComponentData[]> {
-    return new Promise<Array<ExportComponentData>>((resolve) => {
-      resolve(this.mockData.identifiedData);
+
+  public async getDecisionData(): Promise<Array<DecisionData>> {
+    return new Promise<Array<DecisionData>>((resolve) => {
+      resolve(this.mockDecisionData);
     });
   }
 
-  public async getDetectedData(): Promise<ExportComponentData[]> {
-    return new Promise<Array<ExportComponentData>>((resolve) => {
-      resolve(this.mockData.detectedData);
-    });
+  getDetectedData(): Promise<ExportComponentData[]> {
+    return Promise.resolve([]);
   }
 
-  public getRawData() {
-    return this.mockData.rawData;
+  getIdentifiedData(): Promise<ExportComponentData[]> {
+    return Promise.resolve([]);
   }
 
-  public getWfpData(): Promise<string> {
-    return new Promise<string>((resolve) => {
-      resolve(this.mockData.wfpData);
-    });
+  getRawData() {
   }
 
-  public getSettingsComponents(): Promise<Array<SettingsComponentData>> {
-    return new Promise<Array<SettingsComponentData>>((resolve) => {
-      resolve(this.mockData.settingsComponentData);
-    });
-  }
-
-  public getSettingsIgnoredComponentFiles(purls: Array<string>): Promise<Array<SettingsFileData>> {
-    return new Promise<Array<SettingsFileData>>((resolve) => {
-      resolve(this.mockData.settingsFileData);
-    });
-  }
-
-  public async getSettingsReplacedComponentFiles(): Promise<Array<SettingsReplacedComponentFileData>> {
-    return new Promise<Array<SettingsReplacedComponentFileData>>((resolve) => {
-      resolve(this.mockData.settingsDetectedComponentData);
-    });
+  getWfpData(): Promise<string> {
+    return Promise.resolve('');
   }
 }
