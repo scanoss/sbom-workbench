@@ -1,6 +1,5 @@
 import sqlite3 from 'sqlite3';
 import util from 'util';
-import { SettingsComponentData, SettingsFileData, SettingsReplacedComponentFileData } from '../../interfaces/report/SettingsReport';
 import { Model } from '../../Model';
 import { queries } from '../../querys_db';
 import { LicenseReport } from '../../../services/ReportService';
@@ -8,6 +7,7 @@ import { After } from '../../hooks/after/afterHook';
 import { detectedLicenseSummaryAdapter } from '../../adapters/report/detectedLicenseSummaryAdapter';
 import { DataRecord } from '../../interfaces/report/DataRecord';
 import { ExportComponentData } from '../../interfaces/report/ExportComponentData';
+import { DecisionData } from '../../interfaces/report/DecisionData';
 
 export class ReportModel extends Model {
   private connection: sqlite3.Database;
@@ -68,22 +68,8 @@ export class ReportModel extends Model {
     return call(queries.SQL_IDENTIFIED_REPORT_LICENSE_COMPONENT_SUMMARY);
   }
 
-  public async getSettingsComponents(): Promise<Array<SettingsComponentData>> {
+  public async getDecisionData(): Promise<Array<DecisionData>> {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
-    return call(queries.SETTINGS_COMPONENTS);
-  }
-
-  public async getSettingsIgnoredComponentFiles(purls: Array<string>): Promise<Array<SettingsFileData>> {
-    const call:any = util.promisify(this.connection.all.bind(this.connection));
-    const query = queries.SETTINGS_IGNORED_COMPONENTS_FILES.replace('#PLACEHOLDERS', purls.map(() => '?').join(','));
-    return call(query, ...purls);
-  }
-
-  public async getSettingsReplacedComponentFiles(): Promise<Array<SettingsReplacedComponentFileData>> {
-    const call:any = util.promisify(this.connection.all.bind(this.connection));
-    const data = await call(queries.SETTINGS_REPLACED_COMPONENTS_FILES);
-    return data.map((c) => {
-      return { ...c, paths: c.paths?.split(',') };
-    });
+    return call(queries.SQL_DECISION_DATA);
   }
 }

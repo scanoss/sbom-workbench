@@ -1,6 +1,6 @@
 import { ExportSource } from '../../api/types';
 import { ExportRepositoryMock } from './ExportRepositoryMock';
-import { Settings } from '../../main/modules/export/format/Settings';
+import { Settings } from '../../main/modules/export/format/Settings/Settings';
 
 jest.mock('electron', () => ({
   app: {

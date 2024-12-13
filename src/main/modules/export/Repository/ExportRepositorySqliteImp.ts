@@ -1,10 +1,10 @@
 import fs from 'fs';
 import { FileUsageType } from '@api/types';
-import { SettingsComponentData, SettingsFileData, SettingsReplacedComponentFileData } from '../../../model/interfaces/report/SettingsReport';
 import { workspace } from '../../../workspace/Workspace';
 import { modelProvider } from '../../../services/ModelProvider';
 import { ExportComponentData } from '../../../model/interfaces/report/ExportComponentData';
 import { ExportRepository } from './ExportRepository';
+import { DecisionData } from '../../../model/interfaces/report/DecisionData';
 
 export interface ExportData {
   inventoryId: number;
@@ -45,15 +45,8 @@ export class ExportRepositorySqliteImp implements ExportRepository {
     return data;
   }
 
-  public async getSettingsComponents(): Promise<Array<SettingsComponentData>> {
-    return modelProvider.model.report.getSettingsComponents();
+  public async getDecisionData(): Promise<Array<DecisionData>> {
+    return modelProvider.model.report.getDecisionData();
   }
 
-  public async getSettingsIgnoredComponentFiles(purls: Array<string>): Promise<Array<SettingsFileData>> {
-    return modelProvider.model.report.getSettingsIgnoredComponentFiles(purls);
-  }
-
-  public async getSettingsReplacedComponentFiles(): Promise<Array<SettingsReplacedComponentFileData>> {
-    return modelProvider.model.report.getSettingsReplacedComponentFiles();
-  }
 }

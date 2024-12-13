@@ -1,12 +1,10 @@
 import { ExportComponentData } from '../../../model/interfaces/report/ExportComponentData';
-import { SettingsComponentData, SettingsFileData, SettingsReplacedComponentFileData } from '../../../model/interfaces/report/SettingsReport';
+import { DecisionData } from '../../../model/interfaces/report/DecisionData';
 
 export interface ExportRepository {
   getIdentifiedData(): Promise<ExportComponentData[]>;
   getDetectedData(): Promise<ExportComponentData[]>;
   getRawData();
   getWfpData(): Promise<string>;
-  getSettingsComponents(): Promise<Array<SettingsComponentData>>;
-  getSettingsIgnoredComponentFiles(purls: Array<string>): Promise<Array<SettingsFileData>>;
-  getSettingsReplacedComponentFiles(): Promise<Array<SettingsReplacedComponentFileData>>;
+  getDecisionData(): Promise<Array<DecisionData>>;
 }
