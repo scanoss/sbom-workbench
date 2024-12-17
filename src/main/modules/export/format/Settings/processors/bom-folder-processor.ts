@@ -1,3 +1,4 @@
+import path from 'path';
 import DecisionNode from '../identification-tree/decision-node';
 import { Bom, BomItem, ReplaceBomItem } from '../types';
 import { Folder } from '../identification-tree/folder';
@@ -31,7 +32,7 @@ export class BomFolderProcessor {
     const { purl: original, replace_with: replaced } = node.getBom().replace[0];
     const replace: boolean = node.getBom().replace.every((item: ReplaceBomItem) => item.purl === original
             && item.replace_with === replaced);
-    if (replace) node.getBom().replace = [{ paths: [node.getPath()], purl: original, replace_with: replaced }];
+    if (replace) node.getBom().replace = [{ path: node.getPath(), purl: original, replace_with: replaced }];
   }
 
   /**
@@ -45,29 +46,6 @@ export class BomFolderProcessor {
       bom.remove.length > 0,
       bom.replace.length > 0,
     ].filter(Boolean).length > 1;
-  }
-
-  /**
-   * Consolidates replace directives by merging paths for items with the same PURL and replacement.
-   * @param node - The folder node whose replace directives should be merged
-   */
-  public mergeReplacedPaths(node: Folder) {
-    const replaced = node.getBom().replace;
-
-    const replacedMapper = new Map();
-    replaced.forEach((item: ReplaceBomItem) => {
-      const key = `${item.purl}@${item.replace_with}`;
-      const existingItem = replacedMapper.get(key);
-
-      if (existingItem) {
-        existingItem.paths = [...existingItem.paths, ...item.paths];
-      } else {
-        replacedMapper.set(key, { ...item });
-      }
-    });
-
-    if (replacedMapper.size <= 0) return;
-    node.bom.replace = Array.from(replacedMapper.values());
   }
 
   /**
@@ -89,6 +67,5 @@ export class BomFolderProcessor {
 
   public process(node: Folder) {
     this.sanitizeBom(node);
-    this.mergeReplacedPaths(node);
   }
 }

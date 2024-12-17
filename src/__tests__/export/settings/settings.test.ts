@@ -73,7 +73,7 @@ describe('export settings tests', () => {
     expect(bom).toEqual({
       include: [],
       remove: [],
-      replace: [{ paths: ['scanner.c'], purl: 'pkg:github/scanoss/scanner.c', replace_with: 'pkg:github/scanoss/engine' }],
+      replace: [{ path: 'scanner.c', purl: 'pkg:github/scanoss/scanner.c', replace_with: 'pkg:github/scanoss/engine' }],
     });
   });
 
@@ -158,7 +158,7 @@ describe('export settings tests', () => {
       remove: [],
       replace: [
         {
-          paths: ['src'],
+          path: 'src',
           purl: 'pkg:github/scanoss/scanner.c',
           replace_with: 'pkg:github/scanoss/engine',
         },
@@ -194,9 +194,7 @@ describe('export settings tests', () => {
       ],
       replace: [
         {
-          paths: [
-            'src/scanner.h',
-          ],
+          path: 'src/scanner.h',
           purl: 'pkg:github/scanoss/scanner.c',
           replace_with: 'pkg:github/scanoss/engine',
         },
@@ -282,9 +280,7 @@ describe('export settings tests', () => {
       remove: [],
       replace: [
         {
-          paths: [
-            'main',
-          ],
+          path: 'main',
           purl: 'pkg:github/scanoss/scanner.c',
           replace_with: 'pkg:github/scanoss/engine',
         },
@@ -328,9 +324,7 @@ describe('export settings tests', () => {
       ],
       replace: [
         {
-          paths: [
-            'main/src/scanner.c',
-          ],
+          path: 'main/src/scanner.c',
           purl: 'pkg:github/scanoss/scanner.c',
           replace_with: 'pkg:github/scanoss/engine',
         },
@@ -400,7 +394,6 @@ describe('export settings tests', () => {
     ]);
     settingsFormat = new Settings(ExportSource.IDENTIFIED, exportRepositoryMock);
     const settings = await settingsFormat.generate();
-    console.log(settings);
     expect(JSON.parse(settings)).toEqual({
       bom: {
         include: [
@@ -421,10 +414,12 @@ describe('export settings tests', () => {
         ],
         replace: [
           {
-            paths: [
-              '.git/hooks',
-              'inc',
-            ],
+            path: '.git/hooks',
+            purl: 'pkg:github/scanoss/scanner.c',
+            replace_with: 'pkg:github/scanoss/engine',
+          },
+          {
+            path: 'inc',
             purl: 'pkg:github/scanoss/scanner.c',
             replace_with: 'pkg:github/scanoss/engine',
           },

@@ -51,7 +51,7 @@ export class BomLeafProcessor {
       node.setBom({
         include: [],
         remove: [],
-        replace: [{ paths: [node.getPath()], replace_with: identifiedPurl, purl: matchedPurl }] });
+        replace: [{ path: node.getPath(), replace_with: identifiedPurl, purl: matchedPurl }] });
       return;
     }
 

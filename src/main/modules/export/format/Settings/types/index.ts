@@ -9,8 +9,6 @@ export interface BomItem {
   path?: string;
 }
 
-export interface ReplaceBomItem {
-  purl: string;
+export interface ReplaceBomItem extends BomItem {
   replace_with: string;
-  paths: string[];
 }

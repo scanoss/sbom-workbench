@@ -492,7 +492,8 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   LEFT JOIN file_inventories fi ON fi.fileId = f.fileId
   LEFT JOIN inventories i ON i.id = fi.inventoryId
   LEFT JOIN component_versions cv ON cv.id = i.cvid
-  LEFT JOIN results r ON r.fileId = f.fileId;`;
+  LEFT JOIN results r ON r.fileId = f.fileId
+  WHERE f.fileId NOT IN (SELECT d.fileId FROM dependencies d);`;
 }
 
 export const queries = new Queries();
