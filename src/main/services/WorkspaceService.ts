@@ -1,6 +1,6 @@
 import { BrowserWindow, RelaunchOptions, app } from 'electron';
 import { userSettingService } from './UserSettingService';
-import { getContextFiles } from './utils/workspace';
+import { getContextFiles, getScanossSettingsFilePath } from './utils/workspace';
 import { modelProvider } from './ModelProvider';
 import { GroupSearchKeyword } from '../../api/types';
 import { GroupSearchKeywordDTO } from '@api/dto';
@@ -62,6 +62,10 @@ class WorkspaceService {
     const newGroups = modelProvider.workspace.groupKeywoard.delete(id);
     await modelProvider.workspace.destroy();
     return deletedGroup;
+  }
+
+  public async getScanossSettingFilePath(scanRoot: string): Promise<string> {
+    return getScanossSettingsFilePath(scanRoot);
   }
 }
 

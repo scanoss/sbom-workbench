@@ -104,6 +104,14 @@ class WorkspaceService extends BaseService {
     );
     return this.response(response);
   }
+
+  public async getScanossSettingsFilePath(scanRoot: string): Promise<string> {
+    const response = await window.electron.ipcRenderer.invoke(
+      IpcChannels.WORKSPACE_SCANOSS_SETTING_FILE,
+      scanRoot,
+    );
+    return this.response(response);
+  }
 }
 
 export const workspaceService = new WorkspaceService();

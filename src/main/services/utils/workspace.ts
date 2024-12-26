@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 
 export function isIdentifyFile(file: string) {
   const pattern = /sbom\.json/i;
@@ -53,4 +54,15 @@ export async function getContextFiles(scanRoot: string) {
     identifyFile: identifyFiles.length > 0 ? identifyFiles[0] : null,
     ignoreFile: ignoreFiles.length > 0 ? ignoreFiles[0] : null,
   };
+}
+
+export async function getScanossSettingsFilePath(scanRoot: string) {
+  const stats = await fs.promises.stat(scanRoot);
+  const isDirectory = stats.isDirectory();
+
+  if (!isDirectory) return null;
+
+  const files = await fs.promises.readdir(scanRoot);
+  if ((files.some((file) => file === 'scanoss.json'))) return 'scanoss.json';
+  return null;
 }
