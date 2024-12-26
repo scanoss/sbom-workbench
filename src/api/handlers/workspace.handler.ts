@@ -169,3 +169,16 @@ api.handle(IpcChannels.WORKSPACE_DELETE_SEARCH_GROUP, async (_event, id: number)
     return Response.fail({ message: e.message });
   }
 });
+
+api.handle(IpcChannels.WORKSPACE_SCANOSS_SETTING_FILE, async (_event, scanRoot: string) => {
+  try {
+    const scanossSettingsFilePath = await workspaceService.getScanossSettingFilePath(scanRoot);
+    return Response.ok({
+      message: 'Context files retrieved successfully',
+      data: scanossSettingsFilePath,
+    });
+  } catch (e: any) {
+    log.error('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});

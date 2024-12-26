@@ -69,7 +69,6 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
       ScannerEvents.RESULTS_APPENDED,
       (response, filesNotScanned) => {
         this.project.processedFiles += response.getNumberOfFilesScanned();
-        this.project.tree.attachResults(response.getServerResponse());
 
         Object.assign(
           this.project.filesNotScanned,
@@ -100,6 +99,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
   public async done() {
     const resultPath = `${this.project.getMyPath()}/result.json`;
     const result: Record<any, any> = await utilModel.readFile(resultPath);
+    this.project.tree.attachResults(result);
     for (const [key, value] of Object.entries(result)) {
       if (!key.startsWith('/')) {
         result[`/${key}`] = value;

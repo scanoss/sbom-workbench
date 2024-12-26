@@ -1,8 +1,13 @@
 import { SbomMode, ScannerInput, WinnowingMode } from 'scanoss';
 import fs from 'fs';
-import { getContextFiles } from '../../../services/utils/workspace';
+import log from 'electron-log';
+import {
+  getContextFiles,
+  getScanossSettingsFilePath,
+} from '../../../services/utils/workspace';
 import { IScannerInputAdapter } from './IScannerInputAdapter';
 import { Project } from '../../../workspace/Project';
+import path from 'path';
 
 export class CodeScannerInputAdapter implements IScannerInputAdapter {
   async adapterToScannerInput(project: Project, filesToScan: Record<string, string>): Promise<Array<ScannerInput>> {
@@ -39,6 +44,17 @@ export class CodeScannerInputAdapter implements IScannerInputAdapter {
 
     // Allows to ignore a list of components from a SBOM place in the root folder
     const rootPath = project.getScanRoot();
+
+    const scanossSettingsPath = await getScanossSettingsFilePath(rootPath);
+    if (scanossSettingsPath) {
+      log.info('[ SCAN ] - Loading scanoss.json file');
+      const scanossSettings = JSON.parse(await fs.promises.readFile(path.join(rootPath, scanossSettingsPath), 'utf8'));
+      result.forEach((_, index, arr) => {
+        arr[index].settings = scanossSettings;
+        arr[index].sbomMode = SbomMode.SBOM_IDENTIFY;
+      });
+      return result;
+    }
 
     let sbom = '';
     let sbomMode = SbomMode.SBOM_IDENTIFY;
