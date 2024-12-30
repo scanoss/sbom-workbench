@@ -33,7 +33,6 @@ import { Scanner } from '../../../../../main/task/scanner/types';
 import ScannerSource = Scanner.ScannerSource;
 import ScannerType = Scanner.ScannerType;
 
-
 const useStyles = makeStyles((theme) => ({
   size: {
     '& .MuiDialog-paperWidthMd': {
@@ -346,17 +345,12 @@ const ProjectSettings = () => {
                             {apis.slice(1).map((api) => (
                               <MenuItem value={api} key={api.key}>
                                 <span>
-                                  API URL:
-                                  {' '}
                                   {api.URL}
                                 </span>
                                 {api.API_KEY && (
-                                  <span className="api_key">
-                                    {' '}
-                                    - API KEY:
-                                    {' '}
-                                    {api.API_KEY}
-                                  </span>
+                                    <span className="pl-1" style={{ color: '#6c6c6e' }}>
+                                      {`(${('*'.repeat(8))})`}
+                                    </span>
                                 )}
                               </MenuItem>
                             ))}
