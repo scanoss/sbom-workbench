@@ -17,7 +17,7 @@ import { CycloneDXDetected } from '../../modules/export/format/CycloneDX/Cyclone
 import { CycloneDXIdentified } from '../../modules/export/format/CycloneDX/CycloneDxIdentified';
 import { SpdxLiteDetected } from '../../modules/export/format/SPDXLite/SpdxLiteDetected';
 import { SpdxLiteIdentified } from '../../modules/export/format/SPDXLite/SpdxLiteIdentified';
-import { Settings } from '../../modules/export/format/Settings';
+import { Settings } from '../../modules/export/format/Settings/Settings';
 
 export class Export implements ITask<string, IExportResult> {
   private format: Format;

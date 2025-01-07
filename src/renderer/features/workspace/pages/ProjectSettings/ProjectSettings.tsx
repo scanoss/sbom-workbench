@@ -32,8 +32,6 @@ import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 import { Scanner } from '../../../../../main/task/scanner/types';
 import ScannerSource = Scanner.ScannerSource;
 import ScannerType = Scanner.ScannerType;
-import { app } from 'electron';
-import { windowsStore } from 'process';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -73,6 +71,7 @@ const ProjectSettings = () => {
   const [licenses, setLicenses] = useState([]);
   const [apis, setApis] = useState([]);
   const [context, setContext] = useState<ContextFiles>(null);
+  const [scanossSettingFilePath, setScanossSettingFilePath] = useState<string>(null);
 
   const [projectSettings, setProjectSettings] = useState<INewProject>({
     name: '',
@@ -131,6 +130,8 @@ const ProjectSettings = () => {
     const { path } = scanPath;
     const nContext = await workspaceService.contextFiles(path);
     setContext(nContext);
+    const scanossSettingsFilePath = await workspaceService.getScanossSettingsFilePath(path);
+    setScanossSettingFilePath(scanossSettingsFilePath);
   };
 
   const onOpenWorkRoot = () => {
@@ -140,7 +141,8 @@ const ProjectSettings = () => {
 
   const onOpenFile = (filepath: string) => {
     const { path } = scanPath;
-    window.shell.showItemInFolder(path + window.path.sep + filepath);
+    const absolutePath = window.path.resolve(path, filepath);
+    window.shell.openPath(absolutePath);
   };
 
   const onReload = () => getContextInfo();
@@ -343,17 +345,12 @@ const ProjectSettings = () => {
                             {apis.slice(1).map((api) => (
                               <MenuItem value={api} key={api.key}>
                                 <span>
-                                  API URL:
-                                  {' '}
                                   {api.URL}
                                 </span>
                                 {api.API_KEY && (
-                                  <span className="api_key">
-                                    {' '}
-                                    - API KEY:
-                                    {' '}
-                                    {api.API_KEY}
-                                  </span>
+                                    <span className="pl-1" style={{ color: '#6c6c6e' }}>
+                                      {`(${('*'.repeat(8))})`}
+                                    </span>
                                 )}
                               </MenuItem>
                             ))}
@@ -432,7 +429,7 @@ const ProjectSettings = () => {
 
             <div className="grid-item">
               <div className="context-files-info">
-                { context && !context.identifyFile && !context.ignoreFile && (
+                { context && !context.identifyFile && !context.ignoreFile && !scanossSettingFilePath && (
                   <Alert
                     severity="info"
                     action={(
@@ -445,19 +442,25 @@ const ProjectSettings = () => {
                   </Alert>
                 )}
 
-                { context && (context.identifyFile) && (
+                { scanossSettingFilePath && (
+                  <Alert severity="success">
+                    A SCANOSS settings file was found (<Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(scanossSettingFilePath)}>{scanossSettingFilePath}</Link>). It will be used to enhance the scan results.
+                  </Alert>
+                )}
+
+                { !scanossSettingFilePath && context && (context.identifyFile) && (
                   <Alert severity="success">
                     A context file was found (<Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(context.identifyFile)}>{context.identifyFile}</Link>). It will be used to enhance the scan results.
                   </Alert>
                 )}
 
-                { context && (context.ignoreFile) && (
+                { !scanossSettingFilePath && context && (context.ignoreFile) && (
                   <Alert severity="success">
                     An ignore file was found (<Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(context.ignoreFile)}>{context.ignoreFile}</Link>). It will be used to avoid specific  results.
                   </Alert>
                 )}
 
-                { context && context.identifyFile && context.ignoreFile && (
+                { !scanossSettingFilePath && context && context.identifyFile && context.ignoreFile && (
                   <Alert severity="warning">
                     The identified context file takes precedence over the ignore file.
                   </Alert>

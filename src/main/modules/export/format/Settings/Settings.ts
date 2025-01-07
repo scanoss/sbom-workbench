@@ -1,7 +1,8 @@
-import { ExportSource } from '../../../../api/types';
-import { Format } from '../Format';
-import { ExportRepositorySqliteImp } from '../Repository/ExportRepositorySqliteImp';
-import { ExportRepository } from '../Repository/ExportRepository';
+import { ExportSource } from '../../../../../api/types';
+import { Format } from '../../Format';
+import { ExportRepositorySqliteImp } from '../../Repository/ExportRepositorySqliteImp';
+import { ExportRepository } from '../../Repository/ExportRepository';
+import { DecisionTree } from './identification-tree/decision-tree';
 
 /**
  * Represents a component in the SCANOSS JSON output.
@@ -60,38 +61,11 @@ export class Settings extends Format {
    * @returns {Promise<string>} A promise that resolves to the stringified SCANOSS JSON output
    */
   private async generateSettingsFile(): Promise<string> {
-    const components = await this.model.getSettingsComponents();
-    console.log(components);
-
-    const [includedComponents, ignoredComponents, partiallyIgnoredComponents] = components.reduce(
-      ([included, ignored, partialIgnored], c) => {
-        if (c.identifiedFiles > 0) included.push({ purl: c.purl });
-        if (c.totalMatchedFiles === c.ignoredFiles && c.source === 'engine') ignored.push({ purl: c.purl });
-        if (c.ignoredFiles > 0 && c.ignoredFiles < c.totalMatchedFiles) partialIgnored.push(c.purl);
-        return [included, ignored, partialIgnored];
-      },
-      [[], [], []] as [Component[], Component[], string[]],
-    );
-
-    // Retrieve ignored component file from a list of purls
-    const ignoredComponentFiles = await this.model.getSettingsIgnoredComponentFiles(partiallyIgnoredComponents);
-
-    // Retrieve replaced components
-    const allReplacedComponents = await this.model.getSettingsReplacedComponentFiles();
-
-    const [replacedComponents] = allReplacedComponents.reduce(([replaced], c) => {
-      if (c.paths && c.identified && c.original) {
-        replaced.push({ paths: c.paths, replace_with: c.identified, purl: c.original });
-      }
-      return [replaced];
-    }, [[]] as [Array<ComponentReplace>]);
-
-    this.scanossJson.bom = {
-      include: includedComponents,
-      remove: [...ignoredComponents, ...ignoredComponentFiles],
-      replace: [...replacedComponents],
-    };
-    return JSON.stringify(this.scanossJson, null, 2);
+    const identificationData = await this.model.getDecisionData();
+    const decisionTree = new DecisionTree();
+    decisionTree.build(identificationData);
+    const bom = decisionTree.getBom();
+    return JSON.stringify({ bom }, null, 2);
   }
 
   /**
@@ -101,7 +75,7 @@ export class Settings extends Format {
    * @public
    * @returns {Promise<string>} A promise that resolves to the stringified JSON output
    */
-  public async generate() {
+  public async generate(): Promise<string> {
     if (this.source === ExportSource.IDENTIFIED) {
       return this.generateSettingsFile();
     }

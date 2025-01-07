@@ -484,64 +484,16 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0;`;
 
   /**
- * SQL query to retrieve component summary for SETTINGS export.
- *
- * This query provides summary of each component, including:
- * - Summary of components with their number of files matched. For manual source, number of matches is 0.
- * - The number of files that have been identified as belonging to this component
- * - The number of files associated with this component that have been ignored
- * - The source of the component (either 'engine' for automatically detected or 'manual' for manually added)
- *
+ * SQL query to retrieve identification decisions.
  * @type {string}
  */
-  SETTINGS_COMPONENTS = `SELECT purl,totalMatchedFiles, COALESCE(identifiedFiles, 0) AS identifiedFiles, COALESCE(ignoredFiles, 0) AS ignoredFiles, source FROM (
-
-        (SELECT r.purl,COUNT(*)as totalMatchedFiles, 'engine' as source FROM results r
-        INNER JOIN files f ON r.fileId = f.fileId
-        WHERE f.identified = 1  OR f.ignored = 1
-        GROUP BY r.purl
-        UNION
-        SELECT cv.purl , 0 as totalMatches, cv.source FROM component_versions cv
-        WHERE cv.source = 'manual') as summary
-
-        LEFT JOIN
-
-        (SELECT SUM(CASE WHEN cv.purl = r.purl THEN 1 ELSE 0 END) as identifiedFiles ,cv.purl as identified FROM component_versions cv
-        INNER JOIN inventories i ON cv.id = i.cvid
-        INNER JOIN file_inventories fi ON fi.inventoryid = i.id
-        INNER JOIN files f ON f.fileId = fi.fileId
-        INNER JOIN results r ON f.fileId = r.fileId
-		    GROUP BY cv.purl) as identifiedComponent ON summary.purl = identifiedComponent.identified
-
-        LEFT JOIN
-
-        (SELECT COUNT(*) as ignoredFiles ,r.purl as ignoredComponent FROM files f
-        INNER JOIN results r ON r.fileId = f.fileId
-        WHERE f.ignored = 1
-        GROUP BY r.purl) as ignoredComponents ON summary.purl = ignoredComponents.ignoredComponent);`;
-
-  /**
- * SQL query to retrieve the ignored files paths associated to a list ofcomponents for the SCANOSS JSON export.
- *
- * Returns the file path and corresponding PURL for each ignored file.
- *
- * @type {string}
- * *
- * @returns {Object[]} An array of objects, each containing:
- *   @returns {string} path - The file path of the ignored file
- *   @returns {string} purl - The Package URL (PURL) of the component associated with the ignored file
- *
- */
-  SETTINGS_IGNORED_COMPONENTS_FILES = `SELECT f.path, r.purl FROM files f
-    INNER JOIN results r ON f.fileId = r.fileId
-    WHERE r.purl IN (#PLACEHOLDERS) AND f.ignored = 1;`;
-
-  SETTINGS_REPLACED_COMPONENTS_FILES = `SELECT  r.purl as original, cv.purl as identified, GROUP_CONCAT(f.path, ',') as paths
-      FROM component_versions cv INNER JOIN inventories i ON cv.id = i.cvid
-      INNER JOIN file_inventories fi ON fi.inventoryid = i.id
-      INNER JOIN files f ON f.fileId = fi.fileId
-      INNER JOIN results r ON f.fileId = r.fileId
-      WHERE r.purl != cv.purl`;
+  SQL_DECISION_DATA = `SELECT LTRIM(path, '/') as path , cv.purl as identifiedAs, r.purl as original, f.type , f.identified, f.ignored
+  FROM files f
+  LEFT JOIN file_inventories fi ON fi.fileId = f.fileId
+  LEFT JOIN inventories i ON i.id = fi.inventoryId
+  LEFT JOIN component_versions cv ON cv.id = i.cvid
+  LEFT JOIN results r ON r.fileId = f.fileId
+  WHERE f.fileId NOT IN (SELECT d.fileId FROM dependencies d);`;
 }
 
 export const queries = new Queries();
