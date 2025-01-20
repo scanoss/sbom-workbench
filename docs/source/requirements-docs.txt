@@ -1,1 +1,1 @@
-furo
+sphinx_rtd_theme
