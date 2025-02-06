@@ -6,7 +6,7 @@ import { Format } from '../../Format';
 import { Project } from '../../../../workspace/Project';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
 import { ExportRepository } from '../../Repository/ExportRepository';
-
+import { toVulnerabilityExportData } from '../../helpers/exportHelper';
 
 export abstract class CycloneDX extends Format {
   private source: string;
@@ -56,7 +56,12 @@ export abstract class CycloneDX extends Format {
       ? await this.export.getIdentifiedData()
       : await this.export.getDetectedData();
 
+    const vulnerabilityData = this.source === ExportSource.IDENTIFIED
+      ? await this.export.getIdentifiedVulnerability()
+      : await this.export.getDetectedVulnerability();
+
     const components = this.getUniqueComponents(data);
+    const vulnerabilityExportData = toVulnerabilityExportData(vulnerabilityData);
 
     // Add components to CycloneDX with each respective license
     components.forEach((c) => {
@@ -91,6 +96,38 @@ export abstract class CycloneDX extends Format {
       );
 
       bom.components.add(cdxComponent);
+    });
+
+    vulnerabilityExportData.forEach((v) => {
+      const ratingRepository = new CDX.Models.Vulnerability.RatingRepository();
+      ratingRepository.add(new CDX.Models.Vulnerability.Rating({ severity: v.severity.toLowerCase() as any }));
+      const affectedRepository = new CDX.Models.Vulnerability.AffectRepository();
+      v.affectedComponents.forEach((c:any) => {
+        const bomRef = new CDX.Models.BomRef(c.purl);
+        const versions = [];
+        c.versions.forEach((v:string) => {
+          versions.push(new CDX.Models.Vulnerability.AffectedSingleVersion(v));
+        });
+        const affect = new CDX.Models.Vulnerability.Affect(bomRef, {
+          versions: new CDX.Models.Vulnerability.AffectedVersionRepository(versions),
+        });
+        // Create the affected repository
+        affectedRepository.add(affect);
+      });
+
+      const vulnerability = new CDX.Models.Vulnerability.Vulnerability({
+        id: v.cve,
+        description: v.summary,
+        source: new CDX.Models.Vulnerability.Source({
+          name: v.source,
+          url: v.source === 'NDV' ? `https://nvd.nist.gov/vuln/detail/${v.cve}` : `https://osv.dev/vulnerability/${v.cve}`,
+        }),
+        published: new Date(v.published),
+        updated: new Date(v.modified),
+        ratings: ratingRepository,
+        affects: affectedRepository,
+      });
+      bom.vulnerabilities.add(vulnerability);
     });
 
     const jsonSerializer = new CDX.Serialize.JsonSerializer(

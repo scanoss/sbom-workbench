@@ -5,6 +5,7 @@ import { modelProvider } from '../../../services/ModelProvider';
 import { ExportComponentData } from '../../../model/interfaces/report/ExportComponentData';
 import { ExportRepository } from './ExportRepository';
 import { DecisionData } from '../../../model/interfaces/report/DecisionData';
+import { ComponentVulnerability } from '../../../model/entity/ComponentVulnerability';
 
 export interface ExportData {
   inventoryId: number;
@@ -49,4 +50,11 @@ export class ExportRepositorySqliteImp implements ExportRepository {
     return modelProvider.model.report.getDecisionData();
   }
 
+  public async getIdentifiedVulnerability(): Promise<Array<ComponentVulnerability>> {
+    return modelProvider.model.vulnerability.getAllIdentified();
+  }
+
+  public async getDetectedVulnerability(): Promise<Array<ComponentVulnerability>> {
+    return modelProvider.model.vulnerability.getAllDetected();
+  }
 }
