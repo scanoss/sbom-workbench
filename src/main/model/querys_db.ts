@@ -298,12 +298,12 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   // VULNERABILITIES
 
-  SQL_GET_ALL_IDENTIFIED_VULNERABILITIES = `SELECT * FROM vulnerability v
+  SQL_GET_ALL_IDENTIFIED_VULNERABILITIES = `SELECT v.cve, v.source as vsource, v.published, v.modified, v.severity, v.summary, compv.purl, compv.version, compv.rejectAt, cv.name, cv.description, cv.source, cv.reliableLicense, cv.id FROM vulnerability v
   INNER JOIN component_vulnerability compv ON v.cve = compv.cve
   INNER JOIN component_versions cv ON (cv.purl = compv.purl AND cv.version = compv.version)
-  WHERE cv.id IN (SELECT cvid FROM inventories)`;
+  WHERE cv.id IN (SELECT cvid FROM inventories);`;
 
-  SQL_GET_ALL_VULNERABILITIES_DETECTED = `SELECT * FROM vulnerability v
+  SQL_GET_ALL_VULNERABILITIES_DETECTED = `SELECT v.cve, v.source as vsource , v.severity, v.published, v.modified, v.summary, compv.purl, compv.version, compv.rejectAt FROM vulnerability v
   INNER JOIN component_vulnerability compv ON v.cve = compv.cve
   WHERE (compv.version,compv.purl) IN (SELECT version,purl FROM component_versions cv WHERE cv.source='engine')
   OR (compv.version,compv.purl) IN (SELECT version,purl FROM dependencies)`;
