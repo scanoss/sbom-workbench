@@ -32,6 +32,8 @@ export function toVulnerabilityExportData(componentVulnerabilities: Array<Compon
     }
   });
   return Array.from(vulnerabilityMapper.values()).flatMap(((v) => {
-    return { ...v, affectedComponents: Array.from(v.components.values()) as Array<AffectedComponent> };
+    const vulnerability = { ...v, affectedComponents: Array.from(v.components.values()) as Array<AffectedComponent> };
+    delete vulnerability.components;
+    return vulnerability;
   }));
 }

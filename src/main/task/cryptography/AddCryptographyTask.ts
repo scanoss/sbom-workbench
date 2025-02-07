@@ -2,18 +2,17 @@ import log from 'electron-log';
 import {
   CryptographyService,
 } from 'scanoss';
-import fs from 'fs';
 import { ITask } from '../Task';
 import { modelProvider } from '../../services/ModelProvider';
 import { ICryptographyTask } from './ICryptographyTask';
 import { normalizeCryptoAlgorithms } from '../../../shared/adapters/crypto.adapter';
 import { userSettingService } from '../../services/UserSettingService';
+import { AppConfigDefault } from '../../../config/AppConfigDefault';
 
 export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
-
   async run(params: ICryptographyTask): Promise<void> {
-    const {GRPC_PROXY} = userSettingService.get();
-    process.env.grpc_proxy =  GRPC_PROXY ? GRPC_PROXY : '';
+    const { GRPC_PROXY } = userSettingService.get();
+    process.env.grpc_proxy = GRPC_PROXY || '';
 
     try {
       const response = await this.getAlgorithms(params.components, params.token);
@@ -32,11 +31,30 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
 
   private async getAlgorithms(components: Array<string>, token: string) {
     const crypto = new CryptographyService(token);
-    const reqData = {
-      purlsList: components.map((purl) => ({ purl })),
-    };
-    const response: any = await crypto.getAlgorithms(reqData);
-    return response;
+    const chunks = [];
+    for (let i = 0; i < components.length; i += AppConfigDefault.DEFAULT_SERVICE_CHUNK_LIMIT) {
+      chunks.push(components.slice(i, i + 10));
+    }
+    const promises = chunks.map(async (chunk) => {
+      try {
+        const reqData = {
+          purlsList: chunk.map((purl) => ({ purl })),
+        };
+        return await crypto.getAlgorithms(reqData);
+      } catch (err) {
+        log.error('[ CryptographyTask ] Request failed for purls:', chunk.map((item: any) => item.purl));
+        log.error('Error:', err);
+        return null;
+      }
+    });
+    const results = await Promise.all(promises);
+    return results.reduce((acc:any, curr:any) => {
+      if (!curr) return acc;
+      return {
+        purlsList: [...(acc.purlsList || []), ...(curr.purlsList || [])],
+        status: curr.status,
+      };
+    }, { purlsList: [], status: null });
   }
 
   private adaptToCrypographyEntity(response: any): Array< { purl: string, version: string, algorithms: string } > {

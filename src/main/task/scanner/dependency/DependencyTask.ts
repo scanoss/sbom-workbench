@@ -9,6 +9,7 @@ import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
 import { userSettingService } from '../../../services/UserSettingService';
 import { modelProvider } from '../../../services/ModelProvider';
+import AppConfigModule from '../../../../config/AppConfigModule';
 
 export class DependencyTask implements Scanner.IPipelineTask {
   protected project: Project;
@@ -46,10 +47,31 @@ export class DependencyTask implements Scanner.IPipelineTask {
 
       const cfg = new DependencyScannerCfg();
       const { GRPC_PROXY } = userSettingService.get();
-      cfg.GRPC_PROXY = GRPC_PROXY ? GRPC_PROXY : '';
+      cfg.GRPC_PROXY = GRPC_PROXY || '';
       await cfg.validate();
 
-      const dependencies = await new DependencyScanner(cfg).scan(allFiles);
+      const chunks = [];
+      for (let i = 0; i < allFiles.length; i += AppConfigModule.DEFAULT_SERVICE_CHUNK_LIMIT) {
+        chunks.push(allFiles.slice(i, i + 10));
+      }
+      const depScanner = new DependencyScanner(cfg);
+      const promises = chunks.map(async (chunk) => {
+        try {
+          return await depScanner.scan(chunk);
+        } catch (err: any) {
+          log.error('[ DependencyTask ] Request failed for purls:', chunk.map((file: any) => file));
+          log.error('Error:', err);
+          return null;
+        }
+      });
+      const results = await Promise.all(promises);
+
+      const dependencies = results.reduce((acc, curr) => {
+        if (!curr) return acc;
+        return {
+          filesList: [...(acc.filesList || []), ...(curr.filesList || [])],
+        };
+      }, { filesList: [] });
       dependencies.filesList.forEach((f) => {
         f.file = f.file.replace(rootPath, '');
       });

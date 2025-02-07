@@ -10,6 +10,8 @@ export interface IAppConfig {
   ABOUT_MESSAGE: string;
   DEFAULT_SETTING_NAME: string;
 
+  DEFAULT_SERVICE_CHUNK_LIMIT: number;
+
   OSSKB_HOST: string;
   API_URL: string;
   API_KEY: string;
