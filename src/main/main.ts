@@ -151,18 +151,13 @@ const createWindow = async () => {
  */
 
 app.on('window-all-closed', async () => {
-
+  log.info('closing app');
   // Release all project on close app
   await workspace.closeAllProjects();
   await modelProvider.workspace.openDb();
   await modelProvider.workspace.lock.releaseProjects();
   await modelProvider.workspace.destroy();
-  
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  app.quit();
 });
 
 app
