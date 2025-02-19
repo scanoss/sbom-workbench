@@ -3,7 +3,7 @@ import { FileStatusType } from '../../api/types';
 export class Queries {
   /** SQL CREATE SCAN TABLES * */
 
-  SQL_CREATE_TABLE_RESULTS = 'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,fileId integer, vendor text, component text, version text, latest_version text, cpe text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, md5_comp text,compid integer,purl text,file_url text,source text,dirty INTEGER default 0, FOREIGN KEY (fileId) REFERENCES files(fileId));';
+  SQL_CREATE_TABLE_RESULTS = 'CREATE TABLE IF NOT EXISTS results (id integer primary key asc,md5_file text,fileId integer, vendor text, component text, version text, latest_version text, cpe text, url text, lines text, oss_lines text, matched text, filename text, size text, idtype text, url_hash varchar(32) ,compid integer,purl text,file_url text,source text,dirty INTEGER default 0,download_url varchar(128) DEFAULT NULL, FOREIGN KEY (fileId) REFERENCES files(fileId));';
 
   SQL_CREATE_TABLE_FILE_INVENTORIES = 'CREATE TABLE IF NOT EXISTS file_inventories (id integer primary key asc, fileId integer not null, inventoryid integer not null, FOREIGN KEY (inventoryid) REFERENCES inventories(id) ON DELETE CASCADE);';
 
@@ -92,7 +92,7 @@ export class Queries {
 
   /** SQL SCAN INSERT* */
   // SQL INSERT RESULTS
-  SQL_INSERT_RESULTS = 'INSERT or IGNORE INTO results (md5_file,vendor,component,version,latest_version,url,lines,oss_lines,matched,filename,idtype,md5_comp,purl,fileId,file_url,source) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+  SQL_INSERT_RESULTS = 'INSERT or IGNORE INTO results (md5_file,vendor,component,version,latest_version,url,lines,oss_lines,matched,filename,idtype,url_hash,purl,fileId,file_url,source, download_url) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
   // SQL NEW INVENTORY
   SQL_SCAN_INVENTORY_INSERT = 'INSERT INTO inventories (cvid,usage, notes, url, spdxid, source) VALUES (?,?,?,?,?,?);';
@@ -138,7 +138,7 @@ export class Queries {
   // GET INVENTORY BY ID
   SQL_GET_INVENTORY_BY_ID = 'SELECT i.id,i.cvid,i.usage,i.notes,i.url,i.spdxid,l.name AS license_name FROM inventories i INNER JOIN licenses l ON i.spdxid=l.spdxid WHERE i.id=?;';
 
-  SQL_SCAN_SELECT_FILE_RESULTS = 'SELECT r.vendor,r.id AS resultId,f.fileId AS id,f.path AS file_path, r.url,r.lines, r.oss_lines, r.matched, r.filename as file, r.idtype as type, r.md5_file, r.md5_comp as url_hash,r.purl, r.version,r.latest_version as latest, f.identified, f.ignored, r.file_url,rl.spdxid,rl.source FROM files f INNER JOIN results r  ON r.fileId=f.fileId LEFT JOIN result_license rl ON r.id=rl.resultId  WHERE f.path=? ORDER BY f.path;';
+  SQL_SCAN_SELECT_FILE_RESULTS = 'SELECT r.vendor,r.id AS resultId,f.fileId AS id,f.path AS file_path, r.url,r.lines, r.oss_lines, r.matched, r.filename as file, r.idtype as type, r.md5_file, r.url_hash,r.purl, r.version,r.latest_version as latest, f.identified, f.ignored, r.file_url,rl.spdxid,rl.source FROM files f INNER JOIN results r  ON r.fileId=f.fileId LEFT JOIN result_license rl ON r.id=rl.resultId  WHERE f.path=? ORDER BY f.path;';
 
   SQL_SELECT_ALL_FILES_ATTACHED_TO_AN_INVENTORY_BY_ID = 'SELECT DISTINCT f.fileId AS id,f.path,f.identified,f.ignored FROM inventories i INNER JOIN file_inventories fi ON fi.inventoryid=i.id INNER JOIN files f ON f.fileId=fi.fileId  WHERE i.id=?;';
 
