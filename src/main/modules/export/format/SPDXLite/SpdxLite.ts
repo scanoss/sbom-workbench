@@ -1,5 +1,7 @@
 import * as os from 'os';
 import { Buffer } from 'buffer';
+import { app } from 'electron';
+import { PackageURL } from 'packageurl-js';
 import { utilModel } from '../../../../model/UtilModel';
 import { Format } from '../../Format';
 import { workspace } from '../../../../workspace/Workspace';
@@ -7,6 +9,7 @@ import { ExportSource } from '../../../../../api/types';
 import AppConfig from '../../../../../config/AppConfigModule';
 import { modelProvider } from '../../../../services/ModelProvider';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
+import packageJson from '../../../../../../release/app/package.json';
 
 const crypto = require('crypto');
 
@@ -57,8 +60,6 @@ export abstract class SpdxLite extends Format {
     const hashSum = crypto.createHash('sha256');
     hashSum.update(fileBuffer);
     const hex = hashSum.digest('hex');
-
-    spdx.SPDXID = spdx.SPDXID.replace('###', hex);
     // Add DocumentNameSpace
     const p = workspace.getOpenProject();
     let projectName = p.getProjectName();
@@ -70,15 +71,21 @@ export abstract class SpdxLite extends Format {
   }
 
   private static template() {
+    const p = workspace.getOpenedProjects()[0];
     const spdx = {
       spdxVersion: 'SPDX-2.2',
       dataLicense: 'CC0-1.0',
-      SPDXID: 'SPDXRef-###',
-      name: 'SBOM',
+      SPDXID: 'SPDXRef-DOCUMENT',
+      name: `SBOM for ${p.getProjectName()}`,
       documentNamespace: 'https://spdx.org/spdxdocs/DOCUMENTNAME-UUID',
       creationInfo: {
-        creators: [`Tool: ${AppConfig.APP_NAME}`, `Person: ${os.userInfo().username}`],
+        creators: [
+          `Tool: ${AppConfig.APP_NAME}-${app.isPackaged ? app.getVersion() : packageJson.version}`,
+          `Person: ${os.userInfo().username}`,
+          'Organization: SCANOSS',
+        ],
         created: utilModel.getTimeStamp(),
+        comment: 'SBOM Build information - SBOM Type: Build',
       },
       packages: [] as any,
       documentDescribes: [] as any,
@@ -99,6 +106,7 @@ export abstract class SpdxLite extends Format {
     pkg.versionInfo = component.version ? component.version : 'NOASSERTION';
     pkg.downloadLocation = component.url ? component.url : 'NOASSERTION';
     pkg.filesAnalyzed = false;
+    pkg.supplier = `Organization: ${component.vendor ? component.vendor : (PackageURL.fromString(component.purl).namespace || 'NOASSERTION')}`;
     pkg.homepage = component.url || 'NOASSERTION';
     pkg.licenseDeclared = component.detected_licenses ? component.detected_licenses : 'NOASSERTION';
     pkg.licenseConcluded = component.concluded_licenses;
@@ -108,6 +116,12 @@ export abstract class SpdxLite extends Format {
         referenceCategory: 'PACKAGE_MANAGER',
         referenceLocator: component.purl,
         referenceType: 'purl',
+      },
+    ];
+    pkg.checksums = [
+      {
+        algorithm: 'MD5',
+        checksumValue: '2d1700ba496453d779d4987255feb5f2',
       },
     ];
     return pkg;
