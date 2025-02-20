@@ -9,11 +9,11 @@ import { SourceType } from '../../api/dto';
 class CryptographyService {
   public async importFromComponents(components: Array<NewComponentDTO>) {
     const p = workspace.getOpenProject();
-    if (p.getGlobalApiKey()) {
+    if (p.getApiKey()) {
       log.info('%c[ Crypto ]: Importing cryptography into database', 'color: green');
       const cryptoTask = new AddCryptographyTask();
       const comp = this.adaptToCryptographyTask(components);
-      await cryptoTask.run({ components: comp, token: p.getGlobalApiKey() });
+      await cryptoTask.run({ components: comp, token: p.getApiKey() });
     }
   }
 
@@ -28,7 +28,7 @@ class CryptographyService {
     try {
       const p = workspace.getOpenProject();
 
-      if (!p.getGlobalApiKey()) {
+      if (!p.getApiKey()) {
         return {
           identified: [],
           detected: [],
@@ -44,7 +44,7 @@ class CryptographyService {
       );
 
       const cryptographyTask = new AddCryptographyTask();
-      await cryptographyTask.run({ components, token: p.getGlobalApiKey(), force: true });
+      await cryptographyTask.run({ components, token: p.getApiKey(), force: true });
 
       const detected = await modelProvider.model.cryptography.findAllDetected();
       const identified = await modelProvider.model.cryptography.findAllIdentifiedMatched();

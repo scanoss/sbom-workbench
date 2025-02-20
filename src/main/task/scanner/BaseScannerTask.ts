@@ -192,7 +192,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
   }
 
   private async scan() {
-    const scanIn = await this.inputAdapter.adapterToScannerInput(this.project, this.project.filesToScan);
+    const scanIn = await this.inputAdapter.adapterToScannerInput(this.project.filesToScan);
     await this.scanner.scan(scanIn);
   }
 
