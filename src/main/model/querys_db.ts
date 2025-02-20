@@ -457,11 +457,12 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
            INNER JOIN licenses l ON lcv.licid = l.id
            WHERE lcv.cvid = cv.id) AS detected_licenses,
          '' as concluded_licenses,
-          r.url
+          r.url, r.url_hash, r.download_url
         FROM results r
         INNER JOIN component_versions cv ON cv.purl = r.purl AND cv.version = r.version
         UNION
-    SELECT DISTINCT component, d.purl, d.originalVersion as detected_version ,null as vendor,  REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, '' as concluded_licenses, '' as url
+    SELECT DISTINCT component, d.purl, d.originalVersion as detected_version ,null as vendor,
+      REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, '' as concluded_licenses, '' as url, NULL as url_hash, NULL as download_url
     FROM dependencies d;`;
 
   IDENTIFIED_REPORT_DATA = `SELECT coalesce(cv.name,'') as component, cv.purl,cv.version,r.vendor,
@@ -469,15 +470,16 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
            FROM license_component_version lcv
            INNER JOIN licenses l ON lcv.licid = l.id
            WHERE lcv.cvid = cv.id) AS detected_licenses, i.spdxid as concluded_licenses,
-       cv.url
+       cv.url, r.url_hash, r.download_url
         FROM inventories i
         INNER JOIN file_inventories fi ON i.id = fi.inventoryid
         INNER JOIN files f ON f.fileId = fi.fileId
         INNER JOIN component_versions cv ON cv.id = i.cvid
-        INNER JOIN results r ON f.fileId = r.fileId
+        LEFT JOIN results r ON f.fileId = r.fileId AND r.purl = cv.purl AND cv.version = r.version
       GROUP BY cv.purl, cv.version, concluded_licenses
       UNION
-      SELECT cv.name as component,cv.purl,d.version as concluded_version,null as vendor,REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, i.spdxid as concluded_licenses, '' as url
+      SELECT cv.name as component,cv.purl,d.version as concluded_version,null as vendor,
+      REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, i.spdxid as concluded_licenses, '' as url, NULL as url_hash, NULL as download_url
       FROM dependencies d
       INNER JOIN component_versions cv ON cv.purl = d.purl and cv.version = d.version
       INNER JOIN inventories i ON cv.id = i.cvid

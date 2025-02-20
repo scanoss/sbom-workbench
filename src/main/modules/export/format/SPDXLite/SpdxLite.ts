@@ -104,7 +104,7 @@ export abstract class SpdxLite extends Format {
     pkg.name = component.purl;
     pkg.SPDXID = `SPDXRef-${crypto.createHash('md5').update(`${component.purl}@${component.version}`).digest('hex')}`; // md5 purl@version
     pkg.versionInfo = component.version ? component.version : 'NOASSERTION';
-    pkg.downloadLocation = component.url ? component.url : 'NOASSERTION';
+    pkg.downloadLocation = component.download_url || component.url || 'NOASSERTION';
     pkg.filesAnalyzed = false;
     pkg.supplier = `Organization: ${component.vendor ? component.vendor : (PackageURL.fromString(component.purl).namespace || 'NOASSERTION')}`;
     pkg.homepage = component.url || 'NOASSERTION';
@@ -121,7 +121,8 @@ export abstract class SpdxLite extends Format {
     pkg.checksums = [
       {
         algorithm: 'MD5',
-        checksumValue: '2d1700ba496453d779d4987255feb5f2',
+        // Set MD5 hash for those components without url hash
+        checksumValue: component.url_hash || '0'.repeat(32),
       },
     ];
     return pkg;
