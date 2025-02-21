@@ -41,10 +41,10 @@ export function toVulnerabilityExportData(componentVulnerabilities: Array<Compon
   }));
 }
 
-export function removeRepeatedLicenses(expression: string): string {
-  const licenses = new Set(expression.split('AND'));
-  const uniqueLicenses = Array.from(licenses.values());
-  return uniqueLicenses.join('AND');
+export function removeRepeatedLicenses(licenses: string): string {
+  const licenseSet = new Set(licenseHelper.splitLicensesByOperator(licenses, / AND /g));
+  const uniqueLicenses = Array.from(licenseSet.values());
+  return uniqueLicenses.join(' AND ');
 }
 
 export function getSPDXLicenseInfos(licenses: string, uniqueLicenseInfos: Set<string>): Array<LicenseInfo> {

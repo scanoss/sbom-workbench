@@ -11,6 +11,8 @@ import { modelProvider } from '../../../../services/ModelProvider';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
 import packageJson from '../../../../../../release/app/package.json';
 import { getSPDXLicenseInfos } from '../../helpers/exportHelper';
+import { Project } from '../../../../workspace/Project';
+import { ExportRepository } from '../../Repository/ExportRepository';
 
 const crypto = require('crypto');
 
@@ -31,10 +33,11 @@ export abstract class SpdxLite extends Format {
 
   protected licenseMapper: Map<string, any>;
 
-  constructor(source: string) {
+  constructor(source: string, exportModel: ExportRepository) {
     super();
     this.source = source;
     this.extension = '-SPDXLite.json';
+    this.export = exportModel;
   }
 
   protected abstract getUniqueComponents(data: Array<ExportComponentData>): Array<ExportComponentData>;
@@ -43,7 +46,7 @@ export abstract class SpdxLite extends Format {
 
   // @override
   public async generate() {
-    const licenses = await modelProvider.model.license.getAllWithFullText();
+    const licenses = await this.export.getAllLicensesWithFullText();
     this.licenseMapper = new Map<string, any>();
     licenses.forEach((l) => {
       this.licenseMapper.set(l.spdxid, l);
