@@ -31,8 +31,7 @@ class LicenseService {
     const isDev = process.env.NODE_ENV !== 'production';
     const spdxLicensesPath = isDev
       ? path.join(__dirname, '../../../assets/data/licenses-spdx.json')
-      : path.join(__dirname, '../../assets/data/licenses-spdx.json');
-    console.log(spdxLicensesPath);
+      : path.join(__dirname, '../../../assets/data/licenses-spdx.json');
     const spdxLicenses = await fs.promises.readFile(spdxLicensesPath, 'utf8');
 
     const newLicenses = [];
