@@ -3,6 +3,9 @@ import { ExportComponentData } from '../../main/model/interfaces/report/ExportCo
 import { DecisionData } from '../../main/model/interfaces/report/DecisionData';
 import { ComponentVulnerability } from '../../main/model/entity/ComponentVulnerability';
 import { detectedVulnerabilityData, identifiedVulnerabilityData } from './mocks/vulnerability.model.mock';
+import { LicenseDTO } from '@api/dto';
+import { undefined } from 'zod';
+import { licenses } from '@assets/data/licenses';
 
 export class ExportRepositoryMock implements ExportRepository {
   private mockDecisionData: Array<DecisionData>;
@@ -56,5 +59,9 @@ export class ExportRepositoryMock implements ExportRepository {
 
   getIdentifiedVulnerability(): Promise<Array<ComponentVulnerability>> {
     return Promise.resolve(this.identifiedVulnerabilityData);
+  }
+
+  getAllLicensesWithFullText(): Promise<Array<LicenseDTO>> {
+    return Promise.resolve(licenses as unknown as LicenseDTO[]);
   }
 }
