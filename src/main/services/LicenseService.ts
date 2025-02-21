@@ -1,6 +1,9 @@
 import { LicenseDTO, NewLicenseDTO } from '@api/dto';
 import { HttpClient } from 'scanoss';
 import log from 'electron-log';
+import path from 'path';
+import fs from 'fs';
+import { app } from 'electron';
 import { licenses } from '../../../assets/data/licenses';
 import { modelProvider } from './ModelProvider';
 import { licenseHelper } from '../helpers/LicenseHelper';
@@ -22,6 +25,29 @@ class LicenseService {
 
   public async import() {
     await modelProvider.model.license.importFromJSON(licenses);
+
+    const defaultLicenses = await modelProvider.model.license.getAll();
+    const defaultLicensesSPDXs = new Set(defaultLicenses.map((l) => l.spdxid));
+    const isDev = process.env.NODE_ENV !== 'production';
+    const spdxLicensesPath = isDev
+      ? path.join(__dirname, '../../../assets/data/licenses-spdx.json')
+      : path.join(__dirname, '../../assets/data/licenses-spdx.json');
+    console.log(spdxLicensesPath);
+    const spdxLicenses = await fs.promises.readFile(spdxLicensesPath, 'utf8');
+
+    const newLicenses = [];
+    const spdxLicensesParsed = JSON.parse(spdxLicenses);
+    spdxLicensesParsed.licenses.forEach((l) => {
+      if (!defaultLicensesSPDXs.has(l.licenseId)) {
+        newLicenses.push({
+          fulltext: 'AUTOMATIC IMPORT',
+          name: l.name,
+          spdxid: l.licenseId,
+          url: l.reference,
+        });
+      }
+    });
+    await modelProvider.model.license.importFromJSON(newLicenses);
   }
 
   public async create(newLicense: NewLicenseDTO): Promise<LicenseDTO> {

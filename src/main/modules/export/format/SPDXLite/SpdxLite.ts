@@ -10,12 +10,20 @@ import AppConfig from '../../../../../config/AppConfigModule';
 import { modelProvider } from '../../../../services/ModelProvider';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
 import packageJson from '../../../../../../release/app/package.json';
+import { getSPDXLicenseInfos } from '../../helpers/exportHelper';
 
 const crypto = require('crypto');
 
 export enum LicenseType {
   OFFICIAL = 1,
   CUSTOM = 0,
+}
+
+export interface LicenseInfo {
+  'licenseId': string;
+  'name': string;
+  'extractedText': string;
+  'comment': string;
 }
 
 export abstract class SpdxLite extends Format {
@@ -50,10 +58,21 @@ export abstract class SpdxLite extends Format {
     const spdx = SpdxLite.template();
     spdx.packages = [];
     spdx.documentDescribes = [];
+
+
+    const uniqueLicensesInfos = new Set<string>();
     components.forEach((c) => {
       const newPackage = this.getPackage(c);
       spdx.packages.push(newPackage);
       spdx.documentDescribes.push(newPackage.SPDXID);
+
+      // Fill extracted licensing infos with unique LicenseRef identifiers
+      spdx.hasExtractedLicensingInfos.push(...getSPDXLicenseInfos(c.detected_licenses, uniqueLicensesInfos));
+
+      // Only add licensing info from concluded licenses when export source is IDENTIFIED
+      if (this.source === ExportSource.IDENTIFIED) {
+        spdx.hasExtractedLicensingInfos.push(...getSPDXLicenseInfos(c.concluded_licenses, uniqueLicensesInfos));
+      }
     });
 
     const fileBuffer = JSON.stringify(spdx);
@@ -88,7 +107,8 @@ export abstract class SpdxLite extends Format {
         comment: 'SBOM Build information - SBOM Type: Build',
       },
       packages: [] as any,
-      documentDescribes: [] as any,
+      documentDescribes: [],
+      hasExtractedLicensingInfos: [],
     };
     return spdx;
   }

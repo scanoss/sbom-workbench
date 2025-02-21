@@ -136,8 +136,13 @@ class ComponentService {
       components.forEach((c) => { c.description = 'AUTOMATIC IMPORT'; c.source = ComponentSource.ENGINE; });
       await modelProvider.model.component.bulkImport(components);
       const data = await modelProvider.model.component.getLicensesAttachedToComponentsFromResults();
-      const componentLicenses = new ComponentAdapter().componentLicenses(data);
+
+      const defaultLicenses = await modelProvider.model.license.getAll();
+      const defaultSPDXLicenses = new Set(defaultLicenses.map((l) => l.spdxid));
+      const componentLicenses = new ComponentAdapter().componentLicenses(data, defaultSPDXLicenses);
+      console.log(componentLicenses);
       await modelProvider.model.license.bulkAttachComponentLicense(componentLicenses);
+
       // Add most reliable license to each component
       const componentReliableLicense = await modelProvider.model.component.getMostReliableLicensePerComponent();
       await modelProvider.model.component.updateMostReliableLicense(componentReliableLicense);
