@@ -1,5 +1,6 @@
 import { ExportComponentData } from 'main/model/interfaces/report/ExportComponentData';
 import { LicenseType, SpdxLite } from './SpdxLite';
+import { removeRepeatedLicenses } from '../../helpers/exportHelper';
 
 export class SpdxLiteDetected extends SpdxLite {
   // @Override
@@ -17,7 +18,7 @@ export class SpdxLiteDetected extends SpdxLite {
     data.forEach((comp) => {
       const key = `${comp.purl}@${comp.version}`;
       // Detected licenses already joined in query by 'AND'
-      const licenses = comp.detected_licenses ? comp.detected_licenses : 'NOASSERTION';
+      const licenses = comp.detected_licenses ? removeRepeatedLicenses(comp.detected_licenses) : 'NOASSERTION';
       uniqueComponents.set(key, { ...comp, detected_licenses: licenses, concluded_licenses: 'NOASSERTION' });
     });
 
