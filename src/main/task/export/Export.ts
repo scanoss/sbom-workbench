@@ -53,8 +53,8 @@ export class Export implements ITask<string, IExportResult> {
         break;
       case ExportFormat.SPDXLITEJSON:
         this.format = exportDTO.source === ExportSource.DETECTED
-          ? new SpdxLiteDetected(exportDTO.source, workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp())
-          : new SpdxLiteIdentified(exportDTO.source, workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp());
+          ? new SpdxLiteDetected(workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp())
+          : new SpdxLiteIdentified(workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp());
         break;
       case ExportFormat.CYCLONEDX:
         this.format = exportDTO.source === ExportSource.DETECTED ? new CycloneDXDetected(exportDTO.source, workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp()) : new CycloneDXIdentified(exportDTO.source, workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp());

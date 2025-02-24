@@ -1,8 +1,14 @@
 import { ExportComponentData } from 'main/model/interfaces/report/ExportComponentData';
 import { LicenseType, SpdxLite } from './SpdxLite';
 import { removeRepeatedLicenses } from '../../helpers/exportHelper';
+import { Project } from '../../../../workspace/Project';
+import { ExportRepository } from '../../Repository/ExportRepository';
+import { ExportSource } from '../../../../../api/types';
 
 export class SpdxLiteDetected extends SpdxLite {
+  constructor(project: Project, exportModel: ExportRepository) {
+    super(ExportSource.DETECTED, project, exportModel);
+  }
 
   // @Override
   protected getLicenseCopyRight(component: ExportComponentData) {
