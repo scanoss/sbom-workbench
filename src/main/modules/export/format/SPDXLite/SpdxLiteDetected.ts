@@ -3,6 +3,7 @@ import { LicenseType, SpdxLite } from './SpdxLite';
 import { removeRepeatedLicenses } from '../../helpers/exportHelper';
 
 export class SpdxLiteDetected extends SpdxLite {
+
   // @Override
   protected getLicenseCopyRight(component: ExportComponentData) {
     const lic = this.licenseMapper.get(component.detected_licenses);

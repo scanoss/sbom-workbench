@@ -5,7 +5,6 @@ import {
   toVulnerabilityExportData,
 } from '../../../main/modules/export/helpers/exportHelper';
 import { multipleVulnerabilitiesTestData } from '../mocks/vulnerability.model.mock';
-import { LicenseInfo } from '../../../main/modules/export/format/SPDXLite/SpdxLite';
 
 jest.mock('electron', () => ({
   app: {
@@ -122,7 +121,7 @@ describe('export helper tests', () => {
   it('get unique SPDX License Infos', async () => {
     const uniqueLicenseInfos = new Set<string>();
     const licensesCase1 = 'GPL-2.0-only AND GPL-2.0-only AND LGPL-2.1-or-later AND MIT';
-    const uniqueLicenses: Array<LicenseInfo> = [];
+    const uniqueLicenses: Array<ExtractedLicenseInfo> = [];
     uniqueLicenses.push(...getSPDXLicenseInfos(licensesCase1, uniqueLicenseInfos));
 
     const licensesCase2 = 'NAIST-2003 AND Unicode-3.0 AND LicenseRef-scancode-public-domain';

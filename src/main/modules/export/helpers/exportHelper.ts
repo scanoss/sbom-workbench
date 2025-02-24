@@ -1,7 +1,5 @@
-import { string } from 'zod';
 import { ComponentVulnerability } from '../../../model/entity/ComponentVulnerability';
 import { AffectedComponent, VulnerabilityExportData } from '../../../model/interfaces/report/VulnerabilityExportData';
-import { LicenseInfo } from '../format/SPDXLite/SpdxLite';
 import { licenseHelper } from '../../../helpers/LicenseHelper';
 
 export function toVulnerabilityExportData(componentVulnerabilities: Array<ComponentVulnerability>): Array<VulnerabilityExportData> {
@@ -47,7 +45,7 @@ export function removeRepeatedLicenses(licenses: string): string {
   return uniqueLicenses.join(' AND ');
 }
 
-export function getSPDXLicenseInfos(licenses: string, uniqueLicenseInfos: Set<string>): Array<LicenseInfo> {
+export function getSPDXLicenseInfos(licenses: string, uniqueLicenseInfos: Set<string>): Array<ExtractedLicenseInfo> {
   const lic = licenseHelper.splitLicensesByOperator(licenses, / (?:WITH|AND) /g);
   const licenseInfos = [];
   lic.forEach((license) => {

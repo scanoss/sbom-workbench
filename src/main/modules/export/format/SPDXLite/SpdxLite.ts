@@ -4,10 +4,8 @@ import { app } from 'electron';
 import { PackageURL } from 'packageurl-js';
 import { utilModel } from '../../../../model/UtilModel';
 import { Format } from '../../Format';
-import { workspace } from '../../../../workspace/Workspace';
 import { ExportSource } from '../../../../../api/types';
 import AppConfig from '../../../../../config/AppConfigModule';
-import { modelProvider } from '../../../../services/ModelProvider';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
 import packageJson from '../../../../../../release/app/package.json';
 import { getSPDXLicenseInfos } from '../../helpers/exportHelper';
@@ -21,23 +19,19 @@ export enum LicenseType {
   CUSTOM = 0,
 }
 
-export interface LicenseInfo {
-  'licenseId': string;
-  'name': string;
-  'extractedText': string;
-  'comment': string;
-}
-
 export abstract class SpdxLite extends Format {
   private source: string;
 
   protected licenseMapper: Map<string, any>;
 
-  constructor(source: string, exportModel: ExportRepository) {
+  protected project:Project;
+
+  constructor(source: string, project: Project, exportModel: ExportRepository) {
     super();
     this.source = source;
     this.extension = '-SPDXLite.json';
     this.export = exportModel;
+    this.project = project;
   }
 
   protected abstract getUniqueComponents(data: Array<ExportComponentData>): Array<ExportComponentData>;
@@ -58,10 +52,9 @@ export abstract class SpdxLite extends Format {
 
     const components = this.getUniqueComponents(data);
 
-    const spdx = SpdxLite.template();
+    const spdx = this.template();
     spdx.packages = [];
     spdx.documentDescribes = [];
-
 
     const uniqueLicensesInfos = new Set<string>();
     components.forEach((c) => {
@@ -83,8 +76,7 @@ export abstract class SpdxLite extends Format {
     hashSum.update(fileBuffer);
     const hex = hashSum.digest('hex');
     // Add DocumentNameSpace
-    const p = workspace.getOpenProject();
-    let projectName = p.getProjectName();
+    let projectName = this.project.getProjectName();
     projectName = projectName.replace(/\s/g, '');
     spdx.documentNamespace = spdx.documentNamespace.replace('DOCUMENTNAME', projectName);
     spdx.documentNamespace = spdx.documentNamespace.replace('UUID', hex);
@@ -92,13 +84,12 @@ export abstract class SpdxLite extends Format {
     return JSON.stringify(spdx, undefined, 4);
   }
 
-  private static template() {
-    const p = workspace.getOpenedProjects()[0];
+  private template(): SPDXDocument {
     const spdx = {
       spdxVersion: 'SPDX-2.2',
       dataLicense: 'CC0-1.0',
       SPDXID: 'SPDXRef-DOCUMENT',
-      name: `SBOM for ${p.getProjectName()}`,
+      name: `SBOM for ${this.project.getProjectName()}`,
       documentNamespace: 'https://spdx.org/spdxdocs/DOCUMENTNAME-UUID',
       creationInfo: {
         creators: [
