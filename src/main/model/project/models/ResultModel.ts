@@ -146,6 +146,7 @@ export class ResultModel extends Model {
         fileId,
         data.file_url,
         'engine',
+        data.download_url ? data.download_url : null,
         function (this: any, error: any) {
           resolve(this.lastID);
         },
@@ -172,11 +173,11 @@ export class ResultModel extends Model {
         data.oss_lines ? `='${data.oss_lines}'` : 'IS NULL'
       } AND matched ${data.matched ? `='${data.matched}'` : 'IS NULL'} AND filename ${
         data.file ? `='${data.file}'` : 'IS NULL'
-      } AND md5_comp ${data.url_hash ? `='${data.url_hash}'` : 'IS NULL'} AND purl = '${
+      } AND url_hash ${data.url_hash ? `='${data.url_hash}'` : 'IS NULL'} AND purl = '${
         data.purl ? data.purl[0] : ' '
-      }' AND fileId = ${fileId}  AND file_url ${data.file_url ? `='${data.file_url}'` : 'IS NULL'} AND idtype='${
-        data.id
-      }' ; `;
+      }' AND fileId = ${fileId}  AND file_url ${data.file_url ? `='${data.file_url}'` : 'IS NULL'}
+      AND idtype='${data.id}'
+      AND download_url=${data.download_url ? `='${data.download_url}'` : 'IS NULL'}; `;
       db.serialize(() => {
         db.get(SQLquery, (err: any, result: any) => {
           if (result !== undefined) {

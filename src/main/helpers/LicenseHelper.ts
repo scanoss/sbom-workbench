@@ -13,6 +13,13 @@ class LicenseHelper {
     });
     return licenses.slice(0, -1);
   }
+
+  public splitLicensesByOperator(licenses:string, operator: RegExp): Array<string> {
+    return licenses
+      .split(operator)
+      .map((license: string) => license.trim())
+      .filter(Boolean);
+  }
 }
 
 export const licenseHelper = new LicenseHelper();

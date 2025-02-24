@@ -1,12 +1,10 @@
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { app } from 'electron';
-import * as os from 'os';
 import { IProject, ScanState } from '../../api/types';
 import packageJson from '../../../release/app/package.json';
 import { Scanner } from '../task/scanner/types';
 import * as ScannerCFG from '../task/scanner/types';
-import AppConfig from '../../config/AppConfigModule';
 import { workspace } from './Workspace';
 
 export class Metadata {

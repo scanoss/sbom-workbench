@@ -299,7 +299,7 @@ export interface Result {
   filename: string;
   size: string;
   idtype: string;
-  md5_comp: string;
+  url_hash: string;
   compid: number;
   purl: string;
   file_url: string;
