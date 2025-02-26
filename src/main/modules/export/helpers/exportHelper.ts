@@ -1,5 +1,6 @@
 import { ComponentVulnerability } from '../../../model/entity/ComponentVulnerability';
 import { AffectedComponent, VulnerabilityExportData } from '../../../model/interfaces/report/VulnerabilityExportData';
+import { licenseHelper } from '../../../helpers/LicenseHelper';
 
 export function toVulnerabilityExportData(componentVulnerabilities: Array<ComponentVulnerability>): Array<VulnerabilityExportData> {
   const vulnerabilityMapper = new Map<string, VulnerabilityExportData & {
@@ -36,4 +37,39 @@ export function toVulnerabilityExportData(componentVulnerabilities: Array<Compon
     delete vulnerability.components;
     return vulnerability;
   }));
+}
+
+export function removeRepeatedLicenses(licenses: string): string {
+  const licenseSet = new Set(licenseHelper.splitLicensesByOperator(licenses, / AND /g));
+  const uniqueLicenses = Array.from(licenseSet.values());
+  return uniqueLicenses.join(' AND ');
+}
+
+export function getSPDXLicenseInfos(licenses: string, uniqueLicenseInfos: Set<string>): Array<ExtractedLicenseInfo> {
+  const lic = licenseHelper.splitLicensesByOperator(licenses, / (?:WITH|AND) /g);
+  const licenseInfos = [];
+  lic.forEach((license) => {
+    const match = license.match(/^LicenseRef-(scancode-|scanoss-|)(\S+)$/i);
+
+    let source = '';
+    let name = license;
+
+    if (match) {
+      const [, sourceMatch, nameMatch] = match;
+      source = sourceMatch.replace(/-/g, '');
+      name = nameMatch;
+
+      const sourceText = source ? ` by ${source}.` : '.';
+      if (!uniqueLicenseInfos.has(license)) {
+        uniqueLicenseInfos.add(license);
+        licenseInfos.push({
+          licenseId: license,
+          name: name.replace(/-/g, ' '),
+          extractedText: 'Detected license, please review component source code.',
+          comment: `Detected license ${sourceText}`,
+        });
+      }
+    }
+  });
+  return licenseInfos;
 }

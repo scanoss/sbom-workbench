@@ -1,7 +1,6 @@
 import util from 'util';
 import { Dependency } from '@api/types';
 import sqlite3 from 'sqlite3';
-import { PackageURL } from 'packageurl-js';
 import { ReportComponent } from 'main/services/ReportService';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { queries } from '../../querys_db';

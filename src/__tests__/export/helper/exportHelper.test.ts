@@ -1,5 +1,9 @@
 import { ExportRepositoryMock } from '../ExportRepositoryMock';
-import { toVulnerabilityExportData } from '../../../main/modules/export/helpers/exportHelper';
+import {
+  getSPDXLicenseInfos,
+  removeRepeatedLicenses,
+  toVulnerabilityExportData,
+} from '../../../main/modules/export/helpers/exportHelper';
 import { multipleVulnerabilitiesTestData } from '../mocks/vulnerability.model.mock';
 
 jest.mock('electron', () => ({
@@ -98,5 +102,37 @@ describe('export helper tests', () => {
         summary: 'An issue was discovered in AppArmor before 2.12. Incorrect handling of unknown AppArmor profiles in ...',
       },
     ]);
+  });
+
+  it('Remove repeated licenses from string', async () => {
+    const licensesCase1 = 'GPL-2.0-only AND GPL-2.0-only   AND LGPL-2.1-or-later AND MIT';
+    let uniqueLicenses = removeRepeatedLicenses(licensesCase1);
+    expect(uniqueLicenses).toEqual('GPL-2.0-only AND LGPL-2.1-or-later AND MIT');
+
+    const licensesCase2 = 'GPL-2.0-only AND GPL-2.0-only OR MIT AND LGPL-2.1-or-later AND MIT';
+    uniqueLicenses = removeRepeatedLicenses(licensesCase2);
+    expect(uniqueLicenses).toEqual('GPL-2.0-only AND GPL-2.0-only OR MIT AND LGPL-2.1-or-later AND MIT');
+
+    const licensesCase3 = 'GPL-2.0-or-later AND GPL-2.0-or-later WITH Font-exception-2.0 AND LicenseRef-scancode-bitstream';
+    uniqueLicenses = removeRepeatedLicenses(licensesCase3);
+    expect(uniqueLicenses).toEqual('GPL-2.0-or-later AND GPL-2.0-or-later WITH Font-exception-2.0 AND LicenseRef-scancode-bitstream');
+  });
+
+  it('get unique SPDX License Infos', async () => {
+    const uniqueLicenseInfos = new Set<string>();
+    const licensesCase1 = 'GPL-2.0-only AND GPL-2.0-only AND LGPL-2.1-or-later AND MIT';
+    const uniqueLicenses: Array<ExtractedLicenseInfo> = [];
+    uniqueLicenses.push(...getSPDXLicenseInfos(licensesCase1, uniqueLicenseInfos));
+
+    const licensesCase2 = 'NAIST-2003 AND Unicode-3.0 AND LicenseRef-scancode-public-domain';
+    uniqueLicenses.push(...getSPDXLicenseInfos(licensesCase2, uniqueLicenseInfos));
+
+    const licensesCase3 = 'GPL-2.0-or-later AND GPL-2.0-or-later WITH Font-exception-2.0 AND LicenseRef-scancode-bitstream';
+    uniqueLicenses.push(...getSPDXLicenseInfos(licensesCase3, uniqueLicenseInfos));
+
+    // Only those licenses with LicenseRef are added to LicenseInfos
+    expect(uniqueLicenses.length).toEqual(2);
+    expect(new Set(uniqueLicenses.map((ul) => ul.licenseId)))
+      .toEqual(new Set(['LicenseRef-scancode-public-domain', 'LicenseRef-scancode-bitstream']));
   });
 });

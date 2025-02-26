@@ -1,12 +1,10 @@
 import * as grpc from '@grpc/grpc-js';
 import { AppConfigDefault } from '../../../../config/AppConfigDefault';
-import { ComponentsClient } from "../scanoss/api/components/v2/scanoss-components_grpc_pb";
-import { userSettingService } from '../../../services/UserSettingService';
+import { ComponentsClient } from '../scanoss/api/components/v2/scanoss-components_grpc_pb';
 import { workspace } from '../../../workspace/Workspace';
-import { VulnerabilitiesClient } from "../scanoss/api/vulnerabilities/v2/scanoss-vulnerabilities_grpc_pb";
+import { VulnerabilitiesClient } from '../scanoss/api/vulnerabilities/v2/scanoss-vulnerabilities_grpc_pb';
 
 class GRPCConnection {
-
   private vulnerabilityClient: VulnerabilitiesClient;
 
   private componentCatalogClient: grpc.Client;
@@ -17,8 +15,7 @@ class GRPCConnection {
   }
 
   private getApiKey(): string {
-    const { APIS, DEFAULT_API_INDEX } = userSettingService.get();
-    return workspace.getOpenProject().getApiKey() || APIS[DEFAULT_API_INDEX]?.API_KEY;
+    return workspace.getOpenProject().getApiKey();
   }
 
   private getEndpoint(): string {
@@ -47,21 +44,19 @@ class GRPCConnection {
   }
 
   public getVulnerabilityStub(): grpc.Client {
-      const hasApiKey = !!this.getApiKey();
+    const hasApiKey = !!this.getApiKey();
 
-      const endpoint = !hasApiKey
-        ? `${AppConfigDefault.OSSKB_HOST}:${AppConfigDefault.DEFAULT_PORT_gRPC}`
-        : this.getEndpoint();
+    const endpoint = !hasApiKey
+      ? `${AppConfigDefault.OSSKB_HOST}:${AppConfigDefault.DEFAULT_PORT_gRPC}`
+      : this.getEndpoint();
 
-      const credentials = !hasApiKey
-        ? grpc.credentials.createSsl()
-        : this.getCredentials();
+    const credentials = !hasApiKey
+      ? grpc.credentials.createSsl()
+      : this.getCredentials();
 
-      this.vulnerabilityClient = new VulnerabilitiesClient(endpoint, credentials);
-      return this.vulnerabilityClient;
+    this.vulnerabilityClient = new VulnerabilitiesClient(endpoint, credentials);
+    return this.vulnerabilityClient;
   }
-
 }
-
 
 export const gRPCConnections = new GRPCConnection();
