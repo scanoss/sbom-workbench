@@ -42,6 +42,7 @@ jobs:
             release/build/${{ env.ARTIFACT_NAME_PREFIX }}*.exe
             release/build/latest.yml
             release/build/*exe.blockmap
+          retention-days: 2
 
   build_w_sign:
     name: "Sign with CodeSignTool"
@@ -84,6 +85,7 @@ jobs:
             ${{ env.ARTIFACT_NAME_PREFIX }}*.exe
             latest.yml
             *exe.blockmap
+          retention-days: 2
 
   build_m:
     name: "Build for MacOS"
@@ -123,6 +125,7 @@ jobs:
             release/build/${{ env.ARTIFACT_NAME_PREFIX }}*.dmg
             release/build/latest-mac.yml
             release/build/*dmg.blockmap
+          retention-days: 2
 
   build_l:
     name: "Build for Linux"
@@ -154,6 +157,7 @@ jobs:
           path: |
             release/build/${{ env.ARTIFACT_NAME_PREFIX }}*.AppImage
             release/build/latest-linux.yml
+          retention-days: 2
 
 
   create_release:
