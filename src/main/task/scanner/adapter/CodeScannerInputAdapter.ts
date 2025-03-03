@@ -1,16 +1,22 @@
 import { SbomMode, ScannerInput, WinnowingMode } from 'scanoss';
 import fs from 'fs';
 import log from 'electron-log';
+import path from 'path';
 import {
   getContextFiles,
   getScanossSettingsFilePath,
 } from '../../../services/utils/workspace';
 import { IScannerInputAdapter } from './IScannerInputAdapter';
+import { BaseScannerInputAdapter } from './BaseScannerInputAdapter';
 import { Project } from '../../../workspace/Project';
-import path from 'path';
 
-export class CodeScannerInputAdapter implements IScannerInputAdapter {
-  async adapterToScannerInput(project: Project, filesToScan: Record<string, string>): Promise<Array<ScannerInput>> {
+export class CodeScannerInputAdapter extends BaseScannerInputAdapter implements IScannerInputAdapter {
+  constructor(project:Project) {
+    super();
+    this.project = project;
+  }
+
+  async adapterToScannerInput(filesToScan: Record<string, string>): Promise<Array<ScannerInput>> {
     const fullScanList: Array<string> = [];
     const quickScanList: Array<string> = [];
 
@@ -23,27 +29,28 @@ export class CodeScannerInputAdapter implements IScannerInputAdapter {
     }
 
     const result: Array<ScannerInput> = [];
-
     if (fullScanList.length > 0) {
       result.push({
+        ...this.getEngineFlags(),
         fileList: fullScanList,
-        folderRoot: project.metadata.getScanRoot(),
+        folderRoot: this.project.metadata.getScanRoot(),
         winnowing: {
-          mode: project.getDto().scannerConfig.hpsm ? WinnowingMode.FULL_WINNOWING_HPSM : WinnowingMode.FULL_WINNOWING,
+          mode: this.project.getDto().scannerConfig.hpsm ? WinnowingMode.FULL_WINNOWING_HPSM : WinnowingMode.FULL_WINNOWING,
         },
       });
     }
 
     if (quickScanList.length > 0) {
       result.push({
+        ...this.getEngineFlags(),
         fileList: quickScanList,
-        folderRoot: project.metadata.getScanRoot(),
+        folderRoot: this.project.metadata.getScanRoot(),
         winnowing: { mode: WinnowingMode.WINNOWING_ONLY_MD5 },
       });
     }
 
     // Allows to ignore a list of components from a SBOM place in the root folder
-    const rootPath = project.getScanRoot();
+    const rootPath = this.project.getScanRoot();
 
     const scanossSettingsPath = await getScanossSettingsFilePath(rootPath);
     if (scanossSettingsPath) {

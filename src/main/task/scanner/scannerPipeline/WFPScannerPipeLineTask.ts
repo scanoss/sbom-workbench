@@ -36,7 +36,7 @@ export class WFPScannerPipeLineTask extends ScannerPipeline {
     if (metadata.getScannerConfig().type.includes(ScannerType.VULNERABILITIES)) this.queue.push(new VulnerabilitiesTask(project));
 
     // Cryptography
-    if (metadata.getScannerConfig().type.includes(ScannerType.CRYPTOGRAPHY) && project.getGlobalApiKey()) this.queue.push(new CryptographyTask(project));
+    if (metadata.getScannerConfig().type.includes(ScannerType.CRYPTOGRAPHY) && project.getApiKey()) this.queue.push(new CryptographyTask(project));
 
     for await (const [index, task] of this.queue.entries()) {
       await this.executeTask(task, index);

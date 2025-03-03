@@ -38,7 +38,7 @@ export class CryptographyTask implements Scanner.IPipelineTask {
       dependencyComponents,
     );
 
-    const token = this.project.getGlobalApiKey();
+    const token = this.project.getApiKey();
     const addCryptographyTask = new AddCryptographyTask();
     await addCryptographyTask.run({ components, token });
     this.project.save();

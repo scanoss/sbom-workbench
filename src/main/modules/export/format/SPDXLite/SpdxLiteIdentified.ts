@@ -1,7 +1,15 @@
 import { ExportComponentData } from 'main/model/interfaces/report/ExportComponentData';
 import { LicenseType, SpdxLite } from './SpdxLite';
+import { removeRepeatedLicenses } from '../../helpers/exportHelper';
+import { Project } from '../../../../workspace/Project';
+import { ExportRepository } from '../../Repository/ExportRepository';
+import { ExportSource } from '../../../../../api/types';
 
 export class SpdxLiteIdentified extends SpdxLite {
+  constructor(project: Project, exportModel: ExportRepository) {
+    super(ExportSource.IDENTIFIED, project, exportModel);
+  }
+
   // @Override
   protected getLicenseCopyRight(component: ExportComponentData) {
     const lic = this.licenseMapper.get(component.concluded_licenses);
@@ -20,9 +28,9 @@ export class SpdxLiteIdentified extends SpdxLite {
         let licenses = uniqueComponents.get(key).concluded_licenses;
         // Adds the new concluded license
         licenses = `${licenses} AND ${comp.concluded_licenses}`;
-        uniqueComponents.get(key).concluded_licenses = licenses;
+        uniqueComponents.get(key).concluded_licenses = removeRepeatedLicenses(licenses);
       } else {
-        const detectedLicenses = comp.detected_licenses ? comp.detected_licenses : 'NOASSERTION';
+        const detectedLicenses = comp.detected_licenses ? removeRepeatedLicenses(comp.detected_licenses) : 'NOASSERTION';
         uniqueComponents.set(key, { ...comp, detected_licenses: detectedLicenses });
       }
     });

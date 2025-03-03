@@ -196,13 +196,19 @@ export class Project {
     this.metadata.setApiKey(apiKey);
   }
 
-  public getApiKey() {
+  private getProjectAPIKey() {
     return this.metadata.getApiKey();
   }
 
-  public getGlobalApiKey(): string {
+  /**
+   * @brief Retrieves the appropriate API key to be used in SCANOSS services
+   * @return Returns the project-specific API key if configured, otherwise falls back to the global API key
+   * @details If no project key exists it returns the global API key set.
+   * If both keys are unset, returns undefined.
+   */
+  public getApiKey(): string {
     const { DEFAULT_API_INDEX, APIS } = userSettingService.get();
-    return this.getApiKey() ? this.getApiKey() : APIS[DEFAULT_API_INDEX].API_KEY;
+    return this.getProjectAPIKey() ? this.getProjectAPIKey() : APIS[DEFAULT_API_INDEX].API_KEY;
   }
 
   public getGlobalApi(): string {

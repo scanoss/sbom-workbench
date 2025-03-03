@@ -1,3 +1,5 @@
+import os from 'os';
+import * as util from 'util';
 import log from 'electron-log';
 import { ExtractFromProjectDTO, INewProject, IProject, Inventory, InventoryKnowledgeExtraction, LOCK, ProjectAccessMode, ProjectState, ReuseIdentificationTaskDTO } from '../../api/types';
 import { Project } from '../workspace/Project';
@@ -12,12 +14,10 @@ import { ProjectKnowledgeExtractor } from '../modules/projectKnowledge/ProjectKn
 import { ReuseIdentificationTask } from '../task/reuseIdentification/ReuseIdentificationTask';
 import ScannerMode = Scanner.ScannerMode;
 import ScannerType = Scanner.ScannerType;
-import os from 'os';
-import * as util from 'util';
 
 class ProjectService {
   private setCryptographyScanType(p: Project): void {
-    if (p.getGlobalApiKey()) {
+    if (p.getApiKey()) {
       const types = p.metadata.getScannerConfig().type;
       types.push(ScannerType.CRYPTOGRAPHY);
       const uniqueTypes = new Set(types);
