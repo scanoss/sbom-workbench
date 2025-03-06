@@ -140,7 +140,6 @@ class ComponentService {
       const defaultLicenses = await modelProvider.model.license.getAll();
       const defaultSPDXLicenses = new Set(defaultLicenses.map((l) => l.spdxid));
       const componentLicenses = new ComponentAdapter().componentLicenses(data, defaultSPDXLicenses);
-      console.log(componentLicenses);
       await modelProvider.model.license.bulkAttachComponentLicense(componentLicenses);
 
       // Add most reliable license to each component

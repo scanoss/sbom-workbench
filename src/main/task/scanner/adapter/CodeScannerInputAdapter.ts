@@ -58,11 +58,11 @@ export class CodeScannerInputAdapter extends BaseScannerInputAdapter implements 
       const scanossSettings = JSON.parse(await fs.promises.readFile(path.join(rootPath, scanossSettingsPath), 'utf8'));
       result.forEach((_, index, arr) => {
         arr[index].settings = scanossSettings;
-        arr[index].sbomMode = SbomMode.SBOM_IDENTIFY;
       });
       return result;
     }
 
+    // Legacy
     let sbom = '';
     let sbomMode = SbomMode.SBOM_IDENTIFY;
 
