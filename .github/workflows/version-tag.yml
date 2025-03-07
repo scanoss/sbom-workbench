@@ -16,8 +16,10 @@ jobs:
   version-tagging:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout git repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+          token: ${{ secrets.SC_GH_TAG_TOKEN }}
 
       - name: Determine Tag
         id: taggerVersion
