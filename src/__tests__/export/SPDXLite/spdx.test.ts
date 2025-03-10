@@ -2,6 +2,7 @@ import { ExportRepositoryMock } from '../ExportRepositoryMock';
 import { SpdxLiteIdentified } from '../../../main/modules/export/format/SPDXLite/SpdxLiteIdentified';
 import { Project } from '../../../main/workspace/Project';
 import { SpdxLiteDetected } from '../../../main/modules/export/format/SPDXLite/SpdxLiteDetected';
+import AppConfig from '@config/AppConfigModule';
 
 // Mock crypto first
 Object.defineProperty(global, 'crypto', {
@@ -59,8 +60,8 @@ describe('SPDX Lite tests', () => {
     expect(spdxLite.spdxVersion).toEqual('SPDX-2.2');
     expect(spdxLite.SPDXID).toEqual('SPDXRef-DOCUMENT');
     expect(spdxLite.name).toEqual('SBOM for test project');
-    expect(spdxLite.creationInfo.creators[0].includes('Tool: SCANOSS SBOM Workbench')).toBe(true);
-    expect(spdxLite.creationInfo.creators[2]).toEqual('Organization: SCANOSS');
+    expect(spdxLite.creationInfo.creators[0].includes(`Tool: ${AppConfig.APP_NAME}`)).toBe(true);
+    expect(spdxLite.creationInfo.creators[2]).toEqual(`Organization: ${AppConfig.ORGANIZATION_NAME}`);
     expect(spdxLite.creationInfo.comment).toEqual('SBOM Build information - SBOM Type: Build');
     expect(spdxLite.documentDescribes.length).toEqual(2);
 
@@ -91,8 +92,8 @@ describe('SPDX Lite tests', () => {
     expect(spdxLite.spdxVersion).toEqual('SPDX-2.2');
     expect(spdxLite.SPDXID).toEqual('SPDXRef-DOCUMENT');
     expect(spdxLite.name).toEqual('SBOM for test project');
-    expect(spdxLite.creationInfo.creators[0].includes('Tool: SCANOSS SBOM Workbench')).toBe(true);
-    expect(spdxLite.creationInfo.creators[2]).toEqual('Organization: SCANOSS');
+    expect(spdxLite.creationInfo.creators[0].includes(`Tool: ${AppConfig.APP_NAME}`)).toBe(true);
+    expect(spdxLite.creationInfo.creators[2]).toEqual(`Organization: ${AppConfig.ORGANIZATION_NAME}`);
     expect(spdxLite.creationInfo.comment).toEqual('SBOM Build information - SBOM Type: Build');
     expect(spdxLite.documentDescribes.length).toEqual(2);
 

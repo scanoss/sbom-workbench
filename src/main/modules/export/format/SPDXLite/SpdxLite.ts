@@ -95,7 +95,7 @@ export abstract class SpdxLite extends Format {
         creators: [
           `Tool: ${AppConfig.APP_NAME}-${app.isPackaged ? app.getVersion() : packageJson.version}`,
           `Person: ${os.userInfo().username}`,
-          'Organization: SCANOSS',
+          `Organization: ${AppConfig.ORGANIZATION_NAME}`,
         ],
         created: utilModel.getTimeStamp(),
         comment: 'SBOM Build information - SBOM Type: Build',
