@@ -77,5 +77,5 @@ if [[ "$LATEST_TAGGED_VERSION" == "$SEMVER_SBOM_WORKBENCH" ]] ; then
   echo "Latest tag and SBOM-Workbench version are the same: $SEMVER_SBOM_WORKBENCH" >&2
   exit 1
 fi
-echo "New version: $SEMVER_SBOM_WORKBENCH"
+echo "$SEMVER_SBOM_WORKBENCH"
 exit 0
