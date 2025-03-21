@@ -1,5 +1,6 @@
 import log from 'electron-log';
 import path from 'path';
+import { GroupSearchKeywordDTO } from '@api/dto';
 import api from '../api';
 import { IpcChannels } from '../ipc-channels';
 import { workspace } from '../../main/workspace/Workspace';
@@ -8,8 +9,6 @@ import { IProject, License } from '../types';
 import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPath';
 import { ProjectZipper } from '../../main/workspace/ProjectZipper';
 import { workspaceService } from '../../main/services/WorkspaceService';
-import { GroupSearchKeywordDTO } from '@api/dto';
-
 
 api.handle(IpcChannels.WORKSPACE_PROJECT_LIST, async (_event) => {
   try {
@@ -73,9 +72,9 @@ api.handle(IpcChannels.WORKSPACE_IMPORT_PROJECT, async (_event, zippedProjectPat
   }
 });
 
-api.handle(IpcChannels.WORKSPACE_EXPORT_PROJECT, async (_event, pathToSave: string, projectPath: string) => {
+api.handle(IpcChannels.WORKSPACE_EXPORT_PROJECT, async (_event, pathToSave: string, projectPath: string, includeSourceCode = false) => {
   try {
-    await new ProjectZipper().export(pathToSave, path.join(workspace.getMyPath(), projectPath));
+    await new ProjectZipper().export(pathToSave, path.join(workspace.getMyPath(), projectPath), includeSourceCode);
     return Response.ok({
       message: 'Project exported successfully',
       data: true,
