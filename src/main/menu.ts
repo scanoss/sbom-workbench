@@ -76,6 +76,12 @@ export default class MenuBuilder {
           },
         },
         {
+          label: i18next.t('AppMenu:ImportProjectWithSource'),
+          click: () => {
+            this.mainWindow.webContents.send(IpcChannels.MENU_IMPORT_PROJECT_WITH_SOURCE);
+          },
+        },
+        {
           label: i18next.t('AppMenu:Settings'),
           accelerator: 'Command+,',
           click: () => {
@@ -192,6 +198,12 @@ export default class MenuBuilder {
             label: i18next.t('AppMenu:ImportProject'),
             click: () => {
               this.mainWindow.webContents.send(IpcChannels.MENU_IMPORT_PROJECT);
+            },
+          },
+          {
+            label: i18next.t('AppMenu:ImportProjectWithSource'),
+            click: () => {
+              this.mainWindow.webContents.send(IpcChannels.MENU_IMPORT_PROJECT_WITH_SOURCE);
             },
           },
           {

@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { setScanPath } from '@store/workspace-store/workspaceSlice';
 import { Scanner } from 'main/task/scanner/types';
+import { DIALOG_ACTIONS } from '@context/types';
 import { DialogContext, IDialogContext } from './DialogProvider';
 import { dialogController } from '../controllers/dialog-controller';
 
@@ -18,6 +19,7 @@ export interface IAppContext {
   newProjectFromWFP: () => void;
   exportProject: (project: IProject) => void;
   importProject: () => void;
+  importProjectWithSource: () => void;
 }
 
 export const AppContext = React.createContext<IAppContext | null>(null);
@@ -88,13 +90,11 @@ const AppProvider = ({ children }) => {
     const path = await dialogController.showSaveDialog({
       defaultPath: `${window.os.homedir()}/Downloads/${project.name}.zip`,
     });
-
     if (!path) return;
     const dialog = await dialogCtrl.createProgressDialog(t('Dialog:ExportingProject').toUpperCase());
     dialog.present();
-
     try {
-      await workspaceService.exportProject(path, project.work_root, false);
+      await workspaceService.exportProject(path, project.work_root);
       setTimeout(async () => {
         const timeout = setTimeout(() => dialog.dismiss(), 8000);
         const dismiss = () => {
@@ -148,10 +148,39 @@ const AppProvider = ({ children }) => {
     }
   };
 
+  const importProjectWithSource = async () => {
+    const r = await dialogCtrl.openImportProjectSourceDialog();
+    if (r.action === DIALOG_ACTIONS.CANCEL) return;
+    const dialog = await dialogCtrl.createProgressDialog(t('Dialog:ImportingProject').toUpperCase());
+    dialog.present();
+    try {
+      await workspaceService.importProject(r.data.projectPath, r.data.sourcePath);
+      setTimeout(async () => {
+        dialog.finish({ message: t('Dialog:SuccesfulImport').toUpperCase() });
+        dialog.dismiss({ delay: 1500 });
+        dispatch(fetchProjects());
+      }, 2000);
+    } catch (err: any) {
+      dialog.dismiss();
+
+      const errorMessage = `<strong>Importing Error</strong>
+        <span style="font-style: italic;">${err.message || ''}</span>`;
+      await dialogCtrl.openConfirmDialog(
+        `${errorMessage}`,
+        {
+          label: 'OK',
+          role: 'accept',
+        },
+        true,
+      );
+    }
+  };
+
   const setupAppMenuListeners = (): () => void => {
     const subscriptions = [];
     subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_NEW_PROJECT, newProject));
     subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_IMPORT_PROJECT, importProject));
+    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_IMPORT_PROJECT_WITH_SOURCE, importProjectWithSource));
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
@@ -168,6 +197,7 @@ const AppProvider = ({ children }) => {
         newProjectFromWFP,
         exportProject,
         importProject,
+        importProjectWithSource,
       }}
     >
       {children}

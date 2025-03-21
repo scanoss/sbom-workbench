@@ -26,7 +26,7 @@ const Workspace = () => {
   const { settings } = useSelector(selectWorkspaceState);
   const { projects } = useSelector(selectWorkspaceState);
 
-  const { newProject, exportProject, importProject, newProjectFromWFP } = useContext(AppContext) as IAppContext;
+  const { newProject, exportProject, importProject, newProjectFromWFP, importProjectWithSource } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -72,6 +72,10 @@ const Workspace = () => {
 
   const onImportProjectHandler = () => {
     importProject();
+  };
+
+  const onImportProjectWithSourceHandler = () => {
+    importProjectWithSource();
   };
 
   const onNewProjectFromWFPHandler = () => {
@@ -164,6 +168,7 @@ const Workspace = () => {
               onNewProject={onNewProjectHandler}
               onImportProject={onImportProjectHandler}
               onNewProjectFromWFP={onNewProjectFromWFPHandler}
+              onNewProjectWithSource={onImportProjectWithSourceHandler}
               />
           </section>
         </header>

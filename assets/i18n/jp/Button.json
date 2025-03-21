@@ -1,6 +1,7 @@
 {
   "NewProject": "新しいプロジェクト",
   "ImportProject": "プロジェクトのインポート",
+  "ImportProjectWithSource": "Import project with source",
   "Continue": "続ける",
   "Save": "保存",
   "Cancel": "キャンセル",

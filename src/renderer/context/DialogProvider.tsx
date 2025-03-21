@@ -17,6 +17,7 @@ import ComponentSearcherDialog from '../ui/dialog/ComponentSearcherDialog';
 import { ProjectSelectorDialog } from '../ui/dialog/ProjectSelectorDialog';
 import WorkspaceAddDialog from 'renderer/ui/dialog/WorkspaceAddDialog';
 import { KeywordGroupMenu } from 'renderer/features/workbench/components/KeywordGroupMenu/KeywordGroupMenu';
+import ImportProjectSourceDialog from '../ui/dialog/ImportProjectSourceDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>, options?: InventoryDialogOptions) => Promise<Inventory | null>;
@@ -32,6 +33,7 @@ export interface IDialogContext {
   openDependencyDialog: (dependency: Dependency) => Promise<DialogResponse>;
   openProjectSelectorDialog: (params?: { folder?: string, md5File?: string}) => Promise<DialogResponse>;
   openWorkspaceAddDialog: () => Promise<DialogResponse>;
+  openImportProjectSourceDialog: () => Promise<DialogResponse>;
 }
 
 export interface InventoryDialogOptions {
@@ -376,6 +378,30 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
       });
   };
 
+  const [importProjectSourceSelectorDialog, setImportProjectSourceDialog] = useState<{
+    open: boolean;
+    data: {
+      includeSourceCode: boolean;
+    };
+    onClose?: (response: DialogResponse) => void;
+    onCancel?: () => void;
+  }>({ open: false, data: { includeSourceCode: false } });
+
+  const openImportProjectSourceDialog = (): Promise<DialogResponse> => {
+    return new Promise<DialogResponse>((resolve) => {
+      setImportProjectSourceDialog({
+        data: {
+          includeSourceCode: false,
+        },
+        open: true,
+        onClose: (response) => {
+          setImportProjectSourceDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(response);
+        },
+      });
+    });
+  };
+
   const setupAppMenuListeners = (): (() => void) => {
     const subscriptions = [];
     subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_OPEN_SETTINGS, handleOpenSettings));
@@ -403,6 +429,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         openDependencyDialog,
         openProjectSelectorDialog,
         openWorkspaceAddDialog,
+        openImportProjectSourceDialog,
       }}
     >
       {children}
@@ -522,6 +549,15 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
           open={workspaceAddDialog.open}
           onClose={(response) => workspaceAddDialog.onClose && workspaceAddDialog.onClose(response)}
           onCancel={() => workspaceAddDialog.onCancel && workspaceAddDialog.onCancel()}
+        />
+      )}
+
+      {importProjectSourceSelectorDialog.open && (
+        <ImportProjectSourceDialog
+          open={importProjectSourceSelectorDialog.open}
+          onClose={(response) => importProjectSourceSelectorDialog.onClose && importProjectSourceSelectorDialog.onClose(response)}
+          button={confirmDialog.button}
+
         />
       )}
     </DialogContext.Provider>

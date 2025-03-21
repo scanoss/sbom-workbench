@@ -2,6 +2,7 @@
   "File": "&Archivo",
   "NewProject": "&Nuevo proyecto",
   "ImportProject": "&Importar proyecto",
+  "ImportProjectWithSource": "&Importar proyecto con fuente",
   "Settings": "&Preferencias",
   "Close":  "&Cerrar",
   "ManageSearchIndexGroups": "&Administrar grupo de palabras",
