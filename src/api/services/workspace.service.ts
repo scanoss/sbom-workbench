@@ -33,10 +33,11 @@ class WorkspaceService extends BaseService {
     return this.response(response);
   }
 
-  public async importProject(projectZipPath: string): Promise<IProject> {
+  public async importProject(projectZipPath: string, projectSourcePath?:string | null): Promise<IProject> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.WORKSPACE_IMPORT_PROJECT,
       projectZipPath,
+      projectSourcePath,
     );
     return this.response(response);
   }
@@ -44,13 +45,11 @@ class WorkspaceService extends BaseService {
   public async exportProject(
     pathToSave: string,
     projectPath: string,
-    includeSourceCode: boolean,
   ): Promise<void> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.WORKSPACE_EXPORT_PROJECT,
       pathToSave,
       projectPath,
-      includeSourceCode,
     );
     return this.response(response);
   }

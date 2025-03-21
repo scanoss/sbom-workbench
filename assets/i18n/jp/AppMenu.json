@@ -2,6 +2,7 @@
   "File": "&ファイル",
   "NewProject": "&新しいプロジェクト",
   "ImportProject": "&プロジェクトのインポート",
+  "ImportProjectWithSource": "&Import project with source",
   "Settings": "&設定",
   "Close":  "&クローズ",
   "ManageSearchIndexGroups": "&Manage search index groups",

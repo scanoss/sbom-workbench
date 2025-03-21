@@ -38,10 +38,7 @@ export class ProjectZipper {
 
   private zipFolderCount = 0;
 
-  private includeSourceCode = false;
-
-  public async export(pathToSave: string, projectPath: string, includeSourceCode: boolean): Promise<void> {
-    this.includeSourceCode = includeSourceCode;
+  public async export(pathToSave: string, projectPath: string): Promise<void> {
     const zip = new AdmZip();
     // Create a folder in the zip.
     zip.addFile(path.basename(projectPath) + path.sep, Buffer.alloc(0), '');
@@ -65,22 +62,24 @@ export class ProjectZipper {
     const metadata = JSON.parse(txtMetadata);
     delete metadata.apiKey;
     delete metadata.api;
-
-    if (this.includeSourceCode) {
-      zip.addLocalFolder(metadata.scan_root, `${path.basename(projectPath)}/source_code`);
-    }
     metadata.scan_root = null;
     // Add metadata.json to the zip
     zip.addFile(`${path.basename(projectPath)}/metadata.json`, JSON.stringify(metadata, null, 2), '');
     zip.writeZip(pathToSave);
   }
 
-  public async import(zippedProjectPath: string): Promise<IProject> {
+  public async import(zippedProjectPath: string, sourceCodePath:string | null): Promise<IProject> {
     this.readZip(zippedProjectPath);
     if (!this.isValidZip()) throw new Error('The zip file is not valid');
     if (!this.projectName) throw new Error('The zip file is not valid');
     if (workspace.existProject(this.projectName)) throw new Error(`${this.projectName} project already exists`);
     await this.unzipProject();
+    if (sourceCodePath) {
+      const projectPath = path.join(workspace.getMyPath(), this.projectName);
+      const projectMetadata = await Metadata.readFromPath(projectPath);
+      projectMetadata.setScanRoot(sourceCodePath);
+      projectMetadata.save();
+    }
     const project = await Project.readFromPath(workspace.getMyPath() + path.sep + this.projectName);
     workspace.addNewProject(project);
     const iProject = project.getDto();
@@ -119,6 +118,7 @@ export class ProjectZipper {
       || this.zipEntries.length === 0
     ) return false;
     if (
+      this.zipFolderCount === ProjectZipper.MAX_FOLDER_ZIP_COUNT &&
       this.isValidZipVersion()
       && this.scannerState === ScanState.FINISHED
     ) {
@@ -140,25 +140,10 @@ export class ProjectZipper {
     return true;
   }
 
-  private async folderExists(folderPath: string): Promise<boolean> {
-    try {
-      await fs.promises.access(folderPath);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
   private async unzipProject(): Promise<void> {
     this.zip.extractAllTo(workspace.getMyPath(), true);
     const projectPath = path.join(workspace.getMyPath(), this.projectName);
     const projectMetadata = await Metadata.readFromPath(projectPath);
-    const scanRoot = path.join(workspace.getMyPath(), this.projectName, 'source_code');
-    if (await this.folderExists(scanRoot)) {
-      projectMetadata.setScanRoot(scanRoot);
-    } else {
-      projectMetadata.setScanRoot(null);
-    }
     projectMetadata.setSource('IMPORTED');
     projectMetadata.setMyPath(this.projectName);
     projectMetadata.save();

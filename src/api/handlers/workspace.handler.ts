@@ -59,9 +59,9 @@ api.handle(IpcChannels.GET_LICENSES, async (_event) => {
   }
 });
 
-api.handle(IpcChannels.WORKSPACE_IMPORT_PROJECT, async (_event, zippedProjectPath: string) => {
+api.handle(IpcChannels.WORKSPACE_IMPORT_PROJECT, async (_event, zippedProjectPath: string, sourceCodePath:string | null) => {
   try {
-    const Iproject = await new ProjectZipper().import(zippedProjectPath);
+    const Iproject = await new ProjectZipper().import(zippedProjectPath, sourceCodePath);
     return Response.ok({
       message: 'Project imported successfully',
       data: Iproject,
@@ -72,9 +72,9 @@ api.handle(IpcChannels.WORKSPACE_IMPORT_PROJECT, async (_event, zippedProjectPat
   }
 });
 
-api.handle(IpcChannels.WORKSPACE_EXPORT_PROJECT, async (_event, pathToSave: string, projectPath: string, includeSourceCode = false) => {
+api.handle(IpcChannels.WORKSPACE_EXPORT_PROJECT, async (_event, pathToSave: string, projectPath: string) => {
   try {
-    await new ProjectZipper().export(pathToSave, path.join(workspace.getMyPath(), projectPath), includeSourceCode);
+    await new ProjectZipper().export(pathToSave, path.join(workspace.getMyPath(), projectPath));
     return Response.ok({
       message: 'Project exported successfully',
       data: true,
