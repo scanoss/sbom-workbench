@@ -102,7 +102,7 @@ export const workbenchSlice = createSlice({
       state.name = name;
       state.loading = false;
       state.loaded = true;
-      state.imported = imported;
+      state.imported = imported && !scanRoot;
       state.wfp = config.source === Scanner.ScannerSource.WFP;
       state.tree = convertTreeToNode(fileTree, [fileTree]);
       state.dependencies = dependencies;

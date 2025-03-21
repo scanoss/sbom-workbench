@@ -94,7 +94,7 @@ const AppProvider = ({ children }) => {
     dialog.present();
 
     try {
-      await workspaceService.exportProject(path, project.work_root);
+      await workspaceService.exportProject(path, project.work_root, false);
       setTimeout(async () => {
         const timeout = setTimeout(() => dialog.dismiss(), 8000);
         const dismiss = () => {
