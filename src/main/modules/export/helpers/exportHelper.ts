@@ -1,6 +1,8 @@
+import { PackageURL } from 'packageurl-js';
 import { ComponentVulnerability } from '../../../model/entity/ComponentVulnerability';
 import { AffectedComponent, VulnerabilityExportData } from '../../../model/interfaces/report/VulnerabilityExportData';
 import { licenseHelper } from '../../../helpers/LicenseHelper';
+import { ExportComponentData } from '../../../model/interfaces/report/ExportComponentData';
 
 export function toVulnerabilityExportData(componentVulnerabilities: Array<ComponentVulnerability>): Array<VulnerabilityExportData> {
   const vulnerabilityMapper = new Map<string, VulnerabilityExportData & {
@@ -72,4 +74,22 @@ export function getSPDXLicenseInfos(licenses: string, uniqueLicenseInfos: Set<st
     }
   });
   return licenseInfos;
+}
+
+export function getSupplier(component: ExportComponentData) {
+  if (component.vendor) return component.vendor;
+  try {
+    return PackageURL.fromString(component.purl).namespace || 'NOASSERTION';
+  } catch (e) {
+    return 'NOASSERTION';
+  }
+}
+
+export function isValidPurl(purl: string): boolean {
+  try {
+    PackageURL.fromString(purl.replace('@', '%40'));
+    return true;
+  } catch (e) {
+    return false;
+  }
 }

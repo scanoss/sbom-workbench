@@ -8,7 +8,7 @@ import { ExportSource } from '../../../../../api/types';
 import AppConfig from '../../../../../config/AppConfigModule';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
 import packageJson from '../../../../../../release/app/package.json';
-import { getSPDXLicenseInfos } from '../../helpers/exportHelper';
+import { getSPDXLicenseInfos, getSupplier } from '../../helpers/exportHelper';
 import { Project } from '../../../../workspace/Project';
 import { ExportRepository } from '../../Repository/ExportRepository';
 
@@ -120,7 +120,7 @@ export abstract class SpdxLite extends Format {
     pkg.versionInfo = component.version ? component.version : 'NOASSERTION';
     pkg.downloadLocation = component.download_url || component.url || 'NOASSERTION';
     pkg.filesAnalyzed = false;
-    pkg.supplier = `Organization: ${component.vendor ? component.vendor : (PackageURL.fromString(component.purl).namespace || 'NOASSERTION')}`;
+    pkg.supplier = `Organization: ${getSupplier(component)}`;
     pkg.homepage = component.url || 'NOASSERTION';
     pkg.licenseDeclared = component.detected_licenses ? component.detected_licenses : 'NOASSERTION';
     pkg.licenseConcluded = component.concluded_licenses;

@@ -6,7 +6,7 @@ import { Format } from '../../Format';
 import { Project } from '../../../../workspace/Project';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
 import { ExportRepository } from '../../Repository/ExportRepository';
-import { toVulnerabilityExportData } from '../../helpers/exportHelper';
+import { getSupplier, toVulnerabilityExportData } from '../../helpers/exportHelper';
 
 export abstract class CycloneDX extends Format {
   private source: string;
@@ -66,13 +66,13 @@ export abstract class CycloneDX extends Format {
     // Add components to CycloneDX with each respective license
     components.forEach((c) => {
       const licenseRepository = new CDX.Models.LicenseRepository();
-      if (c.unique_detected_licenses.length > 0) {
+      if (c.unique_detected_licenses?.length > 0) {
         c.unique_detected_licenses.forEach((dl) => {
           licenseRepository.add(new CDX.Models.SpdxLicense(dl, { acknowledgement: CDX.Enums.LicenseAcknowledgement.Declared }));
         });
       }
 
-      if (c.unique_concluded_licenses.length > 0) {
+      if (c.unique_concluded_licenses?.length > 0) {
         c.unique_concluded_licenses.forEach((il) => {
           licenseRepository.add(new CDX.Models.SpdxLicense(il, { acknowledgement: CDX.Enums.LicenseAcknowledgement.Concluded }));
         });
@@ -87,7 +87,7 @@ export abstract class CycloneDX extends Format {
         CDX.Enums.ComponentType.Library,
         c.purl,
         {
-          publisher: c.vendor ? c.vendor : (PackageURL.fromString(c.purl).namespace || 'NOASSERTION'),
+          publisher: getSupplier(c),
           purl: PackageURL.fromString(c.purl.replace('@', '%40')),
           version: c.version,
           licenses: licenseRepository,

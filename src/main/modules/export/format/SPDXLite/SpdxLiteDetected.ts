@@ -1,6 +1,7 @@
 import { ExportComponentData } from 'main/model/interfaces/report/ExportComponentData';
+import log from 'electron-log';
 import { LicenseType, SpdxLite } from './SpdxLite';
-import { removeRepeatedLicenses } from '../../helpers/exportHelper';
+import { isValidPurl, removeRepeatedLicenses } from '../../helpers/exportHelper';
 import { Project } from '../../../../workspace/Project';
 import { ExportRepository } from '../../Repository/ExportRepository';
 import { ExportSource } from '../../../../../api/types';
@@ -23,12 +24,15 @@ export class SpdxLiteDetected extends SpdxLite {
   protected getUniqueComponents(data: ExportComponentData[]): ExportComponentData[] {
     const uniqueComponents = new Map<string, ExportComponentData>();
     data.forEach((comp) => {
-      const key = `${comp.purl}@${comp.version}`;
-      // Detected licenses already joined in query by 'AND'
-      const licenses = comp.detected_licenses ? removeRepeatedLicenses(comp.detected_licenses) : 'NOASSERTION';
-      uniqueComponents.set(key, { ...comp, detected_licenses: licenses, concluded_licenses: 'NOASSERTION' });
+      if (isValidPurl(comp.purl)) {
+        const key = `${comp.purl}@${comp.version}`;
+        // Detected licenses already joined in query by 'AND'
+        const licenses = comp.detected_licenses ? removeRepeatedLicenses(comp.detected_licenses) : 'NOASSERTION';
+        uniqueComponents.set(key, { ...comp, detected_licenses: licenses, concluded_licenses: 'NOASSERTION' });
+      } else {
+        log.error(`Invalid purl: ${comp.purl}. Skipping...`);
+      }
     });
-
     return Array.from(uniqueComponents.values());
   }
 }
