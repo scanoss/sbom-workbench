@@ -96,7 +96,6 @@ const useStyles = makeStyles((theme) => ({
 interface ReportDialogProps {
   open: boolean;
   invalidPurls: Array<string>;
-  button: any;
   onClose: (response: DialogResponse) => void;
 }
 
@@ -104,7 +103,7 @@ export const ReportDialog = (props: ReportDialogProps) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
-  const { open, invalidPurls, button, onClose } = props;
+  const { open, invalidPurls, onClose } = props;
 
   const handleCancel = () => onClose({ action: DIALOG_ACTIONS.CANCEL });
   const handleAccept = () => onClose({ action: DIALOG_ACTIONS.OK });
