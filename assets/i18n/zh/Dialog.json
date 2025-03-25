@@ -24,5 +24,6 @@
   "NoGroupKeywordsAvailable": "No groups available",
   "GroupNameLabel": "Group name",
   "GroupKeywordLabel": "Keywords",
-  "GroupAlreadyExists": "Group already exists!"
+  "GroupAlreadyExists": "Group already exists!",
+  "CreateComponentPurlError": "Invalid Package URL"
 }
