@@ -17,6 +17,7 @@ import ComponentSearcherDialog from '../ui/dialog/ComponentSearcherDialog';
 import { ProjectSelectorDialog } from '../ui/dialog/ProjectSelectorDialog';
 import WorkspaceAddDialog from 'renderer/ui/dialog/WorkspaceAddDialog';
 import { KeywordGroupMenu } from 'renderer/features/workbench/components/KeywordGroupMenu/KeywordGroupMenu';
+import ReportDialog from '../ui/dialog/ReportDialog';
 import ImportProjectSourceDialog from '../ui/dialog/ImportProjectSourceDialog';
 
 export interface IDialogContext {
@@ -33,6 +34,7 @@ export interface IDialogContext {
   openDependencyDialog: (dependency: Dependency) => Promise<DialogResponse>;
   openProjectSelectorDialog: (params?: { folder?: string, md5File?: string}) => Promise<DialogResponse>;
   openWorkspaceAddDialog: () => Promise<DialogResponse>;
+  openReportDialog: (invalidPurls: Array<string>) => Promise<DialogResponse>;
   openImportProjectSourceDialog: () => Promise<DialogResponse>;
 }
 
@@ -410,6 +412,26 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
   };
 
 
+  const [reportDialog, setReportDialog] = useState<{
+    open: boolean;
+    invalidPurls: Array<string>,
+    onClose?: (response: DialogResponse) => void;
+  }>({ open: false, invalidPurls: [] });
+
+  const openReportDialog = (invalidPurls: Array<string>): Promise<DialogResponse> => {
+    return new Promise<DialogResponse>((resolve) => {
+      setReportDialog({
+        open: true,
+        invalidPurls,
+        onClose: (response: DialogResponse) => {
+          setReportDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(response);
+        },
+      });
+    });
+  };
+
+
   // setup listeners
   useEffect(setupAppMenuListeners, []);
 
@@ -430,6 +452,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         openProjectSelectorDialog,
         openWorkspaceAddDialog,
         openImportProjectSourceDialog,
+        openReportDialog,
       }}
     >
       {children}
@@ -558,6 +581,15 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
           onClose={(response) => importProjectSourceSelectorDialog.onClose && importProjectSourceSelectorDialog.onClose(response)}
           button={confirmDialog.button}
 
+        />
+      )}
+
+      {reportDialog.open && (
+        <ReportDialog
+          open={reportDialog.open}
+          onClose={(response) => reportDialog.onClose && reportDialog.onClose(response)}
+          invalidPurls={reportDialog.invalidPurls}
+          button={reportDialog.button}
         />
       )}
     </DialogContext.Provider>
