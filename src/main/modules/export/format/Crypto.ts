@@ -3,6 +3,9 @@ import { ExportSource } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
 import { Algorithms, Cryptography } from '../../../model/entity/Cryptography';
 import { LocalCryptography } from '../../../model/entity/LocalCryptography';
+import { DataRecord } from '../../../model/interfaces/report/DataRecord';
+import { ReportData } from '../ReportData';
+import { isValidPurl } from '../helpers/exportHelper';
 
 export interface CryptoComponent {
   component: string,
@@ -46,13 +49,42 @@ export class Crypto extends Format {
     return csv;
   }
 
+  private getReportData(data: CryptoInputData): ReportData<CryptoInputData> {
+    const components: Array<CryptoComponent> = [];
+    const invalidPurls: Array<string> = [];
+
+    // Remove invalid purls
+    data.components.forEach((c) => {
+      if (isValidPurl(c.component)) {
+        components.push(c);
+      } else {
+        invalidPurls.push(c.component);
+      }
+    });
+
+    const processedComponentsData = {
+      ...data,
+      components,
+    };
+
+    return {
+      components: processedComponentsData,
+      invalidPurls,
+    };
+  }
+
   // @override
   public async generate() {
     const data = this.source === ExportSource.IDENTIFIED
       ? await this.getIdentifyData()
       : await this.getDetectedData();
-    const csv = this.csvCreate(data);
-    return csv;
+
+    const { components, invalidPurls } = this.getReportData(data);
+    const csv = this.csvCreate(components);
+    return {
+      report: csv,
+      invalidPurls,
+    };
   }
 
   /**

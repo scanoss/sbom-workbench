@@ -5,6 +5,7 @@ import { isValidPurl, removeRepeatedLicenses } from '../../helpers/exportHelper'
 import { Project } from '../../../../workspace/Project';
 import { ExportRepository } from '../../Repository/ExportRepository';
 import { ExportSource } from '../../../../../api/types';
+import { ReportData } from '../../ReportData';
 
 export class SpdxLiteIdentified extends SpdxLite {
   constructor(project: Project, exportModel: ExportRepository) {
@@ -21,8 +22,9 @@ export class SpdxLiteIdentified extends SpdxLite {
   }
 
   // @Override
-  protected getUniqueComponents(data: ExportComponentData[]): ExportComponentData[] {
+  protected getUniqueComponents(data: ExportComponentData[]): ReportData<ExportComponentData[]> {
     const uniqueComponents = new Map<string, ExportComponentData>();
+    const invalidPurls: Array<string> = [];
     data.forEach((comp) => {
       if (isValidPurl(comp.purl)) {
         const key = `${comp.purl}@${comp.version}`;
@@ -36,10 +38,13 @@ export class SpdxLiteIdentified extends SpdxLite {
           uniqueComponents.set(key, { ...comp, detected_licenses: detectedLicenses });
         }
       } else {
-        log.error(`Invalid purl: ${comp.purl}. Skipping...`);
+        invalidPurls.push(comp.purl);
       }
     });
 
-    return Array.from(uniqueComponents.values());
+    return {
+      components: Array.from(uniqueComponents.values()),
+      invalidPurls,
+    };
   }
 }

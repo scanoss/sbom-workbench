@@ -14,8 +14,8 @@ api.handle(IpcChannels.EXPORT, async (_event, params: NewExportDTO) => {
   try {
     const exportTask = new Export();
     exportTask.setFormat(params);
-    const success = await exportTask.run(params.path);
-    return Response.ok({ message: 'File exported successfully', data: success });
+    const exportResults = await exportTask.run(params.path);
+    return Response.ok({ message: 'File exported successfully', data: exportResults });
   } catch (e: any) {
     log.error('Catch an error: ', e, params);
     return Response.fail({ message: e.message });

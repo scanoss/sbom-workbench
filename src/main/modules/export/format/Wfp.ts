@@ -10,6 +10,9 @@ export class Wfp extends Format {
 
   public async generate() {
     const data = await this.export.getWfpData();
-    return data;
+    return {
+      report: data,
+      invalidPurls: null,
+    };
   }
 }

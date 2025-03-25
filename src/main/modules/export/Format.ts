@@ -5,6 +5,11 @@ import { ExportRepositorySqliteImp } from './Repository/ExportRepositorySqliteIm
 import { IExportResult } from './IExportResult';
 import { ExportRepository } from './Repository/ExportRepository';
 
+export interface ExportResult {
+  report: string;
+  invalidPurls: Array<string> | null;
+}
+
 export abstract class Format {
   protected export: ExportRepository;
 
@@ -14,17 +19,19 @@ export abstract class Format {
     this.export = exportModel;
   }
 
-  public abstract generate();
+  public abstract generate(): Promise<ExportResult>;
 
   public async save(path: string): Promise<IExportResult> {
-    const file = await this.generate();
+    const { report, invalidPurls } = await this.generate();
+    log.info('[ Report ]: Invalid report PURLS: ', invalidPurls);
     try {
-      await fs.promises.writeFile(path, file);
+      await fs.promises.writeFile(path, report);
       return {
         success: true,
         message: 'Export successful',
         extension: this.extension,
         file: path,
+        invalidPurls,
       };
     } catch (error) {
       log.error(error);
@@ -33,6 +40,7 @@ export abstract class Format {
         message: 'Export not successful',
         extension: this.extension,
         file: path,
+        invalidPurls,
       };
     }
   }

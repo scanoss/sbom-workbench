@@ -1,11 +1,12 @@
 import { ExportComponentData } from 'main/model/interfaces/report/ExportComponentData';
 import { CycloneDX } from './CycloneDX';
 import { isValidPurl } from '../../helpers/exportHelper';
-import log from 'electron-log';
+import { ReportData } from '../../ReportData';
 
 export class CycloneDXDetected extends CycloneDX {
-  protected getUniqueComponents(data: ExportComponentData[]) {
+  protected getUniqueComponents(data: ExportComponentData[]): ReportData<ExportComponentData[]> {
     const uniqueComponents = new Map<string, ExportComponentData>();
+    const invalidPurls: Array<string> = [];
     data.forEach((comp) => {
       if (isValidPurl(comp.purl)) {
         const key = `${comp.purl}@${comp.version}`;
@@ -15,10 +16,12 @@ export class CycloneDXDetected extends CycloneDX {
           unique_concluded_licenses: [],
         });
       } else {
-        log.error(`Invalid purl: ${comp.purl}. Skipping...`);
+        invalidPurls.push(comp.purl);
       }
     });
-
-    return Array.from(uniqueComponents.values());
+    return {
+      components: Array.from(uniqueComponents.values()) as ExportComponentData[],
+      invalidPurls,
+    };
   }
 }

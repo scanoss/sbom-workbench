@@ -2,11 +2,12 @@ import * as CDX from '@cyclonedx/cyclonedx-library';
 import { PackageURL } from 'packageurl-js';
 import AppConfig from '../../../../../config/AppConfigModule';
 import { ExportSource } from '../../../../../api/types';
-import { Format } from '../../Format';
+import { ExportResult, Format } from '../../Format';
 import { Project } from '../../../../workspace/Project';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
 import { ExportRepository } from '../../Repository/ExportRepository';
 import { getSupplier, toVulnerabilityExportData } from '../../helpers/exportHelper';
+import { ReportData } from '../../ReportData';
 
 export abstract class CycloneDX extends Format {
   private source: string;
@@ -20,11 +21,11 @@ export abstract class CycloneDX extends Format {
     this.project = project;
   }
 
-  protected abstract getUniqueComponents(data: Array<ExportComponentData>): Array<ExportComponentData>;
+  protected abstract getUniqueComponents(data: Array<ExportComponentData>): ReportData<ExportComponentData[]>;
 
   // See CycloneDX 1.6 https://cyclonedx.org/docs/1.6/json
   // See CycloneDX Example w/ Crypto & Dependencies https://raw.githubusercontent.com/CycloneDX/bom-examples/master/CBOM/Example-With-Dependencies/bom.json
-  public async generate() {
+  public async generate(): Promise<ExportResult> {
     // Create CycloneDX Header
     const bom = new CDX.Models.Bom();
     bom.metadata = new CDX.Models.Metadata({
@@ -60,7 +61,7 @@ export abstract class CycloneDX extends Format {
       ? await this.export.getIdentifiedVulnerability()
       : await this.export.getDetectedVulnerability();
 
-    const components = this.getUniqueComponents(data);
+    const { components, invalidPurls } = this.getUniqueComponents(data);
     const vulnerabilityExportData = toVulnerabilityExportData(vulnerabilityData);
 
     // Add components to CycloneDX with each respective license
@@ -134,6 +135,9 @@ export abstract class CycloneDX extends Format {
       new CDX.Serialize.JSON.Normalize.Factory(CDX.Spec.Spec1dot6),
     );
 
-    return jsonSerializer.serialize(bom, { sortLists: true, space: 2 });
+    return {
+      report: jsonSerializer.serialize(bom, { sortLists: true, space: 2 }),
+      invalidPurls: invalidPurls.length > 0 ? invalidPurls : null,
+    };
   }
 }

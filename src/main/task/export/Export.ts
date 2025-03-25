@@ -14,7 +14,7 @@ import { Crypto } from '../../modules/export/format/Crypto';
 import { workspace } from '../../workspace/Workspace';
 import { ExportRepositorySqliteImp } from '../../modules/export/Repository/ExportRepositorySqliteImp';
 import { CycloneDXDetected } from '../../modules/export/format/CycloneDX/CycloneDXDetected';
-import { CycloneDXIdentified } from '../../modules/export/format/CycloneDX/CycloneDxIdentified';
+import { CycloneDXIdentified } from '../../modules/export/format/CycloneDX/CycloneDXIdentified';
 import { SpdxLiteDetected } from '../../modules/export/format/SPDXLite/SpdxLiteDetected';
 import { SpdxLiteIdentified } from '../../modules/export/format/SPDXLite/SpdxLiteIdentified';
 import { Settings } from '../../modules/export/format/Settings/Settings';

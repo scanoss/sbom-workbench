@@ -2,6 +2,8 @@ import { Format } from '../Format';
 import { ExportSource } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
 import { DataRecord } from '../../../model/interfaces/report/DataRecord';
+import { isValidPurl } from '../helpers/exportHelper';
+import { ReportData } from '../ReportData';
 
 export class Csv extends Format {
   private source: string;
@@ -21,12 +23,42 @@ export class Csv extends Format {
     return csv;
   }
 
+  private getReportData(data: Array<DataRecord>): ReportData<Array<DataRecord>> {
+    const reportData: Array<DataRecord> = [];
+    const invalidPurls: string[] = [];
+    data.forEach((comp) => {
+      const validDetectedPurl = isValidPurl(comp.detected_purl);
+      const validConcludedPurl = isValidPurl(comp.concluded_purl);
+
+      if (!validDetectedPurl) {
+        invalidPurls.push(comp.detected_purl);
+      }
+
+      if (!validConcludedPurl) {
+        invalidPurls.push(comp.concluded_purl);
+      }
+
+      if (validDetectedPurl && validConcludedPurl) {
+        reportData.push(comp);
+      }
+    });
+    return {
+      components: reportData,
+      invalidPurls,
+    };
+  }
+
   // @override
   public async generate() {
     const data = this.source === ExportSource.IDENTIFIED
       ? await modelProvider.model.report.fetchAllIdentifiedRecordsFiles()
       : await modelProvider.model.report.fetchAllDetectedRecordsFiles();
-    const csv = this.csvCreate(data);
-    return csv;
+
+    const { components, invalidPurls } = this.getReportData(data);
+    const csv = this.csvCreate(components);
+    return {
+      report: csv,
+      invalidPurls,
+    };
   }
 }

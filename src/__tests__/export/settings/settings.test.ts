@@ -393,8 +393,8 @@ describe('export settings tests', () => {
       },
     ]);
     settingsFormat = new Settings(ExportSource.IDENTIFIED, exportRepositoryMock);
-    const settings = await settingsFormat.generate();
-    expect(JSON.parse(settings)).toEqual({
+    const { report }= await settingsFormat.generate();
+    expect(JSON.parse(report)).toEqual({
       bom: {
         include: [
           {

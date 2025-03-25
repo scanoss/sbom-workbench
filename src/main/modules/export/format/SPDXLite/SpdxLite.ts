@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 import { app } from 'electron';
 import { PackageURL } from 'packageurl-js';
 import { utilModel } from '../../../../model/UtilModel';
-import { Format } from '../../Format';
+import { ExportResult, Format } from '../../Format';
 import { ExportSource } from '../../../../../api/types';
 import AppConfig from '../../../../../config/AppConfigModule';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
@@ -11,6 +11,7 @@ import packageJson from '../../../../../../release/app/package.json';
 import { getSPDXLicenseInfos, getSupplier } from '../../helpers/exportHelper';
 import { Project } from '../../../../workspace/Project';
 import { ExportRepository } from '../../Repository/ExportRepository';
+import { ReportData } from '../../ReportData';
 
 const crypto = require('crypto');
 
@@ -34,12 +35,12 @@ export abstract class SpdxLite extends Format {
     this.project = project;
   }
 
-  protected abstract getUniqueComponents(data: Array<ExportComponentData>): Array<ExportComponentData>;
+  protected abstract getUniqueComponents(data: Array<ExportComponentData>): ReportData<ExportComponentData[]>;
 
   protected abstract getLicenseCopyRight(component: ExportComponentData);
 
   // @override
-  public async generate() {
+  public async generate(): Promise<ExportResult> {
     const licenses = await this.export.getAllLicensesWithFullText();
     this.licenseMapper = new Map<string, any>();
     licenses.forEach((l) => {
@@ -50,7 +51,7 @@ export abstract class SpdxLite extends Format {
       ? await this.export.getIdentifiedData()
       : await this.export.getDetectedData();
 
-    const components = this.getUniqueComponents(data);
+    const { components, invalidPurls } = this.getUniqueComponents(data);
 
     const spdx = this.template();
     spdx.packages = [];
@@ -81,7 +82,10 @@ export abstract class SpdxLite extends Format {
     spdx.documentNamespace = spdx.documentNamespace.replace('DOCUMENTNAME', projectName);
     spdx.documentNamespace = spdx.documentNamespace.replace('UUID', hex);
 
-    return JSON.stringify(spdx, undefined, 4);
+    return {
+      report: JSON.stringify(spdx, undefined, 4),
+      invalidPurls: invalidPurls.length > 0 ? invalidPurls : null,
+    };
   }
 
   private template(): SPDXDocument {
