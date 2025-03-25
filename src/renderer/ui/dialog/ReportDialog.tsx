@@ -161,11 +161,19 @@ export const ReportDialog = (props: ReportDialogProps) => {
         <Box className={classes.purlListContainer}>
           <List disablePadding>
             {invalidPurls.map((purl, index) => (
-              <ListItem key={index} className={classes.purlItem} disableGutters>
+              <ListItem
+                key={index}
+                className={classes.purlItem}
+                disableGutters
+                style={{ cursor: 'text' }}
+              >
                 <ListItemText
                   primary={purl}
                   primaryTypographyProps={{
-                    style: { fontFamily: 'monospace', fontSize: '14px' },
+                    style: { fontFamily: 'monospace',
+                      fontSize: '14px',
+                      userSelect: 'all',
+                    },
                   }}
                 />
               </ListItem>
