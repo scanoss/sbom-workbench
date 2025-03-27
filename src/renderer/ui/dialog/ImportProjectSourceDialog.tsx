@@ -11,6 +11,7 @@ import {
   FormLabel,
   Grid,
   Typography,
+  Box,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import IconButton from '@mui/material/IconButton';
@@ -26,9 +27,6 @@ const useStyles = makeStyles((theme) => ({
     width: 400,
   },
   closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
     color: theme.palette.grey[500],
   },
   deleteButton: {
@@ -59,15 +57,21 @@ const useStyles = makeStyles((theme) => ({
   },
   input: {
     flex: 1,
+    border: 'solid 1px #80808033',
+    borderRadius: '3px',
   },
   browseButton: {
-    marginLeft: theme.spacing(1),
+    marginLeft: theme.spacing(3),
+    height: '40px',
   },
   errorText: {
     color: theme.palette.error.main,
     fontSize: '0.75rem',
     marginTop: theme.spacing(0.5),
     marginLeft: theme.spacing(1.5),
+  },
+  title: {
+    padding: '12px 15px 12px 15px',
   },
 }));
 
@@ -129,9 +133,10 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
 
   const handleProjectFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
+
     if (files && files.length > 0) {
-      setProjectPath(files[0].path || files[0].name);
-      setProjectPathError('');
+        setProjectPath(files[0].path || files[0].name);
+        setProjectPathError('');
     }
   };
 
@@ -148,6 +153,11 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
     }
   };
 
+
+  const isValid = () => {
+    return projectPath && projectPath !== '';
+  };
+
   return (
     <Dialog
       id="ImportProjectSourceDialog"
@@ -158,8 +168,8 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
       open={open}
       onClose={handleCancel}
     >
-      <DialogTitle>
-        {t('Import Project and Source')}
+      <header className="dialog-title">
+        <label>{t('Import Project and Source')}</label>
         <IconButton
           aria-label="close"
           className={classes.closeButton}
@@ -168,7 +178,7 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
         >
           <CloseIcon />
         </IconButton>
-      </DialogTitle>
+      </header>
       <DialogContent className={classes.content}>
         <FormControl component="fieldset" className={classes.formControl}>
           <FormLabel component="legend">{t('Project')}</FormLabel>
@@ -183,6 +193,9 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
               error={!!projectPathError}
               size="small"
               variant="outlined"
+              InputProps={{
+                readOnly: true,
+              }}
             />
             <Button
               variant="contained"
@@ -203,7 +216,7 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
             />
           </div>
           {projectPathError && (
-            <Typography className={classes.errorText}>{projectPathError}</Typography>
+          <Typography className={classes.errorText}>{projectPathError}</Typography>
           )}
         </FormControl>
 
@@ -219,6 +232,9 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
               fullWidth
               size="small"
               variant="outlined"
+              InputProps={{
+                readOnly: true,
+              }}
             />
             <Button
               variant="outlined"
@@ -250,6 +266,7 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
           autoFocus
           color="secondary"
           variant="contained"
+          disabled={!isValid()}
           onClick={handleAccept}
         >
           {t('Button:Accept')}
