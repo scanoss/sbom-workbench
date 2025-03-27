@@ -35,7 +35,7 @@ export class HtmlSummary extends Format {
     report.setTemplatePath(PATH);
     return {
       report: await report.getHTML(),
-      invalidPurls: null,
+      invalidPurls: await new ComponentDataProvider(this.source).getInvalidPurls(),
     };
   }
 }
