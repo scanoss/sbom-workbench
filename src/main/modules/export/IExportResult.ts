@@ -3,4 +3,5 @@ export interface IExportResult {
   message: string;
   extension: string;
   file: string;
+  invalidPurls: string[] | null;
 }

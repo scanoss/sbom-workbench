@@ -1,4 +1,4 @@
-import { ComponentReport, ComponentReportResponse, ReportData, ReportSummary } from '@api/types';
+import { ComponentReportResponse, ReportData, ReportSummary } from '@api/types';
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
 

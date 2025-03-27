@@ -2,13 +2,16 @@ import { ComponentDataLayer, DataProvider, IDataLayers } from 'scanoss';
 import { ExportSource } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
 import { BaseDataProvider } from './BaseDataProvider';
+import { isValidPurl } from '../helpers/exportHelper';
 
 export class ComponentDataProvider extends BaseDataProvider implements DataProvider {
   async getData(): Promise<IDataLayers> {
     const query = this.source === ExportSource.IDENTIFIED ? await modelProvider.model.component.getComponentsIdentifiedForReport() : await modelProvider.model.component.getComponentsDetectedForReport();
+    const validComponents = query.filter((i) => isValidPurl(i.purl));
+
     const componentsMap: { [key: string]: ComponentDataLayer } = {};
 
-    query.forEach((item) => {
+    validComponents.forEach((item) => {
       const key = item.purl; // Assuming purl[0] is used as the key
 
       if (!componentsMap[key]) {
@@ -47,6 +50,17 @@ export class ComponentDataProvider extends BaseDataProvider implements DataProvi
     return <IDataLayers>{
       component: Object.values(componentsMap) as unknown as ComponentDataLayer[],
     };
+  }
+
+  public async getInvalidPurls(): Promise<Array<string> | null> {
+    const query = this.source === ExportSource.IDENTIFIED
+      ? await modelProvider.model.component.getComponentsIdentifiedForReport()
+      : await modelProvider.model.component.getComponentsDetectedForReport();
+    const invalidPurls = query
+      .filter((i) => !isValidPurl(i.purl))
+      .map((i) => i.purl);
+    if (invalidPurls.length > 0) return invalidPurls;
+    return null;
   }
 
   public getLayerName(): string {

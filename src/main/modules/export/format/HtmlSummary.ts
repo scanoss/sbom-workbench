@@ -1,6 +1,6 @@
 import { DataProviderManager, Report } from 'scanoss';
 import { ExportSource } from '../../../../api/types';
-import { Format } from '../Format';
+import { ExportResult, Format } from '../Format';
 import { ComponentDataProvider } from '../DataProviders/ComponentDataProvider';
 import { LicenseDataProvider } from '../DataProviders/LicenseDataProvider';
 import { SummaryDataProvider } from '../DataProviders/SummaryDataProvider';
@@ -19,7 +19,7 @@ export class HtmlSummary extends Format {
   }
 
   // @override
-  public async generate() {
+  public async generate(): Promise<ExportResult> {
     const isDev = process.env.NODE_ENV !== 'production';
     const PATH = isDev
       ? pathLib.join(__dirname, '../../../../../assets/exportTemplates/template.html')
@@ -33,6 +33,9 @@ export class HtmlSummary extends Format {
     dpm.addDataProvider(new CryptographyDataProvider(this.source));
     const report = new Report(dpm);
     report.setTemplatePath(PATH);
-    return report.getHTML();
+    return {
+      report: await report.getHTML(),
+      invalidPurls: await new ComponentDataProvider(this.source).getInvalidPurls(),
+    };
   }
 }

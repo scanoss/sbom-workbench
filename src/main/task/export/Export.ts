@@ -1,8 +1,6 @@
 /* eslint-disable no-async-promise-executor */
-
-import { NewExportDTO, SourceType } from 'api/dto';
+import { NewExportDTO } from 'api/dto';
 import { Format } from '../../modules/export/Format';
-import { Spdxv20 } from '../../modules/export/format/Spdxv20';
 import { Csv } from '../../modules/export/format/Csv';
 import { Raw } from '../../modules/export/format/Raw';
 import { Wfp } from '../../modules/export/format/Wfp';
@@ -14,7 +12,7 @@ import { Crypto } from '../../modules/export/format/Crypto';
 import { workspace } from '../../workspace/Workspace';
 import { ExportRepositorySqliteImp } from '../../modules/export/Repository/ExportRepositorySqliteImp';
 import { CycloneDXDetected } from '../../modules/export/format/CycloneDX/CycloneDXDetected';
-import { CycloneDXIdentified } from '../../modules/export/format/CycloneDX/CycloneDxIdentified';
+import { CycloneDXIdentified } from '../../modules/export/format/CycloneDX/CycloneDXIdentified';
 import { SpdxLiteDetected } from '../../modules/export/format/SPDXLite/SpdxLiteDetected';
 import { SpdxLiteIdentified } from '../../modules/export/format/SPDXLite/SpdxLiteIdentified';
 import { Settings } from '../../modules/export/format/Settings/Settings';
@@ -34,9 +32,6 @@ export class Export implements ITask<string, IExportResult> {
 
   public setFormat(exportDTO: NewExportDTO) {
     switch (exportDTO.format as ExportFormat) {
-      case ExportFormat.SPDX20:
-        this.format = new Spdxv20();
-        break;
       case ExportFormat.CSV:
         if (exportDTO.inventoryType === InventoryType.SBOM) {
           this.format = new Csv(exportDTO.source);

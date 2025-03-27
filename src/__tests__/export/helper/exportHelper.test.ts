@@ -1,10 +1,11 @@
 import { ExportRepositoryMock } from '../ExportRepositoryMock';
 import {
-  getSPDXLicenseInfos,
+  getSPDXLicenseInfos, getSupplier, isValidPurl,
   removeRepeatedLicenses,
   toVulnerabilityExportData,
 } from '../../../main/modules/export/helpers/exportHelper';
 import { multipleVulnerabilitiesTestData } from '../mocks/vulnerability.model.mock';
+import { ExportComponentData } from '../../../main/model/interfaces/report/ExportComponentData';
 
 jest.mock('electron', () => ({
   app: {
@@ -134,5 +135,104 @@ describe('export helper tests', () => {
     expect(uniqueLicenses.length).toEqual(2);
     expect(new Set(uniqueLicenses.map((ul) => ul.licenseId)))
       .toEqual(new Set(['LicenseRef-scancode-public-domain', 'LicenseRef-scancode-bitstream']));
+  });
+
+  it('Test valid purl', async () => {
+    const tests = [
+      {
+        purl: 'pkg:RFC4634',
+        expectedResult: false,
+      },
+      {
+        purl: 'pkg:SDK_2.x.x_KV5x',
+        expectedResult: false,
+      },
+      {
+        purl: 'pkg:Toshiba_TMPMK4SDK',
+        expectedResult: false,
+      },
+      {
+        purl: 'pkg:github/scanoss/scanner.c',
+        expectedResult: true,
+      },
+    ];
+    tests.forEach((test) => {
+      expect(isValidPurl(test.purl)).toEqual(test.expectedResult);
+    });
+  });
+
+  it('Test get supplier', async () => {
+    const tests: Array<{
+      component: ExportComponentData;
+      expectedResult: string;
+    }> = [
+      {
+        component: {
+          component: 'RFC4634',
+          purl: 'pkg:RFC4634',
+          vendor: null,
+          version: '1.0.0',
+          detected_licenses: '',
+          concluded_licenses: '',
+          url: 'url',
+          url_hash: null,
+          download_url: null,
+          unique_concluded_licenses: null,
+          unique_detected_licenses: null,
+        },
+        expectedResult: 'NOASSERTION',
+      },
+      {
+        component: {
+          component: 'Toshiba_TMPMK4SDK',
+          purl: 'pkg:Toshiba_TMPMK4SDK',
+          vendor: null,
+          version: '1.0.0',
+          detected_licenses: '',
+          concluded_licenses: '',
+          url: 'url',
+          url_hash: null,
+          download_url: null,
+          unique_concluded_licenses: null,
+          unique_detected_licenses: null,
+        },
+        expectedResult: 'NOASSERTION',
+      },
+      {
+        component: {
+          component: 'scanner.c',
+          purl: 'pkg:github/scanoss/scanner.c',
+          vendor: null,
+          version: '1.0.0',
+          detected_licenses: '',
+          concluded_licenses: '',
+          url: 'url',
+          url_hash: null,
+          download_url: null,
+          unique_concluded_licenses: null,
+          unique_detected_licenses: null,
+        },
+        expectedResult: 'scanoss',
+      },
+      {
+        component: {
+          component: '',
+          purl: 'pkg:github/scanoss/scanner.c',
+          vendor: 'scanoss',
+          version: '1.0.0',
+          detected_licenses: '',
+          concluded_licenses: '',
+          url: 'url',
+          url_hash: null,
+          download_url: null,
+          unique_concluded_licenses: null,
+          unique_detected_licenses: null,
+        },
+        expectedResult: 'scanoss',
+      },
+    ];
+    tests.forEach((test) => {
+      expect(getSupplier(test.component)).toEqual(test.expectedResult);
+    });
   });
 });

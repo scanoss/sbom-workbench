@@ -2,6 +2,8 @@ import React, { useState, useEffect, ReactNode } from 'react';
 import { IpcChannels } from '@api/ipc-channels';
 import { Dependency, Inventory, NewComponentDTO } from '@api/types';
 import { useTranslation } from 'react-i18next';
+import WorkspaceAddDialog from 'renderer/ui/dialog/WorkspaceAddDialog';
+import { KeywordGroupMenu } from 'renderer/features/workbench/components/KeywordGroupMenu/KeywordGroupMenu';
 import { InventoryDialog } from '../ui/dialog/InventoryDialog';
 import { InventorySelectorDialog } from '../features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
 import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse, LoaderController } from './types';
@@ -15,9 +17,8 @@ import { ProgressDialog } from '../ui/dialog/ProgressDialog';
 import DependencyDialog from '../ui/dialog/DependencyDialog';
 import ComponentSearcherDialog from '../ui/dialog/ComponentSearcherDialog';
 import { ProjectSelectorDialog } from '../ui/dialog/ProjectSelectorDialog';
-import WorkspaceAddDialog from 'renderer/ui/dialog/WorkspaceAddDialog';
-import { KeywordGroupMenu } from 'renderer/features/workbench/components/KeywordGroupMenu/KeywordGroupMenu';
-import ImportProjectSourceDialog from '../ui/dialog/ImportProjectSourceDialog';
+import { ReportDialog } from '../ui/dialog/ReportDialog';
+import { ImportProjectSourceDialog } from '../ui/dialog/ImportProjectSourceDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>, options?: InventoryDialogOptions) => Promise<Inventory | null>;
@@ -31,8 +32,9 @@ export interface IDialogContext {
   openPreLoadInventoryDialog: (folder: string, overwrite: boolean) => Promise<boolean>;
   createProgressDialog: (message: ReactNode) => Promise<LoaderController>;
   openDependencyDialog: (dependency: Dependency) => Promise<DialogResponse>;
-  openProjectSelectorDialog: (params?: { folder?: string, md5File?: string}) => Promise<DialogResponse>;
+  openProjectSelectorDialog: (params?: { folder?: string, md5File?: string }) => Promise<DialogResponse>;
   openWorkspaceAddDialog: () => Promise<DialogResponse>;
+  openReportDialog: (invalidPurls: Array<string>) => Promise<DialogResponse>;
   openImportProjectSourceDialog: () => Promise<DialogResponse>;
 }
 
@@ -53,21 +55,20 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     open: boolean;
     inventory: Partial<InventoryForm>;
     options: InventoryDialogOptions;
-    onClose?: (inventory) => void;
+    onClose?:(inventory) => void;
   }>({ open: false, inventory: {}, options: {} });
-
 
   const [keywordGroupDialog, setKeywordGroupDialog] = useState<{
     open: boolean,
     onValueChange: any,
-    close?: ()=> void;
+    close?:()=> void;
   }>({ open: false, onValueChange: null });
 
   const openInventory = (inventory: Partial<InventoryForm>, options: InventoryDialogOptions = {}): Promise<Inventory | null> => {
     return new Promise<Inventory>((resolve) => {
       setInventoryDialog({
         inventory,
-        options: {...defaultInventoryDialogOptions, ...options},
+        options: { ...defaultInventoryDialogOptions, ...options },
         open: true,
         onClose: (inv) => {
           setInventoryDialog((dialog) => ({ ...dialog, open: false }));
@@ -80,7 +81,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
   const [inventorySelectorDialog, setInventorySelectorDialog] = useState<{
     open: boolean;
     inventories: Inventory[];
-    onClose?: (response: InventorySelectorResponse) => void;
+    onClose?:(response: InventorySelectorResponse) => void;
   }>({ open: false, inventories: [] });
 
   const openInventorySelector = (inventories: Inventory[]): Promise<InventorySelectorResponse> => {
@@ -101,7 +102,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     message?: string;
     button?: any;
     hideDeleteButton?: boolean;
-    onClose?: (response: DialogResponse) => void;
+    onClose?:(response: DialogResponse) => void;
   }>({ open: false });
 
   const openConfirmDialog = (
@@ -113,7 +114,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
       label: 'OK',
       role: 'accept',
     },
-    hideDeleteButton = false
+    hideDeleteButton = false,
   ): Promise<DialogResponse> => {
     return new Promise<DialogResponse>((resolve) => {
       setConfirmDialog({
@@ -134,7 +135,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     open: boolean;
     message?: string;
     buttons?: any[];
-    onClose?: (response: DialogResponse) => void;
+    onClose?:(response: DialogResponse) => void;
   }>({ open: false, buttons: [] });
 
   const openAlertDialog = (
@@ -177,7 +178,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         message,
       });
       resolve({
-        present: ({ message } = {}) => setProgressDialog((dialog) => ({ ...dialog, open: true, loader: true, ...( message ? { message } : {} )})),
+        present: ({ message } = {}) => setProgressDialog((dialog) => ({ ...dialog, open: true, loader: true, ...(message ? { message } : {}) })),
         finish: ({ message }) => setProgressDialog((dialog) => ({ ...dialog, message, loader: false })),
         dismiss: (props) => {
           return new Promise((resolve) => {
@@ -193,7 +194,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
 
   const [licenseDialog, setLicenseDialog] = useState<{
     open: boolean;
-    onClose?: (response: DialogResponse) => void;
+    onClose?:(response: DialogResponse) => void;
     save?: boolean;
   }>({ open: false });
 
@@ -212,7 +213,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
 
   const [settingsDialog, setSettingsDialog] = useState<{
     open: boolean;
-    onClose?: (response: DialogResponse) => void;
+    onClose?:(response: DialogResponse) => void;
   }>({ open: false });
 
   const openSettings = () => {
@@ -227,12 +228,11 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     });
   };
 
-
   const [componentDialog, setComponentDialog] = useState<{
     open: boolean;
     component: Partial<NewComponentDTO>;
     label?: string;
-    onClose?: (response: DialogResponse) => void;
+    onClose?:(response: DialogResponse) => void;
   }>({ open: false, component: {} });
 
   const openComponentDialog = (component: Partial<NewComponentDTO> = {}, label = t('Title:CreateComponent')) => {
@@ -253,7 +253,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     folder: string;
     open: boolean;
     overwrite: boolean;
-    onClose?: (response: any) => void;
+    onClose?:(response: any) => void;
   }>({ folder: '', open: false, overwrite: false });
 
   const openPreLoadInventoryDialog = (folder: string, overwrite: boolean) => {
@@ -273,7 +273,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
   const [dependencyDialog, setDependencyDialog] = useState<{
     open: boolean;
     dependency: Partial<Dependency>;
-    onClose?: (response: DialogResponse) => void;
+    onClose?:(response: DialogResponse) => void;
     onCancel?: () => void;
   }>({ open: false, dependency: {} });
 
@@ -297,7 +297,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
   const [componentSearcherDialog, setComponentSearcherDialog] = useState<{
     open: boolean;
     query: string;
-    onClose?: (response: DialogResponse) => void;
+    onClose?:(response: DialogResponse) => void;
     onCancel?: () => void;
   }>({ open: false, query: null });
 
@@ -321,7 +321,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
   const [projectSelectorDialog, setProjectSelectorDialog] = useState<{
     open: boolean;
     params: { folder?: string, md5File?: string }
-    onClose?: (response: DialogResponse) => void;
+    onClose?:(response: DialogResponse) => void;
     onCancel?: () => void;
   }>({ open: false, params: {} });
 
@@ -344,7 +344,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
 
   const [workspaceAddDialog, setWorkspaceAddDialog] = useState<{
     open: boolean;
-    onClose?: (response: DialogResponse) => void;
+    onClose?:(response: DialogResponse) => void;
     onCancel?: () => void;
   }>({ open: false });
 
@@ -368,14 +368,14 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     openSettings();
   };
 
-  const handleOpenGroupKeywords = () =>{
-      setKeywordGroupDialog({
-        open: true,
-        onValueChange: null,
-        close: ()=>{
-          setKeywordGroupDialog({open: false, onValueChange: null})
-        },
-      });
+  const handleOpenGroupKeywords = () => {
+    setKeywordGroupDialog({
+      open: true,
+      onValueChange: null,
+      close: () => {
+        setKeywordGroupDialog({ open: false, onValueChange: null });
+      },
+    });
   };
 
   const [importProjectSourceSelectorDialog, setImportProjectSourceDialog] = useState<{
@@ -383,7 +383,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     data: {
       includeSourceCode: boolean;
     };
-    onClose?: (response: DialogResponse) => void;
+    onClose?:(response: DialogResponse) => void;
     onCancel?: () => void;
   }>({ open: false, data: { includeSourceCode: false } });
 
@@ -409,6 +409,24 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
 
+  const [reportDialog, setReportDialog] = useState<{
+    open: boolean;
+    invalidPurls: Array<string>,
+    onClose?:(response: DialogResponse) => void;
+  }>({ open: false, invalidPurls: [] });
+
+  const openReportDialog = (invalidPurls: Array<string>): Promise<DialogResponse> => {
+    return new Promise<DialogResponse>((resolve) => {
+      setReportDialog({
+        open: true,
+        invalidPurls,
+        onClose: (response: DialogResponse) => {
+          setReportDialog((dialog) => ({ ...dialog, open: false }));
+          resolve(response);
+        },
+      });
+    });
+  };
 
   // setup listeners
   useEffect(setupAppMenuListeners, []);
@@ -430,13 +448,13 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         openProjectSelectorDialog,
         openWorkspaceAddDialog,
         openImportProjectSourceDialog,
+        openReportDialog,
       }}
     >
       {children}
 
-
       {keywordGroupDialog.open && (
-        <KeywordGroupMenu open={keywordGroupDialog.open} onValueChange={null} close={keywordGroupDialog.close && keywordGroupDialog.close}></KeywordGroupMenu>
+        <KeywordGroupMenu open={keywordGroupDialog.open} onValueChange={null} close={keywordGroupDialog.close && keywordGroupDialog.close} />
 
       )}
 
@@ -558,6 +576,14 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
           onClose={(response) => importProjectSourceSelectorDialog.onClose && importProjectSourceSelectorDialog.onClose(response)}
           button={confirmDialog.button}
 
+        />
+      )}
+
+      {reportDialog.open && (
+        <ReportDialog
+          open={reportDialog.open}
+          onClose={(response) => reportDialog.onClose && reportDialog.onClose(response)}
+          invalidPurls={reportDialog.invalidPurls}
         />
       )}
     </DialogContext.Provider>

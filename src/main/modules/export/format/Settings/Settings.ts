@@ -1,5 +1,5 @@
 import { ExportSource } from '../../../../../api/types';
-import { Format } from '../../Format';
+import { ExportResult, Format } from '../../Format';
 import { ExportRepositorySqliteImp } from '../../Repository/ExportRepositorySqliteImp';
 import { ExportRepository } from '../../Repository/ExportRepository';
 import { DecisionTree } from './identification-tree/decision-tree';
@@ -73,12 +73,18 @@ export class Settings extends Format {
    * If the source is 'IDENTIFIED', it generates the SCANOSS JSON output.
    * Otherwise, it returns the default empty SCANOSS JSON structure.
    * @public
-   * @returns {Promise<string>} A promise that resolves to the stringified JSON output
+   * @returns {Promise<ExportResult>}
    */
-  public async generate(): Promise<string> {
+  public async generate(): Promise<ExportResult> {
     if (this.source === ExportSource.IDENTIFIED) {
-      return this.generateSettingsFile();
+      return {
+        report: await this.generateSettingsFile(),
+        invalidPurls: null,
+      };
     }
-    return JSON.stringify(this.scanossJson, null, 2);
+    return {
+      report: JSON.stringify(this.scanossJson, null, 2),
+      invalidPurls: null,
+    };
   }
 }

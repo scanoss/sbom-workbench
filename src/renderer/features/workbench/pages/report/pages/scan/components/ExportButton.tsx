@@ -1,4 +1,4 @@
-import react, { useState } from 'react';
+import react, { useContext, useState } from 'react';
 
 import { exportService } from '@api/services/export.service';
 import { ExportSource, ExportFormat, InventoryType } from '@api/types';
@@ -13,6 +13,8 @@ import { Button, Collapse, Fade, List, Menu, MenuItem, Tooltip } from '@mui/mate
 
 import GetAppIcon from '@mui/icons-material/GetApp';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { DialogContext, IDialogContext } from '@context/DialogProvider';
+
 
 export const ExportButton = ({ empty }) => {
   const { pathname } = useLocation();
@@ -80,6 +82,7 @@ export const ExportButton = ({ empty }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [subMenuOpened, setSubMenuOpened] = useState<string>(null);
+  const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const onExportClicked = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -104,7 +107,11 @@ export const ExportButton = ({ empty }) => {
 
     if (path) {
       localStorage.setItem('last-path-used', window.path.dirname(path));
-      await exportService.export({ path, format, source, inventoryType });
+      const response = await exportService.export({ path, format, source, inventoryType });
+      if (response.invalidPurls) {
+        console.log(response);
+        await dialogCtrl.openReportDialog(response.invalidPurls);
+      }
     }
   };
 

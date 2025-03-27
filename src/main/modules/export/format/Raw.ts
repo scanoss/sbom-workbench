@@ -16,6 +16,9 @@ export class Raw extends Format {
       if (key.charAt(0) === '/') vKey = key.substring(1);
       out[vKey] = obj;
     }
-    return JSON.stringify(out, undefined, 2);
+    return {
+      report: JSON.stringify(out, undefined, 2),
+      invalidPurls: null,
+    };
   }
 }

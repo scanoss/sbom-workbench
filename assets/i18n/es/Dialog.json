@@ -33,5 +33,6 @@
   "NoGroupKeywordsAvailable": "No hay grupos disponibles",
   "GroupNameLabel": "Grupo",
   "GroupKeywordLabel": "Palabras",
-  "GroupAlreadyExists": "El grupo ya existe"
+  "GroupAlreadyExists": "El grupo ya existe",
+  "CreateComponentPurlError": "PURL invalido"
 }

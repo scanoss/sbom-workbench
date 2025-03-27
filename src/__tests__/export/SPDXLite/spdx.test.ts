@@ -47,8 +47,8 @@ describe('SPDX Lite tests', () => {
 
   it('SPDX Lite detected test', async () => {
     const spdxLiteFormatter = new SpdxLiteDetected(new Project('test project'), exportRepositoryMock);
-    const spdxLiteString = await spdxLiteFormatter.generate();
-    const spdxLite: SPDXDocument = JSON.parse(spdxLiteString);
+    const { report } = await spdxLiteFormatter.generate();
+    const spdxLite: SPDXDocument = JSON.parse(report);
     const uniqueExtractedLicensingInfos = new Set([
       'LicenseRef-scancode-unknown-license-reference',
       'LicenseRef-sspl',
@@ -79,8 +79,8 @@ describe('SPDX Lite tests', () => {
 
   it('SPDX Lite identified test', async () => {
     const spdxLiteFormatter = new SpdxLiteIdentified(new Project('test project'), exportRepositoryMock);
-    const spdxLiteString = await spdxLiteFormatter.generate();
-    const spdxLite: SPDXDocument = JSON.parse(spdxLiteString);
+    const { report } = await spdxLiteFormatter.generate();
+    const spdxLite: SPDXDocument = JSON.parse(report);
     const uniqueExtractedLicensingInfos = new Set([
       'LicenseRef-scancode-unknown-license-reference',
       'LicenseRef-sspl',
