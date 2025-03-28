@@ -40,17 +40,18 @@ interface WorkspaceAddDialogProps {
 const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
   const { t } = useTranslation();
   const classes = useStyles();
-
   const { open, onClose, onCancel } = props;
   const [data, setData] = useState<any>(initial);
-  const [finalPath, setFinalPath] = useState('');
 
   const onSelectPathHandler = async () => {
     const paths = await dialogController.showOpenDialog({
-      properties: ['openDirectory'],
+      properties: ['openDirectory', 'createDirectory'],
     });
+
     if (paths && paths.length > 0) {
-      setData({ ...data, PATH: paths[0] });
+      const PATH = paths[0];
+      const NAME = PATH.split(window.path.sep)[PATH.split(window.path.sep).length - 1];
+      setData({ ...data, NAME, PATH });
     }
   };
 
@@ -60,12 +61,9 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    onClose({ action: DIALOG_ACTIONS.OK, data: { ...data, PATH: finalPath } });
-  };
 
-  useEffect(() => {
-    if (data.PATH) setFinalPath(data.PATH + window.path.sep + data.NAME);
-  }, [data]);
+    onClose({ action: DIALOG_ACTIONS.OK, data });
+  };
 
   return (
     <Dialog
@@ -84,6 +82,35 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
 
       <form onSubmit={onSubmit}>
         <div className="dialog-content">
+          <div className={`${classes.path} dialog-row`}>
+            <div className="dialog-form-field">
+              <label className="dialog-form-field-label"> {t('Dialog:WorkspaceLocation')}</label>
+              <Paper className={`${classes.field} dialog-form-field-control `}>
+                <TextField
+                  name="location"
+                  size="small"
+                  fullWidth
+                  value={data.PATH}
+                  autoFocus
+                  onChange={(e) => setData({ ...data, PATH: e.target.value })}
+                />
+              </Paper>
+            </div>
+            <div className="dialog-form-field">
+              <Button
+                type="button"
+                variant="outlined"
+                color="primary"
+                sx={{
+                  height: '41px',
+                }}
+                startIcon={<SearchIcon />}
+                onClick={onSelectPathHandler}
+              >
+                {t('Button:Choose')}
+              </Button>
+            </div>
+          </div>
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">{t('Dialog:WorkspaceName')}</label>
             <Paper className={`${classes.field} dialog-form-field-control `}>
@@ -95,29 +122,8 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
                 value={data.NAME}
                 onChange={(e) => setData({ ...data, NAME: e.target.value })}
                 required
-                autoFocus
               />
             </Paper>
-          </div>
-
-          <div className={`${classes.path} dialog-row`}>
-            <div className="dialog-form-field">
-              <label className="dialog-form-field-label"> {t('Dialog:WorkspaceLocation')}</label>
-              <Paper className={`${classes.field} dialog-form-field-control `}>
-                <TextField
-                  name="location"
-                  size="small"
-                  fullWidth
-                  value={data.PATH}
-                  onChange={(e) => setData({ ...data, PATH: e.target.value })}
-                />
-              </Paper>
-            </div>
-            <div className="dialog-form-field">
-              <Button type="button" variant="text" color="primary" startIcon={<SearchIcon />} onClick={onSelectPathHandler}>
-                {t('Button:Choose')}
-              </Button>
-            </div>
           </div>
         </div>
         <DialogActions>

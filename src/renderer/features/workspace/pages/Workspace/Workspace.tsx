@@ -8,7 +8,7 @@ import { DIALOG_ACTIONS } from '@context/types';
 import AppConfig from '@config/AppConfigModule';
 import SearchBox from '@components/SearchBox/SearchBox';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProjects, setSettings } from '@store/workspace-store/workspaceThunks';
+import { fetchProjects, removeWorkspace, setSettings } from '@store/workspace-store/workspaceThunks';
 import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
 import { useTranslation } from 'react-i18next';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
@@ -87,14 +87,7 @@ const Workspace = () => {
   };
 
   const onWorkspaceRemoveHandler = (workspace: WorkspaceData) => {
-    const currentWorkspace = settings.WORKSPACES[settings.DEFAULT_WORKSPACE_INDEX];
-    const workspaces = settings.WORKSPACES.filter((items) => items !== workspace);
-    const currentWorkspaceIndex = workspaces.findIndex((workspace: WorkspaceData) => workspace.PATH === currentWorkspace.PATH);
-    dispatch(setSettings({
-      ...settings,
-      WORKSPACES: workspaces,
-      DEFAULT_WORKSPACE_INDEX: currentWorkspaceIndex,
-    }));
+    dispatch(removeWorkspace(workspace));
   };
 
   const onWorkspaceCreateHandler = async () => {

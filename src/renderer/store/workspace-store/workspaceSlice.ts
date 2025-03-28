@@ -36,11 +36,11 @@ export const workspaceSlice = createSlice({
       state.scanPath = action.payload;
     },
     setCurrentProject: (state, action: PayloadAction<IProject>) => {
-      state.currentProject = action.payload
+      state.currentProject = action.payload;
     },
-    setApis:(state, action: PayloadAction<any>) => {
+    setApis: (state, action: PayloadAction<any>) => {
       state.settings.APIS = action.payload;
-    }
+    },
   },
   extraReducers: {
     [fetchProjects.pending.type]: (state) => ({ ...state, loading: true }),
@@ -50,20 +50,20 @@ export const workspaceSlice = createSlice({
       projects: action.payload,
     }),
     [fetchProjects.rejected.type]: (state) => ({ ...state, loading: false }),
-    [init.fulfilled.type]: (state, action: PayloadAction<{app:  IAppInfo, settings: IWorkspaceCfg}>) => ({
+    [init.fulfilled.type]: (state, action: PayloadAction<{ app: IAppInfo, settings: IWorkspaceCfg }>) => ({
       ...state,
       appInfo: action.payload.app,
-      settings: action.payload.settings
+      settings: action.payload.settings,
     }),
     [setSettings.fulfilled.type]: (state, action: PayloadAction<IWorkspaceCfg>) => ({
       ...state,
-      settings: action.payload
+      settings: action.payload,
     }),
   },
 });
 
 // actions
-export const { setNewProject, setScanPath, setCurrentProject, setApis} = workspaceSlice.actions;
+export const { setNewProject, setScanPath, setCurrentProject, setApis } = workspaceSlice.actions;
 
 // selectors
 export const selectWorkspaceState = (state: RootState) => state.workspace;
