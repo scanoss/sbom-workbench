@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { DialogResponse, DIALOG_ACTIONS } from "@context/types";
-import { Dialog, Paper, TextField, DialogActions, Button, IconButton } from "@mui/material";
+import { useState, useEffect } from 'react';
+import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
+import { Dialog, Paper, TextField, DialogActions, Button, IconButton } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useTranslation } from "react-i18next";
-import { WorkspaceData } from "@api/types";
-import { dialogController } from "renderer/controllers/dialog-controller";
+import { useTranslation } from 'react-i18next';
+import { WorkspaceData } from '@api/types';
+import { dialogController } from 'renderer/controllers/dialog-controller';
 
 /* icons */
 import CloseIcon from '@mui/icons-material/Close';
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     '& > .dialog-form-field:nth-child(2)': {
       flex: '0 !important',
     },
-  }
+  },
 }));
 
 interface WorkspaceAddDialogProps {
@@ -41,20 +41,18 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
   const { t } = useTranslation();
   const classes = useStyles();
 
-  const {open, onClose, onCancel} = props;
+  const { open, onClose, onCancel } = props;
   const [data, setData] = useState<any>(initial);
+  const [finalPath, setFinalPath] = useState('');
 
   const onSelectPathHandler = async () => {
     const paths = await dialogController.showOpenDialog({
       properties: ['openDirectory'],
     });
-
     if (paths && paths.length > 0) {
-      const PATH = paths[0];
-      const NAME = PATH.split(window.path.sep)[PATH.split(window.path.sep).length - 1];
-      setData({ ...data, NAME, PATH });
+      setData({ ...data, PATH: paths[0] });
     }
-  }
+  };
 
   const isValid = (): boolean => {
     return data.NAME && data.PATH;
@@ -62,14 +60,19 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    onClose({ action: DIALOG_ACTIONS.OK, data: data });
+    onClose({ action: DIALOG_ACTIONS.OK, data: { ...data, PATH: finalPath } });
   };
+
+  useEffect(() => {
+    if (data.PATH) setFinalPath(data.PATH + window.path.sep + data.NAME);
+  }, [data]);
 
   return (
     <Dialog
       id="WorkspaceAddDialog"
       className={`${classes.path} dialog`}
-      open={open} onClose={onCancel}
+      open={open}
+      onClose={onCancel}
     >
 
       <header className="dialog-title">

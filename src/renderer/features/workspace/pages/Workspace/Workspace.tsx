@@ -11,11 +11,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchProjects, setSettings } from '@store/workspace-store/workspaceThunks';
 import { selectWorkspaceState, setScanPath } from '@store/workspace-store/workspaceSlice';
 import { useTranslation } from 'react-i18next';
+import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import ProjectList from '../Components/ProjectList';
 import AddProjectButton from '../Components/AddProjectButton/AddProjectButton';
 
 /* icons */
-import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import { WorkspaceSelector } from '../Components/WorskpaceSelector/WorkspaceSelector';
 
 const Workspace = () => {
@@ -42,7 +42,7 @@ const Workspace = () => {
 
   const onShowScanHandler = async (project: IProject, mode: ProjectAccessMode) => {
     if (project.appVersion >= AppConfig.MIN_VERSION_SUPPORTED) {
-      dispatch(setScanPath({ path: project.work_root, action: 'none', mode, }));
+      dispatch(setScanPath({ path: project.work_root, action: 'none', mode }));
       navigate('/workbench/detected');
     } else {
       const { action } = await dialogCtrl.openAlertDialog(
@@ -50,7 +50,7 @@ const Workspace = () => {
         [
           { label: t('Button:Cancel'), role: 'cancel' },
           { label: t('Button:Delete&Scan'), action: 'delete', role: 'delete' },
-        ]
+        ],
       );
 
       if (action !== DIALOG_ACTIONS.CANCEL) {
@@ -82,28 +82,31 @@ const Workspace = () => {
     newProjectFromWFP();
   };
 
-  const onWorkspaceSelectedHandler = (workspace: WorkspaceData) => {
-    workspaceService.setCurrent(workspace.PATH);
+  const onWorkspaceSelectedHandler = async (workspace: WorkspaceData) => {
+    await workspaceService.setCurrent(workspace.PATH);
   };
 
   const onWorkspaceRemoveHandler = (workspace: WorkspaceData) => {
+    const currentWorkspace = settings.WORKSPACES[settings.DEFAULT_WORKSPACE_INDEX];
+    const workspaces = settings.WORKSPACES.filter((items) => items !== workspace);
+    const currentWorkspaceIndex = workspaces.findIndex((workspace: WorkspaceData) => workspace.PATH === currentWorkspace.PATH);
     dispatch(setSettings({
       ...settings,
-      WORKSPACES: settings.WORKSPACES.filter(items => items !== workspace),
+      WORKSPACES: workspaces,
+      DEFAULT_WORKSPACE_INDEX: currentWorkspaceIndex,
     }));
   };
 
-  const onWorkspaceCreateHandler = async  () => {
+  const onWorkspaceCreateHandler = async () => {
     const { action, data } = await dialogCtrl.openWorkspaceAddDialog();
     if (action !== DIALOG_ACTIONS.CANCEL) {
       await dispatch(setSettings({
         ...settings,
         WORKSPACES: [...settings.WORKSPACES, data],
       }));
-
-      onWorkspaceSelectedHandler(data);
+      await onWorkspaceSelectedHandler(data);
     }
-   };
+  };
 
   const onTrashHandler = async (project: IProject) => {
     const { action } = await dialogCtrl.openConfirmDialog(t('Dialog:DeleteQuestion'), {
@@ -143,50 +146,48 @@ const Workspace = () => {
   }, []);
 
   return (
-    <>
-      <section id="Workspace" className="app-page">
-        <header className="app-header">
-          <div className="workspace-selector">
-            <WorkspaceSelector
-              workspaces={settings?.WORKSPACES}
-              selected={settings?.WORKSPACES[settings?.DEFAULT_WORKSPACE_INDEX]}
-              onSelected={onWorkspaceSelectedHandler}
-              onRemoved={onWorkspaceRemoveHandler}
-              onCreated={onWorkspaceCreateHandler}
-            />
-            <ChevronRightOutlinedIcon fontSize="small" />
-            <h4 className="">{t('Title:Projects')}</h4>
-          </div>
-
-          <section className="subheader">
-            <div className="search-box">
-              {projects && projects.length > 0 && (
-                <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
-              )}
-            </div>
-            <AddProjectButton
-              onNewProject={onNewProjectHandler}
-              onImportProject={onImportProjectHandler}
-              onNewProjectFromWFP={onNewProjectFromWFPHandler}
-              onNewProjectWithSource={onImportProjectWithSourceHandler}
-              />
-          </section>
-        </header>
-        <main className="app-content">
-          <ProjectList
-            projects={projects}
-            searchQuery={searchQuery}
-            onProjectClick={onShowScanHandler}
-            onProjectDelete={onTrashHandler}
-            onProjectRestore={onRestoreHandler}
-            onProjectRescan={onRescanHandler}
-            onProjectExport={onExportHandler}
-            onProjectCreate={onNewProjectHandler}
-            onProjectImport={onImportProjectHandler}
+    <section id="Workspace" className="app-page">
+      <header className="app-header">
+        <div className="workspace-selector">
+          <WorkspaceSelector
+            workspaces={settings?.WORKSPACES}
+            selected={settings?.WORKSPACES[settings?.DEFAULT_WORKSPACE_INDEX]}
+            onSelected={onWorkspaceSelectedHandler}
+            onRemoved={onWorkspaceRemoveHandler}
+            onCreated={onWorkspaceCreateHandler}
           />
-        </main>
-      </section>
-    </>
+          <ChevronRightOutlinedIcon fontSize="small" />
+          <h4 className="">{t('Title:Projects')}</h4>
+        </div>
+
+        <section className="subheader">
+          <div className="search-box">
+            {projects && projects.length > 0 && (
+            <SearchBox onChange={(value) => setSearchQuery(value.trim().toLowerCase())} />
+            )}
+          </div>
+          <AddProjectButton
+            onNewProject={onNewProjectHandler}
+            onImportProject={onImportProjectHandler}
+            onNewProjectFromWFP={onNewProjectFromWFPHandler}
+            onNewProjectWithSource={onImportProjectWithSourceHandler}
+          />
+        </section>
+      </header>
+      <main className="app-content">
+        <ProjectList
+          projects={projects}
+          searchQuery={searchQuery}
+          onProjectClick={onShowScanHandler}
+          onProjectDelete={onTrashHandler}
+          onProjectRestore={onRestoreHandler}
+          onProjectRescan={onRescanHandler}
+          onProjectExport={onExportHandler}
+          onProjectCreate={onNewProjectHandler}
+          onProjectImport={onImportProjectHandler}
+        />
+      </main>
+    </section>
   );
 };
 
