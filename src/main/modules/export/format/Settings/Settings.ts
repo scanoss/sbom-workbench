@@ -1,4 +1,4 @@
-import { ExportSource } from '../../../../../api/types';
+import { ExportSource, ExportStatusCode } from '../../../../../api/types';
 import { ExportResult, Format } from '../../Format';
 import { ExportRepositorySqliteImp } from '../../Repository/ExportRepositorySqliteImp';
 import { ExportRepository } from '../../Repository/ExportRepository';
@@ -79,12 +79,22 @@ export class Settings extends Format {
     if (this.source === ExportSource.IDENTIFIED) {
       return {
         report: await this.generateSettingsFile(),
-        invalidPurls: null,
+        status: {
+          code: ExportStatusCode.SUCCESS,
+          info: {
+            invalidPurls: [],
+          },
+        },
       };
     }
     return {
       report: JSON.stringify(this.scanossJson, null, 2),
-      invalidPurls: null,
+      status: {
+        code: ExportStatusCode.SUCCESS,
+        info: {
+          invalidPurls: [],
+        },
+      },
     };
   }
 }

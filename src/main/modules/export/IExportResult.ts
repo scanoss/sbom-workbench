@@ -1,7 +1,10 @@
+import { ExportResultsInfo, ExportStatusCode } from '../../../api/types';
+
 export interface IExportResult {
   success: boolean;
   message: string;
   extension: string;
   file: string;
-  invalidPurls: string[] | null;
+  statusCode: ExportStatusCode;
+  info: ExportResultsInfo;
 }

@@ -1,7 +1,7 @@
-import react, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { exportService } from '@api/services/export.service';
-import { ExportSource, ExportFormat, InventoryType } from '@api/types';
+import { ExportFormat, ExportSource, ExportStatusCode, InventoryType } from '@api/types';
 import AppConfig from '@config/AppConfigModule';
 import { getFormatFilesAttributes } from '@shared/utils/file-utils';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
@@ -76,7 +76,6 @@ export const ExportButton = ({ empty }) => {
       sources: [ExportSource.IDENTIFIED],
       fileName: 'settings',
     },
-
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -101,16 +100,17 @@ export const ExportButton = ({ empty }) => {
     const dirname = localStorage.getItem('last-path-used') || projectPath;
     const attributes = getFormatFilesAttributes(format);
     const path = await dialogController.showSaveDialog({
-      defaultPath: `${dirname}/${name}${attributes.prefix ? `-${attributes.prefix}` : ''}${attributes.defaultFileName ? `-${attributes.defaultFileName}` : ''}.${attributes.extension}`,
+      defaultPath: `${dirname}/${name}${attributes.prefix ? `-${attributes.prefix}` : ''}${
+        attributes.defaultFileName ? `-${attributes.defaultFileName}` : ''
+      }.${attributes.extension}`,
       filters: [{ name: attributes.description, extensions: [attributes.extension] }],
     });
 
     if (path) {
       localStorage.setItem('last-path-used', window.path.dirname(path));
       const response = await exportService.export({ path, format, source, inventoryType });
-      if (response.invalidPurls) {
-        console.log(response);
-        await dialogCtrl.openReportDialog(response.invalidPurls);
+      if (response.statusCode !== ExportStatusCode.SUCCESS && response.info.invalidPurls.length > 0) {
+        await dialogCtrl.openReportDialog(response.info.invalidPurls);
       }
     }
   };
@@ -133,13 +133,13 @@ export const ExportButton = ({ empty }) => {
           </MenuItem>
         </Tooltip>
         {item.childrens && (
-        <Collapse in={subMenuOpened === format} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            {item.childrens.map((children) => (
-              <CustomMenuItem format={format} item={children} depth={depth + 1} />
-            ))}
-          </List>
-        </Collapse>
+          <Collapse in={subMenuOpened === format} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {item.childrens.map((children) => (
+                <CustomMenuItem format={format} item={children} depth={depth + 1} />
+              ))}
+            </List>
+          </Collapse>
         )}
       </>
     );
@@ -147,8 +147,8 @@ export const ExportButton = ({ empty }) => {
 
   return (
     <div id="ExportButton">
-      {!AppConfig.FF_EXPORT_FORMAT_OPTIONS
-        || (AppConfig.FF_EXPORT_FORMAT_OPTIONS.length === 0 && (
+      {!AppConfig.FF_EXPORT_FORMAT_OPTIONS ||
+        (AppConfig.FF_EXPORT_FORMAT_OPTIONS.length === 0 && (
           <Button
             startIcon={<GetAppIcon />}
             aria-controls="customized-menu"
@@ -190,10 +190,11 @@ export const ExportButton = ({ empty }) => {
           </Button>
           <Menu anchorEl={anchorEl} keepMounted open={open} onClose={handleClose} TransitionComponent={Fade}>
             {AppConfig.FF_EXPORT_FORMAT_OPTIONS.map(
-              (format) => exportLabels[format]
-                && exportLabels[format].sources.includes(source) && (
-                <CustomMenuItem format={format} item={exportLabels[format]} />
-              ),
+              (format) =>
+                exportLabels[format] &&
+                exportLabels[format].sources.includes(source) && (
+                  <CustomMenuItem format={format} item={exportLabels[format]} />
+                )
             )}
           </Menu>
         </>

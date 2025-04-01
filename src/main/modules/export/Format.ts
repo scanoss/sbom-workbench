@@ -4,10 +4,14 @@ import fs from 'fs';
 import { ExportRepositorySqliteImp } from './Repository/ExportRepositorySqliteImp';
 import { IExportResult } from './IExportResult';
 import { ExportRepository } from './Repository/ExportRepository';
+import { ExportResultsInfo, ExportStatusCode } from '../../../api/types';
 
 export interface ExportResult {
   report: string;
-  invalidPurls: Array<string> | null;
+  status: {
+    code: ExportStatusCode;
+    info: ExportResultsInfo;
+  }
 }
 
 export abstract class Format {
@@ -22,8 +26,8 @@ export abstract class Format {
   public abstract generate(): Promise<ExportResult>;
 
   public async save(path: string): Promise<IExportResult> {
-    const { report, invalidPurls } = await this.generate();
-    log.info('[ Report ]: Invalid report PURLS: ', invalidPurls);
+    const { report, status } = await this.generate();
+    log.info('[ Report ]: Invalid report PURLS: ', status);
     try {
       await fs.promises.writeFile(path, report);
       return {
@@ -31,7 +35,8 @@ export abstract class Format {
         message: 'Export successful',
         extension: this.extension,
         file: path,
-        invalidPurls,
+        statusCode: status.code,
+        info: status.info,
       };
     } catch (error) {
       log.error(error);
@@ -40,7 +45,10 @@ export abstract class Format {
         message: 'Export not successful',
         extension: this.extension,
         file: path,
-        invalidPurls,
+        statusCode: ExportStatusCode.FAILED,
+        info: {
+          invalidPurls: [],
+        },
       };
     }
   }

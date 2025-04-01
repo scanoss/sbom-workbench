@@ -448,3 +448,13 @@ export interface LicenseObligation {
   patent_hints: string;
   label?: string;
 }
+
+export enum ExportStatusCode {
+  SUCCESS = 'SUCCESS',
+  SUCCESS_WITH_WARNINGS = 'SUCCESS_WITH_WARNINGS',
+  FAILED = 'FAILED',
+}
+
+export interface ExportResultsInfo {
+  invalidPurls: Array<string>;
+}
