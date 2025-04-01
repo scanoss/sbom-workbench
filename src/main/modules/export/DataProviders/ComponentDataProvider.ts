@@ -56,11 +56,9 @@ export class ComponentDataProvider extends BaseDataProvider implements DataProvi
     const query = this.source === ExportSource.IDENTIFIED
       ? await modelProvider.model.component.getComponentsIdentifiedForReport()
       : await modelProvider.model.component.getComponentsDetectedForReport();
-    const invalidPurls = query
+    return query
       .filter((i) => !isValidPurl(i.purl))
       .map((i) => i.purl);
-    if (invalidPurls.length > 0) return invalidPurls;
-    return null;
   }
 
   public getLayerName(): string {

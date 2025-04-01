@@ -1,5 +1,5 @@
 import { Format } from '../Format';
-import { ExportSource } from '../../../../api/types';
+import { ExportSource, ExportStatusCode } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
 import { DataRecord } from '../../../model/interfaces/report/DataRecord';
 import { isValidPurl } from '../helpers/exportHelper';
@@ -25,17 +25,17 @@ export class Csv extends Format {
 
   private getReportData(data: Array<DataRecord>): ReportData<Array<DataRecord>> {
     const reportData: Array<DataRecord> = [];
-    const invalidPurls: string[] = [];
+    const invalidPurls: Set<string> = new Set();
     data.forEach((comp) => {
       const validDetectedPurl = isValidPurl(comp.detected_purl);
       const validConcludedPurl = isValidPurl(comp.concluded_purl);
 
-      if (!validDetectedPurl) {
-        invalidPurls.push(comp.detected_purl);
+      if (!validDetectedPurl && comp.detected_purl !== '') {
+        invalidPurls.add(comp.detected_purl);
       }
 
-      if (!validConcludedPurl) {
-        invalidPurls.push(comp.concluded_purl);
+      if (!validConcludedPurl && comp.concluded_purl !== '') {
+        invalidPurls.add(comp.concluded_purl);
       }
 
       if (validDetectedPurl && validConcludedPurl) {
@@ -44,7 +44,7 @@ export class Csv extends Format {
     });
     return {
       components: reportData,
-      invalidPurls,
+      invalidPurls: Array.from(invalidPurls),
     };
   }
 
@@ -58,7 +58,12 @@ export class Csv extends Format {
     const csv = this.csvCreate(components);
     return {
       report: csv,
-      invalidPurls,
+      status: {
+        code: invalidPurls.length > 0 ? ExportStatusCode.SUCCESS_WITH_WARNINGS : ExportStatusCode.SUCCESS,
+        info: {
+          invalidPurls,
+        },
+      },
     };
   }
 }

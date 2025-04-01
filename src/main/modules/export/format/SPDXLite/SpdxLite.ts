@@ -1,10 +1,9 @@
 import * as os from 'os';
 import { Buffer } from 'buffer';
 import { app } from 'electron';
-import { PackageURL } from 'packageurl-js';
 import { utilModel } from '../../../../model/UtilModel';
 import { ExportResult, Format } from '../../Format';
-import { ExportSource } from '../../../../../api/types';
+import { ExportSource, ExportStatusCode } from '../../../../../api/types';
 import AppConfig from '../../../../../config/AppConfigModule';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
 import packageJson from '../../../../../../release/app/package.json';
@@ -84,7 +83,12 @@ export abstract class SpdxLite extends Format {
 
     return {
       report: JSON.stringify(spdx, undefined, 4),
-      invalidPurls: invalidPurls.length > 0 ? invalidPurls : null,
+      status: {
+        code: invalidPurls.length > 0 ? ExportStatusCode.SUCCESS_WITH_WARNINGS : ExportStatusCode.SUCCESS,
+        info: {
+          invalidPurls,
+        },
+      },
     };
   }
 

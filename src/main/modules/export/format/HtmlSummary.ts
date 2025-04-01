@@ -1,5 +1,5 @@
 import { DataProviderManager, Report } from 'scanoss';
-import { ExportSource } from '../../../../api/types';
+import { ExportSource, ExportStatusCode } from '../../../../api/types';
 import { ExportResult, Format } from '../Format';
 import { ComponentDataProvider } from '../DataProviders/ComponentDataProvider';
 import { LicenseDataProvider } from '../DataProviders/LicenseDataProvider';
@@ -33,9 +33,15 @@ export class HtmlSummary extends Format {
     dpm.addDataProvider(new CryptographyDataProvider(this.source));
     const report = new Report(dpm);
     report.setTemplatePath(PATH);
+    const invalidPurls = await new ComponentDataProvider(this.source).getInvalidPurls()
     return {
       report: await report.getHTML(),
-      invalidPurls: await new ComponentDataProvider(this.source).getInvalidPurls(),
+      status: {
+        code: invalidPurls.length > 0 ? ExportStatusCode.SUCCESS_WITH_WARNINGS : ExportStatusCode.SUCCESS,
+        info: {
+          invalidPurls,
+        },
+      },
     };
   }
 }

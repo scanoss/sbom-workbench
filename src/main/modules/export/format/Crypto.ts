@@ -1,5 +1,5 @@
 import { Format } from '../Format';
-import { ExportSource } from '../../../../api/types';
+import { ExportSource, ExportStatusCode } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
 import { Algorithms, Cryptography } from '../../../model/entity/Cryptography';
 import { LocalCryptography } from '../../../model/entity/LocalCryptography';
@@ -83,7 +83,12 @@ export class Crypto extends Format {
     const csv = this.csvCreate(components);
     return {
       report: csv,
-      invalidPurls,
+      status: {
+        code: invalidPurls.length > 0 ? ExportStatusCode.SUCCESS_WITH_WARNINGS : ExportStatusCode.SUCCESS,
+        info: {
+          invalidPurls,
+        },
+      },
     };
   }
 

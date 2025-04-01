@@ -1,7 +1,7 @@
 import * as CDX from '@cyclonedx/cyclonedx-library';
 import { PackageURL } from 'packageurl-js';
 import AppConfig from '../../../../../config/AppConfigModule';
-import { ExportSource } from '../../../../../api/types';
+import { ExportSource, ExportStatusCode } from '../../../../../api/types';
 import { ExportResult, Format } from '../../Format';
 import { Project } from '../../../../workspace/Project';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
@@ -42,7 +42,6 @@ export abstract class CycloneDX extends Format {
       this.project.metadata.getName(),
       { version: 'NOASSERTION',
       },
-
     );
 
     if (this.project.metadata.getLicense()) {
@@ -137,7 +136,12 @@ export abstract class CycloneDX extends Format {
 
     return {
       report: jsonSerializer.serialize(bom, { sortLists: true, space: 2 }),
-      invalidPurls: invalidPurls.length > 0 ? invalidPurls : null,
+      status: {
+        code: invalidPurls.length > 0 ? ExportStatusCode.SUCCESS_WITH_WARNINGS : ExportStatusCode.SUCCESS,
+        info: {
+          invalidPurls,
+        },
+      },
     };
   }
 }
