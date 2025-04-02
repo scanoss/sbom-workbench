@@ -35,7 +35,7 @@ import ProxyConfigSetup from 'renderer/features/workspace/components/ProxyConfig
 import { mapToGlobalSettingsFormValues } from 'renderer/features/workspace/mappers';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import ControlledInput from '../Input';
-
+import { useTheme } from '@mui/material';
 const filter = createFilterOptions();
 
 const useStyles = makeStyles((theme) => ({
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
   new: {
     fontSize: '0.9rem',
     fontWeight: 600,
-    color: theme.palette.primary.light,
+    color: useTheme().palette.primary.light,
   },
   option: {
     display: 'flex',

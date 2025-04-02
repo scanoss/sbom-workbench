@@ -4,6 +4,7 @@ import { makeStyles } from '@mui/styles';
 import PauseIcon from '@mui/icons-material/Pause';
 import { ScannerStage } from '@api/types';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/material';
 
 interface CircularComponentProps {
   stage: {
@@ -35,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: '50%',
   },
   circularProgress: {
-    color: theme.palette.primary.main,
+    color: useTheme().palette.primary.main,
     position: 'absolute',
   },
   typographyContainer: {
@@ -58,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
   },
   number: {
     fontSize: '4em',
-    color: theme.palette.primary.main,
+    color: useTheme().palette.primary.main,
     fontWeight: 'bold',
   },
   stage: {
@@ -104,7 +105,7 @@ const CircularComponent = ({
     stage.stageName === ScannerStage.DEPENDENCY ||
     stage.stageName === ScannerStage.VULNERABILITY ||
     stage.stageName === ScannerStage.UNZIP ||
-    stage.stageName === ScannerStage.CRYPTOGRAPHY || 
+    stage.stageName === ScannerStage.CRYPTOGRAPHY ||
     stage.stageName === ScannerStage.LOCAL_CRYPTOGRAPHY;
 
   const resumeEnable =
