@@ -4,6 +4,7 @@ import { makeStyles } from '@mui/styles';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
+import { useTheme } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -11,15 +12,15 @@ const useStyles = makeStyles((theme) => ({
   },
   closeButton: {
     position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
+    right: useTheme().spacing(1),
+    top: useTheme().spacing(1),
+    color: useTheme().palette.grey[500],
   },
   deleteButton: {
-    backgroundColor: theme.palette.error.main,
+    backgroundColor: useTheme().palette.error.main,
     color: 'white',
     '&:hover': {
-      backgroundColor: theme.palette.error.dark,
+      backgroundColor: useTheme().palette.error.dark,
     },
   },
   content: {
@@ -32,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: 'pre-line',
   },
   actions: {
-    padding: theme.spacing(2),
+    padding: useTheme().spacing(2),
     borderTop: '1px solid #D4D4D8',
     backgroundColor: '#f4f4f5',
   },

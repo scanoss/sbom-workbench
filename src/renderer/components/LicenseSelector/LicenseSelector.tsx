@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 import SearchIcon from '@mui/icons-material/Search';
 import { makeStyles } from '@mui/styles';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
-
+import { useTheme } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
       alignItems: 'center',
       fontSize: 14,
       fontWeight: 500,
-      color: theme.palette.primary.main,
+      color: useTheme().palette.primary.main,
     },
   },
   attributionInfo: {

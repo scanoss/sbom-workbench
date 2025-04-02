@@ -18,80 +18,83 @@ import CloseIcon from '@mui/icons-material/Close';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  dialog: {
-    width: 400,
-  },
-  closeButton: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    color: theme.palette.grey[500],
-  },
-  title: {
-    padding: theme.spacing(1),
-    borderBottom: '1px solid #D4D4D8',
-    display: 'flex !important',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  content: {
-    backgroundColor: '#f4f4f5',
-    padding: theme.spacing(3, 3, 2),
-  },
-  text: {
-    width: '100%',
-    fontSize: '18px',
-    color: '#27272A !important',
-    whiteSpace: 'pre-line',
-    marginBottom: theme.spacing(2),
-  },
-  messageIcon: {
-    color: theme.palette.error.main,
-    marginRight: theme.spacing(1),
-    fontSize: '24px',
-  },
-  messageContainer: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    flexFlow: 'column',
-    margin: theme.spacing(2, 0, 2, 0),
-  },
-  purlListContainer: {
-    maxHeight: '200px',
-    overflow: 'auto',
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: theme.palette.grey[50],
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(2),
-  },
-  purlItem: {
-    padding: theme.spacing(0.75, 2),
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    '&:last-child': {
-      borderBottom: 'none',
-    },
-  },
-  actions: {
-    padding: theme.spacing(1.5),
-    borderTop: '1px solid #D4D4D8',
-    justifyContent: 'flex-end',
-  },
-  messageTitle: {
-    fontWeight: 600,
-    fontSize: '16px',
-    color: theme.palette.error.main,
-    marginBottom: theme.spacing(0.5),
-  },
-  messageDescription: {
-    fontSize: '14px',
-    color: '#52525B',
-    padding: '2px 0px 0px 6px',
-    marginBottom: theme.spacing(1),
-  },
-}));
+const useStyles = makeStyles((theme) => {
+return {
+      dialog: {
+        width: 400,
+      },
+      closeButton: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        color: useTheme().palette.grey[500],
+      },
+      title: {
+        padding: useTheme().spacing(1),
+        borderBottom: '1px solid #D4D4D8',
+        display: 'flex !important',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      },
+      content: {
+        backgroundColor: '#f4f4f5',
+        padding: useTheme().spacing(3, 3, 2),
+      },
+      text: {
+        width: '100%',
+        fontSize: '18px',
+        color: '#27272A !important',
+        whiteSpace: 'pre-line',
+        marginBottom: useTheme().spacing(2),
+      },
+      messageIcon: {
+        color: useTheme().palette.error.main,
+        marginRight: useTheme().spacing(1),
+        fontSize: '24px',
+      },
+      messageContainer: {
+        display: 'flex',
+        alignItems: 'flex-start',
+        flexFlow: 'column',
+        margin: useTheme().spacing(2, 0, 2, 0),
+      },
+      purlListContainer: {
+        maxHeight: '200px',
+        overflow: 'auto',
+        border: `1px solid ${useTheme().palette.divider}`,
+        borderRadius: useTheme().shape.borderRadius,
+        backgroundColor: useTheme().palette.grey[50],
+        marginTop: useTheme().spacing(1),
+        marginBottom: useTheme().spacing(2),
+      },
+      purlItem: {
+        padding: useTheme().spacing(0.75, 2),
+        borderBottom: `1px solid ${useTheme().palette.divider}`,
+        '&:last-child': {
+          borderBottom: 'none',
+        },
+      },
+      actions: {
+        padding: useTheme().spacing(1.5),
+        borderTop: '1px solid #D4D4D8',
+        justifyContent: 'flex-end',
+      },
+      messageTitle: {
+        fontWeight: 600,
+        fontSize: '16px',
+        color: useTheme().palette.error.main,
+        marginBottom: useTheme().spacing(0.5),
+      },
+      messageDescription: {
+        fontSize: '14px',
+        color: '#52525B',
+        padding: '2px 0px 0px 6px',
+        marginBottom: useTheme().spacing(1),
+      },
+    }
+});
 
 interface ReportDialogProps {
   open: boolean;
