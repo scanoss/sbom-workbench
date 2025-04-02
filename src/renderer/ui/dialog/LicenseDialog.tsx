@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useContext, useEffect, useState } from 'react';
-import {Dialog, Paper, DialogActions, Button, InputBase, TextField, IconButton} from '@mui/material';
+import {Dialog, Paper, DialogActions, Button, TextField, IconButton} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { License } from '@api/types';
 import { licenseService } from '@api/services/license.service';

@@ -8,6 +8,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import { Inventory } from '../../../../../api/types';
 import Label from '../Label/Label';
 import { DIALOG_ACTIONS, InventorySelectorResponse } from '../../../../context/types';
+import { useTheme } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -20,9 +21,9 @@ const useStyles = makeStyles((theme) => ({
   },
   closeButton: {
     position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
+    right: useTheme().spacing(1),
+    top: useTheme().spacing(1),
+    color: useTheme().palette.grey[500],
   },
   md: {
     maxWidth: 300,

@@ -3,13 +3,10 @@ import {
   Dialog,
   DialogActions,
   Button,
-  DialogContentText,
   DialogContent,
-  DialogTitle,
   TextField,
   FormControl,
   FormLabel,
-  Grid,
   Typography,
   Box,
 } from '@mui/material';
@@ -19,21 +16,21 @@ import CloseIcon from '@mui/icons-material/Close';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
 import { useTranslation } from 'react-i18next';
-import { setScanPath } from '@store/workspace-store/workspaceSlice';
 import { dialogController } from '../../controllers/dialog-controller';
+import { useTheme } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
     width: 400,
   },
   closeButton: {
-    color: theme.palette.grey[500],
+    color: useTheme().palette.grey[500],
   },
   deleteButton: {
-    backgroundColor: theme.palette.error.main,
+    backgroundColor: useTheme().palette.error.main,
     color: 'white',
     '&:hover': {
-      backgroundColor: theme.palette.error.dark,
+      backgroundColor: useTheme().palette.error.dark,
     },
   },
   content: {
@@ -41,19 +38,19 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: '5px',
   },
   actions: {
-    padding: theme.spacing(2),
+    padding: useTheme().spacing(2),
     borderTop: '1px solid #D4D4D8',
     backgroundColor: '#f4f4f5',
   },
   formControl: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
+    marginTop: useTheme().spacing(2),
+    marginBottom: useTheme().spacing(1),
     width: '100%',
   },
   inputContainer: {
     display: 'flex',
     alignItems: 'center',
-    marginTop: theme.spacing(0.5),
+    marginTop: useTheme().spacing(0.5),
   },
   input: {
     flex: 1,
@@ -61,14 +58,14 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: '3px',
   },
   browseButton: {
-    marginLeft: theme.spacing(3),
+    marginLeft: useTheme().spacing(3),
     height: '40px',
   },
   errorText: {
-    color: theme.palette.error.main,
+    color: useTheme().palette.error.main,
     fontSize: '0.75rem',
-    marginTop: theme.spacing(0.5),
-    marginLeft: theme.spacing(1.5),
+    marginTop: useTheme().spacing(0.5),
+    marginLeft: useTheme().spacing(1.5),
   },
   title: {
     padding: '12px 15px 12px 15px',

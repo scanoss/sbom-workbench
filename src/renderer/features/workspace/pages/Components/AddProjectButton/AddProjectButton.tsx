@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, ButtonGroup, Grow, MenuItem, MenuList, Paper, Popper } from '@mui/material';
-import { ClickAwayListener } from '@mui/base';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';

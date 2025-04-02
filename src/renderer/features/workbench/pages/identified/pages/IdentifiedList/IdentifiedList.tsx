@@ -11,6 +11,7 @@ import usePagination from '@hooks/usePagination';
 import SearchBox from '@components/SearchBox/SearchBox';
 import RecognizedCard from '../../../../components/RecognizedCard/RecognizedCard';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
+import { useTheme } from '@mui/material';
 
 const filter = (items, query) => {
   if (!items) {
@@ -37,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
     width: 420,
   },
   input: {
-    marginLeft: theme.spacing(1),
+    marginLeft: useTheme().spacing(1),
     flex: 1,
   },
   iconButton: {

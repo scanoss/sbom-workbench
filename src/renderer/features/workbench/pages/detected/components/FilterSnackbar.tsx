@@ -7,6 +7,7 @@ import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { useSelector } from 'react-redux';
 import FilterIcon from '@assets/imgs/filter-icon.svg';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
   alert: {
     backgroundColor: 'white',
-    color: theme.palette.primary.main,
+    color: useTheme().palette.primary.main,
     border: '1px solid #e0e0e0',
     boxShadow: '0px 1px 3px 0px #0000001A',
   },

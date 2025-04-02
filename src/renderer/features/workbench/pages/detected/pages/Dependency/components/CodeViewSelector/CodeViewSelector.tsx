@@ -4,10 +4,11 @@ import { makeStyles } from '@mui/styles';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginRight: theme.spacing(1),
+    marginRight: useTheme().spacing(1),
   },
   button: {
     fontSize: 16,

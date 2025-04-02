@@ -32,6 +32,7 @@ import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 import { Scanner } from '../../../../../main/task/scanner/types';
 import ScannerSource = Scanner.ScannerSource;
 import ScannerType = Scanner.ScannerType;
+import { useTheme } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   size: {
@@ -46,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
   new: {
     fontSize: '0.9rem',
     fontWeight: 600,
-    color: theme.palette.primary.light,
+    color: useTheme().palette.primary.light,
   },
   option: {
     display: 'flex',

@@ -10,7 +10,6 @@ import {
   MenuItem,
   TextField,
   IconButton,
-  Tooltip,
   PaperProps
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -30,11 +29,12 @@ import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import { makeStyles } from '@mui/styles';
 import { useTranslation } from 'react-i18next';
 import Draggable from 'react-draggable';
+import { useTheme } from '@mui/material';
 
 // icons
 import CloseIcon from '@mui/icons-material/Close'
-import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
+
 
 function PaperComponent(props: PaperProps) {
   return (
@@ -76,7 +76,7 @@ const useStyles = makeStyles((theme) => ({
       alignItems: 'center',
       fontSize: 14,
       fontWeight: 500,
-      color: theme.palette.primary.main,
+      color: useTheme().palette.primary.main,
     },
   },
 
