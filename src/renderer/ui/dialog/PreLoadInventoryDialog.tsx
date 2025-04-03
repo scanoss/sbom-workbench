@@ -11,7 +11,6 @@ import {
   TextareaAutosize,
   Tooltip,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import Alert from '@mui/material/Alert';
 import { AutoSizer, List } from 'react-virtualized';
 import { useSelector } from 'react-redux';
@@ -21,49 +20,6 @@ import { inventoryService } from '@api/services/inventory.service';
 import { InventorySourceType } from '@api/types';
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '@mui/material';
-
-const useStyles = makeStyles((theme) => ({
-  size: {
-    '& .MuiDialog-paperWidthMd': {
-      width: '700px',
-    },
-  },
-  dialog: {
-    width: 800,
-  },
-  closeButton: {
-    position: 'absolute',
-    right: useTheme().spacing(1),
-    top: useTheme().spacing(1),
-    color: useTheme().palette.grey[500],
-  },
-  deleteButton: {
-    backgroundColor: useTheme().palette.error.main,
-    color: 'white',
-    '&:hover': {
-      backgroundColor: useTheme().palette.error.dark,
-    },
-  },
-  content: {
-    backgroundColor: 'white !important',
-  },
-  text: {
-    width: '90%',
-    fontSize: '20px',
-    color: '#27272A !important',
-    whiteSpace: 'pre-line',
-  },
-  actions: {
-    padding: useTheme().spacing(2),
-    borderTop: '1px solid #D4D4D8',
-    backgroundColor: '#f4f4f5',
-  },
-  listItem: {
-    padding: '0px',
-    margin: '0px',
-  },
-}));
 
 interface IPreLoadInventoryDialog {
   open: boolean;
@@ -74,18 +30,14 @@ interface IPreLoadInventoryDialog {
 }
 
 export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
-  const classes = useStyles();
   const { t } = useTranslation();
-
   const { open, folder, overwrite, onClose, onCancel } = props;
-
   const { isFilterActive } = useSelector(selectNavigationState);
   const { dependencies } = useSelector(selectWorkbench);
   const [inventories, setInventories] = useState<any[]>([]);
   const [checked, setChecked] = useState<any[]>([]);
   const [inventoryNoLicenseCount, setInventoryNoLicenseCount] = useState<number>(0);
   const [validInventories, setValidInventories] = useState<any[]>([]);
-
   const dependenciesInFolder = dependencies.filter((dependency) => dependency.startsWith(folder));
 
   const handleToggle = (value: any) => () => {
@@ -154,7 +106,12 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
       scroll="body"
       fullWidth
       onClose={onCancel}
-      className={`${classes.size} dialog`}
+      className="dialog"
+      sx={{
+        '& .MuiDialog-paper': {
+          width: 800,
+        },
+      }}
     >
       <header className="dialog-title">
         <span>{t('Title:AcceptAll')}</span>
@@ -186,7 +143,10 @@ export const PreLoadInventoryDialog = (props: IPreLoadInventoryDialog) => {
                       style={style}
                       onClick={value.spdxid ? handleToggle(value) : null}
                       disabled={!value.spdxid}
-                      className={classes.listItem}
+                      sx={{
+                        padding: '0px',
+                        margin: '0px',
+                      }}
                       key={value.cvid + value.version + value.spdxid + value.purl + value.usage}
                     >
                       <ListItemIcon className="list-item">

@@ -55,8 +55,8 @@ function ProxyConfigSetup() {
       <Typography variant="body1" fontWeight="bold" gutterBottom>
         {t('Title:ProxySettings')}
       </Typography>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
+      <Grid container spacing={3} sx={{width:'100%'}}>
+        <Grid sx={{ display: 'block', width: '100%', colSpan:12 }}>
           <FormControl component="fieldset" sx={{ width: '100%' }}>
             <RadioGroup
               name="proxyConfig.mode"
@@ -74,7 +74,7 @@ function ProxyConfigSetup() {
               />
               {isManualProxy && (
                 <Grid container columnSpacing={3} rowGap={1} sx={{ my: 1.5 }}>
-                  <Grid item xs={12} md={8}>
+                  <Grid sx={{ colSpan:12 }}>
                     <ControlledInput
                       control={control}
                       label="Title:ProxyHttp"
@@ -83,7 +83,7 @@ function ProxyConfigSetup() {
                       placeholder="192.168.0.0.1"
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid sx={{ display: 'block', width: '100%', colSpan:12 }}>
                     <ControlledInput
                       control={control}
                       label="Title:Port"
@@ -93,7 +93,7 @@ function ProxyConfigSetup() {
                       type="number"
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  sx={{ display: 'block', width: '100%', colSpan:12 }}>
                     <Controller
                       control={control}
                       name="proxyConfig.sameConfigAsHttp"
@@ -106,10 +106,10 @@ function ProxyConfigSetup() {
                       )}
                     />
                   </Grid>
-                  <Grid item xs={12} md={8}>
+                  <Grid sx={{ display: 'block', width: '100%', colSpan:12 }}>
                     <ControlledInput control={control} label="Title:ProxyHttps" name="proxyConfig.httpsHost" />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid sx={{ display: 'block', width: '100%', colSpan:12 }}>
                     <ControlledInput control={control} label="Title:Port" name="proxyConfig.httpsPort" type="number" />
                   </Grid>
                 </Grid>
@@ -131,7 +131,7 @@ function ProxyConfigSetup() {
             </RadioGroup>
           </FormControl>
         </Grid>
-        <Grid item xs={12}>
+        <Grid sx={{ display: 'block', width: '100%', colSpan:12 }}>
           <ControlledInput
             control={control}
             label={t('Title:ProxyWhitelist')}
@@ -148,13 +148,13 @@ function ProxyConfigSetup() {
             }
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid sx={{ display: 'block', width: '100%', colSpan:12 }}>
           <Stack direction="row" gap={2}>
             <ControlledInput control={control} label="GRPC Proxy" name="proxyConfig.grpcProxyHost" fullWidth />
             <ControlledInput control={control} label={t('Title:Port')} name="proxyConfig.grpcProxyPort" fullWidth />
           </Stack>
         </Grid>
-        <Grid item xs={12}>
+        <Grid sx={{ display: 'block', width: '100%', colSpan:12 }}>
           <Stack gap={1}>
             <Stack direction="row" gap={2} alignItems="flex-end" sx={{ width: '100%' }}>
               <ControlledInput control={control} label="CA Certificate" name="proxyConfig.caCertificatePath" />
