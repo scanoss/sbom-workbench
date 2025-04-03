@@ -10,7 +10,7 @@ import {
   MenuItem,
   TextField,
   IconButton,
-  PaperProps
+  PaperProps, Box
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
@@ -26,7 +26,6 @@ import { ResponseStatus } from '@api/Response';
 import { useSelector } from 'react-redux';
 import { selectComponentState } from '@store/component-store/componentSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
-import { makeStyles } from '@mui/styles';
 import { useTranslation } from 'react-i18next';
 import Draggable from 'react-draggable';
 import { useTheme } from '@mui/material';
@@ -48,46 +47,6 @@ function PaperComponent(props: PaperProps) {
   );
 }
 
-const useStyles = makeStyles((theme) => ({
-  size: {
-    '& .MuiDialog-paperWidthMd': {
-      width: '700px',
-    },
-  },
-  usageNotes: {
-    display: 'grid',
-    gridTemplateColumns: '0.75fr 1fr',
-    gridGap: '20px',
-  },
-  componentVersion: {
-    display: 'grid',
-    gridTemplateColumns: '1.5fr 0.75fr',
-    gridGap: '20px',
-  },
-  option: {
-    display: 'flex',
-    flexDirection: 'column',
-    '& span.middle': {
-      fontSize: '0.8rem',
-      color: '#6c6c6e',
-    },
-    '& .searcher': {
-      display: 'flex',
-      alignItems: 'center',
-      fontSize: 14,
-      fontWeight: 500,
-      color: useTheme().palette.primary.main,
-    },
-  },
-
-  keep: {
-    '& .MuiInputBase-input': {
-      fontStyle: 'italic',
-      color: 'gray',
-    }
-  },
-}));
-
 const filter = createFilterOptions<any>();
 
 interface InventoryDialogProps {
@@ -99,7 +58,7 @@ interface InventoryDialogProps {
 }
 
 export const InventoryDialog = (props: InventoryDialogProps) => {
-  const classes = useStyles();
+  const theme = useTheme();
   const dialogCtrl = useContext<any>(DialogContext);
   const { t } = useTranslation();
 
@@ -323,7 +282,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   return (
     <Dialog
       id="InventoryDialog"
-      className={`${classes.size} dialog`}
+      className="dialog"
+      sx={{
+        '& .MuiDialog-paperWidthMd': {
+          width: '700px',
+        }
+      }}
       PaperComponent={PaperComponent}
       maxWidth="md"
       scroll="body"
@@ -331,12 +295,16 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       open={open}
       onClose={onCancel}
     >
-      <header className="dialog-title" style={{ cursor: 'move' }} id="draggable-dialog-title">
-        <span>
-          {!form.id
-            ? t('Title:IdentifyComponent')
-            : t('Title:EditIdentification')}
-        </span>
+      <header
+        className="dialog-title"
+        style={{ cursor: 'move' }}
+        id="draggable-dialog-title"
+      >
+      <span>
+        {!form.id
+          ? t('Title:IdentifyComponent')
+          : t('Title:EditIdentification')}
+      </span>
         <IconButton
           aria-label="close"
           tabIndex={-1}
@@ -354,7 +322,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
               {t('ActionCurrentFilterCriteria')}
             </Alert>
           )}
-          <div className={`${classes.componentVersion} dialog-row`}>
+          <div className="dialog-row" sx={{ display: 'grid', gridTemplateColumns: '1.5fr 0.75fr', gridGap: '20px' }}>
             <div className="dialog-form-field">
               <div className="dialog-form-field-label">
                 <label>{t('Title:Component')}</label>
@@ -410,18 +378,34 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   getOptionLabel={(option) => option.name || ''}
                   renderOption={(props, option, { selected }) => (
                     <li {...props} key={option.purl}>
-                      <div className={classes.option}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          '& span.middle': {
+                            fontSize: '0.8rem',
+                            color: '#6c6c6e',
+                          },
+                          '& .searcher': {
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontSize: 14,
+                            fontWeight: 500,
+                            color: (theme) => theme.palette.primary.main,
+                          },
+                        }}
+                      >
                         {option.search ? (
                           <span color="primary" className="searcher">
-                            {option.name}
-                          </span>
+                          {option.name}
+                        </span>
                         ) : (
                           <>
                             <span>{option.name}</span>
                             <span className="middle">{option.purl}</span>
                           </>
                         )}
-                      </div>
+                      </Box>
                     </li>
                   )}
                   disableClearable
@@ -504,11 +488,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   value={
                     licenses && form.spdxid
                       ? {
-                          spdxid: form.spdxid,
-                          name: licenses.find(
-                            (item) => item.spdxid === form.spdxid
-                          )?.name,
-                        }
+                        spdxid: form.spdxid,
+                        name: licenses.find(
+                          (item) => item.spdxid === form.spdxid
+                        )?.name,
+                      }
                       : null
                   }
                   isOptionEqualToValue={(option: any) =>
@@ -560,7 +544,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
             </div>
           </div>
 
-          <div className={`${classes.usageNotes} dialog-row`}>
+          <div className="dialog-row" sx={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr', gridGap: '20px' }}>
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">
                 {t('Title:Usage')}
@@ -571,7 +555,12 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
                   size="small"
                   fullWidth
                   value={form?.usage || 'file'}
-                  className={form?.usage === 'keep' ? classes.keep : ''}
+                  sx={form?.usage === 'keep' ? {
+                    '& .MuiInputBase-input': {
+                      fontStyle: 'italic',
+                      color: 'gray',
+                    }
+                  } : {}}
                   onChange={(e) => inputHandler(e)}
                 >
                   { options.keepOriginalOption && <MenuItem value="keep" sx={{fontStyle: 'italic', color: 'gray'}}>{t('KeepOriginalUsage')}</MenuItem> }

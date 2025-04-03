@@ -1,5 +1,6 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import {
+  Box,
   Button, CircularProgress,
   Dialog,
   DialogContent, FormControlLabel,
@@ -11,7 +12,6 @@ import {
   Stepper,
   Switch
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import Alert from '@mui/material/Alert';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
@@ -32,103 +32,7 @@ import {
   AutoSizer,
   Column,
   Table,
-  TableHeaderProps,
 } from 'react-virtualized';
-import IconComponent from '../../features/workbench/components/IconComponent/IconComponent';
-
-
-
-const useStyles = makeStyles((theme) => ({
-  size: {
-    '& .MuiDialog-paperWidthMd': {
-      width: 700,
-    },
-
-    '& .MuiGrid-root': {
-      height: 280
-    }
-  },
-  selector: {
-    width: '100%',
-    justifyContent: 'space-between',
-    '& .form-group': {
-      width: 400,
-    },
-  },
-  left: {
-    height: '100%',
-    marginBottom: -5,
-  },
-
-  headerColumn: {
-    fontWeight: 600,
-    fontSize: '0.875rem',
-    lineHeight: '1.5rem',
-    color: 'rgba(0, 0, 0, 0.87)',
-    textTransform: 'capitalize',
-    height: '100%',
-    alignItems: 'center',
-    display: 'flex',
-  },
-
-  row: {
-    fontWeight: 400,
-    fontSize: '0.75rem',
-    borderBottom: '1px solid rgba(224, 224, 224, 1)',
-    color: 'rgba(0, 0, 0, 0.87)',
-  },
-
-  dataGrid: {
-    border: 0,
-
-    '& .MuiDataGrid-row': {
-      background: 'white',
-      margin: '2px 0',
-      border: 0,
-    },
-
-    '& .MuiDataGrid-cell': {
-      border: 0,
-      outline: '0 !important',
-    },
-
-    '& .MuiDataGrid-columnHeaders': {
-      border: 0,
-      outline: '0 !important',
-    },
-
-  },
-  dataResults: {
-    maxHeight: 250,
-
-    '& .file-cell': {
-      width: 300,
-      display: 'flex',
-    },
-
-    '& .file': {
-      textOverflow: 'ellipsis',
-      overflow: 'hidden',
-    },
-
-    '& .component-name-cell': {
-      display: 'flex',
-      alignItems: 'center',
-      fontWeight: 500,
-      color: '#3B82F6',
-      fontSize: 'inherit',
-
-      '& h3': {
-        margin: 0,
-        marginLeft: 3
-      }
-    },
-    '& .MuiTableCell-root': {
-      fontSize: 14,
-      fontWeight: 500,
-    }
-  }
-}));
 
 interface IProjectSelectorDialog {
   open: boolean;
@@ -138,7 +42,6 @@ interface IProjectSelectorDialog {
 }
 
 export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
-  const classes = useStyles();
   const dialogCtrl = useContext<any>(DialogContext);
   const dispatch = useDispatch();
   const { t } = useTranslation();
@@ -236,7 +139,15 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
       scroll="body"
       fullWidth
       onClose={onCancel}
-      className={`${classes.size} dialog`}
+      className="dialog"
+      sx={{
+        '& .MuiDialog-paper': {
+          width: 500,
+        },
+        '& .MuiGrid-root': {
+          height: 280
+        }
+      }}
     >
       <header className="dialog-title">
         <span>{t('Title:ImportFromProjects')}</span>
@@ -270,9 +181,32 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
 
         {activeStep === 0 && (
           <Grid >
-          <div className={`${classes.left}`}>
+          <Box
+            sx={{
+              height: '100%',
+              marginBottom: -5,
+            }}
+          >
             <DataGrid
-              className={classes.dataGrid}
+              sx={{
+                border: 0,
+
+                '& .MuiDataGrid-row': {
+                  background: 'white',
+                  margin: '2px 0',
+                  border: 0,
+                },
+
+                '& .MuiDataGrid-cell': {
+                  border: 0,
+                  outline: '0 !important',
+                },
+
+                '& .MuiDataGrid-columnHeaders': {
+                  border: 0,
+                  outline: '0 !important',
+                },
+              }}
               rows={projectsList.current}
               columns={[
                 {
@@ -290,9 +224,12 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
               checkboxSelection={false}
               headerHeight={41}
               selectionModel={selected.map(r => r.uuid)}
+              disableMultipleRowSelection
+              onRowSelectionModelChange={onSelectionHandler}
+              getRowId={(row) => row.uuid}
               onSelectionModelChange={onSelectionHandler}
             />
-          </div>
+          </Box>
         </Grid>
         )}
 
@@ -330,8 +267,22 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
                       headerHeight={40}
                       rowCount={items.length}
                       rowGetter={({index}) => items[index]}
-                      headerClassName={classes.headerColumn}
-                      rowClassName={classes.row}
+                      headerStyle={{
+                        fontWeight: 600,
+                        fontSize: '0.875rem',
+                        lineHeight: '1.5rem',
+                        color: 'rgba(0, 0, 0, 0.87)',
+                        textTransform: 'capitalize',
+                        height: '100%',
+                        alignItems: 'center',
+                        display: 'flex',
+                      }}
+                      rowStyle={{
+                        fontWeight: 400,
+                        fontSize: '0.75rem',
+                        borderBottom: '1px solid rgba(224, 224, 224, 1)',
+                        color: 'rgba(0, 0, 0, 0.87)',
+                      }}
                     >
                       <Column label={t('Table:Header:LocalFile')} dataKey="files" width={250} flexGrow={0} flexShrink={0} />
                       <Column label={t('Table:Header:Component')} dataKey="name" width={100} flexGrow={0} flexShrink={0} />

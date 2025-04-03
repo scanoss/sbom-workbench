@@ -1,40 +1,11 @@
 import React from "react";
-import { Autocomplete, AutocompleteProps, Paper } from '@mui/material';
+import { Autocomplete, AutocompleteProps, Box, Paper, useTheme } from '@mui/material';
 import TextField from '@mui/material/TextField';
 
 // icons
 import SearchIcon from '@mui/icons-material/Search';
-import { makeStyles } from '@mui/styles';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
-import { useTheme } from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: '100%',
-  },
-  option: {
-    display: 'flex',
-    flexDirection: 'column',
-    '& span.middle': {
-      fontSize: '0.8rem',
-      color: '#6c6c6e',
-    },
-    '& .searcher': {
-      display: 'flex',
-      alignItems: 'center',
-      fontSize: 14,
-      fontWeight: 500,
-      color: useTheme().palette.primary.main,
-    },
-  },
-  attributionInfo: {
-    marginTop: 5,
-    '& small': {
-      fontSize: 10,
-      color: '#666666'
-    },
-  },
-}));
 
 interface LicenseSelectorProps extends AutocompleteProps<any, any, any, any> {
   showURL?: boolean;
@@ -46,10 +17,14 @@ const defaultProps: Partial<LicenseSelectorProps> = {
 
 const LicenseSelector: React.FC<Partial<LicenseSelectorProps>> = (props) => {
   const {showURL, ...autocompleteProps } = {...defaultProps, ...props};
-  const classes = useStyles();
+  const theme = useTheme();
 
   return (
-    <div className={classes.root}>
+    <Box
+      sx={{
+        width: '100%',
+      }}
+    >
       <Paper>
         <Autocomplete
           size="small"
@@ -60,10 +35,26 @@ const LicenseSelector: React.FC<Partial<LicenseSelectorProps>> = (props) => {
           isOptionEqualToValue={(option: any, value: any) => option.spdxid === value.spdxid}
           renderOption={(props, option, { selected }) => (
             <li {...props} key={option.spdxid}>
-              <div className={classes.option}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  '& span.middle': {
+                    fontSize: '0.8rem',
+                    color: '#6c6c6e',
+                  },
+                  '& .searcher': {
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: 14,
+                    fontWeight: 500,
+                    color: theme.palette.primary.main,
+                  },
+                }}
+              >
                 <span>{option.name}</span>
                 <span className="middle">{option.spdxid}</span>
-              </div>
+              </Box>
             </li>
           )}
           filterOptions={(options, params) => {
@@ -92,7 +83,15 @@ const LicenseSelector: React.FC<Partial<LicenseSelectorProps>> = (props) => {
       </Paper>
 
       { showURL &&
-        <div className={classes.attributionInfo}>
+        <Box
+          sx={{
+            marginTop: 1.5,
+            '& small': {
+              fontSize: 10,
+              color: '#666666'
+            },
+          }}
+        >
           <small className="d-flex align-center">
             <span className="mr-1">SPDX Specification: </span>
             {autocompleteProps.value && autocompleteProps.value.spdxid && !autocompleteProps.value.spdxid?.startsWith('LicenseRef') ? (
@@ -110,9 +109,9 @@ const LicenseSelector: React.FC<Partial<LicenseSelectorProps>> = (props) => {
               '-'
             )}
           </small>
-        </div>
+        </Box>
       }
-    </div>
+    </Box>
   );
 };
 

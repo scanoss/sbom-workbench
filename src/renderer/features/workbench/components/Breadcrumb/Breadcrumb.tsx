@@ -1,26 +1,14 @@
 import React from 'react';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import { Breadcrumbs, Link, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 
-const useStyles = makeStyles({
-  itemLink: {
-    cursor: 'pointer',
-  },
-  current: {
-    fontWeight: 600,
-    color: '#27272A',
-  },
-});
 
 const Breadcrumb = () => {
   const navigate = useNavigate();
-  const classes = useStyles();
-
   const { tree } = useSelector(selectWorkbench);
   const { node } = useSelector(selectNavigationState);
 
@@ -53,7 +41,9 @@ const Breadcrumb = () => {
           index < nodes.length - 1 ? (
             <Link
               key={iNode.path}
-              className={classes.itemLink}
+              sx={{
+                cursor: 'pointer',
+              }}
               underline="hover"
               color="inherit"
               onClick={() => goToNode(iNode)}
@@ -61,7 +51,13 @@ const Breadcrumb = () => {
               {iNode.name}
             </Link>
           ) : (
-            <Typography key={iNode.path} className={classes.current}>
+            <Typography
+              key={iNode.path}
+              sx={{
+                fontWeight: 600,
+                color: '#27272A',
+              }}
+            >
               {iNode.name}
             </Typography>
           )

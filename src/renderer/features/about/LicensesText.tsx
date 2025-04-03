@@ -1,44 +1,42 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
-
-const useStyles = makeStyles({
-  header: {
-    fontWeight: 700,
-    marginTop: 20,
-  },
-  info: {
-    fontWeight: 500,
-    '& h3': {
-      margin: 0,
-      marginBottom: 5,
-      fontWeight: 600,
-    },
-    '& h5': {
-      fontWeight: 500,
-      margin: 0,
-    },
-    ' & h4': {
-      fontWeight: 500,
-      marginTop: 8,
-      marginBottom: -8,
-    },
-    '& p': {
-      fontWeight: 500,
-      textAlign: 'justify',
-    },
-  },
-});
+import { Box, Typography } from '@mui/material';
 
 const LicensesText = () => {
-  const classes = useStyles();
-
+  
   return (
     <>
-      <p className={classes.header}>
+      <Typography
+        sx={{
+          fontWeight: 700,
+          marginTop: 20,
+        }}
+      >
         SBOM Workbench is Open Source and makes use of more awesome opensource, for which the respective
         attribution notices are listed below:
-      </p>
-      <div className={classes.info}>
+      </Typography>
+      <Box
+        sx={{
+          fontWeight: 500,
+          '& h3': {
+            margin: 0,
+            marginBottom: 5,
+            fontWeight: 600,
+          },
+          '& h5': {
+            fontWeight: 500,
+            margin: 0,
+          },
+          ' & h4': {
+            fontWeight: 500,
+            marginTop: 8,
+            marginBottom: -8,
+          },
+          '& p': {
+            fontWeight: 500,
+            textAlign: 'justify',
+          },
+        }}
+      >
 
         <div className="item">
           <h3>Material-UI</h3>
@@ -549,7 +547,7 @@ const LicensesText = () => {
             SOFTWARE.
           </p>
         </div>
-      </div>
+      </Box>
     </>
   );
 };
