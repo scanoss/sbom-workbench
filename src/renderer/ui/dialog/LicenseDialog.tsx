@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useContext, useEffect, useState } from 'react';
 import {Dialog, Paper, DialogActions, Button, TextField, IconButton} from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { License } from '@api/types';
 import { licenseService } from '@api/services/license.service';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
@@ -9,14 +8,6 @@ import { DialogContext } from '@context/DialogProvider';
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from 'react-i18next';
 import { licenseHelper } from '../../../main/helpers/LicenseHelper';
-
-const useStyles = makeStyles((theme) => ({
-  size: {
-    '& .MuiDialog-paperWidthMd': {
-      width: '500px',
-    },
-  },
-}));
 
 interface LicenseDialogProps {
   open: boolean;
@@ -26,7 +17,6 @@ interface LicenseDialogProps {
 }
 
 export const LicenseDialog = (props: LicenseDialogProps) => {
-  const classes = useStyles();
   const { t } = useTranslation();
 
   const { open, onClose, onCancel, save } = props;
@@ -71,7 +61,12 @@ export const LicenseDialog = (props: LicenseDialogProps) => {
       id="LicenseDialog"
       maxWidth="md"
       scroll="body"
-      className={`${classes.size} dialog`}
+      className="dialog"
+      sx={{
+        '& .MuiDialog-paperWidthMd': {
+          width: '500px',
+        },
+      }}
       fullWidth
       open={open}
       onClose={onCancel}

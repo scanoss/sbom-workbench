@@ -1,17 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { makeStyles } from '@mui/styles';
+import React, { useEffect, useState } from 'react';
 import {
   AutoSizer,
   Column,
   Table,
 } from 'react-virtualized';
 import { useTranslation } from 'react-i18next';
-
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
+import { styled } from '@mui/material/styles';
 
-const useStyles = makeStyles({
-  headerColumn: {
+const StyledTable = styled(Table)(({ theme }) => ({
+  '& .ReactVirtualized__Table__headerColumn': {
     fontWeight: 600,
     fontSize: '0.875rem',
     lineHeight: '1.5rem',
@@ -21,8 +20,7 @@ const useStyles = makeStyles({
     alignItems: 'center',
     display: 'flex',
   },
-
-  row: {
+  '& .ReactVirtualized__Table__row': {
     fontWeight: 400,
     fontSize: '0.75rem',
     borderBottom: '1px solid rgba(224, 224, 224, 1)',
@@ -39,12 +37,11 @@ const useStyles = makeStyles({
     '&:hover .file': {
       textDecoration: 'underline',
     },
-  },
+  }
+}));
 
-});
 
 const ObligationsDataTable = ({ data }) => {
-  const classes = useStyles();
   const { t } = useTranslation();
   const [licenseHash, setLicenseHash] = useState({});
 
@@ -66,7 +63,7 @@ const ObligationsDataTable = ({ data }) => {
   return (
     <AutoSizer>
       {({ height, width }) => (
-        <Table
+        <StyledTable
           className="tableRowLicense"
           height={height}
           width={width}
@@ -74,8 +71,6 @@ const ObligationsDataTable = ({ data }) => {
           headerHeight={40}
           rowCount={data.length}
           rowGetter={({ index }) => data[index]}
-          headerClassName={classes.headerColumn}
-          rowClassName={classes.row}
         >
 
           <Column label={t('Table:Header:License')} dataKey="label" width={200} flexGrow={1} flexShrink={0} />
@@ -115,7 +110,7 @@ const ObligationsDataTable = ({ data }) => {
               </div>
             )}
           />
-        </Table>
+        </StyledTable>
       )}
     </AutoSizer>
   );

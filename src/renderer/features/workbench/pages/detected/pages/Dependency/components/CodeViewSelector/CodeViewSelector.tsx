@@ -1,25 +1,9 @@
 import React from 'react';
-import { ButtonGroup, Button, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { ButtonGroup, Button, Tooltip, Box } from '@mui/material';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    marginRight: useTheme().spacing(1),
-  },
-  button: {
-    fontSize: 16,
-    minWidth: 32,
-
-    '&:not(.MuiButton-containedPrimary)': {
-      backgroundColor: '#fff',
-      color: '#000',
-    },
-  },
-}));
 
 export enum CodeViewSelectorMode {
   CODE,
@@ -27,15 +11,26 @@ export enum CodeViewSelectorMode {
 }
 
 const CodeViewSelector = ({ active, setView }) => {
-  const classes = useStyles();
+  const theme  = useTheme();
   const { t } = useTranslation();
 
   return (
-    <div className={classes.root}>
+    <Box
+      sx={{
+        marginRight: theme.spacing(1),
+      }}
+    >
       <ButtonGroup variant="contained" size="small" aria-label="file view selector">
         <Tooltip title={t('Tooltip:RawView')} arrow>
           <Button
-            className={classes.button}
+            sx={{
+              fontSize: 16,
+              minWidth: 32,
+              '&:not(.MuiButton-containedPrimary)': {
+                backgroundColor: '#fff',
+                color: '#000',
+              },
+            }}
             onClick={() => setView(CodeViewSelectorMode.CODE)}
             color={active === CodeViewSelectorMode.CODE ? 'primary' : 'secondary'}
             aria-label="code"
@@ -54,7 +49,7 @@ const CodeViewSelector = ({ active, setView }) => {
           </Button>
         </Tooltip>
       </ButtonGroup>
-    </div>
+    </Box>
   );
 };
 

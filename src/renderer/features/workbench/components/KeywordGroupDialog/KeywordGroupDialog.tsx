@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { makeStyles } from '@mui/styles';
 import { workspaceService } from '@api/services/workspace.service';
 import { GroupSearchKeywordDTO } from '@api/dto';
 import Button from '@mui/material/Button';
@@ -8,74 +7,8 @@ import { Autocomplete, Chip, TextField } from '@mui/material';
 import * as SearchUtils from '@shared/utils/search-utils';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles((theme) => ({
-    button: {
-      position: 'absolute',
-      top: 9,
-      right: 9,
-      zIndex: 1,
-    },
-    autocomplete: {
-      '& .MuiAutocomplete-endAdornment': {},
-    },
-    searchInput: {
-      '& .MuiInputBase-input': {
-        fontSize: '0.8rem',
-        padding: '7px 0px !important',
-      },
-    },
-    dataGrid: {
-      '& .MuiDataGrid-columnHeader': {
-        fontSize: '12px',
-        fontWeight: '400 !important',
-        padding: 0,
-        '& .MuiDataGrid-columnSeparator': {
-          display: 'none',
-        },
-      },
-      '& .MuiDataGrid-columnHeaderCheckbox': {
-        '& .MuiSvgIcon-root': {
-          width: '0.85em',
-          height: '0.85em',
-        },
-      },
-      '& .MuiTablePagination-caption': {
-        fontSize: '0.8rem',
-        fontWeight: 500,
-      },
-      '& .MuiTablePagination-actions': {
-        marginLeft: 10,
-      },
-      border: 2,
-      '& .MuiDataGrid-cell': {
-        border: 0,
-        padding: '0 3px',
-      },
-      '& .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
-        visibility: 'hidden',
-  
-        '& .MuiSvgIcon-root': {
-          width: '0.85em',
-          height: '0.85em',
-        },
-      },
-      '& .MuiDataGrid-row.Mui-selected .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
-        visibility: 'visible !important',
-      },
-      '& .MuiDataGrid-row:hover': {
-        '& .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
-          visibility: 'visible',
-        },
-      },
-      '& .MuiButtonBase-root ': {
-        padding: 0,
-      },
-    },
-}));
-
 export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, isEditMode, onCancel, isOpen }) => {
     const { t } = useTranslation();
-    const classes = useStyles();
     const searchQuery = useRef(null);
     const [value, setValue] = React.useState<string[]>([]);
     const [form, setForm] = useState<
@@ -102,11 +35,11 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
 
     const createGroup = async () => {
         // Update group if id is present
-        if(form && form.id) { 
-           await workspaceService.updateSearchGroup(form as GroupSearchKeywordDTO); 
+        if(form && form.id) {
+           await workspaceService.updateSearchGroup(form as GroupSearchKeywordDTO);
         } else {
-           await workspaceService.addSearchGroups([form] as Array<GroupSearchKeywordDTO>); 
-        }    
+           await workspaceService.addSearchGroups([form] as Array<GroupSearchKeywordDTO>);
+        }
         resetFields();
         onGroupCreated();
     }
@@ -144,7 +77,7 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
       if(groupEdit){
         const tags = getTags(groupEdit.words);
         searchQuery.current = tags.join(' ');
-    
+
         setForm((prevForm) => ({
           ...prevForm,
           id: groupEdit.id,
@@ -157,21 +90,21 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
 
 
     return (
-    <>            
+    <>
       <div className='new-group-dialog'>
           <section className='form-box'>
             <article>
               <div className="dialog-form-field">
                 <label className="dialog-form-field-label">{t('Dialog:GroupNameLabel')}</label><span className='group-exists' hidden={isEditMode || !groupMapper.has(form.label)}>{t('Dialog:GroupAlreadyExists')}</span>
                   <Paper className="dialog-form-field-control">
-                    <TextField                                      
+                    <TextField
                       name="label"
                       size="small"
                       fullWidth
                       disabled={isEditMode}
                       autoFocus
                       value={form?.label}
-                      InputProps= {{                          
+                      InputProps= {{
                         disableUnderline: true,
                       }}
                       onChange={(e) => inputHandler(e.target.name, e.target.value)}
@@ -181,10 +114,12 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
               </div>
             </article>
 
-            <article>                          
+            <article>
                 <Autocomplete
                   multiple
-                  className={classes.autocomplete}
+                  sx={{
+                    '& .MuiAutocomplete-endAdornment': {},
+                  }}
                   fullWidth
                   size="small"
                   options={['license', 'copyright', 'author', 'version']}
@@ -218,9 +153,14 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
                             name="name"
                             size="small"
                             fullWidth
-                            className={classes.searchInput}                                            
+                            sx={{
+                              '& .MuiInputBase-input': {
+                                fontSize: '0.8rem',
+                                padding: '7px 0px !important',
+                              },
+                            }}
                             InputProps={{
-                              ...params.InputProps,                                              
+                              ...params.InputProps,
                               disableUnderline: true,
                             }}
                           />
@@ -228,7 +168,7 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
                       </div>
                     </>
                   )}
-                />                            
+                />
             </article>
           </section>
           <section className='new-group-btn-box'>
@@ -241,15 +181,15 @@ export const KeywordGroupDialog = ({ onGroupCreated, groupEdit , groupMapper, is
               variant="contained"
               color="secondary"
               disabled={enableSubmit(form)}
-              style={{ padding: 0, lineHeight: 1, minWidth: 0 }}    
+              style={{ padding: 0, lineHeight: 1, minWidth: 0 }}
               onClick={(event) => {
-                event.stopPropagation(); 
-                createGroup();                                               
-              }}                     
+                event.stopPropagation();
+                createGroup();
+              }}
             >
               {t('Button:Create')}
             </Button>
-          </section>       
+          </section>
       </div>
     </>
     );

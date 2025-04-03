@@ -1,13 +1,5 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-
-  },
-
-}));
 
 export interface InfoProps {
   message: string;
@@ -15,7 +7,7 @@ export interface InfoProps {
 }
 
 const Info = ({ message, icon }: InfoProps) => {
-  const classes = useStyles();
+
 
   return (
     <section className="loader">

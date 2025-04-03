@@ -1,11 +1,8 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { Dialog, Tooltip, Paper, DialogActions, Button, InputBase, TextField, IconButton } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useContext, useEffect, useState } from 'react';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import Autocomplete from '@mui/material/Autocomplete';
 import { Dependency } from '@api/types';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { ResponseStatus } from '@api/Response';
@@ -16,30 +13,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from 'react-i18next';
 import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 
-const useStyles = makeStyles((theme) => ({
-  size: {
-    '& .MuiDialog-paperWidthMd': {
-      width: '500px',
-    },
-  },
-  row: {
-    display: 'grid',
-    gridTemplateColumns: '2fr 0.7fr',
-    gridGap: '20px',
-  },
-  search: {
-    padding: '10px 0px 10px 10px',
-  },
-  option: {
-    display: 'flex',
-    flexDirection: 'column',
-    '& span.middle': {
-      fontSize: '0.8rem',
-      color: '#6c6c6e',
-    },
-  },
-}));
-
 interface DependencyDialogProps {
   open: boolean;
   dependency: Partial<Dependency>;
@@ -48,7 +21,6 @@ interface DependencyDialogProps {
 }
 
 const DependencyDialog = (props: DependencyDialogProps) => {
-  const classes = useStyles();
   const dialogCtrl = useContext<any>(DialogContext);
   const { t } = useTranslation();
 
@@ -107,12 +79,17 @@ const DependencyDialog = (props: DependencyDialogProps) => {
   return (
     <Dialog
       id="DependencyDialog"
-      className={`${classes.size} dialog`}
+      className="dialog"
       maxWidth="md"
       scroll="body"
       fullWidth
       open={open}
       onClose={onCancel}
+      sx={{
+        '& .MuiDialog-paper': {
+          width: 500,
+        },
+      }}
     >
       <header className="dialog-title">
         <span dangerouslySetInnerHTML={

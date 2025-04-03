@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import { Chip, IconButton, TextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Chip, IconButton, InputBase, styled, TextField } from '@mui/material';
 import { IpcChannels } from '@api/ipc-channels';
 import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
@@ -17,74 +16,59 @@ import { KeywordGroupMenu } from '../KeywordGroupMenu/KeywordGroupMenu';
 import { GroupSearchKeyword } from '@api/types';
 import TocOutlinedIcon from '@mui/icons-material/TocOutlined';
 
-const useStyles = makeStyles((theme) => ({
-  button: {
-    position: 'absolute',
-    top: 9,
-    right: 9,
-    zIndex: 1,
-  },
-  autocomplete: {
-    '& .MuiAutocomplete-endAdornment': {},
-  },
-  searchInput: {
-    '& .MuiInputBase-input': {
-      fontSize: '0.8rem',
-      padding: '7px 0px !important',
-    },
-  },
-  dataGrid: {
-    '& .MuiDataGrid-columnHeader': {
-      fontSize: '12px',
-      fontWeight: '400 !important',
-      padding: 0,
-      '& .MuiDataGrid-columnSeparator': {
-        display: 'none',
-      },
-    },
-    '& .MuiDataGrid-columnHeaderCheckbox': {
-      '& .MuiSvgIcon-root': {
-        width: '0.85em',
-        height: '0.85em',
-      },
-    },
-    '& .MuiTablePagination-caption': {
-      fontSize: '0.8rem',
-      fontWeight: 500,
-    },
-    '& .MuiTablePagination-actions': {
-      marginLeft: 10,
-    },
-    border: 2,
-    '& .MuiDataGrid-cell': {
-      border: 0,
-      padding: '0 3px',
-    },
-    '& .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
-      visibility: 'hidden',
 
-      '& .MuiSvgIcon-root': {
-        width: '0.85em',
-        height: '0.85em',
-      },
+
+// For the data grid
+const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+  '& .MuiDataGrid-columnHeader': {
+    fontSize: '12px',
+    fontWeight: '400 !important',
+    padding: 0,
+    '& .MuiDataGrid-columnSeparator': {
+      display: 'none',
     },
-    '& .MuiDataGrid-row.Mui-selected .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
-      visibility: 'visible !important',
+  },
+  '& .MuiDataGrid-columnHeaderCheckbox': {
+    '& .MuiSvgIcon-root': {
+      width: '0.85em',
+      height: '0.85em',
     },
-    '& .MuiDataGrid-row:hover': {
-      '& .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
-        visibility: 'visible',
-      },
+  },
+  '& .MuiTablePagination-caption': {
+    fontSize: '0.8rem',
+    fontWeight: 500,
+  },
+  '& .MuiTablePagination-actions': {
+    marginLeft: 10,
+  },
+  border: 2,
+  '& .MuiDataGrid-cell': {
+    border: 0,
+    padding: '0 3px',
+  },
+  '& .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
+    visibility: 'hidden',
+    '& .MuiSvgIcon-root': {
+      width: '0.85em',
+      height: '0.85em',
     },
-    '& .MuiButtonBase-root ': {
-      padding: 0,
+  },
+  '& .MuiDataGrid-row.Mui-selected .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
+    visibility: 'visible !important',
+  },
+  '& .MuiDataGrid-row:hover': {
+    '& .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
+      visibility: 'visible',
     },
+  },
+  '& .MuiButtonBase-root ': {
+    padding: 0,
   },
 }));
 
+
 const SearchPanel = () => {
   const navigate = useNavigate();
-  const classes = useStyles();
   const searchQuery = useRef(null);
   const { summary } = useSelector(selectWorkbench);
   const { t } = useTranslation();
@@ -130,7 +114,6 @@ const SearchPanel = () => {
     .map((tag) => tag.toLowerCase().trim())
     .map((tag) => SearchUtils.getTerms(tag))
     .flat();
-
     searchQuery.current = nTags.join(' ');
     setValue(nTags);
   };
@@ -203,9 +186,8 @@ const SearchPanel = () => {
     }
   };
 
-  const handleGroupKeyword = (group: GroupSearchKeyword) => {   
+  const handleGroupKeyword = (group: GroupSearchKeyword) => {
     const nTags = sanitizeTags(group.words);
-
     searchQuery.current = nTags.join(' ');
     setValue(nTags);
 };
@@ -255,7 +237,6 @@ const SearchPanel = () => {
           <div className="search-panel-input d-flex align-center">
             <i className="ri-search-line mr-1" />
             <Autocomplete
-              className={classes.autocomplete}
               multiple
               fullWidth
               size="small"
@@ -275,11 +256,12 @@ const SearchPanel = () => {
                   />
                 ))
               }
-              onChange={(event, data) => onTagsHandler(data)}
+              onChange={(event, data) => {
+                onTagsHandler(data)
+              }}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  className={classes.searchInput}
                   autoFocus
                   variant="standard"
                   InputProps={{
@@ -305,13 +287,17 @@ const SearchPanel = () => {
         <IconButton
           disabled={selected?.length === 0}
           size="small"
-          className={classes.button}
+          sx={{
+            position: 'absolute',
+            top: 9,
+            right: 9,
+            zIndex: 1,
+          }}
           onClick={onMenuActionHandler}
         >
           <i className="ri-more-line" />
         </IconButton>
-        <DataGrid
-          className={classes.dataGrid}
+        <StyledDataGrid
           rows={results}
           columns={[
             {

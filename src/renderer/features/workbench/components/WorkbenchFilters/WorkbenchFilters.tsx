@@ -14,13 +14,10 @@ import {
   Switch,
   Divider,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-
 import { useDispatch, useSelector } from 'react-redux';
 import { projectService } from '@api/services/project.service';
 import { FileStatusType, FileTreeViewMode, FileUsageType } from '@api/types';
@@ -28,16 +25,7 @@ import { setFilter, resetFilter, selectNavigationState } from '@store/navigation
 import SearchBox from '@components/SearchBox/SearchBox';
 import { Trans, useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles((theme) => ({
-  info: {
-    maxWidth: 100,
-    textAlign: 'center',
-    lineHeight: 'normal',
-  },
-}));
-
 const WorkbenchFilters = () => {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const { filter, isFilterActive } = useSelector(selectNavigationState);
   const { t } = useTranslation();
@@ -83,7 +71,11 @@ const WorkbenchFilters = () => {
         <h4 className="mr-1 mb-2 mt-0 d-flex align-end">
           {t('Title:Filters')}
           <Tooltip
-            classes={{ tooltip: classes.info }}
+            sx={{
+              maxWidth: 100,
+              textAlign: 'center',
+              lineHeight: 'normal',
+            }}
             title={(
               <Trans
                 i18nKey="Tooltip:FilterUsageHelp"
@@ -200,7 +192,11 @@ const WorkbenchFilters = () => {
 
           <FormGroup>
             <Tooltip
-              classes={{ tooltip: classes.info }}
+              sx={{
+                maxWidth: 100,
+                textAlign: 'center',
+                lineHeight: 'normal',
+              }}
               placement={open ? 'right' : 'bottom'}
               title={(
                 <p className="mt-1 mb-1">{t('Tooltip:ShowOnlyFilteredMatches')}</p>

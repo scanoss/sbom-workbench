@@ -1,7 +1,17 @@
 import react, { useState } from 'react';
-import { Button, Divider, Menu, MenuItem, ListItemText, styled, ListItemIcon, Chip, IconButton } from '@mui/material';
+import {
+  Button,
+  Divider,
+  Menu,
+  MenuItem,
+  ListItemText,
+  styled,
+  ListItemIcon,
+  Chip,
+  IconButton,
+  Box
+} from '@mui/material';
 import { WorkspaceData } from '@api/types';
-import { makeStyles } from '@mui/styles';
 import { useTranslation } from 'react-i18next';
 
 /* icons */
@@ -19,20 +29,6 @@ const MainButton = styled(Button)({
   fontWeight: 500
 });
 
-const useStyles = makeStyles((theme) => ({
-  menuInner: {
-    maxHeight: 216,
-    overflowY: 'auto',
-  },
-  menuItem: {
-    '& .action': {
-      visibility: 'hidden'
-    },
-    '&:hover .action, &:focus .action': {
-      visibility: 'visible'
-    },
-  }
-}));
 
 interface WorkspaceSelectorProps {
   workspaces: WorkspaceData[];
@@ -43,7 +39,6 @@ interface WorkspaceSelectorProps {
 }
 
 export const WorkspaceSelector = (props: WorkspaceSelectorProps) => {
-  const classes = useStyles();
   const { t } = useTranslation();
 
   const { selected, workspaces, onSelected, onCreated, onRemoved } = props;
@@ -108,12 +103,24 @@ export const WorkspaceSelector = (props: WorkspaceSelectorProps) => {
           },
         }}
       >
-        <div className={classes.menuInner}>
+        <Box
+          sx={{
+            maxHeight: 216,
+            overflowY: 'auto',
+          }}
+        >
           {workspaces?.map((workspace, index) => (
             <MenuItem
               key={workspace.PATH}
               onClick={() => !isSelected(workspace, index) ? onItemSelected(workspace) : handleClose() }
-              className={classes.menuItem}
+              sx={{
+                '& .action': {
+                  visibility: 'hidden'
+                },
+                '&:hover .action, &:focus .action': {
+                  visibility: 'visible'
+                },
+              }}
               disableRipple
             >
               <ListItemText
@@ -140,7 +147,7 @@ export const WorkspaceSelector = (props: WorkspaceSelectorProps) => {
               </div>
             </MenuItem>
           ))}
-        </div>
+        </Box>
 
         <Divider />
         <MenuItem onClick={() => onItemNew()} disableRipple>

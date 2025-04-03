@@ -1,24 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Paper, IconButton, InputBase } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: '0px 4px',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  input: {
-    flex: 1,
-  },
-  iconButton: {
-    opacity: 0.6,
-    padding: 10,
-  },
-}));
 
 export interface SearchBoxProps {
   value?: string;
@@ -29,7 +14,6 @@ export interface SearchBoxProps {
 }
 
 const SearchBox = ({ value, placeholder, responseDelay, disabled, onChange }: SearchBoxProps) => {
-  const classes = useStyles();
   const { t } = useTranslation();
 
   const [query, setQuery] = useState('');
@@ -44,11 +28,25 @@ const SearchBox = ({ value, placeholder, responseDelay, disabled, onChange }: Se
   }, [value]);
 
   return (
-    <Paper id="SearchBox" component="form" className={classes.root}>
-      <SearchIcon className={`start-icon ${classes.iconButton}`} />
+    <Paper id="SearchBox" component="form"
+           sx={{
+             padding: '0px 4px',
+             display: 'flex',
+             alignItems: 'center',
+           }}
+    >
+      <SearchIcon
+        className="start-icon"
+        sx={{
+          opacity: 0.6,
+          padding: 1,
+        }}
+      />
       <InputBase
         disabled={disabled}
-        className={classes.input}
+        sx={{
+          flex: 1,
+        }}
         value={query}
         onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
         onChange={(e: any) => setQuery(e.target.value)}
@@ -56,7 +54,14 @@ const SearchBox = ({ value, placeholder, responseDelay, disabled, onChange }: Se
         inputProps={{ 'aria-label': placeholder, spellCheck: 'false' }}
       />
       {query && (
-        <IconButton size="small" className={`end-icon ${classes.iconButton}`} onClick={() => setQuery('')}>
+        <IconButton
+          size="small"
+          className="end-icon"
+          sx={{
+            opacity: 0.6,
+            padding: '10px',
+          }}
+          onClick={() => setQuery('')}>
           <CloseIcon fontSize="inherit" />
         </IconButton>
       )}

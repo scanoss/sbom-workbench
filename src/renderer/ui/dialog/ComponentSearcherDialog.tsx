@@ -303,10 +303,12 @@ const ComponentSearcherDialog = (props: ComponentSearcherDialogProps) => {
             },
           ]}
           localeText={{ noRowsLabel: (<Message />) as unknown as string }}
-          headerHeight={40}
-          rowHeight={22}
+          rowHeight={28}
           disableColumnMenu
-          onSelectionModelChange={onSelectionModelChange}
+          checkboxSelection
+          disableMultipleRowSelection
+          onRowSelectionModelChange={onSelectionModelChange}
+          getRowId={(row) => row.id}
           hideFooter
         />
       </main>
