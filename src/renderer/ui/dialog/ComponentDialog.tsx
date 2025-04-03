@@ -2,10 +2,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Dialog, Tooltip, Paper, DialogActions, Button, InputBase, TextField, IconButton, Box } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import Autocomplete from '@mui/material/Autocomplete';
 import { NewComponentDTO } from '@api/types';
 import { DialogResponse, DIALOG_ACTIONS } from '@context/types';
 import { ResponseStatus } from '@api/Response';
@@ -18,32 +15,6 @@ import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 import { PackageURL } from 'packageurl-js';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
-const useStyles = makeStyles((theme) => ({
-  size: {
-    '& .MuiDialog-paperWidthMd': {
-      width: '500px',
-    },
-  },
-  componentVersion: {
-    display: 'grid',
-    gridTemplateColumns: '1.5fr 0.75fr',
-    gridGap: '20px',
-  },
-  errorText: {
-    color: '#f44336',
-    fontSize: '12px',
-    display: 'flex',
-    alignItems: 'center',
-    fontWeight: 500,
-  },
-  errorIcon: {
-    fontSize: '12px',
-    marginRight: '1px',
-    display: 'flex',
-    alignItems: 'center',
-  },
-}));
-
 interface ComponentDialogProps {
   open: boolean;
   onClose: (response: DialogResponse) => void;
@@ -53,7 +24,6 @@ interface ComponentDialogProps {
 }
 
 export const ComponentDialog = (props: ComponentDialogProps) => {
-  const classes = useStyles();
   const { t } = useTranslation();
 
   const { open, onClose, onCancel, component, label } = props;
@@ -187,11 +157,16 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
   return (
     <Dialog
       id="ComponentDialog"
-      className={`${classes.size} dialog`}
+      className="dialog"
       maxWidth="md"
       scroll="body"
       fullWidth
       open={open}
+      sx={{
+        '& .MuiDialog-paper': {
+          width: 500,
+        },
+      }}
       onClose={onCancel}
     >
       <header className="dialog-title">
@@ -203,7 +178,14 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
 
       <form onSubmit={handleClose}>
         <div className="dialog-content">
-          <div className={`dialog-row ${classes.componentVersion} `}>
+          <Box
+            className="dialog-row"
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '1.5fr 0.75fr',
+              gap: '20px'
+            }}
+          >
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">{t('Title:Component')}</label>
               <Paper className="dialog-form-field-control">
@@ -233,7 +215,7 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                 />
               </Paper>
             </div>
-          </div>
+          </Box>
 
           <div className="dialog-form-field">
             <div className="dialog-form-field-label">
@@ -267,14 +249,29 @@ export const ComponentDialog = (props: ComponentDialogProps) => {
                   }}
                 >
                   <label className="dialog-form-field-label">{t('Title:PURL')}</label>
-                  <div className={classes.errorText}>
+                  <Box
+                    sx={{
+                      color: '#f44336',
+                      fontSize: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      fontWeight: 500,
+                    }}
+                  >
                     {purlError && (
                       <>
-                        <ErrorOutlineIcon className={classes.errorIcon} />
+                        <ErrorOutlineIcon
+                          sx={{
+                            fontSize: '12px',
+                            marginRight: '1px',
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
+                        />
                         <span>{purlError}</span>
                       </>
                     )}
-                  </div>
+                  </Box>
                 </Box>
                 <Paper className="dialog-form-field-control">
                   <TextField

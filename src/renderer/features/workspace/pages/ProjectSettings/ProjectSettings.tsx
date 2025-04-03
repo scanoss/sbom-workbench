@@ -13,7 +13,6 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -32,35 +31,8 @@ import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 import { Scanner } from '../../../../../main/task/scanner/types';
 import ScannerSource = Scanner.ScannerSource;
 import ScannerType = Scanner.ScannerType;
-import { useTheme } from '@mui/material';
-
-const useStyles = makeStyles((theme) => ({
-  size: {
-    '& .MuiDialog-paperWidthMd': {
-      width: '600px',
-    },
-  },
-  search: {
-    padding: '8px 16px 8px 8px',
-    outline: 'none',
-  },
-  new: {
-    fontSize: '0.9rem',
-    fontWeight: 600,
-    color: useTheme().palette.primary.light,
-  },
-  option: {
-    display: 'flex',
-    flexDirection: 'column',
-    '& span.middle': {
-      fontSize: '0.8rem',
-      color: '#6c6c6e',
-    },
-  },
-}));
 
 const ProjectSettings = () => {
-  const classes = useStyles();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { t } = useTranslation();

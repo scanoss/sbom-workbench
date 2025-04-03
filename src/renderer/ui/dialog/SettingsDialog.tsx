@@ -1,19 +1,19 @@
 import React, { MouseEvent, SyntheticEvent, useContext, useEffect, useState } from 'react';
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
   FormHelperText,
   Grid,
-  IconButton,
+  IconButton, ListItem,
   MenuItem,
   Paper,
   Select,
-  Stack,
+  Stack, styled,
   Tooltip,
-  Typography,
+  Typography
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import TextField from '@mui/material/TextField';
 import AddIcon from '@mui/icons-material/Add';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
@@ -38,37 +38,15 @@ import ControlledInput from '../Input';
 import { useTheme } from '@mui/material';
 const filter = createFilterOptions();
 
-const useStyles = makeStyles((theme) => ({
-  size: {
-    '& .MuiDialog-paperWidthMd': {
-      width: '600px',
-    },
-  },
-  new: {
-    fontSize: '0.9rem',
-    fontWeight: 600,
-    color: useTheme().palette.primary.light,
-  },
-  option: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 3,
-    padding: 6,
-    '& span.middle': {
-      fontSize: '0.8rem',
-      color: '#6c6c6e',
-    },
-  },
-  key: {
-    textAlign: 'center',
-    verticalAlign: 'center',
-    marginLeft: '5px',
-    letterSpacing: 2,
-    padding: '4px 3px 2px 4px',
-    borderRadius: '4px',
-    backgroundColor: '#eef2ff',
-    fontSize: '0.6rem',
-  },
+const StyledSpan = styled('span')(({ theme }) => ({
+  textAlign: 'center',
+  verticalAlign: 'center',
+  marginLeft: '5px',
+  letterSpacing: 2,
+  padding: '4px 3px 2px 4px',
+  borderRadius: '4px',
+  backgroundColor: '#eef2ff',
+  fontSize: '0.6rem',
 }));
 
 interface NewEndpointDialogProps {
@@ -80,7 +58,6 @@ interface NewEndpointDialogProps {
 
 const NewEndpointDialog = (props: NewEndpointDialogProps) => {
   const { t } = useTranslation();
-
   const { open, onClose, onCancel, defaultData } = props;
 
   const initial = {
@@ -111,7 +88,14 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
   useEffect(setDefaults, [open]);
 
   return (
-    <Dialog id="NewEndpointDialog" maxWidth="xs" fullWidth className="dialog" open={open} onClose={onCancel}>
+    <Dialog
+      id="NewEndpointDialog"
+      maxWidth="xs"
+      fullWidth
+      className="dialog"
+      open={open}
+      onClose={onCancel}
+    >
       <form onSubmit={onSubmit}>
         <div className="dialog-content">
           <div className="dialog-form-field">
@@ -164,7 +148,7 @@ interface SettingDialogProps {
 
 const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
   const { t } = useTranslation();
-  const classes = useStyles();
+  const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const [apiDialog, setApiDialog] = useState({
@@ -245,10 +229,15 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
         id="SettingsDialog"
         maxWidth="md"
         scroll="body"
-        className={`${classes.size} dialog`}
+        className="dialog"
         fullWidth
         open={open}
         onClose={onCancel}
+        sx={{
+          '& .MuiDialog-paper': {
+            width: 600,
+          }
+        }}
       >
         <header className="dialog-title">
           <span>{t('Title:Settings')}</span>
@@ -326,26 +315,42 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                           renderOption={(props, option) => {
                             if (option.new) {
                               return (
-                                <li {...props} className={classes.new}>
+                                <ListItem
+                                  {...props}
+                                  sx={{
+                                    height: '10px',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 600,
+                                    color: theme.palette.primary.light,
+                                  }}
+                                >
                                   {option.URL}
-                                </li>
+                                </ListItem>
                               );
                             }
 
                             return (
                               <li {...props}>
                                 <article className="w-100 d-flex space-between align-center">
-                                  <div className={classes.option}>
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: 1,
+                                      padding: 1,
+                                      '& span.middle': {
+                                        fontSize: '0.8rem',
+                                        color: '#6c6c6e',
+                                      },
+                                    }}
+                                  >
                                     <span>{option.URL}</span>
                                     {option.API_KEY && (
                                       <span className="middle">API KEY:
-                                        <span
-                                          className={`${classes.key}`}
-                                        >{'*'.repeat(8)}
-                                        </span>
+                                        <StyledSpan>{'*'.repeat(8)}</StyledSpan>
                                       </span>
                                     )}
-                                  </div>
+                                  </Box>
                                   <IconButton
                                     disabled={apis && apis?.length <= 1}
                                     size="small"
@@ -374,7 +379,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   </Stack>
                 )}
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sx={{ display: 'block', width: '100%' }}>
                 <ControlledInput
                   label={t('Title:SBOMLedgerToken')}
                   name="sbomLedgerToken"
@@ -384,7 +389,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   size="medium"
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sx={{ display: 'block', width: '100%' }}>
                 <Stack gap={1}>
                   <Typography variant="body2" fontWeight={500} component="label">
                     {t('Title:Language')}
@@ -400,7 +405,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                   </Paper>
                 </Stack>
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} >
                 <ProxyConfigSetup />
               </Grid>
             </Grid>

@@ -1,35 +1,35 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
-
-const useStyles = makeStyles((theme) => ({
-  container: {
-    display: 'grid',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  root: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    maxWidth: 300,
-    margin: '0 auto',
-  },
-  message: {
-    textAlign: 'center',
-    color: '#71717A',
-  },
-}));
+import { Box, Typography } from '@mui/material';
 
 const EmptyMessagePlaceholder = ({ children }) => {
-  const classes = useStyles();
 
   return (
-    <div className={classes.container}>
-      <div className={classes.root}>
-        <h4 className={classes.message}>{children}</h4>
-      </div>
-    </div>
+    <Box
+      sx={{
+        display: 'grid',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          maxWidth: 300,
+          margin: '0 auto',
+        }}
+      >
+        <Typography
+          sx={{
+            textAlign: 'center',
+            color: '#71717A',
+            fontWeight: '500',
+          }}
+        >{children}</Typography>
+      </Box>
+    </Box>
   );
 };
 

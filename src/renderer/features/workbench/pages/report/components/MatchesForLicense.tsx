@@ -1,18 +1,17 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
 import { useTranslation } from 'react-i18next';
 import { AutoSizer, Column, Table } from 'react-virtualized';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchComponent } from '@store/component-store/componentThunks';
 import { Link } from '@mui/material';
-import { Component } from 'main/services/ReportService';
+import { styled } from '@mui/material/styles';
 
 /* icons  */
 import IconComponent from '../../../components/IconComponent/IconComponent';
 
-const useStyles = makeStyles({
-  headerColumn: {
+const StyledTable = styled(Table)(({ theme }) => ({
+  '& .ReactVirtualized__Table__headerColumn': {
     fontWeight: 600,
     fontSize: '0.875rem',
     lineHeight: '1.5rem',
@@ -22,21 +21,20 @@ const useStyles = makeStyles({
     alignItems: 'center',
     display: 'flex',
   },
-  row: {
+  '& .ReactVirtualized__Table__row': {
     fontWeight: 400,
     fontSize: '0.75rem',
     borderBottom: '1px solid rgba(224, 224, 224, 1)',
     color: 'rgba(0, 0, 0, 0.87)',
-  },
-});
+  }
+}));
 
 export default function MatchesForLicense({ components, mode }) {
-  const classes = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const onSelectComponent = async (e, component: Component) => {
+  const onSelectComponent = async (e, component: any) => {
     e.preventDefault();
     if (component.manifestFiles) {
       onSelectFile(e, component.manifestFiles[0]);
@@ -59,15 +57,13 @@ export default function MatchesForLicense({ components, mode }) {
     <>
       <AutoSizer>
         {({ height, width }) => (
-          <Table
+          <StyledTable
             height={height}
             width={width}
             rowHeight={42}
             headerHeight={40}
             rowCount={components.length}
             rowGetter={({ index }) => components[index]}
-            headerClassName={classes.headerColumn}
-            rowClassName={classes.row}
           >
             <Column
               label={t('Table:Header:Component')}
@@ -114,7 +110,7 @@ export default function MatchesForLicense({ components, mode }) {
                 return <span title={data}>{data}</span>;
               }}
             />
-          </Table>
+          </StyledTable>
         )}
       </AutoSizer>
 

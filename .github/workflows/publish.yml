@@ -33,7 +33,7 @@ jobs:
 
       - name: Build binaries for Windows
         run: |
-          npm exec -- electron-builder build --win --publish never
+          npm exec -- electron-builder build --win
 
       - uses: actions/upload-artifact@v4
         with:
@@ -115,7 +115,7 @@ jobs:
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: |
-          npm exec -- electron-builder build --mac --publish never
+          npm exec -- electron-builder build --mac
 
 
       - uses: actions/upload-artifact@v4
@@ -149,7 +149,7 @@ jobs:
 
       - name: Build binaries for linux
         run: |
-          npm exec -- electron-builder build --linux --publish never
+          npm exec -- electron-builder build --linux
 
       - uses: actions/upload-artifact@v4
         with:
