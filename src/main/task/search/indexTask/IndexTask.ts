@@ -42,7 +42,7 @@ export class IndexTask implements Scanner.IPipelineTask {
 
     const indexer = new Indexer();
     const filesToIndex = this.fileAdapter(files);
-    const index = indexer.index(filesToIndex);
+    const index = await indexer.index(filesToIndex);
     const projectPath = this.project.metadata.getMyPath();
     await indexer.saveIndex(index, `${projectPath}/dictionary/`);
     this.project.save();
