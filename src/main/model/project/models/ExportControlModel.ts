@@ -1,0 +1,50 @@
+import sqlite3 from 'sqlite3';
+import util from 'util';
+import { Model } from '../../Model';
+import { queries } from '../../querys_db';
+import { ExportControl } from '../../entity/ExportControl';
+
+export class ExportControlModel extends Model {
+  private connection: sqlite3.Database;
+
+  public constructor(conn: sqlite3.Database) {
+    super();
+    this.connection = conn;
+  }
+
+  private exportControlAdapter(input: Array<{ purl: string, version: string, hints: string }>): Array<ExportControl> {
+    return input.map((ec) => ({ purl: ec.purl, version: ec.version, hints: JSON.parse(ec.hints) }));
+  }
+
+  public async findAll(): Promise<Array<ExportControl>> {
+    const query = queries.SQL_GET_ALL_EXPORT_CONTROL;
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const response = await call(query);
+    return this.exportControlAdapter(response);
+  }
+
+  public async deleteAll(): Promise<void> {
+    const call = await util.promisify(this.connection.run.bind(this.connection)) as any;
+    await call(queries.SQL_DELETE_EXPORT_CONTROL);
+  }
+
+  public async insertAll(exportControl: Array<ExportControl>): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      this.connection.serialize(async () => {
+        this.connection.run('begin transaction');
+        exportControl.forEach((ec) => {
+          this.connection.run(
+            'INSERT OR IGNORE INTO export_control (purl,version,hints) VALUES(?,?,?);',
+            ec.purl,
+            ec.version,
+            JSON.stringify(ec.hints),
+          );
+        });
+        this.connection.run('commit', (err: any) => {
+          if (!err) resolve();
+          reject(err);
+        });
+      });
+    });
+  }
+}

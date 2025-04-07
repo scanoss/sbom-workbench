@@ -505,6 +505,11 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   LEFT JOIN component_versions cv ON cv.id = i.cvid
   LEFT JOIN results r ON r.fileId = f.fileId
   WHERE f.fileId NOT IN (SELECT d.fileId FROM dependencies d);`;
+
+  // Export Control
+  SQL_GET_ALL_EXPORT_CONTROL = 'SELECT purl, version , hints FROM export_control;';
+
+  SQL_DELETE_EXPORT_CONTROL = 'DELETE FROM export_control';
 }
 
 export const queries = new Queries();
