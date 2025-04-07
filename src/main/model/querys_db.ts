@@ -55,6 +55,13 @@ export class Queries {
     ON DELETE CASCADE
     );`;
 
+  EXPORT_CONTROL_TABLE = `CREATE TABLE IF NOT EXISTS export_control (
+    id integer PRIMARY KEY ASC,
+    purl text UNIQUE NOT NULL,
+    version text UNIQUE NOT NULL,
+    hints text NOT NULL
+  );`;
+
   /** **** WORKSPACE ***** */
 
   WORKSPACE_LOCK = `CREATE TABLE IF NOT EXISTS lock (
@@ -85,7 +92,9 @@ export class Queries {
     + this.VULNERABILITY_TABLE
     + this.COMPONENT_VULNERABILITY
     + this.CRYPTOGRAPHY_TABLE
-    + this.LOCAL_CRYPTOGRAPHY_TABLE;
+    + this.LOCAL_CRYPTOGRAPHY_TABLE
+    + this.EXPORT_CONTROL_TABLE
+  ;
 
   WORKSPACE_DB = this.WORKSPACE_LOCK
     + this.WORKSPACE_SEARCH_ITEM_GROUP_TABLE;
