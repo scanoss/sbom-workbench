@@ -5,15 +5,17 @@ import { Project } from '../../../workspace/Project';
 import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
-import { AddCryptographyTask } from '../../cryptography/AddCryptographyTask';
 import { componentHelper } from '../../../helpers/ComponentHelper';
 import { exportControlService } from '../../../services/ExportControlService';
 
 export class ExportControlTask implements Scanner.IPipelineTask {
   private project: Project;
 
-  constructor(project: Project) {
+  private readonly forceDataReset: Boolean;
+
+  constructor(project: Project, forceDataReset: boolean = false) {
     this.project = project;
+    this.forceDataReset = forceDataReset;
   }
 
   public getStageProperties():Scanner.StageProperties {
@@ -27,6 +29,10 @@ export class ExportControlTask implements Scanner.IPipelineTask {
   public async run():Promise<boolean> {
     log.info('[ Export Control init ]');
     if (!AppConfig.FF_ENABLE_SCAN_CRYPTOGRAPHY) return false;
+
+    if (this.forceDataReset) {
+      await modelProvider.model.exportControlModel.deleteAll();
+    }
 
     const detectedComponents = await modelProvider.model.component.getAll(null);
     const dependencyComponents = await modelProvider.model.dependency.getAll(
