@@ -7,8 +7,9 @@ import { ScannerStage } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
 import { AddCryptographyTask } from '../../cryptography/AddCryptographyTask';
 import { componentHelper } from '../../../helpers/ComponentHelper';
+import { exportControlService } from '../../../services/ExportControlService';
 
-export class CryptographyTask implements Scanner.IPipelineTask {
+export class ExportControlTask implements Scanner.IPipelineTask {
   private project: Project;
 
   constructor(project: Project) {
@@ -17,14 +18,14 @@ export class CryptographyTask implements Scanner.IPipelineTask {
 
   public getStageProperties():Scanner.StageProperties {
     return {
-      name: ScannerStage.CRYPTOGRAPHY,
+      name: ScannerStage.EXPORT_CONTROL,
       label: i18next.t('Title:AnalyzingCryptography'),
       isCritical: false,
     };
   }
 
   public async run():Promise<boolean> {
-    log.info('[ Cryptography init ]');
+    log.info('[ Export Control init ]');
     if (!AppConfig.FF_ENABLE_SCAN_CRYPTOGRAPHY) return false;
 
     const detectedComponents = await modelProvider.model.component.getAll(null);
@@ -37,8 +38,7 @@ export class CryptographyTask implements Scanner.IPipelineTask {
     );
 
     const token = this.project.getApiKey();
-    const addCryptographyTask = new AddCryptographyTask();
-    await addCryptographyTask.run({ components, token });
+    const exportControl = await exportControlService.getExportControl(token, components);
     this.project.save();
 
     return true;

@@ -8,7 +8,7 @@ import { utilModel } from '../../../model/UtilModel';
 
 export class CodeReScanTask extends RescanTask<CodeDispatcher, CodeScannerInputAdapter> {
   constructor(project: Project) {
-    super(project, new CodeDispatcher(), new CodeScannerInputAdapter());
+    super(project, new CodeDispatcher(), new CodeScannerInputAdapter(project));
   }
 
   public async reScan(): Promise<void> {

@@ -17,12 +17,12 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
     try {
       const response = await this.getAlgorithms(params.components, params.token);
 
-      const cryptographies = this.adaptToCrypographyEntity(response);
+      const crypto = this.adaptToCrypographyEntity(response);
 
       // Delete all cryptography if force flag is setted
       if (params.force) await modelProvider.model.cryptography.deleteAll();
       // Import Crypto into Database
-      await modelProvider.model.cryptography.insertAll(cryptographies);
+      await modelProvider.model.cryptography.insertAll(crypto);
     } catch (e: any) {
       log.error(e);
       throw new Error(e.message);
