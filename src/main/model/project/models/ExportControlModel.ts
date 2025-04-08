@@ -17,7 +17,7 @@ export class ExportControlModel extends Model {
   }
 
   public async findAll(): Promise<Array<ExportControl>> {
-    const query = queries.SQL_GET_ALL_EXPORT_CONTROL;
+    const query = queries.SQL_EXPORT_CONTROL_FIND_ALL;
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
     const response = await call(query);
     return this.exportControlAdapter(response);
@@ -25,7 +25,7 @@ export class ExportControlModel extends Model {
 
   public async deleteAll(): Promise<void> {
     const call = await util.promisify(this.connection.run.bind(this.connection)) as any;
-    await call(queries.SQL_DELETE_EXPORT_CONTROL);
+    await call(queries.SQL_EXPORT_CONTROL_DELETE_ALL);
   }
 
   public async insertAll(exportControl: Array<ExportControl>): Promise<void> {
@@ -47,4 +47,5 @@ export class ExportControlModel extends Model {
       });
     });
   }
+
 }

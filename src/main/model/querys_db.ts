@@ -507,9 +507,10 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   WHERE f.fileId NOT IN (SELECT d.fileId FROM dependencies d);`;
 
   // Export Control
-  SQL_GET_ALL_EXPORT_CONTROL = 'SELECT purl, version , hints FROM export_control;';
+  SQL_EXPORT_CONTROL_FIND_ALL = 'SELECT purl, version, hints FROM export_control;';
 
-  SQL_DELETE_EXPORT_CONTROL = 'DELETE FROM export_control';
+  SQL_EXPORT_CONTROL_DELETE_ALL = 'DELETE FROM export_control';
+
 }
 
 export const queries = new Queries();
