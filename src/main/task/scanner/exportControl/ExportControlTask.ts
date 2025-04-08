@@ -44,9 +44,8 @@ export class ExportControlTask implements Scanner.IPipelineTask {
     );
 
     const token = this.project.getApiKey();
-    const exportControl = await exportControlService.getExportControl(token, components);
-    this.project.save();
-
+    const exportControl = await exportControlService.find(token, components);
+    await modelProvider.model.exportControlModel.insertAll(exportControl);
     return true;
   }
 }

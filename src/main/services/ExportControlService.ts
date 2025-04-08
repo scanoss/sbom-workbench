@@ -1,40 +1,66 @@
 import log from 'electron-log';
-import { CryptographyService } from 'scanoss/build/module';
+import { CryptographyService, ExportControlResponse, PurlRequest } from 'scanoss';
 import { AppConfigDefault } from '../../config/AppConfigDefault';
+import { ExportControl } from '../model/entity/ExportControl';
 
 class ExportControlService {
-  public async getExportControl(token: string, components: any) {
-    const cryptoService = new CryptographyService(token);
+
+  private generateRequests(reqData: Array<string>): Array<PurlRequest> {
     const chunks = [];
-    for (let i = 0; i < components.length; i += AppConfigDefault.DEFAULT_SERVICE_CHUNK_LIMIT) {
-      chunks.push(components.slice(i, i + 10));
+    for (let i = 0; i < reqData.length; i += AppConfigDefault.DEFAULT_SERVICE_CHUNK_LIMIT) {
+      chunks.push(reqData.slice(i, i + 10));
     }
-    const promises = chunks.map(async (chunk) => {
+    const requests = [];
+    chunks.forEach((components: Array<string>) => {
+      requests.push({
+        purlsList: components.map((purl) => {
+          const splitPurl = purl.split('@');
+          return {
+            purl: splitPurl[0],
+            requirement: splitPurl[1],
+          };
+        }),
+      });
+    });
+    return requests;
+  }
+
+  private async getExportControl(token: string, components: Array<string>) {
+    const cryptoService = new CryptographyService(token);
+    const requests = this.generateRequests(components);
+    const promises = requests.map(async (req: any) => {
       try {
-        const reqData = {
-          purls: chunk.map((purl) => {
-            const splitPurl = purl.split('@');
-            return {
-              purl: splitPurl[0],
-              requirement: splitPurl[1],
-            };
-          }),
-        };
-        return await cryptoService.getExportControl(reqData);
+        return await cryptoService.getExportControl(req);
       } catch (err) {
-        log.error('[ Export Control Service ] Request failed for purls:', chunk.map((item: any) => item.purl));
+        log.error('[ Export Control Service ] Request failed for purls:', req.purlsList.map((item: any) => item.purl));
         log.error('Error:', err);
         return null;
       }
     });
     const results = await Promise.all(promises);
-    return results.reduce((acc:any, curr:any) => {
-      if (!curr) return acc;
-      return {
-        purls: [...(acc.purls || []), ...(curr.purls || [])],
-        status: curr.status,
-      };
-    }, { purls: [], status: null });
+
+    return Object.assign(results, {
+      pipe<R>(transform: (data: typeof results) => R): R {
+        return transform(results);
+      },
+    });
+  }
+
+  private convertToExportControlEntity(results: Array<ExportControlResponse>) {
+    return results.flatMap((result: any) => result.purlsList
+      .filter((ec: any) => ec.versionsList.length > 0)
+      .map((ec: any) => ({
+        purl: ec.purl,
+        version: ec.versionsList[0],
+        hints: ec.hintsList,
+      })));
+  }
+
+  public async find(token: string, components: any): Promise<ExportControl[]> {
+    const results = await this.getExportControl(token, components);
+    return results.pipe((r:Array<ExportControlResponse>) => {
+      return this.convertToExportControlEntity(r);
+    });
   }
 }
 

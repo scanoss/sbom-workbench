@@ -82,8 +82,8 @@ class ReportService {
     return {
       data: exportControl,
       categorySummary: Object.fromEntries(categoryMap),
-      totalCategories: categoryMap.size
-    }
+      totalCategories: categoryMap.size,
+    };
   }
 
   private getVulnerabilitiesReport(vulnerabilities: any) {
