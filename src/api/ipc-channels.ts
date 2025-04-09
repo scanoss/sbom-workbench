@@ -142,6 +142,8 @@ export enum IpcChannels {
   MIGRATION_INIT = 'MIGRATION_INIT',
 
   MIGRATION_FINISH = 'MIGRATION_FINISH',
+
+  EXPORT_CONTROL_GET_ALL = 'EXPORT_CONTROL_GET_ALL',
 }
 
 export const ipcMainEvents = [
@@ -228,8 +230,8 @@ export const ipcRendererEvents = [
   IpcChannels.WORKSPACE_SET_CURRENT,
   IpcChannels.WORKSPACE_CONTEXT_FILES,
   IpcChannels.WORKSPACE_GET_SEARCH_GROUP_KEYWORDS,
-  IpcChannels.WORKSPACE_DELETE_SEARCH_GROUP ,
-  IpcChannels.WORKSPACE_PUT_SEARCH_GROUP ,
+  IpcChannels.WORKSPACE_DELETE_SEARCH_GROUP,
+  IpcChannels.WORKSPACE_PUT_SEARCH_GROUP,
   IpcChannels.WORKSPACE_POST_SEARCH_GROUP,
 
   IpcChannels.USER_SETTING_SET,
@@ -259,4 +261,6 @@ export const ipcRendererEvents = [
 
   IpcChannels.MIGRATION_INIT,
   IpcChannels.MIGRATION_FINISH,
+
+  IpcChannels.EXPORT_CONTROL_GET_ALL,
 ];

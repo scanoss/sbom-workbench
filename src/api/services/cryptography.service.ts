@@ -16,3 +16,4 @@ class CryptographyService extends BaseService {
 }
 
 export const cryptographyService = new CryptographyService();
+

@@ -12,7 +12,7 @@ import './handlers/userSetting.handler';
 import './handlers/app.handler';
 import './handlers/search.handler';
 import './handlers/vulnerability.handler';
-import './handlers/cryptography.handler';
+import './handlers/exportControl.handler';
 
 import { writeAccessMiddleware } from './middlewares/writeAccess.middleware';
 import { IpcChannels } from './ipc-channels';

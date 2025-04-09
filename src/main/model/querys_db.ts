@@ -93,8 +93,7 @@ export class Queries {
     + this.COMPONENT_VULNERABILITY
     + this.CRYPTOGRAPHY_TABLE
     + this.LOCAL_CRYPTOGRAPHY_TABLE
-    + this.EXPORT_CONTROL_TABLE
-  ;
+    + this.EXPORT_CONTROL_TABLE;
 
   WORKSPACE_DB = this.WORKSPACE_LOCK
     + this.WORKSPACE_SEARCH_ITEM_GROUP_TABLE;
@@ -515,6 +514,34 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   SQL_EXPORT_CONTROL_FIND_ALL_IDENTIFIED = `SELECT ec.purl, ec.version, ec.hints FROM export_control ec
   INNER JOIN component_versions cv on ec.purl = cv.purl AND ec.version = cv.version
+  INNER JOIN inventories i ON cv.id = i.cvid;`;
+
+  SQL_EXPORT_CONTROL_GET_DETECTED_CATEGORY_SUMMARY = `WITH extracted AS (
+  SELECT json_extract(value, '$.category') as category
+  FROM export_control, json_each(hints)
+  WHERE json_valid(hints)
+  )
+  SELECT DISTINCT category, COUNT(*) total
+  FROM extracted
+  WHERE category IS NOT NULL
+  GROUP BY category;`;
+
+  SQL_EXPORT_CONTROL_GET_DETECTED_COUNT = 'SELECT COUNT(*) total FROM export_control;';
+
+  SQL_EXPORT_CONTROL_GET_IDENTIFIED_CATEGORY_SUMMARY = `WITH extracted AS (
+  SELECT json_extract(value, '$.category') as category
+  FROM export_control ec,  json_each(ec.hints)
+  INNER JOIN component_versions cv ON ec.purl = cv.purl AND ec.version = cv.version
+  INNER JOIN inventories i ON cv.id = i.cvid
+  WHERE json_valid(ec.hints)
+  )
+  SELECT DISTINCT category, COUNT(*) as total
+  FROM extracted
+  WHERE category IS NOT NULL
+  GROUP BY category;`;
+
+  SQL_EXPORT_CONTROL_GET_IDENTIFIED_COUNT = `SELECT COUNT(*) total FROM export_control ec
+  INNER JOIN component_versions cv ON ec.purl = cv.purl AND ec.version = cv.version
   INNER JOIN inventories i ON cv.id = i.cvid;`;
 }
 

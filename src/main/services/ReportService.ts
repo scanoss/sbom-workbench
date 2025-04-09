@@ -3,7 +3,6 @@ import { modelProvider } from './ModelProvider';
 import { ComponentReportVisitor } from '../modules/report/components/ComponentReportVisitor';
 import { ReportComponentIdentified } from '../modules/report/components/ReportComponentIndentified';
 import { ReportComponentDetected } from '../modules/report/components/ReportComponentDetected';
-import { ExportControl } from '../model/entity/ExportControl';
 
 export interface ReportComponent {
   name: string,
@@ -44,9 +43,14 @@ export interface LicenseReport {
 }
 
 export interface ExportControlReport {
-  data: Array<ExportControl>;
-  categorySummary: Record<string, number>;
-  totalCategories: number;
+  components: {
+    total: number;
+    categorySummary: Record<string, number>
+  }
+  files:{
+    total: number;
+    categorySummary: Record<string, number>
+  }
 }
 
 export interface IReportData {
@@ -69,21 +73,6 @@ export interface IReportData {
 }
 
 class ReportService {
-  private getExportControlReport(exportControl: Array<ExportControl>): ExportControlReport {
-    const categoryMap = new Map<string, number>();
-    exportControl.flatMap((ec) => ec.hints)
-      .filter((hint) => hint.category)
-      .forEach((hint) => {
-        const currentCount = categoryMap.get(hint.category) || 0;
-        categoryMap.set(hint.category, currentCount + 1);
-      });
-    return {
-      data: exportControl,
-      categorySummary: Object.fromEntries(categoryMap),
-      totalCategories: categoryMap.size,
-    };
-  }
-
   private getVulnerabilitiesReport(vulnerabilities: any) {
     const vulnerabilityReportMapper: Record<string, number> = vulnerabilities.reduce((acc, curr) => {
       if (!acc[curr.severity.toLowerCase()]) acc[curr.severity.toLowerCase()] = curr.count;
@@ -158,15 +147,21 @@ class ReportService {
     const dependenciesSummary = await modelProvider.model.dependency.getIdentifiedSummary();
 
     // Export control
-    const identifiedExpoertControl = await modelProvider.model.exportControl.findAllIdentified();
-    const exportControlReport = this.getExportControlReport(identifiedExpoertControl);
+    const componentSummary = await modelProvider.model.exportControl.getIdentifiedSummary();
+    const exportControl: ExportControlReport = {
+      files: null,
+      components: {
+        categorySummary: componentSummary.categorySummary,
+        total: componentSummary.total,
+      },
+    };
 
     return {
       licenses: identifiedLicenseSummary,
       vulnerabilities: vulnerabilityReport,
       cryptographies,
       dependencies: dependenciesSummary,
-      exportControl: exportControlReport,
+      exportControl,
     };
   }
 
@@ -222,15 +217,21 @@ class ReportService {
     };
 
     // Export control
-    const exportControl = await modelProvider.model.exportControl.findAll();
-    const exportControlReport = this.getExportControlReport(exportControl);
+    const componentSummary = await modelProvider.model.exportControl.getDetectedSummary();
+    const exportControl: ExportControlReport = {
+      files: null,
+      components: {
+        categorySummary: componentSummary.categorySummary,
+        total: componentSummary.total,
+      },
+    };
 
     return {
       licenses: detectedlicensesSummary,
       cryptographies,
       vulnerabilities: vulnerabilityReport,
       dependencies: dependenciesSummary,
-      exportControl: exportControlReport,
+      exportControl,
     };
   }
 
