@@ -5,7 +5,6 @@ import { ReportComponentIdentified } from '../modules/report/components/ReportCo
 import { ReportComponentDetected } from '../modules/report/components/ReportComponentDetected';
 import { ExportControl } from '../model/entity/ExportControl';
 
-
 export interface ReportComponent {
   name: string,
   url: string,
@@ -39,7 +38,7 @@ export interface ISummary {
   original: number;
 }
 
-export interface  LicenseReport {
+export interface LicenseReport {
   label: string,
   value: number;
 }
@@ -70,12 +69,11 @@ export interface IReportData {
 }
 
 class ReportService {
-
   private getExportControlReport(exportControl: Array<ExportControl>): ExportControlReport {
-    const categoryMap = new Map<string,number>();
-    exportControl.flatMap(ec => ec.hints)
-      .filter(hint => hint.category)
-      .forEach(hint => {
+    const categoryMap = new Map<string, number>();
+    exportControl.flatMap((ec) => ec.hints)
+      .filter((hint) => hint.category)
+      .forEach((hint) => {
         const currentCount = categoryMap.get(hint.category) || 0;
         categoryMap.set(hint.category, currentCount + 1);
       });
@@ -135,7 +133,6 @@ class ReportService {
  * @throws {Error} - Throws an error if any of the data fetching or processing operations fail.
  */
   public async getIdentified(): Promise<IReportData> {
-
     // License components summary
     const identifiedLicenseSummary = await modelProvider.model.report.identifedLicenseComponentSummary();
 
@@ -160,16 +157,20 @@ class ReportService {
     // Dependencies
     const dependenciesSummary = await modelProvider.model.dependency.getIdentifiedSummary();
 
+    // Export control
+    const identifiedExpoertControl = await modelProvider.model.exportControl.findAllIdentified();
+    const exportControlReport = this.getExportControlReport(identifiedExpoertControl);
+
     return {
       licenses: identifiedLicenseSummary,
       vulnerabilities: vulnerabilityReport,
       cryptographies,
       dependencies: dependenciesSummary,
-      exportControl: null,
-    }
+      exportControl: exportControlReport,
+    };
   }
 
-/**
+  /**
  * @brief Retrieves a summary of detected data, including licenses, vulnerabilities, dependencies, and cryptographic algorithms.
  * This method gathers various types of detected information from the database and compiles a summary report.
  * It includes detected license components, vulnerability counts categorized by severity, detected dependencies,
@@ -190,7 +191,6 @@ class ReportService {
  * @throws {Error} - Throws an error if any of the data fetching or processing operations fail.
  */
   public async getDetected(): Promise<IReportData> {
-
     // License components summary
     const detectedlicensesSummary = await modelProvider.model.report.detectedLicenseComponentSummary();
 
@@ -222,7 +222,7 @@ class ReportService {
     };
 
     // Export control
-    const exportControl = await modelProvider.model.exportControlModel.findAll();
+    const exportControl = await modelProvider.model.exportControl.findAll();
     const exportControlReport = this.getExportControlReport(exportControl);
 
     return {
@@ -247,11 +247,11 @@ class ReportService {
  */
   public async getDetectedComponents(license?: string): Promise<ComponentReportResponse> {
     const componentReportVisitor = new ComponentReportVisitor();
-    const reportComponentDetected  = new ReportComponentDetected(license);
+    const reportComponentDetected = new ReportComponentDetected(license);
     return reportComponentDetected.generate(componentReportVisitor);
   }
 
-/**
+  /**
  *@brief Retrieves identified components with their associated file counts, optionally filtering by license.
  * This method fetches identified components from the database and adds file count data
  * for each component based on its source ('detected' or 'declared'). It then filters the results
@@ -263,11 +263,10 @@ class ReportService {
  * @throws {Error} - Throws an error if any of the data fetching or processing operations fail.
  */
   public async getIdentifiedComponents(license?: string): Promise<ComponentReportResponse> {
-      const componentReportVisitor = new ComponentReportVisitor();
-      const identifiedComponents = new ReportComponentIdentified(license);
-      return await identifiedComponents.generate(componentReportVisitor);
-
-   }
+    const componentReportVisitor = new ComponentReportVisitor();
+    const identifiedComponents = new ReportComponentIdentified(license);
+    return identifiedComponents.generate(componentReportVisitor);
+  }
 }
 
 export const reportService = new ReportService();

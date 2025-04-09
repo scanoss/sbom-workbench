@@ -511,6 +511,11 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   SQL_EXPORT_CONTROL_DELETE_ALL = 'DELETE FROM export_control';
 
+  SQL_EXPORT_CONTROL_CREATE = 'INSERT OR IGNORE INTO export_control (purl,version,hints) VALUES(?,?,?);';
+
+  SQL_EXPORT_CONTROL_FIND_ALL_IDENTIFIED = `SELECT ec.purl, ec.version, ec.hints FROM export_control ec
+  INNER JOIN component_versions cv on ec.purl = cv.purl AND ec.version = cv.version
+  INNER JOIN inventories i ON cv.id = i.cvid;`;
 }
 
 export const queries = new Queries();

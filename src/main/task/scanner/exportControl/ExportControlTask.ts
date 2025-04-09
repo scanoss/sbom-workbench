@@ -31,7 +31,7 @@ export class ExportControlTask implements Scanner.IPipelineTask {
     if (!AppConfig.FF_ENABLE_SCAN_CRYPTOGRAPHY) return false;
 
     if (this.forceDataReset) {
-      await modelProvider.model.exportControlModel.deleteAll();
+      await modelProvider.model.exportControl.deleteAll();
     }
 
     const detectedComponents = await modelProvider.model.component.getAll(null);
@@ -44,8 +44,8 @@ export class ExportControlTask implements Scanner.IPipelineTask {
     );
 
     const token = this.project.getApiKey();
-    const exportControl = await exportControlService.find(token, components);
-    await modelProvider.model.exportControlModel.insertAll(exportControl);
+    const exportControls = await exportControlService.find(token, components);
+    await modelProvider.model.exportControl.createMany(exportControls);
     return true;
   }
 }

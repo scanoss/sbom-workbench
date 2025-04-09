@@ -28,13 +28,13 @@ export class ExportControlModel extends Model {
     await call(queries.SQL_EXPORT_CONTROL_DELETE_ALL);
   }
 
-  public async insertAll(exportControl: Array<ExportControl>): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
-      this.connection.serialize(async () => {
+  public async createMany(exportControls: Array<ExportControl>): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.connection.serialize(() => {
         this.connection.run('begin transaction');
-        exportControl.forEach((ec) => {
+        exportControls.forEach((ec) => {
           this.connection.run(
-            'INSERT OR IGNORE INTO export_control (purl,version,hints) VALUES(?,?,?);',
+            queries.SQL_EXPORT_CONTROL_CREATE,
             ec.purl,
             ec.version,
             JSON.stringify(ec.hints),
@@ -48,4 +48,10 @@ export class ExportControlModel extends Model {
     });
   }
 
+  public async findAllIdentified(): Promise<Array<ExportControl>> {
+    const query = queries.SQL_EXPORT_CONTROL_FIND_ALL_IDENTIFIED;
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const response = await call(query);
+    return this.exportControlAdapter(response);
+  }
 }
