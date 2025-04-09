@@ -95,12 +95,6 @@ const CryptographyReport = () => {
   return (
     <section id="CryptographyReportPage" className="app-page">
       <header className="app-header">
-        <h4 className="header-subtitle back">
-          <IconButton onClick={() => navigate(-1)} component="span">
-            <ArrowBackIcon />
-          </IconButton>
-          Reports
-        </h4>
         <h1 className="header-title">{type === SourceType.detected ? t('Title:DetectedCryptography') : t('Title:IdentifiedCryptography')}</h1>
         <section className="subheader">
           <nav className="tabs-navigator">
