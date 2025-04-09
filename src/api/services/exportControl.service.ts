@@ -9,7 +9,4 @@ class ExportControlService extends BaseService {
     return this.response(response);
   }
 }
-
 export const exportControlService = new ExportControlService();
-
-document.ec = exportControlService;
