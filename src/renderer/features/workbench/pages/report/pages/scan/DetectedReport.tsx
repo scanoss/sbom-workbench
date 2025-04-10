@@ -138,7 +138,7 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
       </Card>
 
       <Card className={`report-item cryptography ${layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) ? 'no-blocked' : 'blocked'}`}>
-        <ConditionalLink to="../../cryptographies?type=detected" className="w-100 no-underline" disabled={false}>
+        <ConditionalLink to="../../cryptography?type=detected" className="w-100 no-underline" disabled={false}>
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:Cryptography')}</span>
             <div className="action">

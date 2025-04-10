@@ -158,7 +158,7 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
       </Card>
 
       <Card className={`report-item cryptography ${layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) ? 'no-blocked' : 'blocked'}`}>
-        <ConditionalLink to="../../cryptographies?type=identified" className="w-100 no-underline" disabled={false}>
+        <ConditionalLink to="../../cryptography?type=identified" className="w-100 no-underline" disabled={false}>
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:Cryptography')}</span>
             <div className="action">
