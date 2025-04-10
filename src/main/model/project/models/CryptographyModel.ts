@@ -74,6 +74,20 @@ export class CryptographyModel extends Model {
     return Array.from(new Set(algorithms).values());
   }
 
+  public async identifiedAlgorithmsCount(): Promise<number> {
+    const query = queries.SQL_GET_IDENTIFIED_ALGORITHMS_COUNT;
+    const call = await util.promisify(this.connection.get.bind(this.connection)) as any;
+    const response = await call(query);
+    return response.algorithms_count;
+  }
+
+  public async detectedAlgorithmsCount(): Promise<number> {
+    const query = queries.SQL_GET_DETECTED_ALGORITHMS_COUNT;
+    const call = await util.promisify(this.connection.get.bind(this.connection)) as any;
+    const response = await call(query);
+    return response.algorithms_count;
+  }
+
   private cryptographyAdapter(cryptography: Array<{ purl: string, version: string, algorithms: string , hints:string }>): Array<Cryptography> {
     return cryptography.map((c) => ({ purl: c.purl, version: c.version, algorithms: JSON.parse(c.algorithms) as Algorithms[], hints: JSON.parse(c.hints) as Hint[] }));
   }

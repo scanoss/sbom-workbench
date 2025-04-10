@@ -124,11 +124,11 @@ class ReportService {
     };
 
     // Crypto
-    const sbomAlgorithms = await modelProvider.model.cryptography.getAllIdentifiedAlgorithms();
     const localAlgorithms = await modelProvider.model.localCryptography.getAllAlgorithms();
+    // TODO: Refactor on cryptography structure to support cryptography hints
     const cryptographies = {
-      sbom: sbomAlgorithms.length,
-      local: localAlgorithms.length,
+      sbom: await modelProvider.model.cryptography.identifiedAlgorithmsCount(),
+      local: localAlgorithms.length, // TODO: Add query to get identified local algorithms count
     };
 
     // Dependencies
@@ -180,17 +180,10 @@ class ReportService {
     const dependenciesSummary = await modelProvider.model.dependency.getDetectedSummary();
 
     // Crypto
-    const detectedCrypto = await modelProvider.model.cryptography.findAllDetected();
-    const sbomAlgorithms = new Set();
-    detectedCrypto.forEach((c) => {
-      c.algorithms.forEach((a) => {
-        sbomAlgorithms.add(a.algorithm);
-      });
-    });
     const localAlgorithms = await modelProvider.model.localCryptography.getAllAlgorithms();
     const cryptographies = {
-      sbom: Array.from(sbomAlgorithms.values()).length,
-      local: localAlgorithms.length,
+      sbom: await modelProvider.model.cryptography.detectedAlgorithmsCount(),
+      local: localAlgorithms.length, // TODO: Add query to get detected local algorithms count
     };
 
     return {

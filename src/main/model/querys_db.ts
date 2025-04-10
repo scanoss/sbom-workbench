@@ -366,6 +366,26 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   SELECT cvid FROM inventories i)) as  ic
   INNER JOIN cryptography crypto ON crypto.purl = ic.purl AND crypto.version = ic.version;`;
 
+  SQL_GET_IDENTIFIED_ALGORITHMS_COUNT = `WITH extracted AS (
+  SELECT json_extract(value, '$.algorithm') as algorithm
+  FROM cryptography c, json_each(c.algorithms)
+  INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
+  INNER JOIN inventories i ON cv.id = i.cvid
+  WHERE json_valid(c.algorithms)
+  )
+  SELECT COUNT(DISTINCT algorithm) as algorithms_count
+  FROM extracted
+  WHERE algorithm IS NOT NULL`;
+
+  SQL_GET_DETECTED_ALGORITHMS_COUNT = `WITH extracted AS (
+  SELECT json_extract(value, '$.algorithm') as algorithm
+  FROM cryptography c, json_each(c.algorithms)
+  WHERE json_valid(c.algorithms)
+  )
+  SELECT COUNT(DISTINCT algorithm) as algorithms_count
+  FROM extracted
+  WHERE algorithm IS NOT NULL`;
+
   // Local Cryptography
   SQL_GET_ALL_LOCAL_CRYPTOGRAPHY = `SELECT lc.id, lc.file_id, lc.algorithms, f.path, f.type  FROM local_cryptography lc
   INNER JOIN files f ON f.fileId = lc.file_id;`;
