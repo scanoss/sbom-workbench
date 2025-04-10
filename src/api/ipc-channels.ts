@@ -142,8 +142,6 @@ export enum IpcChannels {
   MIGRATION_INIT = 'MIGRATION_INIT',
 
   MIGRATION_FINISH = 'MIGRATION_FINISH',
-
-  EXPORT_CONTROL_GET_ALL = 'EXPORT_CONTROL_GET_ALL',
 }
 
 export const ipcMainEvents = [
@@ -261,6 +259,4 @@ export const ipcRendererEvents = [
 
   IpcChannels.MIGRATION_INIT,
   IpcChannels.MIGRATION_FINISH,
-
-  IpcChannels.EXPORT_CONTROL_GET_ALL,
 ];

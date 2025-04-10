@@ -6,7 +6,7 @@ import { Metadata } from '../main/workspace/Metadata';
 import { Cryptography } from '../main/model/entity/Cryptography';
 import { LocalCryptography } from '../main/model/entity/LocalCryptography';
 import { IReportData, ISummary, ReportComponent } from 'main/services/ReportService';
-import { ExportControl } from '../main/model/entity/ExportControl';
+
 
 export enum ScanState {
   CREATED = 'CREATED',
@@ -459,28 +459,4 @@ export enum ExportStatusCode {
 
 export interface ExportResultsInfo {
   invalidPurls: Array<string>;
-}
-
-export interface ExportControlResponseDTO {
-  files: {
-    // TBD
-    // data: Array<ExportControlLocal>;
-    // ExportControlLocal: {
-    // file: string: ,
-    // hints:[{
-    //   id:string,
-    //   name: string;
-    //   description: string;
-    //   category: string;
-    //   url: string;
-    //   }]
-    //   }
-    categorySummary: Record<string, number>;
-    total: number;
-  }
-  components: {
-    data: Array<ExportControl>;
-    categorySummary: Record<string, number>;
-    total: number;
-  }
 }
