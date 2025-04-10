@@ -15,7 +15,6 @@ export namespace Scanner {
     VULNERABILITIES,
     UNZIP,
     CRYPTOGRAPHY,
-    EXPORT_CONTROL,
   }
 
   export enum ScannerSource {

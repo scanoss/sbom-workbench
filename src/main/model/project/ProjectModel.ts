@@ -43,8 +43,6 @@ export class ProjectModel {
 
   localCryptography: LocalCryptographyModel;
 
-  exportControl : ExportControlModel;
-
   report : ReportModel;
 
   constructor(path: string) {
@@ -59,7 +57,6 @@ export class ProjectModel {
     this.cryptography = null;
     this.localCryptography = null;
     this.report = null;
-    this.exportControl = null;
   }
 
   private async createViews(db: sqlite3.Database): Promise<void> {
@@ -98,7 +95,6 @@ export class ProjectModel {
     this.cryptography = new CryptographyModel(db);
     this.localCryptography = new LocalCryptographyModel(db);
     this.report = new ReportModel(db);
-    this.exportControl = new ExportControlModel(db);
   }
 
   public async init(mode: number): Promise<void> {

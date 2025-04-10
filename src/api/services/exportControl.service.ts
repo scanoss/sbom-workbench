@@ -10,3 +10,5 @@ class ExportControlService extends BaseService {
   }
 }
 export const exportControlService = new ExportControlService();
+
+document.ec = exportControlService;

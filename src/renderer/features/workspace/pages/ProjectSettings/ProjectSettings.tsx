@@ -88,7 +88,6 @@ const ProjectSettings = () => {
         ScannerType.CODE,
         ScannerType.DEPENDENCIES,
         ScannerType.VULNERABILITIES,
-        ScannerType.EXPORT_CONTROL,
       ],
       obfuscate: false,
     },

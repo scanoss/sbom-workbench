@@ -2,7 +2,7 @@ import util from 'util';
 import sqlite3 from 'sqlite3';
 import { queries } from '../../querys_db';
 import { Model } from '../../Model';
-import { Cryptography } from '../../entity/Cryptography';
+import { Algorithms, Cryptography, Hint } from '../../entity/Cryptography';
 
 export class CryptographyModel extends Model {
   private connection: sqlite3.Database;
@@ -12,20 +12,19 @@ export class CryptographyModel extends Model {
     this.connection = conn;
   }
 
-  public async insertAll(cryptography: Array<{ purl: string, version: string, algorithms: string }>): Promise<void> {
+  public async createBatch(cryptography: Array<{ purl: string, version: string, algorithms: Algorithms[], hints: Hint[] }>): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
-
         cryptography.forEach((c) => {
           this.connection.run(
-            'INSERT OR IGNORE INTO cryptography (purl,version,algorithms) VALUES(?,?,?);',
+            'INSERT OR IGNORE INTO cryptography (purl, version, algorithms, hints) VALUES(?,?,?,?);',
             c.purl,
             c.version,
-            c.algorithms,
+            JSON.stringify(c.algorithms),
+            JSON.stringify(c.hints),
           );
         });
-
         this.connection.run('commit', (err: any) => {
           if (!err) resolve();
           reject(err);
@@ -75,7 +74,7 @@ export class CryptographyModel extends Model {
     return Array.from(new Set(algorithms).values());
   }
 
-  private cryptographyAdapter(cryptography: Array<{ purl: string, version: string, algorithms: string }>): Array<Cryptography> {
-    return cryptography.map((c) => ({ purl: c.purl, version: c.version, algorithms: JSON.parse(c.algorithms) }));
+  private cryptographyAdapter(cryptography: Array<{ purl: string, version: string, algorithms: string , hints:string }>): Array<Cryptography> {
+    return cryptography.map((c) => ({ purl: c.purl, version: c.version, algorithms: JSON.parse(c.algorithms) as Algorithms[], hints: JSON.parse(c.hints) as Hint[] }));
   }
 }

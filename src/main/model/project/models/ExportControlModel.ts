@@ -1,3 +1,4 @@
+/*
 import sqlite3 from 'sqlite3';
 import util from 'util';
 import { Model } from '../../Model';
@@ -87,3 +88,4 @@ export class ExportControlModel extends Model {
     };
   }
 }
+*/

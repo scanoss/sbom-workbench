@@ -16,7 +16,6 @@ import ScannerType = Scanner.ScannerType;
 import { CryptographyTask } from '../cryptography/CryptographyTask';
 import { LocalCryptographyTask } from '../cryptography/LocalCryptographyTask';
 import { ReScanDependencyTask } from '../dependency/ReScanDependencyTask';
-import { ExportControlTask } from '../exportControl/ExportControlTask';
 
 export class CodeScannerPipelineTask extends ScannerPipeline {
   public async run(project: Project): Promise<boolean> {
@@ -58,11 +57,6 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
     if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY)) && project.getApiKey()) {
       this.queue.push(new CryptographyTask(project, forceDataReset));
       this.queue.push(new LocalCryptographyTask(project));
-    }
-
-    // Export Control
-    if (metadata.getScannerConfig().type.includes((ScannerType.EXPORT_CONTROL)) && project.getApiKey()) {
-      this.queue.push(new ExportControlTask(project, forceDataReset));
     }
 
     // search index

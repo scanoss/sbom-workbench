@@ -12,7 +12,6 @@ import { IScannerInputAdapter } from '../adapter/IScannerInputAdapter';
 import { WFPResumeTask } from '../resume/WFPResumeTask';
 import { CryptographyTask } from '../cryptography/CryptographyTask';
 import { userSettingService } from '../../../services/UserSettingService';
-import { ExportControlTask } from '../exportControl/ExportControlTask';
 
 export class WFPScannerPipeLineTask extends ScannerPipeline {
   public async run(project: Project): Promise<boolean> {
@@ -38,9 +37,6 @@ export class WFPScannerPipeLineTask extends ScannerPipeline {
 
     // Cryptography
     if (metadata.getScannerConfig().type.includes(ScannerType.CRYPTOGRAPHY) && project.getApiKey()) this.queue.push(new CryptographyTask(project));
-
-    // Cryptography
-    if (metadata.getScannerConfig().type.includes(ScannerType.EXPORT_CONTROL) && project.getApiKey()) this.queue.push(new ExportControlTask(project));
 
     for await (const [index, task] of this.queue.entries()) {
       await this.executeTask(task, index);

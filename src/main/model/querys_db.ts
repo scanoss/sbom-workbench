@@ -43,6 +43,7 @@ export class Queries {
     purl varchar(45) NOT NULL,
     version varchar(35),
     algorithms varchar(500) NOT NULL,
+    hints text NOT NULL,
     CONSTRAINT cryptography_pk PRIMARY KEY (purl, version)
     );`;
 
@@ -54,13 +55,6 @@ export class Queries {
     CONSTRAINT fk_local_cryptography FOREIGN KEY (file_id) REFERENCES files(fileId)
     ON DELETE CASCADE
     );`;
-
-  EXPORT_CONTROL_TABLE = `CREATE TABLE IF NOT EXISTS export_control (
-    id integer PRIMARY KEY ASC,
-    purl text UNIQUE NOT NULL,
-    version text UNIQUE NOT NULL,
-    hints text NOT NULL
-  );`;
 
   /** **** WORKSPACE ***** */
 
@@ -93,7 +87,6 @@ export class Queries {
     + this.COMPONENT_VULNERABILITY
     + this.CRYPTOGRAPHY_TABLE
     + this.LOCAL_CRYPTOGRAPHY_TABLE
-    + this.EXPORT_CONTROL_TABLE;
 
   WORKSPACE_DB = this.WORKSPACE_LOCK
     + this.WORKSPACE_SEARCH_ITEM_GROUP_TABLE;
@@ -351,17 +344,17 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     WHERE target.md5_file = fdb.md5_file`;
 
   // Cryptography
-  SQL_GET_ALL_CRYPTOGRAPHY = 'SELECT purl, version , algorithms FROM cryptography;';
+  SQL_GET_ALL_CRYPTOGRAPHY = 'SELECT purl, version, algorithms, hints FROM cryptography;';
 
-  SQL_GET_ALL_DETECTED_CRYPTOGRAPHY = `SELECT c.purl, c.version , c.algorithms
+  SQL_GET_ALL_DETECTED_CRYPTOGRAPHY = `SELECT c.purl, c.version , c.algorithms, c.hints
     FROM cryptography c
     INNER JOIN component_versions cv ON c.purl = cv.purl AND c.version = cv.version AND cv.source = 'engine'
     UNION
-    SELECT c.purl, c.version , c.algorithms
+    SELECT c.purl, c.version, c.algorithms, c.hints
     FROM cryptography c
     INNER JOIN dependencies  d ON c.purl =  d.purl AND c.version = d.originalVersion;`;
 
-  SQL_GET_ALL_IDENTIFIED_CRYPTOGRAPHY = `SELECT crypto.purl, crypto.version, crypto.algorithms FROM
+  SQL_GET_ALL_IDENTIFIED_CRYPTOGRAPHY = `SELECT crypto.purl, crypto.version, crypto.algorithms, crypto.hints FROM
  (SELECT cv.purl, cv.version FROM component_versions cv WHERE id IN (
  SELECT cvid FROM inventories i)) as  ic
  INNER JOIN cryptography crypto ON crypto.purl = ic.purl AND crypto.version = ic.version;`;

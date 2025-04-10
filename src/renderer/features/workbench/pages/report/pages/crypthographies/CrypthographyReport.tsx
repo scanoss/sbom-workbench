@@ -30,7 +30,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { cryptographyService } from '@api/services/cryptography.service';
 
-
 // interfaces & types
 interface ICryptographyFilter {
   algorithm?: string[];

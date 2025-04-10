@@ -42,17 +42,6 @@ export interface LicenseReport {
   value: number;
 }
 
-export interface ExportControlReport {
-  components: {
-    total: number;
-    categorySummary: Record<string, number>
-  }
-  files:{
-    total: number;
-    categorySummary: Record<string, number>
-  }
-}
-
 export interface IReportData {
   licenses: Array<LicenseReport>;
   vulnerabilities: {
@@ -69,7 +58,6 @@ export interface IReportData {
     files: any; // FIX TYPE
     total: number;
   }
-  exportControl: ExportControlReport;
 }
 
 class ReportService {
@@ -146,22 +134,11 @@ class ReportService {
     // Dependencies
     const dependenciesSummary = await modelProvider.model.dependency.getIdentifiedSummary();
 
-    // Export control
-    const componentSummary = await modelProvider.model.exportControl.getIdentifiedSummary();
-    const exportControl: ExportControlReport = {
-      files: null,
-      components: {
-        categorySummary: componentSummary.categorySummary,
-        total: componentSummary.total,
-      },
-    };
-
     return {
       licenses: identifiedLicenseSummary,
       vulnerabilities: vulnerabilityReport,
       cryptographies,
       dependencies: dependenciesSummary,
-      exportControl,
     };
   }
 
@@ -216,22 +193,11 @@ class ReportService {
       local: localAlgorithms.length,
     };
 
-    // Export control
-    const componentSummary = await modelProvider.model.exportControl.getDetectedSummary();
-    const exportControl: ExportControlReport = {
-      files: null,
-      components: {
-        categorySummary: componentSummary.categorySummary,
-        total: componentSummary.total,
-      },
-    };
-
     return {
       licenses: detectedlicensesSummary,
       cryptographies,
       vulnerabilities: vulnerabilityReport,
       dependencies: dependenciesSummary,
-      exportControl,
     };
   }
 
