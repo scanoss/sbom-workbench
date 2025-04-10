@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   Autocomplete,
   Checkbox,
   Chip,
-  IconButton,
   Link,
   Paper,
   Tab,
@@ -25,13 +24,9 @@ import { useNavigate } from 'react-router-dom';
 import { CryptoReportData } from '@shared/adapters/types';
 import { adaptCryptographyGetAll, getAlgorithms } from '@shared/adapters/report.adapter';
 
-// icons
 import SearchIcon from '@mui/icons-material/Search';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { cryptographyService } from '@api/services/cryptography.service';
 
-
-// interfaces & types
 interface ICryptographyFilter {
   algorithm?: string[];
 }
@@ -39,7 +34,8 @@ interface ICryptographyFilter {
 const CryptographyReport = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const type = useSearchParams().get('type');
+  const searchParams = useSearchParams();
+  const sourceType = searchParams.get('type') || SourceType.identified;
 
   const data = useRef<CryptoReportData>(null);
 
@@ -50,8 +46,7 @@ const CryptographyReport = () => {
   const [tab, setTab] = useState<string>('local');
 
   const init = async () => {
-    const source = type === SourceType.identified ? SourceType.identified : SourceType.detected;
-    const response = await cryptographyService.getAll({ type: source });
+    const response = await cryptographyService.getAll({ type: sourceType as SourceType });
     const entries = adaptCryptographyGetAll(response);
 
     data.current = entries;
@@ -73,8 +68,10 @@ const CryptographyReport = () => {
 
   // filter items
   useEffect(() => {
-    const getFilteredItems = (data) => {
-      return (filter?.algorithm?.length > 0) ? data?.filter((item) => item.algorithms.some((alg) => filter.algorithm.includes(alg.algorithm))) : data;
+    const getFilteredItems = (items) => {
+      return filter?.algorithm?.length > 0
+        ? items?.filter((item) => item.algorithms.some((alg) => filter.algorithm.includes(alg.algorithm)))
+        : items;
     };
 
     if (!data.current) return;
@@ -87,15 +84,17 @@ const CryptographyReport = () => {
     setFilteredItems(newItems);
   }, [filter]);
 
-  // on mounted
   useEffect(() => {
     init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <section id="CryptographyReportPage" className="app-page">
       <header className="app-header">
-        <h1 className="header-title">{type === SourceType.detected ? t('Title:DetectedCryptography') : t('Title:IdentifiedCryptography')}</h1>
+        <h1 className="header-title">
+          {sourceType === SourceType.detected ? t('Title:DetectedCryptography') : t('Title:IdentifiedCryptography')}
+        </h1>
         <section className="subheader">
           <nav className="tabs-navigator">
             <Tabs value={tab} onChange={(e, value) => setTab(value)}>
@@ -121,15 +120,17 @@ const CryptographyReport = () => {
                         <span className={`tag tag-${option} option`}> {option} </span>
                       </li>
                     )}
-                    renderTags={(value: readonly string[], getTagProps) => value.map((option: string, index: number) => (
-                      <Chip
-                        key={option}
-                        label={option}
-                        size="small"
-                        {...getTagProps({ index })}
-                        className={`tag tag-${option} mr-1`}
-                      />
-                    ))}
+                    renderTags={(value: readonly string[], getTagProps) =>
+                      // eslint-disable-next-line implicit-arrow-linebreak
+                      value.map((option: string, index: number) => (
+                        <Chip
+                          key={option}
+                          label={option}
+                          size="small"
+                          {...getTagProps({ index })}
+                          className={`tag tag-${option} mr-1`}
+                        />
+                      ))}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -166,16 +167,25 @@ const CryptographyReport = () => {
                 {filteredItems?.files.map((item) => (
                   <TableRow key={item.file}>
                     <TableCell>
-                      <Link href="#" underline="hover" color="inherit" onClick={(e) => onSelectFile(e, item.file)}>{item.file}</Link>
+                      <Link href="#" underline="hover" color="inherit" onClick={(e) => onSelectFile(e, item.file)}>
+                        {item.file}
+                      </Link>
                     </TableCell>
-                    <TableCell className="algorithms">{item.algorithms.map((algorithm) => <span className="tag"> {algorithm.algorithm} ({algorithm.strength})</span>)}</TableCell>
+                    <TableCell className="algorithms">
+                      {item.algorithms.map((algorithm) => (
+                        <span className="tag">
+                          {' '}
+                          {algorithm.algorithm} ({algorithm.strength})
+                        </span>
+                      ))}
+                    </TableCell>
                   </TableRow>
                 ))}
 
                 {(!filteredItems || filteredItems.files.length === 0) && (
                   <TableRow>
                     <TableCell colSpan={2} align="center" className="pt-4 pb-4">
-                      { !filteredItems ? t('Loading') : t('NoDataFound') }
+                      {!filteredItems ? t('Loading') : t('NoDataFound')}
                     </TableCell>
                   </TableRow>
                 )}
@@ -197,14 +207,21 @@ const CryptographyReport = () => {
                 {filteredItems?.components.map((item) => (
                   <TableRow key={item.purl}>
                     <TableCell>{item.purl}</TableCell>
-                    <TableCell className="algorithms">{item.algorithms.map((algorithm) => <span className="tag"> {algorithm.algorithm} ({algorithm.strength})</span>)}</TableCell>
+                    <TableCell className="algorithms">
+                      {item.algorithms.map((algorithm) => (
+                        <span className="tag">
+                          {' '}
+                          {algorithm.algorithm} ({algorithm.strength})
+                        </span>
+                      ))}
+                    </TableCell>
                   </TableRow>
                 ))}
 
                 {(!filteredItems || filteredItems.components.length === 0) && (
                   <TableRow>
                     <TableCell colSpan={2} align="center" className="pt-4 pb-4">
-                      { !filteredItems ? t('Loading') : t('NoDataFound') }
+                      {!filteredItems ? t('Loading') : t('NoDataFound')}
                     </TableCell>
                   </TableRow>
                 )}

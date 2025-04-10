@@ -1,23 +1,28 @@
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { Box, IconButton, Card, CardActionArea, CardContent, Typography, Grid } from '@mui/material';
+import { Box, IconButton, Card, CardActionArea, Typography, Grid } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
 import SecurityIcon from '@mui/icons-material/Security';
-import { useEffect, useState } from 'react';
 import useSearchParams from '@hooks/useSearchParams';
+import { SourceType } from '@api/dto';
 import CryptographyReport from './CrypthographyReport';
 import './CryptoReport.scss';
+import SecurityReport from './SecurityReport';
 
 const TabNavigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const searchParams = useSearchParams();
   const currentPath = location.pathname;
 
   const isCryptoActive = currentPath.endsWith('/crypto');
   const isSecurityActive = currentPath.endsWith('/security');
 
   const handleNavigate = (path: string) => {
-    navigate(path);
+    navigate({
+      pathname: path,
+      search: `?type=${searchParams.get('type')}`,
+    });
   };
 
   return (
@@ -86,20 +91,15 @@ const TabNavigation = () => {
 
 const CryptoReport = () => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useState('identified');
-  const type = useSearchParams().get('type');
+  const searchParams = useSearchParams();
+  const sourceType = searchParams.get('type') || SourceType.identified;
 
-  // On component initialization, ensure the type parameter exists
-  useEffect(() => {
-    setSearchParams(type);
-  }, []);
-
-  // Handler that preserves the type parameter during navigation
   const handleNavigateBack = () => {
     navigate({
-      pathname: `/workbench/report/scan/${searchParams}`,
+      pathname: `/workbench/report/scan/${sourceType}`,
     });
   };
+
   return (
     <section id="#CryptographyReport">
       <h4 className="header-subtitle back">
@@ -111,9 +111,19 @@ const CryptoReport = () => {
       <TabNavigation />
       <div className="w-full">
         <Routes>
+          <Route
+            path=""
+            element={(
+              <Navigate
+                to={{
+                  pathname: 'crypto',
+                  search: `?type=${sourceType}`,
+                }}
+              />
+            )}
+          />
           <Route path="crypto" element={<CryptographyReport />} />
-          <Route path="security" element={<CryptographyReport />} />
-          <Route path="" element={<Navigate to="crypto" replace />} />
+          <Route path="security" element={<SecurityReport />} />
         </Routes>
       </div>
     </section>

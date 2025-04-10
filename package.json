@@ -123,6 +123,7 @@
     "@mui/styles": "^5.15.10",
     "@mui/x-data-grid": "^5.12.3",
     "@reduxjs/toolkit": "^1.8.1",
+    "@tanstack/react-query": "^5.72.2",
     "adm-zip": "^0.5.9",
     "chart.js": "^3.5.0",
     "electron-debug": "^3.2.0",
@@ -162,6 +163,7 @@
   "devDependencies": {
     "@grpc/grpc-js": "^1.8.7",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.6",
+    "@tanstack/eslint-plugin-query": "^5.72.2",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.1",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.2.0",
