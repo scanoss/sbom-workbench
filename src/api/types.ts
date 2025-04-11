@@ -408,10 +408,16 @@ export interface LOCK {
 export interface CryptographyResponseDTO {
   files: Array<CryptographicItem>,
   components: Array<CryptographicItem>
-  summary:{
-    files: Record<string, number> // md5:5, library:10
-    components: Record<string, number>; // md5:5, library:10
-  }
+  summary: {
+    files: {
+      type: Record<string, number>;
+      crypto: Record<string, number>;
+    },
+    components:{
+      type: Record<string,number>;
+      crypto: Record<string, number>;
+    }
+  },
 }
 
 /* Report Handler */

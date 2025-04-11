@@ -66,14 +66,30 @@ class CryptographyService {
 
   private async getDetected(): Promise<CryptographyResponseDTO> {
     try {
+      // Get identified algorithms and hints
       const components = await modelProvider.model.cryptography.findAllDetectedGroupByType();
       const files = await modelProvider.model.localCryptography.findAllDetectedGroupByType();
+
+      // Crypto type summary for identified files(local) and components: i.e { algorithm: 2, library:1 }
+      const fileTypeSummary = await modelProvider.model.localCryptography.getDetectedTypeSummary();
+      const componentTypeSummary = await modelProvider.model.cryptography.getDetectedTypeSummary();
+
+      // Crypto summary for identified files(local) and components: i.e { md5: 2, openssl:1 }
+      const fileCryptoSummary = await modelProvider.model.localCryptography.getDetectedCryptoSummary();
+      const componentCryptoSummary = await modelProvider.model.cryptography.getDetectedCryptoSummary();
+
       return {
         files,
         components,
         summary: {
-          files: {},
-          components: {},
+          files: {
+            type: fileTypeSummary,
+            crypto: fileCryptoSummary, // TODO: Review the name
+          },
+          components: {
+            type: componentTypeSummary,
+            crypto: componentCryptoSummary, // TODO: Review the name
+          },
         },
       };
     } catch (e: any) {
@@ -83,14 +99,31 @@ class CryptographyService {
 
   private async getIdentified(): Promise<CryptographyResponseDTO> {
     try {
+      // Get identified algorithms and hints
       const components = await modelProvider.model.cryptography.findAllIdentifiedGroupByType();
       const files = await modelProvider.model.localCryptography.findAllIdentifiedGroupByType();
+
+      // Crypto type summary for identified files(local) and components: i.e { algorithm: 2, library:1 }
+      const fileTypeSummary = await modelProvider.model.localCryptography.getIdentifiedTypeSummary();
+      const componentTypeSummary = await modelProvider.model.cryptography.getIdentifiedTypeSummary();
+
+      // Crypto summary for identified files(local) and components: i.e { md5: 2, openssl:1 }
+      // TODO: Review the name
+      const fileCryptoSummary = await modelProvider.model.localCryptography.getIdentifiedCryptoSummary();
+      const componentCryptoSummary = await modelProvider.model.cryptography.getIdentifiedCryptoSummary();
+
       return {
         files,
         components,
         summary: {
-          components: {},
-          files: {},
+          files: {
+            type: fileTypeSummary,
+            crypto: fileCryptoSummary, // TODO: Review the name
+          },
+          components: {
+            type: componentTypeSummary,
+            crypto: componentCryptoSummary, // TODO: Review the name
+          },
         },
       };
     } catch (e: any) {

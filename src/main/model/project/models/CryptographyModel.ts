@@ -42,7 +42,7 @@ export class CryptographyModel extends Model {
   }
 
   public async findAllDetected(): Promise<Array<Cryptography>> {
-    const query = queries.SQL_GET_ALL_DETECTED_CRYPTOGRAPHY;
+    const query = queries.SQL_GET_CRYPTOGRAPHY_ALL_DETECTED;
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
     const response = await call(query);
     const crypto = this.cryptographyAdapter(response);
@@ -50,7 +50,7 @@ export class CryptographyModel extends Model {
   }
 
   public async findAllIdentifiedMatched(): Promise<Array<Cryptography>> {
-    const query = queries.SQL_GET_ALL_IDENTIFIED_CRYPTOGRAPHY;
+    const query = queries.SQL_GET_CRYPTOGRAPHY_ALL_IDENTIFIED;
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
     const response = await call(query);
     const crypto = this.cryptographyAdapter(response);
@@ -58,27 +58,27 @@ export class CryptographyModel extends Model {
   }
 
   public async deleteAll() {
-    const query = queries.SQL_DELETE_CRYPTOGRAPHY;
+    const query = queries.SQL_CRYPTOGRAPHY_DELETE_ALL;
     const call = await util.promisify(this.connection.run.bind(this.connection));
     await call(query);
   }
 
   public async identifiedAlgorithmsCount(): Promise<number> {
-    const query = queries.SQL_GET_IDENTIFIED_ALGORITHMS_COUNT;
+    const query = queries.SQL_GET_CRYPTOGRAPHY_ALGORITHMS_IDENTIFIED_COUNT;
     const call = await util.promisify(this.connection.get.bind(this.connection)) as any;
     const response = await call(query);
     return response.algorithms_count;
   }
 
   public async detectedAlgorithmsCount(): Promise<number> {
-    const query = queries.SQL_GET_DETECTED_ALGORITHMS_COUNT;
+    const query = queries.SQL_GET_CRYPTOGRAPHY_ALGORITHM_DETECTED_COUNT;
     const call = await util.promisify(this.connection.get.bind(this.connection)) as any;
     const response = await call(query);
     return response.algorithms_count;
   }
 
   public async findAllDetectedGroupByType(): Promise<Array<CryptographicItem>> {
-    const query = queries.SQL_GET_ALL_DETECTED_CRYPTO_GROUP_BY_TYPE;
+    const query = queries.SQL_GET_CRYPTOGRAPHY_DETECTED_GROUPED_BY_TYPE;
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
     const results = await call(query);
     return results.map((item: any) => ({
@@ -88,13 +88,73 @@ export class CryptographyModel extends Model {
   }
 
   public async findAllIdentifiedGroupByType(): Promise<Array<CryptographicItem>> {
-    const query = queries.SQL_GET_ALL_IDENTIFIED_CRYPTO_GROUP_BY_TYPE;
+    const query = queries.SQL_GET_CRYPTOGRAPHY_IDENTIFIED_GROUPED_BY_TYPE;
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
     const results = await call(query);
     return results.map((item: any) => ({
       ...item,
       value: JSON.parse(item.value),
     }));
+  }
+
+  /**
+   * @brief Returns a summary of detected cryptography types as a record.
+   * @returns {Record<string, number>} An object where keys are cryptography types and values are their counts.
+   * @example { algorithm: 10, library: 2 }
+   */
+  public async getDetectedTypeSummary(): Promise<Record<string, number>> {
+    const query = queries.SQL_GET_DETECTED_CRYPTO_TYPE_SUMMARY.replaceAll('#TABLE', 'cryptography');
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const response = await call(query);
+    return response.reduce((result: Record<string, number>, item:{ type:string, count: number }) => {
+      result[item.type] = item.count;
+      return result;
+    }, {});
+  }
+
+  /**
+   * @brief Returns a summary of identified cryptography types as a record.
+   * @returns {Record<string, number>} An object where keys are cryptography types and values are their counts.
+   * @example { algorithm: 10, library: 2 }
+   */
+  public async getIdentifiedTypeSummary(): Promise<Record<string, number>> {
+    const query = queries.SQL_GET_CRYPTOGRAPHY_IDENTIFIED_TYPE_SUMMARY;
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const response = await call(query);
+    return response.reduce((result: Record<string, number>, item:{ type:string, count: number }) => {
+      result[item.type] = item.count;
+      return result;
+    }, {});
+  }
+
+  /**
+   * @brief Returns a summary of detected cryptography as a record.
+   * @returns {Record<string, number>} An object where keys are cryptography types and values are their counts.
+   * @example { md5: 10, openssl: 2 }
+   */
+  public async getDetectedCryptoSummary(): Promise<Record<string, number>> {
+    const query = queries.SQL_GET_DETECTED_CRYPTO_SUMMARY.replaceAll('#TABLE', 'cryptography');
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const response = await call(query);
+    return response.reduce((result: Record<string, number>, item:{ crypto:string, count: number }) => {
+      result[item.crypto] = item.count;
+      return result;
+    }, {});
+  }
+
+  /**
+   * @brief Returns a summary of identified cryptography as a record.
+   * @returns {Record<string, number>} An object where keys are cryptography types and values are their counts.
+   * @example { md5: 10, openssl: 2 }
+   */
+  public async getIdentifiedCryptoSummary(): Promise<Record<string, number>> {
+    const query = queries.SQL_GET_CRYPTOGRAPHY_IDENTIFIED_CRYPTO_SUMMARY;
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const response = await call(query);
+    return response.reduce((result: Record<string, number>, item:{ type:string, count: number }) => {
+      result[item.type] = item.count;
+      return result;
+    }, {});
   }
 
   private cryptographyAdapter(cryptography: Array<{ purl: string, version: string, algorithms: string, hints:string }>): Array<Cryptography> {
