@@ -66,11 +66,15 @@ class CryptographyService {
 
   private async getDetected(): Promise<CryptographyResponseDTO> {
     try {
-      const components = await modelProvider.model.cryptography.findAllDetected();
-      const files = await modelProvider.model.localCryptography.findAll();
+      const components = await modelProvider.model.cryptography.findAllDetectedGroupByType();
+      const files = await modelProvider.model.localCryptography.findAllDetectedGroupByType();
       return {
         files,
         components,
+        summary: {
+          files: {},
+          components: {},
+        },
       };
     } catch (e: any) {
       throw new Error(`Error retrieving detected cryptography: cause: ${e.message}`);
@@ -79,11 +83,15 @@ class CryptographyService {
 
   private async getIdentified(): Promise<CryptographyResponseDTO> {
     try {
-      const components = await modelProvider.model.cryptography.findAllIdentifiedMatched();
-      const files = await modelProvider.model.localCryptography.findAll();
+      const components = await modelProvider.model.cryptography.findAllIdentifiedGroupByType();
+      const files = await modelProvider.model.localCryptography.findAllIdentifiedGroupByType();
       return {
         files,
         components,
+        summary: {
+          components: {},
+          files: {},
+        },
       };
     } catch (e: any) {
       throw new Error(`Error retrieving identified cryptography: cause: ${e.message}`);

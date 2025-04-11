@@ -3,7 +3,7 @@ import { Scanner } from '../main/task/scanner/types';
 import ScannerConfig = Scanner.ScannerConfig;
 import Folder from '../main/workspace/tree/Folder';
 import { Metadata } from '../main/workspace/Metadata';
-import { Cryptography } from '../main/model/entity/Cryptography';
+import { CryptographicItem, Cryptography } from '../main/model/entity/Cryptography';
 import { LocalCryptography } from '../main/model/entity/LocalCryptography';
 import { IReportData, ISummary, ReportComponent } from 'main/services/ReportService';
 
@@ -406,8 +406,12 @@ export interface LOCK {
 }
 
 export interface CryptographyResponseDTO {
-  files: Array<LocalCryptography>;
-  components: Array<Cryptography>;
+  files: Array<CryptographicItem>,
+  components: Array<CryptographicItem>
+  summary:{
+    files: Record<string, number> // md5:5, library:10
+    components: Record<string, number>; // md5:5, library:10
+  }
 }
 
 /* Report Handler */

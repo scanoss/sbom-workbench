@@ -3,6 +3,7 @@ import sqlite3 from 'sqlite3';
 import { Model } from '../../Model';
 import { queries } from '../../querys_db';
 import { LocalCryptography } from '../../entity/LocalCryptography';
+import { CryptographicItem } from '../../entity/Cryptography';
 
 export interface ILocalCryptographyModel {
   id: number;
@@ -20,16 +21,17 @@ export class LocalCryptographyModel extends Model {
     this.connection = conn;
   }
 
-  public async import(cryptography: Array<{ fileId: number, algorithms: string }>): Promise<void> {
+  public async import(cryptography: Array<{ fileId: number, algorithms: string, hints:any[] }>): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
 
         cryptography.forEach((c) => {
           this.connection.run(
-            'INSERT OR IGNORE INTO local_cryptography (file_id,algorithms) VALUES(?,?);',
+            'INSERT OR IGNORE INTO local_cryptography (file_id, algorithms, hints) VALUES(?,?,?);',
             c.fileId,
             c.algorithms,
+            JSON.stringify(c.hints),
           );
         });
 
@@ -64,6 +66,26 @@ export class LocalCryptographyModel extends Model {
     if (!allAlgorithms) return [];
     const algorithms = allAlgorithms.map((a) => a.algorithm);
     return Array.from(new Set(algorithms).values());
+  }
+
+  public async findAllDetectedGroupByType(): Promise<Array<CryptographicItem>> {
+    const query = queries.SQL_GET_ALL_DETECTED_LOCAL_CRYPTO_GROUP_BY_TYPE;
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const results = await call(query);
+    return results.map((item: any) => ({
+      ...item,
+      value: JSON.parse(item.value),
+    }));
+  }
+
+  public async findAllIdentifiedGroupByType(): Promise<Array<CryptographicItem>> {
+    const query = queries.SQL_GET_ALL_IDENTIFIED_LOCAL_CRYPTO_GROUP_BY_TYPE;
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const results = await call(query);
+    return results.map((item: any) => ({
+      ...item,
+      value: JSON.parse(item.value),
+    }));
   }
 
   private cryptographyAdapter(crypto: Array <ILocalCryptographyModel>): Array<LocalCryptography> {

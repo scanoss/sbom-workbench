@@ -2,7 +2,7 @@ import util from 'util';
 import sqlite3 from 'sqlite3';
 import { queries } from '../../querys_db';
 import { Model } from '../../Model';
-import { Algorithms, Cryptography, Hint } from '../../entity/Cryptography';
+import { Algorithms, CryptographicItem, Cryptography, Hint } from '../../entity/Cryptography';
 
 export class CryptographyModel extends Model {
   private connection: sqlite3.Database;
@@ -63,17 +63,6 @@ export class CryptographyModel extends Model {
     await call(query);
   }
 
-  public async getAllIdentifiedAlgorithms() {
-    const query = queries.SQL_GET_ALL_IDENTIFIED_ALGORITHMS;
-    const call = await util.promisify(this.connection.get.bind(this.connection));
-    const response = await call(query) as any;
-    if (!response.algorithms) return [];
-    const allAlgorithms = JSON.parse(response.algorithms);
-    if (!allAlgorithms) return [];
-    const algorithms = allAlgorithms.map((a) => a.algorithm);
-    return Array.from(new Set(algorithms).values());
-  }
-
   public async identifiedAlgorithmsCount(): Promise<number> {
     const query = queries.SQL_GET_IDENTIFIED_ALGORITHMS_COUNT;
     const call = await util.promisify(this.connection.get.bind(this.connection)) as any;
@@ -88,7 +77,27 @@ export class CryptographyModel extends Model {
     return response.algorithms_count;
   }
 
-  private cryptographyAdapter(cryptography: Array<{ purl: string, version: string, algorithms: string , hints:string }>): Array<Cryptography> {
+  public async findAllDetectedGroupByType(): Promise<Array<CryptographicItem>> {
+    const query = queries.SQL_GET_ALL_DETECTED_CRYPTO_GROUP_BY_TYPE;
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const results = await call(query);
+    return results.map((item: any) => ({
+      ...item,
+      value: JSON.parse(item.value),
+    }));
+  }
+
+  public async findAllIdentifiedGroupByType(): Promise<Array<CryptographicItem>> {
+    const query = queries.SQL_GET_ALL_IDENTIFIED_CRYPTO_GROUP_BY_TYPE;
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const results = await call(query);
+    return results.map((item: any) => ({
+      ...item,
+      value: JSON.parse(item.value),
+    }));
+  }
+
+  private cryptographyAdapter(cryptography: Array<{ purl: string, version: string, algorithms: string, hints:string }>): Array<Cryptography> {
     return cryptography.map((c) => ({ purl: c.purl, version: c.version, algorithms: JSON.parse(c.algorithms) as Algorithms[], hints: JSON.parse(c.hints) as Hint[] }));
   }
 }

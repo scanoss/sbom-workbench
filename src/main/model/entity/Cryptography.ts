@@ -21,3 +21,9 @@ export interface Algorithms {
   algorithm: string;
   strength: string;
 }
+
+export interface CryptographicItem {
+  name: string; // filePath | pkg@version
+  type: string; // algorithm | library
+  value: Array<string>;
+}
