@@ -1,6 +1,6 @@
 import log from 'electron-log';
 import i18next from 'i18next';
-import { CryptographyScanner, CryptoCfg, ILocalCryptographyResponse } from 'scanoss';
+import { CryptographyAlgorithmScanner , CryptoCfg, ILocalCryptographyResponse } from 'scanoss';
 import path from 'path';
 import { modelProvider } from '../../../services/ModelProvider';
 import { Project } from '../../../workspace/Project';
@@ -58,7 +58,7 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
           : path.join(__dirname, '../../../assets/data/defaultCryptoRules.json');
       }
       const cryptoCfg = new CryptoCfg({ rulesPath: rules, threads: this.THREADS });
-      const cryptoScanner = new CryptographyScanner(cryptoCfg);
+      const cryptoScanner = new CryptographyAlgorithmScanner(cryptoCfg);
       const files = this.project.getTree().getRootFolder().getFiles();
 
       // Map absolute -> relative
@@ -69,7 +69,6 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
         .forEach((f) => fileIdMapper.set(path.join(this.project.getScanRoot(), f.path), f.path));
 
       const localCryptography = await cryptoScanner.scan([...fileIdMapper.keys()]);
-
       // Import local cryptography
       await this.importLocalCrypto(localCryptography, fileIdMapper);
 
@@ -94,7 +93,7 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
     const filesWithCrypto = crypto.fileList.filter((ci) => ci.algorithms.length > 0);
 
     // Convert file paths to fileIds
-    const localCrypto = filesWithCrypto.map((fc) => ({ fileId: fileIdMapper.get(filePathMapper.get(fc.file)), algorithms: JSON.stringify(normalizeCryptoAlgorithms(fc.algorithms)) }));
+    const localCrypto = filesWithCrypto.map((fc) => ({ fileId: fileIdMapper.get(filePathMapper.get(fc.file)), algorithms: JSON.stringify(normalizeCryptoAlgorithms(fc.algorithms)), hints: [] }));
 
     // Import results of local cryprography
     await modelProvider.model.localCryptography.import(localCrypto);
