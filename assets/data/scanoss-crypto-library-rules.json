@@ -1,0 +1,2930 @@
+[
+    {
+        "id": "library/webcrypto",
+        "name": "Web Cryptography API",
+        "description": "A JavaScript API for performing basic cryptographic operations in web applications.",
+        "keywords": [
+            "window.crypto.subtle",
+            "crypto.subtle.",
+            "crypto.getRandomValues",
+            "NodeWebCrypto",
+            "WebCryptoAPI"
+        ],
+        "url": "https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API",
+        "category": "library",
+        "purl": "pkg:generic/webcrypto",
+        "tags": [
+            "JavaScript"
+        ]
+    },
+    {
+        "id": "library/mbedtls",
+        "name": "Mbed TLS",
+        "description": "An open source, portable, easy to use, readable and flexible SSL library (formerly known as PolarSSL).",
+        "keywords": [
+            "mbedtls/",
+            "mbedtls_ssl_",
+            "mbedtls_aes_",
+            "mbedtls_sha",
+            "mbedtls_x509_",
+            "mbedtls_key",
+            "mbedtls_err",
+            "mbedtls_net",
+            "mbedtls_ctr",
+            "mbedtls_entropy_context",
+            "mbedtls_pk_context",
+            "mbedtls_entropy_",
+            "mbedtls_pk_",
+            "mbedtls_md5",
+            "mbedtls_ecp_",
+            "mbedtls_ecdsa_",
+            "mbedtls_mpi",
+            "mbedtls_rsa_",
+            "mbedtls_md_",
+            "mbedtls_dhm_context",
+            "mbedtls_gcm",
+            "mbedtls_cipher_",
+            "mbedtls_ecdh_context",
+            "mbedtls_hmac_",
+            "mbedtls_debug_",
+            "mbedtls_timing_",
+            "mbedtls_check_return",
+            "mbedtls_platform_",
+            "mbedtls_base64_",
+            "mbedtls_asn1_"
+        ],
+        "url": "https://tls.mbed.org/",
+        "category": "library",
+        "purl": "pkg:github/ARMmbed/mbedtls",
+        "tags": [
+            "C"
+        ]
+    },
+    {
+        "id": "library/passlib",
+        "name": "Passlib",
+        "description": "A password hashing library for Python 2 & 3, which provides cross-platform implementations of over 30 password hashing algorithms.",
+        "keywords": [
+            "from passlib.hash",
+            "passlib.context",
+            "CryptContext",
+            "passlib.hash",
+            "passlib.pwd",
+            "passlib.registry",
+            "passlib.crypto",
+            "passlib.exc",
+            "passlib.ifc",
+            "passlib.utils"
+        ],
+        "url": "https://passlib.readthedocs.io/",
+        "category": "library",
+        "purl": "pkg:pypi/passlib",
+        "tags": [
+            "Python"
+        ]
+    },
+    {
+        "id": "library/jose-jwt",
+        "name": "JOSE & JWT Libraries",
+        "description": "Libraries for handling JSON Object Signing and Encryption (JOSE) and JSON Web Tokens (JWT).",
+        "keywords": [
+            "jose.jwk",
+            "jose.jwt",
+            "jwt.sign",
+            "JsonWebToken",
+            "BadJOSEException",
+            "JOSEObjectType",
+            "JOSEHandler",
+            "JWSCreator",
+            "JWSProvider",
+            "JWEProvider",
+            "JWECreator",
+            "JWTVerificationException",
+            "JOSEObjectCodec",
+            "JWTClaimsVerifier",
+            "JWTVerifierBuilder",
+            "JWTValidator"
+        ],
+        "url": "https://jwt.io/",
+        "category": "library",
+        "purl": "pkg:npm/jsonwebtoken",
+        "tags": [
+            "JavaScript"
+        ]
+    },
+    {
+        "id": "library/nss",
+        "name": "Network Security Services (NSS)",
+        "description": "A set of libraries designed to support cross-platform development of security-enabled client and server applications.",
+        "keywords": [
+            "NSS_Init",
+            "#include <nss.h>"
+        ],
+        "url": "https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS",
+        "category": "library",
+        "purl": "pkg:github/nss-dev/nss",
+        "tags": [
+            "C"
+        ]
+    },
+    {
+        "id": "library/openssl",
+        "name": "OpenSSL",
+        "description": "A robust, full-featured open-source toolkit implementing the Secure Sockets Layer (SSL) and Transport Layer Security (TLS) protocols.",
+        "keywords": [
+            "include <openssl/",
+            "openssl/ssl.h",
+            "openssl/crypto.h",
+            "openssl/err.h",
+            "libssl.",
+            "libcrypto.",
+            "libeay32.dll",
+            "ssleay32.dll",
+            "pyopenssl",
+            "crypto.X509"
+        ],
+        "url": "https://www.openssl.org/docs/",
+        "category": "library",
+        "purl": "pkg:github/openssl/openssl",
+        "tags": [
+            "C"
+        ]
+    },
+    {
+        "id": "library/bouncycastle",
+        "name": "BouncyCastle",
+        "description": "A collection of APIs used in cryptography, including lightweight cryptography for Java and C#.",
+        "keywords": [
+            "org.bouncycastle.",
+            "bcprov-jdk",
+            "bcpkix-jdk",
+            "bcmail-jdk",
+            "bcpg-jdk",
+            "bctls-jdk",
+            "Org.BouncyCastle.",
+            "BouncyCastle.NetCore",
+            "Portable.BouncyCastle",
+            "BouncyCastleProvider"
+        ],
+        "url": "https://www.bouncycastle.org/documentation.html",
+        "category": "library",
+        "purl": "pkg:github/bouncycastle/bc-java",
+        "tags": [
+            "Java"
+        ]
+    },
+    {
+        "id": "library/libsodium",
+        "name": "libsodium",
+        "description": "A modern, easy-to-use software library for encryption, decryption, signatures, password hashing, and more.",
+        "keywords": [
+            "crypto_secretbox_",
+            "crypto_box_seal",
+            "crypto_sign",
+            "crypto_generichash",
+            "crypto_pwhash",
+            "crypto_box_keypair",
+            "crypto_sign_keypair",
+            "crypto_aead_xchacha20poly1305",
+            "sodium_memzero",
+            "sodium_mlock",
+            "sodium_munlock",
+            "sodium_memcmp",
+            "sodium_increment",
+            "sodium.h",
+            "libsodium",
+            "sodium_version_H"
+        ],
+        "url": "https://libsodium.gitbook.io/doc/",
+        "category": "library",
+        "purl": "pkg:github/jedisct1/libsodium",
+        "tags": [
+            "C"
+        ]
+    },
+    {
+        "id": "package/cryptojs",
+        "name": "CryptoJS",
+        "description": "A self-contained Python package of low-level cryptographic primitives.",
+        "keywords": [
+            "require(\"crypto-js\");",
+            "CryptoJS."
+        ],
+        "url": "https://cryptojs.gitbook.io/docs/",
+        "category": "package",
+        "purl": "pkg:npm/crypto-js",
+        "tags": [
+            "JavaScript"
+        ]
+    },
+    {
+        "id": "package/nodjs-crypto",
+        "name": "CryptoJS",
+        "description": "A built-in NodeJS module",
+        "keywords": [
+            "require(\"crypto\");",
+            "node:crypto"
+        ],
+        "url": "https://nodejs.org/api/crypto.html",
+        "category": "package",
+        "purl": "pkg:npm/node",
+        "tags": [
+            "JavaScript"
+        ]
+    },
+    {
+        "id": "package/bcryptjs",
+        "name": "BcryptJS",
+        "description": "Package for encrypting passwords using secure hashes",
+        "keywords": [
+            "require(\"bcryptjs\");",
+            "bcrypt."
+        ],
+        "url": " https://github.com/dcodeIO/bcrypt.js",
+        "category": "package",
+        "purl": "pkg:npm/bcryptjs",
+        "tags": [
+            "JavaScript"
+        ]
+    },
+    {
+        "id": "package/openpgp-js",
+        "name": "OpenPGP.js",
+        "description": "End-to-end implementation of OpenPGP standard",
+        "keywords": [
+            "require(\"openpgp\");",
+            "openpgp."
+        ],
+        "url": "https://openpgpjs.org/",
+        "category": "package",
+        "purl": "pkg:npm/openpgp",
+        "tags": [
+            "JavaScript"
+        ]
+    },
+    {
+        "id": "library/tweennacl-js",
+        "name": "TweetNaCl.js",
+        "description": "Lightwight library for modern cryptography",
+        "keywords": [
+            "require(\"tweetnacl\");",
+            "nacl.util = require(\"tweetnacl-util\");"
+        ],
+        "url": "https://github.com/dchest/tweetnacl-js",
+        "category": "library",
+        "purl": "pkg:npm/tweennacl",
+        "tags": [
+            "JavaScript"
+        ]
+    },
+    {
+        "id": "package/pycryptodome",
+        "name": "PyCryptodome",
+        "description": "A self-contained Python package of low-level cryptographic primitives.",
+        "keywords": [
+            "Cryptodome.",
+            "pycryptodome"
+        ],
+        "url": "https://pycryptodome.readthedocs.io/en/latest/",
+        "category": "package",
+        "purl": "pkg:github/Legrandin/pycryptodome",
+        "tags": [
+            "Python"
+        ]
+    },
+    {
+        "id": "library/cryptography",
+        "name": "Cryptography (Python package)",
+        "description": "A Python library providing cryptographic recipes and primitives to developers.",
+        "keywords": [
+            "cryptography.hazmat",
+            "cryptography.fernet",
+            "cryptography.x509"
+        ],
+        "url": "https://cryptography.io/en/latest/",
+        "category": "library",
+        "purl": "pkg:pypi/cryptography",
+        "tags": [
+            "Python"
+        ]
+    },
+    {
+        "id": "library/nacl",
+        "name": "NaCl (Networking and Cryptography Library)",
+        "description": "A high-speed software library for network communication, encryption, decryption, signatures, etc.",
+        "keywords": [
+            "crypto_auth",
+            "crypto_core",
+            "crypto_hash",
+            "crypto_onetimeauth",
+            "crypto_scalarmult",
+            "crypto_stream",
+            "crypto_verify",
+            "libnacl.",
+            "nacl.h",
+            "crypto_secretbox",
+            "crypto_sign",
+            "crypto_box",
+            "libsodium (NaCl fork)"
+        ],
+        "url": "https://nacl.cr.yp.to/",
+        "category": "library",
+        "purl": "pkg:github/dedis/nacl",
+        "tags": [
+            "C"
+        ]
+    },
+    {
+        "id": "library/magical-crypto-friends",
+        "name": "MCF (Magical Crypto Friends)",
+        "description": "A modern cryptographic library providing a common API for multiple cryptographic backends.",
+        "keywords": [
+            "MCFContext",
+            "MCF::Key",
+            "MCF::Hash",
+            "MCF_init",
+            "MCF_encrypt",
+            "MCF_decrypt",
+            "MCF_cipher_",
+            "MCF_hash_",
+            "MCF_hmac_",
+            "MCF_kdf_",
+            "MCF_rsa_",
+            "MCF_ecdsa_",
+            "MCF_curve25519_",
+            "MCF_ed25519_",
+            "MCF_secure_",
+            "MCF_aead_",
+            "MCF_poly1305_",
+            "MCF_constant_",
+            "MCF_asn1_",
+            "MCF_pem_",
+            "MCF_crypto_",
+            "MCF_signature_",
+            "MCF_threshold_",
+            "MCF_oblivious_",
+            "MCF_commitment_"
+        ],
+        "url": "https://github.com/blockstream/mcf",
+        "category": "library",
+        "purl": "pkg:github/blockstream/mcf",
+        "tags": [
+            "C++"
+        ]
+    },
+    {
+        "id": "sdk/awskms",
+        "name": "AWS Key Management Service (KMS)",
+        "description": "A managed service that makes it easy to create and control the encryption keys used to encrypt your data.",
+        "keywords": [
+            "GenerateDataKey",
+            "ScheduleKeyDeletion",
+            "EnableKey",
+            "ListAliases",
+            "KeyPolicy",
+            "CustomerMasterKeySpec",
+            "MultiRegionKey",
+            "ReplicateKey",
+            "UpdatePrimaryRegion",
+            "aws-kms",
+            "AWSKMS",
+            "KmsClient",
+            "aws-sdk-kms",
+            "boto3.client('kms')",
+            "new AWS.KMS"
+        ],
+        "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+        "category": "sdk",
+        "purl": "pkg:aws/kms",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "framework/spring-security",
+        "name": "Spring Security",
+        "description": "Spring Security provides security services for the Spring IO Platform.",
+        "keywords": [
+            "SecurityContextHolder.getContext",
+            "SecurityContext.getAuthentication",
+            "UserDetailsService.loadUserByUsername",
+            "@PreAuthorize(",
+            "@PostAuthorize("
+        ],
+        "url": "https://spring.io/projects/spring-security",
+        "category": "framework",
+        "purl": "pkg:github/spring-projects/spring-security",
+        "tags": [
+            "Java"
+        ]
+    },
+    {
+        "id": "library/googletink",
+        "name": "Google Tink",
+        "description": "A multi-language, cross-platform library that provides cryptographic APIs that are secure, easy to use correctly, and hard(er) to misuse.",
+        "keywords": [
+            "com.google.crypto.tink",
+            "google/cloud/tink",
+            "github.com/google/tink",
+            "KeysetHandle",
+            "KeysetManager",
+            "KeysetReader",
+            "KeysetWriter",
+            "KeyTemplate",
+            "CleartextKeysetHandle",
+            "DeterministicAead",
+            "StreamingAead",
+            "KmsClient",
+            "KmsAead",
+            "GcpKmsClient",
+            "AwsKmsClient",
+            "Registry.registerKeyManager",
+            "AeadFactory.getPrimitive",
+            "MacFactory.getPrimitive",
+            "tink.proto",
+            "tink_bindings",
+            "tinkey",
+            "google-crypto-tink",
+            "tink-gcpkms",
+            "tink-awskms",
+            "google-cloud/tink'",
+            "tink-testing-server",
+            "tinkey create-keyset",
+            "tinkey create-public-keyset",
+            "TinkException"
+        ],
+        "url": "https://developers.google.com/tink",
+        "category": "library",
+        "purl": "pkg:github/google/tink",
+        "tags": [
+            "Java",
+            "Python",
+            "Go",
+            "C"
+        ]
+    },
+    {
+        "id": "sdk/microsoftcng",
+        "name": "Microsoft Cryptography Next Generation (CNG)",
+        "description": "A suite of cryptographic APIs that are part of the Windows operating system, used to perform cryptographic operations.",
+        "keywords": [
+            "NCryptDeleteKey",
+            "NCryptOpenStorageProvider",
+            "NCryptOpenKey",
+            "NCryptImportKey",
+            "NCryptExportKey",
+            "NCryptSignHash",
+            "NCryptVerifySignature",
+            "NCryptSecretAgreement",
+            "ICngAsymmetricAlgorithmProvider",
+            "ICngSymmetricAlgorithmProvider",
+            "ICngKey",
+            "bcrypt.h",
+            "ncrypt.h",
+            "bcrypt.dll",
+            "ncrypt.dll",
+            "NCryptCreatePersistedKey",
+            "BCryptEncrypt",
+            "BCryptDecrypt",
+            "Microsoft CNG"
+        ],
+        "url": "https://docs.microsoft.com/en-us/windows/win32/seccng/cng-portal",
+        "category": "sdk",
+        "purl": "pkg:github/microsoft/CNG",
+        "tags": [
+            "C"
+        ]
+    },
+    {
+        "id": "framework/javajca-jce",
+        "name": "Java Cryptography Architecture/Java Cryptography Extension (JCA/JCE)",
+        "description": "A framework for accessing and developing cryptographic functionality for the Java platform.",
+        "keywords": [
+            "SecretKeySpec",
+            "IvParameterSpec",
+            "PBEKeySpec",
+            "X509EncodedKeySpec",
+            "PKCS8EncodedKeySpec",
+            "GCMParameterSpec",
+            "DHParameterSpec",
+            "KeyStore.PrivateKeyEntry",
+            "java.security.egd",
+            "javax.net.ssl.keyStore",
+            "javax.net.ssl.trustStore",
+            "java.policy",
+            "java.login.config",
+            "JceSecurity",
+            "KeyStore.getDefaultType",
+            "AlgorithmParameters.getInstance",
+            "AlgorithmParameterGenerator.getInstance",
+            "CertificateFactory.getInstance",
+            "jarsigner",
+            "javax.crypto",
+            "java.security",
+            "Cipher.getInstance",
+            "javax.crypto.spec.SecretKeySpec",
+            "javax.crypto.Cipher"
+        ],
+        "url": "https://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html",
+        "category": "framework",
+        "purl": "pkg:github/oracle/jdk8u",
+        "tags": [
+            "Java"
+        ]
+    },
+    {
+        "id": "library/gnutls",
+        "name": "GnuTLS",
+        "description": "GnuTLS is an implementation of the SSL, TLS, and DTLS protocols that is compatible with various operating systems. It is part of the GNU project.",
+        "keywords": [
+            "gnutls/gnutls.h",
+            "gnutls_",
+            "GNUTLS_",
+            "libgnutls.so"
+        ],
+        "url": "https://www.gnutls.org/documentation.html",
+        "category": "library",
+        "purl": "pkg:github/gnutls/gnutls",
+        "tags": [
+            "C"
+        ]
+    },
+    {
+        "id": "library/crypto-browserify",
+        "name": "crypto-browserify",
+        "description": "A port of node's crypto module to the browser.",
+        "keywords": [
+            "require('browserify"
+        ],
+        "url": "https://browserify.org/",
+        "category": "library",
+        "purl": "pkg:github/browserify/crypto-browserify",
+        "tags": [
+            "JavaScript"
+        ]
+    },
+    {
+        "id": "library/wolfssl",
+        "name": "WolfSSL",
+        "description": "(CyaSSL) WolfSSL is a lightweight, open-source SSL/TLS library designed for resource-constrained environments such as embedded devices.",
+        "keywords": [
+            "wolfssl/options.h",
+            "wolfssl/ssl.h",
+            "wolfssl/wolfcrypt/",
+            "wolfSSL_CTX_new",
+            "wolfSSL_new",
+            "wolfSSL_connect",
+            "wolfSSL_accept",
+            "libwolfssl.so"
+        ],
+        "url": "https://www.wolfssl.com/docs/",
+        "category": "library",
+        "purl": "pkg:github/wolfSSL/wolfssl",
+        "tags": [
+            "C"
+        ]
+    },
+    {
+        "id": "library/boringssl",
+        "name": "BoringSSL",
+        "description": "BoringSSL is a cryptographic library forked from OpenSSL, designed by Google to meet their specific needs for speed, security, and maintainability.",
+        "keywords": [
+            "EVP_has_aes_hardware",
+            "boringssl_prefix_symbols.h",
+            "openssl/is_boringssl.h",
+            "OPENSSL_IS_BORINGSSL",
+            "boringssl.h"
+        ],
+        "url": "https://boringssl.googlesource.com/boringssl/",
+        "category": "library",
+        "purl": "pkg:googlesource/boringssl",
+        "tags": [
+            "C"
+        ]
+    },
+    {
+        "id": "library/paramiko",
+        "name": "paramiko",
+        "description": "Paramiko is a pure-Python 1 (3.6+) implementation of the SSHv2 protocol 2, providing both client and server functionality.",
+        "keywords": [
+            "paramiko.",
+            "import paramiko",
+            "from paramiko"
+        ],
+        "url": "https://www.paramiko.org/",
+        "category": "library",
+        "purl": "pkg:github/paramiko/paramiko",
+        "tags": [
+            "Python"
+        ]
+    },
+    {
+        "id": "library/crypto++",
+        "name": "Crypto++",
+        "description": "Crypto++: free C++ Class Library of Cryptographic Schemes.",
+        "keywords": [
+            "cryptopp/",
+            "CryptoPP::"
+        ],
+        "url": "https://cryptopp.com/",
+        "category": "library",
+        "purl": "pkg:github/weidai11/cryptopp",
+        "tags": [
+            "C"
+        ]
+    },
+    {
+        "id": "library/keyczar",
+        "name": "Google Keyczar ",
+        "description": "Keyczar is an open source cryptographic toolkit designed to make it easier and safer to use cryptography in applications",
+        "keywords": [
+            "keyczar.",
+            "KeyczarReader",
+            "KeyczarToolbox"
+        ],
+        "url": " https://github.com/google/keyczar",
+        "category": "library",
+        "purl": "pkg:github/google/keyczar"
+    },
+    {
+        "id": "library/themis",
+        "name": "Themis Cryptographic Library ",
+        "description": "Themis is an open-source high-level cryptographic services library that provides secure data handling, storage and messaging for mobile and server platforms",
+        "keywords": [
+            "themis/"
+        ],
+        "url": "https://github.com/cossacklabs/themis",
+        "category": "library",
+        "purl": "pkg:github/cossacklabs/themis",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "library/ring",
+        "name": "Ring",
+        "description": "Safe, fast, small crypto using Rust with BoringSSL's cryptography primitives.",
+        "keywords": [
+
+            "ring::digest",
+            "ring::hmac",
+            "ring::aead",
+            "ring::agreement",
+            "ring::error",
+            "ring::hkdf",
+            "ring::pbkdf2",
+            "ring::rand",
+            "ring::signature",
+            "ring::test"
+        ],
+        "url": "https://github.com/briansmith/ring",
+        "category": "library",
+        "purl": "pkg:cargo/ring",
+        "tags": [
+            "Rust"
+        ]
+    },
+    {
+        "id": "library/spongy-castle",
+        "name": "Spongy Castle (Android)",
+        "description": "Spongy Castle is a repackaged version of Bouncy Castle cryptographic library specifically for Android. It provides a clean library that can be used in conjunction with canonical Bouncy Castle deployments",
+        "keywords": [
+            "org.spongycastle"
+        ],
+        "url": "https://rtyley.github.io/spongycastle/",
+        "category": "library",
+        "purl": "pkg:maven/com.madgag/spongycastle-core",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "library/chilkat",
+        "name": "Chilkat",
+        "description": "A comprehensive cross-platform software component library that provides implementations of various internet protocols, encryption, compression, and data manipulation algorithms",
+        "keywords": [
+            "Chilkat.",
+            "CkGlobal",
+            "CkCrypt2"
+        ],
+        "url": "https://www.chilkatsoft.com/",
+        "category": "library",
+        "purl": "pkg:generic/chilkat",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/ssl",
+        "name": "Secure Sockets Layer",
+        "description": "SSL (Secure Sockets Layer) is a cryptographic protocol designed to provide secure communications over computer networks",
+        "keywords": [
+            " SSL_",
+            " ssl_",
+            "::ssl::",
+            "::SSL::",
+            "::SSL->",
+            "SslConnector",
+            "SslAcceptor.accept",
+            "SslStream",
+            "crypto.constants.SSL_OP_NO_TLSv1",
+            "ssl.create_default_context",
+            "ssl.wrap_socket",
+            "SSLContext.load_cert_chain",
+            "SSLContext.load_verify_locations",
+            "SSLContext.wrap_socket",
+            "SSLStream.AuthenticateAsClient",
+            "SSLStream.AuthenticateAsServer",
+            "SSLContext#verify_mode=",
+            "SSLContext#add_certificate",
+            "javax.net.ssl",
+            "SSLSocket",
+            "SSLServerSocket",
+            "SSLv2",
+            "SSLv3",
+            "SecureTransport",
+            "SecureSocket",
+            "SSLHandshake",
+            "SSLEngine",
+            "SSLSession",
+            "SSLParameters"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/tls",
+        "name": "TLS",
+        "description": "TLS (Transport Layer Security) is a cryptographic protocol designed to provide secure communication over computer networks.",
+        "keywords": [
+            " TLS_",
+            " tls_",
+            "::ssl::Tls",
+            "TlsConnector",
+            "TlsStream",
+            "::TLS->new",
+            "tls.c",
+            "TLSContext.",
+            "TLSStream.",
+            "Handler.TlsProtocols",
+            "tls.Dial",
+            "tls.Listen",
+            "tls.LoadX509KeyPair",
+            "TLSSocket",
+            "TLSv1.1",
+            "TLSv1.2",
+            "TLSv1.3",
+            "tls.createServer",
+            "tls.connect",
+            "createTLSEngine",
+            "tls.TLSSocket",
+            "TLSCertificate",
+            "TLSHandshake",
+            "SecurityTLS",
+            "TLSProtocol",
+            "SecTrustEvaluate",
+            "TLSCipherSuite"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/https",
+        "name": "HTTPS",
+        "description": "HTTPS (Hypertext Transfer Protocol Secure) is a protocol for secure communication over a computer network",
+        "keywords": [
+            "https.request",
+            "https.get",
+            "HTTPSConnection.",
+            "https.createServer",
+            "https.Server",
+            "https.Agent",
+            "https.globalAgent",
+            "SSL::HTTPS",
+            "Net::HTTPS->new",
+            "Net::HTTPS->request",
+            "Net::HTTPS->connect",
+            "Net::HTTP::NBIO",
+            "Net::HTTP::HTTPSSocket",
+            "HttpClientHandler.",
+            "HttpClient.",
+            "XMLHttpRequest.",
+            "requests.Session",
+            "openssl::ssl::Https",
+            "urllib.request.urlopen",
+            "urllib3.PoolManager",
+            "urllib3.HTTPSConnection",
+            "HttpsURLConnection",
+            "createHttpsServer",
+            "https.request",
+            "axios.https",
+            "createHttpsConnection",
+            "CFHTTPSConnection",
+            "SecureHTTP",
+            "HttpsTransport",
+            "WinHttpSendRequest",
+            "INTERNET_SCHEME_HTTPS",
+            "URLSession",
+            "HttpsWebRequest",
+            "httpsClient",
+            "OkHttpClient"
+        ],
+        "category": "library",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/dtls",
+        "name": "DTLS",
+        "description": "N/A",
+        "keywords": [
+            "DTLS_",
+            "::ssl::Dtls",
+            "DtlsConnectorBuilder.build",
+            "DtlsConnector.",
+            "DtlsAcceptor.",
+            "DtlsStream",
+            "BIO_new_dgram",
+            "BIO_ctrl",
+            "BIO_dgram_",
+            "SSL_set_options",
+            "SSL_get_dtlsv1_timeout",
+            "::DTLS",
+            "net.dtls.",
+            "DTLSv1.0",
+            "DTLSv1.2",
+            "DTLSv1.3",
+            "DTLSContext",
+            "DTLSSocket",
+            "DTLSEngine",
+            "DTLSParameters",
+            "DTLSClientContext",
+            "DTLSServerContext",
+            "DTLS_method",
+            "DTLS_client_method",
+            "DTLS_server_method",
+            "DTLSSession",
+            "createDTLSEngine",
+            "dtls.connect",
+            "dtls.createServer",
+            "DTLSCipherSuite",
+            "DTLSHandshake",
+            "DTLSHandshakeState",
+            "DTLSConnection",
+            "DTLSTransport",
+            "DTLSProtocol",
+            "DTLSSRTPKeyingMaterial"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/quic",
+        "name": " ",
+        "description": "N/A",
+        "keywords": [
+            "quic.D",
+            "quic.Listen",
+            "quic.C",
+            "quic.S",
+            "quic.Handshake",
+            "quic.IdleTimeout",
+            "quic.MaxIdleTimeout",
+            "quic.T",
+            "quic.AddTransportParameter",
+            "quic.Enable",
+            "quic.AcceptStream",
+            "quic.AcceptSession",
+            "quic.Open",
+            "quic.Re",
+            "quic.Pa",
+            "quic.NewToken",
+            "quic.VerifyToken",
+            "quic.AckFrame",
+            "quic.ZeroRTT"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/zrtp",
+        "name": "ZRTP",
+        "description": "N/A",
+        "keywords": [
+            "ZRTP_"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "library/age-encryption",
+        "name": "Age Encryption",
+        "description": "A simple, modern, and secure file encryption tool and format.",
+        "keywords": [
+            "age.Encrypt",
+            "age.GenerateX25519Identity",
+            "age.Encrypt",
+            "age.Decrypt",
+            "age.Recipient",
+            "age.Identity",
+            "age.Scrypt",
+            "age.X25519Recipient",
+            "age.X25519Identity",
+            "age.RecipientFunc",
+            "age.NewScryptIdentity",
+            "age.NewScryptRecipient",
+            "age.NewX25519Identity",
+            "age.NewX25519IdentityFromSeed",
+            "age.ParseX25519Identity",
+            "age.ParseX25519Recipient",
+            "age.Stanza",
+            "age.StanzaFormatError",
+            "age.ArmorFlag",
+            "age.RecipientErrors",
+            "age.DecryptWithIdentities",
+            "age.EncryptWithArmor",
+            "age.EncryptedWriter"
+        ],
+        "url": "https://age-encryption.org/",
+        "category": "library",
+        "purl": "pkg:github/FiloSottile/age",
+        "tags": [
+            "Go",
+            "Rust"
+        ]
+    },
+    {
+        "id": "protocol/bitmessage",
+        "name": "Bitmessage ",
+        "description": "Bitmessage is a decentralized, peer-to-peer, encrypted messaging protocol that allows users to send and receive messages anonymously.",
+        "keywords": [
+            "require('bitmessage-js'",
+            "org.bitmessage.bmapi.",
+            "bmconnection.",
+            "bmpeer.",
+            "bmproto.",
+            "bmqueuepool.",
+            "bmreactor.",
+            "bmsettings.",
+            "BMPOWResult.",
+            "BMRawMessage."
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/ssh",
+        "name": "SSH ",
+        "description": "Secure shell",
+        "keywords": [
+            "paramiko.SSHClient.",
+            "paramiko.SSHException",
+            "crypto/ssh",
+            "ssh.NewC",
+            "ssh.ParsePrivateKey",
+            "ssh.PasswordCallback",
+            "ssh.PublicKeys",
+            "require('ssh",
+            "libssh/libssh.h",
+            "ssh_options_set",
+            "ssh_connect",
+            "com.jcraft.jsch.JSch",
+            "com.jcraft.jsch.Session",
+            "ssh2::Session",
+            "ssh-keygen",
+            "ssh_connect",
+            "sshSession",
+            "SshClient",
+            "ssh.connect",
+            "SshNet",
+            "SSHConnection",
+            "SSHChannel",
+            "SSHProtocol",
+            "SSHKnownHosts",
+            "ssh-rsa",
+            "ssh-dss",
+            "ssh-ed25519",
+            "SshStream",
+            "SshAuthenticationMethod"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "library/nettle",
+        "name": "Nettle",
+        "description": "A low-level cryptographic library that is designed to fit easily in more or less any context.",
+        "keywords": [
+            "nettle/",
+            "nettle_",
+            "include <nettle/",
+            
+                "nettle_aes_",
+                "nettle_arcfour_",
+                "nettle_arctwo_",
+                "nettle_arctwo128_",
+                "nettle_arctwo40_b",
+                "nettle_blowfish_",
+                "nettle_camellia",
+                "nettle_cast128_",
+                "nettle_chacha_",
+                "nettle_des_",
+                "nettle_des3_",
+                "nettle_salsa20_",
+                "nettle_salsa20r12_",
+                "nettle_serpent_",
+                "nettle_twofish_",
+                "nettle_md2_",
+                "nettle_md4_",
+                "nettle_md5_",
+                "nettle_ripemd160_",
+                "nettle_sha1_",
+                "nettle_sha224_",
+                "nettle_sha256_",
+                "nettle_sha384_",
+                "nettle_sha512_",
+                "nettle_sha3_",
+                "nettle_gosthas",
+                "nettle_cbc_",
+                "nettle_ctr_",
+                "nettle_eax_",
+                "nettle_ccm_",
+                "nettle_gcm_",
+                "nettle_curve",
+                "nettle_dsa_",
+                "nettle_rsa_",
+                "nettle_hmac_",
+                "nettle_umac32_",
+                "nettle_umac64_",
+                "nettle_umac96_",
+                "nettle_umac128_",
+                "nettle_yarrow",
+                "nettle_knuth_",
+                "nettle_pss_encode_mgf1",
+                "nettle_pss_verify_mgf1",
+                "nettle_pbkdf2_",
+                "nettle_ecdsa_",
+                "nettle_eddsa_sign",
+                "nettle_eddsa_verify",
+                "nettle_ed25519_sha512_public_key",
+                "nettle_ed25519_sha512_sign",
+                "nettle_ed25519_sha512_verify",
+                "nettle_base16_",
+                "nettle_base64_",
+                "nettle_base64url_",
+                "nettle_buffer_",
+                "nettle_armor_",
+                "nettle_get_secp_",
+                "nettle_hkdf_extract",
+                "nettle_hkdf_expand",
+                "nettle_sexp_"
+            
+        ],
+        "url": "https://www.lysator.liu.se/~nisse/nettle/",
+        "category": "library",
+        "purl": "pkg:github/gnutls/nettle",
+        "tags": [
+            "C"
+        ]
+    },
+    {
+        "id": "protocol/scp",
+        "name": "Secure Copy Protocol",
+        "description": "SCP (Secure Copy Protocol) is a protocol and command-line tool used to securely transfer files between computers over a network",
+        "keywords": [
+            "ssh.NewSCPClient",
+            "scp.Copy",
+            "scp.upload",
+            "scp.download",
+            "require('ssh2-scp-client')",
+            "Session::scp_send",
+            "Session::scp_recv",
+            "ssh2::ChannelType::Scp",
+            "ssh_scp_"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/sftp",
+        "name": "SFTP ",
+        "description": "SFTP (SSH File Transfer Protocol) is a secure network protocol that provides file transfer and manipulation functionality over a secure SSH connection",
+        "keywords": [
+            "paramiko.SFTPClient.",
+            "ssh.NewSFTPClient",
+            "sftp.",
+            "SftpException",
+            "SFTPStream",
+            "client.sftp",
+            "ssh_sftp_",
+            "phpseclib\\Net\\SFTP",
+            " SFTP::",
+            "SftpClient.",
+            "Net::SFTP::",
+            "$sftp->",
+            "sftp.put",
+            "sftp.get",
+            "sftp_open",
+            "sftp_close",
+            "sftp_write",
+            "sftp_read",
+            "libssh2_sftp",
+            "SFTPSession",
+            "SFTPChannel",
+            "SftpFileAttributes",
+            "SFTPStatusCode",
+            "sftpConnection",
+            "SFTPDirectoryEntry",
+            "SFTPFile"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/OAuth",
+        "name": "Open Authorization",
+        "description": "N/A",
+        "keywords": [
+            "OAuth2",
+            "OAuthClient",
+            "OAuthProvider",
+            "OAuthToken",
+            "oauth_signature",
+            "oauth_timestamp",
+            "oauth_nonce",
+            "oauth_consumer_key",
+            "oauth_token",
+            "OAuthCredential",
+            "OAuthWebSecurity",
+            "OAuthSession",
+            "OAuthAuthentication",
+            "OAuthAuthorization",
+            "OAuthClient",
+            "OAuthServer",
+            "OAuthProvider",
+            "OAuthFlow",
+            "OAuthBearer",
+            "OAuthResponse",
+            "OAuthRequest",
+            "OAuthMiddleware",
+            "OAuthSecurity",
+            "OAuthCallback",
+            "OAuthSigner",
+            "OAuthConsumer",
+            "OAuthRealm",
+            "OAuthAuthenticate",
+            "OAuthAuthorize",
+            "OAuthRefresh",
+            "OAuthVerify",
+            "OAuthServerProvider",
+            "OAuthClientProvider",
+            "OAuthAuthorizationServer",
+            "OAuthResourceServer"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/saml",
+        "name": "Security Assertion Markup Language",
+        "description": "N/A",
+        "keywords": [
+            "SAMLRequest",
+            "SAMLResponse",
+            "SAMLAssertion",
+            "SAML2.0",
+            "saml:Assertion",
+            "saml:AuthnRequest",
+            "saml:Response",
+            "saml:Attribute",
+            "SAMLToken",
+            "SAMLAuthRequest",
+            "SAMLResponseValidator",
+            "SAMLAuthnStatement",
+            "SAMLIdentityProvider",
+            "SAMLServiceProvider",
+            "SAMLAuthentication",
+            "saml:Issuer",
+            "saml:Subject",
+            "saml:Conditions",
+            "saml:AudienceRestriction"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/ldap",
+        "name": "O",
+        "description": "N/A",
+        "keywords": [
+            "LDAPS",
+            "ldaps://",
+            "LdapConnection",
+            "LdapSecurity",
+            "LdapContext",
+            "LdapSSL",
+            "ldap.ssl",
+            "LdapOverSSL",
+            "SecureLdap",
+            "SSLLdapContext",
+            "TLSLdapConnection",
+            "ldap.setSecurity",
+            "ldap.setSecurityCredentials",
+            "LdapTLS",
+            "ldap.simple",
+            "LdapAuthHandler",
+            "LdapSSLSocketFactory",
+            "LdapSecureSocketFactory"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/jwt",
+        "name": "JSON Web Token",
+        "description": "N/A",
+        "keywords": [
+            "JWTToken",
+            "JWTVerifier",
+            "JWTClaimsSet",
+            "jwt.sign",
+            "jwt.verify",
+            "jwt.decode",
+            "JwtSecurityToken",
+            "JwtEncode",
+            "JwtDecode",
+            "JwtBuilder",
+            "JwtConsumer",
+            "JwtHeader",
+            "JwtPayload",
+            "JWTSignature",
+            "JsonWebToken",
+            "JWTAuthentication",
+            "io.jsonwebtoken",
+            "com.auth0.jwt",
+            "JWTAlgorithm",
+            "JwsHeader",
+            "JweHeader",
+            "JwtHandler",
+            "JwtIssuer",
+            "JwtAudience",
+            "JwtExpiration"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/ipsec",
+        "name": "Internet Protocol Security",
+        "description": "N/A",
+        "keywords": [
+            "IPsecPolicy",
+            "IPsecSecurity",
+            "ipsec_add_sa",
+            "ipsec_process",
+            "IPsecTunnel",
+            "IPsecTransport",
+            "SecurityPolicy"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/kerberos",
+        "name": "Kerberos",
+        "description": "N/A",
+        "keywords": [
+            "KerberosClient",
+            "KerberosTicket",
+            "KerberosKey",
+            "KerberosCredential",
+            "KerberosPrincipal",
+            "KerberosToken",
+            "KerberosAuthentication"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/radius",
+        "name": "Remote Authentication Dial-In User Service",
+        "description": "N/A",
+        "keywords": [
+            "RadiusClient",
+            "RadiusServer",
+            "RadiusProtocol",
+            "RadiusPacket",
+            "RadiusAttribute",
+            "RadiusAuthenticator",
+            "RadiusPassword",
+            "RadiusSecret",
+            "RadiusNAS",
+            "RadiusSession",
+            "RadiusAuthentication",
+            "org.tinyradius",
+            "RADToken",
+            "RadiusChallenge",
+            "RadiusAuthorization"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/ntlm",
+        "name": "NT LAN Manager",
+        "description": "N/A",
+        "keywords": [
+            "NTLMAuthentication",
+            "NTLMv2",
+            "NTLMCredential",
+            "NTLMClient",
+            "NTLMChallenge",
+            "NTLMResponse",
+            "NTLMHash",
+            "ntlm_auth",
+            "NTLM_MESSAGE",
+            "NTLMSSP",
+            "NTLMContext",
+            "NEGOTIATE_NTLM",
+            "NEGOTIATE_OEM",
+            "NTLMSSP_NEGOTIATE",
+            "NTLMConnection",
+            "NTLM_SecurityHandle"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/oidconnect",
+        "name": "OpenID Connect",
+        "description": "N/A",
+        "keywords": [
+            "OpenIDConnect",
+            "OIDC",
+            "OIDCClient",
+            "OIDCProvider",
+            "OIDCToken",
+            "IDToken",
+            "OIDCClaims",
+            "OpenIDConfiguration",
+            "OIDCSession",
+            "OIDCAuthentication",
+            "OIDCAuthorization",
+            "OIDCRequestObject",
+            "OIDCResponseType",
+            "OAuthFlow",
+            "OIDCScope",
+            "OIDCSubject",
+            "OpenIdConnectAuthenticationOptions"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "library/gpgme",
+        "name": "GPGME",
+        "description": "GnuPG Made Easy - A library that allows cryptography operations through GnuPG.",
+        "keywords": [
+            "gpgme_",
+            "#include <gpgme.h>",
+            "from gpg import",
+            "gpgme_check_version",
+            "gpgme_new",
+            "gpgme_release",
+            "gpgme_set_",
+            "gpgme_get_",
+            "gpgme_ctx_get_engine_info",
+            "gpgme_ctx_set_engine_info",
+            "gpgme_op_",
+            "gpgme_key_",
+            "gpgme_data_",
+            "gpgme_signers_",
+            "gpgme_wait",
+            "gpgme_cancel",
+            "GPGME_PROTOCOL_",
+            "GPGME_SIG_",
+            "GPGME_PK_",
+            "GPGME_KEYLIST_",
+            "GPGME_VALIDITY_",
+            "GPGME_ENCRYPT_",
+            "GPGME_EXPORT_",
+            "gpgme_error_t",
+            "gpgme_ctx_t",
+            "gpgme_decrypt_",
+            "gpgme_passphrase_"
+        ],
+        "url": "https://gnupg.org/software/gpgme/",
+        "category": "library",
+        "purl": "pkg:github/gpg/gpgme",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/pgp-gpg",
+        "name": "Pretty Good Privacy/GNU Privacy Guard",
+        "description": "N/A",
+        "keywords": [
+            "OpenPGP",
+            "PGPEncryption",
+            "PGPSignature",
+            "PGPKey",
+            "PGPKeyRing",
+            "PGPPrivateKey",
+            "PGPPublicKey",
+            "GnuPG",
+            "GPGEncrypt",
+            "GPGDecrypt",
+            "GPGSign",
+            "GPGVerify",
+            "PGPEncryptionStream",
+            "PGPSecretKey",
+            "PGPKeyID",
+            "PGPKeyPair",
+            "PGPCompressedData",
+            "PGPLiteralData",
+            "PGPOnePassSignature",
+            "PGPEncryptedData",
+            "org.bouncycastle.openpgp"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/smime",
+        "name": "Secure/Multipurpose Internet Mail Extensions",
+        "description": "N/A",
+        "keywords": [
+            "S/MIME",
+            "SMIMEEncryption",
+            "SMIMESignature",
+            "SMIMECertificate",
+            "SMIMEMessage",
+            "MimeEncrypted",
+            "MimeSigned",
+            "SMIMEProcessor",
+            "SMIMECompressed",
+            "application/pkcs7-mime",
+            "smime-type=",
+            "SMIMEUtil",
+            "SMIMEToolkit",
+            "MimeBodyPart"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/srtp",
+        "name": "Secure Real-time Transport Protocol",
+        "description": "N/A",
+        "keywords": [
+            "SRTPCrypto",
+            "SRTPSuite",
+            "SRTPProfile",
+            "SRTPPolicy",
+            "SRTPProtection",
+            "SRTPTransform",
+            "SRTPCryptoContext",
+            "SRTPSession",
+            "SRTPConnection",
+            "createSrtpSession",
+            "SRTP_AES128_CM_SHA1_80",
+            "SRTP_AES128_CM_SHA1_32",
+            "srtp_protect",
+            "srtp_unprotect",
+            "srtp_create",
+            "SRTPTransport",
+            "DTLS-SRTP"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/gdoi",
+        "name": "Group Domain of Interpretation",
+        "description": "N/A",
+        "keywords": [
+            "GDOIGroupKey",
+            "GDOIKeyServer",
+            "GDOIMember",
+            "GDOIProtocol",
+            "GDOIPolicy",
+            "GDOIGroupID",
+            "GDOIKeyPush",
+            "GDOIRekey",
+            "GDOISecurityAssociation",
+            "GROUPKEY-PULL",
+            "GROUPKEY-PUSH",
+            "GDOIGroupSecretKey",
+            "GDOICryptoProfile",
+            "GDOIRegistration",
+            "GDOIAuthentication",
+            "IKEv2-GDOI",
+            "GDOIKeyEncryption",
+            "GDOITrafficEncryption"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/httpss",
+        "name": "HTTP Strict Transport Security",
+        "description": "N/A",
+        "keywords": [
+            "Strict-Transport-Security",
+            "HSTSPolicy",
+            "HSTSHeader",
+            "HSTSPreload",
+            "enforceHTTPS",
+            "forceHTTPS",
+            "HSTSConfiguration",
+            "enableHSTS",
+            "addHSTSHeader",
+            "setHSTS",
+            "configureHSTS"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/jose",
+        "name": "JavaScript Object Signing and Encryption",
+        "description": "N/A",
+        "keywords": [
+            "JOSEHeader",
+            "JOSEObject",
+            "JWEEncrypter",
+            "JWEDecrypter",
+            "JWSVerifier",
+            "JWSSigner",
+            "JWKSet",
+            "JWKSource",
+            "JWKSelector",
+            "jose4j",
+            "nimbus-jose-jwt",
+            "JWKThumbprint"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/dkim",
+        "name": "DomainKeys Identified Mail",
+        "description": "N/A",
+        "keywords": [
+            "DKIMSigner",
+            "DKIMVerifier",
+            "DKIMSignature",
+            "DKIMKey",
+            "DKIM-Signature",
+            "DKIMSelector",
+            "DKIMPrivateKey",
+            "DKIMPublicKey",
+            "DKIMHeader",
+            "DKIMBody",
+            "DKIMSignatureField",
+            "DKIMSigningDomain"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/spf",
+        "name": "Sender Policy Framework",
+        "description": "N/A",
+        "keywords": [
+            "SPFRecord",
+            "SPFValidator",
+            "SPFCheck",
+            "SPFResult",
+            "SPFMechanism",
+            "SPFModifier",
+            "SPFPass",
+            "SPFFail",
+            "SPFSoftFail",
+            "SPFNeutral",
+            "SPFPermError",
+            "SPFTempError",
+            "SPFNone",
+            "checkSPF",
+            "validateSPF",
+            "processSPF",
+            "SPFPolicy"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/dmarc",
+        "name": "Domain-based Message Authentication, Reporting & Conformance",
+        "description": "N/A",
+        "keywords": [
+            "DMARCRecord",
+            "DMARCValidator",
+            "DMARCPolicy",
+            "DMARCResult",
+            "DMARCReport",
+            "DMARCAggregate",
+            "DMARCForensic",
+            "DMARCReporter",
+            "DMARCFeedback",
+            "checkDMARC",
+            "validateDMARC",
+            "processDMARC",
+            "DMARCAlignment",
+            "DMARCIdentifier",
+            "DMARCConfiguration"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/fido",
+        "name": "Fast Identity Online",
+        "description": "N/A",
+        "keywords": [
+            "FIDOAuthenticator",
+            "FIDOCredential",
+            "FIDOAssertion",
+            "FIDOAttestation",
+            "FIDOChallenge",
+            "FIDOResponse"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/scep",
+        "name": "Simple Certificate Enrollment Protocol",
+        "description": "N/A",
+        "keywords": [
+            "SCEPClient",
+            "SCEPServer",
+            "SCEPMessage",
+            "SCEPRequest",
+            "SCEPResponse",
+            "SCEPCertificate",
+            "SCEPChallenge",
+            "SCEPEnrollment",
+            "SCEPEnrollmentRequest",
+            "SCEPEnrollmentResponse"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/pptp",
+        "name": "Point-to-Point Tunneling Protocol",
+        "description": "N/A",
+        "keywords": [
+            "PPTPClient",
+            "PPTPServer",
+            "PPTPTunnel",
+            "PPTPConnection",
+            "PPTPPacket",
+            "PPTPControlConnection",
+            "PPTPDataConnection",
+            "PPTPCallID",
+            "PPTPSessionID",
+            "PPTPAuthentication",
+            "PPTPEncryption",
+            "PPTPCompression",
+            "createPPTPTunnel",
+            "connectPPTP",
+            "PPTPHeader",
+            "PPTPPayload"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/mtls",
+        "name": "Mutual TLS",
+        "description": "N/A",
+        "keywords": [
+            "mTLS",
+            "mutual TLS",
+            "mutualTLS",
+            "TLSClientAuth",
+            "ClientCertificateRequired",
+            "SSLVerifyClient",
+            "requireClientCert",
+            "HTTPS_CLIENT_AUTH",
+            "NeedsClientAuth",
+            "WantsClientAuth",
+            "clientCertificateAuthenticationEnabled"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/totp",
+        "name": "Time-based One-Time Password",
+        "description": "N/A",
+        "keywords": [
+            "TOTP",
+            "TimeBasedOneTimePassword",
+            "OTPAuth",
+            "generateTOTP",
+            "verifyTOTP",
+            "TOTPGenerator",
+            "TOTPValidator",
+            "TOTPSecret",
+            "TOTPAuthenticator",
+            "TOTPWindow",
+            "TOTPAlgorithm",
+            "TOTPCodeGenerator",
+            "TOTPVerifier",
+            "generateOTP",
+            "verifyOTP",
+            "TOTPProvider",
+            "TOTPService",
+            "OtpAuthenticator",
+            "otplib"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/pkce",
+        "name": "Proof Key for Code Exchange",
+        "description": "N/A",
+        "keywords": [
+            "code_challenge_method",
+            "PKCEUtil",
+            "PKCEGenerator",
+            "PKCEVerifier",
+            "createCodeChallenge",
+            "createCodeVerifier",
+            "OAuthPKCE",
+            "PKCESupport",
+            "PKCEParams",
+            "PKCEValidation",
+            "ProofKeyForCodeExchange",
+            "AuthorizationCodePKCE",
+            "OAuthPKCEFlow",
+            "PKCEAuthorizationFlow"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/paseto",
+        "name": "Platform-Agnostic Security Tokens",
+        "description": "N/A",
+        "keywords": [
+            "PasetoToken",
+            "PasetoBuilder",
+            "PasetoParser",
+            "PasetoV1",
+            "PasetoV2",
+            "PasetoV3",
+            "PasetoV4",
+            "PasetoPublicKey",
+            "PasetoPrivateKey",
+            "PasetoClaims",
+            "PasetoPayload",
+            "PasetoHeader",
+            "PasetoFooter",
+            "PasetoEncrypt",
+            "PasetoDecrypt",
+            "PasetoSign",
+            "PasetoVerify",
+            "PasetoService",
+            "PasetoBuilder"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/hawk",
+        "name": "Hawk Authentication",
+        "description": "N/A",
+        "keywords": [
+            "HawkClient",
+            "HawkServer",
+            "HawkCredentials",
+            "HawkHeader",
+            "HawkAuthentication",
+            "HawkOptions",
+            "HawkAuthHeader",
+            "HawkResponse",
+            "generateHawkHeader",
+            "validateHawkHeader",
+            "HawkAuthenticator",
+            "hawk.client.header",
+            "hawk.server.authenticate",
+            "HawkAuthScheme",
+            "createHawkHeader",
+            "HawkAuthPlugin"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/sqrl",
+        "name": "Secure Quick Reliable Login",
+        "description": "N/A",
+        "keywords": [
+            "SQRLClient",
+            "SQRLServer",
+            "SQRLIdentity",
+            "SQRLAuthentication",
+            "SQRLSignature",
+            "SQRLKey",
+            "SQRLTransaction",
+            "SQRLRequest",
+            "SQRLResponse",
+            "SQRLIdentifier",
+            "SQRLPrivateKey",
+            "SQRLPublicKey",
+            "SQRLCode",
+            "SQRLQRCode",
+            "SQRLProvider",
+            "SQRLAuthenticator",
+            "SQRLValidator",
+            "createSQRL",
+            "validateSQRL"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/hotp",
+        "name": "HMAC-based One-Time Password",
+        "description": "N/A",
+        "keywords": [
+            "HMACBasedOneTimePassword",
+            "generateHOTP",
+            "verifyHOTP",
+            "HOTPGenerator",
+            "HOTPValidator",
+            "HOTPSecret",
+            "HOTPCounter",
+            "HOTPDigits",
+            "HOTPWindow",
+            "HOTPAlgorithm",
+            "HOTP-SHA1",
+            "HOTP-SHA256",
+            "HOTPAuthenticator",
+            "counterBasedOTP",
+            "validateHOTP",
+            "generateHOTPCode",
+            "HOTPService",
+            "HOTPProvider",
+            "HOTPVerification",
+            "HOTPAuthentication",
+            "HOTPToken",
+            "OTPCounterBased"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/ocsp",
+        "name": "Online Certificate Status Protocol",
+        "description": "N/A",
+        "keywords": [
+            "OCSPStatus",
+            "OCSPClient",
+            "CertificateStatus",
+            "OCSPRevocationStatus",
+            "OCSPStapling",
+            "OCSPNonce",
+            "OCSPCertID",
+            "OCSPBasicResponse",
+            "getOCSPStatus",
+            "checkOCSPRevocation",
+            "OCSPValidator",
+            "OCSPVerifier",
+            "OCSPChecker",
+            "OCSPResponseStatus",
+            "OCSPUtil",
+            "OCSPReq",
+            "OCSPResp",
+            "OCSPCertStatus",
+            "X509ExtendedKeyManager"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/scram",
+        "name": "Salted Challenge Response Authentication Mechanism",
+        "description": "N/A",
+        "keywords": [
+            "SCRAM-SHA-1",
+            "SCRAM-SHA-256",
+            "SCRAMCredentials",
+            "SCRAMClient",
+            "SCRAMServer",
+            "SCRAMAuthentication",
+            "SCRAMSaslClient",
+            "SCRAMSaslServer",
+            "SCRAMClientMessage",
+            "SCRAMServerMessage",
+            "SCRAMAuthMessage",
+            "SCRAMChallenge",
+            "SCRAMResponse",
+            "SCRAMAttributes"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/xacml",
+        "name": "eXtensible Access Control Markup Language",
+        "description": "N/A",
+        "keywords": [
+            "XACMLPolicy",
+            "XACMLRequest",
+            "XACMLResponse",
+            "XACMLPolicySet",
+            "XACMLRule",
+            "XACMLAttribute",
+            "XACMLSubject",
+            "XACMLResource",
+            "XACMLAction",
+            "XACMLEnvironment",
+            "XACMLTarget",
+            "XACMLEffect",
+            "XACMLObligation",
+            "XACMLAdvice",
+            "XACMLPolicyDecisionPoint",
+            "XACMLPolicyEnforcementPoint",
+            "XACMLPolicyInformationPoint",
+            "XACMLPolicyAdministrationPoint",
+            "XACMLContext",
+            "XACMLEvaluate",
+            "XACMLDecision"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/cms",
+        "name": "Cryptographic Message Syntax",
+        "description": "N/A",
+        "keywords": [
+            "CMSEnvelopedData",
+            "CMSSignedData",
+            "CMSAuthenticatedData",
+            "CMSEncryptedData",
+            "CMSCompressedData",
+            "CMSSigner",
+            "CMSRecipient",
+            "CMSSignature",
+            "CMSEncryption",
+            "CMSDecryption",
+            "CMSVerifier",
+            "CMSContentInfo",
+            "CMSDigestedData"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/sts",
+        "name": "Secure Token Service",
+        "description": "N/A",
+        "keywords": [
+            "SecureTokenService",
+            "TokenService",
+            "SecurityTokenService",
+            "STSClient",
+            "STSService",
+            "WSTrustClient",
+            "WSTrustService",
+            "STSConfiguration"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/caa",
+        "name": "Certificate Authority Authorization",
+        "description": "N/A",
+        "keywords": [
+            "CAARecord",
+            "DNSCAARecord",
+            "CAACheck",
+            "CAAValidator",
+            "CAAVerifier",
+            "CAAIssuer",
+            "CAAFlag",
+            "CAATag",
+            "CAAConstraint",
+            "CAAValidate",
+            "CAACompliance",
+            "CAAPropertyValue",
+            "CAAIssuerDomain",
+            "CAACritical",
+            "CAAPermittedCAs"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/xfo",
+        "name": "X-Frame-Options",
+        "description": "N/A",
+        "keywords": [
+            "X-Frame-Options",
+            "XFrameOptionsHeader",
+            "XFOHeader",
+            "XFOPolicy",
+            "XFOSetting",
+            "XFOValue",
+            "XFOMode",
+            "addXFO"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/rpki",
+        "name": "Resource Public Key Infrastructure",
+        "description": "N/A",
+        "keywords": [
+            "RPKICertificate",
+            "RPKIRepository",
+            "RPKIValidator",
+            "RPKICache",
+            "RPKIObject",
+            "RouteOriginAuthorization",
+            "RPKIManifest",
+            "RPKICertificateRepository",
+            "RPKITrustAnchor",
+            "RPKIPublication",
+            "RPKIClient",
+            "RPKIValidation",
+            "RPKIVerification",
+            "RPKIPrefix",
+            "RPKIASNumber",
+            "RPKIResourceCertificate",
+            "RPKISignature",
+            "RPKIBGPSecValidation",
+            "RPKIOriginValidation",
+            "ROAPrefix"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/sshfp",
+        "name": "SSH Fingerprint",
+        "description": "N/A",
+        "keywords": [
+            "SSHFingerprint",
+            "SSHFPRecord",
+            "SSHFPValidator",
+            "SSHFPVerifier",
+            "SSHFPCheck",
+            "SSHFPAlgorithm",
+            "SSHFPType",
+            "SSHFPFingerprint",
+            "SSHFPHash",
+            "SSHFPLookup",
+            "verifySSHFP",
+            "validateSSHFP",
+            "generateSSHFP",
+            "createSSHFP",
+            "SSHFPDNSRecord",
+            "SSHKeyFingerprint",
+            "SSHPublicKeyHash"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "protocol/csr",
+        "name": "Certificate Signing Request",
+        "description": "N/A",
+        "keywords": [
+            "CertificateSigningRequest",
+            "X509CertificateRequest",
+            "CSRAttributes",
+            "CSRSubject",
+            "CSRExtensions",
+            "CSRValidator",
+            "CSRVerifier",
+            "CSRGenerator",
+            "CSRParser",
+            "CSREncoder",
+            "CSRDecoder",
+            "CSRChallengePassword",
+            "CSRKeyUsage",
+            "CSRExtendedKeyUsage",
+            "CSRSubjectAlternativeName",
+            "CSRSignature"
+        ],
+        "category": "protocol",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "framework/vault",
+        "name": "HashiCorp Vault",
+        "description": "A tool for secrets management, encryption as a service, and privileged access management.",
+        "keywords": [
+            "VaultClient",
+            "vault_client",
+            "spring-vault",
+            "spring-cloud-vault",
+            "vault-java-driver",
+            "VaultTemplate",
+            "VaultTokenProvider",
+            "VaultOperations",
+            "VaultAutoConfiguration",
+            "@VaultPropertySource",
+            "from hvac import Client",
+            "VaultException",
+            "VaultToken"
+        ],
+        "url": "https://www.vaultproject.io/",
+        "category": "library",
+        "purl": "pkg:github/hashicorp/vault",
+        "tags": [
+            "Java"
+        ]
+    },
+    {
+        "id": "framework/azure-keyvault",
+        "name": "Azure Key Vault",
+        "description": "N/A",
+        "keywords": [
+            "Azure.Security.KeyVault",
+            "Microsoft.Azure.KeyVault",
+            "KeyVault.Certificates",
+            "Azure.Identity",
+            "DefaultAzureCredentialBuilder"
+        ],
+        "category": "framework",
+        "tags": [
+            "Java",
+            "Python",
+            "JavaScript",
+            ".NET",
+            "Go"
+        ]
+    },
+    {
+        "id": "framework/cloudkms",
+        "name": "Google Cloud KMS",
+        "description": "N/A",
+        "keywords": [
+            "CloudKMS",
+            "from google.cloud import kms",
+            "com.google.cloud.kms",
+            "google-cloud-kms",
+            "google.cloud.kms.v1",
+            "com.google.cloud.kms.v1",
+            "google.cloud.kms_v1"
+        ],
+        "category": "framework",
+        "tags": [
+            "Java",
+            "Python",
+            "Go",
+            "Node.js"
+        ]
+    },
+    {
+        "id": "framework/passport",
+        "name": "Passport.js",
+        "description": "N/A",
+        "keywords": [
+            "passport-local",
+            "passport-oauth",
+            "passport-oauth2",
+            "passport-jwt",
+            "passport-saml",
+            "passport-google-oauth",
+            "passport-facebook",
+            "passport-twitter",
+            "passport-github",
+            "passport-azure-ad",
+            "passport-auth0",
+            "passport.authenticate",
+            "passport.use",
+            "passport.initialize",
+            "passport.session"
+        ],
+        "category": "framework",
+        "tags": [
+            "JavaScript",
+            "Node.js"
+        ]
+    },
+    {
+        "id": "framework/keycloak",
+        "name": "Keycloak",
+        "description": "N/A",
+        "keywords": [
+            "KeycloakAdapter",
+            "KeycloakBuilder",
+            "KeycloakSecurityContext",
+            "Keycloak.init",
+            "Keycloak.login",
+            "Keycloak.logout",
+            "Keycloak.register",
+            "Keycloak.accountManagement",
+            "Keycloak.createLoginUrl",
+            "Keycloak.createLogoutUrl",
+            "keycloak-js",
+            "keycloak-connect",
+            "keycloak-admin-client",
+            "spring-boot-starter-keycloak",
+            "keycloak-adapter-core",
+            "keycloak-spring-boot-starter",
+            "keycloak-spring-security-adapter",
+            "KeycloakAuthenticationToken",
+            "KeycloakConfigResolver",
+            "KeycloakSpringBootConfigResolver",
+            "KeycloakSecurityConfig",
+            "KeycloakWebSecurityConfigurerAdapter"
+        ],
+        "category": "framework",
+        "tags": [
+            "Java",
+            "JavaScript",
+            "Node.js",
+            "Python"
+        ]
+    },
+    {
+        "id": "framework/shiro",
+        "name": "Apache Shiro",
+        "description": "N/A",
+        "keywords": [
+            "org.apache.shiro",
+            "ShiroFilterFactoryBean",
+            "ShiroAnnotationProcessorAutoConfiguration",
+            "ShiroDialect"
+        ],
+        "category": "framework",
+        "tags": [
+            "Java"
+        ]
+    },
+    {
+        "id": "framework/guardian",
+        "name": "Guardian (Elixir)",
+        "description": "N/A",
+        "keywords": [
+            "Guardian.Plug",
+            "Guardian.Token",
+            "Guardian.Token.Jwt",
+            "Guardian.DB",
+            "use Guardian",
+            "Guardian.Plug.sign_in",
+            "Guardian.Plug.sign_out",
+            "Guardian.Plug.current_resource",
+            "Guardian.Plug.current_token",
+            "Guardian.Plug.authenticated?",
+            "Guardian.Plug.EnsureAuthenticated",
+            "Guardian.Plug.VerifyHeader",
+            "Guardian.Plug.VerifySession",
+            "Guardian.Plug.VerifyCookie",
+            "guardian_default_token",
+            "guardian.secret_key",
+            "Guardian.Controller",
+            "Guardian.ErrorHandler",
+            "Guardian.Permissions",
+            "subject_for_token"
+        ],
+        "category": "framework",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "framework/devise",
+        "name": "Devise",
+        "description": "N/A",
+        "keywords": [
+            "devise/sessions",
+            "devise/registrations",
+            "devise/passwords",
+            "devise/confirmations",
+            "devise/unlocks",
+            "devise/omniauth_callbacks",
+            "Devise::Mailer",
+            "Devise::PasswordsController",
+            "Devise::SessionsController",
+            "Devise::OmniauthCallbacksController",
+            "Devise.setup",
+            "devise :database_authenticatable",
+            "devise :registerable",
+            "devise :recoverable",
+            "devise :rememberable",
+            "devise :trackable",
+            "devise :validatable",
+            "devise :confirmable",
+            "devise :lockable",
+            "devise :timeoutable",
+            "devise :omniauthable",
+            "Devise.secret_key"
+        ],
+        "category": "framework",
+        "tags": [
+            "Ruby"
+        ]
+    },
+    {
+        "id": "framework/cancancan",
+        "name": "CanCanCan",
+        "description": "N/A",
+        "keywords": [
+            "CanCanCan",
+            "cancancan",
+            "CanCan::AccessDenied",
+            "CanCan::ModelAdditions",
+            "CanCan::Ability",
+            "ability.can(:action",
+            "ability.cannot(:action",
+            "rescue_from CanCan::AccessDenied"
+        ],
+        "category": "framework",
+        "tags": [
+            "Ruby"
+        ]
+    },
+    {
+        "id": "framework/pundit",
+        "name": "Pundit",
+        "description": "N/A",
+        "keywords": [
+            "include Pundit",
+            "Pundit.authorize",
+            "Pundit::NotAuthorizedError",
+            "rescue_from Pundit::NotAuthorizedError",
+            "pundit_user",
+            "PunditHelper",
+            "authorize @post"
+        ],
+        "category": "framework",
+        "tags": [
+            "Ruby"
+        ]
+    },
+    {
+        "id": "framework/casbin",
+        "name": "Casbin",
+        "description": "N/A",
+        "keywords": [
+            "CasbinRule",
+            "CasbinMiddleware",
+            "casbin.Enforcer",
+            "casbinx",
+            "casbin-spring-boot-starter",
+            "jCasbin",
+            "Node-Casbin",
+            "PyCasbin",
+            "PHP-Casbin",
+            "Casbin.NET",
+            "Casbin-RS",
+            "Casbin-CPP",
+            "casbin.enforce"
+        ],
+        "category": "framework",
+        "tags": [
+            "Go",
+            "Java",
+            "Node.js",
+            "Python",
+            "PHP",
+            ".NET",
+            "Rust",
+            "C++"
+        ]
+    },
+    {
+        "id": "framework/owasp-esapi",
+        "name": "OWASP ESAPI",
+        "description": "N/A",
+        "keywords": [
+            "org.owasp.esapi",
+            "ESAPI.encoder",
+            "ESAPI.validator",
+            "ESAPI.authenticator",
+            "ESAPI.accessController",
+            "ESAPI.httpUtilities",
+            "ESAPI.encryptor",
+            "ESAPI.randomizer",
+            "ESAPI.securityConfiguration"
+        ],
+        "category": "framework",
+        "tags": [
+            "Java",
+            "PHP",
+            ".NET",
+            "Python",
+            "JavaScript"
+        ]
+    },
+    {
+        "id": "framework/zap",
+        "name": "OWASP ZAP API",
+        "description": "N/A",
+        "keywords": [
+            "org.zaproxy",
+            "zapv2",
+            "ZAPv2",
+            "python-owasp-zap-v2.4",
+            "node-zap-api",
+            "zap-api-java",
+            "zap-api-dotnet",
+            "zap.urlopen",
+            "zap.spider",
+            "zap.ascan",
+            "zap.ajax",
+            "core.alerts",
+            "zap.context",
+            "zap.core",
+            "zap.attack",
+            "zap.auth",
+            "OWASPZAPClient",
+            "ZAProxy",
+            "ZapScan",
+            "zap-baseline.py",
+            "zap-api-scan.py"
+        ],
+        "category": "framework",
+        "tags": [
+            "Python",
+            "Java",
+            "Node.js",
+            ".NET"
+        ]
+    },
+    {
+        "id": "framework/owasp-dependency",
+        "name": "OWASP Dependency Check",
+        "description": "N/A",
+        "keywords": [
+            "org.owasp.dependencycheck",
+            "DependencyCheckSensor",
+            "org.owasp:dependency-check-core",
+            "org.owasp:dependency-check-maven",
+            "org.owasp:dependency-check-gradle",
+            "org.owasp:dependency-check-ant",
+            "org.owasp:dependency-check-cli"
+        ],
+        "category": "framework",
+        "tags": [
+            "Java"
+        ]
+    },
+    {
+        "id": "framework/pwntools",
+        "name": "Pwntools",
+        "description": "N/A",
+        "keywords": [
+            "pwntools",
+            "from pwn import *",
+            "pwnlib",
+            "pwnlib.tubes",
+            "pwnlib.util",
+            "pwnlib.gdb",
+            "pwnlib.elf",
+            "pwnlib.rop",
+            "pwnlib.shellcraft",
+            "pwnlib.adb",
+            "pwnlib.fmtstr"
+        ],
+        "category": "framework",
+        "tags": [
+            "Python"
+        ]
+    },
+    {
+        "id": "framework/apparmor",
+        "name": "AppArmor",
+        "description": "N/A",
+        "keywords": [
+            "apparmor",
+            "libapparmor",
+            "pam_apparmor",
+            "/etc/apparmor.d/"
+        ],
+        "category": "framework",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "framework/nessus",
+        "name": "Nessus",
+        "description": "N/A",
+        "keywords": [
+            "NessusClient",
+            "nessusd",
+            "nessuscli",
+            "nessus-xmlrpc",
+            "python-nessus",
+            "NessusClientData_v2",
+            "NessusPlugin"
+        ],
+        "category": "framework",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "framework/splunk",
+        "name": "Splunk Security",
+        "description": "N/A",
+        "keywords": [
+            "SplunkEnterpriseSecurity",
+            "SplunkPhantom",
+            "SplunkSIEM",
+            "SplunkSOAR",
+            "SplunkUBA",
+            "SplunkMisc",
+            "SplunkForwarder",
+            "SplunkHEC",
+            "SplunkSDK",
+            "SplunkAPI",
+            "SplunkClient",
+            "SplunkService",
+            "SplunkCorrelationSearch",
+            "SplunkNotable",
+            "SplunkRisk",
+            "SplunkThreat",
+            "SplunkActions",
+            "SplunkAdaptiveResponse",
+            "SplunkStreamingAlert",
+            "SplunkParsers",
+            "SplunkConnections",
+            "SplunkCollectors",
+            "SplunkSecurity",
+            "Splunk.Client",
+            "SplunkSDK",
+            "splunk-sdk-python",
+            "splunklib"
+        ],
+        "category": "framework",
+        "tags": [
+            "Python"
+        ]
+    },
+    {
+        "id": "framework/sumologic",
+        "name": "Sumo Logic",
+        "description": "N/A",
+        "keywords": [
+            "SumoLogicAPI",
+            "SumoSDK",
+            "SumoLogicClient",
+            "SumoLogicConnector",
+            "SumoLogicIntegration",
+            "SumoLogicSecurity",
+            "SumoLogicCloudSecurity"
+        ],
+        "category": "framework",
+        "tags": [
+            "Generic",
+            "Log Management",
+            "SIEM",
+            "Security Analytics"
+        ]
+    },
+    {
+        "id": "framework/azure-sentinel",
+        "name": "Azure Sentinel",
+        "description": "N/A",
+        "keywords": [
+            "AzureSentinel",
+            "MicrosoftSentinel",
+            "SentinelAPI",
+            "SentinelSDK",
+            "SentinelPlaybook",
+            "SentinelWorkbook",
+            "SentinelAnalytics",
+            "SentinelHunting",
+            "SentinelSOAR",
+            "SentinelSIEM",
+            "SentinelKQL",
+            "SentinelRules",
+            "SentinelAlerts",
+            "SentinelIncidents",
+            "SentinelConnector",
+            "SentinelDataConnector",
+            "LogicApp",
+            "MSSentinel",
+            "SentinelThreatIntelligence"
+        ],
+        "category": "framework",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "framework/aws-security",
+        "name": "AWS Security",
+        "description": "N/A",
+        "keywords": [
+            "AWSSecurityHub",
+            "AWSFirewall",
+            "AWSShield",
+            "AWSWAFv2",
+            "AWSKMS",
+            "AWSSecretsManager",
+            "AWSIAMAccessAnalyzer",
+            "AWSCertificateManager",
+            "AWSDirectoryService",
+            "AWSSSLCertificates",
+            "AWSKeyPair",
+            "AWSSecurityProfile",
+            "AWSSecurityGroup",
+            "AWSNetworkACL",
+            "AWSSSMSession",
+            "AWSPrivateCA",
+            "AWSNetworkFirewall"
+        ],
+        "category": "framework",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "framework/azure-security-center",
+        "name": "Azure Security Center",
+        "description": "N/A",
+        "keywords": [
+            "AzureSecurityCenter",
+            "AzureSecurity",
+            "AzureDefenderForCloud",
+            "AzureSecurityAlerts",
+            "AzureSecurityRecommendations",
+            "AzureSecurityScore",
+            "AzureSecurityConfiguration",
+            "AzurePolicy",
+            "AzureRBAC",
+            "AzureMFA",
+            "AzureConditionalAccess",
+            "AzureIdentityProtection",
+            "AzureADIdentitySecure",
+            "AzureSecurityClient",
+            "AzureSecuritySDK",
+            "SecureScoreControl"
+        ],
+        "category": "framework",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "framework/opensaml",
+        "name": "OpenSAML",
+        "description": "N/A",
+        "keywords": [
+            "OpenSAML",
+            "SAMLProfiles",
+            "SAMLBinding",
+            "SAMLConformance",
+            "SAMLConfiguration",
+            "SAMLAuthentication",
+            "SAMLCredential",
+            "SAMLObjectBuilder",
+            "SAMLObjectProvider",
+            "SAMLObjectMarshaller",
+            "SAMLObjectUnmarshaller",
+            "SAMLMetadataProvider",
+            "SAMLSignatureValidator",
+            "EncryptedAssertion",
+            "EncryptedAttribute",
+            "EncryptedID",
+            "SignableSAMLObject",
+            "SAMLDataProvider",
+            "SAMLBackchannel",
+            "SAMLPostEncoder",
+            "SAMLRedirectEncoder",
+            "SAMLArtifactEncoder",
+            "BasicSAMLMessageContext",
+            "SAML2ActionSupport",
+            "SAML2HTTPPostSimpleSignBindingDecoder",
+            "SAML2HTTPRedirectDeflateSignatureSecurityHandler",
+            "BasicSAMLMetadataCredentialResolver",
+            "SAML2HTTPPostEncoder",
+            "SAML2HTTPRedirectDeflateSigner"
+        ],
+        "category": "framework",
+        "tags": [
+            "Java"
+        ]
+    },
+    {
+        "id": "framework/rust-crypto",
+        "name": "Rust Crypto",
+        "description": "N/A",
+        "keywords": [
+            "RustCrypto",
+            "RustCryptography",
+            "rust-crypto",
+            "rust-openssl",
+            "sodiumoxide",
+            "rusty-secrets",
+            "rustls"
+        ],
+        "category": "framework",
+        "tags": [
+            "Rust"
+        ]
+    },
+    {
+        "id": "framework/signal-protocol",
+        "name": "Signal Protocol",
+        "description": "A cryptographic protocol used for end-to-end encrypted messaging, developed by Signal.",
+        "keywords": [
+            "libsignal-protocol-javascript",
+            "libsignal-protocol-c",
+            "libsignal-protocol-swift",
+            "signal-protocol-java"
+        ],
+        "url": "https://github.com/signalapp/libsignal-protocol-c",
+        "category": "library",
+        "purl": "pkg:github/signalapp/libsignal-protocol-c",
+        "tags": [
+            "Java",
+            "JavaScript",
+            "C++",
+            "Swift"
+        ]
+    },
+    {
+        "id": "framework/owasp-csrfguard",
+        "name": "OWASP CSRFGuard",
+        "description": "N/A",
+        "keywords": [
+            "CSRFGuard",
+            "OWASP-CSRFGuard",
+            "CSRFProtection",
+            "CSRFToken",
+            "CSRFFilter",
+            "JavaEE-CSRF",
+            "JavaCSRF",
+            "CSRFInterceptor",
+            "CSRFValidator",
+            "CSRFPreventionFilter",
+            "CSRFGuardFilter",
+            "CSRFServletFilter",
+            "CSRFHttpSessionListener",
+            "Owasp.CsrfGuard",
+            "CSRFGuardServletContextListener",
+            "CSRFGuardLogger",
+            "CSRFGuardTokenRepository",
+            "CSRFGuardTokenManager",
+            "CSRFGuardStaticFiles",
+            "CSRFJavaScript"
+        ],
+        "category": "framework",
+        "tags": [
+            "Generic",
+            "Web Security",
+            "CSRF Protection",
+            "Java"
+        ]
+    },
+    {
+        "id": "framework/ory-hydra",
+        "name": "Ory Hydra",
+        "description": "N/A",
+        "keywords": [
+            "OryHydra",
+            "OryKratos",
+            "OryOathkeeper",
+            "OryKeto",
+            "HydraAdmin",
+            "HydraPublic",
+            "OryAuthorization",
+            "OryIdentity",
+            "OryAccessControl"
+        ],
+        "category": "framework",
+        "tags": [
+            "Generic"
+        ]
+    },
+    {
+        "id": "framework/owasp-wstg",
+        "name": "OWASP Web Security Testing Guide",
+        "description": "N/A",
+        "keywords": [
+            "OWASP-WSTG",
+            "WebSecurityTestingGuide",
+            "OWASP-Testing-Guide",
+            "API-OWASP",
+            "WSTG-INFO",
+            "WSTG-CONF",
+            "WSTG-ATHN",
+            "WSTG-ATHZ",
+            "WSTG-SESS",
+            "WSTG-INPV",
+            "WSTG-ERRH",
+            "WSTG-CRYP",
+            "WSTG-BUSL",
+            "WSTG-CLNT",
+            "WSTG-APIT"
+        ],
+        "category": "framework",
+        "tags": [
+            "Generic"
+        ]
+    }
+]

@@ -16,6 +16,8 @@ export interface ILocalCryptographyModel {
 export class LocalCryptographyModel extends Model {
   private connection: sqlite3.Database;
 
+  private tableName = 'local_cryptography';
+
   public constructor(conn: sqlite3.Database) {
     super();
     this.connection = conn;
@@ -94,7 +96,7 @@ export class LocalCryptographyModel extends Model {
    * @example { algorithm: 10, library: 2 }
    */
   public async getDetectedTypeSummary(): Promise<Record<string, number>> {
-    const query = queries.SQL_GET_DETECTED_CRYPTO_TYPE_SUMMARY.replaceAll('#TABLE', 'local_cryptography');
+    const query = queries.SQL_GET_DETECTED_CRYPTO_TYPE_SUMMARY.replaceAll('#TABLE', this.tableName);
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
     const response = await call(query);
     return response.reduce((result: Record<string, number>, item:{ type:string, count: number }) => {
@@ -124,7 +126,7 @@ export class LocalCryptographyModel extends Model {
    * @example { md5: 10, openssl: 2 }
    */
   public async getDetectedCryptoSummary(): Promise<Record<string, number>> {
-    const query = queries.SQL_GET_DETECTED_CRYPTO_SUMMARY.replaceAll('#TABLE', 'local_cryptography');
+    const query = queries.SQL_GET_DETECTED_CRYPTO_SUMMARY.replaceAll('#TABLE', this.tableName);
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
     const response = await call(query);
     return response.reduce((result: Record<string, number>, item:{ crypto:string, count: number }) => {
