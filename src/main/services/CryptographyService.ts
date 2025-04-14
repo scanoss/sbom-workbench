@@ -18,8 +18,9 @@ class CryptographyService {
   }
 
   private adaptToCryptographyTask(components: NewComponentDTO[]): Array<string> {
-    const response = components
-      .flatMap((component: NewComponentDTO) => component.versions.map((v) => `${component.purl}@${v.version}`));
+    const response = components.flatMap((component: NewComponentDTO) =>
+      component.versions.map((v) => `${component.purl}@${v.version}`)
+    );
 
     return response;
   }
@@ -38,10 +39,7 @@ class CryptographyService {
       const componentVersion = await modelProvider.model.component.getAll(null);
       const dependencyComponents = await modelProvider.model.dependency.getAll(null);
 
-      const components = componentHelper.groupComponentByPurlVersion(
-        componentVersion,
-        dependencyComponents,
-      );
+      const components = componentHelper.groupComponentByPurlVersion(componentVersion, dependencyComponents);
 
       const cryptographyTask = new AddCryptographyTask();
       await cryptographyTask.run({ components, token: p.getApiKey(), force: true });
@@ -58,10 +56,7 @@ class CryptographyService {
   }
 
   public async getAll(type: SourceType): Promise<CryptographyResponseDTO> {
-    const response = type === SourceType.detected
-      ? await this.getDetected()
-      : await this.getIdentified();
-    return response;
+    return type === SourceType.detected ? this.getDetected() : this.getIdentified();
   }
 
   private async getDetected(): Promise<CryptographyResponseDTO> {
@@ -71,11 +66,11 @@ class CryptographyService {
       const files = await modelProvider.model.localCryptography.findAllDetectedGroupByType();
 
       // Crypto type summary for identified files(local) and components: i.e { algorithm: 2, library:1 }
-      const fileTypeSummary = await modelProvider.model.localCryptography.getDetectedTypeSummary();
+      const localTypeSummary = await modelProvider.model.localCryptography.getDetectedTypeSummary();
       const componentTypeSummary = await modelProvider.model.cryptography.getDetectedTypeSummary();
 
       // Crypto summary for identified files(local) and components: i.e { md5: 2, openssl:1 }
-      const fileCryptoSummary = await modelProvider.model.localCryptography.getDetectedCryptoSummary();
+      const localCryptoSummary = await modelProvider.model.localCryptography.getDetectedCryptoSummary();
       const componentCryptoSummary = await modelProvider.model.cryptography.getDetectedCryptoSummary();
 
       return {
@@ -83,8 +78,8 @@ class CryptographyService {
         components,
         summary: {
           files: {
-            type: fileTypeSummary,
-            crypto: fileCryptoSummary, // TODO: Review the name
+            type: localTypeSummary,
+            crypto: localCryptoSummary, // TODO: Review the name
           },
           components: {
             type: componentTypeSummary,
