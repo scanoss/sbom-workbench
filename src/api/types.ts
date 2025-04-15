@@ -1,11 +1,11 @@
+import { IReportData, ISummary, ReportComponent } from 'main/services/ReportService';
 import { NodeStatus } from '../main/workspace/tree/Node';
 import { Scanner } from '../main/task/scanner/types';
 import ScannerConfig = Scanner.ScannerConfig;
 import Folder from '../main/workspace/tree/Folder';
 import { Metadata } from '../main/workspace/Metadata';
-import { CryptographicItem, Cryptography } from '../main/model/entity/Cryptography';
-import { LocalCryptography } from '../main/model/entity/LocalCryptography';
-import { IReportData, ISummary, ReportComponent } from 'main/services/ReportService';
+import { CryptographicItem } from '../main/model/entity/Cryptography';
+
 
 
 export enum ScanState {

@@ -37,7 +37,7 @@ export class Export implements ITask<string, IExportResult> {
           this.format = new Csv(exportDTO.source);
         }
         if (exportDTO.inventoryType === InventoryType.CRYPTOGRAPHY) {
-          this.format = new Crypto(exportDTO.source);
+          this.format = new Crypto(exportDTO.source, new ExportRepositorySqliteImp());
         }
         break;
       case ExportFormat.RAW:

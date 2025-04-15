@@ -395,35 +395,33 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     SELECT * FROM hint_results;`;
 
   SQL_GET_CRYPTOGRAPHY_IDENTIFIED_GROUPED_BY_TYPE = `
-    WITH
-    extracted_algorithms AS (
-      SELECT json_extract(value, '$.algorithm') as algorithm, c.purl, c.version
-      FROM cryptography c, json_each(c.algorithms)
-      INNER JOIN component_versions cv ON c.purl = cv.purl AND c.version = cv.purl
-      INNER JOIN inventories i ON cv.id =  i.cvid
-      WHERE json_valid(c.algorithms)
-    ),
-    algorithm_results AS (
-      SELECT purl || '@' || version AS name, 'algorithms' as type, json_group_array(algorithm) as value
-      FROM extracted_algorithms
-      WHERE algorithm IS NOT NULL
-      GROUP BY name
-    ),
-    extracted_hints AS (
-      SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as hintId, c.purl, c.version
+    WITH hints_types AS (
+      SELECT json_extract(value, '$.category') as type
       FROM cryptography c, json_each(c.hints)
-      INNER JOIN component_versions cv ON c.purl = cv.purl AND c.version = cv.purl
-      INNER JOIN inventories i ON cv.id =  i.cvid
+      INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
       WHERE json_valid(c.hints)
+      AND cv.id IN (SELECT cvid FROM inventories)
     ),
-    hint_results AS (
-      SELECT purl || '@' || version AS name, type, json_group_array(hintId) as value
-      FROM extracted_hints
-      GROUP BY name,type
+    hints_count AS (
+      SELECT type, COUNT(*) count
+      FROM hints_types
+      GROUP BY type
+    ),
+    algorithms_types AS (
+      SELECT 'algorithm' as type
+      FROM cryptography c, json_each(c.algorithms)
+      INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
+      WHERE json_valid(c.algorithms)
+      AND cv.id IN (SELECT cvid FROM inventories)
+    ),
+    algorithms_count AS (
+      SELECT type, COUNT(*) count
+      FROM algorithms_types
+      GROUP BY type
     )
-    SELECT * FROM algorithm_results
+    SELECT type, count FROM algorithms_count
     UNION
-    SELECT * FROM hint_results;`;
+    SELECT type, count FROM hints_count;`;
 
   SQL_GET_CRYPTOGRAPHY_IDENTIFIED_TYPE_SUMMARY = `
     WITH hints_types AS (
@@ -457,27 +455,27 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   SQL_GET_CRYPTOGRAPHY_IDENTIFIED_CRYPTO_SUMMARY = `
   WITH crypto_hints AS (
     SELECT json_extract(value, '$.id') as crypto
-  FROM  cryptography c, json_each(c.hints)
-  INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
-  INNER JOIN inventories i ON cv.id = i.cvid
-  WHERE json_valid(c.hints)
+    FROM  cryptography c, json_each(c.hints)
+    INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
+    WHERE json_valid(c.hints)
+    AND cv.id IN (SELECT cvid FROM inventories)
   ),
-  hints_count AS (
+ hints_count AS (
     SELECT crypto, COUNT(*) count
-  FROM crypto_hints
-  GROUP BY crypto
+    FROM crypto_hints
+    GROUP BY crypto
   ),
-  crypto_algorithms AS (
+ crypto_algorithms AS (
     SELECT json_extract(value, '$.algorithm') as crypto
-  FROM cryptography c, json_each(c.algorithms)
-  INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
-  INNER JOIN inventories i ON cv.id = i.cvid
-  WHERE json_valid(c.algorithms)
+    FROM cryptography c, json_each(c.algorithms)
+    INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
+    WHERE json_valid(c.algorithms)
+    AND cv.id IN (SELECT cvid FROM inventories)
   ),
-  algorithms_count AS (
+ algorithms_count AS (
     SELECT crypto, COUNT(*) count
-  FROM crypto_algorithms
-  GROUP BY crypto
+    FROM crypto_algorithms
+    GROUP BY crypto
   )
   SELECT crypto, count FROM algorithms_count
   UNION
