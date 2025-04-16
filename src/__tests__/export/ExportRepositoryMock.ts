@@ -124,24 +124,24 @@ export class ExportRepositoryMock implements ExportRepository {
         {
           name: '/external/src/winnowing.c',
           type: 'algorithm',
-          value: ['md5', 'crc32'],
+          values: ['md5', 'crc32'],
         },
         {
           name: '/external/src/winnowing.c',
           type: 'library',
-          value: ['library/openssl', 'library/webcrypto'],
+          values: ['library/openssl', 'library/webcrypto'],
         },
       ],
       componentCryptography: [
         {
           name: 'pkg:github/scanoss/engine@4.0.4',
           type: 'algorithm',
-          value: ['md5'],
+          values: ['md5'],
         },
         {
           name: 'pkg:github/scanoss/engine@4.0.4',
           type: 'library',
-          value: ['library/openssl'],
+          values: ['library/openssl'],
         },
       ],
     });
@@ -153,12 +153,12 @@ export class ExportRepositoryMock implements ExportRepository {
         {
           name: '/external/src/winnowing.c',
           type: 'algorithm',
-          value: ['md5', 'crc32'],
+          values: ['md5', 'crc32'],
         },
         {
           name: '/external/src/winnowing.c',
           type: 'library',
-          value: ['library/openssl', 'library/webcrypto'],
+          values: ['library/openssl', 'library/webcrypto'],
         },
       ],
       componentCryptography: [],

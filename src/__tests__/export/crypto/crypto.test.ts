@@ -1,7 +1,7 @@
 import { Crypto } from '../../../main/modules/export/format/Crypto';
 import { ExportSource, ExportStatusCode } from '../../../api/types';
 import { ExportRepositoryMock } from '../ExportRepositoryMock';
-import { validate } from 'webpack';
+
 
 jest.mock('electron', () => ({
   app: {

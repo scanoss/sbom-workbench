@@ -85,7 +85,7 @@ export class CryptographyModel extends Model {
     const results = await call(query);
     return results.map((item: any) => ({
       ...item,
-      value: JSON.parse(item.value),
+      values: JSON.parse(item.values),
     }));
   }
 
@@ -95,7 +95,7 @@ export class CryptographyModel extends Model {
     const results = await call(query);
     return results.map((item: any) => ({
       ...item,
-      value: JSON.parse(item.value),
+      values: JSON.parse(item.values),
     }));
   }
 
