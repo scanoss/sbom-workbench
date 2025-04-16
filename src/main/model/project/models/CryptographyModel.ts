@@ -65,20 +65,32 @@ export class CryptographyModel extends Model {
     await call(query);
   }
 
-  public async identifiedAlgorithmsCount(): Promise<number> {
-    const query = queries.SQL_GET_CRYPTOGRAPHY_ALGORITHMS_IDENTIFIED_COUNT;
+  /**
+   * Returns the total count of detected cryptographic elements.
+   * @returns {number} The total count of all detected cryptographic types (algorithms, libraries, protocol, etc.).
+   */
+  public async detectedTypeCount(): Promise<number> {
+    const query = queries.SQL_GET_CRYPTO_DETECTED_TYPE_COUNT.replaceAll('#TABLE', this.tableName);
     const call = await util.promisify(this.connection.get.bind(this.connection)) as any;
     const response = await call(query);
-    return response.algorithms_count;
+    return response.count;
   }
 
-  public async detectedAlgorithmsCount(): Promise<number> {
-    const query = queries.SQL_GET_CRYPTOGRAPHY_ALGORITHM_DETECTED_COUNT;
+  /**
+   * Returns the total count of identified cryptographic elements.
+   * @returns {number} The total count of all identified cryptographic types (algorithms, libraries, protocol, etc.).
+   */
+  public async identifiedTypeCount(): Promise<number> {
+    const query = queries.SQL_GET_CRYPTOGRAPHY_IDENTIFIED_TYPE_COUNT;
     const call = await util.promisify(this.connection.get.bind(this.connection)) as any;
     const response = await call(query);
-    return response.algorithms_count;
+    return response.count;
   }
 
+  /**
+   * Returns all detected cryptographic elements grouped by type and PURL.
+   * @returns {CryptographicItem} Returns array of detected CryptographicItem.
+   */
   public async findAllDetectedGroupByType(): Promise<Array<CryptographicItem>> {
     const query = queries.SQL_GET_CRYPTOGRAPHY_DETECTED_GROUPED_BY_TYPE;
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
@@ -89,6 +101,11 @@ export class CryptographyModel extends Model {
     }));
   }
 
+  /**
+   * Returns all identified cryptographic elements grouped by type and PURL.
+   * @returns {CryptographicItem} Returns array of identified CryptographicItem.
+   * @example [{ name:'pkg:github/scanoss@0.15.0', type:'algorithm', values:['md5', crc32] }]
+   */
   public async findAllIdentifiedGroupByType(): Promise<Array<CryptographicItem>> {
     const query = queries.SQL_GET_CRYPTOGRAPHY_IDENTIFIED_GROUPED_BY_TYPE;
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
@@ -102,7 +119,7 @@ export class CryptographyModel extends Model {
   /**
    * @brief Returns a summary of detected cryptography types as a record.
    * @returns {Record<string, number>} An object where keys are cryptography types and values are their counts.
-   * @example { algorithm: 10, library: 2 }
+   * @example [{ name:'pkg:github/scanoss@0.15.0', type:'algorithm', values:['md5', crc32] }]
    */
   public async getDetectedTypeSummary(): Promise<Record<string, number>> {
     const query = queries.SQL_GET_DETECTED_CRYPTO_TYPE_SUMMARY.replaceAll('#TABLE', this.tableName);

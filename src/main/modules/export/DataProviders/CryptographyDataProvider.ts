@@ -24,9 +24,7 @@ export class CryptographyDataProvider extends BaseDataProvider implements DataPr
       fileCryptography = await modelProvider.model.localCryptography.findAllIdentifiedGroupByType();
     }
 
-    const localCrypto = await modelProvider.model.localCryptography.findAll();
-
-    if (localCrypto.length <= 0 && componentCryptography.length <= 0) return <IDataLayers> { cryptography: null };
+    if (fileCryptography.length <= 0 && componentCryptography.length <= 0) return <IDataLayers> { cryptography: null };
 
     return <IDataLayers> {
       cryptography: {

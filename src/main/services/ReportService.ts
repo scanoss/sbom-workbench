@@ -124,11 +124,9 @@ class ReportService {
     };
 
     // Crypto
-    const localAlgorithms = await modelProvider.model.localCryptography.getAllAlgorithms();
-    // TODO: Refactor on cryptography structure to support cryptography hints
     const cryptographies = {
-      sbom: await modelProvider.model.cryptography.identifiedAlgorithmsCount(),
-      local: localAlgorithms.length, // TODO: Add query to get identified local algorithms count
+      sbom: await modelProvider.model.cryptography.identifiedTypeCount(),
+      local: await modelProvider.model.localCryptography.identifiedTypeCount(),
     };
 
     // Dependencies
@@ -180,10 +178,9 @@ class ReportService {
     const dependenciesSummary = await modelProvider.model.dependency.getDetectedSummary();
 
     // Crypto
-    const localAlgorithms = await modelProvider.model.localCryptography.getAllAlgorithms();
     const cryptographies = {
-      sbom: await modelProvider.model.cryptography.detectedAlgorithmsCount(),
-      local: localAlgorithms.length, // TODO: Add query to get detected local algorithms count
+      sbom: await modelProvider.model.cryptography.detectedTypeCount(),
+      local: await modelProvider.model.localCryptography.detectedTypeCount(),
     };
 
     return {
