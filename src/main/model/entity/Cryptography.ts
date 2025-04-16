@@ -13,8 +13,8 @@ export interface Hint {
   name: string;
   description: string;
   category: string;
-  url: string;
-  purl: string;
+  url?: string;
+  purl?: string;
 }
 
 export interface Algorithms {
@@ -25,5 +25,5 @@ export interface Algorithms {
 export interface CryptographicItem {
   name: string; // filePath | pkg@version
   type: string; // algorithm | library
-  value: Array<string>;
+  values: Array<string>;
 }

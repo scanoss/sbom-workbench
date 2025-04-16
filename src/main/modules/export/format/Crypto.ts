@@ -22,14 +22,14 @@ export class Crypto extends Format {
 
     // Local Crypto
     localCrypto.forEach((c) => {
-      c.value.forEach((value) => {
+      c.values.forEach((value) => {
         const row = `${c.name},${c.type},${value}\r\n`;
         csv += row;
       });
     });
 
     componentCrypto.forEach((c) => {
-      c.value.forEach((value) => {
+      c.values.forEach((value) => {
         const row = `${c.name},${c.type},${value}\r\n`;
         csv += row;
       });

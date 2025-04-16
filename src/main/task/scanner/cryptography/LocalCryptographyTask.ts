@@ -119,7 +119,7 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       dbFiles.forEach((f) => { dbFileMapper.set(path.join(this.project.getScanRoot(), f.path), f.id); });
 
       // Scan local cryptography
-      const localCryptography = await cryptoScanner.scan(filePaths);
+      const localCryptography = await cryptoScanner.scanFiles(filePaths);
       // Import local cryptography
       await this.importLocalCrypto(localCryptography, dbFileMapper);
       return true;
