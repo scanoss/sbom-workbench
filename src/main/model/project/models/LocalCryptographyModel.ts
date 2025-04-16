@@ -45,31 +45,39 @@ export class LocalCryptographyModel extends Model {
     });
   }
 
-  public async findAll() : Promise<Array<LocalCryptography>> {
-    const query = queries.SQL_GET_LOCAL_CRYPTOGRAPHY_ALL;
-    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
-    const response: Array<ILocalCryptographyModel> = await call(query);
-    const crypto = this.cryptographyAdapter(response);
-    return crypto;
-  }
-
   public async deleteAll() {
     const query = queries.SQL_DELETE_LOCAL_CRYPTOGRAPHY_ALL;
     const call = await util.promisify(this.connection.run.bind(this.connection));
     await call(query);
   }
 
-  public async getAllAlgorithms() {
-    const query = queries.SQL_GET_LOCAL_CRYPTOGRAPHY_ALGORITHMS_ALL;
-    const call = await util.promisify(this.connection.get.bind(this.connection));
-    const response = await call(query) as any;
-    if (!response) return [];
-    const allAlgorithms = JSON.parse(response.algorithms);
-    if (!allAlgorithms) return [];
-    const algorithms = allAlgorithms.map((a) => a.algorithm);
-    return Array.from(new Set(algorithms).values());
+  /**
+   * Returns the total count of detected cryptographic elements.
+   * @returns {number} The total count of all detected cryptographic types (algorithms, libraries, protocol, etc.).
+   */
+  public async detectedTypeCount(): Promise<number> {
+    const query = queries.SQL_GET_CRYPTO_DETECTED_TYPE_COUNT.replaceAll('#TABLE', this.tableName);
+    const call = await util.promisify(this.connection.get.bind(this.connection)) as any;
+    const response = await call(query);
+    return response.count;
   }
 
+  /**
+   * Returns the total count of identified cryptographic elements.
+   * @returns {number} The total count of all identified cryptographic types (algorithms, libraries, protocol, etc.).
+   */
+  public async identifiedTypeCount(): Promise<number> {
+    const query = queries.SQL_GET_LOCAL_CRYPTOGRAPHY_IDENTIFIED_TYPE_COUNT;
+    const call = await util.promisify(this.connection.get.bind(this.connection)) as any;
+    const response = await call(query);
+    return response.count;
+  }
+
+  /**
+   * Returns all detected cryptographic elements grouped by type and file path.
+   * @returns {CryptographicItem} Returns array of detected CryptographicItem.
+   * @example [{ name:'/main.c', type:'algorithm', values:['md5', crc32] }]
+   */
   public async findAllDetectedGroupByType(): Promise<Array<CryptographicItem>> {
     const query = queries.SQL_GET_LOCAL_CRYPTOGRAPHY_ALL_GROUPED_BY_TYPE;
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
@@ -80,6 +88,11 @@ export class LocalCryptographyModel extends Model {
     }));
   }
 
+  /**
+   * Returns all identified cryptographic elements grouped by type and file path.
+   * @returns {CryptographicItem} Returns array of identified CryptographicItem.
+   * @example [{ name:'/main.c', type:'algorithm', values:['md5', crc32] }]
+   */
   public async findAllIdentifiedGroupByType(): Promise<Array<CryptographicItem>> {
     const query = queries.SQL_GET_LOCAL_CRYPTOGRAPHY_ALL_IDENTIFIED_GROUPED_BY_TYPE;
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
@@ -148,9 +161,5 @@ export class LocalCryptographyModel extends Model {
       result[item.crypto] = item.count;
       return result;
     }, {});
-  }
-
-  private cryptographyAdapter(crypto: Array <ILocalCryptographyModel>): Array<LocalCryptography> {
-    return crypto.map((c) => { return { file: c.path, algorithms: JSON.parse(c.algorithms) }; });
   }
 }

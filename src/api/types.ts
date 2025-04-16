@@ -414,7 +414,7 @@ export interface CryptographyResponseDTO {
       crypto: Record<string, number>;
     },
     components:{
-      type: Record<string,number>;
+      type: Record<string, number>;
       crypto: Record<string, number>;
     }
   },
