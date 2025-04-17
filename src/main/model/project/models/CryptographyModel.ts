@@ -170,8 +170,8 @@ export class CryptographyModel extends Model {
     const query = queries.SQL_GET_CRYPTOGRAPHY_IDENTIFIED_CRYPTO_SUMMARY;
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
     const response = await call(query);
-    return response.reduce((result: Record<string, number>, item:{ type:string, count: number }) => {
-      result[item.type] = item.count;
+    return response.reduce((result: Record<string, number>, item:{ crypto:string, count: number }) => {
+      result[item.crypto] = item.count;
       return result;
     }, {});
   }

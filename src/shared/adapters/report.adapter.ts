@@ -1,30 +1,25 @@
 import { CryptographyResponseDTO } from '@api/types';
 import { CryptoReportData } from './types';
 
-export const adaptCryptographyGetAll = (data: CryptographyResponseDTO): CryptoReportData => {
-  const groupedComponents = new Map<string, any>();
-  data.components.forEach((component) => {
-    if (!groupedComponents.has(component.purl)) {
-      groupedComponents.set(component.purl, {
-        purl: component.purl,
-        versions: [],
-        algorithms: [],
-      });
-    }
-    const groupComponent = groupedComponents.get(component.purl);
-    groupComponent.versions.push(component.version);
-    groupComponent.algorithms = [...new Map([...groupComponent.algorithms, ...component.algorithms].map((item) => [item.algorithm, item])).values()];
-  });
-
-  return {
-    files: data.files,
-    components: [...groupedComponents.values()],
-  };
-};
-
 export const getAlgorithms = (data: CryptographyResponseDTO): Array<string> => {
-  const algorithmsFiles = data.files.map((file) => file.algorithms.map((algorithm) => algorithm.algorithm)).flat();
-  const algorithmsComponents = data.components.map((component) => component.algorithms.map((algorithm) => algorithm.algorithm)).flat();
-  const algorithms: Array<string> = [...algorithmsFiles, ...algorithmsComponents];
-  return [...new Set(algorithms)].sort((a, b) => a.localeCompare(b));
+  const algorithms = new Set<string>();
+  for (const c of Object.keys(data.summary.components.crypto)) {
+    algorithms.add(c);
+  }
+  for (const c of Object.keys(data.summary.files.crypto)) {
+    algorithms.add(c);
+  }
+  return Array.from(algorithms.values());
 };
+
+export const getTypes = (data: CryptographyResponseDTO): Array<string> => {
+  const types = new Set<string>();
+  for (const t of Object.keys(data.summary.components.type)) {
+    types.add(t);
+  }
+  for (const t of Object.keys(data.summary.files.type)) {
+    types.add(t);
+  }
+  return Array.from(types.values());
+};
+
