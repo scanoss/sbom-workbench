@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { SourceType } from '@api/dto';
 import useSearchParams from '@hooks/useSearchParams';
 import { useNavigate } from 'react-router-dom';
-import { getAlgorithms, getTypes } from '@shared/adapters/report.adapter';
+import { filterCryptoByAlgorithms, getAlgorithms, getTypes } from '@shared/adapters/report.adapter';
 
 // icons
 import SearchIcon from '@mui/icons-material/Search';
@@ -75,16 +75,19 @@ const CryptographyReport = () => {
   // filter items
   useEffect(() => {
     const getFilteredItems = (cryptography: Array<CryptographicItem>) => {
-      if (filter && filter?.algorithm?.length <= 0 && filter?.types.length <= 0) return cryptography;
+      if (filter && filter?.algorithm?.length <= 0 && filter?.types?.length <= 0) return cryptography;
 
       // Filter by type and algorithm
       if (filter?.types?.length > 0 && filter?.algorithm?.length > 0) {
-        return cryptography.filter((c) => {
-          return c.values.some((i) => filter?.algorithm?.includes(i)) && filter?.types.includes(c.type);
+        const c =  cryptography.filter((c) => {
+          return c.values.some((i) => filter?.types.includes(c.type))
         });
+        return filterCryptoByAlgorithms(c, filter.algorithm);
       }
       // Filter by algorithm
-      if (filter?.algorithm?.length > 0) return cryptography.filter((c) => c.values.some((i) => filter?.algorithm?.includes(i)));
+      if (filter?.algorithm?.length > 0) {
+        return filterCryptoByAlgorithms(cryptography, filter.algorithm);
+      }
 
       // Filter by type
       if (filter?.types?.length > 0) return cryptography.filter((c) => filter?.types.includes(c.type));
