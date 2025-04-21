@@ -20,7 +20,7 @@ api.handle(IpcChannels.CRYPTOGRAPHY_GET_ALL, async (event, { type }: Cryptograph
     const data = await cryptographyService.getAll(type);
     return Response.ok({ message: 'Cryptography retrieved successfully', data });
   } catch (error: any) {
-    log.error('[Cryptography get all]: ', error);
+    log.error('[Cryptography Get All]: ', error);
     return Response.fail({ message: error.message });
   }
 });
