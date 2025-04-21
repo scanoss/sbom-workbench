@@ -15,7 +15,9 @@
     "Copyleft": "Copyleft",
     "IncompatibleLicenses": "不兼容的许可证",
     "PURL": "PURL",
-    "URL": "URL"
+    "URL": "URL",
+    "Algorithm": "Algorithm",
+    "Type": "Type"
   },
   "Version": "版本",
   "License": "许可证"

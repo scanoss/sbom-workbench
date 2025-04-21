@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import {
-  Autocomplete,
+  Autocomplete, Box,
   Checkbox,
   Chip,
   IconButton,
@@ -15,7 +15,7 @@ import {
   TableHead,
   TableRow,
   Tabs,
-  TextField,
+  TextField
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
@@ -30,6 +30,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { cryptographyService } from '@api/services/cryptography.service';
 import { CryptographyResponseDTO } from '@api/types';
 import { CryptographicItem } from '../../../../../../../main/model/entity/Cryptography';
+import { CryptoAlgorithmsPieChart, CryptoChart, TypeDistributionChart } from './components/CryptoChart';
 
 // interfaces & types
 interface ICryptographyFilter {
@@ -121,6 +122,9 @@ const CryptographyReport = () => {
         <h1 className="header-title">
           {type === SourceType.detected ? t('Title:DetectedCryptography') : t('Title:IdentifiedCryptography')}
         </h1>
+        <Box>
+          <CryptoChart data={tab === 'local' ? filteredItems?.summary?.files : filteredItems?.summary?.components}></CryptoChart>
+        </Box>
         <section className="subheader">
           <nav className="tabs-navigator">
             <Tabs value={tab} onChange={(e, value) => setTab(value)}>
@@ -221,15 +225,20 @@ const CryptographyReport = () => {
         </section>
       </header>
 
-      <main className="app-content">
         {tab === 'local' && (
-          <TableContainer className="local-cryptography-table selectable" component={Paper}>
+          <TableContainer
+            style={{
+              minHeight: '300px',  // Set your desired height here
+              overflow: 'auto',
+              marginBottom: '50px',
+            }}
+            component={Paper}>
             <Table stickyHeader aria-label="cryptography table" size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>{t('Table:Header:File')}</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell>{t('Table:Header:Algorithms')}</TableCell>
+                  <TableCell>{t('Table:Header:Type')}</TableCell>
+                  <TableCell>{t('Table:Header:Algorithm')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -251,7 +260,7 @@ const CryptographyReport = () => {
 
                 {(!filteredItems || filteredItems.files.length === 0) && (
                   <TableRow>
-                    <TableCell colSpan={2} align="center" className="pt-4 pb-4">
+                    <TableCell colSpan={3} align="center" className="pt-4 pb-4">
                       {!filteredItems ? t('Loading') : t('NoDataFound')}
                     </TableCell>
                   </TableRow>
@@ -262,13 +271,19 @@ const CryptographyReport = () => {
         )}
 
         {tab === 'component' && (
-          <TableContainer className="component-cryptography-table selectable" component={Paper}>
+          <TableContainer
+            style={{
+              minHeight: '300px',  // Set your desired height here
+              overflow: 'auto',
+              marginBottom: '50px',
+            }}
+            component={Paper}>
             <Table stickyHeader aria-label="cryptography table" size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>{t('Table:Header:Component')}</TableCell>
                   <TableCell>Type</TableCell>
-                  <TableCell>{t('Table:Header:Algorithms')}</TableCell>
+                  <TableCell>{t('Table:Header:Algorithm')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -295,7 +310,6 @@ const CryptographyReport = () => {
             </Table>
           </TableContainer>
         )}
-      </main>
     </section>
   );
 };

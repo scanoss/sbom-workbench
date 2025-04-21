@@ -1,5 +1,6 @@
 #CryptographyReportPage {
   display: grid;
+  overflow-y: scroll;
 
   .app-header {
     padding-bottom: 10px;
@@ -8,12 +9,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-  }
-
-  .app-content {
-    .local-cryptography-table, .component-cryptography-table {
-      max-height: 100%;
     }
   }
 

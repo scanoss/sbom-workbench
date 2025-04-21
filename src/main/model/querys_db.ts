@@ -573,6 +573,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     WITH hints_types AS (
     SELECT json_extract(value, '$.category') as type
     FROM local_cryptography lc, json_each(lc.hints)
+    INNER JOIN file_inventories fi ON fi.fileId = lc.file_id
     WHERE json_valid(lc.hints)
     ),
     hints_count AS (
@@ -583,11 +584,13 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     algorithms_types AS (
     SELECT 'algorithm' as type
     FROM local_cryptography lc, json_each(lc.algorithms)
+    INNER JOIN file_inventories fi ON fi.fileId = lc.file_id
     WHERE json_valid(lc.algorithms)
     ),
     algorithms_count AS (
     SELECT type, COUNT(*) count
     FROM algorithms_types
+    HAVING count > 0
     )
     SELECT type, count FROM algorithms_count
     UNION
