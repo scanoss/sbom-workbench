@@ -121,8 +121,8 @@ const CryptographyReport = () => {
         <section className="subheader">
           <nav className="tabs-navigator">
             <Tabs value={tab} onChange={(e, value) => setTab(value)}>
-              <Tab value="local" label={`${t('Title:Local')} (${filteredItems?.files.length})`} />
-              <Tab value="component" label={`${t('Title:Components')} (${filteredItems?.components.length})`} />
+              <Tab value="local" label={`${t('Title:Local')} (${filteredItems?.files.flatMap(file => file.values || []).length})`} />
+              <Tab value="component" label={`${t('Title:Components')} (${filteredItems?.components.flatMap(c => c.values || []).length})`} />
             </Tabs>
           </nav>
           <form className="default-form">
@@ -230,8 +230,9 @@ const CryptographyReport = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredItems?.files.map((item, key) => (
-                  <TableRow key={key}>
+                {filteredItems?.files.map((item, itemIndex) => (
+                  item.values.map((algorithm, algIndex) => (
+                    <TableRow key={`${itemIndex}-${algIndex}`}>
                     <TableCell>
                       <Link href="#" underline="hover" color="inherit" onClick={(e) => onSelectFile(e, item.name)}>
                         {item.name}
@@ -239,11 +240,10 @@ const CryptographyReport = () => {
                     </TableCell>
                     <TableCell>{item.type}</TableCell>
                     <TableCell className="algorithms">
-                      {item.values.map((algorithm) => (
-                        <span className="tag"> {algorithm}</span>
-                      ))}
+                        <span key={algIndex} className="tag">{algorithm}</span>
                     </TableCell>
                   </TableRow>
+                ))
                 ))}
 
                 {(!filteredItems || filteredItems.files.length === 0) && (
@@ -269,16 +269,16 @@ const CryptographyReport = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredItems?.components.map((item, key) => (
-                  <TableRow key={key}>
+                {filteredItems?.components.map((item, itemIndex) => (
+                  item.values.map((algorithm, algIndex) => (
+                  <TableRow key={`${itemIndex}-${algIndex}`}>
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{item.type}</TableCell>
                     <TableCell className="algorithms">
-                      {item.values.map((algorithm) => (
-                        <span className="tag"> {algorithm}</span>
-                      ))}
+                      <span className="tag">{algorithm}</span>
                     </TableCell>
                   </TableRow>
+                ))
                 ))}
 
                 {(!filteredItems || filteredItems.components.length === 0) && (
