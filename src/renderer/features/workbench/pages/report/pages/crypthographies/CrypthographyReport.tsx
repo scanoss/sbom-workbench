@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { SourceType } from '@api/dto';
 import useSearchParams from '@hooks/useSearchParams';
 import { useNavigate } from 'react-router-dom';
-import { filterCryptoByAlgorithms, getAlgorithms, getTypes } from '@shared/adapters/report.adapter';
+import { filterCryptoByAlgorithms, getDetections, getTypes } from '@shared/adapters/report.adapter';
 
 // icons
 import SearchIcon from '@mui/icons-material/Search';
@@ -47,7 +47,7 @@ const CryptographyReport = () => {
 
   const [filteredItems, setFilteredItems] = useState<CryptographyResponseDTO>(null);
   const [filter, setFilter] = useState<ICryptographyFilter>(null);
-  const [algorithms, setAlgorithms] = useState<Array<string>>([]);
+  const [detections, setDetections] = useState<Array<string>>([]);
   const [types, setTypes] = useState<Array<string>>([]);
 
   const [tab, setTab] = useState<string>('local');
@@ -56,8 +56,8 @@ const CryptographyReport = () => {
     const source = type === SourceType.identified ? SourceType.identified : SourceType.detected;
     const response: CryptographyResponseDTO = await cryptographyService.getAll({ type: source });
     setFilteredItems(response);
-    setAlgorithms(getAlgorithms(response));
-    setTypes(getTypes(response));
+    setDetections(getDetections(response.summary.files.typeDetection));
+    setTypes(getTypes(response.summary.files.typeDetection));
     data.current = response;
   };
 
@@ -105,6 +105,32 @@ const CryptographyReport = () => {
     setFilteredItems(newItems);
   }, [filter]);
 
+  const handleTab = (value: string)=>  {
+    setTab(value);
+    if(value === 'local') {
+      setTypes(getTypes(data.current.summary.files.typeDetection));
+      setDetections(getDetections(data.current.summary.files.typeDetection));
+    } else {
+      setTypes(getTypes(data.current.summary.components.typeDetection));
+      setDetections(getDetections(data.current.summary.components.typeDetection));
+    }
+  }
+
+  const onTypeChange = (newFilter: ICryptographyFilter) => {
+    let detections = [];
+    if (tab === 'local') {
+      newFilter.types.forEach((i) => {
+        detections = [...detections, ...data.current.summary.files.typeDetection[i]]
+      })
+    } else {
+      newFilter.types.forEach((i) => {
+        detections = [...detections, ...data.current.summary.components.typeDetection[i]]
+      })
+    }
+    setDetections(detections);
+    onFilterHandler(newFilter)
+  }
+
   // on mounted
   useEffect(() => {
     init();
@@ -127,7 +153,7 @@ const CryptographyReport = () => {
         </Box>
         <section className="subheader">
           <nav className="tabs-navigator">
-            <Tabs value={tab} onChange={(e, value) => setTab(value)}>
+            <Tabs value={tab} onChange={(e, value) => { handleTab(value) } }>
               <Tab value="local" label={`${t('Title:Local')} (${filteredItems?.files.flatMap(file => file.values || []).length})`} />
               <Tab value="component" label={`${t('Title:Components')} (${filteredItems?.components.flatMap(c => c.values || []).length})`} />
             </Tabs>
@@ -143,7 +169,7 @@ const CryptographyReport = () => {
                     multiple
                     forcePopupIcon
                     disableCloseOnSelect
-                    onChange={(e_, types) => onFilterHandler({ ...filter, types })}
+                    onChange={(e_, types) => onTypeChange({ ...filter, types }) }
                     renderOption={(props, option, { selected }) => (
                       <li {...props}>
                         <Checkbox style={{ marginRight: 8 }} checked={selected} size="small" />
@@ -180,7 +206,7 @@ const CryptographyReport = () => {
               <div className="form-group filter-algorithm">
                 <Paper>
                   <Autocomplete
-                    options={algorithms}
+                    options={detections}
                     size="small"
                     disablePortal
                     multiple
@@ -250,7 +276,7 @@ const CryptographyReport = () => {
                       </Link>
                     </TableCell>
                     <TableCell>{item.type}</TableCell>
-                    <TableCell className="algorithms">
+                    <TableCell className="detections">
                         <span key={algIndex} className="tag">{algorithm}</span>
                     </TableCell>
                   </TableRow>
@@ -291,7 +317,7 @@ const CryptographyReport = () => {
                   <TableRow key={`${itemIndex}-${algIndex}`}>
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{item.type}</TableCell>
-                    <TableCell className="algorithms">
+                    <TableCell className="detections">
                       <span className="tag">{algorithm}</span>
                     </TableCell>
                   </TableRow>
@@ -300,7 +326,7 @@ const CryptographyReport = () => {
 
                 {(!filteredItems || filteredItems.components.length === 0) && (
                   <TableRow>
-                    <TableCell colSpan={2} align="center" className="pt-4 pb-4">
+                    <TableCell colSpan={3} align="center" className="pt-4 pb-4">
                       {!filteredItems ? t('Loading') : t('NoDataFound')}
                     </TableCell>
                   </TableRow>

@@ -479,6 +479,32 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       (SELECT COUNT(algorithm) FROM algorithm_data) +
       (SELECT COUNT(type) FROM hint_data) as count;`;
 
+  SQL_GET_CRYPTOGRAPHY_IDENTIFIED_DETECTION_GROUP_BY_TYPE = `
+  WITH hints_types AS (
+      SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as detected
+      FROM cryptography  c, json_each(c.hints)
+      INNER JOIN component_versions cv ON cv.purl = c.purl and cv.version = c.version
+      INNER JOIN inventories i ON i.cvid = cv.id
+      WHERE json_valid(c.hints)
+    ),
+    hints_detection AS (
+      SELECT DISTINCT type, detected
+      FROM hints_types
+      GROUP BY type
+    ),
+    algorithms_detection AS (
+      SELECT DISTINCT  'algorithm' as type,   json_extract(value, '$.algorithm') as detected
+      FROM  cryptography  c, json_each(c.algorithms)
+      INNER JOIN component_versions cv ON cv.purl = c.purl and cv.version = c.version
+      INNER JOIN inventories i ON i.cvid = cv.id
+      WHERE json_valid(c.algorithms)
+    )
+    SELECT type, json_group_array(detected)  as detection  FROM algorithms_detection
+    GROUP BY type
+    UNION
+    SELECT type ,json_group_array(detected) as detection  FROM hints_detection
+    GROUP BY type;`;
+
   /** ************** Local Cryptography Queries **************** */
   SQL_GET_LOCAL_CRYPTOGRAPHY_ALL_GROUPED_BY_TYPE = `
    WITH
@@ -613,6 +639,27 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
         (SELECT COUNT(algorithm) FROM algorithm_data) +
         (SELECT COUNT(type) FROM hint_data) as count;`;
 
+  SQL_GET_LOCAL_CRYPTOGRAPHY_IDENTIFIED_DETECTION_GROUP_BY_TYPE = `
+  WITH hints_types AS (
+      SELECT DISTINCT json_extract(value, '$.category') as type, json_extract(value, '$.id') as detected
+      FROM local_cryptography c, json_each(c.hints)
+      INNER JOIN file_inventories fi ON fi.fileId = c.file_id
+      WHERE json_valid(c.hints)
+    ),
+    hints_detection AS (
+      SELECT DISTINCT type, detected
+      FROM hints_types
+    ),
+    algorithms_detection AS (
+      SELECT 'algorithm' as type, json_extract(value, '$.algorithm') as detected
+      FROM  local_cryptography c, json_each(c.algorithms)
+      INNER JOIN file_inventories fi ON fi.fileId = c.file_id
+      WHERE json_valid(c.algorithms)
+    )
+    SELECT type, json_group_array(detected) as detection  FROM algorithms_detection
+    UNION
+    SELECT type ,json_group_array(detected) as detection  FROM hints_detection;`;
+
   /** *************** END Local Cryptography Queries ************* */
 
   /** ************** Cryptography Shared Queries **************** */
@@ -681,7 +728,28 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       (SELECT COUNT(algorithm) FROM algorithm_data) +
       (SELECT COUNT(type) FROM hint_data) as count;`;
 
-  /** ************** END Cryptography Shared Queries **************** */
+  SQL_GET_DETECTED_DETECTION_GROUP_BY_TYPE = `
+   WITH hints_types AS (
+      SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as detected
+      FROM #TABLE c, json_each(c.hints)
+      WHERE json_valid(c.hints)
+    ),
+    hints_detection AS (
+      SELECT DISTINCT type, detected
+      FROM hints_types
+    ),
+    algorithms_detection AS (
+      SELECT DISTINCT 'algorithm' as type,   json_extract(value, '$.algorithm') as detected
+      FROM #TABLE c, json_each(c.algorithms)
+      WHERE json_valid(c.algorithms)
+    )
+    SELECT type, json_group_array(detected)  as detection  FROM algorithms_detection
+    GROUP BY type
+    UNION
+    SELECT type ,json_group_array(detected) as detection  FROM hints_detection
+    GROUP BY type;`;
+
+    /** ************** END Cryptography Shared Queries **************** */
 
   /** ******************************************************************
    *               END CRYPTOGRAPHY QUERIES                            *

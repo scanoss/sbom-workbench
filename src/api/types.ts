@@ -412,10 +412,12 @@ export interface CryptographyResponseDTO {
     files: {
       type: Record<string, number>;
       crypto: Record<string, number>;
+      typeDetection: Record<string, Array<string>>;
     },
     components:{
       type: Record<string, number>;
       crypto: Record<string, number>;
+      typeDetection: Record<string, Array<string>>;
     }
   },
 }
