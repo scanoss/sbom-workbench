@@ -162,4 +162,34 @@ export class LocalCryptographyModel extends Model {
       return result;
     }, {});
   }
+
+  /**
+   * @brief Returns detected detections grouped by type.
+   * @returns {Record<string, Array<string>>}
+   * @example { algorithm:['md5'] }
+   */
+  public async getDetectedDetectionGroupedByType():Promise<Record<string, Array<string>>> {
+    const query = queries.SQL_GET_DETECTED_DETECTION_GROUP_BY_TYPE.replaceAll('#TABLE', this.tableName);
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const response = await call(query);
+    return response.reduce((result: Record<string, number>, item:{ type:string, detection: string }) => {
+      result[item.type] = JSON.parse(item.detection);
+      return result;
+    }, {});
+  }
+
+  /**
+   * @brief Returns detected detections grouped by type.
+   * @returns {Record<string, Array<string>>}
+   * @example { algorithm:['md5'] }
+   */
+  public async getIdentifiedDetectionGroupedByType():Promise<Record<string, Array<string>>> {
+    const query = queries.SQL_GET_LOCAL_CRYPTOGRAPHY_IDENTIFIED_DETECTION_GROUP_BY_TYPE;
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const response = await call(query);
+    return response.reduce((result: Record<string, number>, item:{ type:string, detection: string }) => {
+      result[item.type] = JSON.parse(item.detection);
+      return result;
+    }, {});
+  }
 }

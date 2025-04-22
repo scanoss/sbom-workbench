@@ -1,25 +1,19 @@
 import { CryptographyResponseDTO } from '@api/types';
 import { CryptoReportData } from './types';
-import { CryptoAlgorithm } from 'scanoss';
+import { CryptoAlgorithm, CryptographyData } from 'scanoss';
 import { CryptographicItem } from '../../main/model/entity/Cryptography';
 
-export const getAlgorithms = (data: CryptographyResponseDTO): Array<string> => {
+export const getDetections = (data: Record<string, Array<string>>): Array<string> => {
   const algorithms = new Set<string>();
-  for (const c of Object.keys(data.summary.components.crypto)) {
-    algorithms.add(c);
-  }
-  for (const c of Object.keys(data.summary.files.crypto)) {
-    algorithms.add(c);
+  for (const c of Object.values(data)) {
+    c.forEach((c) => {algorithms.add(c)})
   }
   return Array.from(algorithms.values());
 };
 
-export const getTypes = (data: CryptographyResponseDTO): Array<string> => {
+export const getTypes = (data: Record<string, Array<string>>): Array<string> => {
   const types = new Set<string>();
-  for (const t of Object.keys(data.summary.components.type)) {
-    types.add(t);
-  }
-  for (const t of Object.keys(data.summary.files.type)) {
+  for (const t of Object.keys(data)) {
     types.add(t);
   }
   return Array.from(types.values());

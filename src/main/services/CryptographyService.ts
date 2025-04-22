@@ -65,17 +65,24 @@ class CryptographyService {
       // Crypto summary for identified files(local) and components: i.e { md5: 2, openssl:1 }
       const localCryptoSummary = await modelProvider.model.localCryptography.getDetectedCryptoSummary();
       const componentCryptoSummary = await modelProvider.model.cryptography.getDetectedCryptoSummary();
+
+      // Get detection grouped by type { algorithm: ['MD5'] }
+      const localTypeDetection = await modelProvider.model.localCryptography.getDetectedDetectionGroupedByType();
+      const componentTypeDetection = await modelProvider.model.cryptography.getDetectedDetectionGroupedByType();
+
       return {
         files,
         components,
         summary: {
           files: {
             type: localTypeSummary,
-            crypto: localCryptoSummary, // TODO: Review the name
+            crypto: localCryptoSummary, // TODO: Rename to detection
+            typeDetection: localTypeDetection,
           },
           components: {
             type: componentTypeSummary,
-            crypto: componentCryptoSummary, // TODO: Review the name
+            crypto: componentCryptoSummary, // TODO: Rename to detection
+            typeDetection: componentTypeDetection,
           },
         },
       };
@@ -99,17 +106,23 @@ class CryptographyService {
       const fileCryptoSummary = await modelProvider.model.localCryptography.getIdentifiedCryptoSummary();
       const componentCryptoSummary = await modelProvider.model.cryptography.getIdentifiedCryptoSummary();
 
+      // Get detection grouped by type { algorithm: ['MD5'] }
+      const localTypeDetection = await modelProvider.model.localCryptography.getIdentifiedDetectionGroupedByType();
+      const componentTypeDetection = await modelProvider.model.cryptography.getIdentifiedDetectionGroupedByType();
+
       return {
         files,
         components,
         summary: {
           files: {
             type: fileTypeSummary,
-            crypto: fileCryptoSummary, // TODO: Review the name
+            crypto: fileCryptoSummary,
+            typeDetection: localTypeDetection,
           },
           components: {
             type: componentTypeSummary,
-            crypto: componentCryptoSummary, // TODO: Review the name
+            crypto: componentCryptoSummary,
+            typeDetection: componentTypeDetection,
           },
         },
       };

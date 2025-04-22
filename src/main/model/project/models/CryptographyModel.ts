@@ -176,6 +176,36 @@ export class CryptographyModel extends Model {
     }, {});
   }
 
+  /**
+   * @brief Returns detected detections grouped by type.
+   * @returns {Record<string, Array<string>>}
+   * @example { algorithm:['md5'] }
+   */
+  public async getDetectedDetectionGroupedByType():Promise<Record<string, Array<string>>> {
+    const query = queries.SQL_GET_DETECTED_DETECTION_GROUP_BY_TYPE.replaceAll('#TABLE', this.tableName);
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const response = await call(query);
+    return response.reduce((result: Record<string, number>, item:{ type:string, detection: string }) => {
+      result[item.type] = JSON.parse(item.detection);
+      return result;
+    }, {});
+  }
+
+  /**
+   * @brief Returns detected detections grouped by type.
+   * @returns {Record<string, Array<string>>}
+   * @example { algorithm:['md5'] }
+   */
+  public async getIdentifiedDetectionGroupedByType():Promise<Record<string, Array<string>>> {
+    const query = queries.SQL_GET_CRYPTOGRAPHY_IDENTIFIED_DETECTION_GROUP_BY_TYPE;
+    const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
+    const response = await call(query);
+    return response.reduce((result: Record<string, number>, item:{ type:string, detection: string }) => {
+      result[item.type] = JSON.parse(item.detection);
+      return result;
+    }, {});
+  }
+
   private cryptographyAdapter(cryptography: Array<{ purl: string, version: string, algorithms: string, hints:string }>): Array<Cryptography> {
     return cryptography.map((c) => ({ purl: c.purl, version: c.version, algorithms: JSON.parse(c.algorithms) as Algorithms[], hints: JSON.parse(c.hints) as Hint[] }));
   }
