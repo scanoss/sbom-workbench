@@ -9,7 +9,6 @@ import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import { forceUpdate, getReport } from '@store/report-store/reportThunks';
 import { selectReportState } from '@store/report-store/reportSlice';
 import { AppDispatch } from '@store/store';
-import { dialogController } from '../../../../../../controllers/dialog-controller';
 import IdentifiedReport from './IdentifiedReport';
 import DetectedReport from './DetectedReport';
 import { NavigationTabs } from './components/Navigation';

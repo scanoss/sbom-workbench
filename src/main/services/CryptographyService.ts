@@ -5,6 +5,7 @@ import { AddCryptographyTask } from '../task/cryptography/AddCryptographyTask';
 import { modelProvider } from './ModelProvider';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { SourceType } from '../../api/dto';
+import { LocalCryptographyTask } from '../task/scanner/cryptography/LocalCryptographyTask';
 
 class CryptographyService {
   public async importFromComponents(components: Array<NewComponentDTO>) {
@@ -25,31 +26,23 @@ class CryptographyService {
     return response;
   }
 
-  public async update() {
+  public async update():Promise<void> {
     try {
       const p = workspace.getOpenProject();
 
-      if (!p.getApiKey()) {
-        return {
-          identified: [],
-          detected: [],
-        };
-      }
+      if (!p.getApiKey()) return;
 
+      // Component Crypto
       const componentVersion = await modelProvider.model.component.getAll(null);
       const dependencyComponents = await modelProvider.model.dependency.getAll(null);
-
       const components = componentHelper.groupComponentByPurlVersion(componentVersion, dependencyComponents);
-
       const cryptographyTask = new AddCryptographyTask();
       await cryptographyTask.run({ components, token: p.getApiKey(), force: true });
 
-      const detected = await modelProvider.model.cryptography.findAllDetected();
-      const identified = await modelProvider.model.cryptography.findAllIdentifiedMatched();
-      return {
-        identified,
-        detected,
-      };
+      // Local Crypto
+      const localCrypto = new LocalCryptographyTask(p);
+      await localCrypto.run();
+
     } catch (e: any) {
       throw new Error(`Error updating cryptography: cause: ${e.message}`);
     }

@@ -30,13 +30,13 @@ export const ProgressDialog = (props: ProgressDialogProps) => {
         {loader ? <LinearProgress /> : <LinearProgress variant="determinate" color="secondary" value={100} />}
         <Box
           sx={{
-            marginTop: 12,
+            pt: 1.5,
             fontSize: '0.8rem',
             fontWeight: 500,
-            color: '#fff !important',
             textAlign: 'center',
           }}
           >
+          {message}
         </Box>
       </DialogContent>
     </Dialog>

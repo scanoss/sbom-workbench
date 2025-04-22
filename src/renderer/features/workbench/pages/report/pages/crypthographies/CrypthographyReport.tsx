@@ -228,7 +228,6 @@ const CryptographyReport = () => {
         {tab === 'local' && (
           <TableContainer
             style={{
-              minHeight: '300px',  // Set your desired height here
               overflow: 'auto',
               marginBottom: '50px',
             }}
