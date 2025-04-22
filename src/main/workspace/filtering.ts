@@ -36,7 +36,7 @@ export class NameFilter extends AbstractFilter {
   constructor(condition: string, value: string, scope: string) {
     super(condition, value);
     this.ftype = 'NAME';
-    this.scope = scope || super.scope;
+    this.scope = scope || 'ALL';
   }
 
   evaluate(path: string): boolean {
@@ -66,7 +66,7 @@ class ContentFilter extends AbstractFilter {
   constructor(condition: string, value: string, scope: string) {
     super(condition, value);
     this.ftype = 'CONTENT';
-    this.scope = scope || super.scope; // Verificar
+    this.scope = scope || 'ALL'; // Verificar
   }
 
   evaluate(path: string): boolean {
@@ -84,7 +84,7 @@ class ExtensionFilter extends AbstractFilter {
   constructor(condition: string, value: string, scope: string) {
     super(condition, value);
     this.ftype = 'EXTENSION';
-    this.scope = scope || super.scope; // Verificar
+    this.scope = scope || 'ALL'; // Verificar
   }
 
   evaluate(path: string): boolean {
@@ -98,7 +98,7 @@ class SizeFilter extends AbstractFilter {
   constructor(condition: string, value: string, scope: string) {
     super(condition, value);
     this.ftype = 'SIZE';
-    this.scope = scope || super.scope; // Verificar
+    this.scope = scope || 'ALL'; // Verificar
   }
 
   evaluate(path: string): boolean {
@@ -129,7 +129,7 @@ class DateFilter extends AbstractFilter {
   constructor(condition: string, value: string, scope: string) {
     super(condition, value);
     this.ftype = 'DATE';
-    this.scope = scope || super.scope; // Verificar
+    this.scope = scope || 'ALL'; // Verificar
   }
 
   evaluate(path: string): boolean {

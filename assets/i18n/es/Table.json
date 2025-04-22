@@ -22,7 +22,8 @@
     "File": "Fichero",
     "Dependencies ": "Dependencias",
     "Cryptography": "Criptografia",
-    "Type": "Tipo"
+    "Type": "Tipo",
+    "Detected": "Detectado"
   },
   "Version": "Versión",
   "License": "Licencia"

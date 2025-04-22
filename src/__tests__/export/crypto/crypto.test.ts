@@ -43,7 +43,7 @@ describe('Crypto export tests', () => {
 
     // Get and validate headers
     const headers = lines[0].split(',').map((header) => header.trim());
-    const expectedHeaders = ['source', 'type', 'value']; // Replace with your actual headers
+    const expectedHeaders = ['source', 'type', 'value'];
     expectedHeaders.forEach((header) => {
       expect(headers).toContain(header);
     });

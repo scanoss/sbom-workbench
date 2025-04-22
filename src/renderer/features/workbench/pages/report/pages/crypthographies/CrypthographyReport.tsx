@@ -205,7 +205,7 @@ const CryptographyReport = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        placeholder="Algorithms"
+                        placeholder="Detections"
                         InputProps={{
                           ...params.InputProps,
                           startAdornment: (
@@ -237,7 +237,7 @@ const CryptographyReport = () => {
                 <TableRow>
                   <TableCell>{t('Table:Header:File')}</TableCell>
                   <TableCell>{t('Table:Header:Type')}</TableCell>
-                  <TableCell>{t('Table:Header:Algorithm')}</TableCell>
+                  <TableCell>{t('Table:Header:Detected')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -281,8 +281,8 @@ const CryptographyReport = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>{t('Table:Header:Component')}</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell>{t('Table:Header:Algorithm')}</TableCell>
+                  <TableCell>{t('Table:Header:Type')}</TableCell>
+                  <TableCell>{t('Table:Header:Detected')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

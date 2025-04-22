@@ -22,7 +22,8 @@
     "File": "File",
     "Dependencies ": "Dependencies",
     "Cryptography": "Cryptography",
-    "Type": "Type"
+    "Type": "Type",
+    "Detected": "Detected"
   },
   "Version": "Version",
   "License": "License"

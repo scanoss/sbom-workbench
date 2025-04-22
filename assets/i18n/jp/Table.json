@@ -18,7 +18,8 @@
     "URL": "URL",
     "LocalFile": "ローカルファイル",
     "Algorithm": "Algorithm",
-    "Type": "Type"
+    "Type": "Type",
+    "Detected": "Detected"
   },
   "Version": "バージョン",
   "License": "ライセンス"
