@@ -17,7 +17,8 @@
     "PURL": "PURL",
     "URL": "URL",
     "Algorithm": "Algorithm",
-    "Type": "Type"
+    "Type": "Type",
+    "Detected": "Detected"
   },
   "Version": "版本",
   "License": "许可证"

@@ -13,7 +13,7 @@ export const CryptoChart = ({data}) =>{
   return (
     <>
       {data && Object.entries(data?.type || []).length > 0 ? (
-        <Box sx={{pt: 1, pb:1, mb:4, borderRadius:2, display: 'flex', flexDirection: 'row', alignItems:'flex-start',  justifyContent: 'space-around', backgroundColor: 'white'}}>
+        <Box sx={{pt:2.5, pb:1, mb:4, borderRadius:2, display: 'flex', flexDirection: 'row', alignItems:'flex-start',  justifyContent: 'space-around', backgroundColor: 'white'}}>
           <TypeDistributionChart title={'Type report'} data={data}></TypeDistributionChart>
           <CryptoAlgorithmsPieChart title={'Type report'} data={data}></CryptoAlgorithmsPieChart>
         </Box>
@@ -42,7 +42,6 @@ export const TypeDistributionChart = ({ data, title }) => {
 
   return (
     <div>
-      <Typography sx={{pt: 0.9, pb:1.3, fontWeight:'600'}} variant='h6' color='textPrimary'>Types</Typography>
       <BarChart
         width={455}
         height={270}
@@ -61,8 +60,6 @@ export const TypeDistributionChart = ({ data, title }) => {
     </div>
   );
 };
-
-
 
 export const CryptoAlgorithmsPieChart = ({ data, title }) => {
   // Transform the crypto data for the pie chart
@@ -84,7 +81,6 @@ export const CryptoAlgorithmsPieChart = ({ data, title }) => {
 
   return (
     <div>
-          <Typography sx={{pt: 0.9, pb:1.3, fontWeight:'600'}} variant='h6' color='textPrimary'>Algorithms</Typography>
           <PieChart
             width={550} height={270}
           >
