@@ -132,6 +132,8 @@ The structure of `scanoss-crypto-algorithm-rules.json` should be formatted as fo
  ]
 ``` 
 
+### Library Rules Structure
+
 The structure of `scanoss-crypto-library-rules.json` should be formatted as follows:
 ```json
 [
