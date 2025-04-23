@@ -3,7 +3,7 @@ import {
   BarChart, Bar,
   PieChart, Pie, Cell,
   XAxis, YAxis,
-  CartesianGrid, Tooltip
+  CartesianGrid, Tooltip, Legend, RadialBarChart, RadialBar, ResponsiveContainer
 } from 'recharts';
 import { Box, Typography } from '@mui/material';
 import { getColor } from '@shared/utils/utils';
@@ -13,7 +13,7 @@ export const CryptoChart = ({data}) =>{
   return (
     <>
       {data && Object.entries(data?.type || []).length > 0 ? (
-        <Box sx={{pt:2.5, pb:1, mb:4, borderRadius:2, display: 'flex', flexDirection: 'row', alignItems:'flex-start',  justifyContent: 'space-around', backgroundColor: 'white'}}>
+        <Box sx={{pt:2.5, pb:1, mb:4, borderRadius:2, overflow: 'hidden', height: 350 , display: 'flex', flexDirection: 'row', alignItems:'flex-end',  justifyContent: 'space-around', backgroundColor: 'white'}}>
           <TypeDistributionChart title={'Type report'} data={data}></TypeDistributionChart>
           <CryptoAlgorithmsPieChart title={'Type report'} data={data}></CryptoAlgorithmsPieChart>
         </Box>
@@ -41,11 +41,12 @@ export const TypeDistributionChart = ({ data, title }) => {
   }
 
   return (
-    <div>
+    <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
       <BarChart
-        width={455}
-        height={270}
+        width={500}
+        height={350}
         barGap={1}
+        barCategoryGap={2}
         cx='20%'
         data={typeData}>
 
@@ -55,17 +56,18 @@ export const TypeDistributionChart = ({ data, title }) => {
           allowDecimals={false}
         />
         <Tooltip />
-        <Bar dataKey="value" fill="#6366F1" barSize={40}/>
+        <Bar dataKey="value" fill="#6366F1" barSize={20}/>
       </BarChart>
-    </div>
+    </Box>
   );
 };
 
 export const CryptoAlgorithmsPieChart = ({ data, title }) => {
   // Transform the crypto data for the pie chart
   // Expecting data structure like: { crypto: { "md5": 1, "sha256": 3, ... } }
-  const cryptoData = Object.entries(data?.crypto || {}).map(([name, value]) => ({
+  const cryptoData = Object.entries(data?.crypto || {}).map(([name, value],index) => ({
     name,
+    fill: getColor(index),
     value
   }));
 
@@ -73,34 +75,30 @@ export const CryptoAlgorithmsPieChart = ({ data, title }) => {
     return <div>No cryptographic algorithm data available</div>;
   }
 
-  const COLORS = [
-    '#FF5733', '#C70039', '#900C3F', '#581845', '#2471A3',
-    '#1ABC9C', '#27AE60', '#F1C40F', '#E67E22', '#7D3C98',
-    '#2E86C1', '#138D75', '#D4AC0D', '#A569BD', '#5D6D7E'
-  ];
+
 
   return (
-    <div>
-          <PieChart
-            width={550} height={270}
-          >
-            <Pie
-              data={cryptoData}
-              cx="50%"
-              cy="50%"
-              label={({ name, value }) => `${name} (${value})`}
-              outerRadius={100}
-              strokeWidth={0.5}
-              dataKey="value"
-            >
-              {cryptoData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={getColor(index)} />
-              ))}
-            </Pie>
-            <Tooltip formatter={(value, name) => [`${value}`, name]} />
-
-          </PieChart>
-    </div>
-  );
+    <ResponsiveContainer width="55%" height="100%">
+      <PieChart
+      >
+        <Pie
+          data={cryptoData}
+          cx="50%"
+          cy="50%"
+          outerRadius={100}
+          strokeWidth={0.5}
+          dataKey="value"
+        >
+          {cryptoData.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={getColor(index)} />
+          ))}
+        </Pie>
+        <Tooltip formatter={(value, name) => [`${value}`, name]} />
+        <Legend
+          layout='horizontal' verticalAlign='bottom' align="center"
+        />
+      </PieChart>
+    </ResponsiveContainer>
+  )
 };
 
