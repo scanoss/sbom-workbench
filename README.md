@@ -22,7 +22,7 @@ _Find prebuilt binaries for all platforms over at: [Software Transparency Founda
 
 ## Prerequisites
 
-- Node.js v14+
+- Node.js >=v22.12.0
 - NPM (Node Packages Manager)
 
 We strongly recommend handling your node versions using [nvm](https://github.com/nvm-sh/nvm)
