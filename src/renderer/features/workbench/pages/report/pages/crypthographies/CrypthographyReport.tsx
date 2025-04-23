@@ -127,8 +127,16 @@ const CryptographyReport = () => {
         detections = [...detections, ...data.current.summary.components.typeDetection[i]]
       })
     }
+    const validAlgorithms = newFilter?.algorithm?.filter(algo => detections.includes(algo));
+    // Create updated filter with valid algorithms only
+    const updatedFilter = {
+      ...newFilter,
+      algorithm: validAlgorithms
+    };
+
     setDetections(detections);
-    onFilterHandler(newFilter)
+    // Update the filter
+    onFilterHandler(updatedFilter);
   }
 
   // on mounted
@@ -154,8 +162,8 @@ const CryptographyReport = () => {
         <section className="subheader">
           <nav className="tabs-navigator">
             <Tabs value={tab} onChange={(e, value) => { handleTab(value) } }>
-              <Tab value="local" label={`${t('Title:Local')} (${filteredItems?.files.flatMap(file => file.values || []).length})`} />
-              <Tab value="component" label={`${t('Title:Components')} (${filteredItems?.components.flatMap(c => c.values || []).length})`} />
+              <Tab value="local" label={`${t('Title:Local')} (${filteredItems?.files?.flatMap(file => file.values || []).length})`} />
+              <Tab value="component" label={`${t('Title:Components')} (${filteredItems?.components?.flatMap(c => c.values || []).length})`} />
             </Tabs>
           </nav>
           <form className="default-form">
@@ -206,6 +214,8 @@ const CryptographyReport = () => {
               <div className="form-group filter-algorithm">
                 <Paper>
                   <Autocomplete
+                    key={detections.join('-')}
+                    value={filter?.algorithm?.filter(algo => detections.includes(algo))}
                     options={detections}
                     size="small"
                     disablePortal
