@@ -22,7 +22,7 @@ jobs:
       - name: Install Node and NPM
         uses: actions/setup-node@v3
         with:
-          node-version: 22.15.0
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
