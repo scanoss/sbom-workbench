@@ -1,9 +1,11 @@
 #CryptographyReportPage {
   display: grid;
-  overflow-y: scroll;
+
 
   .app-header {
     padding-bottom: 10px;
+    position: unset;
+    z-index: 10;
 
     .subheader {
       display: flex;
