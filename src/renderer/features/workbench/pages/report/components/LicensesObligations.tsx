@@ -32,7 +32,6 @@ const LicensesObligations = ({ data }) => {
           minWidth: 400,
           '& .MuiTableHead-root .MuiTableCell-root': {
             backgroundColor: 'transparent !important',
-            padding: 8,
           },
         }}
       >

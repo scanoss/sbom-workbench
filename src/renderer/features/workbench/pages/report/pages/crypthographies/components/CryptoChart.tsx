@@ -9,11 +9,11 @@ import { Box, Typography } from '@mui/material';
 import { getColor } from '@shared/utils/utils';
 
 
-export const CryptoChart = ({data}) =>{
+export const CryptoChart = ({data}) => {
   return (
     <>
       {data && Object.entries(data?.type || []).length > 0 ? (
-        <Box sx={{pt:2.5, pb:1, mb:4, borderRadius:2, overflow: 'hidden', height: 350 , display: 'flex', flexDirection: 'row', alignItems:'flex-end',  justifyContent: 'space-around', backgroundColor: 'white'}}>
+        <Box sx={{pt:2.5, pb:1, mb:4, borderRadius:2, overflow: 'hidden', height: 360 , display: 'flex', flexDirection: 'row', alignItems:'flex-end',  justifyContent: 'space-around', backgroundColor: 'white'}}>
           <TypeDistributionChart title={'Type report'} data={data}></TypeDistributionChart>
           <CryptoAlgorithmsPieChart title={'Type report'} data={data}></CryptoAlgorithmsPieChart>
         </Box>
@@ -74,8 +74,6 @@ export const CryptoAlgorithmsPieChart = ({ data, title }) => {
   if (cryptoData.length === 0) {
     return <div>No cryptographic algorithm data available</div>;
   }
-
-
 
   return (
     <ResponsiveContainer width="55%" height="100%">
