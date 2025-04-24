@@ -14,10 +14,25 @@ jobs:
   build_w:
     name: "Build for Windows"
     runs-on: windows-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v3
+
+      - name: Get crypto rules
+        uses: actions/checkout@v3
+        with:
+          repository: scanoss/platform-deployment
+          path: platform-deployment
+          token: ${{ secrets.SC_GH_TAG_TOKEN }}
+          ref: main
+
+      - name: Copy crypto rules
+        shell: bash
+        run: |
+          cp platform-deployment/datasets/cryptography/scanoss-crypto-libraries.json  assets/data/scanoss-crypto-library-rules.json
 
       - name: Install Node and NPM
         uses: actions/setup-node@v3
@@ -95,6 +110,19 @@ jobs:
       - name: Checkout git repo
         uses: actions/checkout@v3
 
+      - name: Get crypto rules
+        uses: actions/checkout@v3
+        with:
+          repository: scanoss/platform-deployment
+          path: platform-deployment
+          token: ${{ secrets.SC_GH_TAG_TOKEN }}
+          ref: main
+
+      - name: Copy crypto rules
+        shell: bash
+        run: |
+          cp platform-deployment/datasets/cryptography/scanoss-crypto-libraries.json  assets/data/scanoss-crypto-library-rules.json
+
       - name: Install Node and NPM
         uses: actions/setup-node@v3
         with:
@@ -134,6 +162,20 @@ jobs:
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v3
+
+      - name: Get crypto rules
+        uses: actions/checkout@v3
+        with:
+          repository: scanoss/platform-deployment
+          path: platform-deployment
+          token: ${{ secrets.SC_GH_TAG_TOKEN }}
+          ref: main
+
+      - name: Copy crypto rules
+        shell: bash
+        run: |
+          mkdir -p assets/data
+          cp platform-deployment/datasets/cryptography/scanoss-crypto-libraries.json assets/data/scanoss-crypto-library-rules.json
 
       - name: Install Node and NPM
         uses: actions/setup-node@v3
