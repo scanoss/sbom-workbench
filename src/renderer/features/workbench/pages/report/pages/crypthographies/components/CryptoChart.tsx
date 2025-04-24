@@ -13,9 +13,9 @@ export const CryptoChart = ({data}) => {
   return (
     <>
       {data && Object.entries(data?.type || []).length > 0 ? (
-        <Box sx={{pt:2.5, pb:1, mb:4, borderRadius:2, overflow: 'hidden', height: 360 , display: 'flex', flexDirection: 'row', alignItems:'flex-end',  justifyContent: 'space-around', backgroundColor: 'white'}}>
-          <TypeDistributionChart title={'Type report'} data={data}></TypeDistributionChart>
-          <CryptoAlgorithmsPieChart title={'Type report'} data={data}></CryptoAlgorithmsPieChart>
+        <Box sx={{pt:2.5, pb:1, mb:4, borderRadius:2, height:350, overflow: 'scroll' , display: 'flex', flexDirection: 'row', alignItems:'flex-end',  justifyContent: 'space-around', backgroundColor: 'white'}}>
+            <TypeDistributionChart title={'Type report'} data={data}></TypeDistributionChart>
+            <CryptoAlgorithmsPieChart title={'Type report'} data={data}></CryptoAlgorithmsPieChart>
         </Box>
       ) : (
         <Box sx={{pt: 1.5, pb:1.5, mb:4, borderRadius:2, display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
@@ -41,10 +41,8 @@ export const TypeDistributionChart = ({ data, title }) => {
   }
 
   return (
-    <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+    <ResponsiveContainer width="45%" height="100%">
       <BarChart
-        width={500}
-        height={350}
         barGap={1}
         barCategoryGap={2}
         cx='20%'
@@ -58,7 +56,7 @@ export const TypeDistributionChart = ({ data, title }) => {
         <Tooltip />
         <Bar dataKey="value" fill="#6366F1" barSize={20}/>
       </BarChart>
-    </Box>
+    </ResponsiveContainer>
   );
 };
 
@@ -76,7 +74,7 @@ export const CryptoAlgorithmsPieChart = ({ data, title }) => {
   }
 
   return (
-    <ResponsiveContainer width="55%" height="100%">
+    <ResponsiveContainer width="50%" height="100%">
       <PieChart
       >
         <Pie
@@ -92,9 +90,14 @@ export const CryptoAlgorithmsPieChart = ({ data, title }) => {
           ))}
         </Pie>
         <Tooltip formatter={(value, name) => [`${value}`, name]} />
-        <Legend
-          layout='horizontal' verticalAlign='bottom' align="center"
+        <Legend  layout='horizontal' verticalAlign='bottom' align="center"
+         wrapperStyle={{
+           maxHeight: '100px',
+           overflow: 'auto',
+           paddingBottom: '10px'
+         }}
         />
+
       </PieChart>
     </ResponsiveContainer>
   )
