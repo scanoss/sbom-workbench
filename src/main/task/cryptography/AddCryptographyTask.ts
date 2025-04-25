@@ -1,6 +1,6 @@
 import log from 'electron-log';
 import {
-  PurlRequest, CryptographyResponse, CryptographyScanner, CryptoCfg,
+  PurlRequest, CryptographyScanner, CryptoCfg,
 } from 'scanoss';
 import { ITask } from '../Task';
 import { modelProvider } from '../../services/ModelProvider';
@@ -13,7 +13,7 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
   private generateRequests(reqData: Array<string>): Array<PurlRequest> {
     const chunks = [];
     for (let i = 0; i < reqData.length; i += AppConfigDefault.DEFAULT_SERVICE_CHUNK_LIMIT) {
-      chunks.push(reqData.slice(i, i + 10));
+      chunks.push(reqData.slice(i, i + AppConfigDefault.DEFAULT_SERVICE_CHUNK_LIMIT));
     }
     const requests = [];
     chunks.forEach((components: Array<string>) => {
@@ -37,27 +37,24 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
     });
     const cryptoScanner = new CryptographyScanner(cryptoCfg);
     const requests = this.generateRequests(components);
-
     const promises = requests.map(async (req: any) => {
       try {
-        return await cryptoScanner.scanComponents(req);
+        const r = await cryptoScanner.scanComponents(req);
+        return r;
       } catch (err) {
         log.error('Error:', err);
         return null;
       }
     });
     const results = await Promise.all(promises);
-    let cryptography: Array<CryptographyResponse> = [];
-    results.forEach((c) => {
-      cryptography = [...c.flat()];
-    });
-    return cryptography;
+    return results.flat().map(c => c);
   }
 
   public async run(params: ICryptographyTask): Promise<void> {
     try {
       const { GRPC_PROXY } = userSettingService.get();
       const cryptography = await this.getCryptography(params.components, params.token, GRPC_PROXY);
+
       // Delete all cryptography if force flag is set
       if (params.force) await modelProvider.model.cryptography.deleteAll();
       // Import Crypto into Database
